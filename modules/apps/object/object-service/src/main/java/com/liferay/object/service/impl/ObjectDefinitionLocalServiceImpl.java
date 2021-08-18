@@ -33,6 +33,7 @@ import com.liferay.object.service.base.ObjectDefinitionLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectEntryPersistence;
 import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
+import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
@@ -49,6 +50,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Validator;
@@ -525,6 +527,14 @@ public class ObjectDefinitionLocalServiceImpl
 				dbTableName = StringBundler.concat(
 					"O_", user.getCompanyId(), StringPool.UNDERLINE, shortName);
 			}
+		}
+
+		if (MapUtil.isEmpty(labelMap)) {
+			labelMap = LocalizedMapUtil.getLocalizedMap(name);
+		}
+
+		if (MapUtil.isEmpty(pluralLabelMap)) {
+			pluralLabelMap = LocalizedMapUtil.getLocalizedMap(name);
 		}
 
 		if (Validator.isNull(pkObjectFieldName)) {
