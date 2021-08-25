@@ -18,6 +18,7 @@ import com.liferay.dynamic.data.mapping.exception.StorageException;
 import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceSettings;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
@@ -145,6 +146,7 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 				new ObjectEntry() {
 					{
 						properties = _getObjectEntryProperties(
+							ddmForm.getDDMFormFieldsReferencesMap(true),
 							ddmFormValues.getDDMFormFieldValues(),
 							_objectFieldLocalService.getObjectFields(
 								objectDefinitionId));
@@ -178,7 +180,10 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 			value.addString(locale, new String((byte[])objectFieldValue));
 		}
 		else {
-			value.addString(locale, String.valueOf(objectFieldValue));
+			value.addString(
+				locale,
+				_getOptionReferenceKey(
+					ddmFormField, String.valueOf(objectFieldValue)));
 		}
 
 		return value;
@@ -276,6 +281,7 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 	}
 
 	private Map<String, Object> _getObjectEntryProperties(
+			Map<String, DDMFormField> ddmFormFieldsMap,
 			List<DDMFormFieldValue> ddmFormFieldValues,
 			List<ObjectField> objectFields)
 		throws ParseException {
@@ -294,23 +300,15 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 
 				properties.putAll(
 					_getObjectEntryProperties(
+						ddmFormFieldsMap,
 						ddmFormFieldValue.getNestedDDMFormFieldValues(),
 						objectFields));
 			}
 			else {
-				String objectFieldName = _getObjectFieldName(
-					ddmFormFieldValue.getDDMFormField());
-
-				Value value = ddmFormFieldValue.getValue();
-
-				Map<Locale, String> values = value.getValues();
-
-				properties.put(
-					objectFieldName,
-					_getValue(
-						value.getDefaultLocale(),
-						objectFieldTypes.get(objectFieldName),
-						values.get(value.getDefaultLocale())));
+				_getOptionReferenceValue(
+					ddmFormFieldValue, ddmFormFieldsMap, properties,
+					_getObjectFieldName(ddmFormFieldValue.getDDMFormField()),
+					objectFieldTypes);
 			}
 		}
 
@@ -330,6 +328,133 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 			}
 
 			return StringPool.BLANK;
+		}
+	}
+
+	private String _getOptionReferenceKey(
+		DDMFormField ddmFormField, String objectFieldValue) {
+
+		DDMFormFieldOptions ddmFormFieldOptions =
+			(DDMFormFieldOptions)ddmFormField.getProperty("options");
+
+		Map<String, String> optionsReferences =
+			ddmFormFieldOptions.getOptionsReferences();
+
+		objectFieldValue = objectFieldValue.replaceAll("\\[|\\]|\"", "");
+
+		if (StringUtil.equals(
+				ddmFormField.getType(),
+				DDMFormFieldTypeConstants.CHECKBOX_MULTIPLE) ||
+			StringUtil.equals(
+				ddmFormField.getType(), DDMFormFieldTypeConstants.SELECT)) {
+
+			StringBuilder optionReference = new StringBuilder();
+
+			optionReference.append("[\"");
+
+			for (Map.Entry<String, String> entry :
+					optionsReferences.entrySet()) {
+
+				if (StringUtil.contains(objectFieldValue, entry.getValue())) {
+					optionReference.append(entry.getKey());
+					optionReference.append("\",\"");
+				}
+			}
+
+			optionReference = new StringBuilder(
+				optionReference.substring(0, optionReference.length() - 3));
+
+			optionReference.append("\"]");
+
+			return optionReference.toString();
+		}
+		else if (StringUtil.equals(
+					ddmFormField.getType(), DDMFormFieldTypeConstants.RADIO)) {
+
+			String optionReferenceKey = "";
+
+			for (Map.Entry<String, String> entry :
+					optionsReferences.entrySet()) {
+
+				if (StringUtil.equals(objectFieldValue, entry.getValue())) {
+					optionReferenceKey = entry.getKey();
+				}
+			}
+
+			return optionReferenceKey;
+		}
+		else {
+			return objectFieldValue;
+		}
+	}
+
+	private void _getOptionReferenceValue(
+			DDMFormFieldValue ddmFormFieldValue,
+			Map<String, DDMFormField> ddmFormFieldsMap,
+			Map<String, Object> properties, String objectFieldName,
+			Map<String, String> objectFieldTypes)
+		throws ParseException {
+
+		DDMFormField ddmFormField = ddmFormFieldsMap.get(
+			ddmFormFieldValue.getName());
+
+		DDMFormFieldOptions ddmFormFieldOptions =
+			(DDMFormFieldOptions)ddmFormField.getProperty("options");
+
+		Value value = ddmFormFieldValue.getValue();
+
+		String optionValue = value.getString(value.getDefaultLocale());
+
+		optionValue = optionValue.replaceAll("\\[|\\]|\"", "");
+
+		if (StringUtil.equals(
+				ddmFormFieldValue.getType(),
+				DDMFormFieldTypeConstants.CHECKBOX_MULTIPLE) ||
+			StringUtil.equals(
+				ddmFormFieldValue.getType(),
+				DDMFormFieldTypeConstants.SELECT)) {
+
+			Map<String, String> optionsReferences =
+				ddmFormFieldOptions.getOptionsReferences();
+
+			StringBuilder optionReference = new StringBuilder();
+
+			optionReference.append("[\"");
+
+			for (Map.Entry<String, String> entry :
+					optionsReferences.entrySet()) {
+
+				if (StringUtil.contains(optionValue, entry.getKey())) {
+					optionReference.append(entry.getValue());
+					optionReference.append("\",\"");
+				}
+			}
+
+			optionReference = new StringBuilder(
+				optionReference.substring(0, optionReference.length() - 3));
+
+			optionReference.append("\"]");
+
+			properties.put(objectFieldName, optionReference);
+		}
+		else if (StringUtil.equals(
+					ddmFormFieldValue.getType(),
+					DDMFormFieldTypeConstants.RADIO)) {
+
+			String optionReference = ddmFormFieldOptions.getOptionReference(
+				optionValue);
+
+			properties.put(objectFieldName, optionReference);
+		}
+		else {
+			Map<Locale, String> values = value.getValues();
+
+			properties.put(
+				objectFieldName,
+				_getValue(
+					value.getDefaultLocale(),
+					objectFieldTypes.get(objectFieldName),
+					values.get(value.getDefaultLocale())));
 		}
 	}
 
