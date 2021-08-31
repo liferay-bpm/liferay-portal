@@ -15,8 +15,12 @@
 package com.liferay.object.internal.deployer;
 
 import com.liferay.info.collection.provider.InfoCollectionProvider;
+import com.liferay.item.selector.ItemSelectorView;
+import com.liferay.item.selector.ItemSelectorViewDescriptorRenderer;
+import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
 import com.liferay.object.internal.info.collection.provider.ObjectEntrySingleFormVariationInfoCollectionProvider;
+import com.liferay.object.internal.item.selector.ObjectEntryItemSelectorView;
 import com.liferay.object.internal.search.spi.model.index.contributor.ObjectEntryModelDocumentContributor;
 import com.liferay.object.internal.search.spi.model.index.contributor.ObjectEntryModelIndexerWriterContributor;
 import com.liferay.object.internal.search.spi.model.query.contributor.ObjectEntryKeywordQueryContributor;
@@ -26,6 +30,7 @@ import com.liferay.object.internal.security.permission.resource.ObjectEntryPortl
 import com.liferay.object.internal.workflow.ObjectEntryWorkflowHandler;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.petra.reflect.ReflectionUtil;
@@ -39,6 +44,7 @@ import com.liferay.portal.kernel.security.permission.resource.PortletResourcePer
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermissionFactory;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
@@ -65,26 +71,33 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		BundleContext bundleContext, DestinationFactory destinationFactory,
 		DynamicQueryBatchIndexingActionableFactory
 			dynamicQueryBatchIndexingActionableFactory,
+		ItemSelectorViewDescriptorRenderer<InfoItemItemSelectorCriterion>
+			itemSelectorViewDescriptorRenderer,
 		MessageBus messageBus,
 		ModelSearchRegistrarHelper modelSearchRegistrarHelper,
+		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectEntryLocalService objectEntryLocalService,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectScopeProviderRegistry objectScopeProviderRegistry,
 		PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry,
-		ResourceActions resourceActions,
+		Portal portal, ResourceActions resourceActions,
 		ModelPreFilterContributor workflowStatusModelPreFilterContributor) {
 
 		_bundleContext = bundleContext;
 		_destinationFactory = destinationFactory;
 		_dynamicQueryBatchIndexingActionableFactory =
 			dynamicQueryBatchIndexingActionableFactory;
+		_itemSelectorViewDescriptorRenderer =
+			itemSelectorViewDescriptorRenderer;
 		_messageBus = messageBus;
 		_modelSearchRegistrarHelper = modelSearchRegistrarHelper;
+		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryLocalService = objectEntryLocalService;
 		_objectFieldLocalService = objectFieldLocalService;
 		_objectScopeProviderRegistry = objectScopeProviderRegistry;
 		_persistedModelLocalServiceRegistry =
 			persistedModelLocalServiceRegistry;
+		_portal = portal;
 		_resourceActions = resourceActions;
 		_workflowStatusModelPreFilterContributor =
 			workflowStatusModelPreFilterContributor;
@@ -128,6 +141,13 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				new ObjectEntrySingleFormVariationInfoCollectionProvider(
 					objectDefinition, _objectEntryLocalService,
 					_objectFieldLocalService, _objectScopeProviderRegistry),
+				null),
+			_bundleContext.registerService(
+				ItemSelectorView.class,
+				new ObjectEntryItemSelectorView(
+					_itemSelectorViewDescriptorRenderer, objectDefinition,
+					_objectDefinitionLocalService, _objectEntryLocalService,
+					_portal),
 				null),
 			_bundleContext.registerService(
 				KeywordQueryContributor.class,
@@ -225,13 +245,17 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	private final DestinationFactory _destinationFactory;
 	private final DynamicQueryBatchIndexingActionableFactory
 		_dynamicQueryBatchIndexingActionableFactory;
+	private final ItemSelectorViewDescriptorRenderer
+		<InfoItemItemSelectorCriterion> _itemSelectorViewDescriptorRenderer;
 	private final MessageBus _messageBus;
 	private final ModelSearchRegistrarHelper _modelSearchRegistrarHelper;
+	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectEntryLocalService _objectEntryLocalService;
 	private final ObjectFieldLocalService _objectFieldLocalService;
 	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 	private final PersistedModelLocalServiceRegistry
 		_persistedModelLocalServiceRegistry;
+	private final Portal _portal;
 	private final ResourceActions _resourceActions;
 	private final ModelPreFilterContributor
 		_workflowStatusModelPreFilterContributor;

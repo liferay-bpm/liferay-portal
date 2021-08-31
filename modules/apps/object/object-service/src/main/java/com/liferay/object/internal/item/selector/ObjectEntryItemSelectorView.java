@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.object.web.internal.item.selector;
+package com.liferay.object.internal.item.selector;
 
 import com.liferay.info.item.selector.InfoItemSelectorView;
 import com.liferay.item.selector.ItemSelectorReturnType;

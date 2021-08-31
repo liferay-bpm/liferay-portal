@@ -14,6 +14,8 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.item.selector.ItemSelectorViewDescriptorRenderer;
+import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
 import com.liferay.object.exception.DuplicateObjectDefinitionException;
 import com.liferay.object.exception.ObjectDefinitionLabelException;
@@ -53,6 +55,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Validator;
@@ -379,10 +382,11 @@ public class ObjectDefinitionLocalServiceImpl
 		_addingObjectDefinitionDeployer(
 			new ObjectDefinitionDeployerImpl(
 				_bundleContext, _destinationFactory,
-				_dynamicQueryBatchIndexingActionableFactory, _messageBus,
-				_modelSearchRegistrarHelper, _objectEntryLocalService,
+				_dynamicQueryBatchIndexingActionableFactory,
+				_itemSelectorViewDescriptorRenderer, _messageBus,
+				_modelSearchRegistrarHelper, this, _objectEntryLocalService,
 				_objectFieldLocalService, _objectScopeProviderRegistry,
-				_persistedModelLocalServiceRegistry, _resourceActions,
+				_persistedModelLocalServiceRegistry, _portal, _resourceActions,
 				_workflowStatusModelPreFilterContributor));
 
 		_objectDefinitionDeployerServiceTracker = new ServiceTracker<>(
@@ -891,6 +895,10 @@ public class ObjectDefinitionLocalServiceImpl
 		_dynamicQueryBatchIndexingActionableFactory;
 
 	@Reference
+	private ItemSelectorViewDescriptorRenderer<InfoItemItemSelectorCriterion>
+		_itemSelectorViewDescriptorRenderer;
+
+	@Reference
 	private MessageBus _messageBus;
 
 	@Reference
@@ -917,6 +925,9 @@ public class ObjectDefinitionLocalServiceImpl
 	@Reference
 	private PersistedModelLocalServiceRegistry
 		_persistedModelLocalServiceRegistry;
+
+	@Reference
+	private Portal _portal;
 
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
