@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.io.IOException;
 
@@ -40,7 +39,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -50,19 +48,27 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Guilherme Camacho
  */
-@Component(
-	property = "item.selector.view.order:Integer=500",
-	service = ItemSelectorView.class
-)
 public class ObjectEntryItemSelectorView
 	implements InfoItemSelectorView,
 			   ItemSelectorView<InfoItemItemSelectorCriterion> {
+
+	public ObjectEntryItemSelectorView(
+		ItemSelectorViewDescriptorRenderer<InfoItemItemSelectorCriterion>
+			itemSelectorViewDescriptorRenderer,
+		ObjectDefinition objectDefinition,
+		ObjectDefinitionLocalService objectDefinitionLocalService,
+		ObjectEntryLocalService objectEntryLocalService, Portal portal) {
+
+		_itemSelectorViewDescriptorRenderer =
+			itemSelectorViewDescriptorRenderer;
+		_objectDefinition = objectDefinition;
+		_objectDefinitionLocalService = objectDefinitionLocalService;
+		_objectEntryLocalService = objectEntryLocalService;
+		_portal = portal;
+	}
 
 	@Override
 	public String getClassName() {
@@ -83,10 +89,7 @@ public class ObjectEntryItemSelectorView
 
 	@Override
 	public String getTitle(Locale locale) {
-		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-			locale, ObjectEntryItemSelectorView.class);
-
-		return ResourceBundleUtil.getString(resourceBundle, "objects");
+		return _objectDefinition.getName();
 	}
 
 	@Override
@@ -100,25 +103,20 @@ public class ObjectEntryItemSelectorView
 			servletRequest, servletResponse, infoItemItemSelectorCriterion,
 			portletURL, itemSelectedEventName, search,
 			new ObjectItemSelectorViewDescriptor(
-				(HttpServletRequest)servletRequest, portletURL));
+				(HttpServletRequest)servletRequest, _objectDefinition,
+				portletURL));
 	}
 
 	private static final List<ItemSelectorReturnType>
 		_supportedItemSelectorReturnTypes = Collections.singletonList(
 			new InfoItemItemSelectorReturnType());
 
-	@Reference
-	private ItemSelectorViewDescriptorRenderer<InfoItemItemSelectorCriterion>
-		_itemSelectorViewDescriptorRenderer;
-
-	@Reference
-	private ObjectDefinitionLocalService _objectDefinitionLocalService;
-
-	@Reference
-	private ObjectEntryLocalService _objectEntryLocalService;
-
-	@Reference
-	private Portal _portal;
+	private final ItemSelectorViewDescriptorRenderer
+		<InfoItemItemSelectorCriterion> _itemSelectorViewDescriptorRenderer;
+	private final ObjectDefinition _objectDefinition;
+	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
+	private final ObjectEntryLocalService _objectEntryLocalService;
+	private final Portal _portal;
 
 	private class ObjectEntryItemDescriptor
 		implements ItemSelectorViewDescriptor.ItemDescriptor {
@@ -203,9 +201,11 @@ public class ObjectEntryItemSelectorView
 		implements ItemSelectorViewDescriptor<ObjectEntry> {
 
 		public ObjectItemSelectorViewDescriptor(
-			HttpServletRequest httpServletRequest, PortletURL portletURL) {
+			HttpServletRequest httpServletRequest,
+			ObjectDefinition objectDefinition, PortletURL portletURL) {
 
 			_httpServletRequest = httpServletRequest;
+			_objectDefinition = objectDefinition;
 			_portletURL = portletURL;
 
 			_portletRequest = (PortletRequest)_httpServletRequest.getAttribute(
@@ -229,7 +229,9 @@ public class ObjectEntryItemSelectorView
 		}
 
 		@Override
-		public SearchContainer<ObjectEntry> getSearchContainer() {
+		public SearchContainer<ObjectEntry> getSearchContainer()
+			throws PortalException {
+
 			SearchContainer<ObjectEntry> searchContainer =
 				new SearchContainer<>(
 					_portletRequest, _portletURL, null,
@@ -237,6 +239,7 @@ public class ObjectEntryItemSelectorView
 
 			List<ObjectEntry> objectEntries =
 				_objectEntryLocalService.getObjectEntries(
+					_objectDefinition.getObjectDefinitionId(),
 					searchContainer.getStart(), searchContainer.getEnd());
 
 			searchContainer.setResults(objectEntries);
@@ -248,6 +251,7 @@ public class ObjectEntryItemSelectorView
 		}
 
 		private final HttpServletRequest _httpServletRequest;
+		private final ObjectDefinition _objectDefinition;
 		private final PortletRequest _portletRequest;
 		private final PortletURL _portletURL;
 
