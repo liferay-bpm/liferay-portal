@@ -159,7 +159,7 @@ public class ObjectEntrySingleFormVariationInfoCollectionProvider
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _objectDefinition.getName();
+		return _objectDefinition.getLabel(locale);
 	}
 
 	private SearchContext _buildSearchContext(CollectionQuery collectionQuery)

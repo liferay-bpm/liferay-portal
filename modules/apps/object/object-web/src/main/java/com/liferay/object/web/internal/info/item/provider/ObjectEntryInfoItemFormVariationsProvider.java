@@ -22,9 +22,12 @@ import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.Collection;
+import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -48,7 +51,7 @@ public class ObjectEntryInfoItemFormVariationsProvider
 			groupId, String.valueOf(objectDefinition.getObjectDefinitionId()),
 			InfoLocalizedValue.localize(
 				ObjectEntryInfoItemFormVariationsProvider.class,
-				objectDefinition.getName()));
+				objectDefinition.getLabel(_getLocale())));
 	}
 
 	@Override
@@ -63,7 +66,17 @@ public class ObjectEntryInfoItemFormVariationsProvider
 				String.valueOf(objectDefinition.getObjectDefinitionId()),
 				InfoLocalizedValue.localize(
 					ObjectEntryInfoItemFormVariationsProvider.class,
-					objectDefinition.getName())));
+					objectDefinition.getLabel(_getLocale()))));
+	}
+
+	private Locale _getLocale() {
+		Locale locale = LocaleThreadLocal.getThemeDisplayLocale();
+
+		if (locale == null) {
+			locale = LocaleUtil.getDefault();
+		}
+
+		return locale;
 	}
 
 	@Reference

@@ -36,6 +36,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
+import com.liferay.portal.kernel.util.LocaleUtil;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -170,6 +172,16 @@ public class ObjectEntryInfoItemFormProvider
 		).build();
 	}
 
+	private Locale _getLocale() {
+		Locale locale = LocaleThreadLocal.getThemeDisplayLocale();
+
+		if (locale == null) {
+			locale = LocaleUtil.getDefault();
+		}
+
+		return locale;
+	}
+
 	private InfoFieldSet _getObjectDefinitionInfoFieldSet(
 			long objectDefinitionId)
 		throws NoSuchFormVariationException {
@@ -212,9 +224,10 @@ public class ObjectEntryInfoItemFormProvider
 				}
 			}
 		).labelInfoLocalizedValue(
-			InfoLocalizedValue.singleValue(objectDefinition.getName())
+			InfoLocalizedValue.singleValue(
+				objectDefinition.getLabel(_getLocale()))
 		).name(
-			objectDefinition.getName()
+			objectDefinition.getLabel(_getLocale())
 		).build();
 	}
 
