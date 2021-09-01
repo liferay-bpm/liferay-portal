@@ -23,6 +23,8 @@ import com.liferay.item.selector.criteria.InfoItemItemSelectorReturnType;
 import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.scope.ObjectScopeProvider;
+import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.petra.string.StringBundler;
@@ -30,6 +32,8 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.Portal;
 
@@ -60,13 +64,16 @@ public class ObjectEntryItemSelectorView
 			itemSelectorViewDescriptorRenderer,
 		ObjectDefinition objectDefinition,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
-		ObjectEntryLocalService objectEntryLocalService, Portal portal) {
+		ObjectEntryLocalService objectEntryLocalService,
+		ObjectScopeProviderRegistry objectScopeProviderRegistry,
+		Portal portal) {
 
 		_itemSelectorViewDescriptorRenderer =
 			itemSelectorViewDescriptorRenderer;
 		_objectDefinition = objectDefinition;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryLocalService = objectEntryLocalService;
+		_objectScopeProviderRegistry = objectScopeProviderRegistry;
 		_portal = portal;
 	}
 
@@ -89,7 +96,7 @@ public class ObjectEntryItemSelectorView
 
 	@Override
 	public String getTitle(Locale locale) {
-		return _objectDefinition.getName();
+		return _objectDefinition.getLabel(locale);
 	}
 
 	@Override
@@ -104,7 +111,7 @@ public class ObjectEntryItemSelectorView
 			portletURL, itemSelectedEventName, search,
 			new ObjectItemSelectorViewDescriptor(
 				(HttpServletRequest)servletRequest, _objectDefinition,
-				portletURL));
+				_objectScopeProviderRegistry, portletURL));
 	}
 
 	private static final List<ItemSelectorReturnType>
@@ -116,6 +123,7 @@ public class ObjectEntryItemSelectorView
 	private final ObjectDefinition _objectDefinition;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectEntryLocalService _objectEntryLocalService;
+	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 	private final Portal _portal;
 
 	private class ObjectEntryItemDescriptor
@@ -202,10 +210,13 @@ public class ObjectEntryItemSelectorView
 
 		public ObjectItemSelectorViewDescriptor(
 			HttpServletRequest httpServletRequest,
-			ObjectDefinition objectDefinition, PortletURL portletURL) {
+			ObjectDefinition objectDefinition,
+			ObjectScopeProviderRegistry objectScopeProviderRegistry,
+			PortletURL portletURL) {
 
 			_httpServletRequest = httpServletRequest;
 			_objectDefinition = objectDefinition;
+			_objectScopeProviderRegistry = objectScopeProviderRegistry;
 			_portletURL = portletURL;
 
 			_portletRequest = (PortletRequest)_httpServletRequest.getAttribute(
@@ -239,7 +250,7 @@ public class ObjectEntryItemSelectorView
 
 			List<ObjectEntry> objectEntries =
 				_objectEntryLocalService.getObjectEntries(
-					_objectDefinition.getObjectDefinitionId(),
+					_getGroupId(), _objectDefinition.getObjectDefinitionId(),
 					searchContainer.getStart(), searchContainer.getEnd());
 
 			searchContainer.setResults(objectEntries);
@@ -250,8 +261,24 @@ public class ObjectEntryItemSelectorView
 			return searchContainer;
 		}
 
+		private long _getGroupId() throws PortalException {
+			ObjectScopeProvider objectScopeProvider =
+				_objectScopeProviderRegistry.getObjectScopeProvider(
+					_objectDefinition.getScope());
+
+			if (!objectScopeProvider.isGroupAware()) {
+				return 0;
+			}
+
+			ServiceContext serviceContext =
+				ServiceContextThreadLocal.getServiceContext();
+
+			return objectScopeProvider.getGroupId(serviceContext.getRequest());
+		}
+
 		private final HttpServletRequest _httpServletRequest;
 		private final ObjectDefinition _objectDefinition;
+		private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 		private final PortletRequest _portletRequest;
 		private final PortletURL _portletURL;
 

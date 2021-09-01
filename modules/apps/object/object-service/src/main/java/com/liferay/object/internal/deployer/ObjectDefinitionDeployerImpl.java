@@ -147,8 +147,10 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				new ObjectEntryItemSelectorView(
 					_itemSelectorViewDescriptorRenderer, objectDefinition,
 					_objectDefinitionLocalService, _objectEntryLocalService,
-					_portal),
-				null),
+					_objectScopeProviderRegistry, _portal),
+				HashMapDictionaryBuilder.<String, Object>put(
+					"item.selector.view.order", 500
+				).build()),
 			_bundleContext.registerService(
 				KeywordQueryContributor.class,
 				new ObjectEntryKeywordQueryContributor(
