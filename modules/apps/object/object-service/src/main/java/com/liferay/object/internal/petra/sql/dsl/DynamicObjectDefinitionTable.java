@@ -23,6 +23,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 
 import java.math.BigDecimal;
@@ -124,6 +125,7 @@ public class DynamicObjectDefinitionTable
 			sb.append(objectField.getDBColumnName());
 			sb.append(" ");
 			sb.append(_getDataType(objectField.getType()));
+			sb.append(" DEFAULT ");
 			sb.append(_getSQLColumnNull(objectField.getType()));
 		}
 
@@ -162,13 +164,26 @@ public class DynamicObjectDefinitionTable
 	}
 
 	private static String _getSQLColumnNull(String type) {
-		if (type.equals("BigDecimal") || type.equals("Date") ||
-			type.equals("Map") || type.equals("String")) {
-
-			return " null";
+		if (type.equals("BigDecimal")) {
+			return String.valueOf(BigDecimal.ZERO);
+		}
+		else if (type.equals("Boolean")) {
+			return String.valueOf(GetterUtil.DEFAULT_BOOLEAN);
+		}
+		else if (type.equals("Date")) {
+			return "null";
+		}
+		else if (type.equals("Double")) {
+			return String.valueOf(GetterUtil.DEFAULT_DOUBLE);
+		}
+		else if (type.equals("Integer")) {
+			return String.valueOf(GetterUtil.DEFAULT_INTEGER);
+		}
+		else if (type.equals("Long")) {
+			return String.valueOf(GetterUtil.DEFAULT_LONG);
 		}
 
-		return StringPool.BLANK;
+		return StringPool.DOUBLE_QUOTE;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
