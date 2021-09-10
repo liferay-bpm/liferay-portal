@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
@@ -141,6 +142,8 @@ public class ObjectEntryManagerImpl implements ObjectEntryManager {
 				Field.ENTRY_CLASS_PK),
 			searchContext -> {
 				searchContext.addVulcanAggregation(aggregation);
+				searchContext.setAttribute(
+					Field.STATUS, WorkflowConstants.STATUS_ANY);
 				searchContext.setAttribute(
 					"objectDefinitionId", objectDefinitionId);
 				searchContext.setCompanyId(companyId);
