@@ -674,7 +674,14 @@ public class DDMFormAdminDisplayContext {
 				ddmFormBuilderContextResponse.getContext()));
 	}
 
-	public List<NavigationItem> getFormBuilderNavigationItems() {
+	public List<NavigationItem> getFormBuilderNavigationItems()
+		throws PortalException {
+
+		DDMFormInstance formInstance = getDDMFormInstance();
+
+		String storageType =
+			(formInstance != null) ? formInstance.getStorageType() : "";
+
 		HttpServletRequest httpServletRequest =
 			ddmFormAdminRequestHelper.getRequest();
 
@@ -693,6 +700,7 @@ public class DDMFormAdminDisplayContext {
 					LanguageUtil.get(httpServletRequest, "rules"));
 			}
 		).add(
+			() -> !storageType.equals("object"),
 			navigationItem -> {
 				navigationItem.putData("action", "showReport");
 

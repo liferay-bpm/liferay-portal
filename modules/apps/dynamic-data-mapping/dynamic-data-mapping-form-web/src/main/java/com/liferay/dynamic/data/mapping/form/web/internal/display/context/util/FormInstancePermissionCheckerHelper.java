@@ -86,9 +86,18 @@ public class FormInstancePermissionCheckerHelper {
 	public boolean isShowViewEntriesIcon(DDMFormInstance formInstance)
 		throws PortalException {
 
-		return DDMFormInstancePermission.contains(
-			_formAdminRequestHelper.getPermissionChecker(), formInstance,
-			ActionKeys.VIEW);
+		String storageType =
+			(formInstance != null) ? formInstance.getStorageType() : "";
+
+		if (!storageType.equals("object") &&
+			DDMFormInstancePermission.contains(
+				_formAdminRequestHelper.getPermissionChecker(), formInstance,
+				ActionKeys.VIEW)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private final DDMFormAdminRequestHelper _formAdminRequestHelper;
