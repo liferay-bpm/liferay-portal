@@ -21,6 +21,7 @@ import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldUtil;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectDefinitionResource;
 import com.liferay.object.service.ObjectDefinitionService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.util.LanguageUtils;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -168,6 +169,8 @@ public class ObjectDefinitionResourceImpl
 				dateCreated = objectDefinition.getCreateDate();
 				dateModified = objectDefinition.getModifiedDate();
 				id = objectDefinition.getObjectDefinitionId();
+				label = LanguageUtils.getLanguageIdMap(
+					objectDefinition.getLabelMap());
 				name = objectDefinition.getShortName();
 				objectFields = transformToArray(
 					_objectFieldLocalService.getObjectFields(
