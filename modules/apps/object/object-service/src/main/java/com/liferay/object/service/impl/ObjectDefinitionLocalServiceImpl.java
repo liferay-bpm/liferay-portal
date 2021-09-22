@@ -43,6 +43,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.cluster.Clusterable;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -55,9 +56,12 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalRunMode;
@@ -76,6 +80,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -666,6 +672,26 @@ public class ObjectDefinitionLocalServiceImpl
 		runSQL(dynamicObjectDefinitionTable.getCreateTableSQL());
 	}
 
+	private void _deleteObjectEntriesWorkflowTasks(
+			ObjectDefinition objectDefinition, List<ObjectEntry> objectEntries)
+		throws PortalException {
+
+		Stream<ObjectEntry> stream = objectEntries.stream();
+
+		List<ObjectEntry> objectEntriesPending = stream.filter(
+			listTypeEntry -> listTypeEntry.getStatus() == 1
+		).collect(
+			Collectors.toList()
+		);
+
+		for (ObjectEntry objectEntry : objectEntriesPending) {
+			_workflowInstanceLinkLocalService.deleteWorkflowInstanceLink(
+				objectEntry.getCompanyId(), objectEntry.getCompanyId(),
+				objectDefinition.getClassName(),
+				objectEntry.getObjectEntryId());
+		}
+	}
+
 	private void _dropTable(String dbTableName) {
 		String sql = "drop table " + dbTableName;
 
@@ -779,13 +805,28 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setPluralLabelMap(pluralLabelMap);
 
 		if (objectDefinition.isApproved()) {
+			List<ObjectEntry> objectEntries =
+				_objectEntryLocalService.getObjectEntries(
+					0, objectDefinition.getObjectDefinitionId(),
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
 			if (!active && originalActive) {
+				_deleteObjectEntriesWorkflowTasks(
+					objectDefinition, objectEntries);
+
 				objectDefinitionLocalService.undeployObjectDefinition(
 					objectDefinition);
 			}
 			else if (active) {
 				objectDefinitionLocalService.deployObjectDefinition(
 					objectDefinition);
+
+				for (ObjectEntry objectEntry : objectEntries) {
+					_objectEntryLocalService.updateObjectEntry(
+						objectEntry.getUserId(), objectEntry.getObjectEntryId(),
+						objectEntry.getValues(),
+						ServiceContextThreadLocal.getServiceContext());
+				}
 			}
 
 			return objectDefinitionPersistence.update(objectDefinition);
@@ -946,6 +987,9 @@ public class ObjectDefinitionLocalServiceImpl
 	private BundleContext _bundleContext;
 
 	@Reference
+	private CompanyLocalService _companyLocalService;
+
+	@Reference
 	private DestinationFactory _destinationFactory;
 
 	@Reference
@@ -996,6 +1040,9 @@ public class ObjectDefinitionLocalServiceImpl
 
 	@Reference
 	private UserLocalService _userLocalService;
+
+	@Reference
+	private WorkflowInstanceLinkLocalService _workflowInstanceLinkLocalService;
 
 	@Reference(target = "(model.pre.filter.contributor.id=WorkflowStatus)")
 	private ModelPreFilterContributor _workflowStatusModelPreFilterContributor;
