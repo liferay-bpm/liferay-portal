@@ -108,7 +108,9 @@ ViewListTypeEntriesDisplayContext viewListTypeEntriesDisplayContext = (ViewListT
 			{}
 		);
 
-		if (!localizedNames[themeDisplay.getDefaultLanguageId()]) {
+		if (
+			!localizedNames[themeDisplay.getDefaultLanguageId().replace('_', '-')]
+		) {
 			Liferay.Util.openToast({
 				message: Liferay.Language.get('name-must-not-be-empty'),
 				type: 'danger',
