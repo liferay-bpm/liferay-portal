@@ -36,7 +36,7 @@ ListTypeEntry listTypeEntry = (ListTypeEntry)request.getAttribute(ObjectWebKeys.
 	<div class="modal-body">
 		<aui:model-context bean="<%= listTypeEntry %>" model="<%= ListTypeEntry.class %>" />
 
-		<aui:input name="name" value="<%= listTypeEntry.getName(themeDisplay.getLocale()) %>" />
+		<aui:input name="name" required="<%= true %>" value="<%= listTypeEntry.getName(themeDisplay.getLocale()) %>" />
 
 		<aui:input disabled="<%= true %>" name="key" required="<%= true %>" value="<%= listTypeEntry.getKey() %>" />
 	</div>
@@ -89,6 +89,16 @@ ListTypeEntry listTypeEntry = (ListTypeEntry)request.getAttribute(ObjectWebKeys.
 			},
 			{}
 		);
+
+		if (
+			!localizedNames[themeDisplay.getDefaultLanguageId().replace('_', '-')]
+		) {
+			Liferay.Util.openToast({
+				message: Liferay.Language.get('name-must-not-be-empty'),
+				type: 'danger',
+			});
+			return;
+		}
 
 		Liferay.Util.fetch(
 			'/o/headless-admin-list-type/v1.0/list-type-entries/<%= listTypeEntry.getListTypeEntryId() %>',
