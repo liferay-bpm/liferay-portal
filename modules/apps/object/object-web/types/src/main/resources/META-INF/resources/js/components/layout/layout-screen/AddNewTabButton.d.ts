@@ -12,5 +12,7 @@
  * details.
  */
 
+import React from 'react';
+
 declare const AddNewTabButton: () => JSX.Element;
 export default AddNewTabButton;
