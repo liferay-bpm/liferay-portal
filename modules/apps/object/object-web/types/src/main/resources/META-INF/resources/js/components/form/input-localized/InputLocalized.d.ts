@@ -13,14 +13,26 @@
  */
 
 import React from 'react';
-interface ITabTypeProps extends React.HTMLAttributes<HTMLElement> {
-	description: string;
+import './InputLocalized.scss';
+declare const InputLocalized: React.FC<IInputLocalizedProps>;
+interface IInputLocalizedProps {
+	className?: string;
 	disabled?: boolean;
-	disabledMessage?: string;
-	type: string;
+	error?: string;
+	id: string;
 	label: string;
-	onChangeType: (type: string) => void;
-	selected: string;
+	locales: TLocale[];
+	onTranslationsChange: (value: TTranslations) => void;
+	onSelectedLocaleChange: (value: TLocale) => void;
+	required?: boolean;
+	selectedLocale: TLocale;
+	translations: TTranslations;
 }
-declare const TabType: React.FC<ITabTypeProps>;
-export default TabType;
+declare type TTranslations = {
+	[key: string]: string;
+};
+declare type TLocale = {
+	label: string;
+	symbol: string;
+};
+export default InputLocalized;
