@@ -45,6 +45,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -112,7 +114,8 @@ public class ObjectEntryItemSelectorView
 			servletRequest, servletResponse, infoItemItemSelectorCriterion,
 			portletURL, itemSelectedEventName, search,
 			new ObjectItemSelectorViewDescriptor(
-				(HttpServletRequest)servletRequest, _objectDefinition,
+				(HttpServletRequest)servletRequest,
+				infoItemItemSelectorCriterion, _objectDefinition,
 				_objectScopeProviderRegistry, portletURL));
 	}
 
@@ -220,11 +223,13 @@ public class ObjectEntryItemSelectorView
 
 		public ObjectItemSelectorViewDescriptor(
 			HttpServletRequest httpServletRequest,
+			InfoItemItemSelectorCriterion infoItemItemSelectorCriterion,
 			ObjectDefinition objectDefinition,
 			ObjectScopeProviderRegistry objectScopeProviderRegistry,
 			PortletURL portletURL) {
 
 			_httpServletRequest = httpServletRequest;
+			_infoItemItemSelectorCriterion = infoItemItemSelectorCriterion;
 			_objectDefinition = objectDefinition;
 			_objectScopeProviderRegistry = objectScopeProviderRegistry;
 			_portletURL = portletURL;
@@ -263,6 +268,44 @@ public class ObjectEntryItemSelectorView
 					_getGroupId(), _objectDefinition.getObjectDefinitionId(),
 					searchContainer.getStart(), searchContainer.getEnd());
 
+			Stream<ObjectEntry> objectEntriesStream = objectEntries.stream();
+
+			List<ItemSelectorReturnType> desiredItemSelectorReturnTypes =
+				_infoItemItemSelectorCriterion.
+					getDesiredItemSelectorReturnTypes();
+
+			Stream<ItemSelectorReturnType>
+				desiredItemSelectorReturnTypesStream =
+					desiredItemSelectorReturnTypes.stream();
+
+			boolean isInfoItemItemSelectorReturnType =
+				desiredItemSelectorReturnTypesStream.anyMatch(
+					itemSelectorReturnType -> itemSelectorReturnType instanceof
+						InfoItemItemSelectorReturnType);
+
+			if (isInfoItemItemSelectorReturnType) {
+				objectEntries = objectEntriesStream.filter(
+					objectEntry -> objectEntry.isApproved()
+				).collect(
+					Collectors.toList()
+				);
+			}
+
+//			String keywords = ParamUtil.getString(
+//				_httpServletRequest, "keywords");
+//
+//			int status = isInfoItemItemSelectorReturnType ?
+//				WorkflowConstants.STATUS_APPROVED : WorkflowConstants.STATUS_ANY;
+//
+//			BaseModelSearchResult<ObjectEntry> baseModelSearchResult =
+//				_objectEntryLocalService.searchObjectEntries(
+//					_getGroupId(), _objectDefinition.getObjectDefinitionId(),
+//					keywords, searchContainer.getStart(),
+//					searchContainer.getEnd(), status);
+//
+//			List<ObjectEntry> objectEntries1 =
+//				baseModelSearchResult.getBaseModels();
+
 			searchContainer.setResults(objectEntries);
 
 			searchContainer.setTotal(
@@ -287,6 +330,8 @@ public class ObjectEntryItemSelectorView
 		}
 
 		private final HttpServletRequest _httpServletRequest;
+		private final InfoItemItemSelectorCriterion
+			_infoItemItemSelectorCriterion;
 		private final ObjectDefinition _objectDefinition;
 		private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 		private final PortletRequest _portletRequest;
