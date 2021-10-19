@@ -57,6 +57,7 @@ import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
 import com.liferay.object.web.internal.display.context.util.ObjectRequestHelper;
 import com.liferay.object.web.internal.item.selector.ObjectEntryItemSelectorReturnType;
+import com.liferay.object.web.internal.security.permission.resource.ObjectEntryPermission;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -68,6 +69,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -450,7 +452,8 @@ public class ObjectEntryDisplayContext {
 		return ddmForm;
 	}
 
-	private DDMFormField _getDDMFormField(ObjectField objectField) {
+	private DDMFormField _getDDMFormField(ObjectField objectField)
+		throws PortalException {
 
 		// TODO Store the type and the object field type in the database
 
@@ -472,6 +475,15 @@ public class ObjectEntryDisplayContext {
 		ddmFormField.setLabel(ddmFormFieldLabelLocalizedValue);
 
 		ddmFormField.setRequired(objectField.isRequired());
+
+		if (!ObjectEntryPermission.contains(
+				_objectDefinitionLocalService.getObjectDefinition(
+					objectField.getObjectDefinitionId()),
+				_objectEntry.getObjectEntryId(), _objectRequestHelper,
+				ActionKeys.UPDATE)) {
+
+			ddmFormField.setReadOnly(true);
+		}
 
 		if (Validator.isNotNull(objectField.getRelationshipType())) {
 			ObjectRelationship objectRelationship =
