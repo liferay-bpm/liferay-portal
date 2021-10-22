@@ -17,7 +17,7 @@ package com.liferay.object.service.impl;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.security.permission.resource.ObjectEntryPermission;
-import com.liferay.object.web.internal.display.context.util.ObjectRequestHelper;
+import com.liferay.object.util.ObjectRequestHelper;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 

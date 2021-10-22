@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.object.web.internal.display.context.util;
+package com.liferay.object.util;
 
 import com.liferay.portal.kernel.display.context.util.BaseRequestHelper;
 

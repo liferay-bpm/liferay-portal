@@ -34,7 +34,7 @@ import com.liferay.object.action.trigger.ObjectActionTriggerRegistry;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
-import com.liferay.object.web.internal.display.context.util.ObjectRequestHelper;
+import com.liferay.object.util.ObjectRequestHelper;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;

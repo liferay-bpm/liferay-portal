@@ -15,6 +15,7 @@
 package com.liferay.object.security.permission.resource;
 
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.util.ObjectRequestHelper;
 import com.liferay.portal.kernel.exception.PortalException;
 
 /**
@@ -23,8 +24,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 public interface ObjectEntryPermission {
 
 	public boolean contains(
-		ObjectDefinition objectDefinition, long objectEntryId,
-		ObjectRequestHelper objectRequestHelper, String actionId)
+			ObjectDefinition objectDefinition, long objectEntryId,
+			ObjectRequestHelper objectRequestHelper, String actionId)
 		throws PortalException;
 
 }
