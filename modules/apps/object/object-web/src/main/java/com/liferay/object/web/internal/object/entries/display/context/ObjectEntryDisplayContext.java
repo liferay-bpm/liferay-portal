@@ -49,13 +49,14 @@ import com.liferay.object.model.ObjectLayoutColumn;
 import com.liferay.object.model.ObjectLayoutRow;
 import com.liferay.object.model.ObjectLayoutTab;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.security.permission.resource.ObjectEntryPermission;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectLayoutLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.object.web.internal.constants.ObjectWebKeys;
 import com.liferay.object.util.ObjectRequestHelper;
+import com.liferay.object.web.internal.constants.ObjectWebKeys;
 import com.liferay.object.web.internal.item.selector.ObjectEntryItemSelectorReturnType;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -68,6 +69,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -99,6 +101,7 @@ public class ObjectEntryDisplayContext {
 		ItemSelector itemSelector,
 		ListTypeEntryLocalService listTypeEntryLocalService,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
+		ObjectEntryPermission objectEntryPermission,
 		ObjectEntryService objectEntryService,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectLayoutLocalService objectLayoutLocalService,
@@ -108,6 +111,7 @@ public class ObjectEntryDisplayContext {
 		_itemSelector = itemSelector;
 		_listTypeEntryLocalService = listTypeEntryLocalService;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
+		_objectEntryPermission = objectEntryPermission;
 		_objectEntryService = objectEntryService;
 		_objectFieldLocalService = objectFieldLocalService;
 		_objectLayoutLocalService = objectLayoutLocalService;
@@ -428,6 +432,15 @@ public class ObjectEntryDisplayContext {
 
 		ddmForm.addAvailableLocale(_objectRequestHelper.getLocale());
 
+		boolean readOnly = false;
+
+		if (_objectEntry != null) {
+			readOnly = !_objectEntryPermission.contains(
+				objectDefinition, _objectEntry.getObjectEntryId(),
+				_objectRequestHelper, ActionKeys.UPDATE);
+		}
+
+
 		List<ObjectField> objectFields =
 			_objectFieldLocalService.getObjectFields(
 				objectDefinition.getObjectDefinitionId());
@@ -438,7 +451,8 @@ public class ObjectEntryDisplayContext {
 					continue;
 				}
 
-				ddmForm.addDDMFormField(_getDDMFormField(objectField));
+				ddmForm.addDDMFormField(
+					_getDDMFormField(objectField, readOnly));
 			}
 		}
 		else {
@@ -450,7 +464,8 @@ public class ObjectEntryDisplayContext {
 		return ddmForm;
 	}
 
-	private DDMFormField _getDDMFormField(ObjectField objectField) {
+	private DDMFormField _getDDMFormField(
+		ObjectField objectField, boolean readOnly) {
 
 		// TODO Store the type and the object field type in the database
 
@@ -472,6 +487,8 @@ public class ObjectEntryDisplayContext {
 		ddmFormField.setLabel(ddmFormFieldLabelLocalizedValue);
 
 		ddmFormField.setRequired(objectField.isRequired());
+
+		ddmFormField.setReadOnly(readOnly);
 
 		if (Validator.isNotNull(objectField.getRelationshipType())) {
 			ObjectRelationship objectRelationship =
@@ -576,6 +593,14 @@ public class ObjectEntryDisplayContext {
 
 		List<DDMFormField> nestedDDMFormFields = new ArrayList<>();
 
+		boolean readOnly = false;
+
+		if (_objectEntry != null) {
+			readOnly = !_objectEntryPermission.contains(
+				getObjectDefinition(), _objectEntry.getObjectEntryId(),
+				_objectRequestHelper, ActionKeys.UPDATE);
+		}
+
 		for (ObjectLayoutRow objectLayoutRow :
 				objectLayoutBox.getObjectLayoutRows()) {
 
@@ -600,7 +625,9 @@ public class ObjectEntryDisplayContext {
 					_objectFieldNames.put(
 						objectLayoutColumn.getObjectFieldId(),
 						objectField.getName());
-					nestedDDMFormFields.add(_getDDMFormField(objectField));
+					nestedDDMFormFields.add(
+						_getDDMFormField(
+							objectField, readOnly));
 				}
 			}
 		}
@@ -730,6 +757,7 @@ public class ObjectEntryDisplayContext {
 	private final ListTypeEntryLocalService _listTypeEntryLocalService;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private ObjectEntry _objectEntry;
+	private final ObjectEntryPermission _objectEntryPermission;
 	private final ObjectEntryService _objectEntryService;
 	private final ObjectFieldLocalService _objectFieldLocalService;
 	private final Map<Long, String> _objectFieldNames = new HashMap<>();
