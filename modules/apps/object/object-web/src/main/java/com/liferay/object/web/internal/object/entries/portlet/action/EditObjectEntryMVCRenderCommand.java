@@ -17,7 +17,7 @@ package com.liferay.object.web.internal.object.entries.portlet.action;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
-import com.liferay.object.security.permission.resource.ObjectEntryPermission;
+import com.liferay.object.security.permission.resource.ObjectEntryPermissionTracker;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -41,7 +41,7 @@ public class EditObjectEntryMVCRenderCommand implements MVCRenderCommand {
 		DDMFormRenderer ddmFormRenderer, ItemSelector itemSelector,
 		ListTypeEntryLocalService listTypeEntryLocalService,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
-		ObjectEntryPermission objectEntryPermission,
+		ObjectEntryPermissionTracker objectEntryPermissionTracker,
 		ObjectEntryService objectEntryService,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectLayoutLocalService objectLayoutLocalService,
@@ -52,7 +52,7 @@ public class EditObjectEntryMVCRenderCommand implements MVCRenderCommand {
 		_itemSelector = itemSelector;
 		_listTypeEntryLocalService = listTypeEntryLocalService;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
-		_objectEntryPermission = objectEntryPermission;
+		_objectEntryPermissionTracker = objectEntryPermissionTracker;
 		_objectEntryService = objectEntryService;
 		_objectFieldLocalService = objectFieldLocalService;
 		_objectLayoutLocalService = objectLayoutLocalService;
@@ -70,7 +70,7 @@ public class EditObjectEntryMVCRenderCommand implements MVCRenderCommand {
 			new ObjectEntryDisplayContext(
 				_ddmFormRenderer, _portal.getHttpServletRequest(renderRequest),
 				_itemSelector, _listTypeEntryLocalService,
-				_objectDefinitionLocalService, _objectEntryPermission,
+				_objectDefinitionLocalService, _objectEntryPermissionTracker,
 				_objectEntryService, _objectFieldLocalService,
 				_objectLayoutLocalService, _objectRelationshipLocalService));
 
@@ -81,7 +81,7 @@ public class EditObjectEntryMVCRenderCommand implements MVCRenderCommand {
 	private final ItemSelector _itemSelector;
 	private final ListTypeEntryLocalService _listTypeEntryLocalService;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
-	private final ObjectEntryPermission _objectEntryPermission;
+	private final ObjectEntryPermissionTracker _objectEntryPermissionTracker;
 	private final ObjectEntryService _objectEntryService;
 	private final ObjectFieldLocalService _objectFieldLocalService;
 	private final ObjectLayoutLocalService _objectLayoutLocalService;

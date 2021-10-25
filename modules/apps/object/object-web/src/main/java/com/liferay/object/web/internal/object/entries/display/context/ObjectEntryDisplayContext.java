@@ -49,7 +49,7 @@ import com.liferay.object.model.ObjectLayoutColumn;
 import com.liferay.object.model.ObjectLayoutRow;
 import com.liferay.object.model.ObjectLayoutTab;
 import com.liferay.object.model.ObjectRelationship;
-import com.liferay.object.security.permission.resource.ObjectEntryPermission;
+import com.liferay.object.security.permission.resource.ObjectEntryPermissionTracker;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -70,6 +70,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -101,7 +102,7 @@ public class ObjectEntryDisplayContext {
 		ItemSelector itemSelector,
 		ListTypeEntryLocalService listTypeEntryLocalService,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
-		ObjectEntryPermission objectEntryPermission,
+		ObjectEntryPermissionTracker objectEntryPermissionTracker,
 		ObjectEntryService objectEntryService,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectLayoutLocalService objectLayoutLocalService,
@@ -111,7 +112,7 @@ public class ObjectEntryDisplayContext {
 		_itemSelector = itemSelector;
 		_listTypeEntryLocalService = listTypeEntryLocalService;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
-		_objectEntryPermission = objectEntryPermission;
+		_objectEntryPermissionTracker = objectEntryPermissionTracker;
 		_objectEntryService = objectEntryService;
 		_objectFieldLocalService = objectFieldLocalService;
 		_objectLayoutLocalService = objectLayoutLocalService;
@@ -435,11 +436,14 @@ public class ObjectEntryDisplayContext {
 		boolean readOnly = false;
 
 		if (_objectEntry != null) {
-			readOnly = !_objectEntryPermission.contains(
-				objectDefinition, _objectEntry.getObjectEntryId(),
-				_objectRequestHelper, ActionKeys.UPDATE);
-		}
+			ModelResourcePermission<ObjectEntry> modelResourcePermission =
+				_objectEntryPermissionTracker.getModelResourcePermission(
+					objectDefinition.getClassName());
 
+			readOnly = !modelResourcePermission.contains(
+				_objectRequestHelper.getPermissionChecker(),
+				_objectEntry.getObjectEntryId(), ActionKeys.UPDATE);
+		}
 
 		List<ObjectField> objectFields =
 			_objectFieldLocalService.getObjectFields(
@@ -596,9 +600,15 @@ public class ObjectEntryDisplayContext {
 		boolean readOnly = false;
 
 		if (_objectEntry != null) {
-			readOnly = !_objectEntryPermission.contains(
-				getObjectDefinition(), _objectEntry.getObjectEntryId(),
-				_objectRequestHelper, ActionKeys.UPDATE);
+			ObjectDefinition objectDefinition = getObjectDefinition();
+
+			ModelResourcePermission<ObjectEntry> modelResourcePermission =
+				_objectEntryPermissionTracker.getModelResourcePermission(
+					objectDefinition.getClassName());
+
+			readOnly = !modelResourcePermission.contains(
+				_objectRequestHelper.getPermissionChecker(),
+				_objectEntry.getObjectEntryId(), ActionKeys.UPDATE);
 		}
 
 		for (ObjectLayoutRow objectLayoutRow :
@@ -626,8 +636,7 @@ public class ObjectEntryDisplayContext {
 						objectLayoutColumn.getObjectFieldId(),
 						objectField.getName());
 					nestedDDMFormFields.add(
-						_getDDMFormField(
-							objectField, readOnly));
+						_getDDMFormField(objectField, readOnly));
 				}
 			}
 		}
@@ -757,7 +766,7 @@ public class ObjectEntryDisplayContext {
 	private final ListTypeEntryLocalService _listTypeEntryLocalService;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private ObjectEntry _objectEntry;
-	private final ObjectEntryPermission _objectEntryPermission;
+	private final ObjectEntryPermissionTracker _objectEntryPermissionTracker;
 	private final ObjectEntryService _objectEntryService;
 	private final ObjectFieldLocalService _objectFieldLocalService;
 	private final Map<Long, String> _objectFieldNames = new HashMap<>();

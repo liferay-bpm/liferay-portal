@@ -40,7 +40,7 @@ import com.liferay.object.deployer.ObjectDefinitionDeployer;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
-import com.liferay.object.security.permission.resource.ObjectEntryPermission;
+import com.liferay.object.security.permission.resource.ObjectEntryPermissionTracker;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryService;
@@ -256,10 +256,10 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				MVCRenderCommand.class,
 				new EditObjectEntryMVCRenderCommand(
 					_ddmFormRenderer, _itemSelector, _listTypeEntryLocalService,
-					_objectDefinitionLocalService, _objectEntryPermission,
-					_objectEntryService, _objectFieldLocalService,
-					_objectLayoutLocalService, _objectRelationshipLocalService,
-					_portal),
+					_objectDefinitionLocalService,
+					_objectEntryPermissionTracker, _objectEntryService,
+					_objectFieldLocalService, _objectLayoutLocalService,
+					_objectRelationshipLocalService, _portal),
 				HashMapDictionaryBuilder.<String, Object>put(
 					"javax.portlet.name", objectDefinition.getPortletId()
 				).put(
@@ -359,7 +359,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Reference
-	private ObjectEntryPermission _objectEntryPermission;
+	private ObjectEntryPermissionTracker _objectEntryPermissionTracker;
 
 	@Reference
 	private ObjectEntryService _objectEntryService;
