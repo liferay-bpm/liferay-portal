@@ -14,18 +14,20 @@
 
 package com.liferay.object.security.permission.resource;
 
-import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.util.ObjectRequestHelper;
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.object.model.ObjectEntry;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+
+import java.util.Map;
 
 /**
  * @author Mateus Santana
  */
-public interface ObjectEntryPermission {
+public interface ObjectEntryPermissionTracker {
 
-	public boolean contains(
-			ObjectDefinition objectDefinition, long objectEntryId,
-			ObjectRequestHelper objectRequestHelper, String actionId)
-		throws PortalException;
+	public ModelResourcePermission<ObjectEntry> getModelResourcePermission(
+		String className);
+
+	public Map<String, ModelResourcePermission<ObjectEntry>>
+		getModelResourcePermissions();
 
 }

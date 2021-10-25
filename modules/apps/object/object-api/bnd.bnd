@@ -12,8 +12,8 @@ Export-Package:\
 	com.liferay.object.related.models,\
 	com.liferay.object.rest.context.path,\
 	com.liferay.object.scope,\
+	com.liferay.object.security.permission.resource,\
 	com.liferay.object.service,\
 	com.liferay.object.service.persistence,\
 	com.liferay.object.system,\
-	com.liferay.object.util,\
-	com.liferay.object.security.permission.resource
+	com.liferay.object.util
