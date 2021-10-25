@@ -14,11 +14,8 @@
 
 package com.liferay.object.service.impl;
 
-import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
-import com.liferay.object.security.permission.resource.ObjectEntryPermission;
-import com.liferay.object.util.ObjectRequestHelper;
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.object.security.permission.resource.ObjectEntryPermissionTracker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 
 import java.util.Map;
@@ -33,20 +30,20 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 /**
  * @author Mateus Santana
  */
-@Component(immediate = true, service = ObjectEntryPermission.class)
-public class ObjectEntryPermissionImpl implements ObjectEntryPermission {
+@Component(immediate = true, service = ObjectEntryPermissionTracker.class)
+public class ObjectEntryPermissionTrackerImpl
+	implements ObjectEntryPermissionTracker {
 
-	public boolean contains(
-			ObjectDefinition objectDefinition, long objectEntryId,
-			ObjectRequestHelper objectRequestHelper, String actionId)
-		throws PortalException {
+	public ModelResourcePermission<ObjectEntry> getModelResourcePermission(
+		String className) {
 
-		ModelResourcePermission<ObjectEntry> modelResourcePermission =
-			_modelResourcePermissions.get(objectDefinition.getClassName());
+		return _modelResourcePermissions.get(className);
+	}
 
-		return modelResourcePermission.contains(
-			objectRequestHelper.getPermissionChecker(), objectEntryId,
-			actionId);
+	public Map<String, ModelResourcePermission<ObjectEntry>>
+		getModelResourcePermissions() {
+
+		return _modelResourcePermissions;
 	}
 
 	@Reference(
