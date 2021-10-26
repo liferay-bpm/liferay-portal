@@ -130,7 +130,7 @@ public class ObjectDefinitionLocalServiceTest {
 			throw objectDefinitionNameException;
 		}
 
-		// Name must only contain letters and digits
+		// Object Name must only contain letters and digits
 
 		_testAddCustomObjectDefinition(" Test ");
 
@@ -141,7 +141,7 @@ public class ObjectDefinitionLocalServiceTest {
 		}
 		catch (ObjectDefinitionNameException objectDefinitionNameException) {
 			Assert.assertEquals(
-				"Name must only contain letters and digits",
+				"Object Name must only contain letters and digits",
 				objectDefinitionNameException.getMessage());
 		}
 
@@ -152,11 +152,11 @@ public class ObjectDefinitionLocalServiceTest {
 		}
 		catch (ObjectDefinitionNameException objectDefinitionNameException) {
 			Assert.assertEquals(
-				"Name must only contain letters and digits",
+				"Object Name must only contain letters and digits",
 				objectDefinitionNameException.getMessage());
 		}
 
-		// The first character of a name must be an upper case letter
+		// The first character of an Object Name must be an upper case lette
 
 		try {
 			_testAddCustomObjectDefinition("test");
@@ -165,7 +165,7 @@ public class ObjectDefinitionLocalServiceTest {
 		}
 		catch (ObjectDefinitionNameException objectDefinitionNameException) {
 			Assert.assertEquals(
-				"The first character of a name must be an upper case letter",
+				"The first character of an Object Name must be an upper case lette",
 				objectDefinitionNameException.getMessage());
 		}
 
@@ -209,7 +209,7 @@ public class ObjectDefinitionLocalServiceTest {
 					duplicateObjectDefinitionException) {
 
 			Assert.assertEquals(
-				"Duplicate name C_Test",
+				"Object Name already exists",
 				duplicateObjectDefinitionException.getMessage());
 		}
 
@@ -647,7 +647,7 @@ public class ObjectDefinitionLocalServiceTest {
 				objectDefinitionNameException.getMessage());
 		}
 
-		// Name must only contain letters and digits
+		// Object Name must only contain letters and digits
 
 		_testAddSystemObjectDefinition(" Test ");
 
@@ -658,7 +658,7 @@ public class ObjectDefinitionLocalServiceTest {
 		}
 		catch (ObjectDefinitionNameException objectDefinitionNameException) {
 			Assert.assertEquals(
-				"Name must only contain letters and digits",
+				"Object Name must only contain letters and digits",
 				objectDefinitionNameException.getMessage());
 		}
 
@@ -669,11 +669,11 @@ public class ObjectDefinitionLocalServiceTest {
 		}
 		catch (ObjectDefinitionNameException objectDefinitionNameException) {
 			Assert.assertEquals(
-				"Name must only contain letters and digits",
+				"Object Name must only contain letters and digits",
 				objectDefinitionNameException.getMessage());
 		}
 
-		// The first character of a name must be an upper case letter
+		// The first character of an Object Name must be an upper case lette
 
 		try {
 			_testAddSystemObjectDefinition("test");
@@ -682,7 +682,7 @@ public class ObjectDefinitionLocalServiceTest {
 		}
 		catch (ObjectDefinitionNameException objectDefinitionNameException) {
 			Assert.assertEquals(
-				"The first character of a name must be an upper case letter",
+				"The first character of an Object Name must be an upper case lette",
 				objectDefinitionNameException.getMessage());
 		}
 
@@ -721,7 +721,7 @@ public class ObjectDefinitionLocalServiceTest {
 					duplicateObjectDefinitionException) {
 
 			Assert.assertEquals(
-				"Duplicate name Test",
+				"Object Name already exists",
 				duplicateObjectDefinitionException.getMessage());
 		}
 

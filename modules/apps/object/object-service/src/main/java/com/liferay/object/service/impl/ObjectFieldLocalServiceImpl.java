@@ -338,7 +338,7 @@ public class ObjectFieldLocalServiceImpl
 		for (char c : nameCharArray) {
 			if (!Validator.isChar(c) && !Validator.isDigit(c)) {
 				throw new ObjectFieldNameException(
-					"Name must only contain letters and digits");
+					"Field Name must only contain letters and digits");
 			}
 		}
 
@@ -365,7 +365,7 @@ public class ObjectFieldLocalServiceImpl
 		if ((objectField != null) &&
 			(objectField.getObjectFieldId() != objectFieldId)) {
 
-			throw new DuplicateObjectFieldException("Duplicate name " + name);
+			throw new DuplicateObjectFieldException("Field Name already exists");
 		}
 	}
 

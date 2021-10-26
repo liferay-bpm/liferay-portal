@@ -430,7 +430,7 @@ public class ObjectRelationshipLocalServiceImpl
 		for (char c : nameCharArray) {
 			if (!Validator.isChar(c) && !Validator.isDigit(c)) {
 				throw new ObjectRelationshipNameException(
-					"Name must only contain letters and digits");
+					"Relationship Name must only contain letters and digits");
 			}
 		}
 
@@ -450,7 +450,7 @@ public class ObjectRelationshipLocalServiceImpl
 
 		if (objectRelationship != null) {
 			throw new DuplicateObjectRelationshipException(
-				"Duplicate name " + name);
+				"Relationship Name already exists");
 		}
 
 		if (!Objects.equals(
