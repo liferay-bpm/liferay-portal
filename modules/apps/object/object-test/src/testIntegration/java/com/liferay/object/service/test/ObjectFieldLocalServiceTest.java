@@ -152,7 +152,7 @@ public class ObjectFieldLocalServiceTest {
 				"Name is null", objectFieldNameException.getMessage());
 		}
 
-		// Name must only contain letters and digits
+		// Field Name must only contain letters and digits
 
 		_testAddSystemObjectField(
 			ObjectFieldUtil.createObjectField(" able ", "String"));
@@ -165,7 +165,7 @@ public class ObjectFieldLocalServiceTest {
 		}
 		catch (ObjectFieldNameException objectFieldNameException) {
 			Assert.assertEquals(
-				"Name must only contain letters and digits",
+				"Field Name must only contain letters and digits",
 				objectFieldNameException.getMessage());
 		}
 
@@ -177,11 +177,11 @@ public class ObjectFieldLocalServiceTest {
 		}
 		catch (ObjectFieldNameException objectFieldNameException) {
 			Assert.assertEquals(
-				"Name must only contain letters and digits",
+				"Field Name must only contain letters and digits",
 				objectFieldNameException.getMessage());
 		}
 
-		// The first character of a name must be an upper case letter
+		// The first character of an Field Name must be an upper case lette
 
 		try {
 			_testAddSystemObjectField(
@@ -265,7 +265,7 @@ public class ObjectFieldLocalServiceTest {
 		}
 		catch (DuplicateObjectFieldException duplicateObjectFieldException) {
 			Assert.assertEquals(
-				"Duplicate name able",
+				"Field Name already exists",
 				duplicateObjectFieldException.getMessage());
 		}
 

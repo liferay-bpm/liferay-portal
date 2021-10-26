@@ -922,7 +922,7 @@ public class ObjectDefinitionLocalServiceImpl
 
 			if (!Validator.isChar(c) && !Validator.isDigit(c)) {
 				throw new ObjectDefinitionNameException(
-					"Name must only contain letters and digits");
+					"Object Name must only contain letters and digits");
 			}
 		}
 
@@ -930,7 +930,8 @@ public class ObjectDefinitionLocalServiceImpl
 			(!system && !Character.isUpperCase(nameCharArray[2]))) {
 
 			throw new ObjectDefinitionNameException(
-				"The first character of a name must be an upper case letter");
+				"The first character of an Object " +
+				 "Name must be an upper case lette");
 		}
 
 		if ((system && (nameCharArray.length > 41)) ||
@@ -947,7 +948,7 @@ public class ObjectDefinitionLocalServiceImpl
 			(objectDefinition.getObjectDefinitionId() != objectDefinitionId)) {
 
 			throw new DuplicateObjectDefinitionException(
-				"Duplicate name " + name);
+				"Object Name already exists");
 		}
 	}
 
