@@ -64,9 +64,16 @@ public class ObjectEntriesTableClayDataSetDisplayView
 				continue;
 			}
 
+			String fieldName = objectField.getName();
+
+			if (objectField.getListTypeDefinitionId() > 0) {
+				fieldName = fieldName + ".name";
+			}
+
 			ClayTableSchemaField clayTableSchemaField =
-				clayTableSchemaBuilder.addClayTableSchemaField(
-					objectField.getName(), objectField.getLabel(locale, true));
+				clayTableSchemaField =
+					clayTableSchemaBuilder.addClayTableSchemaField(
+						fieldName, objectField.getLabel(locale, true));
 
 			if (Objects.equals(objectField.getType(), "Boolean")) {
 				clayTableSchemaField.setContentRenderer("boolean");

@@ -84,7 +84,7 @@ portletDisplay.setURLBack(backURL);
 		return fields.reduce((obj, field) => {
 			let value = field.value;
 			if (field.type === 'select' && !field.multiple) {
-				value = field.value[0];
+				value = {key: field.value[0]};
 			}
 
 			return Object.assign(obj, {[field.fieldName]: value});
@@ -125,7 +125,7 @@ portletDisplay.setURLBack(backURL);
 					Liferay.Util.fetch(path, {
 						body: JSON.stringify(values),
 						headers: new Headers({
-							Accept: 'application/json',
+							'Accept': 'application/json',
 							'Content-Type': 'application/json',
 						}),
 						method: objectEntryId ? 'PUT' : 'POST',
