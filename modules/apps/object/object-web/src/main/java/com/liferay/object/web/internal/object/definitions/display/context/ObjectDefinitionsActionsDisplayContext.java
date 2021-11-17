@@ -56,6 +56,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
@@ -249,12 +250,34 @@ public class ObjectDefinitionsActionsDisplayContext {
 
 		ObjectActionExecutor objectActionExecutor = getObjectActionExecutor();
 
-		if (objectActionExecutor.getSettings() == null) {
+		Class<?> objectActionExecutorSettings =
+			objectActionExecutor.getSettings();
+
+		if (objectActionExecutorSettings == null) {
 			return "";
 		}
 
-		DDMForm ddmForm = DDMFormFactory.create(
-			objectActionExecutor.getSettings());
+		DDMForm ddmForm = DDMFormFactory.create(objectActionExecutorSettings);
+
+		if (StringUtil.equals(
+				objectActionExecutorSettings.getName(),
+				"com.liferay.object.internal.action.settings.WebhookObjectActionSettings")) {
+
+			List<DDMFormField> ddmFormFields = ddmForm.getDDMFormFields();
+
+			Stream<DDMFormField> stream = ddmFormFields.stream();
+
+			stream.forEach(
+				ddmFormField -> {
+					if (ddmFormField.getName(
+						).equals(
+							"url"
+						)) {
+
+						ddmFormField.setProperty("required", true);
+					}
+				});
+		}
 
 		DDMFormRenderingContext ddmFormRenderingContext =
 			new DDMFormRenderingContext();
