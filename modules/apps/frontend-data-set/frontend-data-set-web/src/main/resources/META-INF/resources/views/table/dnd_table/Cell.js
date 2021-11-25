@@ -104,7 +104,11 @@ function Cell({children, className, columnName, expand, heading, resizable}) {
 				width,
 			}}
 		>
-			{children}
+			{children?.props?.options?.truncate ? (
+				<span className={classNames('text-truncate')}>{children}</span>
+			) : (
+				<span>{children}</span>
+			)}
 
 			{resizable && (
 				<span
