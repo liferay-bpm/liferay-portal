@@ -19,6 +19,7 @@ import com.liferay.frontend.taglib.clay.data.set.view.table.ClayTableSchema;
 import com.liferay.frontend.taglib.clay.data.set.view.table.ClayTableSchemaBuilder;
 import com.liferay.frontend.taglib.clay.data.set.view.table.ClayTableSchemaBuilderFactory;
 import com.liferay.frontend.taglib.clay.data.set.view.table.ClayTableSchemaField;
+import com.liferay.frontend.taglib.clay.data.set.view.table.ClobTypeClayTableSchemaField;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -83,6 +84,19 @@ public class ObjectEntriesTableClayDataSetDisplayView
 				objectField.isIndexed()) {
 
 				clayTableSchemaField.setSortable(true);
+			}
+
+			if (Objects.equals(objectField.getType(), "Clob")) {
+				ClobTypeClayTableSchemaField clobTypeClayTableSchemaField =
+					new ClobTypeClayTableSchemaField();
+
+				clobTypeClayTableSchemaField.setFieldName(fieldName);
+				clobTypeClayTableSchemaField.setLabel(
+					objectField.getLabel(locale, true));
+				clobTypeClayTableSchemaField.setTruncate(true);
+
+				clayTableSchemaBuilder.addClayTableSchemaField(
+					clobTypeClayTableSchemaField);
 			}
 		}
 
