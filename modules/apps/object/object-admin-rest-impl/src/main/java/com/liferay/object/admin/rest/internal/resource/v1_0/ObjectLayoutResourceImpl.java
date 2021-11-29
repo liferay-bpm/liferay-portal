@@ -19,6 +19,7 @@ import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutBox;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutColumn;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutRow;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutTab;
+import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectLayoutUtil;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectLayoutResource;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectLayoutService;
@@ -126,42 +127,27 @@ public class ObjectLayoutResourceImpl extends BaseObjectLayoutResourceImpl {
 	private ObjectLayout _toObjectLayout(
 		com.liferay.object.model.ObjectLayout serviceBuilderObjectLayout) {
 
-		return new ObjectLayout() {
-			{
-				actions = HashMapBuilder.put(
-					"delete",
-					addAction(
-						ActionKeys.DELETE, "deleteObjectLayout",
-						ObjectDefinition.class.getName(),
-						serviceBuilderObjectLayout.getObjectDefinitionId())
-				).put(
-					"get",
-					addAction(
-						ActionKeys.VIEW, "getObjectLayout",
-						ObjectDefinition.class.getName(),
-						serviceBuilderObjectLayout.getObjectDefinitionId())
-				).put(
-					"update",
-					addAction(
-						ActionKeys.UPDATE, "putObjectLayout",
-						ObjectDefinition.class.getName(),
-						serviceBuilderObjectLayout.getObjectDefinitionId())
-				).build();
-				dateCreated = serviceBuilderObjectLayout.getCreateDate();
-				dateModified = serviceBuilderObjectLayout.getModifiedDate();
-				defaultObjectLayout =
-					serviceBuilderObjectLayout.getDefaultObjectLayout();
-				id = serviceBuilderObjectLayout.getObjectLayoutId();
-				name = LocalizedMapUtil.getI18nMap(
-					serviceBuilderObjectLayout.getNameMap());
-				objectDefinitionId =
-					serviceBuilderObjectLayout.getObjectDefinitionId();
-				objectLayoutTabs = transformToArray(
-					serviceBuilderObjectLayout.getObjectLayoutTabs(),
-					objectLayoutTab -> _toObjectLayoutTab(objectLayoutTab),
-					ObjectLayoutTab.class);
-			}
-		};
+		return ObjectLayoutUtil.toObjectLayout(
+			HashMapBuilder.put(
+				"delete",
+				addAction(
+					ActionKeys.DELETE, "deleteObjectLayout",
+					ObjectDefinition.class.getName(),
+					serviceBuilderObjectLayout.getObjectDefinitionId())
+			).put(
+				"get",
+				addAction(
+					ActionKeys.VIEW, "getObjectLayout",
+					ObjectDefinition.class.getName(),
+					serviceBuilderObjectLayout.getObjectDefinitionId())
+			).put(
+				"update",
+				addAction(
+					ActionKeys.UPDATE, "putObjectLayout",
+					ObjectDefinition.class.getName(),
+					serviceBuilderObjectLayout.getObjectDefinitionId())
+			).build(),
+			serviceBuilderObjectLayout);
 	}
 
 	private com.liferay.object.model.ObjectLayoutBox _toObjectLayoutBox(
@@ -184,25 +170,6 @@ public class ObjectLayoutResourceImpl extends BaseObjectLayoutResourceImpl {
 		return serviceBuilderObjectLayoutBox;
 	}
 
-	private ObjectLayoutBox _toObjectLayoutBox(
-		com.liferay.object.model.ObjectLayoutBox
-			serviceBuilderObjectLayoutBox) {
-
-		return new ObjectLayoutBox() {
-			{
-				collapsable = serviceBuilderObjectLayoutBox.getCollapsable();
-				id = serviceBuilderObjectLayoutBox.getObjectLayoutBoxId();
-				name = LocalizedMapUtil.getI18nMap(
-					serviceBuilderObjectLayoutBox.getNameMap());
-				objectLayoutRows = transformToArray(
-					serviceBuilderObjectLayoutBox.getObjectLayoutRows(),
-					objectLayoutRow -> _toObjectLayoutRow(objectLayoutRow),
-					ObjectLayoutRow.class);
-				priority = serviceBuilderObjectLayoutBox.getPriority();
-			}
-		};
-	}
-
 	private com.liferay.object.model.ObjectLayoutColumn _toObjectLayoutColumn(
 		ObjectLayoutColumn objectLayoutColumn) {
 
@@ -218,21 +185,6 @@ public class ObjectLayoutResourceImpl extends BaseObjectLayoutResourceImpl {
 			GetterUtil.getInteger(objectLayoutColumn.getSize(), 12));
 
 		return serviceBuilderObjectLayoutColumn;
-	}
-
-	private ObjectLayoutColumn _toObjectLayoutColumn(
-		com.liferay.object.model.ObjectLayoutColumn
-			serviceBuilderObjectLayoutColumn) {
-
-		return new ObjectLayoutColumn() {
-			{
-				id = serviceBuilderObjectLayoutColumn.getObjectLayoutColumnId();
-				objectFieldId =
-					serviceBuilderObjectLayoutColumn.getObjectFieldId();
-				priority = serviceBuilderObjectLayoutColumn.getPriority();
-				size = serviceBuilderObjectLayoutColumn.getSize();
-			}
-		};
 	}
 
 	private com.liferay.object.model.ObjectLayoutRow _toObjectLayoutRow(
@@ -251,23 +203,6 @@ public class ObjectLayoutResourceImpl extends BaseObjectLayoutResourceImpl {
 		return serviceBuilderObjectLayoutRow;
 	}
 
-	private ObjectLayoutRow _toObjectLayoutRow(
-		com.liferay.object.model.ObjectLayoutRow
-			serviceBuilderObjectLayoutRow) {
-
-		return new ObjectLayoutRow() {
-			{
-				id = serviceBuilderObjectLayoutRow.getObjectLayoutRowId();
-				objectLayoutColumns = transformToArray(
-					serviceBuilderObjectLayoutRow.getObjectLayoutColumns(),
-					objectLayoutColumn -> _toObjectLayoutColumn(
-						objectLayoutColumn),
-					ObjectLayoutColumn.class);
-				priority = serviceBuilderObjectLayoutRow.getPriority();
-			}
-		};
-	}
-
 	private com.liferay.object.model.ObjectLayoutTab _toObjectLayoutTab(
 		ObjectLayoutTab objectLayoutTab) {
 
@@ -281,31 +216,11 @@ public class ObjectLayoutResourceImpl extends BaseObjectLayoutResourceImpl {
 				objectLayoutTab.getObjectLayoutBoxes(),
 				this::_toObjectLayoutBox));
 		serviceBuilderObjectLayoutTab.setObjectRelationshipId(
-			objectLayoutTab.getObjectRelationshipId());
+			GetterUtil.getLong(objectLayoutTab.getObjectRelationshipId()));
 		serviceBuilderObjectLayoutTab.setPriority(
 			objectLayoutTab.getPriority());
 
 		return serviceBuilderObjectLayoutTab;
-	}
-
-	private ObjectLayoutTab _toObjectLayoutTab(
-		com.liferay.object.model.ObjectLayoutTab
-			serviceBuilderObjectLayoutTab) {
-
-		return new ObjectLayoutTab() {
-			{
-				id = serviceBuilderObjectLayoutTab.getObjectLayoutTabId();
-				name = LocalizedMapUtil.getI18nMap(
-					serviceBuilderObjectLayoutTab.getNameMap());
-				objectLayoutBoxes = transformToArray(
-					serviceBuilderObjectLayoutTab.getObjectLayoutBoxes(),
-					objectLayoutBox -> _toObjectLayoutBox(objectLayoutBox),
-					ObjectLayoutBox.class);
-				objectRelationshipId =
-					serviceBuilderObjectLayoutTab.getObjectRelationshipId();
-				priority = serviceBuilderObjectLayoutTab.getPriority();
-			}
-		};
 	}
 
 	@Reference

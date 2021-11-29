@@ -222,6 +222,27 @@ public class ObjectDefinition implements Cloneable, Serializable {
 
 	protected ObjectField[] objectFields;
 
+	public ObjectLayout[] getObjectLayouts() {
+		return objectLayouts;
+	}
+
+	public void setObjectLayouts(ObjectLayout[] objectLayouts) {
+		this.objectLayouts = objectLayouts;
+	}
+
+	public void setObjectLayouts(
+		UnsafeSupplier<ObjectLayout[], Exception> objectLayoutsUnsafeSupplier) {
+
+		try {
+			objectLayouts = objectLayoutsUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected ObjectLayout[] objectLayouts;
+
 	public ObjectRelationship[] getObjectRelationships() {
 		return objectRelationships;
 	}
@@ -309,6 +330,27 @@ public class ObjectDefinition implements Cloneable, Serializable {
 	}
 
 	protected Map<String, String> pluralLabel;
+
+	public Boolean getPortlet() {
+		return portlet;
+	}
+
+	public void setPortlet(Boolean portlet) {
+		this.portlet = portlet;
+	}
+
+	public void setPortlet(
+		UnsafeSupplier<Boolean, Exception> portletUnsafeSupplier) {
+
+		try {
+			portlet = portletUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Boolean portlet;
 
 	public String getScope() {
 		return scope;

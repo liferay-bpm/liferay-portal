@@ -918,6 +918,14 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("objectLayouts", additionalAssertFieldName)) {
+				if (objectDefinition.getObjectLayouts() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals(
 					"objectRelationships", additionalAssertFieldName)) {
 
@@ -946,6 +954,14 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 
 			if (Objects.equals("pluralLabel", additionalAssertFieldName)) {
 				if (objectDefinition.getPluralLabel() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("portlet", additionalAssertFieldName)) {
+				if (objectDefinition.getPortlet() == null) {
 					valid = false;
 				}
 
@@ -1169,6 +1185,17 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("objectLayouts", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						objectDefinition1.getObjectLayouts(),
+						objectDefinition2.getObjectLayouts())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals(
 					"objectRelationships", additionalAssertFieldName)) {
 
@@ -1208,6 +1235,17 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				if (!equals(
 						(Map)objectDefinition1.getPluralLabel(),
 						(Map)objectDefinition2.getPluralLabel())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("portlet", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						objectDefinition1.getPortlet(),
+						objectDefinition2.getPortlet())) {
 
 					return false;
 				}
@@ -1452,6 +1490,11 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("objectLayouts")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("objectRelationships")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -1474,6 +1517,11 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 		}
 
 		if (entityFieldName.equals("pluralLabel")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("portlet")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
 		}
@@ -1549,6 +1597,7 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 					RandomTestUtil.randomString());
 				panelCategoryKey = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
+				portlet = RandomTestUtil.randomBoolean();
 				scope = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				system = RandomTestUtil.randomBoolean();
 			}

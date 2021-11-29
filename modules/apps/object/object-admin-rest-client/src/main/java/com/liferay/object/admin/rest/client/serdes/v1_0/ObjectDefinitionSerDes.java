@@ -17,6 +17,7 @@ package com.liferay.object.admin.rest.client.serdes.v1_0;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectAction;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectField;
+import com.liferay.object.admin.rest.client.dto.v1_0.ObjectLayout;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectRelationship;
 import com.liferay.object.admin.rest.client.json.BaseJSONParser;
 
@@ -197,6 +198,29 @@ public class ObjectDefinitionSerDes {
 			sb.append("]");
 		}
 
+		if (objectDefinition.getObjectLayouts() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"objectLayouts\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < objectDefinition.getObjectLayouts().length;
+				 i++) {
+
+				sb.append(
+					String.valueOf(objectDefinition.getObjectLayouts()[i]));
+
+				if ((i + 1) < objectDefinition.getObjectLayouts().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
 		if (objectDefinition.getObjectRelationships() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -259,6 +283,16 @@ public class ObjectDefinitionSerDes {
 			sb.append("\"pluralLabel\": ");
 
 			sb.append(_toJSON(objectDefinition.getPluralLabel()));
+		}
+
+		if (objectDefinition.getPortlet() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"portlet\": ");
+
+			sb.append(objectDefinition.getPortlet());
 		}
 
 		if (objectDefinition.getScope() != null) {
@@ -390,6 +424,15 @@ public class ObjectDefinitionSerDes {
 				String.valueOf(objectDefinition.getObjectFields()));
 		}
 
+		if (objectDefinition.getObjectLayouts() == null) {
+			map.put("objectLayouts", null);
+		}
+		else {
+			map.put(
+				"objectLayouts",
+				String.valueOf(objectDefinition.getObjectLayouts()));
+		}
+
 		if (objectDefinition.getObjectRelationships() == null) {
 			map.put("objectRelationships", null);
 		}
@@ -424,6 +467,13 @@ public class ObjectDefinitionSerDes {
 			map.put(
 				"pluralLabel",
 				String.valueOf(objectDefinition.getPluralLabel()));
+		}
+
+		if (objectDefinition.getPortlet() == null) {
+			map.put("portlet", null);
+		}
+		else {
+			map.put("portlet", String.valueOf(objectDefinition.getPortlet()));
 		}
 
 		if (objectDefinition.getScope() == null) {
@@ -534,6 +584,18 @@ public class ObjectDefinitionSerDes {
 						));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "objectLayouts")) {
+				if (jsonParserFieldValue != null) {
+					objectDefinition.setObjectLayouts(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> ObjectLayoutSerDes.toDTO((String)object)
+						).toArray(
+							size -> new ObjectLayout[size]
+						));
+				}
+			}
 			else if (Objects.equals(
 						jsonParserFieldName, "objectRelationships")) {
 
@@ -566,6 +628,11 @@ public class ObjectDefinitionSerDes {
 					objectDefinition.setPluralLabel(
 						(Map)ObjectDefinitionSerDes.toMap(
 							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "portlet")) {
+				if (jsonParserFieldValue != null) {
+					objectDefinition.setPortlet((Boolean)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "scope")) {
