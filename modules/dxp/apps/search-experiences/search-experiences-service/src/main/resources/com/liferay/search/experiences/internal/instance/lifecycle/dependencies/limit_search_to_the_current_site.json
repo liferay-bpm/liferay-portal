@@ -13,12 +13,8 @@
 								"context": "query",
 								"occur": "filter",
 								"query": {
-									"wrapper": {
-										"query": {
-											"term": {
-												"scopeGroupId": "${context.scope_group_id}"
-											}
-										}
+									"term": {
+										"scopeGroupId": "${context.scope_group_id}"
 									}
 								}
 							}

@@ -21,6 +21,8 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.dynamic.data.mapping.util.DefaultDDMStructureHelper;
 import com.liferay.fragment.importer.FragmentsImporter;
+import com.liferay.headless.admin.list.type.resource.v1_0.ListTypeDefinitionResource;
+import com.liferay.headless.admin.list.type.resource.v1_0.ListTypeEntryResource;
 import com.liferay.headless.admin.taxonomy.resource.v1_0.TaxonomyCategoryResource;
 import com.liferay.headless.admin.taxonomy.resource.v1_0.TaxonomyVocabularyResource;
 import com.liferay.headless.delivery.resource.v1_0.DocumentFolderResource;
@@ -100,7 +102,9 @@ public class SiteInitializerExtender
 				_layoutLocalService, _layoutPageTemplateEntryLocalService,
 				_layoutPageTemplatesImporter,
 				_layoutPageTemplateStructureLocalService,
-				_layoutSetLocalService, _objectDefinitionLocalService,
+				_layoutSetLocalService, _listTypeDefinitionResource,
+				_listTypeDefinitionResourceFactory, _listTypeEntryResource,
+				_listTypeEntryResourceFactory, _objectDefinitionLocalService,
 				_objectDefinitionResourceFactory, _objectEntryLocalService,
 				_portal, _remoteAppEntryLocalService,
 				_resourcePermissionLocalService, _roleLocalService,
@@ -211,6 +215,19 @@ public class SiteInitializerExtender
 
 	@Reference
 	private LayoutSetLocalService _layoutSetLocalService;
+
+	@Reference
+	private ListTypeDefinitionResource _listTypeDefinitionResource;
+
+	@Reference
+	private ListTypeDefinitionResource.Factory
+		_listTypeDefinitionResourceFactory;
+
+	@Reference
+	private ListTypeEntryResource _listTypeEntryResource;
+
+	@Reference
+	private ListTypeEntryResource.Factory _listTypeEntryResourceFactory;
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;

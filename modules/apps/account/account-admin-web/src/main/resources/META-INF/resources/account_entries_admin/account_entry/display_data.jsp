@@ -76,7 +76,7 @@ String[] types = GetterUtil.getStringValues(request.getAttribute(AccountWebKeys.
 				<label class="control-label"></label>
 
 				<liferay-ui:logo-selector
-					currentLogoURL="<%= (accountEntryDisplay.getLogoId() == 0) ? accountEntryDisplay.getDefaultLogoURL(liferayPortletRequest) : accountEntryDisplay.getLogoURL(themeDisplay) %>"
+					currentLogoURL="<%= (accountEntryDisplay.getLogoId() == 0) ? accountEntryDisplay.getDefaultLogoURL(liferayPortletRequest) : accountEntryDisplay.getLogoURL(themeDisplay.getPathImage()) %>"
 					defaultLogo="<%= accountEntryDisplay.getLogoId() == 0 %>"
 					defaultLogoURL="<%= accountEntryDisplay.getDefaultLogoURL(liferayPortletRequest) %>"
 					tempImageFileName="<%= String.valueOf(accountEntryDisplay.getAccountEntryId()) %>"

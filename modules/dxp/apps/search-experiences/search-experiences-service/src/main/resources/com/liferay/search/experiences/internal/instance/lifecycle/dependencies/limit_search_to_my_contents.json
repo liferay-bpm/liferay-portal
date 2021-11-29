@@ -1,0 +1,31 @@
+{
+	"description_i18n": {
+		"en_US": "Limit search to contents that a user is an owner of."
+	},
+	"elementDefinition": {
+		"category": "filter",
+		"configuration": {
+			"queryConfiguration": {
+				"queryEntries": [
+					{
+						"clauses": [
+							{
+								"context": "query",
+								"occur": "filter",
+								"query": {
+									"term": {
+										"userId": "${user.id}"
+									}
+								}
+							}
+						]
+					}
+				]
+			}
+		},
+		"icon": "filter"
+	},
+	"title_i18n": {
+		"en_US": "Limit Search to My Contents"
+	}
+}

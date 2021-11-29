@@ -1,0 +1,31 @@
+{
+	"description_i18n": {
+		"en_US": "Limit search to PDF files."
+	},
+	"elementDefinition": {
+		"category": "filter",
+		"configuration": {
+			"queryConfiguration": {
+				"queryEntries": [
+					{
+						"clauses": [
+							{
+								"context": "query",
+								"occur": "filter",
+								"query": {
+									"term": {
+										"mimeType": "application_pdf"
+									}
+								}
+							}
+						]
+					}
+				]
+			}
+		},
+		"icon": "filter"
+	},
+	"title_i18n": {
+		"en_US": "Limit Search to PDF files"
+	}
+}

@@ -32,6 +32,10 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.dynamic.data.mapping.util.DefaultDDMStructureHelper;
 import com.liferay.fragment.importer.FragmentsImporter;
+import com.liferay.headless.admin.list.type.dto.v1_0.ListTypeDefinition;
+import com.liferay.headless.admin.list.type.dto.v1_0.ListTypeEntry;
+import com.liferay.headless.admin.list.type.resource.v1_0.ListTypeDefinitionResource;
+import com.liferay.headless.admin.list.type.resource.v1_0.ListTypeEntryResource;
 import com.liferay.headless.admin.taxonomy.dto.v1_0.TaxonomyCategory;
 import com.liferay.headless.admin.taxonomy.dto.v1_0.TaxonomyVocabulary;
 import com.liferay.headless.admin.taxonomy.resource.v1_0.TaxonomyCategoryResource;
@@ -183,6 +187,10 @@ public class BundleSiteInitializer implements SiteInitializer {
 		LayoutPageTemplateStructureLocalService
 			layoutPageTemplateStructureLocalService,
 		LayoutSetLocalService layoutSetLocalService,
+		ListTypeDefinitionResource listTypeDefinitionResource,
+		ListTypeDefinitionResource.Factory listTypeDefinitionResourceFactory,
+		ListTypeEntryResource listTypeEntryResource,
+		ListTypeEntryResource.Factory listTypeEntryResourceFactory,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectDefinitionResource.Factory objectDefinitionResourceFactory,
 		ObjectEntryLocalService objectEntryLocalService, Portal portal,
@@ -229,6 +237,10 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_layoutPageTemplateStructureLocalService =
 			layoutPageTemplateStructureLocalService;
 		_layoutSetLocalService = layoutSetLocalService;
+		_listTypeDefinitionResource = listTypeDefinitionResource;
+		_listTypeDefinitionResourceFactory = listTypeDefinitionResourceFactory;
+		_listTypeEntryResource = listTypeEntryResource;
+		_listTypeEntryResourceFactory = listTypeEntryResourceFactory;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectDefinitionResourceFactory = objectDefinitionResourceFactory;
 		_objectEntryLocalService = objectEntryLocalService;
@@ -315,7 +327,6 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 			_invoke(() -> _addDDMStructures(serviceContext));
 			_invoke(() -> _addFragmentEntries(serviceContext));
-			_invoke(() -> _addObjectDefinitions(serviceContext));
 			_invoke(() -> _addSAPEntries(serviceContext));
 			_invoke(() -> _addStyleBookEntries(serviceContext));
 			_invoke(() -> _addTaxonomyVocabularies(serviceContext));
@@ -344,6 +355,14 @@ public class BundleSiteInitializer implements SiteInitializer {
 				() -> _addLayoutPageTemplates(
 					assetListEntryIdsStringUtilReplaceValues,
 					documentsStringUtilReplaceValues, serviceContext));
+
+			Map<String, String> listTypeDefinitionsStringUtilReplaceValues =
+				_invoke(() -> _addListTypeDefinitions(serviceContext));
+
+			_invoke(
+				() -> _addObjectDefinitions(
+					listTypeDefinitionsStringUtilReplaceValues,
+					serviceContext));
 
 			Map<String, String> remoteAppEntryIdsStringUtilReplaceValues =
 				_invoke(
@@ -512,7 +531,14 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 			String json = _read(resourcePath);
 
-			Catalog catalog = Catalog.toDTO(json);
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(json);
+
+			String assetVocabularyName = jsonObject.getString(
+				"assetVocabularyName");
+
+			jsonObject.remove("assetVocabularyName");
+
+			Catalog catalog = Catalog.toDTO(String.valueOf(jsonObject));
 
 			if (catalog == null) {
 				_log.error(
@@ -524,7 +550,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 			catalog = catalogResource.postCatalog(catalog);
 
 			_addCPDefinitions(
-				catalog, channel, commerceInventoryWarehouses,
+				assetVocabularyName, catalog, channel,
+				commerceInventoryWarehouses,
 				StringUtil.replaceLast(resourcePath, ".json", ".products.json"),
 				serviceContext);
 		}
@@ -709,50 +736,6 @@ public class BundleSiteInitializer implements SiteInitializer {
 	}
 
 	private void _addCPDefinitions(
-			Catalog catalog, Channel channel,
-			List<CommerceInventoryWarehouse> commerceInventoryWarehouses,
-			String resourcePath, ServiceContext serviceContext)
-		throws Exception {
-
-		String json = _read(resourcePath);
-
-		if (json == null) {
-			return;
-		}
-
-		Group commerceCatalogGroup =
-			CommerceCatalogLocalServiceUtil.getCommerceCatalogGroup(
-				catalog.getId());
-
-		TaxonomyVocabularyResource.Builder taxonomyVocabularyResourceBuilder =
-			_taxonomyVocabularyResourceFactory.create();
-
-		TaxonomyVocabularyResource taxonomyVocabularyResource =
-			taxonomyVocabularyResourceBuilder.user(
-				serviceContext.fetchUser()
-			).build();
-
-		Group companyGroup = _groupLocalService.getCompanyGroup(
-			serviceContext.getCompanyId());
-
-		TaxonomyVocabulary taxonomyVocabulary =
-			taxonomyVocabularyResource.
-				getSiteTaxonomyVocabularyByExternalReferenceCode(
-					companyGroup.getGroupId(),
-					channel.getExternalReferenceCode());
-
-		_commerceReferencesHolder.cpDefinitionsImporter.importCPDefinitions(
-			JSONFactoryUtil.createJSONArray(json), taxonomyVocabulary.getName(),
-			commerceCatalogGroup.getGroupId(), channel.getId(),
-			ListUtil.toLongArray(
-				commerceInventoryWarehouses,
-				CommerceInventoryWarehouse.
-					COMMERCE_INVENTORY_WAREHOUSE_ID_ACCESSOR),
-			_classLoader, StringUtil.replace(resourcePath, ".json", "/"),
-			serviceContext.getScopeGroupId(), serviceContext.getUserId());
-	}
-
-	private void _addCPDefinitions(
 			Map<String, String> documentsStringUtilReplaceValues,
 			ServiceContext serviceContext)
 		throws Exception {
@@ -775,6 +758,33 @@ public class BundleSiteInitializer implements SiteInitializer {
 			serviceContext);
 		_addCommerceNotificationTemplates(
 			channel.getId(), documentsStringUtilReplaceValues, serviceContext);
+	}
+
+	private void _addCPDefinitions(
+			String assetVocabularyName, Catalog catalog, Channel channel,
+			List<CommerceInventoryWarehouse> commerceInventoryWarehouses,
+			String resourcePath, ServiceContext serviceContext)
+		throws Exception {
+
+		String json = _read(resourcePath);
+
+		if (json == null) {
+			return;
+		}
+
+		Group commerceCatalogGroup =
+			CommerceCatalogLocalServiceUtil.getCommerceCatalogGroup(
+				catalog.getId());
+
+		_commerceReferencesHolder.cpDefinitionsImporter.importCPDefinitions(
+			JSONFactoryUtil.createJSONArray(json), assetVocabularyName,
+			commerceCatalogGroup.getGroupId(), channel.getId(),
+			ListUtil.toLongArray(
+				commerceInventoryWarehouses,
+				CommerceInventoryWarehouse.
+					COMMERCE_INVENTORY_WAREHOUSE_ID_ACCESSOR),
+			_classLoader, StringUtil.replace(resourcePath, ".json", "/"),
+			serviceContext.getScopeGroupId(), serviceContext.getUserId());
 	}
 
 	private void _addDDMStructures(ServiceContext serviceContext)
@@ -847,7 +857,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 	}
 
 	private Long _addDocumentFolder(
-			Long documentFolderId, String resourcePath,
+			Long documentFolderId, long groupId, String resourcePath,
 			ServiceContext serviceContext)
 		throws Exception {
 
@@ -877,21 +887,38 @@ public class BundleSiteInitializer implements SiteInitializer {
 				).toString());
 		}
 
-		if (documentFolderId != null) {
-			documentFolder =
-				documentFolderResource.postDocumentFolderDocumentFolder(
-					documentFolderId, documentFolder);
+		Page<DocumentFolder> documentFoldersPage =
+			documentFolderResource.getSiteDocumentFoldersPage(
+				groupId, true, null, null,
+				documentFolderResource.toFilter(
+					StringBundler.concat(
+						"name eq '", documentFolder.getName(), "'")),
+				null, null);
+
+		DocumentFolder existingDocumentFolder =
+			documentFoldersPage.fetchFirstItem();
+
+		if (existingDocumentFolder == null) {
+			if (documentFolderId != null) {
+				documentFolder =
+					documentFolderResource.postDocumentFolderDocumentFolder(
+						documentFolderId, documentFolder);
+			}
+			else {
+				documentFolder = documentFolderResource.postSiteDocumentFolder(
+					groupId, documentFolder);
+			}
 		}
 		else {
-			documentFolder = documentFolderResource.postSiteDocumentFolder(
-				serviceContext.getScopeGroupId(), documentFolder);
+			documentFolder = documentFolderResource.putDocumentFolder(
+				existingDocumentFolder.getId(), documentFolder);
 		}
 
 		return documentFolder.getId();
 	}
 
 	private Map<String, String> _addDocuments(
-			Long documentFolderId, String parentResourcePath,
+			Long documentFolderId, long groupId, String parentResourcePath,
 			ServiceContext serviceContext)
 		throws Exception {
 
@@ -916,8 +943,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 				documentsStringUtilReplaceValues.putAll(
 					_addDocuments(
 						_addDocumentFolder(
-							documentFolderId, resourcePath, serviceContext),
-						resourcePath, serviceContext));
+							documentFolderId, groupId, resourcePath,
+							serviceContext),
+						groupId, resourcePath, serviceContext));
 
 				continue;
 			}
@@ -952,28 +980,74 @@ public class BundleSiteInitializer implements SiteInitializer {
 			Document document = null;
 
 			if (documentFolderId != null) {
-				document = documentResource.postDocumentFolderDocument(
-					documentFolderId,
-					MultipartBody.of(
-						Collections.singletonMap(
-							"file",
-							new BinaryFile(
-								MimeTypesUtil.getContentType(fileName),
-								fileName, urlConnection.getInputStream(),
-								urlConnection.getContentLength())),
-						__ -> _objectMapper, values));
+				Page<Document> documentsPage =
+					documentResource.getDocumentFolderDocumentsPage(
+						documentFolderId, false, null, null,
+						documentResource.toFilter(
+							StringBundler.concat("title eq '", fileName, "'")),
+						null, null);
+
+				Document existingDocument = documentsPage.fetchFirstItem();
+
+				if (existingDocument == null) {
+					document = documentResource.postDocumentFolderDocument(
+						documentFolderId,
+						MultipartBody.of(
+							Collections.singletonMap(
+								"file",
+								new BinaryFile(
+									MimeTypesUtil.getContentType(fileName),
+									fileName, urlConnection.getInputStream(),
+									urlConnection.getContentLength())),
+							__ -> _objectMapper, values));
+				}
+				else {
+					document = documentResource.putDocument(
+						existingDocument.getId(),
+						MultipartBody.of(
+							Collections.singletonMap(
+								"file",
+								new BinaryFile(
+									MimeTypesUtil.getContentType(fileName),
+									fileName, urlConnection.getInputStream(),
+									urlConnection.getContentLength())),
+							__ -> _objectMapper, values));
+				}
 			}
 			else {
-				document = documentResource.postSiteDocument(
-					serviceContext.getScopeGroupId(),
-					MultipartBody.of(
-						Collections.singletonMap(
-							"file",
-							new BinaryFile(
-								MimeTypesUtil.getContentType(fileName),
-								fileName, urlConnection.getInputStream(),
-								urlConnection.getContentLength())),
-						__ -> _objectMapper, values));
+				Page<Document> documentsPage =
+					documentResource.getSiteDocumentsPage(
+						groupId, false, null, null,
+						documentResource.toFilter(
+							StringBundler.concat("title eq '", fileName, "'")),
+						null, null);
+
+				Document existingDocument = documentsPage.fetchFirstItem();
+
+				if (existingDocument == null) {
+					document = documentResource.postSiteDocument(
+						groupId,
+						MultipartBody.of(
+							Collections.singletonMap(
+								"file",
+								new BinaryFile(
+									MimeTypesUtil.getContentType(fileName),
+									fileName, urlConnection.getInputStream(),
+									urlConnection.getContentLength())),
+							__ -> _objectMapper, values));
+				}
+				else {
+					document = documentResource.putDocument(
+						existingDocument.getId(),
+						MultipartBody.of(
+							Collections.singletonMap(
+								"file",
+								new BinaryFile(
+									MimeTypesUtil.getContentType(fileName),
+									fileName, urlConnection.getInputStream(),
+									urlConnection.getContentLength())),
+							__ -> _objectMapper, values));
+				}
 			}
 
 			String key = resourcePath;
@@ -1006,8 +1080,18 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private Map<String, String> _addDocuments(ServiceContext serviceContext)
 		throws Exception {
 
-		return _addDocuments(
-			null, "/site-initializer/documents", serviceContext);
+		Group group = _groupLocalService.getCompanyGroup(
+			serviceContext.getCompanyId());
+
+		return HashMapBuilder.putAll(
+			_addDocuments(
+				null, group.getGroupId(), "/site-initializer/documents/company",
+				serviceContext)
+		).putAll(
+			_addDocuments(
+				null, serviceContext.getScopeGroupId(),
+				"/site-initializer/documents/group", serviceContext)
+		).build();
 	}
 
 	private void _addFragmentEntries(ServiceContext serviceContext)
@@ -1369,6 +1453,121 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_addSiteNavigationMenus(serviceContext);
 	}
 
+	private Map<String, String> _addListTypeDefinitions(
+			ServiceContext serviceContext)
+		throws Exception {
+
+		Set<String> resourcePaths = _servletContext.getResourcePaths(
+			"/site-initializer/list-type-definitions");
+
+		Map<String, String> listTypeDefinitionsStringUtilReplaceValues =
+			new HashMap<>();
+
+		if (SetUtil.isEmpty(resourcePaths)) {
+			return listTypeDefinitionsStringUtilReplaceValues;
+		}
+
+		ListTypeDefinitionResource.Builder listTypeDefinitionResourceBuilder =
+			_listTypeDefinitionResourceFactory.create();
+
+		ListTypeDefinitionResource listTypeDefinitionResource =
+			listTypeDefinitionResourceBuilder.user(
+				serviceContext.fetchUser()
+			).build();
+
+		for (String resourcePath : resourcePaths) {
+			if (resourcePath.endsWith(".list-type-entries.json")) {
+				continue;
+			}
+
+			String json = _read(resourcePath);
+
+			ListTypeDefinition listTypeDefinition = ListTypeDefinition.toDTO(
+				json);
+
+			if (listTypeDefinition == null) {
+				_log.error(
+					"Unable to transform list type definition from JSON: " +
+						json);
+
+				continue;
+			}
+
+			Page<ListTypeDefinition> listTypeDefinitionsPage =
+				listTypeDefinitionResource.getListTypeDefinitionsPage(
+					null, null,
+					listTypeDefinitionResource.toFilter(
+						StringBundler.concat(
+							"name eq '", listTypeDefinition.getName(), "'")),
+					null, null);
+
+			ListTypeDefinition existingListTypeDefinition =
+				listTypeDefinitionsPage.fetchFirstItem();
+
+			if (existingListTypeDefinition == null) {
+				listTypeDefinition =
+					listTypeDefinitionResource.postListTypeDefinition(
+						listTypeDefinition);
+			}
+			else {
+				listTypeDefinition =
+					listTypeDefinitionResource.putListTypeDefinition(
+						existingListTypeDefinition.getId(), listTypeDefinition);
+			}
+
+			listTypeDefinitionsStringUtilReplaceValues.put(
+				"LIST_TYPE_DEFINITION_ID:" + listTypeDefinition.getName(),
+				String.valueOf(listTypeDefinition.getId()));
+
+			String listTypeEntriesJSON = _read(
+				StringUtil.replace(
+					resourcePath, ".json", ".list-type-entries.json"));
+
+			if (listTypeEntriesJSON == null) {
+				continue;
+			}
+
+			JSONArray jsonArray = _jsonFactory.createJSONArray(
+				listTypeEntriesJSON);
+
+			ListTypeEntryResource.Builder listTypeEntryResourceBuilder =
+				_listTypeEntryResourceFactory.create();
+
+			ListTypeEntryResource listTypeEntryResource =
+				listTypeEntryResourceBuilder.user(
+					serviceContext.fetchUser()
+				).build();
+
+			for (int i = 0; i < jsonArray.length(); i++) {
+				ListTypeEntry listTypeEntry = ListTypeEntry.toDTO(
+					String.valueOf(jsonArray.getJSONObject(i)));
+
+				Page<ListTypeEntry> listTypeEntriesPage =
+					listTypeEntryResource.
+						getListTypeDefinitionListTypeEntriesPage(
+							listTypeDefinition.getId(), null, null,
+							listTypeEntryResource.toFilter(
+								StringBundler.concat(
+									"key eq '", listTypeEntry.getKey(), "'")),
+							null, null);
+
+				ListTypeEntry existingListTypeEntry =
+					listTypeEntriesPage.fetchFirstItem();
+
+				if (existingListTypeEntry == null) {
+					listTypeEntryResource.postListTypeDefinitionListTypeEntry(
+						listTypeDefinition.getId(), listTypeEntry);
+				}
+				else {
+					listTypeEntryResource.putListTypeEntry(
+						existingListTypeEntry.getId(), listTypeEntry);
+				}
+			}
+		}
+
+		return listTypeDefinitionsStringUtilReplaceValues;
+	}
+
 	private void _addModelResourcePermissions(
 			String className, String primKey, String resourcePath,
 			ServiceContext serviceContext)
@@ -1398,7 +1597,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 		}
 	}
 
-	private void _addObjectDefinitions(ServiceContext serviceContext)
+	private void _addObjectDefinitions(
+			Map<String, String> listTypeDefinitionsStringUtilReplaceValues,
+			ServiceContext serviceContext)
 		throws Exception {
 
 		Set<String> resourcePaths = _servletContext.getResourcePaths(
@@ -1422,6 +1623,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 			}
 
 			String json = _read(resourcePath);
+
+			json = StringUtil.replace(
+				json, "[$", "$]", listTypeDefinitionsStringUtilReplaceValues);
 
 			ObjectDefinition objectDefinition = ObjectDefinition.toDTO(json);
 
@@ -2313,6 +2517,11 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private final LayoutPageTemplateStructureLocalService
 		_layoutPageTemplateStructureLocalService;
 	private final LayoutSetLocalService _layoutSetLocalService;
+	private final ListTypeDefinitionResource _listTypeDefinitionResource;
+	private final ListTypeDefinitionResource.Factory
+		_listTypeDefinitionResourceFactory;
+	private final ListTypeEntryResource _listTypeEntryResource;
+	private final ListTypeEntryResource.Factory _listTypeEntryResourceFactory;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectDefinitionResource.Factory
 		_objectDefinitionResourceFactory;

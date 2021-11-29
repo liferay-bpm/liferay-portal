@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.service.GroupServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -39,7 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 public class DLBreadcrumbUtil {
 
 	public static void addPortletBreadcrumbEntries(
-			Folder folder, String displayStyle,
+			String displayStyle, Folder folder,
 			HttpServletRequest httpServletRequest,
 			LiferayPortletResponse liferayPortletResponse,
 			PortletURL portletURL, boolean showGroupSelector)
@@ -52,10 +51,14 @@ public class DLBreadcrumbUtil {
 
 		portletURL.setParameter("displayStyle", displayStyle);
 
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
 		_addPortletBreadcrumbEntry(
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, httpServletRequest,
-			_getRootFolderName(folder, httpServletRequest, showGroupSelector),
-			portletURL);
+			portletURL, themeDisplay.getScopeGroupId(),
+			_getRootFolderName(httpServletRequest, showGroupSelector));
 
 		if (folder != null) {
 			List<Folder> ancestorFolders = folder.getAncestors();
@@ -65,12 +68,13 @@ public class DLBreadcrumbUtil {
 			for (Folder ancestorFolder : ancestorFolders) {
 				_addPortletBreadcrumbEntry(
 					ancestorFolder.getFolderId(), httpServletRequest,
-					ancestorFolder.getName(), portletURL);
+					portletURL, ancestorFolder.getRepositoryId(),
+					ancestorFolder.getName());
 			}
 
 			_addPortletBreadcrumbEntry(
-				folder.getFolderId(), httpServletRequest, folder.getName(),
-				portletURL);
+				folder.getFolderId(), httpServletRequest, portletURL,
+				folder.getRepositoryId(), folder.getName());
 		}
 	}
 
@@ -93,9 +97,10 @@ public class DLBreadcrumbUtil {
 	}
 
 	private static void _addPortletBreadcrumbEntry(
-		long folderId, HttpServletRequest httpServletRequest, String title,
-		PortletURL portletURL) {
+		long folderId, HttpServletRequest httpServletRequest,
+		PortletURL portletURL, long repositoryId, String title) {
 
+		portletURL.setParameter("repositoryId", String.valueOf(repositoryId));
 		portletURL.setParameter("folderId", String.valueOf(folderId));
 
 		PortalUtil.addPortletBreadcrumbEntry(
@@ -103,8 +108,7 @@ public class DLBreadcrumbUtil {
 	}
 
 	private static String _getRootFolderName(
-			Folder folder, HttpServletRequest httpServletRequest,
-			boolean showGroupSelector)
+			HttpServletRequest httpServletRequest, boolean showGroupSelector)
 		throws Exception {
 
 		if (!showGroupSelector) {
@@ -116,10 +120,6 @@ public class DLBreadcrumbUtil {
 				WebKeys.THEME_DISPLAY);
 
 		Group group = themeDisplay.getScopeGroup();
-
-		if (folder != null) {
-			group = GroupServiceUtil.getGroup(folder.getGroupId());
-		}
 
 		return group.getDescriptiveName(themeDisplay.getLocale());
 	}

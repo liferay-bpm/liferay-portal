@@ -59,13 +59,15 @@ public class DLSelectFolderDisplayContext {
 	public DLSelectFolderDisplayContext(
 		DLAppService dlAppService, Folder folder,
 		HttpServletRequest httpServletRequest, PortletURL portletURL,
-		long selectedFolderId, boolean showGroupSelector) {
+		long selectedFolderId, long selectedRepositoryId,
+		boolean showGroupSelector) {
 
 		_dlAppService = dlAppService;
 		_folder = folder;
 		_httpServletRequest = httpServletRequest;
 		_portletURL = portletURL;
 		_selectedFolderId = selectedFolderId;
+		_selectedRepositoryId = selectedRepositoryId;
 		_showGroupSelector = showGroupSelector;
 
 		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
@@ -183,6 +185,10 @@ public class DLSelectFolderDisplayContext {
 		return _selectedFolderId;
 	}
 
+	public long getSelectedRepositoryId() {
+		return _selectedRepositoryId;
+	}
+
 	public Map<String, Object> getSelectorButtonData() {
 		return getSelectorButtonData(_folder);
 	}
@@ -224,6 +230,15 @@ public class DLSelectFolderDisplayContext {
 
 				return getFolderName();
 			}
+		).put(
+			"repositoryid",
+			() -> {
+				if (folder != null) {
+					return folder.getRepositoryId();
+				}
+
+				return getRepositoryId();
+			}
 		).build();
 	}
 
@@ -240,11 +255,13 @@ public class DLSelectFolderDisplayContext {
 	}
 
 	public boolean isSelectButtonDisabled() {
-		return isSelectButtonDisabled(getFolderId());
+		return isSelectButtonDisabled(getFolderId(), getRepositoryId());
 	}
 
-	public boolean isSelectButtonDisabled(long folderId) {
-		if (folderId == getSelectedFolderId()) {
+	public boolean isSelectButtonDisabled(long folderId, long repositoryId) {
+		if ((folderId == getSelectedFolderId()) &&
+			(repositoryId == getSelectedRepositoryId())) {
+
 			return true;
 		}
 
@@ -265,6 +282,8 @@ public class DLSelectFolderDisplayContext {
 			"folderId", folderId
 		).setParameter(
 			"ignoreRootFolder", true
+		).setParameter(
+			"repositoryId", getRepositoryId()
 		).setParameter(
 			"selectedFolderId", getSelectedFolderId()
 		).setParameter(
@@ -299,6 +318,7 @@ public class DLSelectFolderDisplayContext {
 	private final HttpServletRequest _httpServletRequest;
 	private final PortletURL _portletURL;
 	private final long _selectedFolderId;
+	private final long _selectedRepositoryId;
 	private final boolean _showGroupSelector;
 	private final ThemeDisplay _themeDisplay;
 

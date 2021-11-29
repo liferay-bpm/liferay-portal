@@ -67,6 +67,20 @@ public class TypeOptionsSerDes {
 			sb.append(typeOptions.getBoost());
 		}
 
+		if (typeOptions.getFormat() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"format\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(typeOptions.getFormat()));
+
+			sb.append("\"");
+		}
+
 		if (typeOptions.getMax() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -212,6 +226,13 @@ public class TypeOptionsSerDes {
 			map.put("boost", String.valueOf(typeOptions.getBoost()));
 		}
 
+		if (typeOptions.getFormat() == null) {
+			map.put("format", null);
+		}
+		else {
+			map.put("format", String.valueOf(typeOptions.getFormat()));
+		}
+
 		if (typeOptions.getMax() == null) {
 			map.put("max", null);
 		}
@@ -292,6 +313,11 @@ public class TypeOptionsSerDes {
 			if (Objects.equals(jsonParserFieldName, "boost")) {
 				if (jsonParserFieldValue != null) {
 					typeOptions.setBoost((Boolean)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "format")) {
+				if (jsonParserFieldValue != null) {
+					typeOptions.setFormat((String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "max")) {
