@@ -53,6 +53,15 @@ renderResponse.setTitle(editRemoteAppEntryDisplayContext.getTitle());
 				/>
 			</aui:field-wrapper>
 
+			<liferay-editor:editor
+				contents="<%= editRemoteAppEntryDisplayContext.getDescription() %>"
+				editorName="contentEditor"
+				name="description"
+				placeholder="description"
+			/>
+
+			<aui:input label="source-code-url" name="sourceCodeURL" type="text" />
+
 			<clay:select
 				disabled="<%= editRemoteAppEntryDisplayContext.isTypeDisabled() %>"
 				label="type"
@@ -139,7 +148,7 @@ renderResponse.setTitle(editRemoteAppEntryDisplayContext.getTitle());
 
 	<liferay-frontend:edit-form-footer>
 		<clay:button
-			label="save"
+			label='<%= WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), 0L, RemoteAppEntry.class.getName()) ? "submit-for-publication" : "publish" %>'
 			type="submit"
 		/>
 

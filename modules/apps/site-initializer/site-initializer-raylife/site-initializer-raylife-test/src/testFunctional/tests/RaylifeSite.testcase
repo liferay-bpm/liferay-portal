@@ -56,21 +56,37 @@ definition {
 	}
 
 	@description = "LPS-142178 - Verify if when Raylife is created, a Catalog in Commerce will be created for it as well."
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CatalogForRaylifeIsCreated {
+		Raylife.createRaylifeSite(siteName = "Raylife");
 
-		// TODO LPS-142178 CatalogForRaylifeIsCreated pending implementation
+		CommerceNavigator.gotoPortlet(
+			category = "Product Management",
+			portlet = "Catalogs");
 
+		AssertElementPresent(
+			name = "Raylife",
+			locator1 = "Raylife#TABLE_CATALOG_NAME");
+
+		Click(
+			name = "Raylife",
+			locator1 = "Raylife#TABLE_CATALOG_NAME");
+
+		AssertElementPresent(
+			title = "Raylife",
+			locator1 = "Raylife#CATALOG_TITLE");
 	}
 
 	@description = "LPS-142180 - Verify if, when Raylife is created, Products related to Raylife are also created."
-	@ignore = "Test Stub"
 	@priority = "5"
 	test ProductsForRaylifeIsCreated {
+		Raylife.createRaylifeSite(siteName = "Raylife");
 
-		// TODO LPS-142180 ProductsForRaylifeIsCreated pending implementation
+		CommerceNavigator.gotoPortlet(
+			category = "Product Management",
+			portlet = "Products");
 
+		Raylife.viewProductsList(productList = "General Liability,Professional Liability,Workers Compensation,Business Owners Policy");
 	}
 
 }

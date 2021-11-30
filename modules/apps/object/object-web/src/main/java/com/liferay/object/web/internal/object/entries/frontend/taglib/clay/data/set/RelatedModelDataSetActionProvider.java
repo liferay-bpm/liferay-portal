@@ -22,7 +22,7 @@ import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.web.internal.object.entries.constants.ObjectEntriesClayDataSetDisplayNames;
-import com.liferay.object.web.internal.object.entries.frontend.taglib.clay.data.set.data.provider.RelatedModel;
+import com.liferay.object.web.internal.object.entries.frontend.taglib.clay.data.set.data.model.RelatedModel;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;

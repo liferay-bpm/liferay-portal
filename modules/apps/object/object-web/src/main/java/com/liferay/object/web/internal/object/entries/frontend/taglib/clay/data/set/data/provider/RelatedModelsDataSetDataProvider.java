@@ -27,6 +27,7 @@ import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.web.internal.object.entries.constants.ObjectEntriesClayDataSetDisplayNames;
+import com.liferay.object.web.internal.object.entries.frontend.taglib.clay.data.set.data.model.RelatedModel;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.util.ParamUtil;

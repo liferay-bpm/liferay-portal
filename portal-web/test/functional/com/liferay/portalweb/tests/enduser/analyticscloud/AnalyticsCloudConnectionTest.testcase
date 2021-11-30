@@ -136,7 +136,7 @@ definition {
 
 			Click(locator1 = "ACDXPSettings#SYNC_CONTACTS_OPTION");
 
-			var currentContacts = selenium.getText(locator1 = "ACDXPSettings#SYNC_ALL_CONTACTS_NUMBER");
+			var currentContacts = selenium.getText("ACDXPSettings#SYNC_ALL_CONTACTS_NUMBER");
 			var numberContacts = StringUtil.extractDigits("${currentContacts}");
 		}
 
@@ -666,6 +666,7 @@ definition {
 	@priority = "5"
 	test ViewAssetAddedByDXPDataSource {
 		property portal.release = "true";
+		property portal.upstream = "quarantine";
 
 		task ("Create site, page and add a blog to the page") {
 			ACUtils.addSiteAndPage();

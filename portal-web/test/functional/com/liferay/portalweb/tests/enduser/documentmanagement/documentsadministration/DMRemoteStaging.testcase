@@ -69,9 +69,7 @@ definition {
 	test DeleteDocumentWithCustomType {
 		property test.name.skip.portal.instance = "RemoteStagingDM#DeleteDocumentWithCustomType";
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
-
-		DMNavigator.gotoDocumentType();
+		DMNavigator.openDocumentTypesAdmin(siteURLKey = "site-name");
 
 		DMDocumentType.add(
 			dmDocumentTypeDescription = "DM Document Type Description",
@@ -263,9 +261,7 @@ definition {
 	test EditDocumentWithCustomType {
 		property test.name.skip.portal.instance = "RemoteStagingDM#EditDocumentWithCustomType";
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
-
-		DMNavigator.gotoDocumentType();
+		DMNavigator.openDocumentTypesAdmin(siteURLKey = "site-name");
 
 		DMDocumentType.add(
 			dmDocumentTypeDescription = "DM Document Type Description",
@@ -356,9 +352,7 @@ definition {
 	test PublishEditsToDocumentType {
 		property test.name.skip.portal.instance = "RemoteStagingDM#PublishEditsToDocumentType";
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
-
-		DMNavigator.gotoDocumentType();
+		DMNavigator.openDocumentTypesAdmin(siteURLKey = "site-name");
 
 		DMDocumentType.add(
 			dmDocumentTypeDescription = "DM Document Type Description",
@@ -409,9 +403,7 @@ definition {
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
-
-		DMNavigator.gotoDocumentType();
+		DMNavigator.openDocumentTypesAdmin(siteURLKey = "site-name");
 
 		DMDocumentType.edit(
 			dmDocumentTypeFieldNameEdit = "Photo",
@@ -465,9 +457,7 @@ definition {
 	test PublishEditsToDocumentUsingCustomTypeAndSet {
 		property test.name.skip.portal.instance = "RemoteStagingDM#PublishEditsToDocumentUsingCustomTypeAndSet";
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
-
-		DMNavigator.gotoMetadataSets();
+		DMNavigator.openMetadataSetsAdmin(siteURLKey = "site-name");
 
 		DMMetadataSet.addTitle(metadataSetName = "Document Metadata Set Name");
 
@@ -477,11 +467,7 @@ definition {
 
 		DDLDataDefinition.save();
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
-
-		DMNavigator.gotoDocumentType();
-
-		LexiconEntry.gotoAdd();
+		DMNavigator.openToAddDocumentType(siteURLKey = "site-name");
 
 		PortletEntry.inputName(name = "DM Document Type Name");
 
@@ -529,11 +515,9 @@ definition {
 			dmDocumentType = "DM Document Type Name",
 			previewImage = "Document_1.jpg");
 
-		DMNavigator.openDocumentsAndMediaAdmin(
+		DMNavigator.openDocumentTypesAdmin(
 			baseURL = "http://localhost:9080",
 			siteURLKey = "remote-site");
-
-		DMNavigator.gotoDocumentType();
 
 		DMDocumentType.viewCP(dmDocumentTypeName = "DM Document Type Name");
 
@@ -585,9 +569,7 @@ definition {
 	test PublishEditsToMetadataSet {
 		property test.name.skip.portal.instance = "RemoteStagingDM#PublishEditsToMetadataSet";
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
-
-		DMNavigator.gotoMetadataSets();
+		DMNavigator.openMetadataSetsAdmin(siteURLKey = "site-name");
 
 		DMMetadataSet.addTitle(metadataSetName = "DM Metadata Set Name");
 
@@ -664,9 +646,7 @@ definition {
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
-
-		DMNavigator.gotoMetadataSets();
+		DMNavigator.openMetadataSetsAdmin(siteURLKey = "site-name");
 
 		DMDocumentType.edit(
 			dmDocumentTypeFieldNameEdit = "Company",

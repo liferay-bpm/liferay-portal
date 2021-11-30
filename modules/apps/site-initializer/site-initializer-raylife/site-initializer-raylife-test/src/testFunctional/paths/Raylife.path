@@ -20,6 +20,96 @@
 	<td>//span[contains(@class, 'loading-animation')]</td>
 	<td></td>
 </tr>
+<tr>
+	<td>FORMS_FIELDS</td>
+	<td>css=liferay-remote-app-raylife>>>[name='${label}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TABLE_CATALOG_NAME</td>
+	<td>//a[contains(text(),'${name}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CATALOG_TITLE</td>
+	<td>//h3[contains(text(),'${title}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PRODUCTS_NAME</td>
+	<td>//a[contains(text(),'${productsName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>BUTTON_DISMISS</td>
+	<td>//button[@id='dismiss']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>HIDE_DISMISS_BUTTON</td>
+	<td>//div[contains(@class, "hide")]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MORE_INFO_PANEL</td>
+	<td>//div[contains(@class, "dynamic-web-content-primary")]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>BTN_BACK_TO_EDIT_INFO_QUOTE_PAGE</td>
+	<td>//button[contains(@class, "back-to-edit-info")]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>BTN_BACK_TO_EDIT_INFO_CONTACT_PAGE</td>
+	<td>//button[@id='contact-agent-btn-back']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>HANG_TIGHT_TITLE</td>
+	<td>//h1[contains(text(),'Hang tight...')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>BUTTON_CONTINUE</td>
+	<td>css=liferay-remote-app-raylife>>>.continue</td>
+	<td></td>
+</tr>
+<tr>
+	<td>BUTTON_CONTINUE_DISABLED</td>
+	<td>css=liferay-remote-app-raylife>>>.continue[disabled]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TIP_INFO_PANEL</td>
+	<td>//div[@id='tip']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>BUTTON_PREVIOUS</td>
+	<td>css=liferay-remote-app-raylife>>>.btn.btn-flat</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FIRST_MORE_INFO</td>
+	<td>css=liferay-remote-app-raylife>>>.input-area .btn.badge.more-info</td>
+	<td></td>
+</tr>
+<tr>
+	<td>BUTTON_YES_OPTION</td>
+	<td>css=liferay-remote-app-raylife>>>[for='${field}']+.switch-wrapper button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>BUTTON_NO_OPTION</td>
+	<td>css=liferay-remote-app-raylife>>>[for='${field}']+.switch-wrapper button+button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ERROR_MESSAGE</td>
+	<td>css=liferay-remote-app-raylife>>>.badge-error</td>
+	<td></td>
+</tr>
 </tbody>
 </table>
 </body>

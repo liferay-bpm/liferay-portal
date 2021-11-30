@@ -39,6 +39,7 @@ definition {
 	@priority = "5"
 	test ShowsSitesTopInterests {
 		property portal.acceptance = "false";
+		property portal.upstream = "quarantine";
 
 		var pageNameList = "sports,technology,science";
 

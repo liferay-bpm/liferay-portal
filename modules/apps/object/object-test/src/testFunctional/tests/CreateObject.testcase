@@ -899,12 +899,28 @@ definition {
 	}
 
 	@description = "LPS-135397 - Verify that the Relationship tab cannot be added first"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CannotAddRelationshipTabFirst {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-141521 CannotAddRelationshipTabFirst pending implementation
+		ObjectAdmin.addObjectLayoutViaAPI(
+			layoutName = "Layout Name",
+			objectName = "CustomObject");
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToLayoutsTab();
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		ObjectAdmin.goToLayoutTabOnLayouts();
+
+		CreateObject.assertCannotAddRelationshipTabFirst();
 	}
 
 	@description = "LPS-135549 - Verify that it is not possible to create a Field with a duplicated Field Name"
@@ -2590,13 +2606,69 @@ definition {
 	}
 
 	@description = "LPS-135397 - Verify if it's possible to view the Entry with two columns"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanViewEntryWithTwoColumns {
 		property portal.acceptance = "true";
 
-		// TODO LPS-141512 CanViewEntryWithTwoColumns pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
+		for (var letter : list "A,B") {
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldLabelName = "Custom Field ${letter}",
+				fieldName = "customObjectField${letter}",
+				fieldType = "String",
+				isRequired = "false",
+				objectName = "CustomObject");
+		}
+
+		ObjectAdmin.addObjectLayoutViaAPI(
+			layoutName = "Layout",
+			objectName = "CustomObject");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		ObjectAdmin.goToLayoutsTab();
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		SelectFrame(locator1 = "IFrame#IFRAME");
+
+		Click(locator1 = "ObjectAdmin#LAYOUT_LAYOUT_TAB");
+
+		ObjectAdmin.addTabFieldsOnLayout(
+			blockName = "Block 1",
+			columnsNumber = "2",
+			fieldList = "Custom Field A,Custom Field B",
+			tabName = "Field Tab");
+
+		Click(locator1 = "ObjectAdmin#LAYOUT_INFO_TAB");
+
+		Click.clickAtNotVisible(locator1 = "ObjectAdmin#ENTRY_BOOLEAN_CHECKBOX");
+
+		Button.clickSave();
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		Navigator.openURL();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		LexiconEntry.gotoAdd();
+
+		AssertElementPresent(
+			key_fieldColumnNumber = "0",
+			key_fieldLabel = "Custom Field A",
+			locator1 = "ObjectAdmin#FIELD_COLUMN_POSITION_ON_ENTRY_PAGE");
+
+		AssertElementPresent(
+			key_fieldColumnNumber = "1",
+			key_fieldLabel = "Custom Field B",
+			locator1 = "ObjectAdmin#FIELD_COLUMN_POSITION_ON_ENTRY_PAGE");
 	}
 
 	@description = "LPS-135400 - There is an explanation about each Relationship type"
@@ -2859,13 +2931,81 @@ definition {
 	}
 
 	@description = "LPS-135397 - Verify if it's possible to view a tab of relationship with entries"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanViewRelationshipTab {
 		property portal.acceptance = "true";
 
-		// TODO LPS-141514 CanViewRelationshipTab pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldLabelName = "Custom Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject");
+
+		ObjectAdmin.addObjectRelationshipViaAPI(
+			objectName_1 = "CustomObject",
+			objectName_2 = "CustomObject",
+			relationshipLabel = "Relationship",
+			relationshipName = "relationship",
+			relationshipType = "oneToMany");
+
+		ObjectAdmin.addObjectLayoutViaAPI(
+			layoutName = "Layout",
+			objectName = "CustomObject");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		ObjectAdmin.goToLayoutsTab();
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		SelectFrame(locator1 = "IFrame#IFRAME");
+
+		Click(locator1 = "ObjectAdmin#LAYOUT_LAYOUT_TAB");
+
+		ObjectAdmin.addTabFieldsOnLayout(
+			blockName = "Block 1",
+			columnsNumber = "2",
+			fieldLabelName = "Custom Field",
+			tabName = "Field Tab");
+
+		ObjectAdmin.addTabRelationshipsOnLayout(
+			relationshipsLabelName = "Relationship",
+			tabName = "Relationship Tab");
+
+		Click(locator1 = "ObjectAdmin#LAYOUT_INFO_TAB");
+
+		Click.clickAtNotVisible(locator1 = "ObjectAdmin#ENTRY_BOOLEAN_CHECKBOX");
+
+		Button.clickSave();
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+			fieldName = "customObjectField",
+			objectName = "CustomObject",
+			value = "Entry 1");
+
+		Navigator.openURL();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		Click(
+			key_tabName = "Relationship Tab",
+			locator1 = "ObjectAdmin#ANY_TAB_ON_ENTRY");
+
+		AssertElementPresent(
+			key_tabName = "Relationship Tab",
+			locator1 = "ObjectAdmin#ANY_TAB_ON_ENTRY");
 	}
 
 	@description = "LPS-135401 - Verify if Cascade deletion type of Relationship Many to Many will allow to delete only the entry with relation but not its relations"
