@@ -22,4 +22,5 @@ public class DateTimeClayTableSchemaField extends DateClayTableSchemaField {
 	public DateTimeClayTableSchemaField() {
 		setContentRenderer("datetime");
 	}
+
 }

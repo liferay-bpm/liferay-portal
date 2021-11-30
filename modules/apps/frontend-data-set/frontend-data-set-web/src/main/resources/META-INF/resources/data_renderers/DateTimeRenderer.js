@@ -14,20 +14,18 @@
 
 import PropType from 'prop-types';
 
-import {getDateFromDateString, prettifyDateObject} from '../utils/dates';
-
-function DateRenderer({options, value}) {
+function DateTimeRenderer({options, value}) {
 	if (!value) {
 		return null;
 	}
 
-	const dateObject = getDateFromDateString(value.split('T')[0]);
-	value = prettifyDateObject(dateObject);
-
 	const locale = themeDisplay.getLanguageId().replace('_', '-');
 	const dateOptions = options?.format || {
 		day: 'numeric',
+		hour: 'numeric',
+		minute: 'numeric',
 		month: 'short',
+		second: 'numeric',
 		year: 'numeric',
 	};
 	const formattedDate = new Intl.DateTimeFormat(locale, dateOptions).format(
@@ -37,11 +35,11 @@ function DateRenderer({options, value}) {
 	return formattedDate;
 }
 
-DateRenderer.propTypes = {
+DateTimeRenderer.propTypes = {
 	options: PropType.shape({
 		format: PropType.object,
 	}),
 	value: PropType.string.isRequired,
 };
 
-export default DateRenderer;
+export default DateTimeRenderer;

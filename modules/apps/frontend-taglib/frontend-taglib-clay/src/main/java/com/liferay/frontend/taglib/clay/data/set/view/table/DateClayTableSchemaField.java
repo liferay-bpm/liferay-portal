@@ -37,10 +37,9 @@ public class DateClayTableSchemaField extends ClayTableSchemaField {
 	public JSONObject toJSONObject() {
 		JSONObject clayTableSchemaFieldJSONObject = super.toJSONObject();
 
-		return clayTableSchemaFieldJSONObject.put(
-			"format", getFormat()
-		);
+		return clayTableSchemaFieldJSONObject.put("format", getFormat());
 	}
 
 	private String _format;
+
 }
