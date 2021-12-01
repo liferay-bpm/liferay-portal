@@ -20,6 +20,20 @@ import React from 'react';
 import {logError} from '../utils/logError';
 import TooltipTextRenderer from './TooltipTextRenderer';
 
+const Wrapper = ({options, ...props}) => {
+	return options.truncate ? (
+		<span
+			className={classNames(
+				'default-renderer__text-truncate',
+				'text-truncate'
+			)}
+		>
+			{props.children}
+		</span>
+	) : (
+		<>{props.children}</>
+	);
+};
 function DefaultRenderer({options, value}) {
 	if (
 		typeof value === 'number' ||
@@ -27,20 +41,7 @@ function DefaultRenderer({options, value}) {
 		value === undefined ||
 		value === null
 	) {
-		if (options.truncate) {
-			return (
-				<span
-					className={classNames(
-						'default-renderer__text-truncate',
-						'text-truncate'
-					)}
-				>
-					{value ?? ''}
-				</span>
-			);
-		}
-
-		return <>{value ?? ''}</>;
+		return <Wrapper options={options}>{value ?? ''}</Wrapper>;
 	}
 	else if (value.icon) {
 		return <ClayIcon symbol={value.icon} />;
@@ -48,21 +49,8 @@ function DefaultRenderer({options, value}) {
 	else if (!!value.iconSymbol && !!value.text) {
 		return <TooltipTextRenderer value={value} />;
 	}
-	else if (value.label) {
-		if (options.truncate) {
-			return (
-				<span
-					className={classNames(
-						'default-renderer__text-truncate',
-						'text-truncate'
-					)}
-				>
-					{value.label}
-				</span>
-			);
-		}
-
-		return <>{value.label}</>;
+	else if (value) {
+		return <Wrapper options={options}>{value}</Wrapper>;
 	}
 
 	logError(

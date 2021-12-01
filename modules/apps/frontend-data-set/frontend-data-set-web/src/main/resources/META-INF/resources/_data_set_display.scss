@@ -16,6 +16,10 @@
 		}
 	}
 
+	.default-renderer__text-truncate {
+		max-width: 400px;
+	}
+
 	&.data-set-fluid {
 		.data-set-pagination-wrapper {
 			margin: map-get($spacers, 3) 0 0;
@@ -204,8 +208,4 @@
 			flex-shrink: 0;
 		}
 	}
-}
-
-.default-renderer__text-truncate {
-	max-width: 400px;
 }
