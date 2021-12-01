@@ -17,6 +17,10 @@ package com.liferay.object.util;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectFieldLocalServiceUtil;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author Guilherme Camacho
  */
@@ -67,6 +71,18 @@ public class ObjectFieldUtil {
 		String label, String name, String type) {
 
 		return createObjectField(label, name, false, type);
+	}
+
+	public static Map<String, ObjectField> getObjectFieldsMap(
+		List<ObjectField> objectFields) {
+
+		Map<String, ObjectField> objectFieldsMap = new LinkedHashMap<>();
+
+		for (ObjectField objectField : objectFields) {
+			objectFieldsMap.put(objectField.getName(), objectField);
+		}
+
+		return objectFieldsMap;
 	}
 
 }
