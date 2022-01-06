@@ -13,7 +13,7 @@
  */
 
 import ClayForm, {ClayCheckbox} from '@clayui/form';
-import React from 'react';
+import React, {useState} from 'react';
 
 import {normalizeLanguageId} from '../../utils/string';
 import Card from '../Card/Card';
@@ -24,6 +24,13 @@ const defaultLanguageId = normalizeLanguageId(
 );
 
 const BasicInfoScreen = () => {
+	const objectView = {
+		label: {
+			[defaultLanguageId]: 'Custom View Name',
+		},
+		isDefault: false,
+	};
+
 	return (
 		<Card>
 			<Card.Header title={Liferay.Language.get('basic-info')} />
@@ -36,6 +43,7 @@ const BasicInfoScreen = () => {
 						label={Liferay.Language.get('name')}
 						name="name"
 						onChange={({target: {value}}: any) => {
+							objectView.label[defaultLanguageId] = value;
 
 							// dispatch({
 							// 	payload: {
@@ -48,16 +56,20 @@ const BasicInfoScreen = () => {
 
 						}}
 						required
-						value="" // objectLayout.name[defaultLanguageId]}
+						value={objectView.label[defaultLanguageId]}
+
+						// value={objectView.label[defaultLanguageId]}
+
 					/>
 				</ClayForm.Group>
 
 				<ClayForm.Group className="mb-0">
 					<ClayCheckbox
-						checked={true} // objectLayout.defaultObjectLayout}
+						checked={objectView.isDefault} // objectLayout.defaultObjectLayout}
 						disabled={false} // isViewOnly}
 						label={Liferay.Language.get('mark-as-default')}
 						onChange={({target: {checked}}) => {
+							objectView.isDefault = checked;
 
 							// dispatch({
 							// 	payload: {checked},
