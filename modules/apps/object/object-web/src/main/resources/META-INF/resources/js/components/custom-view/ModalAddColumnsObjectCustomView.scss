@@ -1,0 +1,21 @@
+.object-web__modal-add-columns {
+	&--list {
+		height: 300px;
+		width: 100%;
+		overflow: hidden;
+		overflow-y: scroll;
+
+		.custom-control-label {
+			font-weight: 600;
+		}
+		.list-group-item {
+			background-color: #f7f8f9;
+			border: 0;
+		}
+	}
+
+	&--selection-title {
+		font-size: 18px;
+		font-weight: 600;
+	}
+}
