@@ -47,7 +47,7 @@ public class ObjectFieldsTableClayDataSetDisplayView
 
 		labelClayTableSchemaField.setContentRenderer("actionLink");
 
-		clayTableSchemaBuilder.addClayTableSchemaField("type", "type");
+		clayTableSchemaBuilder.addClayTableSchemaField("DBType", "type");
 
 		ClayTableSchemaField requiredClayTableSchemaField =
 			clayTableSchemaBuilder.addClayTableSchemaField(
