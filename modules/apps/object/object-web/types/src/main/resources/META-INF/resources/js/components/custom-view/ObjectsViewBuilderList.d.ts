@@ -13,9 +13,7 @@
  */
 
 import React from 'react';
-interface ICustonViewWrapperProps extends React.HTMLAttributes<HTMLElement> {
-	isViewOnly: boolean;
-	objectViewId: string;
-}
-declare const CustomViewWrapper: React.FC<ICustonViewWrapperProps>;
-export default CustomViewWrapper;
+declare const ObjectsViewBuilderList: React.FC<React.HTMLAttributes<
+	HTMLElement
+>>;
+export default ObjectsViewBuilderList;

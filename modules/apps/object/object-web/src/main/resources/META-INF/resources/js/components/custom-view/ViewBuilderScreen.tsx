@@ -19,36 +19,39 @@ import {ClayInput} from '@clayui/form';
 import ClayList from '@clayui/list';
 import ClayManagementToolbar from '@clayui/management-toolbar';
 import {useModal} from '@clayui/modal';
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
+import {normalizeLanguageId} from '../../utils/string';
 import Card from '../Card/Card';
+import ModalAddColumnsObjectCustomView from './ModalAddColumnsObjectCustomView';
+import ViewContext, {TObjectView} from './context';
 
 import './ViewBuilderScreen.scss';
-import Panel from '../Panel/Panel';
+
+const defaultLanguageId = normalizeLanguageId(
+	Liferay.ThemeDisplay.getDefaultLanguageId()
+);
 
 const ViewBuilderScreen = () => {
+	const [
+		{isViewOnly, objectFields, objectView, objectViewId},
+		dispatch,
+	] = useContext(ViewContext);
+
+	// console.log(JSON.stringify(objectView));
 	const [visibleModal, setVisibleModal] = useState(false);
+
+	// const [currentObjectView, setCurrentObjectView] = useState<TObjectView>()
+
 	const {observer, onClose} = useModal({
 		onClose: () => setVisibleModal(false),
 	});
 
-	const columnList: Array<any> = [
-		{
-			label: 'Name',
-		},
-		{
-			label: 'Age',
-		},
-		{
-			label: 'Description',
-		},
-		{
-			label: 'City',
-		},
-		{
-			label: 'Email',
-		},
-	];
+	// console.log(currentObjectView);
+	// console.log(currentObjectView?.objectViewColumn);
+	// useEffect(() => {
+	// 	setCurrentObjectView(objectView);
+	// }, [])
 
 	return (
 		<>
@@ -99,50 +102,54 @@ const ViewBuilderScreen = () => {
 						</ClayManagementToolbar.ItemList>
 					</ClayManagementToolbar>
 
-					{columnList.length > 0 ? (
-						<ClayList>                           
-							{columnList.map((element, index) => {                              
-								return (
-                                    <>
-                                        {index === 0 && (
-                                            <ClayList.Item flex>
-                                                <ClayList.ItemField expand>
-                                                    <ClayList.ItemField>
-                                                        Name
-                                                    </ClayList.ItemField>
-                                                </ClayList.ItemField>
-                                            </ClayList.Item>
-                                        )}
-                                        <ClayList.Item flex>
-                                            <ClayList.ItemField>
-                                                <ClayButtonWithIcon
-                                                    displayType={null}
-                                                    symbol="drag"
-                                                />
-                                            </ClayList.ItemField>
+					{objectView?.objectViewColumn?.length > 0 ? (
+						<ClayList>
+							{objectView?.objectViewColumn.map(
+								(element, index) => {
+									return (
+										<>
+											{index === 0 && (
+												<ClayList.Item flex>
+													<ClayList.ItemField expand>
+														<ClayList.ItemField>
+															Name
+														</ClayList.ItemField>
+													</ClayList.ItemField>
+												</ClayList.Item>
+											)}
+											<ClayList.Item flex>
+												<ClayList.ItemField>
+													<ClayButtonWithIcon
+														displayType={null}
+														symbol="drag"
+													/>
+												</ClayList.ItemField>
 
-                                            <ClayList.ItemField expand>
-                                                <ClayList.ItemTitle>
-                                                    {element.label}
-                                                </ClayList.ItemTitle>
-                                            </ClayList.ItemField>
+												<ClayList.ItemField expand>
+													<ClayList.ItemTitle>
+														{
+															element.objectFieldName
+														}
+													</ClayList.ItemTitle>
+												</ClayList.ItemField>
 
-                                            <ClayList.ItemField>
-                                                <ClayList.QuickActionMenu>
-                                                    <ClayList.QuickActionMenu.Item
-                                                        onClick={() =>
-                                                            alert(
-                                                                'Clicked the trash!'
-                                                            )
-                                                        }
-                                                        symbol="times"
-                                                    />
-                                                </ClayList.QuickActionMenu>
-                                            </ClayList.ItemField>
-                                        </ClayList.Item>
-                                    </>
-								);
-							})}
+												<ClayList.ItemField>
+													<ClayList.QuickActionMenu>
+														<ClayList.QuickActionMenu.Item
+															onClick={() =>
+																alert(
+																	'Clicked the trash!'
+																)
+															}
+															symbol="times"
+														/>
+													</ClayList.QuickActionMenu>
+												</ClayList.ItemField>
+											</ClayList.Item>
+										</>
+									);
+								}
+							)}
 						</ClayList>
 					) : (
 						<div className="object-web__custom-view-view-builder--empty-space">
@@ -162,12 +169,12 @@ const ViewBuilderScreen = () => {
 				</Card.Body>
 			</Card>
 
-			{/* {visibleModal && (
-                    <ModalDeAlininha
-                        observer={observer}
-                        onClose={onClose}
-                    />
-                )}  */}
+			{visibleModal && (
+				<ModalAddColumnsObjectCustomView
+					observer={observer}
+					onClose={onClose}
+				/>
+			)}
 		</>
 	);
 };

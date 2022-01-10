@@ -14,11 +14,12 @@
 
 import ClayButton from '@clayui/button';
 import ClayTabs from '@clayui/tabs';
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import SidePanelContent from '../SidePanelContent';
 import BasicInfoScreen from './BasicInfoScreen';
 import ViewBuilderScreen from './ViewBuilderScreen';
+import ViewContext, {TObjectField, TYPES, ViewContextProvider} from './context';
 
 const TABS = [
 	{
@@ -31,15 +32,90 @@ const TABS = [
 	},
 ];
 
+const HEADERS = new Headers({
+	'Accept': 'application/json',
+	'Content-Type': 'application/json',
+});
+
 const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
+	const [
+		{isViewOnly, objectFields, objectView, objectViewId},
+		dispatch,
+	] = useContext(ViewContext);
 	const [activeIndex, setActiveIndex] = useState<number>(0);
-	const [loading, setLoading] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(true);
 
 	const onCloseSidePanel = () => {
 		const parentWindow = Liferay.Util.getOpener();
 
 		parentWindow.Liferay.fire('close-side-panel');
 	};
+
+	useEffect(() => {
+		const makeFetch = async () => {
+			const objectLayoutResponse = await Liferay.Util.fetch(
+				`/o/object-admin/v1.0/object-layouts/${objectViewId}`,
+				{
+					header: HEADERS,
+					method: 'GET',
+				}
+			);
+
+			const {
+				defaultObjectLayout,
+				name,
+				objectDefinitionId,
+				objectLayoutTabs,
+			} = await objectLayoutResponse.json();
+
+			const objectFieldsResponse = await Liferay.Util.fetch(
+				`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}/object-fields`,
+				{
+					headers: HEADERS,
+					method: 'GET',
+				}
+			);
+
+			// const [primeiro, segundo] = await Promise.all([
+			// 	objectLayoutResponsePromise,
+			// 	objectFieldsResponsePromise
+			// ]).then()
+
+			const objectView = {
+				objectDefinitionId,
+				defaultObjectLayout,
+				name,
+			};
+
+			dispatch({
+				payload: {
+					objectView,
+				},
+				type: TYPES.ADD_OBJECT_VIEW,
+			});
+
+			const {
+				items: objectFields,
+			}: {items: TObjectField[]} = await objectFieldsResponse.json();
+
+			dispatch({
+				payload: {
+					objectFields,
+				},
+				type: TYPES.ADD_OBJECT_FIELDS,
+			});
+
+			// console.log(defaultObjectLayout);
+			// console.log(name);
+			// console.log(objectDefinitionId);
+			// console.log(objectLayoutTabs);
+			// console.log(objectFields);
+
+			setLoading(false);
+		};
+
+		makeFetch();
+	}, [objectViewId, dispatch]);
 
 	return (
 		<>
@@ -91,5 +167,20 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 		</>
 	);
 };
+interface ICustonViewWrapperProps extends React.HTMLAttributes<HTMLElement> {
+	isViewOnly: boolean;
+	objectViewId: string;
+}
 
-export default CustomView;
+const CustomViewWrapper: React.FC<ICustonViewWrapperProps> = ({
+	isViewOnly,
+	objectViewId,
+}) => {
+	return (
+		<ViewContextProvider value={{isViewOnly, objectViewId}}>
+			<CustomView />
+		</ViewContextProvider>
+	);
+};
+
+export default CustomViewWrapper;

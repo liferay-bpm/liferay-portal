@@ -17,9 +17,13 @@ import ClayForm, {ClayCheckbox, ClayInput} from '@clayui/form';
 import ClayList from '@clayui/list';
 import ClayManagementToolbar from '@clayui/management-toolbar';
 import ClayModal from '@clayui/modal';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
+
+import {normalizeLanguageId} from '../../utils/string';
+import ViewContext from './context';
 
 import './ModalAddColumnsObjectCustomView.scss';
+import {TYPES} from './context';
 
 interface IProps extends React.HTMLAttributes<HTMLElement> {
 	observer: any;
@@ -34,114 +38,180 @@ type TInitialValues = {
 	type: string;
 };
 
+type TName = {
+	[key: string]: string;
+};
+
+interface TObjectViewColumn {
+	label: TName;
+	checked: boolean;
+	filtered: boolean;
+}
+
+const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
+
 const ModalAddColumnsObjectCustomView: React.FC<IProps> = ({
 	observer,
 	onClose,
 }) => {
-	let initialValues: TInitialValues[] = [
-		{
-			label: '',
-			listTypeDefinitionId: 0,
-			name: undefined,
-			required: false,
-			type: '',
-		},
-	];
 
-	initialValues = [
+	// let initialValues: TInitialValues[] = [
+	// 	{
+	// 		label: '',
+	// 		listTypeDefinitionId: 0,
+	// 		name: undefined,
+	// 		required: false,
+	// 		type: '',
+	// 	},
+	// ];
+
+	// Author, Creation Date, Modified Date, Workflow Status, ID
+
+	const metadatas = [
 		{
 			label: 'Author',
-			listTypeDefinitionId: 0,
-			name: undefined,
+			checked: false,
+			filtered: true,
+			id: 1,
+			indexed: true,
+			indexedAsKeyword: true,
+			indexedLanguageId: '',
+			inLayout: true, // eslint-disable-line @typescript-eslint/member-ordering
+			listTypeDefinitionId: true,
+			name: 'author',
 			required: false,
-			type: '',
+			type: 'metadata',
 		},
 		{
-			label: 'Delivery Date',
-			listTypeDefinitionId: 0,
-			name: undefined,
+			label: 'Creation Date',
+			checked: false,
+			filtered: true,
+			id: 2,
+			indexed: true,
+			indexedAsKeyword: true,
+			indexedLanguageId: '',
+			inLayout: true, // eslint-disable-line @typescript-eslint/member-ordering
+			listTypeDefinitionId: true,
+			name: 'creationDate',
 			required: false,
-			type: '',
+			type: 'metadata',
 		},
 		{
-			label: 'Name',
-			listTypeDefinitionId: 0,
-			name: undefined,
+			label: 'Modified Date',
+			checked: false,
+			filtered: true,
+
+			id: 3,
+			indexed: true,
+			indexedAsKeyword: true,
+			indexedLanguageId: '',
+			inLayout: true, // eslint-disable-line @typescript-eslint/member-ordering
+			listTypeDefinitionId: true,
+			name: 'odifiedDate',
 			required: false,
-			type: '',
+			type: 'metadata',
 		},
 		{
-			label: 'Price',
-			listTypeDefinitionId: 0,
-			name: undefined,
+			label: 'Workflow Status',
+			checked: false,
+			filtered: true,
+			id: 4,
+			indexed: true,
+			indexedAsKeyword: true,
+			indexedLanguageId: '',
+			inLayout: true, // eslint-disable-line @typescript-eslint/member-ordering
+			listTypeDefinitionId: true,
+			name: 'author',
 			required: false,
-			type: '',
+			type: 'metadata',
 		},
 		{
-			label: 'Quantity',
-			listTypeDefinitionId: 0,
-			name: undefined,
+			label: 'ID',
+			checked: false,
+			filtered: true,
+			id: 5,
+			indexed: true,
+			indexedAsKeyword: true,
+			indexedLanguageId: '',
+			inLayout: true, // eslint-disable-line @typescript-eslint/member-ordering
+			listTypeDefinitionId: true,
+			name: 'author',
 			required: false,
-			type: '',
-		},
-		{
-			label: 'SKU',
-			listTypeDefinitionId: 0,
-			name: undefined,
-			required: false,
-			type: '',
+			type: 'metadata',
 		},
 	];
 
-	const newValue = initialValues.map((value) => {
-		return {
-			...value,
-			checked: false,
-			filtered: true,
-		};
-	});
+	// const newValue = initialValues.map((value) => {
+	// 	return {
+	// 		...value,
+	// 		checked: false,
+	// 		filtered: true,
+	// 	};
+	// });
 
-	const [filteredItems, setFilteredItems] = useState(newValue);
+	const [
+		{isViewOnly, objectFields, objectView, objectViewId},
+		dispatch,
+	] = useContext(ViewContext);
+
+	const [filteredItems, setFilteredItems] = useState(objectFields);
 	const [fieldsChecked, setFieldsChecked] = useState(false);
 	const [query, setQuery] = useState('');
 
+	
 	useEffect(() => {
-		if (filteredItems.find((item) => item.checked === true)) {
-			setFieldsChecked(true);
-		}
-		else {
-			setFieldsChecked(false);
-		}
-	}, [filteredItems]);
+		const objectFieldsWithCheck = objectFields.map((field) => {
+			return {
+				...field,
+				checked: false,
+				filtered: true,
+			};
+		});
+		setFilteredItems(objectFieldsWithCheck);
+	}, []);
 
-	useEffect(() => {
-		if (query) {
-			setFilteredItems(
-				filteredItems.map((field) => {
-					if (
-						!field.label.toLowerCase().includes(query.toLowerCase())
-					) {
-						return {
-							...field,
-							filtered: false,
-						};
-					}
+	console.log(filteredItems);
 
-					return field;
-				})
-			);
-		}
-		else {
-			setFilteredItems(
-				filteredItems.map((field) => {
-					return {
-						...field,
-						filtered: true,
-					};
-				})
-			);
-		}
-	}, [filteredItems, query]);
+
+	// console.log(filteredItems);
+
+	// useEffect(() => {
+	// 	if (filteredItems.find((item) => item.checked === true)) {
+	// 		setFieldsChecked(true);
+	// 	}
+	// 	else {
+	// 		setFieldsChecked(false);
+	// 	}
+	// }, [filteredItems]);
+
+	// useEffect(() => {
+	// 	if (query) {
+	// 		setFilteredItems(
+	// 			filteredItems.map((field) => {
+	// 				if (
+	// 					!field.label.toLowerCase().includes(query.toLowerCase())
+	// 				) {
+	// 					return {
+	// 						...field,
+	// 						filtered: false,
+	// 					};
+	// 				}
+
+	// 				return field;
+	// 			})
+	// 		);
+	// 	}
+	// 	else {
+	// 		setFilteredItems(
+	// 			filteredItems.map((field) => {
+	// 				return {
+	// 					...field,
+	// 					filtered: true,
+	// 				};
+	// 			})
+	// 		);
+	// 	}
+	// }, [filteredItems, query]);
 
 	const handleAllFieldsChecked = () => {
 		setFilteredItems(
@@ -155,19 +225,30 @@ const ModalAddColumnsObjectCustomView: React.FC<IProps> = ({
 		setFieldsChecked(!fieldsChecked);
 	};
 
-	const handleFieldChecked = (label: String) => {
-		setFilteredItems(
-			filteredItems.map((field) => {
-				if (field.label === label) {
-					return {
-						...field,
-						checked: !field.checked,
-					};
-				}
+	const handleFieldChecked = (name: String) => {
+		const newfiltredItems = filteredItems.map((field) => {
+			if (field.name === name) {
+				return {
+					...field,
+					checked: !field.checked,
+				};
+			}
 
-				return field;
-			})
-		);
+			return field;
+		});
+
+		setFilteredItems(newfiltredItems);
+	};
+
+	const onSubmit = () => {
+		dispatch({
+			payload: {
+				filteredItems,
+			},
+			type: TYPES.ADD_OBJECT_VIEW_COLUMN,
+		});
+
+		onClose();
 	};
 
 	return (
@@ -176,7 +257,7 @@ const ModalAddColumnsObjectCustomView: React.FC<IProps> = ({
 				className="object-web__modal-add-columns"
 				observer={observer}
 			>
-				<ClayForm>
+				<ClayForm onSubmit={onSubmit}>
 					<ClayModal.Header>
 						{Liferay.Language.get('add-columns')}
 					</ClayModal.Header>
@@ -207,6 +288,7 @@ const ModalAddColumnsObjectCustomView: React.FC<IProps> = ({
 											onChange={({target}) =>
 												setQuery(target.value)
 											}
+											placeholder="Search"
 											type="text"
 										/>
 
@@ -234,7 +316,7 @@ const ModalAddColumnsObjectCustomView: React.FC<IProps> = ({
 
 						<div>
 							<ClayList className="object-web__modal-add-columns--list">
-								{filteredItems.map((field, index) => (
+								{filteredItems?.map((field, index) => (
 									<ClayList.Item
 										className={
 											field?.filtered ? '' : 'hide'
@@ -243,10 +325,15 @@ const ModalAddColumnsObjectCustomView: React.FC<IProps> = ({
 										key={`list-item-${index}`}
 									>
 										<ClayCheckbox
+
+											// @ts-ignore
+
 											checked={field.checked}
-											label={field.label}
+											label={
+												field.label[defaultLanguageId]
+											}
 											onChange={() => {
-												handleFieldChecked(field.label);
+												handleFieldChecked(field.name);
 											}}
 										/>
 									</ClayList.Item>
@@ -260,7 +347,7 @@ const ModalAddColumnsObjectCustomView: React.FC<IProps> = ({
 							<ClayButton.Group key={1} spaced>
 								<ClayButton
 									displayType="secondary"
-									onClick={() => onClose()}
+									onClick={onClose}
 								>
 									{Liferay.Language.get('cancel')}
 								</ClayButton>
