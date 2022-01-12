@@ -69,10 +69,10 @@ export enum TYPES {
 	ADD_OBJECT_VIEW = 'ADD_OBJECT_VIEW',
 	ADD_OBJECT_CUSTOM_VIEW_FIELD = 'ADD_OBJECT_CUSTOM_VIEW_FIELD',
 	ADD_OBJECT_VIEW_COLUMN = 'ADD_OBJECT_VIEW_COLUMN',
+	CHANGE_OBJECT_VIEW_NAME = 'CHANGE_OBJECT_VIEW_NAME',
 	DELETE_OBJECT_VIEW_COLUMN = 'DELETE_OBJECT_VIEW_COLUMN',
 	DELETE_OBJECT_CUSTOM_VIEW_FIELD = 'DELETE_OBJECT_CUSTOM_VIEW_FIELD',
 	SET_OBJECT_VIEW_AS_DEFAULT = 'SET_OBJECT_VIEW_AS_DEFAULT',
-	SET_OBJECT_FIELD_AS_CHECKED = 'SET_OBJECT_FIELD_AS_CHECKED',
 }
 
 const initialState = {
@@ -123,6 +123,21 @@ const viewReducer = (state: TState, action: TAction) => {
 				objectFields,
 			};
 		}
+		case TYPES.CHANGE_OBJECT_VIEW_NAME: {
+			const {newName} = action.payload;
+
+			const newObjectView = {
+				...state.objectView,
+				name: {
+					defaultLanguageId: newName,
+				},
+			};
+
+			return {
+				...state,
+				objectView: newObjectView,
+			};
+		}
 		case TYPES.DELETE_OBJECT_VIEW_COLUMN: {
 			const {objectFieldName} = action.payload;
 
@@ -142,10 +157,18 @@ const viewReducer = (state: TState, action: TAction) => {
 				objectView: newObjectView,
 			};
 		}
-		case TYPES.SET_OBJECT_FIELD_AS_CHECKED: {
-		}
 		case TYPES.SET_OBJECT_VIEW_AS_DEFAULT: {
-			return state;
+			const {checked} = action.payload;
+
+			const newObjectView = {
+				...state.objectView,
+				defaultObjectView: checked,
+			};
+
+			return {
+				...state,
+				objectView: newObjectView,
+			};
 		}
 		default:
 			return state;

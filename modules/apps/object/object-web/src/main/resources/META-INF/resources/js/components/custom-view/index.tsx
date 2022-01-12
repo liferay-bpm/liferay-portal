@@ -83,7 +83,7 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 
 			const objectView = {
 				objectDefinitionId,
-				defaultObjectLayout,
+				defaultObjectView: defaultObjectLayout,
 				name,
 			};
 
@@ -104,12 +104,6 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 				},
 				type: TYPES.ADD_OBJECT_FIELDS,
 			});
-
-			// console.log(defaultObjectLayout);
-			// console.log(name);
-			// console.log(objectDefinitionId);
-			// console.log(objectLayoutTabs);
-			// console.log(objectFields);
 
 			setLoading(false);
 		};

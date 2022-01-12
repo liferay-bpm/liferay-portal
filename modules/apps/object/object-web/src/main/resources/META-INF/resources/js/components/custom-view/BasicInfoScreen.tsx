@@ -13,23 +13,35 @@
  */
 
 import ClayForm, {ClayCheckbox} from '@clayui/form';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 
-import {normalizeLanguageId} from '../../utils/string';
 import Card from '../Card/Card';
 import Input from '../form/Input';
+import ViewContext, { TYPES } from './context';
 
-const defaultLanguageId = normalizeLanguageId(
-	Liferay.ThemeDisplay.getDefaultLanguageId()
-);
+const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 const BasicInfoScreen = () => {
-	const objectView = {
-		label: {
-			[defaultLanguageId]: 'Custom View Name',
-		},
-		isDefault: false,
-	};
+
+	const [
+		{isViewOnly, objectFields, objectView, objectViewId},
+		dispatch,
+	] = useContext(ViewContext);
+
+	const handleChangeName = (newName: string) => {
+
+		dispatch({
+			payload: {newName},
+			type: TYPES.CHANGE_OBJECT_VIEW_NAME
+		})
+	}
+
+	const handleChangeChecked = (checked: boolean) => {
+		dispatch({
+			payload: {checked},
+			type: TYPES.SET_OBJECT_VIEW_AS_DEFAULT
+		})
+	}
 
 	return (
 		<Card>
@@ -38,44 +50,26 @@ const BasicInfoScreen = () => {
 			<Card.Body>
 				<ClayForm.Group>
 					<Input
-						disabled={false} // isViewOnly}
+						disabled={false}
 						id="objectLayoutName"
 						label={Liferay.Language.get('name')}
 						name="name"
 						onChange={({target: {value}}: any) => {
-							objectView.label[defaultLanguageId] = value;
-
-							// dispatch({
-							// 	payload: {
-							// 		name: {
-							// 			[defaultLanguageId]: value,
-							// 		},
-							// 	},
-							// 	type: TYPES.CHANGE_OBJECT_LAYOUT_NAME,
-							// });
-
+							handleChangeName(value);
 						}}
 						required
-						value={objectView.label[defaultLanguageId]}
-
-						// value={objectView.label[defaultLanguageId]}
+						value={objectView.name[defaultLanguageId]}
 
 					/>
 				</ClayForm.Group>
 
 				<ClayForm.Group className="mb-0">
 					<ClayCheckbox
-						checked={objectView.isDefault} // objectLayout.defaultObjectLayout}
-						disabled={false} // isViewOnly}
+						checked={objectView.defaultObjectView}
+						disabled={false}
 						label={Liferay.Language.get('mark-as-default')}
 						onChange={({target: {checked}}) => {
-							objectView.isDefault = checked;
-
-							// dispatch({
-							// 	payload: {checked},
-							// 	type: TYPES.SET_OBJECT_LAYOUT_AS_DEFAULT,
-							// });
-
+							handleChangeChecked(checked);
 						}}
 					/>
 				</ClayForm.Group>
