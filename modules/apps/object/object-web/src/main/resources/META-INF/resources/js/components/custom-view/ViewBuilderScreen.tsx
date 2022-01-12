@@ -24,7 +24,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import {normalizeLanguageId} from '../../utils/string';
 import Card from '../Card/Card';
 import ModalAddColumnsObjectCustomView from './ModalAddColumnsObjectCustomView';
-import ViewContext, {TObjectView} from './context';
+import ViewContext, {TObjectView, TYPES} from './context';
 
 import './ViewBuilderScreen.scss';
 
@@ -38,7 +38,7 @@ const ViewBuilderScreen = () => {
 		dispatch,
 	] = useContext(ViewContext);
 
-	// console.log(JSON.stringify(objectView));
+	console.log(JSON.stringify(objectView));
 	const [visibleModal, setVisibleModal] = useState(false);
 
 	// const [currentObjectView, setCurrentObjectView] = useState<TObjectView>()
@@ -52,6 +52,13 @@ const ViewBuilderScreen = () => {
 	// useEffect(() => {
 	// 	setCurrentObjectView(objectView);
 	// }, [])
+
+	const handleDeleteColumn = (objectFieldName: string) => {
+		dispatch({
+			payload: {objectFieldName},
+			type: TYPES.DELETE_OBJECT_VIEW_COLUMN,
+		});
+	};
 
 	return (
 		<>
@@ -105,7 +112,7 @@ const ViewBuilderScreen = () => {
 					{objectView?.objectViewColumn?.length > 0 ? (
 						<ClayList>
 							{objectView?.objectViewColumn.map(
-								(element, index) => {
+								(viewColumn, index) => {
 									return (
 										<>
 											{index === 0 && (
@@ -128,7 +135,7 @@ const ViewBuilderScreen = () => {
 												<ClayList.ItemField expand>
 													<ClayList.ItemTitle>
 														{
-															element.objectFieldName
+															viewColumn.objectFieldName
 														}
 													</ClayList.ItemTitle>
 												</ClayList.ItemField>
@@ -137,8 +144,8 @@ const ViewBuilderScreen = () => {
 													<ClayList.QuickActionMenu>
 														<ClayList.QuickActionMenu.Item
 															onClick={() =>
-																alert(
-																	'Clicked the trash!'
+																handleDeleteColumn(
+																	viewColumn.objectFieldName
 																)
 															}
 															symbol="times"

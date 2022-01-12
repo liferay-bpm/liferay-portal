@@ -69,6 +69,7 @@ export enum TYPES {
 	ADD_OBJECT_VIEW = 'ADD_OBJECT_VIEW',
 	ADD_OBJECT_CUSTOM_VIEW_FIELD = 'ADD_OBJECT_CUSTOM_VIEW_FIELD',
 	ADD_OBJECT_VIEW_COLUMN = 'ADD_OBJECT_VIEW_COLUMN',
+	DELETE_OBJECT_VIEW_COLUMN = 'DELETE_OBJECT_VIEW_COLUMN',
 	DELETE_OBJECT_CUSTOM_VIEW_FIELD = 'DELETE_OBJECT_CUSTOM_VIEW_FIELD',
 	SET_OBJECT_VIEW_AS_DEFAULT = 'SET_OBJECT_VIEW_AS_DEFAULT',
 	SET_OBJECT_FIELD_AS_CHECKED = 'SET_OBJECT_FIELD_AS_CHECKED',
@@ -79,9 +80,7 @@ const initialState = {
 	objectView: {} as TObjectView,
 } as TState;
 
-const defaultLanguageId = normalizeLanguageId(
-	Liferay.ThemeDisplay.getDefaultLanguageId()
-);
+const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 const viewReducer = (state: TState, action: TAction) => {
 	switch (action.type) {
@@ -111,22 +110,10 @@ const viewReducer = (state: TState, action: TAction) => {
 				objectViewColumn: viewColumn,
 			};
 
-			console.log(newObjectView);
-
-			const newState = {...state};
-
-			// const objectViewWithColumn = {
-			// 	...objectView,
-			// 	objectViewColumn: viewColumn
-			// }
-
 			return {
 				...state,
 				objectView: newObjectView,
 			};
-		}
-		case TYPES.ADD_OBJECT_CUSTOM_VIEW_FIELD: {
-			return state;
 		}
 		case TYPES.ADD_OBJECT_FIELDS: {
 			const {objectFields} = action.payload;
@@ -136,8 +123,24 @@ const viewReducer = (state: TState, action: TAction) => {
 				objectFields,
 			};
 		}
-		case TYPES.DELETE_OBJECT_CUSTOM_VIEW_FIELD: {
-			return state;
+		case TYPES.DELETE_OBJECT_VIEW_COLUMN: {
+			const {objectFieldName} = action.payload;
+
+			const newState = {...state};
+
+			const viewColumn = newState.objectView?.objectViewColumn.filter(
+				(viewColumn) => viewColumn.objectFieldName !== objectFieldName
+			);
+
+			const newObjectView = {
+				...state.objectView,
+				objectViewColumn: viewColumn,
+			};
+
+			return {
+				...state,
+				objectView: newObjectView,
+			};
 		}
 		case TYPES.SET_OBJECT_FIELD_AS_CHECKED: {
 		}
