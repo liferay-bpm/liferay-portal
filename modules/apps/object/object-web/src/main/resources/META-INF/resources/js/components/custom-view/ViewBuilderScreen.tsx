@@ -20,10 +20,13 @@ import ClayList from '@clayui/list';
 import ClayManagementToolbar from '@clayui/management-toolbar';
 import {useModal} from '@clayui/modal';
 import React, {useContext, useEffect, useState} from 'react';
+import {DndProvider} from 'react-dnd';
+import {HTML5Backend} from 'react-dnd-html5-backend';
 
 import {normalizeLanguageId} from '../../utils/string';
 import Card from '../Card/Card';
 import ModalAddColumnsObjectCustomView from './ModalAddColumnsObjectCustomView';
+import ViewBuilderListItem from './ViewBuilderListItem';
 import ViewContext, {TObjectView, TYPES} from './context';
 
 import './ViewBuilderScreen.scss';
@@ -52,13 +55,6 @@ const ViewBuilderScreen = () => {
 	// useEffect(() => {
 	// 	setCurrentObjectView(objectView);
 	// }, [])
-
-	const handleDeleteColumn = (objectFieldName: string) => {
-		dispatch({
-			payload: {objectFieldName},
-			type: TYPES.DELETE_OBJECT_VIEW_COLUMN,
-		});
-	};
 
 	return (
 		<>
@@ -124,35 +120,15 @@ const ViewBuilderScreen = () => {
 													</ClayList.ItemField>
 												</ClayList.Item>
 											)}
-											<ClayList.Item flex>
-												<ClayList.ItemField>
-													<ClayButtonWithIcon
-														displayType={null}
-														symbol="drag"
-													/>
-												</ClayList.ItemField>
 
-												<ClayList.ItemField expand>
-													<ClayList.ItemTitle>
-														{
-															viewColumn.objectFieldName
-														}
-													</ClayList.ItemTitle>
-												</ClayList.ItemField>
-
-												<ClayList.ItemField>
-													<ClayList.QuickActionMenu>
-														<ClayList.QuickActionMenu.Item
-															onClick={() =>
-																handleDeleteColumn(
-																	viewColumn.objectFieldName
-																)
-															}
-															symbol="times"
-														/>
-													</ClayList.QuickActionMenu>
-												</ClayList.ItemField>
-											</ClayList.Item>
+											<DndProvider backend={HTML5Backend}>
+												<ViewBuilderListItem
+													index={index}
+													objectViewColumn={
+														viewColumn
+													}
+												/>
+											</DndProvider>
 										</>
 									);
 								}

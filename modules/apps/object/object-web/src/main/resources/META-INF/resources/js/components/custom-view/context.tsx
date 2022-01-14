@@ -33,14 +33,15 @@ export type TObjectField = {
 	type: string;
 };
 
-type TObjectFieldName = {
+export type TObjectViewColumn = {
 	objectFieldName: string;
+	priority?: number;
 };
 
 export type TObjectView = {
 	defaultObjectView: boolean;
 	name: TName;
-	objectViewColumn: TObjectFieldName[];
+	objectViewColumn: TObjectViewColumn[];
 };
 
 type TState = {
@@ -104,7 +105,7 @@ const METADATAS = [
 		indexedLanguageId: '',
 		inLayout: true,
 		listTypeDefinitionId: true,
-		name: 'odifiedDate',
+		name: 'modifiedDate',
 		required: false,
 		type: 'metadata',
 	},
@@ -118,7 +119,7 @@ const METADATAS = [
 		indexedLanguageId: '',
 		inLayout: true,
 		listTypeDefinitionId: true,
-		name: 'author',
+		name: 'workflowStatus',
 		required: false,
 		type: 'metadata',
 	},
@@ -132,7 +133,7 @@ const METADATAS = [
 		indexedLanguageId: '',
 		inLayout: true,
 		listTypeDefinitionId: true,
-		name: 'author',
+		name: 'id',
 		required: false,
 		type: 'metadata',
 	},
@@ -144,6 +145,7 @@ export enum TYPES {
 	ADD_OBJECT_CUSTOM_VIEW_FIELD = 'ADD_OBJECT_CUSTOM_VIEW_FIELD',
 	ADD_OBJECT_VIEW_COLUMN = 'ADD_OBJECT_VIEW_COLUMN',
 	CHANGE_OBJECT_VIEW_NAME = 'CHANGE_OBJECT_VIEW_NAME',
+	CHANGE_OBJECT_VIEW_COLUMN_ORDER = 'CHANGE_OBJECT_VIEW_COLUMN_ORDER',
 	DELETE_OBJECT_VIEW_COLUMN = 'DELETE_OBJECT_VIEW_COLUMN',
 	DELETE_OBJECT_CUSTOM_VIEW_FIELD = 'DELETE_OBJECT_CUSTOM_VIEW_FIELD',
 	SET_OBJECT_VIEW_AS_DEFAULT = 'SET_OBJECT_VIEW_AS_DEFAULT',
@@ -167,19 +169,27 @@ const viewReducer = (state: TState, action: TAction) => {
 		case TYPES.ADD_OBJECT_VIEW_COLUMN: {
 			const {filteredItems} = action.payload;
 
-			const viewColumn: any = [];
+			const viewColumn: TObjectViewColumn[] = [];
 
-			filteredItems.map((field: TObjectField) => {
+			filteredItems.map((field: TObjectField, index: number) => {
 				if (field.checked === true) {
 					viewColumn.push({
 						objectFieldName: field.label[defaultLanguageId],
+						priority: index,
 					});
 				}
 			});
 
+			const newViewColumn = viewColumn.map((viewColumn, index) => {
+				return {
+					...viewColumn,
+					priority: index,
+				};
+			});
+
 			const newObjectView = {
 				...state.objectView,
-				objectViewColumn: viewColumn,
+				objectViewColumn: newViewColumn,
 			};
 
 			return {
@@ -231,6 +241,37 @@ const viewReducer = (state: TState, action: TAction) => {
 				objectView: newObjectView,
 			};
 		}
+		case TYPES.CHANGE_OBJECT_VIEW_COLUMN_ORDER: {
+			const {draggedIndex, targetIndex} = action.payload;
+
+			const newState = {...state};
+
+			const viewColumns = newState.objectView.objectViewColumn;
+
+			const dragged = viewColumns[draggedIndex];
+
+			viewColumns.splice(draggedIndex, 1);
+			viewColumns.splice(targetIndex, 0, dragged);
+
+			const newViewColumn = viewColumns.map((viewColumn, index) => {
+				return {
+					...viewColumn,
+					priority: index,
+				};
+			});
+
+			console.log(newViewColumn);
+
+			const newObjectView = {
+				...state.objectView,
+				objectViewColumn: newViewColumn,
+			};
+
+			return {
+				...state,
+				objectView: newObjectView,
+			};
+		}
 		case TYPES.DELETE_OBJECT_VIEW_COLUMN: {
 			const {objectFieldName} = action.payload;
 
@@ -240,9 +281,16 @@ const viewReducer = (state: TState, action: TAction) => {
 				(viewColumn) => viewColumn.objectFieldName !== objectFieldName
 			);
 
+			const newViewColumn = viewColumn.map((viewColumn, index) => {
+				return {
+					...viewColumn,
+					priority: index,
+				};
+			});
+
 			const newObjectView = {
 				...state.objectView,
-				objectViewColumn: viewColumn,
+				objectViewColumn: newViewColumn,
 			};
 
 			return {

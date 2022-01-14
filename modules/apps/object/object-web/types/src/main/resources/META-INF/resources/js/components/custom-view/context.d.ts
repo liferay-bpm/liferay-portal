@@ -30,13 +30,14 @@ export declare type TObjectField = {
 	required: boolean;
 	type: string;
 };
-declare type TObjectFieldName = {
+export declare type TObjectViewColumn = {
 	objectFieldName: string;
+	priority?: number;
 };
 export declare type TObjectView = {
 	defaultObjectView: boolean;
 	name: TName;
-	objectViewColumn: TObjectFieldName[];
+	objectViewColumn: TObjectViewColumn[];
 };
 declare type TState = {
 	isViewOnly: boolean;
@@ -61,6 +62,7 @@ export declare enum TYPES {
 	ADD_OBJECT_CUSTOM_VIEW_FIELD = 'ADD_OBJECT_CUSTOM_VIEW_FIELD',
 	ADD_OBJECT_VIEW_COLUMN = 'ADD_OBJECT_VIEW_COLUMN',
 	CHANGE_OBJECT_VIEW_NAME = 'CHANGE_OBJECT_VIEW_NAME',
+	CHANGE_OBJECT_VIEW_COLUMN_ORDER = 'CHANGE_OBJECT_VIEW_COLUMN_ORDER',
 	DELETE_OBJECT_VIEW_COLUMN = 'DELETE_OBJECT_VIEW_COLUMN',
 	DELETE_OBJECT_CUSTOM_VIEW_FIELD = 'DELETE_OBJECT_CUSTOM_VIEW_FIELD',
 	SET_OBJECT_VIEW_AS_DEFAULT = 'SET_OBJECT_VIEW_AS_DEFAULT',

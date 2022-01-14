@@ -17,7 +17,13 @@ import ClayForm, {ClayCheckbox, ClayInput} from '@clayui/form';
 import ClayList from '@clayui/list';
 import ClayManagementToolbar from '@clayui/management-toolbar';
 import ClayModal from '@clayui/modal';
-import React, {FormEvent, useContext, useEffect, useState} from 'react';
+import React, {
+	ChangeEventHandler,
+	FormEvent,
+	useContext,
+	useEffect,
+	useState,
+} from 'react';
 
 import {normalizeLanguageId} from '../../utils/string';
 import ViewContext, {TObjectField} from './context';
@@ -76,7 +82,7 @@ const ModalAddColumnsObjectCustomView: React.FC<IProps> = ({
 	const [fieldsChecked, setFieldsChecked] = useState(false);
 	const [query, setQuery] = useState('');
 
-	console.log(filteredItems);
+	// console.log(filteredItems);
 
 	// useEffect(() => {
 	// 	if (filteredItems.find((item) => item.checked === true)) {
