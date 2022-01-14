@@ -14,8 +14,6 @@
 
 import React, {createContext, useReducer} from 'react';
 
-import {normalizeLanguageId} from '../../utils/string';
-
 type TName = {
 	[key: string]: string;
 };
@@ -64,6 +62,82 @@ interface IViewContextProps extends Array<TState | Function> {
 
 const ViewContext = createContext({} as IViewContextProps);
 
+const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
+
+const METADATAS = [
+	{
+		label: {[defaultLanguageId]: 'Author'},
+		checked: false,
+		filtered: true,
+		id: 1,
+		indexed: true,
+		indexedAsKeyword: true,
+		indexedLanguageId: '',
+		inLayout: true,
+		listTypeDefinitionId: true,
+		name: 'author',
+		required: false,
+		type: 'metadata',
+	},
+	{
+		label: {[defaultLanguageId]: 'Creation Date'},
+		checked: false,
+		filtered: true,
+		id: 2,
+		indexed: true,
+		indexedAsKeyword: true,
+		indexedLanguageId: '',
+		inLayout: true,
+		listTypeDefinitionId: true,
+		name: 'creationDate',
+		required: false,
+		type: 'metadata',
+	},
+	{
+		label: {[defaultLanguageId]: 'Modified Date'},
+		checked: false,
+		filtered: true,
+
+		id: 3,
+		indexed: true,
+		indexedAsKeyword: true,
+		indexedLanguageId: '',
+		inLayout: true,
+		listTypeDefinitionId: true,
+		name: 'odifiedDate',
+		required: false,
+		type: 'metadata',
+	},
+	{
+		label: {[defaultLanguageId]: 'Workflow Status'},
+		checked: false,
+		filtered: true,
+		id: 4,
+		indexed: true,
+		indexedAsKeyword: true,
+		indexedLanguageId: '',
+		inLayout: true,
+		listTypeDefinitionId: true,
+		name: 'author',
+		required: false,
+		type: 'metadata',
+	},
+	{
+		label: {[defaultLanguageId]: 'ID'},
+		checked: false,
+		filtered: true,
+		id: 5,
+		indexed: true,
+		indexedAsKeyword: true,
+		indexedLanguageId: '',
+		inLayout: true,
+		listTypeDefinitionId: true,
+		name: 'author',
+		required: false,
+		type: 'metadata',
+	},
+];
+
 export enum TYPES {
 	ADD_OBJECT_FIELDS = 'ADD_OBJECT_FIELDS',
 	ADD_OBJECT_VIEW = 'ADD_OBJECT_VIEW',
@@ -79,8 +153,6 @@ const initialState = {
 	objectFields: [] as TObjectField[],
 	objectView: {} as TObjectView,
 } as TState;
-
-const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 const viewReducer = (state: TState, action: TAction) => {
 	switch (action.type) {
@@ -118,9 +190,29 @@ const viewReducer = (state: TState, action: TAction) => {
 		case TYPES.ADD_OBJECT_FIELDS: {
 			const {objectFields} = action.payload;
 
+			const objectFieldsWithCheck = objectFields.map(
+				(field: TObjectField) => {
+					return {
+						...field,
+						checked: false,
+						filtered: true,
+					};
+				}
+			);
+
+			const newObjectFields: TObjectField[] = [];
+
+			METADATAS.map((field) => {
+				newObjectFields.push(field);
+			});
+
+			objectFieldsWithCheck.map((field: TObjectField) => {
+				newObjectFields.push(field);
+			});
+
 			return {
 				...state,
-				objectFields,
+				objectFields: newObjectFields,
 			};
 		}
 		case TYPES.CHANGE_OBJECT_VIEW_NAME: {

@@ -17,31 +17,29 @@ import React, {useContext, useState} from 'react';
 
 import Card from '../Card/Card';
 import Input from '../form/Input';
-import ViewContext, { TYPES } from './context';
+import ViewContext, {TYPES} from './context';
 
 const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 const BasicInfoScreen = () => {
-
 	const [
 		{isViewOnly, objectFields, objectView, objectViewId},
 		dispatch,
 	] = useContext(ViewContext);
 
 	const handleChangeName = (newName: string) => {
-
 		dispatch({
 			payload: {newName},
-			type: TYPES.CHANGE_OBJECT_VIEW_NAME
-		})
-	}
+			type: TYPES.CHANGE_OBJECT_VIEW_NAME,
+		});
+	};
 
 	const handleChangeChecked = (checked: boolean) => {
 		dispatch({
 			payload: {checked},
-			type: TYPES.SET_OBJECT_VIEW_AS_DEFAULT
-		})
-	}
+			type: TYPES.SET_OBJECT_VIEW_AS_DEFAULT,
+		});
+	};
 
 	return (
 		<Card>
@@ -59,7 +57,6 @@ const BasicInfoScreen = () => {
 						}}
 						required
 						value={objectView.name[defaultLanguageId]}
-
 					/>
 				</ClayForm.Group>
 

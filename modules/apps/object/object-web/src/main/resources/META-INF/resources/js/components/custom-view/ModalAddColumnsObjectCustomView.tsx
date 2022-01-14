@@ -20,7 +20,7 @@ import ClayModal from '@clayui/modal';
 import React, {FormEvent, useContext, useEffect, useState} from 'react';
 
 import {normalizeLanguageId} from '../../utils/string';
-import ViewContext from './context';
+import ViewContext, {TObjectField} from './context';
 
 import './ModalAddColumnsObjectCustomView.scss';
 import {TYPES} from './context';
@@ -67,88 +67,6 @@ const ModalAddColumnsObjectCustomView: React.FC<IProps> = ({
 
 	// Author, Creation Date, Modified Date, Workflow Status, ID
 
-	const metadatas = [
-		{
-			label: 'Author',
-			checked: false,
-			filtered: true,
-			id: 1,
-			indexed: true,
-			indexedAsKeyword: true,
-			indexedLanguageId: '',
-			inLayout: true, // eslint-disable-line @typescript-eslint/member-ordering
-			listTypeDefinitionId: true,
-			name: 'author',
-			required: false,
-			type: 'metadata',
-		},
-		{
-			label: 'Creation Date',
-			checked: false,
-			filtered: true,
-			id: 2,
-			indexed: true,
-			indexedAsKeyword: true,
-			indexedLanguageId: '',
-			inLayout: true, // eslint-disable-line @typescript-eslint/member-ordering
-			listTypeDefinitionId: true,
-			name: 'creationDate',
-			required: false,
-			type: 'metadata',
-		},
-		{
-			label: 'Modified Date',
-			checked: false,
-			filtered: true,
-
-			id: 3,
-			indexed: true,
-			indexedAsKeyword: true,
-			indexedLanguageId: '',
-			inLayout: true, // eslint-disable-line @typescript-eslint/member-ordering
-			listTypeDefinitionId: true,
-			name: 'odifiedDate',
-			required: false,
-			type: 'metadata',
-		},
-		{
-			label: 'Workflow Status',
-			checked: false,
-			filtered: true,
-			id: 4,
-			indexed: true,
-			indexedAsKeyword: true,
-			indexedLanguageId: '',
-			inLayout: true, // eslint-disable-line @typescript-eslint/member-ordering
-			listTypeDefinitionId: true,
-			name: 'author',
-			required: false,
-			type: 'metadata',
-		},
-		{
-			label: 'ID',
-			checked: false,
-			filtered: true,
-			id: 5,
-			indexed: true,
-			indexedAsKeyword: true,
-			indexedLanguageId: '',
-			inLayout: true, // eslint-disable-line @typescript-eslint/member-ordering
-			listTypeDefinitionId: true,
-			name: 'author',
-			required: false,
-			type: 'metadata',
-		},
-	];
-
-	// const newValue = initialValues.map((value) => {
-	// 	return {
-	// 		...value,
-	// 		checked: false,
-	// 		filtered: true,
-	// 	};
-	// });
-
 	const [
 		{isViewOnly, objectFields, objectView, objectViewId},
 		dispatch,
@@ -158,18 +76,7 @@ const ModalAddColumnsObjectCustomView: React.FC<IProps> = ({
 	const [fieldsChecked, setFieldsChecked] = useState(false);
 	const [query, setQuery] = useState('');
 
-	useEffect(() => {
-		const objectFieldsWithCheck = objectFields.map((field) => {
-			return {
-				...field,
-				checked: false,
-				filtered: true,
-			};
-		});
-		setFilteredItems(objectFieldsWithCheck);
-	}, []);
-
-	// console.log(filteredItems);
+	console.log(filteredItems);
 
 	// useEffect(() => {
 	// 	if (filteredItems.find((item) => item.checked === true)) {
