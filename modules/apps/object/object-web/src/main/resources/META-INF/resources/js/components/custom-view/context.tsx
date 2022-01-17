@@ -185,6 +185,7 @@ const viewReducer = (state: TState, action: TAction) => {
 			return {
 				...state,
 				objectView: newObjectView,
+				objectFields: filteredItems,
 			};
 		}
 		case TYPES.ADD_OBJECT_FIELDS: {
