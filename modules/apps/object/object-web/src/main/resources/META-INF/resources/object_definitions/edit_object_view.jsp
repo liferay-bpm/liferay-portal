@@ -1,4 +1,6 @@
-<%@ page import="com.liferay.object.model.ObjectView" %><%--
+<%@ page import="com.liferay.object.model.ObjectView" %>
+
+<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
