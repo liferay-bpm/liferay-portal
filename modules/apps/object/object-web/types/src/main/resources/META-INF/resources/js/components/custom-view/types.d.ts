@@ -37,7 +37,7 @@ export declare type TObjectViewColumn = {
 export declare type TObjectView = {
 	defaultObjectView: boolean;
 	name: TName;
-	objectViewColumn: TObjectViewColumn[];
+	objectViewColumns: TObjectViewColumn[];
 };
 export declare type TState = {
 	isViewOnly: boolean;

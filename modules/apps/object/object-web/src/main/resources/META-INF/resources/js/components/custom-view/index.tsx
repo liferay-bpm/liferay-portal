@@ -39,7 +39,10 @@ const HEADERS = new Headers({
 });
 
 const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
-	const [{isViewOnly, objectViewId}, dispatch] = useContext(ViewContext);
+	const [
+		{isViewOnly, objectFields, objectView, objectViewId},
+		dispatch,
+	] = useContext(ViewContext);
 	const [activeIndex, setActiveIndex] = useState<number>(0);
 	const [loading, setLoading] = useState<boolean>(true);
 
@@ -51,8 +54,8 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 
 	useEffect(() => {
 		const makeFetch = async () => {
-			const objectLayoutResponse = await Liferay.Util.fetch(
-				`/o/object-admin/v1.0/object-layouts/${objectViewId}`,
+			const objectViewResponse = await Liferay.Util.fetch(
+				`/o/object-admin/v1.0/object-views/${objectViewId}`,
 				{
 					header: HEADERS,
 					method: 'GET',
@@ -60,10 +63,11 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 			);
 
 			const {
-				defaultObjectLayout,
+				defaultObjectView,
 				name,
 				objectDefinitionId,
-			} = await objectLayoutResponse.json();
+				objectViewColumns,
+			} = await objectViewResponse.json();
 
 			const objectFieldsResponse = await Liferay.Util.fetch(
 				`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}/object-fields`,
@@ -74,9 +78,10 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 			);
 
 			const objectView = {
-				defaultObjectView: defaultObjectLayout,
-				name,
 				objectDefinitionId,
+				defaultObjectView,
+				name,
+				objectViewColumns,
 			};
 
 			dispatch({
@@ -102,6 +107,46 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 
 		makeFetch();
 	}, [objectViewId, dispatch]);
+
+	const handleSaveObjectView = async () => {
+
+		const response = await Liferay.Util.fetch(
+			`/o/object-admin/v1.0/object-views/${objectViewId}`,
+			{
+				body: JSON.stringify(objectView),
+				headers: HEADERS,
+				method: 'PUT',
+			}
+		);
+
+		if (response.status === 401) {
+			window.location.reload();
+		}
+		else if (response.ok) {
+			Liferay.Util.openToast({
+				message: Liferay.Language.get(
+					'modifications-saved-successfully'
+				),
+				type: 'success',
+			});
+
+			setTimeout(() => {
+				const parentWindow = Liferay.Util.getOpener();
+				parentWindow.Liferay.fire('close-side-panel');
+			}, 1500);
+		}
+		else {
+			const {
+				title = Liferay.Language.get('an-error-occurred'),
+			} = await response.json();
+
+			Liferay.Util.openToast({
+				message: title,
+				type: 'danger',
+			});
+		}
+
+	}
 
 	return (
 		<>
@@ -139,8 +184,10 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 							</ClayButton>
 
 							<ClayButton
-								disabled={isViewOnly}
-								onClick={() => {}}
+
+								// disabled={isViewOnly}
+
+								onClick={() => handleSaveObjectView()}
 							>
 								{Liferay.Language.get('save')}
 							</ClayButton>
