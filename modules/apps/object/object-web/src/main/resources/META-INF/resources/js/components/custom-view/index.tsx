@@ -42,6 +42,7 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 	const [{isViewOnly, objectView, objectViewId}, dispatch] = useContext(
 		ViewContext
 	);
+
 	const [activeIndex, setActiveIndex] = useState<number>(0);
 	const [loading, setLoading] = useState<boolean>(true);
 
@@ -53,8 +54,8 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 
 	useEffect(() => {
 		const makeFetch = async () => {
-			const objectLayoutResponse = await Liferay.Util.fetch(
-				`/o/object-admin/v1.0/object-layouts/${objectViewId}`,
+			const objectViewResponse = await Liferay.Util.fetch(
+				`/o/object-admin/v1.0/object-views/${objectViewId}`,
 				{
 					header: HEADERS,
 					method: 'GET',
@@ -62,10 +63,11 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 			);
 
 			const {
-				defaultObjectLayout,
+				defaultObjectView,
 				name,
 				objectDefinitionId,
-			} = await objectLayoutResponse.json();
+				objectViewColumns,
+			} = await objectViewResponse.json();
 
 			const objectFieldsResponse = await Liferay.Util.fetch(
 				`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}/object-fields`,
@@ -143,7 +145,8 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 				type: 'danger',
 			});
 		}
-	};
+
+	}
 
 	return (
 		<>

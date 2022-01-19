@@ -87,9 +87,9 @@ const ViewBuilderScreen = () => {
 						</ClayManagementToolbar.ItemList>
 					</ClayManagementToolbar>
 
-					{objectView?.objectViewColumn?.length > 0 ? (
+					{objectView?.objectViewColumns?.length > 0 ? (
 						<ClayList>
-							{objectView?.objectViewColumn.map(
+							{objectView?.objectViewColumns.map(
 								(viewColumn, index) => {
 									return (
 										<>

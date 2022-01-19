@@ -41,7 +41,7 @@ export type TObjectViewColumn = {
 export type TObjectView = {
 	defaultObjectView: boolean;
 	name: TName;
-	objectViewColumn: TObjectViewColumn[];
+	objectViewColumns: TObjectViewColumn[];
 };
 
 export type TState = {

@@ -157,7 +157,7 @@ const viewReducer = (state: TState, action: TAction) => {
 
 			const newObjectView = {
 				...state.objectView,
-				objectViewColumn: newViewColumn,
+				objectViewColumns: newViewColumn,
 			};
 
 			return {
@@ -213,7 +213,7 @@ const viewReducer = (state: TState, action: TAction) => {
 			const newObjectView = {
 				...state.objectView,
 				name: {
-					defaultLanguageId: newName,
+					[defaultLanguageId]: newName,
 				},
 			};
 
@@ -227,7 +227,7 @@ const viewReducer = (state: TState, action: TAction) => {
 
 			const newState = {...state};
 
-			const viewColumns = newState.objectView.objectViewColumn;
+			const viewColumns = newState.objectView.objectViewColumns;
 
 			const dragged = viewColumns[draggedIndex];
 
@@ -243,7 +243,7 @@ const viewReducer = (state: TState, action: TAction) => {
 
 			const newObjectView = {
 				...state.objectView,
-				objectViewColumn: newViewColumn,
+				objectViewColumns: newViewColumn,
 			};
 
 			return {
@@ -256,7 +256,7 @@ const viewReducer = (state: TState, action: TAction) => {
 
 			const newState = {...state};
 
-			const viewColumn = newState.objectView?.objectViewColumn.filter(
+			const viewColumn = newState.objectView?.objectViewColumns.filter(
 				(viewColumn) => viewColumn.objectFieldName !== objectFieldName
 			);
 
@@ -269,7 +269,7 @@ const viewReducer = (state: TState, action: TAction) => {
 
 			const newObjectView = {
 				...state.objectView,
-				objectViewColumn: newViewColumn,
+				objectViewColumns: newViewColumn,
 			};
 
 			return {
