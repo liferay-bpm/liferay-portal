@@ -145,8 +145,7 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 				type: 'danger',
 			});
 		}
-
-	}
+	};
 
 	return (
 		<>
