@@ -41,11 +41,15 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.IOException;
+import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -262,7 +266,7 @@ public class ObjectEntryItemSelectorView
 					_portletRequest, _portletURL, null,
 					"no-entries-were-found");
 
-			List<ObjectEntry> objectEntries = null;
+			List<ObjectEntry> objectEntries = new ArrayList<>();
 
 			List<ItemSelectorReturnType> desiredItemSelectorReturnTypes =
 				_infoItemItemSelectorCriterion.
@@ -271,16 +275,86 @@ public class ObjectEntryItemSelectorView
 			if (desiredItemSelectorReturnTypes.get(0) instanceof
 					InfoItemItemSelectorReturnType) {
 
-				objectEntries = _objectEntryLocalService.getObjectEntries(
-					_getGroupId(), _objectDefinition.getObjectDefinitionId(),
-					WorkflowConstants.STATUS_APPROVED,
-					searchContainer.getStart(), searchContainer.getEnd());
+				objectEntries.addAll(
+					_objectEntryLocalService.getObjectEntries(
+						_getGroupId(),
+						_objectDefinition.getObjectDefinitionId(),
+						WorkflowConstants.STATUS_APPROVED,
+						searchContainer.getStart(), searchContainer.getEnd()));
 			}
 			else {
-				objectEntries = _objectEntryLocalService.getObjectEntries(
-					_getGroupId(), _objectDefinition.getObjectDefinitionId(),
-					searchContainer.getStart(), searchContainer.getEnd());
+				objectEntries.addAll(
+					_objectEntryLocalService.getObjectEntries(
+						_getGroupId(),
+						_objectDefinition.getObjectDefinitionId(),
+						searchContainer.getStart(), searchContainer.getEnd()));
 			}
+
+			List<Map<String, Serializable>> entriesValue = new ArrayList<>();
+
+			objectEntries.forEach(
+				objectEntry -> entriesValue.add(objectEntry.getValues()));
+
+			PortletRequest portletRequest = searchContainer.getPortletRequest();
+
+			Map<String, String[]> parameterMap =
+				portletRequest.getParameterMap();
+
+			String[] itemSelectedEventNameArray = parameterMap.get(
+				"itemSelectedEventName");
+
+			itemSelectedEventNameArray = itemSelectedEventNameArray[0].split(
+				"_");
+
+			Long objectDefinitionId2 = null;
+
+			for (String current : itemSelectedEventNameArray) {
+				try {
+					objectDefinitionId2 = Long.parseLong(current);
+				}
+				catch (Exception exception) {
+					continue;
+				}
+
+				break;
+			}
+
+			ObjectDefinition objectDefinition2 =
+				_objectDefinitionLocalService.getObjectDefinition(
+					objectDefinitionId2);
+
+			String pkName = objectDefinition2.getPKObjectFieldName();
+
+			entriesValue.forEach(
+				entryValue -> {
+					Set<String> currentKeys = entryValue.keySet();
+
+					Boolean flag = false;
+
+					for (String currentKey : currentKeys) {
+						if (currentKey.contains(pkName)) {
+							flag =
+								entryValue.get(currentKey) != Long.valueOf(0);
+						}
+					}
+
+					if (flag) {
+						ObjectEntry objectEntryToBeRemoved = null;
+
+						try {
+							objectEntryToBeRemoved =
+								_objectEntryLocalService.getObjectEntry(
+									(Long)entryValue.get(
+										_objectDefinition.
+											getPKObjectFieldName()));
+						}
+						catch (PortalException portalException) {
+							portalException.printStackTrace();
+						}
+
+						objectEntries.remove(objectEntryToBeRemoved);
+					}
+				});
 
 			searchContainer.setResults(objectEntries);
 
