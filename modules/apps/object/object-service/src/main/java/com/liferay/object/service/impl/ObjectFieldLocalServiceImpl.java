@@ -21,6 +21,7 @@ import com.liferay.object.exception.ObjectFieldLabelException;
 import com.liferay.object.exception.ObjectFieldNameException;
 import com.liferay.object.exception.ObjectFieldRelationshipTypeException;
 import com.liferay.object.exception.RequiredObjectFieldException;
+import com.liferay.object.field.business.type.ObjectFieldBusinessTypeServicesTracker;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
@@ -36,6 +37,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -317,8 +319,10 @@ public class ObjectFieldLocalServiceImpl
 	private void _validateBusinessType(String businessType)
 		throws PortalException {
 
-		if (Validator.isNotNull(businessType) &&
-			!_businessTypes.contains(businessType)) {
+		if (Validator.isNull(
+				_objectFieldBusinessTypeServicesTracker.
+					getObjectFieldBusinessType(
+						GetterUtil.getString(businessType)))) {
 
 			throw new ObjectFieldBusinessTypeException(
 				"Invalid business type " + businessType);
@@ -396,15 +400,16 @@ public class ObjectFieldLocalServiceImpl
 		}
 	}
 
-	private final Set<String> _businessTypes = SetUtil.fromArray(
-		"Boolean", "Date", "Decimal", "Integer", "LongInteger", "LongText",
-		"Picklist", "PrecisionDecimal", "Relationship", "Text");
 	private final Set<String> _dbTypes = SetUtil.fromArray(
 		"BigDecimal", "Blob", "Boolean", "Clob", "Date", "Double", "Integer",
 		"Long", "String");
 
 	@Reference
 	private ObjectDefinitionPersistence _objectDefinitionPersistence;
+
+	@Reference
+	private ObjectFieldBusinessTypeServicesTracker
+		_objectFieldBusinessTypeServicesTracker;
 
 	@Reference
 	private ObjectLayoutColumnPersistence _objectLayoutColumnPersistence;
