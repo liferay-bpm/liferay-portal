@@ -534,6 +534,31 @@ public class ObjectEntryDisplayContext {
 			return null;
 		}
 
+		List<DDMFormField> ddmFormFields = ddmForm.getDDMFormFields();
+
+		for (DDMFormField ddmFormField : ddmFormFields) {
+			Object ddmFormFieldProperty = ddmFormField.getProperty("type");
+
+			if (ddmFormFieldProperty.equals("date")) {
+				for (Map.Entry<String, Serializable> value :
+						values.entrySet()) {
+
+					String valueKey = value.getKey();
+
+					if (valueKey.equals(ddmFormField.getProperty("name"))) {
+						Serializable date = value.getValue();
+
+						String dateString = date.toString();
+
+						String dateWithoutTime = dateString.replaceAll(
+							" [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}.[0-9]", "");
+
+						values.replace(valueKey, date, dateWithoutTime);
+					}
+				}
+			}
+		}
+
 		DDMFormValues ddmFormValues = new DDMFormValues(ddmForm);
 
 		ddmFormValues.addAvailableLocale(_objectRequestHelper.getLocale());
