@@ -121,22 +121,22 @@ export function handleAction(
 }
 
 function ActionItem({
-	action,
 	closeMenu,
 	data,
 	handleAction,
+	icon,
 	itemData,
 	itemId,
+	label,
 	method,
 	onClick,
 	setLoading,
 	size,
+	target,
 	title,
 	url,
 }) {
 	const context = useContext(DataSetContext);
-
-	const {icon, label, target} = action;
 
 	function handleClickOnLink(event) {
 		event.preventDefault();
@@ -171,7 +171,13 @@ function ActionItem({
 			onClick={(event) => {
 				if (onActionDropdownItemClick) {
 					onActionDropdownItemClick({
-						action,
+						action: {
+							data,
+							icon,
+							label,
+							target,
+							url,
+						},
 						event,
 						itemData,
 					});
@@ -384,7 +390,7 @@ function ActionsDropdownRenderer({actions, itemData, itemId}) {
 
 			return (
 				<ActionItem
-					action={item}
+					{...item}
 					closeMenu={() => setMenuActive(false)}
 					handleAction={handleAction}
 					itemData={itemData}
