@@ -38,6 +38,17 @@ public class ObjectFieldRelationshipTypeException extends PortalException {
 		super(throwable);
 	}
 
+	public static class IsNotObjectFieldRelationshipType
+		extends ObjectFieldRelationshipTypeException {
+
+		public IsNotObjectFieldRelationshipType() {
+			super(
+				"Object field cannot be deleted because it is not of " +
+					"relationship type.");
+		}
+
+	}
+
 	public static class MustNotDeleteObjectFieldRelationshipType
 		extends ObjectFieldRelationshipTypeException {
 
