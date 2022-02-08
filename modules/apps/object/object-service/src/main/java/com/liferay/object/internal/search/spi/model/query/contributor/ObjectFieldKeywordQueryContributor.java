@@ -45,9 +45,38 @@ public class ObjectFieldKeywordQueryContributor
 
 		_queryHelper.addSearchTerm(
 			booleanQuery, searchContext, Field.ENTRY_CLASS_PK, false);
-		_queryHelper.addSearchTerm(
-			booleanQuery, searchContext, Field.NAME, false);
+
+		_queryHelper.addSearchLocalizedTerm(
+			booleanQuery, searchContext, "label", false);
+
+		//		addSearchLocalizedTerm(
+		//			booleanQuery, keywordQueryContributorHelper, "label");
+
 	}
+
+	//	protected void addSearchLocalizedTerm(
+	//		BooleanQuery booleanQuery,
+	//		KeywordQueryContributorHelper keywordQueryContributorHelper,
+	//		String fieldName) {
+	//
+	//		SearchContext searchContext =
+	//			keywordQueryContributorHelper.getSearchContext();
+	//
+	//		if (Validator.isNull(searchContext.getAttribute(fieldName))) {
+	//			return;
+	//		}
+	//
+	//		String fieldNameLocalizedName = LocalizationUtil.getLocalizedName(
+	//			fieldName, searchContext.getLanguageId());
+
+	//
+	//		searchContext.setAttribute(
+	//			fieldNameLocalizedName, searchContext.getAttribute(fieldName));
+	//
+	//		_queryHelper.addSearchLocalizedTerm(
+	//			booleanQuery, keywordQueryContributorHelper.getSearchContext(),
+	//			fieldName, false);
+	//	}
 
 	@Reference
 	private QueryHelper _queryHelper;

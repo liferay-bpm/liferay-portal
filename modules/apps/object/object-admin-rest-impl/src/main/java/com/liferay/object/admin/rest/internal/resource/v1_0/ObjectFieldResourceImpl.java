@@ -86,7 +86,7 @@ public class ObjectFieldResourceImpl
 			queryConfig -> queryConfig.setSelectedFieldNames(
 				Field.ENTRY_CLASS_PK),
 			searchContext -> {
-				searchContext.setAttribute(Field.NAME, search);
+				searchContext.setAttribute("label", search);
 				searchContext.setAttribute(
 					"objectDefinitionId", objectDefinitionId);
 				searchContext.setCompanyId(contextCompany.getCompanyId());
