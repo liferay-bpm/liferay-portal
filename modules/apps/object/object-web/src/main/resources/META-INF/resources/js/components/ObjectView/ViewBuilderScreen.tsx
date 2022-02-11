@@ -15,6 +15,7 @@
 import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import ClayEmptyState from '@clayui/empty-state';
 import {ClayInput} from '@clayui/form';
+import ClayIcon from '@clayui/icon';
 import ClayList from '@clayui/list';
 import ClayManagementToolbar from '@clayui/management-toolbar';
 import {useModal} from '@clayui/modal';
@@ -77,17 +78,9 @@ const ViewBuilderScreen: React.FC<{}> = () => {
 											after
 											tag="span"
 										>
-											<ClayButtonWithIcon
-												className="navbar-breakpoint-d-none"
-												displayType="unstyled"
-												onClick={() => {}}
-												symbol="times"
-											/>
-
-											<ClayButtonWithIcon
-												displayType="unstyled"
+											<ClayIcon
+												className="lfr-object__object-view-builder-search-icon"
 												symbol="search"
-												type="submit"
 											/>
 										</ClayInput.GroupInsetItem>
 									</ClayInput.GroupItem>
