@@ -93,6 +93,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
@@ -304,13 +305,17 @@ public class ObjectEntryDisplayContext {
 		infoItemItemSelectorCriterion.setItemType(
 			objectDefinition.getClassName());
 
-		return PortletURLBuilder.create(
+		PortletURL portletURL = PortletURLBuilder.create(
 			_itemSelector.getItemSelectorURL(
 				requestBackedPortletURLFactory,
 				liferayPortletResponse.getNamespace() +
 					"selectRelatedModalEntry",
 				infoItemItemSelectorCriterion)
-		).buildString();
+		).setParameter(
+			"objectDefinition", objectDefinition
+		).buildPortletURL();
+
+		return portletURL.toString();
 	}
 
 	public Map<String, String> getRelationshipContextParams()
