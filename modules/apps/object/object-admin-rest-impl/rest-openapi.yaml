@@ -320,7 +320,6 @@ components:
                     items:
                         $ref: "#/components/schemas/ObjectViewSortColumn"
                     type: array
-
         ObjectViewColumn:
             properties:
                 id:
