@@ -43,6 +43,8 @@ public class ObjectServiceUpgrade implements UpgradeStepRegistrator {
 
 		registry.register(
 			"2.1.0", "2.2.0", new ObjectValidationRuleUpgradeProcess());
+
+		registry.register("2.2.0", "2.3.0", new ObjectViewUpgradeProcess());
 	}
 
 }
