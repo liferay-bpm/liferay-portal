@@ -14,6 +14,7 @@
 
 import React, {useContext} from 'react';
 
+import {getObjectFieldType} from '../../../utils/objectFieldType';
 import Panel from '../../Panel/Panel';
 import LayoutContext, {TYPES} from '../context';
 import {TObjectField} from '../types';
@@ -37,11 +38,19 @@ const ObjectLayoutField: React.FC<IObjectLayoutFieldProps> = ({
 	rowIndex,
 	tabIndex,
 }) => {
-	const [{objectFields}, dispatch] = useContext(LayoutContext);
+	const [{objectFieldBusinessTypes, objectFields}, dispatch] = useContext(
+		LayoutContext
+	);
 
 	const objectField = objectFields.find(
 		({id}) => id === objectFieldId
 	) as TObjectField;
+
+	const objectFieldType = getObjectFieldType(
+		'businessType',
+		objectFieldBusinessTypes,
+		objectField.businessType
+	);
 
 	return (
 		<>
@@ -66,7 +75,7 @@ const ObjectLayoutField: React.FC<IObjectLayoutFieldProps> = ({
 					title={objectField?.label[defaultLanguageId]}
 				>
 					<small className="text-secondary">
-						{objectField?.DBType} |{' '}
+						{objectFieldType?.label} |{' '}
 					</small>
 
 					<RequiredLabel required={objectField?.required} />
