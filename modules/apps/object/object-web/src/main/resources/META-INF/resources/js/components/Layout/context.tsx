@@ -23,6 +23,7 @@ import {TObjectField, TObjectLayout, TObjectRelationship} from './types';
 
 type TState = {
 	isViewOnly: boolean;
+	objectFieldBusinessTypes: IObjectFieldBusinessType[];
 	objectFields: TObjectField[];
 	objectLayout: TObjectLayout;
 	objectLayoutId: string;
@@ -340,6 +341,7 @@ interface ILayoutContextProviderProps
 	extends React.HTMLAttributes<HTMLElement> {
 	value: {
 		isViewOnly: boolean;
+		objectFieldBusinessTypes: IObjectFieldBusinessType[];
 		objectLayoutId: string;
 	};
 }

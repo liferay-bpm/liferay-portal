@@ -15,6 +15,7 @@
 import React from 'react';
 interface ILayoutWrapperProps extends React.HTMLAttributes<HTMLElement> {
 	isViewOnly: boolean;
+	objectFieldBusinessTypes: IObjectFieldBusinessType[];
 	objectLayoutId: string;
 }
 declare const LayoutWrapper: React.FC<ILayoutWrapperProps>;

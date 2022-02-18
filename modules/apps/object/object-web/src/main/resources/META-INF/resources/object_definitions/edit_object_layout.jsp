@@ -30,6 +30,8 @@ ObjectLayout objectLayout = (ObjectLayout)request.getAttribute(ObjectWebKeys.OBJ
 			HashMapBuilder.<String, Object>put(
 				"isViewOnly", !objectDefinitionsLayoutsDisplayContext.hasUpdateObjectDefinitionPermission()
 			).put(
+				"objectFieldBusinessTypes", objectDefinitionsLayoutsDisplayContext.getObjectFieldBusinessTypeMaps(locale)
+			).put(
 				"objectLayoutId", objectLayout.getObjectLayoutId()
 			).build()
 		%>'

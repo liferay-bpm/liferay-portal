@@ -301,15 +301,19 @@ const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 
 interface ILayoutWrapperProps extends React.HTMLAttributes<HTMLElement> {
 	isViewOnly: boolean;
+	objectFieldBusinessTypes: IObjectFieldBusinessType[];
 	objectLayoutId: string;
 }
 
 const LayoutWrapper: React.FC<ILayoutWrapperProps> = ({
 	isViewOnly,
+	objectFieldBusinessTypes,
 	objectLayoutId,
 }) => {
 	return (
-		<LayoutContextProvider value={{isViewOnly, objectLayoutId}}>
+		<LayoutContextProvider
+			value={{isViewOnly, objectFieldBusinessTypes, objectLayoutId}}
+		>
 			<Layout />
 		</LayoutContextProvider>
 	);
