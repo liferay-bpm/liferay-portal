@@ -21,6 +21,7 @@ import React, {useEffect, useState} from 'react';
 
 import useForm from '../hooks/useForm';
 import {ERRORS} from '../utils/errors';
+import {getObjectFieldType} from '../utils/objectFieldType';
 import {toCamelCase} from '../utils/string';
 import CustomSelect from './Form/CustomSelect/CustomSelect';
 import Input from './Form/Input';
@@ -63,15 +64,6 @@ const ModalAddObjectField: React.FC<IProps> = ({
 		required: false,
 	};
 
-	const getObjectFieldType = (
-		key: keyof IObjectFieldBusinessType,
-		value: string
-	) => {
-		return objectFieldBusinessTypes.find(
-			(objectFieldType) => objectFieldType[key] === value
-		) as IObjectFieldBusinessType;
-	};
-
 	const onSubmit = async ({
 		businessType,
 		label,
@@ -81,6 +73,7 @@ const ModalAddObjectField: React.FC<IProps> = ({
 	}: TInitialValues) => {
 		const objectFieldType = getObjectFieldType(
 			'businessType',
+			objectFieldBusinessTypes,
 			businessType
 		);
 
@@ -273,6 +266,7 @@ const ModalAddObjectField: React.FC<IProps> = ({
 								else {
 									const objectFieldType = getObjectFieldType(
 										'dbType',
+										objectFieldBusinessTypes,
 										selectedObjectFieldType
 									);
 									selectedBusinessType =
