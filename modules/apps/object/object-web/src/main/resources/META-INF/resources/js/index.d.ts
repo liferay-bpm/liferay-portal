@@ -12,13 +12,9 @@
  * details.
  */
 
-import React from 'react';
-interface IProps extends React.HTMLAttributes<HTMLElement> {
-	apiURL: string;
-	ffObjectFieldBusinessTypeConfigurationEnabled: boolean;
-	objectFieldBusinessTypes: IObjectFieldBusinessType[];
-	observer: any;
-	onClose: () => void;
+interface IObjectFieldBusinessType {
+	businessType: string;
+	dbType: string;
+	description: string;
+	label: string;
 }
-declare const ModalWithProvider: React.FC<IProps>;
-export default ModalWithProvider;

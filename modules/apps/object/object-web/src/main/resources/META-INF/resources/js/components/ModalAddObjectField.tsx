@@ -351,13 +351,6 @@ interface IProps extends React.HTMLAttributes<HTMLElement> {
 	onClose: () => void;
 }
 
-interface IObjectFieldBusinessType {
-	businessType: string;
-	dbType: string;
-	description: string;
-	label: string;
-}
-
 type TPicklist = {
 	id: string;
 	name: string;
