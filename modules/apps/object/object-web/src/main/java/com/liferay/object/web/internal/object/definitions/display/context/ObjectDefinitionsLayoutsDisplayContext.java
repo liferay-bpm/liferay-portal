@@ -16,6 +16,8 @@ package com.liferay.object.web.internal.object.definitions.display.context;
 
 import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.object.field.business.type.ObjectFieldBusinessType;
+import com.liferay.object.field.business.type.ObjectFieldBusinessTypeServicesTracker;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
 import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
@@ -26,9 +28,13 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
@@ -43,10 +49,14 @@ public class ObjectDefinitionsLayoutsDisplayContext {
 	public ObjectDefinitionsLayoutsDisplayContext(
 		HttpServletRequest httpServletRequest,
 		ModelResourcePermission<ObjectDefinition>
-			objectDefinitionModelResourcePermission) {
+			objectDefinitionModelResourcePermission,
+		ObjectFieldBusinessTypeServicesTracker
+			objectFieldBusinessTypeServicesTracker) {
 
 		_objectDefinitionModelResourcePermission =
 			objectDefinitionModelResourcePermission;
+		_objectFieldBusinessTypeServicesTracker =
+			objectFieldBusinessTypeServicesTracker;
 
 		_objectRequestHelper = new ObjectRequestHelper(httpServletRequest);
 	}
@@ -110,6 +120,32 @@ public class ObjectDefinitionsLayoutsDisplayContext {
 		return objectDefinition.getObjectDefinitionId();
 	}
 
+	public List<Map<String, String>> getObjectFieldBusinessTypeMaps(
+		Locale locale) {
+
+		List<Map<String, String>> objectFieldBusinessTypeMaps =
+			new ArrayList<>();
+
+		for (ObjectFieldBusinessType objectFieldBusinessType :
+				_objectFieldBusinessTypeServicesTracker.
+					getObjectFieldBusinessTypes()) {
+
+			objectFieldBusinessTypeMaps.add(
+				HashMapBuilder.put(
+					"businessType", objectFieldBusinessType.getName()
+				).put(
+					"dbType", objectFieldBusinessType.getDBType()
+				).put(
+					"description",
+					objectFieldBusinessType.getDescription(locale)
+				).put(
+					"label", objectFieldBusinessType.getLabel(locale)
+				).build());
+		}
+
+		return objectFieldBusinessTypeMaps;
+	}
+
 	public PortletURL getPortletURL() throws PortletException {
 		return PortletURLUtil.clone(
 			PortletURLUtil.getCurrent(
@@ -128,6 +164,8 @@ public class ObjectDefinitionsLayoutsDisplayContext {
 
 	private final ModelResourcePermission<ObjectDefinition>
 		_objectDefinitionModelResourcePermission;
+	private final ObjectFieldBusinessTypeServicesTracker
+		_objectFieldBusinessTypeServicesTracker;
 	private final ObjectRequestHelper _objectRequestHelper;
 
 }
