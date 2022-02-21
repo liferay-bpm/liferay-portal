@@ -845,13 +845,13 @@ definition {
 
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
-			fieldType = "BigDecimal");
+			fieldType = "PrecisionDecimal");
 
 		Refresh();
 
 		ObjectAdmin.assertObjectField(
 			fieldLabel = "Custom Field",
-			fieldType = "BigDecimal");
+			fieldType = "PrecisionDecimal");
 	}
 
 	@description = "LPS-135549 - Verify it is possible to create a Boolean field"
@@ -936,13 +936,13 @@ definition {
 
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
-			fieldType = "Double");
+			fieldType = "Decimal");
 
 		Refresh();
 
 		ObjectAdmin.assertObjectField(
 			fieldLabel = "Custom Field",
-			fieldType = "Double");
+			fieldType = "Decimal");
 	}
 
 	@description = "LPS-135549 - Verify it is possible to create an Integer field"
@@ -1009,11 +1009,11 @@ definition {
 
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
-			fieldType = "Long");
+			fieldType = "LongInteger");
 
 		ObjectAdmin.assertObjectField(
 			fieldLabel = "Custom Field",
-			fieldType = "Long");
+			fieldType = "LongInteger");
 	}
 
 	@description = "LPS-135401 - Verify it is possible to create a Many to Many Relationship"
@@ -1104,7 +1104,7 @@ definition {
 
 		ObjectAdmin.assertObjectField(
 			fieldLabel = "Field Picklist",
-			fieldType = "String");
+			fieldType = "Picklist");
 	}
 
 	@description = "LPS-135549 - Verify it is possible to create a String field"
@@ -1125,13 +1125,13 @@ definition {
 
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
-			fieldType = "String");
+			fieldType = "Text");
 
 		Refresh();
 
 		ObjectAdmin.assertObjectField(
 			fieldLabel = "Custom Field",
-			fieldType = "String");
+			fieldType = "Text");
 	}
 
 	@description = "LPS-137879 - Verify it is not possible to delete a Custom Object field after the Object is published"
@@ -1603,7 +1603,7 @@ definition {
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
 			fieldName = "customObjectField",
-			fieldType = "String");
+			fieldType = "Text");
 
 		ObjectAdmin.viewFieldErrorMessage(message = "This name is already in use. Try another one.");
 	}
@@ -1784,7 +1784,7 @@ definition {
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
 			fieldName = " ",
-			fieldType = "String");
+			fieldType = "Text");
 
 		ObjectAdmin.viewFieldErrorMessage(message = "Name is required.");
 	}
@@ -1808,7 +1808,7 @@ definition {
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "",
 			fieldName = "customField",
-			fieldType = "String");
+			fieldType = "Text");
 
 		ObjectAdmin.assertLabelFieldRequired();
 	}
@@ -2059,7 +2059,7 @@ definition {
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
 			fieldName = "customField#$%",
-			fieldType = "Long");
+			fieldType = "LongInteger");
 
 		ObjectAdmin.viewFieldErrorMessage(message = "Name must only contain letters and digits.");
 	}
@@ -2081,7 +2081,7 @@ definition {
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
 			fieldName = "CustomField",
-			fieldType = "String");
+			fieldType = "Text");
 
 		ObjectAdmin.viewFieldErrorMessage(message = "The first character of a name must be an lower case letter.");
 	}
@@ -3159,7 +3159,7 @@ definition {
 
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
-			fieldType = "String",
+			fieldType = "Text",
 			isMandatory = "true");
 
 		ObjectAdmin.goToFieldsDetails(label = "Custom Field");

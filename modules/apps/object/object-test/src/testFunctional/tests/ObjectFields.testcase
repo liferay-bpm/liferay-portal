@@ -40,7 +40,7 @@ definition {
 
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
-			fieldType = "Clob");
+			fieldType = "LongText");
 
 		Refresh();
 
