@@ -26,18 +26,6 @@ import CustomSelect from './Form/CustomSelect/CustomSelect';
 import Input from './Form/Input';
 import Select from './Form/Select';
 
-const objectFieldTypes = [
-	'BigDecimal',
-	'Boolean',
-	'Clob',
-	'Date',
-	'Double',
-	'Integer',
-	'Long',
-	'Picklist',
-	'String',
-];
-
 const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 const headers = new Headers({
@@ -47,7 +35,6 @@ const headers = new Headers({
 
 const ModalAddObjectField: React.FC<IProps> = ({
 	apiURL,
-	ffObjectFieldBusinessTypeConfigurationEnabled,
 	objectFieldBusinessTypes,
 	observer,
 	onClose,
@@ -168,7 +155,6 @@ const ModalAddObjectField: React.FC<IProps> = ({
 					{error && (
 						<ClayAlert displayType="danger">{error}</ClayAlert>
 					)}
-
 					<Input
 						error={errors.label}
 						id="objectFieldLabel"
@@ -178,7 +164,6 @@ const ModalAddObjectField: React.FC<IProps> = ({
 						required
 						value={values.label}
 					/>
-
 					<Input
 						error={errors.name || errors.label}
 						id="objectFieldName"
@@ -188,116 +173,54 @@ const ModalAddObjectField: React.FC<IProps> = ({
 						required
 						value={values.name ?? toCamelCase(values.label)}
 					/>
+					<CustomSelect
+						error={errors.type}
+						label={Liferay.Language.get('type')}
+						onChange={async (type: any) => {
+							if (type.businessType === 'Picklist') {
+								const result = await fetch(
+									'/o/headless-admin-list-type/v1.0/list-type-definitions',
+									{
+										headers,
+										method: 'GET',
+									}
+								);
 
-					{ffObjectFieldBusinessTypeConfigurationEnabled ? (
-						<CustomSelect
-							error={errors.type}
-							label={Liferay.Language.get('type')}
-							onChange={async (type: any) => {
-								if (type.businessType === 'Picklist') {
-									const result = await fetch(
-										'/o/headless-admin-list-type/v1.0/list-type-definitions',
-										{
-											headers,
-											method: 'GET',
-										}
-									);
+								const {items = []} = (await result.json()) as {
+									items: [];
+								};
 
-									const {
-										items = [],
-									} = (await result.json()) as {
-										items: [];
-									};
+								setPicklist(
+									items.map(({id, name}: TPicklist) => ({
+										id,
+										name,
+									}))
+								);
+							}
 
-									setPicklist(
-										items.map(({id, name}: TPicklist) => ({
-											id,
-											name,
-										}))
-									);
-								}
+							setSelectedObjectBusinessTypeLabel(type.label);
 
-								setSelectedObjectBusinessTypeLabel(type.label);
-
-								handleChange({
-									target: {
-										name: 'businessType',
-										value: type.businessType,
-									},
-								} as any);
-							}}
-							options={objectFieldBusinessTypes}
-							required
-							value={selectedObjectBusinessTypeLabel}
-						>
-							{({description, label}) => (
-								<>
-									<div>{label}</div>
-									<span className="text-small">
-										{description}
-									</span>
-								</>
-							)}
-						</CustomSelect>
-					) : (
-						<Select
-							error={errors.type}
-							id="objectFieldType"
-							label={Liferay.Language.get('type')}
-							onChange={async ({target: {value}}: any) => {
-								const selectedObjectFieldType =
-									objectFieldTypes[Number(value) - 1];
-
-								let selectedBusinessType = selectedObjectFieldType;
-
-								if (selectedObjectFieldType === 'Picklist') {
-									const result = await fetch(
-										'/o/headless-admin-list-type/v1.0/list-type-definitions',
-										{
-											headers,
-											method: 'GET',
-										}
-									);
-
-									const {
-										items = [],
-									} = (await result.json()) as {
-										items: [];
-									};
-
-									setPicklist(
-										items.map(({id, name}: TPicklist) => ({
-											id,
-											name,
-										}))
-									);
-								}
-								else if (
-									selectedObjectFieldType === 'String'
-								) {
-									selectedBusinessType = 'Text';
-								}
-								else {
-									const objectFieldType = getObjectFieldType(
-										'dbType',
-										selectedObjectFieldType
-									);
-									selectedBusinessType =
-										objectFieldType.businessType;
-								}
-
-								handleChange({
-									target: {
-										name: 'businessType',
-										value: selectedBusinessType,
-									},
-								} as any);
-							}}
-							options={objectFieldTypes}
-							required
-						/>
-					)}
-
+							handleChange({
+								target: {
+									name: 'businessType',
+									value: type.businessType,
+								},
+							} as any);
+						}}
+						options={objectFieldBusinessTypes}
+						required
+						value={selectedObjectBusinessTypeLabel}
+					>
+						{({description, label}) => (
+							<>
+								<div>{label}</div>
+								<span className="text-small">
+									{description}
+								</span>
+							</>
+						)}
+					</CustomSelect>
+					)
 					{values.businessType === 'Picklist' && (
 						<Select
 							error={errors.listTypeDefinitionId}
@@ -314,7 +237,6 @@ const ModalAddObjectField: React.FC<IProps> = ({
 							required
 						/>
 					)}
-
 					<ClayToggle
 						label={Liferay.Language.get('mandatory')}
 						onToggle={() => {
@@ -352,7 +274,6 @@ const ModalAddObjectField: React.FC<IProps> = ({
 
 interface IProps extends React.HTMLAttributes<HTMLElement> {
 	apiURL: string;
-	ffObjectFieldBusinessTypeConfigurationEnabled: boolean;
 	objectFieldBusinessTypes: IObjectFieldBusinessType[];
 	observer: any;
 	onClose: () => void;
@@ -381,7 +302,6 @@ type TInitialValues = {
 
 const ModalWithProvider: React.FC<IProps> = ({
 	apiURL,
-	ffObjectFieldBusinessTypeConfigurationEnabled,
 	objectFieldBusinessTypes,
 }) => {
 	const [visibleModal, setVisibleModal] = useState<boolean>(false);
@@ -402,9 +322,6 @@ const ModalWithProvider: React.FC<IProps> = ({
 			{visibleModal && (
 				<ModalAddObjectField
 					apiURL={apiURL}
-					ffObjectFieldBusinessTypeConfigurationEnabled={
-						ffObjectFieldBusinessTypeConfigurationEnabled
-					}
 					objectFieldBusinessTypes={objectFieldBusinessTypes}
 					observer={observer}
 					onClose={onClose}
