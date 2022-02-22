@@ -23,26 +23,37 @@ import com.liferay.item.selector.criteria.InfoItemItemSelectorReturnType;
 import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
-import com.liferay.object.scope.ObjectScopeProvider;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
+import com.liferay.object.rest.resource.v1_0.ObjectEntryResource;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
+import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
+import com.liferay.portal.vulcan.pagination.Page;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -55,6 +66,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+
+import javax.ws.rs.core.UriInfo;
 
 /**
  * @author Guilherme Camacho
@@ -69,16 +82,21 @@ public class ObjectEntryItemSelectorView
 		ObjectDefinition objectDefinition,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectEntryLocalService objectEntryLocalService,
-		ObjectScopeProviderRegistry objectScopeProviderRegistry,
-		Portal portal) {
+		ObjectEntryManager objectEntryManager,
+		ObjectEntryResource objectEntryResource,
+		ObjectScopeProviderRegistry objectScopeProviderRegistry, Portal portal,
+		UserLocalService userLocalService) {
 
 		_itemSelectorViewDescriptorRenderer =
 			itemSelectorViewDescriptorRenderer;
 		_objectDefinition = objectDefinition;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryLocalService = objectEntryLocalService;
+		_objectEntryManager = objectEntryManager;
+		_objectEntryResource = objectEntryResource;
 		_objectScopeProviderRegistry = objectScopeProviderRegistry;
 		_portal = portal;
+		_userLocalService = userLocalService;
 	}
 
 	@Override
@@ -114,10 +132,13 @@ public class ObjectEntryItemSelectorView
 			servletRequest, servletResponse, infoItemItemSelectorCriterion,
 			portletURL, itemSelectedEventName, search,
 			new ObjectItemSelectorViewDescriptor(
-				(HttpServletRequest)servletRequest,
-				infoItemItemSelectorCriterion, _objectDefinition,
-				_objectScopeProviderRegistry, portletURL));
+				(HttpServletRequest)servletRequest, _objectDefinition,
+				_objectEntryManager, _objectEntryResource, portletURL,
+				_userLocalService));
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ObjectEntryItemSelectorView.class);
 
 	private static final List<ItemSelectorReturnType>
 		_supportedItemSelectorReturnTypes = Arrays.asList(
@@ -129,8 +150,11 @@ public class ObjectEntryItemSelectorView
 	private final ObjectDefinition _objectDefinition;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectEntryLocalService _objectEntryLocalService;
+	private final ObjectEntryManager _objectEntryManager;
+	private final ObjectEntryResource _objectEntryResource;
 	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 	private final Portal _portal;
+	private final UserLocalService _userLocalService;
 
 	private class AcceptLanguageImpl implements AcceptLanguage {
 
@@ -273,19 +297,21 @@ public class ObjectEntryItemSelectorView
 
 		public ObjectItemSelectorViewDescriptor(
 			HttpServletRequest httpServletRequest,
-			InfoItemItemSelectorCriterion infoItemItemSelectorCriterion,
 			ObjectDefinition objectDefinition,
-			ObjectScopeProviderRegistry objectScopeProviderRegistry,
-			PortletURL portletURL) {
+			ObjectEntryManager objectEntryManager,
+			ObjectEntryResource objectEntryResource, PortletURL portletURL,
+			UserLocalService userLocalService) {
 
 			_httpServletRequest = httpServletRequest;
-			_infoItemItemSelectorCriterion = infoItemItemSelectorCriterion;
 			_objectDefinition = objectDefinition;
-			_objectScopeProviderRegistry = objectScopeProviderRegistry;
+			_objectEntryManager = objectEntryManager;
+			_objectEntryResource = objectEntryResource;
 			_portletURL = portletURL;
 
 			_portletRequest = (PortletRequest)_httpServletRequest.getAttribute(
 				JavaConstants.JAVAX_PORTLET_REQUEST);
+
+			_userLocalService = userLocalService;
 		}
 
 		@Override
@@ -313,56 +339,101 @@ public class ObjectEntryItemSelectorView
 					_portletRequest, _portletURL, null,
 					"no-entries-were-found");
 
-			searchContainer.setResultsAndTotal(
-				() -> {
-					List<ItemSelectorReturnType>
-						desiredItemSelectorReturnTypes =
-							_infoItemItemSelectorCriterion.
-								getDesiredItemSelectorReturnTypes();
+			ServiceContext serviceContext =
+				ServiceContextThreadLocal.getServiceContext();
 
-					if (desiredItemSelectorReturnTypes.get(0) instanceof
-							InfoItemItemSelectorReturnType) {
+			_objectEntryResource.setContextAcceptLanguage(
+				new AcceptLanguageImpl(
+					serviceContext.getRequest(), serviceContext.getLocale(),
+					_userLocalService.getUser(serviceContext.getUserId())));
 
-						return _objectEntryLocalService.getObjectEntries(
-							_getGroupId(),
-							_objectDefinition.getObjectDefinitionId(),
-							WorkflowConstants.STATUS_APPROVED,
-							searchContainer.getStart(),
-							searchContainer.getEnd());
-					}
+			try {
+				Page<com.liferay.object.rest.dto.v1_0.ObjectEntry>
+					objectEntriesPage = _objectEntryManager.getObjectEntries(
+						serviceContext.getCompanyId(), _objectDefinition, null,
+						null, _getDTOConverterContext(null),
+						_objectEntryResource.toFilter(
+							_getFilterString(
+								_objectEntryLocalService.
+									getOneToManyRelatedObjectEntries(
+										0,
+										ParamUtil.getLong(
+											_portletRequest,
+											"objectRelationshipId"),
+										ParamUtil.getLong(
+											_portletRequest, "objectEntryId"),
+										QueryUtil.ALL_POS, QueryUtil.ALL_POS))),
+						null, null, null);
 
-					return _objectEntryLocalService.getObjectEntries(
-						_getGroupId(),
-						_objectDefinition.getObjectDefinitionId(),
-						searchContainer.getStart(), searchContainer.getEnd());
-				},
-				_objectEntryLocalService.getObjectEntriesCount());
+				List<ObjectEntry> objectEntries = TransformUtil.transform(
+					objectEntriesPage.getItems(),
+					item -> _toObjectEntry(
+						item, _objectDefinition.getObjectDefinitionId()));
+
+				searchContainer.setResultsAndTotal(
+					() -> objectEntries, objectEntries.size());
+			}
+			catch (Exception exception) {
+				_log.error(exception, exception);
+
+				searchContainer.setResultsAndTotal(() -> new ArrayList<>(), 0);
+			}
 
 			return searchContainer;
 		}
 
-		private long _getGroupId() throws PortalException {
-			ObjectScopeProvider objectScopeProvider =
-				_objectScopeProviderRegistry.getObjectScopeProvider(
-					_objectDefinition.getScope());
+		private DefaultDTOConverterContext _getDTOConverterContext(
+			Long objectEntryId) {
 
-			if (!objectScopeProvider.isGroupAware()) {
-				return 0;
-			}
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)_httpServletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
 
-			ServiceContext serviceContext =
-				ServiceContextThreadLocal.getServiceContext();
-
-			return objectScopeProvider.getGroupId(serviceContext.getRequest());
+			return new DefaultDTOConverterContext(
+				false, null, null, _httpServletRequest, objectEntryId,
+				_httpServletRequest.getLocale(), _contextUriInfo,
+				themeDisplay.getUser());
 		}
 
+		private String _getFilterString(List<ObjectEntry> objectEntryList) {
+			StringBundler sb = new StringBundler(objectEntryList.size() * 2);
+
+			objectEntryList.forEach(
+				objectEntry -> {
+					sb.append(
+						String.format(
+							"(id ne '%d')", objectEntry.getObjectEntryId()));
+
+					sb.append(" and ");
+				});
+
+			if (sb.length() > 0) {
+				sb.setIndex(sb.index() - 1);
+			}
+
+			return sb.toString();
+		}
+
+		private ObjectEntry _toObjectEntry(
+			com.liferay.object.rest.dto.v1_0.ObjectEntry objectEntry,
+			long objectDefinitionId) {
+
+			ObjectEntry serviceBuilderObjectEntry =
+				_objectEntryLocalService.createObjectEntry(objectEntry.getId());
+
+			serviceBuilderObjectEntry.setObjectDefinitionId(objectDefinitionId);
+
+			return serviceBuilderObjectEntry;
+		}
+
+		private UriInfo _contextUriInfo;
 		private final HttpServletRequest _httpServletRequest;
-		private final InfoItemItemSelectorCriterion
-			_infoItemItemSelectorCriterion;
 		private final ObjectDefinition _objectDefinition;
-		private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
+		private final ObjectEntryManager _objectEntryManager;
+		private final ObjectEntryResource _objectEntryResource;
 		private final PortletRequest _portletRequest;
 		private final PortletURL _portletURL;
+		private final UserLocalService _userLocalService;
 
 	}
 
