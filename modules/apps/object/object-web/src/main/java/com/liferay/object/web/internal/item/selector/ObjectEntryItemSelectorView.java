@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
 import java.io.IOException;
 
@@ -130,6 +131,56 @@ public class ObjectEntryItemSelectorView
 	private final ObjectEntryLocalService _objectEntryLocalService;
 	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 	private final Portal _portal;
+
+	private class AcceptLanguageImpl implements AcceptLanguage {
+
+		public AcceptLanguageImpl(
+			HttpServletRequest httpServletRequest, Locale preferredLocale,
+			User user) {
+
+			_httpServletRequest = httpServletRequest;
+			_preferredLocale = preferredLocale;
+			_user = user;
+		}
+
+		@Override
+		public List<Locale> getLocales() {
+			return Arrays.asList(getPreferredLocale());
+		}
+
+		@Override
+		public String getPreferredLanguageId() {
+			return LocaleUtil.toLanguageId(getPreferredLocale());
+		}
+
+		@Override
+		public Locale getPreferredLocale() {
+			if (_preferredLocale != null) {
+				return _preferredLocale;
+			}
+
+			if (_httpServletRequest != null) {
+				Locale locale = (Locale)_httpServletRequest.getAttribute(
+					WebKeys.LOCALE);
+
+				if (locale != null) {
+					return locale;
+				}
+			}
+
+			return _user.getLocale();
+		}
+
+		@Override
+		public boolean isAcceptAllLanguages() {
+			return false;
+		}
+
+		private final HttpServletRequest _httpServletRequest;
+		private final Locale _preferredLocale;
+		private final User _user;
+
+	}
 
 	private class ObjectEntryItemDescriptor
 		implements ItemSelectorViewDescriptor.ItemDescriptor {
