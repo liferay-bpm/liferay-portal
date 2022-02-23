@@ -95,10 +95,30 @@ function getLocationValue(field, context) {
 										itemChild.childNodes
 									);
 
+									const itemChildNodesAttributes = getChildAttributes(
+										item.childNodes
+									);
+
 									let itemContent;
 
 									if (childNodesAttributes.length) {
 										itemContent = childNodesAttributes;
+									}
+									else if (
+										itemChildNodesAttributes.length
+									) {
+										itemContent = itemChildNodesAttributes;
+
+										if (itemChildNodesAttributes.length) {
+											if (!childContent[item.tagName]) {
+												childContent[item.tagName] = [];
+											}
+
+											childContent[
+												item.tagName
+											] = itemContent;
+										}
+										break;
 									}
 									else {
 										itemContent = itemChild.textContent;
