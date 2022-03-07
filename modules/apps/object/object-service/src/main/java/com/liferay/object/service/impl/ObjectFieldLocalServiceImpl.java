@@ -30,8 +30,8 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
-import com.liferay.object.model.ObjectView;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
+import com.liferay.object.service.ObjectLayoutLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.object.service.base.ObjectFieldLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
@@ -443,13 +443,7 @@ public class ObjectFieldLocalServiceImpl
 		_objectLayoutColumnPersistence.removeByObjectFieldId(
 			objectField.getObjectFieldId());
 
-		List<ObjectView> objectViews =
-			_objectViewPersistence.findByObjectDefinitionId(
-				objectField.getObjectDefinitionId());
-
-		for (ObjectView objectView : objectViews) {
-			_objectViewLocalService.deleteObjectView(objectView);
-		}
+		_objectViewLocalService.deleteObjectFieldFromObjectView(objectField);
 
 		if (Objects.equals(
 				objectDefinition.getExtensionDBTableName(),
@@ -618,6 +612,9 @@ public class ObjectFieldLocalServiceImpl
 
 	@Reference
 	private ObjectLayoutColumnPersistence _objectLayoutColumnPersistence;
+
+	@Reference
+	private ObjectLayoutLocalService _objectLayoutLocalService;
 
 	@Reference
 	private ObjectViewColumnPersistence _objectViewColumnPersistence;
