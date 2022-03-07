@@ -67,6 +67,8 @@ public class ObjectValidationRuleTable
 	public final Column<ObjectValidationRuleTable, String> errorLabel =
 		createColumn(
 			"errorLabel", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
+	public final Column<ObjectValidationRuleTable, String> name = createColumn(
+		"name", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<ObjectValidationRuleTable, String> engine =
 		createColumn(
 			"engine", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);

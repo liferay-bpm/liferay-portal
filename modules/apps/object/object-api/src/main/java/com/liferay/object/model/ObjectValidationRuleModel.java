@@ -345,6 +345,105 @@ public interface ObjectValidationRuleModel
 		Map<Locale, String> errorLabelMap, Locale defaultLocale);
 
 	/**
+	 * Returns the name of this object validation rule.
+	 *
+	 * @return the name of this object validation rule
+	 */
+	public String getName();
+
+	/**
+	 * Returns the localized name of this object validation rule in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the locale of the language
+	 * @return the localized name of this object validation rule
+	 */
+	@AutoEscape
+	public String getName(Locale locale);
+
+	/**
+	 * Returns the localized name of this object validation rule in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the local of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized name of this object validation rule. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	 */
+	@AutoEscape
+	public String getName(Locale locale, boolean useDefault);
+
+	/**
+	 * Returns the localized name of this object validation rule in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @return the localized name of this object validation rule
+	 */
+	@AutoEscape
+	public String getName(String languageId);
+
+	/**
+	 * Returns the localized name of this object validation rule in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized name of this object validation rule
+	 */
+	@AutoEscape
+	public String getName(String languageId, boolean useDefault);
+
+	@AutoEscape
+	public String getNameCurrentLanguageId();
+
+	@AutoEscape
+	public String getNameCurrentValue();
+
+	/**
+	 * Returns a map of the locales and localized names of this object validation rule.
+	 *
+	 * @return the locales and localized names of this object validation rule
+	 */
+	public Map<Locale, String> getNameMap();
+
+	/**
+	 * Sets the name of this object validation rule.
+	 *
+	 * @param name the name of this object validation rule
+	 */
+	public void setName(String name);
+
+	/**
+	 * Sets the localized name of this object validation rule in the language.
+	 *
+	 * @param name the localized name of this object validation rule
+	 * @param locale the locale of the language
+	 */
+	public void setName(String name, Locale locale);
+
+	/**
+	 * Sets the localized name of this object validation rule in the language, and sets the default locale.
+	 *
+	 * @param name the localized name of this object validation rule
+	 * @param locale the locale of the language
+	 * @param defaultLocale the default locale
+	 */
+	public void setName(String name, Locale locale, Locale defaultLocale);
+
+	public void setNameCurrentLanguageId(String languageId);
+
+	/**
+	 * Sets the localized names of this object validation rule from the map of locales and localized names.
+	 *
+	 * @param nameMap the locales and localized names of this object validation rule
+	 */
+	public void setNameMap(Map<Locale, String> nameMap);
+
+	/**
+	 * Sets the localized names of this object validation rule from the map of locales and localized names, and sets the default locale.
+	 *
+	 * @param nameMap the locales and localized names of this object validation rule
+	 * @param defaultLocale the default locale
+	 */
+	public void setNameMap(Map<Locale, String> nameMap, Locale defaultLocale);
+
+	/**
 	 * Returns the engine of this object validation rule.
 	 *
 	 * @return the engine of this object validation rule

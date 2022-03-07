@@ -78,7 +78,7 @@ public class ObjectValidationRuleCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(27);
+		StringBundler sb = new StringBundler(29);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -102,6 +102,8 @@ public class ObjectValidationRuleCacheModel
 		sb.append(active);
 		sb.append(", errorLabel=");
 		sb.append(errorLabel);
+		sb.append(", name=");
+		sb.append(name);
 		sb.append(", engine=");
 		sb.append(engine);
 		sb.append(", script=");
@@ -161,6 +163,13 @@ public class ObjectValidationRuleCacheModel
 			objectValidationRuleImpl.setErrorLabel(errorLabel);
 		}
 
+		if (name == null) {
+			objectValidationRuleImpl.setName("");
+		}
+		else {
+			objectValidationRuleImpl.setName(name);
+		}
+
 		if (engine == null) {
 			objectValidationRuleImpl.setEngine("");
 		}
@@ -198,6 +207,7 @@ public class ObjectValidationRuleCacheModel
 
 		active = objectInput.readBoolean();
 		errorLabel = objectInput.readUTF();
+		name = objectInput.readUTF();
 		engine = objectInput.readUTF();
 		script = objectInput.readUTF();
 	}
@@ -240,6 +250,13 @@ public class ObjectValidationRuleCacheModel
 			objectOutput.writeUTF(errorLabel);
 		}
 
+		if (name == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(name);
+		}
+
 		if (engine == null) {
 			objectOutput.writeUTF("");
 		}
@@ -266,6 +283,7 @@ public class ObjectValidationRuleCacheModel
 	public long objectDefinitionId;
 	public boolean active;
 	public String errorLabel;
+	public String name;
 	public String engine;
 	public String script;
 
