@@ -22,7 +22,7 @@ import {HTML5Backend} from 'react-dnd-html5-backend';
 
 import Card from '../../Card/Card';
 import {ManagementToolbarSearch} from '../ManagementToolbarSearch/ManagementToolbarSearch';
-import {TObjectViewSortColumn} from '../types';
+import {TObjectColumn} from '../types';
 import BuilderListItem from './BuilderListItem';
 
 import './BuilderScreen.scss';
@@ -34,7 +34,7 @@ interface IProps {
 		title: string;
 	};
 	isDefaultSort?: boolean;
-	objectColumns: TObjectViewSortColumn[];
+	objectColumns: TObjectColumn[];
 	onEditingObjectFieldName?: (objectFieldName: string) => void;
 	onEditingSort?: (boolean: boolean) => void;
 	onVisibleModal: (boolean: boolean) => void;
@@ -58,7 +58,7 @@ export function BuilderScreen({
 	}, [objectColumns]);
 
 	const newFilteredItems = filteredItems.filter(
-		(objectColumns: TObjectViewSortColumn) =>
+		(objectColumns: TObjectColumn) =>
 			objectColumns.label.toLowerCase().includes(query.toLowerCase())
 	);
 

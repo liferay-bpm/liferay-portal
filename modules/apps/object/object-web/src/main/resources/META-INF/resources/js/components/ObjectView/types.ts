@@ -32,6 +32,16 @@ export type TObjectField = {
 	type: string;
 };
 
+export type TObjectColumn = {
+	filterBy?: string;
+	label: string;
+	objectFieldName: string;
+	operator?: string;
+	priority?: number;
+	sortOrder?: string;
+	value?: string;
+};
+
 export type TObjectViewColumn = {
 	isDefaultSort: boolean;
 	label: string;
@@ -46,10 +56,19 @@ export type TObjectViewSortColumn = {
 	sortOrder?: string;
 };
 
+export type TObjectViewFilterColumn = {
+	filterBy: string;
+	label: string;
+	objectFieldName: string;
+	operator: string;
+	value: string;
+};
+
 export type TObjectView = {
 	defaultObjectView: boolean;
 	name: TName;
 	objectViewColumns: TObjectViewColumn[];
+	objectViewFilterColumns: TObjectViewFilterColumn[];
 	objectViewSortColumns: TObjectViewSortColumn[];
 };
 
