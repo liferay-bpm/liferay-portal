@@ -14,28 +14,4 @@
 
 /// <reference types="react" />
 
-import {TObjectColumn} from '../types';
-import './BuilderScreen.scss';
-interface IProps {
-	emptyState: {
-		buttonText: string;
-		description: string;
-		title: string;
-	};
-	isDefaultSort?: boolean;
-	objectColumns: TObjectColumn[];
-	onEditingObjectFieldName?: (objectFieldName: string) => void;
-	onEditingSort?: (boolean: boolean) => void;
-	onVisibleModal: (boolean: boolean) => void;
-	title: string;
-}
-export declare function BuilderScreen({
-	emptyState,
-	isDefaultSort,
-	objectColumns,
-	onEditingObjectFieldName,
-	onEditingSort,
-	onVisibleModal,
-	title,
-}: IProps): JSX.Element;
-export {};
+export declare function DefaultFilterScreen(): JSX.Element;
