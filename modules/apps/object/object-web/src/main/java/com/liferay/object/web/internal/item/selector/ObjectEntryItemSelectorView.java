@@ -41,11 +41,15 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.IOException;
+import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -280,10 +284,41 @@ public class ObjectEntryItemSelectorView
 							searchContainer.getEnd());
 					}
 
-					return _objectEntryLocalService.getObjectEntries(
-						_getGroupId(),
-						_objectDefinition.getObjectDefinitionId(),
-						searchContainer.getStart(), searchContainer.getEnd());
+					List<ObjectEntry> objectEntries =
+						_objectEntryLocalService.getObjectEntries(
+							_getGroupId(),
+							_objectDefinition.getObjectDefinitionId(),
+							searchContainer.getStart(),
+							searchContainer.getEnd());
+
+					List<ObjectEntry> newObjectEntries = new ArrayList<>(
+						Collections.emptyList());
+
+					for (ObjectEntry objectEntry : objectEntries) {
+						Map<String, Serializable> values =
+							objectEntry.getValues();
+
+						for (Map.Entry<String, Serializable> valueMap :
+								values.entrySet()) {
+
+							String valueKey = valueMap.getKey();
+
+							if (valueKey.startsWith("r_")) {
+								String valueString = String.valueOf(
+									values.get(valueKey));
+
+								Long value = Long.valueOf(valueString);
+
+								long valueLong = value.longValue();
+
+								if (valueLong == 0) {
+									newObjectEntries.add(objectEntry);
+								}
+							}
+						}
+					}
+
+					return newObjectEntries;
 				},
 				_objectEntryLocalService.getObjectEntriesCount());
 
