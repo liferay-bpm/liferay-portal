@@ -146,6 +146,8 @@ public class ObjectValidationRulePersistenceTest {
 
 		newObjectValidationRule.setErrorLabel(RandomTestUtil.randomString());
 
+		newObjectValidationRule.setName(RandomTestUtil.randomString());
+
 		newObjectValidationRule.setEngine(RandomTestUtil.randomString());
 
 		newObjectValidationRule.setScript(RandomTestUtil.randomString());
@@ -192,6 +194,9 @@ public class ObjectValidationRulePersistenceTest {
 		Assert.assertEquals(
 			existingObjectValidationRule.getErrorLabel(),
 			newObjectValidationRule.getErrorLabel());
+		Assert.assertEquals(
+			existingObjectValidationRule.getName(),
+			newObjectValidationRule.getName());
 		Assert.assertEquals(
 			existingObjectValidationRule.getEngine(),
 			newObjectValidationRule.getEngine());
@@ -265,7 +270,7 @@ public class ObjectValidationRulePersistenceTest {
 			"objectValidationRuleId", true, "companyId", true, "userId", true,
 			"userName", true, "createDate", true, "modifiedDate", true,
 			"objectDefinitionId", true, "active", true, "errorLabel", true,
-			"engine", true, "script", true);
+			"name", true, "engine", true, "script", true);
 	}
 
 	@Test
@@ -526,6 +531,8 @@ public class ObjectValidationRulePersistenceTest {
 		objectValidationRule.setActive(RandomTestUtil.randomBoolean());
 
 		objectValidationRule.setErrorLabel(RandomTestUtil.randomString());
+
+		objectValidationRule.setName(RandomTestUtil.randomString());
 
 		objectValidationRule.setEngine(RandomTestUtil.randomString());
 

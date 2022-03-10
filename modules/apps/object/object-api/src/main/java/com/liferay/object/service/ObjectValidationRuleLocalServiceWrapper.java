@@ -37,6 +37,20 @@ public class ObjectValidationRuleLocalServiceWrapper
 		_objectValidationRuleLocalService = objectValidationRuleLocalService;
 	}
 
+	@Override
+	public com.liferay.object.model.ObjectValidationRule
+			addObjectValidationRule(
+				long userId, long objectDefinitionId, boolean active,
+				java.util.Map<java.util.Locale, String> errorLabelMap,
+				java.util.Map<java.util.Locale, String> nameMap, String engine,
+				String script)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectValidationRuleLocalService.addObjectValidationRule(
+			userId, objectDefinitionId, active, errorLabelMap, nameMap, engine,
+			script);
+	}
+
 	/**
 	 * Adds the object validation rule to the database. Also notifies the appropriate model listeners.
 	 *
@@ -343,11 +357,10 @@ public class ObjectValidationRuleLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.object.model.ObjectValidationRule>
-		getObjectValidationRules(
-			long objectDefinitionId, boolean active, int start, int end) {
+		getObjectValidationRules(long objectDefinitionId, boolean active) {
 
 		return _objectValidationRuleLocalService.getObjectValidationRules(
-			objectDefinitionId, active, start, end);
+			objectDefinitionId, active);
 	}
 
 	/**
@@ -381,6 +394,20 @@ public class ObjectValidationRuleLocalServiceWrapper
 
 		return _objectValidationRuleLocalService.getPersistedModel(
 			primaryKeyObj);
+	}
+
+	@Override
+	public com.liferay.object.model.ObjectValidationRule
+			updateObjectValidationRule(
+				long objectValidationRuleId, boolean active,
+				java.util.Map<java.util.Locale, String> errorLabelMap,
+				java.util.Map<java.util.Locale, String> nameMap, String engine,
+				String script)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectValidationRuleLocalService.updateObjectValidationRule(
+			objectValidationRuleId, active, errorLabelMap, nameMap, engine,
+			script);
 	}
 
 	/**

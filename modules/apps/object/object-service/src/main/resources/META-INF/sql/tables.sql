@@ -205,6 +205,7 @@ create table ObjectValidationRule (
 	objectDefinitionId LONG,
 	active_ BOOLEAN,
 	errorLabel STRING null,
+	name STRING null,
 	engine VARCHAR(75) null,
 	script VARCHAR(75) null
 );
