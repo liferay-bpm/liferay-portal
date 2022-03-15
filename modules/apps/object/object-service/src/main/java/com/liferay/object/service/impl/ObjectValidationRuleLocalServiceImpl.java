@@ -15,7 +15,10 @@
 package com.liferay.object.service.impl;
 
 import com.liferay.object.exception.ObjectValidationRuleException;
+import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectValidationRule;
+import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.base.ObjectValidationRuleLocalServiceBaseImpl;
 import com.liferay.object.validation.rule.ObjectValidationRuleEngine;
 import com.liferay.object.validation.rule.ObjectValidationRuleEngineServicesTracker;
@@ -175,6 +178,13 @@ public class ObjectValidationRuleLocalServiceImpl
 				HashMapBuilder.<String, Object>putAll(
 					baseModel.getModelAttributes());
 
+			ObjectEntry objectEntry = (ObjectEntry)baseModel;
+
+			if (objectEntry != null) {
+				hashMapWrapper.putAll(
+					_objectEntryLocalService.getValues(objectEntry));
+			}
+
 			if (originalBaseModel != null) {
 				Map<String, Object> modelAttributes =
 					originalBaseModel.getModelAttributes();
@@ -185,20 +195,6 @@ public class ObjectValidationRuleLocalServiceImpl
 					hashMapWrapper.put(
 						"original." + entry.getKey(), entry.getValue());
 				}
-			}
-
-			if (userId > 0) {
-				User user = _userLocalService.getUser(userId);
-
-				hashMapWrapper.put(
-					"user.emailAddress", user.getEmailAddress()
-				).put(
-					"user.firstName", user.getFirstName()
-				).put(
-					"user.lastName", user.getLastName()
-				).put(
-					"userId", userId
-				);
 			}
 
 			if (!objectValidationRuleEngine.evaluate(
@@ -251,6 +247,12 @@ public class ObjectValidationRuleLocalServiceImpl
 			throw new ObjectValidationRuleException("Script is invalid");
 		}
 	}
+
+	@Reference
+	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Reference
+	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@Reference
 	private ObjectValidationRuleEngineServicesTracker
