@@ -550,7 +550,7 @@ definition {
 		ObjectAdmin.addObjectRelationshipViaAPI(
 			objectName_1 = "CustomObject10",
 			objectName_2 = "CustomObject10",
-			relationshipLabel = "Relationship",
+			relationshipLabel = "Relationship Label",
 			relationshipName = "relationship",
 			relationshipType = "oneToMany");
 
@@ -586,11 +586,11 @@ definition {
 		ObjectAdmin.addTabFieldsOnLayout(
 			blockName = "Block 1",
 			columnsNumber = "1",
-			fieldList = "Custom Field,Custom Object 10",
+			fieldList = "Custom Field,Relationship Label",
 			tabName = "Field Tab");
 
 		ObjectAdmin.addTabRelationshipsOnLayout(
-			relationshipsLabelName = "Relationship",
+			relationshipsLabelName = "Relationship Label",
 			tabName = "Relationship Tab");
 
 		Button.clickSave();
@@ -7749,8 +7749,13 @@ definition {
 		ObjectAdmin.gotoRelationshipsTab();
 
 		ObjectAdmin.addObjectRelationshipViaUI(
+<<<<<<< HEAD
 			label = "Relationship",
 			object = "CustomObjectB168",
+=======
+			label = "Relationship Label",
+			object = "CustomObjectB",
+>>>>>>> LPS-148589 Fix poshi tests
 			type = "One to Many");
 
 		ObjectAdmin.openObjectAdmin();
@@ -7760,7 +7765,11 @@ definition {
 		ObjectAdmin.goToFieldsTab();
 
 		ObjectAdmin.assertObjectField(
+<<<<<<< HEAD
 			fieldLabel = "Custom Object A 168",
+=======
+			fieldLabel = "Relationship Label",
+>>>>>>> LPS-148589 Fix poshi tests
 			fieldType = "Relationship");
 	}
 
