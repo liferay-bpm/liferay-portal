@@ -465,6 +465,7 @@
 		<column name="objectDefinitionId" type="long" />
 		<column name="active" type="boolean" />
 		<column localized="true" name="errorLabel" type="String" />
+		<column localized="true" name="name" type="String" />
 		<column name="engine" type="String" />
 		<column name="script" type="String" />
 
@@ -594,7 +595,7 @@
 		<exception>ObjectRelationshipName</exception>
 		<exception>ObjectRelationshipReverse</exception>
 		<exception>ObjectRelationshipType</exception>
-		<exception>ObjectValidation</exception>
+		<exception>ObjectValidationRule</exception>
 		<exception>ObjectViewSortColumn</exception>
 		<exception>RequiredObjectDefinition</exception>
 		<exception>RequiredObjectField</exception>

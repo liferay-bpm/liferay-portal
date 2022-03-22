@@ -12,19 +12,28 @@
  * details.
  */
 
-package com.liferay.object.validation.rule;
+package com.liferay.object.exception;
 
-import java.util.Map;
+import com.liferay.portal.kernel.exception.PortalException;
 
 /**
  * @author Marco Leo
  */
-public interface ObjectValidationRuleEngine {
+public class ObjectValidationRuleException extends PortalException {
 
-	public boolean evaluate(Map<String, Object> inputObjects, String script);
+	public ObjectValidationRuleException() {
+	}
 
-	public String getName();
+	public ObjectValidationRuleException(String msg) {
+		super(msg);
+	}
 
-	public boolean isValidScript(String script);
+	public ObjectValidationRuleException(String msg, Throwable throwable) {
+		super(msg, throwable);
+	}
+
+	public ObjectValidationRuleException(Throwable throwable) {
+		super(throwable);
+	}
 
 }

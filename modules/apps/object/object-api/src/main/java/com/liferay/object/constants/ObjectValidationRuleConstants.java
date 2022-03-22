@@ -12,28 +12,15 @@
  * details.
  */
 
-package com.liferay.object.exception;
-
-import com.liferay.portal.kernel.exception.PortalException;
+package com.liferay.object.constants;
 
 /**
- * @author Marco Leo
+ * @author Marcela Cunha
  */
-public class ObjectValidationException extends PortalException {
+public class ObjectValidationRuleConstants {
 
-	public ObjectValidationException() {
-	}
+	public static final String ENGINE_TYPE_DDM = "ddm";
 
-	public ObjectValidationException(String msg) {
-		super(msg);
-	}
-
-	public ObjectValidationException(String msg, Throwable throwable) {
-		super(msg, throwable);
-	}
-
-	public ObjectValidationException(Throwable throwable) {
-		super(throwable);
-	}
+	public static final String ENGINE_TYPE_GROOVY = "groovy";
 
 }
