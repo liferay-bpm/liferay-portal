@@ -20,16 +20,22 @@ import com.liferay.info.list.renderer.DefaultInfoListRendererContext;
 import com.liferay.info.list.renderer.InfoListRenderer;
 import com.liferay.info.list.renderer.InfoListRendererContext;
 import com.liferay.info.taglib.servlet.taglib.InfoListBasicTableTag;
+import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.web.internal.info.item.renderer.ObjectEntryRowInfoItemRenderer;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -45,10 +51,14 @@ public class ObjectEntryTableInfoListRenderer
 
 	public ObjectEntryTableInfoListRenderer(
 		InfoItemRendererTracker infoItemRendererTracker,
-		ObjectFieldLocalService objectFieldLocalService) {
+		ObjectFieldLocalService objectFieldLocalService,
+		ObjectRelationshipLocalService objectRelationshipLocalService,
+		ObjectDefinitionLocalService objectDefinitionLocalService) {
 
 		_infoItemRendererTracker = infoItemRendererTracker;
 		_objectFieldLocalService = objectFieldLocalService;
+		_objectRelationshipLocalService = objectRelationshipLocalService;
+		_objectDefinitionLocalService = objectDefinitionLocalService;
 	}
 
 	@Override
@@ -64,8 +74,10 @@ public class ObjectEntryTableInfoListRenderer
 
 	@Override
 	public void render(
-		List<ObjectEntry> objectEntries, HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse) {
+			List<ObjectEntry> objectEntries,
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws PortalException {
 
 		render(
 			objectEntries,
@@ -75,8 +87,9 @@ public class ObjectEntryTableInfoListRenderer
 
 	@Override
 	public void render(
-		List<ObjectEntry> objectEntries,
-		InfoListRendererContext infoListRendererContext) {
+			List<ObjectEntry> objectEntries,
+			InfoListRendererContext infoListRendererContext)
+		throws PortalException {
 
 		InfoListBasicTableTag infoListBasicTableTag =
 			new InfoListBasicTableTag();
@@ -84,11 +97,34 @@ public class ObjectEntryTableInfoListRenderer
 		if ((objectEntries != null) && !objectEntries.isEmpty()) {
 			ObjectEntry objectEntry = objectEntries.get(0);
 
+			List<ObjectField> objectFields =
+				_objectFieldLocalService.getObjectFields(
+					objectEntry.getObjectDefinitionId());
+
+			List<ObjectField> newObjectFields = new ArrayList<>();
+
+			for (ObjectField objectField : objectFields) {
+				if (Validator.isNotNull(objectField.getRelationshipType())) {
+					ObjectRelationship objectRelationship =
+						_objectRelationshipLocalService.
+							fetchObjectRelationshipByObjectFieldId2(
+								objectField.getObjectFieldId());
+
+					ObjectDefinition objectDefinition =
+						_objectDefinitionLocalService.getObjectDefinition(
+							objectRelationship.getObjectDefinitionId1());
+
+					if (objectDefinition.isActive()) {
+						newObjectFields.add(objectField);
+					}
+				}
+				else {
+					newObjectFields.add(objectField);
+				}
+			}
+
 			infoListBasicTableTag.setInfoListObjectColumnNames(
-				ListUtil.toList(
-					_objectFieldLocalService.getObjectFields(
-						objectEntry.getObjectDefinitionId()),
-					ObjectField::getLabel));
+				ListUtil.toList(newObjectFields, ObjectField::getLabel));
 		}
 
 		infoListBasicTableTag.setInfoListObjects(objectEntries);
@@ -121,6 +157,9 @@ public class ObjectEntryTableInfoListRenderer
 		ObjectEntryTableInfoListRenderer.class);
 
 	private final InfoItemRendererTracker _infoItemRendererTracker;
+	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectFieldLocalService _objectFieldLocalService;
+	private final ObjectRelationshipLocalService
+		_objectRelationshipLocalService;
 
 }

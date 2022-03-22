@@ -183,8 +183,8 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				new ObjectEntryRowInfoItemRenderer(
 					_assetDisplayPageFriendlyURLProvider,
 					_listTypeEntryLocalService, _objectDefinitionLocalService,
-					_objectEntryLocalService, _objectFieldLocalService,
-					_servletContext),
+					_objectEntryLocalService, _objectRelationshipLocalService,
+					_objectFieldLocalService, _servletContext),
 				HashMapDictionaryBuilder.<String, Object>put(
 					Constants.SERVICE_RANKING, 100
 				).put(
@@ -195,7 +195,9 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			_bundleContext.registerService(
 				InfoListRenderer.class,
 				new ObjectEntryTableInfoListRenderer(
-					_infoItemRendererTracker, _objectFieldLocalService),
+					_infoItemRendererTracker, _objectFieldLocalService,
+					_objectRelationshipLocalService,
+					_objectDefinitionLocalService),
 				HashMapDictionaryBuilder.<String, Object>put(
 					"item.class.name", objectDefinition.getClassName()
 				).build()),

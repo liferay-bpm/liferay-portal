@@ -16,6 +16,7 @@ package com.liferay.info.list.renderer;
 
 import com.liferay.info.item.renderer.InfoItemRenderer;
 import com.liferay.info.type.Keyed;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.Collections;
@@ -40,10 +41,11 @@ public interface InfoListRenderer<T> extends Keyed {
 
 	public void render(
 		List<T> list, HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse);
+		HttpServletResponse httpServletResponse) throws PortalException;
 
 	public default void render(
-		List<T> list, InfoListRendererContext infoListRendererContext) {
+		List<T> list, InfoListRendererContext infoListRendererContext)
+		throws PortalException {
 
 		render(
 			list, infoListRendererContext.getHttpServletRequest(),

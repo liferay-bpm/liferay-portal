@@ -18,11 +18,14 @@ import com.liferay.asset.display.page.portlet.AssetDisplayPageFriendlyURLProvide
 import com.liferay.info.item.renderer.InfoItemRenderer;
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
+import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -36,6 +39,7 @@ import java.io.Serializable;
 
 import java.text.Format;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -64,6 +68,7 @@ public class ObjectEntryRowInfoItemRenderer
 		ListTypeEntryLocalService listTypeEntryLocalService,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectEntryLocalService objectEntryLocalService,
+		ObjectRelationshipLocalService objectRelationshipLocalService,
 		ObjectFieldLocalService objectFieldLocalService,
 		ServletContext servletContext) {
 
@@ -72,6 +77,7 @@ public class ObjectEntryRowInfoItemRenderer
 		_listTypeEntryLocalService = listTypeEntryLocalService;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryLocalService = objectEntryLocalService;
+		_objectRelationshipLocalService = objectRelationshipLocalService;
 		_objectFieldLocalService = objectFieldLocalService;
 		_servletContext = servletContext;
 	}
@@ -128,7 +134,29 @@ public class ObjectEntryRowInfoItemRenderer
 			_objectFieldLocalService.getObjectFields(
 				objectEntry.getObjectDefinitionId());
 
-		Stream<ObjectField> objectFieldsStream = objectFields.stream();
+		List<ObjectField> newObjectFields = new ArrayList<>();
+
+		for (ObjectField objectField : objectFields) {
+			if (Validator.isNotNull(objectField.getRelationshipType())) {
+				ObjectRelationship objectRelationship =
+					_objectRelationshipLocalService.
+						fetchObjectRelationshipByObjectFieldId2(
+							objectField.getObjectFieldId());
+
+				ObjectDefinition objectDefinition =
+					_objectDefinitionLocalService.getObjectDefinition(
+						objectRelationship.getObjectDefinitionId1());
+
+				if (objectDefinition.isActive()) {
+					newObjectFields.add(objectField);
+				}
+			}
+			else {
+				newObjectFields.add(objectField);
+			}
+		}
+
+		Stream<ObjectField> objectFieldsStream = newObjectFields.stream();
 
 		Map<String, ObjectField> objectFieldsMap = objectFieldsStream.collect(
 			Collectors.toMap(ObjectField::getName, Function.identity()));
@@ -200,6 +228,8 @@ public class ObjectEntryRowInfoItemRenderer
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectEntryLocalService _objectEntryLocalService;
 	private final ObjectFieldLocalService _objectFieldLocalService;
+	private final ObjectRelationshipLocalService
+		_objectRelationshipLocalService;
 	private final ServletContext _servletContext;
 
 }
