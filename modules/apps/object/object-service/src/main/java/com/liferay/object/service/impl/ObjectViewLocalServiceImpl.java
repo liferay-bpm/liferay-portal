@@ -15,6 +15,7 @@
 package com.liferay.object.service.impl;
 
 import com.liferay.object.exception.DefaultObjectViewException;
+import com.liferay.object.exception.ObjectViewColumnFieldNameException;
 import com.liferay.object.exception.ObjectViewSortColumnException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
@@ -23,6 +24,7 @@ import com.liferay.object.model.ObjectViewColumn;
 import com.liferay.object.model.ObjectViewSortColumn;
 import com.liferay.object.service.base.ObjectViewLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
+import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.service.persistence.ObjectViewColumnPersistence;
 import com.liferay.object.service.persistence.ObjectViewSortColumnPersistence;
 import com.liferay.portal.aop.AopService;
@@ -87,8 +89,7 @@ public class ObjectViewLocalServiceImpl extends ObjectViewLocalServiceBaseImpl {
 		objectView = objectViewPersistence.update(objectView);
 
 		objectView.setObjectViewColumns(
-			_addObjectViewColumns(
-				user, objectView.getObjectViewId(), objectViewColumns));
+			_addObjectViewColumns(user, objectView, objectViewColumns));
 		objectView.setObjectViewSortColumns(
 			_addObjectViewSortColumns(
 				user, objectView, objectViewColumns, objectViewSortColumns));
@@ -214,8 +215,8 @@ public class ObjectViewLocalServiceImpl extends ObjectViewLocalServiceBaseImpl {
 
 		objectView.setObjectViewColumns(
 			_addObjectViewColumns(
-				_userLocalService.getUser(objectView.getUserId()),
-				objectView.getObjectViewId(), objectViewColumns));
+				_userLocalService.getUser(objectView.getUserId()), objectView,
+				objectViewColumns));
 		objectView.setObjectViewSortColumns(
 			_addObjectViewSortColumns(
 				_userLocalService.getUser(objectView.getUserId()), objectView,
@@ -225,8 +226,19 @@ public class ObjectViewLocalServiceImpl extends ObjectViewLocalServiceBaseImpl {
 	}
 
 	private List<ObjectViewColumn> _addObjectViewColumns(
-		User user, long objectViewId,
-		List<ObjectViewColumn> objectViewColumns) {
+			User user, ObjectView objectView,
+			List<ObjectViewColumn> objectViewColumns)
+		throws ObjectViewColumnFieldNameException {
+
+		try {
+			_validate(objectView, objectViewColumns);
+		}
+		catch (ObjectViewColumnFieldNameException
+					objectViewColumnFieldNameException) {
+
+			throw new ObjectViewColumnFieldNameException(
+				objectViewColumnFieldNameException.getMessage());
+		}
 
 		return TransformUtil.transform(
 			objectViewColumns,
@@ -238,7 +250,8 @@ public class ObjectViewLocalServiceImpl extends ObjectViewLocalServiceBaseImpl {
 				newObjectViewColumn.setCompanyId(user.getCompanyId());
 				newObjectViewColumn.setUserId(user.getUserId());
 				newObjectViewColumn.setUserName(user.getFullName());
-				newObjectViewColumn.setObjectViewId(objectViewId);
+				newObjectViewColumn.setObjectViewId(
+					objectView.getObjectViewId());
 				newObjectViewColumn.setLabelMap(objectViewColumn.getLabelMap());
 				newObjectViewColumn.setObjectFieldName(
 					objectViewColumn.getObjectFieldName());
@@ -291,10 +304,7 @@ public class ObjectViewLocalServiceImpl extends ObjectViewLocalServiceBaseImpl {
 			List<ObjectViewSortColumn> objectViewSortColumns)
 		throws ObjectViewSortColumnException {
 
-		Set<String> objectFieldNames = SetUtil.fromArray(
-			new String[] {
-				"creator", "dateCreated", "dateModified", "id", "status"
-			});
+		Set<String> objectFieldNames = SetUtil.fromArray(new String[0]);
 
 		for (ObjectViewColumn objectViewColumn : objectViewColumns) {
 			objectFieldNames.add(objectViewColumn.getObjectFieldName());
@@ -307,7 +317,7 @@ public class ObjectViewLocalServiceImpl extends ObjectViewLocalServiceBaseImpl {
 					objectViewSortColumn.getObjectFieldName())) {
 
 				throw new ObjectViewSortColumnException(
-					"There is no object field with the name: " +
+					"There is no object view column with the name: " +
 						objectViewSortColumn.getObjectFieldName());
 			}
 
@@ -337,8 +347,52 @@ public class ObjectViewLocalServiceImpl extends ObjectViewLocalServiceBaseImpl {
 		}
 	}
 
+	private void _validate(
+			ObjectView objectView, List<ObjectViewColumn> objectViewColumns)
+		throws ObjectViewColumnFieldNameException {
+
+		Set<String> objectFieldNames = SetUtil.fromArray(new String[0]);
+
+		for (ObjectViewColumn objectViewColumn : objectViewColumns) {
+			if (objectFieldNames.contains(
+					objectViewColumn.getObjectFieldName())) {
+
+				throw new ObjectViewColumnFieldNameException(
+					"Already exist an object view column with field name: " +
+						objectViewColumn.getObjectFieldName());
+			}
+
+			objectFieldNames.add(objectViewColumn.getObjectFieldName());
+		}
+
+		List<ObjectField> objectFields =
+			_objectFieldPersistence.findByObjectDefinitionId(
+				objectView.getObjectDefinitionId());
+
+		objectFieldNames.addAll(
+			SetUtil.fromArray(
+				"creator", "dateCreated", "dateModified", "id", "status"));
+
+		for (ObjectField objectField : objectFields) {
+			objectFieldNames.add(objectField.getName());
+		}
+
+		for (ObjectViewColumn objectViewColumn : objectViewColumns) {
+			if (!objectFieldNames.contains(
+					objectViewColumn.getObjectFieldName())) {
+
+				throw new ObjectViewColumnFieldNameException(
+					"There is no object field with the name: " +
+						objectViewColumn.getObjectFieldName());
+			}
+		}
+	}
+
 	@Reference
 	private ObjectDefinitionPersistence _objectDefinitionPersistence;
+
+	@Reference
+	private ObjectFieldPersistence _objectFieldPersistence;
 
 	@Reference
 	private ObjectViewColumnPersistence _objectViewColumnPersistence;
