@@ -28,12 +28,15 @@ import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionRequest;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionResponse;
 import com.liferay.portal.kernel.test.portlet.MockLiferayResourceRequest;
 import com.liferay.portal.kernel.test.portlet.MockLiferayResourceResponse;
+import com.liferay.portal.kernel.test.util.PropsTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.File;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Props;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -47,7 +50,9 @@ import java.io.ByteArrayOutputStream;
 
 import java.util.List;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -67,6 +72,18 @@ public class ExportImportObjectDefinitionTest {
 	@Rule
 	public static final LiferayIntegrationTestRule liferayIntegrationTestRule =
 		new LiferayIntegrationTestRule();
+
+	@BeforeClass
+	public static void setUpClass() {
+		_props = PropsUtil.getProps();
+
+		PropsTestUtil.setProps("feature.flag.LPS-149119", "true");
+	}
+
+	@AfterClass
+	public static void tearDownClass() {
+		PropsUtil.setProps(_props);
+	}
 
 	@Test
 	public void testExportImportObjectDefinition() throws Exception {
@@ -212,6 +229,8 @@ public class ExportImportObjectDefinitionTest {
 
 		return items.get(0);
 	}
+
+	private static Props _props;
 
 	@Inject
 	private File _file;
