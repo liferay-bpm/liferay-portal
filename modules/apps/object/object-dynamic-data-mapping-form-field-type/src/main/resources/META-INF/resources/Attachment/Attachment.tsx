@@ -131,6 +131,9 @@ export default function Attachment({
 		const selectedFile = files?.[0];
 		if (selectedFile) {
 			const maxFileSize = Number(maximumFileSize);
+			const selectedFileExtension = String(
+				selectedFile.name.split('.').pop()
+			).toLowerCase();
 
 			if (selectedFile.size > maxFileSize * BYTES_PER_MB) {
 				setError({
@@ -146,6 +149,25 @@ export default function Attachment({
 
 				return;
 			}
+			else if (
+				!acceptedFileExtensions
+					.toLowerCase()
+					.includes(selectedFileExtension)
+			) {
+				setError({
+					displayErrors: true,
+					errorMessage: Liferay.Util.sub(
+						Liferay.Language.get(
+							'please-enter-a-file-with-a-valid-extension-x'
+						),
+						`${acceptedFileExtensions}`
+					),
+					valid: false,
+				});
+
+				return;
+			}
+
 			setError({});
 			setLoading(true);
 			try {
