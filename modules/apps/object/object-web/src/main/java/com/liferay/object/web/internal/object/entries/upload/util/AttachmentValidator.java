@@ -26,8 +26,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.File;
 
-import java.util.Arrays;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -62,7 +60,7 @@ public class AttachmentValidator {
 			_FILE_LENGTH_MB;
 	}
 
-	public void validateFileExtension(String fileName, long objectFielId)
+	public void validateFileExtension(String fileName, long objectFieldId)
 		throws FileExtensionException {
 
 		boolean validFileExtension = false;
@@ -70,7 +68,7 @@ public class AttachmentValidator {
 		String fileExtension = FileUtil.getExtension(fileName);
 
 		for (String acceptedFileExtension :
-				Arrays.asList(getAcceptedFileExtensions(objectFielId))) {
+				getAcceptedFileExtensions(objectFieldId)) {
 
 			if (StringUtil.equalsIgnoreCase(
 					fileExtension, StringUtil.trim(acceptedFileExtension))) {
@@ -87,14 +85,14 @@ public class AttachmentValidator {
 		}
 	}
 
-	public void validateFileSize(File file, String fileName, long objectFielId)
+	public void validateFileSize(File file, String fileName, long objectFieldId)
 		throws FileSizeException, InvalidFileException {
 
 		if (file == null) {
 			throw new InvalidFileException("File is null for " + fileName);
 		}
 
-		long maximumFileSize = getMaximumFileSize(objectFielId);
+		long maximumFileSize = getMaximumFileSize(objectFieldId);
 
 		if ((maximumFileSize > 0) && (file.length() > maximumFileSize)) {
 			throw new FileSizeException(
