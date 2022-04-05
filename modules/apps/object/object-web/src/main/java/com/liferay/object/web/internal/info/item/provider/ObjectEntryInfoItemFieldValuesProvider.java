@@ -47,6 +47,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.util.TransformUtil;
 import com.liferay.template.info.item.provider.TemplateInfoItemFieldSetProvider;
@@ -254,11 +255,14 @@ public class ObjectEntryInfoItemFieldValuesProvider
 			return listTypeEntry.getName(serviceContext.getLocale());
 		}
 		else if (Validator.isNotNull(objectField.getRelationshipType())) {
-			ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
-				(Long)values.get(objectField.getName()));
+			if (!StringUtil.equals(value.toString(), StringPool.BLANK)) {
+				ObjectEntry objectEntry =
+					_objectEntryLocalService.fetchObjectEntry(
+						(Long)values.get(objectField.getName()));
 
-			if (objectEntry != null) {
-				return objectEntry.getTitleValue();
+				if (objectEntry != null) {
+					return objectEntry.getTitleValue();
+				}
 			}
 		}
 		else if (Objects.equals(objectField.getDBType(), "Date")) {

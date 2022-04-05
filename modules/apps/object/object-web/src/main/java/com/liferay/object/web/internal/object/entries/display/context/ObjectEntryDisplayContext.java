@@ -63,6 +63,7 @@ import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelpe
 import com.liferay.object.web.internal.item.selector.ObjectEntryItemSelectorReturnType;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -97,6 +98,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.portlet.PortletRequest;
@@ -711,6 +713,34 @@ public class ObjectEntryDisplayContext {
 					if (!StringUtil.equals(
 							ddmFormField.getType(),
 							DDMFormFieldTypeConstants.FIELDSET)) {
+
+						if (StringUtil.equals(
+								ddmFormField.getType(),
+								"object-relationship")) {
+
+							Set<Map.Entry<String, Serializable>> entrySet =
+								values.entrySet();
+
+							Stream<Map.Entry<String, Serializable>>
+								entryStream = entrySet.stream();
+
+							entryStream.forEach(
+								entry -> {
+									if (StringUtil.equals(
+											entry.getKey(),
+											ddmFormField.getName())) {
+
+										String value = String.valueOf(
+											entry.getValue());
+
+										if (StringUtil.equals(value, "0")) {
+											values.replace(
+												ddmFormField.getName(),
+												StringPool.BLANK);
+										}
+									}
+								});
+						}
 
 						_setDDMFormFieldValueValue(
 							ddmFormField.getName(), ddmFormFieldValue, values);
