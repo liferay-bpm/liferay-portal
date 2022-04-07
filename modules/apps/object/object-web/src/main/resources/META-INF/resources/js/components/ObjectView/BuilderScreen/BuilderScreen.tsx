@@ -39,6 +39,7 @@ interface IProps {
 	objectColumns: TObjectViewSortColumn[];
 	onEditing?: (boolean: boolean) => void;
 	onEditingObjectFieldName?: (objectFieldName: string) => void;
+	onFieldWithoutName?: (boolean: boolean) => void;
 	onVisibleEditModal: (boolean: boolean) => void;
 	onVisibleModal: (boolean: boolean) => void;
 	title: string;
@@ -53,6 +54,7 @@ export function BuilderScreen({
 	objectColumns,
 	onEditing,
 	onEditingObjectFieldName,
+	onFieldWithoutName,
 	onVisibleEditModal,
 	onVisibleModal,
 	title,
@@ -63,8 +65,18 @@ export function BuilderScreen({
 	const [filteredItems, setFilteredItems] = useState(objectColumns);
 
 	useEffect(() => {
+		if (onFieldWithoutName) {
+			onFieldWithoutName(false);
+
+			objectColumns.forEach((column) => {
+				if (!column.fieldLabel) {
+					onFieldWithoutName(true);
+				}
+			});
+		}
+
 		setFilteredItems(objectColumns);
-	}, [objectColumns]);
+	}, [objectColumns, onFieldWithoutName]);
 
 	const newFilteredItems = filteredItems.filter(
 		(objectColumns: TObjectViewSortColumn) =>

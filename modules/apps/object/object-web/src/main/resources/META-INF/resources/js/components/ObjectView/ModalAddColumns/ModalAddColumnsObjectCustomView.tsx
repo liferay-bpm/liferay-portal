@@ -12,6 +12,7 @@
  * details.
  */
 
+import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
 import ClayForm, {ClayCheckbox} from '@clayui/form';
 import ClayList from '@clayui/list';
@@ -184,6 +185,15 @@ const ModalAddColumnsObjectCustomView: React.FC<IProps> = ({
 			</ClayModal.Header>
 
 			<ClayModal.Body>
+				<ClayAlert
+					displayType="info"
+					title={`${Liferay.Language.get('info')}:`}
+				>
+					{Liferay.Language.get(
+						'object-fields-must-have-their-localizable-labels-with-the-same-location-as-the-portal-instance-in-order-to-appear-in-the-modal'
+					)}
+				</ClayAlert>
+
 				<div className="lfr-object__object-view-modal-add-columns-selection-title">
 					{Liferay.Language.get('select-the-columns')}
 				</div>

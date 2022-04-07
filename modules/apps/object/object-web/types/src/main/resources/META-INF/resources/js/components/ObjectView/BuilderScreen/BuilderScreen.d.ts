@@ -27,6 +27,7 @@ interface IProps {
 	objectColumns: TObjectViewSortColumn[];
 	onEditing?: (boolean: boolean) => void;
 	onEditingObjectFieldName?: (objectFieldName: string) => void;
+	onFieldWithoutName?: (boolean: boolean) => void;
 	onVisibleEditModal: (boolean: boolean) => void;
 	onVisibleModal: (boolean: boolean) => void;
 	title: string;
@@ -38,6 +39,7 @@ export declare function BuilderScreen({
 	objectColumns,
 	onEditing,
 	onEditingObjectFieldName,
+	onFieldWithoutName,
 	onVisibleEditModal,
 	onVisibleModal,
 	title,

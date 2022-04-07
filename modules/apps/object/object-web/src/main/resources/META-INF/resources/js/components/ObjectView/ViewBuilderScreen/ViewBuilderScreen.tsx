@@ -12,6 +12,7 @@
  * details.
  */
 
+import ClayAlert from '@clayui/alert';
 import {useModal} from '@clayui/modal';
 import React, {useContext, useState} from 'react';
 
@@ -32,6 +33,7 @@ const ViewBuilderScreen: React.FC<{}> = () => {
 
 	const [visibleEditModal, setVisibleEditModal] = useState(false);
 	const [editingObjectFieldName, setEditingObjectFieldName] = useState('');
+	const [fieldWithoutName, setFieldWithoutName] = useState(false);
 
 	const {observer, onClose} = useModal({
 		onClose: () =>
@@ -42,6 +44,19 @@ const ViewBuilderScreen: React.FC<{}> = () => {
 
 	return (
 		<>
+			<ClayAlert
+				displayType={fieldWithoutName ? 'warning' : 'info'}
+				title={
+					fieldWithoutName
+						? `${Liferay.Language.get('warning')}:`
+						: `${Liferay.Language.get('info')}:`
+				}
+			>
+				{Liferay.Language.get(
+					'object-fields-must-have-their-localizable-labels-with-the-same-location-as-the-portal-instance-in-order-to-appear-in-the-view-builder'
+				)}
+			</ClayAlert>
+
 			<BuilderScreen
 				aliasColumnHeader={
 					isFFObjectViewColumnAliasEnabled
@@ -57,6 +72,7 @@ const ViewBuilderScreen: React.FC<{}> = () => {
 				}}
 				objectColumns={objectViewColumns ?? []}
 				onEditingObjectFieldName={setEditingObjectFieldName}
+				onFieldWithoutName={setFieldWithoutName}
 				onVisibleEditModal={setVisibleEditModal}
 				onVisibleModal={setVisibleModal}
 				title={Liferay.Language.get('columns')}
