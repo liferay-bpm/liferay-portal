@@ -323,6 +323,15 @@ public class ObjectEntryDisplayContext {
 				liferayPortletResponse.getNamespace() +
 					"selectRelatedModalEntry",
 				infoItemItemSelectorCriterion)
+		).setParameter(
+			"objectEntryId",
+			() -> {
+				ObjectEntry objectEntry = getObjectEntry();
+
+				return objectEntry.getObjectEntryId();
+			}
+		).setParameter(
+			"objectRelationshipId", objectRelationship.getObjectRelationshipId()
 		).buildString();
 	}
 
