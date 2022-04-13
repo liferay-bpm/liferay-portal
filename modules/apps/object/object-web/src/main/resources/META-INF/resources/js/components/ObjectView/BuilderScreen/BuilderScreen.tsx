@@ -20,6 +20,7 @@ import React, {useEffect, useState} from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
 
+import {defaultLanguageId} from '../../../utils/locale';
 import Card from '../../Card/Card';
 import {ManagementToolbarSearch} from '../ManagementToolbarSearch/ManagementToolbarSearch';
 import {TObjectViewSortColumn} from '../types';
@@ -42,8 +43,6 @@ interface IProps {
 	onVisibleModal: (boolean: boolean) => void;
 	title: string;
 }
-
-const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 export function BuilderScreen({
 	aliasColumnHeader,
