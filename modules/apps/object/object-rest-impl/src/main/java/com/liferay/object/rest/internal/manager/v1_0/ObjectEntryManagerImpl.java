@@ -16,9 +16,11 @@ package com.liferay.object.rest.internal.manager.v1_0;
 
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.object.constants.ObjectConstants;
+import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.internal.dto.v1_0.converter.ObjectEntryDTOConverter;
 import com.liferay.object.rest.internal.odata.entity.v1_0.ObjectEntryEntityModel;
@@ -27,8 +29,11 @@ import com.liferay.object.rest.internal.search.aggregation.AggregationUtil;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
+import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
@@ -43,6 +48,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -61,18 +67,22 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.ActionUtil;
 import com.liferay.portal.vulcan.util.GroupUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.io.Serializable;
 
 import java.text.ParseException;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
@@ -183,6 +193,8 @@ public class ObjectEntryManagerImpl implements ObjectEntryManager {
 			dtoConverterContext.getUriInfoOptional();
 
 		UriInfo uriInfo = uriInfoOptional.orElse(null);
+
+		_checkPreventDeletionType(objectDefinition.getObjectDefinitionId());
 
 		return SearchUtil.search(
 			HashMapBuilder.put(
@@ -322,6 +334,27 @@ public class ObjectEntryManagerImpl implements ObjectEntryManager {
 				new ServiceContext()));
 	}
 
+	private List<ObjectRelationship> _checkManyToManyRelationship(
+		long objectDefinitionId) {
+
+		List<ObjectRelationship> objectRelationships =
+			_objectRelationshipLocalService.
+				getObjectRelationshipsByObjectDefinitionId2(objectDefinitionId);
+
+		return TransformUtil.transform(
+			objectRelationships,
+			objectRelationship -> {
+				if (StringUtil.equals(
+						objectRelationship.getType(),
+						ObjectRelationshipConstants.TYPE_MANY_TO_MANY)) {
+
+					return objectRelationship;
+				}
+
+				return null;
+			});
+	}
+
 	private void _checkObjectEntryObjectDefinitionId(
 			ObjectDefinition objectDefinition,
 			com.liferay.object.model.ObjectEntry objectEntry)
@@ -331,6 +364,33 @@ public class ObjectEntryManagerImpl implements ObjectEntryManager {
 				objectEntry.getObjectDefinitionId()) {
 
 			throw new NoSuchObjectEntryException();
+		}
+	}
+
+	private void _checkPreventDeletionType(long objectDefinitionId) {
+		_hasPreventTypeRelationship = false;
+
+		List<ObjectRelationship> objectRelationships = new ArrayList<>();
+
+		objectRelationships.addAll(
+			_objectRelationshipLocalService.getObjectRelationships(
+				objectDefinitionId));
+
+		objectRelationships.addAll(
+			_checkManyToManyRelationship(objectDefinitionId));
+
+		for (ObjectRelationship objectRelationship :
+				_objectRelationshipLocalService.getObjectRelationships(
+					objectDefinitionId)) {
+
+			if (StringUtil.equals(
+					objectRelationship.getDeletionType(),
+					ObjectRelationshipConstants.DELETION_TYPE_PREVENT)) {
+
+				_hasPreventTypeRelationship = true;
+				_objectRelationshipsWithPreventDeletionType.add(
+					objectRelationship);
+			}
 		}
 	}
 
@@ -362,6 +422,47 @@ public class ObjectEntryManagerImpl implements ObjectEntryManager {
 
 	private String _getObjectEntryPermissionName(long objectDefinitionId) {
 		return ObjectDefinition.class.getName() + "#" + objectDefinitionId;
+	}
+
+	private boolean _hasRelatedObjectEntries(
+			com.liferay.object.model.ObjectEntry objectEntry)
+		throws PortalException {
+
+		for (ObjectRelationship objectRelationship :
+				_objectRelationshipsWithPreventDeletionType) {
+
+			int count = 0;
+
+			if (StringUtil.equals(
+					objectRelationship.getType(),
+					ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
+
+				count =
+					_objectEntryLocalService.
+						getOneToManyRelatedObjectEntriesCount(
+							objectEntry.getGroupId(),
+							objectRelationship.getObjectRelationshipId(),
+							objectEntry.getPrimaryKey());
+			}
+
+			if (StringUtil.equals(
+					objectRelationship.getType(),
+					ObjectRelationshipConstants.TYPE_MANY_TO_MANY)) {
+
+				count =
+					_objectEntryLocalService.
+						getManyToManyRelatedObjectEntriesCount(
+							objectEntry.getGroupId(),
+							objectRelationship.getObjectRelationshipId(),
+							objectEntry.getPrimaryKey(), true);
+			}
+
+			if (count > 0) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private Date _toDate(Locale locale, String valueString) {
@@ -425,13 +526,21 @@ public class ObjectEntryManagerImpl implements ObjectEntryManager {
 				dtoConverterContext.isAcceptAllLanguages(),
 				HashMapBuilder.put(
 					"delete",
-					ActionUtil.addAction(
-						ActionKeys.DELETE, ObjectEntryResourceImpl.class,
-						objectEntry.getObjectEntryId(), "deleteObjectEntry",
-						null, objectEntry.getUserId(),
-						_getObjectEntryPermissionName(
-							objectEntry.getObjectDefinitionId()),
-						objectEntry.getGroupId(), uriInfo)
+					() -> {
+						if (_hasPreventTypeRelationship &&
+							_hasRelatedObjectEntries(objectEntry)) {
+
+							return null;
+						}
+
+						return ActionUtil.addAction(
+							ActionKeys.DELETE, ObjectEntryResourceImpl.class,
+							objectEntry.getObjectEntryId(), "deleteObjectEntry",
+							null, objectEntry.getUserId(),
+							_getObjectEntryPermissionName(
+								objectEntry.getObjectDefinitionId()),
+							objectEntry.getGroupId(), uriInfo);
+					}
 				).put(
 					"get",
 					ActionUtil.addAction(
@@ -527,14 +636,25 @@ public class ObjectEntryManagerImpl implements ObjectEntryManager {
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	private boolean _hasPreventTypeRelationship;
+
 	@Reference
 	private ObjectEntryDTOConverter _objectEntryDTOConverter;
+
+	@Reference
+	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Reference
 	private ObjectEntryService _objectEntryService;
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
+
+	private final Set<ObjectRelationship>
+		_objectRelationshipsWithPreventDeletionType = new HashSet<>();
 
 	@Reference
 	private ObjectScopeProviderRegistry _objectScopeProviderRegistry;
