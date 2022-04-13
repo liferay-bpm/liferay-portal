@@ -15,12 +15,14 @@
 import ClayForm, {ClayCheckbox} from '@clayui/form';
 import React, {useContext} from 'react';
 
+<<<<<<< HEAD
 import {invalidateRequired} from '../../../hooks/useForm';
+=======
+import {defaultLanguageId} from '../../../utils/locale';
+>>>>>>> LPS-151492 Create a Util to export locale constants and use them in all Object Web
 import Card from '../../Card/Card';
 import Input from '../../Form/Input';
 import LayoutContext, {TYPES} from '../context';
-
-const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 const InfoScreen: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 	const [{isViewOnly, objectLayout}, dispatch] = useContext(LayoutContext);
