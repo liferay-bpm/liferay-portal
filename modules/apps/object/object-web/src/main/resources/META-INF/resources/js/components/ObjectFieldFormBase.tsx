@@ -233,6 +233,9 @@ export function useObjectFieldForm({
 
 		const settings = normalizeFieldSettings(field.objectFieldSettings);
 
+		const maxUploadRequestSize =
+			Liferay.PropsValues.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE;
+
 		if (invalidateRequired(label)) {
 			errors.label = REQUIRED_MSG;
 		}
@@ -257,6 +260,14 @@ export function useObjectFieldForm({
 			}
 			if (!settings.maximumFileSize && settings.maximumFileSize !== 0) {
 				errors.maximumFileSize = REQUIRED_MSG;
+			}
+			else if (settings.maximumFileSize > maxUploadRequestSize) {
+				errors.maximumFileSize = Liferay.Util.sub(
+					Liferay.Language.get(
+						'file-size-is-larger-than-maximum-upload-request-size-x-mb'
+					),
+					maxUploadRequestSize
+				);
 			}
 			else if (settings.maximumFileSize < 0) {
 				errors.maximumFileSize = Liferay.Util.sub(
