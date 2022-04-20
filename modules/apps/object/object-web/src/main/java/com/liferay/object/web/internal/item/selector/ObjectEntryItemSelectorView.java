@@ -21,14 +21,18 @@ import com.liferay.item.selector.ItemSelectorViewDescriptor;
 import com.liferay.item.selector.ItemSelectorViewDescriptorRenderer;
 import com.liferay.item.selector.criteria.InfoItemItemSelectorReturnType;
 import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
+import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -75,6 +79,7 @@ public class ObjectEntryItemSelectorView
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectEntryLocalService objectEntryLocalService,
 		ObjectEntryManager objectEntryManager,
+		ObjectRelationshipLocalService objectRelationshipLocalService,
 		ObjectScopeProviderRegistry objectScopeProviderRegistry,
 		Portal portal) {
 
@@ -84,6 +89,7 @@ public class ObjectEntryItemSelectorView
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryLocalService = objectEntryLocalService;
 		_objectEntryManager = objectEntryManager;
+		_objectRelationshipLocalService = objectRelationshipLocalService;
 		_objectScopeProviderRegistry = objectScopeProviderRegistry;
 		_portal = portal;
 	}
@@ -139,6 +145,8 @@ public class ObjectEntryItemSelectorView
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectEntryLocalService _objectEntryLocalService;
 	private final ObjectEntryManager _objectEntryManager;
+	private final ObjectRelationshipLocalService
+		_objectRelationshipLocalService;
 	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 	private final Portal _portal;
 
@@ -311,12 +319,65 @@ public class ObjectEntryItemSelectorView
 				return StringPool.BLANK;
 			}
 
+			ObjectRelationship objectRelationship =
+				_objectRelationshipLocalService.getObjectRelationship(
+					ParamUtil.getLong(_portletRequest, "objectRelationshipId"));
+
+			if (StringUtil.equals(
+					objectRelationship.getType(),
+					ObjectRelationshipConstants.TYPE_MANY_TO_MANY)) {
+
+				return _getFilterString(
+					_getManyToManyRelatedObjectEntries(
+						objectDefinitionId,
+						objectRelationship.getObjectRelationshipId()));
+			}
+
 			ObjectDefinition objectDefinition =
 				_objectDefinitionLocalService.getObjectDefinition(
 					objectDefinitionId);
 
 			return StringUtil.toLowerCase(objectDefinition.getShortName()) +
 				"Id eq 0";
+		}
+
+		private String _getFilterString(List<ObjectEntry> objectEntries) {
+			StringBundler sb = new StringBundler(objectEntries.size() * 2);
+
+			objectEntries.forEach(
+				objectEntry -> {
+					sb.append(
+						String.format(
+							"(id ne '%d')", objectEntry.getObjectEntryId()));
+					sb.append(" and ");
+				});
+
+			if (sb.length() > 0) {
+				sb.setIndex(sb.index() - 1);
+			}
+
+			return sb.toString();
+		}
+
+		private List<ObjectEntry> _getManyToManyRelatedObjectEntries(
+				long objectDefinitionId, long objectRelationshipId)
+			throws PortalException {
+
+			List<ObjectEntry> relatedObjectEntries = new ArrayList<>();
+
+			for (ObjectEntry relatedObjectEntry :
+					_objectEntryLocalService.getObjectEntries(
+						0, objectDefinitionId, QueryUtil.ALL_POS,
+						QueryUtil.ALL_POS)) {
+
+				relatedObjectEntries.addAll(
+					_objectEntryLocalService.getManyToManyRelatedObjectEntries(
+						0, objectRelationshipId,
+						relatedObjectEntry.getObjectEntryId(), false,
+						QueryUtil.ALL_POS, QueryUtil.ALL_POS));
+			}
+
+			return relatedObjectEntries;
 		}
 
 		private ObjectEntry _toObjectEntry(
