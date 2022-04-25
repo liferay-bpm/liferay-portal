@@ -2293,6 +2293,21 @@ public class ObjectEntryLocalServiceImpl
 			Map<String, Serializable> values)
 		throws PortalException {
 
+		DynamicObjectDefinitionTable dynamicObjectDefinitionTable =
+			_getDynamicObjectDefinitionTable(objectDefinitionId);
+
+		List<ObjectField> objectFields =
+			dynamicObjectDefinitionTable.getObjectFields();
+
+		for (ObjectField objectField : objectFields) {
+			Object value = values.get(objectField.getName());
+
+			if (Validator.isNull(value) && objectField.isRequired()) {
+				throw new ObjectEntryValuesException.Required(
+					objectField.getName());
+			}
+		}
+
 		for (Map.Entry<String, Serializable> entry : values.entrySet()) {
 			_validateValues(
 				defaultUser, entry, objectDefinitionId, portletId,
