@@ -374,6 +374,21 @@ public class ObjectRelationshipLocalServiceUtil {
 			objectDefinitionId1, start, end);
 	}
 
+	public static List<ObjectRelationship>
+		getObjectRelationshipsByObjectDefinitionId2(long objectDefinitionId2) {
+
+		return getService().getObjectRelationshipsByObjectDefinitionId2(
+			objectDefinitionId2);
+	}
+
+	public static List<ObjectRelationship>
+		getObjectRelationshipsByObjectDefinitionId2(
+			long objectDefinitionId2, int start, int end) {
+
+		return getService().getObjectRelationshipsByObjectDefinitionId2(
+			objectDefinitionId2, start, end);
+	}
+
 	/**
 	 * Returns the number of object relationships.
 	 *
