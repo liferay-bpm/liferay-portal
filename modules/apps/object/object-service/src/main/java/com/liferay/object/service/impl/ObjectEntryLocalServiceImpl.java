@@ -68,6 +68,7 @@ import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
@@ -81,6 +82,8 @@ import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelper;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -439,6 +442,19 @@ public class ObjectEntryLocalServiceImpl
 			long groupId, long objectRelationshipId, long primaryKey)
 		throws PortalException {
 
+		ObjectRelationship objectRelationship =
+			_objectRelationshipPersistence.findByPrimaryKey(
+				objectRelationshipId);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.findByPrimaryKey(
+				objectRelationship.getObjectDefinitionId2());
+
+		if (objectDefinition.isSystem()) {
+			return _getOneToManyRelatedSystemObjectEntriesCount(
+				primaryKey, objectDefinition, objectRelationship);
+		}
+
 		DSLQuery dslQuery = _getOneToManyRelatedObjectEntriesGroupByStep(
 			groupId, objectRelationshipId, primaryKey,
 			DSLQueryFactoryUtil.countDistinct(
@@ -450,6 +466,35 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		return objectEntryPersistence.dslQueryCount(dslQuery);
+	}
+
+	@Override
+	public List<Map<String, Object>> getOneToManyRelatedSystemObjectEntries(
+			long foreignKey, ObjectDefinition objectDefinition,
+			ObjectRelationship objectRelationship)
+		throws PortalException {
+
+		DynamicObjectDefinitionTable dynamicObjectDefinitionTable =
+			_getDynamicObjectDefinitionTable(
+				objectDefinition.getObjectDefinitionId());
+
+		DSLQuery dslQuery = _getOneToManyRelatedSystemObjectEntriesGroupByStep(
+			objectRelationship, foreignKey, dynamicObjectDefinitionTable,
+			DSLQueryFactoryUtil.selectDistinct(dynamicObjectDefinitionTable));
+
+		PersistedModelLocalService persistedModelLocalService =
+			_persistedModelLocalServiceRegistry.getPersistedModelLocalService(
+				objectDefinition.getClassName());
+
+		List<BaseModel<?>> baseModels = persistedModelLocalService.dslQuery(
+			dslQuery);
+
+		List<Map<String, Object>> entriesMap = new ArrayList<>();
+
+		baseModels.forEach(
+			baseModel -> entriesMap.add(baseModel.getModelAttributes()));
+
+		return entriesMap;
 	}
 
 	@Override
@@ -1024,6 +1069,54 @@ public class ObjectEntryLocalServiceImpl
 						dynamicObjectDefinitionTable.getPrimaryKeyColumn());
 				}
 			)
+		);
+	}
+
+	private int _getOneToManyRelatedSystemObjectEntriesCount(
+			long foreignKey, ObjectDefinition objectDefinition,
+			ObjectRelationship objectRelationship)
+		throws PortalException {
+
+		DynamicObjectDefinitionTable dynamicObjectDefinitionTable =
+			_getDynamicObjectDefinitionTable(
+				objectDefinition.getObjectDefinitionId());
+
+		DSLQuery dslQuery = _getOneToManyRelatedSystemObjectEntriesGroupByStep(
+			objectRelationship, foreignKey, dynamicObjectDefinitionTable,
+			DSLQueryFactoryUtil.countDistinct(
+				dynamicObjectDefinitionTable.getPrimaryKeyColumn()));
+
+		return objectEntryPersistence.dslQueryCount(dslQuery);
+	}
+
+	private GroupByStep _getOneToManyRelatedSystemObjectEntriesGroupByStep(
+			ObjectRelationship objectRelationship, long foreignKey,
+			DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
+			FromStep fromStep)
+		throws PortalException {
+
+		DynamicObjectDefinitionTable extensionDynamicObjectDefinitionTable =
+			_getExtensionDynamicObjectDefinitionTable(
+				objectRelationship.getObjectDefinitionId2());
+		ObjectField objectField = _objectFieldPersistence.fetchByPrimaryKey(
+			objectRelationship.getObjectFieldId2());
+
+		Column<DynamicObjectDefinitionTable, Long>
+			extensionSystemObjectFKColumn =
+				(Column<DynamicObjectDefinitionTable, Long>)
+					extensionDynamicObjectDefinitionTable.getColumn(
+						objectField.getDBColumnName());
+
+		return fromStep.from(
+			dynamicObjectDefinitionTable
+		).innerJoinON(
+			extensionDynamicObjectDefinitionTable,
+			extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn(
+			).eq(
+				dynamicObjectDefinitionTable.getPrimaryKeyColumn()
+			)
+		).where(
+			extensionSystemObjectFKColumn.eq(foreignKey)
 		);
 	}
 
@@ -1941,6 +2034,10 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private ObjectScopeProviderRegistry _objectScopeProviderRegistry;
+
+	@Reference
+	private PersistedModelLocalServiceRegistry
+		_persistedModelLocalServiceRegistry;
 
 	@Reference
 	private ResourceLocalService _resourceLocalService;
