@@ -26,6 +26,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -155,6 +156,16 @@ public class ObjectEntryMtoMObjectRelatedModelsProviderImpl
 		return _objectEntryLocalService.getManyToManyRelatedObjectEntriesCount(
 			groupId, objectRelationship.getObjectRelationshipId(), primaryKey,
 			reverse);
+	}
+
+	@Override
+	public List<Map<String, Object>> getRelatedSystemModels(
+			long foreignKey, ObjectDefinition objectDefinition,
+			ObjectRelationship objectRelationship)
+		throws PortalException {
+
+		return _objectEntryLocalService._getOneToManySystemRelatedObjectEntries(
+			foreignKey, objectDefinition, objectRelationship);
 	}
 
 	private final String _className;

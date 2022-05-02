@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import java.io.Serializable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -164,6 +165,16 @@ public class ObjectEntry1to1ObjectRelatedModelsProviderImpl
 			groupId, objectRelationshipId, primaryKey, 0, 1);
 
 		return relatedModels.size();
+	}
+
+	@Override
+	public List<Map<String, Object>> getRelatedSystemModels(
+			long foreignKey, ObjectDefinition objectDefinition,
+			ObjectRelationship objectRelationship)
+		throws PortalException {
+
+		return _objectEntryLocalService._getOneToManySystemRelatedObjectEntries(
+			foreignKey, objectDefinition, objectRelationship);
 	}
 
 	private final String _className;
