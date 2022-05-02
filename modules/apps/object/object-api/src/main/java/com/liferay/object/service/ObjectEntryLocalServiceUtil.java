@@ -45,6 +45,17 @@ public class ObjectEntryLocalServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.object.service.impl.ObjectEntryLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
+	public static List<Map<String, Object>>
+			_getOneToManySystemRelatedObjectEntries(
+				long foreignKey,
+				com.liferay.object.model.ObjectDefinition objectDefinition,
+				com.liferay.object.model.ObjectRelationship objectRelationship)
+		throws PortalException {
+
+		return getService()._getOneToManySystemRelatedObjectEntries(
+			foreignKey, objectDefinition, objectRelationship);
+	}
+
 	public static ObjectEntry addObjectEntry(
 			long userId, long groupId, long objectDefinitionId,
 			Map<String, Serializable> values,

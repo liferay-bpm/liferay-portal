@@ -38,6 +38,18 @@ public class ObjectEntryLocalServiceWrapper
 	}
 
 	@Override
+	public java.util.List<java.util.Map<String, Object>>
+			_getOneToManySystemRelatedObjectEntries(
+				long foreignKey,
+				com.liferay.object.model.ObjectDefinition objectDefinition,
+				com.liferay.object.model.ObjectRelationship objectRelationship)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectEntryLocalService._getOneToManySystemRelatedObjectEntries(
+			foreignKey, objectDefinition, objectRelationship);
+	}
+
+	@Override
 	public com.liferay.object.model.ObjectEntry addObjectEntry(
 			long userId, long groupId, long objectDefinitionId,
 			java.util.Map<String, java.io.Serializable> values,
