@@ -62,7 +62,8 @@ public class RelatedModelFDSActionProvider implements FDSActionProvider {
 
 		RelatedModel relatedModel = (RelatedModel)model;
 
-		if (!_objectEntryService.hasModelResourcePermission(
+		if (!relatedModel.getIsSystem() &&
+			!_objectEntryService.hasModelResourcePermission(
 				_objectEntryLocalService.getObjectEntry(relatedModel.getId()),
 				ActionKeys.UPDATE)) {
 
