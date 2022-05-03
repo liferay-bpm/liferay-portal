@@ -29,8 +29,10 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PropsUtil;
 
 import java.util.List;
 
@@ -62,17 +64,28 @@ public class RelatedModelFDSActionProvider implements FDSActionProvider {
 
 		RelatedModel relatedModel = (RelatedModel)model;
 
-		if (relatedModel.isSystem()) {
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-151676"))) {
+			if (relatedModel.isSystem()) {
 
-			// TODO Alternative permission checker
+				// TODO Alternative permission checker
 
+			}
+			else if (!_objectEntryService.hasModelResourcePermission(
+						_objectEntryLocalService.getObjectEntry(
+							relatedModel.getId()),
+						ActionKeys.UPDATE)) {
+
+				return null;
+			}
 		}
-		else if (!_objectEntryService.hasModelResourcePermission(
+		else {
+			if (!_objectEntryService.hasModelResourcePermission(
 					_objectEntryLocalService.getObjectEntry(
 						relatedModel.getId()),
 					ActionKeys.UPDATE)) {
 
-			return null;
+				return null;
+			}
 		}
 
 		return DropdownItemListBuilder.add(

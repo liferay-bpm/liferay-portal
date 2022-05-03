@@ -32,7 +32,9 @@ import com.liferay.object.web.internal.object.entries.constants.ObjectEntriesFDS
 import com.liferay.object.web.internal.object.entries.frontend.data.set.data.model.RelatedModel;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.List;
@@ -80,7 +82,9 @@ public class RelatedModelsFDSDataProvider
 		long objectEntryId = ParamUtil.getLong(
 			httpServletRequest, "objectEntryId");
 
-		if (objectDefinition.isSystem()) {
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-151676")) &&
+			objectDefinition.isSystem()) {
+
 			return TransformUtil.transform(
 				objectRelatedModelsProvider.getRelatedSystemModels(
 					objectEntryId, objectDefinition, objectRelationship),
