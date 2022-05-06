@@ -15,11 +15,11 @@
 import ClayTabs from '@clayui/tabs';
 import {useFeatureFlag} from 'data-engine-js-components-web';
 import {fetch} from 'frontend-js-web';
-import React, {useContext, useEffect, useState} from 'react';
+import React, {FormEvent, useContext, useEffect, useState} from 'react';
 
 import {invalidateRequired} from '../../hooks/useForm';
 import {defaultLanguageId} from '../../utils/locale';
-import SidePanelContent, {closeSidePanel, openToast} from '../SidePanelContent';
+import {SidePanelForm, closeSidePanel, openToast} from '../SidePanelContent';
 import BasicInfoScreen from './BasicInfoScreen/BasicInfoScreen';
 import {DefaultFilterScreen} from './DefaultFilterScreen/DefaultFilterScreen';
 import {DefaultSortScreen} from './DefaultSortScreen/DefaultSortScreen';
@@ -157,7 +157,9 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 		return newObjectView;
 	};
 
-	const handleSaveObjectView = async () => {
+	const handleSaveObjectView = async (event: FormEvent) => {
+		event.preventDefault();
+
 		const newObjectView = removeUnnecessaryPropertiesFromObjectView(
 			objectView
 		);
@@ -217,8 +219,8 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 	};
 
 	return (
-		<SidePanelContent
-			onSave={handleSaveObjectView}
+		<SidePanelForm
+			onSubmit={handleSaveObjectView}
 			readOnly={isViewOnly || loading}
 			title={Liferay.Language.get('custom-view')}
 		>
@@ -241,7 +243,7 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 					</ClayTabs.TabPane>
 				))}
 			</ClayTabs.Content>
-		</SidePanelContent>
+		</SidePanelForm>
 	);
 };
 interface ICustomViewWrapperProps extends React.HTMLAttributes<HTMLElement> {

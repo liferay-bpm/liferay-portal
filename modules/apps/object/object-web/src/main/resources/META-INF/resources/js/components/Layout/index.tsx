@@ -14,12 +14,12 @@
 
 import ClayTabs from '@clayui/tabs';
 import {fetch} from 'frontend-js-web';
-import React, {useContext, useEffect, useState} from 'react';
+import React, {FormEvent, useContext, useEffect, useState} from 'react';
 
 import {invalidateRequired} from '../../hooks/useForm';
 import {defaultLanguageId} from '../../utils/locale';
 import {TabsVisitor} from '../../utils/visitor';
-import SidePanelContent, {closeSidePanel, openToast} from '../SidePanelContent';
+import {SidePanelForm, closeSidePanel, openToast} from '../SidePanelContent';
 import InfoScreen from './InfoScreen/InfoScreen';
 import LayoutScreen from './LayoutScreen/LayoutScreen';
 import LayoutContext, {LayoutContextProvider, TYPES} from './context';
@@ -194,7 +194,9 @@ const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 		makeFetch();
 	}, [objectLayoutId, dispatch]);
 
-	const saveObjectLayout = async () => {
+	const saveObjectLayout = async (event: FormEvent) => {
+		event.preventDefault();
+
 		const hasFieldsInLayout = objectFields.some(
 			(objectField) => objectField.inLayout
 		);
@@ -251,8 +253,8 @@ const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 	};
 
 	return (
-		<SidePanelContent
-			onSave={saveObjectLayout}
+		<SidePanelForm
+			onSubmit={saveObjectLayout}
 			readOnly={isViewOnly || loading}
 			title={Liferay.Language.get('layout')}
 		>
@@ -275,7 +277,7 @@ const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 					</ClayTabs.TabPane>
 				))}
 			</ClayTabs.Content>
-		</SidePanelContent>
+		</SidePanelForm>
 	);
 };
 
