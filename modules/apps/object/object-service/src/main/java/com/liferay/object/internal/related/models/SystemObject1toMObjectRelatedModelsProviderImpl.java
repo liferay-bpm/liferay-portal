@@ -44,6 +44,8 @@ import java.io.Serializable;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Marco Leo
@@ -204,6 +206,76 @@ public class SystemObject1toMObjectRelatedModelsProviderImpl
 		return persistedModelLocalService.dslQueryCount(dslQuery);
 	}
 
+	@Override
+	public List<BaseModel<?>> getUnrelatedModels(
+			long companyId, long groupId, ObjectDefinition objectDefinition,
+			long objectFieldId)
+		throws PortalException {
+
+		Column<?, Long> companyIdColumn = (Column<?, Long>)_table.getColumn(
+			"companyId");
+
+		PersistedModelLocalService persistedModelLocalService =
+			_persistedModelLocalServiceRegistry.getPersistedModelLocalService(
+				objectDefinition.getClassName());
+
+		List<BaseModel<?>> baseModels = persistedModelLocalService.dslQuery(
+			DSLQueryFactoryUtil.select(
+				_table
+			).from(
+				_table
+			).where(
+				companyIdColumn.eq(
+					companyId
+				).and(
+					() -> {
+						Column<?, Long> groupIdColumn = _table.getColumn(
+							"groupId");
+
+						if (groupIdColumn == null) {
+							return null;
+						}
+
+						return groupIdColumn.eq(groupId);
+					}
+				)
+			));
+
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			objectFieldId);
+
+		Column<DynamicObjectDefinitionTable, Long>
+			extensionSystemObjectFKColumn =
+				(Column<DynamicObjectDefinitionTable, Long>)
+					_dynamicObjectDefinitionTable.getColumn(
+						objectField.getDBColumnName());
+
+		List<BaseModel<?>> relatedBaseModels =
+			persistedModelLocalService.dslQuery(
+				DSLQueryFactoryUtil.select(
+					_table
+				).from(
+					_table
+				).innerJoinON(
+					_dynamicObjectDefinitionTable,
+					_dynamicObjectDefinitionTable.getPrimaryKeyColumn(
+					).eq(
+						_table.getColumn(
+							objectDefinition.getPKObjectFieldDBColumnName())
+					)
+				).where(
+					extensionSystemObjectFKColumn.neq(0L)
+				));
+
+		Stream<BaseModel<?>> stream = baseModels.stream();
+
+		return stream.filter(
+			baseModel -> !relatedBaseModels.contains(baseModel)
+		).collect(
+			Collectors.toList()
+		);
+	}
+
 	private GroupByStep _getGroupByStep(
 			long groupId, long objectRelationshipId, long primaryKey,
 			FromStep fromStep)
@@ -216,18 +288,10 @@ public class SystemObject1toMObjectRelatedModelsProviderImpl
 		ObjectField objectField = _objectFieldLocalService.getObjectField(
 			objectRelationship.getObjectFieldId2());
 
-		Column<?, Long> primaryKeyColumn = null;
-
-		if (Objects.equals(objectField.getDBTableName(), _table)) {
-			primaryKeyColumn = (Column<?, Long>)_table.getColumn(
-				objectField.getDBColumnName());
-		}
-		else {
-			primaryKeyColumn =
-				(Column<DynamicObjectDefinitionTable, Long>)
-					_dynamicObjectDefinitionTable.getColumn(
-						objectField.getDBColumnName());
-		}
+		Column<DynamicObjectDefinitionTable, Long> primaryKeyColumn =
+			(Column<DynamicObjectDefinitionTable, Long>)
+				_dynamicObjectDefinitionTable.getColumn(
+					objectField.getDBColumnName());
 
 		return fromStep.from(
 			_table
