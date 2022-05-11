@@ -147,7 +147,7 @@ public class SystemObject1toMObjectRelatedModelsProviderImpl
 
 		_objectEntryLocalService.insertIntoOrUpdateExtensionTable(
 			objectRelationship.getObjectDefinitionId2(),
-			GetterUtil.getLong(primaryKey1),
+			GetterUtil.getLong(primaryKey2),
 			HashMapBuilder.<String, Serializable>put(
 				() -> {
 					ObjectField objectField =
@@ -201,7 +201,8 @@ public class SystemObject1toMObjectRelatedModelsProviderImpl
 
 		DSLQuery dslQuery = _getGroupByStep(
 			groupId, objectRelationshipId, primaryKey,
-			DSLQueryFactoryUtil.selectDistinct(_table));
+			DSLQueryFactoryUtil.countDistinct(
+				_dynamicObjectDefinitionTable.getPrimaryKeyColumn()));
 
 		return persistedModelLocalService.dslQueryCount(dslQuery);
 	}
