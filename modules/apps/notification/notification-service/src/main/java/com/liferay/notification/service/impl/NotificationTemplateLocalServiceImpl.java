@@ -21,8 +21,10 @@ import com.liferay.notification.service.NotificationQueueEntryLocalService;
 import com.liferay.notification.service.base.NotificationTemplateLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.Validator;
@@ -74,7 +76,17 @@ public class NotificationTemplateLocalServiceImpl
 		notificationTemplate.setSubjectMap(subjectMap);
 		notificationTemplate.setBodyMap(bodyMap);
 
-		return notificationTemplatePersistence.update(notificationTemplate);
+		notificationTemplate = notificationTemplatePersistence.update(
+			notificationTemplate);
+
+		_resourceLocalService.addResources(
+			notificationTemplate.getCompanyId(), 0,
+			notificationTemplate.getUserId(),
+			NotificationTemplate.class.getName(),
+			notificationTemplate.getNotificationTemplateId(), false, true,
+			true);
+
+		return notificationTemplate;
 	}
 
 	@Override
@@ -92,13 +104,17 @@ public class NotificationTemplateLocalServiceImpl
 	@Override
 	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public NotificationTemplate deleteNotificationTemplate(
-		NotificationTemplate notificationTemplate) {
+			NotificationTemplate notificationTemplate)
+		throws PortalException {
 
 		_notificationQueueEntryLocalService.
 			updateNotificationQueueEntriesTemplateIds(
 				notificationTemplate.getNotificationTemplateId());
 
 		notificationTemplatePersistence.remove(notificationTemplate);
+
+		_resourceLocalService.deleteResource(
+			notificationTemplate, ResourceConstants.SCOPE_INDIVIDUAL);
 
 		return notificationTemplate;
 	}
@@ -144,6 +160,9 @@ public class NotificationTemplateLocalServiceImpl
 	@Reference
 	private NotificationQueueEntryLocalService
 		_notificationQueueEntryLocalService;
+
+	@Reference
+	private ResourceLocalService _resourceLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;
