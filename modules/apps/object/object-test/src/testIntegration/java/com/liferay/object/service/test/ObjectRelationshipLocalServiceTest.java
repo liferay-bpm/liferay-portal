@@ -40,6 +40,7 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import java.sql.Connection;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -178,6 +179,8 @@ public class ObjectRelationshipLocalServiceTest {
 			Assert.assertTrue(
 				message.contains("Invalid type for system object definition"));
 		}
+
+		_testSystemObjectRelationshipOneToMany();
 	}
 
 	@Test
@@ -274,6 +277,58 @@ public class ObjectRelationshipLocalServiceTest {
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			StringUtil.randomId(), type);
+	}
+
+	private void _testSystemObjectRelationshipOneToMany()
+		throws Exception {
+
+		ObjectRelationship objectRelationship;
+
+		String objectFieldNamePrefix;
+
+		for (String deletionType :
+			Arrays.asList(
+				ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+				ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
+				ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE)) {
+
+			objectRelationship = _objectRelationshipLocalService.addObjectRelationship(
+				TestPropsValues.getUserId(),
+				_objectDefinition1.getObjectDefinitionId(),
+				_systemObjectDefinition.getObjectDefinitionId(),
+				deletionType,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				StringUtil.randomId(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
+
+			objectFieldNamePrefix = "r_" + objectRelationship.getName() + "_";
+
+			Assert.assertTrue(
+				_hasColumn(
+					_systemObjectDefinition.getExtensionDBTableName(),
+					objectFieldNamePrefix +
+						_objectDefinition1.getPKObjectFieldName()));
+			Assert.assertNotNull(
+				_objectFieldLocalService.fetchObjectField(
+					_systemObjectDefinition.getObjectDefinitionId(),
+					objectFieldNamePrefix +
+					_objectDefinition1.getPKObjectFieldName()));
+
+			objectRelationship =
+				_objectRelationshipLocalService.updateObjectRelationship(
+					objectRelationship.getObjectRelationshipId(),
+					objectRelationship.getDeletionType(),
+					LocalizedMapUtil.getLocalizedMap("Baker"));
+
+			Assert.assertEquals(
+				LocalizedMapUtil.getLocalizedMap("Baker"),
+				objectRelationship.getLabelMap());
+
+			_objectRelationshipLocalService.deleteObjectRelationship(
+				objectRelationship);
+
+			Assert.assertFalse(_hasTable(objectRelationship.getDBTableName()));
+		}
 	}
 
 	@DeleteAfterTestRun
