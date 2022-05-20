@@ -140,7 +140,8 @@ public class NotificationTemplateResourceImpl
 				notificationTemplate.getName(),
 				LocalizedMapUtil.getLocalizedMap(
 					notificationTemplate.getSubject()),
-				notificationTemplate.getTo()));
+				LocalizedMapUtil.getLocalizedMap(
+					notificationTemplate.getTo())));
 	}
 
 	@Override
@@ -165,7 +166,8 @@ public class NotificationTemplateResourceImpl
 				notificationTemplate.getName(),
 				LocalizedMapUtil.getLocalizedMap(
 					notificationTemplate.getSubject()),
-				notificationTemplate.getTo()));
+				LocalizedMapUtil.getLocalizedMap(
+					notificationTemplate.getTo())));
 	}
 
 	private void _checkFeatureFlag() throws Exception {
