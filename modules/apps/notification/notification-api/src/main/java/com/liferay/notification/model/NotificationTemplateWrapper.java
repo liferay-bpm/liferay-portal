@@ -619,6 +619,72 @@ public class NotificationTemplateWrapper
 	}
 
 	/**
+	 * Returns the localized to of this notification template in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the locale of the language
+	 * @return the localized to of this notification template
+	 */
+	@Override
+	public String getTo(java.util.Locale locale) {
+		return model.getTo(locale);
+	}
+
+	/**
+	 * Returns the localized to of this notification template in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the local of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized to of this notification template. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	 */
+	@Override
+	public String getTo(java.util.Locale locale, boolean useDefault) {
+		return model.getTo(locale, useDefault);
+	}
+
+	/**
+	 * Returns the localized to of this notification template in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @return the localized to of this notification template
+	 */
+	@Override
+	public String getTo(String languageId) {
+		return model.getTo(languageId);
+	}
+
+	/**
+	 * Returns the localized to of this notification template in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized to of this notification template
+	 */
+	@Override
+	public String getTo(String languageId, boolean useDefault) {
+		return model.getTo(languageId, useDefault);
+	}
+
+	@Override
+	public String getToCurrentLanguageId() {
+		return model.getToCurrentLanguageId();
+	}
+
+	@Override
+	public String getToCurrentValue() {
+		return model.getToCurrentValue();
+	}
+
+	/**
+	 * Returns a map of the locales and localized tos of this notification template.
+	 *
+	 * @return the locales and localized tos of this notification template
+	 */
+	@Override
+	public Map<java.util.Locale, String> getToMap() {
+		return model.getToMap();
+	}
+
+	/**
 	 * Returns the user ID of this notification template.
 	 *
 	 * @return the user ID of this notification template
@@ -1062,6 +1128,59 @@ public class NotificationTemplateWrapper
 	@Override
 	public void setTo(String to) {
 		model.setTo(to);
+	}
+
+	/**
+	 * Sets the localized to of this notification template in the language.
+	 *
+	 * @param to the localized to of this notification template
+	 * @param locale the locale of the language
+	 */
+	@Override
+	public void setTo(String to, java.util.Locale locale) {
+		model.setTo(to, locale);
+	}
+
+	/**
+	 * Sets the localized to of this notification template in the language, and sets the default locale.
+	 *
+	 * @param to the localized to of this notification template
+	 * @param locale the locale of the language
+	 * @param defaultLocale the default locale
+	 */
+	@Override
+	public void setTo(
+		String to, java.util.Locale locale, java.util.Locale defaultLocale) {
+
+		model.setTo(to, locale, defaultLocale);
+	}
+
+	@Override
+	public void setToCurrentLanguageId(String languageId) {
+		model.setToCurrentLanguageId(languageId);
+	}
+
+	/**
+	 * Sets the localized tos of this notification template from the map of locales and localized tos.
+	 *
+	 * @param toMap the locales and localized tos of this notification template
+	 */
+	@Override
+	public void setToMap(Map<java.util.Locale, String> toMap) {
+		model.setToMap(toMap);
+	}
+
+	/**
+	 * Sets the localized tos of this notification template from the map of locales and localized tos, and sets the default locale.
+	 *
+	 * @param toMap the locales and localized tos of this notification template
+	 * @param defaultLocale the default locale
+	 */
+	@Override
+	public void setToMap(
+		Map<java.util.Locale, String> toMap, java.util.Locale defaultLocale) {
+
+		model.setToMap(toMap, defaultLocale);
 	}
 
 	/**

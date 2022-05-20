@@ -40,5 +40,5 @@ create table NotificationTemplate (
 	fromName STRING null,
 	name STRING null,
 	subject STRING null,
-	to_ VARCHAR(75) null
+	to_ STRING null
 );

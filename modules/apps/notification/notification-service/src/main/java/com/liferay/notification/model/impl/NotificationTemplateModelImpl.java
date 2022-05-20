@@ -117,7 +117,7 @@ public class NotificationTemplateModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table NotificationTemplate (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,notificationTemplateId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,bcc VARCHAR(75) null,body STRING null,cc VARCHAR(75) null,description VARCHAR(75) null,enabled BOOLEAN,from_ VARCHAR(75) null,fromName STRING null,name STRING null,subject STRING null,to_ VARCHAR(75) null)";
+		"create table NotificationTemplate (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,notificationTemplateId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,bcc VARCHAR(75) null,body STRING null,cc VARCHAR(75) null,description VARCHAR(75) null,enabled BOOLEAN,from_ VARCHAR(75) null,fromName STRING null,name STRING null,subject STRING null,to_ STRING null)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table NotificationTemplate";
@@ -1097,12 +1097,97 @@ public class NotificationTemplateModelImpl
 	}
 
 	@Override
+	public String getTo(Locale locale) {
+		String languageId = LocaleUtil.toLanguageId(locale);
+
+		return getTo(languageId);
+	}
+
+	@Override
+	public String getTo(Locale locale, boolean useDefault) {
+		String languageId = LocaleUtil.toLanguageId(locale);
+
+		return getTo(languageId, useDefault);
+	}
+
+	@Override
+	public String getTo(String languageId) {
+		return LocalizationUtil.getLocalization(getTo(), languageId);
+	}
+
+	@Override
+	public String getTo(String languageId, boolean useDefault) {
+		return LocalizationUtil.getLocalization(
+			getTo(), languageId, useDefault);
+	}
+
+	@Override
+	public String getToCurrentLanguageId() {
+		return _toCurrentLanguageId;
+	}
+
+	@JSON
+	@Override
+	public String getToCurrentValue() {
+		Locale locale = getLocale(_toCurrentLanguageId);
+
+		return getTo(locale);
+	}
+
+	@Override
+	public Map<Locale, String> getToMap() {
+		return LocalizationUtil.getLocalizationMap(getTo());
+	}
+
+	@Override
 	public void setTo(String to) {
 		if (_columnOriginalValues == Collections.EMPTY_MAP) {
 			_setColumnOriginalValues();
 		}
 
 		_to = to;
+	}
+
+	@Override
+	public void setTo(String to, Locale locale) {
+		setTo(to, locale, LocaleUtil.getDefault());
+	}
+
+	@Override
+	public void setTo(String to, Locale locale, Locale defaultLocale) {
+		String languageId = LocaleUtil.toLanguageId(locale);
+		String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
+
+		if (Validator.isNotNull(to)) {
+			setTo(
+				LocalizationUtil.updateLocalization(
+					getTo(), "To", to, languageId, defaultLanguageId));
+		}
+		else {
+			setTo(
+				LocalizationUtil.removeLocalization(getTo(), "To", languageId));
+		}
+	}
+
+	@Override
+	public void setToCurrentLanguageId(String languageId) {
+		_toCurrentLanguageId = languageId;
+	}
+
+	@Override
+	public void setToMap(Map<Locale, String> toMap) {
+		setToMap(toMap, LocaleUtil.getDefault());
+	}
+
+	@Override
+	public void setToMap(Map<Locale, String> toMap, Locale defaultLocale) {
+		if (toMap == null) {
+			return;
+		}
+
+		setTo(
+			LocalizationUtil.updateLocalization(
+				toMap, getTo(), "To", LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	@Override
@@ -1197,6 +1282,17 @@ public class NotificationTemplateModelImpl
 			}
 		}
 
+		Map<Locale, String> toMap = getToMap();
+
+		for (Map.Entry<Locale, String> entry : toMap.entrySet()) {
+			Locale locale = entry.getKey();
+			String value = entry.getValue();
+
+			if (Validator.isNotNull(value)) {
+				availableLanguageIds.add(LocaleUtil.toLanguageId(locale));
+			}
+		}
+
 		return availableLanguageIds.toArray(
 			new String[availableLanguageIds.size()]);
 	}
@@ -1273,6 +1369,15 @@ public class NotificationTemplateModelImpl
 		}
 		else {
 			setSubject(getSubject(defaultLocale), defaultLocale, defaultLocale);
+		}
+
+		String to = getTo(defaultLocale);
+
+		if (Validator.isNull(to)) {
+			setTo(getTo(modelDefaultLanguageId), defaultLocale);
+		}
+		else {
+			setTo(getTo(defaultLocale), defaultLocale, defaultLocale);
 		}
 	}
 
@@ -1676,6 +1781,7 @@ public class NotificationTemplateModelImpl
 	private String _subject;
 	private String _subjectCurrentLanguageId;
 	private String _to;
+	private String _toCurrentLanguageId;
 
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);

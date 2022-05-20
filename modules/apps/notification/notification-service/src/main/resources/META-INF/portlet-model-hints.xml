@@ -42,6 +42,6 @@
 		<field localized="true" name="fromName" type="String" />
 		<field localized="true" name="name" type="String" />
 		<field localized="true" name="subject" type="String" />
-		<field name="to" type="String" />
+		<field localized="true" name="to" type="String" />
 	</model>
 </model-hints>
