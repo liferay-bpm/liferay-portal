@@ -240,11 +240,7 @@ public class NotificationTemplateSerDes {
 
 			sb.append("\"to\": ");
 
-			sb.append("\"");
-
-			sb.append(_escape(notificationTemplate.getTo()));
-
-			sb.append("\"");
+			sb.append(_toJSON(notificationTemplate.getTo()));
 		}
 
 		sb.append("}");
@@ -497,7 +493,9 @@ public class NotificationTemplateSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "to")) {
 				if (jsonParserFieldValue != null) {
-					notificationTemplate.setTo((String)jsonParserFieldValue);
+					notificationTemplate.setTo(
+						(Map)NotificationTemplateSerDes.toMap(
+							(String)jsonParserFieldValue));
 				}
 			}
 		}

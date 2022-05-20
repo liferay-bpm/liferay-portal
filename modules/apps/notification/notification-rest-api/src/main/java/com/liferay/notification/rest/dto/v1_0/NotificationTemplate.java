@@ -453,16 +453,19 @@ public class NotificationTemplate implements Serializable {
 	protected Map<String, String> subject;
 
 	@Schema
-	public String getTo() {
+	@Valid
+	public Map<String, String> getTo() {
 		return to;
 	}
 
-	public void setTo(String to) {
+	public void setTo(Map<String, String> to) {
 		this.to = to;
 	}
 
 	@JsonIgnore
-	public void setTo(UnsafeSupplier<String, Exception> toUnsafeSupplier) {
+	public void setTo(
+		UnsafeSupplier<Map<String, String>, Exception> toUnsafeSupplier) {
+
 		try {
 			to = toUnsafeSupplier.get();
 		}
@@ -476,7 +479,7 @@ public class NotificationTemplate implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String to;
+	protected Map<String, String> to;
 
 	@Override
 	public boolean equals(Object object) {
@@ -684,11 +687,7 @@ public class NotificationTemplate implements Serializable {
 
 			sb.append("\"to\": ");
 
-			sb.append("\"");
-
-			sb.append(_escape(to));
-
-			sb.append("\"");
+			sb.append(_toJSON(to));
 		}
 
 		sb.append("}");

@@ -322,15 +322,17 @@ public class NotificationTemplate implements Cloneable, Serializable {
 
 	protected Map<String, String> subject;
 
-	public String getTo() {
+	public Map<String, String> getTo() {
 		return to;
 	}
 
-	public void setTo(String to) {
+	public void setTo(Map<String, String> to) {
 		this.to = to;
 	}
 
-	public void setTo(UnsafeSupplier<String, Exception> toUnsafeSupplier) {
+	public void setTo(
+		UnsafeSupplier<Map<String, String>, Exception> toUnsafeSupplier) {
+
 		try {
 			to = toUnsafeSupplier.get();
 		}
@@ -339,7 +341,7 @@ public class NotificationTemplate implements Cloneable, Serializable {
 		}
 	}
 
-	protected String to;
+	protected Map<String, String> to;
 
 	@Override
 	public NotificationTemplate clone() throws CloneNotSupportedException {
