@@ -50,7 +50,7 @@ public class NotificationTemplateServiceImpl
 			long userId, String bcc, Map<Locale, String> bodyMap, String cc,
 			String description, boolean enabled, String from,
 			Map<Locale, String> fromNameMap, String name,
-			Map<Locale, String> subjectMap, String to)
+			Map<Locale, String> subjectMap, Map<Locale, String> toMap)
 		throws PortalException {
 
 		_portletResourcePermission.check(
@@ -59,7 +59,7 @@ public class NotificationTemplateServiceImpl
 
 		return _notificationTemplateLocalService.addNotificationTemplate(
 			userId, bcc, bodyMap, cc, description, enabled, from, fromNameMap,
-			name, subjectMap, to);
+			name, subjectMap, toMap);
 	}
 
 	@Override
@@ -105,7 +105,8 @@ public class NotificationTemplateServiceImpl
 			long notificationTemplateId, String bcc,
 			Map<Locale, String> bodyMap, String cc, String description,
 			boolean enabled, String from, Map<Locale, String> fromNameMap,
-			String name, Map<Locale, String> subjectMap, String to)
+			String name, Map<Locale, String> subjectMap,
+			Map<Locale, String> toMap)
 		throws PortalException {
 
 		_notificationTemplateModelResourcePermission.check(
@@ -113,7 +114,7 @@ public class NotificationTemplateServiceImpl
 
 		return _notificationTemplateLocalService.updateNotificationTemplate(
 			notificationTemplateId, bcc, bodyMap, cc, description, enabled,
-			from, fromNameMap, name, subjectMap, to);
+			from, fromNameMap, name, subjectMap, toMap);
 	}
 
 	@Reference
