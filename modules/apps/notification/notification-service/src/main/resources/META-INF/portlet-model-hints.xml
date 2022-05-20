@@ -34,7 +34,9 @@
 		<field name="createDate" type="Date" />
 		<field name="modifiedDate" type="Date" />
 		<field name="bcc" type="String" />
-		<field localized="true" name="body" type="String" />
+		<field localized="true" name="body" type="String">
+			<hint-collection name="CLOB" />
+		</field>
 		<field name="cc" type="String" />
 		<field name="description" type="String" />
 		<field name="enabled" type="boolean" />
