@@ -99,7 +99,8 @@ public class NotificationTemplateLocalServiceTest {
 				notificationTemplate.getFrom(),
 				notificationTemplate.getFromName(LocaleUtil.US), 0,
 				notificationTemplate.getSubject(LocaleUtil.US),
-				notificationTemplate.getTo(), RandomTestUtil.randomString());
+				notificationTemplate.getTo(LocaleUtil.US),
+				RandomTestUtil.randomString());
 
 		Assert.assertEquals(
 			notificationTemplate.getNotificationTemplateId(),
@@ -131,7 +132,8 @@ public class NotificationTemplateLocalServiceTest {
 			name,
 			Collections.singletonMap(
 				LocaleUtil.US, RandomTestUtil.randomString()),
-			RandomTestUtil.randomString());
+			Collections.singletonMap(
+				LocaleUtil.US, RandomTestUtil.randomString()));
 	}
 
 	@Inject
