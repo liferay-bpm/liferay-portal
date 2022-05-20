@@ -208,11 +208,15 @@ public class SystemObject1toMObjectRelatedModelsProviderImpl
 	@Override
 	public List<T> getUnrelatedModels(
 			long companyId, long groupId, ObjectDefinition objectDefinition,
-			long objectFieldId)
+			long objectEntryId, long objectRelationshipId)
 		throws PortalException {
 
 		Column<?, Long> companyIdColumn = (Column<?, Long>)_table.getColumn(
 			"companyId");
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.getObjectRelationship(
+				objectRelationshipId);
 
 		PersistedModelLocalService persistedModelLocalService =
 			_persistedModelLocalServiceRegistry.getPersistedModelLocalService(
@@ -244,7 +248,7 @@ public class SystemObject1toMObjectRelatedModelsProviderImpl
 
 						ObjectField objectField =
 							_objectFieldLocalService.getObjectField(
-								objectFieldId);
+								objectRelationship.getObjectFieldId2());
 
 						Column<DynamicObjectDefinitionTable, Long>
 							foreignKeyColumn =
