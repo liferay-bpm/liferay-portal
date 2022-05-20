@@ -34,6 +34,7 @@ const headers = new Headers({
 
 const ModalAddObjectRelationship: React.FC<IProps> = ({
 	apiURL,
+	ffManyToManyRelationshipCustomAndSystemObjects,
 	ffOneToOneRelationshipConfigurationEnabled,
 	objectDefinitionId,
 	observer,
@@ -62,8 +63,8 @@ const ModalAddObjectRelationship: React.FC<IProps> = ({
 
 	const filteredObjectRelationshipTypes = objectRelationshipTypes.filter(
 		({value}) => {
-			if (system) {
-				return value === 'oneToMany';
+			if (system && ffManyToManyRelationshipCustomAndSystemObjects) {
+				return value === 'oneToMany' || value === 'manyToMany';
 			}
 			else if (!ffOneToOneRelationshipConfigurationEnabled) {
 				return value !== 'oneToOne';
@@ -161,10 +162,37 @@ const ModalAddObjectRelationship: React.FC<IProps> = ({
 				})
 			);
 
+<<<<<<< HEAD
 			const manyToManyObjectDefinitions = objectDefinitions.filter(
 				(objectDefinition) =>
 					objectDefinition.id !== Number(objectDefinitionId)
 			);
+=======
+			if (
+				ffManyToManyRelationshipCustomAndSystemObjects ||
+				ffOneToManyRelationshipCustomAndNativeObjects
+			) {
+				let manyToManyObjectDefinitions = objectDefinitions.filter(
+					(objectDefinition) =>
+						objectDefinition.id !== Number(objectDefinitionId)
+				);
+
+				if (
+					ffManyToManyRelationshipCustomAndSystemObjects &&
+					currentObjectDefinition.system
+				) {
+					manyToManyObjectDefinitions = objectDefinitions.filter(
+						(objectDefinition) => !objectDefinition.system
+					);
+				}
+
+				setManyToManyObjectDefinitions(manyToManyObjectDefinitions);
+
+				if (currentObjectDefinition.system) {
+					const customObjectDefinitions = objectDefinitions.filter(
+						({system}: TObjectDefinition) => !system
+					);
+>>>>>>> LPS-154049 Add feature flag
 
 			setManyToManyObjectDefinitions(manyToManyObjectDefinitions);
 
@@ -182,7 +210,15 @@ const ModalAddObjectRelationship: React.FC<IProps> = ({
 		};
 
 		makeRequest();
+<<<<<<< HEAD
 	}, [objectDefinitionId]);
+=======
+	}, [
+		objectDefinitionId,
+		ffManyToManyRelationshipCustomAndSystemObjects,
+		ffOneToManyRelationshipCustomAndNativeObjects,
+	]);
+>>>>>>> LPS-154049 Add feature flag
 
 	return (
 		<ClayModal observer={observer}>
@@ -273,6 +309,11 @@ const ModalAddObjectRelationship: React.FC<IProps> = ({
 
 interface IProps extends React.HTMLAttributes<HTMLElement> {
 	apiURL: string;
+<<<<<<< HEAD
+=======
+	ffManyToManyRelationshipCustomAndSystemObjects: boolean;
+	ffOneToManyRelationshipCustomAndNativeObjects: boolean;
+>>>>>>> LPS-154049 Add feature flag
 	ffOneToOneRelationshipConfigurationEnabled: boolean;
 	objectDefinitionId: number;
 	observer: any;
@@ -298,6 +339,11 @@ type TInitialValues = {
 
 const ModalWithProvider: React.FC<IProps> = ({
 	apiURL,
+<<<<<<< HEAD
+=======
+	ffManyToManyRelationshipCustomAndSystemObjects,
+	ffOneToManyRelationshipCustomAndNativeObjects,
+>>>>>>> LPS-154049 Add feature flag
 	ffOneToOneRelationshipConfigurationEnabled,
 	objectDefinitionId,
 	system,
@@ -320,6 +366,15 @@ const ModalWithProvider: React.FC<IProps> = ({
 			{visibleModal && (
 				<ModalAddObjectRelationship
 					apiURL={apiURL}
+<<<<<<< HEAD
+=======
+					ffManyToManyRelationshipCustomAndSystemObjects={
+						ffManyToManyRelationshipCustomAndSystemObjects
+					}
+					ffOneToManyRelationshipCustomAndNativeObjects={
+						ffOneToManyRelationshipCustomAndNativeObjects
+					}
+>>>>>>> LPS-154049 Add feature flag
 					ffOneToOneRelationshipConfigurationEnabled={
 						ffOneToOneRelationshipConfigurationEnabled
 					}
