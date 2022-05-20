@@ -50,7 +50,9 @@ components:
                         type: string
                     type: object
                 to:
-                    type: string
+                    additionalProperties:
+                        type: string
+                    type: object
             type: object
 info:
     description:
