@@ -61,7 +61,6 @@
 		<column localized="true" name="body" type="String" />
 		<column name="cc" type="String" />
 		<column name="description" type="String" />
-		<column name="enabled" type="boolean" />
 		<column name="from" type="String" />
 		<column localized="true" name="fromName" type="String" />
 		<column localized="true" name="name" type="String" />
