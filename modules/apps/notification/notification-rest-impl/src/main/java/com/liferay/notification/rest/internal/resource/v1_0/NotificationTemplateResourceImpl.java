@@ -234,6 +234,8 @@ public class NotificationTemplateResourceImpl
 					serviceBuilderNotificationTemplate.getNameMap());
 				subject = LocalizedMapUtil.getI18nMap(
 					serviceBuilderNotificationTemplate.getSubjectMap());
+				to = LocalizedMapUtil.getI18nMap(
+					serviceBuilderNotificationTemplate.getToMap());
 			}
 		};
 	}
