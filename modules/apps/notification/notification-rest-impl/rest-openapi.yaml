@@ -27,8 +27,6 @@ components:
                     type: string
                 description:
                     type: string
-                enable:
-                    type: boolean
                 from:
                     type: string
                 fromName:
