@@ -39,7 +39,6 @@
 		</field>
 		<field name="cc" type="String" />
 		<field name="description" type="String" />
-		<field name="enabled" type="boolean" />
 		<field name="from" type="String" />
 		<field localized="true" name="fromName" type="String" />
 		<field localized="true" name="name" type="String" />

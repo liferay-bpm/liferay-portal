@@ -57,7 +57,6 @@ public class NotificationTemplateWrapper
 		attributes.put("body", getBody());
 		attributes.put("cc", getCc());
 		attributes.put("description", getDescription());
-		attributes.put("enabled", isEnabled());
 		attributes.put("from", getFrom());
 		attributes.put("fromName", getFromName());
 		attributes.put("name", getName());
@@ -140,12 +139,6 @@ public class NotificationTemplateWrapper
 
 		if (description != null) {
 			setDescription(description);
-		}
-
-		Boolean enabled = (Boolean)attributes.get("enabled");
-
-		if (enabled != null) {
-			setEnabled(enabled);
 		}
 
 		String from = (String)attributes.get("from");
@@ -318,16 +311,6 @@ public class NotificationTemplateWrapper
 	@Override
 	public String getDescription() {
 		return model.getDescription();
-	}
-
-	/**
-	 * Returns the enabled of this notification template.
-	 *
-	 * @return the enabled of this notification template
-	 */
-	@Override
-	public boolean getEnabled() {
-		return model.getEnabled();
 	}
 
 	/**
@@ -724,16 +707,6 @@ public class NotificationTemplateWrapper
 		return model.getUuid();
 	}
 
-	/**
-	 * Returns <code>true</code> if this notification template is enabled.
-	 *
-	 * @return <code>true</code> if this notification template is enabled; <code>false</code> otherwise
-	 */
-	@Override
-	public boolean isEnabled() {
-		return model.isEnabled();
-	}
-
 	@Override
 	public void persist() {
 		model.persist();
@@ -865,16 +838,6 @@ public class NotificationTemplateWrapper
 	@Override
 	public void setDescription(String description) {
 		model.setDescription(description);
-	}
-
-	/**
-	 * Sets whether this notification template is enabled.
-	 *
-	 * @param enabled the enabled of this notification template
-	 */
-	@Override
-	public void setEnabled(boolean enabled) {
-		model.setEnabled(enabled);
 	}
 
 	/**

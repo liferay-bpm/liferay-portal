@@ -147,8 +147,6 @@ public class NotificationTemplatePersistenceTest {
 
 		newNotificationTemplate.setDescription(RandomTestUtil.randomString());
 
-		newNotificationTemplate.setEnabled(RandomTestUtil.randomBoolean());
-
 		newNotificationTemplate.setFrom(RandomTestUtil.randomString());
 
 		newNotificationTemplate.setFromName(RandomTestUtil.randomString());
@@ -204,9 +202,6 @@ public class NotificationTemplatePersistenceTest {
 		Assert.assertEquals(
 			existingNotificationTemplate.getDescription(),
 			newNotificationTemplate.getDescription());
-		Assert.assertEquals(
-			existingNotificationTemplate.isEnabled(),
-			newNotificationTemplate.isEnabled());
 		Assert.assertEquals(
 			existingNotificationTemplate.getFrom(),
 			newNotificationTemplate.getFrom());
@@ -273,8 +268,8 @@ public class NotificationTemplatePersistenceTest {
 			"NotificationTemplate", "mvccVersion", true, "uuid", true,
 			"notificationTemplateId", true, "companyId", true, "userId", true,
 			"userName", true, "createDate", true, "modifiedDate", true, "bcc",
-			true, "cc", true, "description", true, "enabled", true, "from",
-			true, "fromName", true, "name", true, "subject", true, "to", true);
+			true, "cc", true, "description", true, "from", true, "fromName",
+			true, "name", true, "subject", true, "to", true);
 	}
 
 	@Test
@@ -537,8 +532,6 @@ public class NotificationTemplatePersistenceTest {
 		notificationTemplate.setCc(RandomTestUtil.randomString());
 
 		notificationTemplate.setDescription(RandomTestUtil.randomString());
-
-		notificationTemplate.setEnabled(RandomTestUtil.randomBoolean());
 
 		notificationTemplate.setFrom(RandomTestUtil.randomString());
 

@@ -353,27 +353,6 @@ public interface NotificationTemplateModel
 	public void setDescription(String description);
 
 	/**
-	 * Returns the enabled of this notification template.
-	 *
-	 * @return the enabled of this notification template
-	 */
-	public boolean getEnabled();
-
-	/**
-	 * Returns <code>true</code> if this notification template is enabled.
-	 *
-	 * @return <code>true</code> if this notification template is enabled; <code>false</code> otherwise
-	 */
-	public boolean isEnabled();
-
-	/**
-	 * Sets whether this notification template is enabled.
-	 *
-	 * @param enabled the enabled of this notification template
-	 */
-	public void setEnabled(boolean enabled);
-
-	/**
 	 * Returns the from of this notification template.
 	 *
 	 * @return the from of this notification template

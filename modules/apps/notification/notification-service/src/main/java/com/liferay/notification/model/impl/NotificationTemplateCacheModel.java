@@ -78,7 +78,7 @@ public class NotificationTemplateCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(37);
+		StringBundler sb = new StringBundler(35);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -104,8 +104,6 @@ public class NotificationTemplateCacheModel
 		sb.append(cc);
 		sb.append(", description=");
 		sb.append(description);
-		sb.append(", enabled=");
-		sb.append(enabled);
 		sb.append(", from=");
 		sb.append(from);
 		sb.append(", fromName=");
@@ -189,8 +187,6 @@ public class NotificationTemplateCacheModel
 			notificationTemplateImpl.setDescription(description);
 		}
 
-		notificationTemplateImpl.setEnabled(enabled);
-
 		if (from == null) {
 			notificationTemplateImpl.setFrom("");
 		}
@@ -250,8 +246,6 @@ public class NotificationTemplateCacheModel
 		body = (String)objectInput.readObject();
 		cc = objectInput.readUTF();
 		description = objectInput.readUTF();
-
-		enabled = objectInput.readBoolean();
 		from = objectInput.readUTF();
 		fromName = objectInput.readUTF();
 		name = objectInput.readUTF();
@@ -314,8 +308,6 @@ public class NotificationTemplateCacheModel
 			objectOutput.writeUTF(description);
 		}
 
-		objectOutput.writeBoolean(enabled);
-
 		if (from == null) {
 			objectOutput.writeUTF("");
 		}
@@ -364,7 +356,6 @@ public class NotificationTemplateCacheModel
 	public String body;
 	public String cc;
 	public String description;
-	public boolean enabled;
 	public String from;
 	public String fromName;
 	public String name;

@@ -86,10 +86,9 @@ public class NotificationTemplateModelImpl
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
 		{"bcc", Types.VARCHAR}, {"body", Types.CLOB}, {"cc", Types.VARCHAR},
-		{"description", Types.VARCHAR}, {"enabled", Types.BOOLEAN},
-		{"from_", Types.VARCHAR}, {"fromName", Types.VARCHAR},
-		{"name", Types.VARCHAR}, {"subject", Types.VARCHAR},
-		{"to_", Types.VARCHAR}
+		{"description", Types.VARCHAR}, {"from_", Types.VARCHAR},
+		{"fromName", Types.VARCHAR}, {"name", Types.VARCHAR},
+		{"subject", Types.VARCHAR}, {"to_", Types.VARCHAR}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -108,7 +107,6 @@ public class NotificationTemplateModelImpl
 		TABLE_COLUMNS_MAP.put("body", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("cc", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("description", Types.VARCHAR);
-		TABLE_COLUMNS_MAP.put("enabled", Types.BOOLEAN);
 		TABLE_COLUMNS_MAP.put("from_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("fromName", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("name", Types.VARCHAR);
@@ -117,7 +115,7 @@ public class NotificationTemplateModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table NotificationTemplate (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,notificationTemplateId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,bcc VARCHAR(75) null,body TEXT null,cc VARCHAR(75) null,description VARCHAR(75) null,enabled BOOLEAN,from_ VARCHAR(75) null,fromName STRING null,name STRING null,subject STRING null,to_ STRING null)";
+		"create table NotificationTemplate (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,notificationTemplateId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,bcc VARCHAR(75) null,body TEXT null,cc VARCHAR(75) null,description VARCHAR(75) null,from_ VARCHAR(75) null,fromName STRING null,name STRING null,subject STRING null,to_ STRING null)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table NotificationTemplate";
@@ -335,12 +333,6 @@ public class NotificationTemplateModelImpl
 			"description",
 			(BiConsumer<NotificationTemplate, String>)
 				NotificationTemplate::setDescription);
-		attributeGetterFunctions.put(
-			"enabled", NotificationTemplate::getEnabled);
-		attributeSetterBiConsumers.put(
-			"enabled",
-			(BiConsumer<NotificationTemplate, Boolean>)
-				NotificationTemplate::setEnabled);
 		attributeGetterFunctions.put("from", NotificationTemplate::getFrom);
 		attributeSetterBiConsumers.put(
 			"from",
@@ -711,27 +703,6 @@ public class NotificationTemplateModelImpl
 		}
 
 		_description = description;
-	}
-
-	@JSON
-	@Override
-	public boolean getEnabled() {
-		return _enabled;
-	}
-
-	@JSON
-	@Override
-	public boolean isEnabled() {
-		return _enabled;
-	}
-
-	@Override
-	public void setEnabled(boolean enabled) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_enabled = enabled;
 	}
 
 	@JSON
@@ -1414,7 +1385,6 @@ public class NotificationTemplateModelImpl
 		notificationTemplateImpl.setBody(getBody());
 		notificationTemplateImpl.setCc(getCc());
 		notificationTemplateImpl.setDescription(getDescription());
-		notificationTemplateImpl.setEnabled(isEnabled());
 		notificationTemplateImpl.setFrom(getFrom());
 		notificationTemplateImpl.setFromName(getFromName());
 		notificationTemplateImpl.setName(getName());
@@ -1455,8 +1425,6 @@ public class NotificationTemplateModelImpl
 			this.<String>getColumnOriginalValue("cc"));
 		notificationTemplateImpl.setDescription(
 			this.<String>getColumnOriginalValue("description"));
-		notificationTemplateImpl.setEnabled(
-			this.<Boolean>getColumnOriginalValue("enabled"));
 		notificationTemplateImpl.setFrom(
 			this.<String>getColumnOriginalValue("from_"));
 		notificationTemplateImpl.setFromName(
@@ -1622,8 +1590,6 @@ public class NotificationTemplateModelImpl
 			notificationTemplateCacheModel.description = null;
 		}
 
-		notificationTemplateCacheModel.enabled = isEnabled();
-
 		notificationTemplateCacheModel.from = getFrom();
 
 		String from = notificationTemplateCacheModel.from;
@@ -1772,7 +1738,6 @@ public class NotificationTemplateModelImpl
 	private String _bodyCurrentLanguageId;
 	private String _cc;
 	private String _description;
-	private boolean _enabled;
 	private String _from;
 	private String _fromName;
 	private String _fromNameCurrentLanguageId;
@@ -1825,7 +1790,6 @@ public class NotificationTemplateModelImpl
 		_columnOriginalValues.put("body", _body);
 		_columnOriginalValues.put("cc", _cc);
 		_columnOriginalValues.put("description", _description);
-		_columnOriginalValues.put("enabled", _enabled);
 		_columnOriginalValues.put("from_", _from);
 		_columnOriginalValues.put("fromName", _fromName);
 		_columnOriginalValues.put("name", _name);
@@ -1880,17 +1844,15 @@ public class NotificationTemplateModelImpl
 
 		columnBitmasks.put("description", 2048L);
 
-		columnBitmasks.put("enabled", 4096L);
+		columnBitmasks.put("from_", 4096L);
 
-		columnBitmasks.put("from_", 8192L);
+		columnBitmasks.put("fromName", 8192L);
 
-		columnBitmasks.put("fromName", 16384L);
+		columnBitmasks.put("name", 16384L);
 
-		columnBitmasks.put("name", 32768L);
+		columnBitmasks.put("subject", 32768L);
 
-		columnBitmasks.put("subject", 65536L);
-
-		columnBitmasks.put("to_", 131072L);
+		columnBitmasks.put("to_", 65536L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

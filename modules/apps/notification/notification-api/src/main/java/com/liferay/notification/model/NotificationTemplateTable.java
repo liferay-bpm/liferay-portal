@@ -67,9 +67,6 @@ public class NotificationTemplateTable
 	public final Column<NotificationTemplateTable, String> description =
 		createColumn(
 			"description", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
-	public final Column<NotificationTemplateTable, Boolean> enabled =
-		createColumn(
-			"enabled", Boolean.class, Types.BOOLEAN, Column.FLAG_DEFAULT);
 	public final Column<NotificationTemplateTable, String> from = createColumn(
 		"from_", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<NotificationTemplateTable, String> fromName =

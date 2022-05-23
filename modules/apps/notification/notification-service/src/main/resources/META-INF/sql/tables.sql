@@ -35,7 +35,6 @@ create table NotificationTemplate (
 	body TEXT null,
 	cc VARCHAR(75) null,
 	description VARCHAR(75) null,
-	enabled BOOLEAN,
 	from_ VARCHAR(75) null,
 	fromName STRING null,
 	name STRING null,
