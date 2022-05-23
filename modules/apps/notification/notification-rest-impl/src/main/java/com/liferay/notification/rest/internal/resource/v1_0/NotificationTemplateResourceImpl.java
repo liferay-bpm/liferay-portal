@@ -133,7 +133,6 @@ public class NotificationTemplateResourceImpl
 					notificationTemplate.getBody()),
 				notificationTemplate.getCc(),
 				notificationTemplate.getDescription(),
-				notificationTemplate.getEnable(),
 				notificationTemplate.getFrom(),
 				LocalizedMapUtil.getLocalizedMap(
 					notificationTemplate.getFromName()),
@@ -159,7 +158,6 @@ public class NotificationTemplateResourceImpl
 					notificationTemplate.getBody()),
 				notificationTemplate.getCc(),
 				notificationTemplate.getDescription(),
-				notificationTemplate.getEnable(),
 				notificationTemplate.getFrom(),
 				LocalizedMapUtil.getLocalizedMap(
 					notificationTemplate.getFromName()),
@@ -225,7 +223,6 @@ public class NotificationTemplateResourceImpl
 					serviceBuilderNotificationTemplate.getModifiedDate();
 				description =
 					serviceBuilderNotificationTemplate.getDescription();
-				enable = serviceBuilderNotificationTemplate.getEnabled();
 				from = serviceBuilderNotificationTemplate.getFrom();
 				fromName = LocalizedMapUtil.getI18nMap(
 					serviceBuilderNotificationTemplate.getFromNameMap());
