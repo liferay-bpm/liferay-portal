@@ -56,7 +56,7 @@ public interface NotificationTemplateService extends BaseService {
 			long userId, String bcc, Map<Locale, String> bodyMap, String cc,
 			String description, boolean enabled, String from,
 			Map<Locale, String> fromNameMap, String name,
-			Map<Locale, String> subjectMap, String to)
+			Map<Locale, String> subjectMap, Map<Locale, String> toMap)
 		throws PortalException;
 
 	public NotificationTemplate deleteNotificationTemplate(
@@ -83,7 +83,8 @@ public interface NotificationTemplateService extends BaseService {
 			long notificationTemplateId, String bcc,
 			Map<Locale, String> bodyMap, String cc, String description,
 			boolean enabled, String from, Map<Locale, String> fromNameMap,
-			String name, Map<Locale, String> subjectMap, String to)
+			String name, Map<Locale, String> subjectMap,
+			Map<Locale, String> toMap)
 		throws PortalException;
 
 }

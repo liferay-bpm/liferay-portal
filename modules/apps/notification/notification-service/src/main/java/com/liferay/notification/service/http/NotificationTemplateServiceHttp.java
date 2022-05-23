@@ -57,7 +57,7 @@ public class NotificationTemplateServiceHttp {
 				String description, boolean enabled, String from,
 				java.util.Map<java.util.Locale, String> fromNameMap,
 				String name, java.util.Map<java.util.Locale, String> subjectMap,
-				String to)
+				java.util.Map<java.util.Locale, String> toMap)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -68,7 +68,7 @@ public class NotificationTemplateServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, userId, bcc, bodyMap, cc, description, enabled, from,
-				fromNameMap, name, subjectMap, to);
+				fromNameMap, name, subjectMap, toMap);
 
 			Object returnObj = null;
 
@@ -237,7 +237,7 @@ public class NotificationTemplateServiceHttp {
 				String cc, String description, boolean enabled, String from,
 				java.util.Map<java.util.Locale, String> fromNameMap,
 				String name, java.util.Map<java.util.Locale, String> subjectMap,
-				String to)
+				java.util.Map<java.util.Locale, String> toMap)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -248,7 +248,8 @@ public class NotificationTemplateServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, notificationTemplateId, bcc, bodyMap, cc,
-				description, enabled, from, fromNameMap, name, subjectMap, to);
+				description, enabled, from, fromNameMap, name, subjectMap,
+				toMap);
 
 			Object returnObj = null;
 
@@ -286,7 +287,7 @@ public class NotificationTemplateServiceHttp {
 		new Class[] {
 			long.class, String.class, java.util.Map.class, String.class,
 			String.class, boolean.class, String.class, java.util.Map.class,
-			String.class, java.util.Map.class, String.class
+			String.class, java.util.Map.class, java.util.Map.class
 		};
 	private static final Class<?>[] _deleteNotificationTemplateParameterTypes1 =
 		new Class[] {long.class};
@@ -298,7 +299,7 @@ public class NotificationTemplateServiceHttp {
 		new Class[] {
 			long.class, String.class, java.util.Map.class, String.class,
 			String.class, boolean.class, String.class, java.util.Map.class,
-			String.class, java.util.Map.class, String.class
+			String.class, java.util.Map.class, java.util.Map.class
 		};
 
 }

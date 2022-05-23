@@ -32,7 +32,7 @@ create table NotificationTemplate (
 	createDate DATE null,
 	modifiedDate DATE null,
 	bcc VARCHAR(75) null,
-	body STRING null,
+	body TEXT null,
 	cc VARCHAR(75) null,
 	description VARCHAR(75) null,
 	enabled BOOLEAN,

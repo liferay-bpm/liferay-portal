@@ -42,12 +42,13 @@ public class NotificationTemplateServiceUtil {
 			long userId, String bcc, Map<java.util.Locale, String> bodyMap,
 			String cc, String description, boolean enabled, String from,
 			Map<java.util.Locale, String> fromNameMap, String name,
-			Map<java.util.Locale, String> subjectMap, String to)
+			Map<java.util.Locale, String> subjectMap,
+			Map<java.util.Locale, String> toMap)
 		throws PortalException {
 
 		return getService().addNotificationTemplate(
 			userId, bcc, bodyMap, cc, description, enabled, from, fromNameMap,
-			name, subjectMap, to);
+			name, subjectMap, toMap);
 	}
 
 	public static NotificationTemplate deleteNotificationTemplate(
@@ -85,12 +86,13 @@ public class NotificationTemplateServiceUtil {
 			Map<java.util.Locale, String> bodyMap, String cc,
 			String description, boolean enabled, String from,
 			Map<java.util.Locale, String> fromNameMap, String name,
-			Map<java.util.Locale, String> subjectMap, String to)
+			Map<java.util.Locale, String> subjectMap,
+			Map<java.util.Locale, String> toMap)
 		throws PortalException {
 
 		return getService().updateNotificationTemplate(
 			notificationTemplateId, bcc, bodyMap, cc, description, enabled,
-			from, fromNameMap, name, subjectMap, to);
+			from, fromNameMap, name, subjectMap, toMap);
 	}
 
 	public static NotificationTemplateService getService() {

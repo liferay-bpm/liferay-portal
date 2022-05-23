@@ -85,7 +85,7 @@ public class NotificationTemplateModelImpl
 		{"notificationTemplateId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
-		{"bcc", Types.VARCHAR}, {"body", Types.VARCHAR}, {"cc", Types.VARCHAR},
+		{"bcc", Types.VARCHAR}, {"body", Types.CLOB}, {"cc", Types.VARCHAR},
 		{"description", Types.VARCHAR}, {"enabled", Types.BOOLEAN},
 		{"from_", Types.VARCHAR}, {"fromName", Types.VARCHAR},
 		{"name", Types.VARCHAR}, {"subject", Types.VARCHAR},
@@ -105,7 +105,7 @@ public class NotificationTemplateModelImpl
 		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("bcc", Types.VARCHAR);
-		TABLE_COLUMNS_MAP.put("body", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("body", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("cc", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("description", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("enabled", Types.BOOLEAN);
@@ -117,7 +117,7 @@ public class NotificationTemplateModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table NotificationTemplate (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,notificationTemplateId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,bcc VARCHAR(75) null,body STRING null,cc VARCHAR(75) null,description VARCHAR(75) null,enabled BOOLEAN,from_ VARCHAR(75) null,fromName STRING null,name STRING null,subject STRING null,to_ STRING null)";
+		"create table NotificationTemplate (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,notificationTemplateId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,bcc VARCHAR(75) null,body TEXT null,cc VARCHAR(75) null,description VARCHAR(75) null,enabled BOOLEAN,from_ VARCHAR(75) null,fromName STRING null,name STRING null,subject STRING null,to_ STRING null)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table NotificationTemplate";

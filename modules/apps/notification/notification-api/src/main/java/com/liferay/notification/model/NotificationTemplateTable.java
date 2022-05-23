@@ -17,6 +17,7 @@ package com.liferay.notification.model;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.base.BaseTable;
 
+import java.sql.Clob;
 import java.sql.Types;
 
 import java.util.Date;
@@ -59,8 +60,8 @@ public class NotificationTemplateTable
 			"modifiedDate", Date.class, Types.TIMESTAMP, Column.FLAG_DEFAULT);
 	public final Column<NotificationTemplateTable, String> bcc = createColumn(
 		"bcc", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
-	public final Column<NotificationTemplateTable, String> body = createColumn(
-		"body", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
+	public final Column<NotificationTemplateTable, Clob> body = createColumn(
+		"body", Clob.class, Types.CLOB, Column.FLAG_DEFAULT);
 	public final Column<NotificationTemplateTable, String> cc = createColumn(
 		"cc", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<NotificationTemplateTable, String> description =

@@ -232,7 +232,9 @@ public class NotificationTemplateCacheModel
 	}
 
 	@Override
-	public void readExternal(ObjectInput objectInput) throws IOException {
+	public void readExternal(ObjectInput objectInput)
+		throws ClassNotFoundException, IOException {
+
 		mvccVersion = objectInput.readLong();
 		uuid = objectInput.readUTF();
 
@@ -245,7 +247,7 @@ public class NotificationTemplateCacheModel
 		createDate = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
 		bcc = objectInput.readUTF();
-		body = objectInput.readUTF();
+		body = (String)objectInput.readObject();
 		cc = objectInput.readUTF();
 		description = objectInput.readUTF();
 
@@ -292,10 +294,10 @@ public class NotificationTemplateCacheModel
 		}
 
 		if (body == null) {
-			objectOutput.writeUTF("");
+			objectOutput.writeObject("");
 		}
 		else {
-			objectOutput.writeUTF(body);
+			objectOutput.writeObject(body);
 		}
 
 		if (cc == null) {
