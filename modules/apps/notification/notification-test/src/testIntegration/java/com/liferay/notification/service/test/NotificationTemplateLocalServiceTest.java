@@ -125,8 +125,7 @@ public class NotificationTemplateLocalServiceTest {
 			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
 			Collections.singletonMap(
 				LocaleUtil.US, RandomTestUtil.randomString()),
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(), true,
-			from,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(), from,
 			Collections.singletonMap(
 				LocaleUtil.US, RandomTestUtil.randomString()),
 			name,

@@ -54,7 +54,7 @@ public class NotificationQueueEntryLocalServiceTest {
 				Collections.singletonMap(
 					LocaleUtil.US, RandomTestUtil.randomString()),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-				true, RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(),
 				Collections.singletonMap(
 					LocaleUtil.US, RandomTestUtil.randomString()),
 				RandomTestUtil.randomString(),

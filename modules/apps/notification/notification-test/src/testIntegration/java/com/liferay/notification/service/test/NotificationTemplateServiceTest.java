@@ -156,7 +156,7 @@ public class NotificationTemplateServiceTest {
 			user.getUserId(), RandomTestUtil.randomString(),
 			Collections.singletonMap(
 				LocaleUtil.US, RandomTestUtil.randomString()),
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(), true,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(),
 			Collections.singletonMap(
 				LocaleUtil.US, RandomTestUtil.randomString()),
@@ -186,7 +186,7 @@ public class NotificationTemplateServiceTest {
 					Collections.singletonMap(
 						LocaleUtil.US, RandomTestUtil.randomString()),
 					RandomTestUtil.randomString(),
-					RandomTestUtil.randomString(), true,
+					RandomTestUtil.randomString(),
 					RandomTestUtil.randomString(),
 					Collections.singletonMap(
 						LocaleUtil.US, RandomTestUtil.randomString()),
@@ -265,7 +265,7 @@ public class NotificationTemplateServiceTest {
 					Collections.singletonMap(
 						LocaleUtil.US, RandomTestUtil.randomString()),
 					RandomTestUtil.randomString(),
-					RandomTestUtil.randomString(), true,
+					RandomTestUtil.randomString(),
 					RandomTestUtil.randomString(),
 					Collections.singletonMap(
 						LocaleUtil.US, RandomTestUtil.randomString()),
