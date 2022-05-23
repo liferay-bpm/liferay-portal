@@ -20,6 +20,7 @@ import com.liferay.notification.rest.dto.v1_0.NotificationTemplate;
 import com.liferay.notification.rest.internal.odata.entity.v1_0.NotificationTemplateEntityModel;
 import com.liferay.notification.rest.resource.v1_0.NotificationTemplateResource;
 import com.liferay.notification.service.NotificationTemplateService;
+import com.liferay.notification.util.LocalizedMapUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
@@ -32,7 +33,6 @@ import com.liferay.portal.vulcan.aggregation.Aggregation;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -214,7 +214,7 @@ public class NotificationTemplateResourceImpl
 							getNotificationTemplateId())
 				).build();
 				bcc = serviceBuilderNotificationTemplate.getBcc();
-				body = LocalizedMapUtil.getI18nMap(
+				body = LocalizedMapUtil.getLanguageIdMap(
 					serviceBuilderNotificationTemplate.getBodyMap());
 				cc = serviceBuilderNotificationTemplate.getCc();
 				dateCreated =
@@ -224,17 +224,17 @@ public class NotificationTemplateResourceImpl
 				description =
 					serviceBuilderNotificationTemplate.getDescription();
 				from = serviceBuilderNotificationTemplate.getFrom();
-				fromName = LocalizedMapUtil.getI18nMap(
+				fromName = LocalizedMapUtil.getLanguageIdMap(
 					serviceBuilderNotificationTemplate.getFromNameMap());
 				id =
 					serviceBuilderNotificationTemplate.
 						getNotificationTemplateId();
 				name = serviceBuilderNotificationTemplate.getName();
-				name_i18n = LocalizedMapUtil.getI18nMap(
+				name_i18n = LocalizedMapUtil.getLanguageIdMap(
 					serviceBuilderNotificationTemplate.getNameMap());
-				subject = LocalizedMapUtil.getI18nMap(
+				subject = LocalizedMapUtil.getLanguageIdMap(
 					serviceBuilderNotificationTemplate.getSubjectMap());
-				to = LocalizedMapUtil.getI18nMap(
+				to = LocalizedMapUtil.getLanguageIdMap(
 					serviceBuilderNotificationTemplate.getToMap());
 			}
 		};
