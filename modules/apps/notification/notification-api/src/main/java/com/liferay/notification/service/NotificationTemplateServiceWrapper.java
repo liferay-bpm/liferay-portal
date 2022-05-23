@@ -42,15 +42,15 @@ public class NotificationTemplateServiceWrapper
 			addNotificationTemplate(
 				long userId, String bcc,
 				java.util.Map<java.util.Locale, String> bodyMap, String cc,
-				String description, boolean enabled, String from,
+				String description, String from,
 				java.util.Map<java.util.Locale, String> fromNameMap,
 				String name, java.util.Map<java.util.Locale, String> subjectMap,
 				java.util.Map<java.util.Locale, String> toMap)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _notificationTemplateService.addNotificationTemplate(
-			userId, bcc, bodyMap, cc, description, enabled, from, fromNameMap,
-			name, subjectMap, toMap);
+			userId, bcc, bodyMap, cc, description, from, fromNameMap, name,
+			subjectMap, toMap);
 	}
 
 	@Override
@@ -97,15 +97,15 @@ public class NotificationTemplateServiceWrapper
 			updateNotificationTemplate(
 				long notificationTemplateId, String bcc,
 				java.util.Map<java.util.Locale, String> bodyMap, String cc,
-				String description, boolean enabled, String from,
+				String description, String from,
 				java.util.Map<java.util.Locale, String> fromNameMap,
 				String name, java.util.Map<java.util.Locale, String> subjectMap,
 				java.util.Map<java.util.Locale, String> toMap)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _notificationTemplateService.updateNotificationTemplate(
-			notificationTemplateId, bcc, bodyMap, cc, description, enabled,
-			from, fromNameMap, name, subjectMap, toMap);
+			notificationTemplateId, bcc, bodyMap, cc, description, from,
+			fromNameMap, name, subjectMap, toMap);
 	}
 
 	@Override

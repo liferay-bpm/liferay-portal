@@ -70,9 +70,9 @@ public interface NotificationTemplateLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public NotificationTemplate addNotificationTemplate(
 			long userId, String bcc, Map<Locale, String> bodyMap, String cc,
-			String description, boolean enabled, String from,
-			Map<Locale, String> fromNameMap, String name,
-			Map<Locale, String> subjectMap, Map<Locale, String> toMap)
+			String description, String from, Map<Locale, String> fromNameMap,
+			String name, Map<Locale, String> subjectMap,
+			Map<Locale, String> toMap)
 		throws PortalException;
 
 	/**
@@ -309,9 +309,8 @@ public interface NotificationTemplateLocalService
 	public NotificationTemplate updateNotificationTemplate(
 			long notificationTemplateId, String bcc,
 			Map<Locale, String> bodyMap, String cc, String description,
-			boolean enabled, String from, Map<Locale, String> fromNameMap,
-			String name, Map<Locale, String> subjectMap,
-			Map<Locale, String> toMap)
+			String from, Map<Locale, String> fromNameMap, String name,
+			Map<Locale, String> subjectMap, Map<Locale, String> toMap)
 		throws PortalException;
 
 	/**
