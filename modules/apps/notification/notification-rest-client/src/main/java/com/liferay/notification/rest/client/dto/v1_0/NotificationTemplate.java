@@ -180,27 +180,6 @@ public class NotificationTemplate implements Cloneable, Serializable {
 
 	protected String description;
 
-	public Boolean getEnable() {
-		return enable;
-	}
-
-	public void setEnable(Boolean enable) {
-		this.enable = enable;
-	}
-
-	public void setEnable(
-		UnsafeSupplier<Boolean, Exception> enableUnsafeSupplier) {
-
-		try {
-			enable = enableUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Boolean enable;
-
 	public String getFrom() {
 		return from;
 	}

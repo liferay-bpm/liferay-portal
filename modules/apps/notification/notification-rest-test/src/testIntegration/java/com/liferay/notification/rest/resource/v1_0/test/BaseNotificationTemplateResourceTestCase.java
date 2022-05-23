@@ -999,14 +999,6 @@ public abstract class BaseNotificationTemplateResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals("enable", additionalAssertFieldName)) {
-				if (notificationTemplate.getEnable() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
 			if (Objects.equals("from", additionalAssertFieldName)) {
 				if (notificationTemplate.getFrom() == null) {
 					valid = false;
@@ -1220,17 +1212,6 @@ public abstract class BaseNotificationTemplateResourceTestCase {
 				if (!Objects.deepEquals(
 						notificationTemplate1.getDescription(),
 						notificationTemplate2.getDescription())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("enable", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						notificationTemplate1.getEnable(),
-						notificationTemplate2.getEnable())) {
 
 					return false;
 				}
@@ -1515,11 +1496,6 @@ public abstract class BaseNotificationTemplateResourceTestCase {
 			return sb.toString();
 		}
 
-		if (entityFieldName.equals("enable")) {
-			throw new IllegalArgumentException(
-				"Invalid entity field " + entityFieldName);
-		}
-
 		if (entityFieldName.equals("from")) {
 			sb.append("'");
 			sb.append(String.valueOf(notificationTemplate.getFrom()));
@@ -1613,7 +1589,6 @@ public abstract class BaseNotificationTemplateResourceTestCase {
 				dateModified = RandomTestUtil.nextDate();
 				description = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
-				enable = RandomTestUtil.randomBoolean();
 				from = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
 				name = StringUtil.toLowerCase(RandomTestUtil.randomString());

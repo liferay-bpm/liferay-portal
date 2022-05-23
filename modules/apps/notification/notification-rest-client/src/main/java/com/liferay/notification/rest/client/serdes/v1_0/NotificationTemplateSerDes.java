@@ -155,16 +155,6 @@ public class NotificationTemplateSerDes {
 			sb.append("\"");
 		}
 
-		if (notificationTemplate.getEnable() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"enable\": ");
-
-			sb.append(notificationTemplate.getEnable());
-		}
-
 		if (notificationTemplate.getFrom() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -325,13 +315,6 @@ public class NotificationTemplateSerDes {
 				String.valueOf(notificationTemplate.getDescription()));
 		}
 
-		if (notificationTemplate.getEnable() == null) {
-			map.put("enable", null);
-		}
-		else {
-			map.put("enable", String.valueOf(notificationTemplate.getEnable()));
-		}
-
 		if (notificationTemplate.getFrom() == null) {
 			map.put("from", null);
 		}
@@ -446,12 +429,6 @@ public class NotificationTemplateSerDes {
 				if (jsonParserFieldValue != null) {
 					notificationTemplate.setDescription(
 						(String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "enable")) {
-				if (jsonParserFieldValue != null) {
-					notificationTemplate.setEnable(
-						(Boolean)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "from")) {

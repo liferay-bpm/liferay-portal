@@ -259,34 +259,6 @@ public class NotificationTemplate implements Serializable {
 	protected String description;
 
 	@Schema
-	public Boolean getEnable() {
-		return enable;
-	}
-
-	public void setEnable(Boolean enable) {
-		this.enable = enable;
-	}
-
-	@JsonIgnore
-	public void setEnable(
-		UnsafeSupplier<Boolean, Exception> enableUnsafeSupplier) {
-
-		try {
-			enable = enableUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Boolean enable;
-
-	@Schema
 	public String getFrom() {
 		return from;
 	}
@@ -600,16 +572,6 @@ public class NotificationTemplate implements Serializable {
 			sb.append(_escape(description));
 
 			sb.append("\"");
-		}
-
-		if (enable != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"enable\": ");
-
-			sb.append(enable);
 		}
 
 		if (from != null) {
