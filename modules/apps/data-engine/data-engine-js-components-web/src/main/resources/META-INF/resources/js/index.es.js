@@ -45,6 +45,23 @@ export {PagesVisitor} from './utils/visitors.es';
 
 export {EVENT_TYPES} from './core/actions/eventTypes.es';
 export {Field} from './core/components/Field/Field.es';
+export {Input} from './core/components/Input';
+export {FieldBase} from './core/components/FieldBase';
+export {Card} from './core/components/Card/Card';
+export {InputLocalized} from './core/components/InputLocalized';
+export {CustomSelect} from './core/components/CustomSelect';
+export {FormCustomSelect, CustomItem} from './core/components/FormCustomSelect';
+export {AutoComplete} from './core/components/AutoComplete';
+export {CheckboxItem} from './core/components/CheckBoxItem';
+export {Select} from './core/components/Select';
+export {
+	SidePanelContent,
+	SidePanelForm,
+	closeSidePanel,
+	openToast,
+} from './core/components/SidePanelContent';
+export {Collapsable} from './core/components/Collapsable';
+export {EditorSidebar} from './core/components/EditorSidebar';
 export {FieldFeedback} from './core/components/FieldFeedback';
 export {FieldStateless} from './core/components/Field/FieldStateless.es';
 export * as DefaultVariant from './core/components/PageRenderer/DefaultVariant.es';

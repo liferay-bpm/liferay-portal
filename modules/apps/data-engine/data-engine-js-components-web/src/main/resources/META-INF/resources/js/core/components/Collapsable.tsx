@@ -12,22 +12,22 @@
  * details.
  */
 
-/// <reference types="react" />
+// @ts-ignore
 
-import {CustomItem} from 'data-engine-js-components-web';
-import {FormError} from '../../../hooks/useForm';
-export default function ActionBuilder({
-	errors,
-	objectActionExecutors,
-	objectActionTriggers,
-	setValues,
-	values,
-}: IProps): JSX.Element;
-interface IProps {
-	errors: FormError<ObjectAction & ObjectActionParameters>;
-	objectActionExecutors: CustomItem[];
-	objectActionTriggers: CustomItem[];
-	setValues: (values: Partial<ObjectAction>) => void;
-	values: Partial<ObjectAction>;
+import {Collapse} from '@liferay/layout-content-page-editor-web';
+import React from 'react';
+
+export function Collapsable({children, label}: ICollapsable) {
+	return (
+		<div className="lfr-objects__object-editor-sidebar-collapsable-button-list">
+			<Collapse label={label} open>
+				{children}
+			</Collapse>
+		</div>
+	);
 }
-export {};
+
+interface ICollapsable {
+	children: React.ReactNode;
+	label: string;
+}

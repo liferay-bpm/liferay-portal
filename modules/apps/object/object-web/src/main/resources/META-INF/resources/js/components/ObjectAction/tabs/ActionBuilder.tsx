@@ -12,13 +12,16 @@
  * details.
  */
 
+import {
+	Card,
+	CustomItem,
+	FormCustomSelect,
+	Input,
+} from 'data-engine-js-components-web';
 import React, {useMemo} from 'react';
 
 import {FormError} from '../../../hooks/useForm';
-import Card from '../../Card/Card';
 import CodeMirrorEditor from '../../CodeMirrorEditor';
-import CustomSelect, {CustomItem} from '../../Form/CustomSelect/CustomSelect';
-import Input from '../../Form/Input';
 
 export default function ActionBuilder({
 	errors,
@@ -54,7 +57,7 @@ export default function ActionBuilder({
 					title={Liferay.Language.get('when[object]')}
 					viewMode="inline"
 				>
-					<CustomSelect
+					<FormCustomSelect
 						error={errors.objectActionTriggerKey}
 						onChange={({value}) =>
 							setValues({objectActionTriggerKey: value})
@@ -73,7 +76,7 @@ export default function ActionBuilder({
 					title={Liferay.Language.get('then[object]')}
 					viewMode="inline"
 				>
-					<CustomSelect
+					<FormCustomSelect
 						error={errors.objectActionExecutorKey}
 						onChange={({value}) =>
 							setValues({

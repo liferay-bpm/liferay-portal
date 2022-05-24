@@ -15,8 +15,9 @@
 import ClayForm from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import classNames from 'classnames';
-import {FieldFeedback} from 'data-engine-js-components-web';
 import React, {ReactNode} from 'react';
+
+import {FieldFeedback} from './FieldFeedback';
 
 function RequiredMask() {
 	return (
@@ -32,7 +33,7 @@ function RequiredMask() {
 	);
 }
 
-export default function FieldBase({
+export function FieldBase({
 	children,
 	className,
 	disabled,

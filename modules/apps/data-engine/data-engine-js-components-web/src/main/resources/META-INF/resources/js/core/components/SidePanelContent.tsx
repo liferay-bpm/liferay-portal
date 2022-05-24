@@ -32,7 +32,7 @@ export function openToast(options: {
 	parentWindow.Liferay.Util.openToast(options);
 }
 
-export default function SidePanelContent({
+export function SidePanelContent({
 	children,
 	className,
 	onSave,

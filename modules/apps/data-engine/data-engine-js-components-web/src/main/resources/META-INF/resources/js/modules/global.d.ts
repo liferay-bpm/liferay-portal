@@ -112,3 +112,14 @@ interface FieldType {
 	name: string;
 	settingsContext: {pages: unknown[]};
 }
+
+interface ObjectValidationRuleElement {
+	items: ObjectValidationRuleElementItem[];
+	label: string;
+}
+
+interface ObjectValidationRuleElementItem {
+	content: string;
+	label: string;
+	tooltip: string;
+}

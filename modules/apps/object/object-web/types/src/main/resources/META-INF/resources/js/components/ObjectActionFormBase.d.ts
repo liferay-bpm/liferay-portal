@@ -14,20 +14,26 @@
 
 /// <reference types="react" />
 
+import 'codemirror/mode/groovy/groovy';
 import {CustomItem} from 'data-engine-js-components-web';
-import {FormError} from '../../../hooks/useForm';
-export default function ActionBuilder({
-	errors,
+export default function ObjectActionFormBase({
+	objectAction: initialValues,
 	objectActionExecutors,
 	objectActionTriggers,
-	setValues,
-	values,
+	readOnly,
+	requestParams: {method, url},
+	successMessage,
 }: IProps): JSX.Element;
 interface IProps {
-	errors: FormError<ObjectAction & ObjectActionParameters>;
+	objectAction: Partial<ObjectAction>;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
-	setValues: (values: Partial<ObjectAction>) => void;
-	values: Partial<ObjectAction>;
+	readOnly?: boolean;
+	requestParams: {
+		method: string;
+		url: string;
+	};
+	successMessage: string;
+	title: string;
 }
 export {};

@@ -16,11 +16,11 @@ import ClayAutocomplete from '@clayui/autocomplete';
 import ClayDropDown from '@clayui/drop-down';
 import React, {useRef, useState} from 'react';
 
-import FieldBase from '../FieldBase';
+import {FieldBase} from './FieldBase';
 
-import './CustomSelect.scss';
+import './FormCustomSelect.scss';
 
-export default function CustomSelect<T extends CustomItem = CustomItem>({
+export function FormCustomSelect<T extends CustomItem = CustomItem>({
 	className,
 	disabled,
 	error,

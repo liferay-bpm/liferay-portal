@@ -16,13 +16,13 @@ import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import ClayEmptyState from '@clayui/empty-state';
 import ClayList from '@clayui/list';
 import classNames from 'classnames';
+import {Card} from 'data-engine-js-components-web';
 import {ManagementToolbar} from 'frontend-js-components-web';
 import React, {useEffect, useState} from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
 
 import {defaultLanguageId} from '../../../utils/locale';
-import Card from '../../Card/Card';
 import {ManagementToolbarSearch} from '../ManagementToolbarSearch/ManagementToolbarSearch';
 import {TObjectColumn} from '../types';
 import BuilderListItem from './BuilderListItem';

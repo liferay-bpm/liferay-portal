@@ -14,7 +14,7 @@
 
 /// <reference types="react" />
 
-import {CustomItem} from '../Form/CustomSelect/CustomSelect';
+import {CustomItem} from 'data-engine-js-components-web';
 export default function EditObjectAction({
 	objectAction: {id, ...values},
 	objectActionExecutors,

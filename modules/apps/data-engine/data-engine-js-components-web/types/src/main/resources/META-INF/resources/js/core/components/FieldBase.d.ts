@@ -12,22 +12,27 @@
  * details.
  */
 
-/// <reference types="react" />
-
-import {CustomItem} from 'data-engine-js-components-web';
-import {FormError} from '../../../hooks/useForm';
-export default function ActionBuilder({
-	errors,
-	objectActionExecutors,
-	objectActionTriggers,
-	setValues,
-	values,
+import {ReactNode} from 'react';
+export declare function FieldBase({
+	children,
+	className,
+	disabled,
+	errorMessage,
+	helpMessage,
+	id,
+	label,
+	required,
+	warningMessage,
 }: IProps): JSX.Element;
 interface IProps {
-	errors: FormError<ObjectAction & ObjectActionParameters>;
-	objectActionExecutors: CustomItem[];
-	objectActionTriggers: CustomItem[];
-	setValues: (values: Partial<ObjectAction>) => void;
-	values: Partial<ObjectAction>;
+	children: ReactNode;
+	className?: string;
+	disabled?: boolean;
+	errorMessage?: string;
+	helpMessage?: string;
+	id?: string;
+	label?: string;
+	required?: boolean;
+	warningMessage?: string;
 }
 export {};

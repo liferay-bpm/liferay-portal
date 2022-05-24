@@ -14,20 +14,39 @@
 
 /// <reference types="react" />
 
-import {CustomItem} from 'data-engine-js-components-web';
-import {FormError} from '../../../hooks/useForm';
-export default function ActionBuilder({
-	errors,
-	objectActionExecutors,
-	objectActionTriggers,
-	setValues,
-	values,
+import './InputLocalized.scss';
+export declare function InputLocalized({
+	disabled,
+	error,
+	id,
+	label,
+	locales,
+	name,
+	onSelectedLocaleChange,
+	onTranslationsChange,
+	placeholder,
+	required,
+	selectedLocale,
+	translations,
+	...otherProps
 }: IProps): JSX.Element;
+interface ILocale {
+	label: string;
+	symbol: string;
+}
 interface IProps {
-	errors: FormError<ObjectAction & ObjectActionParameters>;
-	objectActionExecutors: CustomItem[];
-	objectActionTriggers: CustomItem[];
-	setValues: (values: Partial<ObjectAction>) => void;
-	values: Partial<ObjectAction>;
+	className?: string;
+	disabled?: boolean;
+	error?: string;
+	id?: string;
+	label: string;
+	locales: ILocale[];
+	name?: string;
+	onSelectedLocaleChange: (value: ILocale) => void;
+	onTranslationsChange: (value: LocalizedValue<string>) => void;
+	placeholder?: string;
+	required?: boolean;
+	selectedLocale: ILocale;
+	translations: LocalizedValue<string>;
 }
 export {};

@@ -12,16 +12,11 @@
  * details.
  */
 
-import ClayLocalizedInput from '@clayui/localized-input';
-import classNames from 'classnames';
-import React from 'react';
-
-import {defaultLanguageId} from '../../../utils/locale';
-import FieldBase from '../FieldBase';
+/// <reference types="react" />
 
 import './InputLocalized.scss';
-
-export default function InputLocalized({
+export declare function InputLocalized({
+	defaultLanguageId,
 	disabled,
 	error,
 	id,
@@ -35,50 +30,14 @@ export default function InputLocalized({
 	selectedLocale,
 	translations,
 	...otherProps
-}: IProps) {
-	return (
-		<FieldBase
-			className="lfr-objects__input-localized"
-			disabled={disabled}
-			errorMessage={error}
-			id={id}
-			label={label}
-			required={required}
-		>
-			<ClayLocalizedInput
-				{...otherProps}
-				className={classNames({
-					'lfr-objects__input-localized--rtl':
-
-						// @ts-ignore
-
-						Liferay.Language.direction[selectedLocale.label] ===
-						'rtl',
-				})}
-				disabled={disabled}
-				id={id}
-				label=""
-				locales={locales.sort((a) =>
-					a.label === defaultLanguageId ? -1 : 1
-				)}
-				name={name}
-				onSelectedLocaleChange={onSelectedLocaleChange}
-				onTranslationsChange={onTranslationsChange}
-				placeholder={placeholder}
-				selectedLocale={selectedLocale}
-				translations={translations}
-			/>
-		</FieldBase>
-	);
-}
-
+}: IProps): JSX.Element;
 interface ILocale {
 	label: string;
 	symbol: string;
 }
-
 interface IProps {
 	className?: string;
+	defaultLanguageId: Locale;
 	disabled?: boolean;
 	error?: string;
 	id?: string;
@@ -92,3 +51,4 @@ interface IProps {
 	selectedLocale: ILocale;
 	translations: LocalizedValue<string>;
 }
+export {};

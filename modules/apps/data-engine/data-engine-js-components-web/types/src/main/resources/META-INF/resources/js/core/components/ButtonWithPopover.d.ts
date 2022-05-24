@@ -12,22 +12,15 @@
  * details.
  */
 
-/// <reference types="react" />
-
-import {CustomItem} from 'data-engine-js-components-web';
-import {FormError} from '../../../hooks/useForm';
-export default function ActionBuilder({
-	errors,
-	objectActionExecutors,
-	objectActionTriggers,
-	setValues,
-	values,
+import {MouseEventHandler} from 'react';
+export declare function ButtonWithPopover({
+	label,
+	onClick,
+	tooltip,
 }: IProps): JSX.Element;
 interface IProps {
-	errors: FormError<ObjectAction & ObjectActionParameters>;
-	objectActionExecutors: CustomItem[];
-	objectActionTriggers: CustomItem[];
-	setValues: (values: Partial<ObjectAction>) => void;
-	values: Partial<ObjectAction>;
+	label: string;
+	onClick?: MouseEventHandler;
+	tooltip: string;
 }
 export {};

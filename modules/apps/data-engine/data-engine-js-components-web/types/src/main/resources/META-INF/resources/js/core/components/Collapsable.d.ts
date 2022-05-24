@@ -12,22 +12,13 @@
  * details.
  */
 
-/// <reference types="react" />
-
-import {CustomItem} from 'data-engine-js-components-web';
-import {FormError} from '../../../hooks/useForm';
-export default function ActionBuilder({
-	errors,
-	objectActionExecutors,
-	objectActionTriggers,
-	setValues,
-	values,
-}: IProps): JSX.Element;
-interface IProps {
-	errors: FormError<ObjectAction & ObjectActionParameters>;
-	objectActionExecutors: CustomItem[];
-	objectActionTriggers: CustomItem[];
-	setValues: (values: Partial<ObjectAction>) => void;
-	values: Partial<ObjectAction>;
+import React from 'react';
+export declare function Collapsable({
+	children,
+	label,
+}: ICollapsable): JSX.Element;
+interface ICollapsable {
+	children: React.ReactNode;
+	label: string;
 }
 export {};

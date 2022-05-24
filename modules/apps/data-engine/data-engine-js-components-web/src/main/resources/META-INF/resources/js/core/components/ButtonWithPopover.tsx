@@ -17,7 +17,7 @@ import ClayIcon from '@clayui/icon';
 import ClayPopover from '@clayui/popover';
 import React, {MouseEventHandler, useState} from 'react';
 
-export function ElementItem({label, onClick, tooltip}: IElementItem) {
+export function ButtonWithPopover({label, onClick, tooltip}: IProps) {
 	const [showPreview, setShowPreview] = useState(false);
 
 	return (
@@ -61,26 +61,7 @@ export function ElementItem({label, onClick, tooltip}: IElementItem) {
 	);
 }
 
-export default function Element({items, onItemClick}: IProps) {
-	return (
-		<>
-			{items.map((item) => (
-				<ElementItem
-					key={item.label}
-					label={item.label}
-					onClick={() => onItemClick(item)}
-					tooltip={item.tooltip}
-				/>
-			))}
-		</>
-	);
-}
-
 interface IProps {
-	items: ObjectValidationRuleElementItem[];
-	onItemClick: (item: ObjectValidationRuleElementItem) => void;
-}
-interface IElementItem {
 	label: string;
 	onClick?: MouseEventHandler;
 	tooltip: string;

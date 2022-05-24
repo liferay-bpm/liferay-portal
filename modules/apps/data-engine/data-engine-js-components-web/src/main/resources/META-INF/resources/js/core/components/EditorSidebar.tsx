@@ -15,27 +15,27 @@
 import CodeMirror from 'codemirror';
 import React, {useMemo} from 'react';
 
-import {defaultLanguageId} from '../../../utils/locale';
-import {METADATAS} from '../../ObjectView/context';
+import {ButtonWithPopover} from './ButtonWithPopover';
 import {Collapsable} from './Collapsable';
-import Element from './Element';
 
-import './Sidebar.scss';
+import './EditorSidebar.scss';
 
-export default function Sidebar({
+export function EditorSidebar({
+	defaultLanguageId,
 	editorRef,
-	objectValidationRuleElements,
+	metadatasFields,
+	sidebarElements,
 }: IProps) {
 	const onItemClick = (item: ObjectValidationRuleElementItem) =>
 		editorRef.current?.replaceSelection(item.content);
 
-	const metadatas = METADATAS.map((metadata) => ({
+	const metadatas = metadatasFields.map((metadata) => ({
 		content: metadata.name,
 		label: metadata.label[defaultLanguageId],
 		tooltip: '',
 	}));
 
-	const objectFields = {...objectValidationRuleElements[0]};
+	const objectFields = {...sidebarElements[0]};
 
 	objectFields.items = useMemo(
 		() => objectFields.items.concat(metadatas),
@@ -43,9 +43,7 @@ export default function Sidebar({
 		[]
 	);
 
-	const elements = objectValidationRuleElements.filter(
-		(_, index) => index !== 0
-	);
+	const elements = sidebarElements.filter((_, index) => index !== 0);
 
 	elements.unshift(objectFields);
 
@@ -56,7 +54,14 @@ export default function Sidebar({
 
 				{elements.map(({items, label}) => (
 					<Collapsable key={label} label={label}>
-						<Element items={items} onItemClick={onItemClick} />
+						{items.map((item) => (
+							<ButtonWithPopover
+								key={item.label}
+								label={item.label}
+								onClick={() => onItemClick(item)}
+								tooltip={item.tooltip}
+							/>
+						))}
 					</Collapsable>
 				))}
 			</div>
@@ -65,6 +70,8 @@ export default function Sidebar({
 }
 interface IProps {
 	className?: string;
+	defaultLanguageId: Locale;
 	editorRef: React.MutableRefObject<CodeMirror.Editor | undefined>;
-	objectValidationRuleElements: ObjectValidationRuleElement[];
+	metadatasFields: any[];
+	sidebarElements: ObjectValidationRuleElement[];
 }

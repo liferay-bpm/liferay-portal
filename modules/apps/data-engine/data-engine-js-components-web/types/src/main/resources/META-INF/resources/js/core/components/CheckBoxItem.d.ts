@@ -12,22 +12,15 @@
  * details.
  */
 
-/// <reference types="react" />
-
-import {CustomItem} from 'data-engine-js-components-web';
-import {FormError} from '../../../hooks/useForm';
-export default function ActionBuilder({
-	errors,
-	objectActionExecutors,
-	objectActionTriggers,
-	setValues,
-	values,
-}: IProps): JSX.Element;
+import React from 'react';
 interface IProps {
-	errors: FormError<ObjectAction & ObjectActionParameters>;
-	objectActionExecutors: CustomItem[];
-	objectActionTriggers: CustomItem[];
-	setValues: (values: Partial<ObjectAction>) => void;
-	values: Partial<ObjectAction>;
+	checked?: boolean;
+	label: string;
+	onChange: React.ChangeEventHandler<HTMLInputElement>;
 }
+export declare function CheckboxItem({
+	checked,
+	label,
+	onChange,
+}: IProps): JSX.Element;
 export {};

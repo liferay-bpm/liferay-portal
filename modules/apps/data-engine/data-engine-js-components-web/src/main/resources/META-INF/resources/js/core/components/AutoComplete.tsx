@@ -15,8 +15,8 @@
 import ClayDropDown from '@clayui/drop-down';
 import React, {useState} from 'react';
 
-import CustomSelect from '../CustomSelect/CustomSelect';
-import FieldBase from './FieldBase';
+import {CustomSelect} from './CustomSelect';
+import {FieldBase} from './FieldBase';
 
 import './AutoComplete.scss';
 
@@ -35,7 +35,7 @@ interface IAutoCompleteProps extends React.HTMLAttributes<HTMLElement> {
 	value?: string;
 }
 
-const AutoComplete: React.FC<IAutoCompleteProps> = ({
+export function AutoComplete({
 	children,
 	className,
 	contentRight,
@@ -50,7 +50,7 @@ const AutoComplete: React.FC<IAutoCompleteProps> = ({
 	query,
 	required = false,
 	value,
-}) => {
+}: IAutoCompleteProps) {
 	const [active, setActive] = useState<boolean>(false);
 
 	return (
@@ -105,6 +105,4 @@ const AutoComplete: React.FC<IAutoCompleteProps> = ({
 			</ClayDropDown>
 		</FieldBase>
 	);
-};
-
-export default AutoComplete;
+}

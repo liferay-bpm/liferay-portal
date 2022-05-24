@@ -14,20 +14,34 @@
 
 /// <reference types="react" />
 
-import {CustomItem} from 'data-engine-js-components-web';
-import {FormError} from '../../../hooks/useForm';
-export default function ActionBuilder({
-	errors,
-	objectActionExecutors,
-	objectActionTriggers,
-	setValues,
-	values,
-}: IProps): JSX.Element;
-interface IProps {
-	errors: FormError<ObjectAction & ObjectActionParameters>;
-	objectActionExecutors: CustomItem[];
-	objectActionTriggers: CustomItem[];
-	setValues: (values: Partial<ObjectAction>) => void;
-	values: Partial<ObjectAction>;
+import './FormCustomSelect.scss';
+export declare function FormCustomSelect<T extends CustomItem = CustomItem>({
+	className,
+	disabled,
+	error,
+	feedbackMessage,
+	id,
+	label,
+	onChange,
+	options,
+	required,
+	value,
+}: IProps<T>): JSX.Element;
+export interface CustomItem {
+	description?: string;
+	label: string;
+	value?: string;
+}
+interface IProps<T extends CustomItem = CustomItem> {
+	className?: string;
+	disabled?: boolean;
+	error?: string;
+	feedbackMessage?: string;
+	id?: string;
+	label: string;
+	onChange?: (selected: T) => void;
+	options: T[];
+	required?: boolean;
+	value?: string | number | string[];
 }
 export {};

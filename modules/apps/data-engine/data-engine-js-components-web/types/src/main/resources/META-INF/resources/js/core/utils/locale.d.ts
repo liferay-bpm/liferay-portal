@@ -12,22 +12,13 @@
  * details.
  */
 
-/// <reference types="react" />
-
-import {CustomItem} from 'data-engine-js-components-web';
-import {FormError} from '../../../hooks/useForm';
-export default function ActionBuilder({
-	errors,
-	objectActionExecutors,
-	objectActionTriggers,
-	setValues,
-	values,
-}: IProps): JSX.Element;
-interface IProps {
-	errors: FormError<ObjectAction & ObjectActionParameters>;
-	objectActionExecutors: CustomItem[];
-	objectActionTriggers: CustomItem[];
-	setValues: (values: Partial<ObjectAction>) => void;
-	values: Partial<ObjectAction>;
-}
+export declare const availableLocales: TLocale[];
+export declare const defaultLanguageId: Locale;
+export declare const defaultLocale: TLocale | undefined;
+export declare const languageId: Locale;
+export declare const locale: TLocale | undefined;
+declare type TLocale = {
+	label: string;
+	symbol: string;
+};
 export {};

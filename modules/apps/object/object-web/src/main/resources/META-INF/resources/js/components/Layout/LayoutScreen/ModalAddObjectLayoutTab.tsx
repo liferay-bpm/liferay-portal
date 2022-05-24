@@ -18,13 +18,12 @@ import ClayLabel from '@clayui/label';
 import ClayModal from '@clayui/modal';
 import {ClayTooltipProvider} from '@clayui/tooltip';
 import classNames from 'classnames';
+import {AutoComplete, Input} from 'data-engine-js-components-web';
 import React, {useContext, useMemo, useState} from 'react';
 
 import useForm from '../../../hooks/useForm';
 import {defaultLanguageId} from '../../../utils/locale';
 import {separateCamelCase} from '../../../utils/string';
-import AutoComplete from '../../Form/AutoComplete';
-import Input from '../../Form/Input';
 import LayoutContext, {TYPES as EVENT_TYPES} from '../context';
 import {TObjectRelationship} from '../types';
 

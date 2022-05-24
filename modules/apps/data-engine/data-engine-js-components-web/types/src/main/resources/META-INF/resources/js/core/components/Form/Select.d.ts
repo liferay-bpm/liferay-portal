@@ -12,11 +12,7 @@
  * details.
  */
 
-import {ClaySelect} from '@clayui/form';
 import React from 'react';
-
-import FieldBase from './FieldBase';
-
 interface ISelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 	disabled?: boolean;
 	error?: string;
@@ -25,8 +21,7 @@ interface ISelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 	options?: string[];
 	required?: boolean;
 }
-
-export default function Select({
+export declare function Select({
 	className,
 	disabled,
 	error,
@@ -37,35 +32,5 @@ export default function Select({
 	options,
 	required,
 	...otherProps
-}: ISelectProps) {
-	return (
-		<FieldBase
-			className={className}
-			disabled={disabled}
-			errorMessage={error}
-			helpMessage={feedbackMessage}
-			id={id}
-			label={label}
-			required={required}
-		>
-			<ClaySelect
-				{...otherProps}
-				disabled={disabled}
-				id={id}
-				onChange={onChange}
-			>
-				<ClaySelect.Option
-					label={Liferay.Language.get('choose-an-option')}
-				/>
-
-				{options?.map((label, index) => (
-					<ClaySelect.Option
-						key={index}
-						label={label}
-						value={index}
-					/>
-				))}
-			</ClaySelect>
-		</FieldBase>
-	);
-}
+}: ISelectProps): JSX.Element;
+export {};

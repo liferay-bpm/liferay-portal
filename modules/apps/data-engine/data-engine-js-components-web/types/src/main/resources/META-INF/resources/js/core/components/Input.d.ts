@@ -12,22 +12,21 @@
  * details.
  */
 
-/// <reference types="react" />
-
-import {CustomItem} from 'data-engine-js-components-web';
-import {FormError} from '../../../hooks/useForm';
-export default function ActionBuilder({
-	errors,
-	objectActionExecutors,
-	objectActionTriggers,
-	setValues,
-	values,
-}: IProps): JSX.Element;
-interface IProps {
-	errors: FormError<ObjectAction & ObjectActionParameters>;
-	objectActionExecutors: CustomItem[];
-	objectActionTriggers: CustomItem[];
-	setValues: (values: Partial<ObjectAction>) => void;
-	values: Partial<ObjectAction>;
+import React from 'react';
+export declare const Input: React.ForwardRefExoticComponent<
+	IProps & React.RefAttributes<HTMLInputElement>
+>;
+interface IProps
+	extends React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
+	component?: 'input' | 'textarea' | React.ForwardRefExoticComponent<any>;
+	disabled?: boolean;
+	error?: string;
+	feedbackMessage?: string;
+	id?: string;
+	label?: string;
+	name?: string;
+	required?: boolean;
+	type?: 'number' | 'text';
+	value?: string | number | string[];
 }
 export {};

@@ -15,9 +15,9 @@
 import {ClayInput} from '@clayui/form';
 import React from 'react';
 
-import FieldBase from './FieldBase';
+import {FieldBase} from './FieldBase';
 
-const Input: React.ForwardRefExoticComponent<
+export const Input: React.ForwardRefExoticComponent<
 	IProps & React.RefAttributes<HTMLInputElement>
 > = React.forwardRef(
 	(
@@ -65,8 +65,6 @@ const Input: React.ForwardRefExoticComponent<
 		);
 	}
 );
-
-export default Input;
 
 interface IProps
 	extends React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {

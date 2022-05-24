@@ -12,22 +12,13 @@
  * details.
  */
 
-/// <reference types="react" />
-
-import {CustomItem} from 'data-engine-js-components-web';
-import {FormError} from '../../../hooks/useForm';
-export default function ActionBuilder({
-	errors,
-	objectActionExecutors,
-	objectActionTriggers,
-	setValues,
-	values,
-}: IProps): JSX.Element;
-interface IProps {
-	errors: FormError<ObjectAction & ObjectActionParameters>;
-	objectActionExecutors: CustomItem[];
-	objectActionTriggers: CustomItem[];
-	setValues: (values: Partial<ObjectAction>) => void;
-	values: Partial<ObjectAction>;
+import React from 'react';
+import './CustomSelect.scss';
+export declare const CustomSelect: React.ForwardRefExoticComponent<
+	ICustomSelectProps & React.RefAttributes<HTMLDivElement>
+>;
+interface ICustomSelectProps extends React.HTMLAttributes<HTMLDivElement> {
+	contentRight?: React.ReactNode;
+	value?: string;
 }
 export {};

@@ -12,22 +12,23 @@
  * details.
  */
 
-/// <reference types="react" />
-
-import {CustomItem} from 'data-engine-js-components-web';
-import {FormError} from '../../../hooks/useForm';
-export default function ActionBuilder({
-	errors,
-	objectActionExecutors,
-	objectActionTriggers,
-	setValues,
-	values,
+import React from 'react';
+import './Card.scss';
+export declare function Card({
+	children,
+	className,
+	title,
+	tooltip,
+	viewMode,
+	...otherProps
 }: IProps): JSX.Element;
-interface IProps {
-	errors: FormError<ObjectAction & ObjectActionParameters>;
-	objectActionExecutors: CustomItem[];
-	objectActionTriggers: CustomItem[];
-	setValues: (values: Partial<ObjectAction>) => void;
-	values: Partial<ObjectAction>;
+interface IProps extends React.HTMLAttributes<HTMLDivElement> {
+	title: string;
+	tooltip?: ITooltip | null;
+	viewMode?: 'inline' | 'no-padding';
+}
+interface ITooltip {
+	content: string;
+	symbol: string;
 }
 export {};

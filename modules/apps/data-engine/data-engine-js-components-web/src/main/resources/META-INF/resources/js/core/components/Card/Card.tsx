@@ -18,7 +18,7 @@ import React from 'react';
 
 import './Card.scss';
 
-export default function Card({
+export function Card({
 	children,
 	className,
 	title,

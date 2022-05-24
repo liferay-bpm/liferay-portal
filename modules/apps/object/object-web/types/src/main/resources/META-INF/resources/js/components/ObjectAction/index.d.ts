@@ -15,7 +15,7 @@
 /// <reference types="react" />
 
 import 'codemirror/mode/groovy/groovy';
-import {CustomItem} from '../Form/CustomSelect/CustomSelect';
+import {CustomItem} from 'data-engine-js-components-web';
 export default function Action({
 	objectAction: initialValues,
 	objectActionExecutors,

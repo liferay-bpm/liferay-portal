@@ -14,18 +14,22 @@
 
 import 'codemirror/mode/groovy/groovy';
 import {ClayToggle} from '@clayui/form';
-import {FieldFeedback} from 'data-engine-js-components-web';
+import {
+	Card,
+	EditorSidebar,
+	FieldFeedback,
+	Input,
+	InputLocalized,
+	Select,
+} from 'data-engine-js-components-web';
 import React, {ChangeEventHandler, useRef, useState} from 'react';
 
-import Card from '../Card/Card';
-import Sidebar from '../Editor/Sidebar/Sidebar';
-import InputLocalized from '../Form/InputLocalized/InputLocalized';
-import Select from '../Form/Select';
+import {defaultLanguageId} from '../../utils/locale';
 import {ObjectValidationErrors} from '../ObjectValidationFormBase';
+import {METADATAS} from '../ObjectView/context';
 
 import './ObjectValidationTabs.scss';
 import CodeMirrorEditor from '../CodeMirrorEditor';
-import Input from '../Form/Input';
 
 function BasicInfo({
 	componentLabel,
@@ -47,6 +51,7 @@ function BasicInfo({
 		<>
 			<Card title={componentLabel}>
 				<InputLocalized
+					defaultLanguageId={defaultLanguageId}
 					disabled={disabled}
 					error={errors.name}
 					label={Liferay.Language.get('label')}
@@ -148,17 +153,18 @@ function Conditions({
 						</div>
 					</div>
 
-					<Sidebar
+					<EditorSidebar
+						defaultLanguageId={defaultLanguageId}
 						editorRef={editorRef}
-						objectValidationRuleElements={
-							objectValidationRuleElements
-						}
+						metadatasFields={METADATAS}
+						sidebarElements={objectValidationRuleElements}
 					/>
 				</div>
 			</Card>
 
 			<Card title={Liferay.Language.get('error-message')}>
 				<InputLocalized
+					defaultLanguageId={defaultLanguageId}
 					disabled={disabled}
 					error={errors.errorLabel}
 					label={Liferay.Language.get('message')}

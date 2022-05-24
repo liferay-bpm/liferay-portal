@@ -12,22 +12,20 @@
  * details.
  */
 
-/// <reference types="react" />
-
-import {CustomItem} from 'data-engine-js-components-web';
-import {FormError} from '../../../hooks/useForm';
-export default function ActionBuilder({
-	errors,
-	objectActionExecutors,
-	objectActionTriggers,
-	setValues,
-	values,
+import CodeMirror from 'codemirror';
+import React from 'react';
+import './EditorSidebar.scss';
+export declare function EditorSidebar({
+	defaultLanguageId,
+	editorRef,
+	metadatasFields,
+	sidebarElements,
 }: IProps): JSX.Element;
 interface IProps {
-	errors: FormError<ObjectAction & ObjectActionParameters>;
-	objectActionExecutors: CustomItem[];
-	objectActionTriggers: CustomItem[];
-	setValues: (values: Partial<ObjectAction>) => void;
-	values: Partial<ObjectAction>;
+	className?: string;
+	defaultLanguageId: Locale;
+	editorRef: React.MutableRefObject<CodeMirror.Editor | undefined>;
+	metadatasFields: any[];
+	sidebarElements: ObjectValidationRuleElement[];
 }
 export {};

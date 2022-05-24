@@ -12,21 +12,25 @@
  * details.
  */
 
-// @ts-ignore
-
-import {Collapse} from '@liferay/layout-content-page-editor-web';
 import React from 'react';
-
-export function Collapsable({children, label}: ICollapsable) {
-	return (
-		<div className="lfr-objects__object-editor-sidebar-collapsable-button-list">
-			<Collapse label={label} open>
-				{children}
-			</Collapse>
-		</div>
-	);
-}
-interface ICollapsable {
-	children: React.ReactNode;
+interface ISelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+	disabled?: boolean;
+	error?: string;
+	feedbackMessage?: string;
 	label: string;
+	options?: string[];
+	required?: boolean;
 }
+export declare function Select({
+	className,
+	disabled,
+	error,
+	feedbackMessage,
+	id,
+	label,
+	onChange,
+	options,
+	required,
+	...otherProps
+}: ISelectProps): JSX.Element;
+export {};

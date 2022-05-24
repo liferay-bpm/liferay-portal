@@ -17,34 +17,30 @@ import React from 'react';
 
 import './CustomSelect.scss';
 
-const CustomSelect = React.forwardRef<HTMLDivElement, ICustomSelectProps>(
-	(
-		{contentRight, onClick, placeholder, value, ...otherProps},
-		forwardRef
-	) => {
-		return (
-			<div
-				{...otherProps}
-				className="custom-select__content form-control"
-				onClick={onClick}
-				ref={forwardRef}
-				tabIndex={0}
-			>
-				<span>{value || placeholder}</span>
+export const CustomSelect = React.forwardRef<
+	HTMLDivElement,
+	ICustomSelectProps
+>(({contentRight, onClick, placeholder, value, ...otherProps}, forwardRef) => {
+	return (
+		<div
+			{...otherProps}
+			className="custom-select__content form-control"
+			onClick={onClick}
+			ref={forwardRef}
+			tabIndex={0}
+		>
+			<span>{value || placeholder}</span>
 
-				<div>
-					{contentRight}
+			<div>
+				{contentRight}
 
-					<a className="custom-select__icon">
-						<ClayIcon symbol="caret-double" />
-					</a>
-				</div>
+				<a className="custom-select__icon">
+					<ClayIcon symbol="caret-double" />
+				</a>
 			</div>
-		);
-	}
-);
-
-export default CustomSelect;
+		</div>
+	);
+});
 
 interface ICustomSelectProps extends React.HTMLAttributes<HTMLDivElement> {
 	contentRight?: React.ReactNode;
