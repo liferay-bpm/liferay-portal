@@ -95,6 +95,12 @@ public class NotificationQueueEntryLocalServiceUtil {
 		return getService().createPersistedModel(primaryKeyObj);
 	}
 
+	public static void deleteNotificationQueueEntries(java.util.Date sentDate)
+		throws PortalException {
+
+		getService().deleteNotificationQueueEntries(sentDate);
+	}
+
 	/**
 	 * Deletes the notification queue entry with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
@@ -304,6 +310,10 @@ public class NotificationQueueEntryLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
+	public static void sendNotificationQueueEntries() throws Exception {
+		getService().sendNotificationQueueEntries();
+	}
+
 	/**
 	 * Updates the notification queue entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
@@ -319,6 +329,13 @@ public class NotificationQueueEntryLocalServiceUtil {
 
 		return getService().updateNotificationQueueEntry(
 			notificationQueueEntry);
+	}
+
+	public static NotificationQueueEntry updateSent(
+			long notificationQueueEntryId, boolean sent)
+		throws PortalException {
+
+		return getService().updateSent(notificationQueueEntryId, sent);
 	}
 
 	public static NotificationQueueEntryLocalService getService() {

@@ -98,6 +98,14 @@ public class NotificationQueueEntryLocalServiceWrapper
 			primaryKeyObj);
 	}
 
+	@Override
+	public void deleteNotificationQueueEntries(java.util.Date sentDate)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_notificationQueueEntryLocalService.deleteNotificationQueueEntries(
+			sentDate);
+	}
+
 	/**
 	 * Deletes the notification queue entry with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
@@ -345,6 +353,11 @@ public class NotificationQueueEntryLocalServiceWrapper
 			primaryKeyObj);
 	}
 
+	@Override
+	public void sendNotificationQueueEntries() throws Exception {
+		_notificationQueueEntryLocalService.sendNotificationQueueEntries();
+	}
+
 	/**
 	 * Updates the notification queue entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
@@ -363,6 +376,15 @@ public class NotificationQueueEntryLocalServiceWrapper
 
 		return _notificationQueueEntryLocalService.updateNotificationQueueEntry(
 			notificationQueueEntry);
+	}
+
+	@Override
+	public com.liferay.notification.model.NotificationQueueEntry updateSent(
+			long notificationQueueEntryId, boolean sent)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _notificationQueueEntryLocalService.updateSent(
+			notificationQueueEntryId, sent);
 	}
 
 	@Override

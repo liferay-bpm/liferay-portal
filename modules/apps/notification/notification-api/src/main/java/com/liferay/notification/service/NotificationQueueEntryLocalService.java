@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.io.Serializable;
 
+import java.util.Date;
 import java.util.List;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -98,6 +99,9 @@ public interface NotificationQueueEntryLocalService
 	 * @throws PortalException
 	 */
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
+		throws PortalException;
+
+	public void deleteNotificationQueueEntries(Date sentDate)
 		throws PortalException;
 
 	/**
@@ -270,6 +274,8 @@ public interface NotificationQueueEntryLocalService
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
+	public void sendNotificationQueueEntries() throws Exception;
+
 	/**
 	 * Updates the notification queue entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
@@ -283,5 +289,10 @@ public interface NotificationQueueEntryLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public NotificationQueueEntry updateNotificationQueueEntry(
 		NotificationQueueEntry notificationQueueEntry);
+
+	@Indexable(type = IndexableType.REINDEX)
+	public NotificationQueueEntry updateSent(
+			long notificationQueueEntryId, boolean sent)
+		throws PortalException;
 
 }
