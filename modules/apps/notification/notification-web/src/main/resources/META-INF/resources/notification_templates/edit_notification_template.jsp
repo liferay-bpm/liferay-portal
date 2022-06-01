@@ -18,13 +18,19 @@
 
 <%
 ViewNotificationTemplatesDisplayContext viewNotificationTemplatesDisplayContext = (ViewNotificationTemplatesDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
+
+NotificationTemplate notificationTemplate = viewNotificationTemplatesDisplayContext.getNotificationTemplate();
+
+portletDisplay.setShowBackIcon(true);
+
+if (Validator.isNull(redirect)) {
+	portletDisplay.setURLBack(String.valueOf(renderResponse.createRenderURL()));
+}
+else {
+	portletDisplay.setURLBack(redirect);
+}
 %>
 
-<frontend-data-set:headless-display
-	apiURL="<%= viewNotificationTemplatesDisplayContext.getAPIURL() %>"
-	creationMenu="<%= viewNotificationTemplatesDisplayContext.getCreationMenu() %>"
-	fdsActionDropdownItems="<%= viewNotificationTemplatesDisplayContext.getFDSActionDropdownItems() %>"
-	formName="fm"
-	id="<%= NotificationFDSNames.NOTIFICATION_TEMPLATES %>"
-	style="fluid"
-/>
+TODO
+
+<%= notificationTemplate.getName() %>
