@@ -14,10 +14,16 @@
 
 package com.liferay.notification.internal.messaging;
 
+import com.liferay.notification.constants.NotificationConstants;
+import com.liferay.notification.internal.configuration.NotificationQueueEntryConfiguration;
 import com.liferay.notification.service.NotificationQueueEntryLocalService;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
 import com.liferay.portal.kernel.scheduler.SchedulerEntry;
@@ -25,6 +31,7 @@ import com.liferay.portal.kernel.scheduler.SchedulerEntryImpl;
 import com.liferay.portal.kernel.scheduler.TimeUnit;
 import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.scheduler.TriggerFactory;
+import com.liferay.portal.kernel.settings.SystemSettingsLocator;
 import com.liferay.portal.kernel.util.Time;
 
 import java.util.Date;
@@ -39,6 +46,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Gustavo Lima
  */
 @Component(
+	configurationPid = "com.liferay.notification.internal.configuration.NotificationQueueConfiguration",
 	immediate = true, service = CheckNotificationQueueEntryMessageListener.class
 )
 public class CheckNotificationQueueEntryMessageListener
@@ -51,8 +59,21 @@ public class CheckNotificationQueueEntryMessageListener
 
 		String className = clazz.getName();
 
+		try {
+			_notificationQueueEntryConfiguration =
+				_configurationProvider.getConfiguration(
+					NotificationQueueEntryConfiguration.class,
+					new SystemSettingsLocator(
+						NotificationConstants.RESOURCE_NAME));
+		}
+		catch (ConfigurationException configurationException) {
+			_log.error(configurationException);
+		}
+
 		Trigger trigger = _triggerFactory.createTrigger(
-			className, className, null, null, 15, TimeUnit.MINUTE);
+			className, className, null, null,
+			_notificationQueueEntryConfiguration.checkInterval(),
+			TimeUnit.MINUTE);
 
 		SchedulerEntry schedulerEntry = new SchedulerEntryImpl(
 			className, trigger);
@@ -75,8 +96,11 @@ public class CheckNotificationQueueEntryMessageListener
 
 		// Delete old sent notification queue entries
 
+		int deleteInterval =
+			_notificationQueueEntryConfiguration.deleteInterval();
+
 		Date date = new Date(
-			System.currentTimeMillis() - (43200 * Time.MINUTE));
+			System.currentTimeMillis() - (deleteInterval * Time.MINUTE));
 
 		_notificationQueueEntryLocalService.deleteNotificationQueueEntries(
 			date);
@@ -86,6 +110,15 @@ public class CheckNotificationQueueEntryMessageListener
 	protected void setModuleServiceLifecycle(
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		CheckNotificationQueueEntryMessageListener.class);
+
+	@Reference
+	private ConfigurationProvider _configurationProvider;
+
+	private volatile NotificationQueueEntryConfiguration
+		_notificationQueueEntryConfiguration;
 
 	@Reference
 	private NotificationQueueEntryLocalService
