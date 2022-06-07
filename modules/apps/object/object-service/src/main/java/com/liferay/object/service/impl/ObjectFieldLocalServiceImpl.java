@@ -244,6 +244,13 @@ public class ObjectFieldLocalServiceImpl
 	}
 
 	@Override
+	public List<ObjectField> getCustomObjectFields(
+		long objectFieldId, boolean system) {
+
+		return _objectFieldPersistence.findByODI_NotS(objectFieldId, system);
+	}
+
+	@Override
 	public ObjectField getObjectField(long objectFieldId)
 		throws PortalException {
 
