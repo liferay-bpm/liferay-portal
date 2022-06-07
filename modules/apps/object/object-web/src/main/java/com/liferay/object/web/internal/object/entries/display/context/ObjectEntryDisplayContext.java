@@ -605,6 +605,10 @@ public class ObjectEntryDisplayContext {
 					continue;
 				}
 
+				if (objectField.isSystem()) {
+					continue;
+				}
+
 				ddmForm.addDDMFormField(
 					_getDDMFormField(objectField, readOnly));
 			}
