@@ -280,6 +280,14 @@ public class ObjectFieldPersistenceTest {
 	}
 
 	@Test
+	public void testCountByODI_NotS() throws Exception {
+		_persistence.countByODI_NotS(
+			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());
+
+		_persistence.countByODI_NotS(0L, RandomTestUtil.randomBoolean());
+	}
+
+	@Test
 	public void testCountByODI_DBT_I() throws Exception {
 		_persistence.countByODI_DBT_I(
 			RandomTestUtil.nextLong(), "", RandomTestUtil.randomBoolean());
@@ -289,14 +297,6 @@ public class ObjectFieldPersistenceTest {
 
 		_persistence.countByODI_DBT_I(
 			0L, (String)null, RandomTestUtil.randomBoolean());
-	}
-
-	@Test
-	public void testCountByODI_NotS() throws Exception {
-		_persistence.countByODI_NotS(
-			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());
-
-		_persistence.countByODI_NotS(0L, RandomTestUtil.randomBoolean());
 	}
 
 	@Test
