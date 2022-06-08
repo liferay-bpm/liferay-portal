@@ -63,6 +63,7 @@ const normalizeObjectFields: TNormalizeObjectFields = ({
 	objectLayout,
 }) => {
 	const visitor = new TabsVisitor(objectLayout);
+
 	const objectFieldIds = objectFields.map(({id}) => id);
 
 	const normalizedObjectFields = [...objectFields];
@@ -108,7 +109,13 @@ const normalizeObjectRelationships: TNormalizeObjectRelationships = ({
 
 const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 	const [
-		{isViewOnly, objectFields, objectLayout, objectLayoutId},
+		{
+			ffMetadataFieldsAsSystemFields,
+			isViewOnly,
+			objectFields,
+			objectLayout,
+			objectLayoutId,
+		},
 		dispatch,
 	] = useContext(LayoutContext);
 	const [activeIndex, setActiveIndex] = useState<number>(0);
@@ -166,15 +173,32 @@ const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 				items: TObjectField[];
 			} = (await objectFieldsResponse.json()) as any;
 
-			dispatch({
-				payload: {
-					objectFields: normalizeObjectFields({
-						objectFields,
-						objectLayout,
-					}),
-				},
-				type: TYPES.ADD_OBJECT_FIELDS,
-			});
+			if (ffMetadataFieldsAsSystemFields) {
+				const filteredObjectFields = objectFields.filter(
+					({system}) => !system
+				);
+
+				dispatch({
+					payload: {
+						objectFields: normalizeObjectFields({
+							objectFields: filteredObjectFields,
+							objectLayout,
+						}),
+					},
+					type: TYPES.ADD_OBJECT_FIELDS,
+				});
+			}
+			else {
+				dispatch({
+					payload: {
+						objectFields: normalizeObjectFields({
+							objectFields,
+							objectLayout,
+						}),
+					},
+					type: TYPES.ADD_OBJECT_FIELDS,
+				});
+			}
 
 			const {
 				items: objectRelationships,
@@ -196,7 +220,7 @@ const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 		};
 
 		makeFetch();
-	}, [objectLayoutId, dispatch]);
+	}, [ffMetadataFieldsAsSystemFields, objectLayoutId, dispatch]);
 
 	const saveObjectLayout = async () => {
 		const hasFieldsInLayout = objectFields.some(
@@ -284,12 +308,14 @@ const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 };
 
 interface ILayoutWrapperProps extends React.HTMLAttributes<HTMLElement> {
+	ffMetadataFieldsAsSystemFields: boolean;
 	isViewOnly: boolean;
 	objectFieldTypes: ObjectFieldType[];
 	objectLayoutId: string;
 }
 
 const LayoutWrapper: React.FC<ILayoutWrapperProps> = ({
+	ffMetadataFieldsAsSystemFields,
 	isViewOnly,
 	objectFieldTypes,
 	objectLayoutId,
@@ -297,6 +323,7 @@ const LayoutWrapper: React.FC<ILayoutWrapperProps> = ({
 	return (
 		<LayoutContextProvider
 			value={{
+				ffMetadataFieldsAsSystemFields,
 				isViewOnly,
 				objectFieldTypes,
 				objectLayoutId,
