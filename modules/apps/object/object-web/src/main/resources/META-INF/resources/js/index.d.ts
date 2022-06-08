@@ -55,6 +55,7 @@ interface ObjectField {
 	relationshipType?: unknown;
 	required: boolean;
 	state: boolean;
+	system: boolean;
 }
 
 interface ObjectFieldSetting {

@@ -112,7 +112,12 @@ export default function EditObjectField({
 		onSubmit,
 	});
 
-	const disabled = !!(readOnly || isApproved || values.relationshipType);
+	const disabled = !!(
+		readOnly ||
+		isApproved ||
+		values.relationshipType ||
+		values.system
+	);
 
 	const [locale, setSelectedLocale] = useState(
 		defaultLocale as {
