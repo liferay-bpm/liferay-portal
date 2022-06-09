@@ -20,7 +20,9 @@ import com.liferay.notification.service.NotificationQueueEntryLocalService;
 import com.liferay.notification.service.NotificationTemplateLocalService;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.object.util.ObjectFieldUtil;
 import com.liferay.petra.string.StringBundler;
@@ -28,7 +30,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -38,6 +40,7 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -84,7 +87,7 @@ public class ObjectDefinitionNotificationTermContributorTest {
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-				TestPropsValues.getUserId(),
+				user.getUserId(),
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"A" + RandomTestUtil.randomString(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -98,14 +101,21 @@ public class ObjectDefinitionNotificationTermContributorTest {
 		_objectDefinitionLocalService.publishCustomObjectDefinition(
 			user.getUserId(), objectDefinition.getObjectDefinitionId());
 
+		ObjectEntry objectEntry = _objectEntryLocalService.addObjectEntry(
+			user.getUserId(), 0, objectDefinition.getObjectDefinitionId(),
+			Collections.emptyMap(), ServiceContextTestUtil.getServiceContext());
+
 		_notificationTemplateLocalService.sendNotificationTemplate(
 			user.getUserId(), notificationTemplate.getNotificationTemplateId(),
-			objectDefinition.getClassName(), objectDefinition);
+			objectDefinition.getClassName(), objectEntry);
 
 		Assert.assertEquals(
 			1,
 			_notificationQueueEntryLocalService.
 				getNotificationQueueEntriesCount());
+
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinition.getObjectDefinitionId());
 	}
 
 	@Inject
@@ -117,6 +127,9 @@ public class ObjectDefinitionNotificationTermContributorTest {
 
 	@Inject
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Inject
+	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Inject
 	private UserLocalService _userLocalService;
