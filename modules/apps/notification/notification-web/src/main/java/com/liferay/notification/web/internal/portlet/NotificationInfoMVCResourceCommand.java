@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 
@@ -59,9 +60,12 @@ public class NotificationInfoMVCResourceCommand extends BaseMVCResourceCommand {
 
 			termsSet.add(
 				JSONUtil.put(
-					"objectFieldName", objectField.getName()
+					"name", objectField.getLabel(LocaleUtil.getDefault())
 				).put(
-					"term", objectField.getName()
+					"term",
+					"[%" +
+						objectField.getName(
+						).toUpperCase() + "%]"
 				));
 		}
 
