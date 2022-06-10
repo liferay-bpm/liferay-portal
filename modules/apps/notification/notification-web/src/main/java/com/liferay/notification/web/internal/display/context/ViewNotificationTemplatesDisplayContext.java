@@ -16,6 +16,7 @@ package com.liferay.notification.web.internal.display.context;
 
 import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.notification.constants.NotificationActionKeys;
 import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.notification.web.internal.constants.NotificationWebKeys;
@@ -76,17 +77,18 @@ public class ViewNotificationTemplatesDisplayContext {
 			return creationMenu;
 		}
 
-		creationMenu.addDropdownItem(
+		return CreationMenuBuilder.addPrimaryDropdownItem(
 			dropdownItem -> {
-				dropdownItem.setHref("addNotificationTemplate");
+				dropdownItem.setHref(
+					getPortletURL(), "mvcRenderCommandName",
+					"/notification_templates/edit_notification_template",
+					"backURL", _notificationRequestHelper.getCurrentURL());
 				dropdownItem.setLabel(
 					LanguageUtil.get(
 						_notificationRequestHelper.getRequest(),
 						"add-notification-template"));
-				dropdownItem.setTarget("event");
-			});
-
-		return creationMenu;
+			}
+		).build();
 	}
 
 	public Object getEditorConfig(String editorConfigKey) {
