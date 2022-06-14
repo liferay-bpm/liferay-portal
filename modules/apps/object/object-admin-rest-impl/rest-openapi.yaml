@@ -64,6 +64,8 @@ components:
                     format: date
                     readOnly: true
                     type: string
+                externalReferenceCode:
+                    type: string
                 id:
                     format: int64
                     readOnly: true
@@ -114,9 +116,8 @@ components:
                 system:
                     readOnly: true
                     type: boolean
-                titleObjectFieldId:
-                    format: int64
-                    type: integer
+                titleObjectFieldName:
+                    type: string
             type: object
         ObjectField:
             properties:
@@ -247,9 +248,8 @@ components:
                     format: int64
                     readOnly: true
                     type: integer
-                objectFieldId:
-                    format: int64
-                    type: integer
+                objectFieldName:
+                    type: string
                 priority:
                     format: int32
                     type: integer
@@ -310,6 +310,8 @@ components:
                         type: string
                     type: object
                 name:
+                    type: string
+                objectDefinitionExternalReferenceCode2:
                     type: string
                 objectDefinitionId1:
                     format: int64
@@ -615,6 +617,51 @@ paths:
             tags: ["ObjectDefinition"]
         post:
             operationId: postObjectDefinition
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ObjectDefinition"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/ObjectDefinition"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ObjectDefinition"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ObjectDefinition"
+            tags: ["ObjectDefinition"]
+    "/object-definitions/by-external-reference-code/{externalReferenceCode}":
+        get:
+            operationId: getObjectDefinitionByExternalReferenceCode
+            parameters:
+                - in: path
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ObjectDefinition"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ObjectDefinition"
+            tags: ["ObjectDefinition"]
+        put:
+            operationId: putObjectDefinitionByExternalReferenceCode
+            parameters:
+                - in: path
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
             requestBody:
                 content:
                     application/json:
