@@ -37,3 +37,5 @@ export {
 	SidePanelContent,
 	SidePanelForm,
 } from './components/SidePanelContent';
+export {BuilderScreen} from './components/BuilderScreen/BuilderScreen';
+export {ManagementToolbarSearch} from './components/ManagementToolbarSearch';

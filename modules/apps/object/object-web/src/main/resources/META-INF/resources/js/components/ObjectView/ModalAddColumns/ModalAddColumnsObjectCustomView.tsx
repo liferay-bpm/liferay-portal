@@ -16,11 +16,11 @@ import ClayButton from '@clayui/button';
 import ClayForm, {ClayCheckbox} from '@clayui/form';
 import ClayList from '@clayui/list';
 import ClayModal from '@clayui/modal';
+import {ManagementToolbarSearch} from '@liferay/object-js-components-web';
 import {ManagementToolbar} from 'frontend-js-components-web';
 import React, {FormEvent, useContext, useEffect, useState} from 'react';
 
 import {defaultLanguageId} from '../../../utils/locale';
-import {ManagementToolbarSearch} from '../ManagementToolbarSearch/ManagementToolbarSearch';
 import ViewContext, {TYPES} from '../context';
 
 import './ModalAddColumnsObjectCustomView.scss';
