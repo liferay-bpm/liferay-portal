@@ -86,7 +86,7 @@ interface ObjectValidation {
 	engine: string;
 	engineLabel: string;
 	errorLabel: LocalizedValue<string>;
-	ffUseMetadataAsSystemFields: boolean;
+	ffUseMetadataAsSystemFields?: boolean;
 	id: number;
 	name: LocalizedValue<string>;
 	script: string;
