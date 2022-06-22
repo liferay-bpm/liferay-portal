@@ -275,7 +275,7 @@ renderResponse.setTitle(LanguageUtil.format(request, "edit-x", objectDefinition.
 		}
 		else {
 			accountEntryRestrictionSelectElement.className =
-				'form-control disabled';
+				'disabled form-control';
 			accountEntryRestrictionSelectElement.setAttribute('disabled', '');
 			accountEntryRestrictionSelectElement.value = '0';
 		}
