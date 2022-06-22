@@ -1713,7 +1713,7 @@ public class ObjectEntryLocalServiceImpl
 			for (ObjectField objectField : objectFields) {
 				Object value = values.get(objectField.getName());
 
-				if (value == null) {
+				if (Validator.isNull(value)) {
 					continue;
 				}
 
