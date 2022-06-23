@@ -233,7 +233,11 @@ export default function ActionBuilder({
 		const allFields: ObjectField[] = [];
 
 		items.forEach((field) => {
-			if (field.businessType !== 'Relationship' && !field.system) {
+			if (
+				field.businessType !== 'Relationship' &&
+				field.businessType !== 'Aggregation' &&
+				!field.system
+			) {
 				allFields.push(field);
 
 				if (field.required) {
