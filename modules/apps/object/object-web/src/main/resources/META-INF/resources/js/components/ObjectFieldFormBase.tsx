@@ -24,7 +24,13 @@ import {
 	useForm,
 } from '@liferay/object-js-components-web';
 import {fetch, sub} from 'frontend-js-web';
-import React, {ChangeEventHandler, ReactNode, useMemo, useState} from 'react';
+import React, {
+	ChangeEventHandler,
+	ReactNode,
+	useEffect,
+	useMemo,
+	useState,
+} from 'react';
 
 import {HEADERS} from '../utils/constants';
 import {fetchPickListItems} from '../utils/fetchPickListItems';
@@ -133,6 +139,7 @@ async function fetchObjectFields(objectDefinitionId: number) {
 export default function ObjectFieldFormBase({
 	children,
 	disabled,
+	editingField,
 	errors,
 	handleChange,
 	objectDefinitionId,
@@ -150,22 +157,12 @@ export default function ObjectFieldFormBase({
 
 		return businessTypeMap;
 	}, [objectFieldTypes]);
-
-	const [objectRelationships, setObjectRelatonships] = useState<
-		TObjectRelationship[]
-	>([]);
 	const [pickList, setPickList] = useState<IPickList[]>([]);
 	const [pickListItems, setPickListItems] = useState<PickListItems[]>([]);
 
 	const handleTypeChange = async (option: ObjectFieldType) => {
 		if (option.businessType === 'Picklist') {
 			setPickList(await fetchPickList());
-		}
-
-		if (option.businessType === 'Aggregation') {
-			setObjectRelatonships(
-				await fetchObjectRelationships(objectDefinitionId)
-			);
 		}
 
 		let objectFieldSettings: ObjectFieldSetting[] | undefined;
@@ -270,11 +267,12 @@ export default function ObjectFieldFormBase({
 
 			{values.businessType === 'Aggregation' && (
 				<AggregationSourceProperty
+					editingField={editingField}
 					errors={errors}
+					objectDefinitionId={objectDefinitionId}
 					objectFieldSettings={
 						values.objectFieldSettings as ObjectFieldSetting[]
 					}
-					objectRelationships={objectRelationships}
 					setValues={setValues}
 				/>
 			)}
@@ -430,8 +428,8 @@ export function useObjectFieldForm({
 			errors.businessType = REQUIRED_MSG;
 		}
 		else if (field.businessType === 'Aggregation') {
-			if (!settings.relatedObject) {
-				errors.relatedObject = REQUIRED_MSG;
+			if (!settings.relatedObjectDefinition) {
+				errors.relatedObjectDefinition = REQUIRED_MSG;
 			}
 			if (!settings.function) {
 				errors.function = REQUIRED_MSG;
@@ -531,14 +529,16 @@ export function useObjectFieldForm({
 function AggregationSourceProperty({
 	disabled,
 	errors,
-	objectRelationships,
+	editingField,
+	objectDefinitionId,
 	objectFieldSettings = [],
 	setValues,
 }: IAggregationSourcePropertyProps) {
 	const [query, setQuery] = useState<string>('');
-	const [selectedRelatedObject, setSelectRelatedObject] = useState<
-		TObjectRelationship
-	>();
+	const [
+		selectedRelatedObjectDefinition,
+		setSelectRelatedObjectDefinition,
+	] = useState<TObjectRelationship>();
 	const [selectedSummarizeField, setSelectedSummarizeField] = useState<
 		string
 	>();
@@ -546,14 +546,75 @@ function AggregationSourceProperty({
 		selectedAggregationFunction,
 		setSelectedAggregationFunction,
 	] = useState<{label: string; value: string}>();
+	const [objectRelationships, setObjectRelatonships] = useState<
+		TObjectRelationship[]
+	>();
 	const [objectRelationshipFields, setObjectRelationshipFields] = useState<
 		ObjectField[]
 	>();
 
-	const handleChangeRelatedObject = async (
+	useEffect(() => {
+		const makeFetch = async () => {
+			setObjectRelatonships(
+				await fetchObjectRelationships(objectDefinitionId)
+			);
+		};
+
+		makeFetch();
+	}, [objectDefinitionId]);
+
+	useEffect(() => {
+		if (editingField && objectRelationships) {
+			const makeFetch = async () => {
+				const settings = normalizeFieldSettings(objectFieldSettings);
+
+				const [
+					currentRelatedObjectDefinition,
+				] = objectRelationships.filter(
+					(relationship) =>
+						relationship.name === settings.relatedObjectDefinition
+				);
+
+				const [currentFunction] = aggregationFunctions.filter(
+					(aggregationFunction) =>
+						aggregationFunction.value === settings.function
+				);
+
+				const relatedFields = await fetchObjectFields(
+					currentRelatedObjectDefinition.objectDefinitionId2
+				);
+
+				const [currentSummarizeField] = relatedFields.filter(
+					(relatedField) =>
+						relatedField.name === settings.summarizeField
+				);
+
+				setObjectRelationshipFields(
+					relatedFields.filter(
+						(objectField) =>
+							objectField.businessType === 'Integer' ||
+							objectField.businessType === 'LongInteger' ||
+							objectField.businessType === 'Decimal' ||
+							objectField.businessType === 'PrecisionDecimal'
+					)
+				);
+				setSelectRelatedObjectDefinition(
+					currentRelatedObjectDefinition
+				);
+				setSelectedAggregationFunction(currentFunction);
+				setSelectedSummarizeField(
+					currentSummarizeField.label[defaultLanguageId]
+				);
+			};
+
+			makeFetch();
+		}
+	}, [editingField, objectRelationships, objectFieldSettings]);
+
+	const handleChangeRelatedObjectDefinition = async (
 		objectRelationship: TObjectRelationship
 	) => {
-		setSelectRelatedObject(objectRelationship);
+		setSelectRelatedObjectDefinition(objectRelationship);
 		setSelectedSummarizeField('');
 
 		const relatedFields = await fetchObjectFields(
@@ -576,10 +637,11 @@ function AggregationSourceProperty({
 
 		const newObjectFieldSettings: ObjectFieldSetting[] | undefined = [
 			...fieldSettingWithoutSummarizeField.filter(
-				(fieldSettings) => fieldSettings.name !== 'relatedObject'
+				(fieldSettings) =>
+					fieldSettings.name !== 'relatedObjectDefinition'
 			),
 			{
-				name: 'relatedObject',
+				name: 'relatedObjectDefinition',
 				value: objectRelationship.name,
 			},
 		];
@@ -663,16 +725,18 @@ function AggregationSourceProperty({
 				emptyStateMessage={Liferay.Language.get(
 					'no-related-objects-were-found'
 				)}
-				error={errors.relatedObject}
+				error={errors.relatedObjectDefinition}
 				items={objectRelationships ?? []}
 				label={Liferay.Language.get('related-object')}
 				onChangeQuery={setQuery}
 				onSelectItem={(item: TObjectRelationship) => {
-					handleChangeRelatedObject(item);
+					handleChangeRelatedObjectDefinition(item);
 				}}
 				query={query}
 				required
-				value={selectedRelatedObject?.label[defaultLanguageId]}
+				value={
+					selectedRelatedObjectDefinition?.label[defaultLanguageId]
+				}
 			>
 				{({label}) => (
 					<div className="d-flex justify-content-between">
@@ -810,9 +874,10 @@ function AttachmentSourceProperty({
 
 interface IAggregationSourcePropertyProps {
 	disabled?: boolean;
+	editingField?: boolean;
 	errors: ObjectFieldErrors;
+	objectDefinitionId: number;
 	objectFieldSettings: ObjectFieldSetting[];
-	objectRelationships: TObjectRelationship[];
 	setValues: (values: Partial<ObjectField>) => void;
 }
 
@@ -836,6 +901,7 @@ interface IPickList extends ItemIdName {}
 interface IProps {
 	children?: ReactNode;
 	disabled?: boolean;
+	editingField?: boolean;
 	errors: ObjectFieldErrors;
 	handleChange: ChangeEventHandler<HTMLInputElement>;
 	objectDefinitionId: number;

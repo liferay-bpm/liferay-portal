@@ -168,6 +168,7 @@ export default function EditObjectField({
 
 				<ObjectFieldFormBase
 					disabled={disabled}
+					editingField
 					errors={errors}
 					handleChange={handleChange}
 					objectDefinitionId={objectDefinitionId}

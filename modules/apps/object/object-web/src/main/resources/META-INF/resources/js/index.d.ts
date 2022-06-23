@@ -114,7 +114,7 @@ type ObjectFieldSettingName =
 	| 'showCounter'
 	| 'showFilesInDocumentsAndMedia'
 	| 'storageDLFolderPath'
-	| 'relatedObject'
+	| 'relatedObjectDefinition'
 	| 'function'
 	| 'summarizeField';
 

@@ -49,7 +49,7 @@ public class AggregationObjectFieldBusinessType
 	@Override
 	public Set<String> getAllowedObjectFieldSettingsNames() {
 		return SetUtil.fromArray(
-			"function", "relatedObjectEntry", "summarizeField");
+			"function", "relatedObjectDefinition", "summarizeField");
 	}
 
 	@Override
@@ -103,7 +103,8 @@ public class AggregationObjectFieldBusinessType
 
 	@Override
 	public Set<String> getRequiredObjectFieldSettingsNames() {
-		return SetUtil.fromArray("function", "relatedObject", "summarizeField");
+		return SetUtil.fromArray(
+			"function", "relatedObjectDefinition", "summarizeField");
 	}
 
 	@Reference
