@@ -764,25 +764,15 @@ public class ObjectDefinitionLocalServiceImpl
 		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-154872"))) {
 			_objectFieldLocalService.addSystemObjectField(
 				userId, objectDefinition.getObjectDefinitionId(), "Date",
-				ObjectEntryTable.INSTANCE.status.getName(),
-				ObjectEntryTable.INSTANCE.getTableName(), "Date", false, false,
-				null,
+				ObjectEntryTable.INSTANCE.createDate.getName(), "ObjectEntry",
+				"Date", false, false, null,
 				LocalizedMapUtil.getLocalizedMap(
 					LanguageUtil.get(LocaleUtil.getDefault(), "create-date")),
-				"dateCreated", false);
-
-			_objectFieldLocalService.addSystemObjectField(
-				userId, objectDefinition.getObjectDefinitionId(), "Text",
-				ObjectEntryTable.INSTANCE.status.getName(),
-				ObjectEntryTable.INSTANCE.getTableName(), "String", false,
-				false, null,
-				LocalizedMapUtil.getLocalizedMap(
-					LanguageUtil.get(LocaleUtil.getDefault(), "author")),
-				"creator", false);
+				"createDate", false);
 
 			_objectFieldLocalService.addSystemObjectField(
 				userId, objectDefinition.getObjectDefinitionId(), "Integer",
-				ObjectEntryTable.INSTANCE.status.getName(),
+				ObjectEntryTable.INSTANCE.objectEntryId.getName(),
 				ObjectEntryTable.INSTANCE.getTableName(), "Integer", false,
 				false, null,
 				LocalizedMapUtil.getLocalizedMap(
@@ -791,21 +781,27 @@ public class ObjectDefinitionLocalServiceImpl
 
 			_objectFieldLocalService.addSystemObjectField(
 				userId, objectDefinition.getObjectDefinitionId(), "Date",
-				ObjectEntryTable.INSTANCE.status.getName(),
-				ObjectEntryTable.INSTANCE.getTableName(), "Date", false, false,
-				null,
+				ObjectEntryTable.INSTANCE.modifiedDate.getName(), "ObjectEntry",
+				"Date", false, false, null,
 				LocalizedMapUtil.getLocalizedMap(
 					LanguageUtil.get(LocaleUtil.getDefault(), "modified-date")),
-				"dateModified", false);
+				"modifiedDate", false);
 
 			_objectFieldLocalService.addSystemObjectField(
 				userId, objectDefinition.getObjectDefinitionId(), "Text",
-				ObjectEntryTable.INSTANCE.status.getName(),
-				ObjectEntryTable.INSTANCE.getTableName(), "Integer", false,
-				false, null,
+				ObjectEntryTable.INSTANCE.status.getName(), "ObjectEntry",
+				"Integer", false, false, null,
 				LocalizedMapUtil.getLocalizedMap(
 					LanguageUtil.get(LocaleUtil.getDefault(), "status")),
 				"status", false);
+
+			_objectFieldLocalService.addSystemObjectField(
+				userId, objectDefinition.getObjectDefinitionId(), "Text",
+				ObjectEntryTable.INSTANCE.userName.getName(), "ObjectEntry",
+				"String", false, false, null,
+				LocalizedMapUtil.getLocalizedMap(
+					LanguageUtil.get(LocaleUtil.getDefault(), "author")),
+				"userName", false);
 		}
 
 		if (objectFields != null) {
