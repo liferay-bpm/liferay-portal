@@ -188,8 +188,8 @@ public class ObjectDefinitionLocalServiceImpl
 			_objectFieldLocalService.addSystemObjectField(
 				userId, objectDefinition.getObjectDefinitionId(), "Text",
 				ObjectEntryTable.INSTANCE.status.getName(),
-				ObjectEntryTable.INSTANCE.getTableName(), "Integer", false,
-				false, null,
+				ObjectEntryTable.INSTANCE.getTableName(), "Integer", null,
+				false, false, null,
 				LocalizedMapUtil.getLocalizedMap(
 					LanguageUtil.get(LocaleUtil.getDefault(), "status")),
 				"status", false);
