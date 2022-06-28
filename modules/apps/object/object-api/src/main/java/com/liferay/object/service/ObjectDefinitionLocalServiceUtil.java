@@ -58,6 +58,13 @@ public class ObjectDefinitionLocalServiceUtil {
 			pluralLabelMap, scope, storageType, objectFields);
 	}
 
+	public static ObjectDefinition addObjectDefinition(
+			long userId, String externalReferenceCode)
+		throws PortalException {
+
+		return getService().addObjectDefinition(userId, externalReferenceCode);
+	}
+
 	/**
 	 * Adds the object definition to the database. Also notifies the appropriate model listeners.
 	 *
@@ -285,6 +292,31 @@ public class ObjectDefinitionLocalServiceUtil {
 	}
 
 	/**
+	 * Returns the object definition with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the object definition's external reference code
+	 * @return the matching object definition, or <code>null</code> if a matching object definition could not be found
+	 */
+	public static ObjectDefinition fetchObjectDefinitionByExternalReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return getService().fetchObjectDefinitionByExternalReferenceCode(
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchObjectDefinitionByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	public static ObjectDefinition fetchObjectDefinitionByReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return getService().fetchObjectDefinitionByReferenceCode(
+			companyId, externalReferenceCode);
+	}
+
+	/**
 	 * Returns the object definition with the matching UUID and company.
 	 *
 	 * @param uuid the object definition's UUID
@@ -336,6 +368,22 @@ public class ObjectDefinitionLocalServiceUtil {
 		throws PortalException {
 
 		return getService().getObjectDefinition(objectDefinitionId);
+	}
+
+	/**
+	 * Returns the object definition with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the object definition's external reference code
+	 * @return the matching object definition
+	 * @throws PortalException if a matching object definition could not be found
+	 */
+	public static ObjectDefinition getObjectDefinitionByExternalReferenceCode(
+			long companyId, String externalReferenceCode)
+		throws PortalException {
+
+		return getService().getObjectDefinitionByExternalReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -453,6 +501,14 @@ public class ObjectDefinitionLocalServiceUtil {
 			descriptionObjectFieldId, titleObjectFieldId,
 			accountEntryRestricted, active, labelMap, name, panelAppOrder,
 			panelCategoryKey, portlet, pluralLabelMap, scope);
+	}
+
+	public static ObjectDefinition updateExternalReferenceCode(
+			long objectDefinitionId, String externalReferenceCode)
+		throws com.liferay.object.exception.NoSuchObjectDefinitionException {
+
+		return getService().updateExternalReferenceCode(
+			objectDefinitionId, externalReferenceCode);
 	}
 
 	/**

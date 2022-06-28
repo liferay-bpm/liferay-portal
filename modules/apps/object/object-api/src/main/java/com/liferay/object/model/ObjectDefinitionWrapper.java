@@ -45,6 +45,7 @@ public class ObjectDefinitionWrapper
 
 		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
+		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("objectDefinitionId", getObjectDefinitionId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
@@ -91,6 +92,13 @@ public class ObjectDefinitionWrapper
 
 		if (uuid != null) {
 			setUuid(uuid);
+		}
+
+		String externalReferenceCode = (String)attributes.get(
+			"externalReferenceCode");
+
+		if (externalReferenceCode != null) {
+			setExternalReferenceCode(externalReferenceCode);
 		}
 
 		Long objectDefinitionId = (Long)attributes.get("objectDefinitionId");
@@ -358,6 +366,16 @@ public class ObjectDefinitionWrapper
 	@Override
 	public String getExtensionDBTableName() {
 		return model.getExtensionDBTableName();
+	}
+
+	/**
+	 * Returns the external reference code of this object definition.
+	 *
+	 * @return the external reference code of this object definition
+	 */
+	@Override
+	public String getExternalReferenceCode() {
+		return model.getExternalReferenceCode();
 	}
 
 	/**
@@ -883,6 +901,16 @@ public class ObjectDefinitionWrapper
 	@Override
 	public void setDescriptionObjectFieldId(long descriptionObjectFieldId) {
 		model.setDescriptionObjectFieldId(descriptionObjectFieldId);
+	}
+
+	/**
+	 * Sets the external reference code of this object definition.
+	 *
+	 * @param externalReferenceCode the external reference code of this object definition
+	 */
+	@Override
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		model.setExternalReferenceCode(externalReferenceCode);
 	}
 
 	/**

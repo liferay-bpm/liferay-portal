@@ -78,12 +78,14 @@ public class ObjectDefinitionCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(57);
+		StringBundler sb = new StringBundler(59);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
 		sb.append(", uuid=");
 		sb.append(uuid);
+		sb.append(", externalReferenceCode=");
+		sb.append(externalReferenceCode);
 		sb.append(", objectDefinitionId=");
 		sb.append(objectDefinitionId);
 		sb.append(", companyId=");
@@ -152,6 +154,14 @@ public class ObjectDefinitionCacheModel
 		}
 		else {
 			objectDefinitionImpl.setUuid(uuid);
+		}
+
+		if (externalReferenceCode == null) {
+			objectDefinitionImpl.setExternalReferenceCode("");
+		}
+		else {
+			objectDefinitionImpl.setExternalReferenceCode(
+				externalReferenceCode);
 		}
 
 		objectDefinitionImpl.setObjectDefinitionId(objectDefinitionId);
@@ -280,6 +290,7 @@ public class ObjectDefinitionCacheModel
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
 		uuid = objectInput.readUTF();
+		externalReferenceCode = objectInput.readUTF();
 
 		objectDefinitionId = objectInput.readLong();
 
@@ -329,6 +340,13 @@ public class ObjectDefinitionCacheModel
 		}
 		else {
 			objectOutput.writeUTF(uuid);
+		}
+
+		if (externalReferenceCode == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(externalReferenceCode);
 		}
 
 		objectOutput.writeLong(objectDefinitionId);
@@ -445,6 +463,7 @@ public class ObjectDefinitionCacheModel
 
 	public long mvccVersion;
 	public String uuid;
+	public String externalReferenceCode;
 	public long objectDefinitionId;
 	public long companyId;
 	public long userId;

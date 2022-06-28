@@ -128,6 +128,9 @@ public class ObjectDefinitionPersistenceTest {
 
 		newObjectDefinition.setUuid(RandomTestUtil.randomString());
 
+		newObjectDefinition.setExternalReferenceCode(
+			RandomTestUtil.randomString());
+
 		newObjectDefinition.setCompanyId(RandomTestUtil.nextLong());
 
 		newObjectDefinition.setUserId(RandomTestUtil.nextLong());
@@ -192,6 +195,9 @@ public class ObjectDefinitionPersistenceTest {
 			newObjectDefinition.getMvccVersion());
 		Assert.assertEquals(
 			existingObjectDefinition.getUuid(), newObjectDefinition.getUuid());
+		Assert.assertEquals(
+			existingObjectDefinition.getExternalReferenceCode(),
+			newObjectDefinition.getExternalReferenceCode());
 		Assert.assertEquals(
 			existingObjectDefinition.getObjectDefinitionId(),
 			newObjectDefinition.getObjectDefinitionId());
@@ -350,6 +356,15 @@ public class ObjectDefinitionPersistenceTest {
 	}
 
 	@Test
+	public void testCountByC_ERC() throws Exception {
+		_persistence.countByC_ERC(RandomTestUtil.nextLong(), "");
+
+		_persistence.countByC_ERC(0L, "null");
+
+		_persistence.countByC_ERC(0L, (String)null);
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		ObjectDefinition newObjectDefinition = addObjectDefinition();
 
@@ -375,10 +390,10 @@ public class ObjectDefinitionPersistenceTest {
 	protected OrderByComparator<ObjectDefinition> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
 			"ObjectDefinition", "mvccVersion", true, "uuid", true,
-			"objectDefinitionId", true, "companyId", true, "userId", true,
-			"userName", true, "createDate", true, "modifiedDate", true,
-			"accountEntryRestrictedObjectFieldId", true,
-			"descriptionObjectFieldId", true, "titleObjectFieldId", true,
+			"externalReferenceCode", true, "objectDefinitionId", true,
+			"companyId", true, "userId", true, "userName", true, "createDate",
+			true, "modifiedDate", true, "accountEntryRestrictedObjectFieldId",
+			true, "descriptionObjectFieldId", true, "titleObjectFieldId", true,
 			"accountEntryRestricted", true, "active", true, "dbTableName", true,
 			"label", true, "className", true, "name", true, "panelAppOrder",
 			true, "panelCategoryKey", true, "pkObjectFieldDBColumnName", true,
@@ -677,6 +692,17 @@ public class ObjectDefinitionPersistenceTest {
 			ReflectionTestUtil.invoke(
 				objectDefinition, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "name"));
+
+		Assert.assertEquals(
+			Long.valueOf(objectDefinition.getCompanyId()),
+			ReflectionTestUtil.<Long>invoke(
+				objectDefinition, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "companyId"));
+		Assert.assertEquals(
+			objectDefinition.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				objectDefinition, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
 	}
 
 	protected ObjectDefinition addObjectDefinition() throws Exception {
@@ -687,6 +713,9 @@ public class ObjectDefinitionPersistenceTest {
 		objectDefinition.setMvccVersion(RandomTestUtil.nextLong());
 
 		objectDefinition.setUuid(RandomTestUtil.randomString());
+
+		objectDefinition.setExternalReferenceCode(
+			RandomTestUtil.randomString());
 
 		objectDefinition.setCompanyId(RandomTestUtil.nextLong());
 
