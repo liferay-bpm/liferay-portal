@@ -163,7 +163,7 @@ public class ObjectLayoutResourceTest extends BaseObjectLayoutResourceTestCase {
 	private ObjectLayoutColumn _randomObjectLayoutColumn() {
 		return new ObjectLayoutColumn() {
 			{
-				objectFieldId = _objectField.getObjectFieldId();
+				objectFieldName = _objectField.getName();
 				priority = RandomTestUtil.randomInt();
 				size = RandomTestUtil.randomInt(1, 12);
 			}

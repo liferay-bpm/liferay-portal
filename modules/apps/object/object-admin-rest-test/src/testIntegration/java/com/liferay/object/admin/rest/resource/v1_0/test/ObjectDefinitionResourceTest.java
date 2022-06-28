@@ -187,8 +187,6 @@ public class ObjectDefinitionResourceTest
 			objectDefinition.setStorageType(StringPool.BLANK);
 		}
 
-		objectDefinition.setTitleObjectFieldId(Long.valueOf(0));
-
 		return objectDefinition;
 	}
 
