@@ -28,11 +28,13 @@ import com.liferay.object.internal.upgrade.v3_2_0.ObjectValidationRuleUpgradePro
 import com.liferay.object.internal.upgrade.v3_3_0.util.ObjectViewFilterColumnTable;
 import com.liferay.object.internal.upgrade.v3_4_0.ObjectActionUpgradeProcess;
 import com.liferay.object.internal.upgrade.v3_9_0.ObjectLayoutBoxUpgradeProcess;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.portal.kernel.upgrade.BaseExternalReferenceCodeUpgradeProcess;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marco Leo
@@ -134,6 +136,14 @@ public class ObjectServiceUpgrade implements UpgradeStepRegistrator {
 			"3.13.0", "3.14.0",
 			new com.liferay.object.internal.upgrade.v3_14_0.
 				ObjectFieldUpgradeProcess());
+
+		registry.register(
+			"3.14.0", "3.15.0",
+			new com.liferay.object.internal.upgrade.v3_15_0.
+				ObjectFieldUpgradeProcess(_objectFieldLocalService));
 	}
+
+	@Reference
+	private ObjectFieldLocalService _objectFieldLocalService;
 
 }
