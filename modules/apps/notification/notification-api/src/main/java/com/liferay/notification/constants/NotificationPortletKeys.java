@@ -19,6 +19,10 @@ package com.liferay.notification.constants;
  */
 public class NotificationPortletKeys {
 
+	public static final String NOTIFICATION_QUEUE_ENTRY =
+		"com_liferay_notification_web_internal_portlet" +
+			"_NotificationQueueEntryPortlet";
+
 	public static final String NOTIFICATION_TEMPLATES =
 		"com_liferay_notification_web_internal_portlet" +
 			"_NotificationTemplatesPortlet";
