@@ -48,10 +48,7 @@ public class ObjectFieldSettingUtil {
 
 		return new ObjectFieldSetting() {
 			{
-				id = serviceBuilderObjectFieldSetting.getObjectFieldId();
 				name = serviceBuilderObjectFieldSetting.getName();
-				objectFieldId =
-					serviceBuilderObjectFieldSetting.getObjectFieldId();
 				value = serviceBuilderObjectFieldSetting.getValue();
 			}
 		};
