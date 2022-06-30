@@ -1,4 +1,3 @@
-<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -12,19 +11,13 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
---%>
 
-<%@ include file="/init.jsp" %>
+/// <reference types="react" />
 
-<%
-ViewNotificationQueueEntryDisplayContext viewNotificationQueueEntryDisplayContext = (ViewNotificationQueueEntryDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
-%>
-
-<frontend-data-set:headless-display
-	apiURL="<%= viewNotificationQueueEntryDisplayContext.getAPIURL() %>"
-	fdsActionDropdownItems="<%= viewNotificationQueueEntryDisplayContext.getFDSActionDropdownItems() %>"
-	formName="fm"
-	id="<%= NotificationFDSNames.NOTIFICATION_QUEUE_ENTRY %>"
-	propsTransformer="js/NotificationQueueEntryFDSPropsTransformer"
-	style="fluid"
-/>
+export default function ObjectActionStatusDataRenderer({
+	value,
+}: IProps): JSX.Element;
+interface IProps {
+	value: boolean;
+}
+export {};

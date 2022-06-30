@@ -1,4 +1,3 @@
-<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -12,19 +11,14 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
---%>
 
-<%@ include file="/init.jsp" %>
+import NotificationQueueEntryStatusDataRenderer from './NotificationQueueEntryStatusDataRenderer';
 
-<%
-ViewNotificationQueueEntryDisplayContext viewNotificationQueueEntryDisplayContext = (ViewNotificationQueueEntryDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
-%>
-
-<frontend-data-set:headless-display
-	apiURL="<%= viewNotificationQueueEntryDisplayContext.getAPIURL() %>"
-	fdsActionDropdownItems="<%= viewNotificationQueueEntryDisplayContext.getFDSActionDropdownItems() %>"
-	formName="fm"
-	id="<%= NotificationFDSNames.NOTIFICATION_QUEUE_ENTRY %>"
-	propsTransformer="js/NotificationQueueEntryFDSPropsTransformer"
-	style="fluid"
-/>
+export default function propsTransformer({...otherProps}) {
+	return {
+		...otherProps,
+		customDataRenderers: {
+			notificationQueueEntryStatusDataRenderer: NotificationQueueEntryStatusDataRenderer,
+		},
+	};
+}
