@@ -594,7 +594,8 @@ public class ObjectFieldLocalServiceImpl
 				).findFirst();
 
 			if (!objectFieldSettingOptional.isPresent()) {
-				_objectFieldSettingPersistence.remove(oldObjectFieldSetting);
+				_objectFieldSettingLocalService.deleteObjectFieldSetting(
+					oldObjectFieldSetting.getObjectFieldSettingId());
 			}
 		}
 

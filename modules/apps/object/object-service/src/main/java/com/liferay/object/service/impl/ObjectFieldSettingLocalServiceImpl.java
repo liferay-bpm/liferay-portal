@@ -70,22 +70,30 @@ public class ObjectFieldSettingLocalServiceImpl
 		_addObjectFieldSetting(userId, objectFieldId, name, value);
 	}
 
+	@Override
+	public ObjectFieldSetting deleteObjectFieldSetting(
+			long objectFieldSettingId)
+		throws PortalException {
 
 		ObjectFieldSetting objectFieldSetting =
-			objectFieldSettingPersistence.create(
-				counterLocalService.increment());
+			objectFieldSettingPersistence.findByPrimaryKey(
+				objectFieldSettingId);
 
-		User user = _userLocalService.getUser(userId);
+		ObjectField objectField = _objectFieldPersistence.findByPrimaryKey(
+			objectFieldSetting.getObjectFieldId());
 
-		objectFieldSetting.setCompanyId(user.getCompanyId());
-		objectFieldSetting.setUserId(user.getUserId());
-		objectFieldSetting.setUserName(user.getFullName());
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-156704")) &&
+			Objects.equals(
+				objectField.getBusinessType(),
+				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) &&
+			Objects.equals(
+				objectFieldSetting.getName(), ObjectFilterConstants.FILTER)) {
 
-		objectFieldSetting.setObjectFieldId(objectFieldId);
-		objectFieldSetting.setName(name);
-		objectFieldSetting.setValue(value);
+			_objectFilterLocalService.deleteObjectFilter(
+				GetterUtil.getLong(objectFieldSetting.getValue()));
+		}
 
-		return objectFieldSettingPersistence.update(objectFieldSetting);
+		return objectFieldSettingPersistence.remove(objectFieldSetting);
 	}
 
 	@Override
