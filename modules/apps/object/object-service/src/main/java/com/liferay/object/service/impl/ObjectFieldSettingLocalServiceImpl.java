@@ -258,7 +258,7 @@ public class ObjectFieldSettingLocalServiceImpl
 					jsonObject.getString(ObjectFilterConstants.JSON));
 
 			_addObjectFieldSetting(
-				userId, objectFieldId, "filter",
+				userId, objectFieldId, "filter" + i,
 				String.valueOf(objectFilter.getObjectFilterId()));
 		}
 	}
