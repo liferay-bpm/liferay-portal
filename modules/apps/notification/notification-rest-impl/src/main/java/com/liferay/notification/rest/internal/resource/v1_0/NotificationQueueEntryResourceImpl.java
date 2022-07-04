@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -50,6 +51,8 @@ public class NotificationQueueEntryResourceImpl
 	public void deleteNotificationQueueEntry(Long notificationQueueEntryId)
 		throws Exception {
 
+		_checkFeatureFlag();
+
 		_notificationQueueEntryService.deleteNotificationQueueEntry(
 			notificationQueueEntryId);
 	}
@@ -58,6 +61,8 @@ public class NotificationQueueEntryResourceImpl
 	public NotificationQueueEntry getNotificationQueueEntry(
 			Long notificationQueueEntryId)
 		throws Exception {
+
+		_checkFeatureFlag();
 
 		return _toNotificationQueueEntry(
 			_notificationQueueEntryService.getNotificationQueueEntry(
@@ -69,6 +74,8 @@ public class NotificationQueueEntryResourceImpl
 			String search, Aggregation aggregation, Filter filter,
 			Pagination pagination, Sort[] sorts)
 		throws Exception {
+
+		_checkFeatureFlag();
 
 		return SearchUtil.search(
 			HashMapBuilder.put(
@@ -100,8 +107,16 @@ public class NotificationQueueEntryResourceImpl
 	public void putNotificationQueueEntryResend(Long notificationQueueEntryId)
 		throws Exception {
 
+		_checkFeatureFlag();
+
 		_notificationQueueEntryService.resendNotificationQueueEntry(
 			notificationQueueEntryId);
+	}
+
+	private void _checkFeatureFlag() throws Exception {
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-149051"))) {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	private NotificationQueueEntry _toNotificationQueueEntry(
