@@ -196,8 +196,7 @@ public class ObjectFieldSettingLocalServiceImpl
 
 	@Override
 	public ObjectFieldSetting updateObjectFieldSetting(
-			long objectFieldSettingId, String value)
-		throws PortalException {
+		long objectFieldSettingId, String value) {
 
 		ObjectFieldSetting objectFieldSetting =
 			objectFieldSettingPersistence.fetchByPrimaryKey(
