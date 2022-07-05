@@ -102,6 +102,43 @@ public class ObjectFieldSettingLocalServiceImpl
 		return objectFieldSettingPersistence.remove(objectFieldSetting);
 	}
 
+	public void deleteObjectFieldSettingByObjectFieldId(long objectFieldId)
+		throws PortalException {
+
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-156704"))) {
+			objectFieldSettingPersistence.removeByObjectFieldId(objectFieldId);
+
+			return;
+		}
+
+		ObjectField objectField = _objectFieldPersistence.findByPrimaryKey(
+			objectFieldId);
+
+		if (!Objects.equals(
+				objectField.getBusinessType(),
+				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
+
+			objectFieldSettingPersistence.removeByObjectFieldId(
+				objectField.getObjectFieldId());
+		}
+
+		List<ObjectFieldSetting> objectFieldSettings =
+			objectFieldSettingPersistence.findByObjectFieldId(objectFieldId);
+
+		for (ObjectFieldSetting objectFieldSetting : objectFieldSettings) {
+			if (StringUtil.startsWith(
+					objectFieldSetting.getName(),
+					ObjectFilterConstants.FILTER)) {
+
+				_objectFilterLocalService.deleteObjectFilter(
+					GetterUtil.getLong(objectFieldSetting.getValue()));
+			}
+
+			objectFieldSettingPersistence.remove(
+				objectFieldSetting.getObjectFieldSettingId());
+		}
+	}
+
 	@Override
 	public ObjectFieldSetting fetchObjectFieldSetting(
 		long objectFieldId, String name) {

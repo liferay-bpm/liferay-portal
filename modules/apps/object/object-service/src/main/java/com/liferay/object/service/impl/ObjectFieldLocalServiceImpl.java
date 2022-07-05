@@ -221,8 +221,9 @@ public class ObjectFieldLocalServiceImpl
 
 			objectFieldPersistence.remove(objectField);
 
-			_objectFieldSettingPersistence.removeByObjectFieldId(
-				objectField.getObjectFieldId());
+			_objectFieldSettingLocalService.
+				deleteObjectFieldSettingByObjectFieldId(
+					objectField.getObjectFieldId());
 		}
 	}
 
@@ -689,7 +690,7 @@ public class ObjectFieldLocalServiceImpl
 			objectFieldSettingFileSource = objectFieldSetting.getValue();
 		}
 
-		_objectFieldSettingPersistence.removeByObjectFieldId(
+		_objectFieldSettingLocalService.deleteObjectFieldSettingByObjectFieldId(
 			objectField.getObjectFieldId());
 
 		_objectLayoutColumnPersistence.removeByObjectFieldId(
