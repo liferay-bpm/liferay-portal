@@ -63,7 +63,7 @@ public interface ObjectFieldSettingLocalService
 	 *
 	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.object.service.impl.ObjectFieldSettingLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the object field setting local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link ObjectFieldSettingLocalServiceUtil} if injection and service tracking are not available.
 	 */
-	public ObjectFieldSetting addObjectFieldSetting(
+	public void addObjectFieldSetting(
 			long userId, long objectFieldId, String name, String value)
 		throws PortalException;
 
@@ -126,6 +126,9 @@ public interface ObjectFieldSettingLocalService
 	@Indexable(type = IndexableType.DELETE)
 	public ObjectFieldSetting deleteObjectFieldSetting(
 		ObjectFieldSetting objectFieldSetting);
+
+	public void deleteObjectFieldSettingByObjectFieldId(long objectFieldId)
+		throws PortalException;
 
 	/**
 	 * @throws PortalException
@@ -274,7 +277,8 @@ public interface ObjectFieldSettingLocalService
 	public List<ObjectFieldSetting> getObjectFieldSettings(int start, int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<ObjectFieldSetting> getObjectFieldSettings(long objectFieldId);
+	public List<ObjectFieldSetting> getObjectFieldSettingsByObjectFieldId(
+		long objectFieldId);
 
 	/**
 	 * Returns the number of object field settings.
@@ -300,8 +304,7 @@ public interface ObjectFieldSettingLocalService
 		throws PortalException;
 
 	public ObjectFieldSetting updateObjectFieldSetting(
-			long objectFieldSettingId, String value)
-		throws PortalException;
+		long objectFieldSettingId, String value);
 
 	/**
 	 * Updates the object field setting in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.

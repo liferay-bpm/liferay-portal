@@ -44,12 +44,11 @@ public class ObjectFieldSettingLocalServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.object.service.impl.ObjectFieldSettingLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static ObjectFieldSetting addObjectFieldSetting(
+	public static void addObjectFieldSetting(
 			long userId, long objectFieldId, String name, String value)
 		throws PortalException {
 
-		return getService().addObjectFieldSetting(
-			userId, objectFieldId, name, value);
+		getService().addObjectFieldSetting(userId, objectFieldId, name, value);
 	}
 
 	/**
@@ -122,6 +121,13 @@ public class ObjectFieldSettingLocalServiceUtil {
 		ObjectFieldSetting objectFieldSetting) {
 
 		return getService().deleteObjectFieldSetting(objectFieldSetting);
+	}
+
+	public static void deleteObjectFieldSettingByObjectFieldId(
+			long objectFieldId)
+		throws PortalException {
+
+		getService().deleteObjectFieldSettingByObjectFieldId(objectFieldId);
 	}
 
 	/**
@@ -313,10 +319,11 @@ public class ObjectFieldSettingLocalServiceUtil {
 		return getService().getObjectFieldSettings(start, end);
 	}
 
-	public static List<ObjectFieldSetting> getObjectFieldSettings(
-		long objectFieldId) {
+	public static List<ObjectFieldSetting>
+		getObjectFieldSettingsByObjectFieldId(long objectFieldId) {
 
-		return getService().getObjectFieldSettings(objectFieldId);
+		return getService().getObjectFieldSettingsByObjectFieldId(
+			objectFieldId);
 	}
 
 	/**
@@ -347,8 +354,7 @@ public class ObjectFieldSettingLocalServiceUtil {
 	}
 
 	public static ObjectFieldSetting updateObjectFieldSetting(
-			long objectFieldSettingId, String value)
-		throws PortalException {
+		long objectFieldSettingId, String value) {
 
 		return getService().updateObjectFieldSetting(
 			objectFieldSettingId, value);
