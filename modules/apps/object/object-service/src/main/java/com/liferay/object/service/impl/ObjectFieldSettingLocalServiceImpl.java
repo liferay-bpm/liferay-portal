@@ -19,19 +19,25 @@ import com.liferay.object.constants.ObjectFilterConstants;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.model.ObjectFilter;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFilterLocalService;
 import com.liferay.object.service.base.ObjectFieldSettingLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectFieldPersistence;
+import com.liferay.object.service.persistence.ObjectFilterPersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -104,8 +110,51 @@ public class ObjectFieldSettingLocalServiceImpl
 	}
 
 	@Override
-	public List<ObjectFieldSetting> getObjectFieldSettings(long objectFieldId) {
-		return objectFieldSettingPersistence.findByObjectFieldId(objectFieldId);
+	public List<ObjectFieldSetting> getObjectFieldSettingsByObjectFieldId(
+		long objectFieldId) {
+
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-156704"))) {
+			return objectFieldSettingPersistence.findByObjectFieldId(
+				objectFieldId);
+		}
+
+		ObjectField objectField = _objectFieldPersistence.fetchByPrimaryKey(
+			objectFieldId);
+
+		if (objectField == null) {
+			return Collections.emptyList();
+		}
+
+		List<ObjectFieldSetting> objectFieldSettings =
+			objectFieldSettingPersistence.findByObjectFieldId(objectFieldId);
+
+		if (!Objects.equals(
+				objectField.getBusinessType(),
+				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
+
+			return objectFieldSettings;
+		}
+
+		List<ObjectFieldSetting> filterObjectFieldSettings = new ArrayList<>();
+
+		List<ObjectFieldSetting> newObjectFieldSettings = new ArrayList<>();
+
+		for (ObjectFieldSetting objectFieldSetting : objectFieldSettings) {
+			if (StringUtil.startsWith(
+					objectFieldSetting.getName(),
+					ObjectFilterConstants.FILTER)) {
+
+				filterObjectFieldSettings.add(objectFieldSetting);
+			}
+			else {
+				newObjectFieldSettings.add(objectFieldSetting);
+			}
+		}
+
+		newObjectFieldSettings.add(
+			_addFilterObjectFieldSettings(filterObjectFieldSettings));
+
+		return newObjectFieldSettings;
 	}
 
 	@Override
@@ -120,6 +169,40 @@ public class ObjectFieldSettingLocalServiceImpl
 		objectFieldSetting.setValue(value);
 
 		return objectFieldSettingPersistence.update(objectFieldSetting);
+	}
+
+	private ObjectFieldSetting _addFilterObjectFieldSettings(
+		List<ObjectFieldSetting> objectFieldSettings) {
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		for (ObjectFieldSetting objectFieldSetting : objectFieldSettings) {
+			ObjectFilter objectFilter =
+				_objectFilterPersistence.fetchByPrimaryKey(
+					GetterUtil.getLong(objectFieldSetting.getValue()));
+
+			if (objectFilter == null) {
+				break;
+			}
+
+			jsonArray.put(
+				JSONUtil.put(
+					ObjectFilterConstants.FILTER_BY, objectFilter.getFilterBy()
+				).put(
+					ObjectFilterConstants.FILTER_TYPE,
+					objectFilter.getFilterType()
+				).put(
+					ObjectFilterConstants.JSON, objectFilter.getJson()
+				));
+		}
+
+		ObjectFieldSetting objectFieldSetting =
+			objectFieldSettingLocalService.createObjectFieldSetting(0L);
+
+		objectFieldSetting.setName("filters");
+		objectFieldSetting.setValue(jsonArray.toString());
+
+		return objectFieldSetting;
 	}
 
 	private void _addFilterObjectFieldSettings(
@@ -166,10 +249,16 @@ public class ObjectFieldSettingLocalServiceImpl
 	}
 
 	@Reference
+	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
 	private ObjectFieldPersistence _objectFieldPersistence;
 
 	@Reference
 	private ObjectFilterLocalService _objectFilterLocalService;
+
+	@Reference
+	private ObjectFilterPersistence _objectFilterPersistence;
 
 	@Reference
 	private UserLocalService _userLocalService;
