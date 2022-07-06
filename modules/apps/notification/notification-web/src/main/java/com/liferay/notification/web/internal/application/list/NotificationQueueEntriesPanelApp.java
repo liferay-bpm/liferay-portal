@@ -50,6 +50,10 @@ public class NotificationQueueEntriesPanelApp extends BasePanelApp {
 	public boolean isShow(PermissionChecker permissionChecker, Group group)
 		throws PortalException {
 
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-149051"))) {
+			return false;
+		}
+
 		return super.isShow(permissionChecker, group);
 	}
 
