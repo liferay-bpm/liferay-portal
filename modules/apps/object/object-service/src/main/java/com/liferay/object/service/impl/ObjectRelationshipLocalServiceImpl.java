@@ -24,6 +24,7 @@ import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.model.ObjectView;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -83,6 +84,18 @@ public class ObjectRelationshipLocalServiceImpl
 		return _addObjectRelationship(
 			userId, objectDefinitionId1, objectDefinitionId2, deletionType,
 			labelMap, name, false, type);
+	}
+
+	@Override
+	public void deleteObjectRelationships(long objectDefinitionId)
+		throws PortalException {
+
+		for (ObjectRelationship objectRelationship :
+			objectRelationshipPersistence.findByObjectDefinitionId1(
+				objectDefinitionId)) {
+
+			objectRelationshipLocalService.deleteObjectRelationship(objectRelationship);
+		}
 	}
 
 	@Override

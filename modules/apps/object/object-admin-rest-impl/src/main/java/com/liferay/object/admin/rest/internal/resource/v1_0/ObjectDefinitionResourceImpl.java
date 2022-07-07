@@ -18,9 +18,11 @@ import com.liferay.object.admin.rest.dto.v1_0.ObjectAction;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectField;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectLayout;
+import com.liferay.object.admin.rest.dto.v1_0.ObjectRelationship;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectView;
 import com.liferay.object.admin.rest.dto.v1_0.Status;
 import com.liferay.object.admin.rest.dto.v1_0.util.ObjectActionUtil;
+import com.liferay.object.admin.rest.internal.dto.v1_0.converter.ObjectRelationshipDTOConverter;
 import com.liferay.object.admin.rest.internal.dto.v1_0.converter.ObjectViewDTOConverter;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldUtil;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectLayoutUtil;
@@ -28,6 +30,7 @@ import com.liferay.object.admin.rest.internal.odata.entity.v1_0.ObjectDefinition
 import com.liferay.object.admin.rest.resource.v1_0.ObjectActionResource;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectDefinitionResource;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectLayoutResource;
+import com.liferay.object.admin.rest.resource.v1_0.ObjectRelationshipResource;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectViewResource;
 import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectConstants;
@@ -39,9 +42,12 @@ import com.liferay.object.service.ObjectDefinitionService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectLayoutLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.object.service.ObjectViewService;
 import com.liferay.object.util.LocalizedMapUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
@@ -291,6 +297,25 @@ public class ObjectDefinitionResourceImpl
 			}
 		}
 
+		ObjectRelationship[] objectRelationships = objectDefinition.getObjectRelationships();
+
+		if (objectRelationships != null) {
+			ObjectRelationshipResource.Builder objectRelationshipResourcedBuilder =
+				_objectRelationshipResourceFactory.create();
+
+			ObjectRelationshipResource objectRelationshipResource =
+				objectRelationshipResourcedBuilder.user(
+					contextUser
+				).build();
+
+			_objectRelationshipLocalService.deleteObjectRelationships(objectDefinitionId);
+
+			for (ObjectRelationship objectRelationship : objectDefinition.getObjectRelationships()) {
+				objectRelationshipResource.postObjectDefinitionObjectRelationship(
+					objectDefinitionId, objectRelationship);
+			}
+		}
+
 		ObjectView[] objectViews = objectDefinition.getObjectViews();
 
 		if (objectViews != null) {
@@ -405,6 +430,8 @@ public class ObjectDefinitionResourceImpl
 				active = objectDefinition.isActive();
 				dateCreated = objectDefinition.getCreateDate();
 				dateModified = objectDefinition.getModifiedDate();
+				externalReferenceCode =
+					objectDefinition.getExternalReferenceCode();
 				id = objectDefinition.getObjectDefinitionId();
 				label = LocalizedMapUtil.getLanguageIdMap(
 					objectDefinition.getLabelMap());
@@ -428,6 +455,16 @@ public class ObjectDefinitionResourceImpl
 					objectLayout -> ObjectLayoutUtil.toObjectLayout(
 						null, objectLayout),
 					ObjectLayout.class);
+				objectRelationships = transformToArray(
+					_objectRelationshipLocalService.getObjectRelationships(
+						objectDefinition.getObjectDefinitionId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS),
+					objectRelationship -> _objectRelationshipDTOConverter.toDTO(
+						new DefaultDTOConverterContext(
+							false, null, null, null,
+							contextAcceptLanguage.getPreferredLocale(), null,
+							null),
+						objectRelationship),
+					ObjectRelationship.class);;
 				objectViews = transformToArray(
 					_objectViewLocalService.getObjectViews(
 						objectDefinition.getObjectDefinitionId()),
@@ -438,6 +475,7 @@ public class ObjectDefinitionResourceImpl
 							null),
 						objectView),
 					ObjectView.class);
+
 				panelCategoryKey = objectDefinition.getPanelCategoryKey();
 				pluralLabel = LocalizedMapUtil.getLanguageIdMap(
 					objectDefinition.getPluralLabelMap());
@@ -510,9 +548,18 @@ public class ObjectDefinitionResourceImpl
 	private ObjectViewLocalService _objectViewLocalService;
 
 	@Reference
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
+
+	@Reference
+	private ObjectRelationshipResource.Factory _objectRelationshipResourceFactory;
+
+	@Reference
 	private ObjectViewResource.Factory _objectViewResourceFactory;
 
 	@Reference
 	private ObjectViewService _objectViewService;
+
+	@Reference
+	private ObjectRelationshipDTOConverter _objectRelationshipDTOConverter;
 
 }
