@@ -16,6 +16,7 @@ package com.liferay.object.service;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.object.model.ObjectFieldSetting;
+import com.liferay.object.model.ObjectFilter;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -63,7 +64,11 @@ public interface ObjectFieldSettingLocalService
 	 *
 	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.object.service.impl.ObjectFieldSettingLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the object field setting local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link ObjectFieldSettingLocalServiceUtil} if injection and service tracking are not available.
 	 */
-	public ObjectFieldSetting addObjectFieldSetting(
+	public void addObjectFieldSetting(
+			long userId, long objectFieldId, List<ObjectFilter> objectFilters)
+		throws PortalException;
+
+	public void addObjectFieldSetting(
 			long userId, long objectFieldId, String name, String value)
 		throws PortalException;
 
@@ -126,6 +131,9 @@ public interface ObjectFieldSettingLocalService
 	@Indexable(type = IndexableType.DELETE)
 	public ObjectFieldSetting deleteObjectFieldSetting(
 		ObjectFieldSetting objectFieldSetting);
+
+	public void deleteObjectFieldSettingByObjectFieldId(long objectFieldId)
+		throws PortalException;
 
 	/**
 	 * @throws PortalException
@@ -274,7 +282,8 @@ public interface ObjectFieldSettingLocalService
 	public List<ObjectFieldSetting> getObjectFieldSettings(int start, int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<ObjectFieldSetting> getObjectFieldSettings(long objectFieldId);
+	public List<ObjectFieldSetting> getObjectFieldSettingsByObjectFieldId(
+		long objectFieldId);
 
 	/**
 	 * Returns the number of object field settings.
