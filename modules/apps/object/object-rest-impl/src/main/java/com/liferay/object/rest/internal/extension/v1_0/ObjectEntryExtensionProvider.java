@@ -25,15 +25,11 @@ import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
-import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
+import com.liferay.portal.vulcan.dto.converter.DTOMapper;
 import com.liferay.portal.vulcan.extension.ExtensionProvider;
 import com.liferay.portal.vulcan.extension.PropertyDefinition;
 
 import java.io.Serializable;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -270,50 +266,11 @@ public class ObjectEntryExtensionProvider implements ExtensionProvider {
 		return propertyType;
 	}
 
-	private String _getExternalClassName(DTOConverter<?, ?> dtoConverter) {
-		Class<?> clazz = dtoConverter.getClass();
-
-		Type[] types = clazz.getGenericInterfaces();
-
-		for (Type type : types) {
-			String typeName = type.getTypeName();
-
-			if (!typeName.contains(DTOConverter.class.getSimpleName()) ||
-				!(type instanceof ParameterizedType)) {
-
-				continue;
-			}
-
-			ParameterizedType parameterizedType = (ParameterizedType)type;
-
-			Type[] argumentTypes = parameterizedType.getActualTypeArguments();
-
-			return argumentTypes[1].getTypeName();
-		}
-
-		return null;
-	}
-
 	private ObjectDefinition _getObjectDefinition(
 		long companyId, String className) {
 
-		String internalDTOClassName = null;
-
-		for (String dtoClassName : _dtoConverterRegistry.getDTOClassNames()) {
-			if (StringUtil.equals(
-					_getExternalClassName(
-						_dtoConverterRegistry.getDTOConverter(dtoClassName)),
-					className)) {
-
-				internalDTOClassName = dtoClassName;
-
-				break;
-			}
-		}
-
-		if (internalDTOClassName == null) {
-			return null;
-		}
+		String internalDTOClassName = _dtoMapper.getInternalDTOClassNameFrom(
+			className);
 
 		for (ObjectDefinition objectDefinition :
 				_objectDefinitionLocalService.getObjectDefinitions(
@@ -351,7 +308,7 @@ public class ObjectEntryExtensionProvider implements ExtensionProvider {
 	}
 
 	@Reference
-	private DTOConverterRegistry _dtoConverterRegistry;
+	private DTOMapper _dtoMapper;
 
 	// This probably should be the service and not the local service
 
