@@ -162,9 +162,7 @@ public class RelatedModelFDSActionProvider implements FDSActionProvider {
 		).setMVCRenderCommandName(
 			"/object_entries/edit_object_entry"
 		).setParameter(
-			"objectDefinitionId", objectDefinition.getObjectDefinitionId()
-		).setParameter(
-			"objectEntryId", id
+			"externalReferenceCode", objectEntry.getExternalReferenceCode()
 		).buildPortletURL();
 	}
 
