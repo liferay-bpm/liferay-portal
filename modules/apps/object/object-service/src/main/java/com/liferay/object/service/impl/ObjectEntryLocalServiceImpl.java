@@ -1046,19 +1046,13 @@ public class ObjectEntryLocalServiceImpl
 		throws PortalException {
 
 		try {
-			String fileSource = null;
 			boolean showFilesInDocumentsAndMedia = false;
 			String storageDLFolderPath = null;
 
 			for (ObjectFieldSetting objectFieldSetting : objectFieldSettings) {
 				if (Objects.equals(
-						objectFieldSetting.getName(), "fileSource")) {
-
-					fileSource = objectFieldSetting.getValue();
-				}
-				else if (Objects.equals(
-							objectFieldSetting.getName(),
-							"showFilesInDocumentsAndMedia")) {
+						objectFieldSetting.getName(),
+						"showFilesInDocumentsAndMedia")) {
 
 					showFilesInDocumentsAndMedia = GetterUtil.getBoolean(
 						objectFieldSetting.getValue());
@@ -1069,10 +1063,6 @@ public class ObjectEntryLocalServiceImpl
 
 					storageDLFolderPath = objectFieldSetting.getValue();
 				}
-			}
-
-			if (Objects.equals("documentsAndMedia", fileSource)) {
-				return;
 			}
 
 			DLFolder dlFileEntryFolder = dlFileEntry.getFolder();
