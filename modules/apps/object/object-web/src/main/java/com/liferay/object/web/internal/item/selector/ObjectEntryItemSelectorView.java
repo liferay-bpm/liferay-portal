@@ -49,9 +49,12 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -117,12 +120,15 @@ public class ObjectEntryItemSelectorView
 			PortletURL portletURL, String itemSelectedEventName, boolean search)
 		throws IOException, ServletException {
 
+		boolean relatedModalEntry = itemSelectedEventName.contains(
+			"selectRelatedModalEntry");
+
 		_itemSelectorViewDescriptorRenderer.renderHTML(
 			servletRequest, servletResponse, infoItemItemSelectorCriterion,
 			portletURL, itemSelectedEventName, search,
 			new ObjectItemSelectorViewDescriptor(
-				(HttpServletRequest)servletRequest, _objectDefinition,
-				_objectEntryManager, portletURL));
+				(HttpServletRequest)servletRequest, relatedModalEntry,
+				_objectDefinition, _objectEntryManager, portletURL));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -232,11 +238,12 @@ public class ObjectEntryItemSelectorView
 		implements ItemSelectorViewDescriptor<ObjectEntry> {
 
 		public ObjectItemSelectorViewDescriptor(
-			HttpServletRequest httpServletRequest,
+			HttpServletRequest httpServletRequest, boolean relatedModalEntry,
 			ObjectDefinition objectDefinition,
 			ObjectEntryManager objectEntryManager, PortletURL portletURL) {
 
 			_httpServletRequest = httpServletRequest;
+			_relatedModalEntry = relatedModalEntry;
 			_objectDefinition = objectDefinition;
 			_objectEntryManager = objectEntryManager;
 			_portletURL = portletURL;
@@ -279,14 +286,58 @@ public class ObjectEntryItemSelectorView
 						null, _getDTOConverterContext(), _getFilterString(),
 						null, null, null);
 
-				List<ObjectEntry> objectEntries = TransformUtil.transform(
-					objectEntriesPage.getItems(),
-					objectEntry -> _toObjectEntry(
-						_objectDefinition.getObjectDefinitionId(),
-						objectEntry));
+				if (_relatedModalEntry) {
+					Collection<com.liferay.object.rest.dto.v1_0.ObjectEntry>
+						items = objectEntriesPage.getItems();
 
-				searchContainer.setResultsAndTotal(
-					() -> objectEntries, objectEntries.size());
+					List<com.liferay.object.rest.dto.v1_0.ObjectEntry>
+						noRelatedEntries = new ArrayList<>();
+
+					for (com.liferay.object.rest.dto.v1_0.ObjectEntry item :
+							items) {
+
+						Map<String, Object> properties = item.getProperties();
+
+						Set<Map.Entry<String, Object>> entrySet =
+							properties.entrySet();
+
+						for (Map.Entry<String, Object> entry : entrySet) {
+							String key = entry.getKey();
+							Object value = entry.getValue();
+
+							if (key.startsWith("r_") &&
+								(value instanceof Long)) {
+
+								long relationshipId = (long)value;
+
+								if (relationshipId == 0) {
+									noRelatedEntries.add(item);
+								}
+							}
+						}
+					}
+
+					List<ObjectEntry> newObjectEntries =
+						TransformUtil.transform(
+							noRelatedEntries,
+							objectEntry -> _toObjectEntry(
+								_objectDefinition.getObjectDefinitionId(),
+								objectEntry));
+
+					searchContainer.setResultsAndTotal(
+						() -> newObjectEntries, newObjectEntries.size());
+				}
+				else {
+					List<ObjectEntry> newObjectEntries =
+						TransformUtil.transform(
+							objectEntriesPage.getItems(),
+							objectEntry -> _toObjectEntry(
+								_objectDefinition.getObjectDefinitionId(),
+								objectEntry));
+
+					searchContainer.setResultsAndTotal(
+						() -> newObjectEntries, newObjectEntries.size());
+				}
 			}
 			catch (Exception exception) {
 				_log.error(exception);
@@ -336,6 +387,7 @@ public class ObjectEntryItemSelectorView
 		private final ObjectEntryManager _objectEntryManager;
 		private final PortletRequest _portletRequest;
 		private final PortletURL _portletURL;
+		private final boolean _relatedModalEntry;
 		private final ThemeDisplay _themeDisplay;
 
 	}
