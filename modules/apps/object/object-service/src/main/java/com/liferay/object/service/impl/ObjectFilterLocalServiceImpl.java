@@ -60,14 +60,12 @@ public class ObjectFilterLocalServiceImpl
 	}
 
 	@Override
-	public void deleteObjectFilterByObjectFieldId(long objectFieldId) {
+	public void deleteObjectFieldObjectFilter(long objectFieldId) {
 		objectFilterPersistence.removeByObjectFieldId(objectFieldId);
 	}
 
 	@Override
-	public List<ObjectFilter> getObjectFiltersByObjectFieldId(
-		long objectFieldId) {
-
+	public List<ObjectFilter> getObjectFieldObjectFilter(long objectFieldId) {
 		return objectFilterPersistence.findByObjectFieldId(objectFieldId);
 	}
 
