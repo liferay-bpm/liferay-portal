@@ -96,6 +96,8 @@ public interface ObjectFilterLocalService
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
+	public void deleteObjectFieldObjectFilter(long objectFieldId);
+
 	/**
 	 * Deletes the object filter with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
@@ -123,8 +125,6 @@ public interface ObjectFilterLocalService
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	public ObjectFilter deleteObjectFilter(ObjectFilter objectFilter);
-
-	public void deleteObjectFilterByObjectFieldId(long objectFieldId);
 
 	/**
 	 * @throws PortalException
@@ -229,6 +229,9 @@ public interface ObjectFilterLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<ObjectFilter> getObjectFieldObjectFilter(long objectFieldId);
+
 	/**
 	 * Returns the object filter with the primary key.
 	 *
@@ -266,10 +269,6 @@ public interface ObjectFilterLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<ObjectFilter> getObjectFilters(int start, int end);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<ObjectFilter> getObjectFiltersByObjectFieldId(
-		long objectFieldId);
 
 	/**
 	 * Returns the number of object filters.
