@@ -77,6 +77,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
@@ -156,6 +157,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -1288,6 +1290,19 @@ public class ObjectEntryLocalServiceImpl
 			objectDefinition.getExtensionDBTableName());
 	}
 
+	private Long _getFileEntryValue(Serializable entry) throws JSONException {
+		String entryValueString = entry.toString();
+
+		if (!NumberUtils.isParsable(entryValueString)) {
+			JSONObject entryJSONObject = JSONFactoryUtil.createJSONObject(
+				entryValueString);
+
+			return entryJSONObject.getLong("fileEntryId");
+		}
+
+		return GetterUtil.getLong(entryValueString);
+	}
+
 	private GroupByStep _getManyToManyRelatedObjectEntriesGroupByStep(
 			long groupId, long objectRelationshipId, long primaryKey,
 			boolean reverse, FromStep fromStep)
@@ -2337,8 +2352,10 @@ public class ObjectEntryLocalServiceImpl
 					objectField.getBusinessType(),
 					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
 
+			Long fileEntryId = _getFileEntryValue(entry.getValue());
+
 			DLFileEntry dlFileEntry = _dlFileEntryLocalService.fetchDLFileEntry(
-				GetterUtil.getLong(entry.getValue()));
+				fileEntryId);
 
 			if (dlFileEntry != null) {
 				_validateFileExtension(
