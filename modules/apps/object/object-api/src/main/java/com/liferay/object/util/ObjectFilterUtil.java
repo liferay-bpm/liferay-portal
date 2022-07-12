@@ -14,13 +14,12 @@
 
 package com.liferay.object.util;
 
-import com.google.gson.Gson;
-
 import com.liferay.object.constants.ObjectFilterConstants;
 import com.liferay.object.model.ObjectFilter;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.vulcan.util.ObjectMapperUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,6 @@ public class ObjectFilterUtil {
 	public static JSONArray getObjectFiltersJSONArray(
 		List<ObjectFilter> objectFilters) {
 
-		Gson gson = new Gson();
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 		for (ObjectFilter objectFilter : objectFilters) {
@@ -45,7 +43,8 @@ public class ObjectFilterUtil {
 					objectFilter.getFilterType()
 				).put(
 					ObjectFilterConstants.JSON,
-					gson.fromJson(objectFilter.getJson(), Map.class)
+					(Map)ObjectMapperUtil.readValue(
+						Map.class, objectFilter.getJson())
 				));
 		}
 
