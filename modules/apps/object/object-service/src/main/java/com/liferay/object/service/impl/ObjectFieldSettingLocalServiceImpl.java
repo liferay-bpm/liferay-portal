@@ -93,7 +93,7 @@ public class ObjectFieldSettingLocalServiceImpl
 				objectField.getBusinessType(),
 				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
 
-			_objectFilterLocalService.deleteObjectFilterByObjectFieldId(
+			_objectFilterLocalService.deleteObjectFieldObjectFilter(
 				objectField.getObjectFieldId());
 		}
 	}
@@ -130,7 +130,7 @@ public class ObjectFieldSettingLocalServiceImpl
 
 		objectFieldSetting.setName(ObjectFieldSettingConstants.FILTERS);
 		objectFieldSetting.setObjectFilters(
-			_objectFilterLocalService.getObjectFiltersByObjectFieldId(
+			_objectFilterLocalService.getObjectFieldObjectFilter(
 				objectFieldId));
 
 		objectFieldSettings = new ArrayList<>(objectFieldSettings);

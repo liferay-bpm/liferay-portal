@@ -87,6 +87,10 @@ public class ObjectFilterLocalServiceUtil {
 		return getService().createPersistedModel(primaryKeyObj);
 	}
 
+	public static void deleteObjectFieldObjectFilter(long objectFieldId) {
+		getService().deleteObjectFieldObjectFilter(objectFieldId);
+	}
+
 	/**
 	 * Deletes the object filter with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
@@ -116,10 +120,6 @@ public class ObjectFilterLocalServiceUtil {
 	 */
 	public static ObjectFilter deleteObjectFilter(ObjectFilter objectFilter) {
 		return getService().deleteObjectFilter(objectFilter);
-	}
-
-	public static void deleteObjectFilterByObjectFieldId(long objectFieldId) {
-		getService().deleteObjectFilterByObjectFieldId(objectFieldId);
 	}
 
 	/**
@@ -256,6 +256,12 @@ public class ObjectFilterLocalServiceUtil {
 		return getService().getIndexableActionableDynamicQuery();
 	}
 
+	public static List<ObjectFilter> getObjectFieldObjectFilter(
+		long objectFieldId) {
+
+		return getService().getObjectFieldObjectFilter(objectFieldId);
+	}
+
 	/**
 	 * Returns the object filter with the primary key.
 	 *
@@ -297,12 +303,6 @@ public class ObjectFilterLocalServiceUtil {
 	 */
 	public static List<ObjectFilter> getObjectFilters(int start, int end) {
 		return getService().getObjectFilters(start, end);
-	}
-
-	public static List<ObjectFilter> getObjectFiltersByObjectFieldId(
-		long objectFieldId) {
-
-		return getService().getObjectFiltersByObjectFieldId(objectFieldId);
 	}
 
 	/**

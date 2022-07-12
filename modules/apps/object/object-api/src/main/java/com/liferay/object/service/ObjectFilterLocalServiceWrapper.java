@@ -88,6 +88,11 @@ public class ObjectFilterLocalServiceWrapper
 		return _objectFilterLocalService.createPersistedModel(primaryKeyObj);
 	}
 
+	@Override
+	public void deleteObjectFieldObjectFilter(long objectFieldId) {
+		_objectFilterLocalService.deleteObjectFieldObjectFilter(objectFieldId);
+	}
+
 	/**
 	 * Deletes the object filter with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
@@ -122,12 +127,6 @@ public class ObjectFilterLocalServiceWrapper
 		com.liferay.object.model.ObjectFilter objectFilter) {
 
 		return _objectFilterLocalService.deleteObjectFilter(objectFilter);
-	}
-
-	@Override
-	public void deleteObjectFilterByObjectFieldId(long objectFieldId) {
-		_objectFilterLocalService.deleteObjectFilterByObjectFieldId(
-			objectFieldId);
 	}
 
 	/**
@@ -289,6 +288,14 @@ public class ObjectFilterLocalServiceWrapper
 		return _objectFilterLocalService.getIndexableActionableDynamicQuery();
 	}
 
+	@Override
+	public java.util.List<com.liferay.object.model.ObjectFilter>
+		getObjectFieldObjectFilter(long objectFieldId) {
+
+		return _objectFilterLocalService.getObjectFieldObjectFilter(
+			objectFieldId);
+	}
+
 	/**
 	 * Returns the object filter with the primary key.
 	 *
@@ -337,14 +344,6 @@ public class ObjectFilterLocalServiceWrapper
 		getObjectFilters(int start, int end) {
 
 		return _objectFilterLocalService.getObjectFilters(start, end);
-	}
-
-	@Override
-	public java.util.List<com.liferay.object.model.ObjectFilter>
-		getObjectFiltersByObjectFieldId(long objectFieldId) {
-
-		return _objectFilterLocalService.getObjectFiltersByObjectFieldId(
-			objectFieldId);
 	}
 
 	/**
