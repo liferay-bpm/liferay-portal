@@ -127,21 +127,22 @@ public class ObjectFieldSettingUtil {
 			{
 				name = serviceBuilderObjectFieldSetting.getName();
 				value = serviceBuilderObjectFieldSetting.getValue();
-
-				if (Objects.equals(
-						businessType,
-						ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) &&
-					Objects.equals(name, ObjectFieldSettingConstants.FILTERS)) {
-
-					value = ObjectFilterUtil.getObjectFiltersJSONArray(
-						serviceBuilderObjectFieldSetting.getObjectFilters());
-				}
 			}
 		};
 
 		if (Objects.equals(
-				ObjectFieldSettingConstants.NAME_STATE_FLOW,
-				objectFieldSetting.getName())) {
+				businessType, ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) &&
+			Objects.equals(
+				objectFieldSetting.getName(),
+				ObjectFieldSettingConstants.FILTERS)) {
+
+			objectFieldSetting.setValue(
+				ObjectFilterUtil.getObjectFiltersJSONArray(
+					serviceBuilderObjectFieldSetting.getObjectFilters()));
+		}
+		else if (Objects.equals(
+					ObjectFieldSettingConstants.NAME_STATE_FLOW,
+					objectFieldSetting.getName())) {
 
 			ObjectStateFlow objectStateFlow =
 				ObjectStateFlowUtil.toObjectStateFlow(
