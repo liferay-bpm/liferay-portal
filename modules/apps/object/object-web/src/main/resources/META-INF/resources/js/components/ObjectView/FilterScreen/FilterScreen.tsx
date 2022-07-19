@@ -130,10 +130,9 @@ export function FilterScreen() {
 										if (
 											objectField.businessType ===
 												'Picklist' ||
+											objectField.name === 'createDate' ||
 											objectField.name ===
-												'dateCreated' ||
-											objectField.name ===
-												'dateModified' ||
+												'modifiedDate' ||
 											(objectField.name === 'status' &&
 												!objectField.hasFilter)
 										) {

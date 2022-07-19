@@ -473,7 +473,8 @@ public class ObjectViewLocalServiceImpl extends ObjectViewLocalServiceBaseImpl {
 
 				if (!Objects.equals(
 						objectField.getBusinessType(),
-						ObjectFieldConstants.BUSINESS_TYPE_PICKLIST)) {
+						ObjectFieldConstants.BUSINESS_TYPE_PICKLIST) &&
+					!objectField.isSystem()) {
 
 					throw new ObjectViewFilterColumnException(
 						StringBundler.concat(

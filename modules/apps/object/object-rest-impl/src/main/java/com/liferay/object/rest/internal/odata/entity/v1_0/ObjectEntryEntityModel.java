@@ -50,15 +50,13 @@ public class ObjectEntryEntityModel implements EntityModel {
 		).put(
 			"dateCreated",
 			new DateTimeEntityField(
-				"dateCreated",
-				locale -> Field.getSortableFieldName(Field.CREATE_DATE),
+				"dateCreated", locale -> Field.CREATE_DATE,
 				locale -> Field.CREATE_DATE)
 		).put(
 			"dateModified",
 			new DateTimeEntityField(
-				"dateModified",
-				locale -> Field.getSortableFieldName(Field.MODIFIED_DATE),
-				locale -> Field.MODIFIED_DATE)
+				"dateModified", locale -> "modifiedDate",
+				locale -> "modifiedDate")
 		).put(
 			"externalReferenceCode",
 			new StringEntityField(
