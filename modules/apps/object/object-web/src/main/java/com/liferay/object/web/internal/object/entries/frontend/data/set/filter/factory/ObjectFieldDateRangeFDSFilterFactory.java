@@ -50,11 +50,28 @@ public class ObjectFieldDateRangeFDSFilterFactory
 			ObjectViewFilterColumn objectViewFilterColumn)
 		throws PortalException {
 
+		if (Objects.equals(objectViewFilterColumn.getObjectFieldName(), "createDate")) {
+			return new ObjectFieldDateRangeFDSFilter(
+				"dateCreated",
+				_getLabel(
+					locale, objectDefinitionId,
+					objectViewFilterColumn.getObjectFieldName()));
+		}
+
+		if (Objects.equals(objectViewFilterColumn.getObjectFieldName(), "modifiedDate")) {
+			return new ObjectFieldDateRangeFDSFilter(
+				"dateModified",
+				_getLabel(
+					locale, objectDefinitionId,
+					objectViewFilterColumn.getObjectFieldName()));
+		}
+
 		return new ObjectFieldDateRangeFDSFilter(
 			objectViewFilterColumn.getObjectFieldName(),
 			_getLabel(
 				locale, objectDefinitionId,
 				objectViewFilterColumn.getObjectFieldName()));
+
 	}
 
 	private String _getLabel(

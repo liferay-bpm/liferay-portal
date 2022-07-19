@@ -262,16 +262,13 @@ export function ModalAddFilter({
 			currentErrors.selectedFilterBy = REQUIRED_MSG;
 		}
 		if (
-			!(
-				selectedFilterBy?.businessType === 'Modified Date' ||
-				selectedFilterBy?.businessType === 'Creation Date'
-			) &&
+			selectedFilterBy?.name !== 'createDate' && selectedFilterBy?.name !== 'modifiedDate' &&
 			!selectedFilterType
 		) {
 			currentErrors.selectedFilterType = REQUIRED_MSG;
 		}
 		if (
-			(selectedFilterBy?.businessType === 'Workflow Status' ||
+			(selectedFilterBy?.name === 'status' ||
 				selectedFilterBy?.businessType === 'Picklist') &&
 			!checkedItems.length
 		) {
@@ -323,7 +320,7 @@ export function ModalAddFilter({
 				selectedFilterBy?.businessType,
 				selectedFilterType?.value,
 				editingObjectFieldName,
-				selectedFilterBy?.businessType === 'Workflow Status' ||
+				selectedFilterBy?.name === 'status' ||
 					selectedFilterBy?.businessType === 'Picklist'
 					? checkedItems
 					: undefined,
@@ -337,7 +334,7 @@ export function ModalAddFilter({
 				selectedFilterBy?.businessType,
 				selectedFilterType?.value,
 				selectedFilterBy?.name,
-				selectedFilterBy?.businessType === 'Workflow Status' ||
+				selectedFilterBy?.name === 'status' ||
 					selectedFilterBy?.businessType === 'Picklist'
 					? checkedItems
 					: selectedFilterBy?.businessType === 'Date'
@@ -381,10 +378,9 @@ export function ModalAddFilter({
 					</AutoComplete>
 				)}
 
-				{!(
-					selectedFilterBy?.businessType === 'Modified Date' ||
-					selectedFilterBy?.businessType === 'Creation Date'
-				) && (
+				{
+					selectedFilterBy?.name !== 'createDate' && selectedFilterBy?.name !== 'modifiedDate'
+				 && (
 					<FormCustomSelect
 						error={errors.selectedFilterType}
 						label={Liferay.Language.get('filter-type')}
@@ -419,7 +415,7 @@ export function ModalAddFilter({
 					/>
 				)}
 
-				{(selectedFilterBy?.businessType === 'Workflow Status' ||
+				{(selectedFilterBy?.name === 'status' ||
 					selectedFilterBy?.businessType === 'Picklist') && (
 					<FormCustomSelect
 						error={errors.items}
@@ -431,7 +427,7 @@ export function ModalAddFilter({
 					/>
 				)}
 
-				{selectedFilterBy?.businessType === 'Date' && (
+				{(selectedFilterBy?.businessType === 'Date' && selectedFilterBy.name !== 'createDate' && selectedFilterBy.name !== 'modifiedDate' && !selectedFilterBy.system) && (
 					<div className="row">
 						<div className="col-lg-6">
 							<DatePicker
