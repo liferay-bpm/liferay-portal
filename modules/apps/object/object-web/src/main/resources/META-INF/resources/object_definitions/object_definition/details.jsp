@@ -104,7 +104,7 @@ renderResponse.setTitle(LanguageUtil.format(request, "edit-x", objectDefinition.
 							for (ObjectField objectField : nonrelationshipObjectFields) {
 							%>
 
-								<aui:option label="<%= objectField.getLabel(locale) %>" selected="<%= Objects.equals(objectField.getObjectFieldId(), objectDefinition.getTitleObjectFieldId()) %>" value="<%= objectField.getObjectFieldId() %>" />
+								<aui:option label="<%= objectField.getLabel(locale) %>" localizeLabel="<%= false %>" selected="<%= Objects.equals(objectField.getObjectFieldId(), objectDefinition.getTitleObjectFieldId()) %>" value="<%= objectField.getObjectFieldId() %>" />
 
 							<%
 							}

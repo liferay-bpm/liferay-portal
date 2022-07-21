@@ -73,8 +73,11 @@ public class TableFDSViewContextContributor
 			locale);
 
 		for (FDSTableSchemaField fdsTableSchemaField : fieldsMap.values()) {
-			String label = LanguageUtil.get(
-				resourceBundle, fdsTableSchemaField.getLabel());
+			String label = fdsTableSchemaField.getLabel();
+
+			if (fdsTableSchemaField.isLocalizeLabel()) {
+				label = LanguageUtil.get(resourceBundle, label);
+			}
 
 			if (Validator.isNull(label)) {
 				label = StringPool.BLANK;
