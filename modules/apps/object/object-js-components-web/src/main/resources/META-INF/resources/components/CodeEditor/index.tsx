@@ -23,7 +23,7 @@ import {Sidebar, SidebarCategory} from './Sidebar';
 import './index.scss';
 
 export {default as CodeMirrorEditor} from './CodeMirrorEditor';
-export {SidebarCategory} from './Sidebar';
+export {SidebarCategory, SidebarElement} from './Sidebar';
 
 const CodeEditor = React.forwardRef<CodeMirror.Editor, IProps>(
 	({className, error, sidebarElements, ...options}, ref) => {

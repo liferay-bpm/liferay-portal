@@ -18,7 +18,7 @@ import {ICodeMirrorEditor} from './CodeMirrorEditor';
 import {SidebarCategory} from './Sidebar';
 import './index.scss';
 export {default as CodeMirrorEditor} from './CodeMirrorEditor';
-export {SidebarCategory} from './Sidebar';
+export {SidebarCategory, SidebarElement} from './Sidebar';
 declare const CodeEditor: React.ForwardRefExoticComponent<
 	IProps & React.RefAttributes<CodeMirror.Editor>
 >;

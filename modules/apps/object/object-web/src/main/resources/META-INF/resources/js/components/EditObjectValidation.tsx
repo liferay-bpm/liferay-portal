@@ -16,6 +16,7 @@ import ClayTabs from '@clayui/tabs';
 import {
 	SidePanelForm,
 	SidebarCategory,
+	SidebarElement,
 	openToast,
 	saveAndReload,
 } from '@liferay/object-js-components-web';
@@ -54,6 +55,10 @@ export default function EditObjectValidation({
 	const [errorMessage, setErrorMessage] = useState<ObjectValidationErrors>(
 		{}
 	);
+	const [
+		filteredObjectValidationRuleElements,
+		setFilteredObjectValidationRuleElements,
+	] = useState<SidebarCategory[]>(objectValidationRuleElements);
 
 	const onSubmit = async (objectValidation: ObjectValidation) => {
 		const response = await fetch(
@@ -100,6 +105,33 @@ export default function EditObjectValidation({
 		if (initialValues.script === 'script_placeholder') {
 			initialValues.script = '';
 		}
+
+		const validationFields = objectValidationRuleElements.find(
+			(validationRuleElement) => validationRuleElement.label === 'Fields'
+		);
+
+		if (validationFields) {
+			const filteredFields: SidebarElement[] = validationFields?.items.filter(
+				(validationField) =>
+					validationField.businessType !== 'Aggregation'
+			);
+
+			const newObjectValidationRuleElements: SidebarCategory[] = [
+				{
+					items: filteredFields,
+					label: 'Fields',
+				},
+				...objectValidationRuleElements.filter(
+					(validationRuleElement) =>
+						validationRuleElement.label !== 'Fields'
+				),
+			];
+
+			setFilteredObjectValidationRuleElements(
+				newObjectValidationRuleElements
+			);
+		}
+
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -136,7 +168,7 @@ export default function EditObjectValidation({
 								handleChange={handleChange}
 								locales={availableLocales}
 								objectValidationRuleElements={
-									objectValidationRuleElements
+									filteredObjectValidationRuleElements
 								}
 								setValues={setValues}
 								values={values}

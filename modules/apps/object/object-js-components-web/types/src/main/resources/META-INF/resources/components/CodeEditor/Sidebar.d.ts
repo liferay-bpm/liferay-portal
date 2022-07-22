@@ -24,7 +24,8 @@ export interface SidebarCategory {
 	items: SidebarElement[];
 	label: string;
 }
-interface SidebarElement {
+export interface SidebarElement {
+	businessType: string;
 	content: string;
 	helpText: string;
 	label: string;
