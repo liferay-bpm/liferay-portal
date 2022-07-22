@@ -19,6 +19,7 @@ export {
 	default as CodeEditor,
 	CodeMirrorEditor,
 	SidebarCategory,
+	SidebarElement,
 } from './components/CodeEditor/index';
 export {DatePicker} from './components/DatePicker';
 export * from './components/ExpressionBuilder';

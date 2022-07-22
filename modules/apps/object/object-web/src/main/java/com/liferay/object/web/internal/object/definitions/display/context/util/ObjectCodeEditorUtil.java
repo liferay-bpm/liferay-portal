@@ -48,6 +48,8 @@ public class ObjectCodeEditorUtil {
 					_objectFieldLocalService.getObjectFields(
 						objectDefinitionId),
 					objectField -> HashMapBuilder.put(
+						"businessType", objectField.getBusinessType()
+					).put(
 						"content", objectField.getName()
 					).put(
 						"helpText", StringPool.BLANK
