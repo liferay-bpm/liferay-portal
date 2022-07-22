@@ -14,11 +14,12 @@
 
 package com.liferay.object.web.internal.object.definitions.display.context.util;
 
+import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -42,19 +44,30 @@ public class ObjectCodeEditorUtil {
 
 		List<Map<String, Object>> codeEditorElements = new ArrayList<>();
 
+		List<HashMap<String, String>> objectFieldSettings = new ArrayList<>();
+
+		for (ObjectField objectField :
+				_objectFieldLocalService.getObjectFields(objectDefinitionId)) {
+
+			if (!Objects.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
+
+				continue;
+			}
+
+			objectFieldSettings.add(
+				HashMapBuilder.put(
+					"content", objectField.getName()
+				).put(
+					"helpText", StringPool.BLANK
+				).put(
+					"label", objectField.getLabel(locale)
+				).build());
+		}
+
 		codeEditorElements.add(
-			_createCodeEditorElement(
-				ListUtil.toList(
-					_objectFieldLocalService.getObjectFields(
-						objectDefinitionId),
-					objectField -> HashMapBuilder.put(
-						"content", objectField.getName()
-					).put(
-						"helpText", StringPool.BLANK
-					).put(
-						"label", objectField.getLabel(locale)
-					).build()),
-				"fields", locale));
+			_createCodeEditorElement(objectFieldSettings, "fields", locale));
 
 		if (includeDDMExpressionBuilderElements) {
 			Collections.addAll(
