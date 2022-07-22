@@ -15,11 +15,40 @@
 import {
 	ExpressionBuilderModal as Modal,
 	SidebarCategory,
+	SidebarElement,
 } from '@liferay/object-js-components-web';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 
 export default function ExpressionBuilderModal({sidebarElements}: IProps) {
-	return <Modal sidebarElements={sidebarElements} />;
+	const [filteredSidebarElements, setFilteredSidebarElements] = useState<
+		SidebarCategory[]
+	>(sidebarElements);
+
+	useEffect(() => {
+		const sidebarFields = sidebarElements.find(
+			(sidebarElement) => sidebarElement.label === 'Fields'
+		);
+
+		if (sidebarFields) {
+			const filteredFields: SidebarElement[] = sidebarFields?.items.filter(
+				(sidebarField) => sidebarField.businessType !== 'Aggregation'
+			);
+
+			const newSidebarElements: SidebarCategory[] = [
+				{
+					items: filteredFields,
+					label: 'Fields',
+				},
+				...sidebarElements.filter(
+					(sidebarElement) => sidebarElement.label !== 'Fields'
+				),
+			];
+
+			setFilteredSidebarElements(newSidebarElements);
+		}
+	}, [sidebarElements]);
+
+	return <Modal sidebarElements={filteredSidebarElements} />;
 }
 
 interface IProps {
