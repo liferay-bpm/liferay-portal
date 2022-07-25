@@ -278,7 +278,7 @@ public class ObjectValidationRuleLocalServiceImpl
 						ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY)) {
 
 				GroovyShell groovyShell = new GroovyShell();
-
+				
 				groovyShell.parse(script);
 			}
 		}
