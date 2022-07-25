@@ -162,6 +162,11 @@ public class ObjectServiceUpgradeStepRegistrator
 				ObjectFieldUpgradeProcess(_portalUUID));
 
 		registry.register("3.18.0", "3.19.0", ObjectFilterTable.create());
+
+		registry.register(
+			"3.19.0", "3.19.1",
+			new com.liferay.object.internal.upgrade.v3_19_1.
+				ObjectFieldUpgradeProcess());
 	}
 
 	@Reference
