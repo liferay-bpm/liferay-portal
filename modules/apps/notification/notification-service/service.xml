@@ -31,10 +31,10 @@
 		<column name="priority" type="double" />
 		<column name="sent" type="boolean" />
 		<column name="sentDate" type="Date" />
-		<column name="status" type="int" />
 		<column name="subject" type="String" />
 		<column name="to" type="String" />
 		<column name="toName" type="String" />
+		<column name="status" type="int" />
 
 		<!-- Finder methods -->
 
