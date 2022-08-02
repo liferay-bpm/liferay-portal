@@ -473,6 +473,15 @@ public class ObjectRelationshipLocalServiceWrapper
 	}
 
 	@Override
+	public boolean hasPreventDeletionType(
+		String deletionType, long objectDefinitionId2, boolean reverse,
+		String type) {
+
+		return _objectRelationshipLocalService.hasPreventDeletionType(
+			deletionType, objectDefinitionId2, reverse, type);
+	}
+
+	@Override
 	public com.liferay.object.model.ObjectRelationship updateObjectRelationship(
 			long objectRelationshipId, long parameterObjectFieldId,
 			String deletionType,

@@ -415,6 +415,14 @@ public class ObjectRelationshipLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
+	public static boolean hasPreventDeletionType(
+		String deletionType, long objectDefinitionId2, boolean reverse,
+		String type) {
+
+		return getService().hasPreventDeletionType(
+			deletionType, objectDefinitionId2, reverse, type);
+	}
+
 	public static ObjectRelationship updateObjectRelationship(
 			long objectRelationshipId, long parameterObjectFieldId,
 			String deletionType, Map<java.util.Locale, String> labelMap)

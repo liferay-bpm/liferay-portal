@@ -345,6 +345,11 @@ public interface ObjectRelationshipLocalService
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean hasPreventDeletionType(
+		String deletionType, long objectDefinitionId2, boolean reverse,
+		String type);
+
 	@Indexable(type = IndexableType.REINDEX)
 	public ObjectRelationship updateObjectRelationship(
 			long objectRelationshipId, long parameterObjectFieldId,
