@@ -292,6 +292,18 @@ public class ObjectRelationshipPersistenceTest {
 	}
 
 	@Test
+	public void testCountByODI2_DT_R_T() throws Exception {
+		_persistence.countByODI2_DT_R_T(
+			RandomTestUtil.nextLong(), "", RandomTestUtil.randomBoolean(), "");
+
+		_persistence.countByODI2_DT_R_T(
+			0L, "null", RandomTestUtil.randomBoolean(), "null");
+
+		_persistence.countByODI2_DT_R_T(
+			0L, (String)null, RandomTestUtil.randomBoolean(), (String)null);
+	}
+
+	@Test
 	public void testCountByODI1_ODI2_N_R_T() throws Exception {
 		_persistence.countByODI1_ODI2_N_R_T(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(), "",

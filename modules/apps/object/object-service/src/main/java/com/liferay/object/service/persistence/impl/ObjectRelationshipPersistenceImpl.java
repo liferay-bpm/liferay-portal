@@ -4106,6 +4106,726 @@ public class ObjectRelationshipPersistenceImpl
 	private static final String _FINDER_COLUMN_ODI1_ODI2_N_T_TYPE_3 =
 		"(objectRelationship.type IS NULL OR objectRelationship.type = '')";
 
+	private FinderPath _finderPathWithPaginationFindByODI2_DT_R_T;
+	private FinderPath _finderPathWithoutPaginationFindByODI2_DT_R_T;
+	private FinderPath _finderPathCountByODI2_DT_R_T;
+
+	/**
+	 * Returns all the object relationships where objectDefinitionId2 = &#63; and deletionType = &#63; and reverse = &#63; and type = &#63;.
+	 *
+	 * @param objectDefinitionId2 the object definition id2
+	 * @param deletionType the deletion type
+	 * @param reverse the reverse
+	 * @param type the type
+	 * @return the matching object relationships
+	 */
+	@Override
+	public List<ObjectRelationship> findByODI2_DT_R_T(
+		long objectDefinitionId2, String deletionType, boolean reverse,
+		String type) {
+
+		return findByODI2_DT_R_T(
+			objectDefinitionId2, deletionType, reverse, type, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the object relationships where objectDefinitionId2 = &#63; and deletionType = &#63; and reverse = &#63; and type = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ObjectRelationshipModelImpl</code>.
+	 * </p>
+	 *
+	 * @param objectDefinitionId2 the object definition id2
+	 * @param deletionType the deletion type
+	 * @param reverse the reverse
+	 * @param type the type
+	 * @param start the lower bound of the range of object relationships
+	 * @param end the upper bound of the range of object relationships (not inclusive)
+	 * @return the range of matching object relationships
+	 */
+	@Override
+	public List<ObjectRelationship> findByODI2_DT_R_T(
+		long objectDefinitionId2, String deletionType, boolean reverse,
+		String type, int start, int end) {
+
+		return findByODI2_DT_R_T(
+			objectDefinitionId2, deletionType, reverse, type, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the object relationships where objectDefinitionId2 = &#63; and deletionType = &#63; and reverse = &#63; and type = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ObjectRelationshipModelImpl</code>.
+	 * </p>
+	 *
+	 * @param objectDefinitionId2 the object definition id2
+	 * @param deletionType the deletion type
+	 * @param reverse the reverse
+	 * @param type the type
+	 * @param start the lower bound of the range of object relationships
+	 * @param end the upper bound of the range of object relationships (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching object relationships
+	 */
+	@Override
+	public List<ObjectRelationship> findByODI2_DT_R_T(
+		long objectDefinitionId2, String deletionType, boolean reverse,
+		String type, int start, int end,
+		OrderByComparator<ObjectRelationship> orderByComparator) {
+
+		return findByODI2_DT_R_T(
+			objectDefinitionId2, deletionType, reverse, type, start, end,
+			orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the object relationships where objectDefinitionId2 = &#63; and deletionType = &#63; and reverse = &#63; and type = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ObjectRelationshipModelImpl</code>.
+	 * </p>
+	 *
+	 * @param objectDefinitionId2 the object definition id2
+	 * @param deletionType the deletion type
+	 * @param reverse the reverse
+	 * @param type the type
+	 * @param start the lower bound of the range of object relationships
+	 * @param end the upper bound of the range of object relationships (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching object relationships
+	 */
+	@Override
+	public List<ObjectRelationship> findByODI2_DT_R_T(
+		long objectDefinitionId2, String deletionType, boolean reverse,
+		String type, int start, int end,
+		OrderByComparator<ObjectRelationship> orderByComparator,
+		boolean useFinderCache) {
+
+		deletionType = Objects.toString(deletionType, "");
+		type = Objects.toString(type, "");
+
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+			(orderByComparator == null)) {
+
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByODI2_DT_R_T;
+				finderArgs = new Object[] {
+					objectDefinitionId2, deletionType, reverse, type
+				};
+			}
+		}
+		else if (useFinderCache) {
+			finderPath = _finderPathWithPaginationFindByODI2_DT_R_T;
+			finderArgs = new Object[] {
+				objectDefinitionId2, deletionType, reverse, type, start, end,
+				orderByComparator
+			};
+		}
+
+		List<ObjectRelationship> list = null;
+
+		if (useFinderCache) {
+			list = (List<ObjectRelationship>)finderCache.getResult(
+				finderPath, finderArgs);
+
+			if ((list != null) && !list.isEmpty()) {
+				for (ObjectRelationship objectRelationship : list) {
+					if ((objectDefinitionId2 !=
+							objectRelationship.getObjectDefinitionId2()) ||
+						!deletionType.equals(
+							objectRelationship.getDeletionType()) ||
+						(reverse != objectRelationship.isReverse()) ||
+						!type.equals(objectRelationship.getType())) {
+
+						list = null;
+
+						break;
+					}
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler sb = null;
+
+			if (orderByComparator != null) {
+				sb = new StringBundler(
+					6 + (orderByComparator.getOrderByFields().length * 2));
+			}
+			else {
+				sb = new StringBundler(6);
+			}
+
+			sb.append(_SQL_SELECT_OBJECTRELATIONSHIP_WHERE);
+
+			sb.append(_FINDER_COLUMN_ODI2_DT_R_T_OBJECTDEFINITIONID2_2);
+
+			boolean bindDeletionType = false;
+
+			if (deletionType.isEmpty()) {
+				sb.append(_FINDER_COLUMN_ODI2_DT_R_T_DELETIONTYPE_3);
+			}
+			else {
+				bindDeletionType = true;
+
+				sb.append(_FINDER_COLUMN_ODI2_DT_R_T_DELETIONTYPE_2);
+			}
+
+			sb.append(_FINDER_COLUMN_ODI2_DT_R_T_REVERSE_2);
+
+			boolean bindType = false;
+
+			if (type.isEmpty()) {
+				sb.append(_FINDER_COLUMN_ODI2_DT_R_T_TYPE_3);
+			}
+			else {
+				bindType = true;
+
+				sb.append(_FINDER_COLUMN_ODI2_DT_R_T_TYPE_2);
+			}
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(
+					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+			}
+			else {
+				sb.append(ObjectRelationshipModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(objectDefinitionId2);
+
+				if (bindDeletionType) {
+					queryPos.add(deletionType);
+				}
+
+				queryPos.add(reverse);
+
+				if (bindType) {
+					queryPos.add(type);
+				}
+
+				list = (List<ObjectRelationship>)QueryUtil.list(
+					query, getDialect(), start, end);
+
+				cacheResult(list);
+
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first object relationship in the ordered set where objectDefinitionId2 = &#63; and deletionType = &#63; and reverse = &#63; and type = &#63;.
+	 *
+	 * @param objectDefinitionId2 the object definition id2
+	 * @param deletionType the deletion type
+	 * @param reverse the reverse
+	 * @param type the type
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching object relationship
+	 * @throws NoSuchObjectRelationshipException if a matching object relationship could not be found
+	 */
+	@Override
+	public ObjectRelationship findByODI2_DT_R_T_First(
+			long objectDefinitionId2, String deletionType, boolean reverse,
+			String type,
+			OrderByComparator<ObjectRelationship> orderByComparator)
+		throws NoSuchObjectRelationshipException {
+
+		ObjectRelationship objectRelationship = fetchByODI2_DT_R_T_First(
+			objectDefinitionId2, deletionType, reverse, type,
+			orderByComparator);
+
+		if (objectRelationship != null) {
+			return objectRelationship;
+		}
+
+		StringBundler sb = new StringBundler(10);
+
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		sb.append("objectDefinitionId2=");
+		sb.append(objectDefinitionId2);
+
+		sb.append(", deletionType=");
+		sb.append(deletionType);
+
+		sb.append(", reverse=");
+		sb.append(reverse);
+
+		sb.append(", type=");
+		sb.append(type);
+
+		sb.append("}");
+
+		throw new NoSuchObjectRelationshipException(sb.toString());
+	}
+
+	/**
+	 * Returns the first object relationship in the ordered set where objectDefinitionId2 = &#63; and deletionType = &#63; and reverse = &#63; and type = &#63;.
+	 *
+	 * @param objectDefinitionId2 the object definition id2
+	 * @param deletionType the deletion type
+	 * @param reverse the reverse
+	 * @param type the type
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching object relationship, or <code>null</code> if a matching object relationship could not be found
+	 */
+	@Override
+	public ObjectRelationship fetchByODI2_DT_R_T_First(
+		long objectDefinitionId2, String deletionType, boolean reverse,
+		String type, OrderByComparator<ObjectRelationship> orderByComparator) {
+
+		List<ObjectRelationship> list = findByODI2_DT_R_T(
+			objectDefinitionId2, deletionType, reverse, type, 0, 1,
+			orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last object relationship in the ordered set where objectDefinitionId2 = &#63; and deletionType = &#63; and reverse = &#63; and type = &#63;.
+	 *
+	 * @param objectDefinitionId2 the object definition id2
+	 * @param deletionType the deletion type
+	 * @param reverse the reverse
+	 * @param type the type
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching object relationship
+	 * @throws NoSuchObjectRelationshipException if a matching object relationship could not be found
+	 */
+	@Override
+	public ObjectRelationship findByODI2_DT_R_T_Last(
+			long objectDefinitionId2, String deletionType, boolean reverse,
+			String type,
+			OrderByComparator<ObjectRelationship> orderByComparator)
+		throws NoSuchObjectRelationshipException {
+
+		ObjectRelationship objectRelationship = fetchByODI2_DT_R_T_Last(
+			objectDefinitionId2, deletionType, reverse, type,
+			orderByComparator);
+
+		if (objectRelationship != null) {
+			return objectRelationship;
+		}
+
+		StringBundler sb = new StringBundler(10);
+
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		sb.append("objectDefinitionId2=");
+		sb.append(objectDefinitionId2);
+
+		sb.append(", deletionType=");
+		sb.append(deletionType);
+
+		sb.append(", reverse=");
+		sb.append(reverse);
+
+		sb.append(", type=");
+		sb.append(type);
+
+		sb.append("}");
+
+		throw new NoSuchObjectRelationshipException(sb.toString());
+	}
+
+	/**
+	 * Returns the last object relationship in the ordered set where objectDefinitionId2 = &#63; and deletionType = &#63; and reverse = &#63; and type = &#63;.
+	 *
+	 * @param objectDefinitionId2 the object definition id2
+	 * @param deletionType the deletion type
+	 * @param reverse the reverse
+	 * @param type the type
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching object relationship, or <code>null</code> if a matching object relationship could not be found
+	 */
+	@Override
+	public ObjectRelationship fetchByODI2_DT_R_T_Last(
+		long objectDefinitionId2, String deletionType, boolean reverse,
+		String type, OrderByComparator<ObjectRelationship> orderByComparator) {
+
+		int count = countByODI2_DT_R_T(
+			objectDefinitionId2, deletionType, reverse, type);
+
+		if (count == 0) {
+			return null;
+		}
+
+		List<ObjectRelationship> list = findByODI2_DT_R_T(
+			objectDefinitionId2, deletionType, reverse, type, count - 1, count,
+			orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the object relationships before and after the current object relationship in the ordered set where objectDefinitionId2 = &#63; and deletionType = &#63; and reverse = &#63; and type = &#63;.
+	 *
+	 * @param objectRelationshipId the primary key of the current object relationship
+	 * @param objectDefinitionId2 the object definition id2
+	 * @param deletionType the deletion type
+	 * @param reverse the reverse
+	 * @param type the type
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next object relationship
+	 * @throws NoSuchObjectRelationshipException if a object relationship with the primary key could not be found
+	 */
+	@Override
+	public ObjectRelationship[] findByODI2_DT_R_T_PrevAndNext(
+			long objectRelationshipId, long objectDefinitionId2,
+			String deletionType, boolean reverse, String type,
+			OrderByComparator<ObjectRelationship> orderByComparator)
+		throws NoSuchObjectRelationshipException {
+
+		deletionType = Objects.toString(deletionType, "");
+		type = Objects.toString(type, "");
+
+		ObjectRelationship objectRelationship = findByPrimaryKey(
+			objectRelationshipId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			ObjectRelationship[] array = new ObjectRelationshipImpl[3];
+
+			array[0] = getByODI2_DT_R_T_PrevAndNext(
+				session, objectRelationship, objectDefinitionId2, deletionType,
+				reverse, type, orderByComparator, true);
+
+			array[1] = objectRelationship;
+
+			array[2] = getByODI2_DT_R_T_PrevAndNext(
+				session, objectRelationship, objectDefinitionId2, deletionType,
+				reverse, type, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected ObjectRelationship getByODI2_DT_R_T_PrevAndNext(
+		Session session, ObjectRelationship objectRelationship,
+		long objectDefinitionId2, String deletionType, boolean reverse,
+		String type, OrderByComparator<ObjectRelationship> orderByComparator,
+		boolean previous) {
+
+		StringBundler sb = null;
+
+		if (orderByComparator != null) {
+			sb = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			sb = new StringBundler(6);
+		}
+
+		sb.append(_SQL_SELECT_OBJECTRELATIONSHIP_WHERE);
+
+		sb.append(_FINDER_COLUMN_ODI2_DT_R_T_OBJECTDEFINITIONID2_2);
+
+		boolean bindDeletionType = false;
+
+		if (deletionType.isEmpty()) {
+			sb.append(_FINDER_COLUMN_ODI2_DT_R_T_DELETIONTYPE_3);
+		}
+		else {
+			bindDeletionType = true;
+
+			sb.append(_FINDER_COLUMN_ODI2_DT_R_T_DELETIONTYPE_2);
+		}
+
+		sb.append(_FINDER_COLUMN_ODI2_DT_R_T_REVERSE_2);
+
+		boolean bindType = false;
+
+		if (type.isEmpty()) {
+			sb.append(_FINDER_COLUMN_ODI2_DT_R_T_TYPE_3);
+		}
+		else {
+			bindType = true;
+
+			sb.append(_FINDER_COLUMN_ODI2_DT_R_T_TYPE_2);
+		}
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				sb.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			sb.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						sb.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC);
+					}
+					else {
+						sb.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			sb.append(ObjectRelationshipModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = sb.toString();
+
+		Query query = session.createQuery(sql);
+
+		query.setFirstResult(0);
+		query.setMaxResults(2);
+
+		QueryPos queryPos = QueryPos.getInstance(query);
+
+		queryPos.add(objectDefinitionId2);
+
+		if (bindDeletionType) {
+			queryPos.add(deletionType);
+		}
+
+		queryPos.add(reverse);
+
+		if (bindType) {
+			queryPos.add(type);
+		}
+
+		if (orderByComparator != null) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						objectRelationship)) {
+
+				queryPos.add(orderByConditionValue);
+			}
+		}
+
+		List<ObjectRelationship> list = query.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Removes all the object relationships where objectDefinitionId2 = &#63; and deletionType = &#63; and reverse = &#63; and type = &#63; from the database.
+	 *
+	 * @param objectDefinitionId2 the object definition id2
+	 * @param deletionType the deletion type
+	 * @param reverse the reverse
+	 * @param type the type
+	 */
+	@Override
+	public void removeByODI2_DT_R_T(
+		long objectDefinitionId2, String deletionType, boolean reverse,
+		String type) {
+
+		for (ObjectRelationship objectRelationship :
+				findByODI2_DT_R_T(
+					objectDefinitionId2, deletionType, reverse, type,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
+			remove(objectRelationship);
+		}
+	}
+
+	/**
+	 * Returns the number of object relationships where objectDefinitionId2 = &#63; and deletionType = &#63; and reverse = &#63; and type = &#63;.
+	 *
+	 * @param objectDefinitionId2 the object definition id2
+	 * @param deletionType the deletion type
+	 * @param reverse the reverse
+	 * @param type the type
+	 * @return the number of matching object relationships
+	 */
+	@Override
+	public int countByODI2_DT_R_T(
+		long objectDefinitionId2, String deletionType, boolean reverse,
+		String type) {
+
+		deletionType = Objects.toString(deletionType, "");
+		type = Objects.toString(type, "");
+
+		FinderPath finderPath = _finderPathCountByODI2_DT_R_T;
+
+		Object[] finderArgs = new Object[] {
+			objectDefinitionId2, deletionType, reverse, type
+		};
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
+
+		if (count == null) {
+			StringBundler sb = new StringBundler(5);
+
+			sb.append(_SQL_COUNT_OBJECTRELATIONSHIP_WHERE);
+
+			sb.append(_FINDER_COLUMN_ODI2_DT_R_T_OBJECTDEFINITIONID2_2);
+
+			boolean bindDeletionType = false;
+
+			if (deletionType.isEmpty()) {
+				sb.append(_FINDER_COLUMN_ODI2_DT_R_T_DELETIONTYPE_3);
+			}
+			else {
+				bindDeletionType = true;
+
+				sb.append(_FINDER_COLUMN_ODI2_DT_R_T_DELETIONTYPE_2);
+			}
+
+			sb.append(_FINDER_COLUMN_ODI2_DT_R_T_REVERSE_2);
+
+			boolean bindType = false;
+
+			if (type.isEmpty()) {
+				sb.append(_FINDER_COLUMN_ODI2_DT_R_T_TYPE_3);
+			}
+			else {
+				bindType = true;
+
+				sb.append(_FINDER_COLUMN_ODI2_DT_R_T_TYPE_2);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(objectDefinitionId2);
+
+				if (bindDeletionType) {
+					queryPos.add(deletionType);
+				}
+
+				queryPos.add(reverse);
+
+				if (bindType) {
+					queryPos.add(type);
+				}
+
+				count = (Long)query.uniqueResult();
+
+				finderCache.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String
+		_FINDER_COLUMN_ODI2_DT_R_T_OBJECTDEFINITIONID2_2 =
+			"objectRelationship.objectDefinitionId2 = ? AND ";
+
+	private static final String _FINDER_COLUMN_ODI2_DT_R_T_DELETIONTYPE_2 =
+		"objectRelationship.deletionType = ? AND ";
+
+	private static final String _FINDER_COLUMN_ODI2_DT_R_T_DELETIONTYPE_3 =
+		"(objectRelationship.deletionType IS NULL OR objectRelationship.deletionType = '') AND ";
+
+	private static final String _FINDER_COLUMN_ODI2_DT_R_T_REVERSE_2 =
+		"objectRelationship.reverse = ? AND ";
+
+	private static final String _FINDER_COLUMN_ODI2_DT_R_T_TYPE_2 =
+		"objectRelationship.type = ?";
+
+	private static final String _FINDER_COLUMN_ODI2_DT_R_T_TYPE_3 =
+		"(objectRelationship.type IS NULL OR objectRelationship.type = '')";
+
 	private FinderPath _finderPathFetchByODI1_ODI2_N_R_T;
 	private FinderPath _finderPathCountByODI1_ODI2_N_R_T;
 
@@ -5281,6 +6001,41 @@ public class ObjectRelationshipPersistenceImpl
 			},
 			new String[] {
 				"objectDefinitionId1", "objectDefinitionId2", "name", "type_"
+			},
+			false);
+
+		_finderPathWithPaginationFindByODI2_DT_R_T = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByODI2_DT_R_T",
+			new String[] {
+				Long.class.getName(), String.class.getName(),
+				Boolean.class.getName(), String.class.getName(),
+				Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			},
+			new String[] {
+				"objectDefinitionId2", "deletionType", "reverse", "type_"
+			},
+			true);
+
+		_finderPathWithoutPaginationFindByODI2_DT_R_T = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByODI2_DT_R_T",
+			new String[] {
+				Long.class.getName(), String.class.getName(),
+				Boolean.class.getName(), String.class.getName()
+			},
+			new String[] {
+				"objectDefinitionId2", "deletionType", "reverse", "type_"
+			},
+			true);
+
+		_finderPathCountByODI2_DT_R_T = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByODI2_DT_R_T",
+			new String[] {
+				Long.class.getName(), String.class.getName(),
+				Boolean.class.getName(), String.class.getName()
+			},
+			new String[] {
+				"objectDefinitionId2", "deletionType", "reverse", "type_"
 			},
 			false);
 
