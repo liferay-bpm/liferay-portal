@@ -320,6 +320,21 @@ public class ObjectRelationshipLocalServiceImpl
 			objectDefinitionId2);
 	}
 
+	@Override
+	public boolean hasPreventDeletionType(
+		String deletionType, long objectDefinitionId2, boolean reverse,
+		String type) {
+
+		int count = objectRelationshipPersistence.countByODI2_DT_R_T(
+			objectDefinitionId2, deletionType, reverse, type);
+
+		if (count > 0) {
+			return true;
+		}
+
+		return false;
+	}
+
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectRelationship updateObjectRelationship(
