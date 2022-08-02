@@ -16,6 +16,7 @@ package com.liferay.notification.service.impl;
 
 import com.liferay.mail.kernel.model.MailMessage;
 import com.liferay.mail.kernel.service.MailService;
+import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationQueueEntryAttachment;
 import com.liferay.notification.service.NotificationQueueEntryAttachmentLocalService;
@@ -86,6 +87,7 @@ public class NotificationQueueEntryLocalServiceImpl
 		notificationQueueEntry.setFrom(from);
 		notificationQueueEntry.setFromName(fromName);
 		notificationQueueEntry.setPriority(priority);
+		notificationQueueEntry.setStatus(NotificationConstants.STATUS_SENT);
 		notificationQueueEntry.setSubject(subject);
 		notificationQueueEntry.setTo(to);
 		notificationQueueEntry.setToName(toName);
@@ -224,9 +226,12 @@ public class NotificationQueueEntryLocalServiceImpl
 
 		if (sent) {
 			notificationQueueEntry.setSentDate(new Date());
+			notificationQueueEntry.setStatus(NotificationConstants.STATUS_SENT);
 		}
 		else {
 			notificationQueueEntry.setSentDate(null);
+			notificationQueueEntry.setStatus(
+				NotificationConstants.STATUS_UNSENT);
 		}
 
 		return notificationQueueEntryPersistence.update(notificationQueueEntry);
