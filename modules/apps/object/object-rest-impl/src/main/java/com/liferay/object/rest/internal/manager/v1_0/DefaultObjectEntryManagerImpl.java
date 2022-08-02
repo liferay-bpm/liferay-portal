@@ -579,29 +579,6 @@ public class DefaultObjectEntryManagerImpl
 		return serviceContext;
 	}
 
-	private List<ObjectRelationship> _getManyToManyObjectRelationships(
-			long objectDefinitionId)
-		throws PortalException {
-
-		List<ObjectRelationship> objectRelationships =
-			_objectRelationshipLocalService.
-				getObjectRelationshipsByObjectDefinitionId2(objectDefinitionId);
-
-		return TransformUtil.transform(
-			objectRelationships,
-			objectRelationship -> {
-				if (StringUtil.equals(
-						objectRelationship.getType(),
-						ObjectRelationshipConstants.TYPE_MANY_TO_MANY) &&
-					!objectRelationship.isReverse()) {
-
-					return objectRelationship;
-				}
-
-				return null;
-			});
-	}
-
 	private String _getObjectEntriesPermissionName(long objectDefinitionId) {
 		return ObjectConstants.RESOURCE_NAME + "#" + objectDefinitionId;
 	}
@@ -626,38 +603,6 @@ public class DefaultObjectEntryManagerImpl
 
 	private String _getObjectEntryPermissionName(long objectDefinitionId) {
 		return ObjectDefinition.class.getName() + "#" + objectDefinitionId;
-	}
-
-	private boolean _hasPreventDeletionType(long objectDefinitionId)
-		throws PortalException {
-
-		_objectRelationships = new ArrayList<>();
-
-		_objectRelationships.addAll(
-			TransformUtil.transform(
-				_objectRelationshipLocalService.getObjectRelationships(
-					objectDefinitionId),
-				objectRelationship -> {
-					if (objectRelationship.isReverse()) {
-						return null;
-					}
-
-					return objectRelationship;
-				}));
-
-		_objectRelationships.addAll(
-			_getManyToManyObjectRelationships(objectDefinitionId));
-
-		for (ObjectRelationship objectRelationship : _objectRelationships) {
-			if (StringUtil.equals(
-					objectRelationship.getDeletionType(),
-					ObjectRelationshipConstants.DELETION_TYPE_PREVENT)) {
-
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	private boolean _hasRelatedObjectEntries(
@@ -791,8 +736,14 @@ public class DefaultObjectEntryManagerImpl
 				HashMapBuilder.put(
 					"delete",
 					() -> {
-						if (_hasPreventDeletionType(
-								objectDefinition.getObjectDefinitionId()) &&
+						if (_objectRelationshipLocalService.
+								hasPreventDeletionType(
+									ObjectRelationshipConstants.
+										DELETION_TYPE_PREVENT,
+									objectDefinition.getObjectDefinitionId(),
+									false,
+									ObjectRelationshipConstants.
+										TYPE_MANY_TO_MANY) &&
 							_hasRelatedObjectEntries(objectEntry)) {
 
 							return null;
