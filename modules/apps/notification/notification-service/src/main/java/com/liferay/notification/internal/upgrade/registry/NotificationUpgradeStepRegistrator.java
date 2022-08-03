@@ -16,6 +16,7 @@ package com.liferay.notification.internal.upgrade.registry;
 
 import com.liferay.notification.internal.upgrade.v1_1_0.util.NotificationQueueEntryAttachmentTable;
 import com.liferay.notification.internal.upgrade.v1_1_0.util.NotificationTemplateAttachmentTable;
+import com.liferay.notification.internal.upgrade.v1_2_0.NotificationQueueEntryUpgradeProcess;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 import com.liferay.portal.upgrade.step.util.UpgradeStepFactory;
 
@@ -35,6 +36,9 @@ public class NotificationUpgradeStepRegistrator
 			NotificationTemplateAttachmentTable.create(),
 			UpgradeStepFactory.addColumns(
 				"NotificationTemplate", "objectDefinitionId LONG"));
+
+		registry.register(
+			"1.1.0", "1.2.0", new NotificationQueueEntryUpgradeProcess());
 	}
 
 }
