@@ -690,60 +690,58 @@ public class ObjectEntryLocalServiceImpl
 			extensionDynamicObjectDefinitionTable.getSelectExpressions(),
 			_EXPRESSIONS);
 
-		List<Object[]> rows = _list(
-			DSLQueryFactoryUtil.selectDistinct(
-				selectExpressions
-			).from(
-				dynamicObjectDefinitionTable
-			).innerJoinON(
-				ObjectEntryTable.INSTANCE,
-				ObjectEntryTable.INSTANCE.objectEntryId.eq(
-					dynamicObjectDefinitionTable.getPrimaryKeyColumn())
-			).innerJoinON(
-				extensionDynamicObjectDefinitionTable,
-				extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn(
-				).eq(
-					dynamicObjectDefinitionTable.getPrimaryKeyColumn()
-				)
-			).where(
-				ObjectEntryTable.INSTANCE.objectDefinitionId.eq(
-					objectDefinitionId
-				).and(
-					() -> {
-						if (groupId == 0) {
-							return null;
-						}
-
-						return ObjectEntryTable.INSTANCE.groupId.eq(groupId);
+		DSLQuery dslQuery = DSLQueryFactoryUtil.selectDistinct(
+			selectExpressions
+		).from(
+			dynamicObjectDefinitionTable
+		).innerJoinON(
+			ObjectEntryTable.INSTANCE,
+			ObjectEntryTable.INSTANCE.objectEntryId.eq(
+				dynamicObjectDefinitionTable.getPrimaryKeyColumn())
+		).innerJoinON(
+			extensionDynamicObjectDefinitionTable,
+			extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn(
+			).eq(
+				dynamicObjectDefinitionTable.getPrimaryKeyColumn()
+			)
+		).where(
+			ObjectEntryTable.INSTANCE.objectDefinitionId.eq(
+				objectDefinitionId
+			).and(
+				() -> {
+					if (groupId == 0) {
+						return null;
 					}
-				).and(
-					_fillAccountEntriesPredicate(
-						objectDefinitionId, accountEntryIds)
-				).and(
-					_fillPredicate(objectDefinitionId, predicate, search)
-				).and(
-					() -> {
-						if (PermissionThreadLocal.getPermissionChecker() ==
-								null) {
 
-							return null;
-						}
-
-						ObjectDefinition objectDefinition =
-							_objectDefinitionPersistence.fetchByPrimaryKey(
-								objectDefinitionId);
-
-						return _inlineSQLHelper.getPermissionWherePredicate(
-							objectDefinition.getClassName(),
-							dynamicObjectDefinitionTable.getPrimaryKeyColumn());
+					return ObjectEntryTable.INSTANCE.groupId.eq(groupId);
+				}
+			).and(
+				_fillAccountEntriesPredicate(
+					objectDefinitionId, accountEntryIds)
+			).and(
+				_fillPredicate(objectDefinitionId, predicate, search)
+			).and(
+				() -> {
+					if (PermissionThreadLocal.getPermissionChecker() == null) {
+						return null;
 					}
-				)
-			).orderBy(
-				orderByExpressions
-			).limit(
-				start, end
-			),
-			selectExpressions);
+
+					ObjectDefinition objectDefinition =
+						_objectDefinitionPersistence.fetchByPrimaryKey(
+							objectDefinitionId);
+
+					return _inlineSQLHelper.getPermissionWherePredicate(
+						objectDefinition.getClassName(),
+						dynamicObjectDefinitionTable.getPrimaryKeyColumn());
+				}
+			)
+		).orderBy(
+			orderByExpressions
+		).limit(
+			start, end
+		);
+
+		List<Object[]> rows = objectEntryPersistence.dslQuery(dslQuery);
 
 		List<Map<String, Serializable>> valuesList = new ArrayList<>(
 			rows.size());
