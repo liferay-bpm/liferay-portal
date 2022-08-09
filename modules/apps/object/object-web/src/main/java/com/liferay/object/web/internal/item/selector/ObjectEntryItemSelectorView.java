@@ -319,8 +319,10 @@ public class ObjectEntryItemSelectorView
 				_objectDefinitionLocalService.getObjectDefinition(
 					objectDefinitionId);
 
-			return StringUtil.toLowerCase(objectDefinition.getShortName()) +
-				"Id eq '0'";
+			String shortName = StringUtil.lowerCaseFirstLetter(
+				objectDefinition.getShortName());
+
+			return shortName + "Id eq '0'";
 		}
 
 		private ObjectEntry _toObjectEntry(
