@@ -212,12 +212,22 @@ public class NotificationTemplateLocalServiceImpl
 
 		User user = _userLocalService.getUser(userId);
 
+		Locale siteDefaultLocale = _portal.getSiteDefaultLocale(
+			user.getGroupId());
+
+		String bcc = _formatContent(
+			notificationTemplate.getBcc(), user.getLocale(), null,
+			notificationType, object);
+
+		if (Validator.isNull(bcc)) {
+			bcc = _formatContent(
+				notificationTemplate.getBcc(), siteDefaultLocale, null,
+				notificationType, object);
+		}
+
 		String body = _formatContent(
 			notificationTemplate.getBody(user.getLocale()), user.getLocale(),
 			null, notificationType, object);
-
-		Locale siteDefaultLocale = _portal.getSiteDefaultLocale(
-			user.getGroupId());
 
 		if (Validator.isNull(body)) {
 			body = _formatContent(
@@ -225,12 +235,34 @@ public class NotificationTemplateLocalServiceImpl
 				siteDefaultLocale, null, notificationType, object);
 		}
 
-		String fromName = notificationTemplate.getFromName(
-			user.getLanguageId());
+		String cc = _formatContent(
+			notificationTemplate.getCc(), user.getLocale(), null,
+			notificationType, object);
+
+		if (Validator.isNull(cc)) {
+			cc = _formatContent(
+				notificationTemplate.getCc(), siteDefaultLocale, null,
+				notificationType, object);
+		}
+
+		String from = _formatContent(
+			notificationTemplate.getFrom(), user.getLocale(), null,
+			notificationType, object);
+
+		if (Validator.isNull(from)) {
+			from = _formatContent(
+				notificationTemplate.getFrom(), siteDefaultLocale, null,
+				notificationType, object);
+		}
+
+		String fromName = _formatContent(
+			notificationTemplate.getFromName(user.getLocale()),
+			user.getLocale(), null, notificationType, object);
 
 		if (Validator.isNull(fromName)) {
-			fromName = notificationTemplate.getFromName(
-				_portal.getSiteDefaultLocale(user.getGroupId()));
+			fromName = _formatContent(
+				notificationTemplate.getFromName(siteDefaultLocale),
+				siteDefaultLocale, null, notificationType, object);
 		}
 
 		String subject = _formatContent(
@@ -286,25 +318,20 @@ public class NotificationTemplateLocalServiceImpl
 						addNotificationQueueEntry(
 							defaultUser.getUserId(),
 							notificationTemplate.getNotificationTemplateId(),
-							notificationTemplate.getBcc(), body,
-							notificationTemplate.getCc(),
+							bcc, body, cc,
 							notificationType.getClassName(object),
-							notificationType.getClassPK(object),
-							notificationTemplate.getFrom(), fromName, 0,
-							subject, emailAddressOrUserId, emailAddressOrUserId,
-							fileEntryIds);
+							notificationType.getClassPK(object), fromAdress,
+							fromName, 0, subject, emailAddressOrUserId,
+							emailAddressOrUserId, fileEntryIds);
 
 					continue;
 				}
 			}
 
 			_notificationQueueEntryLocalService.addNotificationQueueEntry(
-				userId, notificationTemplate.getNotificationTemplateId(),
-				notificationTemplate.getBcc(), body,
-				notificationTemplate.getCc(),
-				notificationType.getClassName(object),
-				notificationType.getClassPK(object),
-				notificationTemplate.getFrom(), fromName, 0, subject,
+				userId, notificationTemplate.getNotificationTemplateId(), bcc,
+				body, cc, notificationType.getClassName(object),
+				notificationType.getClassPK(object), from, fromName, 0, subject,
 				toUser.getEmailAddress(), toUser.getFullName(), fileEntryIds);
 		}
 	}
