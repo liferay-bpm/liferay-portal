@@ -17,7 +17,6 @@ package com.liferay.object.scripting.internal.executor;
 import com.liferay.object.scripting.executor.ObjectScriptingExecutor;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.scripting.Scripting;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +47,7 @@ public class ObjectScriptingExecutorImpl implements ObjectScriptingExecutor {
 		currentThread.setContextClassLoader(clazz.getClassLoader());
 
 		try {
-			results = _scripting.eval(
+			results = _scriptingExecutor.eval(
 				null, inputObjects, outputNames, language, script);
 
 			results.put("invalidScript", false);
@@ -68,7 +67,7 @@ public class ObjectScriptingExecutorImpl implements ObjectScriptingExecutor {
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectScriptingExecutorImpl.class);
 
-	@Reference
-	private Scripting _scripting;
+	@Reference(target = "(scripting.language=groovy)")
+	private ScriptingExecutor _scriptingExecutor;
 
 }
