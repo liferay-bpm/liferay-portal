@@ -815,15 +815,24 @@ public class ObjectFieldLocalServiceImpl
 	private ObjectField _getObjectRelationshipField(
 		long objectDefinitionId, String relationshipIdName) {
 
-		for (ObjectField objectField : getObjectFields(objectDefinitionId)) {
+		ObjectField objectField = objectFieldPersistence.fetchByODI_N(
+			objectDefinitionId, relationshipIdName);
+
+		if (objectField != null) {
+			return objectField;
+		}
+
+		for (ObjectField objectDefinitionObjectField :
+				getObjectFields(objectDefinitionId)) {
+
 			if (StringUtil.equals(
-					objectField.getBusinessType(),
+					objectDefinitionObjectField.getBusinessType(),
 					ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP) &&
 				StringUtil.endsWith(
-					objectField.getName(),
+					objectDefinitionObjectField.getName(),
 					StringPool.UNDERLINE + relationshipIdName)) {
 
-				return objectField;
+				return objectDefinitionObjectField;
 			}
 		}
 

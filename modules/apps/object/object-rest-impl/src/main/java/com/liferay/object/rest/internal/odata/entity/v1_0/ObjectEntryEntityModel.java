@@ -98,6 +98,12 @@ public class ObjectEntryEntityModel implements EntityModel {
 
 				String objectFieldName = objectField.getName();
 
+				_entityFieldsMap.put(
+					objectFieldName,
+					new IdEntityField(
+						objectFieldName, locale -> objectFieldName,
+						String::valueOf));
+
 				String relationshipIdName = objectFieldName.substring(
 					objectFieldName.lastIndexOf(StringPool.UNDERLINE) + 1);
 
@@ -107,6 +113,17 @@ public class ObjectEntryEntityModel implements EntityModel {
 						relationshipIdName,
 						locale ->
 							"nestedFieldArray.value_long#" + objectFieldName,
+						String::valueOf));
+			}
+			else if (Objects.equals(
+						objectField.getRelationshipType(), "manyToMany")) {
+
+				String objectFieldName = objectField.getName();
+
+				_entityFieldsMap.put(
+					objectFieldName,
+					new IdEntityField(
+						objectFieldName, locale -> objectFieldName,
 						String::valueOf));
 			}
 			else {
