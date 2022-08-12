@@ -192,13 +192,20 @@ export function ObjectRelationshipFormBase({
 				error={errors.objectDefinitionId2}
 				label={Liferay.Language.get('object')}
 				onChange={({target: {value}}) => {
-					const {id, name} = filteredObjectDefinitions[Number(value)];
+					const {id, name} = Liferay.FeatureFlags['LPS-158478']
+						? objectDefinitions[Number(value)]
+						: filteredObjectDefinitions[Number(value)];
+
 					setValues({
 						objectDefinitionId2: id,
 						objectDefinitionName2: name,
 					});
 				}}
-				options={filteredObjectDefinitions.map(({name}) => name)}
+				options={
+					Liferay.FeatureFlags['LPS-158478']
+						? objectDefinitions.map(({name}) => name)
+						: filteredObjectDefinitions.map(({name}) => name)
+				}
 				required
 				value={values.objectDefinitionName2}
 			/>
