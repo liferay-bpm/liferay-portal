@@ -92,12 +92,14 @@ public class ExportObjectDefinitionMVCResourceCommand
 			Map<String, Object> parameters =
 				(Map<String, Object>)objectAction.getParameters();
 
-			parameters.put(
-				"predefinedValues",
-				ListUtil.toList(
-					(ArrayList<LinkedHashMap>)parameters.get(
-						"predefinedValues"),
-					JSONFactoryUtil::createJSONObject));
+			if (parameters.containsKey("predefinedValues")) {
+				parameters.put(
+					"predefinedValues",
+					ListUtil.toList(
+						(ArrayList<LinkedHashMap>)parameters.get(
+							"predefinedValues"),
+						JSONFactoryUtil::createJSONObject));
+			}
 		}
 
 		objectDefinition.setObjectFields(
