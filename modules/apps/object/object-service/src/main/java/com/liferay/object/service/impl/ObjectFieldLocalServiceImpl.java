@@ -493,6 +493,23 @@ public class ObjectFieldLocalServiceImpl
 		_validateExternalReferenceCode(
 			newObjectField.getObjectFieldId(), newObjectField.getCompanyId(),
 			externalReferenceCode, newObjectField.getObjectDefinitionId());
+<<<<<<< HEAD
+=======
+		_validateLabel(labelMap);
+
+		newObjectField.setExternalReferenceCode(externalReferenceCode);
+		newObjectField.setDefaultValue(defaultValue);
+		newObjectField.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
+
+		if (objectDefinition.isApproved()) {
+			newObjectField = objectFieldPersistence.update(newObjectField);
+
+			_addOrUpdateObjectFieldSettings(
+				newObjectField, oldObjectField, objectFieldSettings);
+
+			return newObjectField;
+		}
+>>>>>>> 84f875d (LPS-158069 Update ObjectField default value when ObjectDefition is approved)
 
 		_validateDefaultValue(
 			businessType, defaultValue, listTypeDefinitionId, state);
@@ -541,7 +558,6 @@ public class ObjectFieldLocalServiceImpl
 
 		newObjectField.setListTypeDefinitionId(listTypeDefinitionId);
 		newObjectField.setDBColumnName(name + StringPool.UNDERLINE);
-		newObjectField.setDefaultValue(defaultValue);
 		newObjectField.setIndexed(indexed);
 		newObjectField.setIndexedAsKeyword(indexedAsKeyword);
 		newObjectField.setIndexedLanguageId(indexedLanguageId);
