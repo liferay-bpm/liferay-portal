@@ -24,6 +24,38 @@
 			"conditionExpression": "",
 			"description": "",
 			"name": "Action",
+			"objectActionExecutorKey": "groovy",
+			"objectActionTriggerKey": "onAfterAdd",
+			"parameters": {
+				"script": "invalidFields = false;"
+			},
+			"status": {
+				"code": 0,
+				"label": "never-ran",
+				"label_i18n": "Never Ran"
+			}
+		},
+		{
+			"active": true,
+			"conditionExpression": "",
+			"description": "",
+			"name": "Action",
+			"objectActionExecutorKey": "notification",
+			"objectActionTriggerKey": "onAfterAdd",
+			"parameters": {
+				"notificationTemplateId": 0
+			},
+			"status": {
+				"code": 0,
+				"label": "never-ran",
+				"label_i18n": "Never Ran"
+			}
+		},
+		{
+			"active": true,
+			"conditionExpression": "",
+			"description": "",
+			"name": "Action",
 			"objectActionExecutorKey": "webhook",
 			"objectActionTriggerKey": "onAfterAdd",
 			"parameters": {
