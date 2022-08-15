@@ -229,8 +229,8 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					_objectDefinitionLocalService, _objectEntryLocalService,
 					_objectEntryManagerTracker.getObjectEntryManager(
 						objectDefinition.getStorageType()),
-					_objectFieldLocalService, _objectRelationshipLocalService,
-					_objectScopeProviderRegistry, _portal),
+					_objectFieldLocalService, _objectScopeProviderRegistry,
+					_portal),
 				HashMapDictionaryBuilder.<String, Object>put(
 					"item.selector.view.order", 500
 				).build()),

@@ -115,17 +115,6 @@ public class ObjectEntryEntityModel implements EntityModel {
 							"nestedFieldArray.value_long#" + objectFieldName,
 						String::valueOf));
 			}
-			else if (Objects.equals(
-						objectField.getRelationshipType(), "manyToMany")) {
-
-				String objectFieldName = objectField.getName();
-
-				_entityFieldsMap.put(
-					objectFieldName,
-					new IdEntityField(
-						objectFieldName, locale -> objectFieldName,
-						String::valueOf));
-			}
 			else {
 				_getEntityField(
 					objectField

@@ -24,13 +24,11 @@ import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelect
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
-import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
-import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -81,7 +79,6 @@ public class ObjectEntryItemSelectorView
 		ObjectEntryLocalService objectEntryLocalService,
 		ObjectEntryManager objectEntryManager,
 		ObjectFieldLocalService objectFieldLocalService,
-		ObjectRelationshipLocalService objectRelationshipLocalService,
 		ObjectScopeProviderRegistry objectScopeProviderRegistry,
 		Portal portal) {
 
@@ -92,7 +89,6 @@ public class ObjectEntryItemSelectorView
 		_objectEntryLocalService = objectEntryLocalService;
 		_objectEntryManager = objectEntryManager;
 		_objectFieldLocalService = objectFieldLocalService;
-		_objectRelationshipLocalService = objectRelationshipLocalService;
 		_objectScopeProviderRegistry = objectScopeProviderRegistry;
 		_portal = portal;
 	}
@@ -149,8 +145,6 @@ public class ObjectEntryItemSelectorView
 	private final ObjectEntryLocalService _objectEntryLocalService;
 	private final ObjectEntryManager _objectEntryManager;
 	private final ObjectFieldLocalService _objectFieldLocalService;
-	private final ObjectRelationshipLocalService
-		_objectRelationshipLocalService;
 	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 	private final Portal _portal;
 
@@ -319,26 +313,16 @@ public class ObjectEntryItemSelectorView
 		}
 
 		private String _getFilterString() throws PortalException {
-			long objectDefinitionId = ParamUtil.getLong(
-				_portletRequest, "objectDefinitionId");
+			if (Objects.equals(
+					ParamUtil.getString(
+						_portletRequest, "objectRelationshipType"),
+					"manyToMany")) {
 
-			if (objectDefinitionId == 0) {
-				return StringPool.BLANK;
-			}
-
-			long objectRelationshipId = ParamUtil.getLong(
-				_portletRequest, "objectRelationshipId");
-
-			ObjectRelationship objectRelationship =
-				_objectRelationshipLocalService.getObjectRelationship(
-					objectRelationshipId);
-
-			if (Objects.equals(objectRelationship.getType(), "manyToMany")) {
 				return null;
 			}
 
 			ObjectField objectField = _objectFieldLocalService.getObjectField(
-				objectRelationship.getObjectFieldId2());
+				ParamUtil.getLong(_portletRequest, "objectFieldId2"));
 
 			return objectField.getDBColumnName() + " eq '0'";
 		}
