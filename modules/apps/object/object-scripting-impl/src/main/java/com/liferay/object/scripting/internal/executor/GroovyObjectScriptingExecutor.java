@@ -17,7 +17,7 @@ package com.liferay.object.scripting.internal.executor;
 import com.liferay.object.scripting.executor.ObjectScriptingExecutor;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.scripting.Scripting;
+import com.liferay.portal.kernel.scripting.ScriptingExecutor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,13 +29,16 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Feliphe Marinho
  */
-@Component(immediate = true, service = ObjectScriptingExecutor.class)
-public class ObjectScriptingExecutorImpl implements ObjectScriptingExecutor {
+@Component(
+	immediate = true, property = "scripting.language=groovy",
+	service = ObjectScriptingExecutor.class
+)
+public class GroovyObjectScriptingExecutor implements ObjectScriptingExecutor {
 
 	@Override
 	public Map<String, Object> execute(
-		Map<String, Object> inputObjects, String language,
-		Set<String> outputNames, String script) {
+		Map<String, Object> inputObjects, Set<String> outputNames,
+		String script) {
 
 		Thread currentThread = Thread.currentThread();
 
@@ -48,8 +51,8 @@ public class ObjectScriptingExecutorImpl implements ObjectScriptingExecutor {
 		currentThread.setContextClassLoader(clazz.getClassLoader());
 
 		try {
-			results = _scripting.eval(
-				null, inputObjects, outputNames, language, script);
+			results = _scriptingExecutor.eval(
+				null, inputObjects, outputNames, script);
 
 			results.put("invalidScript", false);
 		}
@@ -66,9 +69,9 @@ public class ObjectScriptingExecutorImpl implements ObjectScriptingExecutor {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		ObjectScriptingExecutorImpl.class);
+		GroovyObjectScriptingExecutor.class);
 
-	@Reference
-	private Scripting _scripting;
+	@Reference(target = "(scripting.language=groovy)")
+	private ScriptingExecutor _scriptingExecutor;
 
 }
