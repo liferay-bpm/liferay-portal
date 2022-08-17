@@ -127,6 +127,48 @@ public class ObjectDefinition implements Cloneable, Serializable {
 
 	protected Boolean active;
 
+	public Boolean getCategorization() {
+		return categorization;
+	}
+
+	public void setCategorization(Boolean categorization) {
+		this.categorization = categorization;
+	}
+
+	public void setCategorization(
+		UnsafeSupplier<Boolean, Exception> categorizationUnsafeSupplier) {
+
+		try {
+			categorization = categorizationUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Boolean categorization;
+
+	public Boolean getComments() {
+		return comments;
+	}
+
+	public void setComments(Boolean comments) {
+		this.comments = comments;
+	}
+
+	public void setComments(
+		UnsafeSupplier<Boolean, Exception> commentsUnsafeSupplier) {
+
+		try {
+			comments = commentsUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Boolean comments;
+
 	public Date getDateCreated() {
 		return dateCreated;
 	}

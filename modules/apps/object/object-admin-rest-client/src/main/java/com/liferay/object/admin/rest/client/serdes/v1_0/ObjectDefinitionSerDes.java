@@ -108,6 +108,26 @@ public class ObjectDefinitionSerDes {
 			sb.append(objectDefinition.getActive());
 		}
 
+		if (objectDefinition.getCategorization() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"categorization\": ");
+
+			sb.append(objectDefinition.getCategorization());
+		}
+
+		if (objectDefinition.getComments() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"comments\": ");
+
+			sb.append(objectDefinition.getComments());
+		}
+
 		if (objectDefinition.getDateCreated() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -460,6 +480,22 @@ public class ObjectDefinitionSerDes {
 			map.put("active", String.valueOf(objectDefinition.getActive()));
 		}
 
+		if (objectDefinition.getCategorization() == null) {
+			map.put("categorization", null);
+		}
+		else {
+			map.put(
+				"categorization",
+				String.valueOf(objectDefinition.getCategorization()));
+		}
+
+		if (objectDefinition.getComments() == null) {
+			map.put("comments", null);
+		}
+		else {
+			map.put("comments", String.valueOf(objectDefinition.getComments()));
+		}
+
 		if (objectDefinition.getDateCreated() == null) {
 			map.put("dateCreated", null);
 		}
@@ -674,6 +710,17 @@ public class ObjectDefinitionSerDes {
 			else if (Objects.equals(jsonParserFieldName, "active")) {
 				if (jsonParserFieldValue != null) {
 					objectDefinition.setActive((Boolean)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "categorization")) {
+				if (jsonParserFieldValue != null) {
+					objectDefinition.setCategorization(
+						(Boolean)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "comments")) {
+				if (jsonParserFieldValue != null) {
+					objectDefinition.setComments((Boolean)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {

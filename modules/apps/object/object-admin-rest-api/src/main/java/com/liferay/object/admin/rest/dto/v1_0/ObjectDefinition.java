@@ -183,6 +183,62 @@ public class ObjectDefinition implements Serializable {
 	protected Boolean active;
 
 	@Schema
+	public Boolean getCategorization() {
+		return categorization;
+	}
+
+	public void setCategorization(Boolean categorization) {
+		this.categorization = categorization;
+	}
+
+	@JsonIgnore
+	public void setCategorization(
+		UnsafeSupplier<Boolean, Exception> categorizationUnsafeSupplier) {
+
+		try {
+			categorization = categorizationUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Boolean categorization;
+
+	@Schema
+	public Boolean getComments() {
+		return comments;
+	}
+
+	public void setComments(Boolean comments) {
+		this.comments = comments;
+	}
+
+	@JsonIgnore
+	public void setComments(
+		UnsafeSupplier<Boolean, Exception> commentsUnsafeSupplier) {
+
+		try {
+			comments = commentsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Boolean comments;
+
+	@Schema
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -818,6 +874,26 @@ public class ObjectDefinition implements Serializable {
 			sb.append("\"active\": ");
 
 			sb.append(active);
+		}
+
+		if (categorization != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"categorization\": ");
+
+			sb.append(categorization);
+		}
+
+		if (comments != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"comments\": ");
+
+			sb.append(comments);
 		}
 
 		if (dateCreated != null) {

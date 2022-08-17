@@ -976,6 +976,22 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("categorization", additionalAssertFieldName)) {
+				if (objectDefinition.getCategorization() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("comments", additionalAssertFieldName)) {
+				if (objectDefinition.getComments() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("label", additionalAssertFieldName)) {
 				if (objectDefinition.getLabel() == null) {
 					valid = false;
@@ -1257,6 +1273,28 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				if (!Objects.deepEquals(
 						objectDefinition1.getActive(),
 						objectDefinition2.getActive())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("categorization", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						objectDefinition1.getCategorization(),
+						objectDefinition2.getCategorization())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("comments", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						objectDefinition1.getComments(),
+						objectDefinition2.getComments())) {
 
 					return false;
 				}
@@ -1607,6 +1645,16 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("categorization")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("comments")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("dateCreated")) {
 			if (operator.equals("between")) {
 				sb = new StringBundler();
@@ -1828,6 +1876,8 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				accountEntryRestrictedObjectFieldId =
 					RandomTestUtil.randomLong();
 				active = RandomTestUtil.randomBoolean();
+				categorization = RandomTestUtil.randomBoolean();
+				comments = RandomTestUtil.randomBoolean();
 				dateCreated = RandomTestUtil.nextDate();
 				dateModified = RandomTestUtil.nextDate();
 				id = RandomTestUtil.randomLong();
