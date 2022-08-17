@@ -56,6 +56,10 @@ components:
                     type: object
                 active:
                     type: boolean
+                categorization:
+                    type: boolean
+                comments:
+                    type: boolean
                 dateCreated:
                     format: date
                     readOnly: true
