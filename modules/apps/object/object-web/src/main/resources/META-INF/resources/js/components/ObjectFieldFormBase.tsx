@@ -12,6 +12,7 @@
  * details.
  */
 
+import ClayAlert from '@clayui/alert';
 import ClayForm, {ClayToggle} from '@clayui/form';
 import {
 	API,
@@ -107,8 +108,30 @@ export default function ObjectFieldFormBase({
 		return businessTypeMap;
 	}, [objectFieldTypes]);
 
+	const [defaultValue, setDefaltValue] = useState<ObjectState>();
+	const [defaultValueQuery, setDefaultValueQuery] = useState<string>('');
 	const [pickLists, setPickLists] = useState<PickList[]>([]);
 	const [pickListItems, setPickListItems] = useState<PickListItem[]>([]);
+
+	useEffect(() => {
+		const {objectFieldSettings} = values;
+
+		if (values.businessType === 'Picklist' && objectFieldSettings) {
+			const [objectFieldPicklist] = objectFieldSettings;
+			const {value} = objectFieldPicklist;
+			const {objectStates} = value as ObjectFieldPicklistSetting;
+			const defaultPicklistValue = objectStates.find(
+				(objectState) => objectState.key === values.defaultValue
+			);
+
+			if (!defaultPicklistValue && values.defaultValue) {
+				setValues({defaultValue: undefined});
+			}
+
+			setDefaltValue(defaultPicklistValue);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [values.defaultValue]);
 
 	const picklistBusinessType = values.businessType === 'Picklist';
 	const validListTypeDefinitionId =
@@ -128,6 +151,14 @@ export default function ObjectFieldFormBase({
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [values.businessType, values.listTypeDefinitionId]);
+
+	const filteredPicklistItens = useMemo(() => {
+		return pickListItems.filter(({name}) => {
+			return name
+				.toLowerCase()
+				.includes(defaultValueQuery.toLocaleLowerCase());
+		});
+	}, [defaultValueQuery, pickListItems]);
 
 	const selectedPicklist = useMemo(() => {
 		return pickLists.find(({id}) => values.listTypeDefinitionId === id);
@@ -329,26 +360,39 @@ export default function ObjectFieldFormBase({
 			</ClayForm.Group>
 
 			{values.state && (
-				<Select
-					disabled={disabled}
+				<AutoComplete
+					emptyStateMessage={Liferay.Language.get('option-not-found')}
 					error={errors.defaultValue}
+					items={filteredPicklistItens}
 					label={Liferay.Language.get('default-value')}
-					onChange={({target: {value}}) =>
+					onChangeQuery={setDefaultValueQuery}
+					onSelectItem={(item) => {
 						setValues({
-							defaultValue: pickListItems[Number(value)].key,
-						})
-					}
-					options={pickListItems.map(({name}) => name)}
+							defaultValue: item.key,
+						});
+					}}
+					placeholder={Liferay.Language.get('choose-an-option')}
+					query={defaultValueQuery}
 					required
-					value={
-						values.defaultValue &&
-						pickListItems.indexOf(
-							pickListItems.find(
-								({key}) => values.defaultValue === key
-							)!
-						)
-					}
-				/>
+					value={values.defaultValue}
+				>
+					{({name}) => (
+						<div className="d-flex justify-content-between">
+							<div>{name}</div>
+						</div>
+					)}
+				</AutoComplete>
+			)}
+			{values.objectFieldSettings && !defaultValue && (
+				<div className="c-mt-1">
+					<ClayAlert
+						displayType="danger"
+						title={Liferay.Language.get(
+							'missing-picklist-default-value'
+						)}
+						variant="feedback"
+					/>
+				</div>
 			)}
 		</>
 	);

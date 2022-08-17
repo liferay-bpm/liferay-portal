@@ -133,8 +133,13 @@ interface ObjectFieldSetting {
 		| number
 		| boolean
 		| ObjectFieldFilterSetting[]
-		| {id: number; objectStates: ObjectState[]};
+		| ObjectFieldPicklistSetting;
 }
+
+type ObjectFieldPicklistSetting = {
+	id: number;
+	objectStates: ObjectState[];
+};
 
 type ObjectFieldFilterSetting = {
 	filterBy?: string;
