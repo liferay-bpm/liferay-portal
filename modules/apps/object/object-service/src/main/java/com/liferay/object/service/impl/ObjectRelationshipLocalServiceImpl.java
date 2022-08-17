@@ -464,15 +464,26 @@ public class ObjectRelationshipLocalServiceImpl
 					"R_", user.getCompanyId(), objectDefinition1.getShortName(),
 					"_", objectDefinition2.getShortName(), "_", name));
 
+			String pkObjectFieldDBColumnName1 =
+				objectDefinition1.getPKObjectFieldDBColumnName();
+
+			String pkObjectFieldDBColumnName2 =
+				objectDefinition2.getPKObjectFieldDBColumnName();
+
+			if (objectDefinitionId1 == objectDefinitionId2) {
+				pkObjectFieldDBColumnName1 = pkObjectFieldDBColumnName1.concat(
+					"1");
+				pkObjectFieldDBColumnName2 = pkObjectFieldDBColumnName2.concat(
+					"2");
+			}
+
 			runSQL(
 				StringBundler.concat(
 					"create table ", objectRelationship.getDBTableName(), " (",
-					objectDefinition1.getPKObjectFieldDBColumnName(),
-					" LONG not null,",
-					objectDefinition2.getPKObjectFieldDBColumnName(),
-					" LONG not null, primary key (",
-					objectDefinition1.getPKObjectFieldDBColumnName(), ", ",
-					objectDefinition2.getPKObjectFieldDBColumnName(), "))"));
+					pkObjectFieldDBColumnName1, " LONG not null,",
+					pkObjectFieldDBColumnName2, " LONG not null, primary key (",
+					pkObjectFieldDBColumnName1, ", ",
+					pkObjectFieldDBColumnName2, "))"));
 
 			ObjectRelationship reverseObjectRelationship =
 				_addObjectRelationship(
