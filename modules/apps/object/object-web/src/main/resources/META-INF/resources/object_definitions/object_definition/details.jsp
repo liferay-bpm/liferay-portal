@@ -219,12 +219,29 @@ renderResponse.setTitle(LanguageUtil.format(request, "edit-x", objectDefinition.
 
 			<clay:sheet-section>
 				<h3 class="sheet-subtitle">
-					<%= LanguageUtil.get(request, "display") %>
+					<c:choose>
+						<c:when test='<%= GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-158672")) %>'>
+							<%= LanguageUtil.get(request, "configuration") %>
+						</c:when>
+						<c:otherwise>
+							<%= LanguageUtil.get(request, "display") %>
+						</c:otherwise>
+					</c:choose>
 				</h3>
 
 				<aui:field-wrapper cssClass="form-group lfr-input-text-container">
 					<aui:input disabled="<%= objectDefinition.isSystem() || !objectDefinitionsDetailsDisplayContext.hasUpdateObjectDefinitionPermission() %>" label="" labelOff='<%= LanguageUtil.get(request, "hide-widget") %>' labelOn='<%= LanguageUtil.get(request, "show-widget") %>' name="portlet" type="toggle-switch" value="<%= objectDefinition.isPortlet() %>" />
 				</aui:field-wrapper>
+
+				<c:if test='<%= GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-158672")) %>'>
+					<aui:field-wrapper cssClass="form-group lfr-input-text-container">
+						<aui:input disabled="<%= objectDefinition.isSystem() || !objectDefinitionsDetailsDisplayContext.hasUpdateObjectDefinitionPermission() %>" label="" labelOff='<%= LanguageUtil.get(request, "disable-categorization") %>' labelOn='<%= LanguageUtil.get(request, "enable-categorization") %>' name="categorization" type="toggle-switch" value="<%= objectDefinition.isCategorization() %>" />
+					</aui:field-wrapper>
+
+					<aui:field-wrapper cssClass="form-group lfr-input-text-container">
+						<aui:input disabled="<%= objectDefinition.isSystem() || !objectDefinitionsDetailsDisplayContext.hasUpdateObjectDefinitionPermission() %>" label="" labelOff='<%= LanguageUtil.get(request, "disable-comments") %>' labelOn='<%= LanguageUtil.get(request, "enable-comments") %>' name="comments" type="toggle-switch" value="<%= objectDefinition.isComments() %>" />
+					</aui:field-wrapper>
+				</c:if>
 			</clay:sheet-section>
 
 			<c:if test="<%= !objectDefinition.isDefaultStorageType() %>">
