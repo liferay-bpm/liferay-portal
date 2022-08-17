@@ -50,6 +50,7 @@ import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.base.ObjectEntryLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.object.service.persistence.ObjectFieldPersistence;
@@ -1762,7 +1763,7 @@ public class ObjectEntryLocalServiceImpl
 				dynamicObjectDefinitionTable.getObjectDefinition();
 
 			ObjectRelationship objectRelationship =
-				_objectRelationshipPersistence.findByODI1_N(
+				_objectRelationshipLocalService.getObjectRelationship(
 					objectDefinition.getObjectDefinitionId(),
 					GetterUtil.getString(
 						objectFieldSettingsValues.get(
@@ -2966,6 +2967,9 @@ public class ObjectEntryLocalServiceImpl
 	@Reference
 	private ObjectRelatedModelsProviderRegistry
 		_objectRelatedModelsProviderRegistry;
+
+	@Reference
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
 	@Reference
 	private ObjectRelationshipPersistence _objectRelationshipPersistence;
