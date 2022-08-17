@@ -62,6 +62,8 @@
 		<column name="titleObjectFieldId" type="long" />
 		<column name="accountEntryRestricted" type="boolean" />
 		<column name="active" type="boolean" />
+		<column name="categorization" type="boolean" />
+		<column name="comments" type="boolean" />
 		<column method-name="DBTableName" name="dbTableName" type="String" />
 		<column localized="true" name="label" type="String" />
 		<column name="className" type="String" />
