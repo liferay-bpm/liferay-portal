@@ -267,6 +267,8 @@ public class ObjectDefinitionResourceImpl
 					}
 				).build();
 				active = objectDefinition.isActive();
+				categorization = objectDefinition.isCategorization();
+				comments = objectDefinition.isComments();
 				dateCreated = objectDefinition.getCreateDate();
 				dateModified = objectDefinition.getModifiedDate();
 				id = objectDefinition.getObjectDefinitionId();
