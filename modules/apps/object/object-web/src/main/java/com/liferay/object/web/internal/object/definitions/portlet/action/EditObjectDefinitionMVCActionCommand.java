@@ -71,6 +71,9 @@ public class EditObjectDefinitionMVCActionCommand extends BaseMVCActionCommand {
 		boolean accountEntryRestricted = ParamUtil.getBoolean(
 			actionRequest, "accountEntryRestricted");
 		boolean active = ParamUtil.getBoolean(actionRequest, "active");
+		boolean categorization = ParamUtil.getBoolean(
+			actionRequest, "categorization");
+		boolean comments = ParamUtil.getBoolean(actionRequest, "comments");
 		Map<Locale, String> labelMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "label");
 		String name = ParamUtil.getString(actionRequest, "shortName");
@@ -98,9 +101,9 @@ public class EditObjectDefinitionMVCActionCommand extends BaseMVCActionCommand {
 			_objectDefinitionService.updateCustomObjectDefinition(
 				objectDefinitionId, accountEntryRestrictedObjectFieldId,
 				descriptionObjectFieldId, titleObjectFieldId,
-				accountEntryRestricted, active, labelMap, name,
-				panelCategoryOrder, panelCategoryKey, portlet, pluralLabelMap,
-				scope);
+				accountEntryRestricted, active, categorization, comments,
+				labelMap, name, panelCategoryOrder, panelCategoryKey, portlet,
+				pluralLabelMap, scope);
 
 			if (StringUtil.equals(
 					ParamUtil.getString(actionRequest, Constants.CMD),
