@@ -294,6 +294,48 @@ public interface ObjectDefinitionModel
 	public void setActive(boolean active);
 
 	/**
+	 * Returns the categorization of this object definition.
+	 *
+	 * @return the categorization of this object definition
+	 */
+	public boolean getCategorization();
+
+	/**
+	 * Returns <code>true</code> if this object definition is categorization.
+	 *
+	 * @return <code>true</code> if this object definition is categorization; <code>false</code> otherwise
+	 */
+	public boolean isCategorization();
+
+	/**
+	 * Sets whether this object definition is categorization.
+	 *
+	 * @param categorization the categorization of this object definition
+	 */
+	public void setCategorization(boolean categorization);
+
+	/**
+	 * Returns the comments of this object definition.
+	 *
+	 * @return the comments of this object definition
+	 */
+	public boolean getComments();
+
+	/**
+	 * Returns <code>true</code> if this object definition is comments.
+	 *
+	 * @return <code>true</code> if this object definition is comments; <code>false</code> otherwise
+	 */
+	public boolean isComments();
+
+	/**
+	 * Sets whether this object definition is comments.
+	 *
+	 * @param comments the comments of this object definition
+	 */
+	public void setComments(boolean comments);
+
+	/**
 	 * Returns the db table name of this object definition.
 	 *
 	 * @return the db table name of this object definition

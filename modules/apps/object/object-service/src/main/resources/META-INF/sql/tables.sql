@@ -32,6 +32,8 @@ create table ObjectDefinition (
 	titleObjectFieldId LONG,
 	accountEntryRestricted BOOLEAN,
 	active_ BOOLEAN,
+	categorization BOOLEAN,
+	comments BOOLEAN,
 	dbTableName VARCHAR(75) null,
 	label STRING null,
 	className VARCHAR(75) null,

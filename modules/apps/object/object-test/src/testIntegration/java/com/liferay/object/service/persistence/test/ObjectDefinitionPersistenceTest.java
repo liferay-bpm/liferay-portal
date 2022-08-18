@@ -151,6 +151,10 @@ public class ObjectDefinitionPersistenceTest {
 
 		newObjectDefinition.setActive(RandomTestUtil.randomBoolean());
 
+		newObjectDefinition.setCategorization(RandomTestUtil.randomBoolean());
+
+		newObjectDefinition.setComments(RandomTestUtil.randomBoolean());
+
 		newObjectDefinition.setDBTableName(RandomTestUtil.randomString());
 
 		newObjectDefinition.setLabel(RandomTestUtil.randomString());
@@ -225,6 +229,12 @@ public class ObjectDefinitionPersistenceTest {
 		Assert.assertEquals(
 			existingObjectDefinition.isActive(),
 			newObjectDefinition.isActive());
+		Assert.assertEquals(
+			existingObjectDefinition.isCategorization(),
+			newObjectDefinition.isCategorization());
+		Assert.assertEquals(
+			existingObjectDefinition.isComments(),
+			newObjectDefinition.isComments());
 		Assert.assertEquals(
 			existingObjectDefinition.getDBTableName(),
 			newObjectDefinition.getDBTableName());
@@ -379,9 +389,10 @@ public class ObjectDefinitionPersistenceTest {
 			"userName", true, "createDate", true, "modifiedDate", true,
 			"accountEntryRestrictedObjectFieldId", true,
 			"descriptionObjectFieldId", true, "titleObjectFieldId", true,
-			"accountEntryRestricted", true, "active", true, "dbTableName", true,
-			"label", true, "className", true, "name", true, "panelAppOrder",
-			true, "panelCategoryKey", true, "pkObjectFieldDBColumnName", true,
+			"accountEntryRestricted", true, "active", true, "categorization",
+			true, "comments", true, "dbTableName", true, "label", true,
+			"className", true, "name", true, "panelAppOrder", true,
+			"panelCategoryKey", true, "pkObjectFieldDBColumnName", true,
 			"pkObjectFieldName", true, "pluralLabel", true, "portlet", true,
 			"scope", true, "storageType", true, "system", true, "version", true,
 			"status", true);
@@ -709,6 +720,10 @@ public class ObjectDefinitionPersistenceTest {
 			RandomTestUtil.randomBoolean());
 
 		objectDefinition.setActive(RandomTestUtil.randomBoolean());
+
+		objectDefinition.setCategorization(RandomTestUtil.randomBoolean());
+
+		objectDefinition.setComments(RandomTestUtil.randomBoolean());
 
 		objectDefinition.setDBTableName(RandomTestUtil.randomString());
 

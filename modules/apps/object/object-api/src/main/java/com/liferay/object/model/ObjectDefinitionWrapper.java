@@ -59,6 +59,8 @@ public class ObjectDefinitionWrapper
 		attributes.put("titleObjectFieldId", getTitleObjectFieldId());
 		attributes.put("accountEntryRestricted", isAccountEntryRestricted());
 		attributes.put("active", isActive());
+		attributes.put("categorization", isCategorization());
+		attributes.put("comments", isComments());
 		attributes.put("dbTableName", getDBTableName());
 		attributes.put("label", getLabel());
 		attributes.put("className", getClassName());
@@ -161,6 +163,18 @@ public class ObjectDefinitionWrapper
 
 		if (active != null) {
 			setActive(active);
+		}
+
+		Boolean categorization = (Boolean)attributes.get("categorization");
+
+		if (categorization != null) {
+			setCategorization(categorization);
+		}
+
+		Boolean comments = (Boolean)attributes.get("comments");
+
+		if (comments != null) {
+			setComments(comments);
 		}
 
 		String dbTableName = (String)attributes.get("dbTableName");
@@ -296,6 +310,16 @@ public class ObjectDefinitionWrapper
 	}
 
 	/**
+	 * Returns the categorization of this object definition.
+	 *
+	 * @return the categorization of this object definition
+	 */
+	@Override
+	public boolean getCategorization() {
+		return model.getCategorization();
+	}
+
+	/**
 	 * Returns the class name of this object definition.
 	 *
 	 * @return the class name of this object definition
@@ -303,6 +327,16 @@ public class ObjectDefinitionWrapper
 	@Override
 	public String getClassName() {
 		return model.getClassName();
+	}
+
+	/**
+	 * Returns the comments of this object definition.
+	 *
+	 * @return the comments of this object definition
+	 */
+	@Override
+	public boolean getComments() {
+		return model.getComments();
 	}
 
 	/**
@@ -757,6 +791,26 @@ public class ObjectDefinitionWrapper
 		return model.isApproved();
 	}
 
+	/**
+	 * Returns <code>true</code> if this object definition is categorization.
+	 *
+	 * @return <code>true</code> if this object definition is categorization; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isCategorization() {
+		return model.isCategorization();
+	}
+
+	/**
+	 * Returns <code>true</code> if this object definition is comments.
+	 *
+	 * @return <code>true</code> if this object definition is comments; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isComments() {
+		return model.isComments();
+	}
+
 	@Override
 	public boolean isDefaultStorageType() {
 		return model.isDefaultStorageType();
@@ -836,6 +890,16 @@ public class ObjectDefinitionWrapper
 	}
 
 	/**
+	 * Sets whether this object definition is categorization.
+	 *
+	 * @param categorization the categorization of this object definition
+	 */
+	@Override
+	public void setCategorization(boolean categorization) {
+		model.setCategorization(categorization);
+	}
+
+	/**
 	 * Sets the class name of this object definition.
 	 *
 	 * @param className the class name of this object definition
@@ -843,6 +907,16 @@ public class ObjectDefinitionWrapper
 	@Override
 	public void setClassName(String className) {
 		model.setClassName(className);
+	}
+
+	/**
+	 * Sets whether this object definition is comments.
+	 *
+	 * @param comments the comments of this object definition
+	 */
+	@Override
+	public void setComments(boolean comments) {
+		model.setComments(comments);
 	}
 
 	/**

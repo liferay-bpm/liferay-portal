@@ -78,7 +78,7 @@ public class ObjectDefinitionCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(57);
+		StringBundler sb = new StringBundler(61);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -106,6 +106,10 @@ public class ObjectDefinitionCacheModel
 		sb.append(accountEntryRestricted);
 		sb.append(", active=");
 		sb.append(active);
+		sb.append(", categorization=");
+		sb.append(categorization);
+		sb.append(", comments=");
+		sb.append(comments);
 		sb.append(", dbTableName=");
 		sb.append(dbTableName);
 		sb.append(", label=");
@@ -186,6 +190,8 @@ public class ObjectDefinitionCacheModel
 		objectDefinitionImpl.setTitleObjectFieldId(titleObjectFieldId);
 		objectDefinitionImpl.setAccountEntryRestricted(accountEntryRestricted);
 		objectDefinitionImpl.setActive(active);
+		objectDefinitionImpl.setCategorization(categorization);
+		objectDefinitionImpl.setComments(comments);
 
 		if (dbTableName == null) {
 			objectDefinitionImpl.setDBTableName("");
@@ -299,6 +305,10 @@ public class ObjectDefinitionCacheModel
 		accountEntryRestricted = objectInput.readBoolean();
 
 		active = objectInput.readBoolean();
+
+		categorization = objectInput.readBoolean();
+
+		comments = objectInput.readBoolean();
 		dbTableName = objectInput.readUTF();
 		label = objectInput.readUTF();
 		className = objectInput.readUTF();
@@ -356,6 +366,10 @@ public class ObjectDefinitionCacheModel
 		objectOutput.writeBoolean(accountEntryRestricted);
 
 		objectOutput.writeBoolean(active);
+
+		objectOutput.writeBoolean(categorization);
+
+		objectOutput.writeBoolean(comments);
 
 		if (dbTableName == null) {
 			objectOutput.writeUTF("");
@@ -456,6 +470,8 @@ public class ObjectDefinitionCacheModel
 	public long titleObjectFieldId;
 	public boolean accountEntryRestricted;
 	public boolean active;
+	public boolean categorization;
+	public boolean comments;
 	public String dbTableName;
 	public String label;
 	public String className;
