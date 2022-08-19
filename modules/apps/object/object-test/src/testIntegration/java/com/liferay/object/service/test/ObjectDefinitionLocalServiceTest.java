@@ -40,7 +40,6 @@ import com.liferay.object.util.ObjectFieldBuilder;
 import com.liferay.object.util.ObjectFieldUtil;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.Table;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.db.DBInspector;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -1334,8 +1333,6 @@ public class ObjectDefinitionLocalServiceTest {
 				dbTableName
 			).dbType(
 				ObjectFieldConstants.DB_TYPE_DATE
-			).defaultValue(
-				StringPool.BLANK
 			).labelMap(
 				LocalizedMapUtil.getLocalizedMap(
 					LanguageUtil.get(LocaleUtil.getDefault(), "create-date"))
@@ -1351,6 +1348,8 @@ public class ObjectDefinitionLocalServiceTest {
 				ObjectFieldConstants.BUSINESS_TYPE_TEXT
 			).dbColumnName(
 				objectEntryTable.userName.getName()
+			).dbTableName(
+				dbTableName
 			).dbType(
 				ObjectFieldConstants.DB_TYPE_STRING
 			).labelMap(
@@ -1365,8 +1364,14 @@ public class ObjectDefinitionLocalServiceTest {
 			Assert.assertTrue(iterator.hasNext());
 
 			_assertSystemObjectFields(
-				new ObjectFieldBuilder().dbColumnName(
+				new ObjectFieldBuilder().businessType(
+					ObjectFieldConstants.BUSINESS_TYPE_TEXT
+				).dbColumnName(
 					objectEntryTable.externalReferenceCode.getName()
+				).dbTableName(
+					dbTableName
+				).dbType(
+					ObjectFieldConstants.DB_TYPE_STRING
 				).labelMap(
 					LocalizedMapUtil.getLocalizedMap(
 						LanguageUtil.get(
@@ -1384,6 +1389,8 @@ public class ObjectDefinitionLocalServiceTest {
 				ObjectFieldConstants.BUSINESS_TYPE_LONG_INTEGER
 			).dbColumnName(
 				dbColumnName
+			).dbTableName(
+				dbTableName
 			).dbType(
 				ObjectFieldConstants.DB_TYPE_LONG
 			).labelMap(
@@ -1401,6 +1408,8 @@ public class ObjectDefinitionLocalServiceTest {
 				ObjectFieldConstants.BUSINESS_TYPE_DATE
 			).dbColumnName(
 				objectEntryTable.modifiedDate.getName()
+			).dbTableName(
+				dbTableName
 			).dbType(
 				ObjectFieldConstants.DB_TYPE_DATE
 			).labelMap(
@@ -1418,6 +1427,8 @@ public class ObjectDefinitionLocalServiceTest {
 				ObjectFieldConstants.BUSINESS_TYPE_TEXT
 			).dbColumnName(
 				objectEntryTable.status.getName()
+			).dbTableName(
+				dbTableName
 			).dbType(
 				ObjectFieldConstants.DB_TYPE_STRING
 			).labelMap(
