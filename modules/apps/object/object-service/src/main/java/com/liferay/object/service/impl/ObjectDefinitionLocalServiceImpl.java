@@ -1069,6 +1069,11 @@ public class ObjectDefinitionLocalServiceImpl
 				accountEntryRestrictedObjectFieldId, true);
 		}
 
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-158672"))) {
+			objectDefinition.setCategorization(categorization);
+			objectDefinition.setComments(comments);
+		}
+
 		objectDefinition.setAccountEntryRestrictedObjectFieldId(
 			accountEntryRestrictedObjectFieldId);
 		objectDefinition.setDescriptionObjectFieldId(descriptionObjectFieldId);
