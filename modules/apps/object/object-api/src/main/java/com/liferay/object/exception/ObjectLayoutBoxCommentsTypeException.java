@@ -11,31 +11,27 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
-
 package com.liferay.object.exception;
 
 import com.liferay.portal.kernel.exception.PortalException;
 
 /**
- * @author Selton Guedes
+ * @author Paulo Albuquerque
  */
-public class ObjectLayoutBoxCategorizationTypeException
-	extends PortalException {
+public class ObjectLayoutBoxCommentsTypeException extends PortalException {
 
-	public ObjectLayoutBoxCategorizationTypeException() {
+	public ObjectLayoutBoxCommentsTypeException() {
 	}
 
-	public ObjectLayoutBoxCategorizationTypeException(String msg) {
+	public ObjectLayoutBoxCommentsTypeException(String msg) {
 		super(msg);
 	}
 
-	public ObjectLayoutBoxCategorizationTypeException(
-		String msg, Throwable throwable) {
-
+	public ObjectLayoutBoxCommentsTypeException(String msg, Throwable throwable) {
 		super(msg, throwable);
 	}
 
-	public ObjectLayoutBoxCategorizationTypeException(Throwable throwable) {
+	public ObjectLayoutBoxCommentsTypeException(Throwable throwable) {
 		super(throwable);
 	}
 
