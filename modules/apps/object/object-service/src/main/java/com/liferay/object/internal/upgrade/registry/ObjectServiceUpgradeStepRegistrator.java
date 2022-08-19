@@ -197,6 +197,11 @@ public class ObjectServiceUpgradeStepRegistrator
 			"3.20.0", "3.21.0",
 			new com.liferay.object.internal.upgrade.v3_21_0.
 				ObjectDefinitionUpgradeProcess());
+
+		registry.register(
+			"3.21.0", "3.22.0",
+			new com.liferay.object.internal.upgrade.v3_22_0.
+				ObjectDefinitionUpgradeProcess());
 	}
 
 	@Reference
