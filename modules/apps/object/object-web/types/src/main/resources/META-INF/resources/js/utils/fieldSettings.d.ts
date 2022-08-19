@@ -25,16 +25,6 @@ export declare function normalizeFieldSettings(
 				objectStates: ObjectState[];
 		  }
 		| undefined;
-	maxLength?:
-		| string
-		| number
-		| boolean
-		| ObjectFieldFilterSetting[]
-		| {
-				id: number;
-				objectStates: ObjectState[];
-		  }
-		| undefined;
 	acceptedFileExtensions?:
 		| string
 		| number
@@ -56,6 +46,16 @@ export declare function normalizeFieldSettings(
 		  }
 		| undefined;
 	filters?:
+		| string
+		| number
+		| boolean
+		| ObjectFieldFilterSetting[]
+		| {
+				id: number;
+				objectStates: ObjectState[];
+		  }
+		| undefined;
+	maxLength?:
 		| string
 		| number
 		| boolean
