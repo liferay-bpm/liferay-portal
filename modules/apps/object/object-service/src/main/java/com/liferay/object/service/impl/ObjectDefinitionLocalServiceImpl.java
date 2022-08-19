@@ -628,6 +628,7 @@ public class ObjectDefinitionLocalServiceImpl
 			long objectDefinitionId, long accountEntryRestrictedObjectFieldId,
 			long descriptionObjectFieldId, long titleObjectFieldId,
 			boolean accountEntryRestricted, boolean active,
+			boolean categorization, boolean comments,
 			Map<Locale, String> labelMap, String name, String panelAppOrder,
 			String panelCategoryKey, boolean portlet,
 			Map<Locale, String> pluralLabelMap, String scope)
@@ -644,8 +645,9 @@ public class ObjectDefinitionLocalServiceImpl
 		return _updateObjectDefinition(
 			objectDefinition, accountEntryRestrictedObjectFieldId,
 			descriptionObjectFieldId, titleObjectFieldId,
-			accountEntryRestricted, active, null, labelMap, name, panelAppOrder,
-			panelCategoryKey, portlet, null, null, pluralLabelMap, scope);
+			accountEntryRestricted, active, categorization, comments, null,
+			labelMap, name, panelAppOrder, panelCategoryKey, portlet, null,
+			null, pluralLabelMap, scope);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -1035,7 +1037,8 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectDefinition objectDefinition,
 			long accountEntryRestrictedObjectFieldId,
 			long descriptionObjectFieldId, long titleObjectFieldId,
-			boolean accountEntryRestricted, boolean active, String dbTableName,
+			boolean accountEntryRestricted, boolean active,
+			boolean categorization, boolean comments, String dbTableName,
 			Map<Locale, String> labelMap, String name, String panelAppOrder,
 			String panelCategoryKey, boolean portlet,
 			String pkObjectFieldDBColumnName, String pkObjectFieldName,
