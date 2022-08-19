@@ -17,7 +17,7 @@ package com.liferay.notification.constants;
 /**
  * @author Mateus Santana
  */
-public class NotificationsQueryEntryConstants {
+public class NotificationQueueEntryConstants {
 
 	public static final int STATUS_FAILED = 0;
 
