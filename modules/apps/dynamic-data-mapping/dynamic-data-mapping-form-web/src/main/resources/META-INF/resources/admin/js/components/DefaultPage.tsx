@@ -20,6 +20,7 @@ import './DefaultPage.scss';
 import DefaultPageHeader from './DefaultPageHeader';
 
 const DefaultPage: React.FC<IProps> = ({
+	dataEngineRequire,
 	formDescription,
 	formReportDataURL,
 	formTitle,
@@ -52,6 +53,7 @@ const DefaultPage: React.FC<IProps> = ({
 
 				{showReport ? (
 					<PartialResults
+						dataEngineRequire={dataEngineRequire}
 						reportDataURL={formReportDataURL as string}
 					/>
 				) : (
@@ -98,6 +100,7 @@ DefaultPage.displayName = 'DefaultPage';
 export default DefaultPage;
 
 interface IProps {
+	dataEngineRequire: string;
 	formDescription?: string;
 	formReportDataURL?: string;
 	formTitle: string;

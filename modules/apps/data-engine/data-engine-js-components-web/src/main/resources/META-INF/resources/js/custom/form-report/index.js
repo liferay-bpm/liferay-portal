@@ -25,6 +25,7 @@ import './index.scss';
 
 export default function FormReport({
 	data,
+	dataEngineRequire,
 	fields,
 	formReportRecordsFieldValuesURL,
 	portletNamespace,
@@ -40,6 +41,7 @@ export default function FormReport({
 
 	return (
 		<SidebarContextProvider
+			dataEngineRequire={dataEngineRequire}
 			formReportRecordsFieldValuesURL={formReportRecordsFieldValuesURL}
 			portletNamespace={portletNamespace}
 		>

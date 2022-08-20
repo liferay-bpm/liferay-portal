@@ -102,6 +102,8 @@ boolean limitToOneSubmissionPerUser = DDMFormInstanceSubmissionLimitStatusUtil.i
 					module="admin/js/components/DefaultPage"
 					props='<%=
 						HashMapBuilder.<String, Object>put(
+							"dataEngineRequire", ddmFormDisplayContext.getDataEngineRequire()
+						).put(
 							"formDescription", formInstance.getDescription(displayLocale)
 						).put(
 							"formReportDataURL", formReportDataURL.toString()
@@ -265,6 +267,8 @@ boolean limitToOneSubmissionPerUser = DDMFormInstanceSubmissionLimitStatusUtil.i
 								module="admin/js/FormView"
 								props='<%=
 									HashMapBuilder.<String, Object>put(
+										"dataEngineRequire", ddmFormDisplayContext.getDataEngineRequire()
+									).put(
 										"description", StringUtil.trim(formInstance.getDescription(displayLocale))
 									).put(
 										"formReportDataURL", formReportDataURL.toString()

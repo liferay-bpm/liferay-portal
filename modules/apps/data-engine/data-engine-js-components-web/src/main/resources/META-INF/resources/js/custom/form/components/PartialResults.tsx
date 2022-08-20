@@ -22,7 +22,10 @@ import FormReport from '../../form-report/index';
 
 import './PartialResults.scss';
 
-const PartialResults: React.FC<IProps> = ({reportDataURL}) => {
+const PartialResults: React.FC<IProps> = ({
+	dataEngineRequire,
+	reportDataURL,
+}) => {
 	const [resourceState, setResourceState] = useState(() => 'loading');
 	const {resource} = useResource({
 		fetch,
@@ -94,6 +97,7 @@ const PartialResults: React.FC<IProps> = ({reportDataURL}) => {
 
 					<FormReport
 						data={data}
+						dataEngineRequire={dataEngineRequire}
 						fields={fields}
 						formReportRecordsFieldValuesURL={
 							formReportRecordsFieldValuesURL
@@ -109,6 +113,7 @@ const PartialResults: React.FC<IProps> = ({reportDataURL}) => {
 export default PartialResults;
 
 interface IProps {
+	dataEngineRequire: string;
 	reportDataURL: string;
 }
 
