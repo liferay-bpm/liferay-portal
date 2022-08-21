@@ -663,7 +663,7 @@ public class ObjectRelationshipLocalServiceTest {
 
 		@Override
 		public Class<?> getModelClass() {
-			return null;
+			return getClass();
 		}
 
 		@Override
