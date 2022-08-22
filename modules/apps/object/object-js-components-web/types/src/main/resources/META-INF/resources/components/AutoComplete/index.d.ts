@@ -17,6 +17,7 @@ import './index.scss';
 interface IAutoCompleteProps extends React.HTMLAttributes<HTMLElement> {
 	children: (item: any) => React.ReactNode;
 	contentRight?: React.ReactNode;
+	disabled?: boolean;
 	emptyStateMessage: string;
 	error?: string;
 	feedbackMessage?: string;
@@ -34,6 +35,7 @@ export default function AutoComplete({
 	children,
 	className,
 	contentRight,
+	disabled,
 	emptyStateMessage,
 	error,
 	feedbackMessage,

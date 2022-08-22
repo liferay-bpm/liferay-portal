@@ -210,6 +210,7 @@ export function ObjectRelationshipFormBase({
 			/>
 
 			<AutoComplete
+				disabled={readonly}
 				emptyStateMessage={Liferay.Language.get(
 					'no-objects-were-found'
 				)}

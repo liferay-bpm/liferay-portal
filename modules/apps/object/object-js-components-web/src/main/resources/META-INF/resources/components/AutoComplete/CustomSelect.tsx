@@ -13,6 +13,7 @@
  */
 
 import ClayIcon from '@clayui/icon';
+import classNames from 'classnames';
 import React from 'react';
 
 import './CustomSelect.scss';
@@ -20,29 +21,46 @@ import './CustomSelect.scss';
 export const CustomSelect = React.forwardRef<
 	HTMLDivElement,
 	ICustomSelectProps
->(({contentRight, onClick, placeholder, value, ...otherProps}, forwardRef) => {
-	return (
-		<div
-			{...otherProps}
-			className="custom-select__content form-control"
-			onClick={onClick}
-			ref={forwardRef}
-			tabIndex={0}
-		>
-			<span>{value || placeholder}</span>
+>(
+	(
+		{contentRight, disabled, onClick, placeholder, value, ...otherProps},
+		forwardRef
+	) => {
+		return (
+			<div className={classNames({'custom-select__wrapper': disabled})}>
+				<div
+					{...otherProps}
+					className={classNames(
+						'custom-select__content form-control',
+						{
+							'custom-select__content--disabled form-control': disabled,
+						}
+					)}
+					onClick={disabled ? undefined : onClick}
+					ref={forwardRef}
+					tabIndex={0}
+				>
+					<span>{value || placeholder}</span>
 
-			<div>
-				{contentRight}
+					<div>
+						{contentRight}
 
-				<a className="custom-select__icon">
-					<ClayIcon symbol="caret-double" />
-				</a>
+						<a
+							className={classNames('custom-select__icon', {
+								'custom-select__icon--disabled': disabled,
+							})}
+						>
+							<ClayIcon symbol="caret-double" />
+						</a>
+					</div>
+				</div>
 			</div>
-		</div>
-	);
-});
+		);
+	}
+);
 
 interface ICustomSelectProps extends React.HTMLAttributes<HTMLDivElement> {
 	contentRight?: React.ReactNode;
+	disabled?: boolean;
 	value?: string;
 }

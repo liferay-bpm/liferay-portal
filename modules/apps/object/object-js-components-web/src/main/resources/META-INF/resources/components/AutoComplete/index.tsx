@@ -23,6 +23,7 @@ import {CustomSelect} from './CustomSelect';
 interface IAutoCompleteProps extends React.HTMLAttributes<HTMLElement> {
 	children: (item: any) => React.ReactNode;
 	contentRight?: React.ReactNode;
+	disabled?: boolean;
 	emptyStateMessage: string;
 	error?: string;
 	feedbackMessage?: string;
@@ -41,6 +42,7 @@ export default function AutoComplete({
 	children,
 	className,
 	contentRight,
+	disabled,
 	emptyStateMessage,
 	error,
 	feedbackMessage,
@@ -70,6 +72,7 @@ export default function AutoComplete({
 	return (
 		<FieldBase
 			className={className}
+			disabled={disabled}
 			errorMessage={error}
 			helpMessage={feedbackMessage}
 			id={id}
@@ -77,11 +80,14 @@ export default function AutoComplete({
 			required={required}
 		>
 			<ClayDropDown
-				active={active}
-				onActiveChange={setActive}
+				active={!disabled && active}
+				onActiveChange={(value: boolean) =>
+					!disabled ? setActive(value) : setActive(false)
+				}
 				trigger={
 					<CustomSelect
 						contentRight={<>{value && contentRight}</>}
+						disabled={disabled}
 						placeholder={
 							placeholder ??
 							Liferay.Language.get('choose-an-option')

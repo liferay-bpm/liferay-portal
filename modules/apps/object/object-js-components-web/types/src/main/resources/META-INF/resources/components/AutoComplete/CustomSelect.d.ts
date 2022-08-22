@@ -19,6 +19,7 @@ export declare const CustomSelect: React.ForwardRefExoticComponent<
 >;
 interface ICustomSelectProps extends React.HTMLAttributes<HTMLDivElement> {
 	contentRight?: React.ReactNode;
+	disabled?: boolean;
 	value?: string;
 }
 export {};
