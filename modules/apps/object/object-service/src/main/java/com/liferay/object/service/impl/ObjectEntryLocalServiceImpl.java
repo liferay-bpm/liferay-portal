@@ -1472,11 +1472,25 @@ public class ObjectEntryLocalServiceImpl
 		ObjectDefinition objectDefinition2 =
 			_objectDefinitionPersistence.fetchByPrimaryKey(objectDefinitionId2);
 
+		String pkObjectFieldDBColumnName1 =
+			objectDefinition1.getPKObjectFieldDBColumnName();
+
+		String pkObjectFieldDBColumnName2 =
+			objectDefinition2.getPKObjectFieldDBColumnName();
+
+		if ((objectDefinitionId1 == objectDefinitionId2) && reverse) {
+			pkObjectFieldDBColumnName1 = pkObjectFieldDBColumnName1.concat("2");
+			pkObjectFieldDBColumnName2 = pkObjectFieldDBColumnName2.concat("1");
+		}
+		else if (objectDefinitionId1 == objectDefinitionId2) {
+			pkObjectFieldDBColumnName1 = pkObjectFieldDBColumnName1.concat("1");
+			pkObjectFieldDBColumnName2 = pkObjectFieldDBColumnName2.concat("2");
+		}
+
 		DynamicObjectRelationshipMappingTable
 			dynamicObjectRelationshipMappingTable =
 				new DynamicObjectRelationshipMappingTable(
-					objectDefinition1.getPKObjectFieldDBColumnName(),
-					objectDefinition2.getPKObjectFieldDBColumnName(),
+					pkObjectFieldDBColumnName1, pkObjectFieldDBColumnName2,
 					objectRelationship.getDBTableName());
 
 		Column<DynamicObjectRelationshipMappingTable, Long> primaryKeyColumn1 =
