@@ -115,12 +115,7 @@ export default function EditObjectField({
 		onSubmit,
 	});
 
-	const disabled = !!(
-		readOnly ||
-		isApproved ||
-		values.relationshipType ||
-		values.system
-	);
+	const disabled = !!(readOnly || isApproved || values.relationshipType);
 
 	const handleSettingsChange = ({name, value}: ObjectFieldSetting) =>
 		setValues({
@@ -456,21 +451,12 @@ export default function EditObjectField({
 		<SidePanelForm
 			className="lfr-objects__edit-object-field"
 			onSubmit={handleSubmit}
-			readOnly={
-				values.system && objectName !== 'AccountEntry'
-					? disabled
-					: readOnly
-			}
+			readOnly={disabled && !values.system}
 			title={Liferay.Language.get('field')}
 		>
 			<Card title={Liferay.Language.get('basic-info')}>
 				<InputLocalized
-					disableFlag={values.system && objectName !== 'AccountEntry'}
-					disabled={
-						values.system && objectName !== 'AccountEntry'
-							? disabled
-							: readOnly
-					}
+					disabled={disabled && !values.system}
 					error={errors.label}
 					label={Liferay.Language.get('label')}
 					onChange={(label) => setValues({label})}
@@ -479,7 +465,7 @@ export default function EditObjectField({
 				/>
 
 				<ObjectFieldFormBase
-					disabled={disabled}
+					disabled={disabled || values.system}
 					editingField
 					errors={errors}
 					handleChange={handleChange}
@@ -504,11 +490,7 @@ export default function EditObjectField({
 					{(values.businessType === 'Text' ||
 						values.businessType === 'LongText') && (
 						<MaxLengthProperties
-							disabled={
-								values.system && objectName !== 'AccountEntry'
-									? disabled
-									: readOnly
-							}
+							disabled={disabled}
 							errors={errors}
 							isSystemObjectField={!!values.system}
 							objectField={values}
@@ -576,7 +558,7 @@ export default function EditObjectField({
 
 			{values.DBType !== 'Blob' && (
 				<SearchableContainer
-					disabled={disabled}
+					disabled={disabled || values.system}
 					errors={errors}
 					isApproved={isApproved}
 					objectField={values}
@@ -901,7 +883,7 @@ interface IProps {
 }
 
 interface ISearchableProps {
-	disabled: boolean;
+	disabled?: boolean;
 	errors: ObjectFieldErrors;
 	isApproved: boolean;
 	objectField: Partial<ObjectField>;
