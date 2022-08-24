@@ -2038,7 +2038,7 @@ public class ObjectEntryLocalServiceImpl
 		for (ObjectField objectField : objectFields) {
 			Object value = values.get(objectField.getName());
 
-			if (Validator.isNull(value)) {
+			if (!values.containsKey(objectField.getName())) {
 				if (objectField.isRequired()) {
 					throw new ObjectEntryValuesException.Required(
 						objectField.getName());
@@ -2103,7 +2103,7 @@ public class ObjectEntryLocalServiceImpl
 			for (ObjectField objectField : objectFields) {
 				Object value = values.get(objectField.getName());
 
-				if (Validator.isNull(value)) {
+				if (!values.containsKey(objectField.getName())) {
 					continue;
 				}
 
