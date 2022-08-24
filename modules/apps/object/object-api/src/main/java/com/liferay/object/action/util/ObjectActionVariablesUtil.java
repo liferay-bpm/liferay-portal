@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.object.internal.action.util;
+package com.liferay.object.action.util;
 
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
