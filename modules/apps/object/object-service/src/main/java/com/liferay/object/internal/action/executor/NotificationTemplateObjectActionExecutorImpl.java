@@ -17,7 +17,7 @@ package com.liferay.object.internal.action.executor;
 import com.liferay.notification.service.NotificationTemplateLocalService;
 import com.liferay.object.action.executor.ObjectActionExecutor;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
-import com.liferay.object.internal.action.util.ObjectActionVariablesUtil;
+import com.liferay.object.action.util.ObjectActionVariablesUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
