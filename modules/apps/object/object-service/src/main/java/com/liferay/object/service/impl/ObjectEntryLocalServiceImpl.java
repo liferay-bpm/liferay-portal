@@ -102,6 +102,7 @@ import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelper;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
@@ -814,8 +815,13 @@ public class ObjectEntryLocalServiceImpl
 					_fillPredicate(objectDefinitionId, predicate, search)
 				).and(
 					() -> {
-						if (PermissionThreadLocal.getPermissionChecker() ==
-								null) {
+						PermissionChecker permissionChecker =
+							PermissionThreadLocal.getPermissionChecker();
+
+						if ((permissionChecker == null) ||
+							permissionChecker.isCompanyAdmin() ||
+							((groupId > 0) &&
+							 permissionChecker.isGroupAdmin(groupId))) {
 
 							return null;
 						}
