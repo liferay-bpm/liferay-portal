@@ -21,21 +21,40 @@ import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.notification.service.NotificationQueueEntryLocalService;
 import com.liferay.notification.service.NotificationTemplateLocalService;
+import com.liferay.notification.term.contributor.NotificationTermContributor;
+import com.liferay.notification.type.NotificationType;
+import com.liferay.object.service.ObjectActionLocalService;
+import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * @author Gustavo Lima
@@ -48,6 +67,57 @@ public class NotificationTemplateLocalServiceTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
+
+	@BeforeClass
+	public static void setUpClass() {
+		Bundle bundle = FrameworkUtil.getBundle(
+			NotificationTemplateLocalServiceTest.class);
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		bundleContext.registerService(
+			NotificationType.class,
+			(NotificationType)ProxyUtil.newProxyInstance(
+				NotificationType.class.getClassLoader(),
+				new Class<?>[] {NotificationType.class},
+				(proxy, method, args) -> {
+					if (Objects.equals(method.getName(), "getKey")) {
+						return "notificationTypeKey";
+					}
+
+					if (Objects.equals(method.getName(), "getClassName")) {
+						return "";
+					}
+
+					if (Objects.equals(method.getName(), "getClassPK")) {
+						return 0L;
+					}
+
+					return null;
+				}),
+			HashMapDictionaryBuilder.put(
+				"notification.type.key", "notificationTypeKey"
+			).build());
+
+		bundleContext.registerService(
+			NotificationTermContributor.class,
+			(NotificationTermContributor)ProxyUtil.newProxyInstance(
+				NotificationTermContributor.class.getClassLoader(),
+				new Class<?>[] {NotificationTermContributor.class},
+				(proxy, method, args) -> {
+					if (Objects.equals(method.getName(), "getTermValue")) {
+						HashMap<String, String> object =
+							(HashMap<String, String>)args[1];
+
+						return object.get((String)args[2]);
+					}
+
+					return null;
+				}),
+			HashMapDictionaryBuilder.put(
+				"notification.type.key", "notificationTypeKey"
+			).build());
+	}
 
 	@Test
 	public void testAddNotificationTemplate() throws Exception {
@@ -117,6 +187,44 @@ public class NotificationTemplateLocalServiceTest {
 			0, notificationQueueEntry.getNotificationTemplateId());
 	}
 
+	@Test
+	public void testSendNotificationTemplate() throws Exception {
+		String term = "[%able%]";
+
+		NotificationTemplate notificationTemplate =
+			_notificationTemplateLocalService.addNotificationTemplate(
+				TestPropsValues.getUserId(), 0, term,
+				Collections.singletonMap(LocaleUtil.US, term), term, "",
+				term + "@liferay.com",
+				Collections.singletonMap(LocaleUtil.US, term), "New Template",
+				Collections.singletonMap(LocaleUtil.US, term),
+				Collections.singletonMap(LocaleUtil.US, term + "@liferay.com"),
+				Collections.emptyList());
+
+		_notificationTemplateLocalService.sendNotificationTemplate(
+			TestPropsValues.getUserId(),
+			notificationTemplate.getNotificationTemplateId(),
+			"notificationTypeKey",
+			HashMapBuilder.put(
+				term, "ableValue"
+			).build());
+
+		List<NotificationQueueEntry> notificationQueueEntries =
+			_notificationQueueEntryLocalService.getNotificationQueueEntries(
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		NotificationQueueEntry notificationQueueEntry =
+			notificationQueueEntries.get(notificationQueueEntries.size() - 1);
+
+		Assert.assertEquals(1, notificationQueueEntry.getStatus());
+		Assert.assertEquals("ableValue", notificationQueueEntry.getBcc());
+		Assert.assertEquals("ableValue", notificationQueueEntry.getCc());
+		Assert.assertEquals(
+			"ableValue@liferay.com", notificationQueueEntry.getFrom());
+		Assert.assertEquals(
+			"ableValue@liferay.com", notificationQueueEntry.getTo());
+	}
+
 	private NotificationTemplate _addNotificationTemplate(
 			String name, String from)
 		throws PortalException {
@@ -137,10 +245,25 @@ public class NotificationTemplateLocalServiceTest {
 	}
 
 	@Inject
+	private JSONFactory _jsonFactory;
+
+	@Inject
 	private NotificationQueueEntryLocalService
 		_notificationQueueEntryLocalService;
 
 	@Inject
 	private NotificationTemplateLocalService _notificationTemplateLocalService;
+
+	@Inject
+	private ObjectActionLocalService _objectActionLocalService;
+
+	@Inject
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Inject
+	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Inject
+	private ObjectFieldLocalService _objectFieldLocalService;
 
 }
