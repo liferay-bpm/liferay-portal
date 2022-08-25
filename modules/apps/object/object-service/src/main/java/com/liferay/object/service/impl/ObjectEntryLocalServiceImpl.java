@@ -2047,11 +2047,6 @@ public class ObjectEntryLocalServiceImpl
 			Object value = values.get(objectField.getName());
 
 			if (!values.containsKey(objectField.getName())) {
-				if (objectField.isRequired()) {
-					throw new ObjectEntryValuesException.Required(
-						objectField.getName());
-				}
-
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"No value was provided for object field \"" +
