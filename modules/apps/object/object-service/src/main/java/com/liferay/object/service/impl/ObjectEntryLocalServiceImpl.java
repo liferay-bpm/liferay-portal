@@ -2044,8 +2044,6 @@ public class ObjectEntryLocalServiceImpl
 			dynamicObjectDefinitionTable.getObjectFields();
 
 		for (ObjectField objectField : objectFields) {
-			Object value = values.get(objectField.getName());
-
 			if (!values.containsKey(objectField.getName())) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
@@ -2061,7 +2059,8 @@ public class ObjectEntryLocalServiceImpl
 					ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
 
 				_validateOneToOneInsert(
-					objectField.getDBColumnName(), GetterUtil.getLong(value),
+					objectField.getDBColumnName(),
+					GetterUtil.getLong(values.get(objectField.getName())),
 					dynamicObjectDefinitionTable);
 			}
 
@@ -2096,8 +2095,6 @@ public class ObjectEntryLocalServiceImpl
 			_setColumn(preparedStatement, index++, Types.BIGINT, objectEntryId);
 
 			for (ObjectField objectField : objectFields) {
-				Object value = values.get(objectField.getName());
-
 				if (!values.containsKey(objectField.getName())) {
 					continue;
 				}
@@ -2106,7 +2103,8 @@ public class ObjectEntryLocalServiceImpl
 					objectField.getDBColumnName());
 
 				_setColumn(
-					preparedStatement, index++, column.getSQLType(), value);
+					preparedStatement, index++, column.getSQLType(),
+					values.get(objectField.getName()));
 			}
 
 			preparedStatement.executeUpdate();
@@ -2472,8 +2470,6 @@ public class ObjectEntryLocalServiceImpl
 			dynamicObjectDefinitionTable.getObjectFields();
 
 		for (ObjectField objectField : objectFields) {
-			Object value = values.get(objectField.getName());
-
 			if (!values.containsKey(objectField.getName())) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
@@ -2489,7 +2485,8 @@ public class ObjectEntryLocalServiceImpl
 					ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
 
 				_validateOneToOneUpdate(
-					objectField.getDBColumnName(), GetterUtil.getLong(value),
+					objectField.getDBColumnName(),
+					GetterUtil.getLong(values.get(objectField.getName())),
 					dynamicObjectDefinitionTable, objectEntryId);
 			}
 
@@ -2537,8 +2534,6 @@ public class ObjectEntryLocalServiceImpl
 			int index = 1;
 
 			for (ObjectField objectField : objectFields) {
-				Object value = values.get(objectField.getName());
-
 				if (!values.containsKey(objectField.getName())) {
 					continue;
 				}
@@ -2547,7 +2542,8 @@ public class ObjectEntryLocalServiceImpl
 					objectField.getDBColumnName());
 
 				_setColumn(
-					preparedStatement, index++, column.getSQLType(), value);
+					preparedStatement, index++, column.getSQLType(),
+					values.get(objectField.getName()));
 			}
 
 			_setColumn(preparedStatement, index++, Types.BIGINT, objectEntryId);
