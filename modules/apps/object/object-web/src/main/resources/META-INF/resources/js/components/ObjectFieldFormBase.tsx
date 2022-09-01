@@ -121,7 +121,7 @@ export default function ObjectFieldFormBase({
 	useEffect(() => {
 		const {businessType, defaultValue, objectFieldSettings} = values;
 
-		if (businessType === 'Picklist' && objectFieldSettings) {
+		if (businessType === 'Picklist' && objectFieldSettings?.length) {
 			const [{value}] = objectFieldSettings;
 			const {objectStates} = value as ObjectFieldPicklistSetting;
 			const defaultPicklistValue = objectStates.find(
@@ -364,17 +364,20 @@ export default function ObjectFieldFormBase({
 					)}
 				</AutoComplete>
 			)}
-			{values.objectFieldSettings && !picklistDefaultValue && (
-				<div className="c-mt-1">
-					<ClayAlert
-						displayType="danger"
-						title={Liferay.Language.get(
-							'missing-picklist-default-value'
-						)}
-						variant="feedback"
-					/>
-				</div>
-			)}
+
+			{values.businessType === 'Picklist' &&
+				values.state &&
+				!picklistDefaultValue && (
+					<div className="c-mt-1">
+						<ClayAlert
+							displayType="danger"
+							title={Liferay.Language.get(
+								'missing-picklist-default-value'
+							)}
+							variant="feedback"
+						/>
+					</div>
+				)}
 		</>
 	);
 }
