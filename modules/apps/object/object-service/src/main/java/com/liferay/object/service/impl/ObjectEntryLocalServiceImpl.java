@@ -2092,7 +2092,11 @@ public class ObjectEntryLocalServiceImpl
 			dynamicObjectDefinitionTable.getObjectFields();
 
 		for (ObjectField objectField : objectFields) {
-			if (!values.containsKey(objectField.getName())) {
+			if (Objects.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
+				!values.containsKey(objectField.getName())) {
+
 				if (objectField.isRequired()) {
 					throw new ObjectEntryValuesException.Required(
 						objectField.getName());
@@ -2148,7 +2152,11 @@ public class ObjectEntryLocalServiceImpl
 			_setColumn(preparedStatement, index++, Types.BIGINT, objectEntryId);
 
 			for (ObjectField objectField : objectFields) {
-				if (!values.containsKey(objectField.getName())) {
+				if (Objects.equals(
+						objectField.getBusinessType(),
+						ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
+					!values.containsKey(objectField.getName())) {
+
 					continue;
 				}
 
@@ -2491,6 +2499,13 @@ public class ObjectEntryLocalServiceImpl
 			dynamicObjectDefinitionTable.getObjectFields();
 
 		for (ObjectField objectField : objectFields) {
+			if (Objects.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
+
+				continue;
+			}
+
 			if (!values.containsKey(objectField.getName())) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
@@ -2555,7 +2570,11 @@ public class ObjectEntryLocalServiceImpl
 			int index = 1;
 
 			for (ObjectField objectField : objectFields) {
-				if (!values.containsKey(objectField.getName())) {
+				if (Objects.equals(
+						objectField.getBusinessType(),
+						ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
+					!values.containsKey(objectField.getName())) {
+
 					continue;
 				}
 
