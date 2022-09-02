@@ -348,6 +348,9 @@ public class ObjectDefinitionResourceImpl
 				pluralLabel = LocalizedMapUtil.getLanguageIdMap(
 					objectDefinition.getPluralLabelMap());
 				portlet = objectDefinition.getPortlet();
+				restContextPath =
+					objectDefinition.isSystem() ? StringPool.BLANK :
+						("/o" + objectDefinition.getRESTContextPath());
 				scope = objectDefinition.getScope();
 				status = new Status() {
 					{
