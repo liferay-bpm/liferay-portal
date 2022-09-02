@@ -29,6 +29,7 @@ import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.base.ObjectRelationshipLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.object.service.persistence.ObjectFieldPersistence;
@@ -461,6 +462,10 @@ public class ObjectRelationshipLocalServiceImpl
 			}
 		}
 
+		_objectFieldSettingLocalService.addObjectFieldSetting(
+			user.getUserId(), objectField.getObjectFieldId(),
+			"objectDefinition1ShortName", objectDefinition1.getShortName());
+
 		return objectField;
 	}
 
@@ -794,6 +799,9 @@ public class ObjectRelationshipLocalServiceImpl
 
 	@Reference
 	private ObjectFieldPersistence _objectFieldPersistence;
+
+	@Reference
+	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
 
 	@Reference
 	private ObjectLayoutTabPersistence _objectLayoutTabPersistence;
