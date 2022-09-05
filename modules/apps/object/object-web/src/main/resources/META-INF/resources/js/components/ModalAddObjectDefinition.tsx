@@ -111,11 +111,9 @@ const ModalAddObjectDefinition: React.FC<IProps> = ({
 	});
 
 	const selectedStorageType = (storageType: string) => {
-		const selected = storageType.toLowerCase();
+		const selected = storageType?.toLowerCase();
 
-		return storageTypes.findIndex(
-			(type) => type.toLowerCase() === selected
-		);
+		return storageTypes.find((item) => item?.toLowerCase() === selected);
 	};
 
 	return (
@@ -167,10 +165,14 @@ const ModalAddObjectDefinition: React.FC<IProps> = ({
 							onChange={({target: {value}}) => {
 								setValues({
 									...values,
-									storageType: storageTypes[Number(value)],
+									storageType: storageTypes.find(
+										(storageType) => storageType === value
+									),
 								});
 							}}
-							options={storageTypes}
+							options={storageTypes.map((storageType) => {
+								return {label: storageType};
+							})}
 							tooltip={Liferay.Language.get(
 								'object-definition-storage-type-tooltip'
 							)}
