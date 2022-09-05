@@ -348,9 +348,16 @@ public class ObjectDefinitionResourceImpl
 				pluralLabel = LocalizedMapUtil.getLanguageIdMap(
 					objectDefinition.getPluralLabelMap());
 				portlet = objectDefinition.getPortlet();
-				restContextPath =
-					objectDefinition.isSystem() ? StringPool.BLANK :
-						("/o" + objectDefinition.getRESTContextPath());
+
+				if (GetterUtil.getBoolean(
+						com.liferay.portal.kernel.util.PropsUtil.get(
+							"feature.flag.LPS-152650"))) {
+
+					restContextPath =
+						objectDefinition.isSystem() ? StringPool.BLANK :
+							("/o" + objectDefinition.getRESTContextPath());
+				}
+
 				scope = objectDefinition.getScope();
 				status = new Status() {
 					{

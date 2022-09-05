@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
 
 import java.util.ArrayList;
@@ -116,7 +117,13 @@ public class ObjectFieldSettingUtil {
 		com.liferay.object.model.ObjectFieldSetting
 			serviceBuilderObjectFieldSetting) {
 
-		if (serviceBuilderObjectFieldSetting == null) {
+		if ((serviceBuilderObjectFieldSetting == null) ||
+			(Objects.equals(
+				businessType,
+				ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP) &&
+			 !GetterUtil.getBoolean(
+				 PropsUtil.get("feature.flag.LPS-152650")))) {
+
 			return null;
 		}
 

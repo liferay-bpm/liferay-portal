@@ -32,6 +32,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.util.PropsUtil;
 
@@ -70,6 +72,35 @@ public class ObjectDefinitionResourceTest
 				}
 			}
 		}
+	}
+
+	@Override
+	@Test
+	public void testGetObjectDefinition() throws Exception {
+		super.testGetObjectDefinition();
+
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-152650", "true"
+			).build());
+
+		ObjectDefinition objectDefinition = randomObjectDefinition();
+
+		if (objectDefinition.getSystem()) {
+			Assert.assertTrue(
+				StringUtil.startsWith(
+					objectDefinition.getRestContextPath(), ""));
+		}
+		else {
+			Assert.assertTrue(
+				StringUtil.startsWith(
+					objectDefinition.getRestContextPath(), "/o/c/"));
+		}
+
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-152650", "false"
+			).build());
 	}
 
 	@Override

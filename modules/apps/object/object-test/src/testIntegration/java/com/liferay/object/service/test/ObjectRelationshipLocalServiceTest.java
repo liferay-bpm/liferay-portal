@@ -23,9 +23,11 @@ import com.liferay.object.exception.ObjectRelationshipParameterObjectFieldIdExce
 import com.liferay.object.exception.ObjectRelationshipTypeException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.system.BaseSystemObjectDefinitionMetadata;
@@ -43,8 +45,10 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.util.PropsUtil;
 
 import java.sql.Connection;
 
@@ -277,6 +281,11 @@ public class ObjectRelationshipLocalServiceTest {
 	}
 
 	private void _testAddObjectRelationship(String type) throws Exception {
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-152650", "true"
+			).build());
+
 		String name = StringUtil.randomId();
 
 		ObjectRelationship objectRelationship =
@@ -300,6 +309,16 @@ public class ObjectRelationshipLocalServiceTest {
 				_objectDefinition2.getObjectDefinitionId(),
 				objectFieldNamePrefix +
 					_objectDefinition1.getPKObjectFieldName()));
+
+		ObjectFieldSetting objectFieldSetting =
+			_objectFieldSettingLocalService.fetchObjectFieldSetting(
+				objectRelationship.getObjectFieldId2(),
+				"objectDefinitionName1");
+
+		Assert.assertNotNull(objectFieldSetting);
+
+		Assert.assertEquals(
+			_objectDefinition1.getShortName(), objectFieldSetting.getValue());
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
 			objectRelationship);
@@ -333,6 +352,11 @@ public class ObjectRelationshipLocalServiceTest {
 					" does not allow a parameter object field ID",
 				objectRelationshipParameterObjectFieldIdException.getMessage());
 		}
+
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-152650", "false"
+			).build());
 	}
 
 	private ObjectRelationship _testAddSystemObjectRelationship(String type)
@@ -625,6 +649,9 @@ public class ObjectRelationshipLocalServiceTest {
 
 	@Inject
 	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Inject
+	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
 
 	@Inject
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
