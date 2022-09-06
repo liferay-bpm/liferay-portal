@@ -1852,14 +1852,6 @@ public class ObjectEntryLocalServiceImpl
 					)
 			);
 
-			if (!relatedObjectDefinition.isSystem()) {
-				joinStep = joinStep.innerJoinON(
-					ObjectEntryTable.INSTANCE,
-					ObjectEntryTable.INSTANCE.objectEntryId.eq(
-						relatedDynamicObjectDefinitionTable.
-							getPrimaryKeyColumn()));
-			}
-
 			Predicate predicate = null;
 
 			if (Objects.equals(
