@@ -115,7 +115,7 @@ public class ObjectViewLocalServiceTest {
 				_createObjectViewFilterColumn(
 					ObjectViewFilterColumnConstants.FILTER_TYPE_INCLUDES,
 					"{\"includes\": [\"brazil\"]}", "country"),
-				_createObjectViewFilterColumn(null, null, "dateCreated")),
+				_createObjectViewFilterColumn(null, null, "createDate")),
 			Arrays.asList(
 				_createObjectViewSortColumn("able", "asc"),
 				_createObjectViewSortColumn("baker", "asc")));
@@ -397,7 +397,7 @@ public class ObjectViewLocalServiceTest {
 				_createObjectViewFilterColumn(
 					ObjectViewFilterColumnConstants.FILTER_TYPE_INCLUDES,
 					"{\"includes\": [\"brazil\"]}", "country"),
-				_createObjectViewFilterColumn(null, null, "dateCreated")),
+				_createObjectViewFilterColumn(null, null, "createDate")),
 			Arrays.asList(
 				_createObjectViewSortColumn("able", "asc"),
 				_createObjectViewSortColumn("baker", "asc")));
@@ -555,7 +555,7 @@ public class ObjectViewLocalServiceTest {
 	private void _deleteObjectFields() throws Exception {
 		List<ObjectField> objectFields =
 			_objectFieldLocalService.getObjectFields(
-				_objectDefinition.getObjectDefinitionId());
+				_objectDefinition.getObjectDefinitionId(), false);
 
 		for (ObjectField objectField : objectFields) {
 			_objectFieldLocalService.deleteObjectField(objectField);
