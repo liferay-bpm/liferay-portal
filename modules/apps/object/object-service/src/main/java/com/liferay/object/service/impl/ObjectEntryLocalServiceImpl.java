@@ -723,6 +723,22 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	@Override
+	public String getTitleValue(long objectEntryId) throws PortalException {
+		ObjectEntry objectEntry = getObjectEntry(objectEntryId);
+
+		Map<String, Serializable> valueMap = getValues(objectEntryId);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.findByPrimaryKey(
+				objectEntry.getObjectDefinitionId());
+
+		ObjectField titleObjectField = _objectFieldLocalService.getObjectField(
+			objectDefinition.getTitleObjectFieldId());
+
+		return String.valueOf(valueMap.get(titleObjectField.getName()));
+	}
+
+	@Override
 	public Map<String, Serializable> getValues(long objectEntryId)
 		throws PortalException {
 
