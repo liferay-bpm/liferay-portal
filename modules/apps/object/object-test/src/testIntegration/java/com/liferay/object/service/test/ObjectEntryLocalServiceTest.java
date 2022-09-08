@@ -1780,17 +1780,12 @@ public class ObjectEntryLocalServiceTest {
 		objectEntry = _objectEntryLocalService.getObjectEntry(
 			objectEntry.getObjectEntryId());
 
-		Assert.assertNotNull(
+		Assert.assertNull(
 			ReflectionTestUtil.getFieldValue(objectEntry, "_values"));
 
-		Map<String, Serializable> values = _objectEntryLocalService.getValues(
-			objectEntry.getObjectEntryId());
+		Map<String, Serializable> values = objectEntry.getValues();
 
 		Assert.assertEquals(_getValuesFromCacheField(objectEntry), values);
-
-		objectEntry.setValues(null);
-
-		Assert.assertEquals(_getValuesFromDatabase(objectEntry), values);
 
 		Assert.assertEquals(0L, values.get("ageOfDeath"));
 		Assert.assertFalse((boolean)values.get("authorOfGospel"));
@@ -2214,33 +2209,6 @@ public class ObjectEntryLocalServiceTest {
 			Assert.assertEquals(
 				logEntry.getMessage(),
 				"Use cached values for object entry " +
-					objectEntry.getObjectEntryId());
-		}
-
-		return values;
-	}
-
-	private Map<String, Serializable> _getValuesFromDatabase(
-			ObjectEntry objectEntry)
-		throws Exception {
-
-		Map<String, Serializable> values = null;
-
-		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
-				"com.liferay.object.model.impl.ObjectEntryImpl",
-				LoggerTestUtil.DEBUG)) {
-
-			values = objectEntry.getValues();
-
-			List<LogEntry> logEntries = logCapture.getLogEntries();
-
-			Assert.assertEquals(logEntries.toString(), 1, logEntries.size());
-
-			LogEntry logEntry = logEntries.get(0);
-
-			Assert.assertEquals(
-				logEntry.getMessage(),
-				"Get values for object entry " +
 					objectEntry.getObjectEntryId());
 		}
 
