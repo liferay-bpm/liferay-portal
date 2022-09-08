@@ -571,6 +571,13 @@ public class ObjectEntryLocalServiceWrapper
 	}
 
 	@Override
+	public String getTitleValue(long objectEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectEntryLocalService.getTitleValue(objectEntryId);
+	}
+
+	@Override
 	public java.util.Map<String, java.io.Serializable> getValues(
 			long objectEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {

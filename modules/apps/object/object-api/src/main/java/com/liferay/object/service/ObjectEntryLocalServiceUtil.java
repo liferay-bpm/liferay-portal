@@ -501,6 +501,12 @@ public class ObjectEntryLocalServiceUtil {
 			objectDefinition, primaryKey);
 	}
 
+	public static String getTitleValue(long objectEntryId)
+		throws PortalException {
+
+		return getService().getTitleValue(objectEntryId);
+	}
+
 	public static Map<String, Serializable> getValues(long objectEntryId)
 		throws PortalException {
 

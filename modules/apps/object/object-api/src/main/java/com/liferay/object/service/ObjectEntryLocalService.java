@@ -408,6 +408,9 @@ public interface ObjectEntryLocalService
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public String getTitleValue(long objectEntryId) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Map<String, Serializable> getValues(long objectEntryId)
 		throws PortalException;
 
