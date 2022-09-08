@@ -16,14 +16,27 @@ package com.liferay.object.internal.field.filter.parser;
 
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
+import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectViewFilterColumnConstants;
 import com.liferay.object.exception.ObjectViewFilterColumnException;
 import com.liferay.object.field.filter.parser.ObjectFieldFilterParser;
+import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.model.ObjectViewFilterColumn;
+import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 
 import java.util.ArrayList;
@@ -96,7 +109,7 @@ public class ListObjectFieldFilterParser implements ObjectFieldFilterParser {
 
 	@Override
 	public void validate(
-			long listTypeDefinitionId,
+			long objectDefinitionId,
 			ObjectViewFilterColumn objectViewFilterColumn)
 		throws PortalException {
 
@@ -115,17 +128,27 @@ public class ListObjectFieldFilterParser implements ObjectFieldFilterParser {
 		if (Objects.equals(
 				objectViewFilterColumn.getObjectFieldName(), "status")) {
 
-			for (int i = 0; i < jsonArray.length(); i++) {
-				try {
-					_toIntegerList(jsonArray);
-				}
-				catch (Exception exception) {
-					throw new ObjectViewFilterColumnException(
-						"JSON array is invalid for filter type " +
-							objectViewFilterColumn.getFilterType(),
-						exception);
-				}
+			try {
+				_toIntegerList(jsonArray);
 			}
+			catch (Exception exception) {
+				throw new ObjectViewFilterColumnException(
+					"JSON array is invalid for filter type " +
+						objectViewFilterColumn.getFilterType(),
+					exception);
+			}
+		}
+
+		ObjectField objectField = _objectFieldLocalService.fetchObjectField(
+			objectDefinitionId, objectViewFilterColumn.getObjectFieldName());
+
+		if (Objects.equals(
+				objectField.getBusinessType(),
+				ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
+
+			_validate(
+				jsonArray, objectDefinitionId,
+				objectViewFilterColumn.getObjectFieldName());
 		}
 	}
 
@@ -139,7 +162,90 @@ public class ListObjectFieldFilterParser implements ObjectFieldFilterParser {
 		return statuses;
 	}
 
+	private void _validate(
+			JSONArray jsonArray, long objectDefinitionId,
+			String objectFieldName)
+		throws PortalException {
+
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			objectDefinitionId, objectFieldName);
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.
+				fetchObjectRelationshipByObjectFieldId2(
+					objectField.getObjectFieldId());
+
+		ObjectEntry objectEntry = null;
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			objectEntry = _objectEntryLocalService.fetchObjectEntry(
+				GetterUtil.getLong(jsonArray.get(i)));
+
+			if (!Objects.isNull(objectEntry)) {
+				if (!Objects.equals(
+						objectEntry.getObjectDefinitionId(),
+						objectRelationship.getObjectDefinitionId1())) {
+
+					throw new ObjectViewFilterColumnException(
+						StringBundler.concat(
+							"ObjectEntryId: ", jsonArray.get(i),
+							" do not belong to ObjectDefinition1: ",
+							objectRelationship.getObjectDefinitionId1()));
+				}
+			}
+			else {
+				ObjectDefinition objectDefinition1 =
+					_objectDefinitionLocalService.getObjectDefinition(
+						objectRelationship.getObjectDefinitionId1());
+
+				if (!objectDefinition1.isSystem()) {
+					throw new ObjectViewFilterColumnException(
+						"There is no ObjectEntry with id: " +
+							GetterUtil.getLong(jsonArray.get(i)));
+				}
+
+				_validateSystemObject(
+					GetterUtil.getLong(jsonArray.get(i)), objectDefinition1);
+			}
+		}
+	}
+
+	private void _validateSystemObject(
+			long entryId, ObjectDefinition objectDefinition)
+		throws PortalException {
+
+		PersistedModelLocalService persistedModelLocalService =
+			_persistedModelLocalServiceRegistry.getPersistedModelLocalService(
+				objectDefinition.getClassName());
+
+		if (Objects.isNull(
+				persistedModelLocalService.getPersistedModel(entryId))) {
+
+			throw new ObjectViewFilterColumnException(
+				StringBundler.concat(
+					"ObjectEntryId: ", entryId,
+					" do not belong to ObjectDefinition1: ",
+					objectDefinition.getObjectDefinitionId()));
+		}
+	}
+
 	@Reference
 	private ListTypeEntryLocalService _listTypeEntryLocalService;
+
+	@Reference
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
+	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Reference
+	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
+
+	@Reference
+	private PersistedModelLocalServiceRegistry
+		_persistedModelLocalServiceRegistry;
 
 }
