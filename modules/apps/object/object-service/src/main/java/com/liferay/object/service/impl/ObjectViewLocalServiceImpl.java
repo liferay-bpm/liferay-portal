@@ -482,14 +482,12 @@ public class ObjectViewLocalServiceImpl extends ObjectViewLocalServiceBaseImpl {
 						"\" needs to have the filter type and JSON specified"));
 			}
 
-			long listTypeDefinitionId = objectField.getObjectDefinitionId();
-
 			ObjectFieldFilterParser objectFieldFilterParser =
 				_objectFieldFilterParserTracker.getObjectFieldFilterParser(
 					objectViewFilterColumn.getFilterType());
 
 			objectFieldFilterParser.validate(
-				listTypeDefinitionId, objectViewFilterColumn);
+				objectDefinitionId, objectViewFilterColumn);
 		}
 	}
 

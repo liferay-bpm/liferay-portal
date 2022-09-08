@@ -19,12 +19,20 @@ import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectViewFilterColumnConstants;
 import com.liferay.object.exception.ObjectViewFilterColumnException;
 import com.liferay.object.field.filter.parser.ObjectFieldFilterParser;
+import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.model.ObjectViewFilterColumn;
+import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,7 +104,7 @@ public class ListObjectFieldFilterParser implements ObjectFieldFilterParser {
 
 	@Override
 	public void validate(
-			long listTypeDefinitionId,
+			long objectDefinitionId,
 			ObjectViewFilterColumn objectViewFilterColumn)
 		throws PortalException {
 
@@ -112,19 +120,25 @@ public class ListObjectFieldFilterParser implements ObjectFieldFilterParser {
 					objectViewFilterColumn.getFilterType());
 		}
 
+		if (StringUtil.startsWith(
+				objectViewFilterColumn.getObjectFieldName(), "r_")) {
+
+			_validate(
+				jsonArray, objectDefinitionId,
+				objectViewFilterColumn.getObjectFieldName());
+		}
+
 		if (Objects.equals(
 				objectViewFilterColumn.getObjectFieldName(), "status")) {
 
-			for (int i = 0; i < jsonArray.length(); i++) {
-				try {
-					_toIntegerList(jsonArray);
-				}
-				catch (Exception exception) {
-					throw new ObjectViewFilterColumnException(
-						"JSON array is invalid for filter type " +
-							objectViewFilterColumn.getFilterType(),
-						exception);
-				}
+			try {
+				_toIntegerList(jsonArray);
+			}
+			catch (Exception exception) {
+				throw new ObjectViewFilterColumnException(
+					"JSON array is invalid for filter type " +
+						objectViewFilterColumn.getFilterType(),
+					exception);
 			}
 		}
 	}
@@ -139,7 +153,56 @@ public class ListObjectFieldFilterParser implements ObjectFieldFilterParser {
 		return statuses;
 	}
 
+	private void _validate(
+			JSONArray jsonArray, long objectDefinitionId,
+			String objectFieldName)
+		throws PortalException {
+
+		ObjectEntry objectEntry;
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			try {
+				objectEntry = _objectEntryLocalService.getObjectEntry(
+					Long.parseLong((String)jsonArray.get(i)));
+			}
+			catch (Exception exception) {
+				throw new ObjectViewFilterColumnException(
+					StringBundler.concat(
+						"Value: ", jsonArray.get(i), "is not ObjectEntryId"),
+					exception);
+			}
+
+			ObjectField objectField = _objectFieldLocalService.getObjectField(
+				objectDefinitionId, objectFieldName);
+
+			ObjectRelationship objectRelationship =
+				_objectRelationshipLocalService.
+					fetchObjectRelationshipByObjectFieldId2(
+						objectField.getObjectFieldId());
+
+			if (!Objects.equals(
+					objectEntry.getObjectDefinitionId(),
+					objectRelationship.getObjectDefinitionId1())) {
+
+				throw new ObjectViewFilterColumnException(
+					StringBundler.concat(
+						"ObjectEntryId: ", jsonArray.get(i),
+						"do not belong to ObjectDefinition1: ",
+						objectDefinitionId));
+			}
+		}
+	}
+
 	@Reference
 	private ListTypeEntryLocalService _listTypeEntryLocalService;
+
+	@Reference
+	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Reference
+	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
 }
