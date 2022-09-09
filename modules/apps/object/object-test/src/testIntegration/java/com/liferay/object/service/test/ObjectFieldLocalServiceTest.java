@@ -66,8 +66,10 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.util.PropsUtil;
 
 import java.io.Serializable;
 
@@ -1098,6 +1100,11 @@ public class ObjectFieldLocalServiceTest {
 
 	@Test
 	public void testUpdateRequiredRelationshipObjectField() throws Exception {
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-158962", "true"
+			).build());
+
 		ObjectDefinition objectDefinition1 =
 			ObjectDefinitionTestUtil.addObjectDefinition(
 				_objectDefinitionLocalService,
@@ -1173,6 +1180,11 @@ public class ObjectFieldLocalServiceTest {
 			objectRelationship.getObjectFieldId2(), true);
 
 		Assert.assertTrue(objectField.isRequired());
+
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-158962", "false"
+			).build());
 	}
 
 	private void _assertObjectFieldSetting(
