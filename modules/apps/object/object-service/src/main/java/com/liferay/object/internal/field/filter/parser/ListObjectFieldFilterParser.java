@@ -82,6 +82,18 @@ public class ListObjectFieldFilterParser implements ObjectFieldFilterParser {
 					return _toIntegerList(jsonArray);
 				}
 
+				if (StringUtil.startsWith(
+						objectViewFilterColumn.getObjectFieldName(), "r_")) {
+
+					List<String> objectEntryIds = new ArrayList<>();
+
+					for (int i = 0; i < jsonArray.length(); i++) {
+						objectEntryIds.add((String)jsonArray.get(i));
+					}
+
+					return objectEntryIds;
+				}
+
 				List<Map<String, String>> map = new ArrayList<>();
 
 				for (int i = 0; i < jsonArray.length(); i++) {
@@ -168,7 +180,7 @@ public class ListObjectFieldFilterParser implements ObjectFieldFilterParser {
 			catch (Exception exception) {
 				throw new ObjectViewFilterColumnException(
 					StringBundler.concat(
-						"Value: ", jsonArray.get(i), "is not ObjectEntryId"),
+						"Value: ", jsonArray.get(i), " is not ObjectEntryId"),
 					exception);
 			}
 
@@ -187,8 +199,8 @@ public class ListObjectFieldFilterParser implements ObjectFieldFilterParser {
 				throw new ObjectViewFilterColumnException(
 					StringBundler.concat(
 						"ObjectEntryId: ", jsonArray.get(i),
-						"do not belong to ObjectDefinition1: ",
-						objectDefinitionId));
+						" do not belong to ObjectDefinition1: ",
+						objectRelationship.getObjectDefinitionId1()));
 			}
 		}
 	}

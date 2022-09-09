@@ -18,13 +18,17 @@ import com.liferay.object.admin.rest.dto.v1_0.ObjectView;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectViewColumn;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectViewFilterColumn;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectViewSortColumn;
+import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.field.filter.parser.ObjectFieldFilterParser;
 import com.liferay.object.field.filter.parser.ObjectFieldFilterParserTracker;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -152,31 +156,48 @@ public class ObjectViewDTOConverter
 					_objectFieldFilterParserTracker.getObjectFieldFilterParser(
 						serviceBuilderObjectViewFilterColumn.getFilterType());
 
-				if (Objects.equals(
-						serviceBuilderObjectViewFilterColumn.
-							getObjectFieldName(),
-						"status")) {
-
-					Map<String, Object> preloadedData =
-						objectFieldFilterParser.parse(
-							0L, locale, serviceBuilderObjectViewFilterColumn);
-
-					return StringUtil.merge(
-						ListUtil.toList(
-							(List<Integer>)preloadedData.get("itemsValues"),
-							itemValue -> _language.get(
-								locale,
-								WorkflowConstants.getStatusLabel(itemValue))),
-						StringPool.COMMA_AND_SPACE);
-				}
-
 				ObjectField objectField =
 					_objectFieldLocalService.fetchObjectField(
 						objectDefinitionId,
 						objectViewFilterColumn.getObjectFieldName());
 
-				if (objectField.getListTypeDefinitionId() == 0) {
-					return StringPool.BLANK;
+				if (!Objects.equals(
+						objectField.getBusinessType(),
+						ObjectFieldConstants.BUSINESS_TYPE_PICKLIST)) {
+
+					Map<String, Object> preloadedData =
+						objectFieldFilterParser.parse(
+							0L, locale, serviceBuilderObjectViewFilterColumn);
+
+					if (Objects.equals(
+							serviceBuilderObjectViewFilterColumn.
+								getObjectFieldName(),
+							"status")) {
+
+						return StringUtil.merge(
+							ListUtil.toList(
+								(List<Integer>)preloadedData.get("itemsValues"),
+								itemValue -> _language.get(
+									locale,
+									WorkflowConstants.getStatusLabel(
+										itemValue))),
+							StringPool.COMMA_AND_SPACE);
+					}
+
+					return StringUtil.merge(
+						ListUtil.toList(
+							(List<String>)preloadedData.get("itemsValues"),
+							itemValue -> {
+								try {
+									return _objectEntryLocalServiceImpl.
+										getTitleValue(
+											GetterUtil.getLong(itemValue));
+								}
+								catch (PortalException portalException) {
+									throw new RuntimeException(portalException);
+								}
+							}),
+						StringPool.COMMA_AND_SPACE);
 				}
 
 				Map<String, Object> preloadedData =
@@ -215,6 +236,9 @@ public class ObjectViewDTOConverter
 
 	@Reference
 	private Language _language;
+
+	@Reference
+	private ObjectEntryLocalService _objectEntryLocalServiceImpl;
 
 	@Reference
 	private ObjectFieldFilterParserTracker _objectFieldFilterParserTracker;
