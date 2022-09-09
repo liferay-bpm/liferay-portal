@@ -62,7 +62,7 @@ public class ListTypeEntryObjectFieldFDSFilterFactory
 
 			if (Validator.isNotNull(objectViewFilterColumn.getFilterType())) {
 				preloadedData = _objectFieldFilterParser.parse(
-					0L, locale, objectViewFilterColumn);
+					0L, locale, objectDefinitionId, objectViewFilterColumn);
 			}
 
 			return new ObjectEntryStatusSelectionFDSFilter(preloadedData);
@@ -74,7 +74,7 @@ public class ListTypeEntryObjectFieldFDSFilterFactory
 		if (Validator.isNotNull(objectViewFilterColumn.getFilterType())) {
 			preloadedData = _objectFieldFilterParser.parse(
 				objectField.getListTypeDefinitionId(), locale,
-				objectViewFilterColumn);
+				objectDefinitionId, objectViewFilterColumn);
 		}
 
 		ListTypeDefinition listTypeDefinition =

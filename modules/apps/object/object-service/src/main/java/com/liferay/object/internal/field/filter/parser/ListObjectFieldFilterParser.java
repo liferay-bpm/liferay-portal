@@ -63,7 +63,7 @@ public class ListObjectFieldFilterParser implements ObjectFieldFilterParser {
 
 	@Override
 	public Map<String, Object> parse(
-			long listTypeDefinitionId, Locale locale,
+			long listTypeDefinitionId, Locale locale, long objectDefinitionId,
 			ObjectViewFilterColumn objectViewFilterColumn)
 		throws PortalException {
 
@@ -85,6 +85,24 @@ public class ListObjectFieldFilterParser implements ObjectFieldFilterParser {
 						"status")) {
 
 					return _toIntegerList(jsonArray);
+				}
+
+				ObjectField objectField =
+					_objectFieldLocalService.fetchObjectField(
+						objectDefinitionId,
+						objectViewFilterColumn.getObjectFieldName());
+
+				if (Objects.equals(
+						objectField.getBusinessType(),
+						ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
+
+					List<String> objectEntryIds = new ArrayList<>();
+
+					for (int i = 0; i < jsonArray.length(); i++) {
+						objectEntryIds.add((String)jsonArray.get(i));
+					}
+
+					return objectEntryIds;
 				}
 
 				List<Map<String, String>> map = new ArrayList<>();
