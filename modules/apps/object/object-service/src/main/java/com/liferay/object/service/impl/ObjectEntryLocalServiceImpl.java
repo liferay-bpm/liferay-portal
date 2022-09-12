@@ -1332,7 +1332,7 @@ public class ObjectEntryLocalServiceImpl
 				predicate = likePredicate;
 			}
 			else {
-				predicate = predicate.and(likePredicate);
+				predicate = predicate.or(likePredicate);
 			}
 		}
 
