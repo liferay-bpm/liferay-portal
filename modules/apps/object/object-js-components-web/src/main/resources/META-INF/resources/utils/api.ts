@@ -215,8 +215,8 @@ export async function updateRelationship({
 	);
 }
 
-export async function getRelationship<T>(relationshipId: number) {
+export async function getRelationship<T>(objectRelationshipId: number) {
 	return fetchJSON<T>(
-		`/o/object-admin/v1.0/object-relationships/${relationshipId}`
+		`/o/object-admin/v1.0/object-relationships/${objectRelationshipId}`
 	);
 }
