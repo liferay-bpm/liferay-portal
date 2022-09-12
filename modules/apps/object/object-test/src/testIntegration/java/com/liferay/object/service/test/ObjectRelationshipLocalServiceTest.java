@@ -17,6 +17,7 @@ package com.liferay.object.service.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.DuplicateObjectRelationshipException;
 import com.liferay.object.exception.ObjectRelationshipParameterObjectFieldIdException;
@@ -313,7 +314,7 @@ public class ObjectRelationshipLocalServiceTest {
 		ObjectFieldSetting objectFieldSetting =
 			_objectFieldSettingLocalService.fetchObjectFieldSetting(
 				objectRelationship.getObjectFieldId2(),
-				"objectDefinitionName1");
+				ObjectFieldSettingConstants.OBJECT_DEFINITION1_SHORT_NAME);
 
 		Assert.assertNotNull(objectFieldSetting);
 
