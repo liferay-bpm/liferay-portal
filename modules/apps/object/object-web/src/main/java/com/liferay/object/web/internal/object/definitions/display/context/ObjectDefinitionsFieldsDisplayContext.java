@@ -161,7 +161,8 @@ public class ObjectDefinitionsFieldsDisplayContext
 	}
 
 	public Long getObjectRelationshipId(ObjectField objectField) {
-		if (StringUtil.equals(
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-158962")) &&
+			StringUtil.equals(
 				objectField.getBusinessType(),
 				ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
 
