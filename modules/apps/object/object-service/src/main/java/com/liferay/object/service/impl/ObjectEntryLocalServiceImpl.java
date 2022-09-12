@@ -1298,6 +1298,23 @@ public class ObjectEntryLocalServiceImpl
 			return predicate;
 		}
 
+		try {
+			if (predicate == null) {
+				predicate = ObjectEntryTable.INSTANCE.objectEntryId.eq(
+					Long.valueOf(search));
+			}
+			else {
+				predicate = predicate.or(
+					ObjectEntryTable.INSTANCE.objectEntryId.eq(
+						Long.valueOf(search)));
+			}
+		}
+		catch (NumberFormatException numberFormatException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Skip to search by ID", numberFormatException);
+			}
+		}
+
 		List<ObjectField> objectFields =
 			_objectFieldPersistence.findByODI_DBT_I(
 				objectDefinitionId, "String", true);
