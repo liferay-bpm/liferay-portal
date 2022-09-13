@@ -1392,6 +1392,10 @@ public class ObjectDefinitionLocalServiceTest {
 				dbTableName
 			).dbType(
 				ObjectFieldConstants.DB_TYPE_LONG
+			).indexed(
+				Boolean.TRUE
+			).indexedAsKeyword(
+				Boolean.TRUE
 			).labelMap(
 				LocalizedMapUtil.getLocalizedMap(
 					LanguageUtil.get(LocaleUtil.getDefault(), "id"))
