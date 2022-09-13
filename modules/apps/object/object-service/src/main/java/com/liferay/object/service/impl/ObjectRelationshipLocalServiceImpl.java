@@ -56,6 +56,7 @@ import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -464,7 +465,8 @@ public class ObjectRelationshipLocalServiceImpl
 			indexer.reindex(reverseObjectRelationship);
 		}
 
-		if ((objectRelationship.getObjectFieldId2() != 0) &&
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-158962")) &&
+			(objectRelationship.getObjectFieldId2() != 0) &&
 			StringUtil.equals(
 				deletionType,
 				ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE)) {

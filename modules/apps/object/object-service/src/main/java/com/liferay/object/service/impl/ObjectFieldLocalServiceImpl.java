@@ -535,9 +535,14 @@ public class ObjectFieldLocalServiceImpl
 				newObjectField.getObjectDefinitionId());
 
 		if (Validator.isNotNull(newObjectField.getRelationshipType())) {
-			_validateObjectRelationshipDeletionType(objectFieldId, required);
+			if (GetterUtil.getBoolean(
+					PropsUtil.get("feature.flag.LPS-158962"))) {
 
-			newObjectField.setRequired(required);
+				_validateObjectRelationshipDeletionType(
+					objectFieldId, required);
+
+				newObjectField.setRequired(required);
+			}
 
 			if (!Objects.equals(newObjectField.getDBType(), dbType) ||
 				!Objects.equals(newObjectField.getName(), name)) {
@@ -625,7 +630,8 @@ public class ObjectFieldLocalServiceImpl
 		ObjectField objectField = objectFieldPersistence.findByPrimaryKey(
 			objectFieldId);
 
-		if (StringUtil.equals(
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-158962")) &&
+			StringUtil.equals(
 				objectField.getBusinessType(),
 				ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
 
