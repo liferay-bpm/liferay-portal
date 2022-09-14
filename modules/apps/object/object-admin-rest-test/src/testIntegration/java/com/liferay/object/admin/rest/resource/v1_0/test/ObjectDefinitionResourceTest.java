@@ -89,7 +89,7 @@ public class ObjectDefinitionResourceTest
 		if (objectDefinition.getSystem()) {
 			Assert.assertTrue(
 				StringUtil.startsWith(
-					objectDefinition.getRestContextPath(), ""));
+					objectDefinition.getRestContextPath(), "/o/"));
 		}
 		else {
 			Assert.assertTrue(
