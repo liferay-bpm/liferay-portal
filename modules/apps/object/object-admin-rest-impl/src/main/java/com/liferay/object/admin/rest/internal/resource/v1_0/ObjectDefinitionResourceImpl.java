@@ -48,6 +48,7 @@ import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.language.LanguageResources;
@@ -353,9 +354,16 @@ public class ObjectDefinitionResourceImpl
 						com.liferay.portal.kernel.util.PropsUtil.get(
 							"feature.flag.LPS-152650"))) {
 
-					restContextPath =
-						objectDefinition.isSystem() ? StringPool.BLANK :
-							("/o" + objectDefinition.getRESTContextPath());
+					if (StringUtil.startsWith(
+							objectDefinition.getRESTContextPath(), "/")) {
+
+						restContextPath =
+							"/o" + objectDefinition.getRESTContextPath();
+					}
+					else {
+						restContextPath =
+							"/o/" + objectDefinition.getRESTContextPath();
+					}
 				}
 
 				scope = objectDefinition.getScope();
