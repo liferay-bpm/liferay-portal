@@ -20,6 +20,8 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectValidationRuleLocalService;
+import com.liferay.portal.kernel.audit.AuditMessage;
+import com.liferay.portal.kernel.audit.AuditRouter;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
@@ -33,12 +35,21 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.security.audit.event.generators.constants.EventTypes;
+import com.liferay.portal.security.audit.event.generators.util.Attribute;
+import com.liferay.portal.security.audit.event.generators.util.AuditMessageBuilder;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 
+import java.io.Serializable;
+
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -54,6 +65,8 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 	public void onAfterCreate(ObjectEntry objectEntry)
 		throws ModelListenerException {
 
+		_route(EventTypes.ADD, null, objectEntry);
+
 		_executeObjectActions(
 			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD, null, objectEntry);
 	}
@@ -61,6 +74,8 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 	@Override
 	public void onAfterRemove(ObjectEntry objectEntry)
 		throws ModelListenerException {
+
+		_route(EventTypes.DELETE, null, objectEntry);
 
 		_executeObjectActions(
 			ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE, null,
@@ -71,6 +86,8 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 	public void onAfterUpdate(
 			ObjectEntry originalObjectEntry, ObjectEntry objectEntry)
 		throws ModelListenerException {
+
+		_route(EventTypes.UPDATE, originalObjectEntry, objectEntry);
 
 		_executeObjectActions(
 			ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE,
@@ -115,6 +132,47 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		catch (PortalException portalException) {
 			throw new ModelListenerException(portalException);
 		}
+	}
+
+	private AuditMessage _getAuditMessage(
+		String eventType, ObjectEntry objectEntry) {
+
+		AuditMessage auditMessage = AuditMessageBuilder.buildAuditMessage(
+			eventType, objectEntry.getModelClassName(),
+			objectEntry.getObjectEntryId(), null);
+
+		JSONObject additionalInfoJSONObject = auditMessage.getAdditionalInfo();
+
+		Map<String, Serializable> values = objectEntry.getValues();
+
+		for (Map.Entry<String, Serializable> entry : values.entrySet()) {
+			additionalInfoJSONObject.put(entry.getKey(), entry.getValue());
+		}
+
+		return auditMessage;
+	}
+
+	private List<Attribute> _getModifiedAttributes(
+		Map<String, Serializable> originalValues,
+		Map<String, Serializable> values) {
+
+		List<Attribute> attributes = new ArrayList<>();
+
+		for (Map.Entry<String, Serializable> entry :
+				originalValues.entrySet()) {
+
+			Object originalValue = entry.getValue();
+			Object value = values.get(entry.getKey());
+
+			if (!Objects.equals(originalValue, value)) {
+				attributes.add(
+					new Attribute(
+						entry.getKey(), String.valueOf(value),
+						String.valueOf(originalValue)));
+			}
+		}
+
+		return attributes;
 	}
 
 	private String _getObjectDefinitionShortName(long objectDefinitionId)
@@ -175,6 +233,37 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		);
 	}
 
+	private void _route(
+		String eventType, ObjectEntry originalObjectEntry,
+		ObjectEntry objectEntry) {
+
+		try {
+			ObjectDefinition objectDefinition =
+				_objectDefinitionLocalService.getObjectDefinition(
+					objectEntry.getObjectDefinitionId());
+
+			if (!objectDefinition.isEnableEntryHistory()) {
+				return;
+			}
+
+			if (StringUtil.equals(EventTypes.UPDATE, eventType)) {
+				_auditRouter.route(
+					AuditMessageBuilder.buildAuditMessage(
+						EventTypes.UPDATE, objectEntry.getModelClassName(),
+						objectEntry.getObjectEntryId(),
+						_getModifiedAttributes(
+							originalObjectEntry.getValues(),
+							objectEntry.getValues())));
+			}
+			else {
+				_auditRouter.route(_getAuditMessage(eventType, objectEntry));
+			}
+		}
+		catch (PortalException portalException) {
+			throw new ModelListenerException(portalException);
+		}
+	}
+
 	private Map<String, Object> _toDTO(ObjectEntry objectEntry, User user)
 		throws PortalException {
 
@@ -226,6 +315,9 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectEntryModelListener.class);
+
+	@Reference
+	private AuditRouter _auditRouter;
 
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
