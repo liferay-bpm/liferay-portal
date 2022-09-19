@@ -12,15 +12,10 @@
  * details.
  */
 
-import {useModal} from '@clayui/modal';
 import {BuilderScreen} from '@liferay/object-js-components-web';
-import React, {useState} from 'react';
+import React from 'react';
 
-import {
-	FilterErrors,
-	FilterValidation,
-	ModalAddFilter,
-} from '../../ModalAddFilter';
+import {FilterErrors, FilterValidation} from '../../ModalAddFilter';
 import {TYPES, useViewContext} from '../objectViewContext';
 
 const REQUIRED_MSG = Liferay.Language.get('required');
@@ -33,53 +28,11 @@ export function FilterScreen() {
 
 	const {objectViewFilterColumns} = objectView;
 
-	const [editingObjectFieldName, setEditingObjectFieldName] = useState('');
-	const [editingFilter, setEditingFilter] = useState(false);
-
-	const [visibleModal, setVisibleModal] = useState(false);
-
-	const {observer, onClose} = useModal({
-		onClose: () => {
-			setEditingFilter(false);
-			setVisibleModal(false);
-		},
-	});
-
 	const handleDeleteColumn = (objectFieldName: string) => {
 		dispatch({
 			payload: {objectFieldName},
 			type: TYPES.DELETE_OBJECT_VIEW_FILTER_COLUMN,
 		});
-	};
-
-	const saveFilterColumn = (
-		objectFieldName: string,
-		filterBy?: string,
-		fieldLabel?: LocalizedValue<string>,
-		objectFieldBusinessType?: string,
-		filterType?: string,
-		valueList?: IItem[]
-	) => {
-		if (editingFilter) {
-			dispatch({
-				payload: {
-					filterType,
-					objectFieldName,
-					valueList,
-				},
-				type: TYPES.EDIT_OBJECT_VIEW_FILTER_COLUMN,
-			});
-		}
-		else {
-			dispatch({
-				payload: {
-					filterType,
-					objectFieldName,
-					valueList,
-				},
-				type: TYPES.ADD_OBJECT_VIEW_FILTER_COLUMN,
-			});
-		}
 	};
 
 	const validateFilters = ({
@@ -119,6 +72,87 @@ export function FilterScreen() {
 		return currentErrors;
 	};
 
+	const handleAddFilters = () => {
+		const parentWindow = Liferay.Util.getOpener();
+
+		parentWindow.Liferay.fire('openModalAddFilter', {
+			currentFilters: objectViewFilterColumns,
+			disableDateValues: true,
+			filterOperators,
+			header: Liferay.Language.get('new-filter'),
+			modalType: 'add',
+			objectFields: objectFields.filter(
+				(objectField: ObjectFieldView) => {
+					if (
+						objectField.businessType === 'Picklist' ||
+						(Liferay.FeatureFlags['LPS-152650'] &&
+							objectField.businessType === 'Relationship') ||
+						objectField.name === 'createDate' ||
+						objectField.name === 'modifiedDate' ||
+						(objectField.name === 'status' &&
+							!objectField.hasFilter)
+					) {
+						return objectField;
+					}
+				}
+			),
+			onSave: (
+				objectFieldName: string,
+				filterBy?: string,
+				fieldLabel?: LocalizedValue<string>,
+				objectFieldBusinessType?: string,
+				filterType?: string,
+				valueList?: IItem[]
+			) => {
+				dispatch({
+					payload: {
+						filterType,
+						objectFieldName,
+						valueList,
+					},
+					type: TYPES.ADD_OBJECT_VIEW_FILTER_COLUMN,
+				});
+			},
+			showModal: true,
+			validate: validateFilters,
+			workflowStatusJSONArray,
+		});
+	};
+
+	const handleEditFilters = (objectFieldName: string) => {
+		const parentWindow = Liferay.Util.getOpener();
+
+		parentWindow.Liferay.fire('openModalAddFilter', {
+			currentFilters: objectViewFilterColumns,
+			disableDateValues: true,
+			editingObjectFieldName: objectFieldName,
+			filterOperators,
+			header: Liferay.Language.get('edit-filter'),
+			modalType: 'edit',
+			objectFields,
+			onSave: (
+				objectFieldName: string,
+				filterBy?: string,
+				fieldLabel?: LocalizedValue<string>,
+				objectFieldBusinessType?: string,
+				filterType?: string,
+				valueList?: IItem[]
+			) => {
+				dispatch({
+					payload: {
+						filterType,
+						objectFieldName,
+						valueList,
+					},
+					type: TYPES.EDIT_OBJECT_VIEW_FILTER_COLUMN,
+				});
+			},
+			showModal: true,
+			validate: validateFilters,
+			workflowStatusJSONArray,
+		});
+	};
+
 	return (
 		<>
 			<BuilderScreen
@@ -148,54 +182,12 @@ export function FilterScreen() {
 					}) ?? []
 				}
 				onDeleteColumn={handleDeleteColumn}
-				onEditing={setEditingFilter}
-				onEditingObjectFieldName={setEditingObjectFieldName}
-				onVisibleEditModal={setVisibleModal}
-				openModal={() => setVisibleModal(true)}
+				openEditModal={handleEditFilters}
+				openModal={handleAddFilters}
 				secondColumnHeader={Liferay.Language.get('type')}
 				thirdColumnHeader={Liferay.Language.get('value')}
 				title={Liferay.Language.get('filters')}
 			/>
-
-			{visibleModal && (
-				<ModalAddFilter
-					currentFilters={objectViewFilterColumns}
-					disableDateValues
-					editingFilter={editingFilter}
-					editingObjectFieldName={editingObjectFieldName}
-					filterOperators={filterOperators}
-					header={Liferay.Language.get('new-filter')}
-					objectFields={
-						editingFilter
-							? objectFields
-							: objectFields.filter(
-									(objectField: ObjectFieldView) => {
-										if (
-											objectField.businessType ===
-												'Picklist' ||
-											(Liferay.FeatureFlags[
-												'LPS-152650'
-											] &&
-												objectField.businessType ===
-													'Relationship') ||
-											objectField.name === 'createDate' ||
-											objectField.name ===
-												'modifiedDate' ||
-											(objectField.name === 'status' &&
-												!objectField.hasFilter)
-										) {
-											return objectField;
-										}
-									}
-							  )
-					}
-					observer={observer}
-					onClose={onClose}
-					onSave={saveFilterColumn}
-					validate={validateFilters}
-					workflowStatusJSONArray={workflowStatusJSONArray}
-				/>
-			)}
 		</>
 	);
 }

@@ -74,7 +74,7 @@ export declare type TAction =
 				objectFieldName: string;
 				objectFields: ObjectField[];
 				objectViewSortColumns?: TObjectViewSortColumn[];
-				selectedObjetSort: TSortOptions;
+				selectedObjectSort: TSortOptions;
 			};
 			type: TYPES.ADD_OBJECT_VIEW_SORT_COLUMN;
 	  }

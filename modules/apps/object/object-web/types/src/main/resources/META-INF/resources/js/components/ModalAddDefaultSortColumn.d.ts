@@ -14,26 +14,5 @@
 
 /// <reference types="react" />
 
-import './ModalAddFilter.scss';
-declare function ModalAddFilter(): JSX.Element | null;
-export default ModalAddFilter;
-interface IItem extends LabelValueObject {
-	checked?: boolean;
-}
-export declare type FilterErrors = {
-	endDate?: string;
-	items?: string;
-	selectedFilterBy?: string;
-	selectedFilterType?: string;
-	startDate?: string;
-	value?: string;
-};
-export declare type FilterValidation = {
-	checkedItems: IItem[];
-	disableDateValues?: boolean;
-	items: IItem[];
-	selectedFilterBy?: ObjectField | null;
-	selectedFilterType?: LabelValueObject | null;
-	setErrors: (value: FilterErrors) => void;
-	value?: string;
-};
+declare function ModalAddDefaultSortColumn(): JSX.Element | null;
+export default ModalAddDefaultSortColumn;

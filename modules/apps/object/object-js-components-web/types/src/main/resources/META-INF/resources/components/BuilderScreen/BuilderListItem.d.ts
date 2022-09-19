@@ -14,6 +14,8 @@
 
 import React from 'react';
 import './BuilderListItem.scss';
+declare const BuilderListItem: React.FC<IProps>;
+export default BuilderListItem;
 interface IProps {
 	disableEdit?: boolean;
 	hasDragAndDrop?: boolean;
@@ -22,9 +24,7 @@ interface IProps {
 	objectFieldName: string;
 	onChangeColumnOrder?: (draggedIndex: number, targetIndex: number) => void;
 	onDeleteColumn: (objectFieldName: string) => void;
-	onEditing?: (boolean: boolean) => void;
-	onEditingObjectFieldName?: (objectFieldName: string) => void;
-	onVisibleEditModal?: (boolean: boolean) => void;
+	openEditModal?: (string: string) => void;
 	secondColumnValue?: string;
 	thirdColumnValues?: TThirdColumnValues[] | string;
 }
@@ -32,5 +32,3 @@ declare type TThirdColumnValues = {
 	label: string;
 	value: string;
 };
-declare const BuilderListItem: React.FC<IProps>;
-export default BuilderListItem;

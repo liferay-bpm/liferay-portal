@@ -14,40 +14,81 @@
 
 import ClayButton from '@clayui/button';
 import ClayForm from '@clayui/form';
-import ClayModal from '@clayui/modal';
-import {Observer} from '@clayui/modal/lib/types';
+import ClayModal, {useModal} from '@clayui/modal';
 import {Input, InputLocalized} from '@liferay/object-js-components-web';
-import React, {FormEvent, useState} from 'react';
+import React, {FormEvent, useEffect, useMemo, useState} from 'react';
 
-import {TYPES, useViewContext} from '../objectViewContext';
-
-interface IProps {
-	editingObjectFieldName: string;
-	observer: Observer;
-	onClose: () => void;
-}
+import {TAction, TYPES} from './ObjectView/objectViewContext';
+import {TObjectViewColumn} from './ObjectView/types';
 
 const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
-export function ModalEditViewColumn({
-	editingObjectFieldName,
-	observer,
-	onClose,
-}: IProps) {
+function ModalEditViewColumn() {
 	const [
-		{
-			objectView: {objectViewColumns},
-		},
-		dispatch,
-	] = useViewContext();
+		{dispatch, editingObjectFieldName, objectViewColumns, showModal},
+		setState,
+	] = useState<IState>({
+		dispatch: () => {},
+		editingObjectFieldName: '',
+		showModal: false,
+	});
 
-	const [editingColumn] = objectViewColumns.filter(
-		(viewColumn) => viewColumn.objectFieldName === editingObjectFieldName
+	const resetModal = () => {
+		setState({
+			dispatch: () => {},
+			editingObjectFieldName: '',
+			showModal: false,
+		});
+	};
+
+	const {observer} = useModal({
+		onClose: resetModal,
+	});
+
+	useEffect(() => {
+		const openModal = ({
+			dispatch = () => {},
+			editingObjectFieldName = '',
+			showModal = true,
+			...otherProps
+		}: Partial<IState>) => {
+			setState({
+				dispatch,
+				editingObjectFieldName,
+				showModal,
+				...otherProps,
+			});
+		};
+
+		Liferay.on('openModalEditViewColumn', openModal);
+
+		return () =>
+			Liferay.detach('openModalEditViewColumn', openModal as () => void);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	const [translations, setTranslations] = useState<LocalizedValue<string>>(
+		{}
 	);
 
-	const {label} = editingColumn;
+	const editingColumn = useMemo(() => {
+		let newEditingColumn = null;
 
-	const [translations, setTranslations] = useState(label);
+		if (objectViewColumns) {
+			[newEditingColumn] = objectViewColumns.filter(
+				(viewColumn) =>
+					viewColumn.objectFieldName === editingObjectFieldName
+			);
+		}
+
+		return newEditingColumn;
+	}, [objectViewColumns, editingObjectFieldName]);
+
+	useEffect(() => {
+		if (editingColumn) {
+			setTranslations(editingColumn.label);
+		}
+	}, [editingColumn]);
 
 	const onSubmit = (event: FormEvent) => {
 		event.preventDefault();
@@ -63,10 +104,10 @@ export function ModalEditViewColumn({
 			type: TYPES.EDIT_OBJECT_VIEW_COLUMN_LABEL,
 		});
 
-		onClose();
+		resetModal();
 	};
 
-	return (
+	return showModal ? (
 		<ClayModal observer={observer}>
 			<ClayForm onSubmit={(event) => onSubmit(event)}>
 				<ClayModal.Header>
@@ -78,7 +119,11 @@ export function ModalEditViewColumn({
 						disabled
 						label={Liferay.Language.get('field-label')}
 						name={editingObjectFieldName}
-						value={editingColumn.label[defaultLanguageId]}
+						value={
+							editingColumn
+								? editingColumn.label[defaultLanguageId]
+								: ''
+						}
 					/>
 
 					<InputLocalized
@@ -95,7 +140,7 @@ export function ModalEditViewColumn({
 						<ClayButton.Group key={1} spaced>
 							<ClayButton
 								displayType="secondary"
-								onClick={() => onClose()}
+								onClick={resetModal}
 							>
 								{Liferay.Language.get('cancel')}
 							</ClayButton>
@@ -108,5 +153,14 @@ export function ModalEditViewColumn({
 				/>
 			</ClayForm>
 		</ClayModal>
-	);
+	) : null;
+}
+
+export default ModalEditViewColumn;
+
+interface IState {
+	dispatch: React.Dispatch<TAction>;
+	editingObjectFieldName: string;
+	objectViewColumns?: TObjectViewColumn[];
+	showModal: boolean;
 }

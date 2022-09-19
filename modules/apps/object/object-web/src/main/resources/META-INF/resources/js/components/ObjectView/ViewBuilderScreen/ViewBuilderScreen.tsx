@@ -12,23 +12,14 @@
  * details.
  */
 
-import {useModal} from '@clayui/modal';
 import {BuilderScreen} from '@liferay/object-js-components-web';
-import React, {useState} from 'react';
+import React from 'react';
 
-import {ModalEditViewColumn} from '../ModalEditViewColumn/ModalEditViewColumn';
 import {TYPES, useViewContext} from '../objectViewContext';
 
 const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 const ViewBuilderScreen: React.FC<{}> = () => {
-	const [visibleEditModal, setVisibleEditModal] = useState(false);
-	const [editingObjectFieldName, setEditingObjectFieldName] = useState('');
-
-	const {observer, onClose} = useModal({
-		onClose: () => setVisibleEditModal(false),
-	});
-
 	const [
 		{
 			objectFields,
@@ -60,7 +51,19 @@ const ViewBuilderScreen: React.FC<{}> = () => {
 					type: TYPES.ADD_OBJECT_VIEW_COLUMN,
 				}),
 			selected,
+			showModal: true,
 			title: Liferay.Language.get('select-the-columns'),
+		});
+	};
+
+	const handleEditColumns = (objectFieldName: string) => {
+		const parentWindow = Liferay.Util.getOpener();
+
+		parentWindow.Liferay.fire('openModalEditViewColumn', {
+			dispatch,
+			editingObjectFieldName: objectFieldName,
+			objectViewColumns,
+			showModal: true,
 		});
 	};
 
@@ -101,20 +104,11 @@ const ViewBuilderScreen: React.FC<{}> = () => {
 				objectColumns={objectViewColumns ?? []}
 				onChangeColumnOrder={handleChangeColumnOrder}
 				onDeleteColumn={handleDeleteColumn}
-				onEditingObjectFieldName={setEditingObjectFieldName}
-				onVisibleEditModal={setVisibleEditModal}
+				openEditModal={handleEditColumns}
 				openModal={handleAddColumns}
 				secondColumnHeader={Liferay.Language.get('column-label')}
 				title={Liferay.Language.get('columns')}
 			/>
-
-			{visibleEditModal && (
-				<ModalEditViewColumn
-					editingObjectFieldName={editingObjectFieldName}
-					observer={observer}
-					onClose={onClose}
-				/>
-			)}
 		</>
 	);
 };

@@ -22,47 +22,15 @@ import {useDrag, useDrop} from 'react-dnd';
 
 import './BuilderListItem.scss';
 
-interface IProps {
-	disableEdit?: boolean;
-	hasDragAndDrop?: boolean;
-	index: number;
-	label?: string;
-	objectFieldName: string;
-	onChangeColumnOrder?: (draggedIndex: number, targetIndex: number) => void;
-	onDeleteColumn: (objectFieldName: string) => void;
-	onEditing?: (boolean: boolean) => void;
-	onEditingObjectFieldName?: (objectFieldName: string) => void;
-	onVisibleEditModal?: (boolean: boolean) => void;
-	secondColumnValue?: string;
-	thirdColumnValues?: TThirdColumnValues[] | string;
-}
-
-type TThirdColumnValues = {
-	label: string;
-	value: string;
-};
-
-type TItemHover = {
-	index: number;
-	type: string;
-};
-
-type TDraggedOffset = {
-	x: number;
-	y: number;
-} | null;
-
 const BuilderListItem: React.FC<IProps> = ({
 	disableEdit,
 	hasDragAndDrop,
 	index,
 	label,
-	objectFieldName,
+	objectFieldName = '',
 	onChangeColumnOrder,
 	onDeleteColumn,
-	onEditing,
-	onEditingObjectFieldName,
-	onVisibleEditModal,
+	openEditModal,
 	secondColumnValue,
 	thirdColumnValues,
 }) => {
@@ -119,12 +87,6 @@ const BuilderListItem: React.FC<IProps> = ({
 	});
 
 	dragRef(dropRef(ref));
-
-	const handleEnableEditModal = (objectFieldName: string) => {
-		onEditingObjectFieldName && onEditingObjectFieldName(objectFieldName);
-		onEditing && onEditing(true);
-		onVisibleEditModal && onVisibleEditModal(true);
-	};
 
 	return (
 		<ClayList.Item
@@ -198,11 +160,9 @@ const BuilderListItem: React.FC<IProps> = ({
 				}
 			>
 				<ClayDropDown.ItemList>
-					{!disableEdit && (
+					{!disableEdit && openEditModal && (
 						<ClayDropDown.Item
-							onClick={() =>
-								handleEnableEditModal(objectFieldName)
-							}
+							onClick={() => openEditModal(objectFieldName)}
 						>
 							<ClayIcon
 								className="lfr-object__object-custom-view-builder-item-icon"
@@ -230,3 +190,31 @@ const BuilderListItem: React.FC<IProps> = ({
 };
 
 export default BuilderListItem;
+
+interface IProps {
+	disableEdit?: boolean;
+	hasDragAndDrop?: boolean;
+	index: number;
+	label?: string;
+	objectFieldName: string;
+	onChangeColumnOrder?: (draggedIndex: number, targetIndex: number) => void;
+	onDeleteColumn: (objectFieldName: string) => void;
+	openEditModal?: (string: string) => void;
+	secondColumnValue?: string;
+	thirdColumnValues?: TThirdColumnValues[] | string;
+}
+
+type TThirdColumnValues = {
+	label: string;
+	value: string;
+};
+
+type TItemHover = {
+	index: number;
+	type: string;
+};
+
+type TDraggedOffset = {
+	x: number;
+	y: number;
+} | null;

@@ -40,9 +40,7 @@ export function BuilderScreen({
 	objectColumns,
 	onChangeColumnOrder,
 	onDeleteColumn,
-	onEditing,
-	onEditingObjectFieldName,
-	onVisibleEditModal,
+	openEditModal,
 	openModal,
 	secondColumnHeader,
 	thirdColumnHeader,
@@ -134,11 +132,7 @@ export function BuilderScreen({
 									objectFieldName={viewColumn.objectFieldName}
 									onChangeColumnOrder={onChangeColumnOrder}
 									onDeleteColumn={onDeleteColumn}
-									onEditing={onEditing}
-									onEditingObjectFieldName={
-										onEditingObjectFieldName
-									}
-									onVisibleEditModal={onVisibleEditModal}
+									openEditModal={openEditModal}
 									secondColumnValue={
 										defaultSort
 											? viewColumn.sortOrder === 'asc'
@@ -222,9 +216,7 @@ interface IProps {
 	objectColumns: TBuilderScreenColumn[];
 	onChangeColumnOrder?: (draggedIndex: number, targetIndex: number) => void;
 	onDeleteColumn: (objectFieldName: string) => void;
-	onEditing?: (boolean: boolean) => void;
-	onEditingObjectFieldName?: (objectFieldName: string) => void;
-	onVisibleEditModal: (boolean: boolean) => void;
+	openEditModal?: (string: string) => void;
 	openModal: () => void;
 	secondColumnHeader: string;
 	thirdColumnHeader?: string;
