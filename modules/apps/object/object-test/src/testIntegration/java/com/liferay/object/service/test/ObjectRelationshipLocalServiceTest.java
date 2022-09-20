@@ -350,6 +350,11 @@ public class ObjectRelationshipLocalServiceTest {
 			LocalizedMapUtil.getLocalizedMap("Able"),
 			objectRelationship.getLabelMap());
 
+		ObjectField objectField = _objectFieldLocalService.updateRequired(
+			objectRelationship.getObjectFieldId2(), true);
+
+		Assert.assertTrue(objectField.isRequired());
+
 		objectRelationship =
 			_objectRelationshipLocalService.updateObjectRelationship(
 				objectRelationship.getObjectRelationshipId(), 0,
@@ -360,6 +365,11 @@ public class ObjectRelationshipLocalServiceTest {
 			LocalizedMapUtil.getLocalizedMap("Baker"),
 			objectRelationship.getLabelMap());
 
+		objectField = _objectFieldLocalService.fetchObjectField(
+			objectRelationship.getObjectFieldId2());
+
+		Assert.assertFalse(objectField.isRequired());
+		
 		ObjectRelationship reverseObjectRelationship =
 			_objectRelationshipLocalService.fetchReverseObjectRelationship(
 				objectRelationship, true);
