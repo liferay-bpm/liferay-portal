@@ -300,7 +300,14 @@ public class SystemObjectDefinitionMetadataModelListener<T extends BaseModel<T>>
 			JSONObject jsonObject = _jsonFactory.createJSONObject(
 				_jsonFactory.looseSerializeDeep(object));
 
-			return jsonObject.toMap();
+			Map<String, Object> baseModelVariables =
+				baseModel.getModelAttributes();
+
+			return jsonObject.put(
+				"createDate", baseModelVariables.get("createDate")
+			).put(
+				"userName", user.getFullName()
+			).toMap();
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {

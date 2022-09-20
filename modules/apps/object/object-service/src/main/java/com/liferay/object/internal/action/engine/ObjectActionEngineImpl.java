@@ -113,6 +113,8 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 			"objectDefinitionId", objectDefinition.getObjectDefinitionId()
 		).put(
 			"userId", userId
+		).put(
+			"userName", user.getFullName()
 		);
 
 		Set<Long> objectActionIds = _objectActionIdsThreadLocal.get();

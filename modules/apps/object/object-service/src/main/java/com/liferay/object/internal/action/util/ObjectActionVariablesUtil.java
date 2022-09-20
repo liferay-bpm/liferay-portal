@@ -54,6 +54,8 @@ public class ObjectActionVariablesUtil {
 			).put(
 				"companyId", payloadJSONObject.getLong("companyId")
 			).put(
+				"creator", payloadJSONObject.get("userName")
+			).put(
 				"currentUserId", payloadJSONObject.getLong("userId")
 			).put(
 				"id", payloadJSONObject.getLong("classPK")
