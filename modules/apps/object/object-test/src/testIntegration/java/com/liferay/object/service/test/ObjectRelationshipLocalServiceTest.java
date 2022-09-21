@@ -337,7 +337,7 @@ public class ObjectRelationshipLocalServiceTest {
 
 	@Test
 	public void testUpdateObjectRelationship() throws Exception {
-		ObjectRelationship objectRelationship =
+		ObjectRelationship objectRelationship1 =
 			_objectRelationshipLocalService.addObjectRelationship(
 				TestPropsValues.getUserId(),
 				_objectDefinition1.getObjectDefinitionId(),
@@ -348,28 +348,28 @@ public class ObjectRelationshipLocalServiceTest {
 
 		Assert.assertEquals(
 			LocalizedMapUtil.getLocalizedMap("Able"),
-			objectRelationship.getLabelMap());
+			objectRelationship1.getLabelMap());
 
-		objectRelationship =
+		objectRelationship1 =
 			_objectRelationshipLocalService.updateObjectRelationship(
-				objectRelationship.getObjectRelationshipId(), 0,
+				objectRelationship1.getObjectRelationshipId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE,
 				LocalizedMapUtil.getLocalizedMap("Baker"));
 
 		Assert.assertEquals(
 			LocalizedMapUtil.getLocalizedMap("Baker"),
-			objectRelationship.getLabelMap());
+			objectRelationship1.getLabelMap());
 
 		ObjectRelationship reverseObjectRelationship =
 			_objectRelationshipLocalService.fetchReverseObjectRelationship(
-				objectRelationship, true);
+				objectRelationship1, true);
 
 		Assert.assertEquals(
-			objectRelationship.getDeletionType(),
+			objectRelationship1.getDeletionType(),
 			reverseObjectRelationship.getDeletionType());
 
 		Assert.assertEquals(
-			objectRelationship.getLabelMap(),
+			objectRelationship1.getLabelMap(),
 			reverseObjectRelationship.getLabelMap());
 
 		try {
@@ -388,6 +388,32 @@ public class ObjectRelationshipLocalServiceTest {
 				"Reverse object relationships cannot be updated",
 				objectRelationshipReverseException.getMessage());
 		}
+
+		ObjectRelationship objectRelationship2 =
+			_objectRelationshipLocalService.addObjectRelationship(
+				TestPropsValues.getUserId(),
+				_objectDefinition1.getObjectDefinitionId(),
+				_objectDefinition2.getObjectDefinitionId(), 0,
+				ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				StringUtil.randomId(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
+
+		ObjectField objectField = _objectFieldLocalService.updateRequired(
+			objectRelationship2.getObjectFieldId2(), true);
+
+		Assert.assertTrue(objectField.isRequired());
+
+		objectRelationship2 =
+			_objectRelationshipLocalService.updateObjectRelationship(
+				objectRelationship2.getObjectRelationshipId(), 0,
+				ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE,
+				objectRelationship2.getLabelMap());
+
+		objectField = _objectFieldLocalService.fetchObjectField(
+			objectRelationship2.getObjectFieldId2());
+
+		Assert.assertFalse(objectField.isRequired());
 	}
 
 	private boolean _hasColumn(String tableName, String columnName)
