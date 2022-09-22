@@ -303,7 +303,13 @@ public class SystemObjectDefinitionMetadataModelListener<T extends BaseModel<T>>
 			return jsonObject.put(
 				"createDate", modelAttributes.get("createDate")
 			).put(
+				"modifiedDate", modelAttributes.get("modifiedDate")
+			).put(
+				"status", modelAttributes.get("status")
+			).put(
 				"userName", user.getFullName()
+			).put(
+				"uuid", modelAttributes.get("uuid")
 			).toMap();
 		}
 		catch (Exception exception) {
