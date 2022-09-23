@@ -111,17 +111,8 @@ public class InfoItemServiceTrackerImpl implements InfoItemServiceTracker {
 				serviceReferenceServiceTuples.stream();
 
 			if (infoItemServiceFilter != null) {
-				try {
-					Filter filter = FrameworkUtil.createFilter(
-						infoItemServiceFilter.getFilterString());
-
-					stream = stream.filter(
-						srst -> filter.match(srst.getServiceReference()));
-				}
-				catch (InvalidSyntaxException invalidSyntaxException) {
-					throw new RuntimeException(
-						"Incorrect filter string", invalidSyntaxException);
-				}
+				stream = _filterServiceReferenceServiceTuplesStream(
+					infoItemServiceFilter, stream);
 			}
 
 			return stream.map(
@@ -279,6 +270,24 @@ public class InfoItemServiceTrackerImpl implements InfoItemServiceTracker {
 				_keyedInfoItemServiceTrackerMap.values()) {
 
 			serviceTrackerMap.close();
+		}
+	}
+
+	private <P> Stream<ServiceReferenceServiceTuple<P, P>>
+		_filterServiceReferenceServiceTuplesStream(
+			InfoItemServiceFilter infoItemServiceFilter,
+			Stream<ServiceReferenceServiceTuple<P, P>> stream) {
+
+		try {
+			Filter filter = FrameworkUtil.createFilter(
+				infoItemServiceFilter.getFilterString());
+
+			return stream.filter(
+				srst -> filter.match(srst.getServiceReference()));
+		}
+		catch (InvalidSyntaxException invalidSyntaxException) {
+			throw new RuntimeException(
+				"Incorrect filter string", invalidSyntaxException);
 		}
 	}
 
