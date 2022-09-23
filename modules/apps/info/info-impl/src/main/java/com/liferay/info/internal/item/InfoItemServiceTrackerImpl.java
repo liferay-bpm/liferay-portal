@@ -154,6 +154,10 @@ public class InfoItemServiceTrackerImpl implements InfoItemServiceTracker {
 			getFirstInfoItemService(
 				InfoItemCapabilitiesProvider.class, itemClassName, null);
 
+		if (infoItemCapabilitiesProvider == null) {
+			return null;
+		}
+
 		return infoItemCapabilitiesProvider.getInfoItemCapabilities();
 	}
 
@@ -198,6 +202,10 @@ public class InfoItemServiceTrackerImpl implements InfoItemServiceTracker {
 				getFirstInfoItemService(
 					InfoItemCapabilitiesProvider.class,
 					curInfoItemClassDetails.getClassName(), null);
+
+			if (infoItemCapabilitiesProvider == null) {
+				continue;
+			}
 
 			List<InfoItemCapability> infoItemCapabilities =
 				infoItemCapabilitiesProvider.getInfoItemCapabilities();
