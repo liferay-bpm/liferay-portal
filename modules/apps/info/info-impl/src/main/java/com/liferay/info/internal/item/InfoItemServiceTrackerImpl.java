@@ -38,6 +38,7 @@ import com.liferay.info.item.provider.InfoItemObjectVariationProvider;
 import com.liferay.info.item.provider.InfoItemPermissionProvider;
 import com.liferay.info.item.provider.InfoItemWorkflowProvider;
 import com.liferay.info.item.provider.filter.InfoItemServiceFilter;
+import com.liferay.info.item.provider.filter.OptionalPropertyInfoItemServiceFilter;
 import com.liferay.info.item.renderer.InfoItemRenderer;
 import com.liferay.info.item.selector.InfoItemSelector;
 import com.liferay.info.item.translator.InfoItemIdentifierTranslator;
@@ -51,6 +52,7 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFa
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerCustomizerFactory;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.translation.info.item.provider.InfoItemLanguagesProvider;
@@ -108,7 +110,11 @@ public class InfoItemServiceTrackerImpl implements InfoItemServiceTracker {
 
 		if (serviceReferenceServiceTuples != null) {
 			Stream<ServiceReferenceServiceTuple<P, P>> stream =
-				serviceReferenceServiceTuples.stream();
+				_filterServiceReferenceServiceTuplesStream(
+					new OptionalPropertyInfoItemServiceFilter(
+						"company.id",
+						String.valueOf(CompanyThreadLocal.getCompanyId())),
+					serviceReferenceServiceTuples.stream());
 
 			if (infoItemServiceFilter != null) {
 				stream = _filterServiceReferenceServiceTuplesStream(
