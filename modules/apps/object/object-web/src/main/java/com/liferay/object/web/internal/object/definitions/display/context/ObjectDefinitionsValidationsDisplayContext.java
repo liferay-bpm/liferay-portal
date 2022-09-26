@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -85,6 +86,12 @@ public class ObjectDefinitionsValidationsDisplayContext
 			_objectValidationRuleEngineTracker.getObjectValidationRuleEngines()
 		).flatMap(
 			List::stream
+		).filter(
+			objectValidationRuleEngine ->
+				!(StringUtil.equals(
+					objectValidationRuleEngine.getName(),
+					ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY) &&
+				  !isOmniadmin())
 		).map(
 			objectValidationRuleEngine -> HashMapBuilder.put(
 				"label",

@@ -24,7 +24,9 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
@@ -79,6 +81,15 @@ public abstract class BaseObjectDefinitionsDisplayContext {
 		return objectDefinitionModelResourcePermission.contains(
 			objectRequestHelper.getPermissionChecker(), getObjectDefinitionId(),
 			ActionKeys.UPDATE);
+	}
+
+	public boolean isOmniadmin() {
+		ThemeDisplay themeDisplay = objectRequestHelper.getThemeDisplay();
+
+		PermissionChecker permissionChecker =
+			themeDisplay.getPermissionChecker();
+
+		return permissionChecker.isOmniadmin();
 	}
 
 	protected BaseObjectDefinitionsDisplayContext(

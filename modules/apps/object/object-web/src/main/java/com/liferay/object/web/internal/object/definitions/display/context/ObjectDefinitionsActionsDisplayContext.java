@@ -21,6 +21,7 @@ import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
 import com.liferay.object.action.trigger.ObjectActionTrigger;
 import com.liferay.object.action.trigger.ObjectActionTriggerRegistry;
 import com.liferay.object.admin.rest.dto.v1_0.util.ObjectActionUtil;
+import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
@@ -36,6 +37,7 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.portlet.url.builder.ResourceURLBuilder;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -100,19 +102,20 @@ public class ObjectDefinitionsActionsDisplayContext
 			true, objectRequestHelper.getLocale(), getObjectDefinitionId());
 	}
 
-	public ObjectActionExecutor getObjectActionExecutor() {
-		ObjectAction objectAction = getObjectAction();
-
-		return _objectActionExecutorRegistry.getObjectActionExecutor(
-			objectAction.getObjectActionExecutorKey());
-	}
-
 	public JSONArray getObjectActionExecutorsJSONArray() {
 		JSONArray objectActionExecutorsJSONArray =
 			_jsonFactory.createJSONArray();
 
 		for (ObjectActionExecutor objectActionExecutor :
 				_objectActionExecutorRegistry.getObjectActionExecutors()) {
+
+			if (StringUtil.equals(
+					objectActionExecutor.getKey(),
+					ObjectActionExecutorConstants.KEY_GROOVY) &&
+				!isOmniadmin()) {
+
+				continue;
+			}
 
 			objectActionExecutorsJSONArray.put(
 				JSONUtil.put(
