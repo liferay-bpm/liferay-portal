@@ -24,7 +24,7 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
-import com.liferay.object.scripting.executor.ObjectScriptingExecutor;
+import com.liferay.object.scripting.ObjectScripting;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
@@ -97,10 +97,9 @@ public class ObjectActionLocalServiceTest {
 
 		_originalHttp = (Http)_getAndSetFieldValue(
 			Http.class, "_http", ObjectActionExecutorConstants.KEY_WEBHOOK);
-		_originalObjectScriptingExecutor =
-			(ObjectScriptingExecutor)_getAndSetFieldValue(
-				ObjectScriptingExecutor.class, "_objectScriptingExecutor",
-				ObjectActionExecutorConstants.KEY_GROOVY);
+		_originalObjectScripting = (ObjectScripting)_getAndSetFieldValue(
+			ObjectScripting.class, "_objectScripting",
+			ObjectActionExecutorConstants.KEY_GROOVY);
 	}
 
 	@After
@@ -114,7 +113,7 @@ public class ObjectActionLocalServiceTest {
 		ReflectionTestUtil.setFieldValue(
 			_objectActionExecutorRegistry.getObjectActionExecutor(
 				ObjectActionExecutorConstants.KEY_GROOVY),
-			"_objectScriptingExecutor", _originalObjectScriptingExecutor);
+			"_objectScripting", _originalObjectScripting);
 	}
 
 	@Test
@@ -422,8 +421,9 @@ public class ObjectActionLocalServiceTest {
 				"id", objectEntry.getObjectEntryId()
 			).build(),
 			arguments[0]);
-		Assert.assertEquals(Collections.emptySet(), arguments[1]);
-		Assert.assertEquals("println \"Hello World\"", arguments[2]);
+		Assert.assertEquals("groovy", arguments[1]);
+		Assert.assertEquals(Collections.emptySet(), arguments[2]);
+		Assert.assertEquals("println \"Hello World\"", arguments[3]);
 
 		_objectActionLocalService.deleteObjectAction(objectAction);
 	}
@@ -512,7 +512,7 @@ public class ObjectActionLocalServiceTest {
 
 					if (Objects.equals(
 							method.getDeclaringClass(),
-							ObjectScriptingExecutor.class) &&
+							ObjectScripting.class) &&
 						Objects.equals(method.getName(), "execute")) {
 
 						return Collections.emptyMap();
@@ -548,6 +548,6 @@ public class ObjectActionLocalServiceTest {
 	private ObjectEntryLocalService _objectEntryLocalService;
 
 	private Http _originalHttp;
-	private ObjectScriptingExecutor _originalObjectScriptingExecutor;
+	private ObjectScripting _originalObjectScripting;
 
 }

@@ -15,7 +15,7 @@
 package com.liferay.object.internal.validation.rule;
 
 import com.liferay.object.constants.ObjectValidationRuleConstants;
-import com.liferay.object.scripting.executor.ObjectScriptingExecutor;
+import com.liferay.object.scripting.ObjectScripting;
 import com.liferay.object.validation.rule.ObjectValidationRuleEngine;
 import com.liferay.portal.kernel.util.SetUtil;
 
@@ -35,8 +35,8 @@ public class GroovyObjectValidationRuleEngineImpl
 	public Map<String, Object> execute(
 		Map<String, Object> inputObjects, String script) {
 
-		return _objectScriptingExecutor.execute(
-			inputObjects, SetUtil.fromArray("invalidFields"), script);
+		return _objectScripting.execute(
+			inputObjects, "groovy", SetUtil.fromArray("invalidFields"), script);
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class GroovyObjectValidationRuleEngineImpl
 		return ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY;
 	}
 
-	@Reference(target = "(scripting.language=groovy)")
-	private ObjectScriptingExecutor _objectScriptingExecutor;
+	@Reference
+	private ObjectScripting _objectScripting;
 
 }

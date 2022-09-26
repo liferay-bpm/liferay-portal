@@ -22,8 +22,8 @@ import com.liferay.object.exception.ObjectValidationRuleNameException;
 import com.liferay.object.exception.ObjectValidationRuleScriptException;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectValidationRule;
+import com.liferay.object.scripting.ObjectScripting;
 import com.liferay.object.scripting.exception.ObjectScriptingException;
-import com.liferay.object.scripting.validator.ObjectScriptingValidator;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.base.ObjectValidationRuleLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
@@ -289,7 +289,7 @@ public class ObjectValidationRuleLocalServiceImpl
 						engine,
 						ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY)) {
 
-				_objectScriptingValidator.validate("groovy", script);
+				_objectScripting.validate("groovy", script);
 			}
 		}
 		catch (PortalException portalException) {
@@ -322,7 +322,7 @@ public class ObjectValidationRuleLocalServiceImpl
 	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Reference
-	private ObjectScriptingValidator _objectScriptingValidator;
+	private ObjectScripting _objectScripting;
 
 	@Reference
 	private ObjectValidationRuleEngineTracker

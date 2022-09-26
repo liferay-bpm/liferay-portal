@@ -18,7 +18,7 @@ import com.liferay.object.action.executor.ObjectActionExecutor;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.internal.action.util.ObjectActionVariablesUtil;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.scripting.executor.ObjectScriptingExecutor;
+import com.liferay.object.scripting.ObjectScripting;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -49,11 +49,12 @@ public class GroovyObjectActionExecutorImpl implements ObjectActionExecutor {
 			_objectDefinitionLocalService.fetchObjectDefinition(
 				payloadJSONObject.getLong("objectDefinitionId"));
 
-		Map<String, Object> results = _objectScriptingExecutor.execute(
+		Map<String, Object> results = _objectScripting.execute(
 			ObjectActionVariablesUtil.toVariables(
 				_dtoConverterRegistry, objectDefinition, payloadJSONObject,
 				_systemObjectDefinitionMetadataTracker),
-			new HashSet<>(), parametersUnicodeProperties.get("script"));
+			"groovy", new HashSet<>(),
+			parametersUnicodeProperties.get("script"));
 
 		if (GetterUtil.getBoolean(results.get("invalidScript"))) {
 			throw new ScriptingException();
@@ -71,8 +72,8 @@ public class GroovyObjectActionExecutorImpl implements ObjectActionExecutor {
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
-	@Reference(target = "(scripting.language=groovy)")
-	private ObjectScriptingExecutor _objectScriptingExecutor;
+	@Reference
+	private ObjectScripting _objectScripting;
 
 	@Reference
 	private SystemObjectDefinitionMetadataTracker

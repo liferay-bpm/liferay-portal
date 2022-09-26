@@ -29,8 +29,8 @@ import com.liferay.object.exception.ObjectActionTriggerKeyException;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.scripting.ObjectScripting;
 import com.liferay.object.scripting.exception.ObjectScriptingException;
-import com.liferay.object.scripting.validator.ObjectScriptingValidator;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.base.ObjectActionLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
@@ -280,7 +280,7 @@ public class ObjectActionLocalServiceImpl
 
 			if (Validator.isNotNull(script)) {
 				try {
-					_objectScriptingValidator.validate("groovy", script);
+					_objectScripting.validate("groovy", script);
 				}
 				catch (ObjectScriptingException objectScriptingException) {
 					errorMessageKeys.put(
@@ -395,7 +395,7 @@ public class ObjectActionLocalServiceImpl
 	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@Reference
-	private ObjectScriptingValidator _objectScriptingValidator;
+	private ObjectScripting _objectScripting;
 
 	@Reference
 	private UserLocalService _userLocalService;
