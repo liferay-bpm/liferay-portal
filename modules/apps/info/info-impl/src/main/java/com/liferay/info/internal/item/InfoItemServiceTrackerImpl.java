@@ -109,23 +109,22 @@ public class InfoItemServiceTrackerImpl implements InfoItemServiceTracker {
 			infoItemServiceTrackerMap.getService(itemClassName);
 
 		if (serviceReferenceServiceTuples != null) {
-			Stream<ServiceReferenceServiceTuple<P, P>> stream =
-				_filterServiceReferenceServiceTuplesStream(
+			serviceReferenceServiceTuples =
+				_filterServiceReferenceServiceTuples(
 					new OptionalPropertyInfoItemServiceFilter(
 						"company.id",
 						String.valueOf(CompanyThreadLocal.getCompanyId())),
-					serviceReferenceServiceTuples.stream());
+					serviceReferenceServiceTuples);
 
 			if (infoItemServiceFilter != null) {
-				stream = _filterServiceReferenceServiceTuplesStream(
-					infoItemServiceFilter, stream);
+				serviceReferenceServiceTuples =
+					_filterServiceReferenceServiceTuples(
+						infoItemServiceFilter, serviceReferenceServiceTuples);
 			}
 
-			return stream.map(
-				ServiceReferenceServiceTuple::getService
-			).collect(
-				Collectors.toList()
-			);
+			return ListUtil.toList(
+				serviceReferenceServiceTuples,
+				ServiceReferenceServiceTuple::getService);
 		}
 
 		return Collections.emptyList();
@@ -287,16 +286,17 @@ public class InfoItemServiceTrackerImpl implements InfoItemServiceTracker {
 		}
 	}
 
-	private <P> Stream<ServiceReferenceServiceTuple<P, P>>
-		_filterServiceReferenceServiceTuplesStream(
+	private <P> List<ServiceReferenceServiceTuple<P, P>>
+		_filterServiceReferenceServiceTuples(
 			InfoItemServiceFilter infoItemServiceFilter,
-			Stream<ServiceReferenceServiceTuple<P, P>> stream) {
+			List<ServiceReferenceServiceTuple<P, P>> serviceReferenceTuples) {
 
 		try {
 			Filter filter = FrameworkUtil.createFilter(
 				infoItemServiceFilter.getFilterString());
 
-			return stream.filter(
+			return ListUtil.filter(
+				serviceReferenceTuples,
 				srst -> filter.match(srst.getServiceReference()));
 		}
 		catch (InvalidSyntaxException invalidSyntaxException) {
