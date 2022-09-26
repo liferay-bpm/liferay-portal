@@ -12,15 +12,23 @@
  * details.
  */
 
-package com.liferay.object.scripting.validator;
+package com.liferay.object.scripting;
+
+import com.liferay.object.scripting.exception.ObjectScriptingException;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
- * @author Feliphe Marinho
+ * @author Carolina Barbosa
  */
-public interface ObjectScriptingValidator {
+public interface ObjectScripting {
 
-	public String getLanguage();
+	public Map<String, Object> execute(
+		Map<String, Object> inputObjects, String language,
+		Set<String> outputNames, String script);
 
-	public void validate(String script) throws Exception;
+	public void validate(String language, String script)
+		throws ObjectScriptingException;
 
 }

@@ -2,6 +2,7 @@ Bundle-Name: Liferay Object Scripting API
 Bundle-SymbolicName: com.liferay.object.scripting.api
 Bundle-Version: 2.0.1
 Export-Package:\
+	com.liferay.object.scripting,\
 	com.liferay.object.scripting.exception,\
 	com.liferay.object.scripting.executor,\
 	com.liferay.object.scripting.validator
