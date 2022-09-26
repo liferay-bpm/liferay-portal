@@ -14,13 +14,17 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.object.constants.ObjectValidationRuleConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectValidationRule;
 import com.liferay.object.service.base.ObjectValidationRuleServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Locale;
 import java.util.Map;
@@ -50,6 +54,8 @@ public class ObjectValidationRuleServiceImpl
 
 		_objectDefinitionModelResourcePermission.check(
 			getPermissionChecker(), objectDefinitionId, ActionKeys.UPDATE);
+
+		_checkOmniadmin(engine, getPermissionChecker());
 
 		return objectValidationRuleLocalService.addObjectValidationRule(
 			getUserId(), objectDefinitionId, active, engine, errorLabelMap,
@@ -105,9 +111,23 @@ public class ObjectValidationRuleServiceImpl
 			getPermissionChecker(),
 			objectValidationRule.getObjectDefinitionId(), ActionKeys.UPDATE);
 
+		_checkOmniadmin(engine, getPermissionChecker());
+
 		return objectValidationRuleLocalService.updateObjectValidationRule(
 			objectValidationRuleId, active, engine, errorLabelMap, nameMap,
 			script);
+	}
+
+	private void _checkOmniadmin(
+			String engine, PermissionChecker permissionChecker)
+		throws PortalException {
+
+		if (StringUtil.equals(
+				engine, ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY) &&
+			!permissionChecker.isOmniadmin()) {
+
+			throw new PrincipalException.MustBeOmniadmin(permissionChecker);
+		}
 	}
 
 	@Reference(

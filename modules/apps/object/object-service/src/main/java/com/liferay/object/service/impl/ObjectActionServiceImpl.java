@@ -14,13 +14,17 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.base.ObjectActionServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 
 import org.osgi.service.component.annotations.Component;
@@ -48,6 +52,8 @@ public class ObjectActionServiceImpl extends ObjectActionServiceBaseImpl {
 
 		_objectDefinitionModelResourcePermission.check(
 			getPermissionChecker(), objectDefinitionId, ActionKeys.UPDATE);
+
+		_checkOmniadmin(objectActionExecutorKey, getPermissionChecker());
 
 		return objectActionLocalService.addObjectAction(
 			getUserId(), objectDefinitionId, active, conditionExpression,
@@ -98,10 +104,25 @@ public class ObjectActionServiceImpl extends ObjectActionServiceBaseImpl {
 			getPermissionChecker(), objectAction.getObjectDefinitionId(),
 			ActionKeys.UPDATE);
 
+		_checkOmniadmin(objectActionExecutorKey, getPermissionChecker());
+
 		return objectActionLocalService.updateObjectAction(
 			objectActionId, active, conditionExpression, description, name,
 			objectActionExecutorKey, objectActionTriggerKey,
 			parametersUnicodeProperties);
+	}
+
+	private void _checkOmniadmin(
+			String objectActionExecutorKey, PermissionChecker permissionChecker)
+		throws PortalException {
+
+		if (StringUtil.equals(
+				objectActionExecutorKey,
+				ObjectActionExecutorConstants.KEY_GROOVY) &&
+			!permissionChecker.isOmniadmin()) {
+
+			throw new PrincipalException.MustBeOmniadmin(permissionChecker);
+		}
 	}
 
 	@Reference(
