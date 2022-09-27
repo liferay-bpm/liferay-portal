@@ -27,9 +27,10 @@ export default function SelectRelationship({
 	const [fields, setFields] = useState<ObjectField[]>([]);
 	const options = useMemo(
 		() =>
-			fields.map(({label}) => {
+			fields.map(({label, name}) => {
 				return {
 					label: label[defaultLanguageId]!,
+					name,
 				};
 			}),
 		[fields]
@@ -57,7 +58,9 @@ export default function SelectRelationship({
 			error={error}
 			label={Liferay.Language.get('parameter')}
 			onChange={(event) => {
-				onChange?.(fields[Number(event.target.value)].id);
+				onChange?.(
+					fields.find(({name}) => name === event.target.value)?.id!
+				);
 			}}
 			options={options}
 			required
