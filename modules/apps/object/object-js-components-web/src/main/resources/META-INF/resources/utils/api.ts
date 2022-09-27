@@ -32,6 +32,8 @@ interface NotificationTemplate {
 	id: number;
 	name: string;
 	objectDefinitionId: number | null;
+	recipientTo: string;
+	recipients: string;
 	subject: LocalizedValue<string>;
 	to: LocalizedValue<string>;
 }

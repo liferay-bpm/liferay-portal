@@ -40,10 +40,26 @@ const HEADERS = new Headers({
 
 const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
+const RECIPIENT_OPTIONS = [
+	{
+		label: Liferay.Language.get('definition-of-terms'),
+		value: 'definitionOfTerms',
+	},
+	{
+		label: Liferay.Language.get('user'),
+		value: 'user',
+	},
+	{
+		label: Liferay.Language.get('role'),
+		value: 'role',
+	},
+];
+
 export default function EditNotificationTemplate({
 	baseResourceURL,
 	editorConfig,
 	notificationTemplateId,
+	notificationTemplateType,
 }: IProps) {
 	notificationTemplateId = Number(notificationTemplateId);
 
@@ -59,6 +75,8 @@ export default function EditNotificationTemplate({
 			[defaultLanguageId]: '',
 		},
 		name: '',
+		recipientTo: '',
+		recipients: 'definitionOfTerms',
 		subject: {
 			[defaultLanguageId]: '',
 		},
@@ -144,6 +162,10 @@ export default function EditNotificationTemplate({
 
 	const [templateTitle, setTemplateTitle] = useState<string>();
 
+	const [notificationType, setNotificationType] = useState<string>(
+		notificationTemplateType
+	);
+
 	useEffect(() => {
 		if (notificationTemplateId !== 0) {
 			API.getNotificationTemplate(notificationTemplateId).then(
@@ -157,6 +179,8 @@ export default function EditNotificationTemplate({
 					fromName,
 					name,
 					objectDefinitionId,
+					recipientTo,
+					recipients,
 					subject,
 					to,
 				}) => {
@@ -171,6 +195,8 @@ export default function EditNotificationTemplate({
 						fromName,
 						name,
 						objectDefinitionId,
+						recipientTo,
+						recipients,
 						subject,
 						to,
 					});
@@ -186,6 +212,32 @@ export default function EditNotificationTemplate({
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [notificationTemplateId]);
+
+	const RecipientTarget = ({type}: {type: string}) => {
+		switch (type) {
+			case 'definitionOfTerms':
+				return (
+					<Input
+						component="textarea"
+						label={Liferay.Language.get('to')}
+						name="to"
+						onChange={({target}) =>
+							setValues({
+								...values,
+								recipientTo: target.value,
+							})
+						}
+						placeholder={Liferay.Language.get(
+							'use-terms-to-configure-recipients-for-this-notifications'
+						)}
+						type="text"
+						value={values.recipientTo}
+					/>
+				);
+			default:
+				return null;
+		}
+	};
 
 	return (
 		<ClayForm onSubmit={handleSubmit}>
@@ -252,89 +304,128 @@ export default function EditNotificationTemplate({
 
 						<div className="col-lg-6 lfr__notification-template-card">
 							<Card title={Liferay.Language.get('settings')}>
-								<InputLocalized
-									label={Liferay.Language.get('to')}
-									name="to"
-									onChange={(translation) => {
-										setValues({
-											...values,
-											to: translation,
-										});
-									}}
-									placeholder=""
-									selectedLocale={selectedLocale}
-									translations={values.to}
-								/>
-
-								<div className="row">
-									<div className="col-lg-6">
-										<Input
-											label={Liferay.Language.get('cc')}
-											name="cc"
-											onChange={({target}) =>
-												setValues({
-													...values,
-													cc: target.value,
-												})
-											}
-											value={values.cc}
-										/>
-									</div>
-
-									<div className="col-lg-6">
-										<Input
-											label={Liferay.Language.get('bcc')}
-											name="bcc"
-											onChange={({target}) =>
-												setValues({
-													...values,
-													bcc: target.value,
-												})
-											}
-											value={values.bcc}
-										/>
-									</div>
-								</div>
-
-								<div className="row">
-									<div className="col-lg-6">
-										<Input
-											error={errors.from}
+								{Liferay.FeatureFlags['LPS-162133'] &&
+								notificationType !== 'email' ? (
+									<>
+										<SingleSelect
 											label={Liferay.Language.get(
-												'from-address'
+												'recipients'
 											)}
-											name="fromAddress"
-											onChange={({target}) =>
+											onChange={(item) => {
 												setValues({
 													...values,
-													from: target.value,
-												})
+													recipients: item.value,
+												});
+											}}
+											options={RECIPIENT_OPTIONS}
+											value={
+												RECIPIENT_OPTIONS.find(
+													(recipient) =>
+														values.recipients ===
+														recipient.value
+												)?.label
 											}
-											required
-											value={values.from}
 										/>
-									</div>
 
-									<div className="col-lg-6">
+										<RecipientTarget
+											type={values.recipients}
+										/>
+									</>
+								) : (
+									<>
 										<InputLocalized
-											error={errors.fromName}
-											label={Liferay.Language.get(
-												'from-name'
-											)}
-											name="fromName"
+											label={Liferay.Language.get('to')}
+											name="to"
 											onChange={(translation) => {
 												setValues({
 													...values,
-													fromName: translation,
+													to: translation,
 												});
 											}}
 											placeholder=""
-											required
 											selectedLocale={selectedLocale}
-											translations={values.fromName}
+											translations={values.to}
 										/>
-									</div>
-								</div>
+
+										<div className="row">
+											<div className="col-lg-6">
+												<Input
+													label={Liferay.Language.get(
+														'cc'
+													)}
+													name="cc"
+													onChange={({target}) =>
+														setValues({
+															...values,
+															cc: target.value,
+														})
+													}
+													value={values.cc}
+												/>
+											</div>
+
+											<div className="col-lg-6">
+												<Input
+													label={Liferay.Language.get(
+														'bcc'
+													)}
+													name="bcc"
+													onChange={({target}) =>
+														setValues({
+															...values,
+															bcc: target.value,
+														})
+													}
+													value={values.bcc}
+												/>
+											</div>
+										</div>
+
+										<div className="row">
+											<div className="col-lg-6">
+												<Input
+													error={errors.from}
+													label={Liferay.Language.get(
+														'from-address'
+													)}
+													name="fromAddress"
+													onChange={({target}) =>
+														setValues({
+															...values,
+															from: target.value,
+														})
+													}
+													required
+													value={values.from}
+												/>
+											</div>
+
+											<div className="col-lg-6">
+												<InputLocalized
+													error={errors.fromName}
+													label={Liferay.Language.get(
+														'from-name'
+													)}
+													name="fromName"
+													onChange={(translation) => {
+														setValues({
+															...values,
+															fromName: translation,
+														});
+													}}
+													placeholder=""
+													required
+													selectedLocale={
+														selectedLocale
+													}
+													translations={
+														values.fromName
+													}
+												/>
+											</div>
+										</div>
+									</>
+								)}
 							</Card>
 						</div>
 					</div>
@@ -385,6 +476,7 @@ interface IProps {
 	baseResourceURL: string;
 	editorConfig: object;
 	notificationTemplateId: number;
+	notificationTemplateType: string;
 }
 
 export type TNotificationTemplate = {
@@ -397,6 +489,8 @@ export type TNotificationTemplate = {
 	fromName: LocalizedValue<string>;
 	name: string;
 	objectDefinitionId: number | null;
+	recipientTo: string;
+	recipients: string;
 	subject: LocalizedValue<string>;
 	to: LocalizedValue<string>;
 };

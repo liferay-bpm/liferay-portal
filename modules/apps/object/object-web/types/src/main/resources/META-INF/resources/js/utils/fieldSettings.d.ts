@@ -23,14 +23,6 @@ export declare function normalizeFieldSettings(
 		| NameValueObject[]
 		| ObjectFieldFilterSetting[]
 		| undefined;
-	maxLength?:
-		| string
-		| number
-		| boolean
-		| ObjectFieldPicklistSetting
-		| NameValueObject[]
-		| ObjectFieldFilterSetting[]
-		| undefined;
 	acceptedFileExtensions?:
 		| string
 		| number
@@ -48,6 +40,14 @@ export declare function normalizeFieldSettings(
 		| ObjectFieldFilterSetting[]
 		| undefined;
 	filters?:
+		| string
+		| number
+		| boolean
+		| ObjectFieldPicklistSetting
+		| NameValueObject[]
+		| ObjectFieldFilterSetting[]
+		| undefined;
+	maxLength?:
 		| string
 		| number
 		| boolean
