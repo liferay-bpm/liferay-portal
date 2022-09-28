@@ -192,7 +192,7 @@ export async function save(
 		const errorMessage =
 			(type && ERRORS[type]) ??
 			title ??
-			Liferay.Language.get('an-error-occurred');
+			Liferay.Language.get('key-must-only-contain-letters-and-digits');
 
 		const ErrorDetails = () => {
 			return {
