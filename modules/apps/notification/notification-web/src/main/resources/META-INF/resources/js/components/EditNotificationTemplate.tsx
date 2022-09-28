@@ -15,6 +15,7 @@
 import ClayButton from '@clayui/button';
 import ClayForm from '@clayui/form';
 import ClayManagementToolbar from '@clayui/management-toolbar';
+import ClayMultiSelect from '@clayui/multi-select';
 import {
 	API,
 	Card,
@@ -43,7 +44,7 @@ const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 const RECIPIENT_OPTIONS = [
 	{
 		label: Liferay.Language.get('definition-of-terms'),
-		value: 'definitionOfTerms',
+		value: 'term',
 	},
 	{
 		label: Liferay.Language.get('user'),
@@ -75,8 +76,7 @@ export default function EditNotificationTemplate({
 			[defaultLanguageId]: '',
 		},
 		name: '',
-		recipientTo: '',
-		recipients: 'definitionOfTerms',
+		recipientType: '',
 		subject: {
 			[defaultLanguageId]: '',
 		},
@@ -107,11 +107,14 @@ export default function EditNotificationTemplate({
 			errors.name = Liferay.Language.get('required');
 		}
 
-		if (!values.from) {
+		if (notificationTemplateType === 'email' && !values.from) {
 			errors.from = Liferay.Language.get('required');
 		}
 
-		if (!values.fromName[defaultLanguageId]) {
+		if (
+			notificationTemplateType === 'email' &&
+			!values.fromName[defaultLanguageId]
+		) {
 			errors.fromName = Liferay.Language.get('required');
 		}
 
@@ -162,9 +165,55 @@ export default function EditNotificationTemplate({
 
 	const [templateTitle, setTemplateTitle] = useState<string>();
 
-	const [notificationType, setNotificationType] = useState<string>(
-		notificationTemplateType
-	);
+	const [rolesList, setRolesList] = useState<Role[]>([]);
+
+	const [roles, setRoles] = useState<Item[]>([]);
+
+	const [searchTerm, setSearchTerm] = useState('');
+
+	const getAccountRoles = async (searchTerm: string) => {
+		const apiURL = '/o/headless-admin-user/v1.0/accounts/0/account-roles';
+		const query = `${apiURL}?page=1&pageSize=10&sort=name:asc${
+			searchTerm ? `&filter=contains(name, '${searchTerm}')` : ''
+		}`;
+		const response = await fetch(query, {
+			headers: HEADERS,
+			method: 'GET',
+		});
+
+		const responseJSON = await response.json();
+
+		const roles = responseJSON.items.map((role: Role) => {
+			return {
+				label: role.displayName,
+				value: role.name,
+			};
+		});
+
+		setRolesList(roles);
+	};
+
+	useEffect(() => {
+		const delayDebounceFn = setTimeout(() => {
+			getAccountRoles(searchTerm);
+		}, 1000);
+
+		return () => clearTimeout(delayDebounceFn);
+	}, [searchTerm]);
+
+	const _handleChange = (value: any) => {
+		setSearchTerm(value);
+	};
+
+	const handleRolesItemsChange = (items: Item[]) => {
+		setValues({
+			...values,
+			to: {
+				[defaultLanguageId]: items.map((item) => item.value).toString(),
+			},
+		});
+		setRoles(items);
+	};
 
 	useEffect(() => {
 		if (notificationTemplateId !== 0) {
@@ -179,8 +228,7 @@ export default function EditNotificationTemplate({
 					fromName,
 					name,
 					objectDefinitionId,
-					recipientTo,
-					recipients,
+					recipientType,
 					subject,
 					to,
 				}) => {
@@ -195,8 +243,7 @@ export default function EditNotificationTemplate({
 						fromName,
 						name,
 						objectDefinitionId,
-						recipientTo,
-						recipients,
+						recipientType,
 						subject,
 						to,
 					});
@@ -212,32 +259,6 @@ export default function EditNotificationTemplate({
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [notificationTemplateId]);
-
-	const RecipientTarget = ({type}: {type: string}) => {
-		switch (type) {
-			case 'definitionOfTerms':
-				return (
-					<Input
-						component="textarea"
-						label={Liferay.Language.get('to')}
-						name="to"
-						onChange={({target}) =>
-							setValues({
-								...values,
-								recipientTo: target.value,
-							})
-						}
-						placeholder={Liferay.Language.get(
-							'use-terms-to-configure-recipients-for-this-notifications'
-						)}
-						type="text"
-						value={values.recipientTo}
-					/>
-				);
-			default:
-				return null;
-		}
-	};
 
 	return (
 		<ClayForm onSubmit={handleSubmit}>
@@ -305,7 +326,7 @@ export default function EditNotificationTemplate({
 						<div className="col-lg-6 lfr__notification-template-card">
 							<Card title={Liferay.Language.get('settings')}>
 								{Liferay.FeatureFlags['LPS-162133'] &&
-								notificationType !== 'email' ? (
+								notificationTemplateType !== 'email' ? (
 									<>
 										<SingleSelect
 											label={Liferay.Language.get(
@@ -314,22 +335,66 @@ export default function EditNotificationTemplate({
 											onChange={(item) => {
 												setValues({
 													...values,
-													recipients: item.value,
+													recipientType: item.value,
 												});
+
+												if (item.value === 'role') {
+													getAccountRoles('');
+												}
 											}}
 											options={RECIPIENT_OPTIONS}
 											value={
 												RECIPIENT_OPTIONS.find(
 													(recipient) =>
-														values.recipients ===
+														values.recipientType ===
 														recipient.value
 												)?.label
 											}
 										/>
 
-										<RecipientTarget
-											type={values.recipients}
-										/>
+										{values.recipientType === 'term' ? (
+											<Input
+												component="textarea"
+												label={Liferay.Language.get(
+													'to'
+												)}
+												name="to"
+												onChange={({target}) =>
+													setValues({
+														...values,
+														to: {
+															[defaultLanguageId]:
+																target.value,
+														},
+													})
+												}
+												placeholder={Liferay.Language.get(
+													'use-terms-to-configure-recipients-for-this-notifications'
+												)}
+												type="text"
+												value={
+													values.to[defaultLanguageId]
+												}
+											/>
+										) : (
+											<ClayForm.Group>
+												<label>
+													{Liferay.Language.get(
+														'role'
+													)}
+												</label>
+
+												<ClayMultiSelect
+													items={roles}
+													onChange={_handleChange}
+													onItemsChange={
+														handleRolesItemsChange
+													}
+													sourceItems={rolesList}
+													value={searchTerm}
+												/>
+											</ClayForm.Group>
+										)}
 									</>
 								) : (
 									<>
@@ -472,6 +537,20 @@ export default function EditNotificationTemplate({
 	);
 }
 
+interface Item {
+	label?: string;
+	value?: string;
+}
+
+interface Role {
+	accountId: number;
+	description: string;
+	displayName: string;
+	id: number;
+	name: string;
+	roleId: number;
+}
+
 interface IProps {
 	baseResourceURL: string;
 	editorConfig: object;
@@ -489,8 +568,7 @@ export type TNotificationTemplate = {
 	fromName: LocalizedValue<string>;
 	name: string;
 	objectDefinitionId: number | null;
-	recipientTo: string;
-	recipients: string;
+	recipientType: string;
 	subject: LocalizedValue<string>;
 	to: LocalizedValue<string>;
 };
