@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
@@ -86,9 +87,14 @@ public class ObjectDefinitionResourceTest
 
 		ObjectDefinition objectDefinition = randomObjectDefinition();
 
+		objectDefinition = _addObjectDefinition(objectDefinition);
+
+		String lowerCaseObjectDefinitionName = TextFormatter.formatPlural(
+			StringUtil.toLowerCase(objectDefinition.getName()));
+
 		String expectedRestContextPath =
 			(objectDefinition.getSystem() ? "/o/" : "/o/c/") +
-				TextFormatter.formatPlural(objectDefinition.getName());
+				lowerCaseObjectDefinitionName;
 
 		Assert.assertEquals(
 			expectedRestContextPath, objectDefinition.getRestContextPath());
