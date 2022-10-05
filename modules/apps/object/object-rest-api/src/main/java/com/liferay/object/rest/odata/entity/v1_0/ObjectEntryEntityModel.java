@@ -43,19 +43,19 @@ public class ObjectEntryEntityModel implements EntityModel {
 	public ObjectEntryEntityModel(List<ObjectField> objectFields) {
 		_entityFieldsMap = HashMapBuilder.<String, EntityField>put(
 			"creator",
-			new StringEntityField("creator", locale -> Field.USER_NAME)
+			new StringEntityField("creator", locale -> "creator")
 		).put(
 			"creatorId",
 			new IntegerEntityField("creatorId", locale -> Field.USER_ID)
 		).put(
-			"dateCreated",
+			"createDate",
 			new DateTimeEntityField(
-				"dateCreated", locale -> Field.CREATE_DATE,
+				"createDate", locale -> Field.CREATE_DATE,
 				locale -> Field.CREATE_DATE)
 		).put(
-			"dateModified",
+			"modifiedDate",
 			new DateTimeEntityField(
-				"dateModified", locale -> "modifiedDate",
+				"modifiedDate", locale -> "modifiedDate",
 				locale -> "modifiedDate")
 		).put(
 			"externalReferenceCode",
