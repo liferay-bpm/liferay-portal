@@ -27,6 +27,7 @@ import com.liferay.document.library.kernel.service.DLFolderLocalService;
 import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
+import com.liferay.object.aggregation.odata.filter.parser.ObjectODataFilterParser;
 import com.liferay.object.configuration.ObjectConfiguration;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldValidationConstants;
