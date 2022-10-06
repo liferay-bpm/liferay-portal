@@ -139,8 +139,6 @@ import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.sort.SortFieldBuilder;
 import com.liferay.portal.search.sort.SortOrder;
 import com.liferay.portal.search.sort.Sorts;
-import com.liferay.portal.vulcan.util.ObjectMapperUtil;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -167,7 +165,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -1705,43 +1702,7 @@ public class ObjectEntryLocalServiceImpl
 			return Collections.emptyList();
 		}
 
-		List<String> oDataFilterStrings = new ArrayList<>();
-
-		for (ObjectFilter objectFilter : objectFilters) {
-			Map<String, Object> map = ObjectMapperUtil.readValue(
-				Map.class, objectFilter.getJSON());
-
-			if (map == null) {
-				continue;
-			}
-
-			Set<String> operators = map.keySet();
-
-			for (String operator : operators) {
-				Object object = map.get(operator);
-
-				if (object instanceof Object[]) {
-					String[] values = TransformUtil.transform(
-						(Object[])object,
-						value -> StringBundler.concat(
-							StringPool.APOSTROPHE, value,
-							StringPool.APOSTROPHE),
-						String.class);
-
-					object = StringBundler.concat(
-						StringPool.OPEN_PARENTHESIS,
-						ArrayUtil.toString(values, StringPool.BLANK),
-						StringPool.CLOSE_PARENTHESIS);
-				}
-
-				oDataFilterStrings.add(
-					StringBundler.concat(
-						objectFilter.getFilterBy(), StringPool.SPACE, operator,
-						StringPool.SPACE, object));
-			}
-		}
-
-		return oDataFilterStrings;
+		return _objectODataFilterParser.parse(objectFilters);
 	}
 
 	private GroupByStep _getOneToManyObjectEntriesGroupByStep(
@@ -3085,6 +3046,9 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private ObjectFieldSettingPersistence _objectFieldSettingPersistence;
+
+	@Reference
+	private ObjectODataFilterParser _objectODataFilterParser;
 
 	@Reference
 	private ObjectRelatedModelsProviderRegistry
