@@ -362,20 +362,25 @@ public class ObjectField implements Serializable {
 	protected Map<String, String> label;
 
 	@Schema
-	public Long getListTypeDefinitionId() {
-		return listTypeDefinitionId;
+	public String getListTypeDefinitionExternalReferenceCode() {
+		return listTypeDefinitionExternalReferenceCode;
 	}
 
-	public void setListTypeDefinitionId(Long listTypeDefinitionId) {
-		this.listTypeDefinitionId = listTypeDefinitionId;
+	public void setListTypeDefinitionExternalReferenceCode(
+		String listTypeDefinitionExternalReferenceCode) {
+
+		this.listTypeDefinitionExternalReferenceCode =
+			listTypeDefinitionExternalReferenceCode;
 	}
 
 	@JsonIgnore
-	public void setListTypeDefinitionId(
-		UnsafeSupplier<Long, Exception> listTypeDefinitionIdUnsafeSupplier) {
+	public void setListTypeDefinitionExternalReferenceCode(
+		UnsafeSupplier<String, Exception>
+			listTypeDefinitionExternalReferenceCodeUnsafeSupplier) {
 
 		try {
-			listTypeDefinitionId = listTypeDefinitionIdUnsafeSupplier.get();
+			listTypeDefinitionExternalReferenceCode =
+				listTypeDefinitionExternalReferenceCodeUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -387,7 +392,7 @@ public class ObjectField implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Long listTypeDefinitionId;
+	protected String listTypeDefinitionExternalReferenceCode;
 
 	@Schema
 	public String getName() {
@@ -754,14 +759,18 @@ public class ObjectField implements Serializable {
 			sb.append(_toJSON(label));
 		}
 
-		if (listTypeDefinitionId != null) {
+		if (listTypeDefinitionExternalReferenceCode != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"listTypeDefinitionId\": ");
+			sb.append("\"listTypeDefinitionExternalReferenceCode\": ");
 
-			sb.append(listTypeDefinitionId);
+			sb.append("\"");
+
+			sb.append(_escape(listTypeDefinitionExternalReferenceCode));
+
+			sb.append("\"");
 		}
 
 		if (name != null) {

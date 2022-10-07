@@ -188,6 +188,7 @@ public abstract class BaseObjectFieldResourceTestCase {
 		objectField.setDefaultValue(regex);
 		objectField.setExternalReferenceCode(regex);
 		objectField.setIndexedLanguageId(regex);
+		objectField.setListTypeDefinitionExternalReferenceCode(regex);
 		objectField.setName(regex);
 
 		String json = ObjectFieldSerDes.toJSON(objectField);
@@ -199,6 +200,8 @@ public abstract class BaseObjectFieldResourceTestCase {
 		Assert.assertEquals(regex, objectField.getDefaultValue());
 		Assert.assertEquals(regex, objectField.getExternalReferenceCode());
 		Assert.assertEquals(regex, objectField.getIndexedLanguageId());
+		Assert.assertEquals(
+			regex, objectField.getListTypeDefinitionExternalReferenceCode());
 		Assert.assertEquals(regex, objectField.getName());
 	}
 
@@ -938,9 +941,12 @@ public abstract class BaseObjectFieldResourceTestCase {
 			}
 
 			if (Objects.equals(
-					"listTypeDefinitionId", additionalAssertFieldName)) {
+					"listTypeDefinitionExternalReferenceCode",
+					additionalAssertFieldName)) {
 
-				if (objectField.getListTypeDefinitionId() == null) {
+				if (objectField.getListTypeDefinitionExternalReferenceCode() ==
+						null) {
+
 					valid = false;
 				}
 
@@ -1209,11 +1215,14 @@ public abstract class BaseObjectFieldResourceTestCase {
 			}
 
 			if (Objects.equals(
-					"listTypeDefinitionId", additionalAssertFieldName)) {
+					"listTypeDefinitionExternalReferenceCode",
+					additionalAssertFieldName)) {
 
 				if (!Objects.deepEquals(
-						objectField1.getListTypeDefinitionId(),
-						objectField2.getListTypeDefinitionId())) {
+						objectField1.
+							getListTypeDefinitionExternalReferenceCode(),
+						objectField2.
+							getListTypeDefinitionExternalReferenceCode())) {
 
 					return false;
 				}
@@ -1452,9 +1461,14 @@ public abstract class BaseObjectFieldResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
-		if (entityFieldName.equals("listTypeDefinitionId")) {
-			throw new IllegalArgumentException(
-				"Invalid entity field " + entityFieldName);
+		if (entityFieldName.equals("listTypeDefinitionExternalReferenceCode")) {
+			sb.append("'");
+			sb.append(
+				String.valueOf(
+					objectField.getListTypeDefinitionExternalReferenceCode()));
+			sb.append("'");
+
+			return sb.toString();
 		}
 
 		if (entityFieldName.equals("name")) {
@@ -1548,7 +1562,8 @@ public abstract class BaseObjectFieldResourceTestCase {
 				indexedAsKeyword = RandomTestUtil.randomBoolean();
 				indexedLanguageId = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
-				listTypeDefinitionId = RandomTestUtil.randomLong();
+				listTypeDefinitionExternalReferenceCode =
+					StringUtil.toLowerCase(RandomTestUtil.randomString());
 				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				required = RandomTestUtil.randomBoolean();
 				state = RandomTestUtil.randomBoolean();

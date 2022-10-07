@@ -260,26 +260,31 @@ public class ObjectField implements Cloneable, Serializable {
 
 	protected Map<String, String> label;
 
-	public Long getListTypeDefinitionId() {
-		return listTypeDefinitionId;
+	public String getListTypeDefinitionExternalReferenceCode() {
+		return listTypeDefinitionExternalReferenceCode;
 	}
 
-	public void setListTypeDefinitionId(Long listTypeDefinitionId) {
-		this.listTypeDefinitionId = listTypeDefinitionId;
+	public void setListTypeDefinitionExternalReferenceCode(
+		String listTypeDefinitionExternalReferenceCode) {
+
+		this.listTypeDefinitionExternalReferenceCode =
+			listTypeDefinitionExternalReferenceCode;
 	}
 
-	public void setListTypeDefinitionId(
-		UnsafeSupplier<Long, Exception> listTypeDefinitionIdUnsafeSupplier) {
+	public void setListTypeDefinitionExternalReferenceCode(
+		UnsafeSupplier<String, Exception>
+			listTypeDefinitionExternalReferenceCodeUnsafeSupplier) {
 
 		try {
-			listTypeDefinitionId = listTypeDefinitionIdUnsafeSupplier.get();
+			listTypeDefinitionExternalReferenceCode =
+				listTypeDefinitionExternalReferenceCodeUnsafeSupplier.get();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected Long listTypeDefinitionId;
+	protected String listTypeDefinitionExternalReferenceCode;
 
 	public String getName() {
 		return name;
