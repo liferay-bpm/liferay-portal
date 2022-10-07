@@ -164,9 +164,8 @@ components:
                     additionalProperties:
                         type: string
                     type: object
-                listTypeDefinitionId:
-                    format: int64
-                    type: integer
+                listTypeDefinitionExternalReferenceCode:
+                    type: string
                 name:
                     type: string
                 objectFieldSettings:
