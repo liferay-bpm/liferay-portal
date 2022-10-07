@@ -264,6 +264,7 @@ type ObjectValidationType = {
 
 interface PickList {
 	actions: Actions;
+	externalReferenceCode: string;
 	id: number;
 	listTypeEntries: PickListItem[];
 	name: string;
