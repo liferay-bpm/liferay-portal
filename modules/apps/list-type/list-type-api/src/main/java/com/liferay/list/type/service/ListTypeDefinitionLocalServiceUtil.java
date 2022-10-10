@@ -397,11 +397,12 @@ public class ListTypeDefinitionLocalServiceUtil {
 	}
 
 	public static ListTypeDefinition updateListTypeDefinition(
-			long listTypeDefinitionId, Map<java.util.Locale, String> nameMap)
+			long listTypeDefinitionId, Map<java.util.Locale, String> nameMap,
+			String externalReferenceCode)
 		throws PortalException {
 
 		return getService().updateListTypeDefinition(
-			listTypeDefinitionId, nameMap);
+			listTypeDefinitionId, nameMap, externalReferenceCode);
 	}
 
 	public static ListTypeDefinitionLocalService getService() {
