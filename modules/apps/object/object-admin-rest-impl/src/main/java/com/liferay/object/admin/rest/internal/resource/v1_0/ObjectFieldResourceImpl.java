@@ -14,6 +14,8 @@
 
 package com.liferay.object.admin.rest.internal.resource.v1_0;
 
+import com.liferay.list.type.model.ListTypeDefinition;
+import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectField;
 import com.liferay.object.admin.rest.internal.dto.v1_0.converter.ObjectFieldDTOConverter;
@@ -156,7 +158,7 @@ public class ObjectFieldResourceImpl
 
 		return _toObjectField(
 			_objectFieldService.addCustomObjectField(
-				objectField.getListTypeDefinitionId(), objectDefinitionId,
+				_getListTypeDefinitionId(objectField), objectDefinitionId,
 				objectField.getBusinessTypeAsString(),
 				ObjectFieldUtil.getDBType(
 					objectField.getDBTypeAsString(),
@@ -192,7 +194,7 @@ public class ObjectFieldResourceImpl
 		return _toObjectField(
 			_objectFieldService.updateObjectField(
 				objectFieldId, objectField.getExternalReferenceCode(),
-				objectField.getListTypeDefinitionId(),
+				_getListTypeDefinitionId(objectField),
 				objectField.getBusinessTypeAsString(),
 				ObjectFieldUtil.getDBType(
 					objectField.getDBTypeAsString(),
@@ -210,6 +212,25 @@ public class ObjectFieldResourceImpl
 							objectField.getBusinessTypeAsString(),
 							objectFieldSetting, _objectFieldSettingLocalService,
 							_objectFilterLocalService))));
+	}
+
+	private long _getListTypeDefinitionId(ObjectField objectField)
+		throws Exception {
+
+		if (!Objects.equals(
+				objectField.getBusinessType(),
+				ObjectField.BusinessType.PICKLIST)) {
+
+			return 0L;
+		}
+
+		ListTypeDefinition listTypeDefinition =
+			_listTypeDefinitionLocalService.
+				getListTypeDefinitionByExternalReferenceCode(
+					contextUser.getCompanyId(),
+					objectField.getListTypeDefinitionExternalReferenceCode());
+
+		return listTypeDefinition.getListTypeDefinitionId();
 	}
 
 	private ObjectField _toObjectField(
@@ -281,6 +302,9 @@ public class ObjectFieldResourceImpl
 
 	private static final EntityModel _entityModel =
 		new ObjectFieldEntityModel();
+
+	@Reference
+	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;

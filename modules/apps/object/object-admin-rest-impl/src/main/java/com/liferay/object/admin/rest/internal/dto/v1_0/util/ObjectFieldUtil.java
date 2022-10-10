@@ -14,6 +14,8 @@
 
 package com.liferay.object.admin.rest.internal.dto.v1_0.util;
 
+import com.liferay.list.type.model.ListTypeDefinition;
+import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectField;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -52,7 +54,8 @@ public class ObjectFieldUtil {
 		ObjectField objectField,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectFieldSettingLocalService objectFieldSettingLocalService,
-		ObjectFilterLocalService objectFilterLocalService) {
+		ObjectFilterLocalService objectFilterLocalService,
+		ListTypeDefinitionLocalService listTypeDefinitionLocalService) {
 
 		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-149625")) &&
 			Objects.equals(
@@ -65,8 +68,19 @@ public class ObjectFieldUtil {
 		com.liferay.object.model.ObjectField serviceBuilderObjectField =
 			objectFieldLocalService.createObjectField(0L);
 
-		serviceBuilderObjectField.setListTypeDefinitionId(
-			GetterUtil.getLong(objectField.getListTypeDefinitionId()));
+		ListTypeDefinition listTypeDefinition =
+			listTypeDefinitionLocalService.
+				fetchListTypeDefinitionByExternalReferenceCode(
+					serviceBuilderObjectField.getCompanyId(),
+					objectField.getExternalReferenceCode());
+
+		long listTypeDefinitionId = 0;
+
+		if (listTypeDefinition != null) {
+			listTypeDefinitionId = listTypeDefinition.getListTypeDefinitionId();
+		}
+
+		serviceBuilderObjectField.setListTypeDefinitionId(listTypeDefinitionId);
 		serviceBuilderObjectField.setBusinessType(
 			objectField.getBusinessTypeAsString());
 		serviceBuilderObjectField.setDBType(

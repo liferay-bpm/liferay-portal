@@ -14,6 +14,8 @@
 
 package com.liferay.object.admin.rest.internal.dto.v1_0.converter;
 
+import com.liferay.list.type.model.ListTypeDefinition;
+import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectField;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectFieldSetting;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldSettingUtil;
@@ -23,6 +25,7 @@ import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Feliphe Marinho
@@ -49,6 +52,20 @@ public class ObjectFieldDTOConverter
 			return null;
 		}
 
+		StringBuilder listTypeDefinitionERC = new StringBuilder();
+		ListTypeDefinition listTypeDefinition;
+
+		if (objectField.getListTypeDefinitionId() != 0) {
+			listTypeDefinition =
+				_listTypeDefinitionLocalService.getListTypeDefinition(
+					objectField.getListTypeDefinitionId());
+
+			if (listTypeDefinition != null) {
+				listTypeDefinitionERC.append(
+					listTypeDefinition.getExternalReferenceCode());
+			}
+		}
+
 		return new ObjectField() {
 			{
 				actions = dtoConverterContext.getActions();
@@ -63,7 +80,8 @@ public class ObjectFieldDTOConverter
 				indexedLanguageId = objectField.getIndexedLanguageId();
 				label = LocalizedMapUtil.getLanguageIdMap(
 					objectField.getLabelMap());
-				listTypeDefinitionId = objectField.getListTypeDefinitionId();
+				listTypeDefinitionExternalReferenceCode =
+					listTypeDefinitionERC.toString();
 				name = objectField.getName();
 				objectFieldSettings = TransformUtil.transformToArray(
 					objectField.getObjectFieldSettings(),
@@ -80,5 +98,8 @@ public class ObjectFieldDTOConverter
 			}
 		};
 	}
+
+	@Reference
+	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;
 
 }

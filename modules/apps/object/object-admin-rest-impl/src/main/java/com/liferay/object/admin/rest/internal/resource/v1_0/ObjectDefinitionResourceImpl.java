@@ -14,6 +14,8 @@
 
 package com.liferay.object.admin.rest.internal.resource.v1_0;
 
+import com.liferay.list.type.model.ListTypeDefinition;
+import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectAction;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectField;
@@ -236,7 +238,8 @@ public class ObjectDefinitionResourceImpl
 						objectField -> ObjectFieldUtil.toObjectField(
 							objectField, _objectFieldLocalService,
 							_objectFieldSettingLocalService,
-							_objectFilterLocalService)));
+							_objectFilterLocalService,
+							_listTypeDefinitionLocalService)));
 
 		if (!Validator.isBlank(objectDefinition.getExternalReferenceCode())) {
 			serviceBuilderObjectDefinition =
@@ -346,11 +349,23 @@ public class ObjectDefinitionResourceImpl
 				_objectFieldLocalService.getObjectFields(objectDefinitionId));
 
 		for (ObjectField objectField : objectDefinition.getObjectFields()) {
+			ListTypeDefinition listTypeDefinition =
+				_listTypeDefinitionLocalService.
+					fetchListTypeDefinitionByExternalReferenceCode(
+						serviceBuilderObjectDefinition.getCompanyId(),
+						objectField.getExternalReferenceCode());
+
+			long listTypeDefinitionId = 0;
+
+			if (listTypeDefinition != null) {
+				listTypeDefinitionId =
+					listTypeDefinition.getListTypeDefinitionId();
+			}
+
 			_objectFieldLocalService.updateObjectField(
 				contextUser.getUserId(), objectDefinitionId,
 				GetterUtil.getLong(objectField.getId()),
-				objectField.getExternalReferenceCode(),
-				GetterUtil.getLong(objectField.getListTypeDefinitionId()),
+				objectField.getExternalReferenceCode(), listTypeDefinitionId,
 				objectField.getBusinessTypeAsString(), null, null,
 				objectField.getDBTypeAsString(), objectField.getDefaultValue(),
 				objectField.getIndexed(), objectField.getIndexedAsKeyword(),
@@ -717,6 +732,9 @@ public class ObjectDefinitionResourceImpl
 
 	@Reference
 	private Language _language;
+
+	@Reference
+	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;
 
 	@Reference
 	private ObjectActionLocalService _objectActionLocalService;
