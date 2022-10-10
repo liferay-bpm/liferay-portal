@@ -243,8 +243,8 @@ public class ListTypeDefinitionServiceTest {
 				_listTypeDefinitionService.updateListTypeDefinition(
 					listTypeDefinition.getListTypeDefinitionId(),
 					Collections.singletonMap(
-						LocaleUtil.getDefault(),
-						RandomTestUtil.randomString()));
+						LocaleUtil.getDefault(), RandomTestUtil.randomString()),
+					listTypeDefinition.getExternalReferenceCode());
 		}
 		finally {
 			if (listTypeDefinition != null) {
