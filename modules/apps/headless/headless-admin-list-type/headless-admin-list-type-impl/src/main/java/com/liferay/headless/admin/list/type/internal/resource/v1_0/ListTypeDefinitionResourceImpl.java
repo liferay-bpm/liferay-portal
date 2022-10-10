@@ -135,7 +135,8 @@ public class ListTypeDefinitionResourceImpl
 			_listTypeDefinitionService.updateListTypeDefinition(
 				listTypeDefinitionId,
 				LocalizedMapUtil.getLocalizedMap(
-					listTypeDefinition.getName_i18n())));
+					listTypeDefinition.getName_i18n()),
+				listTypeDefinition.getExternalReferenceCode()));
 	}
 
 	private Locale _getLocale() {
@@ -202,6 +203,8 @@ public class ListTypeDefinitionResourceImpl
 				dateCreated = serviceBuilderListTypeDefinition.getCreateDate();
 				dateModified =
 					serviceBuilderListTypeDefinition.getModifiedDate();
+				externalReferenceCode =
+					serviceBuilderListTypeDefinition.getExternalReferenceCode();
 				id = serviceBuilderListTypeDefinition.getListTypeDefinitionId();
 				listTypeEntries = transformToArray(
 					_listTypeEntryLocalService.getListTypeEntries(
