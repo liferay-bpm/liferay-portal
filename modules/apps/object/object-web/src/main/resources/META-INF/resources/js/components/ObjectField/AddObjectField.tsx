@@ -164,15 +164,7 @@ export default function AddObjectField({
 				<ModalAddObjectField
 					apiURL={apiURL}
 					objectDefinitionId={objectDefinitionId}
-					objectFieldTypes={
-						!Liferay.FeatureFlags['LPS-149625']
-							? objectFieldTypes.filter(
-									(filterType) =>
-										filterType.businessType !==
-										'Aggregation'
-							  )
-							: objectFieldTypes
-					}
+					objectFieldTypes={objectFieldTypes}
 					objectName={objectName}
 					observer={observer}
 					onClose={onClose}
