@@ -11,11 +11,10 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
-
 import React from 'react';
 interface IDisconnectModalProps {
-	observer: any;
-	onOpenChange: (value: boolean) => void;
+    observer: any;
+    onOpenChange: (value: boolean) => void;
 }
 declare const DisconnectModal: React.FC<IDisconnectModalProps>;
 export default DisconnectModal;

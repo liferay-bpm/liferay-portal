@@ -11,7 +11,6 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
-
 import React from 'react';
 declare const DefaultPage: React.FC<React.HTMLAttributes<HTMLElement>>;
 export default DefaultPage;

@@ -11,9 +11,9 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
-
 import React from 'react';
-import {TGenericComponent} from './WizardPage';
-interface IStepProps extends TGenericComponent {}
+import { TGenericComponent } from './WizardPage';
+interface IStepProps extends TGenericComponent {
+}
 declare const Step: React.FC<IStepProps>;
 export default Step;

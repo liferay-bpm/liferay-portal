@@ -11,17 +11,16 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
-
 import React from 'react';
-import {TProperty} from '../components/PropertiesTable';
+import { TProperty } from '../components/PropertiesTable';
 interface IAssignModalProps {
-	observer: any;
-	onCloseModal: () => void;
-	property: TProperty;
+    observer: any;
+    onCloseModal: () => void;
+    property: TProperty;
 }
 export declare enum ETabs {
-	Channel = 0,
-	Sites = 1,
+    Channel = 0,
+    Sites = 1
 }
 declare const AssignModal: React.FC<IAssignModalProps>;
 export default AssignModal;

@@ -11,12 +11,11 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
-
 import React from 'react';
-import {ESteps} from '../pages/wizard/WizardPage';
+import { ESteps } from '../pages/wizard/WizardPage';
 interface IConnectProps {
-	onChangeStep?: (step: ESteps) => void;
-	title: string;
+    onChangeStep?: (step: ESteps) => void;
+    title: string;
 }
 declare const Connect: React.FC<IConnectProps>;
 export default Connect;

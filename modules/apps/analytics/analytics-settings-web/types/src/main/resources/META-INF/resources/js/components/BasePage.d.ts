@@ -11,14 +11,13 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
-
 import React from 'react';
 interface IBasePageProps extends React.HTMLAttributes<HTMLElement> {
-	description?: string;
-	title: string;
+    description?: string;
+    title: string;
 }
 declare const BasePage: React.FC<IBasePageProps> & {
-	Footer: typeof BasePageFooter;
+    Footer: typeof BasePageFooter;
 };
 declare const BasePageFooter: React.FC<React.HTMLAttributes<HTMLElement>>;
 export default BasePage;

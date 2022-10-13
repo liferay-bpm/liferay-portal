@@ -11,16 +11,15 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
-
 import React from 'react';
 export declare enum ESteps {
-	ConnectAC = 0,
-	Property = 1,
-	People = 2,
-	PeopleData = 3,
+    ConnectAC = 0,
+    Property = 1,
+    People = 2,
+    PeopleData = 3
 }
 export interface TGenericComponent {
-	onChangeStep: (step: ESteps) => void;
+    onChangeStep: (step: ESteps) => void;
 }
 declare const WizardPage: React.FC<React.HTMLAttributes<HTMLElement>>;
 export default WizardPage;

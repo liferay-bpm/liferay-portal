@@ -11,20 +11,19 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
-
 import React from 'react';
 export declare const AppContext: React.Context<any>;
 export declare enum EPageView {
-	Wizard = 'VIEW_WIZARD_MODE',
-	Default = 'VIEW_DEFAULT_MODE',
+    Wizard = "VIEW_WIZARD_MODE",
+    Default = "VIEW_DEFAULT_MODE"
 }
 export declare enum Events {
-	Connected = 'CONNECTED',
+    Connected = "CONNECTED"
 }
 interface IAppProps extends React.HTMLAttributes<HTMLElement> {
-	connected: boolean;
-	liferayAnalyticsURL: string;
-	token: string;
+    connected: boolean;
+    liferayAnalyticsURL: string;
+    token: string;
 }
 declare const App: React.FC<IAppProps>;
 export default App;

@@ -11,19 +11,18 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
-
 import React from 'react';
 export declare type TDataSource = {
-	dataSourceId: string;
-	siteIds: Array<number>;
+    dataSourceId: string;
+    siteIds: Array<number>;
 };
 export declare type TProperty = {
-	channelId: string;
-	dataSources: Array<TDataSource>;
-	name: string;
+    channelId: string;
+    dataSources: Array<TDataSource>;
+    name: string;
 };
 interface IPropertiesTable {
-	properties: Array<TProperty>;
+    properties: Array<TProperty>;
 }
 declare const PropertiesTable: React.FC<IPropertiesTable>;
 export default PropertiesTable;

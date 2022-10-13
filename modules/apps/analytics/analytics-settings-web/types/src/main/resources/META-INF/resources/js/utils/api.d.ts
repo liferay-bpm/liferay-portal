@@ -11,7 +11,6 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
-
 export declare function fetchConnection(token: string): Promise<Response>;
 export declare function deleteConnection(): Promise<Response>;
 export declare function fetchProperties(): Promise<any>;
