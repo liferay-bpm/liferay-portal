@@ -14,9 +14,13 @@
 
 package com.liferay.object.admin.rest.dto.v1_0.util;
 
+import com.liferay.list.type.model.ListTypeDefinition;
+import com.liferay.list.type.service.ListTypeDefinitionServiceUtil;
+import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.model.ObjectField;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 /**
  * @author Feliphe Marinho
@@ -43,8 +47,23 @@ public class ObjectFieldUtil {
 		).put(
 			"label", objectField.getLabelMap()
 		).put(
-			"listTypeDefinitionId",
-			Long.valueOf(objectField.getListTypeDefinitionId())
+			"listTypeDefinitionExternalReferenceCode",
+			() -> {
+				if (StringUtil.equals(
+						objectField.getBusinessType(),
+						ObjectFieldConstants.BUSINESS_TYPE_PICKLIST)) {
+
+					ListTypeDefinition listTypeDefinition =
+						ListTypeDefinitionServiceUtil.getListTypeDefinition(
+							objectField.getListTypeDefinitionId());
+
+					return listTypeDefinition.getExternalReferenceCode();
+				}
+
+				return null;
+			}
+		).put(
+			"listTypeDefinitionId", objectField.getListTypeDefinitionId()
 		).put(
 			"name", objectField.getName()
 		).put(
