@@ -154,6 +154,14 @@ public class ObjectFieldResourceImpl
 			throw new UnsupportedOperationException();
 		}
 
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-164948")) &&
+			Objects.equals(
+				objectField.getBusinessTypeAsString(),
+				ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
+
+			throw new UnsupportedOperationException();
+		}
+
 		return _toObjectField(
 			_objectFieldService.addCustomObjectField(
 				objectField.getListTypeDefinitionId(), objectDefinitionId,
@@ -185,6 +193,14 @@ public class ObjectFieldResourceImpl
 			Objects.equals(
 				objectField.getBusinessTypeAsString(),
 				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
+
+			throw new UnsupportedOperationException();
+		}
+
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-164948")) &&
+			Objects.equals(
+				objectField.getBusinessTypeAsString(),
+				ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
 
 			throw new UnsupportedOperationException();
 		}
