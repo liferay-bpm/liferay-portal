@@ -1931,8 +1931,7 @@ public class ObjectEntryLocalServiceImpl
 		for (ObjectField objectField :
 				dynamicObjectDefinitionTable.getObjectFields()) {
 
-			if (!Objects.equals(
-					objectField.getBusinessType(),
+			if (!objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
 
 				continue;
@@ -2245,9 +2244,10 @@ public class ObjectEntryLocalServiceImpl
 			dynamicObjectDefinitionTable.getObjectFields();
 
 		for (ObjectField objectField : objectFields) {
-			if (Objects.equals(
-					objectField.getBusinessType(),
+			if (objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
+				objectField.compareBusinessType(
+					ObjectFieldConstants.BUSINESS_TYPE_FORMULA) ||
 				!values.containsKey(objectField.getName())) {
 
 				if (objectField.isRequired()) {
@@ -2305,9 +2305,10 @@ public class ObjectEntryLocalServiceImpl
 			_setColumn(preparedStatement, index++, Types.BIGINT, objectEntryId);
 
 			for (ObjectField objectField : objectFields) {
-				if (Objects.equals(
-						objectField.getBusinessType(),
+				if (objectField.compareBusinessType(
 						ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
+					objectField.compareBusinessType(
+						ObjectFieldConstants.BUSINESS_TYPE_FORMULA) ||
 					!values.containsKey(objectField.getName())) {
 
 					continue;
@@ -2365,8 +2366,7 @@ public class ObjectEntryLocalServiceImpl
 			_objectFieldLocalService.getObjectFields(objectDefinitionId);
 
 		for (ObjectField objectField : objectFields) {
-			if (!Objects.equals(
-					objectField.getBusinessType(),
+			if (!objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
 
 				continue;
@@ -2697,9 +2697,10 @@ public class ObjectEntryLocalServiceImpl
 			dynamicObjectDefinitionTable.getObjectFields();
 
 		for (ObjectField objectField : objectFields) {
-			if (Objects.equals(
-					objectField.getBusinessType(),
-					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
+			if (objectField.compareBusinessType(
+					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
+				objectField.compareBusinessType(
+					ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
 
 				continue;
 			}
@@ -2768,9 +2769,10 @@ public class ObjectEntryLocalServiceImpl
 			int index = 1;
 
 			for (ObjectField objectField : objectFields) {
-				if (Objects.equals(
-						objectField.getBusinessType(),
+				if (objectField.compareBusinessType(
 						ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
+					objectField.compareBusinessType(
+						ObjectFieldConstants.BUSINESS_TYPE_FORMULA) ||
 					!values.containsKey(objectField.getName())) {
 
 					continue;
