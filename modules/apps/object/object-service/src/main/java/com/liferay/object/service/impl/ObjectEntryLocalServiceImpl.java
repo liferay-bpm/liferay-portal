@@ -25,6 +25,9 @@ import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFolderLocalService;
 import com.liferay.document.library.kernel.util.DLUtil;
+import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
+import com.liferay.dynamic.data.mapping.expression.DDMExpression;
+import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.configuration.ObjectConfiguration;
@@ -120,6 +123,7 @@ import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -159,6 +163,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+
+import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -811,7 +817,9 @@ public class ObjectEntryLocalServiceImpl
 			),
 			selectExpressions);
 
-		return _getValues(rows.get(0), selectExpressions);
+		return _getFormulaObjectFieldsValues(
+			objectEntry.getObjectDefinitionId(),
+			_getValues(rows.get(0), selectExpressions));
 	}
 
 	@Override
@@ -1516,6 +1524,63 @@ public class ObjectEntryLocalServiceImpl
 		);
 	}
 
+	private Map<String, Serializable> _getFormulaObjectFieldsValues(
+			long objectDefinitionId, Map<String, Serializable> values)
+		throws PortalException {
+
+		List<ObjectField> objectFields =
+			_objectFieldLocalService.getObjectFields(objectDefinitionId);
+
+		for (ObjectField objectField : objectFields) {
+			if (!Objects.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
+
+				continue;
+			}
+
+			List<ObjectFieldSetting> objectFieldSettings =
+				_objectFieldSettingLocalService.
+					getObjectFieldObjectFieldSettings(
+						objectField.getObjectFieldId());
+
+			Map<String, Object> objectFieldSettingMap = new HashMap<>();
+
+			for (ObjectFieldSetting objectFieldSetting : objectFieldSettings) {
+				objectFieldSettingMap.put(
+					objectFieldSetting.getName(),
+					objectFieldSetting.getValue());
+			}
+
+			Object script = objectFieldSettingMap.get("script");
+
+			if (script == null) {
+				break;
+			}
+
+			DDMExpression<Serializable> ddmExpression =
+				_ddmExpressionFactory.createExpression(
+					CreateExpressionRequest.Builder.newBuilder(
+						String.valueOf(script)
+					).build());
+
+			ddmExpression.setVariables(new HashMap<>(values));
+
+			try {
+				values.put(
+					objectField.getName(),
+					_getOutputValue(
+						String.valueOf(objectFieldSettingMap.get("output")),
+						ddmExpression.evaluate()));
+			}
+			catch (PortalException portalException) {
+				_log.error(portalException);
+			}
+		}
+
+		return values;
+	}
+
 	private Expression<?> _getFunctionExpression(
 		Map<String, Object> objectFieldSettingsValues,
 		ObjectDefinition relatedObjectDefinition,
@@ -1820,6 +1885,43 @@ public class ObjectEntryLocalServiceImpl
 				}
 			)
 		);
+	}
+
+	private Serializable _getOutputValue(String outputType, Object value) {
+		if (StringUtil.equals(
+				outputType, ObjectFieldConstants.BUSINESS_TYPE_TEXT)) {
+
+			return GetterUtil.getString(value);
+		}
+
+		if (StringUtil.equals(
+				outputType, ObjectFieldConstants.BUSINESS_TYPE_INTEGER)) {
+
+			return GetterUtil.getInteger(value);
+		}
+
+		if (StringUtil.equals(
+				outputType, ObjectFieldConstants.BUSINESS_TYPE_DATE)) {
+
+			DateFormat dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+				"dd/MM/yyyy");
+
+			return dateFormat.format(value);
+		}
+
+		if (StringUtil.equals(
+				outputType, ObjectFieldConstants.BUSINESS_TYPE_BOOLEAN)) {
+
+			return GetterUtil.getBoolean(value);
+		}
+
+		if (StringUtil.equals(
+				outputType, ObjectFieldConstants.BUSINESS_TYPE_DECIMAL)) {
+
+			return GetterUtil.getDouble(value);
+		}
+
+		return null;
 	}
 
 	private Predicate _getPermissionWherePredicate(
@@ -3051,6 +3153,9 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private CurrentConnection _currentConnection;
+
+	@Reference
+	private DDMExpressionFactory _ddmExpressionFactory;
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
