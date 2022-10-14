@@ -84,13 +84,19 @@ public class AttachmentDDMFormFieldTemplateContextContributor
 			_uploadServletRequestConfigurationHelper.getMaxSize()
 		).put(
 			"tip",
-			_language.format(
-				ddmFormFieldRenderingContext.getLocale(),
-				"upload-a-x-no-larger-than-x-mb",
-				new Object[] {
-					ddmFormField.getProperty("acceptedFileExtensions"),
-					maximumFileSize
-				})
+			() -> {
+				if ((boolean)ddmFormField.getProperty("readOnly")) {
+					return null;
+				}
+
+				return _language.format(
+					ddmFormFieldRenderingContext.getLocale(),
+					"upload-a-x-no-larger-than-x-mb",
+					new Object[] {
+						ddmFormField.getProperty("acceptedFileExtensions"),
+						maximumFileSize
+					});
+			}
 		).put(
 			"url", _getURL(ddmFormField, ddmFormFieldRenderingContext)
 		).putAll(
