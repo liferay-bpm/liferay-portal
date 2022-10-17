@@ -14,6 +14,7 @@
 
 package com.liferay.object.admin.rest.internal.resource.v1_0;
 
+import com.liferay.list.type.model.ListTypeDefinition;
 import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectField;
@@ -22,6 +23,8 @@ import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldSettingUt
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldUtil;
 import com.liferay.object.admin.rest.internal.odata.entity.v1_0.ObjectFieldEntityModel;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectFieldResource;
+import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.exception.ObjectFieldListTypeDefinitionException;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
@@ -32,6 +35,7 @@ import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
@@ -145,6 +149,8 @@ public class ObjectFieldResourceImpl
 			Long objectDefinitionId, ObjectField objectField)
 		throws Exception {
 
+		_validateAndCreateListTypeDefinition(objectField);
+
 		return _toObjectField(
 			_objectFieldService.addCustomObjectField(
 				ObjectFieldUtil.getListTypeDefinitionId(
@@ -173,6 +179,18 @@ public class ObjectFieldResourceImpl
 	public ObjectField putObjectField(
 			Long objectFieldId, ObjectField objectField)
 		throws Exception {
+
+		com.liferay.object.model.ObjectField serviceBuilderObjectField =
+			_objectFieldService.getObjectField(objectFieldId);
+
+		com.liferay.object.model.ObjectDefinition
+			serviceBuilderobjectDefinition =
+				_objectDefinitionLocalService.getObjectDefinition(
+					serviceBuilderObjectField.getObjectDefinitionId());
+
+		if (!serviceBuilderobjectDefinition.isApproved()) {
+			_validateAndCreateListTypeDefinition(objectField);
+		}
 
 		return _toObjectField(
 			_objectFieldService.updateObjectField(
@@ -264,6 +282,38 @@ public class ObjectFieldResourceImpl
 			_objectDefinitionLocalService.getObjectDefinition(
 				objectField.getObjectDefinitionId()),
 			objectField);
+	}
+
+	private void _validateAndCreateListTypeDefinition(ObjectField objectField)
+		throws Exception {
+
+		if (Objects.equals(
+				objectField.getBusinessTypeAsString(),
+				ObjectFieldConstants.BUSINESS_TYPE_PICKLIST)) {
+
+			if (Objects.isNull(
+					objectField.getListTypeDefinitionExternalReferenceCode())) {
+
+				throw new ObjectFieldListTypeDefinitionException(
+					StringBundler.concat(
+						"List type definition external reference code must ",
+						"not be null when business type is ",
+						ObjectFieldConstants.BUSINESS_TYPE_PICKLIST));
+			}
+
+			ListTypeDefinition listTypeDefinition =
+				_listTypeDefinitionLocalService.
+					fetchListTypeDefinitionByExternalReferenceCode(
+						contextUser.getCompanyId(),
+						objectField.
+							getListTypeDefinitionExternalReferenceCode());
+
+			if (listTypeDefinition == null) {
+				_listTypeDefinitionLocalService.addListTypeDefinition(
+					objectField.getListTypeDefinitionExternalReferenceCode(),
+					contextUser.getUserId());
+			}
+		}
 	}
 
 	private static final EntityModel _entityModel =
