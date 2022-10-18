@@ -51,8 +51,12 @@ public class ObjectCodeEditorUtil {
 					ListUtil.filter(
 						_objectFieldLocalService.getObjectFields(
 							objectDefinitionId),
-						objectField -> !objectField.compareBusinessType(
-							ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)),
+						objectField ->
+							!objectField.compareBusinessType(
+								ObjectFieldConstants.
+									BUSINESS_TYPE_AGGREGATION) &&
+							!objectField.compareBusinessType(
+								ObjectFieldConstants.BUSINESS_TYPE_FORMULA)),
 					objectField -> HashMapBuilder.put(
 						"content",
 						StringUtil.removeSubstring(
