@@ -126,6 +126,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -2688,6 +2689,8 @@ public class ObjectEntryLocalServiceImpl
 
 			FinderCacheUtil.clearDSLQueryCache(
 				dynamicObjectDefinitionTable.getTableName());
+
+			objectEntryPersistence.clearCache(SetUtil.fromArray(objectEntryId));
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
