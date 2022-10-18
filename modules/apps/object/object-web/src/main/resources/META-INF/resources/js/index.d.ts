@@ -85,7 +85,8 @@ interface ObjectField {
 	indexedAsKeyword: boolean;
 	indexedLanguageId: Locale | null;
 	label: LocalizedValue<string>;
-	listTypeDefinitionId: number;
+	listTypeDefinitionExternalReferenceCode: string;
+	listTypeDefinitionId?: number;
 	name: string;
 	objectFieldSettings?: ObjectFieldSetting[];
 	relationshipId?: number;
@@ -264,6 +265,7 @@ type ObjectValidationType = {
 
 interface PickList {
 	actions: Actions;
+	externalReferenceCode: string;
 	id: number;
 	listTypeEntries: PickListItem[];
 	name: string;

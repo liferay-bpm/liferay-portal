@@ -798,6 +798,7 @@
 		<exception>ObjectFieldDBType</exception>
 		<exception>ObjectFieldDefaultValue</exception>
 		<exception>ObjectFieldLabel</exception>
+		<exception>ObjectFieldListTypeDefinition</exception>
 		<exception>ObjectFieldName</exception>
 		<exception>ObjectFieldRelationshipType</exception>
 		<exception>ObjectFieldSettingName</exception>

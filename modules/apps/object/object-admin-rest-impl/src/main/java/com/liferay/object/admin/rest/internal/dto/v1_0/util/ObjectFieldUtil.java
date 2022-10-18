@@ -14,7 +14,10 @@
 
 package com.liferay.object.admin.rest.internal.dto.v1_0.util;
 
+import com.liferay.list.type.model.ListTypeDefinition;
+import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectField;
+import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectFilterLocalService;
@@ -22,6 +25,7 @@ import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
@@ -44,7 +48,36 @@ public class ObjectFieldUtil {
 		return dbType;
 	}
 
+	public static long getListTypeDefinitionId(
+		long companyId,
+		ListTypeDefinitionLocalService listTypeDefinitionLocalService,
+		ObjectField objectField) {
+
+		if (!StringUtil.equals(
+				objectField.getBusinessTypeAsString(),
+				ObjectFieldConstants.BUSINESS_TYPE_PICKLIST)) {
+
+			return 0L;
+		}
+
+		long listTypeDefinitionId = GetterUtil.getLong(
+			objectField.getListTypeDefinitionId());
+
+		if (listTypeDefinitionId != 0L) {
+			return objectField.getListTypeDefinitionId();
+		}
+
+		ListTypeDefinition listTypeDefinition =
+			listTypeDefinitionLocalService.
+				fetchListTypeDefinitionByExternalReferenceCode(
+					companyId,
+					objectField.getListTypeDefinitionExternalReferenceCode());
+
+		return listTypeDefinition.getListTypeDefinitionId();
+	}
+
 	public static com.liferay.object.model.ObjectField toObjectField(
+		ListTypeDefinitionLocalService listTypeDefinitionLocalService,
 		ObjectField objectField,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectFieldSettingLocalService objectFieldSettingLocalService,
@@ -54,7 +87,9 @@ public class ObjectFieldUtil {
 			objectFieldLocalService.createObjectField(0L);
 
 		serviceBuilderObjectField.setListTypeDefinitionId(
-			GetterUtil.getLong(objectField.getListTypeDefinitionId()));
+			getListTypeDefinitionId(
+				serviceBuilderObjectField.getCompanyId(),
+				listTypeDefinitionLocalService, objectField));
 		serviceBuilderObjectField.setBusinessType(
 			objectField.getBusinessTypeAsString());
 		serviceBuilderObjectField.setDBType(
