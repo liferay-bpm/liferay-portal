@@ -95,10 +95,13 @@ public class HypersonicLoader {
 		// See LEP-2927. Appending ;shutdown=true to the database connection URL
 		// guarantees that ${databaseName}.log is purged.
 
+		String connectionProperties =
+			";hsqldb.write_delay=false;shutdown=true;sql.syntax_ora=true";
+
 		try (Connection connection = DriverManager.getConnection(
 				StringBundler.concat(
 					"jdbc:hsqldb:", sqlDir, "/", databaseName,
-					";hsqldb.write_delay=false;shutdown=true"),
+					connectionProperties),
 				userName, password)) {
 
 			if (Validator.isNull(fileNames)) {
