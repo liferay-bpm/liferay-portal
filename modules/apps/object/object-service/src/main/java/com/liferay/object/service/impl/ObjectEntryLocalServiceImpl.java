@@ -1890,7 +1890,7 @@ public class ObjectEntryLocalServiceImpl
 		if (StringUtil.equals(
 				outputType, ObjectFieldConstants.BUSINESS_TYPE_TEXT)) {
 
-			return GetterUtil.getString(value);
+			return value.toString();
 		}
 
 		if (StringUtil.equals(
