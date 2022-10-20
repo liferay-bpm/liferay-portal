@@ -40,7 +40,9 @@ import org.osgi.service.component.annotations.Reference;
 public class ObjectCodeEditorUtil {
 
 	public static List<Map<String, Object>> getCodeEditorElements(
-		boolean includeDDMExpressionBuilderElements, Locale locale,
+		boolean includeDDMExpressionBuilderElements,
+		boolean includeObjectFieldAggregation,
+		boolean includeObjectFieldFormula, Locale locale,
 		long objectDefinitionId) {
 
 		List<Map<String, Object>> codeEditorElements = new ArrayList<>();
@@ -52,11 +54,13 @@ public class ObjectCodeEditorUtil {
 						_objectFieldLocalService.getObjectFields(
 							objectDefinitionId),
 						objectField ->
-							!objectField.compareBusinessType(
-								ObjectFieldConstants.
-									BUSINESS_TYPE_AGGREGATION) &&
-							!objectField.compareBusinessType(
-								ObjectFieldConstants.BUSINESS_TYPE_FORMULA)),
+							(includeObjectFieldAggregation ||
+							 !objectField.compareBusinessType(
+								 ObjectFieldConstants.
+									 BUSINESS_TYPE_AGGREGATION)) &&
+							(includeObjectFieldFormula ||
+							 !objectField.compareBusinessType(
+								 ObjectFieldConstants.BUSINESS_TYPE_FORMULA))),
 					objectField -> HashMapBuilder.put(
 						"content",
 						StringUtil.removeSubstring(

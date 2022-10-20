@@ -24,6 +24,7 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.object.web.internal.object.definitions.display.context.util.ObjectCodeEditorUtil;
 import com.liferay.object.web.internal.util.ObjectFieldBusinessTypeUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -151,8 +152,25 @@ public class ObjectDefinitionsFieldsDisplayContext
 			));
 	}
 
+	public Object getObjectFieldFormulaCodeEditorElements() {
+		return ObjectCodeEditorUtil.getCodeEditorElements(
+			true, true, false, objectRequestHelper.getLocale(),
+			getObjectDefinitionId());
+	}
+
 	public JSONObject getObjectFieldJSONObject(ObjectField objectField) {
-		return ObjectFieldUtil.toJSONObject(objectField);
+		JSONObject objectFieldJSONObject = ObjectFieldUtil.toJSONObject(
+			objectField);
+
+		if (objectField.compareBusinessType(
+				ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
+
+			objectFieldJSONObject.put(
+				"codeEditorElements",
+				getObjectFieldFormulaCodeEditorElements());
+		}
+
+		return objectFieldJSONObject;
 	}
 
 	public Long getObjectRelationshipId(ObjectField objectField) {
