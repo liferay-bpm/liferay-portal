@@ -78,6 +78,7 @@ interface ObjectFieldType {
 interface ObjectField {
 	DBType: string;
 	businessType: ObjectFieldBusinessType | string;
+	codeEditorElements: [];
 	defaultValue?: string;
 	externalReferenceCode?: string;
 	id: number;
