@@ -32,6 +32,8 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeFormatter;
 import com.liferay.portal.util.PropsValues;
@@ -163,7 +165,8 @@ public class ObjectDefinitionsFieldsDisplayContext
 			objectField);
 
 		if (objectField.compareBusinessType(
-				ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
+				ObjectFieldConstants.BUSINESS_TYPE_FORMULA) &&
+			GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-164948"))) {
 
 			objectFieldJSONObject.put(
 				"codeEditorElements",
