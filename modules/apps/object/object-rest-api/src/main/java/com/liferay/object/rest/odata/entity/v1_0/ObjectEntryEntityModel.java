@@ -21,7 +21,9 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.util.ObjectFieldSettingValueUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.odata.entity.BooleanEntityField;
 import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.DateEntityField;
@@ -106,17 +108,21 @@ public class ObjectEntryEntityModel implements EntityModel {
 					objectFieldName, locale -> objectFieldName,
 					String::valueOf));
 
-			String objectField2ExternalReferenceCodeName =
-				ObjectFieldSettingValueUtil.getObjectFieldSettingValue(
-					objectField,
-					ObjectFieldSettingConstants.
-						OBJECT_FIELD_2_EXTERNAL_REFERENCE_CODE_NAME);
+			if (GetterUtil.getBoolean(
+					PropsUtil.get("feature.flag.LPS-164801"))) {
 
-			_entityFieldsMap.put(
-				objectField2ExternalReferenceCodeName,
-				new StringEntityField(
+				String objectField2ExternalReferenceCodeName =
+					ObjectFieldSettingValueUtil.getObjectFieldSettingValue(
+						objectField,
+						ObjectFieldSettingConstants.
+							OBJECT_FIELD_2_EXTERNAL_REFERENCE_CODE_NAME);
+
+				_entityFieldsMap.put(
 					objectField2ExternalReferenceCodeName,
-					locale -> objectFieldName));
+					new StringEntityField(
+						objectField2ExternalReferenceCodeName,
+						locale -> objectFieldName));
+			}
 
 			String relationshipIdName = objectFieldName.substring(
 				objectFieldName.lastIndexOf(StringPool.UNDERLINE) + 1);
