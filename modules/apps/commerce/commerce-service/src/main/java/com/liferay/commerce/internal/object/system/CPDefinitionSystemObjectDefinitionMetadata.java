@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.internal.object.system;
 
+import com.liferay.commerce.product.exception.NoSuchCPDefinitionException;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPDefinitionTable;
 import com.liferay.commerce.product.service.CPDefinitionLocalService;
@@ -47,6 +48,24 @@ public class CPDefinitionSystemObjectDefinitionMetadata
 
 		return _cpDefinitionLocalService.deleteCPDefinition(
 			(CPDefinition)baseModel);
+	}
+
+	@Override
+	public BaseModel<?> getBaseModelByExternalReferenceCode(
+			String externalReferenceCode, long companyId)
+		throws PortalException {
+
+		CPDefinition cpDefinition =
+			(CPDefinition)
+				_cpDefinitionLocalService.
+					fetchCPDefinitionByCProductExternalReferenceCode(
+						externalReferenceCode, companyId);
+
+		if (cpDefinition == null) {
+			throw new NoSuchCPDefinitionException();
+		}
+
+		return cpDefinition;
 	}
 
 	@Override

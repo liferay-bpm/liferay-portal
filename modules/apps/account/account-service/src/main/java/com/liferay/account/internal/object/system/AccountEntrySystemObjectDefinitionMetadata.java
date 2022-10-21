@@ -50,6 +50,15 @@ public class AccountEntrySystemObjectDefinitionMetadata
 	}
 
 	@Override
+	public BaseModel<?> getBaseModelByExternalReferenceCode(
+			String externalReferenceCode, long companyId)
+		throws PortalException {
+
+		return _accountEntryLocalService.getAccountEntryByExternalReferenceCode(
+			companyId, externalReferenceCode);
+	}
+
+	@Override
 	public String getJaxRsApplicationName() {
 		return "Liferay.Headless.Admin.User";
 	}
