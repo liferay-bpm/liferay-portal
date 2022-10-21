@@ -51,6 +51,14 @@ public class TestSystemObjectDefinitionMetadata
 	}
 
 	@Override
+	public BaseModel<?> getBaseModelByExternalReferenceCode(
+			String externalReferenceCode, long companyId)
+		throws PortalException {
+
+		return null;
+	}
+
+	@Override
 	public String getJaxRsApplicationName() {
 		return "";
 	}

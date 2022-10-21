@@ -423,6 +423,14 @@ public class ObjectDefinitionLocalServiceTest {
 					}
 
 					@Override
+					public BaseModel<?> getBaseModelByExternalReferenceCode(
+							String externalReferenceCode, long companyId)
+						throws PortalException {
+
+						return null;
+					}
+
+					@Override
 					public String getJaxRsApplicationName() {
 						return "";
 					}
@@ -525,6 +533,14 @@ public class ObjectDefinitionLocalServiceTest {
 
 					@Override
 					public BaseModel<?> deleteBaseModel(BaseModel<?> baseModel)
+						throws PortalException {
+
+						return null;
+					}
+
+					@Override
+					public BaseModel<?> getBaseModelByExternalReferenceCode(
+							String externalReferenceCode, long companyId)
 						throws PortalException {
 
 						return null;
