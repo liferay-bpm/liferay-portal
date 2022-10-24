@@ -271,7 +271,7 @@ public class ObjectEntryLocalServiceImpl
 		objectEntry.setStatus(WorkflowConstants.STATUS_DRAFT);
 		objectEntry.setStatusDate(new Date());
 
-		return objectEntryPersistence.update(objectEntry);
+		return objectEntryPersistence.updateImpl(objectEntry);
 	}
 
 	@Override
