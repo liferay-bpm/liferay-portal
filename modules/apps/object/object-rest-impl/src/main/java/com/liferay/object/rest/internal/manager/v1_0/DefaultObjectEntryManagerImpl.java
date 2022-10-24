@@ -22,6 +22,7 @@ import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.object.constants.ObjectConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.model.ObjectDefinition;
@@ -44,6 +45,7 @@ import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
+import com.liferay.object.util.ObjectFieldSettingValueUtil;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -135,8 +137,10 @@ public class DefaultObjectEntryManagerImpl
 			_objectEntryService.addObjectEntry(
 				groupId, objectDefinition.getObjectDefinitionId(),
 				_toObjectValues(
-					groupId, objectDefinition, 0L, objectEntry.getProperties(),
-					dtoConverterContext.getLocale()),
+					groupId, objectDefinition, 0L,
+					dtoConverterContext.getLocale(),
+					objectEntry.getProperties(),
+					dtoConverterContext.getUserId()),
 				_createServiceContext(
 					objectEntry.getProperties(),
 					dtoConverterContext.getUserId())));
@@ -185,8 +189,10 @@ public class DefaultObjectEntryManagerImpl
 				externalReferenceCode, groupId,
 				objectDefinition.getObjectDefinitionId(),
 				_toObjectValues(
-					groupId, objectDefinition, 0L, objectEntry.getProperties(),
-					dtoConverterContext.getLocale()),
+					groupId, objectDefinition, 0L,
+					dtoConverterContext.getLocale(),
+					objectEntry.getProperties(),
+					dtoConverterContext.getUserId()),
 				serviceContext));
 	}
 
@@ -596,8 +602,9 @@ public class DefaultObjectEntryManagerImpl
 				_toObjectValues(
 					serviceBuilderObjectEntry.getGroupId(), objectDefinition,
 					serviceBuilderObjectEntry.getObjectEntryId(),
+					dtoConverterContext.getLocale(),
 					objectEntry.getProperties(),
-					dtoConverterContext.getLocale()),
+					dtoConverterContext.getUserId()),
 				_createServiceContext(
 					objectEntry.getProperties(),
 					dtoConverterContext.getUserId())));
@@ -663,6 +670,58 @@ public class DefaultObjectEntryManagerImpl
 
 	private String _getObjectEntryPermissionName(long objectDefinitionId) {
 		return ObjectDefinition.class.getName() + "#" + objectDefinitionId;
+	}
+
+	private Object _getObjectRelationshipFieldValue(
+			long groupId, ObjectField objectField,
+			Map<String, Object> properties, long userId)
+		throws Exception {
+
+		String externalReferenceCode = GetterUtil.getString(
+			properties.get(
+				ObjectFieldSettingValueUtil.getObjectFieldSettingValue(
+					objectField,
+					ObjectFieldSettingConstants.
+						OBJECT_FIELD_2_EXTERNAL_REFERENCE_CODE_NAME)));
+
+		if (Validator.isNull(externalReferenceCode)) {
+			return null;
+		}
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.
+				fetchObjectRelationshipByObjectFieldId2(
+					objectField.getObjectFieldId());
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				objectRelationship.getObjectDefinitionId1());
+
+		if (objectDefinition.isSystem()) {
+			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
+				_systemObjectDefinitionMetadataTracker.
+					getSystemObjectDefinitionMetadata(
+						objectDefinition.getName());
+
+			BaseModel<?> baseModel =
+				systemObjectDefinitionMetadata.
+					getBaseModelByExternalReferenceCode(
+						externalReferenceCode, objectDefinition.getCompanyId());
+
+			return baseModel.getPrimaryKeyObj();
+		}
+
+		com.liferay.object.model.ObjectEntry objectEntry =
+			_objectEntryLocalService.getObjectEntry(
+				externalReferenceCode,
+				objectDefinition.getObjectDefinitionId());
+
+		if (objectEntry == null) {
+			objectEntry = _objectEntryLocalService.addObjectEntry(
+				externalReferenceCode, groupId, userId, objectDefinition);
+		}
+
+		return objectEntry.getObjectEntryId();
 	}
 
 	private ObjectDefinition _getRelatedObjectDefinition(
@@ -947,7 +1006,7 @@ public class DefaultObjectEntryManagerImpl
 
 	private Map<String, Serializable> _toObjectValues(
 			long groupId, ObjectDefinition objectDefinition, long objectEntryId,
-			Map<String, Object> properties, Locale locale)
+			Locale locale, Map<String, Object> properties, long userId)
 		throws Exception {
 
 		List<ObjectField> objectFields =
@@ -960,6 +1019,15 @@ public class DefaultObjectEntryManagerImpl
 			String name = objectField.getName();
 
 			Object object = properties.get(name);
+
+			if ((object == null) &&
+				Objects.equals(
+					objectField.getRelationshipType(),
+					ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
+
+				object = _getObjectRelationshipFieldValue(
+					groupId, objectField, properties, userId);
+			}
 
 			if ((object == null) && !objectField.isRequired()) {
 				continue;
@@ -977,30 +1045,23 @@ public class DefaultObjectEntryManagerImpl
 						objectDefinition.getClassName(), objectEntryId,
 						ContentTypes.TEXT_HTML, Sanitizer.MODE_ALL,
 						String.valueOf(object), null));
-
-				continue;
 			}
-
-			if (Objects.equals(
-					objectField.getDBType(),
-					ObjectFieldConstants.DB_TYPE_DATE)) {
+			else if (Objects.equals(
+						objectField.getDBType(),
+						ObjectFieldConstants.DB_TYPE_DATE)) {
 
 				values.put(name, _toDate(locale, String.valueOf(object)));
-
-				continue;
 			}
-
-			if ((objectField.getListTypeDefinitionId() != 0) &&
-				(object instanceof Map)) {
+			else if ((objectField.getListTypeDefinitionId() != 0) &&
+					 (object instanceof Map)) {
 
 				Map<String, String> map = (HashMap<String, String>)object;
 
 				values.put(name, map.get("key"));
-
-				continue;
 			}
-
-			values.put(name, (Serializable)object);
+			else {
+				values.put(name, (Serializable)object);
+			}
 		}
 
 		return values;
