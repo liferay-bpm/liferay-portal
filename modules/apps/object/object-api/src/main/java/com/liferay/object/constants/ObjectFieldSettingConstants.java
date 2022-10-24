@@ -26,4 +26,7 @@ public class ObjectFieldSettingConstants {
 	public static final String OBJECT_DEFINITION_1_SHORT_NAME =
 		"objectDefinition1ShortName";
 
+	public static final String OBJECT_FIELD_2_EXTERNAL_REFERENCE_CODE_NAME =
+		"objectField2ExternalReferenceCodeName";
+
 }
