@@ -541,6 +541,12 @@ public class ObjectRelationshipLocalServiceImpl
 			ObjectFieldSettingConstants.OBJECT_DEFINITION_1_SHORT_NAME,
 			objectDefinition1.getShortName());
 
+		_objectFieldSettingLocalService.addObjectFieldSetting(
+			user.getUserId(), objectField.getObjectFieldId(),
+			ObjectFieldSettingConstants.
+				OBJECT_FIELD_2_EXTERNAL_REFERENCE_CODE_NAME,
+			StringUtil.replaceLast(objectField.getName(), "Id", "ERC"));
+
 		if (objectDefinition2.isApproved()) {
 			runSQL(
 				DynamicObjectDefinitionTable.getAlterTableAddColumnSQL(
