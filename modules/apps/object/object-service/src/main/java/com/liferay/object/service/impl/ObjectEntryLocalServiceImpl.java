@@ -272,7 +272,7 @@ public class ObjectEntryLocalServiceImpl
 		objectEntry.setStatus(WorkflowConstants.STATUS_DRAFT);
 		objectEntry.setStatusDate(new Date());
 
-		objectEntry = objectEntryPersistence.update(objectEntry);
+		objectEntry = objectEntryPersistence.updateImpl(objectEntry);
 
 		_resourceLocalService.addResources(
 			objectEntry.getCompanyId(), objectEntry.getGroupId(),
