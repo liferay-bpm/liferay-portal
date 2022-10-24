@@ -28,7 +28,7 @@ import {
 } from './types';
 
 type TState = {
-	enabledCategorization: boolean;
+	enableCategorization: boolean;
 	isViewOnly: boolean;
 	objectFieldTypes: ObjectFieldType[];
 	objectFields: TObjectField[];
@@ -40,7 +40,7 @@ type TState = {
 type TAction =
 	| {
 			payload: {
-				enabledCategorization: boolean;
+				enableCategorization: boolean;
 				objectLayout: TObjectLayout;
 				objectRelationships: TObjectRelationship[];
 			};
@@ -148,14 +148,14 @@ const layoutReducer = (state: TState, action: TAction) => {
 	switch (action.type) {
 		case TYPES.ADD_OBJECT_LAYOUT: {
 			const {
-				enabledCategorization,
+				enableCategorization,
 				objectLayout,
 				objectRelationships,
 			} = action.payload;
 
 			return {
 				...state,
-				enabledCategorization,
+				enableCategorization,
 				objectLayout,
 				objectRelationships,
 			};

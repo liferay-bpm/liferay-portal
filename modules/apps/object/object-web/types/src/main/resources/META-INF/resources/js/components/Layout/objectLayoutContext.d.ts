@@ -20,7 +20,7 @@ import {
 	TObjectRelationship,
 } from './types';
 declare type TState = {
-	enabledCategorization: boolean;
+	enableCategorization: boolean;
 	isViewOnly: boolean;
 	objectFieldTypes: ObjectFieldType[];
 	objectFields: TObjectField[];
@@ -31,7 +31,7 @@ declare type TState = {
 declare type TAction =
 	| {
 			payload: {
-				enabledCategorization: boolean;
+				enableCategorization: boolean;
 				objectLayout: TObjectLayout;
 				objectRelationships: TObjectRelationship[];
 			};

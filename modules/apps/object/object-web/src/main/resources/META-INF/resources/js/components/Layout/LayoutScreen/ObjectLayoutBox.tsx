@@ -41,14 +41,14 @@ export function ObjectLayoutBox({
 	tabIndex,
 	type,
 }: ObjectLayoutBoxProps) {
-	const [{enabledCategorization, isViewOnly}, dispatch] = useLayoutContext();
+	const [{enableCategorization, isViewOnly}, dispatch] = useLayoutContext();
 	const [visibleModal, setVisibleModal] = useState(false);
 	const {observer, onClose} = useModal({
 		onClose: () => setVisibleModal(false),
 	});
 
 	const disabled =
-		(type === 'categorization' && !enabledCategorization) || isViewOnly;
+		(type === 'categorization' && !enableCategorization) || isViewOnly;
 
 	return (
 		<>
