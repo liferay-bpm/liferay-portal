@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.language.LanguageResources;
@@ -486,16 +487,23 @@ public class ObjectEntryDTOConverter
 					}
 				}
 
-				String objectRelationshipERCFieldName =
-					ObjectFieldSettingValueUtil.getObjectFieldSettingValue(
-						objectField,
-						ObjectFieldSettingConstants.
-							OBJECT_RELATIONSHIP_ERC_FIELD_NAME);
+				if (!GetterUtil.getBoolean(
+						PropsUtil.get("feature.flag.LPS-164801"))) {
 
-				map.put(
-					objectRelationshipERCFieldName,
-					GetterUtil.getString(
-						values.get(objectRelationshipERCFieldName)));
+					map.put(objectFieldName, objectEntryId);
+				}
+				else {
+					String objectRelationshipERCFieldName =
+						ObjectFieldSettingValueUtil.getObjectFieldSettingValue(
+							objectField,
+							ObjectFieldSettingConstants.
+								OBJECT_RELATIONSHIP_ERC_FIELD_NAME);
+
+					map.put(
+						objectRelationshipERCFieldName,
+						GetterUtil.getString(
+							values.get(objectRelationshipERCFieldName)));
+				}
 			}
 			else {
 				map.put(objectFieldName, serializable);
