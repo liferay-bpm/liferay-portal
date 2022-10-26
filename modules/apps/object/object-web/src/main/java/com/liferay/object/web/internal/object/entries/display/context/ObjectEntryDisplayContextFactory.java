@@ -20,10 +20,12 @@ import com.liferay.object.field.business.type.ObjectFieldBusinessTypeTracker;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerTracker;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectLayoutLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -41,11 +43,12 @@ public class ObjectEntryDisplayContextFactory {
 
 		return new ObjectEntryDisplayContext(
 			_ddmFormRenderer, httpServletRequest, _itemSelector,
-			_objectDefinitionLocalService, _objectEntryManagerTracker,
-			_objectEntryService, _objectFieldBusinessTypeTracker,
-			_objectFieldLocalService, _objectLayoutLocalService,
-			_objectRelationshipLocalService, _objectScopeProviderRegistry,
-			readOnly);
+			_objectDefinitionLocalService, _objectEntryLocalService,
+			_objectEntryManagerTracker, _objectEntryService,
+			_objectFieldBusinessTypeTracker, _objectFieldLocalService,
+			_objectLayoutLocalService, _objectRelationshipLocalService,
+			_objectScopeProviderRegistry, readOnly,
+			_systemObjectDefinitionMetadataTracker);
 	}
 
 	@Reference
@@ -56,6 +59,9 @@ public class ObjectEntryDisplayContextFactory {
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
+	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Reference
 	private ObjectEntryManagerTracker _objectEntryManagerTracker;
@@ -77,5 +83,9 @@ public class ObjectEntryDisplayContextFactory {
 
 	@Reference
 	private ObjectScopeProviderRegistry _objectScopeProviderRegistry;
+
+	@Reference
+	private SystemObjectDefinitionMetadataTracker
+		_systemObjectDefinitionMetadataTracker;
 
 }

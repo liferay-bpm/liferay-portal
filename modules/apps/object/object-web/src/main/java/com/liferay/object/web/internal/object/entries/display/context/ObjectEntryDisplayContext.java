@@ -41,6 +41,8 @@ import com.liferay.item.selector.criteria.InfoItemItemSelectorReturnType;
 import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.dynamic.data.mapping.form.field.type.constants.ObjectDDMFormFieldTypeConstants;
 import com.liferay.object.exception.NoSuchObjectLayoutException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeTracker;
@@ -61,10 +63,13 @@ import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerTracker;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectLayoutLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.object.system.SystemObjectDefinitionMetadata;
+import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
 import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
 import com.liferay.object.web.internal.util.ObjectDefinitionPermissionUtil;
@@ -78,6 +83,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
@@ -124,6 +130,7 @@ public class ObjectEntryDisplayContext {
 		DDMFormRenderer ddmFormRenderer, HttpServletRequest httpServletRequest,
 		ItemSelector itemSelector,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
+		ObjectEntryLocalService objectEntryLocalService,
 		ObjectEntryManagerTracker objectEntryManagerTracker,
 		ObjectEntryService objectEntryService,
 		ObjectFieldBusinessTypeTracker objectFieldBusinessTypeTracker,
@@ -131,11 +138,14 @@ public class ObjectEntryDisplayContext {
 		ObjectLayoutLocalService objectLayoutLocalService,
 		ObjectRelationshipLocalService objectRelationshipLocalService,
 		ObjectScopeProviderRegistry objectScopeProviderRegistry,
-		boolean readOnly) {
+		boolean readOnly,
+		SystemObjectDefinitionMetadataTracker
+			systemObjectDefinitionMetadataTracker) {
 
 		_ddmFormRenderer = ddmFormRenderer;
 		_itemSelector = itemSelector;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
+		_objectEntryLocalService = objectEntryLocalService;
 		_objectEntryManagerTracker = objectEntryManagerTracker;
 		_objectEntryService = objectEntryService;
 		_objectFieldBusinessTypeTracker = objectFieldBusinessTypeTracker;
@@ -144,6 +154,8 @@ public class ObjectEntryDisplayContext {
 		_objectRelationshipLocalService = objectRelationshipLocalService;
 		_objectScopeProviderRegistry = objectScopeProviderRegistry;
 		_readOnly = readOnly;
+		_systemObjectDefinitionMetadataTracker =
+			systemObjectDefinitionMetadataTracker;
 
 		_objectRequestHelper = new ObjectRequestHelper(httpServletRequest);
 		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
@@ -789,7 +801,8 @@ public class ObjectEntryDisplayContext {
 	}
 
 	private DDMFormValues _getDDMFormValues(
-		DDMForm ddmForm, ObjectEntry objectEntry) {
+			DDMForm ddmForm, ObjectEntry objectEntry)
+		throws PortalException {
 
 		Map<String, Object> values = objectEntry.getProperties();
 
@@ -822,23 +835,8 @@ public class ObjectEntryDisplayContext {
 							ddmFormField.getType(),
 							DDMFormFieldTypeConstants.FIELDSET)) {
 
-						long value = GetterUtil.getLong(
-							values.get(ddmFormField.getName()));
-
-						if (StringUtil.equals(
-								ddmFormField.getType(),
-								"object-relationship") &&
-							(value == 0)) {
-
-							_setDDMFormFieldValueValue(
-								ddmFormField.getName(), ddmFormFieldValue,
-								Collections.emptyMap());
-						}
-						else {
-							_setDDMFormFieldValueValue(
-								ddmFormField.getName(), ddmFormFieldValue,
-								values);
-						}
+						_setDDMFormFieldValueValue(
+							ddmFormField, ddmFormFieldValue, values);
 					}
 
 					return ddmFormFieldValue;
@@ -967,10 +965,51 @@ public class ObjectEntryDisplayContext {
 				ddmFormFieldValue.setName(ddmFormField.getName());
 
 				_setDDMFormFieldValueValue(
-					ddmFormField.getName(), ddmFormFieldValue, values);
+					ddmFormField, ddmFormFieldValue, values);
 
 				return ddmFormFieldValue;
 			});
+	}
+
+	private Object _getObjectRelationshipFieldValue(
+			DDMFormField ddmFormField, Map<String, Object> values)
+		throws PortalException {
+
+		String externalReferenceCode = GetterUtil.getString(
+			values.get(
+				ddmFormField.getProperty(
+					ObjectFieldSettingConstants.
+						OBJECT_RELATIONSHIP_ERC_FIELD_NAME)));
+
+		if (Validator.isNull(externalReferenceCode)) {
+			return StringPool.BLANK;
+		}
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				GetterUtil.getLong(
+					ddmFormField.getProperty("objectDefinitionId")));
+
+		if (objectDefinition.isSystem()) {
+			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
+				_systemObjectDefinitionMetadataTracker.
+					getSystemObjectDefinitionMetadata(
+						objectDefinition.getName());
+
+			BaseModel<?> baseModel =
+				systemObjectDefinitionMetadata.
+					getBaseModelByExternalReferenceCode(
+						externalReferenceCode, objectDefinition.getCompanyId());
+
+			return baseModel.getPrimaryKeyObj();
+		}
+
+		com.liferay.object.model.ObjectEntry objectEntry =
+			_objectEntryLocalService.fetchObjectEntry(
+				externalReferenceCode,
+				objectDefinition.getObjectDefinitionId());
+
+		return objectEntry.getObjectEntryId();
 	}
 
 	private String _getRows(ObjectLayoutBox objectLayoutBox) {
@@ -1050,10 +1089,18 @@ public class ObjectEntryDisplayContext {
 	}
 
 	private void _setDDMFormFieldValueValue(
-		String ddmFormFieldName, DDMFormFieldValue ddmFormFieldValue,
-		Map<String, Object> values) {
+			DDMFormField ddmFormField, DDMFormFieldValue ddmFormFieldValue,
+			Map<String, Object> values)
+		throws PortalException {
 
-		Object value = values.get(ddmFormFieldName);
+		Object value = values.get(ddmFormField.getName());
+
+		if (StringUtil.equals(
+				ddmFormField.getType(),
+				ObjectDDMFormFieldTypeConstants.OBJECT_RELATIONSHIP)) {
+
+			value = _getObjectRelationshipFieldValue(ddmFormField, values);
+		}
 
 		if (value == null) {
 			ddmFormFieldValue.setValue(
@@ -1103,6 +1150,7 @@ public class ObjectEntryDisplayContext {
 	private final ItemSelector _itemSelector;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private ObjectEntry _objectEntry;
+	private final ObjectEntryLocalService _objectEntryLocalService;
 	private final ObjectEntryManagerTracker _objectEntryManagerTracker;
 	private final ObjectEntryService _objectEntryService;
 	private final ObjectFieldBusinessTypeTracker
@@ -1115,6 +1163,8 @@ public class ObjectEntryDisplayContext {
 	private final ObjectRequestHelper _objectRequestHelper;
 	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 	private final boolean _readOnly;
+	private final SystemObjectDefinitionMetadataTracker
+		_systemObjectDefinitionMetadataTracker;
 	private final ThemeDisplay _themeDisplay;
 
 }
