@@ -17,6 +17,7 @@ package com.liferay.object.rest.internal.resource.v1_0;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
+import com.liferay.object.rest.internal.util.ObjectEntryValuesUtil;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerTracker;
 import com.liferay.object.rest.odata.entity.v1_0.ObjectEntryEntityModel;
@@ -27,6 +28,7 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
+import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.search.Sort;
@@ -62,7 +64,9 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		ObjectEntryManagerTracker objectEntryManagerTracker,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectRelationshipService objectRelationshipService,
-		ObjectScopeProviderRegistry objectScopeProviderRegistry) {
+		ObjectScopeProviderRegistry objectScopeProviderRegistry,
+		SystemObjectDefinitionMetadataTracker
+			systemObjectDefinitionMetadataTracker) {
 
 		_filterPredicateFactory = filterPredicateFactory;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
@@ -71,6 +75,8 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		_objectFieldLocalService = objectFieldLocalService;
 		_objectRelationshipService = objectRelationshipService;
 		_objectScopeProviderRegistry = objectScopeProviderRegistry;
+		_systemObjectDefinitionMetadataTracker =
+			systemObjectDefinitionMetadataTracker;
 	}
 
 	@Override
@@ -324,6 +330,46 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	}
 
 	@Override
+	public ObjectEntry
+			putByExternalReferenceCodeCurrentExternalReferenceCodeObjectRelationshipNameRelatedExternalReferenceCode(
+				String currentExternalReferenceCode,
+				String objectRelationshipName,
+				String relatedExternalReferenceCode)
+		throws Exception {
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipService.getObjectRelationship(
+				_objectDefinition.getObjectDefinitionId(),
+				objectRelationshipName);
+
+		long primaryKey1 =
+			ObjectEntryValuesUtil.getObjectRelationshipFieldValue(
+				currentExternalReferenceCode,
+				objectRelationship.getObjectDefinitionId1(),
+				_objectDefinitionLocalService, _objectEntryLocalService,
+				_systemObjectDefinitionMetadataTracker,
+				contextUser.getUserId());
+		long primaryKey2 =
+			ObjectEntryValuesUtil.getObjectRelationshipFieldValue(
+				relatedExternalReferenceCode,
+				objectRelationship.getObjectDefinitionId2(),
+				_objectDefinitionLocalService, _objectEntryLocalService,
+				_systemObjectDefinitionMetadataTracker,
+				contextUser.getUserId());
+
+		ObjectEntryManager objectEntryManager =
+			_objectEntryManagerTracker.getObjectEntryManager(
+				_objectDefinition.getStorageType());
+
+		return _getRelatedObjectEntry(
+			_objectDefinitionLocalService.getObjectDefinition(
+				objectRelationship.getObjectDefinitionId2()),
+			objectEntryManager.addObjectRelationshipMappingTableValues(
+				_getDTOConverterContext(primaryKey1), _objectDefinition,
+				objectRelationshipName, primaryKey1, primaryKey2));
+	}
+
+	@Override
 	public ObjectEntry putCurrentObjectEntry(
 			Long currentObjectEntryId, String objectRelationshipName,
 			Long relatedObjectEntryId)
@@ -513,5 +559,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	private final ObjectFieldLocalService _objectFieldLocalService;
 	private final ObjectRelationshipService _objectRelationshipService;
 	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
+	private final SystemObjectDefinitionMetadataTracker
+		_systemObjectDefinitionMetadataTracker;
 
 }

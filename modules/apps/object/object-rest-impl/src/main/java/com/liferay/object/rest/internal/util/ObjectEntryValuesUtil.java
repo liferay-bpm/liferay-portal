@@ -77,9 +77,24 @@ public class ObjectEntryValuesUtil {
 				fetchObjectRelationshipByObjectFieldId2(
 					objectField.getObjectFieldId());
 
+		return getObjectRelationshipFieldValue(
+			externalReferenceCode, objectRelationship.getObjectDefinitionId1(),
+			objectDefinitionLocalService, objectEntryLocalService,
+			systemObjectDefinitionMetadataTracker, userId);
+	}
+
+	public static long getObjectRelationshipFieldValue(
+			String externalReferenceCode, long objectDefinitionId,
+			ObjectDefinitionLocalService objectDefinitionLocalService,
+			ObjectEntryLocalService objectEntryLocalService,
+			SystemObjectDefinitionMetadataTracker
+				systemObjectDefinitionMetadataTracker,
+			long userId)
+		throws PortalException {
+
 		ObjectDefinition objectDefinition =
 			objectDefinitionLocalService.fetchObjectDefinition(
-				objectRelationship.getObjectDefinitionId1());
+				objectDefinitionId);
 
 		if (objectDefinition.isSystem()) {
 			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
@@ -92,7 +107,7 @@ public class ObjectEntryValuesUtil {
 					getBaseModelByExternalReferenceCode(
 						externalReferenceCode, objectDefinition.getCompanyId());
 
-			return baseModel.getPrimaryKeyObj();
+			return (long)baseModel.getPrimaryKeyObj();
 		}
 
 		ObjectEntry objectEntry = objectEntryLocalService.fetchObjectEntry(
