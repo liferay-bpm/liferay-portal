@@ -21,6 +21,7 @@ import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
@@ -38,6 +39,7 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.util.ObjectEntryFieldValueUtil;
+import com.liferay.object.util.ObjectFieldSettingValueUtil;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -431,66 +433,69 @@ public class ObjectEntryDTOConverter
 
 				long objectEntryId = 0;
 
-				if (serializable != null) {
-					if (GetterUtil.getLong(serializable) > 0) {
-						objectEntryId = (long)serializable;
+				if (GetterUtil.getLong(serializable) > 0) {
+					objectEntryId = (long)serializable;
+				}
+
+				Optional<UriInfo> uriInfoOptional =
+					dtoConverterContext.getUriInfoOptional();
+
+				int underlineLastIndex = objectFieldName.lastIndexOf(
+					StringPool.UNDERLINE);
+
+				if ((objectEntryId != 0) &&
+					uriInfoOptional.map(
+						UriInfo::getQueryParameters
+					).map(
+						queryParameters -> queryParameters.getFirst(
+							"nestedFields")
+					).map(
+						nestedFields -> nestedFields.contains(
+							StringUtil.replaceLast(
+								objectFieldName.substring(
+									underlineLastIndex + 1),
+								"Id", ""))
+					).orElse(
+						false
+					)) {
+
+					ObjectRelationship objectRelationship =
+						_objectRelationshipLocalService.
+							fetchObjectRelationshipByObjectFieldId2(
+								objectField.getObjectFieldId());
+
+					ObjectDefinition relatedObjectDefinition =
+						_objectDefinitionLocalService.getObjectDefinition(
+							objectRelationship.getObjectDefinitionId1());
+
+					if (relatedObjectDefinition.isSystem()) {
+						map.put(
+							StringUtil.replaceLast(objectFieldName, "Id", ""),
+							_objectEntryLocalService.getSystemModelAttributes(
+								relatedObjectDefinition, objectEntryId));
 					}
-
-					Optional<UriInfo> uriInfoOptional =
-						dtoConverterContext.getUriInfoOptional();
-
-					int underlineLastIndex = objectFieldName.lastIndexOf(
-						StringPool.UNDERLINE);
-
-					if ((objectEntryId != 0) &&
-						uriInfoOptional.map(
-							UriInfo::getQueryParameters
-						).map(
-							queryParameters -> queryParameters.getFirst(
-								"nestedFields")
-						).map(
-							nestedFields -> nestedFields.contains(
-								StringUtil.replaceLast(
-									objectFieldName.substring(
-										underlineLastIndex + 1),
-									"Id", ""))
-						).orElse(
-							false
-						)) {
-
-						ObjectRelationship objectRelationship =
-							_objectRelationshipLocalService.
-								fetchObjectRelationshipByObjectFieldId2(
-									objectField.getObjectFieldId());
-
-						ObjectDefinition relatedObjectDefinition =
-							_objectDefinitionLocalService.getObjectDefinition(
-								objectRelationship.getObjectDefinitionId1());
-
-						if (relatedObjectDefinition.isSystem()) {
-							map.put(
-								StringUtil.replaceLast(
-									objectFieldName, "Id", ""),
-								_objectEntryLocalService.
-									getSystemModelAttributes(
-										relatedObjectDefinition,
-										objectEntryId));
-						}
-						else {
-							map.put(
-								StringUtil.replaceLast(
-									objectFieldName, "Id", ""),
-								_toDTO(
-									_getDTOConverterContext(
-										dtoConverterContext, objectEntryId),
-									nestedFieldsDepth - 1,
-									_objectEntryLocalService.getObjectEntry(
-										objectEntryId)));
-						}
+					else {
+						map.put(
+							StringUtil.replaceLast(objectFieldName, "Id", ""),
+							_toDTO(
+								_getDTOConverterContext(
+									dtoConverterContext, objectEntryId),
+								nestedFieldsDepth - 1,
+								_objectEntryLocalService.getObjectEntry(
+									objectEntryId)));
 					}
 				}
 
-				map.put(objectFieldName, objectEntryId);
+				String objectRelationshipERCFieldName =
+					ObjectFieldSettingValueUtil.getObjectFieldSettingValue(
+						objectField,
+						ObjectFieldSettingConstants.
+							OBJECT_RELATIONSHIP_ERC_FIELD_NAME);
+
+				map.put(
+					objectRelationshipERCFieldName,
+					GetterUtil.getString(
+						values.get(objectRelationshipERCFieldName)));
 			}
 			else {
 				map.put(objectFieldName, serializable);
