@@ -14,13 +14,30 @@
 
 package com.liferay.object.rest.internal.odata.filter.expression;
 
+import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
+import com.liferay.object.service.persistence.ObjectEntryPersistence;
+import com.liferay.object.service.persistence.ObjectRelationshipPersistence;
+import com.liferay.object.system.SystemObjectDefinitionMetadata;
+import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
+import com.liferay.object.util.ObjectFieldSettingValueUtil;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.sql.dsl.spi.expression.DefaultPredicate;
 import com.liferay.petra.sql.dsl.spi.expression.Operand;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -55,11 +72,18 @@ public class PredicateExpressionVisitorImpl
 
 	public PredicateExpressionVisitorImpl(
 		EntityModel entityModel, long objectDefinitionId,
-		ObjectFieldLocalService objectFieldLocalService) {
+		ObjectDefinitionPersistence objectDefinitionPersistence,
+		ObjectEntryPersistence objectEntryPersistence,
+		ObjectFieldLocalService objectFieldLocalService,
+		ObjectRelationshipPersistence objectRelationshipPersistence,
+		SystemObjectDefinitionMetadataTracker
+			systemObjectDefinitionMetadataTracker) {
 
 		this(
 			entityModel, new HashMap<>(), objectDefinitionId,
-			objectFieldLocalService);
+			objectDefinitionPersistence, objectEntryPersistence,
+			objectFieldLocalService, objectRelationshipPersistence,
+			systemObjectDefinitionMetadataTracker);
 	}
 
 	@Override
@@ -89,7 +113,10 @@ public class PredicateExpressionVisitorImpl
 				Collections.singletonMap(
 					lambdaFunctionExpression.getVariableName(),
 					collectionPropertyExpression.getName()),
-				_objectDefinitionId, _objectFieldLocalService));
+				_objectDefinitionId, _objectDefinitionPersistence,
+				_objectEntryPersistence, _objectFieldLocalService,
+				_objectRelationshipPersistence,
+				_systemObjectDefinitionMetadataTracker));
 	}
 
 	@Override
@@ -115,11 +142,12 @@ public class PredicateExpressionVisitorImpl
 		throws ExpressionVisitException {
 
 		if (Objects.equals(ListExpression.Operation.IN, operation)) {
-			Column<?, Object> column =
-				(Column<?, Object>)_objectFieldLocalService.getColumn(
-					_objectDefinitionId, GetterUtil.getString(left));
+			Column<?, Object> column = _getColumn(left);
 
-			return column.in(right.toArray());
+			return column.in(
+				TransformUtil.transformToArray(
+					right, fieldValue -> _convertFieldValue(left, fieldValue),
+					Object.class));
 		}
 
 		throw new UnsupportedOperationException(
@@ -240,21 +268,116 @@ public class PredicateExpressionVisitorImpl
 		EntityModel entityModel,
 		Map<String, String> lambdaVariableExpressionFieldNames,
 		long objectDefinitionId,
-		ObjectFieldLocalService objectFieldLocalService) {
+		ObjectDefinitionPersistence objectDefinitionPersistence,
+		ObjectEntryPersistence objectEntryPersistence,
+		ObjectFieldLocalService objectFieldLocalService,
+		ObjectRelationshipPersistence objectRelationshipPersistence,
+		SystemObjectDefinitionMetadataTracker
+			systemObjectDefinitionMetadataTracker) {
 
 		_entityModel = entityModel;
 		_lambdaVariableExpressionFieldNames =
 			lambdaVariableExpressionFieldNames;
 		_objectDefinitionId = objectDefinitionId;
+		_objectDefinitionPersistence = objectDefinitionPersistence;
+		_objectEntryPersistence = objectEntryPersistence;
 		_objectFieldLocalService = objectFieldLocalService;
+		_objectRelationshipPersistence = objectRelationshipPersistence;
+		_systemObjectDefinitionMetadataTracker =
+			systemObjectDefinitionMetadataTracker;
 	}
 
 	private Predicate _contains(Object fieldName, Object fieldValue) {
-		Column<?, ?> column = _objectFieldLocalService.getColumn(
-			_objectDefinitionId, GetterUtil.getString(fieldName));
+		Column<?, Object> column = _getColumn(fieldName);
 
 		return column.like(
-			StringPool.PERCENT + fieldValue + StringPool.PERCENT);
+			StringPool.PERCENT + _convertFieldValue(fieldName, fieldValue) +
+				StringPool.PERCENT);
+	}
+
+	private Object _convertFieldValue(Object fieldName, Object fieldValue) {
+		EntityField entityField = _getEntityField(fieldName);
+
+		String entityFieldFilterableName = entityField.getFilterableName(null);
+		String entityFieldName = entityField.getName();
+
+		if (Objects.equals(entityFieldFilterableName, entityFieldName)) {
+			return fieldValue;
+		}
+
+		try {
+			ObjectField objectField = _objectFieldLocalService.getObjectField(
+				_objectDefinitionId, entityFieldFilterableName);
+
+			if (!Objects.equals(
+					objectField.getRelationshipType(),
+					ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
+
+				return fieldValue;
+			}
+
+			String objectRelationshipERCFieldName =
+				ObjectFieldSettingValueUtil.getObjectFieldSettingValue(
+					objectField,
+					ObjectFieldSettingConstants.
+						OBJECT_RELATIONSHIP_ERC_FIELD_NAME);
+
+			if (!Objects.equals(
+					entityFieldName, objectRelationshipERCFieldName)) {
+
+				return fieldValue;
+			}
+
+			ObjectRelationship objectRelationship =
+				_objectRelationshipPersistence.findByObjectFieldId2(
+					objectField.getObjectFieldId());
+
+			ObjectDefinition objectDefinition =
+				_objectDefinitionPersistence.findByPrimaryKey(
+					objectRelationship.getObjectDefinitionId1());
+
+			if (objectDefinition.isSystem()) {
+				SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
+					_systemObjectDefinitionMetadataTracker.
+						getSystemObjectDefinitionMetadata(
+							objectDefinition.getName());
+
+				BaseModel<?> baseModel =
+					systemObjectDefinitionMetadata.
+						getBaseModelByExternalReferenceCode(
+							String.valueOf(fieldValue),
+							objectDefinition.getCompanyId());
+
+				return baseModel.getPrimaryKeyObj();
+			}
+
+			ObjectEntry objectEntry = _objectEntryPersistence.findByERC_C_ODI(
+				String.valueOf(fieldValue), objectDefinition.getCompanyId(),
+				objectDefinition.getObjectDefinitionId());
+
+			return objectEntry.getObjectEntryId();
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException);
+			}
+
+			return fieldValue;
+		}
+	}
+
+	private Column<?, Object> _getColumn(Object fieldName) {
+		EntityField entityField = _getEntityField(fieldName);
+
+		return (Column<?, Object>)_objectFieldLocalService.getColumn(
+			_objectDefinitionId, entityField.getFilterableName(null));
+	}
+
+	private EntityField _getEntityField(Object fieldName) {
+		Map<String, EntityField> entityFieldsMap =
+			_entityModel.getEntityFieldsMap();
+
+		return entityFieldsMap.get(GetterUtil.getString(fieldName));
 	}
 
 	private Optional<Predicate> _getPredicateOptional(
@@ -273,15 +396,9 @@ public class PredicateExpressionVisitorImpl
 			return Optional.of(predicate);
 		}
 
-		Map<String, EntityField> entityFieldsMap =
-			_entityModel.getEntityFieldsMap();
+		Column<?, Object> column = _getColumn(left);
 
-		EntityField entityField = entityFieldsMap.get(
-			GetterUtil.getString(left));
-
-		Column<?, Object> column =
-			(Column<?, Object>)_objectFieldLocalService.getColumn(
-				_objectDefinitionId, entityField.getFilterableName(null));
+		right = _convertFieldValue(left, right);
 
 		if (Objects.equals(BinaryExpression.Operation.EQ, operation)) {
 			predicate = column.eq(right);
@@ -309,15 +426,23 @@ public class PredicateExpressionVisitorImpl
 	}
 
 	private Predicate _startsWith(Object fieldName, Object fieldValue) {
-		Column<?, ?> column = _objectFieldLocalService.getColumn(
-			_objectDefinitionId, GetterUtil.getString(fieldName));
+		Column<?, Object> column = _getColumn(fieldName);
 
-		return column.like(fieldValue + StringPool.PERCENT);
+		return column.like(
+			_convertFieldValue(fieldName, fieldValue) + StringPool.PERCENT);
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		PredicateExpressionVisitorImpl.class);
 
 	private final EntityModel _entityModel;
 	private Map<String, String> _lambdaVariableExpressionFieldNames;
 	private final long _objectDefinitionId;
+	private ObjectDefinitionPersistence _objectDefinitionPersistence;
+	private ObjectEntryPersistence _objectEntryPersistence;
 	private final ObjectFieldLocalService _objectFieldLocalService;
+	private ObjectRelationshipPersistence _objectRelationshipPersistence;
+	private final SystemObjectDefinitionMetadataTracker
+		_systemObjectDefinitionMetadataTracker;
 
 }

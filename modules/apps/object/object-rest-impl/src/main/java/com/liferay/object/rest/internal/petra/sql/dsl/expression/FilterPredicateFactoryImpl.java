@@ -18,6 +18,10 @@ import com.liferay.object.rest.internal.odata.filter.expression.PredicateExpress
 import com.liferay.object.rest.odata.entity.v1_0.ObjectEntryEntityModel;
 import com.liferay.object.rest.petra.sql.dsl.expression.FilterPredicateFactory;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
+import com.liferay.object.service.persistence.ObjectEntryPersistence;
+import com.liferay.object.service.persistence.ObjectRelationshipPersistence;
+import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -57,7 +61,10 @@ public class FilterPredicateFactoryImpl implements FilterPredicateFactory {
 
 			return (Predicate)expression.accept(
 				new PredicateExpressionVisitorImpl(
-					entityModel, objectDefinitionId, _objectFieldLocalService));
+					entityModel, objectDefinitionId,
+					_objectDefinitionPersistence, _objectEntryPersistence,
+					_objectFieldLocalService, _objectRelationshipPersistence,
+					_systemObjectDefinitionMetadataTracker));
 		}
 		catch (Exception exception) {
 			_log.error(exception);
@@ -73,6 +80,19 @@ public class FilterPredicateFactoryImpl implements FilterPredicateFactory {
 	private FilterParserProvider _filterParserProvider;
 
 	@Reference
+	private ObjectDefinitionPersistence _objectDefinitionPersistence;
+
+	@Reference
+	private ObjectEntryPersistence _objectEntryPersistence;
+
+	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
+	private ObjectRelationshipPersistence _objectRelationshipPersistence;
+
+	@Reference
+	private SystemObjectDefinitionMetadataTracker
+		_systemObjectDefinitionMetadataTracker;
 
 }
