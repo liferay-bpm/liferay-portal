@@ -603,17 +603,12 @@ public class ObjectDefinitionResourceImpl
 					}
 				).put(
 					"update",
-					() -> {
-						if (objectDefinition.isSystem()) {
-							return null;
-						}
-
-						return addAction(
-							ActionKeys.UPDATE, "putObjectDefinition",
-							permissionName,
-							objectDefinition.getObjectDefinitionId());
-					}
+					addAction(
+						ActionKeys.UPDATE, "putObjectDefinition",
+						permissionName,
+						objectDefinition.getObjectDefinitionId())
 				).build();
+
 				active = objectDefinition.isActive();
 				dateCreated = objectDefinition.getCreateDate();
 				dateModified = objectDefinition.getModifiedDate();
