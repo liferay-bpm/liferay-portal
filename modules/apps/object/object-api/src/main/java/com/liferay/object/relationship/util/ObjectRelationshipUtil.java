@@ -18,6 +18,7 @@ import com.liferay.object.exception.NoSuchObjectRelationshipException;
 import com.liferay.object.exception.ObjectRelationshipReverseException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -78,5 +79,18 @@ public class ObjectRelationshipUtil {
 			pkObjectFieldDBColumnName2.concat(reverse ? "1" : "2")
 		).build();
 	}
+
+	public static boolean getSkipPermissionWherePredicate() {
+		return _skipPermissionWherePredicate.get();
+	}
+
+	public static void setSkipPermissionWherePredicate(boolean value) {
+		_skipPermissionWherePredicate.set(value);
+	}
+
+	private static final ThreadLocal<Boolean> _skipPermissionWherePredicate =
+		new CentralizedThreadLocal<>(
+			ObjectRelationshipUtil.class + "._skipPermissionWherePredicate",
+			() -> false);
 
 }
