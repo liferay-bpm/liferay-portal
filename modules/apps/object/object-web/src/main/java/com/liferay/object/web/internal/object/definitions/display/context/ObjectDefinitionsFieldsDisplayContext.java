@@ -17,7 +17,6 @@ package com.liferay.object.web.internal.object.definitions.display.context;
 import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.list.type.service.ListTypeDefinitionService;
-import com.liferay.object.admin.rest.dto.v1_0.util.ObjectFieldUtil;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeTracker;
@@ -28,7 +27,6 @@ import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.web.internal.object.definitions.display.context.util.ObjectCodeEditorUtil;
 import com.liferay.object.web.internal.util.ObjectFieldBusinessTypeUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
@@ -165,11 +163,6 @@ public class ObjectDefinitionsFieldsDisplayContext
 		}
 
 		return null;
-	}
-
-	public JSONObject getObjectFieldJSONObject(ObjectField objectField) {
-		return ObjectFieldUtil.toJSONObject(
-			_listTypeDefinitionService, objectField);
 	}
 
 	public Long getObjectRelationshipId(ObjectField objectField) {

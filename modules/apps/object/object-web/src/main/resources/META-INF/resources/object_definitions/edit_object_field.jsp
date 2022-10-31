@@ -40,7 +40,7 @@ ObjectField objectField = (ObjectField)request.getAttribute(ObjectWebKeys.OBJECT
 		).put(
 			"objectDefinitionId", objectDefinition.getObjectDefinitionId()
 		).put(
-			"objectField", objectDefinitionsFieldsDisplayContext.getObjectFieldJSONObject(objectField)
+			"objectFieldId", objectField.getObjectFieldId()
 		).put(
 			"objectFieldTypes", objectDefinitionsFieldsDisplayContext.getObjectFieldBusinessTypeMaps(Validator.isNotNull(objectField.getRelationshipType()), locale)
 		).put(

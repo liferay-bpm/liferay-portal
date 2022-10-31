@@ -19,7 +19,7 @@ import {
 	openToast,
 	saveAndReload,
 } from '@liferay/object-js-components-web';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import './EditObjectField.scss';
 import {BasicInfo} from './Tabs/BasicInfo/BasicInfo';
@@ -33,7 +33,7 @@ interface EditObjectFieldProps {
 	isApproved: boolean;
 	isDefaultStorageType: boolean;
 	objectDefinitionId: number;
-	objectField: ObjectField;
+	objectFieldId: number;
 	objectFieldTypes: ObjectFieldType[];
 	objectName: string;
 	objectRelationshipId: number;
@@ -46,6 +46,24 @@ const TABS = [
 	Liferay.Language.get('advanced'),
 ];
 
+const initialValues: Partial<ObjectField> = {
+	DBType: '',
+	businessType: 'Text',
+	defaultValue: '',
+	externalReferenceCode: '',
+	id: 0,
+	indexed: true,
+	indexedAsKeyword: false,
+	indexedLanguageId: 'en_US',
+	label: {},
+	listTypeDefinitionId: 0,
+	name: '',
+	objectFieldSettings: [],
+	required: false,
+	state: false,
+	system: false,
+};
+
 export default function EditObjectField({
 	filterOperators,
 	forbiddenChars,
@@ -54,7 +72,7 @@ export default function EditObjectField({
 	isApproved,
 	isDefaultStorageType,
 	objectDefinitionId,
-	objectField,
+	objectFieldId,
 	objectFieldTypes,
 	objectName,
 	objectRelationshipId,
@@ -98,9 +116,17 @@ export default function EditObjectField({
 		forbiddenChars,
 		forbiddenLastChars,
 		forbiddenNames,
-		initialValues: objectField,
+		initialValues,
 		onSubmit,
 	});
+
+	useEffect(() => {
+		const makeFetch = async () => {
+			setValues(await API.getObjectField(objectFieldId));
+		};
+
+		makeFetch();
+	}, [objectFieldId, setValues]);
 
 	return (
 		<SidePanelForm
