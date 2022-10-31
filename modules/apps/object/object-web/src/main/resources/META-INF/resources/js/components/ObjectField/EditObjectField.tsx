@@ -41,10 +41,7 @@ interface EditObjectFieldProps {
 	workflowStatusJSONArray: LabelValueObject[];
 }
 
-const TABS = [
-	Liferay.Language.get('basic-info'),
-	Liferay.Language.get('advanced'),
-];
+const TABS = [Liferay.Language.get('basic-info')];
 
 export default function EditObjectField({
 	filterOperators,
@@ -140,9 +137,13 @@ export default function EditObjectField({
 					/>
 				</ClayTabs.TabPane>
 
-				<ClayTabs.TabPane>
-					{/* TODO Advanced TAB Component */}
-				</ClayTabs.TabPane>
+				{Liferay.FeatureFlags['LPS-159913'] ? (
+					<ClayTabs.TabPane>
+						{/* TODO Advanced TAB Component */}
+					</ClayTabs.TabPane>
+				) : (
+					<></>
+				)}
 			</ClayTabs.Content>
 		</SidePanelForm>
 	);
