@@ -88,6 +88,9 @@ export declare function getAllObjectDefinitions(): Promise<ObjectDefinition[]>;
 export declare function getObjectDefinitions(
 	parameters?: string
 ): Promise<ObjectDefinition[]>;
+export declare function getObjectField(
+	objectFieldId: number
+): Promise<ObjectField>;
 export declare function getObjectFields(
 	objectDefinitionId: number
 ): Promise<ObjectField[]>;
