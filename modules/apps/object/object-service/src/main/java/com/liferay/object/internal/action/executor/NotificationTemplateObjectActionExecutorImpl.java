@@ -21,7 +21,7 @@ import com.liferay.notification.type.NotificationType;
 import com.liferay.notification.type.NotificationTypeServiceTracker;
 import com.liferay.object.action.executor.ObjectActionExecutor;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
-import com.liferay.object.internal.action.util.ObjectActionVariablesUtil;
+import com.liferay.object.internal.action.util.ObjectEntryVariablesUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
@@ -65,7 +65,7 @@ public class NotificationTemplateObjectActionExecutorImpl
 
 		notificationContext.setClassName(objectDefinition.getClassName());
 
-		Map<String, Object> termValues = ObjectActionVariablesUtil.toVariables(
+		Map<String, Object> termValues = ObjectEntryVariablesUtil.toVariables(
 			_dtoConverterRegistry, objectDefinition, payloadJSONObject,
 			_systemObjectDefinitionMetadataTracker);
 
