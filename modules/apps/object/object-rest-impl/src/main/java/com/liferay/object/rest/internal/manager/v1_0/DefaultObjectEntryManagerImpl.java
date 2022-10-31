@@ -29,6 +29,7 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
+import com.liferay.object.relationship.util.ObjectRelationshipUtil;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.internal.dto.v1_0.converter.ObjectEntryDTOConverter;
 import com.liferay.object.rest.internal.petra.sql.dsl.expression.OrderByExpressionUtil;
@@ -731,14 +732,14 @@ public class DefaultObjectEntryManagerImpl
 	}
 
 	private boolean _hasRelatedObjectEntries(
-			String deletionType, ObjectDefinition objectDefinition,
+			ObjectDefinition objectDefinition,
 			com.liferay.object.model.ObjectEntry objectEntry)
 		throws PortalException {
 
 		for (ObjectRelationship objectRelationship :
 				_objectRelationshipLocalService.getObjectRelationships(
-					objectDefinition.getObjectDefinitionId(), deletionType,
-					false)) {
+					objectDefinition.getObjectDefinitionId(),
+					ObjectRelationshipConstants.DELETION_TYPE_PREVENT, false)) {
 
 			ObjectDefinition objectDefinition2 =
 				_objectDefinitionLocalService.getObjectDefinition(
@@ -754,10 +755,22 @@ public class DefaultObjectEntryManagerImpl
 						objectDefinition2.getClassName(),
 						objectRelationship.getType());
 
-			int count = objectRelatedModelsProvider.getRelatedModelsCount(
-				objectEntry.getGroupId(),
-				objectRelationship.getObjectRelationshipId(),
-				objectEntry.getPrimaryKey());
+			int count = 0;
+
+			try {
+				ObjectRelationshipUtil.setSkipPermissionWherePredicate(true);
+
+				count = objectRelatedModelsProvider.getRelatedModelsCount(
+					objectEntry.getGroupId(),
+					objectRelationship.getObjectRelationshipId(),
+					objectEntry.getPrimaryKey());
+			}
+			catch (Exception exception) {
+				_log.error(exception);
+			}
+			finally {
+				ObjectRelationshipUtil.setSkipPermissionWherePredicate(false);
+			}
 
 			if (count > 0) {
 				return true;
@@ -889,7 +902,6 @@ public class DefaultObjectEntryManagerImpl
 				"delete",
 				() -> {
 					if (_hasRelatedObjectEntries(
-							ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
 							objectDefinition, objectEntry)) {
 
 						return null;

@@ -473,9 +473,20 @@ public class ObjectEntryLocalServiceImpl
 						objectDefinition2.getClassName(),
 						objectRelationship.getType());
 
-			objectRelatedModelsProvider.deleteRelatedModel(
-				PrincipalThreadLocal.getUserId(), groupId,
-				objectRelationship.getObjectRelationshipId(), primaryKey);
+			try {
+				ObjectRelationshipUtil.setSkipPermissionWherePredicate(true);
+
+				objectRelatedModelsProvider.deleteRelatedModel(
+					PrincipalThreadLocal.getUserId(), groupId,
+					objectRelationship.getObjectRelationshipId(), primaryKey);
+			}
+			catch (Exception exception) {
+				ObjectRelationshipUtil.setSkipPermissionWherePredicate(false);
+
+				throw new PortalException(exception.getMessage());
+			}
+
+			ObjectRelationshipUtil.setSkipPermissionWherePredicate(false);
 		}
 	}
 
@@ -1833,7 +1844,11 @@ public class ObjectEntryLocalServiceImpl
 					objectDefinitionId2)
 			).and(
 				() -> {
-					if (PermissionThreadLocal.getPermissionChecker() == null) {
+					if (ObjectRelationshipUtil.
+							getSkipPermissionWherePredicate() ||
+						(PermissionThreadLocal.getPermissionChecker() ==
+							null)) {
+
 						return null;
 					}
 
@@ -2006,7 +2021,11 @@ public class ObjectEntryLocalServiceImpl
 				}
 			).and(
 				() -> {
-					if (PermissionThreadLocal.getPermissionChecker() == null) {
+					if (ObjectRelationshipUtil.
+							getSkipPermissionWherePredicate() ||
+						(PermissionThreadLocal.getPermissionChecker() ==
+							null)) {
+
 						return null;
 					}
 
