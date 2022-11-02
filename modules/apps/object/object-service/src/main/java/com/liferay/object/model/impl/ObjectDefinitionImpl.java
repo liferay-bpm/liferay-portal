@@ -17,10 +17,13 @@ package com.liferay.object.model.impl;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -64,6 +67,15 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 		}
 
 		return getDBTableName() + "_x";
+	}
+
+	@Override
+	public Map<Locale, String> getLabelMap() {
+		Map<Locale, String> labelMap = super.getLabelMap();
+
+		labelMap.putIfAbsent(LocaleUtil.getDefault(), getLabelCurrentValue());
+
+		return labelMap;
 	}
 
 	@Override
