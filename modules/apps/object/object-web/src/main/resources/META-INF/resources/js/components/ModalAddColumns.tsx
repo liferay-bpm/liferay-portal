@@ -33,13 +33,19 @@ function ModalAddColumns<T extends ModalItem>() {
 			onSave,
 			searchTerm,
 			selected,
+			showModal,
 			title,
 		},
 		setState,
-	] = useState<IState<T>>({items: [], searchTerm: '', selected: []});
+	] = useState<IState<T>>({
+		items: [],
+		searchTerm: '',
+		selected: [],
+		showModal: false,
+	});
 
 	const resetModal = () => {
-		setState({items: [], searchTerm: '', selected: []});
+		setState({items: [], searchTerm: '', selected: [], showModal: false});
 	};
 
 	const {observer} = useModal({
@@ -51,9 +57,10 @@ function ModalAddColumns<T extends ModalItem>() {
 			items = [],
 			searchTerm = '',
 			selected = [],
+			showModal = true,
 			...otherProps
 		}: Partial<IState<T>>) => {
-			setState({items, searchTerm, selected, ...otherProps});
+			setState({items, searchTerm, selected, showModal, ...otherProps});
 		};
 
 		Liferay.on('openModalAddColumns', openModal);
@@ -94,7 +101,7 @@ function ModalAddColumns<T extends ModalItem>() {
 		setState((state) => ({...state, selected: selectedItems}));
 	};
 
-	return items.length ? (
+	return showModal ? (
 		<ClayModal
 			className="lfr-object__object-view-modal-add-columns"
 			observer={observer}
@@ -206,5 +213,6 @@ interface IState<T extends ModalItem> {
 	onSave?: (selected: T[]) => void;
 	searchTerm: string;
 	selected: T[];
+	showModal: boolean;
 	title?: string;
 }

@@ -255,6 +255,7 @@ export default function PredefinedValuesTable({
 					});
 				},
 				selected: getSelectedFields(),
+				showModal: true,
 				title: Liferay.Language.get('select-the-fields'),
 			});
 		};
