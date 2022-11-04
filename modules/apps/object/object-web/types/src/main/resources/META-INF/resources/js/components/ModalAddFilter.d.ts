@@ -14,39 +14,7 @@
 
 /// <reference types="react" />
 
-import {Observer} from '@clayui/modal/lib/types';
 import './ModalAddFilter.scss';
-interface IProps {
-	currentFilters: CurrentFilter[];
-	disableDateValues?: boolean;
-	editingFilter: boolean;
-	editingObjectFieldName: string;
-	filterOperators: TFilterOperators;
-	filterTypeRequired?: boolean;
-	header: string;
-	objectFields: ObjectField[];
-	observer: Observer;
-	onClose: () => void;
-	onSave: (
-		objectFieldName: string,
-		filterBy?: string,
-		fieldLabel?: LocalizedValue<string>,
-		objectFieldBusinessType?: string,
-		filterType?: string,
-		valueList?: IItem[],
-		value?: string
-	) => void;
-	validate: ({
-		checkedItems,
-		disableDateValues,
-		items,
-		selectedFilterBy,
-		selectedFilterType,
-		setErrors,
-		value,
-	}: FilterValidation) => FilterErrors;
-	workflowStatusJSONArray: LabelValueObject[];
-}
 interface IItem extends LabelValueObject {
 	checked?: boolean;
 }
@@ -62,37 +30,10 @@ export declare type FilterValidation = {
 	checkedItems: IItem[];
 	disableDateValues?: boolean;
 	items: IItem[];
-	selectedFilterBy?: ObjectField;
+	selectedFilterBy?: ObjectField | null;
 	selectedFilterType?: LabelValueObject | null;
 	setErrors: (value: FilterErrors) => void;
 	value?: string;
 };
-declare type CurrentFilter = {
-	definition: {
-		[key: string]: string[] | number[];
-	} | null;
-	fieldLabel?: string;
-	filterBy?: string;
-	filterType: string | null;
-	label: LocalizedValue<string>;
-	objectFieldBusinessType?: string;
-	objectFieldName?: string;
-	value?: string;
-	valueList?: LabelValueObject[];
-};
-export declare function ModalAddFilter({
-	currentFilters,
-	disableDateValues,
-	editingFilter,
-	editingObjectFieldName,
-	filterOperators,
-	filterTypeRequired,
-	header,
-	objectFields,
-	observer,
-	onClose,
-	onSave,
-	validate,
-	workflowStatusJSONArray,
-}: IProps): JSX.Element;
-export {};
+declare function ModalAddFilter(): JSX.Element | null;
+export default ModalAddFilter;

@@ -13,8 +13,7 @@
  */
 
 import ClayButton from '@clayui/button';
-import ClayModal from '@clayui/modal';
-import {Observer} from '@clayui/modal/lib/types';
+import ClayModal, {useModal} from '@clayui/modal';
 import {
 	API,
 	AutoComplete,
@@ -40,27 +39,31 @@ import {
 } from '../utils/filter';
 
 import './ModalAddFilter.scss';
-interface IProps {
+
+interface IState {
 	currentFilters: CurrentFilter[];
 	disableDateValues?: boolean;
-	editingFilter: boolean;
 	editingObjectFieldName: string;
+	filterEndDate: string;
 	filterOperators: TFilterOperators;
+	filterStartDate: string;
 	filterTypeRequired?: boolean;
-	header: string;
+	header?: string;
+	modalType: string;
 	objectFields: ObjectField[];
-	observer: Observer;
-	onClose: () => void;
-	onSave: (
+	onSave?: (
 		objectFieldName: string,
 		filterBy?: string,
 		fieldLabel?: LocalizedValue<string>,
-		objectFieldBusinessType?: string,
+		objectFieldBusinessType?: ObjectFieldBusinessType | undefined,
 		filterType?: string,
 		valueList?: IItem[],
 		value?: string
 	) => void;
-	validate: ({
+	selectedFilterBy?: ObjectField | null;
+	selectedFilterType?: LabelValueObject | null;
+	showModal: boolean;
+	validate?: ({
 		checkedItems,
 		disableDateValues,
 		items,
@@ -69,6 +72,7 @@ interface IProps {
 		setErrors,
 		value,
 	}: FilterValidation) => FilterErrors;
+	value?: string;
 	workflowStatusJSONArray: LabelValueObject[];
 }
 
@@ -89,7 +93,7 @@ export type FilterValidation = {
 	checkedItems: IItem[];
 	disableDateValues?: boolean;
 	items: IItem[];
-	selectedFilterBy?: ObjectField;
+	selectedFilterBy?: ObjectField | null;
 	selectedFilterType?: LabelValueObject | null;
 	setErrors: (value: FilterErrors) => void;
 	value?: string;
@@ -111,37 +115,95 @@ type CurrentFilter = {
 
 const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
-export function ModalAddFilter({
-	currentFilters,
-	disableDateValues,
-	editingFilter,
-	editingObjectFieldName,
-	filterOperators,
-	filterTypeRequired,
-	header,
-	objectFields,
-	observer,
-	onClose,
-	onSave,
-	validate,
-	workflowStatusJSONArray,
-}: IProps) {
-	const [items, setItems] = useState<IItem[]>([]);
+const defaultFilterOperations: TFilterOperators = {
+	dateOperators: [],
+	numericOperators: [],
+	picklistOperators: [],
+};
 
-	const [selectedFilterBy, setSelectedFilterBy] = useState<ObjectField>();
+const INITIAL_STATE: IState = {
+	currentFilters: [],
+	editingObjectFieldName: '',
+	filterEndDate: '',
+	filterOperators: defaultFilterOperations,
+	filterStartDate: '',
+	modalType: 'add',
+	objectFields: [],
+	showModal: false,
+	workflowStatusJSONArray: [],
+};
 
+function ModalAddFilter() {
 	const [
-		selectedFilterType,
-		setSelectedFilterType,
-	] = useState<LabelValueObject | null>();
-	const [value, setValue] = useState<string>();
+		{
+			currentFilters,
+			disableDateValues,
+			editingObjectFieldName,
+			filterEndDate,
+			filterOperators,
+			filterStartDate,
+			filterTypeRequired,
+			header,
+			modalType,
+			objectFields,
+			onSave,
+			selectedFilterBy,
+			selectedFilterType,
+			showModal,
+			validate,
+			value,
+			workflowStatusJSONArray,
+		},
+		setState,
+	] = useState<IState>(INITIAL_STATE);
+
+	const resetModal = () => {
+		setState({...INITIAL_STATE, selectedFilterBy: null});
+	};
+
+	const {observer} = useModal({
+		onClose: resetModal,
+	});
+
+	useEffect(() => {
+		const openModal = ({
+			currentFilters = [],
+			editingObjectFieldName = '',
+			filterEndDate = '',
+			filterOperators = defaultFilterOperations,
+			filterStartDate = '',
+			modalType = 'add',
+			objectFields = [],
+			showModal = true,
+			workflowStatusJSONArray = [],
+			...otherProps
+		}: Partial<IState>) => {
+			setState({
+				currentFilters,
+				editingObjectFieldName,
+				filterEndDate,
+				filterOperators,
+				filterStartDate,
+				modalType,
+				objectFields,
+				showModal,
+				workflowStatusJSONArray,
+				...otherProps,
+			});
+		};
+
+		Liferay.on('openModalAddFilter', openModal);
+
+		return () =>
+			Liferay.detach('openModalAddFilter', openModal as () => void);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const [errors, setErrors] = useState<FilterErrors>({});
 
-	const [query, setQuery] = useState<string>('');
+	const [items, setItems] = useState<IItem[]>([]);
 
-	const [filterStartDate, setFilterStartDate] = useState('');
-	const [filterEndDate, setFilterEndDate] = useState('');
+	const [query, setQuery] = useState<string>('');
 
 	const filteredAvailableFields = useMemo(() => {
 		return filterArrayByQuery(objectFields, 'label', query);
@@ -165,10 +227,13 @@ export function ModalAddFilter({
 		);
 
 		if (editingFilterType) {
-			setSelectedFilterType({
-				label: editingFilterType.label,
-				value: editingFilterType.value,
-			});
+			setState((state) => ({
+				...state,
+				selectedFilterType: {
+					label: editingFilterType.label,
+					value: editingFilterType.value,
+				},
+			}));
 		}
 
 		return valuesArray;
@@ -176,127 +241,133 @@ export function ModalAddFilter({
 
 	const setFieldValues = useCallback(
 		(objectField: ObjectField) => {
-			if (
-				objectField.businessType === 'MultiselectPicklist' ||
-				objectField?.businessType === 'Picklist'
-			) {
-				const makeFetch = async () => {
-					if (objectField.listTypeDefinitionId) {
-						const items = await API.getPickListItems(
-							objectField.listTypeDefinitionId
+			if (showModal) {
+				if (
+					objectField.businessType === 'MultiselectPicklist' ||
+					objectField?.businessType === 'Picklist'
+				) {
+					const makeFetch = async () => {
+						if (objectField.listTypeDefinitionId) {
+							const items = await API.getPickListItems(
+								objectField.listTypeDefinitionId
+							);
+
+							if (modalType === 'edit') {
+								setItems(
+									getCheckedPickListItems(
+										items,
+										setEditingFilterType
+									)
+								);
+							}
+							else {
+								setItems(
+									items.map((item) => {
+										return {
+											label: item.name,
+											value: item.key,
+										};
+									})
+								);
+							}
+						}
+					};
+
+					makeFetch();
+				}
+				else if (objectField.name === 'status') {
+					let newItems: IItem[] = [];
+
+					if (modalType === 'edit') {
+						newItems = getCheckedWorkflowStatusItems(
+							workflowStatusJSONArray,
+							setEditingFilterType
+						);
+					}
+					else {
+						newItems = workflowStatusJSONArray.map(
+							(workflowStatus) => {
+								return {
+									label: workflowStatus.label,
+									value: workflowStatus.value,
+								};
+							}
+						);
+					}
+
+					setItems(newItems);
+				}
+				else if (objectField.businessType === 'Relationship') {
+					const makeFetch = async () => {
+						const {objectFieldSettings} = objectField;
+
+						const [
+							{value},
+						] = objectFieldSettings as NameValueObject[];
+
+						const [
+							{
+								objectFields,
+								restContextPath,
+								system,
+								titleObjectFieldName,
+							},
+						] = await API.getObjectDefinitions(
+							`filter=name eq '${value}'`
 						);
 
-						if (editingFilter) {
+						const titleField = objectFields.find(
+							(objectField) =>
+								objectField.name === titleObjectFieldName
+						) as ObjectField;
+
+						const relatedEntries = await API.getList<ObjectEntry>(
+							`${restContextPath}`
+						);
+
+						if (modalType === 'edit') {
 							setItems(
-								getCheckedPickListItems(
-									items,
+								getCheckedRelationshipItems(
+									relatedEntries,
+									titleField.name,
+									titleField.system as boolean,
+									system,
 									setEditingFilterType
 								)
 							);
 						}
 						else {
-							setItems(
-								items.map((item) => {
-									return {
-										label: item.name,
-										value: item.key,
-									};
-								})
-							);
+							const newItems = relatedEntries.map((entry) => {
+								const newItemsObject = {
+									value: system
+										? String(entry.id)
+										: entry.externalReferenceCode,
+								} as LabelValueObject;
+
+								if (titleField.system) {
+									return getSystemFieldLabelFromEntry(
+										titleField.name,
+										entry,
+										newItemsObject
+									) as LabelValueObject;
+								}
+
+								return {
+									...newItemsObject,
+									label: entry[titleField?.name] as string,
+								};
+							});
+
+							setItems(newItems);
 						}
-					}
-				};
+					};
 
-				makeFetch();
-			}
-			else if (objectField.name === 'status') {
-				let newItems: IItem[] = [];
-
-				if (editingFilter) {
-					newItems = getCheckedWorkflowStatusItems(
-						workflowStatusJSONArray,
-						setEditingFilterType
-					);
+					makeFetch();
 				}
-				else {
-					newItems = workflowStatusJSONArray.map((workflowStatus) => {
-						return {
-							label: workflowStatus.label,
-							value: workflowStatus.value,
-						};
-					});
-				}
-
-				setItems(newItems);
-			}
-			else if (objectField.businessType === 'Relationship') {
-				const makeFetch = async () => {
-					const {objectFieldSettings} = objectField;
-
-					const [{value}] = objectFieldSettings as NameValueObject[];
-
-					const [
-						{
-							objectFields,
-							restContextPath,
-							system,
-							titleObjectFieldName,
-						},
-					] = await API.getObjectDefinitions(
-						`filter=name eq '${value}'`
-					);
-
-					const titleField = objectFields.find(
-						(objectField) =>
-							objectField.name === titleObjectFieldName
-					) as ObjectField;
-
-					const relatedEntries = await API.getList<ObjectEntry>(
-						`${restContextPath}`
-					);
-
-					if (editingFilter) {
-						setItems(
-							getCheckedRelationshipItems(
-								relatedEntries,
-								titleField.name,
-								titleField.system as boolean,
-								system,
-								setEditingFilterType
-							)
-						);
-					}
-					else {
-						const newItems = relatedEntries.map((entry) => {
-							const newItemsObject = {
-								value: system
-									? String(entry.id)
-									: entry.externalReferenceCode,
-							} as LabelValueObject;
-
-							if (titleField.system) {
-								return getSystemFieldLabelFromEntry(
-									titleField.name,
-									entry,
-									newItemsObject
-								) as LabelValueObject;
-							}
-
-							return {
-								...newItemsObject,
-								label: entry[titleField?.name] as string,
-							};
-						});
-
-						setItems(newItems);
-					}
-				};
-
-				makeFetch();
 			}
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[]
+		[showModal]
 	);
 
 	useEffect(() => {
@@ -319,44 +390,46 @@ export function ModalAddFilter({
 		}
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [
-		editingFilter,
-		setFieldValues,
-		selectedFilterBy,
-		workflowStatusJSONArray,
-	]);
+	}, [modalType, setFieldValues, selectedFilterBy, workflowStatusJSONArray]);
 
 	useEffect(() => {
-		if (editingFilter) {
+		if (modalType === 'edit') {
 			const editingObjectFieldFilter = objectFields.find(
 				(objectField) => objectField.name === editingObjectFieldName
 			);
 
-			setSelectedFilterBy(editingObjectFieldFilter);
+			setState((state) => ({
+				...state,
+				selectedFilterBy: editingObjectFieldFilter,
+			}));
 		}
-	}, [editingFilter, editingObjectFieldName, objectFields]);
+	}, [modalType, editingObjectFieldName, objectFields]);
 
 	const handleSaveFilter = (event: FormEvent) => {
 		event.preventDefault();
 
 		const checkedItems = items.filter((item) => item.checked);
 
-		const currentErrors = validate({
-			checkedItems,
-			disableDateValues,
-			items,
-			selectedFilterBy,
-			selectedFilterType,
-			setErrors,
-			value,
-		});
+		let currentErrors: FilterErrors = {};
+
+		if (validate) {
+			currentErrors = validate({
+				checkedItems,
+				disableDateValues,
+				items,
+				selectedFilterBy,
+				selectedFilterType,
+				setErrors,
+				value,
+			});
+		}
 
 		if (Object.keys(currentErrors).length) {
 			return;
 		}
 
-		if (editingFilter) {
-			onSave(
+		if (modalType === 'edit') {
+			onSave?.(
 				editingObjectFieldName,
 				selectedFilterBy?.name,
 				selectedFilterBy?.label,
@@ -372,7 +445,7 @@ export function ModalAddFilter({
 			);
 		}
 		else {
-			onSave(
+			onSave?.(
 				selectedFilterBy?.name!,
 				selectedFilterBy?.name,
 				selectedFilterBy?.label,
@@ -390,15 +463,15 @@ export function ModalAddFilter({
 			);
 		}
 
-		onClose();
+		resetModal();
 	};
 
-	return (
+	return showModal ? (
 		<ClayModal observer={observer}>
 			<ClayModal.Header>{header}</ClayModal.Header>
 
 			<ClayModal.Body>
-				{!editingFilter && (
+				{modalType !== 'edit' && (
 					<AutoComplete
 						emptyStateMessage={Liferay.Language.get(
 							'there-are-no-columns-available'
@@ -408,9 +481,12 @@ export function ModalAddFilter({
 						label={Liferay.Language.get('filter-by')}
 						onChangeQuery={setQuery}
 						onSelectItem={(item) => {
-							setSelectedFilterBy(item);
-							setSelectedFilterType(null);
-							setValue('');
+							setState((state) => ({
+								...state,
+								selectedFilterBy: item,
+								selectedFilterType: null,
+								value: '',
+							}));
 						}}
 						query={query}
 						required
@@ -424,24 +500,26 @@ export function ModalAddFilter({
 					</AutoComplete>
 				)}
 
-				{selectedFilterBy &&
-					selectedFilterBy?.businessType !== 'Date' && (
-						<SingleSelect
-							error={errors.selectedFilterType}
-							label={Liferay.Language.get('filter-type')}
-							onChange={(target: LabelValueObject) =>
-								setSelectedFilterType(target)
-							}
-							options={
-								selectedFilterBy?.businessType === 'Integer' ||
-								selectedFilterBy?.businessType === 'LongInteger'
-									? filterOperators.numericOperators
-									: filterOperators.picklistOperators
-							}
-							required={filterTypeRequired}
-							value={selectedFilterType?.label ?? ''}
-						/>
-					)}
+				{selectedFilterBy && selectedFilterBy?.businessType !== 'Date' && (
+					<SingleSelect
+						error={errors.selectedFilterType}
+						label={Liferay.Language.get('filter-type')}
+						onChange={(target: LabelValueObject) =>
+							setState((state) => ({
+								...state,
+								selectedFilterType: target,
+							}))
+						}
+						options={
+							selectedFilterBy?.businessType === 'Integer' ||
+							selectedFilterBy?.businessType === 'LongInteger'
+								? filterOperators.numericOperators
+								: filterOperators.picklistOperators
+						}
+						required={filterTypeRequired}
+						value={selectedFilterType?.label ?? ''}
+					/>
+				)}
 
 				{selectedFilterBy &&
 					selectedFilterBy?.businessType === 'Date' &&
@@ -450,7 +528,10 @@ export function ModalAddFilter({
 							error={errors.selectedFilterType}
 							label={Liferay.Language.get('filter-type')}
 							onChange={(target: LabelValueObject) =>
-								setSelectedFilterType(target)
+								setState((state) => ({
+									...state,
+									selectedFilterType: target,
+								}))
 							}
 							options={filterOperators.dateOperators}
 							required={filterTypeRequired}
@@ -466,7 +547,11 @@ export function ModalAddFilter({
 							label={Liferay.Language.get('value')}
 							onChange={({target: {value}}) => {
 								const newValue = value.replace(/[\D]/g, '');
-								setValue(newValue);
+
+								setState((state) => ({
+									...state,
+									value: newValue,
+								}));
 							}}
 							required
 							type="number"
@@ -508,7 +593,10 @@ export function ModalAddFilter({
 											},
 										]);
 
-										setFilterStartDate(value);
+										setState((state) => ({
+											...state,
+											filterStartDate: value,
+										}));
 									}}
 									required
 									value={filterStartDate}
@@ -530,7 +618,10 @@ export function ModalAddFilter({
 											},
 										]);
 
-										setFilterEndDate(value);
+										setState((state) => ({
+											...state,
+											filterEndDate: value,
+										}));
 									}}
 									required
 									value={filterEndDate}
@@ -545,7 +636,7 @@ export function ModalAddFilter({
 					<ClayButton.Group spaced>
 						<ClayButton
 							displayType="secondary"
-							onClick={() => onClose()}
+							onClick={resetModal}
 						>
 							{Liferay.Language.get('cancel')}
 						</ClayButton>
@@ -560,5 +651,7 @@ export function ModalAddFilter({
 				}
 			/>
 		</ClayModal>
-	);
+	) : null;
 }
+
+export default ModalAddFilter;

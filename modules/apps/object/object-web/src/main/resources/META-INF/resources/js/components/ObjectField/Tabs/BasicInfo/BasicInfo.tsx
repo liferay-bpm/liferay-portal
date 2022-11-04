@@ -12,7 +12,6 @@
  * details.
  */
 
-import {useModal} from '@clayui/modal';
 import {
 	API,
 	BuilderScreen,
@@ -24,11 +23,7 @@ import {
 import React, {useEffect, useState} from 'react';
 
 import {updateFieldSettings} from '../../../../utils/fieldSettings';
-import {
-	FilterErrors,
-	FilterValidation,
-	ModalAddFilter,
-} from '../../../ModalAddFilter';
+import {FilterErrors, FilterValidation} from '../../../ModalAddFilter';
 import ObjectFieldFormBase, {
 	ObjectFieldErrors,
 } from '../../ObjectFieldFormBase';
@@ -89,24 +84,11 @@ export function BasicInfo({
 	values,
 	workflowStatusJSONArray,
 }: BasicInfoProps) {
-	const [editingObjectFieldName, setEditingObjectFieldName] = useState<
-		string
-	>('');
-
-	const [editingFilter, setEditingFilter] = useState(false);
 	const [objectFields, setObjectFields] = useState<ObjectField[]>();
 	const [objectDefinitionId2, setObjectDefinitionId2] = useState<number>();
 	const [aggregationFilters, setAggregationFilters] = useState<
 		AggregationFilters[]
 	>([]);
-	const [visibleModal, setVisibleModal] = useState(false);
-
-	const {observer, onClose} = useModal({
-		onClose: () => {
-			setEditingFilter(false);
-			setVisibleModal(false);
-		},
-	});
 
 	const disableFieldFormBase = !!(
 		isApproved ||
@@ -500,6 +482,46 @@ export function BasicInfo({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [objectFields]);
 
+	const filterModalConfig = {
+		currentFilters: [],
+		filterOperators,
+		filterTypeRequired: true,
+		header: Liferay.Language.get('filter'),
+		objectFields:
+			objectFields?.filter((objectField) => {
+				if (
+					objectField.businessType === 'Date' ||
+					objectField.businessType === 'Integer' ||
+					objectField.businessType === 'LongInteger' ||
+					objectField.businessType === 'Picklist' ||
+					objectField.name === 'status'
+				) {
+					return objectField;
+				}
+			}) ?? [],
+		onSave: handleSaveFilterColumn,
+		showModal: true,
+		validate: validateFilters,
+		workflowStatusJSONArray,
+	};
+
+	const handleAddColumns = () => {
+		const parentWindow = Liferay.Util.getOpener();
+		parentWindow.Liferay.fire('openModalAddFilter', {
+			modalType: 'add',
+			...filterModalConfig,
+		});
+	};
+
+	const handleEditColumn = (objectFieldName: string) => {
+		const parentWindow = Liferay.Util.getOpener();
+		parentWindow.Liferay.fire('openModalAddFilter', {
+			editingObjectFieldName: objectFieldName,
+			modalType: 'edit',
+			...filterModalConfig,
+		});
+	};
+
 	return (
 		<>
 			<Card title={Liferay.Language.get('basic-info')}>
@@ -569,41 +591,11 @@ export function BasicInfo({
 					firstColumnHeader={Liferay.Language.get('filter-by')}
 					objectColumns={aggregationFilters}
 					onDeleteColumn={handleDeleteFilterColumn}
-					onEditingObjectFieldName={setEditingObjectFieldName}
-					onVisibleEditModal={setVisibleModal}
-					openModal={() => setVisibleModal(true)}
+					openEditModal={handleEditColumn}
+					openModal={handleAddColumns}
 					secondColumnHeader={Liferay.Language.get('type')}
 					thirdColumnHeader={Liferay.Language.get('value')}
 					title={Liferay.Language.get('filters')}
-				/>
-			)}
-
-			{visibleModal && (
-				<ModalAddFilter
-					currentFilters={[]}
-					editingFilter={editingFilter}
-					editingObjectFieldName={editingObjectFieldName}
-					filterOperators={filterOperators}
-					filterTypeRequired
-					header={Liferay.Language.get('filter')}
-					objectFields={
-						objectFields?.filter((objectField) => {
-							if (
-								objectField.businessType === 'Date' ||
-								objectField.businessType === 'Integer' ||
-								objectField.businessType === 'LongInteger' ||
-								objectField.businessType === 'Picklist' ||
-								objectField.name === 'status'
-							) {
-								return objectField;
-							}
-						}) ?? []
-					}
-					observer={observer}
-					onClose={onClose}
-					onSave={handleSaveFilterColumn}
-					validate={validateFilters}
-					workflowStatusJSONArray={workflowStatusJSONArray}
 				/>
 			)}
 
