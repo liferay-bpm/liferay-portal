@@ -72,3 +72,9 @@ renderResponse.setTitle(objectDefinition.getLabel(locale, true));
 		%>'
 	/>
 </div>
+
+<div>
+	<react:component
+		module="js/components/ModalAddFilter"
+	/>
+</div>

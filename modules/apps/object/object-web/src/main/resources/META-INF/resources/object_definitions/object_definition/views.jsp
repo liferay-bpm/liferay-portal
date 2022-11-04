@@ -54,3 +54,21 @@ renderResponse.setTitle(objectDefinition.getLabel(locale, true));
 		module="js/components/ModalAddColumns"
 	/>
 </div>
+
+<div>
+	<react:component
+		module="js/components/ObjectView/DefaultSortScreen/ModalAddDefaultSortColumn"
+	/>
+</div>
+
+<div>
+	<react:component
+		module="js/components/ObjectView/ViewBuilderScreen/ModalEditViewColumn"
+	/>
+</div>
+
+<div>
+	<react:component
+		module="js/components/ModalAddFilter"
+	/>
+</div>
