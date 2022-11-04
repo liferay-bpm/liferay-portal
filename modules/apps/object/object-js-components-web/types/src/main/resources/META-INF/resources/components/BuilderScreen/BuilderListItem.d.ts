@@ -22,9 +22,7 @@ interface IProps {
 	objectFieldName: string;
 	onChangeColumnOrder?: (draggedIndex: number, targetIndex: number) => void;
 	onDeleteColumn: (objectFieldName: string) => void;
-	onEditing?: (boolean: boolean) => void;
-	onEditingObjectFieldName?: (objectFieldName: string) => void;
-	onVisibleEditModal?: (boolean: boolean) => void;
+	openEditModal?: (string: string) => void;
 	secondColumnValue?: string;
 	thirdColumnValues?: TThirdColumnValues[] | string;
 }

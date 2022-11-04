@@ -25,9 +25,7 @@ export declare function BuilderScreen({
 	objectColumns,
 	onChangeColumnOrder,
 	onDeleteColumn,
-	onEditing,
-	onEditingObjectFieldName,
-	onVisibleEditModal,
+	openEditModal,
 	openModal,
 	secondColumnHeader,
 	thirdColumnHeader,
@@ -65,9 +63,7 @@ interface IProps {
 	objectColumns: TBuilderScreenColumn[];
 	onChangeColumnOrder?: (draggedIndex: number, targetIndex: number) => void;
 	onDeleteColumn: (objectFieldName: string) => void;
-	onEditing?: (boolean: boolean) => void;
-	onEditingObjectFieldName?: (objectFieldName: string) => void;
-	onVisibleEditModal: (boolean: boolean) => void;
+	openEditModal?: (string: string) => void;
 	openModal: () => void;
 	secondColumnHeader: string;
 	thirdColumnHeader?: string;
