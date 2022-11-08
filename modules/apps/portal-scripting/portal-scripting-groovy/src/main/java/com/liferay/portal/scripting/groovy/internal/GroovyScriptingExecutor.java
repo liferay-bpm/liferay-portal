@@ -62,7 +62,14 @@ public class GroovyScriptingExecutor extends BaseScriptingExecutor {
 
 			compiledScript.setBinding(binding);
 
-			compiledScript.run();
+			Object compileObject = compiledScript.run();
+
+			if (compileObject instanceof Boolean) {
+				binding.setProperty("invalidFields", !(Boolean)compileObject);
+			}
+			else {
+				binding.setProperty("invalidFields", false);
+			}
 
 			if (outputNames == null) {
 				return null;
