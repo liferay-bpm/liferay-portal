@@ -297,7 +297,8 @@ public class ObjectEntriesTableFDSView extends BaseTableFDSView {
 			}
 			else {
 				_addFDSTableSchemaField(
-					titleObjectField.getBusinessType(), null,
+					titleObjectField.getBusinessType(),
+					_getContentRenderer(titleObjectField.getName()),
 					titleObjectField.getDBType(), fdsTableSchemaBuilder,
 					_getFieldName(
 						titleObjectField.getBusinessType(),
@@ -310,7 +311,29 @@ public class ObjectEntriesTableFDSView extends BaseTableFDSView {
 		}
 	}
 
+	private String _getContentRenderer(String fieldName) {
+		if (Objects.equals(fieldName, "status")) {
+			return "status";
+		}
+
+		return null;
+	}
+
 	private String _getFieldName(String businessType, String fieldName) {
+		if (fieldName.contains(".creator")) {
+			return StringUtil.replaceLast(fieldName, "creator", "creator.name");
+		}
+
+		if (fieldName.contains(".createDate")) {
+			return StringUtil.replaceLast(
+				fieldName, "createDate", "dateCreated");
+		}
+
+		if (fieldName.contains(".modifiedDate")) {
+			return StringUtil.replace(
+				fieldName, "modifiedDate", "dateModified");
+		}
+
 		if (Objects.equals(
 				businessType, ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
 
