@@ -21,6 +21,7 @@ import com.liferay.object.action.engine.ObjectActionEngine;
 import com.liferay.object.action.executor.ObjectActionExecutor;
 import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
 import com.liferay.object.constants.ObjectActionConstants;
+import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.internal.action.util.ObjectActionThreadLocal;
 import com.liferay.object.internal.action.util.ObjectActionVariablesUtil;
 import com.liferay.object.model.ObjectAction;
@@ -33,10 +34,13 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
@@ -143,6 +147,16 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 				ObjectActionExecutor objectActionExecutor =
 					_objectActionExecutorRegistry.getObjectActionExecutor(
 						objectAction.getObjectActionExecutorKey());
+
+				if (!GetterUtil.getBoolean(
+						PropsUtil.get("feature.flag.LPS-153714")) &&
+					Objects.equals(
+						objectActionExecutor.getKey(),
+						ObjectActionExecutorConstants.
+							KEY_UPDATE_OBJECT_ENTRY)) {
+
+					throw new UnsupportedOperationException();
+				}
 
 				objectActionExecutor.execute(
 					companyId, objectAction.getParametersUnicodeProperties(),
