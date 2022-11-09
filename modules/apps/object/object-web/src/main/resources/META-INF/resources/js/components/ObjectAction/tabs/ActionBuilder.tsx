@@ -51,6 +51,7 @@ export default function ActionBuilder({
 	objectActionCodeEditorElements,
 	objectActionExecutors,
 	objectActionTriggers,
+	objectDefinitionId,
 	objectDefinitionsRelationshipsURL,
 	setValues,
 	validateExpressionURL,
@@ -130,12 +131,12 @@ export default function ActionBuilder({
 	const actionExecutors = useMemo(() => {
 		const executors = new Map<string, string>();
 
-		objectActionExecutors.forEach(({label, value}) => {
+		newObjectActionExecutors.forEach(({label, value}) => {
 			value && executors.set(value, label);
 		});
 
 		return executors;
-	}, [objectActionExecutors]);
+	}, [newObjectActionExecutors]);
 
 	const actionTriggers = useMemo(() => {
 		const triggers = new Map<string, string>();
@@ -160,7 +161,7 @@ export default function ActionBuilder({
 	useEffect(() => {
 		if (values.objectActionTriggerKey === 'onAfterDelete') {
 			newObjectActionExecutors.map((action) => {
-				if (action.value === 'update-current-entry') {
+				if (action.value === 'update-object-entry') {
 					action.disabled = true;
 					action.popover = {
 						body: Liferay.Language.get(
@@ -177,7 +178,7 @@ export default function ActionBuilder({
 			values.objectActionTriggerKey === 'onAfterUpdate'
 		) {
 			newObjectActionExecutors.map((action) => {
-				if (action.value === 'update-current-entry') {
+				if (action.value === 'update-object-entry') {
 					delete action.disabled;
 					delete action.popover;
 				}
@@ -213,11 +214,14 @@ export default function ActionBuilder({
 
 	const fetchObjectDefinitionFields = async () => {
 		let validFields: ObjectField[] = [];
+		let definitionId = values?.parameters?.objectDefinitionId;
 
-		if (values.parameters?.objectDefinitionId) {
-			const items = await API.getObjectFields(
-				values.parameters.objectDefinitionId
-			);
+		if (values.objectActionExecutorKey === 'update-object-entry') {
+			definitionId = objectDefinitionId;
+		}
+
+		if (definitionId) {
+			const items = await API.getObjectFields(definitionId);
 
 			validFields = items.filter(isValidField);
 		}
@@ -242,7 +246,10 @@ export default function ActionBuilder({
 
 				newPredefinedValues.push(field as PredefinedValue);
 			}
-			else if (required) {
+			else if (
+				required &&
+				values.objectActionExecutorKey === 'add-object-entry'
+			) {
 				newPredefinedValues.push({
 					inputAsValue: false,
 					name,
@@ -258,11 +265,7 @@ export default function ActionBuilder({
 		});
 	};
 
-	const handleSelectObject = async ({
-		target: {value},
-	}: React.ChangeEvent<HTMLSelectElement>) => {
-		const objectDefinitionId = parseInt(value, 10);
-
+	const updateParameters = async (objectDefinitionId: number) => {
 		const object = relationships.find(({id}) => id === objectDefinitionId);
 
 		const parameters: ObjectActionParameters = {
@@ -282,7 +285,10 @@ export default function ActionBuilder({
 			if (isValidField(field)) {
 				validFields.push(field);
 
-				if (field.required) {
+				if (
+					field.required &&
+					values.objectActionExecutorKey === 'add-object-entry'
+				) {
 					(parameters.predefinedValues as PredefinedValue[]).push({
 						inputAsValue: false,
 						name: field.name,
@@ -315,13 +321,24 @@ export default function ActionBuilder({
 		}));
 	};
 
+	const handleSelectObject = ({
+		target: {value},
+	}: React.ChangeEvent<HTMLSelectElement>) => {
+		const objectDefinitionId = parseInt(value, 10);
+		updateParameters(objectDefinitionId);
+	};
+
 	useEffect(() => {
 		if (values.objectActionExecutorKey === 'add-object-entry') {
 			fetchObjectDefinitions();
 			fetchObjectDefinitionFields();
 		}
+		else if (values.objectActionExecutorKey === 'update-object-entry') {
+			fetchObjectDefinitionFields();
+			updateParameters(objectDefinitionId);
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [values.objectActionExecutorKey]);
 
 	useEffect(() => {
 		const predefinedValues = values.parameters?.predefinedValues;
@@ -668,6 +685,25 @@ export default function ActionBuilder({
 						value={values.parameters?.script ?? ''}
 					/>
 				)}
+
+				{values.objectActionExecutorKey === 'update-object-entry' && (
+					<PredefinedValuesTable
+						currentObjectDefinitionFields={
+							currentObjectDefinitionFields
+						}
+						disableRequiredChecked={true}
+						errors={
+							errors.predefinedValues as {
+								[key: string]: string;
+							}
+						}
+						objectFieldsMap={objectFieldsMap}
+						setValues={setValues}
+						title={Liferay.Language.get('values')}
+						validateExpressionURL={validateExpressionURL}
+						values={values}
+					/>
+				)}
 			</Card>
 		</>
 	);
@@ -678,6 +714,7 @@ interface IProps {
 	objectActionCodeEditorElements: SidebarCategory[];
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
+	objectDefinitionId: number;
 	objectDefinitionsRelationshipsURL: string;
 	setValues: (values: Partial<ObjectAction>) => void;
 	validateExpressionURL: string;
