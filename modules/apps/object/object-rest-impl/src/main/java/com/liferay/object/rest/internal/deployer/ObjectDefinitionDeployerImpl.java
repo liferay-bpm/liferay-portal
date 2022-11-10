@@ -14,6 +14,7 @@
 
 package com.liferay.object.rest.internal.deployer;
 
+import com.liferay.object.action.engine.ObjectActionEngine;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
@@ -38,6 +39,7 @@ import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.filter.Filter;
@@ -201,11 +203,11 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 
 	private ObjectEntryResourceImpl _createObjectEntryResourceImpl() {
 		return new ObjectEntryResourceImpl(
-			_filterPredicateFactory, _objectDefinitionLocalService,
-			_objectEntryLocalService, _objectEntryManagerRegistry,
-			_objectFieldLocalService, _objectRelationshipService,
-			_objectScopeProviderRegistry,
-			_systemObjectDefinitionMetadataRegistry);
+			_filterPredicateFactory, _jsonFactory, _objectActionEngine,
+			_objectDefinitionLocalService, _objectEntryLocalService,
+			_objectEntryManagerTracker, _objectFieldLocalService,
+			_objectRelationshipService, _objectScopeProviderRegistry,
+			_systemObjectDefinitionMetadataTracker);
 	}
 
 	private void _excludeScopedMethods(
@@ -480,6 +482,12 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	private GroupLocalService _groupLocalService;
 
 	@Reference
+	private JSONFactory _jsonFactory;
+
+	@Reference
+	private ObjectActionEngine _objectActionEngine;
+
+	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	private final Map<String, Map<Long, ObjectDefinition>>
@@ -495,6 +503,9 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 
 	@Reference
 	private ObjectEntryManagerRegistry _objectEntryManagerRegistry;
+
+	@Reference
+	private ObjectEntryManagerRegistry _objectEntryManagerTracker;
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
@@ -534,6 +545,10 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	@Reference
 	private SystemObjectDefinitionMetadataRegistry
 		_systemObjectDefinitionMetadataRegistry;
+
+	@Reference
+	private SystemObjectDefinitionMetadataRegistry
+		_systemObjectDefinitionMetadataTracker;
 
 	@Reference
 	private UserLocalService _userLocalService;
