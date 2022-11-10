@@ -478,6 +478,7 @@ paths:
             tags: ["ObjectEntry"]
     "/{objectEntryId}/object-actions/{objectActionName}":
         put:
+            operationId: putObjectEntryObjectActionObjectActionName
             parameters:
                 - in: path
                   name: objectEntryId
