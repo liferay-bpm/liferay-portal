@@ -476,6 +476,34 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/ObjectEntry"
             tags: ["ObjectEntry"]
+    "/{objectEntryId}/object-actions/{objectActionName}":
+        put:
+            parameters:
+                - in: path
+                  name: objectEntryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: path
+                  name: objectActionName
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: string
+                    application/xml:
+                        schema:
+                            type: string
+            responses:
+                200:
+                    content:
+                        application/json: {}
+                        application/xml: {}
+            tags: ["ObjectEntry"]
     "/{objectEntryId}/permissions":
         get:
             operationId: getObjectEntryPermissionsPage
