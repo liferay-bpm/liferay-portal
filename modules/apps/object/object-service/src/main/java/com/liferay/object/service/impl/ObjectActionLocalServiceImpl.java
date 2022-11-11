@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -254,7 +255,25 @@ public class ObjectActionLocalServiceImpl
 
 		if (Objects.equals(
 				objectActionExecutorKey,
-				ObjectActionExecutorConstants.KEY_ADD_OBJECT_ENTRY)) {
+				ObjectActionExecutorConstants.KEY_UPDATE_OBJECT_ENTRY) &&
+			Objects.equals(
+				objectActionTriggerKey,
+				ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE)) {
+
+			throw new ObjectActionTriggerKeyException(
+				StringBundler.concat(
+					"The executor key:",
+					ObjectActionExecutorConstants.KEY_UPDATE_OBJECT_ENTRY,
+					" is not allowed for trigger key:",
+					ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE));
+		}
+
+		if (Objects.equals(
+				objectActionExecutorKey,
+				ObjectActionExecutorConstants.KEY_ADD_OBJECT_ENTRY) ||
+			Objects.equals(
+				objectActionExecutorKey,
+				ObjectActionExecutorConstants.KEY_UPDATE_OBJECT_ENTRY)) {
 
 			long objectDefinitionId = GetterUtil.getLong(
 				parametersUnicodeProperties.get("objectDefinitionId"));
