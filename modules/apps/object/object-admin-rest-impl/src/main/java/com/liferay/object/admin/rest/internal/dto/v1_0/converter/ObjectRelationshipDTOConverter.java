@@ -51,7 +51,11 @@ public class ObjectRelationshipDTOConverter
 			return null;
 		}
 
-		ObjectDefinition objectDefinition =
+		ObjectDefinition objectDefinition1 =
+			_objectDefinitionLocalService.getObjectDefinition(
+				serviceBuilderObjectRelationship.getObjectDefinitionId1());
+
+		ObjectDefinition objectDefinition2 =
 			_objectDefinitionLocalService.getObjectDefinition(
 				serviceBuilderObjectRelationship.getObjectDefinitionId2());
 
@@ -64,13 +68,11 @@ public class ObjectRelationshipDTOConverter
 				label = LocalizedMapUtil.getLanguageIdMap(
 					serviceBuilderObjectRelationship.getLabelMap());
 				name = serviceBuilderObjectRelationship.getName();
+				objectDefinitionExternalReferenceCode1 =
+					objectDefinition1.getExternalReferenceCode();
 				objectDefinitionExternalReferenceCode2 =
-					objectDefinition.getExternalReferenceCode();
-				objectDefinitionId1 =
-					serviceBuilderObjectRelationship.getObjectDefinitionId1();
-				objectDefinitionId2 =
-					serviceBuilderObjectRelationship.getObjectDefinitionId2();
-				objectDefinitionName2 = objectDefinition.getShortName();
+					objectDefinition2.getExternalReferenceCode();
+				objectDefinitionName2 = objectDefinition2.getShortName();
 				parameterObjectFieldId =
 					serviceBuilderObjectRelationship.
 						getParameterObjectFieldId();
