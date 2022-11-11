@@ -45,11 +45,23 @@ function ModalAddObjectRelationship({
 	};
 
 	const onSubmit = async ({label, name, ...others}: ObjectRelationship) => {
+		const objectRelationship = {
+			deletionType: others.deletionType,
+			id: others.id,
+			objectDefinitionExternalReferenceCode1:
+				others.objectDefinitionExternalReferenceCode1,
+			objectDefinitionExternalReferenceCode2:
+				others.objectDefinitionExternalReferenceCode2,
+			objectDefinitionName2: others.objectDefinitionName2,
+			objectRelationshipId: others.objectRelationshipId,
+			type: others.type,
+		};
+
 		try {
 			await API.save(
 				apiURL,
 				{
-					...others,
+					...objectRelationship,
 					label,
 					name: name ?? toCamelCase(label[defaultLanguageId]!),
 				},
