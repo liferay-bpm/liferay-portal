@@ -113,6 +113,25 @@ public class ObjectRelationshipSerDes {
 			sb.append("\"");
 		}
 
+		if (objectRelationship.getObjectDefinitionExternalReferenceCode1() !=
+				null) {
+
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"objectDefinitionExternalReferenceCode1\": ");
+
+			sb.append("\"");
+
+			sb.append(
+				_escape(
+					objectRelationship.
+						getObjectDefinitionExternalReferenceCode1()));
+
+			sb.append("\"");
+		}
+
 		if (objectRelationship.getObjectDefinitionExternalReferenceCode2() !=
 				null) {
 
@@ -130,26 +149,6 @@ public class ObjectRelationshipSerDes {
 						getObjectDefinitionExternalReferenceCode2()));
 
 			sb.append("\"");
-		}
-
-		if (objectRelationship.getObjectDefinitionId1() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"objectDefinitionId1\": ");
-
-			sb.append(objectRelationship.getObjectDefinitionId1());
-		}
-
-		if (objectRelationship.getObjectDefinitionId2() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"objectDefinitionId2\": ");
-
-			sb.append(objectRelationship.getObjectDefinitionId2());
 		}
 
 		if (objectRelationship.getObjectDefinitionName2() != null) {
@@ -258,6 +257,19 @@ public class ObjectRelationshipSerDes {
 			map.put("name", String.valueOf(objectRelationship.getName()));
 		}
 
+		if (objectRelationship.getObjectDefinitionExternalReferenceCode1() ==
+				null) {
+
+			map.put("objectDefinitionExternalReferenceCode1", null);
+		}
+		else {
+			map.put(
+				"objectDefinitionExternalReferenceCode1",
+				String.valueOf(
+					objectRelationship.
+						getObjectDefinitionExternalReferenceCode1()));
+		}
+
 		if (objectRelationship.getObjectDefinitionExternalReferenceCode2() ==
 				null) {
 
@@ -269,24 +281,6 @@ public class ObjectRelationshipSerDes {
 				String.valueOf(
 					objectRelationship.
 						getObjectDefinitionExternalReferenceCode2()));
-		}
-
-		if (objectRelationship.getObjectDefinitionId1() == null) {
-			map.put("objectDefinitionId1", null);
-		}
-		else {
-			map.put(
-				"objectDefinitionId1",
-				String.valueOf(objectRelationship.getObjectDefinitionId1()));
-		}
-
-		if (objectRelationship.getObjectDefinitionId2() == null) {
-			map.put("objectDefinitionId2", null);
-		}
-		else {
-			map.put(
-				"objectDefinitionId2",
-				String.valueOf(objectRelationship.getObjectDefinitionId2()));
 		}
 
 		if (objectRelationship.getObjectDefinitionName2() == null) {
@@ -376,28 +370,22 @@ public class ObjectRelationshipSerDes {
 			}
 			else if (Objects.equals(
 						jsonParserFieldName,
+						"objectDefinitionExternalReferenceCode1")) {
+
+				if (jsonParserFieldValue != null) {
+					objectRelationship.
+						setObjectDefinitionExternalReferenceCode1(
+							(String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName,
 						"objectDefinitionExternalReferenceCode2")) {
 
 				if (jsonParserFieldValue != null) {
 					objectRelationship.
 						setObjectDefinitionExternalReferenceCode2(
 							(String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName, "objectDefinitionId1")) {
-
-				if (jsonParserFieldValue != null) {
-					objectRelationship.setObjectDefinitionId1(
-						Long.valueOf((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName, "objectDefinitionId2")) {
-
-				if (jsonParserFieldValue != null) {
-					objectRelationship.setObjectDefinitionId2(
-						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(
