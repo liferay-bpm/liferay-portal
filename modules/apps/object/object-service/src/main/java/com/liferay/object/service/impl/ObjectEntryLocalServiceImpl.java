@@ -241,6 +241,8 @@ public class ObjectEntryLocalServiceImpl
 
 		_setExternalReferenceCode(objectEntry, values);
 
+		objectEntry.setExternalReferenceCode(
+			objectDefinition.getExternalReferenceCode());
 		objectEntry.setGroupId(groupId);
 		objectEntry.setCompanyId(user.getCompanyId());
 		objectEntry.setUserId(user.getUserId());
