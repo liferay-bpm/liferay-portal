@@ -2606,17 +2606,24 @@ public class BundleSiteInitializer implements SiteInitializer {
 				continue;
 			}
 
+			com.liferay.object.model.ObjectDefinition objectDefinition =
+				_objectDefinitionLocalService.
+					fetchObjectDefinitionByExternalReferenceCode(
+						serviceContext.getCompanyId(),
+						objectRelationship.
+							getObjectDefinitionExternalReferenceCode1());
+
 			com.liferay.object.model.ObjectRelationship
 				existingObjectRelationship =
 					_objectRelationshipLocalService.
 						fetchObjectRelationshipByObjectDefinitionId(
-							objectRelationship.getObjectDefinitionId1(),
+							objectDefinition.getObjectDefinitionId(),
 							objectRelationship.getName());
 
 			if (existingObjectRelationship == null) {
 				objectRelationshipResource.
 					postObjectDefinitionObjectRelationship(
-						objectRelationship.getObjectDefinitionId1(),
+						objectDefinition.getObjectDefinitionId(),
 						objectRelationship);
 			}
 			else {
