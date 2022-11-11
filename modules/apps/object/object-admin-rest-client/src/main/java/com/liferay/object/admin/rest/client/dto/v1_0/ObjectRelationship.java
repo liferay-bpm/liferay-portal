@@ -145,6 +145,32 @@ public class ObjectRelationship implements Cloneable, Serializable {
 
 	protected String name;
 
+	public String getObjectDefinitionExternalReferenceCode1() {
+		return objectDefinitionExternalReferenceCode1;
+	}
+
+	public void setObjectDefinitionExternalReferenceCode1(
+		String objectDefinitionExternalReferenceCode1) {
+
+		this.objectDefinitionExternalReferenceCode1 =
+			objectDefinitionExternalReferenceCode1;
+	}
+
+	public void setObjectDefinitionExternalReferenceCode1(
+		UnsafeSupplier<String, Exception>
+			objectDefinitionExternalReferenceCode1UnsafeSupplier) {
+
+		try {
+			objectDefinitionExternalReferenceCode1 =
+				objectDefinitionExternalReferenceCode1UnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String objectDefinitionExternalReferenceCode1;
+
 	public String getObjectDefinitionExternalReferenceCode2() {
 		return objectDefinitionExternalReferenceCode2;
 	}
@@ -170,48 +196,6 @@ public class ObjectRelationship implements Cloneable, Serializable {
 	}
 
 	protected String objectDefinitionExternalReferenceCode2;
-
-	public Long getObjectDefinitionId1() {
-		return objectDefinitionId1;
-	}
-
-	public void setObjectDefinitionId1(Long objectDefinitionId1) {
-		this.objectDefinitionId1 = objectDefinitionId1;
-	}
-
-	public void setObjectDefinitionId1(
-		UnsafeSupplier<Long, Exception> objectDefinitionId1UnsafeSupplier) {
-
-		try {
-			objectDefinitionId1 = objectDefinitionId1UnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Long objectDefinitionId1;
-
-	public Long getObjectDefinitionId2() {
-		return objectDefinitionId2;
-	}
-
-	public void setObjectDefinitionId2(Long objectDefinitionId2) {
-		this.objectDefinitionId2 = objectDefinitionId2;
-	}
-
-	public void setObjectDefinitionId2(
-		UnsafeSupplier<Long, Exception> objectDefinitionId2UnsafeSupplier) {
-
-		try {
-			objectDefinitionId2 = objectDefinitionId2UnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Long objectDefinitionId2;
 
 	public String getObjectDefinitionName2() {
 		return objectDefinitionName2;

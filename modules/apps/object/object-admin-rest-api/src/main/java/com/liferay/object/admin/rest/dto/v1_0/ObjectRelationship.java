@@ -210,6 +210,39 @@ public class ObjectRelationship implements Serializable {
 	protected String name;
 
 	@Schema
+	public String getObjectDefinitionExternalReferenceCode1() {
+		return objectDefinitionExternalReferenceCode1;
+	}
+
+	public void setObjectDefinitionExternalReferenceCode1(
+		String objectDefinitionExternalReferenceCode1) {
+
+		this.objectDefinitionExternalReferenceCode1 =
+			objectDefinitionExternalReferenceCode1;
+	}
+
+	@JsonIgnore
+	public void setObjectDefinitionExternalReferenceCode1(
+		UnsafeSupplier<String, Exception>
+			objectDefinitionExternalReferenceCode1UnsafeSupplier) {
+
+		try {
+			objectDefinitionExternalReferenceCode1 =
+				objectDefinitionExternalReferenceCode1UnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String objectDefinitionExternalReferenceCode1;
+
+	@Schema
 	public String getObjectDefinitionExternalReferenceCode2() {
 		return objectDefinitionExternalReferenceCode2;
 	}
@@ -241,62 +274,6 @@ public class ObjectRelationship implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String objectDefinitionExternalReferenceCode2;
-
-	@Schema
-	public Long getObjectDefinitionId1() {
-		return objectDefinitionId1;
-	}
-
-	public void setObjectDefinitionId1(Long objectDefinitionId1) {
-		this.objectDefinitionId1 = objectDefinitionId1;
-	}
-
-	@JsonIgnore
-	public void setObjectDefinitionId1(
-		UnsafeSupplier<Long, Exception> objectDefinitionId1UnsafeSupplier) {
-
-		try {
-			objectDefinitionId1 = objectDefinitionId1UnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Long objectDefinitionId1;
-
-	@Schema
-	public Long getObjectDefinitionId2() {
-		return objectDefinitionId2;
-	}
-
-	public void setObjectDefinitionId2(Long objectDefinitionId2) {
-		this.objectDefinitionId2 = objectDefinitionId2;
-	}
-
-	@JsonIgnore
-	public void setObjectDefinitionId2(
-		UnsafeSupplier<Long, Exception> objectDefinitionId2UnsafeSupplier) {
-
-		try {
-			objectDefinitionId2 = objectDefinitionId2UnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Long objectDefinitionId2;
 
 	@Schema
 	public String getObjectDefinitionName2() {
@@ -503,6 +480,20 @@ public class ObjectRelationship implements Serializable {
 			sb.append("\"");
 		}
 
+		if (objectDefinitionExternalReferenceCode1 != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"objectDefinitionExternalReferenceCode1\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(objectDefinitionExternalReferenceCode1));
+
+			sb.append("\"");
+		}
+
 		if (objectDefinitionExternalReferenceCode2 != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -515,26 +506,6 @@ public class ObjectRelationship implements Serializable {
 			sb.append(_escape(objectDefinitionExternalReferenceCode2));
 
 			sb.append("\"");
-		}
-
-		if (objectDefinitionId1 != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"objectDefinitionId1\": ");
-
-			sb.append(objectDefinitionId1);
-		}
-
-		if (objectDefinitionId2 != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"objectDefinitionId2\": ");
-
-			sb.append(objectDefinitionId2);
 		}
 
 		if (objectDefinitionName2 != null) {
