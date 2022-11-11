@@ -39,6 +39,7 @@ import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectEntryValuesException;
+import com.liferay.object.exception.ObjectRelationshipDeletionTypeException;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.internal.action.util.ObjectActionThreadLocal;
 import com.liferay.object.internal.filter.parser.ObjectFilterParser;
@@ -483,7 +484,8 @@ public class ObjectEntryLocalServiceImpl
 			catch (Exception exception) {
 				ObjectRelationshipUtil.setSkipPermissionWherePredicate(false);
 
-				throw new PortalException(exception.getMessage());
+				throw new ObjectRelationshipDeletionTypeException(
+					exception.getMessage());
 			}
 
 			ObjectRelationshipUtil.setSkipPermissionWherePredicate(false);
