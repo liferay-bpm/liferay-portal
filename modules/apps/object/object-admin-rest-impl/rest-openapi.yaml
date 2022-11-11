@@ -327,14 +327,10 @@ components:
                     type: object
                 name:
                     type: string
+                objectDefinitionExternalReferenceCode1:
+                    type: string
                 objectDefinitionExternalReferenceCode2:
                     type: string
-                objectDefinitionId1:
-                    format: int64
-                    type: integer
-                objectDefinitionId2:
-                    format: int64
-                    type: integer
                 objectDefinitionName2:
                     type: string
                 parameterObjectFieldId:
