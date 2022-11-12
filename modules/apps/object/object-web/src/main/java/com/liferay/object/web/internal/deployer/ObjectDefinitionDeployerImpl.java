@@ -399,6 +399,18 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 
 		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, PortletResourcePermission.class, "resource.name");
+
+		_bundleContext.registerService(
+			InfoItemObjectProvider.class,
+			new ObjectEntryInfoItemObjectProvider(_objectEntryLocalService),
+			HashMapDictionaryBuilder.<String, Object>put(
+				Constants.SERVICE_RANKING, 100
+			).put(
+				"info.item.identifier",
+				"com.liferay.info.item.ClassPKInfoItemIdentifier"
+			).put(
+				"item.class.name", ObjectEntry.class.getName()
+			).build());
 	}
 
 	@Deactivate
