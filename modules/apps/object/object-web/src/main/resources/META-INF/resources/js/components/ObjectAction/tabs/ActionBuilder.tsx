@@ -265,7 +265,7 @@ export default function ActionBuilder({
 		});
 	};
 
-	const updateParameters = async (objectDefinitionId: number) => {
+	const updateParameters = async (definitionId: number) => {
 		const object = relationships.find(({id}) => id === objectDefinitionId);
 
 		const parameters: ObjectActionParameters = {
@@ -277,7 +277,18 @@ export default function ActionBuilder({
 			parameters.relatedObjectEntries = false;
 		}
 
-		const items = await API.getObjectFields(objectDefinitionId);
+		let id;
+
+		if (values.objectActionExecutorKey === 'add-object-entry') {
+			id = definitionId;
+		}
+		else if (values.objectActionExecutorKey === 'update-object-entry') {
+			id =
+				objectDefinitionId ??
+				(values.parameters?.objectDefinitionId as number);
+		}
+
+		const items = await API.getObjectFields(id as number);
 
 		const validFields: ObjectField[] = [];
 
@@ -289,6 +300,14 @@ export default function ActionBuilder({
 					field.required &&
 					values.objectActionExecutorKey === 'add-object-entry'
 				) {
+					(parameters.predefinedValues as PredefinedValue[]).push({
+						inputAsValue: false,
+						name: field.name,
+						value: '',
+					});
+				}
+
+				if (values.objectActionExecutorKey === 'update-object-entry') {
 					(parameters.predefinedValues as PredefinedValue[]).push({
 						inputAsValue: false,
 						name: field.name,
@@ -335,7 +354,9 @@ export default function ActionBuilder({
 		}
 		else if (values.objectActionExecutorKey === 'update-object-entry') {
 			fetchObjectDefinitionFields();
-			updateParameters(objectDefinitionId);
+			if (Object.keys(values.parameters!).length && objectDefinitionId === undefined) {
+				updateParameters(values.parameters?.objectDefinitionId as number);
+			}
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [values.objectActionExecutorKey]);

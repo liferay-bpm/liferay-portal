@@ -56,6 +56,10 @@ export default function Action({
 			delete objectAction?.parameters['lineCount'];
 		}
 
+		// if (objectAction.objectDefinitionId) {
+			delete objectAction?.objectDefinitionId;
+		// }
+
 		try {
 			await API.save(url, objectAction, method);
 			saveAndReload();
