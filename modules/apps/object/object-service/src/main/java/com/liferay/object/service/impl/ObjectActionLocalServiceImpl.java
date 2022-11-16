@@ -184,8 +184,6 @@ public class ObjectActionLocalServiceImpl
 		_validateErrorMessage(errorMessageMap, objectActionTriggerKey);
 		_validateLabel(labelMap);
 		_validateObjectActionExecutorKey(objectActionExecutorKey);
-		_validateObjectActionTriggerKey(
-			conditionExpression, objectActionTriggerKey);
 		_validateParameters(
 			conditionExpression, objectActionExecutorKey,
 			parametersUnicodeProperties);
@@ -200,7 +198,6 @@ public class ObjectActionLocalServiceImpl
 			errorMessageMap, LocaleUtil.getSiteDefault());
 		objectAction.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
 		objectAction.setObjectActionExecutorKey(objectActionExecutorKey);
-		objectAction.setObjectActionTriggerKey(objectActionTriggerKey);
 		objectAction.setParameters(parametersUnicodeProperties.toString());
 		objectAction.setStatus(ObjectActionConstants.STATUS_NEVER_RAN);
 
@@ -214,8 +211,11 @@ public class ObjectActionLocalServiceImpl
 
 		_validateName(
 			objectActionId, objectDefinition.getObjectDefinitionId(), name);
+		_validateObjectActionTriggerKey(
+			conditionExpression, objectActionTriggerKey);
 
 		objectAction.setName(name);
+		objectAction.setObjectActionTriggerKey(objectActionTriggerKey);
 
 		return objectActionPersistence.update(objectAction);
 	}
