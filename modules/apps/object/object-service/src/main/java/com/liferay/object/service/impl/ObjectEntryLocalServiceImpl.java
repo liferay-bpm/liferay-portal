@@ -42,6 +42,7 @@ import com.liferay.object.entry.util.ObjectEntryThreadLocalUtil;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectEntryValuesException;
+import com.liferay.object.exception.ObjectRelationshipDeletionTypeException;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.field.util.ObjectFieldFormulaEvaluatorUtil;
 import com.liferay.object.internal.action.util.ObjectActionThreadLocal;
