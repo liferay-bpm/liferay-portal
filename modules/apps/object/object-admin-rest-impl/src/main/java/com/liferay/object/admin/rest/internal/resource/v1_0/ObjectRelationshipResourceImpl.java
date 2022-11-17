@@ -19,7 +19,9 @@ import com.liferay.object.admin.rest.dto.v1_0.ObjectRelationship;
 import com.liferay.object.admin.rest.internal.dto.v1_0.converter.ObjectRelationshipDTOConverter;
 import com.liferay.object.admin.rest.internal.odata.entity.v1_0.ObjectRelationshipEntityModel;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectRelationshipResource;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.portal.kernel.search.Field;
@@ -34,6 +36,8 @@ import com.liferay.portal.vulcan.fields.NestedFieldSupport;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.SearchUtil;
+
+import java.util.Objects;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -146,8 +150,9 @@ public class ObjectRelationshipResourceImpl
 		return _toObjectRelationship(
 			_objectRelationshipService.addObjectRelationship(
 				objectDefinitionId, objectDefinition.getObjectDefinitionId(),
-				GetterUtil.getLong(
-					objectRelationship.getParameterObjectFieldId()),
+				_getParameterObjectFieldId(
+					objectDefinition.getObjectDefinitionId(),
+					objectRelationship.getParameterObjectFieldName()),
 				objectRelationship.getDeletionTypeAsString(),
 				LocalizedMapUtil.getLocalizedMap(objectRelationship.getLabel()),
 				objectRelationship.getName(),
@@ -159,14 +164,36 @@ public class ObjectRelationshipResourceImpl
 			Long objectRelationshipId, ObjectRelationship objectRelationship)
 		throws Exception {
 
+		com.liferay.object.model.ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.
+				fetchObjectDefinitionByExternalReferenceCode(
+					contextCompany.getCompanyId(),
+					objectRelationship.
+						getObjectDefinitionExternalReferenceCode2());
+
 		return _toObjectRelationship(
 			_objectRelationshipService.updateObjectRelationship(
 				objectRelationshipId,
-				GetterUtil.getLong(
-					objectRelationship.getParameterObjectFieldId()),
+				_getParameterObjectFieldId(
+					objectDefinition.getObjectDefinitionId(),
+					objectRelationship.getParameterObjectFieldName()),
 				objectRelationship.getDeletionTypeAsString(),
 				LocalizedMapUtil.getLocalizedMap(
 					objectRelationship.getLabel())));
+	}
+
+	private long _getParameterObjectFieldId(
+		long objectDefinitionId, String parameterObjectFieldName) {
+
+		ObjectField parameterObjectField =
+			_objectFieldLocalService.fetchObjectField(
+				objectDefinitionId, parameterObjectFieldName);
+
+		if (!Objects.isNull(parameterObjectField)) {
+			return parameterObjectField.getObjectFieldId();
+		}
+
+		return 0L;
 	}
 
 	private ObjectRelationship _toObjectRelationship(
@@ -194,6 +221,9 @@ public class ObjectRelationshipResourceImpl
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
+	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@Reference
 	private ObjectRelationshipDTOConverter _objectRelationshipDTOConverter;

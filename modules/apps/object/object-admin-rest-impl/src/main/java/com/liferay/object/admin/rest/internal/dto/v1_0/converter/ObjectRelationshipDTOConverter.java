@@ -16,10 +16,15 @@ package com.liferay.object.admin.rest.internal.dto.v1_0.converter;
 
 import com.liferay.object.admin.rest.dto.v1_0.ObjectRelationship;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.util.LocalizedMapUtil;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
+
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -59,6 +64,10 @@ public class ObjectRelationshipDTOConverter
 			_objectDefinitionLocalService.getObjectDefinition(
 				serviceBuilderObjectRelationship.getObjectDefinitionId2());
 
+		ObjectField parameterObjectField =
+			_objectFieldLocalService.fetchObjectField(
+				serviceBuilderObjectRelationship.getParameterObjectFieldId());
+
 		return new ObjectRelationship() {
 			{
 				actions = dtoConverterContext.getActions();
@@ -73,9 +82,9 @@ public class ObjectRelationshipDTOConverter
 				objectDefinitionExternalReferenceCode2 =
 					objectDefinition2.getExternalReferenceCode();
 				objectDefinitionName2 = objectDefinition2.getShortName();
-				parameterObjectFieldId =
-					serviceBuilderObjectRelationship.
-						getParameterObjectFieldId();
+				parameterObjectFieldName =
+					Objects.isNull(parameterObjectField) ? StringPool.BLANK :
+						parameterObjectField.getName();
 				reverse = serviceBuilderObjectRelationship.isReverse();
 				type = ObjectRelationship.Type.create(
 					serviceBuilderObjectRelationship.getType());
@@ -85,5 +94,8 @@ public class ObjectRelationshipDTOConverter
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
+	private ObjectFieldLocalService _objectFieldLocalService;
 
 }
