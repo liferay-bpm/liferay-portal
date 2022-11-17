@@ -957,7 +957,7 @@ public class ObjectDefinitionLocalServiceImpl
 			dbColumnName = pkObjectFieldName;
 		}
 
-		_objectFieldLocalService.addSystemObjectField(
+		ObjectField idField = _objectFieldLocalService.addSystemObjectField(
 			userId, objectDefinition.getObjectDefinitionId(),
 			ObjectFieldConstants.BUSINESS_TYPE_LONG_INTEGER, dbColumnName,
 			dbTableName, ObjectFieldConstants.DB_TYPE_LONG, null, true, true,
@@ -965,6 +965,13 @@ public class ObjectDefinitionLocalServiceImpl
 			LocalizedMapUtil.getLocalizedMap(
 				_language.get(LocaleUtil.getDefault(), "id")),
 			"id", false, false);
+
+		if (objectDefinition.getTitleObjectFieldId() == 0) {
+			objectDefinition.setTitleObjectFieldId(idField.getObjectFieldId());
+
+			objectDefinition = objectDefinitionPersistence.update(
+				objectDefinition);
+		}
 
 		_objectFieldLocalService.addSystemObjectField(
 			userId, objectDefinition.getObjectDefinitionId(),
