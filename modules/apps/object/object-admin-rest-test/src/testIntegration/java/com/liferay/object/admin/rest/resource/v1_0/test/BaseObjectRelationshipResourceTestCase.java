@@ -188,6 +188,7 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 		objectRelationship.setObjectDefinitionExternalReferenceCode1(regex);
 		objectRelationship.setObjectDefinitionExternalReferenceCode2(regex);
 		objectRelationship.setObjectDefinitionName2(regex);
+		objectRelationship.setParameterObjectFieldName(regex);
 
 		String json = ObjectRelationshipSerDes.toJSON(objectRelationship);
 
@@ -204,6 +205,8 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 			objectRelationship.getObjectDefinitionExternalReferenceCode2());
 		Assert.assertEquals(
 			regex, objectRelationship.getObjectDefinitionName2());
+		Assert.assertEquals(
+			regex, objectRelationship.getParameterObjectFieldName());
 	}
 
 	@Test
@@ -829,9 +832,9 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 			}
 
 			if (Objects.equals(
-					"parameterObjectFieldId", additionalAssertFieldName)) {
+					"parameterObjectFieldName", additionalAssertFieldName)) {
 
-				if (objectRelationship.getParameterObjectFieldId() == null) {
+				if (objectRelationship.getParameterObjectFieldName() == null) {
 					valid = false;
 				}
 
@@ -1050,11 +1053,11 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 			}
 
 			if (Objects.equals(
-					"parameterObjectFieldId", additionalAssertFieldName)) {
+					"parameterObjectFieldName", additionalAssertFieldName)) {
 
 				if (!Objects.deepEquals(
-						objectRelationship1.getParameterObjectFieldId(),
-						objectRelationship2.getParameterObjectFieldId())) {
+						objectRelationship1.getParameterObjectFieldName(),
+						objectRelationship2.getParameterObjectFieldName())) {
 
 					return false;
 				}
@@ -1241,9 +1244,14 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 			return sb.toString();
 		}
 
-		if (entityFieldName.equals("parameterObjectFieldId")) {
-			throw new IllegalArgumentException(
-				"Invalid entity field " + entityFieldName);
+		if (entityFieldName.equals("parameterObjectFieldName")) {
+			sb.append("'");
+			sb.append(
+				String.valueOf(
+					objectRelationship.getParameterObjectFieldName()));
+			sb.append("'");
+
+			return sb.toString();
 		}
 
 		if (entityFieldName.equals("reverse")) {
@@ -1308,7 +1316,8 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 					RandomTestUtil.randomString());
 				objectDefinitionName2 = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
-				parameterObjectFieldId = RandomTestUtil.randomLong();
+				parameterObjectFieldName = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 				reverse = RandomTestUtil.randomBoolean();
 			}
 		};

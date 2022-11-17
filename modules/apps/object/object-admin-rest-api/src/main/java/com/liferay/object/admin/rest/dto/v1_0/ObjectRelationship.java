@@ -304,20 +304,22 @@ public class ObjectRelationship implements Serializable {
 	protected String objectDefinitionName2;
 
 	@Schema
-	public Long getParameterObjectFieldId() {
-		return parameterObjectFieldId;
+	public String getParameterObjectFieldName() {
+		return parameterObjectFieldName;
 	}
 
-	public void setParameterObjectFieldId(Long parameterObjectFieldId) {
-		this.parameterObjectFieldId = parameterObjectFieldId;
+	public void setParameterObjectFieldName(String parameterObjectFieldName) {
+		this.parameterObjectFieldName = parameterObjectFieldName;
 	}
 
 	@JsonIgnore
-	public void setParameterObjectFieldId(
-		UnsafeSupplier<Long, Exception> parameterObjectFieldIdUnsafeSupplier) {
+	public void setParameterObjectFieldName(
+		UnsafeSupplier<String, Exception>
+			parameterObjectFieldNameUnsafeSupplier) {
 
 		try {
-			parameterObjectFieldId = parameterObjectFieldIdUnsafeSupplier.get();
+			parameterObjectFieldName =
+				parameterObjectFieldNameUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -329,7 +331,7 @@ public class ObjectRelationship implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Long parameterObjectFieldId;
+	protected String parameterObjectFieldName;
 
 	@Schema
 	public Boolean getReverse() {
@@ -522,14 +524,18 @@ public class ObjectRelationship implements Serializable {
 			sb.append("\"");
 		}
 
-		if (parameterObjectFieldId != null) {
+		if (parameterObjectFieldName != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"parameterObjectFieldId\": ");
+			sb.append("\"parameterObjectFieldName\": ");
 
-			sb.append(parameterObjectFieldId);
+			sb.append("\"");
+
+			sb.append(_escape(parameterObjectFieldName));
+
+			sb.append("\"");
 		}
 
 		if (reverse != null) {

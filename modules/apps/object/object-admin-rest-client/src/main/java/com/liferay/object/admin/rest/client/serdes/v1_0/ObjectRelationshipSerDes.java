@@ -165,14 +165,19 @@ public class ObjectRelationshipSerDes {
 			sb.append("\"");
 		}
 
-		if (objectRelationship.getParameterObjectFieldId() != null) {
+		if (objectRelationship.getParameterObjectFieldName() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"parameterObjectFieldId\": ");
+			sb.append("\"parameterObjectFieldName\": ");
 
-			sb.append(objectRelationship.getParameterObjectFieldId());
+			sb.append("\"");
+
+			sb.append(
+				_escape(objectRelationship.getParameterObjectFieldName()));
+
+			sb.append("\"");
 		}
 
 		if (objectRelationship.getReverse() != null) {
@@ -292,13 +297,14 @@ public class ObjectRelationshipSerDes {
 				String.valueOf(objectRelationship.getObjectDefinitionName2()));
 		}
 
-		if (objectRelationship.getParameterObjectFieldId() == null) {
-			map.put("parameterObjectFieldId", null);
+		if (objectRelationship.getParameterObjectFieldName() == null) {
+			map.put("parameterObjectFieldName", null);
 		}
 		else {
 			map.put(
-				"parameterObjectFieldId",
-				String.valueOf(objectRelationship.getParameterObjectFieldId()));
+				"parameterObjectFieldName",
+				String.valueOf(
+					objectRelationship.getParameterObjectFieldName()));
 		}
 
 		if (objectRelationship.getReverse() == null) {
@@ -397,11 +403,11 @@ public class ObjectRelationshipSerDes {
 				}
 			}
 			else if (Objects.equals(
-						jsonParserFieldName, "parameterObjectFieldId")) {
+						jsonParserFieldName, "parameterObjectFieldName")) {
 
 				if (jsonParserFieldValue != null) {
-					objectRelationship.setParameterObjectFieldId(
-						Long.valueOf((String)jsonParserFieldValue));
+					objectRelationship.setParameterObjectFieldName(
+						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "reverse")) {

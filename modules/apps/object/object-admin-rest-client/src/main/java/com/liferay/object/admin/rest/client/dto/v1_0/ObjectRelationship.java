@@ -218,26 +218,28 @@ public class ObjectRelationship implements Cloneable, Serializable {
 
 	protected String objectDefinitionName2;
 
-	public Long getParameterObjectFieldId() {
-		return parameterObjectFieldId;
+	public String getParameterObjectFieldName() {
+		return parameterObjectFieldName;
 	}
 
-	public void setParameterObjectFieldId(Long parameterObjectFieldId) {
-		this.parameterObjectFieldId = parameterObjectFieldId;
+	public void setParameterObjectFieldName(String parameterObjectFieldName) {
+		this.parameterObjectFieldName = parameterObjectFieldName;
 	}
 
-	public void setParameterObjectFieldId(
-		UnsafeSupplier<Long, Exception> parameterObjectFieldIdUnsafeSupplier) {
+	public void setParameterObjectFieldName(
+		UnsafeSupplier<String, Exception>
+			parameterObjectFieldNameUnsafeSupplier) {
 
 		try {
-			parameterObjectFieldId = parameterObjectFieldIdUnsafeSupplier.get();
+			parameterObjectFieldName =
+				parameterObjectFieldNameUnsafeSupplier.get();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected Long parameterObjectFieldId;
+	protected String parameterObjectFieldName;
 
 	public Boolean getReverse() {
 		return reverse;
