@@ -20,8 +20,8 @@ const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 interface IProps {
 	error?: string;
 	objectDefinitionId?: number;
-	onChange: (objectFieldId: number) => void;
-	value?: number;
+	onChange: (objectFieldName: string) => void;
+	value?: string;
 }
 
 export default function SelectRelationship({
@@ -43,7 +43,7 @@ export default function SelectRelationship({
 		[fields]
 	);
 	const selectedValue = useMemo(() => {
-		return fields.find(({id}) => id === value);
+		return fields.find(({name}) => name === value);
 	}, [fields, value]);
 
 	useEffect(() => {
@@ -65,7 +65,7 @@ export default function SelectRelationship({
 			error={error}
 			label={Liferay.Language.get('parameter')}
 			onChange={({target: {value}}) => {
-				onChange(fields.find(({name}) => name === value)?.id!);
+				onChange(fields.find(({name}) => name === value)?.name!);
 			}}
 			options={options}
 			required
