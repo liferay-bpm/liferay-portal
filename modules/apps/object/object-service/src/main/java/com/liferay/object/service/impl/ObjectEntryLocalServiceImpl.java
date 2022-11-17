@@ -41,6 +41,7 @@ import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectEntryValuesException;
+import com.liferay.object.exception.ObjectRelationshipDeletionTypeException;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.field.util.ObjectFieldFormulaEvaluatorUtil;
 import com.liferay.object.internal.action.util.ObjectActionThreadLocal;
@@ -498,13 +499,16 @@ public class ObjectEntryLocalServiceImpl
 					PrincipalThreadLocal.getUserId(), groupId,
 					objectRelationship.getObjectRelationshipId(), primaryKey);
 			}
+			catch (PrincipalException principalException) {
+				throw new ObjectRelationshipDeletionTypeException(
+					principalException.getMessage());
+			}
 			catch (Exception exception) {
-				ObjectRelationshipUtil.setSkipPermissionWherePredicate(false);
-
 				throw new PortalException(exception.getMessage());
 			}
-
-			ObjectRelationshipUtil.setSkipPermissionWherePredicate(false);
+			finally {
+				ObjectRelationshipUtil.setSkipPermissionWherePredicate(false);
+			}
 		}
 	}
 
