@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldSupport;
 import com.liferay.portal.vulcan.pagination.Page;
@@ -142,11 +143,19 @@ public class ObjectLayoutResourceImpl
 			Long objectLayoutId, ObjectLayout objectLayout)
 		throws Exception {
 
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.
-				fetchObjectDefinitionByExternalReferenceCode(
-					contextCompany.getCompanyId(),
-					objectLayout.getObjectDefinitionExternalReferenceCode());
+		if (Validator.isNotNull(
+				objectLayout.getObjectDefinitionExternalReferenceCode())) {
+
+			ObjectDefinition objectDefinition =
+				_objectDefinitionLocalService.
+					fetchObjectDefinitionByExternalReferenceCode(
+						contextCompany.getCompanyId(),
+						objectLayout.
+							getObjectDefinitionExternalReferenceCode());
+
+			objectLayout.setObjectDefinitionId(
+				objectDefinition.getObjectDefinitionId());
+		}
 
 		return _toObjectLayout(
 			_objectLayoutService.updateObjectLayout(
@@ -155,7 +164,7 @@ public class ObjectLayoutResourceImpl
 				transformToList(
 					objectLayout.getObjectLayoutTabs(),
 					objectLayoutTab -> _toObjectLayoutTab(
-						objectDefinition.getObjectDefinitionId(),
+						objectLayout.getObjectDefinitionId(),
 						objectLayoutTab))));
 	}
 
