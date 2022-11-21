@@ -732,6 +732,28 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/ObjectDefinition"
             tags: ["ObjectDefinition"]
+    "/object-definitions/by-external-reference-code/{objectDefinitionExternalReferenceCode}/object-fields":
+        get:
+            operationId: getObjectDefinitionObjectDefinitionExternalReferenceCodeObjectFieldsPage
+            parameters:
+                - in: path
+                  name: objectDefinitionExternalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectField"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectField"
+                                type: array
     "/object-definitions/{objectDefinitionId}":
         delete:
             operationId: deleteObjectDefinition
