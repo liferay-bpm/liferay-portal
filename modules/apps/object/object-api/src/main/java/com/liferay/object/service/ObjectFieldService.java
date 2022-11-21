@@ -69,6 +69,10 @@ public interface ObjectFieldService extends BaseService {
 	public ObjectField getObjectField(long objectFieldId)
 		throws PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<ObjectField> getObjectFields(long objectDefinitionId)
+		throws PortalException;
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *
