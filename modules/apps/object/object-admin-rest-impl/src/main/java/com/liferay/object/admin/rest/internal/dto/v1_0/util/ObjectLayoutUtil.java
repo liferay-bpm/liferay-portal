@@ -19,7 +19,9 @@ import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutBox;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutColumn;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutRow;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutTab;
+import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.petra.function.transform.TransformUtil;
@@ -33,12 +35,17 @@ public class ObjectLayoutUtil {
 
 	public static ObjectLayout toObjectLayout(
 		Map<String, Map<String, String>> actions,
+		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectFieldLocalService objectFieldLocalService,
 		com.liferay.object.model.ObjectLayout serviceBuilderObjectLayout) {
 
 		if (serviceBuilderObjectLayout == null) {
 			return null;
 		}
+
+		ObjectDefinition objectDefinition =
+			objectDefinitionLocalService.fetchObjectDefinition(
+				serviceBuilderObjectLayout.getObjectDefinitionId());
 
 		ObjectLayout objectLayout = new ObjectLayout() {
 			{
@@ -49,6 +56,8 @@ public class ObjectLayoutUtil {
 				id = serviceBuilderObjectLayout.getObjectLayoutId();
 				name = LocalizedMapUtil.getLanguageIdMap(
 					serviceBuilderObjectLayout.getNameMap());
+				objectDefinitionExternalReferenceCode =
+					objectDefinition.getExternalReferenceCode();
 				objectDefinitionId =
 					serviceBuilderObjectLayout.getObjectDefinitionId();
 				objectLayoutTabs = TransformUtil.transformToArray(

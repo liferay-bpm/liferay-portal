@@ -23,6 +23,7 @@ import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectLayoutUtil;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectLayoutResource;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectLayoutService;
 import com.liferay.object.service.persistence.ObjectLayoutBoxPersistence;
@@ -141,6 +142,12 @@ public class ObjectLayoutResourceImpl
 			Long objectLayoutId, ObjectLayout objectLayout)
 		throws Exception {
 
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.
+				fetchObjectDefinitionByExternalReferenceCode(
+					contextCompany.getCompanyId(),
+					objectLayout.getObjectDefinitionExternalReferenceCode());
+
 		return _toObjectLayout(
 			_objectLayoutService.updateObjectLayout(
 				objectLayoutId, objectLayout.getDefaultObjectLayout(),
@@ -148,7 +155,7 @@ public class ObjectLayoutResourceImpl
 				transformToList(
 					objectLayout.getObjectLayoutTabs(),
 					objectLayoutTab -> _toObjectLayoutTab(
-						objectLayout.getObjectDefinitionId(),
+						objectDefinition.getObjectDefinitionId(),
 						objectLayoutTab))));
 	}
 
@@ -175,7 +182,8 @@ public class ObjectLayoutResourceImpl
 					ObjectDefinition.class.getName(),
 					serviceBuilderObjectLayout.getObjectDefinitionId())
 			).build(),
-			_objectFieldLocalService, serviceBuilderObjectLayout);
+			_objectDefinitionLocalService, _objectFieldLocalService,
+			serviceBuilderObjectLayout);
 	}
 
 	private com.liferay.object.model.ObjectLayoutBox _toObjectLayoutBox(
@@ -259,6 +267,9 @@ public class ObjectLayoutResourceImpl
 
 		return serviceBuilderObjectLayoutTab;
 	}
+
+	@Reference
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
