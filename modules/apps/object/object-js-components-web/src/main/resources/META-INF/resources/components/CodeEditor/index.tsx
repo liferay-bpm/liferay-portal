@@ -14,7 +14,7 @@
 
 import classNames from 'classnames';
 import CodeMirror from 'codemirror';
-import React, {ReactNode, useRef} from 'react';
+import React, {useRef, ReactNode} from 'react';
 
 import {FieldBase} from '../FieldBase';
 import CodeMirrorEditor, {ICodeMirrorEditor} from './CodeMirrorEditor';
@@ -27,16 +27,24 @@ export {Collapsible} from './Collapsible';
 export {Element} from './Element';
 export {SidebarCategory} from './Sidebar';
 
-interface IProps extends ICodeMirrorEditor {
+interface CodeEditorProps extends ICodeMirrorEditor {
 	CustomSidebarContent?: ReactNode;
 	className?: string;
 	error?: string;
 	sidebarElements?: SidebarCategory[];
 }
 
-const CodeEditor = React.forwardRef<CodeMirror.Editor, IProps>(
+
+const CodeEditor = React.forwardRef<CodeMirror.Editor, CodeEditorProps>(
 	(
-		{CustomSidebarContent, className, error, sidebarElements, ...options},
+		{
+			CustomSidebarContent,
+			className,
+			error,
+			mode,
+			sidebarElements,
+			...options
+		},
 		ref
 	) => {
 		const editorRef = useRef<CodeMirror.Editor>(
@@ -67,6 +75,7 @@ const CodeEditor = React.forwardRef<CodeMirror.Editor, IProps>(
 				<div className="form-control lfr-objects__code-editor-source">
 					<CodeMirrorEditor
 						lineWrapping={true}
+						mode={mode}
 						ref={handleDomNodeChange}
 						{...options}
 					/>
