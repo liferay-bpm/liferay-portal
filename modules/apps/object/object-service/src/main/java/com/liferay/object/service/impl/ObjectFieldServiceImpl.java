@@ -104,6 +104,16 @@ public class ObjectFieldServiceImpl extends ObjectFieldServiceBaseImpl {
 	}
 
 	@Override
+	public List<ObjectField> getObjectFields(long objectDefinitionId)
+		throws PortalException {
+
+		_objectDefinitionModelResourcePermission.check(
+			getPermissionChecker(), objectDefinitionId, ActionKeys.VIEW);
+
+		return objectFieldLocalService.getObjectFields(objectDefinitionId);
+	}
+
+	@Override
 	public ObjectField updateObjectField(
 			String externalReferenceCode, long objectFieldId,
 			long listTypeDefinitionId, String businessType, String dbType,
