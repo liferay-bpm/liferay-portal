@@ -734,7 +734,7 @@ paths:
             tags: ["ObjectDefinition"]
     "/object-definitions/by-external-reference-code/{objectDefinitionExternalReferenceCode}/object-fields":
         get:
-            operationId: getObjectDefinitionObjectDefinitionExternalReferenceCodeObjectFieldsPage
+            operationId: getObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectFieldsPage
             parameters:
                 - in: path
                   name: objectDefinitionExternalReferenceCode
