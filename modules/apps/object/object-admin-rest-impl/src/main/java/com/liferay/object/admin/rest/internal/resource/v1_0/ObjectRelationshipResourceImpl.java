@@ -35,6 +35,8 @@ import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
+import java.util.Objects;
+
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.osgi.service.component.annotations.Component;
@@ -127,6 +129,20 @@ public class ObjectRelationshipResourceImpl
 	public ObjectRelationship postObjectDefinitionObjectRelationship(
 			Long objectDefinitionId, ObjectRelationship objectRelationship)
 		throws Exception {
+
+		if (!Objects.isNull(
+				objectRelationship.
+					getObjectDefinitionExternalReferenceCode1())) {
+
+			com.liferay.object.model.ObjectDefinition objectDefinition =
+				_objectDefinitionLocalService.
+					getObjectDefinitionByExternalReferenceCode(
+						contextCompany.getCompanyId(),
+						objectRelationship.
+							getObjectDefinitionExternalReferenceCode1());
+
+			objectDefinitionId = objectDefinition.getObjectDefinitionId();
+		}
 
 		long objectDefinitionId2 = GetterUtil.getLong(
 			objectRelationship.getObjectDefinitionId2());
