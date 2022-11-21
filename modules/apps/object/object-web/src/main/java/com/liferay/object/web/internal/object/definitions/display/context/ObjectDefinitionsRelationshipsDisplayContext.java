@@ -128,6 +128,10 @@ public class ObjectDefinitionsRelationshipsDisplayContext
 			ObjectRelationship objectRelationship)
 		throws PortalException {
 
+		ObjectDefinition objectDefinition1 =
+			_objectDefinitionService.getObjectDefinition(
+				objectRelationship.getObjectDefinitionId1());
+
 		ObjectDefinition objectDefinition2 =
 			_objectDefinitionService.getObjectDefinition(
 				objectRelationship.getObjectDefinitionId2());
@@ -139,11 +143,11 @@ public class ObjectDefinitionsRelationshipsDisplayContext
 		).put(
 			"name", objectRelationship.getName()
 		).put(
-			"objectDefinitionId1",
-			Long.valueOf(objectRelationship.getObjectDefinitionId1())
+			"objectDefinitionExternalReferenceCode1",
+			objectDefinition1.getExternalReferenceCode()
 		).put(
-			"objectDefinitionId2",
-			Long.valueOf(objectRelationship.getObjectDefinitionId2())
+			"objectDefinitionExternalReferenceCode2",
+			objectDefinition2.getExternalReferenceCode()
 		).put(
 			"objectDefinitionName2", objectDefinition2.getShortName()
 		).put(

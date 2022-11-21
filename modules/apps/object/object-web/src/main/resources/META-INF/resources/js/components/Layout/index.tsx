@@ -83,7 +83,7 @@ type TNormalizeObjectRelationships = ({
 	objectRelationships,
 }: {
 	objectLayoutTabs: TObjectLayoutTab[];
-	objectRelationships: TObjectRelationship[];
+	objectRelationships: ObjectRelationship[];
 }) => TObjectRelationship[];
 
 const normalizeObjectRelationships: TNormalizeObjectRelationships = ({
@@ -92,7 +92,9 @@ const normalizeObjectRelationships: TNormalizeObjectRelationships = ({
 }) => {
 	const objectRelationshipIds = objectRelationships.map(({id}) => id);
 
-	const normalizedObjectRelationships = [...objectRelationships];
+	const normalizedObjectRelationships: TObjectRelationship[] = [
+		...objectRelationships,
+	];
 
 	objectLayoutTabs.forEach(({objectRelationshipId}) => {
 		if (objectRelationshipId) {

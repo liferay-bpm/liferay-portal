@@ -95,7 +95,10 @@ export function BasicInfo({
 
 	const [editingFilter, setEditingFilter] = useState(false);
 	const [objectFields, setObjectFields] = useState<ObjectField[]>();
-	const [objectDefinitionId2, setObjectDefinitionId2] = useState<number>();
+	const [
+		objectDefinitionExternalReferenceCode2,
+		setObjectDefinitionExternalReferenceCode2,
+	] = useState<string>();
 	const [aggregationFilters, setAggregationFilters] = useState<
 		AggregationFilters[]
 	>([]);
@@ -356,10 +359,15 @@ export function BasicInfo({
 	};
 
 	useEffect(() => {
-		if (values.businessType === 'Aggregation' && objectDefinitionId2) {
-			API.getObjectFields(objectDefinitionId2).then(setObjectFields);
+		if (
+			values.businessType === 'Aggregation' &&
+			objectDefinitionExternalReferenceCode2
+		) {
+			API.getObjectFieldsByExternalReferenceCode(
+				objectDefinitionExternalReferenceCode2
+			).then(setObjectFields);
 		}
-	}, [values.businessType, objectDefinitionId2]);
+	}, [values.businessType, objectDefinitionExternalReferenceCode2]);
 
 	useEffect(() => {
 		if (values.businessType === 'Aggregation') {
@@ -524,7 +532,9 @@ export function BasicInfo({
 					objectName={objectName}
 					objectRelationshipId={objectRelationshipId}
 					onAggregationFilterChange={setAggregationFilters}
-					onRelationshipChange={setObjectDefinitionId2}
+					onRelationshipChange={
+						setObjectDefinitionExternalReferenceCode2
+					}
 					setValues={setValues}
 				>
 					{values.businessType === 'Attachment' && (

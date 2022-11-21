@@ -48,7 +48,9 @@ interface IProps {
 	objectName: string;
 	objectRelationshipId?: number;
 	onAggregationFilterChange?: (aggregationFilterArray: []) => void;
-	onRelationshipChange?: (objectDefinitionId2: number) => void;
+	onRelationshipChange?: (
+		objectDefinitionExternalReferenceCode2: string
+	) => void;
 	setValues: (values: Partial<ObjectField>) => void;
 }
 

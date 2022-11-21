@@ -135,7 +135,9 @@ export default function EditRelationship({
 
 						<SelectRelationship
 							error={errors.parameterObjectFieldId}
-							objectDefinitionId={values.objectDefinitionId2}
+							objectDefinitionExternalReferenceCode={
+								values.objectDefinitionExternalReferenceCode2
+							}
 							onChange={(parameterObjectFieldId) =>
 								setValues({parameterObjectFieldId})
 							}
