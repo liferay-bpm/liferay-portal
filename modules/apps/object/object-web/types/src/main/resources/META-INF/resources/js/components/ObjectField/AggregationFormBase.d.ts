@@ -22,7 +22,9 @@ interface IAggregationSourcePropertyProps {
 	objectDefinitionId: number;
 	objectFieldSettings: ObjectFieldSetting[];
 	onAggregationFilterChange?: (aggregationFilterArray: []) => void;
-	onRelationshipChange?: (objectDefinitionId2: number) => void;
+	onRelationshipChange?: (
+		objectDefinitionExternalReferenceCode2: string
+	) => void;
 	setValues: (values: Partial<ObjectField>) => void;
 }
 export declare function AggregationFormBase({

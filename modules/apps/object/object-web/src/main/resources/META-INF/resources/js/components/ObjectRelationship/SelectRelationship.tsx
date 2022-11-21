@@ -19,14 +19,14 @@ const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 interface IProps {
 	error?: string;
-	objectDefinitionId?: number;
+	objectDefinitionExternalReferenceCode?: string;
 	onChange: (objectFieldId: number) => void;
 	value?: number;
 }
 
 export default function SelectRelationship({
 	error,
-	objectDefinitionId,
+	objectDefinitionExternalReferenceCode,
 	onChange,
 	value,
 	...otherProps
@@ -47,18 +47,22 @@ export default function SelectRelationship({
 	}, [fields, value]);
 
 	useEffect(() => {
-		if (objectDefinitionId) {
-			API.getObjectFields(objectDefinitionId).then((fields) => {
-				const options = fields.filter(
+		const makeFetch = async () => {
+			if (objectDefinitionExternalReferenceCode) {
+				const objectFields = await API.getObjectFieldsByExternalReferenceCode(
+					objectDefinitionExternalReferenceCode
+				);
+				const options = objectFields?.filter(
 					({businessType}) => businessType === 'Relationship'
 				);
 				setFields(options);
-			});
-		}
-		else {
-			setFields([]);
-		}
-	}, [objectDefinitionId]);
+			}
+			else {
+				setFields([]);
+			}
+		};
+		makeFetch();
+	}, [objectDefinitionExternalReferenceCode]);
 
 	return (
 		<Select

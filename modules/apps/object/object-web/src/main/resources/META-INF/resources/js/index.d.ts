@@ -109,6 +109,7 @@ interface ObjectDefinition {
 	dateCreated: string;
 	dateModified: string;
 	enableCategorization: boolean;
+	externalReferenceCode: string;
 	id: number;
 	label: LocalizedValue<string>;
 	name: string;
@@ -246,8 +247,8 @@ interface ObjectRelationship {
 	id: number;
 	label: LocalizedValue<string>;
 	name: string;
-	objectDefinitionId1: number;
-	objectDefinitionId2: number;
+	objectDefinitionExternalReferenceCode1: string;
+	objectDefinitionExternalReferenceCode2: string;
 	readonly objectDefinitionName2: string;
 	objectRelationshipId: number;
 	parameterObjectFieldId?: number;
