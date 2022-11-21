@@ -69,6 +69,14 @@ public class ObjectFieldServiceWrapper
 		return _objectFieldService.getObjectField(objectFieldId);
 	}
 
+	@Override
+	public java.util.List<com.liferay.object.model.ObjectField> getObjectFields(
+			long objectDefinitionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectFieldService.getObjectFields(objectDefinitionId);
+	}
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *

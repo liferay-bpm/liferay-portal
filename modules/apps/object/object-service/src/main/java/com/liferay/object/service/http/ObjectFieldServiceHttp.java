@@ -177,6 +177,48 @@ public class ObjectFieldServiceHttp {
 		}
 	}
 
+	public static java.util.List<com.liferay.object.model.ObjectField>
+			getObjectFields(
+				HttpPrincipal httpPrincipal, long objectDefinitionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				ObjectFieldServiceUtil.class, "getObjectFields",
+				_getObjectFieldsParameterTypes3);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, objectDefinitionId);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return (java.util.List<com.liferay.object.model.ObjectField>)
+				returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
 	public static com.liferay.object.model.ObjectField updateObjectField(
 			HttpPrincipal httpPrincipal, String externalReferenceCode,
 			long objectFieldId, long listTypeDefinitionId, String businessType,
@@ -191,7 +233,7 @@ public class ObjectFieldServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectFieldServiceUtil.class, "updateObjectField",
-				_updateObjectFieldParameterTypes3);
+				_updateObjectFieldParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, externalReferenceCode, objectFieldId,
@@ -241,7 +283,9 @@ public class ObjectFieldServiceHttp {
 		new Class[] {long.class};
 	private static final Class<?>[] _getObjectFieldParameterTypes2 =
 		new Class[] {long.class};
-	private static final Class<?>[] _updateObjectFieldParameterTypes3 =
+	private static final Class<?>[] _getObjectFieldsParameterTypes3 =
+		new Class[] {long.class};
+	private static final Class<?>[] _updateObjectFieldParameterTypes4 =
 		new Class[] {
 			String.class, long.class, long.class, String.class, String.class,
 			String.class, boolean.class, boolean.class, String.class,
