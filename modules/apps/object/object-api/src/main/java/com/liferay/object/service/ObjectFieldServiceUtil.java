@@ -68,6 +68,12 @@ public class ObjectFieldServiceUtil {
 		return getService().getObjectField(objectFieldId);
 	}
 
+	public static List<ObjectField> getObjectFields(long objectDefinitionId)
+		throws PortalException {
+
+		return getService().getObjectFields(objectDefinitionId);
+	}
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *
