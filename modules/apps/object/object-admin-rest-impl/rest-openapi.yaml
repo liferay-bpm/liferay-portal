@@ -334,6 +334,8 @@ components:
                     type: object
                 name:
                     type: string
+                objectDefinitionExternalReferenceCode1:
+                    type: string
                 objectDefinitionExternalReferenceCode2:
                     type: string
                 objectDefinitionId1:
