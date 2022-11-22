@@ -388,6 +388,36 @@ public class ObjectRelationship implements Serializable {
 	protected Long parameterObjectFieldId;
 
 	@Schema
+	public String getParameterObjectFieldName() {
+		return parameterObjectFieldName;
+	}
+
+	public void setParameterObjectFieldName(String parameterObjectFieldName) {
+		this.parameterObjectFieldName = parameterObjectFieldName;
+	}
+
+	@JsonIgnore
+	public void setParameterObjectFieldName(
+		UnsafeSupplier<String, Exception>
+			parameterObjectFieldNameUnsafeSupplier) {
+
+		try {
+			parameterObjectFieldName =
+				parameterObjectFieldNameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String parameterObjectFieldName;
+
+	@Schema
 	public Boolean getReverse() {
 		return reverse;
 	}
@@ -606,6 +636,20 @@ public class ObjectRelationship implements Serializable {
 			sb.append("\"parameterObjectFieldId\": ");
 
 			sb.append(parameterObjectFieldId);
+		}
+
+		if (parameterObjectFieldName != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"parameterObjectFieldName\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(parameterObjectFieldName));
+
+			sb.append("\"");
 		}
 
 		if (reverse != null) {

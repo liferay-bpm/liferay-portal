@@ -195,6 +195,21 @@ public class ObjectRelationshipSerDes {
 			sb.append(objectRelationship.getParameterObjectFieldId());
 		}
 
+		if (objectRelationship.getParameterObjectFieldName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"parameterObjectFieldName\": ");
+
+			sb.append("\"");
+
+			sb.append(
+				_escape(objectRelationship.getParameterObjectFieldName()));
+
+			sb.append("\"");
+		}
+
 		if (objectRelationship.getReverse() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -339,6 +354,16 @@ public class ObjectRelationshipSerDes {
 				String.valueOf(objectRelationship.getParameterObjectFieldId()));
 		}
 
+		if (objectRelationship.getParameterObjectFieldName() == null) {
+			map.put("parameterObjectFieldName", null);
+		}
+		else {
+			map.put(
+				"parameterObjectFieldName",
+				String.valueOf(
+					objectRelationship.getParameterObjectFieldName()));
+		}
+
 		if (objectRelationship.getReverse() == null) {
 			map.put("reverse", null);
 		}
@@ -456,6 +481,14 @@ public class ObjectRelationshipSerDes {
 				if (jsonParserFieldValue != null) {
 					objectRelationship.setParameterObjectFieldId(
 						Long.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "parameterObjectFieldName")) {
+
+				if (jsonParserFieldValue != null) {
+					objectRelationship.setParameterObjectFieldName(
+						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "reverse")) {
