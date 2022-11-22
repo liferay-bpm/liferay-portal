@@ -114,14 +114,14 @@ function ModalAddObjectRelationship({
 					{parameterRequired &&
 						values.type === ObjectRelationshipType.ONE_TO_MANY && (
 							<SelectRelationship
-								error={errors.parameterObjectFieldId}
+								error={errors.parameterObjectFieldName}
 								objectDefinitionExternalReferenceCode={
 									values.objectDefinitionExternalReferenceCode2
 								}
-								onChange={(parameterObjectFieldId) =>
-									setValues({parameterObjectFieldId})
+								onChange={(parameterObjectFieldName) =>
+									setValues({parameterObjectFieldName})
 								}
-								value={values.parameterObjectFieldId}
+								value={values.parameterObjectFieldName}
 							/>
 						)}
 				</ClayModal.Body>

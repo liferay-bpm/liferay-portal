@@ -17,8 +17,8 @@
 interface IProps {
 	error?: string;
 	objectDefinitionExternalReferenceCode?: string;
-	onChange: (objectFieldId: number) => void;
-	value?: number;
+	onChange: (objectFieldName: string) => void;
+	value?: string;
 }
 export default function SelectRelationship({
 	error,

@@ -251,7 +251,7 @@ interface ObjectRelationship {
 	objectDefinitionExternalReferenceCode2: string;
 	readonly objectDefinitionName2: string;
 	objectRelationshipId: number;
-	parameterObjectFieldId?: number;
+	parameterObjectFieldName?: string;
 	reverse: boolean;
 	type: ObjectRelationshipType;
 }
