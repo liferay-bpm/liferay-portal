@@ -94,25 +94,26 @@ public class ObjectActionUtil {
 		for (Map.Entry<String, String> entry :
 				parametersUnicodeProperties.entrySet()) {
 
-			String key = entry.getKey();
 			Object value = entry.getValue();
 
 			if (Objects.equals(entry.getKey(), "notificationTemplateId")) {
 				value = GetterUtil.getLong(value);
 			}
 			else if (Objects.equals(entry.getKey(), "objectDefinitionId")) {
-				key = "objectDefinitionExternalReferenceCode";
-
 				try {
 					ObjectDefinition objectDefinition =
 						objectDefinitionLocalService.getObjectDefinition(
 							GetterUtil.getLong(value));
 
-					value = objectDefinition.getExternalReferenceCode();
+					parameters.put(
+						"objectDefinitionExternalReferenceCode",
+						objectDefinition.getExternalReferenceCode());
 				}
 				catch (PortalException portalException) {
 					_log.error(portalException);
 				}
+
+				value = GetterUtil.getLong(value);
 			}
 			else if (Objects.equals(entry.getKey(), "predefinedValues")) {
 				value = JSONFactoryUtil.looseDeserialize((String)value);
@@ -121,7 +122,7 @@ public class ObjectActionUtil {
 				value = GetterUtil.getBoolean(value);
 			}
 
-			parameters.put(key, value);
+			parameters.put(entry.getKey(), value);
 		}
 
 		return parameters;
