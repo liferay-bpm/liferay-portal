@@ -34,6 +34,8 @@ public class ObjectActionModelDocumentContributor
 	@Override
 	public void contribute(Document document, ObjectAction objectAction) {
 		document.addText(Field.NAME, objectAction.getName());
+		document.addText(
+			"objectActionTriggerKey", objectAction.getObjectActionTriggerKey());
 		document.addKeyword(
 			"objectDefinitionId", objectAction.getObjectDefinitionId());
 		document.remove(Field.USER_NAME);
