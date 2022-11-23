@@ -75,7 +75,8 @@ public interface ObjectActionResource {
 		throws Exception;
 
 	public Page<ObjectAction> getObjectDefinitionObjectActionsPage(
-			Long objectDefinitionId, String search, Pagination pagination)
+			Long objectDefinitionId, String search, Filter filter,
+			Pagination pagination)
 		throws Exception;
 
 	public ObjectAction postObjectDefinitionObjectAction(

@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
@@ -56,6 +57,7 @@ import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -396,7 +398,7 @@ public abstract class BaseObjectActionResourceTestCase {
 
 		Page<ObjectAction> page =
 			objectActionResource.getObjectDefinitionObjectActionsPage(
-				objectDefinitionId, null, Pagination.of(1, 10));
+				objectDefinitionId, null, null, Pagination.of(1, 10));
 
 		Assert.assertEquals(0, page.getTotalCount());
 
@@ -407,7 +409,7 @@ public abstract class BaseObjectActionResourceTestCase {
 					randomIrrelevantObjectAction());
 
 			page = objectActionResource.getObjectDefinitionObjectActionsPage(
-				irrelevantObjectDefinitionId, null, Pagination.of(1, 2));
+				irrelevantObjectDefinitionId, null, null, Pagination.of(1, 2));
 
 			Assert.assertEquals(1, page.getTotalCount());
 
@@ -426,7 +428,7 @@ public abstract class BaseObjectActionResourceTestCase {
 				objectDefinitionId, randomObjectAction());
 
 		page = objectActionResource.getObjectDefinitionObjectActionsPage(
-			objectDefinitionId, null, Pagination.of(1, 10));
+			objectDefinitionId, null, null, Pagination.of(1, 10));
 
 		Assert.assertEquals(2, page.getTotalCount());
 
@@ -438,6 +440,111 @@ public abstract class BaseObjectActionResourceTestCase {
 		objectActionResource.deleteObjectAction(objectAction1.getId());
 
 		objectActionResource.deleteObjectAction(objectAction2.getId());
+	}
+
+	@Test
+	public void testGetObjectDefinitionObjectActionsPageWithFilterDateTimeEquals()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.DATE_TIME);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long objectDefinitionId =
+			testGetObjectDefinitionObjectActionsPage_getObjectDefinitionId();
+
+		ObjectAction objectAction1 = randomObjectAction();
+
+		objectAction1 =
+			testGetObjectDefinitionObjectActionsPage_addObjectAction(
+				objectDefinitionId, objectAction1);
+
+		for (EntityField entityField : entityFields) {
+			Page<ObjectAction> page =
+				objectActionResource.getObjectDefinitionObjectActionsPage(
+					objectDefinitionId, null,
+					getFilterString(entityField, "between", objectAction1),
+					Pagination.of(1, 2));
+
+			assertEquals(
+				Collections.singletonList(objectAction1),
+				(List<ObjectAction>)page.getItems());
+		}
+	}
+
+	@Test
+	public void testGetObjectDefinitionObjectActionsPageWithFilterDoubleEquals()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.DOUBLE);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long objectDefinitionId =
+			testGetObjectDefinitionObjectActionsPage_getObjectDefinitionId();
+
+		ObjectAction objectAction1 =
+			testGetObjectDefinitionObjectActionsPage_addObjectAction(
+				objectDefinitionId, randomObjectAction());
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		ObjectAction objectAction2 =
+			testGetObjectDefinitionObjectActionsPage_addObjectAction(
+				objectDefinitionId, randomObjectAction());
+
+		for (EntityField entityField : entityFields) {
+			Page<ObjectAction> page =
+				objectActionResource.getObjectDefinitionObjectActionsPage(
+					objectDefinitionId, null,
+					getFilterString(entityField, "eq", objectAction1),
+					Pagination.of(1, 2));
+
+			assertEquals(
+				Collections.singletonList(objectAction1),
+				(List<ObjectAction>)page.getItems());
+		}
+	}
+
+	@Test
+	public void testGetObjectDefinitionObjectActionsPageWithFilterStringEquals()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.STRING);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long objectDefinitionId =
+			testGetObjectDefinitionObjectActionsPage_getObjectDefinitionId();
+
+		ObjectAction objectAction1 =
+			testGetObjectDefinitionObjectActionsPage_addObjectAction(
+				objectDefinitionId, randomObjectAction());
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		ObjectAction objectAction2 =
+			testGetObjectDefinitionObjectActionsPage_addObjectAction(
+				objectDefinitionId, randomObjectAction());
+
+		for (EntityField entityField : entityFields) {
+			Page<ObjectAction> page =
+				objectActionResource.getObjectDefinitionObjectActionsPage(
+					objectDefinitionId, null,
+					getFilterString(entityField, "eq", objectAction1),
+					Pagination.of(1, 2));
+
+			assertEquals(
+				Collections.singletonList(objectAction1),
+				(List<ObjectAction>)page.getItems());
+		}
 	}
 
 	@Test
@@ -461,7 +568,7 @@ public abstract class BaseObjectActionResourceTestCase {
 
 		Page<ObjectAction> page1 =
 			objectActionResource.getObjectDefinitionObjectActionsPage(
-				objectDefinitionId, null, Pagination.of(1, 2));
+				objectDefinitionId, null, null, Pagination.of(1, 2));
 
 		List<ObjectAction> objectActions1 =
 			(List<ObjectAction>)page1.getItems();
@@ -471,7 +578,7 @@ public abstract class BaseObjectActionResourceTestCase {
 
 		Page<ObjectAction> page2 =
 			objectActionResource.getObjectDefinitionObjectActionsPage(
-				objectDefinitionId, null, Pagination.of(2, 2));
+				objectDefinitionId, null, null, Pagination.of(2, 2));
 
 		Assert.assertEquals(3, page2.getTotalCount());
 
@@ -483,7 +590,7 @@ public abstract class BaseObjectActionResourceTestCase {
 
 		Page<ObjectAction> page3 =
 			objectActionResource.getObjectDefinitionObjectActionsPage(
-				objectDefinitionId, null, Pagination.of(1, 3));
+				objectDefinitionId, null, null, Pagination.of(1, 3));
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(objectAction1, objectAction2, objectAction3),
@@ -534,6 +641,9 @@ public abstract class BaseObjectActionResourceTestCase {
 			testGetObjectDefinitionObjectActionsPage_getObjectDefinitionId(),
 			objectAction);
 	}
+
+	@Rule
+	public SearchTestRule searchTestRule = new SearchTestRule();
 
 	protected ObjectAction testGraphQLObjectAction_addObjectAction()
 		throws Exception {

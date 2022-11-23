@@ -83,12 +83,14 @@ public interface ObjectActionResource {
 		throws Exception;
 
 	public Page<ObjectAction> getObjectDefinitionObjectActionsPage(
-			Long objectDefinitionId, String search, Pagination pagination)
+			Long objectDefinitionId, String search, String filterString,
+			Pagination pagination)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			getObjectDefinitionObjectActionsPageHttpResponse(
-				Long objectDefinitionId, String search, Pagination pagination)
+				Long objectDefinitionId, String search, String filterString,
+				Pagination pagination)
 		throws Exception;
 
 	public ObjectAction postObjectDefinitionObjectAction(
@@ -667,12 +669,13 @@ public interface ObjectActionResource {
 		}
 
 		public Page<ObjectAction> getObjectDefinitionObjectActionsPage(
-				Long objectDefinitionId, String search, Pagination pagination)
+				Long objectDefinitionId, String search, String filterString,
+				Pagination pagination)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				getObjectDefinitionObjectActionsPageHttpResponse(
-					objectDefinitionId, search, pagination);
+					objectDefinitionId, search, filterString, pagination);
 
 			String content = httpResponse.getContent();
 
@@ -713,7 +716,7 @@ public interface ObjectActionResource {
 
 		public HttpInvoker.HttpResponse
 				getObjectDefinitionObjectActionsPageHttpResponse(
-					Long objectDefinitionId, String search,
+					Long objectDefinitionId, String search, String filterString,
 					Pagination pagination)
 			throws Exception {
 
@@ -740,6 +743,10 @@ public interface ObjectActionResource {
 
 			if (search != null) {
 				httpInvoker.parameter("search", String.valueOf(search));
+			}
+
+			if (filterString != null) {
+				httpInvoker.parameter("filter", filterString);
 			}
 
 			if (pagination != null) {
