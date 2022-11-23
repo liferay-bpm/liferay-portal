@@ -19,7 +19,9 @@ import com.liferay.object.admin.rest.dto.v1_0.ObjectRelationship;
 import com.liferay.object.admin.rest.internal.dto.v1_0.converter.ObjectRelationshipDTOConverter;
 import com.liferay.object.admin.rest.internal.odata.entity.v1_0.ObjectRelationshipEntityModel;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectRelationshipResource;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.portal.kernel.search.Field;
@@ -137,9 +139,9 @@ public class ObjectRelationshipResourceImpl
 			com.liferay.object.model.ObjectDefinition objectDefinition =
 				_objectDefinitionLocalService.
 					getObjectDefinitionByExternalReferenceCode(
-						contextCompany.getCompanyId(),
 						objectRelationship.
-							getObjectDefinitionExternalReferenceCode1());
+							getObjectDefinitionExternalReferenceCode1(),
+						contextCompany.getCompanyId());
 
 			objectDefinitionId = objectDefinition.getObjectDefinitionId();
 		}
@@ -169,11 +171,20 @@ public class ObjectRelationshipResourceImpl
 			objectDefinitionId2 = objectDefinition.getObjectDefinitionId();
 		}
 
+		long parameterObjectFieldId = 0L;
+
+		ObjectField parameterObjectField =
+			_objectFieldLocalService.fetchObjectField(
+				objectDefinitionId2,
+				objectRelationship.getParameterObjectFieldName());
+
+		if (!Objects.isNull(parameterObjectField)) {
+			parameterObjectFieldId = parameterObjectField.getObjectFieldId();
+		}
+
 		return _toObjectRelationship(
 			_objectRelationshipService.addObjectRelationship(
-				objectDefinitionId, objectDefinitionId2,
-				GetterUtil.getLong(
-					objectRelationship.getParameterObjectFieldId()),
+				objectDefinitionId, objectDefinitionId2, parameterObjectFieldId,
 				objectRelationship.getDeletionTypeAsString(),
 				LocalizedMapUtil.getLocalizedMap(objectRelationship.getLabel()),
 				objectRelationship.getName(),
@@ -220,6 +231,9 @@ public class ObjectRelationshipResourceImpl
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
+	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@Reference
 	private ObjectRelationshipDTOConverter _objectRelationshipDTOConverter;
