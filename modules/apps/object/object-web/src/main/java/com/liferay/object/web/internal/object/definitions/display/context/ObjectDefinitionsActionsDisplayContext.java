@@ -22,6 +22,7 @@ import com.liferay.object.action.trigger.ObjectActionTrigger;
 import com.liferay.object.action.trigger.ObjectActionTriggerRegistry;
 import com.liferay.object.admin.rest.dto.v1_0.util.ObjectActionUtil;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
+import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
@@ -193,12 +194,20 @@ public class ObjectDefinitionsActionsDisplayContext
 
 		ObjectDefinition objectDefinition = getObjectDefinition();
 
-		List<ObjectActionTrigger> objectActionTriggers =
-			_objectActionTriggerRegistry.getObjectActionTriggers(
-				objectDefinition.getClassName());
+		for (ObjectActionTrigger objectActionTrigger :
+				_objectActionTriggerRegistry.getObjectActionTriggers(
+					objectDefinition.getClassName())) {
 
-		objectActionTriggers.forEach(
-			objectActionTrigger -> objectActionTriggersJSONArray.put(
+			if (!GetterUtil.getBoolean(
+					PropsUtil.get("feature.flag.LPS-148804")) &&
+				Objects.equals(
+					objectActionTrigger.getKey(),
+					ObjectActionTriggerConstants.KEY_STANDALONE)) {
+
+				continue;
+			}
+
+			objectActionTriggersJSONArray.put(
 				JSONUtil.put(
 					"description",
 					LanguageUtil.get(
@@ -213,7 +222,8 @@ public class ObjectDefinitionsActionsDisplayContext
 							objectActionTrigger.getKey() + "]")
 				).put(
 					"value", objectActionTrigger.getKey()
-				)));
+				));
+		}
 
 		return objectActionTriggersJSONArray;
 	}
@@ -246,6 +256,11 @@ public class ObjectDefinitionsActionsDisplayContext
 
 	@Override
 	protected String getAPIURI() {
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-148804"))) {
+			return "/object-actions?filter=objectActionTriggerKey ne " +
+				"'standalone'";
+		}
+
 		return "/object-actions";
 	}
 

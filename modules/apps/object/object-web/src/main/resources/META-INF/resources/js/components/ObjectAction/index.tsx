@@ -58,6 +58,12 @@ export default function Action({
 
 		delete objectAction.objectDefinitionId;
 
+		if (!objectAction.label && !Liferay.FeatureFlags['LPS-148804']) {
+			objectAction.label = {
+				[Liferay.ThemeDisplay.getDefaultLanguageId()]: objectAction.name,
+			} as LocalizedValue<string>;
+		}
+
 		try {
 			await API.save(url, objectAction, method);
 			saveAndReload();
