@@ -267,6 +267,23 @@ public abstract class ListTypeEntryLocalServiceBaseImpl
 			uuid, companyId, null);
 	}
 
+	@Override
+	public ListTypeEntry fetchListTypeEntryByExternalReferenceCode(
+		String externalReferenceCode, long companyId) {
+
+		return listTypeEntryPersistence.fetchByERC_C(
+			externalReferenceCode, companyId);
+	}
+
+	@Override
+	public ListTypeEntry getListTypeEntryByExternalReferenceCode(
+			String externalReferenceCode, long companyId)
+		throws PortalException {
+
+		return listTypeEntryPersistence.findByERC_C(
+			externalReferenceCode, companyId);
+	}
+
 	/**
 	 * Returns the list type entry with the primary key.
 	 *

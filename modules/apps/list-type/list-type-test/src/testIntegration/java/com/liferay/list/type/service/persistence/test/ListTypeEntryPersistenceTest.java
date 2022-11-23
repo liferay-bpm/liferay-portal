@@ -15,6 +15,7 @@
 package com.liferay.list.type.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.list.type.exception.DuplicateListTypeEntryExternalReferenceCodeException;
 import com.liferay.list.type.exception.NoSuchListTypeEntryException;
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalServiceUtil;
@@ -128,6 +129,9 @@ public class ListTypeEntryPersistenceTest {
 
 		newListTypeEntry.setUuid(RandomTestUtil.randomString());
 
+		newListTypeEntry.setExternalReferenceCode(
+			RandomTestUtil.randomString());
+
 		newListTypeEntry.setCompanyId(RandomTestUtil.nextLong());
 
 		newListTypeEntry.setUserId(RandomTestUtil.nextLong());
@@ -157,6 +161,9 @@ public class ListTypeEntryPersistenceTest {
 		Assert.assertEquals(
 			existingListTypeEntry.getUuid(), newListTypeEntry.getUuid());
 		Assert.assertEquals(
+			existingListTypeEntry.getExternalReferenceCode(),
+			newListTypeEntry.getExternalReferenceCode());
+		Assert.assertEquals(
 			existingListTypeEntry.getListTypeEntryId(),
 			newListTypeEntry.getListTypeEntryId());
 		Assert.assertEquals(
@@ -182,6 +189,26 @@ public class ListTypeEntryPersistenceTest {
 			existingListTypeEntry.getName(), newListTypeEntry.getName());
 		Assert.assertEquals(
 			existingListTypeEntry.getType(), newListTypeEntry.getType());
+	}
+
+	@Test(expected = DuplicateListTypeEntryExternalReferenceCodeException.class)
+	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
+		ListTypeEntry listTypeEntry = addListTypeEntry();
+
+		ListTypeEntry newListTypeEntry = addListTypeEntry();
+
+		newListTypeEntry.setCompanyId(listTypeEntry.getCompanyId());
+
+		newListTypeEntry = _persistence.update(newListTypeEntry);
+
+		Session session = _persistence.getCurrentSession();
+
+		session.evict(newListTypeEntry);
+
+		newListTypeEntry.setExternalReferenceCode(
+			listTypeEntry.getExternalReferenceCode());
+
+		_persistence.update(newListTypeEntry);
 	}
 
 	@Test
@@ -232,6 +259,15 @@ public class ListTypeEntryPersistenceTest {
 	}
 
 	@Test
+	public void testCountByERC_C() throws Exception {
+		_persistence.countByERC_C("", RandomTestUtil.nextLong());
+
+		_persistence.countByERC_C("null", 0L);
+
+		_persistence.countByERC_C((String)null, 0L);
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		ListTypeEntry newListTypeEntry = addListTypeEntry();
 
@@ -257,10 +293,10 @@ public class ListTypeEntryPersistenceTest {
 	protected OrderByComparator<ListTypeEntry> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
 			"ListTypeEntry", "mvccVersion", true, "uuid", true,
-			"listTypeEntryId", true, "companyId", true, "userId", true,
-			"userName", true, "createDate", true, "modifiedDate", true,
-			"listTypeDefinitionId", true, "key", true, "name", true, "type",
-			true);
+			"externalReferenceCode", true, "listTypeEntryId", true, "companyId",
+			true, "userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "listTypeDefinitionId", true, "key", true,
+			"name", true, "type", true);
 	}
 
 	@Test
@@ -537,6 +573,17 @@ public class ListTypeEntryPersistenceTest {
 			ReflectionTestUtil.invoke(
 				listTypeEntry, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "key_"));
+
+		Assert.assertEquals(
+			listTypeEntry.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				listTypeEntry, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
+		Assert.assertEquals(
+			Long.valueOf(listTypeEntry.getCompanyId()),
+			ReflectionTestUtil.<Long>invoke(
+				listTypeEntry, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "companyId"));
 	}
 
 	protected ListTypeEntry addListTypeEntry() throws Exception {
@@ -547,6 +594,8 @@ public class ListTypeEntryPersistenceTest {
 		listTypeEntry.setMvccVersion(RandomTestUtil.nextLong());
 
 		listTypeEntry.setUuid(RandomTestUtil.randomString());
+
+		listTypeEntry.setExternalReferenceCode(RandomTestUtil.randomString());
 
 		listTypeEntry.setCompanyId(RandomTestUtil.nextLong());
 
