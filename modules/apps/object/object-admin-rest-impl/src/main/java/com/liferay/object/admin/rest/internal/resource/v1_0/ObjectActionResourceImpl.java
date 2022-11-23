@@ -22,6 +22,7 @@ import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.service.ObjectActionService;
 import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -63,7 +64,8 @@ public class ObjectActionResourceImpl
 	@NestedField(parentClass = ObjectDefinition.class, value = "objectActions")
 	@Override
 	public Page<ObjectAction> getObjectDefinitionObjectActionsPage(
-			Long objectDefinitionId, String search, Pagination pagination)
+			Long objectDefinitionId, String search, Filter filter,
+			Pagination pagination)
 		throws Exception {
 
 		return SearchUtil.search(
@@ -100,8 +102,8 @@ public class ObjectActionResourceImpl
 			).build(),
 			booleanQuery -> {
 			},
-			null, com.liferay.object.model.ObjectAction.class.getName(), search,
-			pagination,
+			filter, com.liferay.object.model.ObjectAction.class.getName(),
+			search, pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
 				Field.ENTRY_CLASS_PK),
 			searchContext -> {
