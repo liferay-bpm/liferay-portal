@@ -117,7 +117,7 @@ public class ObjectFieldLocalServiceTest {
 		_listTypeEntryKey = RandomTestUtil.randomString();
 
 		_listTypeEntryLocalService.addListTypeEntry(
-			TestPropsValues.getUserId(),
+			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
 			_listTypeDefinition.getListTypeDefinitionId(), _listTypeEntryKey,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()));
 	}

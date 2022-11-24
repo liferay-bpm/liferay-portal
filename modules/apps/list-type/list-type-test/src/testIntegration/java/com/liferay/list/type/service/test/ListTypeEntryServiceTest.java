@@ -154,7 +154,8 @@ public class ListTypeEntryServiceTest {
 
 	private ListTypeEntry _addListTypeEntry(User user) throws Exception {
 		return _listTypeEntryLocalService.addListTypeEntry(
-			user.getUserId(), _listTypeDefinition.getListTypeDefinitionId(),
+			RandomTestUtil.randomString(), user.getUserId(),
+			_listTypeDefinition.getListTypeDefinitionId(),
 			RandomTestUtil.randomString(),
 			Collections.singletonMap(
 				LocaleUtil.US, RandomTestUtil.randomString()));
@@ -231,10 +232,16 @@ public class ListTypeEntryServiceTest {
 
 			listTypeEntry = _addListTypeEntry(user);
 
+			String externalReferenceCode = RandomTestUtil.randomString();
+
 			listTypeEntry = _listTypeEntryService.updateListTypeEntry(
-				listTypeEntry.getListTypeEntryId(),
+				externalReferenceCode, listTypeEntry.getListTypeEntryId(),
 				Collections.singletonMap(
 					LocaleUtil.US, RandomTestUtil.randomString()));
+
+			Assert.assertEquals(
+				externalReferenceCode,
+				listTypeEntry.getExternalReferenceCode());
 		}
 		finally {
 			if (listTypeEntry != null) {
