@@ -736,7 +736,7 @@ paths:
             tags: ["ObjectDefinition"]
     "/object-definitions/by-external-reference-code/{objectDefinitionExternalReferenceCode}/object-relationships":
         post:
-            operationId: postObjectDefinitionObjectRelationship
+            operationId: postObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectRelationship
             parameters:
                 - in: path
                   name: objectDefinitionExternalReferenceCode
