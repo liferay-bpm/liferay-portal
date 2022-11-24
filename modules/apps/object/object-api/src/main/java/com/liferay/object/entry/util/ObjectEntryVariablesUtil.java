@@ -50,6 +50,27 @@ import java.util.Map;
  */
 public class ObjectEntryVariablesUtil {
 
+	public static boolean evaluateActionVariables(
+			String conditionExpression,
+			DDMExpressionFactory ddmExpressionFactory,
+			Map<String, Object> variables)
+		throws Exception {
+
+		if (Validator.isNull(conditionExpression)) {
+			return true;
+		}
+
+		DDMExpression<Boolean> ddmExpression =
+			ddmExpressionFactory.createExpression(
+				CreateExpressionRequest.Builder.newBuilder(
+					conditionExpression
+				).build());
+
+		ddmExpression.setVariables(variables);
+
+		return ddmExpression.evaluate();
+	}
+
 	public static Map<String, Object> getActionVariables(
 		DTOConverterRegistry dtoConverterRegistry,
 		ObjectDefinition objectDefinition, JSONObject payloadJSONObject,

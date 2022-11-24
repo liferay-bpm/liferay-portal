@@ -14,8 +14,6 @@
 
 package com.liferay.object.internal.action.engine;
 
-import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
-import com.liferay.dynamic.data.mapping.expression.DDMExpression;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
 import com.liferay.object.action.engine.ObjectActionEngine;
 import com.liferay.object.action.executor.ObjectActionExecutor;
@@ -35,7 +33,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 
 import java.util.Map;
@@ -100,25 +97,6 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 		}
 	}
 
-	private boolean _evaluateConditionExpression(
-			String conditionExpression, Map<String, Object> variables)
-		throws Exception {
-
-		if (Validator.isNull(conditionExpression)) {
-			return true;
-		}
-
-		DDMExpression<Boolean> ddmExpression =
-			_ddmExpressionFactory.createExpression(
-				CreateExpressionRequest.Builder.newBuilder(
-					conditionExpression
-				).build());
-
-		ddmExpression.setVariables(variables);
-
-		return ddmExpression.evaluate();
-	}
-
 	private void _executeObjectAction(
 			ObjectAction objectAction, ObjectDefinition objectDefinition,
 			JSONObject payloadJSONObject, long userId,
@@ -130,8 +108,9 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 
 		try {
 			if (objectActionIds.contains(objectAction.getObjectActionId()) ||
-				!_evaluateConditionExpression(
-					objectAction.getConditionExpression(), variables)) {
+				!ObjectEntryVariablesUtil.evaluateActionVariables(
+					objectAction.getConditionExpression(),
+					_ddmExpressionFactory, variables)) {
 
 				return;
 			}

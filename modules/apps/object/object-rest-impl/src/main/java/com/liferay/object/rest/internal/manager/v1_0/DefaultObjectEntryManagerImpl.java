@@ -18,11 +18,13 @@ import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.entry.util.ObjectEntryVariablesUtil;
 import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.model.ObjectAction;
@@ -55,6 +57,7 @@ import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
@@ -654,6 +657,56 @@ public class DefaultObjectEntryManagerImpl
 					dtoConverterContext.getUserId())));
 	}
 
+	private void _addStandaloneObjectActions(
+		Map<String, Map<String, String>> actions,
+		DTOConverterContext dtoConverterContext,
+		ObjectDefinition objectDefinition,
+		com.liferay.object.model.ObjectEntry objectEntry) {
+
+		Map<String, Object> variables =
+			ObjectEntryVariablesUtil.getActionVariables(
+				_dtoConverterRegistry, objectDefinition,
+				JSONUtil.put(
+					"classPK", objectEntry.getObjectEntryId()
+				).put(
+					"objectEntry",
+					HashMapBuilder.putAll(
+						objectEntry.getModelAttributes()
+					).put(
+						"values", objectEntry.getValues()
+					).build()
+				).put(
+					"userId", dtoConverterContext.getUserId()
+				),
+				_systemObjectDefinitionMetadataRegistry);
+
+		for (ObjectAction objectAction :
+				_objectActionLocalService.getObjectActions(
+					objectDefinition.getObjectDefinitionId(),
+					ObjectActionTriggerConstants.KEY_STANDALONE)) {
+
+			try {
+				if (!ObjectEntryVariablesUtil.evaluateActionVariables(
+						objectAction.getConditionExpression(),
+						_ddmExpressionFactory, variables)) {
+
+					continue;
+				}
+
+				actions.put(
+					objectAction.getName(),
+					_getAction(
+						ActionKeys.VIEW,
+						"putByExternalReferenceCodeObjectEntryExternal" +
+							"ReferenceCodeObjectActionObjectActionName",
+						objectEntry, dtoConverterContext.getUriInfo()));
+			}
+			catch (Exception exception) {
+				_log.error(exception);
+			}
+		}
+	}
+
 	private void _checkObjectEntryObjectDefinitionId(
 			ObjectDefinition objectDefinition,
 			com.liferay.object.model.ObjectEntry objectEntry)
@@ -983,19 +1036,8 @@ public class DefaultObjectEntryManagerImpl
 					dtoConverterContext.getUriInfo())
 			).build();
 
-			for (ObjectAction objectAction :
-					_objectActionLocalService.getObjectActions(
-						objectDefinition.getObjectDefinitionId(),
-						ObjectActionTriggerConstants.KEY_STANDALONE)) {
-
-				actions.put(
-					objectAction.getName(),
-					_getAction(
-						ActionKeys.VIEW,
-						"putByExternalReferenceCodeObjectEntryExternal" +
-							"ReferenceCodeObjectActionObjectActionName",
-						objectEntry, dtoConverterContext.getUriInfo()));
-			}
+			_addStandaloneObjectActions(
+				actions, dtoConverterContext, objectDefinition, objectEntry);
 		}
 
 		DefaultDTOConverterContext defaultDTOConverterContext =
@@ -1095,6 +1137,9 @@ public class DefaultObjectEntryManagerImpl
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;
+
+	@Reference
+	private DDMExpressionFactory _ddmExpressionFactory;
 
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
