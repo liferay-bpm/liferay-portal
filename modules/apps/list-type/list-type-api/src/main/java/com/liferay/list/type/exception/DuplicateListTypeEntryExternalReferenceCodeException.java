@@ -11,14 +11,16 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
+
 package com.liferay.list.type.exception;
 
 import com.liferay.portal.kernel.exception.SystemException;
 
 /**
- * @author Gabriel Albuquerque
+ * @author Selton Guedes
  */
-public class DuplicateListTypeEntryExternalReferenceCodeException extends SystemException {
+public class DuplicateListTypeEntryExternalReferenceCodeException
+	extends SystemException {
 
 	public DuplicateListTypeEntryExternalReferenceCodeException() {
 	}
@@ -27,11 +29,15 @@ public class DuplicateListTypeEntryExternalReferenceCodeException extends System
 		super(msg);
 	}
 
-	public DuplicateListTypeEntryExternalReferenceCodeException(String msg, Throwable throwable) {
+	public DuplicateListTypeEntryExternalReferenceCodeException(
+		String msg, Throwable throwable) {
+
 		super(msg, throwable);
 	}
 
-	public DuplicateListTypeEntryExternalReferenceCodeException(Throwable throwable) {
+	public DuplicateListTypeEntryExternalReferenceCodeException(
+		Throwable throwable) {
+
 		super(throwable);
 	}
 
