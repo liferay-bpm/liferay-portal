@@ -26,8 +26,10 @@ import com.liferay.object.system.JaxRsApplicationDescriptor;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.object.web.internal.configuration.activator.FFOneToOneRelationshipConfigurationActivator;
+import com.liferay.object.web.internal.constants.ObjectWebKeys;
 import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -180,6 +182,13 @@ public class ObjectDefinitionsRelationshipsDisplayContext
 		);
 	}
 
+	public String getPOSTAPIURL() {
+		return StringBundler.concat(
+			"/o/object-admin/v1.0/object-definitions",
+			"/by-external-reference-code/",
+			_getObjectDefinitionExternalReferenceCode(), getAPIURI());
+	}
+
 	public String getRESTContextPath(ObjectDefinition objectDefinition) {
 		if (!objectDefinition.isSystem()) {
 			return objectDefinition.getRESTContextPath();
@@ -230,6 +239,17 @@ public class ObjectDefinitionsRelationshipsDisplayContext
 					"add-object-relationship"));
 			dropdownItem.setTarget("event");
 		};
+	}
+
+	private String _getObjectDefinitionExternalReferenceCode() {
+		HttpServletRequest httpServletRequest =
+			objectRequestHelper.getRequest();
+
+		ObjectDefinition objectDefinition =
+			(ObjectDefinition)httpServletRequest.getAttribute(
+				ObjectWebKeys.OBJECT_DEFINITION);
+
+		return objectDefinition.getExternalReferenceCode();
 	}
 
 	private final FFOneToOneRelationshipConfigurationActivator

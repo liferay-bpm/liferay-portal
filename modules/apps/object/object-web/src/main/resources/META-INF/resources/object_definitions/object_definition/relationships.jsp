@@ -48,7 +48,7 @@ renderResponse.setTitle(objectDefinition.getLabel(locale, true));
 		module="js/components/ObjectRelationship/AddRelationship"
 		props='<%=
 			HashMapBuilder.<String, Object>put(
-				"apiURL", objectDefinitionsRelationshipsDisplayContext.getAPIURL()
+				"apiURL", objectDefinitionsRelationshipsDisplayContext.getPOSTAPIURL()
 			).put(
 				"externalReferenceCode", objectDefinition.getExternalReferenceCode()
 			).put(
