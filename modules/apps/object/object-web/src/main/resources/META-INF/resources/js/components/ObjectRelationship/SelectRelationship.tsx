@@ -19,14 +19,14 @@ const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 interface IProps {
 	error?: string;
-	objectDefinitionId?: number;
-	onChange: (objectFieldId: number) => void;
-	value?: number;
+	objectDefinitionExternalReferenceCode?: string;
+	onChange: (objectFieldName: string) => void;
+	value?: string;
 }
 
 export default function SelectRelationship({
 	error,
-	objectDefinitionId,
+	objectDefinitionExternalReferenceCode,
 	onChange,
 	value,
 	...otherProps
@@ -43,29 +43,33 @@ export default function SelectRelationship({
 		[fields]
 	);
 	const selectedValue = useMemo(() => {
-		return fields.find(({id}) => id === value);
+		return fields.find(({name}) => name === value);
 	}, [fields, value]);
 
 	useEffect(() => {
-		if (objectDefinitionId) {
-			API.getObjectFields(objectDefinitionId).then((fields) => {
-				const options = fields.filter(
+		const makeFetch = async () => {
+			if (objectDefinitionExternalReferenceCode) {
+				const objectFields = await API.getObjectFieldsByExternalReferenceCode(
+					objectDefinitionExternalReferenceCode
+				);
+				const options = objectFields?.filter(
 					({businessType}) => businessType === 'Relationship'
 				);
 				setFields(options);
-			});
-		}
-		else {
-			setFields([]);
-		}
-	}, [objectDefinitionId]);
+			}
+			else {
+				setFields([]);
+			}
+		};
+		makeFetch();
+	}, [objectDefinitionExternalReferenceCode]);
 
 	return (
 		<Select
 			error={error}
 			label={Liferay.Language.get('parameter')}
 			onChange={({target: {value}}) => {
-				onChange(fields.find(({name}) => name === value)?.id!);
+				onChange(fields.find(({name}) => name === value)?.name!);
 			}}
 			options={options}
 			required

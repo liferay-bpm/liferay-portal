@@ -44,11 +44,11 @@ interface ObjectRelationship {
 	id: number;
 	label: LocalizedValue<string>;
 	name: string;
-	objectDefinitionId1: number;
-	objectDefinitionId2: number;
+	objectDefinitionExternalReferenceCode1: string;
+	objectDefinitionExternalReferenceCode2: string;
 	readonly objectDefinitionName2: string;
 	objectRelationshipId: number;
-	parameterObjectFieldId?: number;
+	parameterObjectFieldName?: string;
 	reverse: boolean;
 	type: ObjectRelationshipType;
 }
@@ -101,6 +101,9 @@ export declare function getObjectField(
 ): Promise<ObjectField>;
 export declare function getObjectFields(
 	objectDefinitionId: number
+): Promise<ObjectField[]>;
+export declare function getObjectFieldsByExternalReferenceCode(
+	objectDefinitionExternalReferenceCode: string
 ): Promise<ObjectField[]>;
 export declare function getObjectRelationships(
 	objectDefinitionId: number

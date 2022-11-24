@@ -80,16 +80,16 @@ export function useObjectRelationshipForm({
 			errors.type = REQUIRED_MSG;
 		}
 
-		if (!relationship.objectDefinitionId2) {
-			errors.objectDefinitionId2 = REQUIRED_MSG;
+		if (!relationship.objectDefinitionExternalReferenceCode2) {
+			errors.objectDefinitionExternalReferenceCode2 = REQUIRED_MSG;
 		}
 
 		if (
 			parameterRequired &&
 			relationship.type === ObjectRelationshipType.ONE_TO_MANY &&
-			!relationship.parameterObjectFieldId
+			!relationship.parameterObjectFieldName
 		) {
-			errors.parameterObjectFieldId = REQUIRED_MSG;
+			errors.parameterObjectFieldName = REQUIRED_MSG;
 		}
 
 		return errors;
@@ -113,7 +113,7 @@ export function ObjectRelationshipFormBase({
 	values,
 }: IPros) {
 	const [objectDefinitions, setObjectDefinitions] = useState<
-		ObjectDefinition[]
+		Partial<ObjectDefinition>[]
 	>([]);
 	const [query, setQuery] = useState<string>('');
 
@@ -131,7 +131,9 @@ export function ObjectRelationshipFormBase({
 			const items = await API.getAllObjectDefinitions();
 
 			const currentObjectDefinition = items.find(
-				({id}) => values.objectDefinitionId1 === id
+				({externalReferenceCode}) =>
+					values.objectDefinitionExternalReferenceCode1 ===
+					externalReferenceCode
 			)!;
 
 			const objectDefinitions = items.filter(
@@ -148,7 +150,8 @@ export function ObjectRelationshipFormBase({
 		if (readonly) {
 			setObjectDefinitions([
 				{
-					id: values.objectDefinitionId2 as number,
+					externalReferenceCode:
+						values.objectDefinitionExternalReferenceCode2,
 					label: values.label as LocalizedValue<string>,
 					name: values.objectDefinitionName2 as string,
 					system: false,
@@ -159,7 +162,7 @@ export function ObjectRelationshipFormBase({
 			fetchObjectDefinitions();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [readonly, values.objectDefinitionId1]);
+	}, [readonly, values.objectDefinitionExternalReferenceCode1]);
 
 	const filteredRelationships = useMemo(() => {
 		return filterArrayByQuery(objectDefinitions, 'label', query);
@@ -192,13 +195,14 @@ export function ObjectRelationshipFormBase({
 				emptyStateMessage={Liferay.Language.get(
 					'no-objects-were-found'
 				)}
-				error={errors.objectDefinitionId2}
+				error={errors.objectDefinitionExternalReferenceCode2}
 				items={filteredRelationships}
 				label={Liferay.Language.get('object')}
 				onChangeQuery={setQuery}
 				onSelectItem={(item) => {
 					setValues({
-						objectDefinitionId2: item.id,
+						objectDefinitionExternalReferenceCode2:
+							item.externalReferenceCode,
 						objectDefinitionName2: item.name,
 					});
 				}}
@@ -236,10 +240,3 @@ interface IPros {
 	setValues: (values: Partial<ObjectRelationship>) => void;
 	values: Partial<ObjectRelationship>;
 }
-
-type ObjectDefinition = {
-	id: number;
-	label: LocalizedValue<string>;
-	name: string;
-	system: boolean;
-};

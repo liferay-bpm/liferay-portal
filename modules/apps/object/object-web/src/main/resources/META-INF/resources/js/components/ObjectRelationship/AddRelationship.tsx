@@ -32,8 +32,8 @@ const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 function ModalAddObjectRelationship({
 	apiURL,
+	externalReferenceCode,
 	ffOneToOneRelationshipConfigurationEnabled,
-	objectDefinitionId,
 	observer,
 	onClose,
 	parameterRequired,
@@ -41,7 +41,7 @@ function ModalAddObjectRelationship({
 	const [error, setError] = useState<string>('');
 
 	const initialValues: Partial<ObjectRelationship> = {
-		objectDefinitionId1: Number(objectDefinitionId),
+		objectDefinitionExternalReferenceCode1: externalReferenceCode,
 	};
 
 	const onSubmit = async ({label, name, ...others}: ObjectRelationship) => {
@@ -114,12 +114,14 @@ function ModalAddObjectRelationship({
 					{parameterRequired &&
 						values.type === ObjectRelationshipType.ONE_TO_MANY && (
 							<SelectRelationship
-								error={errors.parameterObjectFieldId}
-								objectDefinitionId={values.objectDefinitionId2}
-								onChange={(parameterObjectFieldId) =>
-									setValues({parameterObjectFieldId})
+								error={errors.parameterObjectFieldName}
+								objectDefinitionExternalReferenceCode={
+									values.objectDefinitionExternalReferenceCode2
 								}
-								value={values.parameterObjectFieldId}
+								onChange={(parameterObjectFieldName) =>
+									setValues({parameterObjectFieldName})
+								}
+								value={values.parameterObjectFieldName}
 							/>
 						)}
 				</ClayModal.Body>
@@ -147,6 +149,7 @@ function ModalAddObjectRelationship({
 
 export default function AddRelationship({
 	apiURL,
+	externalReferenceCode,
 	ffOneToOneRelationshipConfigurationEnabled,
 	objectDefinitionId,
 	parameterRequired,
@@ -169,6 +172,7 @@ export default function AddRelationship({
 			{visibleModal && (
 				<ModalAddObjectRelationship
 					apiURL={apiURL}
+					externalReferenceCode={externalReferenceCode}
 					ffOneToOneRelationshipConfigurationEnabled={
 						ffOneToOneRelationshipConfigurationEnabled
 					}
@@ -184,6 +188,7 @@ export default function AddRelationship({
 
 interface IProps {
 	apiURL: string;
+	externalReferenceCode: string;
 	ffOneToOneRelationshipConfigurationEnabled: boolean;
 	objectDefinitionId: number;
 	observer: Observer;

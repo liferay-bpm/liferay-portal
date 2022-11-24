@@ -50,9 +50,9 @@ renderResponse.setTitle(objectDefinition.getLabel(locale, true));
 			HashMapBuilder.<String, Object>put(
 				"apiURL", objectDefinitionsRelationshipsDisplayContext.getAPIURL()
 			).put(
-				"ffOneToOneRelationshipConfigurationEnabled", objectDefinitionsRelationshipsDisplayContext.isFFOneToOneRelationshipConfigurationEnabled()
+				"externalReferenceCode", objectDefinition.getExternalReferenceCode()
 			).put(
-				"objectDefinitionId", objectDefinition.getObjectDefinitionId()
+				"ffOneToOneRelationshipConfigurationEnabled", objectDefinitionsRelationshipsDisplayContext.isFFOneToOneRelationshipConfigurationEnabled()
 			).put(
 				"parameterRequired", objectDefinitionsRelationshipsDisplayContext.isParameterRequired(objectDefinition)
 			).build()

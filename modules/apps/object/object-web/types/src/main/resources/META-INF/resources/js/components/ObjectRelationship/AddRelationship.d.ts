@@ -17,12 +17,14 @@
 import {Observer} from '@clayui/modal/lib/types';
 export default function AddRelationship({
 	apiURL,
+	externalReferenceCode,
 	ffOneToOneRelationshipConfigurationEnabled,
 	objectDefinitionId,
 	parameterRequired,
 }: IProps): JSX.Element;
 interface IProps {
 	apiURL: string;
+	externalReferenceCode: string;
 	ffOneToOneRelationshipConfigurationEnabled: boolean;
 	objectDefinitionId: number;
 	observer: Observer;

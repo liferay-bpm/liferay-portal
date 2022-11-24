@@ -58,11 +58,11 @@ interface ObjectRelationship {
 	id: number;
 	label: LocalizedValue<string>;
 	name: string;
-	objectDefinitionId1: number;
-	objectDefinitionId2: number;
+	objectDefinitionExternalReferenceCode1: string;
+	objectDefinitionExternalReferenceCode2: string;
 	readonly objectDefinitionName2: string;
 	objectRelationshipId: number;
-	parameterObjectFieldId?: number;
+	parameterObjectFieldName?: string;
 	reverse: boolean;
 	type: ObjectRelationshipType;
 }
@@ -180,6 +180,14 @@ export async function getObjectField(objectFieldId: number) {
 export async function getObjectFields(objectDefinitionId: number) {
 	return await getList<ObjectField>(
 		`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}/object-fields?pageSize=-1`
+	);
+}
+
+export async function getObjectFieldsByExternalReferenceCode(
+	objectDefinitionExternalReferenceCode: string
+) {
+	return await getList<ObjectField>(
+		`/o/object-admin/v1.0/object-definitions/by-external-reference-code/${objectDefinitionExternalReferenceCode}/object-fields?pageSize=-1`
 	);
 }
 
