@@ -74,6 +74,42 @@ public class ObjectFieldResourceImpl
 		return _entityModel;
 	}
 
+	@Override
+	public Page<ObjectField>
+			getObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectFieldsPage(
+				String objectDefinitionExternalReferenceCode, String search,
+				Filter filter, Pagination pagination, Sort[] sorts)
+		throws Exception {
+
+		com.liferay.object.model.ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.
+				getObjectDefinitionByExternalReferenceCode(
+					objectDefinitionExternalReferenceCode,
+					contextCompany.getCompanyId());
+
+		return SearchUtil.search(
+			null,
+			booleanQuery -> {
+			},
+			filter, com.liferay.object.model.ObjectField.class.getName(),
+			search, pagination,
+			queryConfig -> queryConfig.setSelectedFieldNames(
+				Field.ENTRY_CLASS_PK),
+			searchContext -> {
+				searchContext.setAttribute(Field.NAME, search);
+				searchContext.setAttribute("label", search);
+				searchContext.setAttribute(
+					"objectDefinitionId",
+					objectDefinition.getObjectDefinitionId());
+				searchContext.setCompanyId(contextCompany.getCompanyId());
+			},
+			sorts,
+			document -> _toObjectField(
+				objectDefinition,
+				_objectFieldService.getObjectField(
+					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))));
+	}
+
 	@NestedField(parentClass = ObjectDefinition.class, value = "objectFields")
 	@Override
 	public Page<ObjectField> getObjectDefinitionObjectFieldsPage(
