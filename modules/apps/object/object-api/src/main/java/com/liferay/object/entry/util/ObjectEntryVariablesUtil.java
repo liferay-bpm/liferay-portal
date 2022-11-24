@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.object.internal.action.util;
+package com.liferay.object.entry.util;
 
 import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
 import com.liferay.dynamic.data.mapping.expression.DDMExpression;
