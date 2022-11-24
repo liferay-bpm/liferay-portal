@@ -58,6 +58,12 @@ export default function Action({
 
 		delete objectAction.objectDefinitionId;
 
+		if (!objectAction.label && !Liferay.FeatureFlags['LPS-148804']) {
+			objectAction.label = {
+				[Liferay.ThemeDisplay.getDefaultLanguageId()]: objectAction.name,
+			} as LocalizedValue<string>;
+		}
+
 		try {
 			await API.save(url, objectAction, method);
 			saveAndReload();
@@ -144,7 +150,9 @@ export default function Action({
 			<ClayTabs.Content activeIndex={activeIndex} fade>
 				<ClayTabs.TabPane>
 					<BasicInfo
-						errors={errors}
+						errors={
+							Object.keys(errors).length ? errors : backEndErrors
+						}
 						handleChange={handleChange}
 						readOnly={readOnly}
 						setValues={setValues}

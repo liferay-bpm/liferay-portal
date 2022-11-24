@@ -17,16 +17,18 @@ package com.liferay.object.admin.rest.internal.resource.v1_0;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectAction;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.dto.v1_0.util.ObjectActionUtil;
+import com.liferay.object.admin.rest.internal.odata.entity.v1_0.ObjectActionEntityModel;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectActionResource;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
-import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.service.ObjectActionService;
 import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldSupport;
 import com.liferay.portal.vulcan.pagination.Page;
@@ -34,6 +36,8 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
 import java.util.Objects;
+
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -56,6 +60,11 @@ public class ObjectActionResourceImpl
 	}
 
 	@Override
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap) {
+		return _entityModel;
+	}
+
+	@Override
 	public ObjectAction getObjectAction(Long objectActionId) throws Exception {
 		return _toObjectAction(
 			_objectActionService.getObjectAction(objectActionId));
@@ -64,7 +73,8 @@ public class ObjectActionResourceImpl
 	@NestedField(parentClass = ObjectDefinition.class, value = "objectActions")
 	@Override
 	public Page<ObjectAction> getObjectDefinitionObjectActionsPage(
-			Long objectDefinitionId, String search, Pagination pagination)
+			Long objectDefinitionId, String search, Filter filter,
+			Pagination pagination)
 		throws Exception {
 
 		return SearchUtil.search(
@@ -101,8 +111,8 @@ public class ObjectActionResourceImpl
 			).build(),
 			booleanQuery -> {
 			},
-			null, com.liferay.object.model.ObjectAction.class.getName(), search,
-			pagination,
+			filter, com.liferay.object.model.ObjectAction.class.getName(),
+			search, pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
 				Field.ENTRY_CLASS_PK),
 			searchContext -> {
@@ -126,14 +136,6 @@ public class ObjectActionResourceImpl
 			Objects.equals(
 				objectAction.getObjectActionExecutorKey(),
 				ObjectActionExecutorConstants.KEY_UPDATE_OBJECT_ENTRY)) {
-
-			throw new UnsupportedOperationException();
-		}
-
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-166918")) &&
-			Objects.equals(
-				objectAction.getObjectActionTriggerKey(),
-				ObjectActionTriggerConstants.KEY_STANDALONE)) {
 
 			throw new UnsupportedOperationException();
 		}
@@ -162,14 +164,6 @@ public class ObjectActionResourceImpl
 			Objects.equals(
 				objectAction.getObjectActionExecutorKey(),
 				ObjectActionExecutorConstants.KEY_UPDATE_OBJECT_ENTRY)) {
-
-			throw new UnsupportedOperationException();
-		}
-
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-166918")) &&
-			Objects.equals(
-				objectAction.getObjectActionTriggerKey(),
-				ObjectActionTriggerConstants.KEY_STANDALONE)) {
 
 			throw new UnsupportedOperationException();
 		}
@@ -214,6 +208,9 @@ public class ObjectActionResourceImpl
 			).build(),
 			contextAcceptLanguage.getPreferredLocale(), objectAction);
 	}
+
+	private static final EntityModel _entityModel =
+		new ObjectActionEntityModel();
 
 	@Reference
 	private ObjectActionService _objectActionService;
