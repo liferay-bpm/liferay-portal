@@ -19,9 +19,13 @@ import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.constants.NotificationRecipientConstants;
 import com.liferay.notification.rest.client.dto.v1_0.NotificationTemplate;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.odata.entity.EntityField;
+import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +36,28 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class NotificationTemplateResourceTest
 	extends BaseNotificationTemplateResourceTestCase {
+
+	@Before
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-168220", "true"
+			).build());
+	}
+
+	@After
+	@Override
+	public void tearDown() throws Exception {
+		super.tearDown();
+
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-168220", "false"
+			).build());
+	}
 
 	@Override
 	@Test

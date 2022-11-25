@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
@@ -87,6 +88,10 @@ public class NotificationTemplateResourceImpl
 	public NotificationTemplate getNotificationTemplateByExternalReferenceCode(
 			String externalReferenceCode)
 		throws Exception {
+
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-168220"))) {
+			throw new UnsupportedOperationException();
+		}
 
 		return _toNotificationTemplate(
 			_notificationTemplateService.
@@ -224,6 +229,10 @@ public class NotificationTemplateResourceImpl
 			NotificationTemplate notificationTemplate)
 		throws Exception {
 
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-168220"))) {
+			throw new UnsupportedOperationException();
+		}
+
 		com.liferay.notification.model.NotificationTemplate
 			serviceBuilderNotificationTemplate =
 				_notificationTemplateService.
@@ -319,9 +328,15 @@ public class NotificationTemplateResourceImpl
 					serviceBuilderNotificationTemplate.getDescription();
 				editorType = NotificationTemplate.EditorType.create(
 					serviceBuilderNotificationTemplate.getEditorType());
-				externalReferenceCode =
-					serviceBuilderNotificationTemplate.
-						getExternalReferenceCode();
+
+				if (GetterUtil.getBoolean(
+						PropsUtil.get("feature.flag.LPS-168220"))) {
+
+					externalReferenceCode =
+						serviceBuilderNotificationTemplate.
+							getExternalReferenceCode();
+				}
+
 				id =
 					serviceBuilderNotificationTemplate.
 						getNotificationTemplateId();
