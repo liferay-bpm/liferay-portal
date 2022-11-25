@@ -130,7 +130,16 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		objectDefinitions.put(
 			objectDefinition.getCompanyId(), objectDefinition);
 
-		return Collections.singletonList(
+		List<ServiceRegistration<?>> newServiceRegistrations =
+			new ArrayList<>();
+
+		for (List<ServiceRegistration<?>> serviceRegistrations :
+				_serviceRegistrationsMap.values()) {
+
+			newServiceRegistrations.addAll(serviceRegistrations);
+		}
+
+		newServiceRegistrations.add(
 			_bundleContext.registerService(
 				GraphQLDTOContributor.class,
 				ObjectDefinitionGraphQLDTOContributor.of(
@@ -142,6 +151,8 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				HashMapDictionaryBuilder.<String, Object>put(
 					"dto.name", objectDefinition.getDBTableName()
 				).build()));
+
+		return newServiceRegistrations;
 	}
 
 	public ObjectDefinition getObjectDefinition(
