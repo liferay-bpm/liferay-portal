@@ -192,6 +192,7 @@ public abstract class BaseNotificationTemplateResourceTestCase {
 			randomNotificationTemplate();
 
 		notificationTemplate.setDescription(regex);
+		notificationTemplate.setExternalReferenceCode(regex);
 		notificationTemplate.setName(regex);
 		notificationTemplate.setRecipientType(regex);
 		notificationTemplate.setType(regex);
@@ -204,6 +205,8 @@ public abstract class BaseNotificationTemplateResourceTestCase {
 		notificationTemplate = NotificationTemplateSerDes.toDTO(json);
 
 		Assert.assertEquals(regex, notificationTemplate.getDescription());
+		Assert.assertEquals(
+			regex, notificationTemplate.getExternalReferenceCode());
 		Assert.assertEquals(regex, notificationTemplate.getName());
 		Assert.assertEquals(regex, notificationTemplate.getRecipientType());
 		Assert.assertEquals(regex, notificationTemplate.getType());
@@ -633,6 +636,158 @@ public abstract class BaseNotificationTemplateResourceTestCase {
 	}
 
 	@Test
+	public void testGetNotificationTemplateByExternalReferenceCode()
+		throws Exception {
+
+		NotificationTemplate postNotificationTemplate =
+			testGetNotificationTemplateByExternalReferenceCode_addNotificationTemplate();
+
+		NotificationTemplate getNotificationTemplate =
+			notificationTemplateResource.
+				getNotificationTemplateByExternalReferenceCode(
+					postNotificationTemplate.getExternalReferenceCode());
+
+		assertEquals(postNotificationTemplate, getNotificationTemplate);
+		assertValid(getNotificationTemplate);
+	}
+
+	protected NotificationTemplate
+			testGetNotificationTemplateByExternalReferenceCode_addNotificationTemplate()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetNotificationTemplateByExternalReferenceCode()
+		throws Exception {
+
+		NotificationTemplate notificationTemplate =
+			testGraphQLGetNotificationTemplateByExternalReferenceCode_addNotificationTemplate();
+
+		Assert.assertTrue(
+			equals(
+				notificationTemplate,
+				NotificationTemplateSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"notificationTemplateByExternalReferenceCode",
+								new HashMap<String, Object>() {
+									{
+										put(
+											"externalReferenceCode",
+											"\"" +
+												notificationTemplate.
+													getExternalReferenceCode() +
+														"\"");
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data",
+						"Object/notificationTemplateByExternalReferenceCode"))));
+	}
+
+	@Test
+	public void testGraphQLGetNotificationTemplateByExternalReferenceCodeNotFound()
+		throws Exception {
+
+		String irrelevantExternalReferenceCode =
+			"\"" + RandomTestUtil.randomString() + "\"";
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"notificationTemplateByExternalReferenceCode",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"externalReferenceCode",
+									irrelevantExternalReferenceCode);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected NotificationTemplate
+			testGraphQLGetNotificationTemplateByExternalReferenceCode_addNotificationTemplate()
+		throws Exception {
+
+		return testGraphQLNotificationTemplate_addNotificationTemplate();
+	}
+
+	@Test
+	public void testPutNotificationTemplateByExternalReferenceCode()
+		throws Exception {
+
+		NotificationTemplate postNotificationTemplate =
+			testPutNotificationTemplateByExternalReferenceCode_addNotificationTemplate();
+
+		NotificationTemplate randomNotificationTemplate =
+			randomNotificationTemplate();
+
+		NotificationTemplate putNotificationTemplate =
+			notificationTemplateResource.
+				putNotificationTemplateByExternalReferenceCode(
+					postNotificationTemplate.getExternalReferenceCode(),
+					randomNotificationTemplate);
+
+		assertEquals(randomNotificationTemplate, putNotificationTemplate);
+		assertValid(putNotificationTemplate);
+
+		NotificationTemplate getNotificationTemplate =
+			notificationTemplateResource.
+				getNotificationTemplateByExternalReferenceCode(
+					putNotificationTemplate.getExternalReferenceCode());
+
+		assertEquals(randomNotificationTemplate, getNotificationTemplate);
+		assertValid(getNotificationTemplate);
+
+		NotificationTemplate newNotificationTemplate =
+			testPutNotificationTemplateByExternalReferenceCode_createNotificationTemplate();
+
+		putNotificationTemplate =
+			notificationTemplateResource.
+				putNotificationTemplateByExternalReferenceCode(
+					newNotificationTemplate.getExternalReferenceCode(),
+					newNotificationTemplate);
+
+		assertEquals(newNotificationTemplate, putNotificationTemplate);
+		assertValid(putNotificationTemplate);
+
+		getNotificationTemplate =
+			notificationTemplateResource.
+				getNotificationTemplateByExternalReferenceCode(
+					putNotificationTemplate.getExternalReferenceCode());
+
+		assertEquals(newNotificationTemplate, getNotificationTemplate);
+
+		Assert.assertEquals(
+			newNotificationTemplate.getExternalReferenceCode(),
+			putNotificationTemplate.getExternalReferenceCode());
+	}
+
+	protected NotificationTemplate
+			testPutNotificationTemplateByExternalReferenceCode_createNotificationTemplate()
+		throws Exception {
+
+		return randomNotificationTemplate();
+	}
+
+	protected NotificationTemplate
+			testPutNotificationTemplateByExternalReferenceCode_addNotificationTemplate()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
 	public void testDeleteNotificationTemplate() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		NotificationTemplate notificationTemplate =
@@ -1025,6 +1180,16 @@ public abstract class BaseNotificationTemplateResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (notificationTemplate.getExternalReferenceCode() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("name", additionalAssertFieldName)) {
 				if (notificationTemplate.getName() == null) {
 					valid = false;
@@ -1258,6 +1423,19 @@ public abstract class BaseNotificationTemplateResourceTestCase {
 				if (!Objects.deepEquals(
 						notificationTemplate1.getEditorType(),
 						notificationTemplate2.getEditorType())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						notificationTemplate1.getExternalReferenceCode(),
+						notificationTemplate2.getExternalReferenceCode())) {
 
 					return false;
 				}
@@ -1560,6 +1738,16 @@ public abstract class BaseNotificationTemplateResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("externalReferenceCode")) {
+			sb.append("'");
+			sb.append(
+				String.valueOf(
+					notificationTemplate.getExternalReferenceCode()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("id")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -1666,6 +1854,8 @@ public abstract class BaseNotificationTemplateResourceTestCase {
 				dateCreated = RandomTestUtil.nextDate();
 				dateModified = RandomTestUtil.nextDate();
 				description = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				externalReferenceCode = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
 				name = StringUtil.toLowerCase(RandomTestUtil.randomString());

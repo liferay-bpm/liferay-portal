@@ -168,6 +168,20 @@ public class NotificationTemplateSerDes {
 			sb.append("\"");
 		}
 
+		if (notificationTemplate.getExternalReferenceCode() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"externalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(notificationTemplate.getExternalReferenceCode()));
+
+			sb.append("\"");
+		}
+
 		if (notificationTemplate.getId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -377,6 +391,16 @@ public class NotificationTemplateSerDes {
 				String.valueOf(notificationTemplate.getEditorType()));
 		}
 
+		if (notificationTemplate.getExternalReferenceCode() == null) {
+			map.put("externalReferenceCode", null);
+		}
+		else {
+			map.put(
+				"externalReferenceCode",
+				String.valueOf(
+					notificationTemplate.getExternalReferenceCode()));
+		}
+
 		if (notificationTemplate.getId() == null) {
 			map.put("id", null);
 		}
@@ -517,6 +541,14 @@ public class NotificationTemplateSerDes {
 					notificationTemplate.setEditorType(
 						NotificationTemplate.EditorType.create(
 							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "externalReferenceCode")) {
+
+				if (jsonParserFieldValue != null) {
+					notificationTemplate.setExternalReferenceCode(
+						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
