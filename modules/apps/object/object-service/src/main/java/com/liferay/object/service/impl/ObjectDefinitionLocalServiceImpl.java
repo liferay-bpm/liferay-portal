@@ -1311,7 +1311,7 @@ public class ObjectDefinitionLocalServiceImpl
 				accountEntryRestricted)) {
 
 			throw new ObjectDefinitionAccountEntryRestrictedException(
-				"Account entry restriction cannot be disabled when the " +
+				"Account entry restriction cannot be altered when the " +
 					"object definition is published");
 		}
 	}
