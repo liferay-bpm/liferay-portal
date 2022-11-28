@@ -801,14 +801,16 @@ public class ObjectEntryLocalServiceImpl
 	public String getTitleValue(long objectDefinitionId, long primaryKey)
 		throws PortalException {
 
+		ObjectEntry objectEntry = getObjectEntry(primaryKey);
+
+		String titleValue = objectEntry.getTitleValue();
+
+		if (Validator.isNotNull(titleValue)) {
+			return titleValue;
+		}
+
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
-
-		if (!objectDefinition.isSystem()) {
-			ObjectEntry objectEntry = getObjectEntry(primaryKey);
-
-			return objectEntry.getTitleValue();
-		}
 
 		ObjectField titleObjectField =
 			_objectFieldLocalService.fetchObjectField(

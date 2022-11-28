@@ -60,7 +60,9 @@ public class ObjectEntryWorkflowHandler
 			ObjectEntry objectEntry = _objectEntryLocalService.getObjectEntry(
 				classPK);
 
-			return objectEntry.getTitleValue();
+			return _objectEntryLocalService.getTitleValue(
+				objectEntry.getObjectDefinitionId(),
+				objectEntry.getPrimaryKey());
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
