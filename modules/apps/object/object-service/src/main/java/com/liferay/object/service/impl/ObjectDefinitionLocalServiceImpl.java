@@ -1312,7 +1312,7 @@ public class ObjectDefinitionLocalServiceImpl
 
 			throw new ObjectDefinitionAccountEntryRestrictedException(
 				"Account entry restriction cannot be disabled when the " +
-				"object definition is published");
+					"object definition is published");
 		}
 	}
 
