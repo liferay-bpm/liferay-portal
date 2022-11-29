@@ -2656,7 +2656,7 @@ definition {
 
 			CreateObject.saveObject();
 
-			Alert.viewErrorMessage(errorMessage = "Error:If activated, the account restriction field must be selected.");
+			Alert.viewErrorMessage(errorMessage = "Error:If activated, the Account Restriction Field must be selected.");
 
 			CreateObject.activeToogleAccountRestriction();
 
