@@ -14,7 +14,8 @@ import React from 'react';
 
 import SXPElement from '../../../../src/main/resources/META-INF/resources/sxp_blueprint_admin/js/shared/sxp_element/index';
 import {getUIConfigurationValues} from '../../../../src/main/resources/META-INF/resources/sxp_blueprint_admin/js/utils/utils';
-import {INDEX_FIELDS, QUERY_SXP_ELEMENTS} from '../../mocks/data';
+import {INDEX_FIELDS} from '../../mocks/data';
+import {QUERY_SXP_ELEMENTS} from '../../mocks/sxpElements';
 
 import '@testing-library/jest-dom/extend-expect';
 

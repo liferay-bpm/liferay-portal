@@ -149,7 +149,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
-		KBArticle.selectPGViaKBArticle(
+		KBArticle.selectArticlesToDisplayOnWidget(
 			kbArticleTitle = "KB Folder",
 			kbDisplay = "true",
 			pageName = "Knowledge Base Article Page");
@@ -255,8 +255,6 @@ definition {
 	@priority = "3"
 	@refactordone
 	test CannotAddDuplicateFolder {
-		property test.name.skip.portal.instance = "KBFolder#CannotAddDuplicateFolder";
-
 		JSONKnowledgeBase.addkBFolder(
 			groupName = "Guest",
 			kbFolderDescription = "KB Folder 1 Description",

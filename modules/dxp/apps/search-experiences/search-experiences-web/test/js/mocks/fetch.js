@@ -9,7 +9,8 @@
  * distribution rights of the Software.
  */
 
-import {INDEX_FIELDS, QUERY_SXP_ELEMENTS, mockClassNames} from './data';
+import {INDEX_FIELDS, mockClassNames} from './data';
+import {QUERY_SXP_ELEMENTS} from './sxpElements';
 
 function trimURL(url) {
 	let trimmedURL = url.href || url; // Handling if url is a URL object or a string

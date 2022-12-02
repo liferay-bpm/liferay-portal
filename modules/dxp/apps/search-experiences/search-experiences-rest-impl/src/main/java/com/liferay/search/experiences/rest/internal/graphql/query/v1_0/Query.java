@@ -166,10 +166,12 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {fieldMappingInfos(query: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {fieldMappingInfos(external: ___, indexName: ___, query: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public FieldMappingInfoPage fieldMappingInfos(
+			@GraphQLName("external") Boolean external,
+			@GraphQLName("indexName") String indexName,
 			@GraphQLName("query") String query)
 		throws Exception {
 
@@ -177,7 +179,8 @@ public class Query {
 			_fieldMappingInfoResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			fieldMappingInfoResource -> new FieldMappingInfoPage(
-				fieldMappingInfoResource.getFieldMappingInfosPage(query)));
+				fieldMappingInfoResource.getFieldMappingInfosPage(
+					external, indexName, query)));
 	}
 
 	/**

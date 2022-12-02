@@ -147,6 +147,8 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 		WebDriver.Options options = webDriver.manage();
 
+		options.deleteAllCookies();
+
 		WebDriver.Window window = options.window();
 
 		window.setSize(new Dimension(1280, 1040));
@@ -2347,15 +2349,11 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 		WebDriver.TargetLocator targetLocator = switchTo();
 
 		if (locator.equals("relative=parent")) {
-			targetLocator.window(_defaultWindowHandle);
-
 			if (!_frameWebElements.isEmpty()) {
 				_frameWebElements.pop();
-
-				if (!_frameWebElements.isEmpty()) {
-					targetLocator.frame(_frameWebElements.peek());
-				}
 			}
+
+			targetLocator.parentFrame();
 		}
 		else if (locator.equals("relative=top")) {
 			_frameWebElements.clear();
@@ -4358,7 +4356,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 		WebDriverWait webDriverWait = new WebDriverWait(this, 5);
 
 		webDriverWait.until(
-			ExpectedConditions.presenceOfElementLocated(By.xpath(locator)));
+			ExpectedConditions.presenceOfElementLocated(getBy(locator)));
 
 		return getWrappedWebDriver(getWebElement(locator));
 	}

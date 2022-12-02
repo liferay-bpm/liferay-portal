@@ -947,13 +947,14 @@
     "@babel/helper-validator-identifier" "^7.16.7"
     to-fast-properties "^2.0.0"
 
-"@clayui/button@3.73.0":
-  version "3.73.0"
-  resolved "https://registry.yarnpkg.com/@clayui/button/-/button-3.73.0.tgz#6e4240b18785b1a5db41578be0960d7170479980"
-  integrity sha512-KfG9Mnq7MmA/Ve+BB8JFsHZXJDfjXsWNlJeCNJITfPjNHqWI+SR3Z64fAHNcM5ZkWDFf12CQNXa/0IoW7ghkTA==
+"@clayui/button@3.81.0":
+  version "3.81.0"
+  resolved "https://registry.yarnpkg.com/@clayui/button/-/button-3.81.0.tgz#013dd05ae53ef9a79af2ef190fee2d58f4d7d035"
+  integrity sha512-/EuWH8LYgSrMUi86WD9WU8dOmICrtVRvZm6TRGoRbuWNLeOH2rEjP+BdtM9qYPakvxuWo6e6OQoCBWOkrhSJMQ==
   dependencies:
     "@clayui/icon" "^3.56.0"
     classnames "^2.2.6"
+    warning "^4.0.3"
 
 "@clayui/charts@3.65.0":
   version "3.65.0"

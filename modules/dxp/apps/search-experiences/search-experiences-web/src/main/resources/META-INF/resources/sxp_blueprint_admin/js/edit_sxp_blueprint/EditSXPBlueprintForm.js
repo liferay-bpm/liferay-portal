@@ -30,8 +30,12 @@ import PageToolbar from '../shared/PageToolbar';
 import Sidebar from '../shared/Sidebar';
 import SubmitWarningModal from '../shared/SubmitWarningModal';
 import ThemeContext from '../shared/ThemeContext';
-import {DEFAULT_ERROR, SIDEBARS} from '../utils/constants';
-import {fetchData, fetchPreviewSearch} from '../utils/fetch';
+import {
+	DEFAULT_ERROR,
+	DEFAULT_INDEX_CONFIGURATION,
+	SIDEBARS,
+} from '../utils/constants';
+import {addParams, fetchData, fetchPreviewSearch} from '../utils/fetch';
 import {INPUT_TYPES} from '../utils/inputTypes';
 import {formatLocaleWithUnderscores, renameKeys} from '../utils/language';
 import {setStorageAddSXPElementSidebar} from '../utils/sessionStorage';
@@ -397,9 +401,9 @@ function EditSXPBlueprintForm({
 				null,
 				'\t'
 			),
-			indexConfig: initialConfiguration.indexConfiguration || {
-				indexName: '',
-			},
+			indexConfig:
+				initialConfiguration.indexConfiguration ||
+				DEFAULT_INDEX_CONFIGURATION,
 			parameterConfig: JSON.stringify(
 				initialConfiguration.parameterConfiguration,
 				null,
@@ -419,28 +423,6 @@ function EditSXPBlueprintForm({
 	useShouldConfirmBeforeNavigate(formik.dirty && !formik.isSubmitting);
 
 	useEffect(() => {
-
-		// Example response:
-		// {
-		// 	actions: {},
-		// 	facets: [],
-		// 	items: [
-		// 		{
-		// 			languageIdPosition: -1,
-		// 			name: 'ddmTemplateKey',
-		// 			type: 'keyword',
-		// 		}
-		// 	],
-		// 	lastPage: 1,
-		// 	page: 1,
-		// 	pageSize: 218,
-		// 	totalCount: 218,
-		// }
-
-		fetchData(`/o/search-experiences-rest/v1.0/field-mapping-infos`)
-			.then((responseContent) => setIndexFields(responseContent.items))
-			.catch(() => setIndexFields([]));
-
 		if (featureFlagLps153813 && isCompanyAdmin) {
 
 			// Example response:
@@ -449,6 +431,7 @@ function EditSXPBlueprintForm({
 			// 	facets: [],
 			// 	items: [
 			// 		{
+			// 			external: false,
 			// 			name: 'search-tuning-rankings',
 			// 		}
 			// 	],
@@ -470,6 +453,41 @@ function EditSXPBlueprintForm({
 
 		setStorageAddSXPElementSidebar('open');
 	}, []); //eslint-disable-line
+
+	/**
+	 * Refetch field mapping infos when indexConfiguration changes.
+	 */
+	useEffect(() => {
+
+		// Example response:
+		// {
+		// 	actions: {},
+		// 	facets: [],
+		// 	items: [
+		// 		{
+		// 			languageIdPosition: -1,
+		// 			name: 'ddmTemplateKey',
+		// 			type: 'keyword',
+		// 		}
+		// 	],
+		// 	lastPage: 1,
+		// 	page: 1,
+		// 	pageSize: 218,
+		// 	totalCount: 218,
+		// }
+
+		fetchData(
+			addParams('/o/search-experiences-rest/v1.0/field-mapping-infos', {
+				external: formik.values.indexConfig.external,
+				indexName: formik.values.indexConfig.indexName,
+			})
+		)
+			.then((responseContent) => setIndexFields(responseContent.items))
+			.catch(() => setIndexFields([]));
+	}, [
+		formik.values.indexConfig.external,
+		formik.values.indexConfig.indexName,
+	]);
 
 	/**
 	 * Formats the form values for the "configuration" parameter to send to
@@ -508,7 +526,8 @@ function EditSXPBlueprintForm({
 		};
 
 		if (featureFlagLps153813) {
-			configuration.indexConfiguration = indexConfig || {};
+			configuration.indexConfiguration =
+				indexConfig || DEFAULT_INDEX_CONFIGURATION;
 		}
 
 		return configuration;
@@ -841,7 +860,10 @@ function EditSXPBlueprintForm({
 	};
 
 	const _isIndexCompany = () => {
-		return formik.values.indexConfig.indexName === '';
+		return (
+			formik.values.indexConfig.indexName ===
+			DEFAULT_INDEX_CONFIGURATION.indexName
+		);
 	};
 
 	const _renderTabContent = () => {

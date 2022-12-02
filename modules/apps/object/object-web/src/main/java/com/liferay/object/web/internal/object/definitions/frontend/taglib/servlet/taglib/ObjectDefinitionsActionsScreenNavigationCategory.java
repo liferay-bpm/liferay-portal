@@ -19,6 +19,7 @@ import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
 import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
 import com.liferay.object.action.trigger.ObjectActionTriggerRegistry;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.web.internal.object.definitions.constants.ObjectDefinitionsScreenNavigationEntryConstants;
 import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsActionsDisplayContext;
 import com.liferay.portal.kernel.json.JSONFactory;
@@ -87,9 +88,9 @@ public class ObjectDefinitionsActionsScreenNavigationCategory
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
 			new ObjectDefinitionsActionsDisplayContext(
-				httpServletRequest, _objectActionExecutorRegistry,
-				_objectActionTriggerRegistry,
-				_objectDefinitionModelResourcePermission, _jsonFactory));
+				httpServletRequest, _jsonFactory, _objectActionExecutorRegistry,
+				_objectActionTriggerRegistry, _objectDefinitionLocalService,
+				_objectDefinitionModelResourcePermission));
 
 		super.render(httpServletRequest, httpServletResponse);
 	}
@@ -105,6 +106,9 @@ public class ObjectDefinitionsActionsScreenNavigationCategory
 
 	@Reference
 	private ObjectActionTriggerRegistry _objectActionTriggerRegistry;
+
+	@Reference
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.object.model.ObjectDefinition)"

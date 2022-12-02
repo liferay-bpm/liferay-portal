@@ -27,6 +27,7 @@ import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.model.KBComment;
 import com.liferay.knowledge.base.model.KBFolder;
 import com.liferay.knowledge.base.model.KBTemplate;
+import com.liferay.knowledge.base.service.KBArticleServiceUtil;
 import com.liferay.knowledge.base.web.internal.KBUtil;
 import com.liferay.knowledge.base.web.internal.constants.KBWebKeys;
 import com.liferay.knowledge.base.web.internal.security.permission.resource.AdminPermission;
@@ -53,6 +54,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.rss.util.RSSUtil;
 import com.liferay.subscription.service.SubscriptionLocalServiceUtil;
 import com.liferay.taglib.security.PermissionsURLTag;
@@ -104,7 +106,12 @@ public class KBDropdownItemsProvider {
 					_getEditActionUnsafeConsumer(kbArticle)
 				).add(
 					this::_hasAddPermission,
-					_getAddChildActionUnsafeConsumer(kbArticle)
+					_getAddChildKBArticleActionUnsafeConsumer(kbArticle)
+				).add(
+					() ->
+						_hasChildKBArticles(kbArticle) &&
+						_hasViewChildKBArticlesPermission(),
+					_getViewChildKBArticlesActionUnsafeConsumer(kbArticle)
 				).add(
 					() ->
 						_isSubscriptionEnabled() &&
@@ -322,7 +329,7 @@ public class KBDropdownItemsProvider {
 	}
 
 	private UnsafeConsumer<DropdownItem, Exception>
-		_getAddChildActionUnsafeConsumer(KBArticle kbArticle) {
+		_getAddChildKBArticleActionUnsafeConsumer(KBArticle kbArticle) {
 
 		return dropdownItem -> {
 			dropdownItem.setHref(
@@ -910,6 +917,35 @@ public class KBDropdownItemsProvider {
 		};
 	}
 
+	private UnsafeConsumer<DropdownItem, Exception>
+		_getViewChildKBArticlesActionUnsafeConsumer(KBArticle kbArticle) {
+
+		return dropdownItem -> {
+			dropdownItem.setHref(
+				PortletURLBuilder.createRenderURL(
+					_liferayPortletResponse
+				).setMVCPath(
+					"/admin/view_kb_articles.jsp"
+				).setRedirect(
+					_currentURL
+				).setParameter(
+					"parentResourceClassNameId", kbArticle.getClassNameId()
+				).setParameter(
+					"parentResourcePrimKey", kbArticle.getResourcePrimKey()
+				).setParameter(
+					"resourceClassNameId", kbArticle.getClassNameId()
+				).setParameter(
+					"resourcePrimKey", kbArticle.getResourcePrimKey()
+				).setParameter(
+					"selectedItemId", kbArticle.getResourcePrimKey()
+				).buildRenderURL());
+			dropdownItem.setLabel(
+				LanguageUtil.get(
+					_liferayPortletRequest.getHttpServletRequest(),
+					"view-child-articles"));
+		};
+	}
+
 	private boolean _hasAddPermission() {
 		PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
 
@@ -933,6 +969,18 @@ public class KBDropdownItemsProvider {
 				portletDisplay.getRootPortletId(),
 				KBPortletKeys.KNOWLEDGE_BASE_DISPLAY)) {
 
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean _hasChildKBArticles(KBArticle kbArticle) {
+		int kbArticlesCount = KBArticleServiceUtil.getKBArticlesCount(
+			_themeDisplay.getScopeGroupId(), kbArticle.getResourcePrimKey(),
+			WorkflowConstants.STATUS_ANY);
+
+		if (kbArticlesCount > 0) {
 			return true;
 		}
 
@@ -1198,6 +1246,19 @@ public class KBDropdownItemsProvider {
 		if (KBTemplatePermission.contains(
 				_themeDisplay.getPermissionChecker(), kbTemplate,
 				KBActionKeys.UPDATE)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean _hasViewChildKBArticlesPermission() {
+		PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
+
+		if (Objects.equals(
+				portletDisplay.getRootPortletId(),
+				KBPortletKeys.KNOWLEDGE_BASE_ADMIN)) {
 
 			return true;
 		}

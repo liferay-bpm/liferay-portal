@@ -16,9 +16,15 @@ import {
 	getDefaultValue,
 	getUIConfigurationValues,
 	isDefined,
+	isElementInactiveFromNonCompanyIndex,
 	isEmpty,
 	replaceStr,
 } from '../../../src/main/resources/META-INF/resources/sxp_blueprint_admin/js/utils/utils';
+import {
+	BOOST_ALL_KEYWORDS_MATCH,
+	BOOST_ASSET_TYPE,
+	USER_CREATED_ELEMENT,
+} from '../mocks/sxpElements';
 
 describe('utils', () => {
 	describe('isDefined', () => {
@@ -48,6 +54,53 @@ describe('utils', () => {
 
 		it('returns true for object', () => {
 			expect(isDefined({test: [1, 2, 3]})).toEqual(true);
+		});
+	});
+
+	describe('isElementInactiveFromNonCompanyIndex', () => {
+		it('returns false if index is company index', () => {
+			expect(
+				isElementInactiveFromNonCompanyIndex(
+					true,
+					BOOST_ALL_KEYWORDS_MATCH
+				)
+			).toEqual(false);
+		});
+
+		it('returns false if index is company index and element is Boost Asset Type', () => {
+			expect(
+				isElementInactiveFromNonCompanyIndex(true, BOOST_ASSET_TYPE)
+			).toEqual(false);
+		});
+
+		it('returns false if index is company index and element is user-created element', () => {
+			expect(
+				isElementInactiveFromNonCompanyIndex(true, USER_CREATED_ELEMENT)
+			).toEqual(false);
+		});
+
+		it('returns false if index is non-company index and element is Boost All Keywords Match', () => {
+			expect(
+				isElementInactiveFromNonCompanyIndex(
+					false,
+					BOOST_ALL_KEYWORDS_MATCH
+				)
+			).toEqual(false);
+		});
+
+		it('returns true if index is non-company index and element is Boost Asset Type', () => {
+			expect(
+				isElementInactiveFromNonCompanyIndex(false, BOOST_ASSET_TYPE)
+			).toEqual(true);
+		});
+
+		it('returns false if index is non-company index and element is a user-created element', () => {
+			expect(
+				isElementInactiveFromNonCompanyIndex(
+					false,
+					USER_CREATED_ELEMENT
+				)
+			).toEqual(false);
 		});
 	});
 

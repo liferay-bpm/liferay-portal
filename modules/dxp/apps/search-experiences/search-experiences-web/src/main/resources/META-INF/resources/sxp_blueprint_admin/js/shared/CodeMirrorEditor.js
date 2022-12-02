@@ -36,9 +36,12 @@ import 'codemirror/addon/hint/show-hint';
 import 'codemirror/lib/codemirror.css';
 
 import 'codemirror/mode/javascript/javascript';
+import ClayLoadingIndicator from '@clayui/loading-indicator';
+import getCN from 'classnames';
 import CodeMirror from 'codemirror';
 import React, {useContext, useEffect, useRef} from 'react';
 
+import useAsyncCall from '../hooks/useAsyncCall';
 import ThemeContext from './ThemeContext';
 
 const AUTOCOMPLETE_EXCLUDED_KEYS = new Set([
@@ -658,6 +661,7 @@ const CodeMirrorEditor = React.forwardRef(
 		{
 			autocompleteSchema,
 			folded = false,
+			foldInitializationDelay = 0,
 			lineWrapping = true,
 			onChange = () => {},
 			mode = 'json',
@@ -670,6 +674,20 @@ const CodeMirrorEditor = React.forwardRef(
 		const editorWrapperRef = useRef();
 		const editorRef = useCombinedRefs(ref, innerRef);
 		const {availableLanguages} = useContext(ThemeContext);
+
+		const [foldLoading] = useAsyncCall(() => {
+			if (folded && editorRef.current) {
+				editorRef.current.operation(() => {
+					for (
+						let line = editorRef.current.firstLine() + 1;
+						line <= editorRef.current.lastLine() - 1;
+						++line
+					) {
+						editorRef.current.foldCode({ch: 0, line}, null, 'fold');
+					}
+				});
+			}
+		}, foldInitializationDelay);
 
 		useEffect(() => {
 			if (editorWrapperRef.current) {
@@ -723,27 +741,25 @@ const CodeMirrorEditor = React.forwardRef(
 					});
 				}
 
-				if (folded) {
-					codeMirror.operation(() => {
-						for (
-							let line = codeMirror.firstLine() + 1;
-							line <= codeMirror.lastLine() - 1;
-							++line
-						) {
-							codeMirror.foldCode({ch: 0, line}, null, 'fold');
-						}
-					});
-				}
-
 				editorRef.current = codeMirror;
 			}
 		}, [editorWrapperRef]); // eslint-disable-line
 
 		return (
-			<div
-				className="codemirror-editor-wrapper"
-				ref={editorWrapperRef}
-			></div>
+			<>
+				{foldLoading && (
+					<div className="codemirror-loading-state">
+						<ClayLoadingIndicator />
+					</div>
+				)}
+
+				<div
+					className={getCN('codemirror-editor-wrapper', {
+						hide: foldLoading,
+					})}
+					ref={editorWrapperRef}
+				></div>
+			</>
 		);
 	}
 );

@@ -379,6 +379,32 @@ public class StructuredContentResourceTest
 
 	@Override
 	@Test
+	public void testPatchStructuredContent() throws Exception {
+		super.testPatchStructuredContent();
+
+		StructuredContent structuredContent = randomStructuredContent();
+
+		structuredContent.setPriority(1.0);
+
+		StructuredContent postStructuredContent =
+			structuredContentResource.postSiteStructuredContent(
+				testGroup.getGroupId(), structuredContent);
+
+		StructuredContent patchStructuredContent =
+			structuredContentResource.patchStructuredContent(
+				postStructuredContent.getId(),
+				new StructuredContent() {
+					{
+						title = RandomTestUtil.randomString();
+					}
+				});
+
+		Assert.assertEquals(
+			Double.valueOf(1.0), patchStructuredContent.getPriority());
+	}
+
+	@Override
+	@Test
 	public void testPostSiteStructuredContent() throws Exception {
 		super.testPostSiteStructuredContent();
 

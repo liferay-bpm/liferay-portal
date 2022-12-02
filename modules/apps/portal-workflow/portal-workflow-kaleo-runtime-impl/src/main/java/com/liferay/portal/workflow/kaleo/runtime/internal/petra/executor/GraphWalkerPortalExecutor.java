@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.NamedThreadFactory;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
@@ -145,6 +146,16 @@ public class GraphWalkerPortalExecutor {
 
 	private void _walk(PathElement pathElement) {
 		try {
+			ExecutionContext executionContext =
+				pathElement.getExecutionContext();
+
+			if (PrincipalThreadLocal.getUserId() == 0) {
+				ServiceContext serviceContext =
+					executionContext.getServiceContext();
+
+				PrincipalThreadLocal.setName(serviceContext.getUserId());
+			}
+
 			Queue<List<PathElement>> queue = new LinkedList<>();
 
 			queue.add(Collections.singletonList(pathElement));

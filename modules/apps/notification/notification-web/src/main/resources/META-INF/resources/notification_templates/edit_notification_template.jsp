@@ -23,9 +23,11 @@ ViewNotificationTemplatesDisplayContext viewNotificationTemplatesDisplayContext 
 
 NotificationTemplate notificationTemplate = viewNotificationTemplatesDisplayContext.getNotificationTemplate();
 
+String externalReferenceCode = StringPool.BLANK;
 long notificationTemplateId = 0;
 
 if (notificationTemplate != null) {
+	externalReferenceCode = notificationTemplate.getExternalReferenceCode();
 	notificationTemplateId = notificationTemplate.getNotificationTemplateId();
 }
 
@@ -44,6 +46,8 @@ renderResponse.setTitle(LanguageUtil.get(request, "notification-template"));
 			"baseResourceURL", String.valueOf(baseResourceURL)
 		).put(
 			"editorConfig", viewNotificationTemplatesDisplayContext.getEditorConfig()
+		).put(
+			"externalReferenceCode", externalReferenceCode
 		).put(
 			"notificationTemplateId", notificationTemplateId
 		).put(

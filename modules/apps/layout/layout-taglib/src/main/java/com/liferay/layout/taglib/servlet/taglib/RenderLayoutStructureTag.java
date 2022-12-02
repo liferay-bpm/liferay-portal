@@ -66,7 +66,6 @@ import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutTemplate;
 import com.liferay.portal.kernel.model.LayoutTemplateConstants;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
-import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutTemplateLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.PipingServletResponse;
 import com.liferay.portal.kernel.servlet.SessionErrors;
@@ -195,6 +194,29 @@ public class RenderLayoutStructureTag extends IncludeTag {
 		return layoutStructureProvider.getLayoutStructure(
 			themeDisplay.getPlid(),
 			SegmentsExperienceUtil.getSegmentsExperienceId(httpServletRequest));
+	}
+
+	private LayoutTypePortlet _getLayoutTypePortlet(
+		Layout layout, LayoutTypePortlet layoutTypePortlet, String themeId) {
+
+		String layoutTemplateId = layoutTypePortlet.getLayoutTemplateId();
+
+		if (Validator.isNull(layoutTemplateId)) {
+			return layoutTypePortlet;
+		}
+
+		LayoutTemplate layoutTemplate =
+			LayoutTemplateLocalServiceUtil.getLayoutTemplate(
+				layoutTemplateId, false, themeId);
+
+		if (layoutTemplate != null) {
+			return layoutTypePortlet;
+		}
+
+		layoutTypePortlet.setLayoutTemplateId(
+			layout.getUserId(), PropsValues.DEFAULT_LAYOUT_TEMPLATE_ID);
+
+		return layoutTypePortlet;
 	}
 
 	private void _renderCollectionStyledLayoutStructureItem(
@@ -694,7 +716,7 @@ public class RenderLayoutStructureTag extends IncludeTag {
 		Layout layout = themeDisplay.getLayout();
 
 		if (Objects.equals(layout.getType(), LayoutConstants.TYPE_PORTLET)) {
-			LayoutTypePortlet layoutTypePortlet = _updateLayoutTemplate(
+			LayoutTypePortlet layoutTypePortlet = _getLayoutTypePortlet(
 				layout, themeDisplay.getLayoutTypePortlet(),
 				themeDisplay.getThemeId());
 
@@ -1228,34 +1250,6 @@ public class RenderLayoutStructureTag extends IncludeTag {
 		}
 
 		jspWriter.write("</div>");
-	}
-
-	private LayoutTypePortlet _updateLayoutTemplate(
-			Layout layout, LayoutTypePortlet layoutTypePortlet, String themeId)
-		throws Exception {
-
-		String layoutTemplateId = layoutTypePortlet.getLayoutTemplateId();
-
-		if (Validator.isNull(layoutTemplateId)) {
-			return layoutTypePortlet;
-		}
-
-		LayoutTemplate layoutTemplate =
-			LayoutTemplateLocalServiceUtil.getLayoutTemplate(
-				layoutTemplateId, false, themeId);
-
-		if (layoutTemplate != null) {
-			return layoutTypePortlet;
-		}
-
-		layoutTypePortlet.setLayoutTemplateId(
-			layout.getUserId(), PropsValues.DEFAULT_LAYOUT_TEMPLATE_ID);
-
-		layout = LayoutLocalServiceUtil.updateLayout(
-			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
-			layout.getTypeSettings());
-
-		return (LayoutTypePortlet)layout.getLayoutType();
 	}
 
 	private void _write(

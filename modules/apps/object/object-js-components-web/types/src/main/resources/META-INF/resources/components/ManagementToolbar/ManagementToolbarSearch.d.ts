@@ -12,6 +12,15 @@
  * details.
  */
 
-export default function isNullOrUndefined(value) {
-	return value === undefined || value === null;
+/// <reference types="react" />
+
+import './ManagementToolbarSearch.scss';
+interface IProps {
+	query: string;
+	setQuery: (value: string) => void;
 }
+export declare function ManagementToolbarSearch({
+	query,
+	setQuery,
+}: IProps): JSX.Element;
+export {};

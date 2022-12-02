@@ -16,11 +16,8 @@ import EditSXPBlueprintForm from '../../../src/main/resources/META-INF/resources
 import * as fetchUtils from '../../../src/main/resources/META-INF/resources/sxp_blueprint_admin/js/utils/fetch';
 const Toasts = require('../../../src/main/resources/META-INF/resources/sxp_blueprint_admin/js/utils/toasts');
 import {getUIConfigurationValues} from '../../../src/main/resources/META-INF/resources/sxp_blueprint_admin/js/utils/utils';
-import {
-	ENTITY_JSON,
-	INITIAL_CONFIGURATION,
-	QUERY_SXP_ELEMENTS,
-} from '../mocks/data';
+import {ENTITY_JSON, INITIAL_CONFIGURATION} from '../mocks/data';
+import {QUERY_SXP_ELEMENTS} from '../mocks/sxpElements';
 
 import '@testing-library/jest-dom/extend-expect';
 

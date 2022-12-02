@@ -170,7 +170,6 @@ function PreviewSidebar({
 				<ManagementToolbar.Item>
 					<PreviewModalWithCopyDownload
 						fileName="raw_request.json"
-						folded
 						lineWrapping={false}
 						size="lg"
 						text={parseAndPrettifyJSON(requestString)}
@@ -191,6 +190,7 @@ function PreviewSidebar({
 				<ManagementToolbar.Item>
 					<PreviewModalWithCopyDownload
 						fileName="raw_response.json"
+						foldInitializationDelay={200}
 						folded
 						lineWrapping={false}
 						size="lg"

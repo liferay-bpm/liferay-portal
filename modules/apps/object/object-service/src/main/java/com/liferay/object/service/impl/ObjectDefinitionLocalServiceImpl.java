@@ -159,8 +159,8 @@ public class ObjectDefinitionLocalServiceImpl
 
 		return _addObjectDefinition(
 			userId, null, null, labelMap, name, panelAppOrder, panelCategoryKey,
-			null, null, pluralLabelMap, scope, storageType, false, 0,
-			WorkflowConstants.STATUS_DRAFT, objectFields);
+			null, null, pluralLabelMap, scope, storageType, false,
+			StringPool.BLANK, 0, WorkflowConstants.STATUS_DRAFT, objectFields);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -199,7 +199,13 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectEntryTable.INSTANCE.objectEntryId.getName(),
 			objectDefinition.isSystem(), userId);
 
-		return objectDefinition;
+		// _setTitleObjectFieldId must be called after adding all object fields.
+		// However, to add the object fields, the object definition must already
+		// be persisted.
+
+		_setTitleObjectFieldId(objectDefinition, StringPool.BLANK);
+
+		return objectDefinitionPersistence.update(objectDefinition);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -228,6 +234,7 @@ public class ObjectDefinitionLocalServiceImpl
 				primaryKeyColumn.getName(), primaryKeyColumn.getName(),
 				systemObjectDefinitionMetadata.getPluralLabelMap(),
 				systemObjectDefinitionMetadata.getScope(),
+				systemObjectDefinitionMetadata.getTitleObjectFieldName(),
 				systemObjectDefinitionMetadata.getVersion(),
 				systemObjectDefinitionMetadata.getObjectFields());
 		}
@@ -290,15 +297,17 @@ public class ObjectDefinitionLocalServiceImpl
 			long userId, String className, String dbTableName,
 			Map<Locale, String> labelMap, String name,
 			String pkObjectFieldDBColumnName, String pkObjectFieldName,
-			Map<Locale, String> pluralLabelMap, String scope, int version,
+			Map<Locale, String> pluralLabelMap, String scope,
+			String titleObjectFieldName, int version,
 			List<ObjectField> objectFields)
 		throws PortalException {
 
 		return _addObjectDefinition(
 			userId, className, dbTableName, labelMap, name, null, null,
 			pkObjectFieldDBColumnName, pkObjectFieldName, pluralLabelMap, scope,
-			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT, true, version,
-			WorkflowConstants.STATUS_APPROVED, objectFields);
+			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT, true,
+			titleObjectFieldName, version, WorkflowConstants.STATUS_APPROVED,
+			objectFields);
 	}
 
 	@Override
@@ -805,8 +814,9 @@ public class ObjectDefinitionLocalServiceImpl
 			Map<Locale, String> labelMap, String name, String panelAppOrder,
 			String panelCategoryKey, String pkObjectFieldDBColumnName,
 			String pkObjectFieldName, Map<Locale, String> pluralLabelMap,
-			String scope, String storageType, boolean system, int version,
-			int status, List<ObjectField> objectFields)
+			String scope, String storageType, boolean system,
+			String titleObjectFieldName, int version, int status,
+			List<ObjectField> objectFields)
 		throws PortalException {
 
 		User user = _userLocalService.getUser(userId);
@@ -908,6 +918,14 @@ public class ObjectDefinitionLocalServiceImpl
 				}
 			}
 		}
+
+		// _setTitleObjectFieldId must be called after adding all object fields.
+		// However, to add the object fields, the object definition must already
+		// be persisted.
+
+		_setTitleObjectFieldId(objectDefinition, titleObjectFieldName);
+
+		objectDefinition = objectDefinitionPersistence.update(objectDefinition);
 
 		if (system) {
 			_createTable(
@@ -1137,6 +1155,25 @@ public class ObjectDefinitionLocalServiceImpl
 		}
 	}
 
+	private void _setTitleObjectFieldId(
+			ObjectDefinition objectDefinition, String titleObjectFieldName)
+		throws PortalException {
+
+		if (StringUtil.equals(titleObjectFieldName, StringPool.BLANK)) {
+			titleObjectFieldName = "id";
+		}
+
+		ObjectField objectField = _objectFieldPersistence.findByODI_N(
+			objectDefinition.getObjectDefinitionId(), titleObjectFieldName);
+
+		if (objectDefinition.isSystem()) {
+			_validateObjectFieldId(
+				objectDefinition, objectField.getObjectFieldId());
+		}
+
+		objectDefinition.setTitleObjectFieldId(objectField.getObjectFieldId());
+	}
+
 	private ObjectDefinition _updateObjectDefinition(
 			String externalReferenceCode, ObjectDefinition objectDefinition,
 			long accountEntryRestrictedObjectFieldId,
@@ -1249,7 +1286,19 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setPKObjectFieldName(pkObjectFieldName);
 		objectDefinition.setScope(scope);
 
-		return objectDefinitionPersistence.update(objectDefinition);
+		objectDefinition = objectDefinitionPersistence.update(objectDefinition);
+
+		for (ObjectField objectField :
+				_objectFieldLocalService.getObjectFields(
+					objectDefinition.getObjectDefinitionId(),
+					StringPool.BLANK)) {
+
+			objectField.setDBTableName(objectDefinition.getDBTableName());
+
+			_objectFieldLocalService.updateObjectField(objectField);
+		}
+
+		return objectDefinition;
 	}
 
 	private void _updateWorkflowInstances(ObjectDefinition objectDefinition)

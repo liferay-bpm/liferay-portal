@@ -54,7 +54,8 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface FieldMappingInfoResource {
 
-	public Page<FieldMappingInfo> getFieldMappingInfosPage(String query)
+	public Page<FieldMappingInfo> getFieldMappingInfosPage(
+			Boolean external, String indexName, String query)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

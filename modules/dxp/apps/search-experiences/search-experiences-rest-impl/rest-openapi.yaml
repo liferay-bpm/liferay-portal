@@ -591,6 +591,14 @@ paths:
             operationId: getFieldMappingInfosPage
             parameters:
                 - in: query
+                  name: external
+                  schema:
+                      type: boolean
+                - in: query
+                  name: indexName
+                  schema:
+                      type: string
+                - in: query
                   name: query
                   schema:
                       type: string

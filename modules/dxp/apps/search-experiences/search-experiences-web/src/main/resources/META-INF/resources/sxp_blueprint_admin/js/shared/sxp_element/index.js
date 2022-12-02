@@ -27,6 +27,7 @@ import {
 	cleanUIConfiguration,
 	getSXPElementJSON,
 	isDefined,
+	isElementInactiveFromNonCompanyIndex,
 } from '../../utils/utils';
 import {PreviewModalWithCopyDownload} from '../PreviewModal';
 import ThemeContext from '../ThemeContext';
@@ -107,17 +108,6 @@ function SXPElement({
 		return isDefined(enabled) ? enabled : true;
 	};
 
-	/**
-	 * All system elements that are not 'Custom JSON Element' or 'Paste Any
-	 * Elasticsearch Query Element' are inactive when search index is not the
-	 * company index.
-	 * @returns {boolean}
-	 */
-	const _isInactiveFromNonCompanyIndex = () =>
-		!isIndexCompany &&
-		sxpElement.readOnly &&
-		sxpElement.elementDefinition?.category !== 'custom';
-
 	const _handleDelete = () => {
 		onDeleteSXPElement(id);
 	};
@@ -136,7 +126,9 @@ function SXPElement({
 
 	const _renderInput = (config) => {
 		const disabled =
-			!_isEnabled() || _isInactiveFromNonCompanyIndex() || isSubmitting;
+			!_isEnabled() ||
+			isElementInactiveFromNonCompanyIndex(isIndexCompany, sxpElement) ||
+			isSubmitting;
 		const inputId = _getInputId(id, config.name);
 		const inputName = _getInputName(config.name);
 		const typeOptions = config.typeOptions || {};
@@ -336,7 +328,12 @@ function SXPElement({
 	return (
 		<div
 			className={getCN('sxp-element', 'sheet', {
-				disabled: !_isEnabled() || _isInactiveFromNonCompanyIndex(),
+				disabled:
+					!_isEnabled() ||
+					isElementInactiveFromNonCompanyIndex(
+						isIndexCompany,
+						sxpElement
+					),
 			})}
 			id={prefixedId}
 		>
@@ -365,7 +362,10 @@ function SXPElement({
 						)}
 					</ClayList.ItemField>
 
-					{_isInactiveFromNonCompanyIndex() ? (
+					{isElementInactiveFromNonCompanyIndex(
+						isIndexCompany,
+						sxpElement
+					) ? (
 						<ClayTooltipProvider>
 							<div
 								data-tooltip-align="top"

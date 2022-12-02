@@ -39,11 +39,12 @@ public interface FieldMappingInfoResource {
 		return new Builder();
 	}
 
-	public Page<FieldMappingInfo> getFieldMappingInfosPage(String query)
+	public Page<FieldMappingInfo> getFieldMappingInfosPage(
+			Boolean external, String indexName, String query)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse getFieldMappingInfosPageHttpResponse(
-			String query)
+			Boolean external, String indexName, String query)
 		throws Exception;
 
 	public static class Builder {
@@ -125,11 +126,13 @@ public interface FieldMappingInfoResource {
 	public static class FieldMappingInfoResourceImpl
 		implements FieldMappingInfoResource {
 
-		public Page<FieldMappingInfo> getFieldMappingInfosPage(String query)
+		public Page<FieldMappingInfo> getFieldMappingInfosPage(
+				Boolean external, String indexName, String query)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getFieldMappingInfosPageHttpResponse(query);
+				getFieldMappingInfosPageHttpResponse(
+					external, indexName, query);
 
 			String content = httpResponse.getContent();
 
@@ -169,7 +172,7 @@ public interface FieldMappingInfoResource {
 		}
 
 		public HttpInvoker.HttpResponse getFieldMappingInfosPageHttpResponse(
-				String query)
+				Boolean external, String indexName, String query)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -192,6 +195,14 @@ public interface FieldMappingInfoResource {
 			}
 
 			httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+			if (external != null) {
+				httpInvoker.parameter("external", String.valueOf(external));
+			}
+
+			if (indexName != null) {
+				httpInvoker.parameter("indexName", String.valueOf(indexName));
+			}
 
 			if (query != null) {
 				httpInvoker.parameter("query", String.valueOf(query));

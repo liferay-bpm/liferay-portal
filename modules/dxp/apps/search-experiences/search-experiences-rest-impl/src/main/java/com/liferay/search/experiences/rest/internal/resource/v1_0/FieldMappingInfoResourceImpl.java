@@ -27,6 +27,7 @@ import com.liferay.search.experiences.rest.internal.web.cache.FieldMappingsWebCa
 import com.liferay.search.experiences.rest.resource.v1_0.FieldMappingInfoResource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -51,17 +52,18 @@ public class FieldMappingInfoResourceImpl
 	extends BaseFieldMappingInfoResourceImpl {
 
 	@Override
-	public Page<FieldMappingInfo> getFieldMappingInfosPage(String query)
+	public Page<FieldMappingInfo> getFieldMappingInfosPage(
+			Boolean external, String indexName, String query)
 		throws Exception {
 
-		return Page.of(getFieldMappings(query));
+		return Page.of(getFieldMappings(external, indexName, query));
 	}
 
-	public List<FieldMappingInfo> getFieldMappings(String query) {
+	public List<FieldMappingInfo> getFieldMappings(
+		boolean external, String indexName, String query) {
+
 		JSONObject jsonObject = FieldMappingsWebCacheItem.get(
-			_indexInformation,
-			_indexNameBuilder.getIndexName(contextCompany.getCompanyId()),
-			_jsonFactory);
+			_indexInformation, _getIndexName(indexName), _jsonFactory);
 
 		if (jsonObject.length() == 0) {
 			return Collections.<FieldMappingInfo>emptyList();
@@ -139,6 +141,26 @@ public class FieldMappingInfoResourceImpl
 					languageIdPosition);
 			}
 		}
+	}
+
+	private String _getIndexName(String indexName) {
+		String fullIndexName = _indexNameBuilder.getIndexName(
+			contextCompany.getCompanyId());
+
+		if (Validator.isBlank(indexName)) {
+			return fullIndexName;
+		}
+
+		fullIndexName = fullIndexName + StringPool.DASH + indexName;
+
+		List<String> indexNames = Arrays.asList(
+			_indexInformation.getIndexNames());
+
+		if (indexNames.contains(fullIndexName)) {
+			return fullIndexName;
+		}
+
+		return _indexNameBuilder.getIndexName(contextCompany.getCompanyId());
 	}
 
 	private String _getLanguageId(String fieldName) {

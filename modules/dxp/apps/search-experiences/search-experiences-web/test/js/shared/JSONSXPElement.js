@@ -13,7 +13,7 @@ import {fireEvent, render} from '@testing-library/react';
 import React from 'react';
 
 import JSONSXPElement from '../../../src/main/resources/META-INF/resources/sxp_blueprint_admin/js/shared/JSONSXPElement';
-import {QUERY_SXP_ELEMENTS} from '../mocks/data';
+import {QUERY_SXP_ELEMENTS} from '../mocks/sxpElements';
 
 import '@testing-library/jest-dom/extend-expect';
 

@@ -1,7 +1,7 @@
 @component-name = "portal-search"
 definition {
 
-	property portal.release = "true";
+	property portal.release = "false";
 	property portal.suite.search.engine = "solr";
 	property portal.upstream = "true";
 	property solr.enabled = "true";
@@ -69,11 +69,7 @@ definition {
 		SearchPortlets.searchEmbedded(searchTerm = "apple");
 
 		AssertElementPresent(
-			key_text = "\"explain\"",
-			locator1 = "SearchResults#SEARCH_INSIGHTS_WIDGET_REQUEST_QUERY");
-
-		AssertElementPresent(
-			key_text = "\"_explanation\"",
+			key_text = "explain",
 			locator1 = "SearchResults#SEARCH_INSIGHTS_WIDGET_RESPONSE_QUERY");
 
 		Portlet.gotoPortletOptions(
@@ -92,12 +88,8 @@ definition {
 
 		SearchPortlets.searchEmbedded(searchTerm = "apple");
 
-		AssertElementPresent(
-			key_text = "\"explain\"",
-			locator1 = "SearchResults#SEARCH_INSIGHTS_WIDGET_REQUEST_QUERY");
-
 		AssertElementNotPresent(
-			key_text = "\"_explanation\"",
+			key_text = "explain",
 			locator1 = "SearchResults#SEARCH_INSIGHTS_WIDGET_RESPONSE_QUERY");
 	}
 

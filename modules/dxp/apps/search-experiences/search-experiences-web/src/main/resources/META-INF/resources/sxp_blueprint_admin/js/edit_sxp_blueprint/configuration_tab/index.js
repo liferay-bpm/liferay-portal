@@ -22,6 +22,7 @@ import sortConfigurationSchema from '../../../schemas/sort-configuration.schema.
 import CodeMirrorEditor from '../../shared/CodeMirrorEditor';
 import LearnMessage from '../../shared/LearnMessage';
 import ThemeContext from '../../shared/ThemeContext';
+import {DEFAULT_INDEX_CONFIGURATION} from '../../utils/constants';
 
 const CONFIGURATION_SCHEMAS = {
 	advancedConfig: advancedConfigurationSchema,
@@ -47,6 +48,16 @@ function ConfigurationTab({
 	const {featureFlagLps153813, isCompanyAdmin} = useContext(ThemeContext);
 
 	/**
+	 * Gets the `external` value using the `searchIndexes` array.
+	 * @param {string} name The index name.
+	 * @returns {boolean}
+	 */
+	const _getExternalValue = (name) => {
+		return searchIndexes.find((searchIndex) => searchIndex.name === name)
+			.external;
+	};
+
+	/**
 	 * Called when the Index Configuration radio selection is changed.
 	 * @param {boolean} value
 	 * 	true = 'Default Company Index',
@@ -55,7 +66,12 @@ function ConfigurationTab({
 	const _handleIndexConfigurationRadioChange = (value) => {
 		setFieldValue(
 			'indexConfig',
-			value ? {indexName: ''} : {indexName: searchIndexes[0].name}
+			value
+				? DEFAULT_INDEX_CONFIGURATION
+				: {
+						external: searchIndexes[0].external,
+						indexName: searchIndexes[0].name,
+				  }
 		);
 	};
 
@@ -65,9 +81,16 @@ function ConfigurationTab({
 	 * @param {string} event.target.value
 	 */
 	const _handleIndexConfigurationSelectChange = (event) => {
-		setFieldValue('indexConfig', {indexName: event.target.value});
+		setFieldValue('indexConfig', {
+			external: _getExternalValue(event.target.value),
+			indexName: event.target.value,
+		});
 	};
 
+	/**
+	 * Checks if company index is selected.
+	 * @returns {boolean}
+	 */
 	const _isCompanyIndex = () => {
 		return indexConfig.indexName === '';
 	};

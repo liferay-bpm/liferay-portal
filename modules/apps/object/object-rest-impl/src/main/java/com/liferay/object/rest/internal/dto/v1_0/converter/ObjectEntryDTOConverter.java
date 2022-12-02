@@ -56,6 +56,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -423,10 +424,18 @@ public class ObjectEntryDTOConverter
 					com.liferay.portal.kernel.repository.model.FileEntry
 						fileEntry = _dlAppService.getFileEntry(fileEntryId);
 
-					fileEntryLink.setHref(
-						_dlURLHelper.getDownloadURL(
-							fileEntry, fileEntry.getFileVersion(), null,
-							StringPool.BLANK));
+					String href = _dlURLHelper.getDownloadURL(
+						fileEntry, fileEntry.getFileVersion(), null,
+						StringPool.BLANK);
+
+					href = HttpComponentsUtil.addParameter(
+						href, "objectDefinitionExternalReferenceCode",
+						objectDefinition.getExternalReferenceCode());
+					href = HttpComponentsUtil.addParameter(
+						href, "objectEntryExternalReferenceCode",
+						objectEntry.getExternalReferenceCode());
+
+					fileEntryLink.setHref(href);
 				}
 				catch (PrincipalException principalException) {
 					if (_log.isWarnEnabled()) {

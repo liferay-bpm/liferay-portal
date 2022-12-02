@@ -54,9 +54,8 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.akismet.internal.configuration.AkismetServiceConfiguration",
-	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true,
-	property = "cron.expression=0 0 0 * * ?",
-	service = DeleteMBMessagesListener.class
+	configurationPolicy = ConfigurationPolicy.REQUIRE,
+	property = "cron.expression=0 0 0 * * ?", service = {}
 )
 public class DeleteMBMessagesListener extends BaseMessageListener {
 

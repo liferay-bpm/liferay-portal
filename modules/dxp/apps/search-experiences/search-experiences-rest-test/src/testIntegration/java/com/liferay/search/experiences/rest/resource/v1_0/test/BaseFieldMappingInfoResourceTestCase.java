@@ -197,6 +197,7 @@ public abstract class BaseFieldMappingInfoResourceTestCase {
 	public void testGetFieldMappingInfosPage() throws Exception {
 		Page<FieldMappingInfo> page =
 			fieldMappingInfoResource.getFieldMappingInfosPage(
+				null, RandomTestUtil.randomString(),
 				RandomTestUtil.randomString());
 
 		long totalCount = page.getTotalCount();
@@ -209,7 +210,8 @@ public abstract class BaseFieldMappingInfoResourceTestCase {
 			testGetFieldMappingInfosPage_addFieldMappingInfo(
 				randomFieldMappingInfo());
 
-		page = fieldMappingInfoResource.getFieldMappingInfosPage(null);
+		page = fieldMappingInfoResource.getFieldMappingInfosPage(
+			null, null, null);
 
 		Assert.assertEquals(totalCount + 2, page.getTotalCount());
 

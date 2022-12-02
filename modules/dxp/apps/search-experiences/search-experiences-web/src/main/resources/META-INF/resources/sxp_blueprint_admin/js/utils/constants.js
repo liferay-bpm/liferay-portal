@@ -26,6 +26,11 @@ export const DEFAULT_ERROR = Liferay.Language.get(
 	'an-unexpected-error-occurred'
 );
 
+export const DEFAULT_INDEX_CONFIGURATION = {
+	external: false,
+	indexName: '',
+};
+
 export const SIDEBARS = {
 	ADD_SXP_ELEMENT: 'addSXPElement',
 	CLAUSE_CONTRIBUTORS: 'clauseContributors',

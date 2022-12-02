@@ -32,6 +32,20 @@ definition {
 		Click(locator1 = "TestrayManage#SAVE_BUTTON");
 	}
 
+	macro exportCases {
+		Button.click(button = "Add Cases");
+
+		if (isSet(caseName)) {
+			Click.clickAtNotVisible(
+				key_checkboxOption = "${caseName}",
+				locator1 = "Checkbox#SPECIFIC_CHECKBOX_IN_TABLE");
+		}
+
+		Button.click(button = "Select Cases");
+
+		Button.click(button = "Export");
+	}
+
 	macro linkCasesRequirement {
 		TestrayRequirements.addRequirementCase(
 			buttonText = "${buttonText}",
@@ -69,6 +83,12 @@ definition {
 		Type(
 			locator1 = "TestrayCases#FIELD_STEPS",
 			value1 = "${steps}");
+
+		if (isSet(addAnotherCase)) {
+			Click.clickAtNotVisible(
+				key_checkboxOption = "${addAnotherCase}",
+				locator1 = "Checkbox#ENABLE_CHECKBOX_VIA_SPAN");
+		}
 
 		Click(locator1 = "TestrayManage#SAVE_BUTTON");
 	}

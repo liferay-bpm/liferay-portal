@@ -17,7 +17,7 @@ import {useMutation} from 'graphql-hooks';
 import {useCallback, useMemo, useState} from 'react';
 
 import {subscribeQuery, unsubscribeQuery} from '../../../utils/client.es';
-import {getFullPath} from '../../../utils/utils.es';
+import {deleteCache, getFullPath} from '../../../utils/utils.es';
 
 const FEEDBACK_DELAY = 2000;
 
@@ -76,6 +76,8 @@ const useActiviyQuestionKebabOptions = ({
 			});
 
 			setIsSubscribe(!isSubscribed);
+
+			deleteCache();
 
 			openToast({
 				message: isSubscribed

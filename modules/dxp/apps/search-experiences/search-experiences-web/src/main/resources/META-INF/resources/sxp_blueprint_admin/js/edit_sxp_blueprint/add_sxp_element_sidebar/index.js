@@ -38,6 +38,7 @@ import {
 import {addParams, fetchData} from '../../utils/fetch';
 import {getLocalizedText} from '../../utils/language';
 import {setStorageAddSXPElementSidebar} from '../../utils/sessionStorage';
+import {isElementInactiveFromNonCompanyIndex} from '../../utils/utils';
 
 const DEFAULT_CATEGORY = 'other';
 const DEFAULT_EXPANDED_LIST = ['match'];
@@ -62,18 +63,6 @@ const SXPElementList = ({
 	const _handleAddSXPElement = (sxpElement) => () => {
 		onAddSXPElement(sxpElement);
 	};
-
-	/**
-	 * All system elements that are not 'Custom JSON Element' or 'Paste Any
-	 * Elasticsearch Query Element' cannot be added to query builder when search
-	 * index is not the company index.
-	 * @param {object} sxpElement
-	 * @returns {boolean}
-	 */
-	const _isElementInactiveFromNonCompanyIndex = (sxpElement) =>
-		!isIndexCompany &&
-		sxpElement.readOnly &&
-		sxpElement.elementDefinition?.category !== 'custom';
 
 	return (
 		<>
@@ -108,7 +97,8 @@ const SXPElementList = ({
 						return (
 							<ClayList.Item
 								className={getCN('sxp-element-item', {
-									inactive: _isElementInactiveFromNonCompanyIndex(
+									inactive: isElementInactiveFromNonCompanyIndex(
+										isIndexCompany,
 										sxpElement
 									),
 								})}
@@ -144,7 +134,8 @@ const SXPElementList = ({
 								<ClayList.ItemField>
 									<div className="add-sxp-element-button-background" />
 
-									{_isElementInactiveFromNonCompanyIndex(
+									{isElementInactiveFromNonCompanyIndex(
+										isIndexCompany,
 										sxpElement
 									) ? (
 										<ClayTooltipProvider>

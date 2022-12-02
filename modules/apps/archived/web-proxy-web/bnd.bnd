@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Web Proxy Web
 Bundle-SymbolicName: com.liferay.web.proxy.web
-Bundle-Version: 5.0.20
+Bundle-Version: 5.0.21
 Import-Package:\
 	!org.apache.commons.httpclient.*,\
 	!org.apache.http.*,\

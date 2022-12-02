@@ -84,6 +84,14 @@ public abstract class BaseFieldMappingInfoResourceImpl
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "external"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "indexName"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
 				name = "query"
 			)
 		}
@@ -98,6 +106,12 @@ public abstract class BaseFieldMappingInfoResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public Page<FieldMappingInfo> getFieldMappingInfosPage(
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.ws.rs.QueryParam("external")
+			Boolean external,
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.ws.rs.QueryParam("indexName")
+			String indexName,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("query")
 			String query)
@@ -160,7 +174,10 @@ public abstract class BaseFieldMappingInfoResourceImpl
 			Map<String, Serializable> parameters, String search)
 		throws Exception {
 
-		return getFieldMappingInfosPage((String)parameters.get("query"));
+		return getFieldMappingInfosPage(
+			Boolean.parseBoolean((String)parameters.get("external")),
+			(String)parameters.get("indexName"),
+			(String)parameters.get("query"));
 	}
 
 	@Override

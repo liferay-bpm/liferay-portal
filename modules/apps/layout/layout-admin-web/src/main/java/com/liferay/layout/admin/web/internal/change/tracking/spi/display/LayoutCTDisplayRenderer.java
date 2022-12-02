@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.permission.LayoutPermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -126,13 +127,25 @@ public class LayoutCTDisplayRenderer extends BaseCTDisplayRenderer<Layout> {
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
+		String url = null;
+
+		if (!layout.isDenied() && !layout.isPending()) {
+			url = _portal.getLayoutFriendlyURL(layout, themeDisplay);
+		}
+		else {
+			url = _portal.getLayoutFriendlyURL(
+				layout.fetchDraftLayout(), themeDisplay);
+		}
+
+		url = HttpComponentsUtil.addParameter(url, "p_l_mode", "preview");
+		url = HttpComponentsUtil.addParameter(
+			url, "previewCTCollectionId", layout.getCtCollectionId());
+
 		return StringBundler.concat(
 			"<div style=\"pointer-events: none;\"><iframe frameborder=\"0\" ",
 			"onload=\"this.style.height = (this.contentWindow.document.body.",
-			"scrollHeight+20) + 'px';\" src=\"",
-			_portal.getLayoutFullURL(layout, themeDisplay),
-			"?p_l_mode=preview&previewCTCollectionId=",
-			layout.getCtCollectionId(), "\" width=\"100%\"></iframe></div>");
+			"scrollHeight+20) + 'px';\" src=\"", url,
+			"\" width=\"100%\"></iframe></div>");
 	}
 
 	@Override
