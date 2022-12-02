@@ -361,13 +361,13 @@ public class DDMFormRuleConverterImpl implements SPIDDMFormRuleConverter {
 		).put(
 			"contains", "contains"
 		).put(
-			"equals-to", "equals"
+			"is-equal-to", "equals"
 		).put(
 			"is-empty", "isEmpty"
 		).put(
 			"not-contains", "contains"
 		).put(
-			"not-equals-to", "equals"
+			"is-not-equal-to", "equals"
 		).put(
 			"not-is-empty", "isEmpty"
 		).build();

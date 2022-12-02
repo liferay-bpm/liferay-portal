@@ -84,7 +84,7 @@ const rule = {
 					value: 'aaaa',
 				},
 			],
-			operator: 'equals-to',
+			operator: 'is-equal-to',
 		},
 	],
 	'logical-operator': 'OR',

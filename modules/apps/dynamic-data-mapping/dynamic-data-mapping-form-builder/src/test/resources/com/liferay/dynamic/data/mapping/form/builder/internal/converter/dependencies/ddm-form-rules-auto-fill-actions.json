@@ -27,7 +27,7 @@
 						"value": "91765"
 					}
 				],
-				"operator": "equals-to"
+				"operator": "is-equal-to"
 			}
 		]
 	}

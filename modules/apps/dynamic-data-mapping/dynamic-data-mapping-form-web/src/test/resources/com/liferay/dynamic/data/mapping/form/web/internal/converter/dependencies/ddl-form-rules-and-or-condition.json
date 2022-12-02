@@ -18,7 +18,7 @@
 						"value": "Joe"
 					}
 				],
-				"operator": "not-equals-to"
+				"operator": "is-not-equal-to"
 			},
 			{
 				"operands": [
@@ -96,7 +96,7 @@
 						"value": "Field2"
 					}
 				],
-				"operator": "equals-to"
+				"operator": "is-equal-to"
 			},
 			{
 				"operands": [
@@ -122,7 +122,7 @@
 						"value": "3"
 					}
 				],
-				"operator": "equals-to"
+				"operator": "is-equal-to"
 			}
 		],
 		"logical-operator": "OR"
@@ -163,7 +163,7 @@
 						"value": "5.3"
 					}
 				],
-				"operator": "equals-to"
+				"operator": "is-equal-to"
 			}
 		],
 		"logical-operator": "OR"

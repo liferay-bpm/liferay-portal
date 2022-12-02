@@ -101,8 +101,7 @@ expect.extend({
 					`expected ${received} not to equal by ${ruleNormalized}`,
 				pass: true,
 			};
-		}
-		else {
+		} else {
 			return {
 				message: () =>
 					`expected ${received} to be equal by ${ruleNormalized}`,
@@ -144,7 +143,7 @@ describe('RuleList', () => {
 						createRule([
 							{
 								operands: [leftOperand, rightOperand],
-								operator: 'equals-to',
+								operator: 'is-equal-to',
 							},
 						]),
 					])}
@@ -182,7 +181,7 @@ describe('RuleList', () => {
 							[
 								{
 									operands: [leftOperand, rightOperand],
-									operator: 'equals-to',
+									operator: 'is-equal-to',
 								},
 							],
 							[
@@ -265,7 +264,7 @@ describe('RuleList', () => {
 							[
 								{
 									operands: [leftOperand, rightOperand],
-									operator: 'equals-to',
+									operator: 'is-equal-to',
 								},
 							],
 							[
@@ -306,7 +305,7 @@ describe('RuleList', () => {
 							[
 								{
 									operands: [leftOperand, rightOperand],
-									operator: 'equals-to',
+									operator: 'is-equal-to',
 								},
 							],
 							[

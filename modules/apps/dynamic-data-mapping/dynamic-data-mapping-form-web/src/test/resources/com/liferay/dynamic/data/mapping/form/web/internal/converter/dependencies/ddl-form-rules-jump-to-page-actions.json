@@ -19,7 +19,7 @@
 						"value": "2"
 					}
 				],
-				"operator": "equals-to"
+				"operator": "is-equal-to"
 			}
 		]
 	}
