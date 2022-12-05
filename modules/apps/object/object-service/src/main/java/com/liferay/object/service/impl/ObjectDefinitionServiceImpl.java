@@ -48,10 +48,10 @@ public class ObjectDefinitionServiceImpl
 
 	@Override
 	public ObjectDefinition addCustomObjectDefinition(
-			boolean enableComments,
-			Map<Locale, String> labelMap, String name, String panelAppOrder,
-			String panelCategoryKey, Map<Locale, String> pluralLabelMap,
-			String scope, String storageType, List<ObjectField> objectFields)
+			boolean enableComments, Map<Locale, String> labelMap, String name,
+			String panelAppOrder, String panelCategoryKey,
+			Map<Locale, String> pluralLabelMap, String scope,
+			String storageType, List<ObjectField> objectFields)
 		throws PortalException {
 
 		_portletResourcePermission.check(
