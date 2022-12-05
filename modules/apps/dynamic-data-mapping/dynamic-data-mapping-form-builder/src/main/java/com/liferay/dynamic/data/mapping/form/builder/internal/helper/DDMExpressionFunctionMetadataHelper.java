@@ -137,7 +137,7 @@ public class DDMExpressionFunctionMetadataHelper {
 		_addDDMExpressionFunctionMetadata(
 			ddmExpressionFunctionMetadatasMap,
 			new DDMExpressionFunctionMetadata(
-				"equals-to", _language.get(resourceBundle, "is-equal-to"),
+				"is-equal-to", _language.get(resourceBundle, "is-equal-to"),
 				_TYPE_BOOLEAN, new String[] {_TYPE_BOOLEAN, _TYPE_BOOLEAN}));
 
 		for (Map.Entry<String, String> entry : _binaryFunctions.entrySet()) {
@@ -236,9 +236,9 @@ public class DDMExpressionFunctionMetadataHelper {
 
 	private static final Map<String, String> _binaryFunctions =
 		LinkedHashMapBuilder.put(
-			"equals-to", "is-equal-to"
+			"is-equal-to", "is-equal-to"
 		).put(
-			"not-equals-to", "is-not-equal-to"
+			"is-not-equal-to", "is-not-equal-to"
 		).build();
 	private static final Map<String, String> _numberBinaryFunctions =
 		LinkedHashMapBuilder.put(

@@ -219,7 +219,7 @@ public class ConditionExpressionVisitor extends ExpressionVisitor<Object> {
 		).put(
 			"contains", "contains"
 		).put(
-			"equals", "equals-to"
+			"equals", "is-equal-to"
 		).put(
 			"isEmpty", "is-empty"
 		).build();

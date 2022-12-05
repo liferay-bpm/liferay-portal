@@ -266,13 +266,13 @@ export const OPERATORS_BY_TYPE = {
 		},
 		{
 			label: 'Is equal to',
-			name: 'equals-to',
+			name: 'is-equal-to',
 			parameterClassNames: ['number', 'number'],
 			returnClassName: 'boolean',
 		},
 		{
 			label: 'Is not equal to',
-			name: 'not-equals-to',
+			name: 'is-not-equal-to',
 			parameterClassNames: ['number', 'number'],
 			returnClassName: 'boolean',
 		},
@@ -292,13 +292,13 @@ export const OPERATORS_BY_TYPE = {
 	text: [
 		{
 			label: 'Is equal to',
-			name: 'equals-to',
+			name: 'is-equal-to',
 			parameterClassNames: ['text', 'text'],
 			returnClassName: 'boolean',
 		},
 		{
 			label: 'Is not equal to',
-			name: 'not-equals-to',
+			name: 'is-not-equal-to',
 			parameterClassNames: ['text', 'text'],
 			returnClassName: 'boolean',
 		},

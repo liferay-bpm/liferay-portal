@@ -33,14 +33,14 @@ const LOGICAL_OPERATOR = {
 const OPERATORS = {
 	'belongs-to': Liferay.Language.get('belongs-to'),
 	'contains': Liferay.Language.get('contains'),
-	'equals-to': Liferay.Language.get('is-equal-to'),
+	'is-equal-to': Liferay.Language.get('is-equal-to'),
 	'greater-than': Liferay.Language.get('is-greater-than'),
 	'greater-than-equals': Liferay.Language.get('is-greater-than-or-equal-to'),
 	'is-empty': Liferay.Language.get('is-empty'),
 	'less-than': Liferay.Language.get('is-less-than'),
 	'less-than-equals': Liferay.Language.get('is-less-than-or-equal-to'),
 	'not-contains': Liferay.Language.get('does-not-contain'),
-	'not-equals-to': Liferay.Language.get('is-not-equal-to'),
+	'is-not-equal-to': Liferay.Language.get('is-not-equal-to'),
 	'not-is-empty': Liferay.Language.get('is-not-empty'),
 };
 
@@ -257,7 +257,6 @@ const LogicalOperator = ({children, logicalOperator}) => (
 );
 
 const transformConditions = ({operator, operands: [left, right]}, fields) => {
-
 	// When the left operator is a type `user` the backend does not return
 	// the two operators, only the right operator.
 
@@ -434,8 +433,7 @@ const ListItem = ({
 								onClick: () => {
 									if (!isNestedCondition) {
 										onDelete();
-									}
-									else {
+									} else {
 										openConfirmModal({
 											message: Liferay.Language.get(
 												'you-cannot-create-rules-with-nested-functions.-are-you-sure-you-want-to-delete-this-rule'
