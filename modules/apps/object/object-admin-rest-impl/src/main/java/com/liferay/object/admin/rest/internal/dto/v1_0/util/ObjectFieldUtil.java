@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Collections;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author Gabriel Albuquerque
@@ -56,7 +57,8 @@ public class ObjectFieldUtil {
 		if (Validator.isNull(
 				objectField.getListTypeDefinitionExternalReferenceCode())) {
 
-			return 0;
+			objectField.setListTypeDefinitionExternalReferenceCode(
+				String.valueOf(UUID.randomUUID()));
 		}
 
 		ListTypeDefinition listTypeDefinition =
