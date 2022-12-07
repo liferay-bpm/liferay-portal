@@ -15,6 +15,7 @@
 package com.liferay.list.type.service.impl;
 
 import com.liferay.list.type.exception.DuplicateListTypeEntryException;
+import com.liferay.list.type.exception.DuplicateListTypeEntryExternalReferenceCodeException;
 import com.liferay.list.type.exception.ListTypeEntryKeyException;
 import com.liferay.list.type.exception.ListTypeEntryNameException;
 import com.liferay.list.type.model.ListTypeEntry;
@@ -53,13 +54,15 @@ public class ListTypeEntryLocalServiceImpl
 			long listTypeDefinitionId, String key, Map<Locale, String> nameMap)
 		throws PortalException {
 
+		User user = _userLocalService.getUser(userId);
+
 		_validateKey(listTypeDefinitionId, key);
+		_validateExternalReferenceCode(
+			externalReferenceCode, user.getCompanyId(), 0L);
 		_validateName(nameMap);
 
 		ListTypeEntry listTypeEntry = listTypeEntryPersistence.create(
 			counterLocalService.increment());
-
-		User user = _userLocalService.getUser(userId);
 
 		listTypeEntry.setCompanyId(user.getCompanyId());
 		listTypeEntry.setUserId(user.getUserId());
@@ -126,6 +129,10 @@ public class ListTypeEntryLocalServiceImpl
 		ListTypeEntry listTypeEntry = listTypeEntryPersistence.findByPrimaryKey(
 			listTypeEntryId);
 
+		_validateExternalReferenceCode(
+			externalReferenceCode, listTypeEntry.getCompanyId(),
+			listTypeEntryId);
+
 		if (Validator.isNotNull(externalReferenceCode)) {
 			listTypeEntry.setExternalReferenceCode(externalReferenceCode);
 		}
@@ -133,6 +140,21 @@ public class ListTypeEntryLocalServiceImpl
 		listTypeEntry.setNameMap(nameMap);
 
 		return listTypeEntryPersistence.update(listTypeEntry);
+	}
+
+	private void _validateExternalReferenceCode(
+			String externalReferenceCode, long companyId, long listTypeEntryId)
+		throws PortalException {
+
+		ListTypeEntry listTypeEntry = listTypeEntryPersistence.fetchByERC_C(
+			externalReferenceCode, companyId);
+
+		if ((listTypeEntry != null) &&
+			(listTypeEntry.getListTypeEntryId() != listTypeEntryId)) {
+
+			throw new DuplicateListTypeEntryExternalReferenceCodeException(
+				externalReferenceCode);
+		}
 	}
 
 	private void _validateKey(long listTypeDefinitionId, String key)
