@@ -17,8 +17,10 @@ package com.liferay.object.rest.internal.petra.sql.dsl.expression;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.sql.dsl.Column;
+import com.liferay.petra.sql.dsl.Table;
 import com.liferay.petra.sql.dsl.query.sort.OrderByExpression;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -47,8 +49,24 @@ public class OrderByExpressionUtil {
 					fieldName = parts[1];
 				}
 
-				Column<?, ?> column = objectFieldLocalService.getColumn(
-					objectDefinitionId, fieldName);
+				Column<?, ?> column = null;
+
+				try {
+					column = objectFieldLocalService.getColumn(
+						objectDefinitionId, fieldName);
+				}
+				catch (UnsupportedOperationException
+							unsupportedOperationException) {
+
+					Table<?> table = objectFieldLocalService.getTable(
+						objectDefinitionId, fieldName);
+
+					column = table.getColumn(fieldName + StringPool.UNDERLINE);
+
+					if (column == null) {
+						throw unsupportedOperationException;
+					}
+				}
 
 				if (sort.isReverse()) {
 					return column.descending();

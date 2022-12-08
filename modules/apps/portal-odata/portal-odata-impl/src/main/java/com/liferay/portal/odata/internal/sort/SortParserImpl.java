@@ -120,7 +120,8 @@ public class SortParserImpl implements SortParser {
 				fieldName.substring(complexTypeName.length() + 1));
 		}
 
-		return Optional.ofNullable(entityFieldsMap.get(fieldName));
+		return Optional.ofNullable(
+			_getCorrectEntityField(entityFieldsMap, fieldName));
 	}
 
 	protected Optional<SortField> getSortFieldOptional(String sortString) {
@@ -183,11 +184,29 @@ public class SortParserImpl implements SortParser {
 		return _ASC_DEFAULT;
 	}
 
+	private EntityField _getCorrectEntityField(
+		Map<String, EntityField> entityFieldsMap, String fieldName) {
+
+		if (entityFieldsMap.get(fieldName) != null) {
+			return entityFieldsMap.get(fieldName);
+		}
+
+		if (fieldName.endsWith(_RAW_TEXT)) {
+			return entityFieldsMap.get(
+				com.liferay.portal.kernel.util.StringUtil.replaceLast(
+					fieldName, _RAW_TEXT, StringPool.BLANK));
+		}
+
+		return null;
+	}
+
 	private static final boolean _ASC_DEFAULT = true;
 
 	private static final String _ORDER_BY_ASC = "asc";
 
 	private static final String _ORDER_BY_DESC = "desc";
+
+	private static final String _RAW_TEXT = "RawText";
 
 	private final EntityModel _entityModel;
 
