@@ -88,6 +88,11 @@ public class NotificationUpgradeStepRegistrator
 
 		registry.register(
 			"3.3.0", "3.4.0", new NotificationRecipientUpgradeProcess());
+
+		registry.register(
+			"3.4.0", "3.5.0",
+			new com.liferay.notification.internal.upgrade.v3_5_0.
+				NotificationTemplateUpgradeProcess());
 	}
 
 }
