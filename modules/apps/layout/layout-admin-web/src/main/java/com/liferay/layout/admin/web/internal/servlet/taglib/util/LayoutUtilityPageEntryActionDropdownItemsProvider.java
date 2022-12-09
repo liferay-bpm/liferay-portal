@@ -67,6 +67,8 @@ public class LayoutUtilityPageEntryActionDropdownItemsProvider {
 		_httpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
 		_itemSelector = (ItemSelector)renderRequest.getAttribute(
 			ItemSelector.class.getName());
+		_layout = LayoutLocalServiceUtil.fetchLayout(
+			layoutUtilityPageEntry.getPlid());
 		_layoutUtilityPageThumbnailConfiguration =
 			(LayoutUtilityPageThumbnailConfiguration)renderRequest.getAttribute(
 				LayoutUtilityPageThumbnailConfiguration.class.getName());
@@ -222,12 +224,9 @@ public class LayoutUtilityPageEntryActionDropdownItemsProvider {
 		exportLayoutUtilityPageEntryURL.setResourceID(
 			"/layout_admin/export_layout_utility_page_entries");
 
-		Layout draftLayout = LayoutLocalServiceUtil.fetchDraftLayout(
-			_layoutUtilityPageEntry.getPlid());
-
 		return dropdownItem -> {
 			dropdownItem.setDisabled(
-				draftLayout.getStatus() == WorkflowConstants.STATUS_DRAFT);
+				_draftLayout.getStatus() == WorkflowConstants.STATUS_DRAFT);
 			dropdownItem.setHref(exportLayoutUtilityPageEntryURL);
 			dropdownItem.setIcon("upload");
 			dropdownItem.setLabel(
@@ -287,6 +286,7 @@ public class LayoutUtilityPageEntryActionDropdownItemsProvider {
 					"layoutUtilityPageEntryId",
 					_layoutUtilityPageEntry.getLayoutUtilityPageEntryId()
 				).buildString());
+			dropdownItem.setDisabled(!_layout.isPublished());
 
 			String message = StringPool.BLANK;
 
@@ -420,6 +420,7 @@ public class LayoutUtilityPageEntryActionDropdownItemsProvider {
 	private final Layout _draftLayout;
 	private final HttpServletRequest _httpServletRequest;
 	private final ItemSelector _itemSelector;
+	private final Layout _layout;
 	private final LayoutUtilityPageEntry _layoutUtilityPageEntry;
 	private final LayoutUtilityPageThumbnailConfiguration
 		_layoutUtilityPageThumbnailConfiguration;

@@ -244,6 +244,43 @@ definition {
 			value1 = "$ 18.90");
 	}
 
+	@description = "This is for COMMERCE-10315. It's not possible to save the Root Category for the Commerce Categories Navigation widget"
+	@priority = "4"
+	test CanSaveCommerceCategoriesNavigationRootCategory {
+		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Minium",
+			layoutName = "Test Content Page Name",
+			type = "content");
+
+		ContentPagesNavigator.openEditContentPage(
+			pageName = "Test Content Page Name",
+			siteName = "Minium");
+
+		PageEditor.addWidget(portletName = "Commerce Categories Navigation");
+
+		Portlet.gotoPortletOptions(
+			portletName = "Commerce Categories Navigation",
+			portletOption = "Configuration");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		Check.checkToggleSwitch(
+			key_toggleSwitchLabel = "Use Root Category",
+			locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
+
+		CommerceWidget.addRootCategory(
+			categoryName = "Engine",
+			vocabularyName = "Minium");
+
+		Button.clickSave();
+
+		AssertElementPresent(
+			locator1 = "CommerceWidget#TAG_FACET_LABEL_LAYOUT",
+			tagName = "Engine");
+	}
+
 	@description = "This is a test for COMMERCE-4958."
 	test CheckoutWithDefaultShippingOption {
 		property portal.acceptance = "true";

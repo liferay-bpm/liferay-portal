@@ -15,7 +15,6 @@
 package com.liferay.frontend.js.loader.modules.extender.internal.servlet.taglib;
 
 import com.liferay.frontend.js.loader.modules.extender.internal.configuration.Details;
-import com.liferay.frontend.js.loader.modules.extender.internal.servlet.JSResolveModulesServlet;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.frontend.esm.FrontendESMUtil;
@@ -140,7 +139,7 @@ public class JSLoaderTopHeadDynamicInclude extends BaseDynamicInclude {
 				httpServletRequest);
 
 		return absolutePortalURLBuilder.forServlet(
-			_jsResolveModulesServlet.getURL()
+			"/js_resolve_modules"
 		).build();
 	}
 
@@ -167,10 +166,6 @@ public class JSLoaderTopHeadDynamicInclude extends BaseDynamicInclude {
 
 	private volatile Bundle _bundle;
 	private volatile Details _details;
-
-	@Reference
-	private JSResolveModulesServlet _jsResolveModulesServlet;
-
 	private volatile String _lastModified;
 
 	@Reference

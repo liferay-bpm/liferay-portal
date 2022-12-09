@@ -19,7 +19,13 @@
 <%
 AccountEntryDisplay accountEntryDisplay = (AccountEntryDisplay)request.getAttribute(AccountWebKeys.ACCOUNT_ENTRY_DISPLAY);
 
+String redirect = ParamUtil.getString(request, "redirect");
+
 String backURL = ParamUtil.getString(request, "backURL");
+
+if (Validator.isNull(backURL)) {
+	backURL = redirect;
+}
 
 if (Validator.isNull(backURL)) {
 	backURL = PortletURLBuilder.createRenderURL(
@@ -30,6 +36,8 @@ if (Validator.isNull(backURL)) {
 		"accountEntryId", accountEntryDisplay.getAccountEntryId()
 	).setParameter(
 		"screenNavigationCategoryKey", AccountScreenNavigationEntryConstants.CATEGORY_KEY_USERS
+	).setWindowState(
+		LiferayWindowState.MAXIMIZED
 	).buildString();
 }
 
@@ -49,7 +57,7 @@ renderResponse.setTitle(LanguageUtil.format(request, "add-new-user-to-x", accoun
 			<portlet:param name="mvcPath" value="/account_users_admin/edit_account_user.jsp" />
 		</portlet:renderURL>
 
-		<aui:input name="redirect" type="hidden" value='<%= ParamUtil.getString(request, "redirect", defaultRedirect) %>' />
+		<aui:input name="redirect" type="hidden" value="<%= GetterUtil.getString(redirect, defaultRedirect) %>" />
 		<aui:input name="accountEntryId" type="hidden" value="<%= String.valueOf(accountEntryDisplay.getAccountEntryId()) %>" />
 
 		<h2 class="sheet-title">

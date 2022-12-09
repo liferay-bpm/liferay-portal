@@ -27,7 +27,7 @@ page import="com.liferay.portal.kernel.util.HashMapBuilder" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.search.web.internal.facet.display.context.AssetEntriesSearchFacetDisplayContext" %><%@
-page import="com.liferay.portal.search.web.internal.facet.display.context.AssetEntriesSearchFacetTermDisplayContext" %><%@
+page import="com.liferay.portal.search.web.internal.facet.display.context.BucketDisplayContext" %><%@
 page import="com.liferay.portal.search.web.internal.type.facet.configuration.TypeFacetPortletInstanceConfiguration" %>
 
 <portlet:defineObjects />
@@ -53,7 +53,7 @@ TypeFacetPortletInstanceConfiguration typeFacetPortletInstanceConfiguration = as
 			<aui:input cssClass="start-parameter-name" name="start-parameter-name" type="hidden" value="<%= assetEntriesSearchFacetDisplayContext.getPaginationStartParameterName() %>" />
 
 			<liferay-ddm:template-renderer
-				className="<%= AssetEntriesSearchFacetTermDisplayContext.class.getName() %>"
+				className="<%= AssetEntriesSearchFacetDisplayContext.class.getName() %>"
 				contextObjects='<%=
 					HashMapBuilder.<String, Object>put(
 						"assetEntriesSearchFacetDisplayContext", assetEntriesSearchFacetDisplayContext
@@ -63,7 +63,7 @@ TypeFacetPortletInstanceConfiguration typeFacetPortletInstanceConfiguration = as
 				%>'
 				displayStyle="<%= typeFacetPortletInstanceConfiguration.displayStyle() %>"
 				displayStyleGroupId="<%= assetEntriesSearchFacetDisplayContext.getDisplayStyleGroupId() %>"
-				entries="<%= assetEntriesSearchFacetDisplayContext.getTermDisplayContexts() %>"
+				entries="<%= assetEntriesSearchFacetDisplayContext.getBucketDisplayContexts() %>"
 			>
 				<liferay-ui:panel-container
 					extended="<%= true %>"
@@ -85,7 +85,7 @@ TypeFacetPortletInstanceConfiguration typeFacetPortletInstanceConfiguration = as
 								<%
 								int i = 0;
 
-								for (AssetEntriesSearchFacetTermDisplayContext assetEntriesSearchFacetTermDisplayContext : assetEntriesSearchFacetDisplayContext.getTermDisplayContexts()) {
+								for (BucketDisplayContext bucketDisplayContext : assetEntriesSearchFacetDisplayContext.getBucketDisplayContexts()) {
 									i++;
 								%>
 
@@ -95,22 +95,22 @@ TypeFacetPortletInstanceConfiguration typeFacetPortletInstanceConfiguration = as
 												<input
 													autocomplete="off"
 													class="custom-control-input facet-term"
-													data-term-id="<%= assetEntriesSearchFacetTermDisplayContext.getAssetType() %>"
+													data-term-id="<%= bucketDisplayContext.getFilterValue() %>"
 													disabled
 													id="<portlet:namespace />term_<%= i %>"
 													name="<portlet:namespace />term_<%= i %>"
 													onChange="Liferay.Search.FacetUtil.changeSelection(event);"
 													type="checkbox"
-													<%= assetEntriesSearchFacetTermDisplayContext.isSelected() ? "checked" : StringPool.BLANK %>
+													<%= bucketDisplayContext.isSelected() ? "checked" : StringPool.BLANK %>
 												/>
 
-												<span class="custom-control-label term-name <%= assetEntriesSearchFacetTermDisplayContext.isSelected() ? "facet-term-selected" : "facet-term-unselected" %>">
-													<span class="custom-control-label-text"><%= HtmlUtil.escape(assetEntriesSearchFacetTermDisplayContext.getTypeName()) %></span>
+												<span class="custom-control-label term-name <%= bucketDisplayContext.isSelected() ? "facet-term-selected" : "facet-term-unselected" %>">
+													<span class="custom-control-label-text"><%= HtmlUtil.escape(bucketDisplayContext.getBucketText()) %></span>
 												</span>
 
-												<c:if test="<%= assetEntriesSearchFacetTermDisplayContext.isFrequencyVisible() %>">
+												<c:if test="<%= bucketDisplayContext.isFrequencyVisible() %>">
 													<small class="term-count">
-														(<%= assetEntriesSearchFacetTermDisplayContext.getFrequency() %>)
+														(<%= bucketDisplayContext.getFrequency() %>)
 													</small>
 												</c:if>
 											</label>

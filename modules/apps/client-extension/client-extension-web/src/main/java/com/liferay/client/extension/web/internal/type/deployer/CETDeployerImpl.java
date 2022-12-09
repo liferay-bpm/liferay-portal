@@ -22,6 +22,7 @@ import com.liferay.client.extension.type.deployer.CETDeployer;
 import com.liferay.client.extension.web.internal.portlet.ClientExtensionEntryFriendlyURLMapper;
 import com.liferay.client.extension.web.internal.portlet.ClientExtensionEntryPortlet;
 import com.liferay.client.extension.web.internal.portlet.action.ClientExtensionEntryConfigurationAction;
+import com.liferay.client.extension.web.internal.util.CETUtil;
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -116,14 +117,12 @@ public class CETDeployerImpl implements CETDeployer {
 	}
 
 	private String _getPortletId(CET cet) {
-		String externalReferenceCode = cet.getExternalReferenceCode();
-
 		return StringBundler.concat(
 			"com_liferay_client_extension_web_internal_portlet_",
 			"ClientExtensionEntryPortlet_", cet.getCompanyId(),
 			StringPool.UNDERLINE,
-			externalReferenceCode.replaceAll(
-				"[^a-zA-Z0-9_]", StringPool.UNDERLINE));
+			CETUtil.normalizeExternalReferenceCodeForPortletId(
+				cet.getExternalReferenceCode()));
 	}
 
 	private ServiceRegistration<ConfigurationAction>

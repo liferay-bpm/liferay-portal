@@ -14,13 +14,10 @@
 
 package com.liferay.portal.search.web.internal.modified.facet.portlet.shared.search;
 
-import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.util.CalendarFactory;
-import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.DateFormatFactory;
-import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.search.facet.modified.ModifiedFacetFactory;
 import com.liferay.portal.search.web.internal.modified.facet.builder.DateRangeFactory;
 import com.liferay.portal.search.web.internal.modified.facet.builder.ModifiedFacetBuilder;
@@ -31,6 +28,7 @@ import com.liferay.portal.search.web.internal.util.SearchOptionalUtil;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchContributor;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchSettings;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -59,25 +57,23 @@ public class ModifiedFacetPortletSharedSearchContributor
 				modifiedFacetPortletPreferences, portletSharedSearchSettings));
 	}
 
-	protected CalendarFactory calendarFactory;
-	protected DateFormatFactory dateFormatFactory;
-	protected DateRangeFactory dateRangeFactory;
-	protected JSONFactory jsonFactory;
-
-	@Reference
-	protected ModifiedFacetFactory modifiedFacetFactory;
+	@Activate
+	protected void activate() {
+		_dateRangeFactory = new DateRangeFactory(_dateFormatFactory);
+	}
 
 	private Facet _buildFacet(
 		ModifiedFacetPortletPreferences modifiedFacetPortletPreferences,
 		PortletSharedSearchSettings portletSharedSearchSettings) {
 
 		ModifiedFacetBuilder modifiedFacetBuilder = new ModifiedFacetBuilder(
-			modifiedFacetFactory, _getCalendarFactory(),
-			_getDateFormatFactory(), _jsonFactory);
+			_modifiedFacetFactory, _calendarFactory, _dateFormatFactory,
+			_jsonFactory);
 
 		modifiedFacetBuilder.setRangesJSONArray(
-			_replaceAliases(
-				modifiedFacetPortletPreferences.getRangesJSONArray()));
+			_dateRangeFactory.replaceAliases(
+				modifiedFacetPortletPreferences.getRangesJSONArray(),
+				_calendarFactory.getCalendar(), _jsonFactory));
 
 		modifiedFacetBuilder.setSearchContext(
 			portletSharedSearchSettings.getSearchContext());
@@ -101,46 +97,18 @@ public class ModifiedFacetPortletSharedSearchContributor
 		return modifiedFacetBuilder.build();
 	}
 
-	private CalendarFactory _getCalendarFactory() {
+	@Reference
+	private CalendarFactory _calendarFactory;
 
-		// See LPS-72507 and LPS-76500
+	@Reference
+	private DateFormatFactory _dateFormatFactory;
 
-		if (calendarFactory != null) {
-			return calendarFactory;
-		}
-
-		return CalendarFactoryUtil.getCalendarFactory();
-	}
-
-	private DateFormatFactory _getDateFormatFactory() {
-
-		// See LPS-72507 and LPS-76500
-
-		if (dateFormatFactory != null) {
-			return dateFormatFactory;
-		}
-
-		return DateFormatFactoryUtil.getDateFormatFactory();
-	}
-
-	private DateRangeFactory _getDateRangeFactory() {
-		if (dateRangeFactory == null) {
-			dateRangeFactory = new DateRangeFactory(_getDateFormatFactory());
-		}
-
-		return dateRangeFactory;
-	}
-
-	private JSONArray _replaceAliases(JSONArray rangesJSONArray) {
-		DateRangeFactory dateRangeFactory = _getDateRangeFactory();
-
-		CalendarFactory calendarFactory = _getCalendarFactory();
-
-		return dateRangeFactory.replaceAliases(
-			rangesJSONArray, calendarFactory.getCalendar(), _jsonFactory);
-	}
+	private volatile DateRangeFactory _dateRangeFactory;
 
 	@Reference
 	private JSONFactory _jsonFactory;
+
+	@Reference
+	private ModifiedFacetFactory _modifiedFacetFactory;
 
 }

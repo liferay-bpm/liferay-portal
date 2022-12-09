@@ -18,6 +18,7 @@ import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountEntryUserRel;
 import com.liferay.account.service.AccountEntryLocalService;
+import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.account.service.AccountEntryUserRelLocalService;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.kernel.model.AssetEntry;
@@ -44,7 +45,6 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
-import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.model.ObjectValidationRule;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
@@ -69,6 +69,8 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.model.ModelListener;
+import com.liferay.portal.kernel.model.Organization;
+import com.liferay.portal.kernel.model.OrganizationConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -76,6 +78,7 @@ import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
@@ -953,50 +956,14 @@ public class ObjectEntryLocalServiceTest {
 	public void testAddOrUpdateObjectEntryWithAccountEntryRestrictedObjectFieldId()
 		throws Exception {
 
-		_user = UserTestUtil.addUser();
-
-		ObjectDefinition accountObjectDefinition =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				_user.getCompanyId(), "accountEntry");
-
-		ObjectDefinition customObjectDefinition =
-			ObjectDefinitionTestUtil.addObjectDefinition(
-				_objectDefinitionLocalService,
-				Arrays.asList(
-					ObjectFieldUtil.createObjectField(
-						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-						ObjectFieldConstants.DB_TYPE_STRING, "text")));
-
-		ObjectRelationship objectRelationship =
-			_objectRelationshipLocalService.addObjectRelationship(
-				_user.getUserId(),
-				accountObjectDefinition.getObjectDefinitionId(),
-				customObjectDefinition.getObjectDefinitionId(), 0,
-				ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"relationship", ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
-
-		customObjectDefinition.setAccountEntryRestricted(true);
-
-		ObjectField objectField = _objectFieldLocalService.getObjectField(
-			customObjectDefinition.getObjectDefinitionId(),
-			"r_relationship_accountEntryId");
-
-		customObjectDefinition.setAccountEntryRestrictedObjectFieldId(
-			objectField.getObjectFieldId());
-
-		_objectDefinitionLocalService.updateObjectDefinition(
-			customObjectDefinition);
-
-		_objectDefinitionLocalService.publishCustomObjectDefinition(
-			_user.getUserId(), customObjectDefinition.getObjectDefinitionId());
+		ObjectDefinition objectDefinition =
+			_addObjectDefinitionWithAccountEntryRestricted();
 
 		long invalidAccountEntryId = -1;
 
 		try {
 			_objectEntryLocalService.addObjectEntry(
-				_user.getUserId(), 0,
-				customObjectDefinition.getObjectDefinitionId(),
+				_user.getUserId(), 0, objectDefinition.getObjectDefinitionId(),
 				HashMapBuilder.<String, Serializable>put(
 					"r_relationship_accountEntryId", invalidAccountEntryId
 				).build(),
@@ -1039,8 +1006,7 @@ public class ObjectEntryLocalServiceTest {
 		_userLocalService.addRoleUser(role.getRoleId(), _user);
 
 		ObjectEntry objectEntry = _objectEntryLocalService.addObjectEntry(
-			_user.getUserId(), 0,
-			customObjectDefinition.getObjectDefinitionId(),
+			_user.getUserId(), 0, objectDefinition.getObjectDefinitionId(),
 			HashMapBuilder.<String, Serializable>put(
 				"r_relationship_accountEntryId",
 				accountEntry1.getAccountEntryId()
@@ -1110,11 +1076,7 @@ public class ObjectEntryLocalServiceTest {
 			accountEntry2.getAccountEntryId(),
 			values.get("r_relationship_accountEntryId"));
 
-		_objectRelationshipLocalService.deleteObjectRelationship(
-			objectRelationship);
-
-		_objectDefinitionLocalService.deleteObjectDefinition(
-			customObjectDefinition);
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 
 		_accountEntryUserRelLocalService.deleteAccountEntryUserRel(
 			accountEntryUserRel1);
@@ -1872,6 +1834,83 @@ public class ObjectEntryLocalServiceTest {
 	}
 
 	@Test
+	public void testGetValuesListWithAccountEntryRestricted() throws Exception {
+		ObjectDefinition objectDefinition =
+			_addObjectDefinitionWithAccountEntryRestricted();
+
+		// Get list of values with owner of the account entry
+
+		User user = UserTestUtil.addUser();
+
+		AccountEntry accountEntry = _accountEntryLocalService.addAccountEntry(
+			user.getUserId(), AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT,
+			"account", null, null, null, null, null,
+			AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS,
+			WorkflowConstants.STATUS_APPROVED,
+			ServiceContextTestUtil.getServiceContext());
+
+		_objectEntryLocalService.addObjectEntry(
+			TestPropsValues.getUserId(), 0,
+			objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"r_relationship_accountEntryId",
+				accountEntry.getAccountEntryId()
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
+		_assertValuesListWithAccountEntryRestricted(
+			accountEntry.getAccountEntryId(),
+			objectDefinition.getObjectDefinitionId(), user.getUserId(), 1);
+
+		// Get list of values with member of the account entry
+
+		user = UserTestUtil.addUser();
+
+		_accountEntryUserRelLocalService.addAccountEntryUserRel(
+			accountEntry.getAccountEntryId(), user.getUserId());
+
+		_assertValuesListWithAccountEntryRestricted(
+			accountEntry.getAccountEntryId(),
+			objectDefinition.getObjectDefinitionId(), user.getUserId(), 1);
+
+		// Get list of values with member of the account entry organization
+
+		user = UserTestUtil.addUser();
+
+		Organization parentOrganization =
+			_organizationLocalService.addOrganization(
+				TestPropsValues.getUserId(),
+				OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
+				RandomTestUtil.randomString(), false);
+
+		_organizationLocalService.addUserOrganization(
+			user.getUserId(), parentOrganization.getOrganizationId());
+
+		Organization organization = _organizationLocalService.addOrganization(
+			TestPropsValues.getUserId(), parentOrganization.getOrganizationId(),
+			RandomTestUtil.randomString(), false);
+
+		_accountEntryOrganizationRelLocalService.
+			addAccountEntryOrganizationRels(
+				accountEntry.getAccountEntryId(),
+				new long[] {organization.getOrganizationId()});
+
+		_assertValuesListWithAccountEntryRestricted(
+			accountEntry.getAccountEntryId(),
+			objectDefinition.getObjectDefinitionId(), user.getUserId(), 1);
+
+		// Get list of values with user without permission
+
+		user = UserTestUtil.addUser();
+
+		_assertValuesListWithAccountEntryRestricted(
+			accountEntry.getAccountEntryId(),
+			objectDefinition.getObjectDefinitionId(), user.getUserId(), 0);
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+	}
+
+	@Test
 	public void testScope() throws Exception {
 
 		// Scope by company
@@ -2482,6 +2521,47 @@ public class ObjectEntryLocalServiceTest {
 	@Rule
 	public TestName testName = new TestName();
 
+	private ObjectDefinition _addObjectDefinitionWithAccountEntryRestricted()
+		throws Exception {
+
+		_user = UserTestUtil.addUser();
+
+		ObjectDefinition accountObjectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				_user.getCompanyId(), "accountEntry");
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.addObjectDefinition(
+				_objectDefinitionLocalService,
+				Arrays.asList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING, "text")));
+
+		_objectRelationshipLocalService.addObjectRelationship(
+			_user.getUserId(), accountObjectDefinition.getObjectDefinitionId(),
+			objectDefinition.getObjectDefinitionId(), 0,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			"relationship", ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
+
+		objectDefinition.setAccountEntryRestricted(true);
+
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			objectDefinition.getObjectDefinitionId(),
+			"r_relationship_accountEntryId");
+
+		objectDefinition.setAccountEntryRestrictedObjectFieldId(
+			objectField.getObjectFieldId());
+
+		_objectDefinitionLocalService.updateObjectDefinition(objectDefinition);
+
+		_objectDefinitionLocalService.publishCustomObjectDefinition(
+			_user.getUserId(), objectDefinition.getObjectDefinitionId());
+
+		return objectDefinition;
+	}
+
 	private ObjectEntry _addObjectEntry(Map<String, Serializable> values)
 		throws Exception {
 
@@ -2550,6 +2630,35 @@ public class ObjectEntryLocalServiceTest {
 				0, _objectDefinition.getObjectDefinitionId(), keywords, 0, 20);
 
 		Assert.assertEquals(count, baseModelSearchResult.getLength());
+	}
+
+	private void _assertValuesListWithAccountEntryRestricted(
+			long accountEntryId, long objectDefinitionId, long userId,
+			int valuesListCount)
+		throws Exception {
+
+		Assert.assertEquals(
+			valuesListCount,
+			_objectEntryLocalService.getValuesListCount(
+				0, TestPropsValues.getCompanyId(), userId, objectDefinitionId,
+				null, null));
+
+		List<Map<String, Serializable>> valuesList =
+			_objectEntryLocalService.getValuesList(
+				0, TestPropsValues.getCompanyId(), userId, objectDefinitionId,
+				null, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		Assert.assertEquals(
+			valuesList.toString(), valuesListCount, valuesList.size());
+
+		if (valuesListCount == 0) {
+			return;
+		}
+
+		Map<String, Serializable> values = valuesList.get(0);
+
+		Assert.assertEquals(
+			accountEntryId, values.get("r_relationship_accountEntryId"));
 	}
 
 	private boolean _containsObjectEntryValuesSQLQuery(LogCapture logCapture) {
@@ -2873,6 +2982,10 @@ public class ObjectEntryLocalServiceTest {
 	private AccountEntryLocalService _accountEntryLocalService;
 
 	@Inject
+	private AccountEntryOrganizationRelLocalService
+		_accountEntryOrganizationRelLocalService;
+
+	@Inject
 	private AccountEntryUserRelLocalService _accountEntryUserRelLocalService;
 
 	@Inject
@@ -2924,6 +3037,9 @@ public class ObjectEntryLocalServiceTest {
 
 	@Inject
 	private ObjectValidationRuleLocalService _objectValidationRuleLocalService;
+
+	@Inject
+	private OrganizationLocalService _organizationLocalService;
 
 	@Inject
 	private RoleLocalService _roleLocalService;

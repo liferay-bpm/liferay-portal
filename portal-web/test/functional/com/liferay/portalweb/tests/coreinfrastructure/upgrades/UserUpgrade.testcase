@@ -72,6 +72,16 @@ definition {
 		Upgrade.resetTestUserPassword(administratorEmail = "test@liferay.com");
 	}
 
+	@priority = "5"
+	test ResetTestUserPasswordAfterUpgrade740 {
+		property data.archive.type = "data-archive-portal";
+		property database.types = "mariadb,mysql,postgresql";
+		property portal.version = "7.4.0";
+		property setup.wizard.enabled = "true";
+
+		Upgrade.resetTestUserPassword(administratorEmail = "test@liferay.com");
+	}
+
 	@description = "This is a use case for LPS-73277."
 	@priority = "5"
 	test ResetTestUserPasswordAfterUpgrade7110 {
@@ -213,6 +223,19 @@ definition {
 	}
 
 	@priority = "5"
+	test ViewAndEditUserAfterUpgrade740 {
+		property data.archive.type = "data-archive-user";
+		property database.types = "mariadb,mysql,postgresql";
+		property portal.version = "7.4.0";
+
+		SignIn.signIn();
+
+		SearchAdministration.executeReindex();
+
+		Upgrade.viewAndEditUser();
+	}
+
+	@priority = "5"
 	test ViewAndEditUserAfterUpgrade7110 {
 		property data.archive.type = "data-archive-user";
 		property portal.version = "7.1.10";
@@ -228,6 +251,18 @@ definition {
 	test ViewAndEditUserAfterUpgrade7210 {
 		property data.archive.type = "data-archive-user";
 		property portal.version = "7.2.10";
+
+		SignIn.signIn();
+
+		SearchAdministration.executeReindex();
+
+		Upgrade.viewAndEditUser();
+	}
+
+	@priority = "5"
+	test ViewAndEditUserAfterUpgrade7413 {
+		property data.archive.type = "data-archive-user";
+		property portal.version = "7.4.13";
 
 		SignIn.signIn();
 

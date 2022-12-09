@@ -703,6 +703,24 @@ public class ObjectEntryDisplayContext {
 					"parameterObjectFieldName", parameterObjectField.getName());
 			}
 		}
+		else if (StringUtil.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
+
+			ObjectEntry objectEntry = getObjectEntry();
+
+			if (objectEntry != null) {
+				ObjectDefinition objectDefinition = getObjectDefinition();
+
+				ddmFormField.setProperty(
+					"objectDefinitionExternalReferenceCode",
+					objectDefinition.getExternalReferenceCode());
+
+				ddmFormField.setProperty(
+					"objectEntryExternalReferenceCode",
+					objectEntry.getExternalReferenceCode());
+			}
+		}
 
 		ddmFormField.setReadOnly(readOnly);
 		ddmFormField.setRequired(objectField.isRequired());

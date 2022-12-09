@@ -53,6 +53,7 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.rss.util.RSSUtil;
@@ -112,23 +113,37 @@ public class KBDropdownItemsProvider {
 						_hasChildKBArticles(kbArticle) &&
 						_hasViewChildKBArticlesPermission(),
 					_getViewChildKBArticlesActionUnsafeConsumer(kbArticle)
-				).add(
-					() ->
-						_isSubscriptionEnabled() &&
-						_hasSubscriptionPermission(kbArticle) &&
-						_hasSubscription(kbArticle),
-					_getUnsubscribeActionUnsafeConsumer(kbArticle)
-				).add(
-					() ->
-						_isSubscriptionEnabled() &&
-						_hasSubscriptionPermission(kbArticle) &&
-						!_hasSubscription(kbArticle),
-					_getSubscribeActionUnsafeConsumer(kbArticle)
-				).add(
-					() ->
-						_isHistoryEnabled() && _hasHistoryPermission(kbArticle),
-					_getHistoryActionUnsafeConsumer(kbArticle)
 				).build())
+		).addGroup(
+			dropdownGroupItem -> {
+				dropdownGroupItem.setDropdownItems(
+					DropdownItemListBuilder.add(
+						() ->
+							_isExpirationEnabled() &&
+							_hasExpirationPermission(kbArticle) &&
+							!kbArticle.isExpired(),
+						_getExpireArticleActionConsumer(kbArticle)
+					).add(
+						() ->
+							_isSubscriptionEnabled() &&
+							_hasSubscriptionPermission(kbArticle) &&
+							_hasSubscription(kbArticle),
+						_getUnsubscribeActionUnsafeConsumer(kbArticle)
+					).add(
+						() ->
+							_isSubscriptionEnabled() &&
+							_hasSubscriptionPermission(kbArticle) &&
+							!_hasSubscription(kbArticle),
+						_getSubscribeActionUnsafeConsumer(kbArticle)
+					).add(
+						() ->
+							_isHistoryEnabled() &&
+							_hasHistoryPermission(kbArticle),
+						_getHistoryActionUnsafeConsumer(kbArticle)
+					).build());
+
+				dropdownGroupItem.setSeparator(true);
+			}
 		).addGroup(
 			dropdownGroupItem -> {
 				dropdownGroupItem.setDropdownItems(
@@ -550,6 +565,27 @@ public class KBDropdownItemsProvider {
 			dropdownItem.setLabel(
 				LanguageUtil.get(
 					_liferayPortletRequest.getHttpServletRequest(), "edit"));
+		};
+	}
+
+	private UnsafeConsumer<DropdownItem, Exception>
+		_getExpireArticleActionConsumer(KBArticle kbArticle) {
+
+		return dropdownItem -> {
+			dropdownItem.setHref(
+				PortletURLBuilder.createActionURL(
+					_liferayPortletResponse
+				).setActionName(
+					"/knowledge_base/expire_kb_article"
+				).setRedirect(
+					_currentURL
+				).setParameter(
+					"resourcePrimKey", kbArticle.getResourcePrimKey()
+				).buildActionURL());
+			dropdownItem.setIcon("time");
+			dropdownItem.setLabel(
+				LanguageUtil.get(
+					_liferayPortletRequest.getHttpServletRequest(), "expire"));
 		};
 	}
 
@@ -1037,6 +1073,20 @@ public class KBDropdownItemsProvider {
 		return false;
 	}
 
+	private boolean _hasExpirationPermission(KBArticle kbArticle)
+		throws Exception {
+
+		if (kbArticle.isApproved() &&
+			KBArticlePermission.contains(
+				_themeDisplay.getPermissionChecker(), kbArticle,
+				KBActionKeys.UPDATE)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	private Boolean _hasHistoryPermission(KBArticle kbArticle) {
 		if (kbArticle.isApproved() || !kbArticle.isFirstVersion()) {
 			return true;
@@ -1271,6 +1321,14 @@ public class KBDropdownItemsProvider {
 				_themeDisplay.getPermissionChecker(), kbTemplate,
 				KBActionKeys.VIEW)) {
 
+			return true;
+		}
+
+		return false;
+	}
+
+	private Boolean _isExpirationEnabled() {
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-165476"))) {
 			return true;
 		}
 

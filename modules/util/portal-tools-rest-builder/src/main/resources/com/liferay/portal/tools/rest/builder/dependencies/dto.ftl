@@ -51,6 +51,7 @@ import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -133,6 +134,7 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 		<#assign
 			propertySchema = freeMarkerTool.getDTOPropertySchema(propertyName, schema)
 			propertyType = properties[propertyName]
+			sizeParameters = []
 		/>
 
 		<#if propertySchema.maximum??>
@@ -145,6 +147,18 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 
 		<#if propertySchema.jsonMap>
 			@JsonAnyGetter
+		</#if>
+
+		<#if propertySchema.maxLength??>
+			<#assign sizeParameters = sizeParameters + ["max = ${propertySchema.maxLength}"] />
+		</#if>
+
+		<#if propertySchema.minLength??>
+			<#assign sizeParameters = sizeParameters + ["min = ${propertySchema.minLength}"] />
+		</#if>
+
+		<#if sizeParameters?has_content>
+			@Size(${sizeParameters?join(", ")})
 		</#if>
 
 		@Schema(

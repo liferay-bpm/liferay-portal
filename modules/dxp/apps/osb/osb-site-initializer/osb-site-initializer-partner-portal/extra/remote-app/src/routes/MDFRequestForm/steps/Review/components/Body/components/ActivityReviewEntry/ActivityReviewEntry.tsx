@@ -97,6 +97,7 @@ const ActivityReviewEntry = ({mdfRequestActivity}: IProps) => {
 							),
 					},
 				]}
+				truncate
 			/>
 
 			<ActivityContent mdfRequestActivity={mdfRequestActivity} />

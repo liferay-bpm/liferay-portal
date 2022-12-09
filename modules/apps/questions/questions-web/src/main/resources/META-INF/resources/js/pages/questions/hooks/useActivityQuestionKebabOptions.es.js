@@ -23,6 +23,7 @@ const FEEDBACK_DELAY = 2000;
 
 const useActiviyQuestionKebabOptions = ({
 	context,
+	onClickReport,
 	question,
 	questionId,
 	sectionTitle,
@@ -107,6 +108,11 @@ const useActiviyQuestionKebabOptions = ({
 				onClick: onClickShare,
 				symbolLeft: 'share',
 			},
+			{
+				label: Liferay.Language.get('report'),
+				onClick: () => onClickReport(),
+				symbolLeft: 'flag-empty',
+			},
 		];
 
 		if (question?.actions?.replace) {
@@ -149,6 +155,7 @@ const useActiviyQuestionKebabOptions = ({
 	}, [
 		context.historyRouterBasePath,
 		isSubscribed,
+		onClickReport,
 		onClickShare,
 		onSubscribe,
 		question,

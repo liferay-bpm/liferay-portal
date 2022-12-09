@@ -44,6 +44,7 @@ const GoalsEntries = ({mdfRequest}: IProps) => (
 					value: mdfRequest.country.name,
 				},
 			]}
+			truncate
 		/>
 
 		<Table<Item>
@@ -74,6 +75,7 @@ const GoalsEntries = ({mdfRequest}: IProps) => (
 					value: mdfRequest.liferayBusinessSalesGoals.join('; '),
 				},
 			]}
+			truncate
 		/>
 
 		<Table<Item>
@@ -105,6 +107,7 @@ const GoalsEntries = ({mdfRequest}: IProps) => (
 					value: mdfRequest.targetAudienceRoles.join('; '),
 				},
 			]}
+			truncate
 		/>
 	</div>
 );

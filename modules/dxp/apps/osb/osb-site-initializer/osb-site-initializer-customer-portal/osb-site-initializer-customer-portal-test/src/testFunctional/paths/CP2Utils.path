@@ -36,13 +36,23 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SELECT_LOCATION</td>
+	<td>//*[contains(@name, 'primaryRegion')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DROPDOWN_OPTIONS</td>
 	<td>//select/option[text()='${key_option}']</td>
 	<td></td>
 </tr>
 <tr>
+	<td>PAGINATION_BUTTON_ITEM</td>
+	<td>//*[contains(@class, 'dropdown-toggle') and text()='${key_quantity} items']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SVG_DROPDOWN</td>
-	<td>//*[contains(@class, 'cp-layout-header')]/descendant::span</td>
+	<td>//*[contains(@class, 'cp-project-breadcrumbs-toggle')]//div/following-sibling::span</td>
 	<td></td>
 </tr>
 <tr>
@@ -68,6 +78,11 @@
 <tr>
 	<td>CAPTION_ABOVE_MENU</td>
 	<td>//div[contains(@class, 'cp-activation-key-container')]/following::div//p[contains(text(),'your developer key to download.')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MODAL_TEXT</td>
+	<td>//*[contains(@class, 'modal-content')]//*[text()='${key_text}']</td>
 	<td></td>
 </tr>
 </tbody>

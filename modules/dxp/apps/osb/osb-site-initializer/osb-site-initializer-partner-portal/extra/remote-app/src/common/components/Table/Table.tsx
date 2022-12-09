@@ -21,6 +21,7 @@ interface TableProps<T> {
 	noWrap?: boolean;
 	responsive?: boolean;
 	rows: T[];
+	truncate?: boolean;
 }
 
 const Table = <T extends unknown>({
@@ -62,6 +63,7 @@ const Table = <T extends unknown>({
 										return customClickOnRow(row);
 									}
 								}}
+								{...props}
 							>
 								{column.render
 									? column.render(data, row)

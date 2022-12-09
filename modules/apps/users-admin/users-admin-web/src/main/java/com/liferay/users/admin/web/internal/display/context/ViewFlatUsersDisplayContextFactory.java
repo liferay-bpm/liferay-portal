@@ -119,6 +119,9 @@ public class ViewFlatUsersDisplayContextFactory {
 		if (navigation.equals("active")) {
 			status = WorkflowConstants.STATUS_APPROVED;
 		}
+		else if (navigation.equals("all")) {
+			status = WorkflowConstants.STATUS_ANY;
+		}
 		else if (navigation.equals("inactive")) {
 			status = WorkflowConstants.STATUS_INACTIVE;
 		}

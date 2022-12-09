@@ -11,6 +11,21 @@
 
 <tbody>
 <tr>
+	<td>ANY_LINK</td>
+	<td>//*[contains(@href, 'liferay') and text()='${key_text}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SVG_ACTIVATION_STATUS</td>
+	<td>//*[contains(@class, 'cp-label-activation-status')]//div/descendant::button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SVG_STATUS_OPTION</td>
+	<td>//*[contains(@class, 'dropdown-item')]//*[text()='${key_text}']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>BUTTON</td>
 	<td>//*[contains(@class, btn) and text()='${key_text}']</td>
 	<td></td>
@@ -236,6 +251,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SPECIFIC_ERROR_MESSAGE</td>
+	<td>//*[contains(@name, '${value}')]/parent::*//following-sibling::*//*[text()='${key_errorMessage}']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SUCCESS_MESSAGE</td>
 	<td>//div[contains(@class, 'text-center') and contains(text(), 'Thank you for submitting this request!')]</td>
 	<td></td>
@@ -288,6 +308,11 @@
 <tr>
 	<td>SETUP_VALUE</td>
 	<td>xpath=(//*[contains(@name,'${label}') and contains(@value,'${value}')])[${key_index}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FIELD_VALUE</td>
+	<td>//input[contains(@id,'${label}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -353,6 +378,11 @@
 <tr>
 	<td>SEARCH_BAR</td>
 	<td>//*[contains(@class, 'cp-search-bar')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SEARCH</td>
+	<td>//input[contains(@placeholder, 'Search')]</td>
 	<td></td>
 </tr>
 <tr>

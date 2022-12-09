@@ -100,6 +100,7 @@ public class MessageBoardMessageDTOConverter
 					AssetTag.NAME_ACCESSOR);
 				messageBoardSectionId = mbMessage.getCategoryId();
 				messageBoardThreadId = mbMessage.getThreadId();
+				modified = mbMessage.getMvccVersion() > 1;
 				numberOfMessageBoardAttachments =
 					mbMessage.getAttachmentsFileEntriesCount();
 				numberOfMessageBoardMessages =

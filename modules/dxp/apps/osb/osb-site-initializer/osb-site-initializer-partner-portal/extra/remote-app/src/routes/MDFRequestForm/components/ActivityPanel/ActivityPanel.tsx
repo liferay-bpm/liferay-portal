@@ -43,22 +43,26 @@ const ActivityPanel = ({
 					})}
 				>
 					<div className="d-flex justify-content-between">
-						<div>
+						<div className="text-truncate">
 							<div className="mb-1 text-neutral-7 text-paragraph-sm">
 								{overallCampaignName}
 							</div>
 
-							<h5 className="mb-1">{activity.name}</h5>
+							<h5 className="mb-1 text-truncate">
+								{activity.name}
+							</h5>
 						</div>
 
-						{!detail && (
-							<ClayButtonWithIcon
-								displayType={null}
-								onClick={onRemove}
-								small
-								symbol="trash"
-							/>
-						)}
+						<div className="ml-5">
+							{!detail && (
+								<ClayButtonWithIcon
+									displayType={null}
+									onClick={onRemove}
+									small
+									symbol="trash"
+								/>
+							)}
+						</div>
 					</div>
 
 					<div className="align-items-center d-flex justify-content-between">

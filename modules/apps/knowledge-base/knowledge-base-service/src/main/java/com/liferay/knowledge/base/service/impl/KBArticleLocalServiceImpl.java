@@ -492,6 +492,23 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 	}
 
 	@Override
+	public KBArticle expireKBArticle(
+			long userId, long resourcePrimKey, ServiceContext serviceContext)
+		throws PortalException {
+
+		KBArticle kbArticle = getLatestKBArticle(
+			resourcePrimKey, WorkflowConstants.STATUS_ANY);
+
+		kbArticle.setExpirationDate(new Date());
+
+		kbArticleLocalService.updateKBArticle(kbArticle);
+
+		return updateStatus(
+			userId, resourcePrimKey, WorkflowConstants.STATUS_EXPIRED,
+			serviceContext);
+	}
+
+	@Override
 	public KBArticle fetchFirstChildKBArticle(
 		long groupId, long parentResourcePrimKey) {
 
@@ -1349,7 +1366,9 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		kbArticle = kbArticlePersistence.update(kbArticle);
 
-		if (status != WorkflowConstants.STATUS_APPROVED) {
+		if ((status != WorkflowConstants.STATUS_APPROVED) &&
+			(status != WorkflowConstants.STATUS_EXPIRED)) {
+
 			return kbArticle;
 		}
 
@@ -1365,8 +1384,13 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		// Asset
 
-		AssetEntry assetEntry = _assetEntryLocalService.getEntry(
-			KBArticle.class.getName(), kbArticle.getKbArticleId());
+		AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
+			KBArticle.class.getName(), kbArticle.getResourcePrimKey());
+
+		if (status == WorkflowConstants.STATUS_APPROVED) {
+			assetEntry = _assetEntryLocalService.getEntry(
+				KBArticle.class.getName(), kbArticle.getKbArticleId());
+		}
 
 		List<AssetLink> assetLinks = _assetLinkLocalService.getDirectLinks(
 			assetEntry.getEntryId(), AssetLinkConstants.TYPE_RELATED);
@@ -1610,21 +1634,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			updateStatus(
 				userId, kbArticle.getResourcePrimKey(),
 				WorkflowConstants.STATUS_EXPIRED, serviceContext);
-
-			AssetEntry assetEntry = _assetEntryLocalService.getEntry(
-				KBArticle.class.getName(), kbArticle.getResourcePrimKey());
-
-			_assetEntryLocalService.updateEntry(
-				userId, kbArticle.getGroupId(), kbArticle.getCreateDate(),
-				kbArticle.getModifiedDate(), KBArticle.class.getName(),
-				kbArticle.getResourcePrimKey(), kbArticle.getUuid(), 0,
-				assetEntry.getCategoryIds(), assetEntry.getTagNames(), true,
-				false, null, null, null, kbArticle.getExpirationDate(),
-				ContentTypes.TEXT_HTML, kbArticle.getTitle(),
-				kbArticle.getDescription(), assetEntry.getSummary(), null, null,
-				0, 0, null);
-
-			_indexKBArticle(kbArticle);
 		}
 	}
 

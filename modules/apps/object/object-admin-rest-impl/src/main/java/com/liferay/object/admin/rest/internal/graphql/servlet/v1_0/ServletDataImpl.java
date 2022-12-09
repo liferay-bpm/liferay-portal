@@ -200,6 +200,11 @@ public class ServletDataImpl implements ServletData {
 							ObjectDefinitionResourceImpl.class,
 							"postObjectDefinitionPublish"));
 					put(
+						"mutation#createObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectField",
+						new ObjectValuePair<>(
+							ObjectFieldResourceImpl.class,
+							"postObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectField"));
+					put(
 						"mutation#createObjectDefinitionObjectField",
 						new ObjectValuePair<>(
 							ObjectFieldResourceImpl.class,
@@ -261,6 +266,11 @@ public class ServletDataImpl implements ServletData {
 						new ObjectValuePair<>(
 							ObjectLayoutResourceImpl.class,
 							"putObjectLayoutBatch"));
+					put(
+						"mutation#createObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectRelationship",
+						new ObjectValuePair<>(
+							ObjectRelationshipResourceImpl.class,
+							"postObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectRelationship"));
 					put(
 						"mutation#createObjectDefinitionObjectRelationship",
 						new ObjectValuePair<>(
@@ -385,6 +395,11 @@ public class ServletDataImpl implements ServletData {
 							ObjectDefinitionResourceImpl.class,
 							"getObjectDefinition"));
 					put(
+						"query#objectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectFields",
+						new ObjectValuePair<>(
+							ObjectFieldResourceImpl.class,
+							"getObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectFieldsPage"));
+					put(
 						"query#objectDefinitionObjectFields",
 						new ObjectValuePair<>(
 							ObjectFieldResourceImpl.class,
@@ -402,6 +417,11 @@ public class ServletDataImpl implements ServletData {
 						"query#objectLayout",
 						new ObjectValuePair<>(
 							ObjectLayoutResourceImpl.class, "getObjectLayout"));
+					put(
+						"query#objectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectRelationships",
+						new ObjectValuePair<>(
+							ObjectRelationshipResourceImpl.class,
+							"getObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectRelationshipsPage"));
 					put(
 						"query#objectDefinitionObjectRelationships",
 						new ObjectValuePair<>(

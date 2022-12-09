@@ -14,6 +14,8 @@
 
 package com.liferay.portal.search.rest.internal.resource.v1_0;
 
+import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
@@ -83,6 +85,11 @@ public class SuggestionResourceImpl extends BaseSuggestionResourceImpl {
 
 		LiferayRenderRequest liferayRenderRequest = _createLiferayRenderRequest(
 			currentURL, plid);
+
+		if (!StringUtil.startsWith(destinationFriendlyURL, CharPool.SLASH)) {
+			destinationFriendlyURL = StringPool.SLASH.concat(
+				destinationFriendlyURL);
+		}
 
 		return Page.of(
 			transform(

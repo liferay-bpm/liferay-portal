@@ -19,9 +19,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.CalendarFactory;
-import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.DateFormatFactory;
-import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.facet.modified.ModifiedFacetFactory;
@@ -84,7 +82,7 @@ public class ModifiedFacetPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		PortletSharedSearchResponse portletSharedSearchResponse =
-			portletSharedSearchRequest.search(renderRequest);
+			_portletSharedSearchRequest.search(renderRequest);
 
 		ModifiedFacetDisplayContext modifiedFacetDisplayContext =
 			_buildDisplayContext(portletSharedSearchResponse, renderRequest);
@@ -100,28 +98,16 @@ public class ModifiedFacetPortlet extends MVCPortlet {
 		super.render(renderRequest, renderResponse);
 	}
 
-	protected CalendarFactory calendarFactory;
-	protected DateFormatFactory dateFormatFactory;
-
-	@Reference
-	protected ModifiedFacetFactory modifiedFacetFactory;
-
-	@Reference
-	protected Portal portal;
-
-	@Reference
-	protected PortletSharedSearchRequest portletSharedSearchRequest;
-
 	private ModifiedFacetDisplayContext _buildDisplayContext(
 		PortletSharedSearchResponse portletSharedSearchResponse,
 		RenderRequest renderRequest) {
 
 		ModifiedFacetDisplayContextBuilder modifiedFacetDisplayContextBuilder =
 			_createModifiedFacetDisplayContextBuilder(
-				_getCalendarFactory(), _getDateFormatFactory(), renderRequest);
+				_calendarFactory, _dateFormatFactory, renderRequest);
 
 		modifiedFacetDisplayContextBuilder.setCurrentURL(
-			portal.getCurrentURL(renderRequest));
+			_portal.getCurrentURL(renderRequest));
 		modifiedFacetDisplayContextBuilder.setFacet(
 			portletSharedSearchResponse.getFacet(_getFieldName()));
 
@@ -183,30 +169,8 @@ public class ModifiedFacetPortlet extends MVCPortlet {
 		}
 	}
 
-	private CalendarFactory _getCalendarFactory() {
-
-		// See LPS-72507 and LPS-76500
-
-		if (calendarFactory != null) {
-			return calendarFactory;
-		}
-
-		return CalendarFactoryUtil.getCalendarFactory();
-	}
-
-	private DateFormatFactory _getDateFormatFactory() {
-
-		// See LPS-72507 and LPS-76500
-
-		if (dateFormatFactory != null) {
-			return dateFormatFactory;
-		}
-
-		return DateFormatFactoryUtil.getDateFormatFactory();
-	}
-
 	private String _getFieldName() {
-		Facet facet = modifiedFacetFactory.newInstance(null);
+		Facet facet = _modifiedFacetFactory.newInstance(null);
 
 		return facet.getFieldName();
 	}
@@ -228,5 +192,20 @@ public class ModifiedFacetPortlet extends MVCPortlet {
 
 		return themeDisplaySupplier.getThemeDisplay();
 	}
+
+	@Reference
+	private CalendarFactory _calendarFactory;
+
+	@Reference
+	private DateFormatFactory _dateFormatFactory;
+
+	@Reference
+	private ModifiedFacetFactory _modifiedFacetFactory;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private PortletSharedSearchRequest _portletSharedSearchRequest;
 
 }

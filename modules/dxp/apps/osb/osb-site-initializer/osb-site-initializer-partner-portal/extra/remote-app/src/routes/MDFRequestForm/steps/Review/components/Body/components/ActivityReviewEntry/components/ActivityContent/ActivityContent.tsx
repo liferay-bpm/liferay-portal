@@ -70,6 +70,7 @@ const ActivityContent = ({mdfRequestActivity}: IProps) => (
 					value: mdfRequestActivity.detailsLeadFollowUp,
 				},
 			]}
+			truncate
 		/>
 	</>
 );

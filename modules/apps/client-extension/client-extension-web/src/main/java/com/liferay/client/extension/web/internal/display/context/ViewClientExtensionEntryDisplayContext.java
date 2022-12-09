@@ -79,14 +79,14 @@ public class ViewClientExtensionEntryDisplayContext<T extends CET> {
 
 		Class<? extends CET> clazz = _cet.getClass();
 
-		for (Class<?> interfaceClasses : clazz.getInterfaces()) {
-			if ((interfaceClasses == _CLASS) ||
-				!_CLASS.isAssignableFrom(interfaceClasses)) {
+		for (Class<?> interfaceClass : clazz.getInterfaces()) {
+			if ((interfaceClass == _CLASS) ||
+				!_CLASS.isAssignableFrom(interfaceClass)) {
 
 				continue;
 			}
 
-			for (Method method : interfaceClasses.getDeclaredMethods()) {
+			for (Method method : interfaceClass.getDeclaredMethods()) {
 				if (method.getAnnotation(CETProperty.class) != null) {
 					methods.add(method);
 				}

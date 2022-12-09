@@ -431,6 +431,11 @@ export function ModalAddFilter({
 		}
 	};
 
+	const aggregationRelationshipOrDateFieldType =
+		selectedFilterBy?.businessType === 'Date' ||
+		(aggregationFilter &&
+			selectedFilterBy?.businessType === 'Relationship');
+
 	return (
 		<ClayModal observer={observer}>
 			<ClayModal.Header>{header}</ClayModal.Header>
@@ -481,8 +486,7 @@ export function ModalAddFilter({
 				)}
 
 				{selectedFilterBy &&
-					selectedFilterBy?.businessType !== 'Date' &&
-					selectedFilterBy?.businessType !== 'Relationship' && (
+					!aggregationRelationshipOrDateFieldType && (
 						<SingleSelect
 							error={errors.selectedFilterType}
 							label={Liferay.Language.get('filter-type')}

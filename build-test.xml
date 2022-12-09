@@ -836,31 +836,59 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 
 	<macrodef name="get-host-git-dir">
 		<sequential>
-			<exec executable="/bin/bash" outputproperty="docker.mounts.json">
-				<arg value="-c" />
-				<arg value="docker inspect -f '{{json .Mounts }}' ${env.NODE_NAME}" />
-			</exec>
+			<if>
+				<isset property="env.NODE_NAME" />
+				<then>
+					<exec executable="/bin/bash" outputproperty="docker.mounts.json">
+						<arg value="-c" />
+						<arg value="docker inspect -f '{{json .Mounts }}' ${env.NODE_NAME}" />
+					</exec>
 
-			<beanshell>
-				<![CDATA[
-					import org.json.JSONArray;
-					import org.json.JSONObject;
+					<beanshell>
+						<![CDATA[
+							import org.json.JSONArray;
+							import org.json.JSONObject;
 
-					JSONArray jsonArray = new JSONArray(project.getProperty("docker.mounts.json"));
+							String dockerMountsJSONString = project.getProperty("docker.mounts.json");
 
-					for (int i = 0; i < jsonArray.length(); i++) {
-						JSONObject jsonObject = jsonArray.getJSONObject(i);
+							if (dockerMountsJSONString == null) {
+								return;
+							}
 
-						String destination = jsonObject.getString("Destination");
+							JSONArray jsonArray = new JSONArray(dockerMountsJSONString);
 
-						if (destination.equals("/opt/dev/projects/github")) {
-							project.setProperty("host.git.dir", jsonObject.getString("Source"));
+							for (int i = 0; i < jsonArray.length(); i++) {
+								JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-							break;
-						}
-					}
-				]]>
-			</beanshell>
+								String destination = jsonObject.getString("Destination");
+
+								if (destination.equals("/opt/dev/projects/github")) {
+									project.setProperty("host.git.dir", jsonObject.getString("Source"));
+
+									break;
+								}
+							}
+						]]>
+					</beanshell>
+				</then>
+			</if>
+
+			<if>
+				<not>
+					<isset property="host.git.dir" />
+				</not>
+				<then>
+					<if>
+						<isset property="env.JENKINS_HOME" />
+						<then>
+							<fail message="Unable to get the host's git directory for container ${env.NODE_NAME}" />
+						</then>
+						<else>
+							<property location="${portal.dir}/.." name="host.git.dir" />
+						</else>
+					</if>
+				</then>
+			</if>
 		</sequential>
 	</macrodef>
 
@@ -1737,7 +1765,10 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 					</then>
 				</elseif>
 				<elseif>
-					<isset property="operating.system.docker.image" />
+					<and>
+						<isset property="env.JENKINS_HOME" />
+						<isset property="operating.system.docker.image" />
+					</and>
 					<then>
 						<get-operating-system-property property.name="operating.system.host" />
 
@@ -3424,7 +3455,10 @@ tell application "Safari" to quit
 			<get-browser-property property.name="browser.docker.image" />
 
 			<if>
-				<isset property="browser.docker.image" />
+				<and>
+					<isset property="browser.docker.image" />
+					<isset property="env.JENKINS_HOME" />
+				</and>
 				<then>
 					<get-browser-property property.name="browser.host" />
 
@@ -6971,14 +7005,41 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 				select="\1"
 			/>
 
-			<get-host-git-dir />
+			<local name="ip.address" />
 
-			<get-ip-address />
+			<if>
+				<isset property="env.JENKINS_HOME" />
+				<then>
+					<get-ip-address />
+				</then>
+				<else>
+					<get-operating-system-property property.name="operating.system.host" />
+
+					<exec executable="/bin/bash" outputproperty="ip.address">
+						<arg value="-c" />
+						<arg value="docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${operating.system.host}" />
+					</exec>
+				</else>
+			</if>
+
+			<local name="docker.add.host.hostname.arg" />
+			<local name="docker.add.host.node.name.arg" />
+			<local name="host.git.dir" />
+
+			<condition else="" property="docker.add.host.hostname.arg" value="--add-host ${env.HOSTNAME}:${ip.address}">
+				<isset property="env.HOSTNAME" />
+			</condition>
+
+			<condition else="" property="docker.add.host.node.name.arg" value="--add-host ${env.NODE_NAME}:${ip.address}">
+				<isset property="env.NODE_NAME" />
+			</condition>
+
+			<get-host-git-dir />
 
 			<start-docker-container image="${browser.docker.image}" name="${browser.host}" options="${browser.docker.browser.options}">\
 				${browser.docker.run.options} \
-				--add-host ${env.HOSTNAME}:${ip.address} \
-				--add-host ${env.NODE_NAME}:${ip.address} \
+				${docker.add.host.hostname.arg} \
+				${docker.add.host.node.name.arg} \
 				--add-host www.able.com:${ip.address} \
 				--add-host www.baker.com:${ip.address} \
 				--add-host www.charlie.com:${ip.address} \
@@ -6988,13 +7049,7 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 				--mount type=bind,source=${host.git.dir}/${portal.dir.name},target=${portal.dir} \
 			</start-docker-container>
 
-			<echo>Waiting for ${browser.host}:4444 to load</echo>
-
-			<waitfor maxwait="300" maxwaitunit="second">
-				<socket port="4444" server="${browser.host}" />
-			</waitfor>
-
-			<docker-copy dest.path="${browser.host}:/root/.ssh" src.path="/root/.ssh/." />
+			<wait-for-docker-browser shell.condition="(: &lt;/dev/tcp/127.0.0.1/4444) &amp;> /dev/null &amp;&amp; (: &lt;/dev/tcp/127.0.0.1/22) &amp;> /dev/null" />
 
 			<docker-execute container="${browser.host}">
 				ssh -fN -4 -L 8080:${ip.address}:8080 ${browser.host}
@@ -7056,21 +7111,28 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 			</chmod>
 
 			<local name="docker.start.error" />
+			<local name="docker.start.output" />
+			<local name="docker.start.result" />
 
-			<exec errorproperty="docker.start.error" executable="/bin/bash" os="${os.apple},${os.unix}">
+			<exec errorproperty="docker.start.error" executable="/bin/bash" os="${os.apple},${os.unix}" outputproperty="docker.start.output" resultproperty="docker.start.result">
 				<arg value="${docker.start.script}" />
 			</exec>
 
-			<exec errorproperty="docker.start.error" executable="cmd.exe" os="${os.windows}">
+			<exec errorproperty="docker.start.error" executable="cmd.exe" os="${os.windows}" outputproperty="docker.start.output" resultproperty="docker.start.result">
 				<arg value="${docker.start.script}" />
 			</exec>
 
 			<if>
-				<contains string="${docker.start.error}" substring="repository does not exist or may require 'docker login': denied: requested access to the resource is denied." />
+				<not>
+					<equals arg1="${docker.start.result}" arg2="0" />
+				</not>
 				<then>
-					<fail>Unable to start docker container: ${docker.start.error}</fail>
+					<fail>Unable to start docker container:
+${docker.start.error}</fail>
 				</then>
 			</if>
+
+			<echo>${docker.start.output}</echo>
 
 			<delete file="${docker.start.script}" />
 		</sequential>
@@ -7224,15 +7286,6 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 			/>
 
 			<get-host-git-dir />
-
-			<if>
-				<not>
-					<isset property="host.git.dir" />
-				</not>
-				<then>
-					<fail message="Unable to get mount 'host.git.dir' for ${operating.system.host}" />
-				</then>
-			</if>
 
 			<start-docker-container image="${operating.system.docker.image}" name="${operating.system.host}" options="${operating.system.docker.os.options}">\
 				--mount type=bind,source=${host.git.dir}/${portal.dir.name},target=${portal.dir} \
@@ -7417,7 +7470,10 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 											<property name="app.server.waiting.url" value="http://localhost:${test.app.server.leading.port.number}080/${portal.context}/web/guest" />
 										</then>
 										<elseif>
-											<isset property="operating.system.docker.image" />
+											<and>
+												<isset property="env.JENKINS_HOME" />
+												<isset property="operating.system.docker.image" />
+											</and>
 											<then>
 												<get-operating-system-property property.name="operating.system.host" />
 
@@ -8263,6 +8319,32 @@ war.path=${app.server.portal.dir}/</echo>
 					<fail message="${timed.out.message}" />
 				</then>
 			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="wait-for-docker-browser">
+		<attribute name="shell.condition" />
+
+		<sequential>
+			<property location="setup.sh" name="setup.sh.file" />
+
+			<get-browser-property property.name="browser.host" />
+			<get-browser-property property.name="browser.name" />
+			<get-browser-property property.name="browser.version" />
+
+			<docker-execute container="${browser.host}">
+				<![CDATA[
+					#!/bin/bash
+
+					until @{shell.condition}
+
+					do
+						echo "Waiting for ${browser.name} ${browser.version} to be ready"
+
+						sleep 10
+					done
+				]]>
+			</docker-execute>
 		</sequential>
 	</macrodef>
 
@@ -11135,6 +11217,8 @@ enterprise.product.notification.enabled=false
 
 company.security.strangers.verify=false
 
+default.admin.password=test
+
 browser.launcher.url=
 
 setup.wizard.enabled=false
@@ -11823,6 +11907,7 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 
 		<echo append="true" file="${test.ext.properties.file}">
 			app.server.bin.dir=${app.server.bin.dir}
+			app.server.dir=${app.server.dir}
 			app.server.temp.dir=${app.server.tomcat.temp.dir}
 			app.server.type=${app.server.type}
 			component.names=${component.names}
@@ -12308,7 +12393,10 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 		<get-operating-system-property property.name="operating.system.docker.image" />
 
 		<if>
-			<isset property="operating.system.docker.image" />
+			<and>
+				<isset property="env.JENKINS_HOME" />
+				<isset property="operating.system.docker.image" />
+			</and>
 			<then>
 				<get-operating-system-property property.name="operating.system.host.alias" />
 
@@ -15428,6 +15516,10 @@ url=${short.hostname}:8080</echo>
 		/>
 	</target>
 
+	<target name="start-docker-browser">
+		<start-docker-browser />
+	</target>
+
 	<target name="start-docker-containers">
 		<get-database-property property.name="database.docker.image" />
 
@@ -15900,6 +15992,10 @@ url=${short.hostname}:8080</echo>
 		</if>
 	</target>
 
+	<target name="start-docker-os">
+		<start-docker-os />
+	</target>
+
 	<target name="start-test-smtp-server">
 		<start-test-smtp-server />
 	</target>
@@ -15917,6 +16013,10 @@ url=${short.hostname}:8080</echo>
 		<stop-app-server
 			app.server.bundle.index="${app.server.bundle.index}"
 		/>
+	</target>
+
+	<target name="stop-docker-browser">
+		<stop-docker-browser />
 	</target>
 
 	<target name="stop-docker-containers">
@@ -15950,6 +16050,10 @@ url=${short.hostname}:8080</echo>
 
 	<target name="stop-docker-database">
 		<stop-docker-database />
+	</target>
+
+	<target name="stop-docker-os">
+		<stop-docker-os />
 	</target>
 
 	<target name="test-package">

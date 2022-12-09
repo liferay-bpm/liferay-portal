@@ -436,13 +436,15 @@ export const getMessagesQuery = `
 						dateCreated
 						dateModified
 						encodingFormat
+						friendlyUrlPath
 						hasCompanyMx
 						id
-						friendlyUrlPath
+						modified
 						showAsAnswer
 						status
 					}
 				}
+				modified
 				myRating {
 					ratingValue
 				}

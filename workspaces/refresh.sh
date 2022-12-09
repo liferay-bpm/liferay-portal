@@ -21,7 +21,17 @@ function check_blade {
 		exit 1
 	fi
 
-	${BLADE_PATH} update -s > /dev/null
+	#
+	# Update Blade with Blade.
+	#
+
+	#${BLADE_PATH} update -s > /dev/null
+
+	#
+	# Update Blade directly with JPM.
+	#
+
+	#jpm install -f https://repository-cdn.liferay.com/nexus/service/local/repositories/liferay-public-releases/content/com/liferay/blade/com.liferay.blade.cli/4.1.1/com.liferay.blade.cli-4.1.1.jar
 }
 
 function copy_template {
@@ -55,13 +65,14 @@ function refresh_sample_default_workspace {
 
 	cd sample-default-workspace
 
-	${BLADE_PATH} init --liferay-version dxp-7.4-u40
+	${BLADE_PATH} init --liferay-version dxp-7.4-u53
 
 	echo -e "\n**/dist\n**/node_modules_cache\n.DS_Store" >> .gitignore
 
 	echo -e "\n\nfeature.flag.LPS-153457=true" >> configs/local/portal-ext.properties
 
-	echo -e "\nliferay.workspace.docker.image.liferay=liferay/7.4.13.nightly-d4.1.4-20220707214146" >> gradle.properties
+	#echo -e "\nliferay.workspace.docker.image.liferay=liferay/dxp:7.4.13-u53-d5.0.3-20221201085420" >> gradle.properties
+	echo -e "\nliferay.workspace.node.package.manager=yarn" >> gradle.properties
 
 	sort -o gradle.properties gradle.properties
 
@@ -74,6 +85,10 @@ function refresh_sample_default_workspace {
 function refresh_sample_minimal_workspace {
 	init_workspace sample-minimal-workspace
 
+	#
+	# Able client extensions
+	#
+
 	rm -fr sample-minimal-workspace/client-extensions/able-*
 
 	copy_template custom-element sample-minimal-workspace/client-extensions/able-custom-element "Able Custom Element"
@@ -82,6 +97,20 @@ function refresh_sample_minimal_workspace {
 	copy_template iframe sample-minimal-workspace/client-extensions/able-iframe "Able IFrame"
 	copy_template theme-css sample-minimal-workspace/client-extensions/able-theme-css "Able Theme CSS"
 	copy_template theme-favicon sample-minimal-workspace/client-extensions/able-theme-favicon "Able Theme Favicon"
+
+	#
+	# Fox remote app client extension
+	#
+
+	rm -fr sample-minimal-workspace/client-extensions/fox-remote-app
+
+	../tools/create_remote_app.sh fox-remote-app react
+
+	mv fox-remote-app sample-minimal-workspace/client-extensions
+
+	#
+	# Sample default workspace
+	#
 
 	rm -fr sample-default-workspace/client-extensions
 

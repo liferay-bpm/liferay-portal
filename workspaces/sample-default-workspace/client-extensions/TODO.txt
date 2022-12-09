@@ -1,0 +1,5 @@
+Remove dates and other superfluous information from batch-engine.json and
+foo-object-definition.json.
+
+Use meaning external reference codes instead of generated UUID for
+foo-object-definition.json.

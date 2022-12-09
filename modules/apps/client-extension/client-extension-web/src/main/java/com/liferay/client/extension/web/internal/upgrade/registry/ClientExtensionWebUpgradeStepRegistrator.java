@@ -15,6 +15,7 @@
 package com.liferay.client.extension.web.internal.upgrade.registry;
 
 import com.liferay.portal.kernel.model.Release;
+import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
@@ -53,9 +54,11 @@ public class ClientExtensionWebUpgradeStepRegistrator
 			new com.liferay.client.extension.web.internal.upgrade.v2_0_0.
 				UpgradePortletId());
 
+		registry.register("2.0.0", "3.0.0", new DummyUpgradeStep());
+
 		registry.register(
-			"2.0.0", "3.0.0",
-			new com.liferay.client.extension.web.internal.upgrade.v3_0_0.
+			"3.0.0", "3.0.1",
+			new com.liferay.client.extension.web.internal.upgrade.v3_0_1.
 				UpgradePortletId());
 	}
 

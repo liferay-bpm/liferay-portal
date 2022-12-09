@@ -42,6 +42,21 @@ definition {
 		Button.clickSave();
 	}
 
+	macro addRootCategory {
+		var key_categoryName = "${categoryName}";
+
+		Type(
+			key_vocabularyName = "${vocabularyName}",
+			locator1 = "AssetCategorization#CATEGORIES_FIELD",
+			value1 = "${categoryName}");
+
+		Click.mouseDownMouseUp(locator1 = "AssetCategorization#CATEGORY_AUTOCOMPLETE_SPECIFIC");
+
+		AssertElementPresent(
+			locator1 = "CommerceWidget#TAG_FACET_LABEL_LAYOUT",
+			tagName = "${categoryName}");
+	}
+
 	macro addUserViaOrganizationManagementWidget {
 		Type(
 			locator1 = "CommerceOrganizationManagementWidget#INVITE_EMAIL_INPUT",

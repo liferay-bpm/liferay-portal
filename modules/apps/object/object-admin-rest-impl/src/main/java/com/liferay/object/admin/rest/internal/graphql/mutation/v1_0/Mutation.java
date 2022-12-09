@@ -338,6 +338,23 @@ public class Mutation {
 	}
 
 	@GraphQLField
+	public ObjectField
+			createObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectField(
+				@GraphQLName("objectDefinitionExternalReferenceCode") String
+					objectDefinitionExternalReferenceCode,
+				@GraphQLName("objectField") ObjectField objectField)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_objectFieldResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			objectFieldResource ->
+				objectFieldResource.
+					postObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectField(
+						objectDefinitionExternalReferenceCode, objectField));
+	}
+
+	@GraphQLField
 	public ObjectField createObjectDefinitionObjectField(
 			@GraphQLName("objectDefinitionId") Long objectDefinitionId,
 			@GraphQLName("objectField") ObjectField objectField)
@@ -513,6 +530,25 @@ public class Mutation {
 			this::_populateResourceContext,
 			objectLayoutResource -> objectLayoutResource.putObjectLayoutBatch(
 				callbackURL, object));
+	}
+
+	@GraphQLField
+	public ObjectRelationship
+			createObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectRelationship(
+				@GraphQLName("objectDefinitionExternalReferenceCode") String
+					objectDefinitionExternalReferenceCode,
+				@GraphQLName("objectRelationship") ObjectRelationship
+					objectRelationship)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_objectRelationshipResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			objectRelationshipResource ->
+				objectRelationshipResource.
+					postObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectRelationship(
+						objectDefinitionExternalReferenceCode,
+						objectRelationship));
 	}
 
 	@GraphQLField

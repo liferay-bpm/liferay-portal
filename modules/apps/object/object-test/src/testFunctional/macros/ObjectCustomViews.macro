@@ -448,7 +448,7 @@ definition {
 
 	macro selectPermissionToRegularRole {
 		for (var permissionsName : list "${permissionsList}") {
-			Click(
+			Click.clickAtNotVisible(
 				key_permissionName = "${permissionsName}",
 				locator1 = "ObjectCustomViews#SELECT_PERMISSIONS_TO_REGULAR_ROLE");
 		}
