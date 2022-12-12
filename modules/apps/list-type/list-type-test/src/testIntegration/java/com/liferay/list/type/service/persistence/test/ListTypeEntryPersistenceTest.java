@@ -128,6 +128,9 @@ public class ListTypeEntryPersistenceTest {
 
 		newListTypeEntry.setUuid(RandomTestUtil.randomString());
 
+		newListTypeEntry.setExternalReferenceCode(
+			RandomTestUtil.randomString());
+
 		newListTypeEntry.setCompanyId(RandomTestUtil.nextLong());
 
 		newListTypeEntry.setUserId(RandomTestUtil.nextLong());
@@ -156,6 +159,9 @@ public class ListTypeEntryPersistenceTest {
 			newListTypeEntry.getMvccVersion());
 		Assert.assertEquals(
 			existingListTypeEntry.getUuid(), newListTypeEntry.getUuid());
+		Assert.assertEquals(
+			existingListTypeEntry.getExternalReferenceCode(),
+			newListTypeEntry.getExternalReferenceCode());
 		Assert.assertEquals(
 			existingListTypeEntry.getListTypeEntryId(),
 			newListTypeEntry.getListTypeEntryId());
@@ -257,10 +263,10 @@ public class ListTypeEntryPersistenceTest {
 	protected OrderByComparator<ListTypeEntry> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
 			"ListTypeEntry", "mvccVersion", true, "uuid", true,
-			"listTypeEntryId", true, "companyId", true, "userId", true,
-			"userName", true, "createDate", true, "modifiedDate", true,
-			"listTypeDefinitionId", true, "key", true, "name", true, "type",
-			true);
+			"externalReferenceCode", true, "listTypeEntryId", true, "companyId",
+			true, "userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "listTypeDefinitionId", true, "key", true,
+			"name", true, "type", true);
 	}
 
 	@Test
@@ -547,6 +553,8 @@ public class ListTypeEntryPersistenceTest {
 		listTypeEntry.setMvccVersion(RandomTestUtil.nextLong());
 
 		listTypeEntry.setUuid(RandomTestUtil.randomString());
+
+		listTypeEntry.setExternalReferenceCode(RandomTestUtil.randomString());
 
 		listTypeEntry.setCompanyId(RandomTestUtil.nextLong());
 

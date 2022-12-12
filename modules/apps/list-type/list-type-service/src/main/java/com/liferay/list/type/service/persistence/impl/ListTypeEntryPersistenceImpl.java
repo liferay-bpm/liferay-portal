@@ -2857,6 +2857,10 @@ public class ListTypeEntryPersistenceImpl
 			listTypeEntry.setUuid(uuid);
 		}
 
+		if (Validator.isNull(listTypeEntry.getExternalReferenceCode())) {
+			listTypeEntry.setExternalReferenceCode(listTypeEntry.getUuid());
+		}
+
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
