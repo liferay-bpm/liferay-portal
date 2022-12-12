@@ -229,6 +229,16 @@ public class ListTypeEntryPersistenceTest {
 	}
 
 	@Test
+	public void testCountByERC_C_LTDI() throws Exception {
+		_persistence.countByERC_C_LTDI(
+			"", RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
+
+		_persistence.countByERC_C_LTDI("null", 0L, 0L);
+
+		_persistence.countByERC_C_LTDI((String)null, 0L, 0L);
+	}
+
+	@Test
 	public void testCountByLTDI_K() throws Exception {
 		_persistence.countByLTDI_K(RandomTestUtil.nextLong(), "");
 
@@ -533,6 +543,22 @@ public class ListTypeEntryPersistenceTest {
 	}
 
 	private void _assertOriginalValues(ListTypeEntry listTypeEntry) {
+		Assert.assertEquals(
+			listTypeEntry.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				listTypeEntry, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
+		Assert.assertEquals(
+			Long.valueOf(listTypeEntry.getCompanyId()),
+			ReflectionTestUtil.<Long>invoke(
+				listTypeEntry, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "companyId"));
+		Assert.assertEquals(
+			Long.valueOf(listTypeEntry.getListTypeDefinitionId()),
+			ReflectionTestUtil.<Long>invoke(
+				listTypeEntry, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "listTypeDefinitionId"));
+
 		Assert.assertEquals(
 			Long.valueOf(listTypeEntry.getListTypeDefinitionId()),
 			ReflectionTestUtil.<Long>invoke(
