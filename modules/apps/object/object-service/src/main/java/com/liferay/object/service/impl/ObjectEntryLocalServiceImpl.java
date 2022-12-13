@@ -3272,6 +3272,28 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
+	private void _validateObjectRelationship(
+			ObjectField objectField, long primaryKey)
+		throws PortalException {
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipPersistence.fetchByObjectFieldId2(
+				objectField.getObjectFieldId());
+
+		if (objectRelationship != null) {
+			ObjectDefinition objectDefinition =
+				_objectDefinitionPersistence.fetchByPrimaryKey(
+					objectRelationship.getObjectDefinitionId1());
+
+			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
+				_systemObjectDefinitionMetadataRegistry.
+					getSystemObjectDefinitionMetadata(
+						objectDefinition.getName());
+
+			systemObjectDefinitionMetadata.getExternalReferenceCode(primaryKey);
+		}
+	}
+
 	private void _validateObjectStateTransition(
 			Map.Entry<String, Serializable> entry, long listTypeDefinitionId,
 			ObjectEntry objectEntry, long objectFieldId)
@@ -3550,6 +3572,8 @@ public class ObjectEntryLocalServiceImpl
 							BUSINESS_TYPE_LONG_VALUE_MIN,
 						objectField.getName());
 				}
+
+				_validateObjectRelationship(objectField, value);
 			}
 		}
 		else if (StringUtil.equals(

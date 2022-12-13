@@ -125,6 +125,8 @@ public class ObjectRelationshipLocalServiceImpl
 				_objectDefinitionPersistence.findByPrimaryKey(
 					objectRelationship.getObjectDefinitionId1());
 
+			_validateObjectPrimaryKey(objectDefinition1, primaryKey1);
+
 			if (_hasManyToManyObjectRelationshipMappingTableValues(
 					objectDefinition1, objectDefinition2, objectRelationship,
 					primaryKey1, primaryKey2)) {
@@ -866,6 +868,17 @@ public class ObjectRelationshipLocalServiceImpl
 		_validateParameterObjectFieldId(
 			objectDefinitionId1, objectDefinitionId2, parameterObjectFieldId,
 			type);
+	}
+
+	private void _validateObjectPrimaryKey(
+			ObjectDefinition objectDefinition, long primaryKey)
+		throws PortalException {
+
+		SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
+			_systemObjectDefinitionMetadataRegistry.
+				getSystemObjectDefinitionMetadata(objectDefinition.getName());
+
+		systemObjectDefinitionMetadata.getExternalReferenceCode(primaryKey);
 	}
 
 	private void _validateParameterObjectFieldId(
