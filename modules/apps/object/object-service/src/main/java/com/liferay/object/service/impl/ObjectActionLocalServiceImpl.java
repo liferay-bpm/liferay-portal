@@ -21,7 +21,6 @@ import com.liferay.object.constants.ObjectActionConstants;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
-import com.liferay.object.exception.ObjectActionConditionExpressionException;
 import com.liferay.object.exception.ObjectActionErrorMessageException;
 import com.liferay.object.exception.ObjectActionLabelException;
 import com.liferay.object.exception.ObjectActionNameException;
@@ -352,9 +351,9 @@ public class ObjectActionLocalServiceImpl
 				throw new ObjectActionTriggerKeyException();
 			}
 
-			if (Validator.isNotNull(conditionExpression)) {
-				throw new ObjectActionConditionExpressionException();
-			}
+			//if (Validator.isNotNull(conditionExpression)) {
+			//	throw new ObjectActionConditionExpressionException();
+			//}
 		}
 	}
 

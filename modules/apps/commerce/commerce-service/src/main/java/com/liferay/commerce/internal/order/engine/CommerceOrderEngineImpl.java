@@ -56,11 +56,15 @@ import com.liferay.commerce.service.CommerceShipmentLocalService;
 import com.liferay.commerce.service.CommerceShippingMethodLocalService;
 import com.liferay.commerce.subscription.CommerceSubscriptionEntryHelperUtil;
 import com.liferay.commerce.util.CommerceShippingHelper;
+import com.liferay.object.system.JaxRsApplicationDescriptor;
+import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
@@ -85,8 +89,10 @@ import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import java.math.BigDecimal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.osgi.service.component.annotations.Component;
@@ -513,6 +519,27 @@ public class CommerceOrderEngineImpl implements CommerceOrderEngine {
 		return commerceOrderJSONObject;
 	}
 
+	private DTOConverter<CommerceOrder, ?> _getDTOConverter() {
+		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
+			_systemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+
+		return (DTOConverter<CommerceOrder, ?>)
+			_dtoConverterRegistry.getDTOConverter(
+				jaxRsApplicationDescriptor.getApplicationName(),
+				CommerceOrder.class.getName(),
+				jaxRsApplicationDescriptor.getVersion());
+	}
+
+	private String _getDTOConverterType() {
+		DTOConverter<CommerceOrder, ?> dtoConverter = _getDTOConverter();
+
+		if (dtoConverter == null) {
+			return CommerceOrder.class.getSimpleName();
+		}
+
+		return dtoConverter.getContentType();
+	}
+
 	private boolean _isGuestCheckoutEnabled(long groupId) throws Exception {
 		CommerceOrderCheckoutConfiguration commerceOrderCheckoutConfiguration =
 			_configurationProvider.getConfiguration(
@@ -552,6 +579,12 @@ public class CommerceOrderEngineImpl implements CommerceOrderEngine {
 						"commerceOrderId", commerceOrder.getCommerceOrderId()
 					).put(
 						"orderStatus", commerceOrder.getOrderStatus()
+					).put(
+						"model" + CommerceOrder.class.getSimpleName(),
+						commerceOrder.getModelAttributes()
+					).put(
+						"modelDTO" + _getDTOConverterType(),
+						_toDTO(commerceOrder, commerceOrder.getUserId())
 					));
 
 				MessageBusUtil.sendMessage(
@@ -559,6 +592,67 @@ public class CommerceOrderEngineImpl implements CommerceOrderEngine {
 
 				return null;
 			});
+	}
+
+	private Map<String, Object> _toDTO(CommerceOrder baseModel, long userId) {
+		DTOConverter<CommerceOrder, ?> dtoConverter = _getDTOConverter();
+
+		Map<String, Object> modelAttributes = baseModel.getModelAttributes();
+
+		if (dtoConverter == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"No DTO converter found for " +
+						CommerceOrder.class.getName());
+			}
+
+			return modelAttributes;
+		}
+
+		User user = _userLocalService.fetchUser(userId);
+
+		if (user == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("No user found with user ID " + userId);
+			}
+
+			return modelAttributes;
+		}
+
+		DefaultDTOConverterContext defaultDTOConverterContext =
+			new DefaultDTOConverterContext(
+				false, Collections.emptyMap(), _dtoConverterRegistry,
+				baseModel.getPrimaryKeyObj(), user.getLocale(), null, user);
+
+		try {
+			Object object = dtoConverter.toDTO(defaultDTOConverterContext);
+
+			if (object == null) {
+				return modelAttributes;
+			}
+
+			JSONObject jsonObject = _jsonFactory.createJSONObject(
+				_jsonFactory.looseSerializeDeep(object));
+
+			return jsonObject.put(
+				"createDate", modelAttributes.get("createDate")
+			).put(
+				"modifiedDate", modelAttributes.get("modifiedDate")
+			).put(
+				"status", modelAttributes.get("status")
+			).put(
+				"userName", user.getFullName()
+			).put(
+				"uuid", modelAttributes.get("uuid")
+			).toMap();
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
+		}
+
+		return baseModel.getModelAttributes();
 	}
 
 	private CommerceOrder _transitionCommerceOrder(
@@ -673,6 +767,9 @@ public class CommerceOrderEngineImpl implements CommerceOrderEngine {
 		}
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		CommerceOrderEngineImpl.class);
+
 	private static final TransactionConfig _transactionConfig =
 		TransactionConfig.Factory.create(
 			Propagation.REQUIRED, new Class<?>[] {Exception.class});
@@ -736,6 +833,9 @@ public class CommerceOrderEngineImpl implements CommerceOrderEngine {
 
 	@Reference
 	private JSONFactory _jsonFactory;
+
+	@Reference
+	private SystemObjectDefinitionMetadata _systemObjectDefinitionMetadata;
 
 	@Reference
 	private UserLocalService _userLocalService;
