@@ -171,7 +171,9 @@
 	</entity>
 	<exceptions>
 		<exception>NotificationTemplateAttachmentObjectFieldId</exception>
+		<exception>NotificationTemplateEditorType</exception>
 		<exception>NotificationTemplateFrom</exception>
+		<exception>NotificationTemplateFromName</exception>
 		<exception>NotificationTemplateName</exception>
 		<exception>NotificationTemplateObjectDefinitionId</exception>
 		<exception>NotificationTemplateType</exception>
