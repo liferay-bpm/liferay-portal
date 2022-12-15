@@ -48,6 +48,7 @@ import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
+import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -122,7 +123,25 @@ public class ObjectActionLocalServiceImpl
 		objectAction.setParameters(parametersUnicodeProperties.toString());
 		objectAction.setStatus(ObjectActionConstants.STATUS_NEVER_RAN);
 
-		return objectActionPersistence.update(objectAction);
+		objectAction = objectActionPersistence.update(objectAction);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.findByPrimaryKey(
+				objectAction.getObjectDefinitionId());
+
+		if (objectDefinition.isApproved() &&
+			Objects.equals(
+				objectAction.getObjectActionTriggerKey(),
+				ObjectActionTriggerConstants.KEY_STANDALONE)) {
+
+			_resourceActions.addModelResourceAction(
+				objectAction.getName(), objectDefinition.getClassName());
+
+			_resourceActions.addModelResourceGuestUnsupportedAction(
+				objectAction.getName(), objectDefinition.getClassName());
+		}
+
+		return objectAction;
 	}
 
 	@Indexable(type = IndexableType.DELETE)
@@ -140,7 +159,22 @@ public class ObjectActionLocalServiceImpl
 	@Override
 	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public ObjectAction deleteObjectAction(ObjectAction objectAction) {
-		return objectActionPersistence.remove(objectAction);
+		objectAction = objectActionPersistence.remove(objectAction);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.fetchByPrimaryKey(
+				objectAction.getObjectDefinitionId());
+
+		if (objectDefinition.isApproved() &&
+			Objects.equals(
+				objectAction.getObjectActionTriggerKey(),
+				ObjectActionTriggerConstants.KEY_STANDALONE)) {
+
+			_resourceActions.removeModelResourceAction(
+				objectAction.getName(), objectDefinition.getClassName());
+		}
+
+		return objectAction;
 	}
 
 	@Override
@@ -581,6 +615,9 @@ public class ObjectActionLocalServiceImpl
 
 	@Reference
 	private ObjectScriptingValidator _objectScriptingValidator;
+
+	@Reference
+	private ResourceActions _resourceActions;
 
 	@Reference
 	private UserLocalService _userLocalService;
