@@ -475,6 +475,16 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 	}
 
 	@Override
+	public void unregister(String schedulerEntryEventListenerClass) {
+		ServiceRegistration<?> serviceRegistration =
+			_serviceRegistrations.remove(schedulerEntryEventListenerClass);
+
+		if (serviceRegistration != null) {
+			serviceRegistration.unregister();
+		}
+	}
+
+	@Override
 	public void unschedule(
 			SchedulerEntry schedulerEntry, StorageType storageType)
 		throws SchedulerException {
