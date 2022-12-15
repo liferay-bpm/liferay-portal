@@ -13,7 +13,7 @@
  */
 
 import ClayAlert from '@clayui/alert';
-import ClayForm, {ClayCheckbox, ClaySelect, ClayToggle} from '@clayui/form';
+import {ClayCheckbox, ClaySelect} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import ClayLabel from '@clayui/label';
 import {ClayTooltipProvider} from '@clayui/tooltip';
@@ -22,7 +22,6 @@ import {
 	Card,
 	CodeEditor,
 	CustomItem,
-	ExpressionBuilder,
 	Input,
 	InputLocalized,
 	SelectWithOption,
@@ -36,6 +35,7 @@ import PredefinedValuesTable from '../PredefinedValuesTable';
 
 import './ActionBuilder.scss';
 import {ActionError} from '../index';
+import {ConditionContainer} from './ConditionContainer';
 interface ActionBuilderProps {
 	errors: ActionError;
 	isApproved: boolean;
@@ -262,10 +262,6 @@ export default function ActionBuilder({
 			makeFetch();
 		}
 	}, [values, systemObject]);
-
-	const handleSave = (conditionExpression?: string) => {
-		setValues({conditionExpression});
-	};
 
 	const isValidField = ({
 		businessType,
@@ -525,57 +521,12 @@ export default function ActionBuilder({
 				</Card>
 			</Card>
 
-			<Card
-				disabled={values.objectActionTriggerKey === 'standalone'}
-				title={Liferay.Language.get('condition')}
-			>
-				<ClayForm.Group>
-					<ClayToggle
-						disabled={
-							values.objectActionTriggerKey === 'standalone'
-						}
-						label={Liferay.Language.get('enable-condition')}
-						name="condition"
-						onToggle={(enable) =>
-							setValues({
-								conditionExpression: enable ? '' : undefined,
-							})
-						}
-						toggled={!(values.conditionExpression === undefined)}
-					/>
-				</ClayForm.Group>
-
-				{values.conditionExpression !== undefined && (
-					<ExpressionBuilder
-						error={errors.conditionExpression}
-						feedbackMessage={Liferay.Language.get(
-							'use-expressions-to-create-a-condition'
-						)}
-						label={Liferay.Language.get('expression-builder')}
-						name="conditionExpression"
-						onChange={({target: {value}}) =>
-							setValues({conditionExpression: value})
-						}
-						onOpenModal={() => {
-							const parentWindow = Liferay.Util.getOpener();
-
-							parentWindow.Liferay.fire(
-								'openExpressionBuilderModal',
-								{
-									onSave: handleSave,
-									required: true,
-									source: values.conditionExpression,
-									validateExpressionURL,
-								}
-							);
-						}}
-						placeholder={Liferay.Language.get(
-							'create-an-expression'
-						)}
-						value={values.conditionExpression as string}
-					/>
-				)}
-			</Card>
+			<ConditionContainer
+				errors={errors}
+				setValues={setValues}
+				validateExpressionURL={validateExpressionURL}
+				values={values}
+			/>
 
 			{warningAlerts.requiredFields && (
 				<ClayAlert
