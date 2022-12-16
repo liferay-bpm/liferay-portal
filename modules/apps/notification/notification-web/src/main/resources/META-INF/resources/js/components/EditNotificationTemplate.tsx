@@ -184,6 +184,13 @@ export default function EditNotificationTemplate({
 
 		if (
 			notificationTemplateType === 'email' &&
+			!values.recipients[0].to[defaultLanguageId]
+		) {
+			errors.to = Liferay.Language.get('required');
+		}
+
+		if (
+			notificationTemplateType === 'email' &&
 			!values.recipients[0].from
 		) {
 			errors.from = Liferay.Language.get('required');
@@ -677,6 +684,7 @@ export default function EditNotificationTemplate({
 								) : (
 									<>
 										<InputLocalized
+											error={errors.to}
 											label={Liferay.Language.get('to')}
 											name="to"
 											onChange={(translation) => {
@@ -692,6 +700,7 @@ export default function EditNotificationTemplate({
 												});
 											}}
 											placeholder=""
+											required
 											selectedLocale={selectedLocale}
 											translations={
 												(values
