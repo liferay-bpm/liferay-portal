@@ -495,7 +495,9 @@ export default function EditNotificationTemplate({
 						: undefined
 				}
 				entityId={notificationTemplateId}
-				externalReferenceCode={externalReferenceCode}
+				externalReferenceCode={
+					values.externalReferenceCode ?? externalReferenceCode
+				}
 				externalReferenceCodeSaveURL={`/o/notification/v1.0/notification-templates/${notificationTemplateId}`}
 				hasPublishPermission={true}
 				hasUpdatePermission={true}
@@ -503,6 +505,11 @@ export default function EditNotificationTemplate({
 					'internal-key-to-reference-the-notification-template'
 				)}
 				label={templateTitle}
+				onExternalReferenceCodeChange={(value) => {
+					setValues({
+						externalReferenceCode: value,
+					});
+				}}
 				onGetEntity={() =>
 					API.getNotificationTemplateById(notificationTemplateId)
 				}

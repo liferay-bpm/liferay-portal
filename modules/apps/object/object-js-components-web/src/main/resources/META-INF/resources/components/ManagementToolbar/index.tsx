@@ -38,6 +38,7 @@ interface ManagementToolbarProps {
 	helpMessage: string;
 	isApproved?: boolean;
 	label: string;
+	onExternalReferenceCodeChange: (value: string) => void;
 	onGetEntity: () => Promise<Entity>;
 	onSubmit: (props: boolean) => void;
 	portletNamespace: string;
@@ -51,22 +52,20 @@ export function ManagementToolbar({
 	badgeLabel,
 	className,
 	entityId,
-	externalReferenceCode: initialExternalReferenceCode,
+	externalReferenceCode,
 	externalReferenceCodeSaveURL,
 	hasPublishPermission,
 	hasUpdatePermission,
 	helpMessage,
 	isApproved,
 	label,
+	onExternalReferenceCodeChange,
 	onGetEntity,
 	onSubmit,
 	portletNamespace,
 	screenNavigationCategoryKey,
 	showEntityDetails = true,
 }: ManagementToolbarProps) {
-	const [externalReferenceCode, setExternalReferenceCode] = useState<string>(
-		initialExternalReferenceCode
-	);
 	const [visibleModal, setVisibleModal] = useState<boolean>(false);
 
 	const {observer, onClose} = useModal({
@@ -177,7 +176,7 @@ export function ManagementToolbar({
 					onClose={onClose}
 					onGetEntity={onGetEntity}
 					saveURL={externalReferenceCodeSaveURL}
-					setExternalReferenceCode={setExternalReferenceCode}
+					setExternalReferenceCode={onExternalReferenceCodeChange}
 				/>
 			)}
 		</>
