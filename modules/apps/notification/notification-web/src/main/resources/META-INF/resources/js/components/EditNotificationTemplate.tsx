@@ -93,6 +93,7 @@ export type TNotificationTemplate = {
 	body: LocalizedValue<string>;
 	description: string;
 	editorType: editorTypeOptions;
+	externalReferenceCode: string;
 	name: string;
 	objectDefinitionExternalReferenceCode: string;
 	objectDefinitionId: number | null;
@@ -180,6 +181,13 @@ export default function EditNotificationTemplate({
 
 		if (!values.name) {
 			errors.name = Liferay.Language.get('required');
+		}
+
+		if (
+			notificationTemplateType === 'email' &&
+			!values.recipients[0].to[defaultLanguageId]
+		) {
+			errors.to = Liferay.Language.get('required');
 		}
 
 		if (
@@ -278,6 +286,7 @@ export default function EditNotificationTemplate({
 		},
 		description: '',
 		editorType: 'richText' as editorTypeOptions,
+		externalReferenceCode: '',
 		name: '',
 		objectDefinitionExternalReferenceCode: '',
 		objectDefinitionId: 0,
@@ -289,7 +298,7 @@ export default function EditNotificationTemplate({
 		type: notificationTemplateType,
 	};
 
-	const {errors, setValues, values} = useForm({
+	const {errors, setValues, validateSubmit, values} = useForm({
 		initialValues,
 		onSubmit,
 		validate,
@@ -366,6 +375,7 @@ export default function EditNotificationTemplate({
 					body,
 					description,
 					editorType,
+					externalReferenceCode,
 					name,
 					objectDefinitionExternalReferenceCode,
 					objectDefinitionId,
@@ -383,6 +393,7 @@ export default function EditNotificationTemplate({
 					body,
 					description,
 					editorType,
+					externalReferenceCode,
 					name,
 					objectDefinitionExternalReferenceCode,
 					objectDefinitionId,
@@ -502,7 +513,7 @@ export default function EditNotificationTemplate({
 				onGetEntity={() =>
 					API.getNotificationTemplateById(notificationTemplateId)
 				}
-				onSubmit={() => onSubmit(values)}
+				onSubmit={validateSubmit}
 				portletNamespace={portletNamespace}
 				showEntityDetails={notificationTemplateId !== 0}
 			/>
@@ -677,6 +688,7 @@ export default function EditNotificationTemplate({
 								) : (
 									<>
 										<InputLocalized
+											error={errors.to}
 											label={Liferay.Language.get('to')}
 											name="to"
 											onChange={(translation) => {
@@ -692,6 +704,7 @@ export default function EditNotificationTemplate({
 												});
 											}}
 											placeholder=""
+											required
 											selectedLocale={selectedLocale}
 											translations={
 												(values
