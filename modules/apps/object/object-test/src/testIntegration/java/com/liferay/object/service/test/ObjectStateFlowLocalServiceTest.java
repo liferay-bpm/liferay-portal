@@ -319,6 +319,8 @@ public class ObjectStateFlowLocalServiceTest {
 
 	@Test
 	public void testUpdateObjectStateTransitions() throws Exception {
+		_step4ListTypeEntry = _addListTypeEntry("step4");
+
 		List<ObjectState> objectStates =
 			_objectStateLocalService.getObjectStateFlowObjectStates(
 				_objectStateFlow.getObjectStateFlowId());
@@ -343,11 +345,18 @@ public class ObjectStateFlowLocalServiceTest {
 					getObjectStateObjectStateTransitions(
 						objectState.getObjectStateId());
 
+			if (objectStateTransitions.isEmpty()) {
+				continue;
+			}
+
 			objectState.setObjectStateTransitions(
-				Collections.singletonList(objectStateTransitions.get(0)));
-
-			// TODO Besides removing, add a new one too
-
+				Arrays.asList(
+					objectStateTransitions.get(0),
+					_objectStateTransitionLocalService.addObjectStateTransition(
+						TestPropsValues.getUserId(),
+						_objectStateFlow.getObjectStateFlowId(),
+						objectState.getObjectStateId(),
+						_step4ListTypeEntry.getListTypeEntryId())));
 		}
 
 		newObjectStateFlow.setObjectStates(newObjectStates);
@@ -475,5 +484,6 @@ public class ObjectStateFlowLocalServiceTest {
 	private ListTypeEntry _step1ListTypeEntry;
 	private ListTypeEntry _step2ListTypeEntry;
 	private ListTypeEntry _step3ListTypeEntry;
+	private ListTypeEntry _step4ListTypeEntry;
 
 }
