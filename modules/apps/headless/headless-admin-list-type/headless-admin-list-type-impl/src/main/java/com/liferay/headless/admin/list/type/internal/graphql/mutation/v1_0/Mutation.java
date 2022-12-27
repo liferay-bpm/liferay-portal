@@ -92,6 +92,22 @@ public class Mutation {
 	}
 
 	@GraphQLField
+	public ListTypeDefinition updateListTypeDefinitionByExternalReferenceCode(
+			@GraphQLName("externalReferenceCode") String externalReferenceCode,
+			@GraphQLName("listTypeDefinition") ListTypeDefinition
+				listTypeDefinition)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_listTypeDefinitionResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			listTypeDefinitionResource ->
+				listTypeDefinitionResource.
+					putListTypeDefinitionByExternalReferenceCode(
+						externalReferenceCode, listTypeDefinition));
+	}
+
+	@GraphQLField
 	public boolean deleteListTypeDefinition(
 			@GraphQLName("listTypeDefinitionId") Long listTypeDefinitionId)
 		throws Exception {
