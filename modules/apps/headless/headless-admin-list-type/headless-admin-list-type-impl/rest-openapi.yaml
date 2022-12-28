@@ -417,3 +417,48 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/ListTypeEntry"
             tags: ["ListTypeEntry"]
+    "/list-type-entry/by-external-reference-code/{externalReferenceCode}":
+        get:
+            operationId: getListTypeEntryByExternalReferenceCode
+            parameters:
+                - in: path
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ListTypeEntry"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ListTypeEntry"
+            tags: ["ListTypeEntry"]
+        put:
+            operationId: putListTypeEntryByExternalReferenceCode
+            parameters:
+                - in: path
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ListTypeEntry"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/ListTypeEntry"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ListTypeEntry"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ListTypeEntry"
+            tags: ["ListTypeEntry"]
