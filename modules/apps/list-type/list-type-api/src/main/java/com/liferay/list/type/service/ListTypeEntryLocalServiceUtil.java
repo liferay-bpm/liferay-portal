@@ -228,6 +228,13 @@ public class ListTypeEntryLocalServiceUtil {
 		return getService().fetchListTypeEntry(listTypeDefinitionId, key);
 	}
 
+	public static ListTypeEntry fetchListTypeEntryByExternalReferenceCode(
+		String externalReferenceCode, long companyId) {
+
+		return getService().fetchListTypeEntryByExternalReferenceCode(
+			externalReferenceCode, companyId);
+	}
+
 	/**
 	 * Returns the list type entry with the matching UUID and company.
 	 *
@@ -322,6 +329,14 @@ public class ListTypeEntryLocalServiceUtil {
 		throws PortalException {
 
 		return getService().getListTypeEntry(listTypeDefinitionId, key);
+	}
+
+	public static ListTypeEntry getListTypeEntryByExternalReferenceCode(
+			String externalReferenceCode, long companyId)
+		throws PortalException {
+
+		return getService().getListTypeEntryByExternalReferenceCode(
+			externalReferenceCode, companyId);
 	}
 
 	/**

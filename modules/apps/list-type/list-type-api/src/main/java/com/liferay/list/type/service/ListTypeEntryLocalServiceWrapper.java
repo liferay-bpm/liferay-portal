@@ -254,6 +254,16 @@ public class ListTypeEntryLocalServiceWrapper
 			listTypeDefinitionId, key);
 	}
 
+	@Override
+	public com.liferay.list.type.model.ListTypeEntry
+		fetchListTypeEntryByExternalReferenceCode(
+			String externalReferenceCode, long companyId) {
+
+		return _listTypeEntryLocalService.
+			fetchListTypeEntryByExternalReferenceCode(
+				externalReferenceCode, companyId);
+	}
+
 	/**
 	 * Returns the list type entry with the matching UUID and company.
 	 *
@@ -365,6 +375,17 @@ public class ListTypeEntryLocalServiceWrapper
 
 		return _listTypeEntryLocalService.getListTypeEntry(
 			listTypeDefinitionId, key);
+	}
+
+	@Override
+	public com.liferay.list.type.model.ListTypeEntry
+			getListTypeEntryByExternalReferenceCode(
+				String externalReferenceCode, long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _listTypeEntryLocalService.
+			getListTypeEntryByExternalReferenceCode(
+				externalReferenceCode, companyId);
 	}
 
 	/**
