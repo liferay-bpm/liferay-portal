@@ -773,6 +773,147 @@ public abstract class BaseListTypeEntryResourceTestCase {
 			"This method needs to be implemented");
 	}
 
+	@Test
+	public void testGetListTypeEntryByExternalReferenceCode() throws Exception {
+		ListTypeEntry postListTypeEntry =
+			testGetListTypeEntryByExternalReferenceCode_addListTypeEntry();
+
+		ListTypeEntry getListTypeEntry =
+			listTypeEntryResource.getListTypeEntryByExternalReferenceCode(
+				postListTypeEntry.getExternalReferenceCode());
+
+		assertEquals(postListTypeEntry, getListTypeEntry);
+		assertValid(getListTypeEntry);
+	}
+
+	protected ListTypeEntry
+			testGetListTypeEntryByExternalReferenceCode_addListTypeEntry()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetListTypeEntryByExternalReferenceCode()
+		throws Exception {
+
+		ListTypeEntry listTypeEntry =
+			testGraphQLGetListTypeEntryByExternalReferenceCode_addListTypeEntry();
+
+		Assert.assertTrue(
+			equals(
+				listTypeEntry,
+				ListTypeEntrySerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"listTypeEntryByExternalReferenceCode",
+								new HashMap<String, Object>() {
+									{
+										put(
+											"externalReferenceCode",
+											"\"" +
+												listTypeEntry.
+													getExternalReferenceCode() +
+														"\"");
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data",
+						"Object/listTypeEntryByExternalReferenceCode"))));
+	}
+
+	@Test
+	public void testGraphQLGetListTypeEntryByExternalReferenceCodeNotFound()
+		throws Exception {
+
+		String irrelevantExternalReferenceCode =
+			"\"" + RandomTestUtil.randomString() + "\"";
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"listTypeEntryByExternalReferenceCode",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"externalReferenceCode",
+									irrelevantExternalReferenceCode);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected ListTypeEntry
+			testGraphQLGetListTypeEntryByExternalReferenceCode_addListTypeEntry()
+		throws Exception {
+
+		return testGraphQLListTypeEntry_addListTypeEntry();
+	}
+
+	@Test
+	public void testPutListTypeEntryByExternalReferenceCode() throws Exception {
+		ListTypeEntry postListTypeEntry =
+			testPutListTypeEntryByExternalReferenceCode_addListTypeEntry();
+
+		ListTypeEntry randomListTypeEntry = randomListTypeEntry();
+
+		ListTypeEntry putListTypeEntry =
+			listTypeEntryResource.putListTypeEntryByExternalReferenceCode(
+				postListTypeEntry.getExternalReferenceCode(),
+				randomListTypeEntry);
+
+		assertEquals(randomListTypeEntry, putListTypeEntry);
+		assertValid(putListTypeEntry);
+
+		ListTypeEntry getListTypeEntry =
+			listTypeEntryResource.getListTypeEntryByExternalReferenceCode(
+				putListTypeEntry.getExternalReferenceCode());
+
+		assertEquals(randomListTypeEntry, getListTypeEntry);
+		assertValid(getListTypeEntry);
+
+		ListTypeEntry newListTypeEntry =
+			testPutListTypeEntryByExternalReferenceCode_createListTypeEntry();
+
+		putListTypeEntry =
+			listTypeEntryResource.putListTypeEntryByExternalReferenceCode(
+				newListTypeEntry.getExternalReferenceCode(), newListTypeEntry);
+
+		assertEquals(newListTypeEntry, putListTypeEntry);
+		assertValid(putListTypeEntry);
+
+		getListTypeEntry =
+			listTypeEntryResource.getListTypeEntryByExternalReferenceCode(
+				putListTypeEntry.getExternalReferenceCode());
+
+		assertEquals(newListTypeEntry, getListTypeEntry);
+
+		Assert.assertEquals(
+			newListTypeEntry.getExternalReferenceCode(),
+			putListTypeEntry.getExternalReferenceCode());
+	}
+
+	protected ListTypeEntry
+			testPutListTypeEntryByExternalReferenceCode_createListTypeEntry()
+		throws Exception {
+
+		return randomListTypeEntry();
+	}
+
+	protected ListTypeEntry
+			testPutListTypeEntryByExternalReferenceCode_addListTypeEntry()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
 	@Rule
 	public SearchTestRule searchTestRule = new SearchTestRule();
 

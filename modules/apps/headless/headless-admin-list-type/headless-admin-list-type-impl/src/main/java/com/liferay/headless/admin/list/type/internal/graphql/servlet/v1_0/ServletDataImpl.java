@@ -160,6 +160,11 @@ public class ServletDataImpl implements ServletData {
 						new ObjectValuePair<>(
 							ListTypeEntryResourceImpl.class,
 							"putListTypeEntryBatch"));
+					put(
+						"mutation#updateListTypeEntryByExternalReferenceCode",
+						new ObjectValuePair<>(
+							ListTypeEntryResourceImpl.class,
+							"putListTypeEntryByExternalReferenceCode"));
 
 					put(
 						"query#listTypeDefinitions",
@@ -186,6 +191,11 @@ public class ServletDataImpl implements ServletData {
 						new ObjectValuePair<>(
 							ListTypeEntryResourceImpl.class,
 							"getListTypeEntry"));
+					put(
+						"query#listTypeEntryByExternalReferenceCode",
+						new ObjectValuePair<>(
+							ListTypeEntryResourceImpl.class,
+							"getListTypeEntryByExternalReferenceCode"));
 				}
 			};
 
