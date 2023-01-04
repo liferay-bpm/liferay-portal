@@ -79,6 +79,16 @@ public class ListTypeEntryServiceWrapper
 		return _listTypeEntryService.getListTypeEntry(listTypeEntryId);
 	}
 
+	@Override
+	public com.liferay.list.type.model.ListTypeEntry
+			getListTypeEntryByExternalReferenceCode(
+				String externalReferenceCode, long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _listTypeEntryService.getListTypeEntryByExternalReferenceCode(
+			externalReferenceCode, companyId);
+	}
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *
