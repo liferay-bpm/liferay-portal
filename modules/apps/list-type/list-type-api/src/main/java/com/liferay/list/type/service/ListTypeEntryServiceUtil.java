@@ -74,6 +74,14 @@ public class ListTypeEntryServiceUtil {
 		return getService().getListTypeEntry(listTypeEntryId);
 	}
 
+	public static ListTypeEntry getListTypeEntryByExternalReferenceCode(
+			String externalReferenceCode, long companyId)
+		throws PortalException {
+
+		return getService().getListTypeEntryByExternalReferenceCode(
+			externalReferenceCode, companyId);
+	}
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *
