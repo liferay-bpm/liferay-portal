@@ -74,6 +74,11 @@ public interface ListTypeEntryService extends BaseService {
 	public ListTypeEntry getListTypeEntry(long listTypeEntryId)
 		throws PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ListTypeEntry getListTypeEntryByExternalReferenceCode(
+			String externalReferenceCode, long companyId)
+		throws PortalException;
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *
