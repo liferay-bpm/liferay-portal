@@ -128,6 +128,8 @@ public class ObjectActionPersistenceTest {
 
 		newObjectAction.setUuid(RandomTestUtil.randomString());
 
+		newObjectAction.setExternalReferenceCode(RandomTestUtil.randomString());
+
 		newObjectAction.setCompanyId(RandomTestUtil.nextLong());
 
 		newObjectAction.setUserId(RandomTestUtil.nextLong());
@@ -172,6 +174,9 @@ public class ObjectActionPersistenceTest {
 			newObjectAction.getMvccVersion());
 		Assert.assertEquals(
 			existingObjectAction.getUuid(), newObjectAction.getUuid());
+		Assert.assertEquals(
+			existingObjectAction.getExternalReferenceCode(),
+			newObjectAction.getExternalReferenceCode());
 		Assert.assertEquals(
 			existingObjectAction.getObjectActionId(),
 			newObjectAction.getObjectActionId());
@@ -302,12 +307,13 @@ public class ObjectActionPersistenceTest {
 
 	protected OrderByComparator<ObjectAction> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"ObjectAction", "mvccVersion", true, "uuid", true, "objectActionId",
-			true, "companyId", true, "userId", true, "userName", true,
-			"createDate", true, "modifiedDate", true, "objectDefinitionId",
-			true, "active", true, "description", true, "errorMessage", true,
-			"label", true, "name", true, "objectActionExecutorKey", true,
-			"objectActionTriggerKey", true, "status", true);
+			"ObjectAction", "mvccVersion", true, "uuid", true,
+			"externalReferenceCode", true, "objectActionId", true, "companyId",
+			true, "userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "objectDefinitionId", true, "active", true,
+			"description", true, "errorMessage", true, "label", true, "name",
+			true, "objectActionExecutorKey", true, "objectActionTriggerKey",
+			true, "status", true);
 	}
 
 	@Test
@@ -615,6 +621,8 @@ public class ObjectActionPersistenceTest {
 		objectAction.setMvccVersion(RandomTestUtil.nextLong());
 
 		objectAction.setUuid(RandomTestUtil.randomString());
+
+		objectAction.setExternalReferenceCode(RandomTestUtil.randomString());
 
 		objectAction.setCompanyId(RandomTestUtil.nextLong());
 

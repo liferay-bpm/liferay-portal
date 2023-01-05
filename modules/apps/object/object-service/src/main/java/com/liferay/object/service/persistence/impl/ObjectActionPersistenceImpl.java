@@ -3256,6 +3256,10 @@ public class ObjectActionPersistenceImpl
 			objectAction.setUuid(uuid);
 		}
 
+		if (Validator.isNull(objectAction.getExternalReferenceCode())) {
+			objectAction.setExternalReferenceCode(objectAction.getUuid());
+		}
+
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 

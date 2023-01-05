@@ -81,6 +81,7 @@ public class ObjectActionModelImpl
 
 	public static final Object[][] TABLE_COLUMNS = {
 		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
+		{"externalReferenceCode", Types.VARCHAR},
 		{"objectActionId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
@@ -98,6 +99,7 @@ public class ObjectActionModelImpl
 	static {
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("externalReferenceCode", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("objectActionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
@@ -118,7 +120,7 @@ public class ObjectActionModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table ObjectAction (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,objectActionId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,objectDefinitionId LONG,active_ BOOLEAN,conditionExpression TEXT null,description VARCHAR(75) null,errorMessage STRING null,label STRING null,name VARCHAR(75) null,objectActionExecutorKey VARCHAR(75) null,objectActionTriggerKey VARCHAR(75) null,parameters TEXT null,status INTEGER)";
+		"create table ObjectAction (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,objectActionId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,objectDefinitionId LONG,active_ BOOLEAN,conditionExpression TEXT null,description VARCHAR(75) null,errorMessage STRING null,label STRING null,name VARCHAR(75) null,objectActionExecutorKey VARCHAR(75) null,objectActionTriggerKey VARCHAR(75) null,parameters TEXT null,status INTEGER)";
 
 	public static final String TABLE_SQL_DROP = "drop table ObjectAction";
 
@@ -296,6 +298,12 @@ public class ObjectActionModelImpl
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<ObjectAction, String>)ObjectAction::setUuid);
 		attributeGetterFunctions.put(
+			"externalReferenceCode", ObjectAction::getExternalReferenceCode);
+		attributeSetterBiConsumers.put(
+			"externalReferenceCode",
+			(BiConsumer<ObjectAction, String>)
+				ObjectAction::setExternalReferenceCode);
+		attributeGetterFunctions.put(
 			"objectActionId", ObjectAction::getObjectActionId);
 		attributeSetterBiConsumers.put(
 			"objectActionId",
@@ -422,6 +430,26 @@ public class ObjectActionModelImpl
 	@Deprecated
 	public String getOriginalUuid() {
 		return getColumnOriginalValue("uuid_");
+	}
+
+	@JSON
+	@Override
+	public String getExternalReferenceCode() {
+		if (_externalReferenceCode == null) {
+			return "";
+		}
+		else {
+			return _externalReferenceCode;
+		}
+	}
+
+	@Override
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_externalReferenceCode = externalReferenceCode;
 	}
 
 	@JSON
@@ -1133,6 +1161,7 @@ public class ObjectActionModelImpl
 
 		objectActionImpl.setMvccVersion(getMvccVersion());
 		objectActionImpl.setUuid(getUuid());
+		objectActionImpl.setExternalReferenceCode(getExternalReferenceCode());
 		objectActionImpl.setObjectActionId(getObjectActionId());
 		objectActionImpl.setCompanyId(getCompanyId());
 		objectActionImpl.setUserId(getUserId());
@@ -1164,6 +1193,8 @@ public class ObjectActionModelImpl
 		objectActionImpl.setMvccVersion(
 			this.<Long>getColumnOriginalValue("mvccVersion"));
 		objectActionImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		objectActionImpl.setExternalReferenceCode(
+			this.<String>getColumnOriginalValue("externalReferenceCode"));
 		objectActionImpl.setObjectActionId(
 			this.<Long>getColumnOriginalValue("objectActionId"));
 		objectActionImpl.setCompanyId(
@@ -1281,6 +1312,18 @@ public class ObjectActionModelImpl
 
 		if ((uuid != null) && (uuid.length() == 0)) {
 			objectActionCacheModel.uuid = null;
+		}
+
+		objectActionCacheModel.externalReferenceCode =
+			getExternalReferenceCode();
+
+		String externalReferenceCode =
+			objectActionCacheModel.externalReferenceCode;
+
+		if ((externalReferenceCode != null) &&
+			(externalReferenceCode.length() == 0)) {
+
+			objectActionCacheModel.externalReferenceCode = null;
 		}
 
 		objectActionCacheModel.objectActionId = getObjectActionId();
@@ -1458,6 +1501,7 @@ public class ObjectActionModelImpl
 
 	private long _mvccVersion;
 	private String _uuid;
+	private String _externalReferenceCode;
 	private long _objectActionId;
 	private long _companyId;
 	private long _userId;
@@ -1510,6 +1554,8 @@ public class ObjectActionModelImpl
 
 		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("uuid_", _uuid);
+		_columnOriginalValues.put(
+			"externalReferenceCode", _externalReferenceCode);
 		_columnOriginalValues.put("objectActionId", _objectActionId);
 		_columnOriginalValues.put("companyId", _companyId);
 		_columnOriginalValues.put("userId", _userId);
@@ -1557,39 +1603,41 @@ public class ObjectActionModelImpl
 
 		columnBitmasks.put("uuid_", 2L);
 
-		columnBitmasks.put("objectActionId", 4L);
+		columnBitmasks.put("externalReferenceCode", 4L);
 
-		columnBitmasks.put("companyId", 8L);
+		columnBitmasks.put("objectActionId", 8L);
 
-		columnBitmasks.put("userId", 16L);
+		columnBitmasks.put("companyId", 16L);
 
-		columnBitmasks.put("userName", 32L);
+		columnBitmasks.put("userId", 32L);
 
-		columnBitmasks.put("createDate", 64L);
+		columnBitmasks.put("userName", 64L);
 
-		columnBitmasks.put("modifiedDate", 128L);
+		columnBitmasks.put("createDate", 128L);
 
-		columnBitmasks.put("objectDefinitionId", 256L);
+		columnBitmasks.put("modifiedDate", 256L);
 
-		columnBitmasks.put("active_", 512L);
+		columnBitmasks.put("objectDefinitionId", 512L);
 
-		columnBitmasks.put("conditionExpression", 1024L);
+		columnBitmasks.put("active_", 1024L);
 
-		columnBitmasks.put("description", 2048L);
+		columnBitmasks.put("conditionExpression", 2048L);
 
-		columnBitmasks.put("errorMessage", 4096L);
+		columnBitmasks.put("description", 4096L);
 
-		columnBitmasks.put("label", 8192L);
+		columnBitmasks.put("errorMessage", 8192L);
 
-		columnBitmasks.put("name", 16384L);
+		columnBitmasks.put("label", 16384L);
 
-		columnBitmasks.put("objectActionExecutorKey", 32768L);
+		columnBitmasks.put("name", 32768L);
 
-		columnBitmasks.put("objectActionTriggerKey", 65536L);
+		columnBitmasks.put("objectActionExecutorKey", 65536L);
 
-		columnBitmasks.put("parameters", 131072L);
+		columnBitmasks.put("objectActionTriggerKey", 131072L);
 
-		columnBitmasks.put("status", 262144L);
+		columnBitmasks.put("parameters", 262144L);
+
+		columnBitmasks.put("status", 524288L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}
