@@ -27,6 +27,8 @@ components:
                     additionalProperties:
                         type: string
                     type: object
+                externalReferenceCode:
+                    type: string
                 id:
                     format: int64
                     readOnly: true
@@ -1193,6 +1195,39 @@ paths:
         post:
             operationId: postObjectDefinitionObjectAction
             parameters:
+                - in: path
+                  name: objectDefinitionId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ObjectAction"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/ObjectAction"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ObjectAction"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ObjectAction"
+            tags: ["ObjectAction"]
+    "/object-definitions/{objectDefinitionId}/object-actions/by-external-reference-code":
+        put:
+            operationId: putObjectDefinitionObjectActionByExternalReferenceCode
+            parameters:
+                - in: path
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
                 - in: path
                   name: objectDefinitionId
                   required: true
