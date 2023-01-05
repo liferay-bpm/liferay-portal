@@ -15,6 +15,7 @@
 package com.liferay.object.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.object.exception.DuplicateObjectActionExternalReferenceCodeException;
 import com.liferay.object.exception.NoSuchObjectActionException;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.service.ObjectActionLocalServiceUtil;
@@ -128,6 +129,8 @@ public class ObjectActionPersistenceTest {
 
 		newObjectAction.setUuid(RandomTestUtil.randomString());
 
+		newObjectAction.setExternalReferenceCode(RandomTestUtil.randomString());
+
 		newObjectAction.setCompanyId(RandomTestUtil.nextLong());
 
 		newObjectAction.setUserId(RandomTestUtil.nextLong());
@@ -173,6 +176,9 @@ public class ObjectActionPersistenceTest {
 		Assert.assertEquals(
 			existingObjectAction.getUuid(), newObjectAction.getUuid());
 		Assert.assertEquals(
+			existingObjectAction.getExternalReferenceCode(),
+			newObjectAction.getExternalReferenceCode());
+		Assert.assertEquals(
 			existingObjectAction.getObjectActionId(),
 			newObjectAction.getObjectActionId());
 		Assert.assertEquals(
@@ -217,6 +223,26 @@ public class ObjectActionPersistenceTest {
 			newObjectAction.getParameters());
 		Assert.assertEquals(
 			existingObjectAction.getStatus(), newObjectAction.getStatus());
+	}
+
+	@Test(expected = DuplicateObjectActionExternalReferenceCodeException.class)
+	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
+		ObjectAction objectAction = addObjectAction();
+
+		ObjectAction newObjectAction = addObjectAction();
+
+		newObjectAction.setCompanyId(objectAction.getCompanyId());
+
+		newObjectAction = _persistence.update(newObjectAction);
+
+		Session session = _persistence.getCurrentSession();
+
+		session.evict(newObjectAction);
+
+		newObjectAction.setExternalReferenceCode(
+			objectAction.getExternalReferenceCode());
+
+		_persistence.update(newObjectAction);
 	}
 
 	@Test
@@ -278,6 +304,15 @@ public class ObjectActionPersistenceTest {
 	}
 
 	@Test
+	public void testCountByERC_C() throws Exception {
+		_persistence.countByERC_C("", RandomTestUtil.nextLong());
+
+		_persistence.countByERC_C("null", 0L);
+
+		_persistence.countByERC_C((String)null, 0L);
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		ObjectAction newObjectAction = addObjectAction();
 
@@ -302,12 +337,13 @@ public class ObjectActionPersistenceTest {
 
 	protected OrderByComparator<ObjectAction> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"ObjectAction", "mvccVersion", true, "uuid", true, "objectActionId",
-			true, "companyId", true, "userId", true, "userName", true,
-			"createDate", true, "modifiedDate", true, "objectDefinitionId",
-			true, "active", true, "description", true, "errorMessage", true,
-			"label", true, "name", true, "objectActionExecutorKey", true,
-			"objectActionTriggerKey", true, "status", true);
+			"ObjectAction", "mvccVersion", true, "uuid", true,
+			"externalReferenceCode", true, "objectActionId", true, "companyId",
+			true, "userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "objectDefinitionId", true, "active", true,
+			"description", true, "errorMessage", true, "label", true, "name",
+			true, "objectActionExecutorKey", true, "objectActionTriggerKey",
+			true, "status", true);
 	}
 
 	@Test
@@ -605,6 +641,17 @@ public class ObjectActionPersistenceTest {
 			ReflectionTestUtil.invoke(
 				objectAction, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "objectActionTriggerKey"));
+
+		Assert.assertEquals(
+			objectAction.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				objectAction, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
+		Assert.assertEquals(
+			Long.valueOf(objectAction.getCompanyId()),
+			ReflectionTestUtil.<Long>invoke(
+				objectAction, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "companyId"));
 	}
 
 	protected ObjectAction addObjectAction() throws Exception {
@@ -615,6 +662,8 @@ public class ObjectActionPersistenceTest {
 		objectAction.setMvccVersion(RandomTestUtil.nextLong());
 
 		objectAction.setUuid(RandomTestUtil.randomString());
+
+		objectAction.setExternalReferenceCode(RandomTestUtil.randomString());
 
 		objectAction.setCompanyId(RandomTestUtil.nextLong());
 
