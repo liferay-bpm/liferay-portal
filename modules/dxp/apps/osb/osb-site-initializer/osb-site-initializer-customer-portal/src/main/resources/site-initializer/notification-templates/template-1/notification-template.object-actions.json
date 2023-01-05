@@ -1,6 +1,7 @@
 [
 	{
 		"active": true,
+		"externalReferenceCode": "CP-OBJECT-ACTION-1",
 		"name": "Notification Template Action",
 		"objectActionExecutorKey": "notification",
 		"objectActionTriggerKey": "onAfterAdd",
