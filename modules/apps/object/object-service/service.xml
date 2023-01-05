@@ -4,7 +4,7 @@
 <service-builder auto-import-default-references="false" auto-namespace-tables="false" dependency-injector="ds" mvcc-enabled="true" package-path="com.liferay.object" short-no-such-exception-enabled="false">
 	<author>Marco Leo</author>
 	<namespace>Object</namespace>
-	<entity local-service="true" name="ObjectAction" remote-service="true" uuid="true">
+	<entity external-reference-code="company" local-service="true" name="ObjectAction" remote-service="true" uuid="true">
 
 		<!-- PK fields -->
 
