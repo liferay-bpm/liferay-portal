@@ -181,7 +181,7 @@ public abstract class BaseObjectActionResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PATCH' 'http://localhost:8080/o/object-admin/v1.0/object-actions/{objectActionId}' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PATCH' 'http://localhost:8080/o/object-admin/v1.0/object-actions/{objectActionId}' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "externalReferenceCode": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -240,6 +240,11 @@ public abstract class BaseObjectActionResourceImpl
 				objectAction.getErrorMessage());
 		}
 
+		if (objectAction.getExternalReferenceCode() != null) {
+			existingObjectAction.setExternalReferenceCode(
+				objectAction.getExternalReferenceCode());
+		}
+
 		if (objectAction.getLabel() != null) {
 			existingObjectAction.setLabel(objectAction.getLabel());
 		}
@@ -270,7 +275,7 @@ public abstract class BaseObjectActionResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PUT' 'http://localhost:8080/o/object-admin/v1.0/object-actions/{objectActionId}' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PUT' 'http://localhost:8080/o/object-admin/v1.0/object-actions/{objectActionId}' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "externalReferenceCode": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -346,6 +351,38 @@ public abstract class BaseObjectActionResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
+	 * curl -X 'GET' 'http://localhost:8080/o/object-admin/v1.0/object-actions/by-external-reference-code/{externalReferenceCode}'  -u 'test@liferay.com:test'
+	 */
+	@io.swagger.v3.oas.annotations.Parameters(
+		value = {
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
+				name = "externalReferenceCode"
+			)
+		}
+	)
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectAction")}
+	)
+	@javax.ws.rs.GET
+	@javax.ws.rs.Path(
+		"/object-actions/by-external-reference-code/{externalReferenceCode}"
+	)
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
+	@Override
+	public ObjectAction getObjectActionByExternalReferenceCode(
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.validation.constraints.NotNull
+			@javax.ws.rs.PathParam("externalReferenceCode")
+			String externalReferenceCode)
+		throws Exception {
+
+		return new ObjectAction();
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/by-external-reference-code/{externalReferenceCode}/object-actions'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
@@ -395,7 +432,7 @@ public abstract class BaseObjectActionResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/by-external-reference-code/{externalReferenceCode}/object-actions' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/by-external-reference-code/{externalReferenceCode}/object-actions' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "externalReferenceCode": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -475,7 +512,7 @@ public abstract class BaseObjectActionResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/{objectDefinitionId}/object-actions' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/{objectDefinitionId}/object-actions' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "externalReferenceCode": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -556,6 +593,48 @@ public abstract class BaseObjectActionResourceImpl
 			vulcanBatchEngineImportTaskResource.postImportTask(
 				ObjectAction.class.getName(), callbackURL, null, object)
 		).build();
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'PUT' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/{objectDefinitionId}/object-actions/by-external-reference-code' -d $'{"active": ___, "conditionExpression": ___, "description": ___, "errorMessage": ___, "externalReferenceCode": ___, "label": ___, "name": ___, "objectActionExecutorKey": ___, "objectActionTriggerKey": ___, "parameters": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 */
+	@io.swagger.v3.oas.annotations.Parameters(
+		value = {
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
+				name = "externalReferenceCode"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
+				name = "objectDefinitionId"
+			)
+		}
+	)
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectAction")}
+	)
+	@javax.ws.rs.Consumes({"application/json", "application/xml"})
+	@javax.ws.rs.Path(
+		"/object-definitions/{objectDefinitionId}/object-actions/by-external-reference-code"
+	)
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
+	@javax.ws.rs.PUT
+	@Override
+	public ObjectAction putObjectDefinitionObjectActionByExternalReferenceCode(
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.validation.constraints.NotNull
+			@javax.ws.rs.PathParam("externalReferenceCode")
+			String externalReferenceCode,
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.validation.constraints.NotNull
+			@javax.ws.rs.PathParam("objectDefinitionId")
+			Long objectDefinitionId,
+			ObjectAction objectAction)
+		throws Exception {
+
+		return new ObjectAction();
 	}
 
 	@Override
