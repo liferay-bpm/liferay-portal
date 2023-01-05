@@ -1,10 +1,11 @@
 [
 	{
 		"active": true,
+		"externalReferenceCode": "D2C-OBJECT-ACTION-1",
 		"label": {
 			"en_US": "Notification Template Action"
 		},
-		"name": "NotificationTemplateAction",
+		"name": "Notification Template Action",
 		"objectActionExecutorKey": "notification",
 		"objectActionTriggerKey": "onAfterAdd",
 		"objectDefinitionId": "[$OBJECT_DEFINITION_ID:QuoteRetrieve$]"
