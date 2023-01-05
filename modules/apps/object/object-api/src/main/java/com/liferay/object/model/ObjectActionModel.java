@@ -98,6 +98,21 @@ public interface ObjectActionModel
 	public void setUuid(String uuid);
 
 	/**
+	 * Returns the external reference code of this object action.
+	 *
+	 * @return the external reference code of this object action
+	 */
+	@AutoEscape
+	public String getExternalReferenceCode();
+
+	/**
+	 * Sets the external reference code of this object action.
+	 *
+	 * @param externalReferenceCode the external reference code of this object action
+	 */
+	public void setExternalReferenceCode(String externalReferenceCode);
+
+	/**
 	 * Returns the object action ID of this object action.
 	 *
 	 * @return the object action ID of this object action
