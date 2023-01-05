@@ -21,6 +21,7 @@ import com.liferay.object.constants.ObjectActionConstants;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.exception.DuplicateObjectActionExternalReferenceCodeException;
 import com.liferay.object.exception.ObjectActionConditionExpressionException;
 import com.liferay.object.exception.ObjectActionErrorMessageException;
 import com.liferay.object.exception.ObjectActionLabelException;
@@ -86,22 +87,25 @@ public class ObjectActionLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectAction addObjectAction(
-			long userId, long objectDefinitionId, boolean active,
-			String conditionExpression, String description,
+			String externalReferenceCode, long userId, long objectDefinitionId,
+			boolean active, String conditionExpression, String description,
 			Map<Locale, String> errorMessageMap, Map<Locale, String> labelMap,
 			String name, String objectActionExecutorKey,
 			String objectActionTriggerKey,
 			UnicodeProperties parametersUnicodeProperties)
 		throws PortalException {
 
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
+
+		_validateExternalReferenceCode(
+			externalReferenceCode, 0, objectDefinition.getCompanyId(),
+			objectDefinitionId);
+
 		_validateErrorMessage(errorMessageMap, objectActionTriggerKey);
 		_validateLabel(labelMap);
 		_validateName(0, objectDefinitionId, name);
 		_validateObjectActionExecutorKey(objectActionExecutorKey);
-
-		ObjectDefinition objectDefinition =
-			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
-
 		_validateObjectActionTriggerKey(
 			conditionExpression, objectActionTriggerKey, objectDefinition);
 
@@ -114,6 +118,11 @@ public class ObjectActionLocalServiceImpl
 		ObjectAction objectAction = objectActionPersistence.create(
 			counterLocalService.increment());
 
+		if (Validator.isNull(externalReferenceCode)) {
+			externalReferenceCode = objectAction.getUuid();
+		}
+
+		objectAction.setExternalReferenceCode(externalReferenceCode);
 		objectAction.setCompanyId(user.getCompanyId());
 		objectAction.setUserId(user.getUserId());
 		objectAction.setUserName(user.getFullName());
@@ -148,6 +157,50 @@ public class ObjectActionLocalServiceImpl
 		}
 
 		return objectAction;
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	public ObjectAction addOrUpdateObjectAction(
+			String externalReferenceCode, long objectActionId, long userId,
+			long objectDefinitionId, boolean active, String conditionExpression,
+			String description, Map<Locale, String> errorMessageMap,
+			Map<Locale, String> labelMap, String name,
+			String objectActionExecutorKey, String objectActionTriggerKey,
+			UnicodeProperties parametersUnicodeProperties)
+		throws PortalException {
+
+		ObjectAction existingObjectAction = null;
+
+		if (objectActionId > 0) {
+			existingObjectAction = objectActionPersistence.fetchByPrimaryKey(
+				objectActionId);
+		}
+
+		if ((existingObjectAction == null) &&
+			Validator.isNotNull(externalReferenceCode)) {
+
+			ObjectDefinition objectDefinition =
+				_objectDefinitionPersistence.findByPrimaryKey(
+					objectDefinitionId);
+
+			existingObjectAction = objectActionPersistence.fetchByERC_C_ODI(
+				externalReferenceCode, objectDefinition.getCompanyId(),
+				objectDefinitionId);
+		}
+
+		if (existingObjectAction != null) {
+			return updateObjectAction(
+				externalReferenceCode, existingObjectAction.getObjectActionId(),
+				active, conditionExpression, description, errorMessageMap,
+				labelMap, name, objectActionExecutorKey, objectActionTriggerKey,
+				parametersUnicodeProperties);
+		}
+
+		return addObjectAction(
+			externalReferenceCode, userId, objectDefinitionId, active,
+			conditionExpression, description, errorMessageMap, labelMap, name,
+			objectActionExecutorKey, objectActionTriggerKey,
+			parametersUnicodeProperties);
 	}
 
 	@Indexable(type = IndexableType.DELETE)
@@ -221,24 +274,33 @@ public class ObjectActionLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectAction updateObjectAction(
-			long objectActionId, boolean active, String conditionExpression,
-			String description, Map<Locale, String> errorMessageMap,
-			Map<Locale, String> labelMap, String name,
-			String objectActionExecutorKey, String objectActionTriggerKey,
+			String externalReferenceCode, long objectActionId, boolean active,
+			String conditionExpression, String description,
+			Map<Locale, String> errorMessageMap, Map<Locale, String> labelMap,
+			String name, String objectActionExecutorKey,
+			String objectActionTriggerKey,
 			UnicodeProperties parametersUnicodeProperties)
 		throws PortalException {
+
+		ObjectAction objectAction = objectActionPersistence.findByPrimaryKey(
+			objectActionId);
+
+		_validateExternalReferenceCode(
+			externalReferenceCode, objectAction.getObjectActionId(),
+			objectAction.getCompanyId(), objectAction.getObjectDefinitionId());
 
 		_validateErrorMessage(errorMessageMap, objectActionTriggerKey);
 		_validateLabel(labelMap);
 		_validateObjectActionExecutorKey(objectActionExecutorKey);
 
-		ObjectAction objectAction = objectActionPersistence.findByPrimaryKey(
-			objectActionId);
-
 		_validateParametersUnicodeProperties(
 			objectAction.getCompanyId(), conditionExpression,
 			objectActionExecutorKey, objectActionTriggerKey,
 			parametersUnicodeProperties);
+
+		if (Validator.isNotNull(externalReferenceCode)) {
+			objectAction.setExternalReferenceCode(externalReferenceCode);
+		}
 
 		objectAction.setActive(active);
 		objectAction.setConditionExpression(conditionExpression);
@@ -296,6 +358,25 @@ public class ObjectActionLocalServiceImpl
 
 			throw new ObjectActionErrorMessageException(
 				"Error message is null for locale " + locale.getDisplayName());
+		}
+	}
+
+	private void _validateExternalReferenceCode(
+			String externalReferenceCode, long objectActionId, long companyId,
+			long objectDefinitionId)
+		throws PortalException {
+
+		if (Validator.isNull(externalReferenceCode)) {
+			return;
+		}
+
+		ObjectAction objectAction = objectActionPersistence.fetchByERC_C_ODI(
+			externalReferenceCode, companyId, objectDefinitionId);
+
+		if ((objectAction != null) &&
+			(objectAction.getObjectActionId() != objectActionId)) {
+
+			throw new DuplicateObjectActionExternalReferenceCodeException();
 		}
 	}
 

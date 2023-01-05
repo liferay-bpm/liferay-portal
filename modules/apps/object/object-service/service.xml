@@ -45,6 +45,11 @@
 			<finder-column name="objectDefinitionId" />
 			<finder-column name="name" />
 		</finder>
+		<finder name="ERC_C_ODI" return-type="ObjectEntry" unique="true">
+			<finder-column name="externalReferenceCode" />
+			<finder-column name="companyId" />
+			<finder-column name="objectDefinitionId" />
+		</finder>
 		<finder name="O_A_OATK" return-type="Collection">
 			<finder-column name="objectDefinitionId" />
 			<finder-column name="active" />
