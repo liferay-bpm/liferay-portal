@@ -96,6 +96,11 @@ public interface ObjectActionResource {
 			Long objectDefinitionId, String callbackURL, Object object)
 		throws Exception;
 
+	public ObjectAction putObjectDefinitionObjectActionByExternalReferenceCode(
+			String externalReferenceCode, Long objectDefinitionId,
+			ObjectAction objectAction)
+		throws Exception;
+
 	public default void setContextAcceptLanguage(
 		AcceptLanguage contextAcceptLanguage) {
 	}

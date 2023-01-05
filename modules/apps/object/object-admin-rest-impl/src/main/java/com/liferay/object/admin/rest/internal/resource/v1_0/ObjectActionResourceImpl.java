@@ -162,8 +162,8 @@ public class ObjectActionResourceImpl
 
 		return _toObjectAction(
 			_objectActionService.addObjectAction(
-				objectDefinitionId, objectAction.getActive(),
-				objectAction.getConditionExpression(),
+				objectAction.getExternalReferenceCode(), objectDefinitionId,
+				objectAction.getActive(), objectAction.getConditionExpression(),
 				objectAction.getDescription(),
 				LocalizedMapUtil.getLocalizedMap(
 					objectAction.getErrorMessage()),
@@ -190,8 +190,8 @@ public class ObjectActionResourceImpl
 
 		return _toObjectAction(
 			_objectActionService.updateObjectAction(
-				objectActionId, objectAction.getActive(),
-				objectAction.getConditionExpression(),
+				objectAction.getExternalReferenceCode(), objectActionId,
+				objectAction.getActive(), objectAction.getConditionExpression(),
 				objectAction.getDescription(),
 				LocalizedMapUtil.getLocalizedMap(
 					objectAction.getErrorMessage()),
@@ -201,6 +201,27 @@ public class ObjectActionResourceImpl
 				objectAction.getObjectActionTriggerKey(),
 				ObjectActionUtil.toParametersUnicodeProperties(
 					objectAction.getParameters())));
+	}
+
+	@Override
+	public ObjectAction putObjectDefinitionObjectActionByExternalReferenceCode(
+			String externalReferenceCode, Long objectDefinitionId,
+			ObjectAction objectAction)
+		throws Exception {
+
+		com.liferay.object.model.ObjectAction serviceBuilderObjectAction =
+			_objectActionService.fetchObjectActionByExternalReferenceCode(
+				externalReferenceCode, contextCompany.getCompanyId());
+
+		objectAction.setExternalReferenceCode(externalReferenceCode);
+
+		if (serviceBuilderObjectAction != null) {
+			return putObjectAction(
+				serviceBuilderObjectAction.getObjectActionId(), objectAction);
+		}
+
+		return postObjectDefinitionObjectAction(
+			objectDefinitionId, objectAction);
 	}
 
 	private ObjectAction _toObjectAction(

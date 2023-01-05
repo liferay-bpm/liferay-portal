@@ -130,6 +130,17 @@ public interface ObjectActionResource {
 				Long objectDefinitionId, String callbackURL, Object object)
 		throws Exception;
 
+	public ObjectAction putObjectDefinitionObjectActionByExternalReferenceCode(
+			String externalReferenceCode, Long objectDefinitionId,
+			ObjectAction objectAction)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
+			putObjectDefinitionObjectActionByExternalReferenceCodeHttpResponse(
+				String externalReferenceCode, Long objectDefinitionId,
+				ObjectAction objectAction)
+		throws Exception;
+
 	public static class Builder {
 
 		public Builder authentication(String login, String password) {
@@ -1126,6 +1137,96 @@ public interface ObjectActionResource {
 					_builder._port + _builder._contextPath +
 						"/o/object-admin/v1.0/object-definitions/{objectDefinitionId}/object-actions/batch");
 
+			httpInvoker.path("objectDefinitionId", objectDefinitionId);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
+		}
+
+		public ObjectAction
+				putObjectDefinitionObjectActionByExternalReferenceCode(
+					String externalReferenceCode, Long objectDefinitionId,
+					ObjectAction objectAction)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				putObjectDefinitionObjectActionByExternalReferenceCodeHttpResponse(
+					externalReferenceCode, objectDefinitionId, objectAction);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+
+			try {
+				return ObjectActionSerDes.toDTO(content);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				putObjectDefinitionObjectActionByExternalReferenceCodeHttpResponse(
+					String externalReferenceCode, Long objectDefinitionId,
+					ObjectAction objectAction)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			httpInvoker.body(objectAction.toString(), "application/json");
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.PUT);
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port + _builder._contextPath +
+						"/o/object-admin/v1.0/object-definitions/{objectDefinitionId}/object-actions/by-external-reference-code");
+
+			httpInvoker.path("externalReferenceCode", externalReferenceCode);
 			httpInvoker.path("objectDefinitionId", objectDefinitionId);
 
 			httpInvoker.userNameAndPassword(
