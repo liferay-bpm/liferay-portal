@@ -1168,7 +1168,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 				JSONObject parametersJSONObject = jsonObject.getJSONObject(
 					"parameters");
 
-				_objectActionLocalService.addObjectAction(
+				_objectActionLocalService.addOrUpdateObjectAction(
+					jsonObject.getString("externalReferenceCode"),
 					serviceContext.getUserId(), objectDefinition.getId(),
 					jsonObject.getBoolean("active"),
 					jsonObject.getString("conditionExpression"),
@@ -2445,7 +2446,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-			_objectActionLocalService.addObjectAction(
+			_objectActionLocalService.addOrUpdateObjectAction(
+				jsonObject.getString("externalReferenceCode"),
 				serviceContext.getUserId(),
 				jsonObject.getLong("objectDefinitionId"),
 				jsonObject.getBoolean("active"),
