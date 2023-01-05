@@ -86,8 +86,8 @@ public class ObjectActionLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectAction addObjectAction(
-			long userId, long objectDefinitionId, boolean active,
-			String conditionExpression, String description,
+			String externalReferenceCode, long userId, long objectDefinitionId,
+			boolean active, String conditionExpression, String description,
 			Map<Locale, String> errorMessageMap, Map<Locale, String> labelMap,
 			String name, String objectActionExecutorKey,
 			String objectActionTriggerKey,
@@ -114,6 +114,11 @@ public class ObjectActionLocalServiceImpl
 		ObjectAction objectAction = objectActionPersistence.create(
 			counterLocalService.increment());
 
+		if (Validator.isBlank(externalReferenceCode)) {
+			externalReferenceCode = objectAction.getUuid();
+		}
+
+		objectAction.setExternalReferenceCode(externalReferenceCode);
 		objectAction.setCompanyId(user.getCompanyId());
 		objectAction.setUserId(user.getUserId());
 		objectAction.setUserName(user.getFullName());
@@ -148,6 +153,36 @@ public class ObjectActionLocalServiceImpl
 		}
 
 		return objectAction;
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	public ObjectAction addOrUpdateObjectAction(
+			String externalReferenceCode, long userId, long objectDefinitionId,
+			boolean active, String conditionExpression, String description,
+			Map<Locale, String> errorMessageMap, Map<Locale, String> labelMap,
+			String name, String objectActionExecutorKey,
+			String objectActionTriggerKey,
+			UnicodeProperties parametersUnicodeProperties)
+		throws PortalException {
+
+		User user = _userLocalService.getUser(userId);
+
+		ObjectAction objectAction = fetchObjectActionByExternalReferenceCode(
+			externalReferenceCode, user.getCompanyId());
+
+		if (objectAction != null) {
+			return updateObjectAction(
+				externalReferenceCode, objectAction.getObjectActionId(), active,
+				conditionExpression, description, errorMessageMap, labelMap,
+				name, objectActionExecutorKey, objectActionTriggerKey,
+				parametersUnicodeProperties);
+		}
+
+		return addObjectAction(
+			externalReferenceCode, userId, objectDefinitionId, active,
+			conditionExpression, description, errorMessageMap, labelMap, name,
+			objectActionExecutorKey, objectActionTriggerKey,
+			parametersUnicodeProperties);
 	}
 
 	@Indexable(type = IndexableType.DELETE)
@@ -221,10 +256,11 @@ public class ObjectActionLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectAction updateObjectAction(
-			long objectActionId, boolean active, String conditionExpression,
-			String description, Map<Locale, String> errorMessageMap,
-			Map<Locale, String> labelMap, String name,
-			String objectActionExecutorKey, String objectActionTriggerKey,
+			String externalReferenceCode, long objectActionId, boolean active,
+			String conditionExpression, String description,
+			Map<Locale, String> errorMessageMap, Map<Locale, String> labelMap,
+			String name, String objectActionExecutorKey,
+			String objectActionTriggerKey,
 			UnicodeProperties parametersUnicodeProperties)
 		throws PortalException {
 
@@ -240,6 +276,11 @@ public class ObjectActionLocalServiceImpl
 			objectActionExecutorKey, objectActionTriggerKey,
 			parametersUnicodeProperties);
 
+		if (Validator.isBlank(externalReferenceCode)) {
+			externalReferenceCode = objectAction.getUuid();
+		}
+
+		objectAction.setExternalReferenceCode(externalReferenceCode);
 		objectAction.setActive(active);
 		objectAction.setConditionExpression(conditionExpression);
 		objectAction.setDescription(description);
