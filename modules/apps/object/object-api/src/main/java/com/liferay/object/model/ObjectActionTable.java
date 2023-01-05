@@ -37,6 +37,10 @@ public class ObjectActionTable extends BaseTable<ObjectActionTable> {
 		"mvccVersion", Long.class, Types.BIGINT, Column.FLAG_NULLITY);
 	public final Column<ObjectActionTable, String> uuid = createColumn(
 		"uuid_", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
+	public final Column<ObjectActionTable, String> externalReferenceCode =
+		createColumn(
+			"externalReferenceCode", String.class, Types.VARCHAR,
+			Column.FLAG_DEFAULT);
 	public final Column<ObjectActionTable, Long> objectActionId = createColumn(
 		"objectActionId", Long.class, Types.BIGINT, Column.FLAG_PRIMARY);
 	public final Column<ObjectActionTable, Long> companyId = createColumn(

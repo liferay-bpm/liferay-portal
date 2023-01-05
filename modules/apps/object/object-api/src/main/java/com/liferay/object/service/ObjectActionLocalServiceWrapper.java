@@ -259,6 +259,16 @@ public class ObjectActionLocalServiceWrapper
 		return _objectActionLocalService.fetchObjectAction(objectActionId);
 	}
 
+	@Override
+	public com.liferay.object.model.ObjectAction
+		fetchObjectActionByExternalReferenceCode(
+			String externalReferenceCode, long companyId) {
+
+		return _objectActionLocalService.
+			fetchObjectActionByExternalReferenceCode(
+				externalReferenceCode, companyId);
+	}
+
 	/**
 	 * Returns the object action with the matching UUID and company.
 	 *
@@ -320,6 +330,16 @@ public class ObjectActionLocalServiceWrapper
 
 		return _objectActionLocalService.getObjectAction(
 			objectDefinitionId, name, objectActionTriggerKey);
+	}
+
+	@Override
+	public com.liferay.object.model.ObjectAction
+			getObjectActionByExternalReferenceCode(
+				String externalReferenceCode, long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectActionLocalService.getObjectActionByExternalReferenceCode(
+			externalReferenceCode, companyId);
 	}
 
 	/**

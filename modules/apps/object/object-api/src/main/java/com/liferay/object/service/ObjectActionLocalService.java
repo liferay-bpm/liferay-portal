@@ -220,6 +220,10 @@ public interface ObjectActionLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ObjectAction fetchObjectAction(long objectActionId);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ObjectAction fetchObjectActionByExternalReferenceCode(
+		String externalReferenceCode, long companyId);
+
 	/**
 	 * Returns the object action with the matching UUID and company.
 	 *
@@ -255,6 +259,11 @@ public interface ObjectActionLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ObjectAction getObjectAction(
 			long objectDefinitionId, String name, String objectActionTriggerKey)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ObjectAction getObjectActionByExternalReferenceCode(
+			String externalReferenceCode, long companyId)
 		throws PortalException;
 
 	/**

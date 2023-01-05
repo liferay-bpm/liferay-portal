@@ -232,6 +232,13 @@ public class ObjectActionLocalServiceUtil {
 		return getService().fetchObjectAction(objectActionId);
 	}
 
+	public static ObjectAction fetchObjectActionByExternalReferenceCode(
+		String externalReferenceCode, long companyId) {
+
+		return getService().fetchObjectActionByExternalReferenceCode(
+			externalReferenceCode, companyId);
+	}
+
 	/**
 	 * Returns the object action with the matching UUID and company.
 	 *
@@ -286,6 +293,14 @@ public class ObjectActionLocalServiceUtil {
 
 		return getService().getObjectAction(
 			objectDefinitionId, name, objectActionTriggerKey);
+	}
+
+	public static ObjectAction getObjectActionByExternalReferenceCode(
+			String externalReferenceCode, long companyId)
+		throws PortalException {
+
+		return getService().getObjectActionByExternalReferenceCode(
+			externalReferenceCode, companyId);
 	}
 
 	/**
