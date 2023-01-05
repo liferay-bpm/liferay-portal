@@ -160,6 +160,7 @@ public class ObjectActionLocalServiceImpl
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
+	@Override
 	public ObjectAction addOrUpdateObjectAction(
 			String externalReferenceCode, long objectActionId, long userId,
 			long objectDefinitionId, boolean active, String conditionExpression,

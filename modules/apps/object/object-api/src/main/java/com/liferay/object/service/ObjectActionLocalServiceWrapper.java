@@ -37,24 +37,6 @@ public class ObjectActionLocalServiceWrapper
 		_objectActionLocalService = objectActionLocalService;
 	}
 
-	@Override
-	public com.liferay.object.model.ObjectAction addObjectAction(
-			long userId, long objectDefinitionId, boolean active,
-			String conditionExpression, String description,
-			java.util.Map<java.util.Locale, String> errorMessageMap,
-			java.util.Map<java.util.Locale, String> labelMap, String name,
-			String objectActionExecutorKey, String objectActionTriggerKey,
-			com.liferay.portal.kernel.util.UnicodeProperties
-				parametersUnicodeProperties)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectActionLocalService.addObjectAction(
-			userId, objectDefinitionId, active, conditionExpression,
-			description, errorMessageMap, labelMap, name,
-			objectActionExecutorKey, objectActionTriggerKey,
-			parametersUnicodeProperties);
-	}
-
 	/**
 	 * Adds the object action to the database. Also notifies the appropriate model listeners.
 	 *
@@ -70,6 +52,43 @@ public class ObjectActionLocalServiceWrapper
 		com.liferay.object.model.ObjectAction objectAction) {
 
 		return _objectActionLocalService.addObjectAction(objectAction);
+	}
+
+	@Override
+	public com.liferay.object.model.ObjectAction addObjectAction(
+			String externalReferenceCode, long userId, long objectDefinitionId,
+			boolean active, String conditionExpression, String description,
+			java.util.Map<java.util.Locale, String> errorMessageMap,
+			java.util.Map<java.util.Locale, String> labelMap, String name,
+			String objectActionExecutorKey, String objectActionTriggerKey,
+			com.liferay.portal.kernel.util.UnicodeProperties
+				parametersUnicodeProperties)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectActionLocalService.addObjectAction(
+			externalReferenceCode, userId, objectDefinitionId, active,
+			conditionExpression, description, errorMessageMap, labelMap, name,
+			objectActionExecutorKey, objectActionTriggerKey,
+			parametersUnicodeProperties);
+	}
+
+	@Override
+	public com.liferay.object.model.ObjectAction addOrUpdateObjectAction(
+			String externalReferenceCode, long objectActionId, long userId,
+			long objectDefinitionId, boolean active, String conditionExpression,
+			String description,
+			java.util.Map<java.util.Locale, String> errorMessageMap,
+			java.util.Map<java.util.Locale, String> labelMap, String name,
+			String objectActionExecutorKey, String objectActionTriggerKey,
+			com.liferay.portal.kernel.util.UnicodeProperties
+				parametersUnicodeProperties)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectActionLocalService.addOrUpdateObjectAction(
+			externalReferenceCode, objectActionId, userId, objectDefinitionId,
+			active, conditionExpression, description, errorMessageMap, labelMap,
+			name, objectActionExecutorKey, objectActionTriggerKey,
+			parametersUnicodeProperties);
 	}
 
 	/**
@@ -404,23 +423,6 @@ public class ObjectActionLocalServiceWrapper
 		return _objectActionLocalService.getPersistedModel(primaryKeyObj);
 	}
 
-	@Override
-	public com.liferay.object.model.ObjectAction updateObjectAction(
-			long objectActionId, boolean active, String conditionExpression,
-			String description,
-			java.util.Map<java.util.Locale, String> errorMessageMap,
-			java.util.Map<java.util.Locale, String> labelMap, String name,
-			String objectActionExecutorKey, String objectActionTriggerKey,
-			com.liferay.portal.kernel.util.UnicodeProperties
-				parametersUnicodeProperties)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectActionLocalService.updateObjectAction(
-			objectActionId, active, conditionExpression, description,
-			errorMessageMap, labelMap, name, objectActionExecutorKey,
-			objectActionTriggerKey, parametersUnicodeProperties);
-	}
-
 	/**
 	 * Updates the object action in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
@@ -436,6 +438,24 @@ public class ObjectActionLocalServiceWrapper
 		com.liferay.object.model.ObjectAction objectAction) {
 
 		return _objectActionLocalService.updateObjectAction(objectAction);
+	}
+
+	@Override
+	public com.liferay.object.model.ObjectAction updateObjectAction(
+			String externalReferenceCode, long objectActionId, boolean active,
+			String conditionExpression, String description,
+			java.util.Map<java.util.Locale, String> errorMessageMap,
+			java.util.Map<java.util.Locale, String> labelMap, String name,
+			String objectActionExecutorKey, String objectActionTriggerKey,
+			com.liferay.portal.kernel.util.UnicodeProperties
+				parametersUnicodeProperties)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectActionLocalService.updateObjectAction(
+			externalReferenceCode, objectActionId, active, conditionExpression,
+			description, errorMessageMap, labelMap, name,
+			objectActionExecutorKey, objectActionTriggerKey,
+			parametersUnicodeProperties);
 	}
 
 	@Override

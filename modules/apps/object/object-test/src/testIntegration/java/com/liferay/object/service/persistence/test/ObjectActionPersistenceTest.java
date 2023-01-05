@@ -259,6 +259,16 @@ public class ObjectActionPersistenceTest {
 	}
 
 	@Test
+	public void testCountByERC_C_ODI() throws Exception {
+		_persistence.countByERC_C_ODI(
+			"", RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
+
+		_persistence.countByERC_C_ODI("null", 0L, 0L);
+
+		_persistence.countByERC_C_ODI((String)null, 0L, 0L);
+	}
+
+	@Test
 	public void testCountByO_A_OATK() throws Exception {
 		_persistence.countByO_A_OATK(
 			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean(), "");
@@ -590,6 +600,22 @@ public class ObjectActionPersistenceTest {
 			ReflectionTestUtil.invoke(
 				objectAction, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "name"));
+
+		Assert.assertEquals(
+			objectAction.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				objectAction, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
+		Assert.assertEquals(
+			Long.valueOf(objectAction.getCompanyId()),
+			ReflectionTestUtil.<Long>invoke(
+				objectAction, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "companyId"));
+		Assert.assertEquals(
+			Long.valueOf(objectAction.getObjectDefinitionId()),
+			ReflectionTestUtil.<Long>invoke(
+				objectAction, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "objectDefinitionId"));
 
 		Assert.assertEquals(
 			Long.valueOf(objectAction.getObjectDefinitionId()),
