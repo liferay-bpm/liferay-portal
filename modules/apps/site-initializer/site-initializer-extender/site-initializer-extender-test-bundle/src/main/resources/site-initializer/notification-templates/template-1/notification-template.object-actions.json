@@ -1,6 +1,7 @@
 [
 	{
 		"active": true,
+		"externalReferenceCode": "TEST-OBJECT-ACTION-1",
 		"name": "Test Object Action 3",
 		"objectActionExecutorKey": "notification",
 		"objectActionTriggerKey": "onAfterAdd",
