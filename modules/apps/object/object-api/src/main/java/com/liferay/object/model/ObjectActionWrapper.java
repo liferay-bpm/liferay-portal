@@ -45,6 +45,7 @@ public class ObjectActionWrapper
 
 		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
+		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("objectActionId", getObjectActionId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
@@ -78,6 +79,13 @@ public class ObjectActionWrapper
 
 		if (uuid != null) {
 			setUuid(uuid);
+		}
+
+		String externalReferenceCode = (String)attributes.get(
+			"externalReferenceCode");
+
+		if (externalReferenceCode != null) {
+			setExternalReferenceCode(externalReferenceCode);
 		}
 
 		Long objectActionId = (Long)attributes.get("objectActionId");
@@ -325,6 +333,16 @@ public class ObjectActionWrapper
 	@Override
 	public Map<java.util.Locale, String> getErrorMessageMap() {
 		return model.getErrorMessageMap();
+	}
+
+	/**
+	 * Returns the external reference code of this object action.
+	 *
+	 * @return the external reference code of this object action
+	 */
+	@Override
+	public String getExternalReferenceCode() {
+		return model.getExternalReferenceCode();
 	}
 
 	/**
@@ -695,6 +713,16 @@ public class ObjectActionWrapper
 		java.util.Locale defaultLocale) {
 
 		model.setErrorMessageMap(errorMessageMap, defaultLocale);
+	}
+
+	/**
+	 * Sets the external reference code of this object action.
+	 *
+	 * @param externalReferenceCode the external reference code of this object action
+	 */
+	@Override
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		model.setExternalReferenceCode(externalReferenceCode);
 	}
 
 	/**

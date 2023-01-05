@@ -77,12 +77,14 @@ public class ObjectActionCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(39);
+		StringBundler sb = new StringBundler(41);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
 		sb.append(", uuid=");
 		sb.append(uuid);
+		sb.append(", externalReferenceCode=");
+		sb.append(externalReferenceCode);
 		sb.append(", objectActionId=");
 		sb.append(objectActionId);
 		sb.append(", companyId=");
@@ -133,6 +135,13 @@ public class ObjectActionCacheModel
 		}
 		else {
 			objectActionImpl.setUuid(uuid);
+		}
+
+		if (externalReferenceCode == null) {
+			objectActionImpl.setExternalReferenceCode("");
+		}
+		else {
+			objectActionImpl.setExternalReferenceCode(externalReferenceCode);
 		}
 
 		objectActionImpl.setObjectActionId(objectActionId);
@@ -233,6 +242,7 @@ public class ObjectActionCacheModel
 
 		mvccVersion = objectInput.readLong();
 		uuid = objectInput.readUTF();
+		externalReferenceCode = objectInput.readUTF();
 
 		objectActionId = objectInput.readLong();
 
@@ -267,6 +277,13 @@ public class ObjectActionCacheModel
 		}
 		else {
 			objectOutput.writeUTF(uuid);
+		}
+
+		if (externalReferenceCode == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(externalReferenceCode);
 		}
 
 		objectOutput.writeLong(objectActionId);
@@ -350,6 +367,7 @@ public class ObjectActionCacheModel
 
 	public long mvccVersion;
 	public String uuid;
+	public String externalReferenceCode;
 	public long objectActionId;
 	public long companyId;
 	public long userId;

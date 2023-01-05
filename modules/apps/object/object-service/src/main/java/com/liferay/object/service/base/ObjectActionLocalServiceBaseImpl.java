@@ -267,6 +267,23 @@ public abstract class ObjectActionLocalServiceBaseImpl
 			uuid, companyId, null);
 	}
 
+	@Override
+	public ObjectAction fetchObjectActionByExternalReferenceCode(
+		String externalReferenceCode, long companyId) {
+
+		return objectActionPersistence.fetchByERC_C(
+			externalReferenceCode, companyId);
+	}
+
+	@Override
+	public ObjectAction getObjectActionByExternalReferenceCode(
+			String externalReferenceCode, long companyId)
+		throws PortalException {
+
+		return objectActionPersistence.findByERC_C(
+			externalReferenceCode, companyId);
+	}
+
 	/**
 	 * Returns the object action with the primary key.
 	 *
