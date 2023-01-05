@@ -39,8 +39,9 @@ public class ObjectActionServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.object.service.impl.ObjectActionServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static ObjectAction addObjectAction(
-			long objectDefinitionId, boolean active, String conditionExpression,
-			String description, Map<java.util.Locale, String> errorMessageMap,
+			String externalReferenceCode, long objectDefinitionId,
+			boolean active, String conditionExpression, String description,
+			Map<java.util.Locale, String> errorMessageMap,
 			Map<java.util.Locale, String> labelMap, String name,
 			String objectActionExecutorKey, String objectActionTriggerKey,
 			com.liferay.portal.kernel.util.UnicodeProperties
@@ -48,15 +49,24 @@ public class ObjectActionServiceUtil {
 		throws PortalException {
 
 		return getService().addObjectAction(
-			objectDefinitionId, active, conditionExpression, description,
-			errorMessageMap, labelMap, name, objectActionExecutorKey,
-			objectActionTriggerKey, parametersUnicodeProperties);
+			externalReferenceCode, objectDefinitionId, active,
+			conditionExpression, description, errorMessageMap, labelMap, name,
+			objectActionExecutorKey, objectActionTriggerKey,
+			parametersUnicodeProperties);
 	}
 
 	public static ObjectAction deleteObjectAction(long objectActionId)
 		throws PortalException {
 
 		return getService().deleteObjectAction(objectActionId);
+	}
+
+	public static ObjectAction fetchObjectActionByExternalReferenceCode(
+			String externalReferenceCode, long companyId)
+		throws PortalException {
+
+		return getService().fetchObjectActionByExternalReferenceCode(
+			externalReferenceCode, companyId);
 	}
 
 	public static ObjectAction getObjectAction(long objectActionId)
@@ -75,8 +85,9 @@ public class ObjectActionServiceUtil {
 	}
 
 	public static ObjectAction updateObjectAction(
-			long objectActionId, boolean active, String conditionExpression,
-			String description, Map<java.util.Locale, String> errorMessageMap,
+			String externalReferenceCode, long objectActionId, boolean active,
+			String conditionExpression, String description,
+			Map<java.util.Locale, String> errorMessageMap,
 			Map<java.util.Locale, String> labelMap, String name,
 			String objectActionExecutorKey, String objectActionTriggerKey,
 			com.liferay.portal.kernel.util.UnicodeProperties
@@ -84,9 +95,10 @@ public class ObjectActionServiceUtil {
 		throws PortalException {
 
 		return getService().updateObjectAction(
-			objectActionId, active, conditionExpression, description,
-			errorMessageMap, labelMap, name, objectActionExecutorKey,
-			objectActionTriggerKey, parametersUnicodeProperties);
+			externalReferenceCode, objectActionId, active, conditionExpression,
+			description, errorMessageMap, labelMap, name,
+			objectActionExecutorKey, objectActionTriggerKey,
+			parametersUnicodeProperties);
 	}
 
 	public static ObjectActionService getService() {
