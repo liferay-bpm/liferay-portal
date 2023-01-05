@@ -6,6 +6,10 @@
 	<namespace>Object</namespace>
 	<entity local-service="true" name="ObjectAction" remote-service="true" uuid="true">
 
+		<!-- External reference code -->
+
+		<column name="externalReferenceCode" type="String" />
+
 		<!-- PK fields -->
 
 		<column name="objectActionId" primary="true" type="long" />
