@@ -74,6 +74,10 @@ public interface ObjectActionResource {
 	public Response putObjectActionBatch(String callbackURL, Object object)
 		throws Exception;
 
+	public ObjectAction getObjectActionByExternalReferenceCode(
+			String externalReferenceCode)
+		throws Exception;
+
 	public Page<ObjectAction>
 			getObjectDefinitionByExternalReferenceCodeObjectActionsPage(
 				String externalReferenceCode, String search,
@@ -94,6 +98,11 @@ public interface ObjectActionResource {
 
 	public Response postObjectDefinitionObjectActionBatch(
 			Long objectDefinitionId, String callbackURL, Object object)
+		throws Exception;
+
+	public ObjectAction putObjectDefinitionObjectActionByExternalReferenceCode(
+			String externalReferenceCode, Long objectDefinitionId,
+			ObjectAction objectAction)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

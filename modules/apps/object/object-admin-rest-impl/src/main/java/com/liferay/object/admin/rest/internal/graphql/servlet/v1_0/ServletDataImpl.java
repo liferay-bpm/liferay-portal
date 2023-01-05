@@ -160,6 +160,11 @@ public class ServletDataImpl implements ServletData {
 							ObjectActionResourceImpl.class,
 							"postObjectDefinitionObjectActionBatch"));
 					put(
+						"mutation#updateObjectDefinitionObjectActionByExternalReferenceCode",
+						new ObjectValuePair<>(
+							ObjectActionResourceImpl.class,
+							"putObjectDefinitionObjectActionByExternalReferenceCode"));
+					put(
 						"mutation#createObjectDefinition",
 						new ObjectValuePair<>(
 							ObjectDefinitionResourceImpl.class,
@@ -389,6 +394,11 @@ public class ServletDataImpl implements ServletData {
 						"query#objectAction",
 						new ObjectValuePair<>(
 							ObjectActionResourceImpl.class, "getObjectAction"));
+					put(
+						"query#objectActionByExternalReferenceCode",
+						new ObjectValuePair<>(
+							ObjectActionResourceImpl.class,
+							"getObjectActionByExternalReferenceCode"));
 					put(
 						"query#objectDefinitionByExternalReferenceCodeObjectActions",
 						new ObjectValuePair<>(

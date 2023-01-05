@@ -124,7 +124,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {objectAction(objectActionId: ___){actions, active, conditionExpression, dateCreated, dateModified, description, errorMessage, id, label, name, objectActionExecutorKey, objectActionTriggerKey, parameters, status}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {objectAction(objectActionId: ___){actions, active, conditionExpression, dateCreated, dateModified, description, errorMessage, externalReferenceCode, id, label, name, objectActionExecutorKey, objectActionTriggerKey, parameters, status}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public ObjectAction objectAction(
@@ -136,6 +136,24 @@ public class Query {
 			this::_populateResourceContext,
 			objectActionResource -> objectActionResource.getObjectAction(
 				objectActionId));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {objectActionByExternalReferenceCode(externalReferenceCode: ___){actions, active, conditionExpression, dateCreated, dateModified, description, errorMessage, externalReferenceCode, id, label, name, objectActionExecutorKey, objectActionTriggerKey, parameters, status}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public ObjectAction objectActionByExternalReferenceCode(
+			@GraphQLName("externalReferenceCode") String externalReferenceCode)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_objectActionResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			objectActionResource ->
+				objectActionResource.getObjectActionByExternalReferenceCode(
+					externalReferenceCode));
 	}
 
 	/**
@@ -606,21 +624,22 @@ public class Query {
 
 	}
 
-	@GraphQLTypeExtension(ObjectDefinition.class)
+	@GraphQLTypeExtension(ObjectAction.class)
 	public class
 		GetObjectDefinitionByExternalReferenceCodeObjectViewsPageTypeExtension {
 
 		public GetObjectDefinitionByExternalReferenceCodeObjectViewsPageTypeExtension(
-			ObjectDefinition objectDefinition) {
+			ObjectAction objectAction) {
 
-			_objectDefinition = objectDefinition;
+			_objectAction = objectAction;
 		}
 
 		@GraphQLField
-		public ObjectViewPage byExternalReferenceCodeObjectViews(
-				@GraphQLName("search") String search,
-				@GraphQLName("pageSize") int pageSize,
-				@GraphQLName("page") int page)
+		public ObjectViewPage
+				objectDefinitionByExternalReferenceCodeObjectViews(
+					@GraphQLName("search") String search,
+					@GraphQLName("pageSize") int pageSize,
+					@GraphQLName("page") int page)
 			throws Exception {
 
 			return _applyComponentServiceObjects(
@@ -629,11 +648,11 @@ public class Query {
 				objectViewResource -> new ObjectViewPage(
 					objectViewResource.
 						getObjectDefinitionByExternalReferenceCodeObjectViewsPage(
-							_objectDefinition.getExternalReferenceCode(),
-							search, Pagination.of(page, pageSize))));
+							_objectAction.getExternalReferenceCode(), search,
+							Pagination.of(page, pageSize))));
 		}
 
-		private ObjectDefinition _objectDefinition;
+		private ObjectAction _objectAction;
 
 	}
 
@@ -659,19 +678,19 @@ public class Query {
 
 	}
 
-	@GraphQLTypeExtension(ObjectDefinition.class)
+	@GraphQLTypeExtension(ObjectAction.class)
 	public class
 		GetObjectDefinitionByExternalReferenceCodeObjectRelationshipsPageTypeExtension {
 
 		public GetObjectDefinitionByExternalReferenceCodeObjectRelationshipsPageTypeExtension(
-			ObjectDefinition objectDefinition) {
+			ObjectAction objectAction) {
 
-			_objectDefinition = objectDefinition;
+			_objectAction = objectAction;
 		}
 
 		@GraphQLField
 		public ObjectRelationshipPage
-				byExternalReferenceCodeObjectRelationships(
+				objectDefinitionByExternalReferenceCodeObjectRelationships(
 					@GraphQLName("search") String search,
 					@GraphQLName("filter") String filterString,
 					@GraphQLName("pageSize") int pageSize,
@@ -684,32 +703,57 @@ public class Query {
 				objectRelationshipResource -> new ObjectRelationshipPage(
 					objectRelationshipResource.
 						getObjectDefinitionByExternalReferenceCodeObjectRelationshipsPage(
-							_objectDefinition.getExternalReferenceCode(),
-							search,
+							_objectAction.getExternalReferenceCode(), search,
 							_filterBiFunction.apply(
 								objectRelationshipResource, filterString),
 							Pagination.of(page, pageSize))));
 		}
 
-		private ObjectDefinition _objectDefinition;
+		private ObjectAction _objectAction;
 
 	}
 
 	@GraphQLTypeExtension(ObjectDefinition.class)
-	public class
-		GetObjectDefinitionByExternalReferenceCodeObjectActionsPageTypeExtension {
+	public class GetObjectActionByExternalReferenceCodeTypeExtension {
 
-		public GetObjectDefinitionByExternalReferenceCodeObjectActionsPageTypeExtension(
+		public GetObjectActionByExternalReferenceCodeTypeExtension(
 			ObjectDefinition objectDefinition) {
 
 			_objectDefinition = objectDefinition;
 		}
 
 		@GraphQLField
-		public ObjectActionPage byExternalReferenceCodeObjectActions(
-				@GraphQLName("search") String search,
-				@GraphQLName("pageSize") int pageSize,
-				@GraphQLName("page") int page)
+		public ObjectAction objectActionByExternalReferenceCode()
+			throws Exception {
+
+			return _applyComponentServiceObjects(
+				_objectActionResourceComponentServiceObjects,
+				Query.this::_populateResourceContext,
+				objectActionResource ->
+					objectActionResource.getObjectActionByExternalReferenceCode(
+						_objectDefinition.getExternalReferenceCode()));
+		}
+
+		private ObjectDefinition _objectDefinition;
+
+	}
+
+	@GraphQLTypeExtension(ObjectAction.class)
+	public class
+		GetObjectDefinitionByExternalReferenceCodeObjectActionsPageTypeExtension {
+
+		public GetObjectDefinitionByExternalReferenceCodeObjectActionsPageTypeExtension(
+			ObjectAction objectAction) {
+
+			_objectAction = objectAction;
+		}
+
+		@GraphQLField
+		public ObjectActionPage
+				objectDefinitionByExternalReferenceCodeObjectActions(
+					@GraphQLName("search") String search,
+					@GraphQLName("pageSize") int pageSize,
+					@GraphQLName("page") int page)
 			throws Exception {
 
 			return _applyComponentServiceObjects(
@@ -718,31 +762,32 @@ public class Query {
 				objectActionResource -> new ObjectActionPage(
 					objectActionResource.
 						getObjectDefinitionByExternalReferenceCodeObjectActionsPage(
-							_objectDefinition.getExternalReferenceCode(),
-							search, Pagination.of(page, pageSize))));
+							_objectAction.getExternalReferenceCode(), search,
+							Pagination.of(page, pageSize))));
 		}
 
-		private ObjectDefinition _objectDefinition;
+		private ObjectAction _objectAction;
 
 	}
 
-	@GraphQLTypeExtension(ObjectDefinition.class)
+	@GraphQLTypeExtension(ObjectAction.class)
 	public class
 		GetObjectDefinitionByExternalReferenceCodeObjectFieldsPageTypeExtension {
 
 		public GetObjectDefinitionByExternalReferenceCodeObjectFieldsPageTypeExtension(
-			ObjectDefinition objectDefinition) {
+			ObjectAction objectAction) {
 
-			_objectDefinition = objectDefinition;
+			_objectAction = objectAction;
 		}
 
 		@GraphQLField
-		public ObjectFieldPage byExternalReferenceCodeObjectFields(
-				@GraphQLName("search") String search,
-				@GraphQLName("filter") String filterString,
-				@GraphQLName("pageSize") int pageSize,
-				@GraphQLName("page") int page,
-				@GraphQLName("sort") String sortsString)
+		public ObjectFieldPage
+				objectDefinitionByExternalReferenceCodeObjectFields(
+					@GraphQLName("search") String search,
+					@GraphQLName("filter") String filterString,
+					@GraphQLName("pageSize") int pageSize,
+					@GraphQLName("page") int page,
+					@GraphQLName("sort") String sortsString)
 			throws Exception {
 
 			return _applyComponentServiceObjects(
@@ -751,8 +796,7 @@ public class Query {
 				objectFieldResource -> new ObjectFieldPage(
 					objectFieldResource.
 						getObjectDefinitionByExternalReferenceCodeObjectFieldsPage(
-							_objectDefinition.getExternalReferenceCode(),
-							search,
+							_objectAction.getExternalReferenceCode(), search,
 							_filterBiFunction.apply(
 								objectFieldResource, filterString),
 							Pagination.of(page, pageSize),
@@ -760,7 +804,7 @@ public class Query {
 								objectFieldResource, sortsString))));
 		}
 
-		private ObjectDefinition _objectDefinition;
+		private ObjectAction _objectAction;
 
 	}
 
@@ -794,21 +838,22 @@ public class Query {
 
 	}
 
-	@GraphQLTypeExtension(ObjectDefinition.class)
+	@GraphQLTypeExtension(ObjectAction.class)
 	public class
 		GetObjectDefinitionByExternalReferenceCodeObjectLayoutsPageTypeExtension {
 
 		public GetObjectDefinitionByExternalReferenceCodeObjectLayoutsPageTypeExtension(
-			ObjectDefinition objectDefinition) {
+			ObjectAction objectAction) {
 
-			_objectDefinition = objectDefinition;
+			_objectAction = objectAction;
 		}
 
 		@GraphQLField
-		public ObjectLayoutPage byExternalReferenceCodeObjectLayouts(
-				@GraphQLName("search") String search,
-				@GraphQLName("pageSize") int pageSize,
-				@GraphQLName("page") int page)
+		public ObjectLayoutPage
+				objectDefinitionByExternalReferenceCodeObjectLayouts(
+					@GraphQLName("search") String search,
+					@GraphQLName("pageSize") int pageSize,
+					@GraphQLName("page") int page)
 			throws Exception {
 
 			return _applyComponentServiceObjects(
@@ -817,11 +862,37 @@ public class Query {
 				objectLayoutResource -> new ObjectLayoutPage(
 					objectLayoutResource.
 						getObjectDefinitionByExternalReferenceCodeObjectLayoutsPage(
-							_objectDefinition.getExternalReferenceCode(),
-							search, Pagination.of(page, pageSize))));
+							_objectAction.getExternalReferenceCode(), search,
+							Pagination.of(page, pageSize))));
 		}
 
-		private ObjectDefinition _objectDefinition;
+		private ObjectAction _objectAction;
+
+	}
+
+	@GraphQLTypeExtension(ObjectAction.class)
+	public class GetObjectDefinitionByExternalReferenceCodeTypeExtension {
+
+		public GetObjectDefinitionByExternalReferenceCodeTypeExtension(
+			ObjectAction objectAction) {
+
+			_objectAction = objectAction;
+		}
+
+		@GraphQLField
+		public ObjectDefinition objectDefinitionByExternalReferenceCode()
+			throws Exception {
+
+			return _applyComponentServiceObjects(
+				_objectDefinitionResourceComponentServiceObjects,
+				Query.this::_populateResourceContext,
+				objectDefinitionResource ->
+					objectDefinitionResource.
+						getObjectDefinitionByExternalReferenceCode(
+							_objectAction.getExternalReferenceCode()));
+		}
+
+		private ObjectAction _objectAction;
 
 	}
 
