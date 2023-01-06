@@ -25,11 +25,13 @@ import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.notification.type.BaseNotificationType;
 import com.liferay.notification.type.NotificationType;
+import com.liferay.object.service.ObjectEntryService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -91,6 +93,12 @@ public class UserNotificationType extends BaseNotificationType {
 				notificationTemplate.getRecipientType());
 
 		for (User user : usersProvider.provide(notificationContext)) {
+			if (!_objectEntryService.hasModelResourcePermission(
+					user, notificationContext.getClassPK(), ActionKeys.VIEW)) {
+
+				continue;
+			}
+
 			siteDefaultLocale = portal.getSiteDefaultLocale(user.getGroupId());
 			userLocale = user.getLocale();
 
@@ -147,6 +155,9 @@ public class UserNotificationType extends BaseNotificationType {
 
 		return notificationQueueEntry;
 	}
+
+	@Reference
+	private ObjectEntryService _objectEntryService;
 
 	@Reference
 	private UserNotificationEventLocalService
