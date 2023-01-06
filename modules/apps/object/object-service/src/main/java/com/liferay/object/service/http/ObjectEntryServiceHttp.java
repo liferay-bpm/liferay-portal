@@ -639,6 +639,48 @@ public class ObjectEntryServiceHttp {
 		}
 	}
 
+	public static boolean hasModelResourcePermission(
+			HttpPrincipal httpPrincipal,
+			com.liferay.portal.kernel.model.User user, long objectEntryId,
+			String actionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				ObjectEntryServiceUtil.class, "hasModelResourcePermission",
+				_hasModelResourcePermissionParameterTypes14);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, user, objectEntryId, actionId);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return ((Boolean)returnObj).booleanValue();
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
 	public static boolean hasPortletResourcePermission(
 			HttpPrincipal httpPrincipal, long groupId, long objectDefinitionId,
 			String actionId)
@@ -647,7 +689,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "hasPortletResourcePermission",
-				_hasPortletResourcePermissionParameterTypes14);
+				_hasPortletResourcePermissionParameterTypes15);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, objectDefinitionId, actionId);
@@ -689,7 +731,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "updateObjectEntry",
-				_updateObjectEntryParameterTypes15);
+				_updateObjectEntryParameterTypes16);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectEntryId, values, serviceContext);
@@ -774,10 +816,14 @@ public class ObjectEntryServiceHttp {
 			com.liferay.object.model.ObjectEntry.class, String.class
 		};
 	private static final Class<?>[]
-		_hasPortletResourcePermissionParameterTypes14 = new Class[] {
+		_hasModelResourcePermissionParameterTypes14 = new Class[] {
+			com.liferay.portal.kernel.model.User.class, long.class, String.class
+		};
+	private static final Class<?>[]
+		_hasPortletResourcePermissionParameterTypes15 = new Class[] {
 			long.class, long.class, String.class
 		};
-	private static final Class<?>[] _updateObjectEntryParameterTypes15 =
+	private static final Class<?>[] _updateObjectEntryParameterTypes16 =
 		new Class[] {
 			long.class, java.util.Map.class,
 			com.liferay.portal.kernel.service.ServiceContext.class

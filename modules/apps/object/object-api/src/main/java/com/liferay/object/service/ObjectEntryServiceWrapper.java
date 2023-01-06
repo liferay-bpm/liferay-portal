@@ -181,6 +181,16 @@ public class ObjectEntryServiceWrapper
 	}
 
 	@Override
+	public boolean hasModelResourcePermission(
+			com.liferay.portal.kernel.model.User user, long objectEntryId,
+			String actionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectEntryService.hasModelResourcePermission(
+			user, objectEntryId, actionId);
+	}
+
+	@Override
 	public boolean hasPortletResourcePermission(
 			long groupId, long objectDefinitionId, String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
