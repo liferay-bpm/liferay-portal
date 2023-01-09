@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Arrays;
@@ -82,11 +81,9 @@ public class ViewNotificationTemplatesDisplayContext {
 		_addDropdownItem(
 			creationMenu, "email", NotificationConstants.TYPE_EMAIL);
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-162133"))) {
-			_addDropdownItem(
-				creationMenu, "user-notification",
-				NotificationConstants.TYPE_USER_NOTIFICATION);
-		}
+		_addDropdownItem(
+			creationMenu, "user-notification",
+			NotificationConstants.TYPE_USER_NOTIFICATION);
 
 		return creationMenu;
 	}

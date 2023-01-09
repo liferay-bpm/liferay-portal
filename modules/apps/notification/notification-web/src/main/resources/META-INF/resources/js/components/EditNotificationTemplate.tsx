@@ -268,12 +268,6 @@ export default function EditNotificationTemplate({
 	}
 
 	const initialValues: TNotificationTemplate = {
-		...(Liferay.FeatureFlags['LPS-162133'] && {
-			recipientType:
-				notificationTemplateType === 'userNotification'
-					? 'term'
-					: 'email',
-		}),
 		attachmentObjectFieldIds: [],
 		body: {
 			[defaultLanguageId]: '',
@@ -284,7 +278,8 @@ export default function EditNotificationTemplate({
 		name: '',
 		objectDefinitionExternalReferenceCode: '',
 		objectDefinitionId: 0,
-		recipientType: '',
+		recipientType:
+			notificationTemplateType === 'userNotification' ? 'term' : 'email',
 		recipients: recipientInitialValue,
 		subject: {
 			[defaultLanguageId]: '',
@@ -489,11 +484,9 @@ export default function EditNotificationTemplate({
 					values.type === 'email' ? 'label-success' : 'label-info'
 				}
 				badgeLabel={
-					Liferay.FeatureFlags['LPS-162133']
-						? values.type === 'email'
-							? Liferay.Language.get('email')
-							: Liferay.Language.get('user-notification')
-						: undefined
+					values.type === 'email'
+						? Liferay.Language.get('email')
+						: Liferay.Language.get('user-notification')
 				}
 				entityId={notificationTemplateId}
 				externalReferenceCode={
@@ -554,14 +547,12 @@ export default function EditNotificationTemplate({
 									value={values.description}
 								/>
 
-								{!Liferay.FeatureFlags['LPS-162133'] && (
-									<SingleSelect
-										disabled
-										label={Liferay.Language.get('type')}
-										options={[]}
-										value={Liferay.Language.get('email')}
-									/>
-								)}
+								<SingleSelect
+									disabled
+									label={Liferay.Language.get('type')}
+									options={[]}
+									value={Liferay.Language.get('email')}
+								/>
 							</Card>
 						</div>
 
@@ -573,8 +564,7 @@ export default function EditNotificationTemplate({
 									)}
 								</Text>
 
-								{Liferay.FeatureFlags['LPS-162133'] &&
-								values.type === 'userNotification' ? (
+								{values.type === 'userNotification' ? (
 									<>
 										<SingleSelect
 											label={Liferay.Language.get(
