@@ -15,6 +15,7 @@
 import {
 	API,
 	AutoComplete,
+	getLocalizableLabel,
 	stringIncludesQuery,
 } from '@liferay/object-js-components-web';
 import React, {useEffect, useMemo, useState} from 'react';
@@ -42,7 +43,11 @@ export default function SelectRelationship({
 		() =>
 			fields.map(({label, name}) => {
 				return {
-					label: label[defaultLanguageId]!,
+					label: 
+					getLocalizableLabel(
+						creationLanguageId as Locale,
+						label,
+						name),
 					name,
 				};
 			}),
@@ -107,7 +112,11 @@ export default function SelectRelationship({
 			tooltip={Liferay.Language.get(
 				'choose-a-relationship-field-from-the-selected-object'
 			)}
-			value={selectedValue?.label[defaultLanguageId]}
+			value={getLocalizableLabel(
+				creationLanguageId as Locale,
+				selectedValue?.label,
+				selectedValue?.name
+			)}
 			{...otherProps}
 		>
 			{({label, name}) => (
