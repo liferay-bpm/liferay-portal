@@ -14,15 +14,15 @@
 
 export declare function getCheckedItems(
 	itemValues: LabelValueObject[] | PickListItem[],
-	setEditingFilterType: () => number[] | string[] | null,
-	type: 'Picklist' | 'status'
+	type: 'Picklist' | 'status',
+	valuesArray: number[] | string[] | null
 ): IItem[];
 export declare function getCheckedRelationshipItems(
 	relatedEntries: ObjectEntry[],
 	titleFieldName: string,
 	systemField: boolean,
 	systemObject: boolean,
-	setEditingFilterType: () => number[] | string[] | null
+	valuesArray: string[]
 ): IItem[];
 export declare function getSystemFieldLabelFromEntry(
 	titleFieldName: string,

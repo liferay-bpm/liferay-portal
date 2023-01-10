@@ -16,7 +16,6 @@ import ClayButton from '@clayui/button';
 import ClayModal from '@clayui/modal';
 import {Observer} from '@clayui/modal/lib/types';
 import {
-	API,
 	AutoComplete,
 	DatePicker,
 	Input,
@@ -25,19 +24,9 @@ import {
 	filterArrayByQuery,
 	getLocalizableLabel,
 } from '@liferay/object-js-components-web';
-import React, {
-	FormEvent,
-	useCallback,
-	useEffect,
-	useMemo,
-	useState,
-} from 'react';
+import React, {FormEvent, useEffect, useMemo, useState} from 'react';
 
-import {
-	getCheckedRelationshipItems,
-	getCheckedItems,
-	getSystemFieldLabelFromEntry,
-} from './filter';
+import {setFieldValues} from './setValuesUtil';
 
 import './ModalAddFilter.scss';
 interface IProps {
@@ -97,7 +86,7 @@ export type FilterValidation = {
 	value?: string;
 };
 
-type CurrentFilter = {
+export type CurrentFilter = {
 	definition: {
 		[key: string]: string[] | number[];
 	} | null;
@@ -109,15 +98,6 @@ type CurrentFilter = {
 	objectFieldName?: string;
 	value?: string;
 	valueList?: LabelValueObject[];
-};
-
-type AttachmentEntry = {
-	id: number;
-	link: {
-		href: string;
-		label: string;
-	};
-	name: string;
 };
 
 export function ModalAddFilter({
@@ -163,190 +143,39 @@ export function ModalAddFilter({
 		});
 	}, [creationLanguageId, objectFields, query]);
 
-	const setEditingFilterType = () => {
-		const currentFilterColumn = currentFilters.find((filterColumn) => {
-			if (filterColumn.objectFieldName === editingObjectFieldName) {
-				return filterColumn;
-			}
-		});
-
-		const definition = currentFilterColumn?.definition;
-		const filterType = currentFilterColumn?.filterType;
-
-		const valuesArray =
-			definition && filterType ? definition[filterType] : null;
-
-		const editingFilterType = filterOperators.picklistOperators.find(
-			(filterType) => filterType.value === currentFilterColumn?.filterType
-		);
-
-		if (editingFilterType) {
-			setSelectedFilterType({
-				label: editingFilterType.label,
-				value: editingFilterType.value,
-			});
-		}
-
-		return valuesArray;
-	};
-
-	const setFieldValues = useCallback(
-		(objectField: ObjectField) => {
-			if (
-				objectField.businessType === 'MultiselectPicklist' ||
-				objectField?.businessType === 'Picklist'
-			) {
-				const makeFetch = async () => {
-					if (objectField.listTypeDefinitionId) {
-						const items = await API.getPickListItems(
-							objectField.listTypeDefinitionId
-						);
-
-						if (editingFilter) {
-							setItems(
-								getCheckedItems(
-									items,
-									setEditingFilterType,
-									'Picklist'
-								)
-							);
-						}
-						else {
-							setItems(
-								items.map((item) => {
-									return {
-										label: item.name,
-										value: item.key,
-									};
-								})
-							);
-						}
-					}
-				};
-
-				makeFetch();
-			}
-			else if (objectField.name === 'status') {
-				let newItems: IItem[] = [];
-
-				if (editingFilter) {
-					newItems = getCheckedItems(
-						workflowStatusJSONArray,
-						setEditingFilterType,
-						'status'
-					);
-				}
-				else {
-					newItems = workflowStatusJSONArray.map((workflowStatus) => {
-						return {
-							label: workflowStatus.label,
-							value: workflowStatus.value,
-						};
-					});
-				}
-
-				setItems(newItems);
-			}
-			else if (objectField.businessType === 'Relationship') {
-				const makeFetch = async () => {
-					const {objectFieldSettings} = objectField;
-
-					const [{value}] = objectFieldSettings as NameValueObject[];
-
-					const [
-						{
-							objectFields,
-							restContextPath,
-							system,
-							titleObjectFieldName,
-						},
-					] = await API.getObjectDefinitions(
-						`filter=name eq '${value}'`
-					);
-
-					const titleField = objectFields.find(
-						(objectField) =>
-							objectField.name === titleObjectFieldName
-					) as ObjectField;
-
-					const relatedEntries = await API.getList<ObjectEntry>(
-						`${restContextPath}`
-					);
-
-					if (!relatedEntries) {
-						setItems([]);
-
-						return;
-					}
-
-					if (editingFilter) {
-						setItems(
-							getCheckedRelationshipItems(
-								relatedEntries,
-								titleField.name,
-								titleField.system as boolean,
-								system,
-								setEditingFilterType
-							)
-						);
-					}
-					else {
-						const newItems = relatedEntries.map((entry) => {
-							const newItemsObject = {
-								value: system
-									? String(entry.id)
-									: entry.externalReferenceCode,
-							} as LabelValueObject;
-
-							if (titleField.system) {
-								return getSystemFieldLabelFromEntry(
-									titleField.name,
-									entry,
-									newItemsObject
-								) as LabelValueObject;
-							}
-
-							let label = entry[titleField?.name] as string;
-
-							if (titleField.businessType === 'Attachment') {
-								label = (entry as {
-									[key: string]: AttachmentEntry;
-								})[titleField.name].name;
-							}
-
-							return {
-								...newItemsObject,
-								label,
-							};
-						});
-
-						setItems(newItems);
-					}
-				};
-
-				makeFetch();
-			}
-		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[]
-	);
-
 	useEffect(() => {
 		if (!selectedFilterBy && !editingObjectFieldName) {
 			setItems([]);
 		}
 		else {
 			if (selectedFilterBy) {
-				setFieldValues(
-					(selectedFilterBy as unknown) as ObjectFieldView
-				);
+				setFieldValues({
+					currentFilters,
+					editingFilter,
+					editingObjectFieldName,
+					filterOperators,
+					objectField: selectedFilterBy,
+					setItems,
+					setSelectedFilterType,
+					workflowStatusJSONArray,
+				});
 			}
 			else {
 				const objectField = objectFields.find(
 					({name}) => name === editingObjectFieldName
 				);
 
-				objectField && setFieldValues(objectField);
+				objectField &&
+					setFieldValues({
+						currentFilters,
+						editingFilter,
+						editingObjectFieldName,
+						filterOperators,
+						objectField,
+						setItems,
+						setSelectedFilterType,
+						workflowStatusJSONArray,
+					});
 			}
 		}
 

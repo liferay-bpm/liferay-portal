@@ -69,7 +69,7 @@ export declare type FilterValidation = {
 	setErrors: (value: FilterErrors) => void;
 	value?: string;
 };
-declare type CurrentFilter = {
+export declare type CurrentFilter = {
 	definition: {
 		[key: string]: string[] | number[];
 	} | null;

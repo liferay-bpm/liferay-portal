@@ -14,12 +14,10 @@
 
 export function getCheckedItems(
 	itemValues: LabelValueObject[] | PickListItem[],
-	setEditingFilterType: () => number[] | string[] | null,
-	type: 'Picklist' | 'status'
+	type: 'Picklist' | 'status',
+	valuesArray: number[] | string[] | null
 ) {
 	let newItemsValues: IItem[] = [];
-
-	const valuesArray = setEditingFilterType();
 
 	newItemsValues = itemValues.map((itemValue) => {
 		let item: IItem = {
@@ -67,11 +65,9 @@ export function getCheckedRelationshipItems(
 	titleFieldName: string,
 	systemField: boolean,
 	systemObject: boolean,
-	setEditingFilterType: () => number[] | string[] | null
+	valuesArray: string[]
 ): IItem[] {
 	let newItemsValues: IItem[] = [];
-
-	const valuesArray = setEditingFilterType() as string[];
 
 	newItemsValues = relatedEntries.map((entry) => {
 		let item = {
