@@ -186,6 +186,10 @@ public class ObjectActionResourceImpl
 	private ObjectAction _toObjectAction(
 		com.liferay.object.model.ObjectAction objectAction) {
 
+		if (objectAction == null) {
+			return null;
+		}
+
 		String permissionName =
 			com.liferay.object.model.ObjectDefinition.class.getName();
 
