@@ -29,7 +29,7 @@ import {
 	FilterErrors,
 	FilterValidation,
 	ModalAddFilter,
-} from '../../../ModalAddFilter';
+} from '../../../Modals/FilterModal/ModalAddFilter';
 import ObjectFieldFormBase, {
 	ObjectFieldErrors,
 } from '../../ObjectFieldFormBase';

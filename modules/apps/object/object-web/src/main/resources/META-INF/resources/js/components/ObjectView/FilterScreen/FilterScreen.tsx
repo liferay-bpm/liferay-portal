@@ -20,7 +20,7 @@ import {
 	FilterErrors,
 	FilterValidation,
 	ModalAddFilter,
-} from '../../ModalAddFilter';
+} from '../../Modals/FilterModal/ModalAddFilter';
 import {TYPES, useViewContext} from '../objectViewContext';
 
 const REQUIRED_MSG = Liferay.Language.get('required');

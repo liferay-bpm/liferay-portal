@@ -38,7 +38,7 @@ import {
 	getCheckedRelationshipItems,
 	getCheckedWorkflowStatusItems,
 	getSystemFieldLabelFromEntry,
-} from '../utils/filter';
+} from './filter';
 
 import './ModalAddFilter.scss';
 interface IProps {
