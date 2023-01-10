@@ -17,6 +17,7 @@ import {FrontendDataSet} from '@liferay/frontend-data-set-web';
 import {
 	AutoComplete,
 	filterArrayByQuery,
+	getLocalizableLabel,
 	onActionDropdownItemClick,
 } from '@liferay/object-js-components-web';
 import {createResourceURL, fetch} from 'frontend-js-web';

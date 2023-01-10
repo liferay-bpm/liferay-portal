@@ -17,6 +17,7 @@ import {
 	CodeEditorLocalized,
 	SidebarCategory,
 	filterArrayByQuery,
+	getLocalizableLabel,
 } from '@liferay/object-js-components-web';
 import {createResourceURL, fetch} from 'frontend-js-web';
 import React, {useMemo, useState} from 'react';

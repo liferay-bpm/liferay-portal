@@ -28,6 +28,7 @@ import {
 } from './types';
 
 type TState = {
+	creationLanguageId: Locale;
 	enableCategorization: boolean;
 	isViewOnly: boolean;
 	objectFieldTypes: ObjectFieldType[];
@@ -40,6 +41,7 @@ type TState = {
 type TAction =
 	| {
 			payload: {
+				creationLanguageId: Locale;
 				enableCategorization: boolean;
 				objectLayout: TObjectLayout;
 				objectRelationships: TObjectRelationship[];
@@ -63,7 +65,8 @@ type TAction =
 	  }
 	| {
 			payload: {
-				objectFields: TObjectField[]};
+				objectFields: TObjectField[];
+			};
 			type: TYPES.ADD_OBJECT_FIELDS;
 	  }
 	| {
@@ -157,6 +160,7 @@ const layoutReducer = (state: TState, action: TAction) => {
 	switch (action.type) {
 		case TYPES.ADD_OBJECT_LAYOUT: {
 			const {
+				creationLanguageId,
 				enableCategorization,
 				objectLayout,
 				objectRelationships,
@@ -164,6 +168,7 @@ const layoutReducer = (state: TState, action: TAction) => {
 
 			return {
 				...state,
+				creationLanguageId,
 				enableCategorization,
 				objectLayout,
 				objectRelationships,
@@ -245,7 +250,7 @@ const layoutReducer = (state: TState, action: TAction) => {
 			return newState;
 		}
 		case TYPES.ADD_OBJECT_FIELDS: {
-			const { objectFields} = action.payload;
+			const {objectFields} = action.payload;
 
 			return {
 				...state,

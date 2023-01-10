@@ -117,7 +117,6 @@ export function ObjectRelationshipFormBase({
 		ObjectDefinition[]
 	>([]);
 	const [query, setQuery] = useState<string>('');
-	const [creationLanguageId, setCreationLanguageId] = useState<Locale>();
 
 	const [types, selectedType] = useMemo(() => {
 		const types = [ONE_TO_MANY, MANY_TO_MANY];

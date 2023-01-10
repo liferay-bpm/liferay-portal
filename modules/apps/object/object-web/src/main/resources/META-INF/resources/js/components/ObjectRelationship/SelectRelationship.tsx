@@ -20,8 +20,6 @@ import {
 } from '@liferay/object-js-components-web';
 import React, {useEffect, useMemo, useState} from 'react';
 
-const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
-
 interface IProps {
 	error?: string;
 	objectDefinitionExternalReferenceCode: string;
@@ -43,15 +41,15 @@ export default function SelectRelationship({
 		() =>
 			fields.map(({label, name}) => {
 				return {
-					label: 
-					getLocalizableLabel(
+					label: getLocalizableLabel(
 						creationLanguageId as Locale,
 						label,
-						name),
+						name
+					),
 					name,
 				};
 			}),
-		[fields]
+		[creationLanguageId, fields]
 	);
 
 	const filteredOptions = useMemo(() => {

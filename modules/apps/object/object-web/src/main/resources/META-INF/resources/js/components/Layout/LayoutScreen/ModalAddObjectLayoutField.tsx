@@ -20,6 +20,7 @@ import {Observer} from '@clayui/modal/lib/types';
 import {
 	AutoComplete,
 	FormError,
+	getLocalizableLabel,
 	stringIncludesQuery,
 	useForm,
 } from '@liferay/object-js-components-web';
@@ -41,8 +42,6 @@ type TInitialValues = {
 interface IBoxBtnColumnsProps {
 	setValues: (values: Partial<TInitialValues>) => void;
 }
-
-const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 function BoxBtnColumns({setValues}: IBoxBtnColumnsProps) {
 	const [activeIndex, setActiveIndex] = useState<number>(0);
@@ -93,7 +92,7 @@ export default function ModalAddObjectLayoutField({
 	onClose,
 	tabIndex,
 }: IProps) {
-	const [{ objectFields}, dispatch] = useLayoutContext();
+	const [{creationLanguageId, objectFields}, dispatch] = useLayoutContext();
 	const [query, setQuery] = useState<string>('');
 	const [selectedObjectField, setSelectedObjectField] = useState<
 		TObjectField
@@ -108,11 +107,11 @@ export default function ModalAddObjectLayoutField({
 		return objectFields.filter(
 			({inLayout, label}) =>
 				stringIncludesQuery(
-					label[defaultLanguageId] as string,
+					getLocalizableLabel(creationLanguageId, label),
 					query
 				) && !inLayout
 		);
-	}, [objectFields, query]);
+	}, [creationLanguageId, objectFields, query]);
 
 	const onSubmit = (values: TInitialValues) => {
 		dispatch({
@@ -158,7 +157,6 @@ export default function ModalAddObjectLayoutField({
 
 				<ClayModal.Body>
 					<AutoComplete<TObjectField>
-						creationLanguageId={selectedObjectField?.indexedLanguageId as Locale}
 						contentRight={
 							<>
 								<ClayLabel
@@ -185,6 +183,7 @@ export default function ModalAddObjectLayoutField({
 								)}
 							</>
 						}
+						creationLanguageId={creationLanguageId as Locale}
 						emptyStateMessage={Liferay.Language.get(
 							'there-are-no-fields-for-this-object'
 						)}
@@ -205,12 +204,18 @@ export default function ModalAddObjectLayoutField({
 						}}
 						query={query}
 						required
-						value={selectedObjectField?.label[defaultLanguageId]}
+						value={getLocalizableLabel(
+							creationLanguageId,
+							selectedObjectField?.label
+						)}
 					>
 						{({label, objectFieldSettings, required}) => (
 							<div className="d-flex justify-content-between">
 								<div className="lfr__object-web-layout-modal-add-field-label">
-									{label[defaultLanguageId]}
+									{getLocalizableLabel(
+										creationLanguageId,
+										label
+									)}
 								</div>
 
 								<div>

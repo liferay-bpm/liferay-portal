@@ -22,6 +22,7 @@ import {
 	AutoComplete,
 	FormError,
 	Input,
+	getLocalizableLabel,
 	stringIncludesQuery,
 	useForm,
 } from '@liferay/object-js-components-web';
@@ -136,6 +137,7 @@ export function ModalAddObjectLayoutTab({
 }: ModalAddObjectLayoutTabProps) {
 	const [
 		{
+			creationLanguageId,
 			objectLayout: {objectLayoutTabs},
 			objectRelationships,
 		},
@@ -150,14 +152,12 @@ export function ModalAddObjectLayoutTab({
 	const filteredRelationships = useMemo(() => {
 		return objectRelationships.filter(
 			({inLayout, label, name}) =>
-				(stringIncludesQuery(
-					label[defaultLanguageId] as string,
+				stringIncludesQuery(
+					getLocalizableLabel(creationLanguageId, label, name),
 					query
-				) ??
-					stringIncludesQuery(name, query)) &&
-				!inLayout
+				) && !inLayout
 		);
-	}, [objectRelationships, query]);
+	}, [creationLanguageId, objectRelationships, query]);
 
 	const selectedRelationshipInfo: TLabelInfo = useMemo(() => {
 		return getRelationshipInfo(selectedRelationship?.reverse ?? false);
@@ -180,7 +180,7 @@ export function ModalAddObjectLayoutTab({
 	const onValidate = (values: Partial<TObjectLayoutTab>) => {
 		const errors: FormError<TObjectLayoutTab> = {};
 
-		if (!values.name?.[defaultLanguageId]) {
+		if (!getLocalizableLabel(creationLanguageId, values.name)) {
 			errors.name = Liferay.Language.get('required');
 		}
 
@@ -223,7 +223,10 @@ export function ModalAddObjectLayoutTab({
 							});
 						}}
 						required
-						value={values.name?.[defaultLanguageId]}
+						value={getLocalizableLabel(
+							creationLanguageId,
+							values.name
+						)}
 					/>
 
 					<ClayForm.Group>
@@ -253,7 +256,6 @@ export function ModalAddObjectLayoutTab({
 
 					{selectedType === TYPES.RELATIONSHIPS && (
 						<AutoComplete<TObjectRelationship>
-							creationLanguageId={defaultLanguageId}
 							contentRight={
 								<ClayLabel
 									className="label-inside-custom-select"
@@ -264,6 +266,7 @@ export function ModalAddObjectLayoutTab({
 									{selectedRelationshipInfo.labelContent}
 								</ClayLabel>
 							}
+							creationLanguageId={creationLanguageId}
 							emptyStateMessage={Liferay.Language.get(
 								'there-are-no-relationship-for-this-object'
 							)}
@@ -279,11 +282,11 @@ export function ModalAddObjectLayoutTab({
 							}}
 							query={query}
 							required
-							value={
-								selectedRelationship?.label[
-									defaultLanguageId
-								] ?? selectedRelationship?.name
-							}
+							value={getLocalizableLabel(
+								creationLanguageId,
+								selectedRelationship?.label,
+								selectedRelationship?.name
+							)}
 						>
 							{({label, name, reverse}) => {
 								const relationshipInfo = getRelationshipInfo(
@@ -293,7 +296,11 @@ export function ModalAddObjectLayoutTab({
 								return (
 									<div className="d-flex justify-content-between">
 										<div>
-											{label[defaultLanguageId] ?? name}
+											{getLocalizableLabel(
+												creationLanguageId,
+												label,
+												name
+											)}
 										</div>
 
 										<div className="object-web-relationship-item-label">
