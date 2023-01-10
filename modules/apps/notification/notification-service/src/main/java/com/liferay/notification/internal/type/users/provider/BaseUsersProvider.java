@@ -38,7 +38,7 @@ public abstract class BaseUsersProvider implements UsersProvider {
 		if (modelResourcePermission != null) {
 			try {
 				return modelResourcePermission.contains(
-					_permissionCheckerFactory.create(user), classPK,
+					permissionCheckerFactory.create(user), classPK,
 					ActionKeys.VIEW);
 			}
 			catch (PortalException portalException) {
@@ -50,6 +50,6 @@ public abstract class BaseUsersProvider implements UsersProvider {
 	}
 
 	@Reference
-	private PermissionCheckerFactory _permissionCheckerFactory;
+	protected PermissionCheckerFactory permissionCheckerFactory;
 
 }
