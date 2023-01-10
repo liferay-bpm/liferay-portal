@@ -12,23 +12,48 @@
  * details.
  */
 
-export function getCheckedWorkflowStatusItems(
-	itemValues: LabelValueObject[],
-	setEditingFilterType: () => number[] | string[] | null
-): IItem[] {
+export function getCheckedItems(
+	itemValues: LabelValueObject[] | PickListItem[],
+	setEditingFilterType: () => number[] | string[] | null,
+	type: 'Picklist' | 'status'
+) {
 	let newItemsValues: IItem[] = [];
 
-	const valuesArray = setEditingFilterType() as number[];
+	const valuesArray = setEditingFilterType();
 
 	newItemsValues = itemValues.map((itemValue) => {
-		const item = {
+		let item: IItem = {
 			checked: false,
-			label: itemValue.label,
-			value: itemValue.value,
+			label: '',
+			value: '',
 		};
 
-		if (valuesArray?.includes(Number(itemValue.value))) {
-			item.checked = true;
+		if (type === 'status') {
+			const {label, value} = itemValue as LabelValueObject;
+
+			item = {
+				...item,
+				label,
+				value,
+			};
+
+			if ((valuesArray as number[]).includes(Number(value))) {
+				item.checked = true;
+			}
+		}
+
+		if (type === 'Picklist') {
+			const {key, name} = itemValue as PickListItem;
+
+			item = {
+				...item,
+				label: name,
+				value: key,
+			};
+
+			if ((valuesArray as string[])?.includes(key)) {
+				item.checked = true;
+			}
 		}
 
 		return item;
@@ -37,22 +62,40 @@ export function getCheckedWorkflowStatusItems(
 	return newItemsValues;
 }
 
-export function getCheckedPickListItems(
-	itemValues: PickListItem[],
+export function getCheckedRelationshipItems(
+	relatedEntries: ObjectEntry[],
+	titleFieldName: string,
+	systemField: boolean,
+	systemObject: boolean,
 	setEditingFilterType: () => number[] | string[] | null
 ): IItem[] {
 	let newItemsValues: IItem[] = [];
 
 	const valuesArray = setEditingFilterType() as string[];
 
-	newItemsValues = (itemValues as PickListItem[]).map((itemValue) => {
-		const item = {
+	newItemsValues = relatedEntries.map((entry) => {
+		let item = {
 			checked: false,
-			label: itemValue.name,
-			value: itemValue.key,
-		};
+			value: systemObject
+				? String(entry.id)
+				: entry.externalReferenceCode,
+		} as IItem;
 
-		if (valuesArray?.includes(itemValue.key)) {
+		if (systemField) {
+			item = getSystemFieldLabelFromEntry(
+				titleFieldName,
+				entry,
+				item
+			) as IItem;
+		}
+		else {
+			item = {
+				...item,
+				label: entry[titleFieldName] as string,
+			};
+		}
+
+		if (valuesArray.includes(entry.externalReferenceCode)) {
 			item.checked = true;
 		}
 
@@ -103,47 +146,4 @@ export function getSystemFieldLabelFromEntry(
 		...itemObject,
 		label: entry[titleFieldName],
 	};
-}
-
-export function getCheckedRelationshipItems(
-	relatedEntries: ObjectEntry[],
-	titleFieldName: string,
-	systemField: boolean,
-	systemObject: boolean,
-	setEditingFilterType: () => number[] | string[] | null
-): IItem[] {
-	let newItemsValues: IItem[] = [];
-
-	const valuesArray = setEditingFilterType() as string[];
-
-	newItemsValues = relatedEntries.map((entry) => {
-		let item = {
-			checked: false,
-			value: systemObject
-				? String(entry.id)
-				: entry.externalReferenceCode,
-		} as IItem;
-
-		if (systemField) {
-			item = getSystemFieldLabelFromEntry(
-				titleFieldName,
-				entry,
-				item
-			) as IItem;
-		}
-		else {
-			item = {
-				...item,
-				label: entry[titleFieldName] as string,
-			};
-		}
-
-		if (valuesArray.includes(entry.externalReferenceCode)) {
-			item.checked = true;
-		}
-
-		return item;
-	});
-
-	return newItemsValues;
 }

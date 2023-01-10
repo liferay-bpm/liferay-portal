@@ -34,9 +34,8 @@ import React, {
 } from 'react';
 
 import {
-	getCheckedPickListItems,
 	getCheckedRelationshipItems,
-	getCheckedWorkflowStatusItems,
+	getCheckedItems,
 	getSystemFieldLabelFromEntry,
 } from './filter';
 
@@ -205,9 +204,10 @@ export function ModalAddFilter({
 
 						if (editingFilter) {
 							setItems(
-								getCheckedPickListItems(
+								getCheckedItems(
 									items,
-									setEditingFilterType
+									setEditingFilterType,
+									'Picklist'
 								)
 							);
 						}
@@ -230,9 +230,10 @@ export function ModalAddFilter({
 				let newItems: IItem[] = [];
 
 				if (editingFilter) {
-					newItems = getCheckedWorkflowStatusItems(
+					newItems = getCheckedItems(
 						workflowStatusJSONArray,
-						setEditingFilterType
+						setEditingFilterType,
+						'status'
 					);
 				}
 				else {

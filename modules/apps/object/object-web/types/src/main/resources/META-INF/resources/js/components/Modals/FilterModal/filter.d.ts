@@ -12,12 +12,16 @@
  * details.
  */
 
-export declare function getCheckedWorkflowStatusItems(
-	itemValues: LabelValueObject[],
-	setEditingFilterType: () => number[] | string[] | null
+export declare function getCheckedItems(
+	itemValues: LabelValueObject[] | PickListItem[],
+	setEditingFilterType: () => number[] | string[] | null,
+	type: 'Picklist' | 'status'
 ): IItem[];
-export declare function getCheckedPickListItems(
-	itemValues: PickListItem[],
+export declare function getCheckedRelationshipItems(
+	relatedEntries: ObjectEntry[],
+	titleFieldName: string,
+	systemField: boolean,
+	systemObject: boolean,
 	setEditingFilterType: () => number[] | string[] | null
 ): IItem[];
 export declare function getSystemFieldLabelFromEntry(
@@ -28,10 +32,3 @@ export declare function getSystemFieldLabelFromEntry(
 	label: unknown;
 	value: string;
 };
-export declare function getCheckedRelationshipItems(
-	relatedEntries: ObjectEntry[],
-	titleFieldName: string,
-	systemField: boolean,
-	systemObject: boolean,
-	setEditingFilterType: () => number[] | string[] | null
-): IItem[];
