@@ -58,6 +58,16 @@ public class ObjectActionResourceImpl
 	}
 
 	@Override
+	public ObjectAction getObjectActionByExternalReferenceCode(
+			String externalReferenceCode)
+		throws Exception {
+
+		return _toObjectAction(
+			_objectActionService.fetchObjectActionByExternalReferenceCode(
+				externalReferenceCode, contextCompany.getCompanyId()));
+	}
+
+	@Override
 	public Page<ObjectAction>
 			getObjectDefinitionByExternalReferenceCodeObjectActionsPage(
 				String externalReferenceCode, String search,
@@ -150,8 +160,8 @@ public class ObjectActionResourceImpl
 
 		return _toObjectAction(
 			_objectActionService.addObjectAction(
-				objectDefinitionId, objectAction.getActive(),
-				objectAction.getConditionExpression(),
+				objectAction.getExternalReferenceCode(), objectDefinitionId,
+				objectAction.getActive(), objectAction.getConditionExpression(),
 				objectAction.getDescription(),
 				LocalizedMapUtil.getLocalizedMap(
 					objectAction.getErrorMessage()),
@@ -170,8 +180,8 @@ public class ObjectActionResourceImpl
 
 		return _toObjectAction(
 			_objectActionService.updateObjectAction(
-				objectActionId, objectAction.getActive(),
-				objectAction.getConditionExpression(),
+				objectAction.getExternalReferenceCode(), objectActionId,
+				objectAction.getActive(), objectAction.getConditionExpression(),
 				objectAction.getDescription(),
 				LocalizedMapUtil.getLocalizedMap(
 					objectAction.getErrorMessage()),

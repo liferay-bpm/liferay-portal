@@ -386,6 +386,11 @@ public class ServletDataImpl implements ServletData {
 							"postObjectViewCopy"));
 
 					put(
+						"query#objectActionByExternalReferenceCode",
+						new ObjectValuePair<>(
+							ObjectActionResourceImpl.class,
+							"getObjectActionByExternalReferenceCode"));
+					put(
 						"query#objectAction",
 						new ObjectValuePair<>(
 							ObjectActionResourceImpl.class, "getObjectAction"));

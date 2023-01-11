@@ -184,6 +184,7 @@ public abstract class BaseObjectActionResourceTestCase {
 
 		objectAction.setConditionExpression(regex);
 		objectAction.setDescription(regex);
+		objectAction.setExternalReferenceCode(regex);
 		objectAction.setName(regex);
 		objectAction.setObjectActionExecutorKey(regex);
 		objectAction.setObjectActionTriggerKey(regex);
@@ -196,9 +197,93 @@ public abstract class BaseObjectActionResourceTestCase {
 
 		Assert.assertEquals(regex, objectAction.getConditionExpression());
 		Assert.assertEquals(regex, objectAction.getDescription());
+		Assert.assertEquals(regex, objectAction.getExternalReferenceCode());
 		Assert.assertEquals(regex, objectAction.getName());
 		Assert.assertEquals(regex, objectAction.getObjectActionExecutorKey());
 		Assert.assertEquals(regex, objectAction.getObjectActionTriggerKey());
+	}
+
+	@Test
+	public void testGetObjectActionByExternalReferenceCode() throws Exception {
+		ObjectAction postObjectAction =
+			testGetObjectActionByExternalReferenceCode_addObjectAction();
+
+		ObjectAction getObjectAction =
+			objectActionResource.getObjectActionByExternalReferenceCode(
+				postObjectAction.getExternalReferenceCode());
+
+		assertEquals(postObjectAction, getObjectAction);
+		assertValid(getObjectAction);
+	}
+
+	protected ObjectAction
+			testGetObjectActionByExternalReferenceCode_addObjectAction()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetObjectActionByExternalReferenceCode()
+		throws Exception {
+
+		ObjectAction objectAction =
+			testGraphQLGetObjectActionByExternalReferenceCode_addObjectAction();
+
+		Assert.assertTrue(
+			equals(
+				objectAction,
+				ObjectActionSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"objectActionByExternalReferenceCode",
+								new HashMap<String, Object>() {
+									{
+										put(
+											"externalReferenceCode",
+											"\"" +
+												objectAction.
+													getExternalReferenceCode() +
+														"\"");
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data",
+						"Object/objectActionByExternalReferenceCode"))));
+	}
+
+	@Test
+	public void testGraphQLGetObjectActionByExternalReferenceCodeNotFound()
+		throws Exception {
+
+		String irrelevantExternalReferenceCode =
+			"\"" + RandomTestUtil.randomString() + "\"";
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"objectActionByExternalReferenceCode",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"externalReferenceCode",
+									irrelevantExternalReferenceCode);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected ObjectAction
+			testGraphQLGetObjectActionByExternalReferenceCode_addObjectAction()
+		throws Exception {
+
+		return testGraphQLObjectAction_addObjectAction();
 	}
 
 	@Test
@@ -831,6 +916,16 @@ public abstract class BaseObjectActionResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (objectAction.getExternalReferenceCode() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("label", additionalAssertFieldName)) {
 				if (objectAction.getLabel() == null) {
 					valid = false;
@@ -1047,6 +1142,19 @@ public abstract class BaseObjectActionResourceTestCase {
 				if (!equals(
 						(Map)objectAction1.getErrorMessage(),
 						(Map)objectAction2.getErrorMessage())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						objectAction1.getExternalReferenceCode(),
+						objectAction2.getExternalReferenceCode())) {
 
 					return false;
 				}
@@ -1326,6 +1434,14 @@ public abstract class BaseObjectActionResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("externalReferenceCode")) {
+			sb.append("'");
+			sb.append(String.valueOf(objectAction.getExternalReferenceCode()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("id")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -1421,6 +1537,8 @@ public abstract class BaseObjectActionResourceTestCase {
 				dateCreated = RandomTestUtil.nextDate();
 				dateModified = RandomTestUtil.nextDate();
 				description = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				externalReferenceCode = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
 				name = StringUtil.toLowerCase(RandomTestUtil.randomString());

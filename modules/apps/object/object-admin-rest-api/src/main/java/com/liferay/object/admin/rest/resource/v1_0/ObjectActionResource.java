@@ -56,6 +56,10 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface ObjectActionResource {
 
+	public ObjectAction getObjectActionByExternalReferenceCode(
+			String externalReferenceCode)
+		throws Exception;
+
 	public void deleteObjectAction(Long objectActionId) throws Exception;
 
 	public Response deleteObjectActionBatch(String callbackURL, Object object)

@@ -149,6 +149,20 @@ public class ObjectActionSerDes {
 			sb.append(_toJSON(objectAction.getErrorMessage()));
 		}
 
+		if (objectAction.getExternalReferenceCode() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"externalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(objectAction.getExternalReferenceCode()));
+
+			sb.append("\"");
+		}
+
 		if (objectAction.getId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -310,6 +324,15 @@ public class ObjectActionSerDes {
 				"errorMessage", String.valueOf(objectAction.getErrorMessage()));
 		}
 
+		if (objectAction.getExternalReferenceCode() == null) {
+			map.put("externalReferenceCode", null);
+		}
+		else {
+			map.put(
+				"externalReferenceCode",
+				String.valueOf(objectAction.getExternalReferenceCode()));
+		}
+
 		if (objectAction.getId() == null) {
 			map.put("id", null);
 		}
@@ -426,6 +449,14 @@ public class ObjectActionSerDes {
 					objectAction.setErrorMessage(
 						(Map)ObjectActionSerDes.toMap(
 							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "externalReferenceCode")) {
+
+				if (jsonParserFieldValue != null) {
+					objectAction.setExternalReferenceCode(
+						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
