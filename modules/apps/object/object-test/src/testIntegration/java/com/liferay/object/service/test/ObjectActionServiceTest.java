@@ -155,8 +155,9 @@ public class ObjectActionServiceTest {
 
 	private ObjectAction _addObjectAction(User user) throws Exception {
 		return _objectActionLocalService.addObjectAction(
-			user.getUserId(), _objectDefinition.getObjectDefinitionId(), true,
-			StringPool.BLANK, RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), user.getUserId(),
+			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
+			RandomTestUtil.randomString(),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			RandomTestUtil.randomString(),
@@ -181,6 +182,7 @@ public class ObjectActionServiceTest {
 			_setUser(user);
 
 			objectAction = _objectActionService.addObjectAction(
+				RandomTestUtil.randomString(),
 				_objectDefinition.getObjectDefinitionId(), true,
 				StringPool.BLANK, RandomTestUtil.randomString(),
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -245,8 +247,8 @@ public class ObjectActionServiceTest {
 			objectAction = _addObjectAction(user);
 
 			objectAction = _objectActionService.updateObjectAction(
-				objectAction.getObjectActionId(), true, StringPool.BLANK,
-				RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), objectAction.getObjectActionId(),
+				true, StringPool.BLANK, RandomTestUtil.randomString(),
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				RandomTestUtil.randomString(),
