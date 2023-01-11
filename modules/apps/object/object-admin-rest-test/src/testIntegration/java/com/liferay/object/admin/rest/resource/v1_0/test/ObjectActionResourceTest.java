@@ -91,6 +91,7 @@ public class ObjectActionResourceTest extends BaseObjectActionResourceTestCase {
 				description = RandomTestUtil.randomString();
 				errorMessage = Collections.singletonMap(
 					"en_US", RandomTestUtil.randomString());
+				externalReferenceCode = RandomTestUtil.randomString();
 				id = RandomTestUtil.randomLong();
 				label = Collections.singletonMap(
 					"en_US", RandomTestUtil.randomString());
@@ -115,6 +116,13 @@ public class ObjectActionResourceTest extends BaseObjectActionResourceTestCase {
 
 	@Override
 	protected ObjectAction testGetObjectAction_addObjectAction()
+		throws Exception {
+
+		return _addObjectAction();
+	}
+
+	protected ObjectAction
+			testGetObjectActionByExternalReferenceCode_addObjectAction()
 		throws Exception {
 
 		return _addObjectAction();
