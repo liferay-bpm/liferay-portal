@@ -59,6 +59,8 @@ public class ObjectActionUtil {
 				description = serviceBuilderObjectAction.getDescription();
 				errorMessage = LocalizedMapUtil.getLanguageIdMap(
 					serviceBuilderObjectAction.getErrorMessageMap());
+				externalReferenceCode =
+					serviceBuilderObjectAction.getExternalReferenceCode();
 				id = serviceBuilderObjectAction.getObjectActionId();
 				label = LocalizedMapUtil.getLanguageIdMap(
 					serviceBuilderObjectAction.getLabelMap());
