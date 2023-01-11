@@ -168,7 +168,7 @@ public class SystemRelatedModelsTableFDSView
 					GetterUtil.getLong(
 						modelAttributes.get(
 							objectDefinition.getPKObjectFieldDBColumnName())),
-					value.toString(), true);
+					String.valueOf(value), true);
 			});
 	}
 
