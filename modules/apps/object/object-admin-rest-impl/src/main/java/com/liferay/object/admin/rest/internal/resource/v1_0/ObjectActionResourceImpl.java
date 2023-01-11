@@ -150,8 +150,8 @@ public class ObjectActionResourceImpl
 
 		return _toObjectAction(
 			_objectActionService.addObjectAction(
-				objectDefinitionId, objectAction.getActive(),
-				objectAction.getConditionExpression(),
+				objectAction.getExternalReferenceCode(), objectDefinitionId,
+				objectAction.getActive(), objectAction.getConditionExpression(),
 				objectAction.getDescription(),
 				LocalizedMapUtil.getLocalizedMap(
 					objectAction.getErrorMessage()),
@@ -170,8 +170,8 @@ public class ObjectActionResourceImpl
 
 		return _toObjectAction(
 			_objectActionService.updateObjectAction(
-				objectActionId, objectAction.getActive(),
-				objectAction.getConditionExpression(),
+				objectAction.getExternalReferenceCode(), objectActionId,
+				objectAction.getActive(), objectAction.getConditionExpression(),
 				objectAction.getDescription(),
 				LocalizedMapUtil.getLocalizedMap(
 					objectAction.getErrorMessage()),
