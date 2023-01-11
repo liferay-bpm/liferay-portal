@@ -21,7 +21,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Locale;
 
@@ -43,7 +44,11 @@ public class SiteObjectScopeProviderImpl implements ObjectScopeProvider {
 	public long getGroupId(HttpServletRequest httpServletRequest)
 		throws PortalException {
 
-		return _portal.getScopeGroupId(httpServletRequest);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		return themeDisplay.getScopeGroupId();
 	}
 
 	@Override
@@ -82,8 +87,5 @@ public class SiteObjectScopeProviderImpl implements ObjectScopeProvider {
 
 	@Reference
 	private Language _language;
-
-	@Reference
-	private Portal _portal;
 
 }
