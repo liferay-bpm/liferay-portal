@@ -38,7 +38,6 @@ import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectFieldValidationConstants;
 import com.liferay.object.constants.ObjectFilterConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
-import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectEntryValuesException;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
@@ -3346,19 +3345,8 @@ public class ObjectEntryLocalServiceImpl
 			Map<String, Serializable> values)
 		throws PortalException {
 
-		ObjectField objectField = null;
-
-		try {
-			objectField = _objectFieldLocalService.getObjectField(
-				objectDefinitionId, entry.getKey());
-		}
-		catch (NoSuchObjectFieldException noSuchObjectFieldException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchObjectFieldException);
-			}
-
-			return;
-		}
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			objectDefinitionId, entry.getKey());
 
 		if (Validator.isNull(values.get(objectField.getName())) &&
 			objectField.isRequired()) {

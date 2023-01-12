@@ -1285,6 +1285,12 @@ public class DefaultObjectEntryManagerImpl
 
 		Map<String, Serializable> values = new HashMap<>();
 
+		Map<String, Object> properties = objectEntry.getProperties();
+
+		for (Map.Entry<String, Object> entry : properties.entrySet()) {
+			values.put(entry.getKey(), (Serializable)entry.getValue());
+		}
+
 		for (ObjectField objectField :
 				_objectFieldLocalService.getObjectFields(
 					objectDefinition.getObjectDefinitionId())) {
