@@ -17,6 +17,7 @@ package com.liferay.object.rest.internal.resource.v1_0;
 import com.liferay.object.action.engine.ObjectActionEngine;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.internal.odata.entity.v1_0.ObjectEntryEntityModel;
@@ -34,6 +35,7 @@ import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.sql.dsl.expression.Predicate;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -42,11 +44,13 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -54,8 +58,13 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 import java.io.Serializable;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.core.Context;
@@ -287,9 +296,13 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
+		DTOConverterContext dtoConverterContext = _getDTOConverterContext(null);
+
+		_validateObjectProperties(
+			objectEntry, _objectDefinition, dtoConverterContext.getLocale());
+
 		return objectEntryManager.addObjectEntry(
-			_getDTOConverterContext(null), _objectDefinition, objectEntry,
-			null);
+			dtoConverterContext, _objectDefinition, objectEntry, null);
 	}
 
 	@Override
@@ -615,6 +628,34 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		}
 
 		throw new NotFoundException("Missing parameter \"objectDefinitionId\"");
+	}
+
+	private void _validateObjectProperties(
+		ObjectEntry objectEntry, ObjectDefinition objectDefinition,
+		Locale locale) {
+
+		Stream<String> stream = objectEntry.getProperties(
+		).keySet(
+		).stream();
+
+		List<String> propertyNames = stream.collect(Collectors.toList());
+
+		for (ObjectField objectField :
+				_objectFieldLocalService.getObjectFields(
+					objectDefinition.getObjectDefinitionId())) {
+
+			propertyNames.remove(objectField.getName());
+		}
+
+		if (!propertyNames.isEmpty()) {
+			throw new BadRequestException(
+				String.format(
+					"Object %s does not have the following field(s): %s",
+					objectDefinition.getLabel(locale),
+					ListUtil.toString(
+						propertyNames, (String)null,
+						StringPool.COMMA_AND_SPACE)));
+		}
 	}
 
 	private final FilterPredicateFactory _filterPredicateFactory;
