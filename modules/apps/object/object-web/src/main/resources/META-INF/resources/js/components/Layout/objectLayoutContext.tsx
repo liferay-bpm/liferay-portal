@@ -62,7 +62,8 @@ type TAction =
 			type: TYPES.ADD_OBJECT_LAYOUT_BOX;
 	  }
 	| {
-			payload: {objectFields: TObjectField[]};
+			payload: {
+				objectFields: TObjectField[]};
 			type: TYPES.ADD_OBJECT_FIELDS;
 	  }
 	| {
@@ -244,7 +245,7 @@ const layoutReducer = (state: TState, action: TAction) => {
 			return newState;
 		}
 		case TYPES.ADD_OBJECT_FIELDS: {
-			const {objectFields} = action.payload;
+			const { objectFields} = action.payload;
 
 			return {
 				...state,

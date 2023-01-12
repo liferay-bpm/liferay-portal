@@ -253,6 +253,7 @@ export function ModalAddObjectLayoutTab({
 
 					{selectedType === TYPES.RELATIONSHIPS && (
 						<AutoComplete<TObjectRelationship>
+							creationLanguageId={defaultLanguageId}
 							contentRight={
 								<ClayLabel
 									className="label-inside-custom-select"

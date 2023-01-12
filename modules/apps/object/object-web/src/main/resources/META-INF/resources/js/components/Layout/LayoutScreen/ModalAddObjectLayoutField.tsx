@@ -93,7 +93,7 @@ export default function ModalAddObjectLayoutField({
 	onClose,
 	tabIndex,
 }: IProps) {
-	const [{objectFields}, dispatch] = useLayoutContext();
+	const [{ objectFields}, dispatch] = useLayoutContext();
 	const [query, setQuery] = useState<string>('');
 	const [selectedObjectField, setSelectedObjectField] = useState<
 		TObjectField
@@ -158,6 +158,7 @@ export default function ModalAddObjectLayoutField({
 
 				<ClayModal.Body>
 					<AutoComplete<TObjectField>
+						creationLanguageId={selectedObjectField?.indexedLanguageId as Locale}
 						contentRight={
 							<>
 								<ClayLabel

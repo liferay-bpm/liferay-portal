@@ -449,6 +449,7 @@ export function ModalAddFilter({
 			<ClayModal.Body>
 				{!editingFilter && (
 					<AutoComplete<ObjectField>
+						creationLanguageId={creationLanguageId as Locale}
 						emptyStateMessage={Liferay.Language.get(
 							'there-are-no-columns-available'
 						)}
@@ -482,7 +483,7 @@ export function ModalAddFilter({
 						query={query}
 						required
 						value={getLocalizableLabel(
-							creationLanguageId!,
+							creationLanguageId as Locale,
 							selectedFilterBy?.label
 						)}
 					>

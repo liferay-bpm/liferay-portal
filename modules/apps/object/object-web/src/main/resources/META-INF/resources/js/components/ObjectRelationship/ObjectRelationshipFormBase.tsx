@@ -116,6 +116,7 @@ export function ObjectRelationshipFormBase({
 		ObjectDefinition[]
 	>([]);
 	const [query, setQuery] = useState<string>('');
+	const [creationLanguageId, setCreationLanguageId] = useState<Locale>();
 
 	const [types, selectedType] = useMemo(() => {
 		const types = [ONE_TO_MANY, MANY_TO_MANY];
@@ -143,6 +144,8 @@ export function ObjectRelationshipFormBase({
 						storageType === 'default') &&
 					!parameterRequired
 			);
+
+			setCreationLanguageId(currentObjectDefinition.defaultLanguageId);
 
 			setObjectDefinitions(objectDefinitions);
 		};
@@ -195,6 +198,7 @@ export function ObjectRelationshipFormBase({
 			/>
 
 			<AutoComplete<ObjectDefinition>
+				creationLanguageId={creationLanguageId as Locale}
 				disabled={readonly}
 				emptyStateMessage={Liferay.Language.get(
 					'no-objects-were-found'
