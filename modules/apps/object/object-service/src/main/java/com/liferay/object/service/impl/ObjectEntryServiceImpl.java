@@ -23,6 +23,7 @@ import com.liferay.object.configuration.ObjectConfiguration;
 import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectEntryCountException;
+import com.liferay.object.internal.util.ObjectEntryThreadLocal;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
@@ -93,9 +94,11 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 			Map<String, Serializable> values, ServiceContext serviceContext)
 		throws PortalException {
 
-		_checkPortletResourcePermission(
-			groupId, objectDefinitionId, ObjectActionKeys.ADD_OBJECT_ENTRY,
-			values);
+		if (!ObjectEntryThreadLocal.isSkipObjectEntryResourcePermission()) {
+			_checkPortletResourcePermission(
+				groupId, objectDefinitionId, ObjectActionKeys.ADD_OBJECT_ENTRY,
+				values);
+		}
 
 		_validateSubmissionLimit(objectDefinitionId, getUser());
 
@@ -195,7 +198,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 				start, end);
 
 		for (ObjectEntry objectEntry : objectEntries) {
-			checkModelResourcePermission(
+			objectEntryService.checkModelResourcePermission(
 				objectEntry.getObjectDefinitionId(),
 				objectEntry.getObjectEntryId(), ActionKeys.VIEW);
 		}
@@ -262,7 +265,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 				groupId, objectRelationshipId, primaryKey, related, start, end);
 
 		for (ObjectEntry objectEntry : objectEntries) {
-			checkModelResourcePermission(
+			objectEntryService.checkModelResourcePermission(
 				objectEntry.getObjectDefinitionId(),
 				objectEntry.getObjectEntryId(), ActionKeys.VIEW);
 		}
@@ -357,9 +360,11 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 		ObjectEntry objectEntry = objectEntryLocalService.getObjectEntry(
 			objectEntryId);
 
-		checkModelResourcePermission(
-			objectEntry.getObjectDefinitionId(), objectEntry.getObjectEntryId(),
-			ActionKeys.UPDATE);
+		if (!ObjectEntryThreadLocal.isSkipObjectEntryResourcePermission()) {
+			checkModelResourcePermission(
+				objectEntry.getObjectDefinitionId(),
+				objectEntry.getObjectEntryId(), ActionKeys.UPDATE);
+		}
 
 		return objectEntryLocalService.updateObjectEntry(
 			getUserId(), objectEntryId, values, serviceContext);

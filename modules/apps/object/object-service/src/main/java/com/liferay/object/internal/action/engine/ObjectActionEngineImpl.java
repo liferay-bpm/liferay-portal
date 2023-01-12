@@ -23,6 +23,7 @@ import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
 import com.liferay.object.constants.ObjectActionConstants;
 import com.liferay.object.internal.action.util.ObjectActionThreadLocal;
 import com.liferay.object.internal.action.util.ObjectEntryVariablesUtil;
+import com.liferay.object.internal.util.ObjectEntryThreadLocal;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectActionLocalService;
@@ -105,6 +106,7 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 			PermissionThreadLocal.getPermissionChecker();
 
 		try {
+			ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(true);
 			PrincipalThreadLocal.setName(userId);
 			PermissionThreadLocal.setPermissionChecker(
 				_permissionCheckerFactory.create(user));
@@ -132,6 +134,7 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 			}
 		}
 		finally {
+			ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(false);
 			PrincipalThreadLocal.setName(name);
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
