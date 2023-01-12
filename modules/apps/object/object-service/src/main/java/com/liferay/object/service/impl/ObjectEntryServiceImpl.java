@@ -195,7 +195,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 				start, end);
 
 		for (ObjectEntry objectEntry : objectEntries) {
-			checkModelResourcePermission(
+			objectEntryService.checkModelResourcePermission(
 				objectEntry.getObjectDefinitionId(),
 				objectEntry.getObjectEntryId(), ActionKeys.VIEW);
 		}
@@ -262,7 +262,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 				groupId, objectRelationshipId, primaryKey, related, start, end);
 
 		for (ObjectEntry objectEntry : objectEntries) {
-			checkModelResourcePermission(
+			objectEntryService.checkModelResourcePermission(
 				objectEntry.getObjectDefinitionId(),
 				objectEntry.getObjectEntryId(), ActionKeys.VIEW);
 		}
