@@ -197,7 +197,7 @@ export default function ObjectRelationship({
 						state.selected = selected;
 					}
 					else {
-						onChange({target: {value: null}});
+						onChange({target: {value: ''}});
 					}
 				}
 				setState(({active, searchTerm}) => ({
@@ -303,7 +303,7 @@ export default function ObjectRelationship({
 							target: {
 								value: selected
 									? String(selected[valueKey])
-									: null,
+									: '',
 							},
 						});
 					}}
