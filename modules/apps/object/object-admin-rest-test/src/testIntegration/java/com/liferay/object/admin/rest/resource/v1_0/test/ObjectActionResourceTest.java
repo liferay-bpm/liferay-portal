@@ -78,6 +78,20 @@ public class ObjectActionResourceTest extends BaseObjectActionResourceTestCase {
 	@Ignore
 	@Override
 	@Test
+	public void testGraphQLGetObjectActionByExternalReferenceCode()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGraphQLGetObjectActionByExternalReferenceCodeNotFound()
+		throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
 	public void testGraphQLGetObjectActionNotFound() {
 	}
 
