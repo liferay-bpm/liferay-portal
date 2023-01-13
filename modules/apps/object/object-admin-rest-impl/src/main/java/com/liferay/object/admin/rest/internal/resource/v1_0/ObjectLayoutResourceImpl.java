@@ -23,9 +23,11 @@ import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectLayoutUtil;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectLayoutResource;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectLayoutService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.persistence.ObjectLayoutBoxPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutColumnPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutRowPersistence;
@@ -223,7 +225,7 @@ public class ObjectLayoutResourceImpl
 					serviceBuilderObjectLayout.getObjectDefinitionId())
 			).build(),
 			_objectDefinitionLocalService, _objectFieldLocalService,
-			serviceBuilderObjectLayout);
+			_objectRelationshipLocalService, serviceBuilderObjectLayout);
 	}
 
 	private com.liferay.object.model.ObjectLayoutBox _toObjectLayoutBox(
@@ -288,7 +290,8 @@ public class ObjectLayoutResourceImpl
 	}
 
 	private com.liferay.object.model.ObjectLayoutTab _toObjectLayoutTab(
-		long objectDefinitionId, ObjectLayoutTab objectLayoutTab) {
+			long objectDefinitionId, ObjectLayoutTab objectLayoutTab)
+		throws Exception {
 
 		com.liferay.object.model.ObjectLayoutTab serviceBuilderObjectLayoutTab =
 			_objectLayoutTabPersistence.create(0L);
@@ -300,8 +303,25 @@ public class ObjectLayoutResourceImpl
 				objectLayoutTab.getObjectLayoutBoxes(),
 				objectLayoutBox -> _toObjectLayoutBox(
 					objectDefinitionId, objectLayoutBox)));
-		serviceBuilderObjectLayoutTab.setObjectRelationshipId(
-			GetterUtil.getLong(objectLayoutTab.getObjectRelationshipId()));
+
+		if (Validator.isNotNull(objectLayoutTab.getObjectRelationshipName())) {
+			ObjectRelationship objectRelationship =
+				_objectRelationshipLocalService.
+					getObjectRelationshipByObjectDefinitionId(
+						objectDefinitionId,
+						objectLayoutTab.getObjectRelationshipName());
+
+			serviceBuilderObjectLayoutTab.setObjectRelationshipId(
+				GetterUtil.getLong(
+					objectRelationship.getObjectRelationshipId()));
+		}
+		else if (Validator.isNotNull(
+					objectLayoutTab.getObjectRelationshipId())) {
+
+			serviceBuilderObjectLayoutTab.setObjectRelationshipId(
+				GetterUtil.getLong(objectLayoutTab.getObjectRelationshipId()));
+		}
+
 		serviceBuilderObjectLayoutTab.setPriority(
 			objectLayoutTab.getPriority());
 
@@ -328,5 +348,8 @@ public class ObjectLayoutResourceImpl
 
 	@Reference
 	private ObjectLayoutTabPersistence _objectLayoutTabPersistence;
+
+	@Reference
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
 }
