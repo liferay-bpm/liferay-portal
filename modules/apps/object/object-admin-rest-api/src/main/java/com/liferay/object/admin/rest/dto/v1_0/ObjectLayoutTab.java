@@ -172,6 +172,35 @@ public class ObjectLayoutTab implements Serializable {
 	protected Long objectRelationshipId;
 
 	@Schema
+	public String getObjectRelationshipName() {
+		return objectRelationshipName;
+	}
+
+	public void setObjectRelationshipName(String objectRelationshipName) {
+		this.objectRelationshipName = objectRelationshipName;
+	}
+
+	@JsonIgnore
+	public void setObjectRelationshipName(
+		UnsafeSupplier<String, Exception>
+			objectRelationshipNameUnsafeSupplier) {
+
+		try {
+			objectRelationshipName = objectRelationshipNameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String objectRelationshipName;
+
+	@Schema
 	public Integer getPriority() {
 		return priority;
 	}
@@ -274,6 +303,20 @@ public class ObjectLayoutTab implements Serializable {
 			sb.append("\"objectRelationshipId\": ");
 
 			sb.append(objectRelationshipId);
+		}
+
+		if (objectRelationshipName != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"objectRelationshipName\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(objectRelationshipName));
+
+			sb.append("\"");
 		}
 
 		if (priority != null) {

@@ -118,6 +118,28 @@ public class ObjectLayoutTab implements Cloneable, Serializable {
 
 	protected Long objectRelationshipId;
 
+	public String getObjectRelationshipName() {
+		return objectRelationshipName;
+	}
+
+	public void setObjectRelationshipName(String objectRelationshipName) {
+		this.objectRelationshipName = objectRelationshipName;
+	}
+
+	public void setObjectRelationshipName(
+		UnsafeSupplier<String, Exception>
+			objectRelationshipNameUnsafeSupplier) {
+
+		try {
+			objectRelationshipName = objectRelationshipNameUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String objectRelationshipName;
+
 	public Integer getPriority() {
 		return priority;
 	}
