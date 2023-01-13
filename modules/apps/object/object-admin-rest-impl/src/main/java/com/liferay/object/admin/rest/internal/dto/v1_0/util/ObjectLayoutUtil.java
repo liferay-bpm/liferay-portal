@@ -21,11 +21,14 @@ import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutRow;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutTab;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Map;
 
@@ -38,6 +41,7 @@ public class ObjectLayoutUtil {
 			Map<String, Map<String, String>> actions,
 			ObjectDefinitionLocalService objectDefinitionLocalService,
 			ObjectFieldLocalService objectFieldLocalService,
+			ObjectRelationshipLocalService objectRelationshipLocalService,
 			com.liferay.object.model.ObjectLayout serviceBuilderObjectLayout)
 		throws PortalException {
 
@@ -65,7 +69,8 @@ public class ObjectLayoutUtil {
 				objectLayoutTabs = TransformUtil.transformToArray(
 					serviceBuilderObjectLayout.getObjectLayoutTabs(),
 					objectLayoutTab -> toObjectLayoutTab(
-						objectFieldLocalService, objectLayoutTab),
+						objectFieldLocalService, objectRelationshipLocalService,
+						objectLayoutTab),
 					ObjectLayoutTab.class);
 			}
 		};
@@ -76,8 +81,10 @@ public class ObjectLayoutUtil {
 	}
 
 	public static ObjectLayoutTab toObjectLayoutTab(
-		ObjectFieldLocalService objectFieldLocalService,
-		com.liferay.object.model.ObjectLayoutTab objectLayoutTab) {
+			ObjectFieldLocalService objectFieldLocalService,
+			ObjectRelationshipLocalService objectRelationshipLocalService,
+			com.liferay.object.model.ObjectLayoutTab objectLayoutTab)
+		throws PortalException {
 
 		if (objectLayoutTab == null) {
 			return null;
@@ -93,8 +100,18 @@ public class ObjectLayoutUtil {
 					objectLayoutBox -> _toObjectLayoutBox(
 						objectFieldLocalService, objectLayoutBox),
 					ObjectLayoutBox.class);
+
 				objectRelationshipId =
 					objectLayoutTab.getObjectRelationshipId();
+
+				if (Validator.isNotNull(objectRelationshipId)) {
+					ObjectRelationship objectRelationship =
+						objectRelationshipLocalService.getObjectRelationship(
+							objectRelationshipId);
+
+					objectRelationshipName = objectRelationship.getName();
+				}
+
 				priority = objectLayoutTab.getPriority();
 			}
 		};

@@ -513,20 +513,6 @@ public class ObjectDefinitionResourceImpl
 			}
 		}
 
-		if (objectLayouts != null) {
-			ObjectLayoutResource.Builder builder =
-				_objectLayoutResourceFactory.create();
-
-			ObjectLayoutResource objectLayoutResource = builder.user(
-				contextUser
-			).build();
-
-			for (ObjectLayout objectLayout : objectLayouts) {
-				objectLayoutResource.postObjectDefinitionObjectLayout(
-					objectDefinitionId, objectLayout);
-			}
-		}
-
 		if (objectRelationships != null) {
 			ObjectRelationshipResource.Builder builder =
 				_objectRelationshipResourceFactory.create();
@@ -540,6 +526,20 @@ public class ObjectDefinitionResourceImpl
 				objectRelationshipResource.
 					postObjectDefinitionObjectRelationship(
 						objectDefinitionId, objectRelationship);
+			}
+		}
+
+		if (objectLayouts != null) {
+			ObjectLayoutResource.Builder builder =
+				_objectLayoutResourceFactory.create();
+
+			ObjectLayoutResource objectLayoutResource = builder.user(
+				contextUser
+			).build();
+
+			for (ObjectLayout objectLayout : objectLayouts) {
+				objectLayoutResource.postObjectDefinitionObjectLayout(
+					objectDefinitionId, objectLayout);
 			}
 		}
 
@@ -681,7 +681,8 @@ public class ObjectDefinitionResourceImpl
 						objectDefinition.getObjectDefinitionId()),
 					objectLayout -> ObjectLayoutUtil.toObjectLayout(
 						null, _objectDefinitionLocalService,
-						_objectFieldLocalService, objectLayout),
+						_objectFieldLocalService,
+						_objectRelationshipLocalService, objectLayout),
 					ObjectLayout.class);
 				objectRelationships = transformToArray(
 					_objectRelationshipLocalService.getObjectRelationships(
