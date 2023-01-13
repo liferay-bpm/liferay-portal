@@ -110,6 +110,20 @@ public class ObjectLayoutTabSerDes {
 			sb.append(objectLayoutTab.getObjectRelationshipId());
 		}
 
+		if (objectLayoutTab.getObjectRelationshipName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"objectRelationshipName\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(objectLayoutTab.getObjectRelationshipName()));
+
+			sb.append("\"");
+		}
+
 		if (objectLayoutTab.getPriority() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -169,6 +183,15 @@ public class ObjectLayoutTabSerDes {
 			map.put(
 				"objectRelationshipId",
 				String.valueOf(objectLayoutTab.getObjectRelationshipId()));
+		}
+
+		if (objectLayoutTab.getObjectRelationshipName() == null) {
+			map.put("objectRelationshipName", null);
+		}
+		else {
+			map.put(
+				"objectRelationshipName",
+				String.valueOf(objectLayoutTab.getObjectRelationshipName()));
 		}
 
 		if (objectLayoutTab.getPriority() == null) {
@@ -231,6 +254,14 @@ public class ObjectLayoutTabSerDes {
 				if (jsonParserFieldValue != null) {
 					objectLayoutTab.setObjectRelationshipId(
 						Long.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "objectRelationshipName")) {
+
+				if (jsonParserFieldValue != null) {
+					objectLayoutTab.setObjectRelationshipName(
+						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "priority")) {
