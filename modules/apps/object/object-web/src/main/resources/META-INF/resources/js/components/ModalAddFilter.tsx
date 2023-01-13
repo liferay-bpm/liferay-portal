@@ -443,6 +443,7 @@ export function ModalAddFilter({
 			<ClayModal.Body>
 				{!editingFilter && (
 					<AutoComplete<ObjectField>
+						creationLanguageId={creationLanguageId as Locale}
 						emptyStateMessage={Liferay.Language.get(
 							'there-are-no-columns-available'
 						)}
@@ -475,7 +476,10 @@ export function ModalAddFilter({
 						}}
 						query={query}
 						required
-						value={selectedFilterBy?.label[defaultLanguageId]}
+						value={getLocalizableLabel(
+							creationLanguageId as Locale,
+							selectedFilterBy?.label
+						)}
 					>
 						{({label}) => (
 							<div className="d-flex justify-content-between">

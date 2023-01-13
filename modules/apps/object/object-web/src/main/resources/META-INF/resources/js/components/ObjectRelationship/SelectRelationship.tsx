@@ -35,6 +35,7 @@ export default function SelectRelationship({
 	value,
 	...otherProps
 }: IProps) {
+	const [creationLanguageId, setCreationLanguageId] = useState<Locale>();
 	const [fields, setFields] = useState<ObjectField[]>([]);
 	const [query, setQuery] = useState<string>('');
 	const options = useMemo(
@@ -67,9 +68,15 @@ export default function SelectRelationship({
 					objectDefinitionExternalReferenceCode
 				);
 
+				const objectDefinition = await API.getObjectDefinitionByExternalReferenceCode(
+					objectDefinitionExternalReferenceCode
+				);
+
 				const options = items.filter(
 					({businessType}) => businessType === 'Relationship'
 				);
+
+				setCreationLanguageId(objectDefinition.defaultLanguageId);
 
 				setFields(options);
 			};
@@ -83,6 +90,7 @@ export default function SelectRelationship({
 
 	return (
 		<AutoComplete<LabelNameObject>
+			creationLanguageId={creationLanguageId as Locale}
 			emptyStateMessage={Liferay.Language.get('no-parameters-were-found')}
 			error={error}
 			items={filteredOptions ?? []}

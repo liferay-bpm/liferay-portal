@@ -328,6 +328,7 @@ export function AggregationFormBase({
 	return (
 		<>
 			<AutoComplete<TObjectRelationship>
+				creationLanguageId={creationLanguageId}
 				emptyStateMessage={Liferay.Language.get(
 					'no-relationships-were-found'
 				)}
@@ -363,6 +364,7 @@ export function AggregationFormBase({
 
 			{selectedAggregationFunction?.value !== 'COUNT' && (
 				<AutoComplete<ObjectField>
+					creationLanguageId={creationLanguageId as Locale}
 					emptyStateMessage={Liferay.Language.get(
 						'no-fields-were-found'
 					)}
@@ -379,7 +381,13 @@ export function AggregationFormBase({
 				>
 					{({label}) => (
 						<div className="d-flex justify-content-between">
-							<div>{label[defaultLanguageId]}</div>
+							<div>
+								{getLocalizableLabel(
+									creationLanguageId as Locale,
+									label,
+									name
+								)}
+							</div>
 						</div>
 					)}
 				</AutoComplete>
