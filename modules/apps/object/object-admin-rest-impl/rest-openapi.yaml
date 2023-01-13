@@ -313,6 +313,8 @@ components:
                 objectRelationshipId:
                     format: int64
                     type: integer
+                objectRelationshipName:
+                    type: string
                 priority:
                     format: int32
                     type: integer
