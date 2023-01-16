@@ -100,6 +100,12 @@ public interface ObjectEntryResource {
 			ObjectEntry objectEntry)
 		throws Exception;
 
+	public void
+			putScopeScopeKeyByExternalReferenceCodeObjectActionObjectActionName(
+				String scopeKey, String externalReferenceCode,
+				String objectActionName)
+		throws Exception;
+
 	public void deleteObjectEntry(Long objectEntryId) throws Exception;
 
 	public Response deleteObjectEntryBatch(String callbackURL, Object object)
