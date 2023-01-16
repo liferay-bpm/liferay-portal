@@ -225,11 +225,11 @@ public class ObjectValidationRuleLocalServiceImpl
 				variables, objectValidationRule.getScript());
 
 			if (GetterUtil.getBoolean(results.get("invalidScript"))) {
-				throw new ObjectValidationRuleEngineException();
+				throw new ObjectValidationRuleEngineException.InvalidScript();
 			}
 
 			if (GetterUtil.getBoolean(results.get("invalidFields"))) {
-				throw new ObjectValidationRuleEngineException(
+				throw new ObjectValidationRuleEngineException.InvalidFields(
 					objectValidationRule.getErrorLabel(
 						LocaleUtil.getMostRelevantLocale()));
 			}
@@ -238,7 +238,7 @@ public class ObjectValidationRuleLocalServiceImpl
 
 	private void _validateEngine(String engine) throws PortalException {
 		if (Validator.isNull(engine)) {
-			throw new ObjectValidationRuleEngineException("Engine is null");
+			throw new ObjectValidationRuleEngineException.NullEngine();
 		}
 
 		ObjectValidationRuleEngine objectValidationRuleEngine =
@@ -246,8 +246,8 @@ public class ObjectValidationRuleLocalServiceImpl
 				engine);
 
 		if (objectValidationRuleEngine == null) {
-			throw new ObjectValidationRuleEngineException(
-				"Engine \"" + engine + "\" does not exist");
+			throw new ObjectValidationRuleEngineException.InvalidEngine(engine
+				);
 		}
 	}
 
