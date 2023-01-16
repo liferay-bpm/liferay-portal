@@ -21,21 +21,59 @@ import com.liferay.portal.kernel.exception.PortalException;
  */
 public class ObjectValidationRuleEngineException extends PortalException {
 
-	public ObjectValidationRuleEngineException() {
+	public String getMessageKey() {
+		return _messageKey;
 	}
 
-	public ObjectValidationRuleEngineException(String msg) {
+	public static class InvalidEngine
+		extends ObjectValidationRuleEngineException {
+
+		public InvalidEngine(String engine) {
+			super("Engine \"" + engine + "\" does not exist");
+		}
+
+	}
+
+	public static class InvalidFields
+		extends ObjectValidationRuleEngineException {
+
+		public InvalidFields(String msg) {
+			super(msg);
+		}
+
+	}
+
+	public static class InvalidScript
+		extends ObjectValidationRuleEngineException {
+
+		public InvalidScript() {
+			super(
+				"There was an error validating your data.",
+				"there-was-an-error-validating-your-data");
+		}
+
+	}
+
+	public static class NullEngine extends ObjectValidationRuleEngineException {
+
+		public NullEngine() {
+			super("Engine is null");
+		}
+
+	}
+
+	private ObjectValidationRuleEngineException(String msg) {
 		super(msg);
 	}
 
-	public ObjectValidationRuleEngineException(
-		String msg, Throwable throwable) {
+	private ObjectValidationRuleEngineException(
+		String message, String messageKey) {
 
-		super(msg, throwable);
+		super(message);
+
+		_messageKey = messageKey;
 	}
 
-	public ObjectValidationRuleEngineException(Throwable throwable) {
-		super(throwable);
-	}
+	private String _messageKey;
 
 }
