@@ -402,6 +402,19 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	}
 
 	@Override
+	public void
+			putScopeScopeKeyByExternalReferenceCodeObjectActionObjectActionName(
+				String scopeKey, String externalReferenceCode,
+				String objectActionName)
+		throws Exception {
+
+		_executeObjectAction(
+			objectActionName,
+			getScopeScopeKeyByExternalReferenceCode(
+				scopeKey, externalReferenceCode));
+	}
+
+	@Override
 	public Page<ObjectEntry> read(
 			Filter filter, Pagination pagination, Sort[] sorts,
 			Map<String, Serializable> parameters, String search)
