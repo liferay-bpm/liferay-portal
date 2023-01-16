@@ -32,5 +32,5 @@ export declare function setFieldValues({
 	setItems,
 	setSelectedFilterType,
 	workflowStatusJSONArray,
-}: SetFieldValuesProps): void;
+}: SetFieldValuesProps): Promise<void>;
 export {};

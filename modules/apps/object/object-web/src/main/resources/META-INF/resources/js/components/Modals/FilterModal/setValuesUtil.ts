@@ -41,6 +41,9 @@ interface SetFieldValuesProps {
 	workflowStatusJSONArray: LabelValueObject[];
 }
 
+interface SetPicklistFieldValuesProps
+	extends Omit<SetFieldValuesProps, 'workflowStatusJSONArray'> {}
+
 const setEditingFilterType = (
 	currentFilters: CurrentFilter[],
 	editingObjectFieldName: string,
@@ -73,7 +76,43 @@ const setEditingFilterType = (
 	return valuesArray;
 };
 
-export function setFieldValues({
+async function setPicklistFieldValues({
+	currentFilters,
+	editingFilter,
+	editingObjectFieldName,
+	filterOperators,
+	objectField,
+	setItems,
+	setSelectedFilterType,
+}: SetPicklistFieldValuesProps) {
+	if (objectField.listTypeDefinitionId) {
+		const items = await API.getPickListItems(
+			objectField.listTypeDefinitionId
+		);
+
+		if (editingFilter) {
+			const valuesArray = setEditingFilterType(
+				currentFilters,
+				editingObjectFieldName,
+				filterOperators,
+				setSelectedFilterType
+			);
+
+			return setItems(getCheckedItems(items, 'Picklist', valuesArray));
+		}
+
+		return setItems(
+			items.map((item) => {
+				return {
+					label: item.name,
+					value: item.key,
+				};
+			})
+		);
+	}
+}
+
+export async function setFieldValues({
 	currentFilters,
 	editingFilter,
 	editingObjectFieldName,
@@ -87,36 +126,15 @@ export function setFieldValues({
 		objectField.businessType === 'MultiselectPicklist' ||
 		objectField?.businessType === 'Picklist'
 	) {
-		const makeFetch = async () => {
-			if (objectField.listTypeDefinitionId) {
-				const items = await API.getPickListItems(
-					objectField.listTypeDefinitionId
-				);
-
-				if (editingFilter) {
-					const valuesArray = setEditingFilterType(
-						currentFilters,
-						editingObjectFieldName,
-						filterOperators,
-						setSelectedFilterType
-					);
-
-					setItems(getCheckedItems(items, 'Picklist', valuesArray));
-				}
-				else {
-					setItems(
-						items.map((item) => {
-							return {
-								label: item.name,
-								value: item.key,
-							};
-						})
-					);
-				}
-			}
-		};
-
-		makeFetch();
+		await setPicklistFieldValues({
+			currentFilters,
+			editingFilter,
+			editingObjectFieldName,
+			filterOperators,
+			objectField,
+			setItems,
+			setSelectedFilterType,
+		});
 	}
 	else if (objectField.name === 'status') {
 		let newItems: IItem[] = [];
