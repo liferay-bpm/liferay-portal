@@ -16,6 +16,7 @@ package com.liferay.list.type.service;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.list.type.model.ListTypeDefinition;
+import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -90,7 +91,7 @@ public interface ListTypeDefinitionLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public ListTypeDefinition addListTypeDefinition(
 			String externalReferenceCode, long userId,
-			Map<Locale, String> nameMap)
+			List<ListTypeEntry> listTypeEntries, Map<Locale, String> nameMap)
 		throws PortalException;
 
 	/**
@@ -333,6 +334,7 @@ public interface ListTypeDefinitionLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public ListTypeDefinition updateListTypeDefinition(
 			String externalReferenceCode, long listTypeDefinitionId,
+			long userId, List<ListTypeEntry> listTypeEntries,
 			Map<Locale, String> nameMap)
 		throws PortalException;
 

@@ -100,6 +100,8 @@ public interface ListTypeEntryLocalService
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
+	public void deleteByListTypeDefinitionId(long listTypeDefinitionId);
+
 	/**
 	 * Deletes the list type entry from the database. Also notifies the appropriate model listeners.
 	 *

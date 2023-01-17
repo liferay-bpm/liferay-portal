@@ -90,6 +90,10 @@ public class ListTypeEntryLocalServiceUtil {
 		return getService().createPersistedModel(primaryKeyObj);
 	}
 
+	public static void deleteByListTypeDefinitionId(long listTypeDefinitionId) {
+		getService().deleteByListTypeDefinitionId(listTypeDefinitionId);
+	}
+
 	/**
 	 * Deletes the list type entry from the database. Also notifies the appropriate model listeners.
 	 *
