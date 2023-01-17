@@ -89,6 +89,12 @@ public class ListTypeEntryLocalServiceWrapper
 		return _listTypeEntryLocalService.createPersistedModel(primaryKeyObj);
 	}
 
+	@Override
+	public void deleteByListTypeDefinitionId(long listTypeDefinitionId) {
+		_listTypeEntryLocalService.deleteByListTypeDefinitionId(
+			listTypeDefinitionId);
+	}
+
 	/**
 	 * Deletes the list type entry from the database. Also notifies the appropriate model listeners.
 	 *
