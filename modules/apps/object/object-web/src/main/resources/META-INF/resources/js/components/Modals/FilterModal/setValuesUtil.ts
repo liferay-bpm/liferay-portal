@@ -44,6 +44,9 @@ interface SetFieldValuesProps {
 interface SetPicklistFieldValuesProps
 	extends Omit<SetFieldValuesProps, 'workflowStatusJSONArray'> {}
 
+interface SetStatusFieldValuesProps
+	extends Omit<SetFieldValuesProps, 'objectField'> {}
+
 const setEditingFilterType = (
 	currentFilters: CurrentFilter[],
 	editingObjectFieldName: string,
@@ -112,6 +115,44 @@ async function setPicklistFieldValues({
 	}
 }
 
+function setStatusFieldValues({
+	currentFilters,
+	editingFilter,
+	editingObjectFieldName,
+	filterOperators,
+	setItems,
+	setSelectedFilterType,
+	workflowStatusJSONArray,
+}: SetStatusFieldValuesProps) {
+	if (editingFilter) {
+		const valuesArray = setEditingFilterType(
+			currentFilters,
+			editingObjectFieldName,
+			filterOperators,
+			setSelectedFilterType
+		);
+
+		const chekedItems = getCheckedItems(
+			workflowStatusJSONArray,
+			'status',
+			valuesArray
+		);
+
+		return setItems(chekedItems);
+	}
+
+	const workflowStatusItems = workflowStatusJSONArray.map(
+		(workflowStatus) => {
+			return {
+				label: workflowStatus.label,
+				value: workflowStatus.value,
+			};
+		}
+	);
+
+	return setItems(workflowStatusItems);
+}
+
 export async function setFieldValues({
 	currentFilters,
 	editingFilter,
@@ -137,32 +178,15 @@ export async function setFieldValues({
 		});
 	}
 	else if (objectField.name === 'status') {
-		let newItems: IItem[] = [];
-
-		if (editingFilter) {
-			const valuesArray = setEditingFilterType(
-				currentFilters,
-				editingObjectFieldName,
-				filterOperators,
-				setSelectedFilterType
-			);
-
-			newItems = getCheckedItems(
-				workflowStatusJSONArray,
-				'status',
-				valuesArray
-			);
-		}
-		else {
-			newItems = workflowStatusJSONArray.map((workflowStatus) => {
-				return {
-					label: workflowStatus.label,
-					value: workflowStatus.value,
-				};
-			});
-		}
-
-		setItems(newItems);
+		setStatusFieldValues({
+			currentFilters,
+			editingFilter,
+			editingObjectFieldName,
+			filterOperators,
+			setItems,
+			setSelectedFilterType,
+			workflowStatusJSONArray,
+		});
 	}
 	else if (objectField.businessType === 'Relationship') {
 		const makeFetch = async () => {
