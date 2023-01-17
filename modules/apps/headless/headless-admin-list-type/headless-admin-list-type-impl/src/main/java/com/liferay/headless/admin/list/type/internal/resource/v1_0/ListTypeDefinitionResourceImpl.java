@@ -169,13 +169,17 @@ public class ListTypeDefinitionResourceImpl
 		com.liferay.list.type.model.ListTypeDefinition
 			serviceBuilderListTypeDefinition =
 				_listTypeDefinitionService.
-					getListTypeDefinitionByExternalReferenceCode(
+					fetchListTypeDefinitionByExternalReferenceCode(
 						listTypeDefinitionExternalReferenceCode,
 						contextCompany.getCompanyId());
 
-		return putListTypeDefinition(
-			serviceBuilderListTypeDefinition.getListTypeDefinitionId(),
-			listTypeDefinition);
+		if (serviceBuilderListTypeDefinition != null) {
+			return putListTypeDefinition(
+				serviceBuilderListTypeDefinition.getListTypeDefinitionId(),
+				listTypeDefinition);
+		}
+
+		return postListTypeDefinition(listTypeDefinition);
 	}
 
 	private Locale _getLocale() {
