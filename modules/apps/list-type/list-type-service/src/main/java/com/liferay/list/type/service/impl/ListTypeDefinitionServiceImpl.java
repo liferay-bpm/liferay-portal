@@ -133,8 +133,8 @@ public class ListTypeDefinitionServiceImpl
 			getPermissionChecker(), listTypeDefinitionId, ActionKeys.UPDATE);
 
 		return listTypeDefinitionLocalService.updateListTypeDefinition(
-			externalReferenceCode, listTypeDefinitionId, listTypeEntries,
-			nameMap);
+			externalReferenceCode, listTypeDefinitionId, getUserId(),
+			listTypeEntries, nameMap);
 	}
 
 	@Reference(
