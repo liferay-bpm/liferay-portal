@@ -63,6 +63,15 @@ public class ListTypeDefinitionServiceUtil {
 		return getService().deleteListTypeDefinition(listTypeDefinitionId);
 	}
 
+	public static ListTypeDefinition
+			fetchListTypeDefinitionByExternalReferenceCode(
+				String externalReferenceCode, long companyId)
+		throws PortalException {
+
+		return getService().fetchListTypeDefinitionByExternalReferenceCode(
+			externalReferenceCode, companyId);
+	}
+
 	public static ListTypeDefinition getListTypeDefinition(
 			long listTypeDefinitionId)
 		throws PortalException {
