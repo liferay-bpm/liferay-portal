@@ -16,7 +16,16 @@
 
 import {Observer} from '@clayui/modal/lib/types';
 import './ModalAddFilter.scss';
-interface IProps {
+export interface OnSaveFilterProps {
+	fieldLabel?: LocalizedValue<string>;
+	filterBy?: string;
+	filterType?: string;
+	objectFieldBusinessType?: string;
+	objectFieldName: string;
+	value?: string;
+	valueList?: IItem[];
+}
+interface ModalAddFilterProps {
 	aggregationFilter?: boolean;
 	creationLanguageId?: Locale;
 	currentFilters: CurrentFilter[];
@@ -29,15 +38,15 @@ interface IProps {
 	objectFields: ObjectField[];
 	observer: Observer;
 	onClose: () => void;
-	onSave: (
-		objectFieldName: string,
-		filterBy?: string,
-		fieldLabel?: LocalizedValue<string>,
-		objectFieldBusinessType?: string,
-		filterType?: string,
-		valueList?: IItem[],
-		value?: string
-	) => void;
+	onSave: ({
+		fieldLabel,
+		filterBy,
+		filterType,
+		objectFieldBusinessType,
+		objectFieldName,
+		value,
+		valueList,
+	}: OnSaveFilterProps) => void;
 	validate: ({
 		checkedItems,
 		disableDateValues,
@@ -98,5 +107,5 @@ export declare function ModalAddFilter({
 	onSave,
 	validate,
 	workflowStatusJSONArray,
-}: IProps): JSX.Element;
+}: ModalAddFilterProps): JSX.Element;
 export {};

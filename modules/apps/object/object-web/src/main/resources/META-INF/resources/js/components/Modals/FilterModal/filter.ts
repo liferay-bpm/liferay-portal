@@ -143,3 +143,26 @@ export function getSystemFieldLabelFromEntry(
 		label: entry[titleFieldName],
 	};
 }
+
+export function getValueList(
+	businessType: string,
+	checkedItems: IItem[],
+	editingFilter: boolean,
+	items: IItem[],
+	name: string
+) {
+	if (
+		name === 'status' ||
+		businessType === 'MultiselectPicklist' ||
+		businessType === 'Picklist' ||
+		businessType === 'Relationship'
+	) {
+		return checkedItems;
+	}
+
+	if (!editingFilter && businessType === 'Date') {
+		return items;
+	}
+
+	return undefined;
+}

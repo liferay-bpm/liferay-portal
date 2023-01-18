@@ -29,7 +29,19 @@ import React, {FormEvent, useEffect, useMemo, useState} from 'react';
 import {setFieldValues} from './setValuesUtil';
 
 import './ModalAddFilter.scss';
-interface IProps {
+import {getValueList} from './filter';
+
+export interface OnSaveFilterProps {
+	fieldLabel?: LocalizedValue<string>;
+	filterBy?: string;
+	filterType?: string;
+	objectFieldBusinessType?: string;
+	objectFieldName: string;
+	value?: string;
+	valueList?: IItem[];
+}
+
+interface ModalAddFilterProps {
 	aggregationFilter?: boolean;
 	creationLanguageId?: Locale;
 	currentFilters: CurrentFilter[];
@@ -42,15 +54,15 @@ interface IProps {
 	objectFields: ObjectField[];
 	observer: Observer;
 	onClose: () => void;
-	onSave: (
-		objectFieldName: string,
-		filterBy?: string,
-		fieldLabel?: LocalizedValue<string>,
-		objectFieldBusinessType?: string,
-		filterType?: string,
-		valueList?: IItem[],
-		value?: string
-	) => void;
+	onSave: ({
+		fieldLabel,
+		filterBy,
+		filterType,
+		objectFieldBusinessType,
+		objectFieldName,
+		value,
+		valueList,
+	}: OnSaveFilterProps) => void;
 	validate: ({
 		checkedItems,
 		disableDateValues,
@@ -116,7 +128,7 @@ export function ModalAddFilter({
 	onSave,
 	validate,
 	workflowStatusJSONArray,
-}: IProps) {
+}: ModalAddFilterProps) {
 	const [items, setItems] = useState<IItem[]>([]);
 
 	const [selectedFilterBy, setSelectedFilterBy] = useState<ObjectField>();
@@ -216,40 +228,23 @@ export function ModalAddFilter({
 			return;
 		}
 
-		if (editingFilter) {
-			onSave(
-				editingObjectFieldName,
-				selectedFilterBy?.name,
-				selectedFilterBy?.label,
-				selectedFilterBy?.businessType,
-				selectedFilterType?.value,
-				selectedFilterBy?.name === 'status' ||
-					selectedFilterBy?.businessType === 'MultiselectPicklist' ||
-					selectedFilterBy?.businessType === 'Picklist' ||
-					selectedFilterBy?.businessType === 'Relationship'
-					? checkedItems
-					: undefined,
-				value ?? undefined
-			);
-		}
-		else {
-			onSave(
-				selectedFilterBy?.name!,
-				selectedFilterBy?.name,
-				selectedFilterBy?.label,
-				selectedFilterBy?.businessType,
-				selectedFilterType?.value,
-				selectedFilterBy?.name === 'status' ||
-					selectedFilterBy?.businessType === 'MultiselectPicklist' ||
-					selectedFilterBy?.businessType === 'Picklist' ||
-					selectedFilterBy?.businessType === 'Relationship'
-					? checkedItems
-					: selectedFilterBy?.businessType === 'Date'
-					? items
-					: undefined,
-				value ?? undefined
-			);
-		}
+		const {businessType, label, name} = selectedFilterBy as ObjectField;
+
+		onSave({
+			fieldLabel: label,
+			filterBy: name,
+			filterType: selectedFilterType?.value,
+			objectFieldBusinessType: businessType,
+			objectFieldName: editingFilter ? editingObjectFieldName : name,
+			value: value ?? undefined,
+			valueList: getValueList(
+				businessType,
+				checkedItems,
+				editingFilter,
+				items,
+				name
+			),
+		});
 
 		onClose();
 	};

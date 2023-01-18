@@ -32,3 +32,10 @@ export declare function getSystemFieldLabelFromEntry(
 	label: unknown;
 	value: string;
 };
+export declare function getValueList(
+	businessType: string,
+	checkedItems: IItem[],
+	editingFilter: boolean,
+	items: IItem[],
+	name: string
+): IItem[] | undefined;

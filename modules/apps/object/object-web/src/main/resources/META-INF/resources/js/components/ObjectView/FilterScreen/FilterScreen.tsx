@@ -20,6 +20,7 @@ import {
 	FilterErrors,
 	FilterValidation,
 	ModalAddFilter,
+	OnSaveFilterProps,
 } from '../../Modals/FilterModal/ModalAddFilter';
 import {TYPES, useViewContext} from '../objectViewContext';
 
@@ -58,14 +59,11 @@ export function FilterScreen() {
 		});
 	};
 
-	const saveFilterColumn = (
-		objectFieldName: string,
-		filterBy?: string,
-		fieldLabel?: LocalizedValue<string>,
-		objectFieldBusinessType?: string,
-		filterType?: string,
-		valueList?: IItem[]
-	) => {
+	const saveFilterColumn = ({
+		filterType,
+		objectFieldName,
+		valueList,
+	}: OnSaveFilterProps) => {
 		if (editingFilter) {
 			dispatch({
 				payload: {
@@ -207,8 +205,4 @@ export function FilterScreen() {
 			)}
 		</>
 	);
-}
-
-interface IItem extends LabelValueObject {
-	checked?: boolean;
 }

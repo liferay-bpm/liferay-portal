@@ -29,6 +29,7 @@ import {
 	FilterErrors,
 	FilterValidation,
 	ModalAddFilter,
+	OnSaveFilterProps,
 } from '../../../Modals/FilterModal/ModalAddFilter';
 import ObjectFieldFormBase, {
 	ObjectFieldErrors,
@@ -53,9 +54,6 @@ interface AggregationFilters {
 	valueList?: LabelValueObject[];
 }
 
-interface IItem extends LabelValueObject {
-	checked?: boolean;
-}
 interface BasicInfoProps {
 	errors: ObjectFieldErrors;
 	filterOperators: TFilterOperators;
@@ -166,15 +164,15 @@ export function BasicInfo({
 		});
 	};
 
-	const handleSaveFilterColumn = (
-		objectFieldName: string,
-		filterBy?: string,
-		fieldLabel?: LocalizedValue<string>,
-		objectFieldBusinessType?: string,
-		filterType?: string,
-		valueList?: IItem[],
-		value?: string
-	) => {
+	const handleSaveFilterColumn = ({
+		fieldLabel,
+		filterBy,
+		filterType,
+		objectFieldBusinessType,
+		objectFieldName,
+		value,
+		valueList,
+	}: OnSaveFilterProps) => {
 		const newAggregationFilters = [
 			...aggregationFilters,
 			{
