@@ -44,6 +44,8 @@ interface SetFieldValuesProps {
 interface SetPicklistFieldValuesProps
 	extends Omit<SetFieldValuesProps, 'workflowStatusJSONArray'> {}
 
+interface SetRelationshipFieldValuesProps extends SetPicklistFieldValuesProps {}
+
 interface SetStatusFieldValuesProps
 	extends Omit<SetFieldValuesProps, 'objectField'> {}
 
@@ -153,6 +155,84 @@ function setStatusFieldValues({
 	return setItems(workflowStatusItems);
 }
 
+async function setRelationshipFieldValues({
+	currentFilters,
+	editingFilter,
+	editingObjectFieldName,
+	filterOperators,
+	objectField,
+	setItems,
+	setSelectedFilterType,
+}: SetRelationshipFieldValuesProps) {
+	const {objectFieldSettings} = objectField;
+
+	const [{value}] = objectFieldSettings as NameValueObject[];
+
+	const [
+		{objectFields, restContextPath, system, titleObjectFieldName},
+	] = await API.getObjectDefinitions(`filter=name eq '${value}'`);
+
+	const titleField = objectFields.find(
+		(objectField) => objectField.name === titleObjectFieldName
+	) as ObjectField;
+
+	const relatedEntries = await API.getList<ObjectEntry>(`${restContextPath}`);
+
+	if (!relatedEntries) {
+		setItems([]);
+
+		return;
+	}
+
+	if (editingFilter) {
+		const valuesArray = setEditingFilterType(
+			currentFilters,
+			editingObjectFieldName,
+			filterOperators,
+			setSelectedFilterType
+		);
+
+		return setItems(
+			getCheckedRelationshipItems(
+				relatedEntries,
+				titleField.name,
+				titleField.system as boolean,
+				system,
+				valuesArray as string[]
+			)
+		);
+	}
+
+	const newItems = relatedEntries.map((entry) => {
+		const newItemsObject = {
+			value: system ? String(entry.id) : entry.externalReferenceCode,
+		} as LabelValueObject;
+
+		if (titleField.system) {
+			return getSystemFieldLabelFromEntry(
+				titleField.name,
+				entry,
+				newItemsObject
+			) as LabelValueObject;
+		}
+
+		let label = entry[titleField?.name] as string;
+
+		if (titleField.businessType === 'Attachment') {
+			label = (entry as {
+				[key: string]: AttachmentEntry;
+			})[titleField.name].name;
+		}
+
+		return {
+			...newItemsObject,
+			label,
+		};
+	});
+
+	return setItems(newItems);
+}
+
 export async function setFieldValues({
 	currentFilters,
 	editingFilter,
@@ -189,81 +269,14 @@ export async function setFieldValues({
 		});
 	}
 	else if (objectField.businessType === 'Relationship') {
-		const makeFetch = async () => {
-			const {objectFieldSettings} = objectField;
-
-			const [{value}] = objectFieldSettings as NameValueObject[];
-
-			const [
-				{objectFields, restContextPath, system, titleObjectFieldName},
-			] = await API.getObjectDefinitions(`filter=name eq '${value}'`);
-
-			const titleField = objectFields.find(
-				(objectField) => objectField.name === titleObjectFieldName
-			) as ObjectField;
-
-			const relatedEntries = await API.getList<ObjectEntry>(
-				`${restContextPath}`
-			);
-
-			if (!relatedEntries) {
-				setItems([]);
-
-				return;
-			}
-
-			if (editingFilter) {
-				const valuesArray = setEditingFilterType(
-					currentFilters,
-					editingObjectFieldName,
-					filterOperators,
-					setSelectedFilterType
-				);
-
-				setItems(
-					getCheckedRelationshipItems(
-						relatedEntries,
-						titleField.name,
-						titleField.system as boolean,
-						system,
-						valuesArray as string[]
-					)
-				);
-			}
-			else {
-				const newItems = relatedEntries.map((entry) => {
-					const newItemsObject = {
-						value: system
-							? String(entry.id)
-							: entry.externalReferenceCode,
-					} as LabelValueObject;
-
-					if (titleField.system) {
-						return getSystemFieldLabelFromEntry(
-							titleField.name,
-							entry,
-							newItemsObject
-						) as LabelValueObject;
-					}
-
-					let label = entry[titleField?.name] as string;
-
-					if (titleField.businessType === 'Attachment') {
-						label = (entry as {
-							[key: string]: AttachmentEntry;
-						})[titleField.name].name;
-					}
-
-					return {
-						...newItemsObject,
-						label,
-					};
-				});
-
-				setItems(newItems);
-			}
-		};
-
-		makeFetch();
+		await setRelationshipFieldValues({
+			currentFilters,
+			editingFilter,
+			editingObjectFieldName,
+			filterOperators,
+			objectField,
+			setItems,
+			setSelectedFilterType,
+		});
 	}
 }
