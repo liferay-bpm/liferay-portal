@@ -145,40 +145,40 @@ export function ModalAddFilter({
 
 	useEffect(() => {
 		if (!selectedFilterBy && !editingObjectFieldName) {
-			setItems([]);
-		}
-		else {
-			if (selectedFilterBy) {
-				setFieldValues({
-					currentFilters,
-					editingFilter,
-					editingObjectFieldName,
-					filterOperators,
-					objectField: selectedFilterBy,
-					setItems,
-					setSelectedFilterType,
-					workflowStatusJSONArray,
-				});
-			}
-			else {
-				const objectField = objectFields.find(
-					({name}) => name === editingObjectFieldName
-				);
-
-				objectField &&
-					setFieldValues({
-						currentFilters,
-						editingFilter,
-						editingObjectFieldName,
-						filterOperators,
-						objectField,
-						setItems,
-						setSelectedFilterType,
-						workflowStatusJSONArray,
-					});
-			}
+			return setItems([]);
 		}
 
+		const setFieldValuesProps = {
+			currentFilters,
+			editingFilter,
+			editingObjectFieldName,
+			filterOperators,
+			setItems,
+			setSelectedFilterType,
+			workflowStatusJSONArray,
+		};
+
+		if (selectedFilterBy) {
+			setFieldValues({
+				...setFieldValuesProps,
+				objectField: selectedFilterBy,
+			});
+
+			return;
+		}
+
+		const objectField = objectFields.find(
+			({name}) => name === editingObjectFieldName
+		);
+
+		if (objectField) {
+			setFieldValues({
+				...setFieldValuesProps,
+				objectField,
+			});
+
+			return;
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		editingFilter,
