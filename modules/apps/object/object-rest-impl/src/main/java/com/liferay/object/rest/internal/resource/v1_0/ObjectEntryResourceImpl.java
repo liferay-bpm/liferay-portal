@@ -16,6 +16,7 @@ package com.liferay.object.rest.internal.resource.v1_0;
 
 import com.liferay.object.action.engine.ObjectActionEngine;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
+import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
@@ -359,9 +360,16 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 				String objectActionName)
 		throws Exception {
 
-		_executeObjectAction(
-			objectActionName,
-			getByExternalReferenceCode(objectEntryExternalReferenceCode));
+		try {
+			ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(true);
+
+			_executeObjectAction(
+				objectActionName,
+				getByExternalReferenceCode(objectEntryExternalReferenceCode));
+		}
+		finally {
+			ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(false);
+		}
 	}
 
 	@Override
@@ -383,7 +391,15 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			Long objectEntryId, String objectActionName)
 		throws Exception {
 
-		_executeObjectAction(objectActionName, getObjectEntry(objectEntryId));
+		try {
+			ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(true);
+
+			_executeObjectAction(
+				objectActionName, getObjectEntry(objectEntryId));
+		}
+		finally {
+			ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(false);
+		}
 	}
 
 	@Override
@@ -408,10 +424,17 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 				String objectActionName)
 		throws Exception {
 
-		_executeObjectAction(
-			objectActionName,
-			getScopeScopeKeyByExternalReferenceCode(
-				scopeKey, externalReferenceCode));
+		try {
+			ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(true);
+
+			_executeObjectAction(
+				objectActionName,
+				getScopeScopeKeyByExternalReferenceCode(
+					scopeKey, externalReferenceCode));
+		}
+		finally {
+			ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(false);
+		}
 	}
 
 	@Override
