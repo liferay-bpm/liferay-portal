@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.object.internal.entry.util;
+package com.liferay.object.entry.util;
 
 import com.liferay.petra.lang.CentralizedThreadLocal;
 
