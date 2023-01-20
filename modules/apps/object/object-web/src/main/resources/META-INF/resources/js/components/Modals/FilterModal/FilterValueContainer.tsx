@@ -20,7 +20,7 @@ import {
 import React, {useState} from 'react';
 
 import {FilterErrors} from './ModalAddFilter';
-import {isMultiSelectValue} from './filter';
+import {isMultiSelectValue} from './filterUtil';
 
 interface FilterValueContainerProps {
 	aggregationFilter: boolean;

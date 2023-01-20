@@ -27,7 +27,7 @@ import {setFieldValues} from './setValuesUtil';
 
 import './ModalAddFilter.scss';
 import {FilterValueContainer} from './FilterValueContainer';
-import {getFilterTypeOperators, getValueList} from './filter';
+import {getFilterTypeOperators, getValueList} from './filterUtil';
 
 export interface OnSaveFilterProps {
 	fieldLabel?: LocalizedValue<string>;

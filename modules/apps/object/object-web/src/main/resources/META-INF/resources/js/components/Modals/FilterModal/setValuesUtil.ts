@@ -19,7 +19,7 @@ import {
 	getCheckedItems,
 	getCheckedRelationshipItems,
 	getSystemFieldLabelFromEntry,
-} from './filter';
+} from './filterUtil';
 
 type AttachmentEntry = {
 	id: number;
