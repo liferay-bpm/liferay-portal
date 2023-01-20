@@ -43,3 +43,8 @@ export declare function getValueList(
 	items: IItem[],
 	name: string
 ): IItem[] | undefined;
+export declare function isMultiSelectValue(
+	aggregationFilter: boolean,
+	selectedFilterBy: ObjectField,
+	selectedFilterType: LabelValueObject
+): boolean | undefined;

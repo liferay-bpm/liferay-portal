@@ -17,9 +17,6 @@ import ClayModal from '@clayui/modal';
 import {Observer} from '@clayui/modal/lib/types';
 import {
 	AutoComplete,
-	DatePicker,
-	Input,
-	MultipleSelect,
 	SingleSelect,
 	filterArrayByQuery,
 	getLocalizableLabel,
@@ -29,6 +26,7 @@ import React, {FormEvent, useEffect, useMemo, useState} from 'react';
 import {setFieldValues} from './setValuesUtil';
 
 import './ModalAddFilter.scss';
+import {FilterValueContainer} from './FilterValueContainer';
 import {getFilterTypeOperators, getValueList} from './filter';
 
 export interface OnSaveFilterProps {
@@ -114,10 +112,10 @@ export type CurrentFilter = {
 };
 
 export function ModalAddFilter({
-	aggregationFilter,
+	aggregationFilter = false,
 	creationLanguageId,
 	currentFilters,
-	disableDateValues,
+	disableDateValues = false,
 	editingFilter,
 	editingObjectFieldName,
 	filterOperators,
@@ -144,9 +142,6 @@ export function ModalAddFilter({
 	const [errors, setErrors] = useState<FilterErrors>({});
 
 	const [query, setQuery] = useState<string>('');
-
-	const [filterStartDate, setFilterStartDate] = useState('');
-	const [filterEndDate, setFilterEndDate] = useState('');
 
 	const filteredAvailableFields = useMemo(() => {
 		return filterArrayByQuery({
@@ -251,25 +246,6 @@ export function ModalAddFilter({
 		onClose();
 	};
 
-	const isMultiSelectValue = () => {
-		if (
-			aggregationFilter &&
-			selectedFilterBy?.businessType === 'Relationship'
-		) {
-			return false;
-		}
-
-		if (
-			selectedFilterType &&
-			(selectedFilterBy?.name === 'status' ||
-				selectedFilterBy?.businessType === 'MultiselectPicklist' ||
-				selectedFilterBy?.businessType === 'Picklist' ||
-				selectedFilterBy?.businessType === 'Relationship')
-		) {
-			return true;
-		}
-	};
-
 	return (
 		<ClayModal observer={observer}>
 			<ClayModal.Header>{header}</ClayModal.Header>
@@ -343,81 +319,17 @@ export function ModalAddFilter({
 					/>
 				)}
 
-				{selectedFilterType &&
-					(selectedFilterBy?.businessType === 'Integer' ||
-						selectedFilterBy?.businessType === 'LongInteger') && (
-						<Input
-							error={errors.value}
-							label={Liferay.Language.get('value')}
-							onChange={({target: {value}}) => {
-								const newValue = value.replace(/[\D]/g, '');
-								setValue(newValue);
-							}}
-							required
-							type="number"
-							value={value}
-						/>
-					)}
-
-				{isMultiSelectValue() && (
-					<MultipleSelect
-						error={errors.items}
-						label={Liferay.Language.get('value')}
-						options={items}
-						required
-						setOptions={setItems}
-					/>
-				)}
-
-				{selectedFilterType &&
-					selectedFilterBy?.businessType === 'Date' &&
-					!disableDateValues && (
-						<div className="row">
-							<div className="col-lg-6">
-								<DatePicker
-									error={errors.startDate}
-									label={Liferay.Language.get('start')}
-									onChange={(value) => {
-										setItems([
-											...items.filter(
-												(item) => item.value !== 'ge'
-											),
-											{
-												label: value,
-												value: 'ge',
-											},
-										]);
-
-										setFilterStartDate(value);
-									}}
-									required
-									value={filterStartDate}
-								/>
-							</div>
-
-							<div className="col-lg-6">
-								<DatePicker
-									error={errors.endDate}
-									label={Liferay.Language.get('end')}
-									onChange={(value) => {
-										setItems([
-											...items.filter(
-												(item) => item.value !== 'le'
-											),
-											{
-												label: value,
-												value: 'le',
-											},
-										]);
-
-										setFilterEndDate(value);
-									}}
-									required
-									value={filterEndDate}
-								/>
-							</div>
-						</div>
-					)}
+				<FilterValueContainer
+					aggregationFilter={aggregationFilter}
+					disableDateValues={disableDateValues}
+					errors={errors}
+					items={items}
+					selectedFilterBy={selectedFilterBy as ObjectField}
+					selectedFilterType={selectedFilterType as LabelValueObject}
+					setItems={setItems}
+					setValue={setValue}
+					value={value as string}
+				/>
 			</ClayModal.Body>
 
 			<ClayModal.Footer

@@ -192,3 +192,26 @@ export function getValueList(
 
 	return undefined;
 }
+
+export function isMultiSelectValue(
+	aggregationFilter: boolean,
+	selectedFilterBy: ObjectField,
+	selectedFilterType: LabelValueObject
+) {
+	if (
+		aggregationFilter &&
+		selectedFilterBy?.businessType === 'Relationship'
+	) {
+		return false;
+	}
+
+	if (
+		selectedFilterType &&
+		(selectedFilterBy?.name === 'status' ||
+			selectedFilterBy?.businessType === 'MultiselectPicklist' ||
+			selectedFilterBy?.businessType === 'Picklist' ||
+			selectedFilterBy?.businessType === 'Relationship')
+	) {
+		return true;
+	}
+}
