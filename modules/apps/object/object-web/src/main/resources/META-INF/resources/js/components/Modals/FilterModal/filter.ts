@@ -101,6 +101,32 @@ export function getCheckedRelationshipItems(
 	return newItemsValues;
 }
 
+export function getFilterTypeOperators(
+	filterOperators: TFilterOperators,
+	selectedFilterBy: ObjectField
+) {
+	const {businessType, name} = selectedFilterBy as ObjectField;
+
+	if (businessType === 'Integer' || businessType === 'LongInteger') {
+		return filterOperators.numericOperators;
+	}
+
+	if (
+		businessType === 'Picklist' ||
+		businessType === 'MultiselectPicklist' ||
+		name === 'status' ||
+		businessType === 'Relationship'
+	) {
+		return filterOperators.picklistOperators;
+	}
+
+	if (businessType === 'Date') {
+		return filterOperators.dateOperators;
+	}
+
+	return [];
+}
+
 export function getSystemFieldLabelFromEntry(
 	titleFieldName: string,
 	entry: ObjectEntry,

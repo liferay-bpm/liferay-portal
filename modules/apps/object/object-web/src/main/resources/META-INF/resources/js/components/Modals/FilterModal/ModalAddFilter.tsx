@@ -29,7 +29,7 @@ import React, {FormEvent, useEffect, useMemo, useState} from 'react';
 import {setFieldValues} from './setValuesUtil';
 
 import './ModalAddFilter.scss';
-import {getValueList} from './filter';
+import {getFilterTypeOperators, getValueList} from './filter';
 
 export interface OnSaveFilterProps {
 	fieldLabel?: LocalizedValue<string>;
@@ -63,6 +63,7 @@ interface ModalAddFilterProps {
 		value,
 		valueList,
 	}: OnSaveFilterProps) => void;
+	showFilterType: (selectedFilterBy: ObjectField) => boolean;
 	validate: ({
 		checkedItems,
 		disableDateValues,
@@ -126,6 +127,7 @@ export function ModalAddFilter({
 	observer,
 	onClose,
 	onSave,
+	showFilterType,
 	validate,
 	workflowStatusJSONArray,
 }: ModalAddFilterProps) {
@@ -268,11 +270,6 @@ export function ModalAddFilter({
 		}
 	};
 
-	const aggregationRelationshipOrDateFieldType =
-		selectedFilterBy?.businessType === 'Date' ||
-		(aggregationFilter &&
-			selectedFilterBy?.businessType === 'Relationship');
-
 	return (
 		<ClayModal observer={observer}>
 			<ClayModal.Header>{header}</ClayModal.Header>
@@ -330,39 +327,21 @@ export function ModalAddFilter({
 					)}
 				</AutoComplete>
 
-				{selectedFilterBy &&
-					!aggregationRelationshipOrDateFieldType && (
-						<SingleSelect
-							error={errors.selectedFilterType}
-							label={Liferay.Language.get('filter-type')}
-							onChange={(target: LabelValueObject) =>
-								setSelectedFilterType(target)
-							}
-							options={
-								selectedFilterBy?.businessType === 'Integer' ||
-								selectedFilterBy?.businessType === 'LongInteger'
-									? filterOperators.numericOperators
-									: filterOperators.picklistOperators
-							}
-							required={filterTypeRequired}
-							value={selectedFilterType?.label ?? ''}
-						/>
-					)}
-
-				{selectedFilterBy &&
-					selectedFilterBy?.businessType === 'Date' &&
-					!disableDateValues && (
-						<SingleSelect
-							error={errors.selectedFilterType}
-							label={Liferay.Language.get('filter-type')}
-							onChange={(target: LabelValueObject) =>
-								setSelectedFilterType(target)
-							}
-							options={filterOperators.dateOperators}
-							required={filterTypeRequired}
-							value={selectedFilterType?.label ?? ''}
-						/>
-					)}
+				{selectedFilterBy && showFilterType(selectedFilterBy) && (
+					<SingleSelect
+						error={errors.selectedFilterType}
+						label={Liferay.Language.get('filter-type')}
+						onChange={(target: LabelValueObject) =>
+							setSelectedFilterType(target)
+						}
+						options={getFilterTypeOperators(
+							filterOperators,
+							selectedFilterBy
+						)}
+						required={filterTypeRequired}
+						value={selectedFilterType?.label ?? ''}
+					/>
+				)}
 
 				{selectedFilterType &&
 					(selectedFilterBy?.businessType === 'Integer' ||

@@ -125,6 +125,16 @@ export function FilterScreen() {
 		return currentErrors;
 	};
 
+	const showFilterType = (selectedFilterBy: ObjectField) => {
+		const {businessType, system} = selectedFilterBy;
+
+		if (businessType === 'Date' && system) {
+			return false;
+		}
+
+		return true;
+	};
+
 	return (
 		<>
 			<BuilderScreen
@@ -199,6 +209,7 @@ export function FilterScreen() {
 					observer={observer}
 					onClose={onClose}
 					onSave={saveFilterColumn}
+					showFilterType={showFilterType}
 					validate={validateFilters}
 					workflowStatusJSONArray={workflowStatusJSONArray}
 				/>

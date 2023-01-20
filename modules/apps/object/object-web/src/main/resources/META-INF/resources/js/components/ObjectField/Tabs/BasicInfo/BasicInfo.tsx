@@ -559,6 +559,14 @@ export function BasicInfo({
 		);
 	};
 
+	const showFilterType = (selectedFilterBy: ObjectField) => {
+		if (selectedFilterBy.businessType === 'Relationship') {
+			return false;
+		}
+
+		return true;
+	};
+
 	return (
 		<>
 			<Card title={Liferay.Language.get('basic-info')}>
@@ -662,6 +670,7 @@ export function BasicInfo({
 					observer={observer}
 					onClose={onClose}
 					onSave={handleSaveFilterColumn}
+					showFilterType={showFilterType}
 					validate={validateFilters}
 					workflowStatusJSONArray={workflowStatusJSONArray}
 				/>

@@ -47,6 +47,7 @@ interface ModalAddFilterProps {
 		value,
 		valueList,
 	}: OnSaveFilterProps) => void;
+	showFilterType: (selectedFilterBy: ObjectField) => boolean;
 	validate: ({
 		checkedItems,
 		disableDateValues,
@@ -105,6 +106,7 @@ export declare function ModalAddFilter({
 	observer,
 	onClose,
 	onSave,
+	showFilterType,
 	validate,
 	workflowStatusJSONArray,
 }: ModalAddFilterProps): JSX.Element;

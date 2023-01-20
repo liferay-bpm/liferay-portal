@@ -24,6 +24,10 @@ export declare function getCheckedRelationshipItems(
 	systemObject: boolean,
 	valuesArray: string[]
 ): IItem[];
+export declare function getFilterTypeOperators(
+	filterOperators: TFilterOperators,
+	selectedFilterBy: ObjectField
+): LabelValueObject[];
 export declare function getSystemFieldLabelFromEntry(
 	titleFieldName: string,
 	entry: ObjectEntry,
