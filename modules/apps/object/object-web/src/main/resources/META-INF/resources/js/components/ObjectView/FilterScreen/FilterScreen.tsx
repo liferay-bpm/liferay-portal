@@ -14,7 +14,7 @@
 
 import {useModal} from '@clayui/modal';
 import {BuilderScreen} from '@liferay/object-js-components-web';
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 
 import {
 	FilterErrors,
@@ -52,80 +52,84 @@ export function FilterScreen() {
 		},
 	});
 
-	const handleDeleteColumn = (objectFieldName: string) => {
+	const handleDeleteColumn = useCallback((objectFieldName: string) => {
 		dispatch({
 			payload: {objectFieldName},
 			type: TYPES.DELETE_OBJECT_VIEW_FILTER_COLUMN,
 		});
-	};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
-	const saveFilterColumn = ({
-		filterType,
-		objectFieldName,
-		valueList,
-	}: OnSaveFilterProps) => {
-		if (editingFilter) {
-			dispatch({
-				payload: {
-					filterType,
-					objectFieldName,
-					valueList,
-				},
-				type: TYPES.EDIT_OBJECT_VIEW_FILTER_COLUMN,
-			});
-		}
-		else {
-			dispatch({
-				payload: {
-					creationLanguageId,
-					filterType,
-					objectFieldName,
-					valueList,
-				},
-				type: TYPES.ADD_OBJECT_VIEW_FILTER_COLUMN,
-			});
-		}
-	};
+	const saveFilterColumn = useCallback(
+		({filterType, objectFieldName, valueList}: OnSaveFilterProps) => {
+			if (editingFilter) {
+				dispatch({
+					payload: {
+						filterType,
+						objectFieldName,
+						valueList,
+					},
+					type: TYPES.EDIT_OBJECT_VIEW_FILTER_COLUMN,
+				});
+			}
+			else {
+				dispatch({
+					payload: {
+						creationLanguageId,
+						filterType,
+						objectFieldName,
+						valueList,
+					},
+					type: TYPES.ADD_OBJECT_VIEW_FILTER_COLUMN,
+				});
+			}
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[creationLanguageId, editingFilter]
+	);
 
-	const validateFilters = ({
-		checkedItems,
-		disableDateValues,
-		selectedFilterBy,
-		selectedFilterType,
-		setErrors,
-	}: FilterValidation) => {
-		setErrors({});
-		const currentErrors: FilterErrors = {};
+	const validateFilters = useCallback(
+		({
+			checkedItems,
+			disableDateValues,
+			selectedFilterBy,
+			selectedFilterType,
+			setErrors,
+		}: FilterValidation) => {
+			setErrors({});
+			const currentErrors: FilterErrors = {};
 
-		if (!selectedFilterBy) {
-			currentErrors.selectedFilterBy = REQUIRED_MSG;
-		}
+			if (!selectedFilterBy) {
+				currentErrors.selectedFilterBy = REQUIRED_MSG;
+			}
 
-		if (
-			!selectedFilterType &&
-			!disableDateValues &&
-			(selectedFilterBy?.name !== 'status' ||
-				selectedFilterBy?.businessType !== 'Picklist')
-		) {
-			currentErrors.selectedFilterType = REQUIRED_MSG;
-		}
+			if (
+				!selectedFilterType &&
+				!disableDateValues &&
+				(selectedFilterBy?.name !== 'status' ||
+					selectedFilterBy?.businessType !== 'Picklist')
+			) {
+				currentErrors.selectedFilterType = REQUIRED_MSG;
+			}
 
-		if (
-			selectedFilterType &&
-			(selectedFilterBy?.name === 'status' ||
-				selectedFilterBy?.businessType === 'Picklist' ||
-				selectedFilterBy?.businessType === 'Relationship') &&
-			!checkedItems.length
-		) {
-			currentErrors.items = REQUIRED_MSG;
-		}
+			if (
+				selectedFilterType &&
+				(selectedFilterBy?.name === 'status' ||
+					selectedFilterBy?.businessType === 'Picklist' ||
+					selectedFilterBy?.businessType === 'Relationship') &&
+				!checkedItems.length
+			) {
+				currentErrors.items = REQUIRED_MSG;
+			}
 
-		setErrors(currentErrors);
+			setErrors(currentErrors);
 
-		return currentErrors;
-	};
+			return currentErrors;
+		},
+		[]
+	);
 
-	const showFilterType = (selectedFilterBy: ObjectField) => {
+	const showFilterType = useCallback((selectedFilterBy: ObjectField) => {
 		const {businessType, system} = selectedFilterBy;
 
 		if (businessType === 'Date' && system) {
@@ -133,7 +137,7 @@ export function FilterScreen() {
 		}
 
 		return true;
-	};
+	}, []);
 
 	return (
 		<>
