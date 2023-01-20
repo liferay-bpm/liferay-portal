@@ -23,11 +23,9 @@ import {
 } from '@liferay/object-js-components-web';
 import React, {FormEvent, useEffect, useMemo, useState} from 'react';
 
-import {setFieldValues} from './setValuesUtil';
-
-import './ModalAddFilter.scss';
 import {FilterValueContainer} from './FilterValueContainer';
 import {getFilterTypeOperators, getValueList} from './filterUtil';
+import {setFieldValues} from './setValuesUtil';
 
 export interface OnSaveFilterProps {
 	fieldLabel?: LocalizedValue<string>;

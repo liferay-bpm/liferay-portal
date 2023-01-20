@@ -15,7 +15,6 @@
 /// <reference types="react" />
 
 import {Observer} from '@clayui/modal/lib/types';
-import './ModalAddFilter.scss';
 export interface OnSaveFilterProps {
 	fieldLabel?: LocalizedValue<string>;
 	filterBy?: string;
