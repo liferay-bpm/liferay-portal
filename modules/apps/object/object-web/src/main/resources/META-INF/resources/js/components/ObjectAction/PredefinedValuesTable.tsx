@@ -197,8 +197,7 @@ export default function PredefinedValuesTable({
 		};
 
 		const deletePredefinedValueField = ({itemData}: {itemData: Item}) => {
-			const [name] = itemData.name.props.children;
-
+			const [name] = itemData.label.props.children;
 			if (objectFieldsMap.get(name)?.required) {
 				openToast({
 					message: Liferay.Language.get(
@@ -211,7 +210,7 @@ export default function PredefinedValuesTable({
 			}
 
 			const newPredefinedValues = predefinedValues?.filter(
-				(field) => field.name !== name
+				(field) => field.label[defaultLanguageId] !== name
 			);
 
 			setValues({
