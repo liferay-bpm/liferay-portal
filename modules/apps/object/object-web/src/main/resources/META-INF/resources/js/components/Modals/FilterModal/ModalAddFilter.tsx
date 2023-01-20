@@ -278,58 +278,57 @@ export function ModalAddFilter({
 			<ClayModal.Header>{header}</ClayModal.Header>
 
 			<ClayModal.Body>
-				{!editingFilter && (
-					<AutoComplete<ObjectField>
-						emptyStateMessage={Liferay.Language.get(
-							'there-are-no-columns-available'
-						)}
-						error={errors.selectedFilterBy}
-						items={filteredAvailableFields}
-						label={Liferay.Language.get('filter-by')}
-						onChangeQuery={setQuery}
-						onSelectItem={(item) => {
-							const userRelationship = !!item.objectFieldSettings?.find(
-								({name, value}) =>
-									name === 'objectDefinition1ShortName' &&
-									value === 'User'
-							);
+				<AutoComplete<ObjectField>
+					disabled={editingFilter}
+					emptyStateMessage={Liferay.Language.get(
+						'there-are-no-columns-available'
+					)}
+					error={errors.selectedFilterBy}
+					items={filteredAvailableFields}
+					label={Liferay.Language.get('filter-by')}
+					onChangeQuery={setQuery}
+					onSelectItem={(item) => {
+						const userRelationship = !!item.objectFieldSettings?.find(
+							({name, value}) =>
+								name === 'objectDefinition1ShortName' &&
+								value === 'User'
+						);
 
-							setSelectedFilterBy(item);
-							setValue('');
+						setSelectedFilterBy(item);
+						setValue('');
 
-							if (
-								item.businessType === 'Relationship' &&
-								userRelationship &&
-								aggregationFilter
-							) {
-								return setSelectedFilterType({
-									label: 'currentUser',
-									value: 'currentUser',
-								});
-							}
+						if (
+							item.businessType === 'Relationship' &&
+							userRelationship &&
+							aggregationFilter
+						) {
+							return setSelectedFilterType({
+								label: 'currentUser',
+								value: 'currentUser',
+							});
+						}
 
-							setSelectedFilterType(null);
-						}}
-						query={query}
-						required
-						value={getLocalizableLabel(
-							creationLanguageId!,
-							selectedFilterBy?.label
-						)}
-					>
-						{({label, name}) => (
-							<div className="d-flex justify-content-between">
-								<div>
-									{getLocalizableLabel(
-										creationLanguageId!,
-										label,
-										name
-									)}
-								</div>
+						setSelectedFilterType(null);
+					}}
+					query={query}
+					required
+					value={getLocalizableLabel(
+						creationLanguageId!,
+						selectedFilterBy?.label
+					)}
+				>
+					{({label, name}) => (
+						<div className="d-flex justify-content-between">
+							<div>
+								{getLocalizableLabel(
+									creationLanguageId!,
+									label,
+									name
+								)}
 							</div>
-						)}
-					</AutoComplete>
-				)}
+						</div>
+					)}
+				</AutoComplete>
 
 				{selectedFilterBy &&
 					!aggregationRelationshipOrDateFieldType && (
