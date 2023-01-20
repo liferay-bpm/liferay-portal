@@ -70,32 +70,29 @@ export function getCheckedRelationshipItems(
 	let newItemsValues: IItem[] = [];
 
 	newItemsValues = relatedEntries.map((entry) => {
-		let item = {
+		const item = {
 			checked: false,
 			value: systemObject
 				? String(entry.id)
 				: entry.externalReferenceCode,
 		} as IItem;
 
+		if (valuesArray.includes(entry.externalReferenceCode)) {
+			item.checked = true;
+		}
+
 		if (systemField) {
-			item = getSystemFieldLabelFromEntry(
+			return getSystemFieldLabelFromEntry(
 				titleFieldName,
 				entry,
 				item
 			) as IItem;
 		}
-		else {
-			item = {
-				...item,
-				label: entry[titleFieldName] as string,
-			};
-		}
 
-		if (valuesArray.includes(entry.externalReferenceCode)) {
-			item.checked = true;
-		}
-
-		return item;
+		return {
+			...item,
+			label: entry[titleFieldName] as string,
+		};
 	});
 
 	return newItemsValues;
