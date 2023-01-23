@@ -22,6 +22,7 @@ export function Element({helpText, label, onClick}: IProps) {
 
 	return (
 		<ClayButton
+			aria-label={label}
 			borderless
 			className="lfr-objects__code-editor-sidebar-element-button"
 			displayType="unstyled"

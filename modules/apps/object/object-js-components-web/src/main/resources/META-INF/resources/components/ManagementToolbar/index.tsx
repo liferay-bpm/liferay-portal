@@ -124,6 +124,7 @@ export function ManagementToolbar({
 								</span>
 
 								<ClayButton
+									aria-label={Liferay.Language.get('edit')}
 									className="ml-3 p-0 text-secondary"
 									displayType="unstyled"
 									onClick={() => setVisibleModal(true)}
@@ -140,6 +141,7 @@ export function ManagementToolbar({
 					<ClayManagementToolbar.ItemList>
 						<ClayButton.Group key={1} spaced>
 							<ClayButton
+								aria-label={Liferay.Language.get('cancel')}
 								displayType="secondary"
 								id={`${portletNamespace}cancel`}
 								name="cancel"
@@ -149,6 +151,7 @@ export function ManagementToolbar({
 							</ClayButton>
 
 							<ClayButton
+								aria-label={Liferay.Language.get('save')}
 								disabled={!hasUpdatePermission}
 								displayType={
 									isApproved || isApproved === undefined
@@ -164,6 +167,7 @@ export function ManagementToolbar({
 
 							{isApproved !== undefined && !isApproved && (
 								<ClayButton
+									aria-label={Liferay.Language.get('publish')}
 									disabled={!hasPublishPermission}
 									id={`${portletNamespace}publish`}
 									name="publish"

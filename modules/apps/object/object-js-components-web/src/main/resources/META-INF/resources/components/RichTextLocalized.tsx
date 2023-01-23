@@ -38,10 +38,10 @@ const availableLocales = Object.keys(Liferay.Language.available)
 
 export function RichTextLocalized({
 	ariaLabels = {
-		default: 'Default',
-		openLocalizations: 'Open Localizations',
-		translated: 'Translated',
-		untranslated: 'Untranslated',
+		default: Liferay.Language.get('default'),
+		openLocalizations: Liferay.Language.get('open-localizations'),
+		translated: Liferay.Language.get('translated'),
+		untranslated: Liferay.Language.get('untranslated'),
 	},
 	editorConfig,
 	helpMessage,
@@ -97,6 +97,7 @@ export function RichTextLocalized({
 					onActiveChange={setActive}
 					trigger={
 						<ClayButton
+							aria-label={ariaLabels.openLocalizations}
 							displayType="secondary"
 							monospaced
 							onClick={() => setActive(!active)}

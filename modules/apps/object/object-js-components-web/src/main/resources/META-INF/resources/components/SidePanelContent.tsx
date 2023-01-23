@@ -89,11 +89,19 @@ export function SidePanelContent({
 				className="lfr-objects__side-panel-content-container"
 				spaced
 			>
-				<ClayButton displayType="secondary" onClick={closeSidePanel}>
+				<ClayButton
+					aria-label={Liferay.Language.get('cancel')}
+					displayType="secondary"
+					onClick={closeSidePanel}
+				>
 					{Liferay.Language.get('cancel')}
 				</ClayButton>
 
-				<ClayButton disabled={readOnly} {...saveProps}>
+				<ClayButton
+					aria-label={Liferay.Language.get('save')}
+					disabled={readOnly}
+					{...saveProps}
+				>
 					{Liferay.Language.get('save')}
 				</ClayButton>
 			</ClayButton.Group>

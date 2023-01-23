@@ -204,13 +204,17 @@ export function ExpressionBuilderModal({sidebarElements}: IModalProps) {
 				last={
 					<ClayButton.Group spaced>
 						<ClayButton
+							aria-label={Liferay.Language.get('cancel')}
 							displayType="secondary"
 							onClick={closeModal}
 						>
 							{Liferay.Language.get('cancel')}
 						</ClayButton>
 
-						<ClayButton onClick={handleSave}>
+						<ClayButton
+							aria-label={Liferay.Language.get('done')}
+							onClick={handleSave}
+						>
 							{Liferay.Language.get('done')}
 						</ClayButton>
 					</ClayButton.Group>

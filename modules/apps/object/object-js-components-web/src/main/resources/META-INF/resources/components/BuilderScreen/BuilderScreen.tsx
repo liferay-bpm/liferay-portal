@@ -185,7 +185,11 @@ export function BuilderScreen({
 						description={emptyState.description}
 						title={emptyState.title}
 					>
-						<ClayButton displayType="secondary" onClick={openModal}>
+						<ClayButton
+							aria-label={emptyState.buttonText}
+							displayType="secondary"
+							onClick={openModal}
+						>
 							{emptyState.buttonText}
 						</ClayButton>
 					</ClayEmptyState>

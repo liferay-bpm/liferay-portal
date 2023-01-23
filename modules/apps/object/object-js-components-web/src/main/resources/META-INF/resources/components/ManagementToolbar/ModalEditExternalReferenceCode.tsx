@@ -129,13 +129,18 @@ export function ModalEditExternalReferenceCode({
 					last={
 						<ClayButton.Group key={1} spaced>
 							<ClayButton
+								aria-label={Liferay.Language.get('cancel')}
 								displayType="secondary"
 								onClick={() => onClose()}
 							>
 								{Liferay.Language.get('cancel')}
 							</ClayButton>
 
-							<ClayButton displayType="primary" type="submit">
+							<ClayButton
+								aria-label={Liferay.Language.get('save')}
+								displayType="primary"
+								type="submit"
+							>
 								{Liferay.Language.get('save')}
 							</ClayButton>
 						</ClayButton.Group>

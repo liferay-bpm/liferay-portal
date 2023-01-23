@@ -109,6 +109,7 @@ export function CodeEditorLocalized({
 				onActiveChange={setActive}
 				trigger={
 					<ClayButton
+						aria-label={ariaLabels.openLocalizations}
 						displayType="secondary"
 						monospaced
 						onClick={() => setActive(!active)}
