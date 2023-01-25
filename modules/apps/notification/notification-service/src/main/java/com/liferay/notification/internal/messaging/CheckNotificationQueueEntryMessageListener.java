@@ -153,7 +153,7 @@ public class CheckNotificationQueueEntryMessageListener
 		}
 	}
 
-	private static final int _CHECK_INTERVAL = 15;
+	private static final int _CHECK_INTERVAL = 1;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CheckNotificationQueueEntryMessageListener.class);
