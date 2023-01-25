@@ -95,21 +95,24 @@ public class ObjectDefinitionsFieldsDisplayContext
 		return creationMenu;
 	}
 
+	public String getEditObjectFieldURL() throws Exception {
+		return PortletURLBuilder.create(
+			getPortletURL()
+		).setMVCRenderCommandName(
+			"/object_definitions/edit_object_field"
+		).setParameter(
+			"objectFieldId", "{id}"
+		).setWindowState(
+			LiferayWindowState.POP_UP
+		).buildString();
+	}
+
 	public List<FDSActionDropdownItem> getFDSActionDropdownItems()
 		throws Exception {
 
 		return Arrays.asList(
 			new FDSActionDropdownItem(
-				PortletURLBuilder.create(
-					getPortletURL()
-				).setMVCRenderCommandName(
-					"/object_definitions/edit_object_field"
-				).setParameter(
-					"objectFieldId", "{id}"
-				).setWindowState(
-					LiferayWindowState.POP_UP
-				).buildString(),
-				"view", "view",
+				getEditObjectFieldURL(), "view", "view",
 				LanguageUtil.get(objectRequestHelper.getRequest(), "view"),
 				"get", null, "sidePanel"),
 			new FDSActionDropdownItem(
