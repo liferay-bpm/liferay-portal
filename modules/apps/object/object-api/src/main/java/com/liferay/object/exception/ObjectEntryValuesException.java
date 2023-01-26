@@ -17,6 +17,8 @@ package com.liferay.object.exception;
 import com.liferay.object.model.ObjectState;
 import com.liferay.portal.kernel.exception.PortalException;
 
+import java.io.Serializable;
+
 /**
  * @author Marco Leo
  */
@@ -197,14 +199,13 @@ public class ObjectEntryValuesException extends PortalException {
 		extends ObjectEntryValuesException {
 
 		public InvalidObjectStateTransition(
-			ObjectState sourceObjectState, ObjectState targetObjectState) {
+			ObjectState sourceObjectState, ObjectState targetObjectState,
+			Serializable sourceObjectName, Serializable targetObjectName) {
 
 			super(
 				String.format(
-					"Object state ID %d cannot be transitioned to object " +
-						"state ID %d",
-					sourceObjectState.getObjectStateId(),
-					targetObjectState.getObjectStateId()));
+					"Object state %s cannot be transitioned to object state %s",
+					sourceObjectName.toString(), targetObjectName.toString()));
 
 			_sourceObjectState = sourceObjectState;
 			_targetObjectState = targetObjectState;

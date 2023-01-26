@@ -3224,7 +3224,8 @@ public class ObjectEntryLocalServiceImpl
 
 				throw new ObjectEntryValuesException.
 					InvalidObjectStateTransition(
-						sourceObjectState, targetObjectState);
+						sourceObjectState, targetObjectState,
+						values.get(entry.getKey()), entry.getValue());
 			}
 		}
 	}
