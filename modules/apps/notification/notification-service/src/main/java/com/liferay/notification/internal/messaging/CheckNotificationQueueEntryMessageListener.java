@@ -26,9 +26,6 @@ import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
 import com.liferay.portal.kernel.scheduler.SchedulerEntryImpl;
 import com.liferay.portal.kernel.scheduler.TimeUnit;
 import com.liferay.portal.kernel.scheduler.TriggerFactory;
-import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Time;
 
 import java.util.Date;
@@ -71,8 +68,6 @@ public class CheckNotificationQueueEntryMessageListener
 		NotificationType notificationType =
 			_notificationTypeServiceTracker.getNotificationType(
 				NotificationConstants.TYPE_EMAIL);
-
-		long companyId = CompanyThreadLocal.getCompanyId();
 
 		notificationType.sendUnsentNotifications();
 

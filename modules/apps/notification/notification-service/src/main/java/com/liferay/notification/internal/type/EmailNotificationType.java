@@ -267,7 +267,7 @@ public class EmailNotificationType extends BaseNotificationType {
 	}
 
 	@Override
-	public void sendUnsentNotifications(long companyId) {
+	public void sendUnsentNotifications() {
 		for (NotificationQueueEntry notificationQueueEntry :
 				notificationQueueEntryLocalService.getUnsentNotificationEntries(
 					NotificationConstants.TYPE_EMAIL)) {
