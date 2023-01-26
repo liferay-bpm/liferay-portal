@@ -21,7 +21,6 @@ import com.liferay.notification.type.NotificationTypeServiceTracker;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
-import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
 import com.liferay.portal.kernel.scheduler.SchedulerEntryImpl;
 import com.liferay.portal.kernel.scheduler.TimeUnit;
@@ -53,8 +52,7 @@ public class CheckNotificationQueueEntryMessageListener
 			new SchedulerEntryImpl(
 				className,
 				_triggerFactory.createTrigger(
-					className, className, null, null, _CHECK_INTERVAL,
-					TimeUnit.MINUTE)),
+					className, className, null, null, 15, TimeUnit.MINUTE)),
 			DestinationNames.SCHEDULER_DISPATCH);
 	}
 
@@ -74,11 +72,6 @@ public class CheckNotificationQueueEntryMessageListener
 		_notificationQueueEntryLocalService.deleteNotificationQueueEntries(
 			new Date(System.currentTimeMillis() - Time.MONTH));
 	}
-
-	private static final int _CHECK_INTERVAL = 15;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CheckNotificationQueueEntryMessageListener.class);
 
 	@Reference
 	private NotificationQueueEntryLocalService
