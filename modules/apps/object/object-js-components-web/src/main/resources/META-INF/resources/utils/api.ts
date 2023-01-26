@@ -219,7 +219,7 @@ export async function getObjectFieldsByExternalReferenceCode(
 	externalReferenceCode: string
 ) {
 	return await getList<ObjectField>(
-		`/o/object-admin/v1.0/object-definitions/by-external-reference-code/${externalReferenceCode}/object-fields`
+		`/o/object-admin/v1.0/object-definitions/by-external-reference-code/${externalReferenceCode}/object-fields?pageSize=-1`
 	);
 }
 
