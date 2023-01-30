@@ -258,6 +258,11 @@ public class ObjectServiceUpgradeStepRegistrator
 				}
 
 			});
+
+		registry.register(
+			"3.28.0", "3.28.1",
+			new com.liferay.object.internal.upgrade.v3_28_1.
+				ObjectDefinitionUpgradeProcess());
 	}
 
 	@Reference
