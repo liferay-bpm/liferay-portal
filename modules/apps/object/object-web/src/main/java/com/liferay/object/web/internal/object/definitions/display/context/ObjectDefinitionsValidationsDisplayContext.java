@@ -169,7 +169,7 @@ public class ObjectDefinitionsValidationsDisplayContext
 		}
 
 		return ObjectCodeEditorUtil.getCodeEditorElements(
-			false, includeDDMExpressionBuilderElements, true,
+			true, includeDDMExpressionBuilderElements, true,
 			objectRequestHelper.getLocale(), getObjectDefinitionId());
 	}
 
