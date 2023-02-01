@@ -22,6 +22,7 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectValidationRuleLocalService;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
@@ -108,7 +109,7 @@ public class SystemObjectDefinitionMetadataModelListener<T extends BaseModel<T>>
 		try {
 			ObjectDefinition objectDefinition =
 				_objectDefinitionLocalService.fetchObjectDefinitionByClassName(
-					_getCompanyId(baseModel), _modelClass.getName());
+					_getClassName(baseModel));
 
 			if (objectDefinition == null) {
 				return;
@@ -138,7 +139,7 @@ public class SystemObjectDefinitionMetadataModelListener<T extends BaseModel<T>>
 		try {
 			ObjectDefinition objectDefinition =
 				_objectDefinitionLocalService.fetchObjectDefinitionByClassName(
-					_getCompanyId(baseModel), _modelClass.getName());
+					_getClassName(baseModel));
 
 			if (objectDefinition == null) {
 				return;
@@ -161,6 +162,11 @@ public class SystemObjectDefinitionMetadataModelListener<T extends BaseModel<T>>
 		catch (PortalException portalException) {
 			throw new ModelListenerException(portalException);
 		}
+	}
+
+	private String _getClassName(T baseModel) {
+		return _modelClass.getName() + StringPool.POUND +
+			_getCompanyId(baseModel);
 	}
 
 	private long _getCompanyId(T baseModel) {
@@ -325,7 +331,7 @@ public class SystemObjectDefinitionMetadataModelListener<T extends BaseModel<T>>
 		try {
 			ObjectDefinition objectDefinition =
 				_objectDefinitionLocalService.fetchObjectDefinitionByClassName(
-					_getCompanyId(model), _modelClass.getName());
+					_getClassName(model));
 
 			if (objectDefinition == null) {
 				return;
