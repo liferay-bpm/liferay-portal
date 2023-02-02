@@ -730,8 +730,9 @@ public class ObjectEntryLocalServiceImpl
 		return objectEntryPersistence.dslQueryCount(dslQuery);
 	}
 
+	@Override
 	public Map<String, Object> getSystemModelAttributes(
-			ObjectDefinition objectDefinition, long primaryKey)
+			User user, ObjectDefinition objectDefinition, long primaryKey)
 		throws PortalException {
 
 		if (!objectDefinition.isSystem()) {

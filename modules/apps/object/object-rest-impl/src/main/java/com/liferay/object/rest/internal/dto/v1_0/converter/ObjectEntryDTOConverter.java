@@ -521,6 +521,7 @@ public class ObjectEntryDTOConverter
 								Map<String, Object> systemModelAttributes =
 									_objectEntryLocalService.
 										getSystemModelAttributes(
+											dtoConverterContext.getUser(),
 											relatedObjectDefinition,
 											objectEntryId);
 
