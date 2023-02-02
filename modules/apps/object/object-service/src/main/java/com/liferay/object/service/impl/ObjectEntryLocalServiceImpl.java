@@ -48,6 +48,7 @@ import com.liferay.object.internal.filter.parser.ObjectFilterParser;
 import com.liferay.object.internal.filter.parser.ObjectFilterParserServiceRegistry;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectRelationshipMappingTable;
+import com.liferay.object.internal.system.model.util.SystemObjectDefinitionUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryTable;
@@ -166,6 +167,7 @@ import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.sort.SortOrder;
 import com.liferay.portal.search.sort.Sorts;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -763,56 +765,42 @@ public class ObjectEntryLocalServiceImpl
 		if (!baseModels.isEmpty()) {
 			BaseModel<?> baseModel = baseModels.get(0);
 
-			baseModelAttributes = baseModel.getModelAttributes();
-		}
+			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
+				_systemObjectDefinitionMetadataRegistry.
+					getSystemObjectDefinitionMetadata(
+						objectDefinition.getName());
 
-		Map<String, Object> modelAttributes =
-			HashMapBuilder.<String, Object>put(
-				"createDate",
-				GetterUtil.get(
-					baseModelAttributes.get("createDate"), primaryKey)
-			).put(
-				"externalReferenceCode",
-				GetterUtil.get(
-					baseModelAttributes.get("externalReferenceCode"),
-					primaryKey)
-			).put(
-				"modifiedDate",
-				GetterUtil.get(
-					baseModelAttributes.get("modifiedDate"), primaryKey)
-			).put(
-				"objectDefinitionId", objectDefinition.getObjectDefinitionId()
-			).put(
-				"uuid",
-				GetterUtil.get(baseModelAttributes.get("uuid"), primaryKey)
-			).build();
+			baseModelAttributes = SystemObjectDefinitionUtil.getModelAttributes(
+				baseModel, _dtoConverterRegistry,
+				systemObjectDefinitionMetadata.getJaxRsApplicationDescriptor(),
+				objectDefinition, user);
+		}
 
 		for (ObjectField objectField :
 				_objectFieldLocalService.getObjectFields(
-					objectDefinition.getObjectDefinitionId())) {
-
-			if (!objectField.isSystem()) {
-				continue;
-			}
+					objectDefinition.getObjectDefinitionId(), true)) {
 
 			Object value = GetterUtil.getObject(
-				baseModelAttributes.get(objectField.getDBColumnName()),
-				primaryKey);
+				baseModelAttributes.get(objectField.getName()),
+				GetterUtil.getObject(
+					baseModelAttributes.get(objectField.getDBColumnName()),
+					primaryKey));
 
 			if (value instanceof String) {
 				value = _localization.getLocalization(
 					(String)value, null, true);
 			}
 
-			modelAttributes.put(objectField.getName(), value);
+			baseModelAttributes.put(objectField.getName(), value);
 		}
 
-		modelAttributes.putAll(
+		return HashMapBuilder.<String, Object>putAll(
+			baseModelAttributes
+		).putAll(
 			objectEntryLocalService.
 				getExtensionDynamicObjectDefinitionTableValues(
-					objectDefinition, primaryKey));
-
-		return modelAttributes;
+					objectDefinition, primaryKey)
+		).build();
 	}
 
 	@Override
@@ -3529,6 +3517,9 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private DLFolderLocalService _dlFolderLocalService;
+
+	@Reference
+	private DTOConverterRegistry _dtoConverterRegistry;
 
 	@Reference
 	private FilterPredicateFactory _filterPredicateFactory;
