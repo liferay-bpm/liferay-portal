@@ -23,6 +23,8 @@ import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
+import com.liferay.object.system.SystemObjectDefinitionMetadata;
+import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -48,7 +50,9 @@ public class ObjectEntryRelatedObjectsResourceImpl
 		ObjectEntryManagerRegistry objectEntryManagerRegistry,
 		ObjectRelatedModelsProviderRegistry objectRelatedModelsProviderRegistry,
 		ObjectRelationshipService objectRelationshipService,
-		PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry) {
+		PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry,
+		SystemObjectDefinitionMetadataRegistry
+			systemObjectDefinitionMetadataRegistry) {
 
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryManagerRegistry = objectEntryManagerRegistry;
@@ -57,6 +61,8 @@ public class ObjectEntryRelatedObjectsResourceImpl
 		_objectRelationshipService = objectRelationshipService;
 		_persistedModelLocalServiceRegistry =
 			persistedModelLocalServiceRegistry;
+		_systemObjectDefinitionMetadataRegistry =
+			systemObjectDefinitionMetadataRegistry;
 	}
 
 	@Override
@@ -88,7 +94,10 @@ public class ObjectEntryRelatedObjectsResourceImpl
 			}
 
 			_checkSystemObjectEntry(
-				relatedObjectEntryId, relatedObjectDefinition);
+				relatedObjectEntryId,
+				_systemObjectDefinitionMetadataRegistry.
+					getSystemObjectDefinitionMetadata(
+						relatedObjectDefinition.getName()));
 		}
 		else {
 			_checkRelatedObjectEntry(
@@ -216,12 +225,13 @@ public class ObjectEntryRelatedObjectsResourceImpl
 	}
 
 	private void _checkSystemObjectEntry(
-			long objectEntryId, ObjectDefinition systemObjectDefinition)
+			long objectEntryId,
+			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata)
 		throws Exception {
 
 		PersistedModelLocalService persistedModelLocalService =
 			_persistedModelLocalServiceRegistry.getPersistedModelLocalService(
-				systemObjectDefinition.getClassName());
+				systemObjectDefinitionMetadata.getModelClassName());
 
 		persistedModelLocalService.getPersistedModel(objectEntryId);
 	}
@@ -292,5 +302,7 @@ public class ObjectEntryRelatedObjectsResourceImpl
 	private final ObjectRelationshipService _objectRelationshipService;
 	private final PersistedModelLocalServiceRegistry
 		_persistedModelLocalServiceRegistry;
+	private final SystemObjectDefinitionMetadataRegistry
+		_systemObjectDefinitionMetadataRegistry;
 
 }
