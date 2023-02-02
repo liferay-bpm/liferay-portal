@@ -589,12 +589,13 @@ public class ObjectEntryLocalServiceWrapper
 
 	@Override
 	public java.util.Map<String, Object> getSystemModelAttributes(
+			com.liferay.portal.kernel.model.User user,
 			com.liferay.object.model.ObjectDefinition objectDefinition,
 			long primaryKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectEntryLocalService.getSystemModelAttributes(
-			objectDefinition, primaryKey);
+			user, objectDefinition, primaryKey);
 	}
 
 	@Override

@@ -517,12 +517,13 @@ public class ObjectEntryLocalServiceUtil {
 	}
 
 	public static Map<String, Object> getSystemModelAttributes(
+			com.liferay.portal.kernel.model.User user,
 			com.liferay.object.model.ObjectDefinition objectDefinition,
 			long primaryKey)
 		throws PortalException {
 
 		return getService().getSystemModelAttributes(
-			objectDefinition, primaryKey);
+			user, objectDefinition, primaryKey);
 	}
 
 	public static Map<String, Serializable> getSystemValues(
