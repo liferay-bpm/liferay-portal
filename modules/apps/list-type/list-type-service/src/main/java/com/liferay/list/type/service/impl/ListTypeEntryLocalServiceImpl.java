@@ -141,14 +141,18 @@ public class ListTypeEntryLocalServiceImpl
 		ListTypeEntry listTypeEntry = listTypeEntryPersistence.findByPrimaryKey(
 			listTypeEntryId);
 
-		_validateExternalReferenceCode(
-			externalReferenceCode, listTypeEntry.getCompanyId(),
-			listTypeEntry.getListTypeDefinitionId(), listTypeEntryId);
+		if (Validator.isNotNull(externalReferenceCode)) {
+			_validateExternalReferenceCode(
+				externalReferenceCode, listTypeEntry.getCompanyId(),
+				listTypeEntry.getListTypeDefinitionId(), listTypeEntryId);
 
-		_validateName(nameMap);
+			listTypeEntry.setExternalReferenceCode(externalReferenceCode);
+		}
 
-		listTypeEntry.setExternalReferenceCode(externalReferenceCode);
-		listTypeEntry.setNameMap(nameMap);
+		if (!nameMap.isEmpty()) {
+			_validateName(nameMap);
+			listTypeEntry.setNameMap(nameMap);
+		}
 
 		return listTypeEntryPersistence.update(listTypeEntry);
 	}
