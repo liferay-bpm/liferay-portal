@@ -165,6 +165,22 @@ public class DDMExpressionImplTest {
 	}
 
 	@Test
+	public void testEquals3() throws Exception {
+		DDMExpressionImpl<Boolean> ddmExpressionImpl = new DDMExpressionImpl<>(
+			_ddmExpressionFunctionRegistry, "\"2\" == 2.0");
+
+		Assert.assertTrue(ddmExpressionImpl.evaluate());
+	}
+
+	@Test
+	public void testEquals4() throws Exception {
+		DDMExpressionImpl<Boolean> ddmExpressionImpl = new DDMExpressionImpl<>(
+			_ddmExpressionFunctionRegistry, "\"abc\" == 2.0");
+
+		Assert.assertFalse(ddmExpressionImpl.evaluate());
+	}
+
+	@Test
 	public void testExpressionVariableNames() throws Exception {
 		DDMExpressionImpl<BigDecimal> ddmExpressionImpl =
 			new DDMExpressionImpl<>(_ddmExpressionFunctionRegistry, "a - b");
@@ -366,6 +382,30 @@ public class DDMExpressionImplTest {
 			_ddmExpressionFunctionRegistry, "2 != 2.0");
 
 		Assert.assertFalse(ddmExpressionImpl.evaluate());
+	}
+
+	@Test
+	public void testNotEquals3() throws Exception {
+		DDMExpressionImpl<Boolean> ddmExpressionImpl = new DDMExpressionImpl<>(
+			_ddmExpressionFunctionRegistry, "\"\" != 2.2");
+
+		Assert.assertTrue(ddmExpressionImpl.evaluate());
+	}
+
+	@Test
+	public void testNotEquals4() throws Exception {
+		DDMExpressionImpl<Boolean> ddmExpressionImpl = new DDMExpressionImpl<>(
+			_ddmExpressionFunctionRegistry, "\"2\" != 2.0");
+
+		Assert.assertFalse(ddmExpressionImpl.evaluate());
+	}
+
+	@Test
+	public void testNotEquals5() throws Exception {
+		DDMExpressionImpl<Boolean> ddmExpressionImpl = new DDMExpressionImpl<>(
+			_ddmExpressionFunctionRegistry, "\"abc\" != 2.2");
+
+		Assert.assertTrue(ddmExpressionImpl.evaluate());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
