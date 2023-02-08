@@ -27,25 +27,19 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
-import com.liferay.object.rest.dto.v1_0.Link;
+import com.liferay.object.rest.dto.v1_0.util.ObjectEntryUtil;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -212,39 +206,10 @@ public class ObjectEntryRowInfoItemRenderer
 							return StringPool.BLANK;
 						}
 
-						Link fileEntryLink = new Link() {
-							{
-								href = StringBundler.concat(
-									_portal.getPathContext(),
-									_portal.getPathMain(), "/portal/login");
-								label = dlFileEntry.getFileName();
-							}
-						};
-
-						try {
-							FileEntry fileEntry = _dlAppService.getFileEntry(
-								dlFileEntryId);
-
-							String href = _dlURLHelper.getDownloadURL(
-								fileEntry, fileEntry.getFileVersion(), null,
-								StringPool.BLANK);
-
-							href = HttpComponentsUtil.addParameter(
-								href, "objectDefinitionExternalReferenceCode",
-								objectDefinition.getExternalReferenceCode());
-							href = HttpComponentsUtil.addParameter(
-								href, "objectEntryExternalReferenceCode",
-								objectEntry.getExternalReferenceCode());
-
-							fileEntryLink.setHref(href);
-						}
-						catch (Exception exception) {
-							if (_log.isWarnEnabled()) {
-								_log.warn(exception);
-							}
-						}
-
-						return fileEntryLink;
+						return ObjectEntryUtil.toLink(
+							_dlAppService, dlFileEntry, _dlURLHelper,
+							objectDefinition.getExternalReferenceCode(),
+							objectEntry.getExternalReferenceCode(), _portal);
 					}
 					else if (Objects.equals(
 								objectField.getDBType(),
@@ -288,9 +253,6 @@ public class ObjectEntryRowInfoItemRenderer
 				(oldValue, newValue) -> oldValue, LinkedHashMap::new)
 		);
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ObjectEntryRowInfoItemRenderer.class);
 
 	private final AssetDisplayPageFriendlyURLProvider
 		_assetDisplayPageFriendlyURLProvider;
