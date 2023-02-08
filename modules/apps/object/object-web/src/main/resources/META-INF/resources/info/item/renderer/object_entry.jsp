@@ -28,15 +28,29 @@ for (Map.Entry<String, Serializable> entry : objectEntryValues.entrySet()) {
 
 	<td class="table-cell-expand-smallest">
 		<c:choose>
-			<c:when test="<%= Validator.isNotNull(friendlyURL) %>">
-				<a class="text-truncate-inline" href="<%= friendlyURL %>">
-					<span class="text-truncate"><%= entry.getValue() %></span>
+			<c:when test="<%= entry.getValue() instanceof Link %>">
+
+				<%
+				Link fileEntryLink = (Link)entry.getValue();
+				%>
+
+				<a class="text-truncate-inline" href="<%= fileEntryLink.getHref() %>">
+					<span class="text-truncate"><%= fileEntryLink.getLabel() %></span>
 				</a>
 			</c:when>
 			<c:otherwise>
-				<span class="text-truncate-inline">
-					<span class="text-truncate"><%= entry.getValue() %></span>
-				</span>
+				<c:choose>
+					<c:when test="<%= Validator.isNotNull(friendlyURL) %>">
+						<a class="text-truncate-inline" href="<%= friendlyURL %>">
+							<span class="text-truncate"><%= entry.getValue() %></span>
+						</a>
+					</c:when>
+					<c:otherwise>
+						<span class="text-truncate-inline">
+							<span class="text-truncate"><%= entry.getValue() %></span>
+						</span>
+					</c:otherwise>
+				</c:choose>
 			</c:otherwise>
 		</c:choose>
 	</td>

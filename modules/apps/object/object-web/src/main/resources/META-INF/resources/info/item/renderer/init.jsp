@@ -20,6 +20,7 @@
 
 <%@ page import="com.liferay.asset.display.page.portlet.AssetDisplayPageFriendlyURLProvider" %><%@
 page import="com.liferay.object.model.ObjectEntry" %><%@
+page import="com.liferay.object.rest.dto.v1_0.Link" %><%@
 page import="com.liferay.object.web.internal.constants.ObjectWebKeys" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %>
 

@@ -17,7 +17,9 @@ package com.liferay.object.web.internal.deployer;
 import com.liferay.application.list.PanelApp;
 import com.liferay.asset.display.page.portlet.AssetDisplayPageFriendlyURLProvider;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.frontend.data.set.view.FDSView;
 import com.liferay.frontend.data.set.view.table.FDSTableSchemaBuilderFactory;
 import com.liferay.info.item.creator.InfoItemCreator;
@@ -245,11 +247,11 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			_bundleContext.registerService(
 				InfoItemRenderer.class,
 				new ObjectEntryRowInfoItemRenderer(
-					_assetDisplayPageFriendlyURLProvider,
-					_dlFileEntryLocalService, _listTypeEntryLocalService,
-					_objectDefinitionLocalService, _objectEntryLocalService,
-					_objectFieldLocalService, _objectRelationshipLocalService,
-					_servletContext),
+					_assetDisplayPageFriendlyURLProvider, _dlAppService,
+					_dlFileEntryLocalService, _dlURLHelper,
+					_listTypeEntryLocalService, _objectDefinitionLocalService,
+					_objectEntryLocalService, _objectFieldLocalService,
+					_objectRelationshipLocalService, _portal, _servletContext),
 				HashMapDictionaryBuilder.<String, Object>put(
 					Constants.SERVICE_RANKING, 100
 				).put(
@@ -448,7 +450,13 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	private DisplayPageInfoItemCapability _displayPageInfoItemCapability;
 
 	@Reference
+	private DLAppService _dlAppService;
+
+	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
+
+	@Reference
+	private DLURLHelper _dlURLHelper;
 
 	@Reference
 	private EditPageInfoItemCapability _editPageInfoItemCapability;
