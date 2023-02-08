@@ -32,8 +32,10 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.util.PropsUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -151,6 +153,10 @@ public class ListTypeDefinitionLocalServiceImpl
 
 		listTypeDefinition = listTypeDefinitionPersistence.update(
 			listTypeDefinition);
+
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-167536"))) {
+			return listTypeDefinition;
+		}
 
 		_listTypeEntryLocalService.deleteListTypeEntryByListTypeDefinitionId(
 			listTypeDefinitionId);
