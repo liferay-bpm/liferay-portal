@@ -91,6 +91,9 @@ components:
                     additionalProperties:
                         type: string
                     type: object
+                modifiable:
+                    readOnly: true
+                    type: boolean
                 name:
                     type: string
                 objectActions:
