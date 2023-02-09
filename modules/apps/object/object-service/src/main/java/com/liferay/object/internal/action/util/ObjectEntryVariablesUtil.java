@@ -40,7 +40,6 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.extension.EntityExtensionThreadLocal;
-import com.liferay.portal.vulcan.util.ObjectMapperUtil;
 
 import java.io.Serializable;
 
@@ -294,6 +293,10 @@ public class ObjectEntryVariablesUtil {
 		Map<String, Object> variables = new HashMap<>();
 
 		if (objectDefinition.isSystem()) {
+			String contentType = _getContentType(
+				dtoConverterRegistry, objectDefinition,
+				systemObjectDefinitionMetadataRegistry);
+
 			Object object = payloadJSONObject.get(
 				"model" + objectDefinition.getName());
 
@@ -307,34 +310,13 @@ public class ObjectEntryVariablesUtil {
 				return payloadJSONObject.toMap();
 			}
 
-			if (object instanceof JSONObject) {
-				Map<String, Object> map = ObjectMapperUtil.readValue(
-					Map.class, object);
+			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
+				systemObjectDefinitionMetadataRegistry.
+					getSystemObjectDefinitionMetadata(
+						objectDefinition.getName());
 
-				Map<String, Object> jsonObjectMap =
-					(Map<String, Object>)map.get("_jsonObject");
-
-				variables.putAll((Map<String, Object>)jsonObjectMap.get("map"));
-			}
-			else if (object instanceof Map) {
-				variables.putAll((Map<String, Object>)object);
-			}
-
-			String contentType = _getContentType(
-				dtoConverterRegistry, objectDefinition,
-				systemObjectDefinitionMetadataRegistry);
-
-			Map<String, Object> map =
-				(Map<String, Object>)payloadJSONObject.get(
-					"modelDTO" + contentType);
-
-			if (map != null) {
-				variables.putAll(map);
-			}
-
-			variables.putAll(
-				(Map<String, Object>)payloadJSONObject.get(
-					"extendedProperties"));
+			systemObjectDefinitionMetadata.getVariablesSystem(
+				contentType, object, payloadJSONObject, variables);
 		}
 		else {
 			if (oldValues) {
