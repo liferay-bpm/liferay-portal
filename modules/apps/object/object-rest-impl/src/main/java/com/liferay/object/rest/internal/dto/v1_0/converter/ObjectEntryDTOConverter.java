@@ -484,23 +484,6 @@ public class ObjectEntryDTOConverter
 											getObjectDefinitionId1());
 
 							if (relatedObjectDefinition.isSystem()) {
-								Map<String, Serializable> variables =
-									new HashMap<>();
-
-								Map<String, Object> systemModelAttributes =
-									_objectEntryLocalService.
-										getSystemModelAttributes(
-											relatedObjectDefinition,
-											objectEntryId);
-
-								for (Map.Entry<String, Object> entry :
-										systemModelAttributes.entrySet()) {
-
-									variables.put(
-										entry.getKey(),
-										(Serializable)entry.getValue());
-								}
-
 								_addNestedFields(
 									map, nestedFields, objectFieldName,
 									objectRelationship,
@@ -511,7 +494,11 @@ public class ObjectEntryDTOConverter
 												relatedObjectDefinition.
 													getObjectDefinitionId()),
 										_objectFieldSettingLocalService,
-										_userLocalService, variables));
+										_userLocalService,
+										_objectEntryLocalService.
+											getSystemModelAttributes(
+												relatedObjectDefinition,
+												objectEntryId)));
 							}
 							else {
 								_addNestedFields(

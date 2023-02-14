@@ -730,7 +730,8 @@ public class ObjectEntryLocalServiceImpl
 		return objectEntryPersistence.dslQueryCount(dslQuery);
 	}
 
-	public Map<String, Object> getSystemModelAttributes(
+	@Override
+	public Map<String, Serializable> getSystemModelAttributes(
 			ObjectDefinition objectDefinition, long primaryKey)
 		throws PortalException {
 
@@ -765,8 +766,8 @@ public class ObjectEntryLocalServiceImpl
 			baseModelAttributes = baseModel.getModelAttributes();
 		}
 
-		Map<String, Object> modelAttributes =
-			HashMapBuilder.<String, Object>put(
+		Map<String, Serializable> modelAttributes =
+			HashMapBuilder.<String, Serializable>put(
 				"createDate",
 				GetterUtil.get(
 					baseModelAttributes.get("createDate"), primaryKey)
@@ -803,7 +804,7 @@ public class ObjectEntryLocalServiceImpl
 					(String)value, null, true);
 			}
 
-			modelAttributes.put(objectField.getName(), value);
+			modelAttributes.put(objectField.getName(), (Serializable)value);
 		}
 
 		modelAttributes.putAll(
