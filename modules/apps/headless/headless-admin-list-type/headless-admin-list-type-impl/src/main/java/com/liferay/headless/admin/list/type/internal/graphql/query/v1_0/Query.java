@@ -187,67 +187,72 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {listTypeEntryByExternalReferenceCode(externalReferenceCode: ___){actions, dateCreated, dateModified, externalReferenceCode, id, key, name, name_i18n, type}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {listTypeDefinitionByExternalReferenceCodeListTypeEntries(aggregation: ___, externalReferenceCode: ___, filter: ___, page: ___, pageSize: ___, search: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
-	public ListTypeEntry listTypeEntryByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode)
+	public ListTypeEntryPage
+			listTypeDefinitionByExternalReferenceCodeListTypeEntries(
+				@GraphQLName("externalReferenceCode") String
+					externalReferenceCode,
+				@GraphQLName("search") String search,
+				@GraphQLName("aggregation") List<String> aggregations,
+				@GraphQLName("filter") String filterString,
+				@GraphQLName("pageSize") int pageSize,
+				@GraphQLName("page") int page,
+				@GraphQLName("sort") String sortsString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_listTypeEntryResourceComponentServiceObjects,
 			this::_populateResourceContext,
-			listTypeEntryResource ->
-				listTypeEntryResource.getListTypeEntryByExternalReferenceCode(
-					externalReferenceCode));
-	}
-
-	@GraphQLTypeExtension(ListTypeEntry.class)
-	public class GetListTypeDefinitionByExternalReferenceCodeTypeExtension {
-
-		public GetListTypeDefinitionByExternalReferenceCodeTypeExtension(
-			ListTypeEntry listTypeEntry) {
-
-			_listTypeEntry = listTypeEntry;
-		}
-
-		@GraphQLField
-		public ListTypeDefinition listTypeDefinitionByExternalReferenceCode()
-			throws Exception {
-
-			return _applyComponentServiceObjects(
-				_listTypeDefinitionResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				listTypeDefinitionResource ->
-					listTypeDefinitionResource.
-						getListTypeDefinitionByExternalReferenceCode(
-							_listTypeEntry.getExternalReferenceCode()));
-		}
-
-		private ListTypeEntry _listTypeEntry;
-
+			listTypeEntryResource -> new ListTypeEntryPage(
+				listTypeEntryResource.
+					getListTypeDefinitionByExternalReferenceCodeListTypeEntriesPage(
+						externalReferenceCode, search,
+						_aggregationBiFunction.apply(
+							listTypeEntryResource, aggregations),
+						_filterBiFunction.apply(
+							listTypeEntryResource, filterString),
+						Pagination.of(page, pageSize),
+						_sortsBiFunction.apply(
+							listTypeEntryResource, sortsString))));
 	}
 
 	@GraphQLTypeExtension(ListTypeDefinition.class)
-	public class GetListTypeEntryByExternalReferenceCodeTypeExtension {
+	public class
+		GetListTypeDefinitionByExternalReferenceCodeListTypeEntriesPageTypeExtension {
 
-		public GetListTypeEntryByExternalReferenceCodeTypeExtension(
+		public GetListTypeDefinitionByExternalReferenceCodeListTypeEntriesPageTypeExtension(
 			ListTypeDefinition listTypeDefinition) {
 
 			_listTypeDefinition = listTypeDefinition;
 		}
 
 		@GraphQLField
-		public ListTypeEntry listTypeEntryByExternalReferenceCode()
+		public ListTypeEntryPage byExternalReferenceCodeListTypeEntries(
+				@GraphQLName("search") String search,
+				@GraphQLName("aggregation") List<String> aggregations,
+				@GraphQLName("filter") String filterString,
+				@GraphQLName("pageSize") int pageSize,
+				@GraphQLName("page") int page,
+				@GraphQLName("sort") String sortsString)
 			throws Exception {
 
 			return _applyComponentServiceObjects(
 				_listTypeEntryResourceComponentServiceObjects,
 				Query.this::_populateResourceContext,
-				listTypeEntryResource ->
+				listTypeEntryResource -> new ListTypeEntryPage(
 					listTypeEntryResource.
-						getListTypeEntryByExternalReferenceCode(
-							_listTypeDefinition.getExternalReferenceCode()));
+						getListTypeDefinitionByExternalReferenceCodeListTypeEntriesPage(
+							_listTypeDefinition.getExternalReferenceCode(),
+							search,
+							_aggregationBiFunction.apply(
+								listTypeEntryResource, aggregations),
+							_filterBiFunction.apply(
+								listTypeEntryResource, filterString),
+							Pagination.of(page, pageSize),
+							_sortsBiFunction.apply(
+								listTypeEntryResource, sortsString))));
 		}
 
 		private ListTypeDefinition _listTypeDefinition;
