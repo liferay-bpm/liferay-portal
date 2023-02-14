@@ -123,8 +123,10 @@ public class ObjectEntryResourceTest {
 
 	@After
 	public void tearDown() throws Exception {
-		_objectRelationshipLocalService.deleteObjectRelationship(
-			_objectRelationship);
+		_objectRelationshipLocalService.deleteObjectRelationships(
+			_objectDefinition1.getObjectDefinitionId());
+		_objectRelationshipLocalService.deleteObjectRelationships(
+			_objectDefinition2.getObjectDefinitionId());
 
 		_objectDefinitionLocalService.deleteObjectDefinition(
 			_objectDefinition1);
