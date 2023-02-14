@@ -516,7 +516,7 @@ public class ObjectEntryLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
-	public static Map<String, Object> getSystemModelAttributes(
+	public static Map<String, Serializable> getSystemModelAttributes(
 			com.liferay.object.model.ObjectDefinition objectDefinition,
 			long primaryKey)
 		throws PortalException {

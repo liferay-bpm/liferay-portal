@@ -588,7 +588,7 @@ public class ObjectEntryLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.Map<String, Object> getSystemModelAttributes(
+	public java.util.Map<String, java.io.Serializable> getSystemModelAttributes(
 			com.liferay.object.model.ObjectDefinition objectDefinition,
 			long primaryKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
