@@ -85,12 +85,16 @@ public interface ListTypeEntryResource {
 	public Response putListTypeEntryBatch(String callbackURL, Object object)
 		throws Exception;
 
-	public ListTypeEntry getListTypeEntryByExternalReferenceCode(
-			String externalReferenceCode)
+	public Page<ListTypeEntry>
+			getListTypeDefinitionByExternalReferenceCodeListTypeEntriesPage(
+				String externalReferenceCode, String search,
+				com.liferay.portal.vulcan.aggregation.Aggregation aggregation,
+				Filter filter, Pagination pagination, Sort[] sorts)
 		throws Exception;
 
-	public ListTypeEntry putListTypeEntryByExternalReferenceCode(
-			String externalReferenceCode, ListTypeEntry listTypeEntry)
+	public ListTypeEntry
+			postListTypeDefinitionByExternalReferenceCodeListTypeEntry(
+				String externalReferenceCode, ListTypeEntry listTypeEntry)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

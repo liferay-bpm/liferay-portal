@@ -106,21 +106,27 @@ public interface ListTypeEntryResource {
 			String callbackURL, Object object)
 		throws Exception;
 
-	public ListTypeEntry getListTypeEntryByExternalReferenceCode(
-			String externalReferenceCode)
+	public Page<ListTypeEntry>
+			getListTypeDefinitionByExternalReferenceCodeListTypeEntriesPage(
+				String externalReferenceCode, String search,
+				List<String> aggregations, String filterString,
+				Pagination pagination, String sortString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getListTypeEntryByExternalReferenceCodeHttpResponse(
-				String externalReferenceCode)
+			getListTypeDefinitionByExternalReferenceCodeListTypeEntriesPageHttpResponse(
+				String externalReferenceCode, String search,
+				List<String> aggregations, String filterString,
+				Pagination pagination, String sortString)
 		throws Exception;
 
-	public ListTypeEntry putListTypeEntryByExternalReferenceCode(
-			String externalReferenceCode, ListTypeEntry listTypeEntry)
+	public ListTypeEntry
+			postListTypeDefinitionByExternalReferenceCodeListTypeEntry(
+				String externalReferenceCode, ListTypeEntry listTypeEntry)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			putListTypeEntryByExternalReferenceCodeHttpResponse(
+			postListTypeDefinitionByExternalReferenceCodeListTypeEntryHttpResponse(
 				String externalReferenceCode, ListTypeEntry listTypeEntry)
 		throws Exception;
 
@@ -872,13 +878,17 @@ public interface ListTypeEntryResource {
 			return httpInvoker.invoke();
 		}
 
-		public ListTypeEntry getListTypeEntryByExternalReferenceCode(
-				String externalReferenceCode)
+		public Page<ListTypeEntry>
+				getListTypeDefinitionByExternalReferenceCodeListTypeEntriesPage(
+					String externalReferenceCode, String search,
+					List<String> aggregations, String filterString,
+					Pagination pagination, String sortString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getListTypeEntryByExternalReferenceCodeHttpResponse(
-					externalReferenceCode);
+				getListTypeDefinitionByExternalReferenceCodeListTypeEntriesPageHttpResponse(
+					externalReferenceCode, search, aggregations, filterString,
+					pagination, sortString);
 
 			String content = httpResponse.getContent();
 
@@ -906,7 +916,7 @@ public interface ListTypeEntryResource {
 			}
 
 			try {
-				return ListTypeEntrySerDes.toDTO(content);
+				return Page.of(content, ListTypeEntrySerDes::toDTO);
 			}
 			catch (Exception e) {
 				_logger.log(
@@ -918,8 +928,10 @@ public interface ListTypeEntryResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getListTypeEntryByExternalReferenceCodeHttpResponse(
-					String externalReferenceCode)
+				getListTypeDefinitionByExternalReferenceCodeListTypeEntriesPageHttpResponse(
+					String externalReferenceCode, String search,
+					List<String> aggregations, String filterString,
+					Pagination pagination, String sortString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -943,10 +955,29 @@ public interface ListTypeEntryResource {
 
 			httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
 
+			if (search != null) {
+				httpInvoker.parameter("search", String.valueOf(search));
+			}
+
+			if (filterString != null) {
+				httpInvoker.parameter("filter", filterString);
+			}
+
+			if (pagination != null) {
+				httpInvoker.parameter(
+					"page", String.valueOf(pagination.getPage()));
+				httpInvoker.parameter(
+					"pageSize", String.valueOf(pagination.getPageSize()));
+			}
+
+			if (sortString != null) {
+				httpInvoker.parameter("sort", sortString);
+			}
+
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
-						"/o/headless-admin-list-type/v1.0/list-type-entry/by-external-reference-code/{externalReferenceCode}");
+						"/o/headless-admin-list-type/v1.0/list-type-definitions/by-external-reference-code/{externalReferenceCode}/list-type-entries");
 
 			httpInvoker.path("externalReferenceCode", externalReferenceCode);
 
@@ -956,12 +987,13 @@ public interface ListTypeEntryResource {
 			return httpInvoker.invoke();
 		}
 
-		public ListTypeEntry putListTypeEntryByExternalReferenceCode(
-				String externalReferenceCode, ListTypeEntry listTypeEntry)
+		public ListTypeEntry
+				postListTypeDefinitionByExternalReferenceCodeListTypeEntry(
+					String externalReferenceCode, ListTypeEntry listTypeEntry)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putListTypeEntryByExternalReferenceCodeHttpResponse(
+				postListTypeDefinitionByExternalReferenceCodeListTypeEntryHttpResponse(
 					externalReferenceCode, listTypeEntry);
 
 			String content = httpResponse.getContent();
@@ -1002,7 +1034,7 @@ public interface ListTypeEntryResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				putListTypeEntryByExternalReferenceCodeHttpResponse(
+				postListTypeDefinitionByExternalReferenceCodeListTypeEntryHttpResponse(
 					String externalReferenceCode, ListTypeEntry listTypeEntry)
 			throws Exception {
 
@@ -1027,12 +1059,12 @@ public interface ListTypeEntryResource {
 				httpInvoker.parameter(entry.getKey(), entry.getValue());
 			}
 
-			httpInvoker.httpMethod(HttpInvoker.HttpMethod.PUT);
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
-						"/o/headless-admin-list-type/v1.0/list-type-entry/by-external-reference-code/{externalReferenceCode}");
+						"/o/headless-admin-list-type/v1.0/list-type-definitions/by-external-reference-code/{externalReferenceCode}/list-type-entries");
 
 			httpInvoker.path("externalReferenceCode", externalReferenceCode);
 

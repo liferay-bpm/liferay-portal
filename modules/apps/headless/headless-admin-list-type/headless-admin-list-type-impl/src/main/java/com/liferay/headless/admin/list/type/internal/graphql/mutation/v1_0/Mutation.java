@@ -265,17 +265,20 @@ public class Mutation {
 	}
 
 	@GraphQLField
-	public ListTypeEntry updateListTypeEntryByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode,
-			@GraphQLName("listTypeEntry") ListTypeEntry listTypeEntry)
+	public ListTypeEntry
+			createListTypeDefinitionByExternalReferenceCodeListTypeEntry(
+				@GraphQLName("externalReferenceCode") String
+					externalReferenceCode,
+				@GraphQLName("listTypeEntry") ListTypeEntry listTypeEntry)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_listTypeEntryResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			listTypeEntryResource ->
-				listTypeEntryResource.putListTypeEntryByExternalReferenceCode(
-					externalReferenceCode, listTypeEntry));
+				listTypeEntryResource.
+					postListTypeDefinitionByExternalReferenceCodeListTypeEntry(
+						externalReferenceCode, listTypeEntry));
 	}
 
 	private <T, R, E1 extends Throwable, E2 extends Throwable> R
