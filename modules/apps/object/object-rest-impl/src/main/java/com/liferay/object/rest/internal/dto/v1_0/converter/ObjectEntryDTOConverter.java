@@ -26,6 +26,7 @@ import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.entry.util.ObjectEntryValuesUtil;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
+import com.liferay.object.field.util.ObjectFieldFormulaEvaluatorUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
@@ -157,12 +158,25 @@ public class ObjectEntryDTOConverter
 				objectRelationship.getObjectDefinitionId1());
 
 		if (objectDefinition.isSystem()) {
-			value = _toDTO(
-				objectDefinition.getCompanyId(), primaryKey,
-				_systemObjectDefinitionMetadataRegistry.
-					getSystemObjectDefinitionMetadata(
-						objectDefinition.getName()),
-				dtoConverterContext.getUser());
+			if (GetterUtil.getBoolean(
+					PropsUtil.get("feature.flag.LPS-172094"))) {
+
+				value = ObjectFieldFormulaEvaluatorUtil.evaluate(
+					_ddmExpressionFactory,
+					_objectFieldLocalService.getObjectFields(
+						objectDefinition.getObjectDefinitionId()),
+					_objectFieldSettingLocalService, _userLocalService,
+					_objectEntryLocalService.getSystemModelAttributes(
+						objectDefinition, primaryKey));
+			}
+			else {
+				value = _toDTO(
+					objectDefinition.getCompanyId(), primaryKey,
+					_systemObjectDefinitionMetadataRegistry.
+						getSystemObjectDefinitionMetadata(
+							objectDefinition.getName()),
+					dtoConverterContext.getUser());
+			}
 		}
 		else {
 			value = _toDTO(
