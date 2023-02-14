@@ -170,6 +170,7 @@ public class ObjectDefinitionVulcanBatchEngineTaskItemDelegateTest {
 
 		return new ObjectDefinition() {
 			{
+				boolean system = RandomTestUtil.randomBoolean();
 				accountEntryRestricted = false;
 				accountEntryRestrictedObjectFieldName = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
@@ -182,6 +183,7 @@ public class ObjectDefinitionVulcanBatchEngineTaskItemDelegateTest {
 					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
 				label = Collections.singletonMap("en_US", "O" + sanitizedName);
+				modifiable = !system;
 				name = "O" + sanitizedName;
 				objectFields = new ObjectField[] {_createObjectField()};
 				panelAppOrder = StringUtil.toLowerCase(
@@ -206,7 +208,7 @@ public class ObjectDefinitionVulcanBatchEngineTaskItemDelegateTest {
 					storageType = StringPool.BLANK;
 				}
 
-				system = RandomTestUtil.randomBoolean();
+				this.system = system;
 				titleObjectFieldName = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 			}
