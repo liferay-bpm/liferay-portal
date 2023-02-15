@@ -76,7 +76,8 @@ public interface ListTypeEntryService extends BaseService {
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ListTypeEntry getListTypeEntryByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
+			String externalReferenceCode, long companyId,
+			long listTypeDefinitionId)
 		throws PortalException;
 
 	/**

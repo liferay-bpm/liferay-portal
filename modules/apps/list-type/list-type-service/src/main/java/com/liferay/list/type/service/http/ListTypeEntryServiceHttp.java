@@ -259,7 +259,7 @@ public class ListTypeEntryServiceHttp {
 	public static com.liferay.list.type.model.ListTypeEntry
 			getListTypeEntryByExternalReferenceCode(
 				HttpPrincipal httpPrincipal, String externalReferenceCode,
-				long companyId)
+				long companyId, long listTypeDefinitionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -269,7 +269,8 @@ public class ListTypeEntryServiceHttp {
 				_getListTypeEntryByExternalReferenceCodeParameterTypes5);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, externalReferenceCode, companyId);
+				methodKey, externalReferenceCode, companyId,
+				listTypeDefinitionId);
 
 			Object returnObj = null;
 
@@ -358,7 +359,7 @@ public class ListTypeEntryServiceHttp {
 		new Class[] {long.class};
 	private static final Class<?>[]
 		_getListTypeEntryByExternalReferenceCodeParameterTypes5 = new Class[] {
-			String.class, long.class
+			String.class, long.class, long.class
 		};
 	private static final Class<?>[] _updateListTypeEntryParameterTypes6 =
 		new Class[] {String.class, long.class, java.util.Map.class};

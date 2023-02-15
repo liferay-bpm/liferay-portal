@@ -229,15 +229,6 @@ public class ListTypeEntryPersistenceTest {
 	}
 
 	@Test
-	public void testCountByERC_C() throws Exception {
-		_persistence.countByERC_C("", RandomTestUtil.nextLong());
-
-		_persistence.countByERC_C("null", 0L);
-
-		_persistence.countByERC_C((String)null, 0L);
-	}
-
-	@Test
 	public void testCountByLTDI_K() throws Exception {
 		_persistence.countByLTDI_K(RandomTestUtil.nextLong(), "");
 
@@ -552,17 +543,6 @@ public class ListTypeEntryPersistenceTest {
 	}
 
 	private void _assertOriginalValues(ListTypeEntry listTypeEntry) {
-		Assert.assertEquals(
-			listTypeEntry.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				listTypeEntry, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
-			Long.valueOf(listTypeEntry.getCompanyId()),
-			ReflectionTestUtil.<Long>invoke(
-				listTypeEntry, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "companyId"));
-
 		Assert.assertEquals(
 			Long.valueOf(listTypeEntry.getListTypeDefinitionId()),
 			ReflectionTestUtil.<Long>invoke(

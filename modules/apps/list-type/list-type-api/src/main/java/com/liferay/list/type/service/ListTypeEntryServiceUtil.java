@@ -75,11 +75,12 @@ public class ListTypeEntryServiceUtil {
 	}
 
 	public static ListTypeEntry getListTypeEntryByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
+			String externalReferenceCode, long companyId,
+			long listTypeDefinitionId)
 		throws PortalException {
 
 		return getService().getListTypeEntryByExternalReferenceCode(
-			externalReferenceCode, companyId);
+			externalReferenceCode, companyId, listTypeDefinitionId);
 	}
 
 	/**
