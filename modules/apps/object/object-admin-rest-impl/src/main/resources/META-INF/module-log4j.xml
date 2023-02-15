@@ -2,6 +2,6 @@
 
 <Configuration strict="true">
 	<Loggers>
-		<Logger level="WARN" name="com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldUtil" />
+		<Logger level="WARN" name="com.liferay.object.admin.rest.dto.v1_0.util.ObjectFieldUtil" />
 	</Loggers>
 </Configuration>
