@@ -219,10 +219,6 @@ public interface ListTypeEntryLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ListTypeEntry fetchListTypeEntryByExternalReferenceCode(
-		String externalReferenceCode, long companyId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public ListTypeEntry fetchListTypeEntryByExternalReferenceCode(
 		String externalReferenceCode, long companyId,
 		long listTypeDefinitionId);
 
@@ -296,7 +292,8 @@ public interface ListTypeEntryLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ListTypeEntry getListTypeEntryByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
+			String externalReferenceCode, long companyId,
+			long listTypeDefinitionId)
 		throws PortalException;
 
 	/**

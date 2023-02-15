@@ -82,11 +82,12 @@ public class ListTypeEntryServiceWrapper
 	@Override
 	public com.liferay.list.type.model.ListTypeEntry
 			getListTypeEntryByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
+				String externalReferenceCode, long companyId,
+				long listTypeDefinitionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _listTypeEntryService.getListTypeEntryByExternalReferenceCode(
-			externalReferenceCode, companyId);
+			externalReferenceCode, companyId, listTypeDefinitionId);
 	}
 
 	/**
