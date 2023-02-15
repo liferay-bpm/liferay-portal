@@ -70,6 +70,30 @@ public class ListTypeEntryResourceTest
 
 	@Override
 	@Test
+	public void testGetListTypeDefinitionByExternalReferenceCodeListTypeEntriesPageWithSortInteger()
+		throws Exception {
+
+		testGetListTypeDefinitionByExternalReferenceCodeListTypeEntriesPageWithSort(
+			EntityField.Type.INTEGER,
+			(entityField, listTypeEntry1, listTypeEntry2) -> {
+				if (BeanTestUtil.hasProperty(
+						listTypeEntry1, entityField.getName())) {
+
+					BeanTestUtil.setProperty(
+						listTypeEntry1, entityField.getName(), 0);
+				}
+
+				if (BeanTestUtil.hasProperty(
+						listTypeEntry2, entityField.getName())) {
+
+					BeanTestUtil.setProperty(
+						listTypeEntry2, entityField.getName(), 1);
+				}
+			});
+	}
+
+	@Override
+	@Test
 	public void testGetListTypeDefinitionListTypeEntriesPageWithSortInteger()
 		throws Exception {
 
@@ -122,6 +146,25 @@ public class ListTypeEntryResourceTest
 	}
 
 	@Override
+	protected ListTypeEntry
+			testGetListTypeDefinitionByExternalReferenceCodeListTypeEntriesPage_addListTypeEntry(
+				String externalReferenceCode, ListTypeEntry listTypeEntry)
+		throws Exception {
+
+		return listTypeEntryResource.
+			postListTypeDefinitionByExternalReferenceCodeListTypeEntry(
+				externalReferenceCode, listTypeEntry);
+	}
+
+	@Override
+	protected String
+			testGetListTypeDefinitionByExternalReferenceCodeListTypeEntriesPage_getExternalReferenceCode()
+		throws Exception {
+
+		return _listTypeDefinition.getExternalReferenceCode();
+	}
+
+	@Override
 	protected Long
 		testGetListTypeDefinitionListTypeEntriesPage_getListTypeDefinitionId() {
 
@@ -140,6 +183,17 @@ public class ListTypeEntryResourceTest
 		throws Exception {
 
 		return _addListTypeEntry();
+	}
+
+	@Override
+	protected ListTypeEntry
+			testPostListTypeDefinitionByExternalReferenceCodeListTypeEntry_addListTypeEntry(
+				ListTypeEntry listTypeEntry)
+		throws Exception {
+
+		return listTypeEntryResource.
+			postListTypeDefinitionByExternalReferenceCodeListTypeEntry(
+				_listTypeDefinition.getExternalReferenceCode(), listTypeEntry);
 	}
 
 	@Override
