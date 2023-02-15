@@ -657,7 +657,11 @@ public class ObjectDefinitionResourceImpl
 				id = objectDefinition.getObjectDefinitionId();
 				label = LocalizedMapUtil.getLanguageIdMap(
 					objectDefinition.getLabelMap());
-				modifiable = objectDefinition.getModifiable();
+
+				if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-167253"))) {
+					modifiable = objectDefinition.getModifiable();
+				}
+
 				name = objectDefinition.getShortName();
 				objectActions = transformToArray(
 					_objectActionLocalService.getObjectActions(
