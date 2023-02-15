@@ -190,14 +190,16 @@ public class ListTypeEntryLocalServiceTest {
 			_listTypeEntryLocalService.
 				fetchListTypeEntryByExternalReferenceCode(
 					_listTypeEntry.getExternalReferenceCode(),
-					_listTypeEntry.getCompanyId());
+					_listTypeEntry.getCompanyId(),
+					_listTypeDefinition.getListTypeDefinitionId());
 
 		Assert.assertNotNull(listTypeEntry);
 
 		listTypeEntry =
 			_listTypeEntryLocalService.
 				fetchListTypeEntryByExternalReferenceCode(
-					null, _listTypeEntry.getCompanyId());
+					null, _listTypeEntry.getCompanyId(),
+					_listTypeDefinition.getListTypeDefinitionId());
 
 		Assert.assertNull(listTypeEntry);
 	}
@@ -218,7 +220,8 @@ public class ListTypeEntryLocalServiceTest {
 
 		try {
 			_listTypeEntryLocalService.getListTypeEntryByExternalReferenceCode(
-				RandomTestUtil.randomString(), _listTypeEntry.getCompanyId());
+				RandomTestUtil.randomString(), _listTypeEntry.getCompanyId(),
+				_listTypeDefinition.getListTypeDefinitionId());
 		}
 		catch (NoSuchListTypeEntryException noSuchListTypeEntryException) {
 			Assert.assertNotNull(noSuchListTypeEntryException);
@@ -227,7 +230,8 @@ public class ListTypeEntryLocalServiceTest {
 		Assert.assertNotNull(
 			_listTypeEntryLocalService.getListTypeEntryByExternalReferenceCode(
 				_listTypeEntry.getExternalReferenceCode(),
-				_listTypeEntry.getCompanyId()));
+				_listTypeEntry.getCompanyId(),
+				_listTypeDefinition.getListTypeDefinitionId()));
 	}
 
 	@Test

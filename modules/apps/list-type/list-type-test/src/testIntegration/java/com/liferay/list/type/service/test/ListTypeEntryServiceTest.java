@@ -254,7 +254,8 @@ public class ListTypeEntryServiceTest {
 
 			_listTypeEntryService.getListTypeEntryByExternalReferenceCode(
 				listTypeEntry.getExternalReferenceCode(),
-				listTypeEntry.getCompanyId());
+				listTypeEntry.getCompanyId(),
+				_listTypeDefinition.getListTypeDefinitionId());
 		}
 		finally {
 			if (listTypeEntry != null) {
