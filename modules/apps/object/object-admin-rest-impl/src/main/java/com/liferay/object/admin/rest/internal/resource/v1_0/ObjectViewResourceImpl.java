@@ -15,10 +15,8 @@
 package com.liferay.object.admin.rest.internal.resource.v1_0;
 
 import com.liferay.object.admin.rest.dto.v1_0.ObjectView;
-import com.liferay.object.admin.rest.dto.v1_0.ObjectViewColumn;
-import com.liferay.object.admin.rest.dto.v1_0.ObjectViewFilterColumn;
-import com.liferay.object.admin.rest.dto.v1_0.ObjectViewSortColumn;
 import com.liferay.object.admin.rest.internal.dto.v1_0.converter.ObjectViewDTOConverter;
+import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectViewUtil;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectViewResource;
 import com.liferay.object.admin.rest.resource.v1_0.util.NameMapUtil;
 import com.liferay.object.model.ObjectDefinition;
@@ -160,13 +158,20 @@ public class ObjectViewResourceImpl
 				LocalizedMapUtil.getLocalizedMap(objectView.getName()),
 				transformToList(
 					objectView.getObjectViewColumns(),
-					this::_toObjectViewColumn),
+					objectViewColumn -> ObjectViewUtil.toObjectViewColumn(
+						objectViewColumn, _objectViewColumnPersistence)),
 				transformToList(
 					objectView.getObjectViewFilterColumns(),
-					this::_toObjectViewFilterColumn),
+					objectViewFilterColumn ->
+						ObjectViewUtil.toObjectViewFilterColumn(
+							objectViewFilterColumn,
+							_objectViewFilterColumnPersistence)),
 				transformToList(
 					objectView.getObjectViewSortColumns(),
-					this::_toObjectViewSortColumn)));
+					objectViewSortColumn ->
+						ObjectViewUtil.toObjectViewSortColumn(
+							objectViewSortColumn,
+							_objectViewSortColumnPersistence))));
 	}
 
 	@Override
@@ -193,13 +198,20 @@ public class ObjectViewResourceImpl
 				LocalizedMapUtil.getLocalizedMap(objectView.getName()),
 				transformToList(
 					objectView.getObjectViewColumns(),
-					this::_toObjectViewColumn),
+					objectViewColumn -> ObjectViewUtil.toObjectViewColumn(
+						objectViewColumn, _objectViewColumnPersistence)),
 				transformToList(
 					objectView.getObjectViewFilterColumns(),
-					this::_toObjectViewFilterColumn),
+					objectViewFilterColumn ->
+						ObjectViewUtil.toObjectViewFilterColumn(
+							objectViewFilterColumn,
+							_objectViewFilterColumnPersistence)),
 				transformToList(
 					objectView.getObjectViewSortColumns(),
-					this::_toObjectViewSortColumn)));
+					objectViewSortColumn ->
+						ObjectViewUtil.toObjectViewSortColumn(
+							objectViewSortColumn,
+							_objectViewSortColumnPersistence))));
 	}
 
 	private ObjectView _toObjectView(
@@ -237,58 +249,6 @@ public class ObjectViewResourceImpl
 				null, null, contextAcceptLanguage.getPreferredLocale(), null,
 				null),
 			serviceBuilderObjectView);
-	}
-
-	private com.liferay.object.model.ObjectViewColumn _toObjectViewColumn(
-		ObjectViewColumn objectViewColumn) {
-
-		com.liferay.object.model.ObjectViewColumn
-			serviceBuilderObjectViewColumn =
-				_objectViewColumnPersistence.create(0L);
-
-		serviceBuilderObjectViewColumn.setLabelMap(
-			LocalizedMapUtil.getLocalizedMap(objectViewColumn.getLabel()));
-		serviceBuilderObjectViewColumn.setObjectFieldName(
-			objectViewColumn.getObjectFieldName());
-		serviceBuilderObjectViewColumn.setPriority(
-			objectViewColumn.getPriority());
-
-		return serviceBuilderObjectViewColumn;
-	}
-
-	private com.liferay.object.model.ObjectViewFilterColumn
-		_toObjectViewFilterColumn(
-			ObjectViewFilterColumn objectViewFilterColumn) {
-
-		com.liferay.object.model.ObjectViewFilterColumn
-			serviceBuilderObjectViewFilterColumn =
-				_objectViewFilterColumnPersistence.create(0L);
-
-		serviceBuilderObjectViewFilterColumn.setFilterType(
-			objectViewFilterColumn.getFilterTypeAsString());
-		serviceBuilderObjectViewFilterColumn.setJSON(
-			objectViewFilterColumn.getJson());
-		serviceBuilderObjectViewFilterColumn.setObjectFieldName(
-			objectViewFilterColumn.getObjectFieldName());
-
-		return serviceBuilderObjectViewFilterColumn;
-	}
-
-	private com.liferay.object.model.ObjectViewSortColumn
-		_toObjectViewSortColumn(ObjectViewSortColumn objectViewSortColumn) {
-
-		com.liferay.object.model.ObjectViewSortColumn
-			serviceBuilderObjectViewSortColumn =
-				_objectViewSortColumnPersistence.create(0L);
-
-		serviceBuilderObjectViewSortColumn.setObjectFieldName(
-			objectViewSortColumn.getObjectFieldName());
-		serviceBuilderObjectViewSortColumn.setPriority(
-			objectViewSortColumn.getPriority());
-		serviceBuilderObjectViewSortColumn.setSortOrder(
-			objectViewSortColumn.getSortOrderAsString());
-
-		return serviceBuilderObjectViewSortColumn;
 	}
 
 	@Reference
