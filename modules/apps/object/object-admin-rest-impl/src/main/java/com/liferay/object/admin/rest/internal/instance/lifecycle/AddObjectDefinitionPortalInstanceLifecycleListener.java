@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -57,7 +58,9 @@ public class AddObjectDefinitionPortalInstanceLifecycleListener
 
 	@Override
 	public void portalInstanceRegistered(Company company) {
-		_importJSONObjectDefinition(company);
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-167253"))) {
+			_importJSONObjectDefinition(company);
+		}
 	}
 
 	private void _importJSONObjectDefinition(Company company) {
