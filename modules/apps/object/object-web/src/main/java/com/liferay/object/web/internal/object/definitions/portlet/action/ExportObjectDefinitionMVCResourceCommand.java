@@ -113,6 +113,10 @@ public class ExportObjectDefinitionMVCResourceCommand
 		JSONObject objectDefinitionJSONObject = _jsonFactory.createJSONObject(
 			objectDefinition.toString());
 
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-167253"))) {
+			objectDefinitionJSONObject.remove("modifiable");
+		}
+
 		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-135430"))) {
 			objectDefinitionJSONObject.remove("storageType");
 		}

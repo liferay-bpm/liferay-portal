@@ -183,7 +183,13 @@ public class ObjectDefinitionVulcanBatchEngineTaskItemDelegateTest {
 					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
 				label = Collections.singletonMap("en_US", "O" + sanitizedName);
-				modifiable = !system;
+
+				if (GetterUtil.getBoolean(
+						PropsUtil.get("feature.flag.LPS-167253"))) {
+
+					modifiable = !system;
+				}
+
 				name = "O" + sanitizedName;
 				objectFields = new ObjectField[] {_createObjectField()};
 				panelAppOrder = StringUtil.toLowerCase(
