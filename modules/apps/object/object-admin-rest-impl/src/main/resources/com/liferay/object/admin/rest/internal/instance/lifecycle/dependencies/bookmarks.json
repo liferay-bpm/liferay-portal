@@ -1,0 +1,332 @@
+{
+	"accountEntryRestricted": false,
+	"accountEntryRestrictedObjectFieldName": "",
+	"actions": {
+		"delete": {
+		},
+		"get": {
+		},
+		"permissions": {
+		},
+		"update": {
+		}
+	},
+	"active": true,
+	"defaultLanguageId": "en_US",
+	"enableCategorization": true,
+	"enableComments": false,
+	"enableObjectEntryHistory": false,
+	"externalReferenceCode": "9e12c0d0-5855-35d0-cef9-ed9794b05dcb",
+	"label": {
+		"en_US": "Bookmark"
+	},
+	"name": "Bookmark",
+	"objectActions": [
+	],
+	"objectFields": [
+		{
+			"DBType": "Date",
+			"businessType": "Date",
+			"defaultValue": "",
+			"externalReferenceCode": "83fd6793-02e2-8413-73be-20619790f50a",
+			"indexed": false,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "",
+			"label": {
+				"en_US": "Create Date"
+			},
+			"listTypeDefinitionExternalReferenceCode": "",
+			"name": "createDate",
+			"objectFieldSettings": [
+			],
+			"required": false,
+			"state": false,
+			"system": true,
+			"type": "Date"
+		},
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"defaultValue": "",
+			"externalReferenceCode": "5a617add-f4e4-3cfb-9aaa-87fa82aee12a",
+			"indexed": false,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "",
+			"label": {
+				"en_US": "Author"
+			},
+			"listTypeDefinitionExternalReferenceCode": "",
+			"name": "creator",
+			"objectFieldSettings": [
+			],
+			"required": false,
+			"state": false,
+			"system": true,
+			"type": "String"
+		},
+		{
+			"DBType": "Clob",
+			"businessType": "LongText",
+			"defaultValue": "",
+			"externalReferenceCode": "2541827d-4a56-9257-a4ad-2c10e19a576d",
+			"indexed": true,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "",
+			"label": {
+				"en_US": "Description"
+			},
+			"listTypeDefinitionExternalReferenceCode": "",
+			"name": "description",
+			"objectFieldSettings": [
+				{
+					"name": "showCounter",
+					"value": "false"
+				}
+			],
+			"required": false,
+			"state": false,
+			"system": false,
+			"type": "Clob"
+		},
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"defaultValue": "",
+			"externalReferenceCode": "ef8537f5-9858-95a7-140a-6ba579fb6f68",
+			"indexed": false,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "",
+			"label": {
+				"en_US": "External Reference Code"
+			},
+			"listTypeDefinitionExternalReferenceCode": "",
+			"name": "externalReferenceCode",
+			"objectFieldSettings": [
+			],
+			"required": false,
+			"state": false,
+			"system": true,
+			"type": "String"
+		},
+		{
+			"DBType": "Long",
+			"businessType": "LongInteger",
+			"defaultValue": "",
+			"externalReferenceCode": "4c2b8ec5-4033-e512-2a41-edc3cbfa93ea",
+			"indexed": true,
+			"indexedAsKeyword": true,
+			"indexedLanguageId": "",
+			"label": {
+				"en_US": "ID"
+			},
+			"listTypeDefinitionExternalReferenceCode": "",
+			"name": "id",
+			"objectFieldSettings": [
+			],
+			"required": false,
+			"state": false,
+			"system": true,
+			"type": "Long"
+		},
+		{
+			"DBType": "Date",
+			"businessType": "Date",
+			"defaultValue": "",
+			"externalReferenceCode": "dbbce037-12ec-a27c-4954-f4877729132d",
+			"indexed": false,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "",
+			"label": {
+				"en_US": "Modified Date"
+			},
+			"listTypeDefinitionExternalReferenceCode": "",
+			"name": "modifiedDate",
+			"objectFieldSettings": [
+			],
+			"required": false,
+			"state": false,
+			"system": true,
+			"type": "Date"
+		},
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"defaultValue": "",
+			"externalReferenceCode": "f526a2c1-1228-1c1b-e5a8-06266d5ef9c9",
+			"indexed": true,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "en_US",
+			"label": {
+				"en_US": "Name"
+			},
+			"listTypeDefinitionExternalReferenceCode": "",
+			"name": "name",
+			"objectFieldSettings": [
+				{
+					"name": "showCounter",
+					"value": "false"
+				}
+			],
+			"required": false,
+			"state": false,
+			"system": false,
+			"type": "String"
+		},
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"defaultValue": "",
+			"externalReferenceCode": "e28f9669-a916-a45c-681a-b365fbf4c50d",
+			"indexed": false,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "",
+			"label": {
+				"en_US": "Status"
+			},
+			"listTypeDefinitionExternalReferenceCode": "",
+			"name": "status",
+			"objectFieldSettings": [
+			],
+			"required": false,
+			"state": false,
+			"system": true,
+			"type": "String"
+		},
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"defaultValue": "",
+			"externalReferenceCode": "07709975-c74c-a535-1056-a6ce840b9e9c",
+			"indexed": true,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "en_US",
+			"label": {
+				"en_US": "URL"
+			},
+			"listTypeDefinitionExternalReferenceCode": "",
+			"name": "uRL",
+			"objectFieldSettings": [
+				{
+					"name": "showCounter",
+					"value": "false"
+				}
+			],
+			"required": true,
+			"state": false,
+			"system": false,
+			"type": "String"
+		}
+	],
+	"objectLayouts": [
+		{
+			"defaultObjectLayout": true,
+			"name": {
+				"en_US": "Main"
+			},
+			"objectDefinitionExternalReferenceCode": "9e12c0d0-5855-35d0-cef9-ed9794b05dcb",
+			"objectLayoutTabs": [
+				{
+					"name": {
+						"en_US": "Bookmarks"
+					},
+					"objectLayoutBoxes": [
+						{
+							"collapsable": false,
+							"name": {
+								"en_US": "My Link"
+							},
+							"objectLayoutRows": [
+								{
+									"objectLayoutColumns": [
+										{
+											"objectFieldName": "name",
+											"priority": 0,
+											"size": 12
+										}
+									],
+									"priority": 0
+								},
+								{
+									"objectLayoutColumns": [
+										{
+											"objectFieldName": "uRL",
+											"priority": 0,
+											"size": 12
+										}
+									],
+									"priority": 0
+								},
+								{
+									"objectLayoutColumns": [
+										{
+											"objectFieldName": "description",
+											"priority": 0,
+											"size": 12
+										}
+									],
+									"priority": 0
+								}
+							],
+							"priority": 0,
+							"type": "regular"
+						}
+					],
+					"priority": 0
+				}
+			]
+		}
+	],
+	"objectRelationships": [
+	],
+	"objectViews": [
+		{
+			"defaultObjectView": true,
+			"name": {
+				"en_US": "Main"
+			},
+			"objectDefinitionExternalReferenceCode": "9e12c0d0-5855-35d0-cef9-ed9794b05dcb",
+			"objectViewColumns": [
+				{
+					"label": {
+						"en_US": "Name"
+					},
+					"objectFieldName": "name",
+					"priority": 0
+				},
+				{
+					"label": {
+						"en_US": "URL"
+					},
+					"objectFieldName": "uRL",
+					"priority": 1
+				},
+				{
+					"label": {
+						"en_US": "Description"
+					},
+					"objectFieldName": "description",
+					"priority": 2
+				}
+			],
+			"objectViewFilterColumns": [
+			],
+			"objectViewSortColumns": [
+			]
+		}
+	],
+	"panelCategoryKey": "site_administration.content",
+	"parameterRequired": false,
+	"pluralLabel": {
+		"en_US": "Bookmarks"
+	},
+	"portlet": true,
+	"restContextPath": "/o/c/bookmarks",
+	"scope": "site",
+	"status": {
+		"code": 0,
+		"label": "approved",
+		"label_i18n": "Approved"
+	},
+	"system": false,
+	"titleObjectFieldName": "name"
+}
