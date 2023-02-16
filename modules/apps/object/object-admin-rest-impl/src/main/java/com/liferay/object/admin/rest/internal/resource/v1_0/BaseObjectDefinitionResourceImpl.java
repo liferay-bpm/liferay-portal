@@ -484,6 +484,11 @@ public abstract class BaseObjectDefinitionResourceImpl
 			existingObjectDefinition.setLabel(objectDefinition.getLabel());
 		}
 
+		if (objectDefinition.getModifiable() != null) {
+			existingObjectDefinition.setModifiable(
+				objectDefinition.getModifiable());
+		}
+
 		if (objectDefinition.getName() != null) {
 			existingObjectDefinition.setName(objectDefinition.getName());
 		}
