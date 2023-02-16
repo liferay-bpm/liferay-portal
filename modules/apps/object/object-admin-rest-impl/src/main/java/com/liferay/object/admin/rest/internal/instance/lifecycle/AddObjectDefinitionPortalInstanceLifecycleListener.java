@@ -30,11 +30,14 @@ import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import com.liferay.portal.util.PropsUtil;
 
 import java.util.List;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Paulo Albuquerque
@@ -45,7 +48,9 @@ public class AddObjectDefinitionPortalInstanceLifecycleListener
 
 	@Override
 	public void portalInstanceRegistered(Company company) {
-		_importJSONObjectDefinition(company);
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-167253"))) {
+			_importJSONObjectDefinition(company);
+		}
 	}
 
 	private void _importJSONObjectDefinition(Company company) {
