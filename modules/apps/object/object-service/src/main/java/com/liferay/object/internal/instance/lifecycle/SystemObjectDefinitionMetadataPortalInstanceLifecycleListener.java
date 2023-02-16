@@ -73,6 +73,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.language.LanguageResources;
 import com.liferay.portal.security.service.access.policy.model.SAPEntry;
 import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalService;
+import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -113,7 +114,9 @@ public class SystemObjectDefinitionMetadataPortalInstanceLifecycleListener
 			_apply(company.getCompanyId(), systemObjectDefinitionMetadata);
 		}
 
-		_importJSONObjectDefinition(company);
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-167253"))) {
+			_importJSONObjectDefinition(company);
+		}
 	}
 
 	@Activate
