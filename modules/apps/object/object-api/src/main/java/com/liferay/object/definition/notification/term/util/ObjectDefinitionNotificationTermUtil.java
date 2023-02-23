@@ -22,6 +22,10 @@ import com.liferay.portal.kernel.util.StringUtil;
  */
 public class ObjectDefinitionNotificationTermUtil {
 
+	public static String getGeneralTermName(String name) {
+		return StringBundler.concat("[%", name, "%]");
+	}
+
 	public static String getObjectFieldTermName(
 		String objectDefinitionShortName, String objectFieldName) {
 
