@@ -20,8 +20,6 @@ import com.liferay.notification.internal.configuration.NotificationQueueConfigur
 import com.liferay.notification.service.NotificationQueueEntryLocalService;
 import com.liferay.notification.type.NotificationType;
 import com.liferay.notification.type.NotificationTypeServiceTracker;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
@@ -54,20 +52,14 @@ public class CheckNotificationQueueEntryMessageListener
 
 		Class<?> clazz = getClass();
 
-		String className = StringBundler.concat(
-			clazz.getName(), StringPool.POUND, properties.get("companyId"));
-
-		NotificationQueueConfiguration notificationQueueConfiguration =
-			_getNotificationQueueConfiguration();
+		String className = clazz.getName();
 
 		_schedulerEngineHelper.register(
 			this,
 			new SchedulerEntryImpl(
 				className,
 				_triggerFactory.createTrigger(
-					className, className, null, null,
-					notificationQueueConfiguration.checkInterval(),
-					TimeUnit.MINUTE)),
+					className, className, null, null, 15, TimeUnit.MINUTE)),
 			DestinationNames.SCHEDULER_DISPATCH);
 	}
 
@@ -87,20 +79,14 @@ public class CheckNotificationQueueEntryMessageListener
 			NotificationConstants.TYPE_EMAIL);
 
 		NotificationQueueConfiguration notificationQueueConfiguration =
-			_getNotificationQueueConfiguration();
+			_configurationProvider.getSystemConfiguration(
+				NotificationQueueConfiguration.class);
 
 		long deleteInterval =
 			notificationQueueConfiguration.deleteInterval() * Time.MINUTE;
 
 		_notificationQueueEntryLocalService.deleteNotificationQueueEntries(
 			new Date(System.currentTimeMillis() - deleteInterval));
-	}
-
-	private NotificationQueueConfiguration _getNotificationQueueConfiguration()
-		throws ConfigurationException {
-
-		return _configurationProvider.getSystemConfiguration(
-			NotificationQueueConfiguration.class);
 	}
 
 	@Reference
