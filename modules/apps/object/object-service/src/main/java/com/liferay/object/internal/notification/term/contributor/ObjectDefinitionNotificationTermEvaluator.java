@@ -19,11 +19,16 @@ import com.liferay.object.definition.notification.term.util.ObjectDefinitionNoti
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Contact;
+import com.liferay.portal.kernel.model.ListType;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ListTypeServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Map;
@@ -54,15 +59,24 @@ public class ObjectDefinitionNotificationTermEvaluator
 
 		Map<String, Object> termValues = (Map<String, Object>)object;
 
+		User user = null;
+
 		if (termName.contains("_CREATOR")) {
-			if (context.equals(Context.RECIPIENT)) {
-				return String.valueOf(termValues.get("creator"));
-			}
-
-			User user = _userLocalService.getUser(
+			user = _userLocalService.getUser(
 				GetterUtil.getLong(termValues.get("creator")));
+		}
+		else if (termName.contains("_CURRENTUSER")) {
+			user = _userLocalService.getUser(
+				GetterUtil.getLong(termValues.get("currentUserId")));
+		}
 
-			return user.getFullName(true, true);
+		if (user != null) {
+			Map<String, String> creatorTerms = _getUserVariablesMap(user);
+
+			String suffix = StringUtil.extractLast(
+				termName, StringPool.UNDERLINE);
+
+			return creatorTerms.get(StringUtil.removeSubstring(suffix, "%]"));
 		}
 
 		Map<String, Long> objectFieldIds = _getObjectFieldIds();
@@ -114,6 +128,48 @@ public class ObjectDefinitionNotificationTermEvaluator
 		}
 
 		return objectFieldIds;
+	}
+
+	private Map<String, String> _getUserVariablesMap(User user) {
+		return HashMapBuilder.put(
+			"EMAIL", user.getEmailAddress()
+		).put(
+			"FIRSTNAME", user.getFirstName()
+		).put(
+			"ID", String.valueOf(user.getUserId())
+		).put(
+			"LASTNAME", user.getLastName()
+		).put(
+			"MIDDLENAME", user.getMiddleName()
+		).put(
+			"PREFIX",
+			() -> {
+				Contact contact = user.fetchContact();
+
+				if ((contact == null) || (contact.getPrefixListTypeId() == 0)) {
+					return StringPool.BLANK;
+				}
+
+				ListType listType = ListTypeServiceUtil.getListType(
+					contact.getPrefixListTypeId());
+
+				return listType.getName();
+			}
+		).put(
+			"SUFFIX",
+			() -> {
+				Contact contact = user.fetchContact();
+
+				if ((contact == null) || (contact.getSuffixListTypeId() == 0)) {
+					return StringPool.BLANK;
+				}
+
+				ListType listType = ListTypeServiceUtil.getListType(
+					contact.getSuffixListTypeId());
+
+				return listType.getName();
+			}
+		).build();
 	}
 
 	private final ObjectDefinition _objectDefinition;
