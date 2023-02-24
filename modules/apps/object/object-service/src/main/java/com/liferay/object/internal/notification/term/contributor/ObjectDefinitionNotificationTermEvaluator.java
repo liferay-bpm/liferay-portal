@@ -21,6 +21,7 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.ListType;
 import com.liferay.portal.kernel.model.User;
@@ -62,6 +63,17 @@ public class ObjectDefinitionNotificationTermEvaluator
 		User user = null;
 
 		if (termName.contains("_CREATOR")) {
+			if (!FeatureFlagManagerUtil.isEnabled("LPS-171625")) {
+				if (context.equals(Context.RECIPIENT)) {
+					return String.valueOf(termValues.get("creator"));
+				}
+
+				user = _userLocalService.getUser(
+					GetterUtil.getLong(termValues.get("creator")));
+
+				return user.getFullName(true, true);
+			}
+
 			user = _userLocalService.getUser(
 				GetterUtil.getLong(termValues.get("creator")));
 		}
