@@ -21,6 +21,7 @@ type NotificationTemplate = {
 	body: LocalizedValue<string>;
 	cc: string;
 	description: string;
+	externalReferenceCode: string;
 	from: string;
 	fromName: LocalizedValue<string>;
 	id: number;
@@ -49,6 +50,7 @@ interface ObjectAction {
 
 interface ObjectActionParameters {
 	lineCount?: number;
+	notificationTemplateExternalReferenceCode?: string;
 	notificationTemplateId?: number;
 	objectDefinitionExternalReferenceCode?: string;
 	objectDefinitionId?: number;
