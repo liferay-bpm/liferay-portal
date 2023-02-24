@@ -120,6 +120,7 @@ interface ObjectDefinition {
 	defaultLanguageId: Liferay.Language.Locale;
 	enableCategorization: boolean;
 	enableComments: boolean;
+	enableLocalization: boolean;
 	enableObjectEntryHistory: boolean;
 	externalReferenceCode: string;
 	id: number;
