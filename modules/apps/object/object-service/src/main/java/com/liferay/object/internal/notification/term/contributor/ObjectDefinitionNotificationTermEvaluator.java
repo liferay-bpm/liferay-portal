@@ -19,11 +19,16 @@ import com.liferay.object.definition.notification.term.util.ObjectDefinitionNoti
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Contact;
+import com.liferay.portal.kernel.model.ListType;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ListTypeServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Map;
@@ -54,15 +59,24 @@ public class ObjectDefinitionNotificationTermEvaluator
 
 		Map<String, Object> termValues = (Map<String, Object>)object;
 
+		User user = null;
+
 		if (termName.contains("_CREATOR")) {
-			if (context.equals(Context.RECIPIENT)) {
-				return String.valueOf(termValues.get("creator"));
-			}
-
-			User user = _userLocalService.getUser(
+			user = _userLocalService.getUser(
 				GetterUtil.getLong(termValues.get("creator")));
+		}
+		else if (termName.contains("CURRENT_USER")) {
+			user = _userLocalService.getUser(
+				GetterUtil.getLong(termValues.get("currentUserId")));
+		}
 
-			return user.getFullName(true, true);
+		if (user != null) {
+			Map<String, String> userTermValuesMap = _getUserTermValuesMap(user);
+
+			return userTermValuesMap.get(
+				StringUtil.removeSubstring(
+					StringUtil.extractLast(termName, StringPool.UNDERLINE),
+					"%]"));
 		}
 
 		Map<String, Long> objectFieldIds = _getObjectFieldIds();
@@ -81,6 +95,36 @@ public class ObjectDefinitionNotificationTermEvaluator
 		}
 
 		return String.valueOf(termValues.get(objectField.getDBColumnName()));
+	}
+
+	private String _getListTypeName(boolean prefix, User user)
+		throws PortalException {
+
+		Contact contact = user.fetchContact();
+
+		if (contact == null) {
+			return StringPool.BLANK;
+		}
+
+		if (prefix) {
+			if (Validator.isNull(contact.getPrefixListTypeId())) {
+				return StringPool.BLANK;
+			}
+
+			ListType listType = ListTypeServiceUtil.getListType(
+				contact.getPrefixListTypeId());
+
+			return listType.getName();
+		}
+
+		if (Validator.isNull(contact.getSuffixListTypeId())) {
+			return StringPool.BLANK;
+		}
+
+		ListType listType = ListTypeServiceUtil.getListType(
+			contact.getSuffixListTypeId());
+
+		return listType.getName();
 	}
 
 	private Map<String, Long> _getObjectFieldIds() {
@@ -114,6 +158,26 @@ public class ObjectDefinitionNotificationTermEvaluator
 		}
 
 		return objectFieldIds;
+	}
+
+	private Map<String, String> _getUserTermValuesMap(User user)
+		throws PortalException {
+
+		return HashMapBuilder.put(
+			"EMAIL", user.getEmailAddress()
+		).put(
+			"FIRSTNAME", user.getFirstName()
+		).put(
+			"ID", String.valueOf(user.getUserId())
+		).put(
+			"LASTNAME", user.getLastName()
+		).put(
+			"MIDDLENAME", user.getMiddleName()
+		).put(
+			"PREFIX", _getListTypeName(true, user)
+		).put(
+			"SUFFIX", _getListTypeName(false, user)
+		).build();
 	}
 
 	private final ObjectDefinition _objectDefinition;
