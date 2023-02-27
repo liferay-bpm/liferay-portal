@@ -12,9 +12,17 @@
  * details.
  */
 
-/// <reference types="react" />
-
+import {RefAttributes} from 'react';
 import './Toggle.scss';
+interface ToggleProps extends RefAttributes<HTMLLabelElement> {
+	disabled?: boolean;
+	label: string;
+	name?: string;
+	onToggle?: (val: boolean) => void;
+	toggled?: boolean;
+	tooltip?: string;
+	tooltipAlign?: 'bottom' | 'left' | 'right' | 'top';
+}
 export declare function Toggle({
 	disabled,
 	label,
@@ -23,14 +31,6 @@ export declare function Toggle({
 	toggled,
 	tooltip,
 	tooltipAlign,
-}: IProps): JSX.Element;
-interface IProps {
-	disabled?: boolean;
-	label: string;
-	name: string;
-	onToggle?: (val: boolean) => void;
-	toggled?: boolean;
-	tooltip?: string;
-	tooltipAlign?: 'bottom' | 'left' | 'right' | 'top';
-}
+	...otherProps
+}: ToggleProps): JSX.Element;
 export {};

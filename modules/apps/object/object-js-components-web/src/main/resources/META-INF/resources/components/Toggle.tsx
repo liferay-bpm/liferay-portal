@@ -15,9 +15,19 @@
 import {ClayToggle} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import {ClayTooltipProvider} from '@clayui/tooltip';
-import React from 'react';
+import React, {RefAttributes} from 'react';
 
 import './Toggle.scss';
+
+interface ToggleProps extends RefAttributes<HTMLLabelElement> {
+	disabled?: boolean;
+	label: string;
+	name?: string;
+	onToggle?: (val: boolean) => void;
+	toggled?: boolean;
+	tooltip?: string;
+	tooltipAlign?: 'bottom' | 'left' | 'right' | 'top';
+}
 
 export function Toggle({
 	disabled,
@@ -27,7 +37,8 @@ export function Toggle({
 	toggled,
 	tooltip,
 	tooltipAlign,
-}: IProps) {
+	...otherProps
+}: ToggleProps) {
 	return (
 		<>
 			<ClayToggle
@@ -36,6 +47,7 @@ export function Toggle({
 				name={name}
 				onToggle={onToggle}
 				toggled={toggled}
+				{...otherProps}
 			/>
 
 			{tooltip && (
@@ -53,14 +65,4 @@ export function Toggle({
 			)}
 		</>
 	);
-}
-
-interface IProps {
-	disabled?: boolean;
-	label: string;
-	name: string;
-	onToggle?: (val: boolean) => void;
-	toggled?: boolean;
-	tooltip?: string;
-	tooltipAlign?: 'bottom' | 'left' | 'right' | 'top';
 }

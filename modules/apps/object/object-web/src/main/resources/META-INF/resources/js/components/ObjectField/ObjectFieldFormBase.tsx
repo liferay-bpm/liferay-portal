@@ -12,13 +12,14 @@
  * details.
  */
 
-import ClayForm, {ClayToggle} from '@clayui/form';
+import ClayForm from '@clayui/form';
 import {
 	API,
 	AutoComplete,
 	FormError,
 	Input,
 	SingleSelect,
+	Toggle,
 	stringIncludesQuery,
 } from '@liferay/object-js-components-web';
 import React, {
@@ -434,7 +435,7 @@ export default function ObjectFieldFormBase({
 			<ClayForm.Group className="lfr-objects__object-field-form-base-form-group-toggles">
 				{values.businessType !== 'Aggregation' &&
 					values.businessType !== 'Formula' && (
-						<ClayToggle
+						<Toggle
 							disabled={getMandatoryToggleDisabledState()}
 							label={Liferay.Language.get('mandatory')}
 							name="required"
@@ -445,7 +446,7 @@ export default function ObjectFieldFormBase({
 
 				{values.businessType === 'Picklist' &&
 					validListTypeDefinitionId && (
-						<ClayToggle
+						<Toggle
 							disabled={disabled || objectDefinition?.system}
 							label={Liferay.Language.get('mark-as-state')}
 							name="state"

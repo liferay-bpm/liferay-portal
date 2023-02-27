@@ -12,8 +12,8 @@
  * details.
  */
 
-import {ClayToggle} from '@clayui/form';
 import ClayPanel from '@clayui/panel';
+import {Toggle} from '@liferay/object-js-components-web';
 import React from 'react';
 
 interface ConfigurationContainerProps {
@@ -38,7 +38,7 @@ export function ConfigurationContainer({
 		>
 			<ClayPanel.Body>
 				<div className="lfr-objects__object-definition-details-configuration">
-					<ClayToggle
+					<Toggle
 						disabled={
 							values.system ||
 							!hasUpdateObjectDefinitionPermission
@@ -49,7 +49,7 @@ export function ConfigurationContainer({
 						toggled={values.portlet}
 					/>
 
-					<ClayToggle
+					<Toggle
 						disabled={
 							values.system ||
 							!hasUpdateObjectDefinitionPermission
@@ -64,7 +64,7 @@ export function ConfigurationContainer({
 						toggled={values.enableCategorization}
 					/>
 
-					<ClayToggle
+					<Toggle
 						disabled={
 							values.system ||
 							!hasUpdateObjectDefinitionPermission
@@ -79,7 +79,7 @@ export function ConfigurationContainer({
 						toggled={values.enableComments}
 					/>
 
-					<ClayToggle
+					<Toggle
 						disabled={values.system || isApproved}
 						label={Liferay.Language.get('enable-entry-history')}
 						name="enableEntryHistory"

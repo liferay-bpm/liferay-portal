@@ -13,11 +13,10 @@
  */
 
 import ClayAlert from '@clayui/alert';
-import {ClayToggle} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import ClayLink from '@clayui/link';
 import {ClayTooltipProvider} from '@clayui/tooltip';
-import {Card} from '@liferay/object-js-components-web';
+import {Card, Toggle} from '@liferay/object-js-components-web';
 import React from 'react';
 
 import './TranslationOptionsContainer.scss';
@@ -57,7 +56,7 @@ export function TranslationOptionsContainer({
 			)}
 
 			<div className="lfr__objects-translation-options-container">
-				<ClayToggle
+				<Toggle
 					disabled={isApproved || !translatableField}
 					label={Liferay.Language.get('enable-entry-translation')}
 					onToggle={() =>

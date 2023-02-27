@@ -14,12 +14,10 @@
 
 import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
-import ClayForm, {ClayToggle} from '@clayui/form';
-import ClayIcon from '@clayui/icon';
+import ClayForm from '@clayui/form';
 import ClayModal, {ClayModalProvider, useModal} from '@clayui/modal';
 import {Observer} from '@clayui/modal/lib/types';
-import {ClayTooltipProvider} from '@clayui/tooltip';
-import {API, Input} from '@liferay/object-js-components-web';
+import {API, Input, Toggle} from '@liferay/object-js-components-web';
 import React, {useEffect, useState} from 'react';
 
 import {toCamelCase} from '../../utils/string';
@@ -137,7 +135,7 @@ function ModalAddObjectField({
 						{Liferay.FeatureFlags['LPS-146755'] &&
 							showEnableTranslationToggle && (
 								<div className="lfr-objects-add-object-field-enable-translations-toggle">
-									<ClayToggle
+									<Toggle
 										label={Liferay.Language.get(
 											'enable-entry-translations'
 										)}
@@ -147,20 +145,10 @@ function ModalAddObjectField({
 											})
 										}
 										toggled={values.enableLocalization}
+										tooltip={Liferay.Language.get(
+											'users-will-be-able-to-add-translations-for-the-entries-of-this-field'
+										)}
 									/>
-
-									<ClayTooltipProvider>
-										<span
-											title={Liferay.Language.get(
-												'users-will-be-able-to-add-translations-for-the-entries-of-this-field'
-											)}
-										>
-											<ClayIcon
-												className="lfr-objects-add-object-field-enable-translations-toggle-icon"
-												symbol="question-circle-full"
-											/>
-										</span>
-									</ClayTooltipProvider>
 								</div>
 							)}
 					</ObjectFieldFormBase>
