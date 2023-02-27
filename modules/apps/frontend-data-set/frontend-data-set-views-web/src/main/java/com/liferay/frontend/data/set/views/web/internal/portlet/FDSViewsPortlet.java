@@ -126,9 +126,9 @@ public class FDSViewsPortlet extends MVCPortlet {
 
 		objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-				userId, false, LocalizedMapUtil.getLocalizedMap("FDS Entry"),
-				"FDSEntry", "100", null,
-				LocalizedMapUtil.getLocalizedMap("FDS Entries"),
+				userId, false, false,
+				LocalizedMapUtil.getLocalizedMap("FDS Entry"), "FDSEntry",
+				"100", null, LocalizedMapUtil.getLocalizedMap("FDS Entries"),
 				ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Arrays.asList(

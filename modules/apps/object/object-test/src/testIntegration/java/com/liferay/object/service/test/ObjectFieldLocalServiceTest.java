@@ -1258,7 +1258,7 @@ public class ObjectFieldLocalServiceTest {
 		try {
 			objectDefinition =
 				_objectDefinitionLocalService.addCustomObjectDefinition(
-					TestPropsValues.getUserId(), false,
+					TestPropsValues.getUserId(), false, false,
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
 					"A" + RandomTestUtil.randomString(), null, null,
