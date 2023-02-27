@@ -29,10 +29,13 @@ import com.liferay.portal.kernel.service.ListTypeServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Gustavo Lima
@@ -62,7 +65,10 @@ public class ObjectDefinitionNotificationTermEvaluator
 
 		User user = null;
 
-		if (termName.contains("_CREATOR")) {
+		Set<String> userVariables = _getCreatorTermName(
+			StringUtil.toUpperCase(_objectDefinition.getShortName()));
+
+		if (userVariables.contains(termName)) {
 			if (!FeatureFlagManagerUtil.isEnabled("LPS-171625")) {
 				if (context.equals(Context.RECIPIENT)) {
 					return String.valueOf(termValues.get("creator"));
@@ -77,7 +83,8 @@ public class ObjectDefinitionNotificationTermEvaluator
 			user = _userLocalService.getUser(
 				GetterUtil.getLong(termValues.get("creator")));
 		}
-		else if (termName.contains("_CURRENTUSER")) {
+
+		if (_currentUserTermName.contains(termName)) {
 			user = _userLocalService.getUser(
 				GetterUtil.getLong(termValues.get("currentUserId")));
 		}
@@ -107,6 +114,18 @@ public class ObjectDefinitionNotificationTermEvaluator
 		}
 
 		return String.valueOf(termValues.get(objectField.getDBColumnName()));
+	}
+
+	private Set<String> _getCreatorTermName(String prefix) {
+		return Collections.unmodifiableSet(
+			SetUtil.fromArray(
+				"[%" + prefix + "_CREATOR_ID%]",
+				"[%" + prefix + "_CREATOR_PREFIX%]",
+				"[%" + prefix + "_CREATOR_FIRSTNAME%]",
+				"[%" + prefix + "_CREATOR_MIDDLENAME%]",
+				"[%" + prefix + "_CREATOR_LASTNAME%]",
+				"[%" + prefix + "_CREATOR_SUFFIX%]",
+				"[%" + prefix + "_CREATOR_EMAIL%]"));
 	}
 
 	private Map<String, Long> _getObjectFieldIds() {
@@ -183,6 +202,14 @@ public class ObjectDefinitionNotificationTermEvaluator
 			}
 		).build();
 	}
+
+	private static final Set<String> _currentUserTermName =
+		Collections.unmodifiableSet(
+			SetUtil.fromArray(
+				"[%CURRENTUSER_ID%]", "[%CURRENTUSER_PREFIX%]",
+				"[%CURRENTUSER_FIRSTNAME%]", "[%CURRENTUSER_MIDDLENAME%]",
+				"[%CURRENTUSER_LASTNAME%]", "[%CURRENTUSER_SUFFIX%]",
+				"[%CURRENTUSER_EMAIL%]"));
 
 	private final ObjectDefinition _objectDefinition;
 	private volatile Map<String, Long> _objectFieldIds;
