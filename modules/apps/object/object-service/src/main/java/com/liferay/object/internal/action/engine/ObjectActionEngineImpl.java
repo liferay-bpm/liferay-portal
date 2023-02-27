@@ -210,6 +210,9 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 
 			throw exception;
 		}
+		finally {
+			objectActionIds.remove(objectAction.getObjectActionId());
+		}
 	}
 
 	private void _updatePayloadJSONObject(
