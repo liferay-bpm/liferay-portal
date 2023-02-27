@@ -30,7 +30,6 @@ import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
@@ -66,43 +65,33 @@ public class UpdateObjectEntryObjectActionExecutorImpl
 
 		User user = _userLocalService.getUser(userId);
 
-		TransactionCommitCallbackUtil.registerCallback(
-			() -> {
-				boolean skipObjectEntryResourcePermission =
-					ObjectEntryThreadLocal.
-						isSkipObjectEntryResourcePermission();
+		boolean skipObjectEntryResourcePermission =
+			ObjectEntryThreadLocal.isSkipObjectEntryResourcePermission();
 
-				try {
-					ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(
-						true);
+		try {
+			ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(true);
 
-					objectEntryManager.updateObjectEntry(
-						new DefaultDTOConverterContext(
-							false, Collections.emptyMap(),
-							_dtoConverterRegistry, null, user.getLocale(), null,
-							user),
-						objectDefinition,
-						GetterUtil.getLong(
-							payloadJSONObject.getLong("classPK")),
-						new ObjectEntry() {
-							{
-								properties = _getValues(
-									objectDefinition,
-									parametersUnicodeProperties,
-									ObjectEntryVariablesUtil.getActionVariables(
-										_dtoConverterRegistry, objectDefinition,
-										payloadJSONObject,
-										_systemObjectDefinitionMetadataRegistry));
-							}
-						});
-				}
-				finally {
-					ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(
-						skipObjectEntryResourcePermission);
-				}
-
-				return null;
-			});
+			objectEntryManager.updateObjectEntry(
+				new DefaultDTOConverterContext(
+					false, Collections.emptyMap(), _dtoConverterRegistry, null,
+					user.getLocale(), null, user),
+				objectDefinition,
+				GetterUtil.getLong(payloadJSONObject.getLong("classPK")),
+				new ObjectEntry() {
+					{
+						properties = _getValues(
+							objectDefinition, parametersUnicodeProperties,
+							ObjectEntryVariablesUtil.getActionVariables(
+								_dtoConverterRegistry, objectDefinition,
+								payloadJSONObject,
+								_systemObjectDefinitionMetadataRegistry));
+					}
+				});
+		}
+		finally {
+			ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(
+				skipObjectEntryResourcePermission);
+		}
 	}
 
 	@Override
