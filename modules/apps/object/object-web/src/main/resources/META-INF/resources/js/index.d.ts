@@ -71,6 +71,7 @@ type ObjectFieldBusinessType =
 	| 'Picklist'
 	| 'PrecisionDecimal'
 	| 'Relationship'
+	| 'RichText'
 	| 'Text'
 	| 'Workflow Status';
 interface ObjectFieldType {
@@ -83,6 +84,7 @@ interface ObjectField {
 	DBType: string;
 	businessType: ObjectFieldBusinessType;
 	defaultValue?: string;
+	enableLocalization: boolean;
 	externalReferenceCode?: string;
 	id: number;
 	indexed: boolean;

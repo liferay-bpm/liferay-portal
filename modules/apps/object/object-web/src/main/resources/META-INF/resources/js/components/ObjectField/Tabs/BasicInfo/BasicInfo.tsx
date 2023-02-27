@@ -24,6 +24,7 @@ import {AttachmentProperties} from './AttachmentProperties';
 import {FormulaContainer} from './FormulaContainer';
 import {MaxLengthProperties} from './MaxLengthProperties';
 import {SearchableContainer} from './SearchableContainer';
+import {TranslationOptionsContainer} from './TranslationOptionsContainer';
 
 interface AggregationFilters {
 	defaultSort?: boolean;
@@ -192,6 +193,12 @@ export function BasicInfo({
 					setValues={setValues}
 				/>
 			)}
+
+			<TranslationOptionsContainer
+				isApproved={isApproved}
+				setValues={setValues}
+				values={values}
+			/>
 
 			{Liferay.FeatureFlags['LPS-135430'] && !isDefaultStorageType && (
 				<Card title={Liferay.Language.get('external-data-source')}>
