@@ -29,10 +29,13 @@ import com.liferay.portal.kernel.service.ListTypeServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Gustavo Lima
@@ -62,7 +65,20 @@ public class ObjectDefinitionNotificationTermEvaluator
 
 		User user = null;
 
-		if (termName.contains("_CREATOR")) {
+		String prefix = StringUtil.toUpperCase(
+			_objectDefinition.getShortName());
+
+		Set<String> creatorTermNames = Collections.unmodifiableSet(
+			SetUtil.fromArray(
+				"[%" + prefix + "_CREATOR_EMAIL%]",
+				"[%" + prefix + "_CREATOR_FIRSTNAME%]",
+				"[%" + prefix + "_CREATOR_ID%]",
+				"[%" + prefix + "_CREATOR_LASTNAME%]",
+				"[%" + prefix + "_CREATOR_MIDDLENAME%]",
+				"[%" + prefix + "_CREATOR_PREFIX%]",
+				"[%" + prefix + "_CREATOR_SUFFIX%]"));
+
+		if (creatorTermNames.contains(termName)) {
 			if (!FeatureFlagManagerUtil.isEnabled("LPS-171625")) {
 				if (context.equals(Context.RECIPIENT)) {
 					return String.valueOf(termValues.get("creator"));
@@ -77,7 +93,8 @@ public class ObjectDefinitionNotificationTermEvaluator
 			user = _userLocalService.getUser(
 				GetterUtil.getLong(termValues.get("creator")));
 		}
-		else if (termName.contains("CURRENT_USER")) {
+
+		if (_currentUserTermName.contains(termName)) {
 			user = _userLocalService.getUser(
 				GetterUtil.getLong(termValues.get("currentUserId")));
 		}
@@ -191,6 +208,14 @@ public class ObjectDefinitionNotificationTermEvaluator
 			"SUFFIX", _getListTypeName(false, user)
 		).build();
 	}
+
+	private static final Set<String> _currentUserTermName =
+		Collections.unmodifiableSet(
+			SetUtil.fromArray(
+				"[%CURRENT_USER_EMAIL%]", "[%CURRENT_USER_FIRSTNAME%]",
+				"[%CURRENT_USER_ID%]", "[%CURRENT_USER_LASTNAME%]",
+				"[%CURRENT_USER_MIDDLENAME%]", "[%CURRENT_USER_PREFIX%]",
+				"[%CURRENT_USER_SUFFIX%]"));
 
 	private final ObjectDefinition _objectDefinition;
 	private volatile Map<String, Long> _objectFieldIds;
