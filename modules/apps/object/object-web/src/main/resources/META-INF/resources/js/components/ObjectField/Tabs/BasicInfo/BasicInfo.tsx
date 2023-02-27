@@ -194,11 +194,13 @@ export function BasicInfo({
 				/>
 			)}
 
-			<TranslationOptionsContainer
-				isApproved={isApproved}
-				setValues={setValues}
-				values={values}
-			/>
+			{Liferay.FeatureFlags['LPS-146755'] && (
+				<TranslationOptionsContainer
+					isApproved={isApproved}
+					setValues={setValues}
+					values={values}
+				/>
+			)}
 
 			{Liferay.FeatureFlags['LPS-135430'] && !isDefaultStorageType && (
 				<Card title={Liferay.Language.get('external-data-source')}>
