@@ -159,17 +159,17 @@ public class ObjectDefinitionLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectDefinition addCustomObjectDefinition(
-			long userId, boolean enableComments, Map<Locale, String> labelMap,
-			String name, String panelAppOrder, String panelCategoryKey,
-			Map<Locale, String> pluralLabelMap, String scope,
-			String storageType, List<ObjectField> objectFields)
+			long userId, boolean enableComments, boolean enableLocalization,
+			Map<Locale, String> labelMap, String name, String panelAppOrder,
+			String panelCategoryKey, Map<Locale, String> pluralLabelMap,
+			String scope, String storageType, List<ObjectField> objectFields)
 		throws PortalException {
 
 		return _addObjectDefinition(
-			userId, null, null, enableComments, labelMap, true, name,
-			panelAppOrder, panelCategoryKey, null, null, pluralLabelMap, scope,
-			storageType, false, null, 0, WorkflowConstants.STATUS_DRAFT,
-			objectFields);
+			userId, null, null, enableComments, enableLocalization, labelMap,
+			true, name, panelAppOrder, panelCategoryKey, null, null,
+			pluralLabelMap, scope, storageType, false, null, 0,
+			WorkflowConstants.STATUS_DRAFT, objectFields);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -310,8 +310,8 @@ public class ObjectDefinitionLocalServiceImpl
 		throws PortalException {
 
 		return _addObjectDefinition(
-			userId, className, dbTableName, false, labelMap, modifiable, name,
-			null, null, pkObjectFieldDBColumnName, pkObjectFieldName,
+			userId, className, dbTableName, false, false, labelMap, modifiable,
+			name, null, null, pkObjectFieldDBColumnName, pkObjectFieldName,
 			pluralLabelMap, scope,
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT, true,
 			titleObjectFieldName, version, WorkflowConstants.STATUS_APPROVED,
@@ -824,13 +824,13 @@ public class ObjectDefinitionLocalServiceImpl
 
 	private ObjectDefinition _addObjectDefinition(
 			long userId, String className, String dbTableName,
-			boolean enableComments, Map<Locale, String> labelMap,
-			boolean modifiable, String name, String panelAppOrder,
-			String panelCategoryKey, String pkObjectFieldDBColumnName,
-			String pkObjectFieldName, Map<Locale, String> pluralLabelMap,
-			String scope, String storageType, boolean system,
-			String titleObjectFieldName, int version, int status,
-			List<ObjectField> objectFields)
+			boolean enableComments, boolean enableLocalization,
+			Map<Locale, String> labelMap, boolean modifiable, String name,
+			String panelAppOrder, String panelCategoryKey,
+			String pkObjectFieldDBColumnName, String pkObjectFieldName,
+			Map<Locale, String> pluralLabelMap, String scope,
+			String storageType, boolean system, String titleObjectFieldName,
+			int version, int status, List<ObjectField> objectFields)
 		throws PortalException {
 
 		User user = _userLocalService.getUser(userId);
@@ -875,6 +875,7 @@ public class ObjectDefinitionLocalServiceImpl
 			StringUtil.equals(
 				storageType, ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT));
 		objectDefinition.setEnableComments(enableComments);
+		objectDefinition.setEnableLocalization(enableLocalization);
 		objectDefinition.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
 		objectDefinition.setModifiable(modifiable);
 		objectDefinition.setName(name);

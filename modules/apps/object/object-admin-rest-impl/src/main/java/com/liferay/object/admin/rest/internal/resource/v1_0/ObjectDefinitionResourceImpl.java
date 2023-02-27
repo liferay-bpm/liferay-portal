@@ -242,6 +242,8 @@ public class ObjectDefinitionResourceImpl
 			serviceBuilderObjectDefinition =
 				_objectDefinitionService.addCustomObjectDefinition(
 					GetterUtil.getBoolean(objectDefinition.getEnableComments()),
+					GetterUtil.getBoolean(
+						objectDefinition.getEnableLocalization()),
 					LocalizedMapUtil.getLocalizedMap(
 						objectDefinition.getLabel()),
 					objectDefinition.getName(),
