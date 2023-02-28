@@ -125,6 +125,7 @@ const ObjectLayoutTabs: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 									name
 								)}
 								type="regular"
+								typeX="block"
 							/>
 
 							{!!objectLayoutBoxes?.length &&

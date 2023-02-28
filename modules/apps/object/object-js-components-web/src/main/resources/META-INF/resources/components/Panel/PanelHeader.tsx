@@ -28,6 +28,7 @@ interface IPanelHeaderProps extends React.HTMLAttributes<HTMLElement> {
 	disabled?: boolean;
 	title: string;
 	type: string;
+	typeX?: string;
 }
 
 export function PanelHeader({
@@ -36,6 +37,7 @@ export function PanelHeader({
 	disabled = false,
 	title,
 	type,
+	typeX
 }: IPanelHeaderProps) {
 	const [{expanded}, dispatch] = usePanelContext();
 
@@ -54,7 +56,7 @@ export function PanelHeader({
 					}
 				)}
 			>
-				{type === 'regular' && (
+				{type === 'regular' && typeX !== 'block' && (
 					<ClayButtonWithIcon
 						aria-label={Liferay.Util.sub(
 							Liferay.Language.get('drag-x'),

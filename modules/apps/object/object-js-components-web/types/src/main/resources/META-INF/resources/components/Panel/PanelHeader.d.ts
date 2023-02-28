@@ -20,6 +20,7 @@ interface IPanelHeaderProps extends React.HTMLAttributes<HTMLElement> {
 	disabled?: boolean;
 	title: string;
 	type: string;
+	typeX?: string;
 }
 export declare function PanelHeader({
 	contentLeft,
@@ -27,5 +28,6 @@ export declare function PanelHeader({
 	disabled,
 	title,
 	type,
+	typeX,
 }: IPanelHeaderProps): JSX.Element;
 export {};
