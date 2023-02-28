@@ -17,9 +17,7 @@ package com.liferay.notification.web.internal.portlet.action;
 import com.liferay.notification.constants.NotificationPortletKeys;
 import com.liferay.object.definition.notification.term.util.ObjectDefinitionNotificationTermUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,31 +37,17 @@ public class GeneralNotificationTemplateTermsMVCResourceCommand
 	extends BaseNotificationTemplateTermsMVCResourceCommand {
 
 	protected Set<Map.Entry<String, String>> getEntrySet() {
-		return _currentUserTermsMap.entrySet();
+		Map<String, String> map = UserTerm.getCurrentUserTermMap();
+
+		return map.entrySet();
 	}
 
 	@Override
 	protected String getTermName(String value) {
-		return ObjectDefinitionNotificationTermUtil.getGeneralTermName(
-			_currentUserTermsMap.get(value));
-	}
+		Map<String, String> map = UserTerm.getCurrentUserTermMap();
 
-	private static final Map<String, String> _currentUserTermsMap =
-		Collections.unmodifiableMap(
-			HashMapBuilder.put(
-				"current-user-email-address", "CURRENTUSER_EMAIL"
-			).put(
-				"current-user-first-name", "CURRENTUSER_FIRSTNAME"
-			).put(
-				"current-user-id", "CURRENTUSER_ID"
-			).put(
-				"current-user-last-name", "CURRENTUSER_LASTNAME"
-			).put(
-				"current-user-middle-name", "CURRENTUSER_MIDDLENAME"
-			).put(
-				"current-user-prefix", "CURRENTUSER_PREFIX"
-			).put(
-				"current-user-suffix", "CURRENTUSER_SUFFIX"
-			).build());
+		return ObjectDefinitionNotificationTermUtil.getGeneralTermName(
+			map.get(value));
+	}
 
 }

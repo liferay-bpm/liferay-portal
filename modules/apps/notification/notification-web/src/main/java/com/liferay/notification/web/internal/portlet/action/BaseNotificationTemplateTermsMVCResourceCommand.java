@@ -14,6 +14,7 @@
 
 package com.liferay.notification.web.internal.portlet.action;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -25,6 +26,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.StringUtil;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,6 +40,70 @@ import org.osgi.service.component.annotations.Reference;
  */
 public abstract class BaseNotificationTemplateTermsMVCResourceCommand
 	extends BaseMVCResourceCommand {
+
+	public enum UserTerm {
+
+		AUTHOR_EMAIL("author-email-address", "AUTHOR_EMAIL"),
+		AUTHOR_FIRST_NAME("author-first-name", "AUTHOR_FIRSTNAME"),
+		AUTHOR_ID("author-id", "AUTHOR_ID"),
+		AUTHOR_LAST_NAME("author-last-name", "AUTHOR_LASTNAME"),
+		AUTHOR_MIDDLE_NAME("author-middle-name", "AUTHOR_MIDDLENAME"),
+		AUTHOR_PREFIX("author-prefix", "AUTHOR_PREFIX"),
+		AUTHOR_SUFFIX("author-suffix", "AUTHOR_SUFFIX"),
+		CURRENT_USER_EMAIL("current-user-email-address", "CURRENTUSER_EMAIL"),
+		CURRENT_USER_FIRST_NAME(
+			"current-user-first-name", "CURRENTUSER_FIRSTNAME"),
+		CURRENT_USER_ID("current-user-id", "CURRENTUSER_ID"),
+		CURRENT_USER_LAST_NAME(
+			"current-user-last-name", "CURRENTUSER_LASTNAME"),
+		CURRENT_USER_MIDDLE_NAME(
+			"current-user-middle-name", "CURRENTUSER_MIDDLENAME"),
+		CURRENT_USER_PREFIX("current-user-prefix", "CURRENTUSER_PREFIX"),
+		CURRENT_USER_SUFFIX("current-user-suffix", "CURRENTUSER_SUFFIX");
+
+		public static Map<String, String> getAuthorTermMap() {
+			Map<String, String> map = new LinkedHashMap<>();
+
+			for (UserTerm userTerm : values()) {
+				if (StringUtil.startsWith(userTerm._key, "author")) {
+					map.put(userTerm._key, userTerm._name);
+				}
+			}
+
+			return map;
+		}
+
+		public static Map<String, String> getCurrentUserTermMap() {
+			Map<String, String> map = new LinkedHashMap<>();
+
+			for (UserTerm userTerm : values()) {
+				if (StringUtil.startsWith(userTerm._key, "current-user")) {
+					map.put(userTerm._key, userTerm._name);
+				}
+			}
+
+			return map;
+		}
+
+		public static String getTermName(String key) {
+			for (UserTerm userTerm : values()) {
+				if (StringUtil.equals(key, userTerm._key)) {
+					return userTerm._name;
+				}
+			}
+
+			return StringPool.BLANK;
+		}
+
+		private UserTerm(String key, String name) {
+			_key = key;
+			_name = name;
+		}
+
+		private final String _key;
+		private final String _name;
+
+	}
 
 	@Override
 	protected void doServeResource(

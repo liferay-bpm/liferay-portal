@@ -22,11 +22,9 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
-import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +76,7 @@ public class ObjectFieldNotificationTemplateTermsMVCResourceCommand
 			if (StringUtil.equals(objectField.getName(), "creator") &&
 				FeatureFlagManagerUtil.isEnabled("LPS-171625")) {
 
-				termValues.putAll(_creatorTermValues);
+				termValues.putAll(UserTerm.getAuthorTermMap());
 			}
 			else {
 				termValues.put(
@@ -95,24 +93,6 @@ public class ObjectFieldNotificationTemplateTermsMVCResourceCommand
 		return ObjectDefinitionNotificationTermUtil.getObjectFieldTermName(
 			_objectDefinition.getShortName(), value);
 	}
-
-	private static final Map<String, String> _creatorTermValues =
-		Collections.unmodifiableMap(
-			LinkedHashMapBuilder.put(
-				"author-email-address", "CREATOR_EMAIL"
-			).put(
-				"author-first-name", "CREATOR_FIRSTNAME"
-			).put(
-				"author-id", "CREATOR_ID"
-			).put(
-				"author-last-name", "CREATOR_LASTNAME"
-			).put(
-				"author-middle-name", "CREATOR_MIDDLENAME"
-			).put(
-				"author-prefix", "CREATOR_PREFIX"
-			).put(
-				"author-suffix", "CREATOR_SUFFIX"
-			).build());
 
 	private ObjectDefinition _objectDefinition;
 
