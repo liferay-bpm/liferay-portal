@@ -152,15 +152,15 @@ const TypeActivityKey = {
 };
 
 const ActivityStatus = {
-	ACTIVE: 'active',
 	APPROVED: 'approved',
 	CLAIMED: 'claimed',
 	EXPIRED: 'expired',
+	SUBMITED: 'submited',
 	UNCLAIMED: 'unclaimed',
 };
 
 const activityStatusClassName = {
-	[ActivityStatus.ACTIVE]: 'label label-tonal-success ml-2',
+	[ActivityStatus.SUBMITED]: 'label label-tonal-warning ml-2',
 	[ActivityStatus.APPROVED]: 'label label-tonal-success ml-2',
 	[ActivityStatus.EXPIRED]: 'label label-tonal-danger ml-2',
 };

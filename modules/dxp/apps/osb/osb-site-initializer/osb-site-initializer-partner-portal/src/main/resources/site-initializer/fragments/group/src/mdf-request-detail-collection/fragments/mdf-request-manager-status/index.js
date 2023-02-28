@@ -47,6 +47,40 @@ const editButtonManager = fragmentElement.querySelector('#edit-button-manager');
 
 const editButton = fragmentElement.querySelector('#edit-button-user');
 
+const updateStatusActivities = async (mdfRequestId) => {
+	// eslint-disable-next-line @liferay/portal/no-global-fetch
+	const resultActivities = await fetch(
+		`/o/c/mdfrequests/${mdfRequestId}/mdfReqToActs`,
+		{
+			headers: {
+				'accept': 'application/json',
+				'x-csrf-token': Liferay.authToken,
+			},
+		}
+	);
+
+	const activities = await resultActivities.json();
+
+	activities.items.map(async (activity) => {
+		if (activity.activityStatus.key === 'submited') {
+			// eslint-disable-next-line @liferay/portal/no-global-fetch
+			await fetch(`/o/c/activities/${activity.id}`, {
+				body: `{
+					"activityStatus": {
+					  "key": "approved",
+					  "name": "Approved"
+				  }
+				  }`,
+				headers: {
+					'content-type': 'application/json',
+					'x-csrf-token': Liferay.authToken,
+				},
+				method: 'PUT',
+			});
+		}
+	});
+};
+
 const updateStatus = async (status) => {
 	// eslint-disable-next-line @liferay/portal/no-global-fetch
 	const statusManagerResponse = await fetch(
@@ -60,7 +94,12 @@ const updateStatus = async (status) => {
 			method: 'PUT',
 		}
 	);
+
 	if (statusManagerResponse.ok) {
+		if (status === 'approved') {
+			updateStatusActivities(mdfRequestId);
+		}
+
 		location.reload();
 
 		return;

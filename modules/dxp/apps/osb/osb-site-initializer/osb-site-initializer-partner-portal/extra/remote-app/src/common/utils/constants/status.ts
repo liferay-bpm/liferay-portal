@@ -57,4 +57,8 @@ export const Status = {
 		key: 'moreInfoRequested',
 		name: 'More Info Requested',
 	},
+	SUBMITED: {
+		key: 'submited',
+		name: 'Submited',
+	},
 };
