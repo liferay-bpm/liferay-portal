@@ -401,6 +401,8 @@ public class ObjectActionLocalServiceTest {
 
 			// Execute standalone action to update the current object entry
 
+			Assert.assertEquals(0, _argumentsList.size());
+
 			try {
 				objectEntryResource.
 					putByExternalReferenceCodeObjectEntryExternalReferenceCodeObjectActionObjectActionName(
@@ -427,6 +429,10 @@ public class ObjectActionLocalServiceTest {
 				putByExternalReferenceCodeObjectEntryExternalReferenceCodeObjectActionObjectActionName(
 					objectEntry.getExternalReferenceCode(),
 					objectAction5.getName());
+
+			Assert.assertEquals(1, _argumentsList.size());
+
+			_argumentsList.poll();
 
 			Assert.assertEquals(
 				"Peter",
