@@ -364,7 +364,7 @@
 		{
 			"DBType": "String",
 			"businessType": "Picklist",
-			"defaultValue": "submited",
+			"defaultValue": "submitted",
 			"indexed": true,
 			"indexedAsKeyword": false,
 			"label": {
@@ -378,7 +378,7 @@
 					"value": {
 						"objectStates": [
 							{
-								"key": "submited",
+								"key": "submitted",
 								"objectStateTransitions": [
 									{
 										"key": "approved"

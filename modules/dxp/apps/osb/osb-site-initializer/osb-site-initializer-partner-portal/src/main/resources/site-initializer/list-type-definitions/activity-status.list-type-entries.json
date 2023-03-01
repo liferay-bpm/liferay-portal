@@ -1,9 +1,9 @@
 [
 	{
-		"key": "submited",
-		"name": "Submited",
+		"key": "submitted",
+		"name": "Submitted",
 		"name_i18n": {
-			"en-US": "Submited"
+			"en-US": "Submitted"
 		},
 		"type": "string"
 	},

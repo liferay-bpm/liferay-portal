@@ -47,40 +47,6 @@ const editButtonManager = fragmentElement.querySelector('#edit-button-manager');
 
 const editButton = fragmentElement.querySelector('#edit-button-user');
 
-const updateStatusActivities = async (mdfRequestId) => {
-	// eslint-disable-next-line @liferay/portal/no-global-fetch
-	const resultActivities = await fetch(
-		`/o/c/mdfrequests/${mdfRequestId}/mdfReqToActs`,
-		{
-			headers: {
-				'accept': 'application/json',
-				'x-csrf-token': Liferay.authToken,
-			},
-		}
-	);
-
-	const activities = await resultActivities.json();
-
-	activities.items.map(async (activity) => {
-		if (activity.activityStatus.key === 'submited') {
-			// eslint-disable-next-line @liferay/portal/no-global-fetch
-			await fetch(`/o/c/activities/${activity.id}`, {
-				body: `{
-					"activityStatus": {
-					  "key": "approved",
-					  "name": "Approved"
-				  }
-				  }`,
-				headers: {
-					'content-type': 'application/json',
-					'x-csrf-token': Liferay.authToken,
-				},
-				method: 'PUT',
-			});
-		}
-	});
-};
-
 const updateStatus = async (status) => {
 	// eslint-disable-next-line @liferay/portal/no-global-fetch
 	const statusManagerResponse = await fetch(
@@ -97,9 +63,8 @@ const updateStatus = async (status) => {
 
 	if (statusManagerResponse.ok) {
 		if (status === 'approved') {
-			updateStatusActivities(mdfRequestId);
+			updateStatusActivities();
 		}
-
 		location.reload();
 
 		return;
@@ -182,19 +147,50 @@ if (updateStatusToCanceled) {
 			},
 		});
 }
+const statusResponse = async () => {
+	// eslint-disable-next-line @liferay/portal/no-global-fetch
+	const mdfRequestResponse = await fetch(
+		`/o/c/mdfrequests/${mdfRequestId}?nestedFields=mdfReqToActs
+	`,
+		{
+			headers: {
+				'accept': 'application/json',
+				'x-csrf-token': Liferay.authToken,
+			},
+		}
+	);
+
+	return mdfRequestResponse.json();
+};
+
+const updateStatusActivities = async () => {
+	// eslint-disable-next-line @liferay/portal/no-global-fetch
+	const resultActivities = await statusResponse();
+
+	resultActivities.mdfReqToActs.map((activity) => {
+		if (activity.activityStatus.key === 'submitted') {
+			// eslint-disable-next-line @liferay/portal/no-global-fetch
+			fetch(`/o/c/activities/${activity.id}`, {
+				body: `{
+					"activityStatus": {
+					  "key": "approved",
+					  "name": "Approved"
+				  }
+				  }`,
+				headers: {
+					'content-type': 'application/json',
+					'x-csrf-token': Liferay.authToken,
+				},
+				method: 'PUT',
+			});
+		}
+	});
+};
 
 const getMDFRequestStatus = async () => {
-	// eslint-disable-next-line @liferay/portal/no-global-fetch
-	const statusResponse = await fetch(`/o/c/mdfrequests/${mdfRequestId}`, {
-		headers: {
-			'accept': 'application/json',
-			'x-csrf-token': Liferay.authToken,
-		},
-	});
+	const data = await statusResponse();
 
-	if (statusResponse.ok) {
-		const data = await statusResponse.json();
-
+	if (data) {
 		fragmentElement.querySelector(
 			'#mdf-request-status-display'
 		).innerHTML = `Status: ${Liferay.Util.escape(
