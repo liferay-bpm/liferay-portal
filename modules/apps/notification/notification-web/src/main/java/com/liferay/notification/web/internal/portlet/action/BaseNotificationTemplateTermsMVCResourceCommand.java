@@ -62,7 +62,9 @@ public abstract class BaseNotificationTemplateTermsMVCResourceCommand
 
 	protected abstract Set<Map.Entry<String, String>> getEntrySet();
 
-	protected abstract String getTermName(String value);
+	protected String getTermName(String value) {
+		return value;
+	}
 
 	@Reference
 	protected JSONFactory jsonFactory;
