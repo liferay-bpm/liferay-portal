@@ -781,21 +781,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 				String json = StringUtil.read(url.openStream());
 
-				Group group = serviceContext.getScopeGroup();
-
 				json = _replace(
 					_replace(
-						json,
-						new String[] {
-							"[$COMPANY_ID$]", "[$GROUP_FRIENDLY_URL$]",
-							"[$GROUP_ID$]", "[$GROUP_KEY$]", "[$PORTAL_URL$]"
-						},
-						new String[] {
-							String.valueOf(group.getCompanyId()),
-							group.getFriendlyURL(),
-							String.valueOf(serviceContext.getScopeGroupId()),
-							group.getGroupKey(), serviceContext.getPortalURL()
-						}),
+						json, serviceContext),
 					assetListEntryIdsStringUtilReplaceValues,
 					documentsStringUtilReplaceValues);
 
@@ -865,21 +853,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 			return;
 		}
 
-		Group group = serviceContext.getScopeGroup();
-
 		json = _replace(
 			_replace(
-				json,
-				new String[] {
-					"[$COMPANY_ID$]", "[$GROUP_FRIENDLY_URL$]", "[$GROUP_ID$]",
-					"[$GROUP_KEY$]", "[$PORTAL_URL$]"
-				},
-				new String[] {
-					String.valueOf(group.getCompanyId()),
-					group.getFriendlyURL(),
-					String.valueOf(serviceContext.getScopeGroupId()),
-					group.getGroupKey(), serviceContext.getPortalURL()
-				}),
+				json, serviceContext),
 			assetListEntryIdsStringUtilReplaceValues,
 			clientExtensionEntryIdsStringUtilReplaceValues,
 			ddmStructureEntryIdsStringUtilReplaceValues,
@@ -1019,21 +995,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 				String json = StringUtil.read(url.openStream());
 
-				Group group = serviceContext.getScopeGroup();
-
 				json = _replace(
 					_replace(
-						json,
-						new String[] {
-							"[$COMPANY_ID$]", "[$GROUP_FRIENDLY_URL$]",
-							"[$GROUP_ID$]", "[$GROUP_KEY$]", "[$PORTAL_URL$]"
-						},
-						new String[] {
-							String.valueOf(group.getCompanyId()),
-							group.getFriendlyURL(),
-							String.valueOf(serviceContext.getScopeGroupId()),
-							group.getGroupKey(), serviceContext.getPortalURL()
-						}),
+						json, serviceContext),
 					assetListEntryIdsStringUtilReplaceValues,
 					documentsStringUtilReplaceValues,
 					objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues,
@@ -1144,21 +1108,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 			if (StringUtil.endsWith(urlPath, "page-definition.json")) {
 				String json = StringUtil.read(url.openStream());
 
-				Group group = serviceContext.getScopeGroup();
-
 				json = _replace(
 					_replace(
-						json,
-						new String[] {
-							"[$COMPANY_ID$]", "[$GROUP_FRIENDLY_URL$]",
-							"[$GROUP_ID$]", "[$GROUP_KEY$]", "[$PORTAL_URL$]"
-						},
-						new String[] {
-							String.valueOf(group.getCompanyId()),
-							group.getFriendlyURL(),
-							String.valueOf(serviceContext.getScopeGroupId()),
-							group.getGroupKey(), serviceContext.getPortalURL()
-						}),
+						json, serviceContext),
 					assetListEntryIdsStringUtilReplaceValues,
 					documentsStringUtilReplaceValues,
 					objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues,
@@ -2559,17 +2511,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 					FileUtil.stripExtension(url.getPath())),
 				_replace(
 					_replace(
-						StringUtil.read(url.openStream()),
-						new String[] {
-							"[$COMPANY_ID$]", "[$GROUP_FRIENDLY_URL$]",
-							"[$GROUP_ID$]", "[$GROUP_KEY$]", "[$PORTAL_URL$]"
-						},
-						new String[] {
-							String.valueOf(group.getCompanyId()),
-							group.getFriendlyURL(),
-							String.valueOf(serviceContext.getScopeGroupId()),
-							group.getGroupKey(), serviceContext.getPortalURL()
-						}),
+						StringUtil.read(url.openStream()), serviceContext),
 					documentsStringUtilReplaceValues));
 		}
 
@@ -4497,8 +4439,22 @@ public class BundleSiteInitializer implements SiteInitializer {
 		return StringUtil.replace(s, oldSub, newSub);
 	}
 
-	private String _replace(String s, String[] oldSubs, String[] newSubs) {
-		return StringUtil.replace(s, oldSubs, newSubs);
+	private String _replace(String s, ServiceContext serviceContext)
+		throws Exception {
+
+		Group group = serviceContext.getScopeGroup();
+
+		return StringUtil.replace(
+			s,
+			new String[] {
+				"[$COMPANY_ID$]", "[$GROUP_FRIENDLY_URL$]", "[$GROUP_ID$]",
+				"[$GROUP_KEY$]", "[$PORTAL_URL$]"
+			},
+			new String[] {
+				String.valueOf(group.getCompanyId()), group.getFriendlyURL(),
+				String.valueOf(serviceContext.getScopeGroupId()),
+				group.getGroupKey(), serviceContext.getPortalURL()
+			});
 	}
 
 	private void _setDefaultLayoutUtilityPageEntries(
