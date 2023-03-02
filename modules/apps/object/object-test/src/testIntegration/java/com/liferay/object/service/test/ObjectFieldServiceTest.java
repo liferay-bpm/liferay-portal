@@ -191,7 +191,7 @@ public class ObjectFieldServiceTest {
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 			ObjectFieldConstants.DB_TYPE_STRING, null, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			StringUtil.randomId(), true, false, Collections.emptyList());
+			false, StringUtil.randomId(), true, false, Collections.emptyList());
 	}
 
 	private void _setUser(User user) {
@@ -214,7 +214,8 @@ public class ObjectFieldServiceTest {
 				ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 				ObjectFieldConstants.DB_TYPE_STRING, null, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				StringUtil.randomId(), true, false, Collections.emptyList());
+				false, StringUtil.randomId(), true, false,
+				Collections.emptyList());
 		}
 		finally {
 			if (objectField != null) {
