@@ -28,6 +28,10 @@ import com.liferay.knowledge.base.exception.NoSuchCommentException;
 import com.liferay.message.boards.exception.DiscussionMaxCommentsException;
 import com.liferay.message.boards.exception.MessageSubjectException;
 import com.liferay.message.boards.model.MBMessage;
+import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.service.ObjectDefinitionService;
+import com.liferay.object.service.ObjectEntryService;
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -58,6 +62,7 @@ import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -341,6 +346,32 @@ public class CommentResourceImpl extends BaseCommentResourceImpl {
 			comment.getClassName(), comment.getClassPK());
 
 		return CommentUtil.toComment(comment, _commentManager, _portal);
+	}
+
+	@Override
+	public Page<Comment> getSiteObjectEntryCommentsPage(
+			Long siteId, Long objectEntryId, String search,
+			Aggregation aggregation, Filter filter, Pagination pagination,
+			Sort[] sorts)
+		throws Exception {
+
+		ObjectEntry objectEntry = _objectEntryService.getObjectEntry(
+			objectEntryId);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionService.getObjectDefinition(
+				objectEntry.getObjectDefinitionId());
+
+		Discussion discussion = _commentManager.getDiscussion(
+			objectEntry.getUserId(), siteId, objectDefinition.getClassName(),
+			objectEntryId, _createServiceContextFunction());
+
+		DiscussionComment rootDiscussionComment =
+			discussion.getRootDiscussionComment();
+
+		return _getComments(
+			Collections.emptyMap(), rootDiscussionComment.getCommentId(),
+			search, aggregation, filter, pagination, sorts);
 	}
 
 	@Override
@@ -844,6 +875,12 @@ public class CommentResourceImpl extends BaseCommentResourceImpl {
 
 	@Reference
 	private JournalArticleService _journalArticleService;
+
+	@Reference
+	private ObjectDefinitionService _objectDefinitionService;
+
+	@Reference
+	private ObjectEntryService _objectEntryService;
 
 	@Reference
 	private Portal _portal;
