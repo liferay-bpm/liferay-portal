@@ -96,8 +96,9 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 			throw new UnsupportedOperationException();
 		}
 
-		return "com_liferay_object_web_internal_object_definitions_portlet_" +
-			"ObjectDefinitionsPortlet_" + getObjectDefinitionId();
+		return StringBundler.concat(
+			"com_liferay_object_web_internal_object_definitions_portlet_",
+			"ObjectDefinitionsPortlet_", getCompanyId(), "_", getName());
 	}
 
 	@Override
