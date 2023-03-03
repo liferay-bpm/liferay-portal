@@ -1425,6 +1425,14 @@ public abstract class BaseObjectFieldResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("localized", additionalAssertFieldName)) {
+				if (objectField.getLocalized() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("name", additionalAssertFieldName)) {
 				if (objectField.getName() == null) {
 					valid = false;
@@ -1736,6 +1744,17 @@ public abstract class BaseObjectFieldResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("localized", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						objectField1.getLocalized(),
+						objectField2.getLocalized())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("name", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						objectField1.getName(), objectField2.getName())) {
@@ -1986,6 +2005,11 @@ public abstract class BaseObjectFieldResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("localized")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("name")) {
 			sb.append("'");
 			sb.append(String.valueOf(objectField.getName()));
@@ -2080,6 +2104,7 @@ public abstract class BaseObjectFieldResourceTestCase {
 				listTypeDefinitionExternalReferenceCode =
 					StringUtil.toLowerCase(RandomTestUtil.randomString());
 				listTypeDefinitionId = RandomTestUtil.randomLong();
+				localized = RandomTestUtil.randomBoolean();
 				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				required = RandomTestUtil.randomBoolean();
 				state = RandomTestUtil.randomBoolean();
