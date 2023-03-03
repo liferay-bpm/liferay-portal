@@ -39,7 +39,7 @@ public class ObjectDefinitionServiceWrapper
 
 	@Override
 	public com.liferay.object.model.ObjectDefinition addCustomObjectDefinition(
-			boolean enableComments,
+			boolean enableComments, boolean enableLocalization,
 			java.util.Map<java.util.Locale, String> labelMap, String name,
 			String panelAppOrder, String panelCategoryKey,
 			java.util.Map<java.util.Locale, String> pluralLabelMap,
@@ -48,8 +48,8 @@ public class ObjectDefinitionServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectDefinitionService.addCustomObjectDefinition(
-			enableComments, labelMap, name, panelAppOrder, panelCategoryKey,
-			pluralLabelMap, scope, storageType, objectFields);
+			enableComments, enableLocalization, labelMap, name, panelAppOrder,
+			panelCategoryKey, pluralLabelMap, scope, storageType, objectFields);
 	}
 
 	@Override

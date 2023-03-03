@@ -53,6 +53,7 @@ public class ObjectDefinitionServiceHttp {
 	public static com.liferay.object.model.ObjectDefinition
 			addCustomObjectDefinition(
 				HttpPrincipal httpPrincipal, boolean enableComments,
+				boolean enableLocalization,
 				java.util.Map<java.util.Locale, String> labelMap, String name,
 				String panelAppOrder, String panelCategoryKey,
 				java.util.Map<java.util.Locale, String> pluralLabelMap,
@@ -67,9 +68,9 @@ public class ObjectDefinitionServiceHttp {
 				_addCustomObjectDefinitionParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, enableComments, labelMap, name, panelAppOrder,
-				panelCategoryKey, pluralLabelMap, scope, storageType,
-				objectFields);
+				methodKey, enableComments, enableLocalization, labelMap, name,
+				panelAppOrder, panelCategoryKey, pluralLabelMap, scope,
+				storageType, objectFields);
 
 			Object returnObj = null;
 
@@ -684,9 +685,9 @@ public class ObjectDefinitionServiceHttp {
 
 	private static final Class<?>[] _addCustomObjectDefinitionParameterTypes0 =
 		new Class[] {
-			boolean.class, java.util.Map.class, String.class, String.class,
-			String.class, java.util.Map.class, String.class, String.class,
-			java.util.List.class
+			boolean.class, boolean.class, java.util.Map.class, String.class,
+			String.class, String.class, java.util.Map.class, String.class,
+			String.class, java.util.List.class
 		};
 	private static final Class<?>[] _addObjectDefinitionParameterTypes1 =
 		new Class[] {String.class};
