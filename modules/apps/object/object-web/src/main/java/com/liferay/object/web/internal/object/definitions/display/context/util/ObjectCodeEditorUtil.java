@@ -132,11 +132,10 @@ public class ObjectCodeEditorUtil {
 				"used-to-indicate-a-dependent-relationship",
 			"and"),
 		DIVIDED_BY(
-			"field_name / field_name2",
-			"divide-one-numeric-field-by-another-to-create-an-expression",
+			"/", "divide-one-numeric-field-by-another-to-create-an-expression",
 			"divided-by"),
 		MINUS(
-			"field_name - field_name2",
+			"-",
 			"subtract-numeric-fields-from-one-another-to-create-an-expression",
 			"minus"),
 		OR(
@@ -144,12 +143,8 @@ public class ObjectCodeEditorUtil {
 			"this-is-a-type-of-coordinating-conjunction-that-indicates-an-" +
 				"independent-relationship",
 			"or"),
-		PLUS(
-			"field_name + field_name2",
-			"add-numeric-fields-to-create-an-expression", "plus"),
-		TIMES(
-			"field_name * field_name2",
-			"multiply-numeric-fields-to-create-an-expression", "times");
+		PLUS("+", "add-numeric-fields-to-create-an-expression", "plus"),
+		TIMES("*", "multiply-numeric-fields-to-create-an-expression", "times");
 
 		public static List<Map<String, String>> getItems(Locale locale) {
 			return getItems(null, locale);
