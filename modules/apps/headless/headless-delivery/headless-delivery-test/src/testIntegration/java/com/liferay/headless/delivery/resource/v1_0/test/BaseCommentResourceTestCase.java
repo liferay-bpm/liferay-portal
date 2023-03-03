@@ -2287,6 +2287,392 @@ public abstract class BaseCommentResourceTestCase {
 	}
 
 	@Test
+	public void testGetSiteObjectEntryCommentsPage() throws Exception {
+		Long siteId = testGetSiteObjectEntryCommentsPage_getSiteId();
+		Long irrelevantSiteId =
+			testGetSiteObjectEntryCommentsPage_getIrrelevantSiteId();
+		Long objectEntryId =
+			testGetSiteObjectEntryCommentsPage_getObjectEntryId();
+		Long irrelevantObjectEntryId =
+			testGetSiteObjectEntryCommentsPage_getIrrelevantObjectEntryId();
+
+		Page<Comment> page = commentResource.getSiteObjectEntryCommentsPage(
+			siteId, objectEntryId, null, null, null, Pagination.of(1, 10),
+			null);
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		if ((irrelevantSiteId != null) && (irrelevantObjectEntryId != null)) {
+			Comment irrelevantComment =
+				testGetSiteObjectEntryCommentsPage_addComment(
+					irrelevantSiteId, irrelevantObjectEntryId,
+					randomIrrelevantComment());
+
+			page = commentResource.getSiteObjectEntryCommentsPage(
+				irrelevantSiteId, irrelevantObjectEntryId, null, null, null,
+				Pagination.of(1, 2), null);
+
+			Assert.assertEquals(1, page.getTotalCount());
+
+			assertEquals(
+				Arrays.asList(irrelevantComment),
+				(List<Comment>)page.getItems());
+			assertValid(
+				page,
+				testGetSiteObjectEntryCommentsPage_getExpectedActions(
+					irrelevantSiteId, irrelevantObjectEntryId));
+		}
+
+		Comment comment1 = testGetSiteObjectEntryCommentsPage_addComment(
+			siteId, objectEntryId, randomComment());
+
+		Comment comment2 = testGetSiteObjectEntryCommentsPage_addComment(
+			siteId, objectEntryId, randomComment());
+
+		page = commentResource.getSiteObjectEntryCommentsPage(
+			siteId, objectEntryId, null, null, null, Pagination.of(1, 10),
+			null);
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(comment1, comment2), (List<Comment>)page.getItems());
+		assertValid(
+			page,
+			testGetSiteObjectEntryCommentsPage_getExpectedActions(
+				siteId, objectEntryId));
+
+		commentResource.deleteComment(comment1.getId());
+
+		commentResource.deleteComment(comment2.getId());
+	}
+
+	protected Map<String, Map<String, String>>
+			testGetSiteObjectEntryCommentsPage_getExpectedActions(
+				Long siteId, Long objectEntryId)
+		throws Exception {
+
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
+
+		return expectedActions;
+	}
+
+	@Test
+	public void testGetSiteObjectEntryCommentsPageWithFilterDateTimeEquals()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.DATE_TIME);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long siteId = testGetSiteObjectEntryCommentsPage_getSiteId();
+		Long objectEntryId =
+			testGetSiteObjectEntryCommentsPage_getObjectEntryId();
+
+		Comment comment1 = randomComment();
+
+		comment1 = testGetSiteObjectEntryCommentsPage_addComment(
+			siteId, objectEntryId, comment1);
+
+		for (EntityField entityField : entityFields) {
+			Page<Comment> page = commentResource.getSiteObjectEntryCommentsPage(
+				siteId, objectEntryId, null, null,
+				getFilterString(entityField, "between", comment1),
+				Pagination.of(1, 2), null);
+
+			assertEquals(
+				Collections.singletonList(comment1),
+				(List<Comment>)page.getItems());
+		}
+	}
+
+	@Test
+	public void testGetSiteObjectEntryCommentsPageWithFilterDoubleEquals()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.DOUBLE);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long siteId = testGetSiteObjectEntryCommentsPage_getSiteId();
+		Long objectEntryId =
+			testGetSiteObjectEntryCommentsPage_getObjectEntryId();
+
+		Comment comment1 = testGetSiteObjectEntryCommentsPage_addComment(
+			siteId, objectEntryId, randomComment());
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		Comment comment2 = testGetSiteObjectEntryCommentsPage_addComment(
+			siteId, objectEntryId, randomComment());
+
+		for (EntityField entityField : entityFields) {
+			Page<Comment> page = commentResource.getSiteObjectEntryCommentsPage(
+				siteId, objectEntryId, null, null,
+				getFilterString(entityField, "eq", comment1),
+				Pagination.of(1, 2), null);
+
+			assertEquals(
+				Collections.singletonList(comment1),
+				(List<Comment>)page.getItems());
+		}
+	}
+
+	@Test
+	public void testGetSiteObjectEntryCommentsPageWithFilterStringEquals()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.STRING);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long siteId = testGetSiteObjectEntryCommentsPage_getSiteId();
+		Long objectEntryId =
+			testGetSiteObjectEntryCommentsPage_getObjectEntryId();
+
+		Comment comment1 = testGetSiteObjectEntryCommentsPage_addComment(
+			siteId, objectEntryId, randomComment());
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		Comment comment2 = testGetSiteObjectEntryCommentsPage_addComment(
+			siteId, objectEntryId, randomComment());
+
+		for (EntityField entityField : entityFields) {
+			Page<Comment> page = commentResource.getSiteObjectEntryCommentsPage(
+				siteId, objectEntryId, null, null,
+				getFilterString(entityField, "eq", comment1),
+				Pagination.of(1, 2), null);
+
+			assertEquals(
+				Collections.singletonList(comment1),
+				(List<Comment>)page.getItems());
+		}
+	}
+
+	@Test
+	public void testGetSiteObjectEntryCommentsPageWithPagination()
+		throws Exception {
+
+		Long siteId = testGetSiteObjectEntryCommentsPage_getSiteId();
+		Long objectEntryId =
+			testGetSiteObjectEntryCommentsPage_getObjectEntryId();
+
+		Comment comment1 = testGetSiteObjectEntryCommentsPage_addComment(
+			siteId, objectEntryId, randomComment());
+
+		Comment comment2 = testGetSiteObjectEntryCommentsPage_addComment(
+			siteId, objectEntryId, randomComment());
+
+		Comment comment3 = testGetSiteObjectEntryCommentsPage_addComment(
+			siteId, objectEntryId, randomComment());
+
+		Page<Comment> page1 = commentResource.getSiteObjectEntryCommentsPage(
+			siteId, objectEntryId, null, null, null, Pagination.of(1, 2), null);
+
+		List<Comment> comments1 = (List<Comment>)page1.getItems();
+
+		Assert.assertEquals(comments1.toString(), 2, comments1.size());
+
+		Page<Comment> page2 = commentResource.getSiteObjectEntryCommentsPage(
+			siteId, objectEntryId, null, null, null, Pagination.of(2, 2), null);
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<Comment> comments2 = (List<Comment>)page2.getItems();
+
+		Assert.assertEquals(comments2.toString(), 1, comments2.size());
+
+		Page<Comment> page3 = commentResource.getSiteObjectEntryCommentsPage(
+			siteId, objectEntryId, null, null, null, Pagination.of(1, 3), null);
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(comment1, comment2, comment3),
+			(List<Comment>)page3.getItems());
+	}
+
+	@Test
+	public void testGetSiteObjectEntryCommentsPageWithSortDateTime()
+		throws Exception {
+
+		testGetSiteObjectEntryCommentsPageWithSort(
+			EntityField.Type.DATE_TIME,
+			(entityField, comment1, comment2) -> {
+				BeanTestUtil.setProperty(
+					comment1, entityField.getName(),
+					DateUtils.addMinutes(new Date(), -2));
+			});
+	}
+
+	@Test
+	public void testGetSiteObjectEntryCommentsPageWithSortDouble()
+		throws Exception {
+
+		testGetSiteObjectEntryCommentsPageWithSort(
+			EntityField.Type.DOUBLE,
+			(entityField, comment1, comment2) -> {
+				BeanTestUtil.setProperty(comment1, entityField.getName(), 0.1);
+				BeanTestUtil.setProperty(comment2, entityField.getName(), 0.5);
+			});
+	}
+
+	@Test
+	public void testGetSiteObjectEntryCommentsPageWithSortInteger()
+		throws Exception {
+
+		testGetSiteObjectEntryCommentsPageWithSort(
+			EntityField.Type.INTEGER,
+			(entityField, comment1, comment2) -> {
+				BeanTestUtil.setProperty(comment1, entityField.getName(), 0);
+				BeanTestUtil.setProperty(comment2, entityField.getName(), 1);
+			});
+	}
+
+	@Test
+	public void testGetSiteObjectEntryCommentsPageWithSortString()
+		throws Exception {
+
+		testGetSiteObjectEntryCommentsPageWithSort(
+			EntityField.Type.STRING,
+			(entityField, comment1, comment2) -> {
+				Class<?> clazz = comment1.getClass();
+
+				String entityFieldName = entityField.getName();
+
+				Method method = clazz.getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.isAssignableFrom(Map.class)) {
+					BeanTestUtil.setProperty(
+						comment1, entityFieldName,
+						Collections.singletonMap("Aaa", "Aaa"));
+					BeanTestUtil.setProperty(
+						comment2, entityFieldName,
+						Collections.singletonMap("Bbb", "Bbb"));
+				}
+				else if (entityFieldName.contains("email")) {
+					BeanTestUtil.setProperty(
+						comment1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()) +
+									"@liferay.com");
+					BeanTestUtil.setProperty(
+						comment2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()) +
+									"@liferay.com");
+				}
+				else {
+					BeanTestUtil.setProperty(
+						comment1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						comment2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+			});
+	}
+
+	protected void testGetSiteObjectEntryCommentsPageWithSort(
+			EntityField.Type type,
+			UnsafeTriConsumer<EntityField, Comment, Comment, Exception>
+				unsafeTriConsumer)
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(type);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long siteId = testGetSiteObjectEntryCommentsPage_getSiteId();
+		Long objectEntryId =
+			testGetSiteObjectEntryCommentsPage_getObjectEntryId();
+
+		Comment comment1 = randomComment();
+		Comment comment2 = randomComment();
+
+		for (EntityField entityField : entityFields) {
+			unsafeTriConsumer.accept(entityField, comment1, comment2);
+		}
+
+		comment1 = testGetSiteObjectEntryCommentsPage_addComment(
+			siteId, objectEntryId, comment1);
+
+		comment2 = testGetSiteObjectEntryCommentsPage_addComment(
+			siteId, objectEntryId, comment2);
+
+		for (EntityField entityField : entityFields) {
+			Page<Comment> ascPage =
+				commentResource.getSiteObjectEntryCommentsPage(
+					siteId, objectEntryId, null, null, null,
+					Pagination.of(1, 2), entityField.getName() + ":asc");
+
+			assertEquals(
+				Arrays.asList(comment1, comment2),
+				(List<Comment>)ascPage.getItems());
+
+			Page<Comment> descPage =
+				commentResource.getSiteObjectEntryCommentsPage(
+					siteId, objectEntryId, null, null, null,
+					Pagination.of(1, 2), entityField.getName() + ":desc");
+
+			assertEquals(
+				Arrays.asList(comment2, comment1),
+				(List<Comment>)descPage.getItems());
+		}
+	}
+
+	protected Comment testGetSiteObjectEntryCommentsPage_addComment(
+			Long siteId, Long objectEntryId, Comment comment)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long testGetSiteObjectEntryCommentsPage_getSiteId()
+		throws Exception {
+
+		return testGroup.getGroupId();
+	}
+
+	protected Long testGetSiteObjectEntryCommentsPage_getIrrelevantSiteId()
+		throws Exception {
+
+		return irrelevantGroup.getGroupId();
+	}
+
+	protected Long testGetSiteObjectEntryCommentsPage_getObjectEntryId()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long
+			testGetSiteObjectEntryCommentsPage_getIrrelevantObjectEntryId()
+		throws Exception {
+
+		return null;
+	}
+
+	@Test
 	public void testDeleteSiteStructuredContentByExternalReferenceCodeStructuredContentExternalReferenceCodeCommentByExternalReferenceCode()
 		throws Exception {
 

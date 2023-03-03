@@ -157,6 +157,12 @@ public interface CommentResource {
 				String externalReferenceCode, Comment comment)
 		throws Exception;
 
+	public Page<Comment> getSiteObjectEntryCommentsPage(
+			Long siteId, Long objectEntryId, String search,
+			com.liferay.portal.vulcan.aggregation.Aggregation aggregation,
+			Filter filter, Pagination pagination, Sort[] sorts)
+		throws Exception;
+
 	public void
 			deleteSiteStructuredContentByExternalReferenceCodeStructuredContentExternalReferenceCodeCommentByExternalReferenceCode(
 				Long siteId, String structuredContentExternalReferenceCode,

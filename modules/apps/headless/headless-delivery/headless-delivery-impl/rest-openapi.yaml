@@ -13495,7 +13495,7 @@ paths:
             description:
                 Retrieves the object entry's comments in a list. Results can be paginated, filtered, searched, and
                 sorted.
-            operationId: getObjectEntryCommentsPage
+            operationId: getSiteObjectEntryCommentsPage
             parameters:
                 - in: path
                   name: siteId
