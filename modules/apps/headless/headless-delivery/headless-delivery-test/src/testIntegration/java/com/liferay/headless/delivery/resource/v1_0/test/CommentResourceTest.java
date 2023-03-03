@@ -21,19 +21,38 @@ import com.liferay.document.library.test.util.DLAppTestUtil;
 import com.liferay.headless.delivery.client.dto.v1_0.Comment;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.test.util.JournalTestUtil;
+import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
+import com.liferay.object.service.ObjectEntryLocalServiceUtil;
+import com.liferay.object.service.ObjectFieldLocalServiceUtil;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LoggerTestUtil;
+import com.liferay.portal.test.rule.Inject;
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
+import java.io.Serializable;
+
+import java.util.Collections;
 import java.util.Objects;
+import java.util.function.Function;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,6 +62,18 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 public class CommentResourceTest extends BaseCommentResourceTestCase {
+
+	@After
+	public void tearDown() throws Exception {
+		if (_objectEntry != null) {
+			ObjectEntryLocalServiceUtil.deleteObjectEntry(_objectEntry);
+		}
+
+		if (_objectDefinition != null) {
+			ObjectDefinitionLocalServiceUtil.deleteObjectDefinition(
+				_objectDefinition.getObjectDefinitionId());
+		}
+	}
 
 	@Override
 	@Test
@@ -951,6 +982,44 @@ public class CommentResourceTest extends BaseCommentResourceTestCase {
 		return testGroup.getGroupId();
 	}
 
+	protected Comment testGetSiteObjectEntryCommentsPage_addComment(
+			Long siteId, Long objectEntryId, Comment comment)
+		throws Exception {
+
+		ObjectEntry objectEntry = ObjectEntryLocalServiceUtil.getObjectEntry(
+			objectEntryId);
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionLocalServiceUtil.getObjectDefinition(
+				objectEntry.getObjectDefinitionId());
+
+		long commentId = _commentManager.addComment(
+			comment.getExternalReferenceCode(), TestPropsValues.getUserId(),
+			testGroup.getGroupId(), objectDefinition.getClassName(),
+			objectEntry.getObjectEntryId(), StringPool.BLANK, StringPool.BLANK,
+			"<p>test</p>", _createServiceContextFunction());
+
+		return commentResource.getComment(commentId);
+	}
+
+	protected Long testGetSiteObjectEntryCommentsPage_getObjectEntryId()
+		throws Exception {
+
+		String objectFieldName = StringUtil.randomId();
+
+		_objectDefinition = _addObjectDefinition(objectFieldName);
+
+		_objectEntry = ObjectEntryLocalServiceUtil.addObjectEntry(
+			TestPropsValues.getUserId(), 0,
+			_objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				objectFieldName, "test"
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
+		return _objectEntry.getObjectEntryId();
+	}
+
 	@Override
 	protected Comment
 			testGetSiteStructuredContentByExternalReferenceCodeStructuredContentExternalReferenceCodeCommentByExternalReferenceCode_addComment()
@@ -1230,11 +1299,47 @@ public class CommentResourceTest extends BaseCommentResourceTestCase {
 		return JournalTestUtil.addArticle(testGroup.getGroupId(), 0);
 	}
 
+	private ObjectDefinition _addObjectDefinition(String objectFieldName)
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionLocalServiceUtil.addCustomObjectDefinition(
+				TestPropsValues.getUserId(), true,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"A" + RandomTestUtil.randomString(), null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				ObjectDefinitionConstants.SCOPE_COMPANY,
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Collections.emptyList());
+
+		ObjectFieldLocalServiceUtil.addCustomObjectField(
+			null, TestPropsValues.getUserId(), 0,
+			objectDefinition.getObjectDefinitionId(),
+			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+			ObjectFieldConstants.DB_TYPE_STRING, null, true, true, "",
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			objectFieldName, false, false, Collections.emptyList());
+
+		return ObjectDefinitionLocalServiceUtil.publishCustomObjectDefinition(
+			TestPropsValues.getUserId(),
+			objectDefinition.getObjectDefinitionId());
+	}
+
 	private Comment _addStructuredContentComment() throws Exception {
 		_journalArticle = _addJournalArticle();
 
 		return commentResource.postStructuredContentComment(
 			_journalArticle.getResourcePrimKey(), randomComment());
+	}
+
+	private Function<String, ServiceContext> _createServiceContextFunction() {
+		return className -> {
+			ServiceContext serviceContext = new ServiceContext();
+
+			serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
+
+			return serviceContext;
+		};
 	}
 
 	private String _formatHTML(Comment comment) {
@@ -1248,8 +1353,14 @@ public class CommentResourceTest extends BaseCommentResourceTestCase {
 	}
 
 	private BlogsEntry _blogsEntry;
+
+	@Inject
+	private CommentManager _commentManager;
+
 	private FileEntry _fileEntry;
 	private JournalArticle _journalArticle;
+	private ObjectDefinition _objectDefinition;
+	private ObjectEntry _objectEntry;
 	private Comment _parentComment;
 
 }
