@@ -126,7 +126,6 @@ public class BatchEngineExportTaskItemWriterBuilder {
 					BatchEngineImportConfiguration();
 
 		batchEngineImportConfiguration.setClassName(_itemClass.getName());
-		batchEngineImportConfiguration.setVersion("v1.0");
 
 		if (_parameters == null) {
 			_parameters = new HashMap<>();
@@ -136,6 +135,8 @@ public class BatchEngineExportTaskItemWriterBuilder {
 		_parameters.computeIfAbsent("updateStrategy", key -> "UPDATE");
 
 		batchEngineImportConfiguration.setParameters(_parameters);
+
+		batchEngineImportConfiguration.setVersion("v1.0");
 
 		return batchEngineImportConfiguration;
 	}
