@@ -69,6 +69,7 @@ else {
 				<div class="mb-4 mt-3 portrait-icons">
 					<div class="btn-group button-holder">
 						<aui:button aria-label='<%= LanguageUtil.get(request, "change-image") %>' cssClass="edit-logo modify-link mr-3" value="change" />
+
 						<aui:button aria-label='<%= LanguageUtil.get(request, "delete-image") %>' cssClass="delete-logo modify-link" disabled="<%= defaultLogo && (fileEntryId == 0) %>" value="delete" />
 					</div>
 
