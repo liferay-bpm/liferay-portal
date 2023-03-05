@@ -152,17 +152,17 @@ public class EventSegmentsCriteriaContributorTest {
 			fieldsMap.put(field.getName(), field);
 		}
 
-		Field field1 = fieldsMap.get("commentPosted");
+		Field field1 = fieldsMap.get("blogViewed");
 
 		Assert.assertNotNull(field1);
-		Assert.assertEquals("commentPosted", field1.getName());
+		Assert.assertEquals("blogViewed", field1.getName());
 		Assert.assertNotNull(field1.getLabel());
 		Assert.assertEquals("event", field1.getType());
 
-		Field field2 = fieldsMap.get("blogViewed");
+		Field field2 = fieldsMap.get("commentPosted");
 
 		Assert.assertNotNull(field2);
-		Assert.assertEquals("blogViewed", field2.getName());
+		Assert.assertEquals("commentPosted", field2.getName());
 		Assert.assertNotNull(field2.getLabel());
 		Assert.assertEquals("event", field2.getType());
 
