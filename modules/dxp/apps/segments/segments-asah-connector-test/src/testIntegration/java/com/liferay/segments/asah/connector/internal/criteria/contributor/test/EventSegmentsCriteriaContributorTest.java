@@ -155,57 +155,57 @@ public class EventSegmentsCriteriaContributorTest {
 		Field field1 = fieldsMap.get("blogViewed");
 
 		Assert.assertNotNull(field1);
-		Assert.assertEquals("blogViewed", field1.getName());
 		Assert.assertNotNull(field1.getLabel());
+		Assert.assertEquals("blogViewed", field1.getName());
 		Assert.assertEquals("event", field1.getType());
 
 		Field field2 = fieldsMap.get("commentPosted");
 
 		Assert.assertNotNull(field2);
-		Assert.assertEquals("commentPosted", field2.getName());
 		Assert.assertNotNull(field2.getLabel());
+		Assert.assertEquals("commentPosted", field2.getName());
 		Assert.assertEquals("event", field2.getType());
 
 		Field field3 = fieldsMap.get("documentDownloaded");
 
 		Assert.assertNotNull(field3);
-		Assert.assertEquals("documentDownloaded", field3.getName());
 		Assert.assertNotNull(field3.getLabel());
+		Assert.assertEquals("documentDownloaded", field3.getName());
 		Assert.assertEquals("event", field3.getType());
 
 		Field field4 = fieldsMap.get("documentPreviewed");
 
 		Assert.assertNotNull(field4);
-		Assert.assertEquals("documentPreviewed", field4.getName());
 		Assert.assertNotNull(field4.getLabel());
+		Assert.assertEquals("documentPreviewed", field4.getName());
 		Assert.assertEquals("event", field4.getType());
 
 		Field field5 = fieldsMap.get("formSubmitted");
 
 		Assert.assertNotNull(field5);
-		Assert.assertEquals("formSubmitted", field5.getName());
 		Assert.assertNotNull(field5.getLabel());
+		Assert.assertEquals("formSubmitted", field5.getName());
 		Assert.assertEquals("event", field5.getType());
 
 		Field field6 = fieldsMap.get("formViewed");
 
 		Assert.assertNotNull(field6);
-		Assert.assertEquals("formViewed", field6.getName());
 		Assert.assertNotNull(field6.getLabel());
+		Assert.assertEquals("formViewed", field6.getName());
 		Assert.assertEquals("event", field6.getType());
 
 		Field field7 = fieldsMap.get("pageViewed");
 
 		Assert.assertNotNull(field7);
-		Assert.assertEquals("pageViewed", field7.getName());
 		Assert.assertNotNull(field7.getLabel());
+		Assert.assertEquals("pageViewed", field7.getName());
 		Assert.assertEquals("event", field7.getType());
 
 		Field field8 = fieldsMap.get("webContentViewed");
 
 		Assert.assertNotNull(field8);
-		Assert.assertEquals("webContentViewed", field8.getName());
 		Assert.assertNotNull(field8.getLabel());
+		Assert.assertEquals("webContentViewed", field8.getName());
 		Assert.assertEquals("event", field8.getType());
 	}
 
