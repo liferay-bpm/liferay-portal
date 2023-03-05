@@ -81,17 +81,17 @@ public class AsahSegmentsEntryLocalServiceWrapper
 			return segmentsEntry;
 		}
 
+		IndividualSegment individualSegment =
+			_asahFaroBackendClient.getIndividualSegment(
+				segmentsEntry.getCompanyId(),
+				segmentsEntry.getSegmentsEntryKey());
+
 		ServiceContext serviceContext = _getServiceContext(
 			segmentsEntry.getCompanyId());
 
 		Map<Locale, String> nameMap = Collections.singletonMap(
 			_portal.getSiteDefaultLocale(serviceContext.getScopeGroupId()),
 			individualSegment.getName());
-
-		IndividualSegment individualSegment =
-			_asahFaroBackendClient.getIndividualSegment(
-				segmentsEntry.getCompanyId(),
-				segmentsEntry.getSegmentsEntryKey());
 
 		IndividualSegmentsExpressionParser individualSegmentsExpressionParser =
 			new IndividualSegmentsExpressionParser(
