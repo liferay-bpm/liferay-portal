@@ -805,9 +805,19 @@ public class DLAdminDisplayContext {
 		SearchContext searchContext = SearchContextFactory.getInstance(
 			_httpServletRequest);
 
+		searchContext.setAttribute("paginationType", "regular");
+
 		long searchRepositoryId = ParamUtil.getLong(
 			_httpServletRequest, "searchRepositoryId",
 			_themeDisplay.getScopeGroupId());
+
+		searchContext.setAttribute("searchRepositoryId", searchRepositoryId);
+
+		searchContext.setEnd(searchContainer.getEnd());
+		searchContext.setFolderIds(
+			new long[] {
+				ParamUtil.getLong(_httpServletRequest, "searchFolderId")
+			});
 
 		Group group = GroupLocalServiceUtil.fetchGroup(searchRepositoryId);
 
@@ -818,14 +828,6 @@ public class DLAdminDisplayContext {
 			searchContext.setGroupIds(new long[] {searchRepositoryId});
 		}
 
-		searchContext.setAttribute("paginationType", "regular");
-
-		searchContext.setAttribute("searchRepositoryId", searchRepositoryId);
-		searchContext.setEnd(searchContainer.getEnd());
-		searchContext.setFolderIds(
-			new long[] {
-				ParamUtil.getLong(_httpServletRequest, "searchFolderId")
-			});
 		searchContext.setIncludeDiscussions(true);
 		searchContext.setIncludeInternalAssetCategories(true);
 		searchContext.setKeywords(
