@@ -17,9 +17,6 @@ package com.liferay.dynamic.data.mapping.internal.upgrade.v5_3_0;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.util.HashMapBuilder;
-
-import java.util.Map;
 
 /**
  * @author Tibor Lipusz
@@ -34,41 +31,36 @@ public class DDMTemplateUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_updateSearchBarTemplates();
-	}
-
-	private void _updateSearchBarTemplates() throws Exception {
+		long newClassNameId = _classNameLocalService.getClassNameId(
+			"com.liferay.portal.search.web.internal.search.bar.portlet." +
+				"SearchBarPortlet");
 		long resourceClassNameId = _classNameLocalService.getClassNameId(
 			"com.liferay.portlet.display.template.PortletDisplayTemplate");
 
-		for (Map.Entry<String, String> entry :
-				_searchBarTemplateClassNames.entrySet()) {
+		_updateDDMTemplate(
+			newClassNameId,
+			"com.liferay.portal.search.web.internal.search.bar.portlet." +
+				"display.context.SearchBarPortletDisplayContext",
+			resourceClassNameId);
+		_updateDDMTemplate(
+			newClassNameId,
+			"com.liferay.portal.search.web.internal.search.bar.portlet." +
+				"SearchBarPortletDisplayContext",
+			resourceClassNameId);
+	}
 
-			long newClassNameId = _classNameLocalService.getClassNameId(
-				entry.getValue());
-			long oldClassNameId = _classNameLocalService.getClassNameId(
-				entry.getKey());
+	private void _updateDDMTemplate(
+			long newClassNameId, String oldClassName, long resourceClassNameId)
+		throws Exception {
 
-			runSQL(
-				StringBundler.concat(
-					"update DDMTemplate set classNameId = ", newClassNameId,
-					" where classNameId = ", oldClassNameId,
-					" and resourceClassNameId = ", resourceClassNameId));
-		}
+		runSQL(
+			StringBundler.concat(
+				"update DDMTemplate set classNameId = ", newClassNameId,
+				" where classNameId = ",
+				_classNameLocalService.getClassNameId(oldClassName),
+				" and resourceClassNameId = ", resourceClassNameId));
 	}
 
 	private final ClassNameLocalService _classNameLocalService;
-	private final Map<String, String> _searchBarTemplateClassNames =
-		HashMapBuilder.put(
-			"com.liferay.portal.search.web.internal.search.bar.portlet." +
-				"display.context.SearchBarPortletDisplayContext",
-			"com.liferay.portal.search.web.internal.search.bar.portlet." +
-				"SearchBarPortlet"
-		).put(
-			"com.liferay.portal.search.web.internal.search.bar.portlet." +
-				"SearchBarPortletDisplayContext",
-			"com.liferay.portal.search.web.internal.search.bar.portlet." +
-				"SearchBarPortlet"
-		).build();
 
 }
