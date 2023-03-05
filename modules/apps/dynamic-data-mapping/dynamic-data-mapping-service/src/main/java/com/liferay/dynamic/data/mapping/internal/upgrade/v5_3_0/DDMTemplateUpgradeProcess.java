@@ -24,9 +24,9 @@ import java.util.Map;
 /**
  * @author Tibor Lipusz
  */
-public class DDMSearchBarTemplateUpgradeProcess extends UpgradeProcess {
+public class DDMTemplateUpgradeProcess extends UpgradeProcess {
 
-	public DDMSearchBarTemplateUpgradeProcess(
+	public DDMTemplateUpgradeProcess(
 		ClassNameLocalService classNameLocalService) {
 
 		_classNameLocalService = classNameLocalService;
