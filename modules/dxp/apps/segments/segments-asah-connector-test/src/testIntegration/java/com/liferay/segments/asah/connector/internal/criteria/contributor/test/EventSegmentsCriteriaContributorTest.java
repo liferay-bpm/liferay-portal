@@ -132,6 +132,9 @@ public class EventSegmentsCriteriaContributorTest {
 
 	@Test
 	public void testGetFields() {
+		SegmentsCriteriaContributor segmentsCriteriaContributor =
+			_getSegmentsCriteriaContributor();
+
 		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
 			new MockLiferayPortletRenderRequest();
 
@@ -140,13 +143,10 @@ public class EventSegmentsCriteriaContributorTest {
 		mockLiferayPortletRenderRequest.setAttribute(
 			WebKeys.THEME_DISPLAY, _getThemeDisplay());
 
-		SegmentsCriteriaContributor segmentsCriteriaContributor =
-			_getSegmentsCriteriaContributor();
+		Map<String, Field> fieldsMap = new HashMap<>();
 
 		List<Field> fields = segmentsCriteriaContributor.getFields(
 			mockLiferayPortletRenderRequest);
-
-		Map<String, Field> fieldsMap = new HashMap<>();
 
 		for (Field field : fields) {
 			fieldsMap.put(field.getName(), field);
