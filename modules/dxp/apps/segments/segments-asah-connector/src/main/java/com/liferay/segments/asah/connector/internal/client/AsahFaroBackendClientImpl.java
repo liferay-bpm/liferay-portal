@@ -196,7 +196,7 @@ public class AsahFaroBackendClientImpl implements AsahFaroBackendClient {
 		long companyId, String individualSegmentId) {
 
 		if (Validator.isNull(individualSegmentId)) {
-			throw new IllegalArgumentException("IndividualSegment ID is null");
+			throw new IllegalArgumentException("Individual segment ID is null");
 		}
 
 		try {

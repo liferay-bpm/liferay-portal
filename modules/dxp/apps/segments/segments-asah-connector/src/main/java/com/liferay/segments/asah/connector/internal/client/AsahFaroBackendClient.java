@@ -91,13 +91,6 @@ public interface AsahFaroBackendClient {
 		long companyId, String individualSegmentId, int cur, int delta,
 		List<OrderByField> orderByFields);
 
-	/**
-	 * Returns an individual segment.
-	 *
-	 * @param  companyId the company ID
-	 * @param  individualSegmentId the individual segment's ID
-	 * @return an individual segment.
-	 */
 	public IndividualSegment getIndividualSegment(
 		long companyId, String individualSegmentId);
 

@@ -81,6 +81,13 @@ public class AsahSegmentsEntryLocalServiceWrapper
 			return segmentsEntry;
 		}
 
+		ServiceContext serviceContext = _getServiceContext(
+			segmentsEntry.getCompanyId());
+
+		Map<Locale, String> nameMap = Collections.singletonMap(
+			_portal.getSiteDefaultLocale(serviceContext.getScopeGroupId()),
+			individualSegment.getName());
+
 		IndividualSegment individualSegment =
 			_asahFaroBackendClient.getIndividualSegment(
 				segmentsEntry.getCompanyId(),
@@ -97,13 +104,6 @@ public class AsahSegmentsEntryLocalServiceWrapper
 
 		Criteria criteria = expressionContext.accept(
 			new IndividualSegmentsExpressionVisitorImpl());
-
-		ServiceContext serviceContext = _getServiceContext(
-			segmentsEntry.getCompanyId());
-
-		Map<Locale, String> nameMap = Collections.singletonMap(
-			_portal.getSiteDefaultLocale(serviceContext.getScopeGroupId()),
-			individualSegment.getName());
 
 		return updateSegmentsEntry(
 			segmentsEntry.getSegmentsEntryId(), individualSegment.getId(),
