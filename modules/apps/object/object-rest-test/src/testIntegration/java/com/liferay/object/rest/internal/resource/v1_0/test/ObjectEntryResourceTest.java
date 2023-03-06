@@ -463,7 +463,7 @@ public class ObjectEntryResourceTest {
 	}
 
 	@Test
-	public void testPostCustomObjectEntryWithWrongNestedCustomObjectEntries()
+	public void testPostCustomObjectEntryWithInvalidNestedCustomObjectEntries()
 		throws Exception {
 
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
@@ -477,7 +477,7 @@ public class ObjectEntryResourceTest {
 					TestPropsValues.getUserId(),
 					ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
 
-			_testPostCustomObjectEntryWithWrongNestedCustomObjectEntriesInManyToManyRelationship(
+			_testPostCustomObjectEntryWithInvalidNestedCustomObjectEntriesInManyToManyRelationship(
 				_objectDefinition1.getRESTContextPath(), _objectRelationship);
 
 			_objectRelationship =
@@ -486,10 +486,10 @@ public class ObjectEntryResourceTest {
 					TestPropsValues.getUserId(),
 					ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
-			_testPostCustomObjectEntryWithWrongNestedCustomObjectEntriesInManyToOneRelationship(
+			_testPostCustomObjectEntryWithInvalidNestedCustomObjectEntriesInManyToOneRelationship(
 				_objectDefinition2.getRESTContextPath(), _objectRelationship);
 
-			_testPostCustomObjectEntryWithWrongNestedCustomObjectEntriesInOneToManyRelationship(
+			_testPostCustomObjectEntryWithInvalidNestedCustomObjectEntriesInOneToManyRelationship(
 				_objectDefinition1.getRESTContextPath(), _objectRelationship);
 		}
 	}
@@ -972,7 +972,7 @@ public class ObjectEntryResourceTest {
 	}
 
 	private void
-			_testPostCustomObjectEntryWithWrongNestedCustomObjectEntriesInManyToManyRelationship(
+			_testPostCustomObjectEntryWithInvalidNestedCustomObjectEntriesInManyToManyRelationship(
 				String objectDefinitionRESTContextPath,
 				ObjectRelationship objectRelationship)
 		throws Exception {
@@ -994,7 +994,7 @@ public class ObjectEntryResourceTest {
 	}
 
 	private void
-			_testPostCustomObjectEntryWithWrongNestedCustomObjectEntriesInManyToOneRelationship(
+			_testPostCustomObjectEntryWithInvalidNestedCustomObjectEntriesInManyToOneRelationship(
 				String objectDefinitionRESTContextPath,
 				ObjectRelationship objectRelationship)
 		throws Exception {
@@ -1015,7 +1015,7 @@ public class ObjectEntryResourceTest {
 	}
 
 	private void
-			_testPostCustomObjectEntryWithWrongNestedCustomObjectEntriesInOneToManyRelationship(
+			_testPostCustomObjectEntryWithInvalidNestedCustomObjectEntriesInOneToManyRelationship(
 				String objectDefinitionRESTContextPath,
 				ObjectRelationship objectRelationship)
 		throws Exception {
