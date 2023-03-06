@@ -141,7 +141,7 @@
 					</license>
 				</licenses>
 				<current-version-publish-date>2022-04-16 01:53:24</current-version-publish-date>
-				<latest-version-publish-date>2023-02-04 00:09:09</latest-version-publish-date>
+				<latest-version-publish-date>2023-03-05 02:59:12</latest-version-publish-date>
 			</library>
 			<library>
 				<file-name>com.liferay.calendar.service.jar!jparsec.jar</file-name>
@@ -209,7 +209,7 @@
 					</license>
 				</licenses>
 				<current-version-publish-date>2021-03-01 21:14:40</current-version-publish-date>
-				<latest-version-publish-date>2023-02-17 20:25:31</latest-version-publish-date>
+				<latest-version-publish-date>2023-03-02 21:55:34</latest-version-publish-date>
 			</library>
 			<library>
 				<file-name>com.liferay.comment.sanitizer.jar!error_prone_annotations.jar</file-name>
@@ -1758,7 +1758,7 @@
 					</license>
 				</licenses>
 				<current-version-publish-date>2018-02-06 00:42:33</current-version-publish-date>
-				<latest-version-publish-date>2023-02-09 23:47:17</latest-version-publish-date>
+				<latest-version-publish-date>2023-03-02 09:07:52</latest-version-publish-date>
 			</library>
 			<library>
 				<file-name>com.liferay.frontend.js.minifier.jar!yuicompressor.jar</file-name>
@@ -2034,7 +2034,7 @@
 					</license>
 				</licenses>
 				<current-version-publish-date>2021-11-18 23:11:50</current-version-publish-date>
-				<latest-version-publish-date>2022-12-12 20:37:22</latest-version-publish-date>
+				<latest-version-publish-date>2023-03-02 18:28:30</latest-version-publish-date>
 			</library>
 			<library>
 				<file-name>com.liferay.ip.geocoder.impl.jar!maxmind-db.jar</file-name>
@@ -4221,7 +4221,7 @@
 					</license>
 				</licenses>
 				<current-version-publish-date>2021-03-11 03:10:47</current-version-publish-date>
-				<latest-version-publish-date>2023-02-16 21:44:03</latest-version-publish-date>
+				<latest-version-publish-date>2023-03-01 22:17:50</latest-version-publish-date>
 			</library>
 			<library>
 				<file-name>com.liferay.portal.store.gcs.jar!google-cloud-core.jar</file-name>
@@ -4235,7 +4235,7 @@
 					</license>
 				</licenses>
 				<current-version-publish-date>2021-03-11 03:10:45</current-version-publish-date>
-				<latest-version-publish-date>2023-02-16 21:58:03</latest-version-publish-date>
+				<latest-version-publish-date>2023-03-01 22:11:54</latest-version-publish-date>
 			</library>
 			<library>
 				<file-name>com.liferay.portal.store.gcs.jar!google-cloud-storage.jar</file-name>
@@ -4484,7 +4484,7 @@
 					</license>
 				</licenses>
 				<current-version-publish-date>2022-07-15 20:54:32</current-version-publish-date>
-				<latest-version-publish-date>2023-02-27 22:23:06</latest-version-publish-date>
+				<latest-version-publish-date>2023-03-03 21:38:06</latest-version-publish-date>
 			</library>
 			<library>
 				<file-name>com.liferay.portal.store.s3.jar!aws-java-sdk-kms.jar</file-name>
@@ -4498,7 +4498,7 @@
 					</license>
 				</licenses>
 				<current-version-publish-date>2022-07-15 20:54:29</current-version-publish-date>
-				<latest-version-publish-date>2023-02-27 22:22:18</latest-version-publish-date>
+				<latest-version-publish-date>2023-03-03 21:38:33</latest-version-publish-date>
 			</library>
 			<library>
 				<file-name>com.liferay.portal.store.s3.jar!aws-java-sdk-s3.jar</file-name>
@@ -4512,7 +4512,7 @@
 					</license>
 				</licenses>
 				<current-version-publish-date>2022-07-15 20:53:45</current-version-publish-date>
-				<latest-version-publish-date>2023-02-27 22:23:03</latest-version-publish-date>
+				<latest-version-publish-date>2023-03-03 21:37:26</latest-version-publish-date>
 			</library>
 			<library>
 				<file-name>com.liferay.portal.store.s3.jar!commons-logging.jar</file-name>
@@ -5106,7 +5106,7 @@
 					</license>
 				</licenses>
 				<current-version-publish-date>2022-07-26 23:55:52</current-version-publish-date>
-				<latest-version-publish-date>2023-02-27 05:10:56</latest-version-publish-date>
+				<latest-version-publish-date>2023-03-02 00:27:41</latest-version-publish-date>
 			</library>
 			<library>
 				<file-name>com.liferay.portal.vulcan.impl.jar!guava.jar</file-name>
@@ -6460,7 +6460,7 @@
 					</license>
 				</licenses>
 				<current-version-publish-date>2021-03-11 03:10:47</current-version-publish-date>
-				<latest-version-publish-date>2023-02-16 21:44:03</latest-version-publish-date>
+				<latest-version-publish-date>2023-03-01 22:17:50</latest-version-publish-date>
 			</library>
 			<library>
 				<file-name>com.liferay.site.initializer.testray.dispatch.task.executor.jar!google-cloud-core.jar</file-name>
@@ -6474,7 +6474,7 @@
 					</license>
 				</licenses>
 				<current-version-publish-date>2021-03-11 03:10:45</current-version-publish-date>
-				<latest-version-publish-date>2023-02-16 21:58:03</latest-version-publish-date>
+				<latest-version-publish-date>2023-03-01 22:11:54</latest-version-publish-date>
 			</library>
 			<library>
 				<file-name>com.liferay.site.initializer.testray.dispatch.task.executor.jar!google-cloud-storage.jar</file-name>
