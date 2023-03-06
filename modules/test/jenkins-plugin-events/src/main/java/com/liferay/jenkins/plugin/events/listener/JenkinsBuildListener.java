@@ -42,7 +42,7 @@ public class JenkinsBuildListener extends RunListener<Build> {
 	}
 
 	@Override
-	public void onStarted(Build build, TaskListener listener) {
+	public void onStarted(Build build, TaskListener taskListener) {
 		Executor executor = build.getExecutor();
 
 		JenkinsPublisherUtil.publish(
