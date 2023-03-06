@@ -164,7 +164,6 @@ function create_react_app {
 
 	mkdir -p common/services/liferay common/styles
 
-	write_gitignore
 	write_react_app_files
 
 	cd ..
@@ -237,11 +236,6 @@ function write_angular_client_extension {
 	echo "        - ${CUSTOM_ELEMENT_NAME}/polyfills.*.js" >> client-extension.yaml
 	echo "        - ${CUSTOM_ELEMENT_NAME}/runtime.*.js" >> client-extension.yaml
 	echo -n "    useESM: true" >> client-extension.yaml
-}
-
-function write_gitignore {
-	cat <<EOF > .gitignore
-EOF
 }
 
 function write_react_app_files {
