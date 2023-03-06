@@ -19,7 +19,7 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +49,7 @@ public class ObjectEntry1toMObjectRelationshipElementsParserImpl
 		if (objectRelationship.getObjectDefinitionId1() ==
 				objectDefinition.getObjectDefinitionId()) {
 
-			return Arrays.asList(parseOne(value));
+			return Collections.singletonList(parseOne(value));
 		}
 
 		return parseMany(value);
