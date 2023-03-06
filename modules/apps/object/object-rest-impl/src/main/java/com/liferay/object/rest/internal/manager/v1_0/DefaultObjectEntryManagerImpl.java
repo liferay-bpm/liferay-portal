@@ -733,11 +733,11 @@ public class DefaultObjectEntryManagerImpl
 						relatedObjectDefinition.getClassName(),
 						objectRelationship.getType());
 
-			List<ObjectEntry> relatedElements =
+			List<ObjectEntry> nestedObjectEntries =
 				objectRelationshipElementsParser.parse(
 					objectRelationship, properties.get(entry.getKey()));
 
-			for (ObjectEntry nestedObjectEntry : relatedElements) {
+			for (ObjectEntry nestedObjectEntry : nestedObjectEntries) {
 				nestedObjectEntry = objectEntryManager.addOrUpdateObjectEntry(
 					objectDefinition.getCompanyId(), dtoConverterContext,
 					nestedObjectEntry.getExternalReferenceCode(),
