@@ -80,14 +80,18 @@ function create_angular_app {
 
 	cd ${CUSTOM_ELEMENT_NAME}
 
+	#
 	# Add support for custom elements and disable tests
+	#
 
 	sed -i \
 		-e '/"@angular\/core":/a\    "@angular/elements": "^15.0.0",' \
 		-e 's/"test":/"e2e-test":/' \
 		package.json
 
-	# Convert sample widget to custom element
+	#
+	# Convert sample widget to a custom element
+	#
 
 	sed -i \
 		-e 's/{ Component }/{ Component, Input }/' \
