@@ -81,7 +81,7 @@ function create_angular_app {
 	cd ${CUSTOM_ELEMENT_NAME}
 
 	#
-	# Add support for custom elements and disable tests
+	# Add support for custom elements and disable tests.
 	#
 
 	sed -i \
@@ -90,7 +90,7 @@ function create_angular_app {
 		package.json
 
 	#
-	# Convert sample widget to a custom element
+	# Convert sample widget to a custom element.
 	#
 
 	sed -i \
