@@ -103,6 +103,7 @@ public class JenkinsPublisher {
 			outputStreamWriter.write(payload);
 
 			outputStreamWriter.flush();
+
 			outputStreamWriter.close();
 
 			try (InputStream errorInputStream =
@@ -112,9 +113,8 @@ public class JenkinsPublisher {
 					ByteArrayOutputStream byteArrayOutputStream =
 						new ByteArrayOutputStream();
 
-					byte[] bytes = new byte[1024];
-
 					int b;
+					byte[] bytes = new byte[1024];
 
 					while ((b = errorInputStream.read(bytes)) != -1) {
 						byteArrayOutputStream.write(bytes, 0, b);
@@ -133,9 +133,8 @@ public class JenkinsPublisher {
 					ByteArrayOutputStream byteArrayOutputStream =
 						new ByteArrayOutputStream();
 
-					byte[] bytes = new byte[1024];
-
 					int b;
+					byte[] bytes = new byte[1024];
 
 					while ((b = inputStream.read(bytes)) != -1) {
 						byteArrayOutputStream.write(bytes, 0, b);
