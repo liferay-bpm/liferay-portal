@@ -76,9 +76,9 @@ function check_utils {
 }
 
 function create_angular_app {
-	npx @angular/cli new ${REMOTE_APP_DIR} --defaults --skip-install
+	npx @angular/cli new ${CUSTOM_ELEMENT_NAME} --defaults --skip-install
 
-	cd ${REMOTE_APP_DIR}
+	cd ${CUSTOM_ELEMENT_NAME}
 
 	# Add support for custom elements and disable tests
 
@@ -125,9 +125,9 @@ function create_angular_app {
 function create_react_app {
 	check_utils yarn
 
-	yarn create react-app ${REMOTE_APP_DIR}
+	yarn create react-app ${CUSTOM_ELEMENT_NAME}
 
-	cd ${REMOTE_APP_DIR}
+	cd ${CUSTOM_ELEMENT_NAME}
 
 	yarn add sass
 	yarn remove @testing-library/jest-dom @testing-library/react @testing-library/user-event web-vitals
@@ -171,10 +171,10 @@ function create_vue_2_app {
 
 	npm i -g @vue/cli
 
-	vue create ${REMOTE_APP_DIR} --default
+	vue create ${CUSTOM_ELEMENT_NAME} --default
 
-	sed -i -e "s|<div id=\"app\"></div>|<${CUSTOM_ELEMENT_NAME}></${CUSTOM_ELEMENT_NAME}>|g" ${REMOTE_APP_DIR}/public/index.html
-	sed -i -e "s|#app|${CUSTOM_ELEMENT_NAME}|g" ${REMOTE_APP_DIR}/src/main.js
+	sed -i -e "s|<div id=\"app\"></div>|<${CUSTOM_ELEMENT_NAME}></${CUSTOM_ELEMENT_NAME}>|g" ${CUSTOM_ELEMENT_NAME}/public/index.html
+	sed -i -e "s|#app|${CUSTOM_ELEMENT_NAME}|g" ${CUSTOM_ELEMENT_NAME}/src/main.js
 }
 
 function create_vue_3_app {
@@ -186,14 +186,14 @@ function main {
 
 	CUSTOM_ELEMENT_NAME="${1}"
 
-	CUSTOM_ELEMENT_DISPLAY_NAME="$(echo ${CUSTOM_ELEMENT_NAME} | sed -r 's/^(.)|-(.)/ \U\1\U\2/g' | sed -r 's/^ (.*)/\1/')"
-
-	REMOTE_APP_DIR="${1}"
-
-	if [ -e ${REMOTE_APP_DIR} ]
+	if [ -e ${CUSTOM_ELEMENT_NAME} ]
 	then
-		REMOTE_APP_DIR=${REMOTE_APP_DIR}-$(random_letter)$(random_digit)$(random_letter)$(random_digit)
+		echo "The directory ${CUSTOM_ELEMENT_NAME} already exists."
+
+		exit 1
 	fi
+
+	CUSTOM_ELEMENT_DISPLAY_NAME="$(echo ${CUSTOM_ELEMENT_NAME} | sed -r 's/^(.)|-(.)/ \U\1\U\2/g' | sed -r 's/^ (.*)/\1/')"
 
 	if [ "${2}" == "angular" ]
 	then
@@ -214,32 +214,24 @@ function main {
 	fi
 }
 
-function random_digit {
-	echo $(((RANDOM % 10) + 1))
-}
-
-function random_letter {
-	echo cat /dev/urandom | tr -cd 'a-z' | head -c 1
-}
-
 function write_angular_client_extension {
 	echo "assemble:" > client-extension.yaml
 	echo "    - from: dist" >> client-extension.yaml
-	echo "      include: ${REMOTE_APP_DIR}/" >> client-extension.yaml
+	echo "      include: ${CUSTOM_ELEMENT_NAME}/" >> client-extension.yaml
 	echo "      into: static/" >> client-extension.yaml
-	echo "${REMOTE_APP_DIR}:" >> client-extension.yaml
+	echo "${CUSTOM_ELEMENT_NAME}:" >> client-extension.yaml
 	echo "    cssURLs:" >> client-extension.yaml
-	echo "        - ${REMOTE_APP_DIR}/styles.*.css" >> client-extension.yaml
-	echo "    friendlyURLMapping: ${REMOTE_APP_DIR}" >> client-extension.yaml
+	echo "        - ${CUSTOM_ELEMENT_NAME}/styles.*.css" >> client-extension.yaml
+	echo "    friendlyURLMapping: ${CUSTOM_ELEMENT_NAME}" >> client-extension.yaml
 	echo "    htmlElementName: ${CUSTOM_ELEMENT_NAME}" >> client-extension.yaml
 	echo "    instanceable: false" >> client-extension.yaml
 	echo "    name: ${CUSTOM_ELEMENT_DISPLAY_NAME}" >> client-extension.yaml
 	echo "    portletCategoryName: category.client-extensions" >> client-extension.yaml
 	echo "    type: customElement" >> client-extension.yaml
 	echo "    urls:" >> client-extension.yaml
-	echo "        - ${REMOTE_APP_DIR}/main.*.js" >> client-extension.yaml
-	echo "        - ${REMOTE_APP_DIR}/polyfills.*.js" >> client-extension.yaml
-	echo "        - ${REMOTE_APP_DIR}/runtime.*.js" >> client-extension.yaml
+	echo "        - ${CUSTOM_ELEMENT_NAME}/main.*.js" >> client-extension.yaml
+	echo "        - ${CUSTOM_ELEMENT_NAME}/polyfills.*.js" >> client-extension.yaml
+	echo "        - ${CUSTOM_ELEMENT_NAME}/runtime.*.js" >> client-extension.yaml
 	echo -n "    useESM: true" >> client-extension.yaml
 }
 
