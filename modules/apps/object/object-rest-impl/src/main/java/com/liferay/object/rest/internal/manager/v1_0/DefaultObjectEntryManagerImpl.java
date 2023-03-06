@@ -651,27 +651,25 @@ public class DefaultObjectEntryManagerImpl
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
 
-		com.liferay.object.model.ObjectEntry updateObjectEntry =
-			_objectEntryService.updateObjectEntry(
-				objectEntryId,
-				_toObjectValues(
-					serviceBuilderObjectEntry.getGroupId(),
-					dtoConverterContext.getUserId(), objectDefinition,
-					objectEntry, serviceBuilderObjectEntry.getObjectEntryId(),
-					dtoConverterContext.getLocale()),
-				_createServiceContext(
-					objectEntry.getProperties(),
-					dtoConverterContext.getUserId()));
+		serviceBuilderObjectEntry = _objectEntryService.updateObjectEntry(
+			objectEntryId,
+			_toObjectValues(
+				serviceBuilderObjectEntry.getGroupId(),
+				dtoConverterContext.getUserId(), objectDefinition, objectEntry,
+				serviceBuilderObjectEntry.getObjectEntryId(),
+				dtoConverterContext.getLocale()),
+			_createServiceContext(
+				objectEntry.getProperties(), dtoConverterContext.getUserId()));
 
 		if (FeatureFlagManagerUtil.isEnabled("LPS-153117")) {
 			_addOrUpdateNestedObjectEntries(
 				dtoConverterContext, objectDefinition, objectEntry,
 				_getObjectRelationships(objectDefinition, objectEntry),
-				updateObjectEntry.getPrimaryKey());
+				serviceBuilderObjectEntry.getPrimaryKey());
 		}
 
 		return _toObjectEntry(
-			dtoConverterContext, objectDefinition, updateObjectEntry);
+			dtoConverterContext, objectDefinition, serviceBuilderObjectEntry);
 	}
 
 	private Map<String, String> _addAction(
