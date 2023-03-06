@@ -47,14 +47,19 @@ public class JenkinsPublisherUtil {
 
 		JSONObject payloadJSONObject = new JSONObject();
 
-		payloadJSONObject.put("build", _getBuildJSONObject(eventObject));
 		payloadJSONObject.put(
-			"computer", _getComputerJSONObject(eventObject, eventTrigger));
-		payloadJSONObject.put("eventTrigger", eventTrigger);
-		payloadJSONObject.put("jenkins", _getJenkinsJSONObject(jenkins));
-		payloadJSONObject.put("job", _getJobJSONObject(eventObject));
-		payloadJSONObject.put(
-			"queueItem", _getQueueItemJSONObject(eventObject));
+			"build", _getBuildJSONObject(eventObject)
+		).put(
+			"computer", _getComputerJSONObject(eventObject, eventTrigger)
+		).put(
+			"eventTrigger", eventTrigger
+		).put(
+			"jenkins", _getJenkinsJSONObject(jenkins)
+		).put(
+			"job", _getJobJSONObject(eventObject)
+		).put(
+			"queueItem", _getQueueItemJSONObject(eventObject)
+		);
 
 		JenkinsEventsRootAction jenkinsEventsRootAction =
 			jenkins.getDescriptorByType(JenkinsEventsRootAction.class);
@@ -88,9 +93,13 @@ public class JenkinsPublisherUtil {
 
 		JSONObject jsonObject = new JSONObject();
 
-		jsonObject.put("duration", build.getDuration());
-		jsonObject.put("number", build.getNumber());
-		jsonObject.put("result", build.getResult());
+		jsonObject.put(
+			"duration", build.getDuration()
+		).put(
+			"number", build.getNumber()
+		).put(
+			"result", build.getResult()
+		);
 
 		return jsonObject;
 	}
@@ -132,8 +141,11 @@ public class JenkinsPublisherUtil {
 			jsonObject.put("busy", !computer.isIdle());
 		}
 
-		jsonObject.put("name", computer.getDisplayName());
-		jsonObject.put("online", computer.isOnline());
+		jsonObject.put(
+			"name", computer.getDisplayName()
+		).put(
+			"online", computer.isOnline()
+		);
 
 		return jsonObject;
 	}
@@ -200,8 +212,11 @@ public class JenkinsPublisherUtil {
 		if (queueItem instanceof Queue.BuildableItem) {
 			Queue.BuildableItem buildableItem = (Queue.BuildableItem)queueItem;
 
-			jsonObject.put("pending", buildableItem.isPending());
-			jsonObject.put("stuck", buildableItem.isStuck());
+			jsonObject.put(
+				"pending", buildableItem.isPending()
+			).put(
+				"stuck", buildableItem.isStuck()
+			);
 		}
 		else if (queueItem instanceof Queue.LeftItem) {
 			Queue.LeftItem leftItem = (Queue.LeftItem)queueItem;
@@ -222,9 +237,11 @@ public class JenkinsPublisherUtil {
 			}
 		}
 
-		jsonObject.put("parameters", parameters);
-
-		jsonObject.put("task", _getQueueTaskJSONObject(queueItem.task));
+		jsonObject.put(
+			"parameters", parameters
+		).put(
+			"task", _getQueueTaskJSONObject(queueItem.task)
+		);
 
 		return jsonObject;
 	}
@@ -236,8 +253,11 @@ public class JenkinsPublisherUtil {
 
 		JSONObject jsonObject = new JSONObject();
 
-		jsonObject.put("concurrent", queueTask.isConcurrentBuild());
-		jsonObject.put("name", queueTask.getDisplayName());
+		jsonObject.put(
+			"concurrent", queueTask.isConcurrentBuild()
+		).put(
+			"name", queueTask.getDisplayName()
+		);
 
 		return jsonObject;
 	}
