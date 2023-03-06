@@ -13,4 +13,4 @@ sample-custom-element-2:
     type: customElement
     urls:
         - static/js/main.*.js
-    useESM: false
+    useESM: true
