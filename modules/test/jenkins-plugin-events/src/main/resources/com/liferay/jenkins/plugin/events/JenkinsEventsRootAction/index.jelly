@@ -16,8 +16,9 @@
 
 				<f:form action="jenkinsEventsConfiguration" method="post" name="jenkinsEventsConfiguration">
 					<f:entry>
-						<f:repeatable var="jenkinsPublishers" items="${it.jenkinsPublishers}">
+						<f:repeatable items="${it.jenkinsPublishers}" var="jenkinsPublishers">
 							<h3>Jenkins Publisher</h3>
+
 							<f:entry>
 								<div align="right">
 									<f:repeatableDeleteButton />
