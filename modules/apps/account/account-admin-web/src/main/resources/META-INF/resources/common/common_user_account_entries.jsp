@@ -21,7 +21,7 @@ boolean singleSelect = ParamUtil.getBoolean(request, "singleSelect", true);
 %>
 
 <liferay-util:buffer
-	var="removeButtonAccounts"
+	var="removeButton"
 >
 	<clay:button
 		aria-label="TOKEN_ARIA_LABEL"
@@ -197,7 +197,7 @@ boolean singleSelect = ParamUtil.getBoolean(request, "singleSelect", true);
 								);
 
 								let removeButton =
-									'<%= UnicodeFormatter.toString(removeButtonAccounts) %>';
+									'<%= UnicodeFormatter.toString(removeButton) %>';
 
 								removeButton = removeButton
 									.replace('TOKEN_ARIA_LABEL', label)
