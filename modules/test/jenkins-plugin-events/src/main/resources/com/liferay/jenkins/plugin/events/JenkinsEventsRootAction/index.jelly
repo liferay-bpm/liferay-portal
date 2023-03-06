@@ -13,7 +13,8 @@
 					<h2>Jenkins Events</h2>
 					<p>The specified events occur, a POST wil be made the specified URLs provided.</p>
 				</div>
-				<f:form method="post" name="jenkinsEventsConfiguration" action="jenkinsEventsConfiguration">
+
+				<f:form action="jenkinsEventsConfiguration" method="post" name="jenkinsEventsConfiguration">
 					<f:entry>
 						<f:repeatable var="jenkinsPublishers" items="${it.jenkinsPublishers}">
 							<h3>Jenkins Publisher</h3>
