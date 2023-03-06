@@ -312,6 +312,38 @@ public class ObjectEntryResourceTest {
 	}
 
 	@Test
+	public void testPostCustomObjectEntryWithInvalidNestedCustomObjectEntries()
+		throws Exception {
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"com.liferay.portal.vulcan.internal.jaxrs.exception.mapper." +
+					"WebApplicationExceptionMapper",
+				LoggerTestUtil.WARN)) {
+
+			_objectRelationship =
+				ObjectRelationshipTestUtil.addObjectRelationship(
+					_objectDefinition1, _objectDefinition2,
+					TestPropsValues.getUserId(),
+					ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
+
+			_testPostCustomObjectEntryWithInvalidNestedCustomObjectEntriesInManyToManyRelationship(
+				_objectDefinition1.getRESTContextPath(), _objectRelationship);
+
+			_objectRelationship =
+				ObjectRelationshipTestUtil.addObjectRelationship(
+					_objectDefinition1, _objectDefinition2,
+					TestPropsValues.getUserId(),
+					ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
+
+			_testPostCustomObjectEntryWithInvalidNestedCustomObjectEntriesInManyToOneRelationship(
+				_objectDefinition2.getRESTContextPath(), _objectRelationship);
+
+			_testPostCustomObjectEntryWithInvalidNestedCustomObjectEntriesInOneToManyRelationship(
+				_objectDefinition1.getRESTContextPath(), _objectRelationship);
+		}
+	}
+
+	@Test
 	public void testPostCustomObjectEntryWithNestedCustomObjectEntriesInManyToManyRelationship()
 		throws Exception {
 
@@ -460,38 +492,6 @@ public class ObjectEntryResourceTest {
 		_assertObjectEntryField(
 			(JSONObject)nestedObjectEntriesJSONArray.get(1),
 			_OBJECT_FIELD_NAME_2, _NEW_OBJECT_FIELD_VALUE_2);
-	}
-
-	@Test
-	public void testPostCustomObjectEntryWithInvalidNestedCustomObjectEntries()
-		throws Exception {
-
-		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
-				"com.liferay.portal.vulcan.internal.jaxrs.exception.mapper." +
-					"WebApplicationExceptionMapper",
-				LoggerTestUtil.WARN)) {
-
-			_objectRelationship =
-				ObjectRelationshipTestUtil.addObjectRelationship(
-					_objectDefinition1, _objectDefinition2,
-					TestPropsValues.getUserId(),
-					ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
-
-			_testPostCustomObjectEntryWithInvalidNestedCustomObjectEntriesInManyToManyRelationship(
-				_objectDefinition1.getRESTContextPath(), _objectRelationship);
-
-			_objectRelationship =
-				ObjectRelationshipTestUtil.addObjectRelationship(
-					_objectDefinition1, _objectDefinition2,
-					TestPropsValues.getUserId(),
-					ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
-
-			_testPostCustomObjectEntryWithInvalidNestedCustomObjectEntriesInManyToOneRelationship(
-				_objectDefinition2.getRESTContextPath(), _objectRelationship);
-
-			_testPostCustomObjectEntryWithInvalidNestedCustomObjectEntriesInOneToManyRelationship(
-				_objectDefinition1.getRESTContextPath(), _objectRelationship);
-		}
 	}
 
 	@Test
