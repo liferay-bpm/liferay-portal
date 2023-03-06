@@ -42,18 +42,16 @@ public abstract class BaseObjectRelationshipElementsParserImpl<T>
 		return objectDefinition.getClassName();
 	}
 
-	protected List<T> parseMany(Object item) {
-		if (!(item instanceof List)) {
+	protected List<T> parseMany(Object object) {
+		if (!(object instanceof List)) {
 			throw new BadRequestException(
 				"Unable to create nested object entries");
 		}
 
 		List<T> list = new ArrayList<>();
 
-		for (Object object : (List<?>)item) {
-			validateOne(object);
-
-			list.add(parseOne(object));
+		for (Object curObject : (List<?>)object) {
+			list.add(parseOne(curObject));
 		}
 
 		return list;
