@@ -76,7 +76,7 @@ function check_utils {
 }
 
 function create_angular_app {
-	echo "y" | npx @angular/cli new ${CUSTOM_ELEMENT_NAME} --defaults --skip-install
+	echo "y" | npx @angular/cli new ${CUSTOM_ELEMENT_NAME} --defaults
 
 	cd ${CUSTOM_ELEMENT_NAME}
 
