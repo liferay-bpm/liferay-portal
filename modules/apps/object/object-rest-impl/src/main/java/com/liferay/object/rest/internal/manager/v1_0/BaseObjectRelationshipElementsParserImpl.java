@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.BadRequestException;
-
 /**
  * @author Carlos Correa
  * @author Sergio Jimenez del Coso
@@ -43,11 +41,6 @@ public abstract class BaseObjectRelationshipElementsParserImpl<T>
 	}
 
 	protected List<T> parseMany(Object object) {
-		if (!(object instanceof List)) {
-			throw new BadRequestException(
-				"Unable to create nested object entries");
-		}
-
 		List<T> list = new ArrayList<>();
 
 		for (Object curObject : (List<?>)object) {
@@ -70,13 +63,6 @@ public abstract class BaseObjectRelationshipElementsParserImpl<T>
 		objectEntry.setProperties(nestedObjectEntryProperties);
 
 		return objectEntry;
-	}
-
-	protected void validateOne(Object object) {
-		if (!(object instanceof Map)) {
-			throw new BadRequestException(
-				"Unable to create nested object entries");
-		}
 	}
 
 	protected ObjectDefinition objectDefinition;

@@ -50,8 +50,6 @@ public class ObjectEntryMtoMObjectRelationshipElementsParserImpl
 
 	@Override
 	protected ObjectEntry parseOne(Object object) {
-		validateOne(object);
-
 		return toObjectEntry((Map<String, Object>)object);
 	}
 
