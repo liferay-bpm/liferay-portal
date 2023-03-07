@@ -324,7 +324,7 @@ export default function ObjectRelationship({
 						}
 					}}
 					placeholder={placeholder}
-					readOnly={readOnly}
+					readOnly={true}
 					required={required}
 					value={label}
 				/>
