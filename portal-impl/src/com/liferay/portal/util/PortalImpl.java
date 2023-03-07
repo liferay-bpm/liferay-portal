@@ -540,7 +540,6 @@ public class PortalImpl implements Portal {
 
 		_alwaysAllowDoAsUsers = ServiceTrackerListFactory.open(
 			_bundleContext, AlwaysAllowDoAsUser.class);
-
 		_portalInetSocketAddressEventListeners = ServiceTrackerListFactory.open(
 			_bundleContext, PortalInetSocketAddressEventListener.class);
 	}
