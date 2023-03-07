@@ -1741,10 +1741,20 @@ public class ServletDataImpl implements ServletData {
 							CommentResourceImpl.class,
 							"getSiteDocumentByExternalReferenceCodeDocumentExternalReferenceCodeCommentByExternalReferenceCode"));
 					put(
+						"query#objectEntryComments",
+						new ObjectValuePair<>(
+							CommentResourceImpl.class,
+							"getSiteObjectEntryCommentsPage"));
+					put(
 						"query#structuredContentByExternalReferenceCodeStructuredContentExternalReferenceCodeCommentByExternalReferenceCode",
 						new ObjectValuePair<>(
 							CommentResourceImpl.class,
 							"getSiteStructuredContentByExternalReferenceCodeStructuredContentExternalReferenceCodeCommentByExternalReferenceCode"));
+					put(
+						"query#objectDefinitionExternalReferenceCodeObjectEntryExternalReferenceCodeComments",
+						new ObjectValuePair<>(
+							CommentResourceImpl.class,
+							"getSiteObjectDefinitionExternalReferenceCodeObjectEntryExternalReferenceCodeCommentsPage"));
 					put(
 						"query#structuredContentComments",
 						new ObjectValuePair<>(
