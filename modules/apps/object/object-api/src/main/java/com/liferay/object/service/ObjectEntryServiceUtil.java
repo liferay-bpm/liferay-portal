@@ -124,6 +124,14 @@ public class ObjectEntryServiceUtil {
 	}
 
 	public static ObjectEntry getObjectEntry(
+			String externalReferenceCode, long objectDefinitionId)
+		throws PortalException {
+
+		return getService().getObjectEntry(
+			externalReferenceCode, objectDefinitionId);
+	}
+
+	public static ObjectEntry getObjectEntry(
 			String externalReferenceCode, long companyId, long groupId)
 		throws PortalException {
 
