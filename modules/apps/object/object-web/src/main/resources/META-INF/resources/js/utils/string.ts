@@ -80,9 +80,7 @@ export function toCamelCase(
 	removeSpecialCharacters?: boolean
 ): string {
 	const split = str.split(' ');
-	const capitalizeFirstLetters = split.map((str: string) =>
-		str
-	);
+	const capitalizeFirstLetters = split.map((str: string) => str);
 	const join = capitalizeFirstLetters.join('');
 
 	if (removeSpecialCharacters) {
