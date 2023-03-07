@@ -115,7 +115,7 @@ public class BatchEngineZipUtil {
 						}
 						catch (Exception exception) {
 							throw new IllegalStateException(
-								"Unable to add new zip entry", exception);
+								"Unable to add new ZIP entry", exception);
 						}
 
 						return FileVisitResult.CONTINUE;
@@ -125,7 +125,7 @@ public class BatchEngineZipUtil {
 		}
 		catch (Exception exception) {
 			throw new IllegalStateException(
-				"Unable to write zip file", exception);
+				"Unable to write ZIP file", exception);
 		}
 
 		return zipFile;
