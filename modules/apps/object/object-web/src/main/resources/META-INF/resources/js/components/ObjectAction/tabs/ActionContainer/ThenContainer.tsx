@@ -83,10 +83,6 @@ export function ThenContainer({
 
 	const [objectsOptions, setObjectOptions] = useState<ObjectsOptionsList>([]);
 
-	const [selectedObjectDefinition, setSelectedObjectDefinition] = useState(
-		''
-	);
-
 	const actionExecutors = useMemo(() => {
 		const executors = new Map<string, string>();
 
@@ -194,13 +190,12 @@ export function ThenContainer({
 							error={errors.objectDefinitionExternalReferenceCode}
 							items={objectsOptions}
 							onSelectChange={(label, value) => {
-								updateParameters(value);
-								setSelectedObjectDefinition(label);
+								updateParameters(value+','+label)				
 							}}
 							placeholder={Liferay.Language.get(
 								'choose-an-object'
 							)}
-							value={selectedObjectDefinition}
+							value={values.parameters?.objectDefinitionName ?? ''}
 						/>
 						{values.parameters?.relatedObjectEntries !==
 							undefined && (

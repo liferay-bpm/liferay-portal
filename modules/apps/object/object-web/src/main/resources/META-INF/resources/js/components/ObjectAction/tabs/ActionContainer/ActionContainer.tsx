@@ -94,7 +94,7 @@ export function ActionContainer({
 
 	const updateParameters = useCallback(
 		async (value: string) => {
-			const [externalReferenceCode, definitionIdValue] = value.split(',');
+			const [externalReferenceCode, definitionIdValue, definitionName] = value.split(',');
 
 			const definitionId = Number(definitionIdValue);
 
@@ -106,6 +106,7 @@ export function ActionContainer({
 			const parameters: ObjectActionParameters = {
 				objectDefinitionExternalReferenceCode: externalReferenceCode,
 				objectDefinitionId: definitionId,
+				objectDefinitionName: definitionName,
 				predefinedValues: [],
 			};
 

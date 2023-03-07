@@ -53,6 +53,7 @@ interface ObjectActionParameters {
 	notificationTemplateId?: number;
 	objectDefinitionExternalReferenceCode?: string;
 	objectDefinitionId?: number;
+	objectDefinitionName?: string;
 	predefinedValues?: PredefinedValue[];
 	relatedObjectEntries?: boolean;
 	script?: string;
