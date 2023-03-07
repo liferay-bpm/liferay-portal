@@ -61,19 +61,20 @@ const updateStatus = async (status) => {
 		}
 	);
 
-	if (statusManagerResponse.ok && status === 'approved') {
-		await updateStatusActivities(status);
+	if (statusManagerResponse.ok) {
+		if (status === 'approved') {
+			await updateStatusActivities(status);
 
-		location.reload();
+			location.reload();
 
-		return;
+			return;
+		}
 	}
 
 	Liferay.Util.openToast({
 		message: 'The MDF Request Status cannot be changed.',
 		type: 'danger',
 	});
-	location.reload();
 };
 
 if (updateStatusToApproved) {
@@ -164,9 +165,9 @@ const statusResponse = async () => {
 };
 
 const updateStatusActivities = async (status) => {
-	const resultActivities = await statusResponse();
+	const mdfRequest = await statusResponse();
 
-	resultActivities.mdfReqToActs.map((activity) => {
+	mdfRequest.mdfReqToActs.map((activity) => {
 		if (activity.activityStatus.key === 'submitted') {
 			// eslint-disable-next-line @liferay/portal/no-global-fetch
 			fetch(`/o/c/activities/${activity.id}`, {
@@ -182,8 +183,8 @@ const updateStatusActivities = async (status) => {
 };
 
 const getMDFRequestStatus = async () => {
-	const data = await statusResponse();
-	if (data) {
+	const mdfRequest = await statusResponse();
+	if (mdfRequest) {
 		fragmentElement.querySelector(
 			'#mdf-request-status-display'
 		).innerHTML = `Status: ${Liferay.Util.escape(
