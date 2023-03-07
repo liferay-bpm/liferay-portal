@@ -334,6 +334,11 @@ body .ddm-user-view-content {
 	.input-group .form-control {
 		z-index: initial;
 	}
+
+	.form-control[readonly] {
+		background-color: #f1f2f5;
+		border-color: #e7e7ed;
+	}
 }
 
 .form-builder-select-field {
