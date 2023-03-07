@@ -86,8 +86,8 @@ export function toCamelCase(
 	const join = capitalizeFirstLetters.join('');
 
 	if (removeSpecialCharacters) {
-		return firstLetterLowercase(removeAllSpecialCharacters(join));
+		return removeAllSpecialCharacters(join);
 	}
 
-	return firstLetterLowercase(join);
+	return join;
 }
