@@ -19,14 +19,23 @@ import com.liferay.object.definition.notification.term.util.ObjectDefinitionNoti
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.model.Contact;
+import com.liferay.portal.kernel.model.ListType;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ListTypeServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Gustavo Lima
@@ -54,15 +63,51 @@ public class ObjectDefinitionNotificationTermEvaluator
 
 		Map<String, Object> termValues = (Map<String, Object>)object;
 
-		if (termName.contains("_CREATOR")) {
-			if (context.equals(Context.RECIPIENT)) {
-				return String.valueOf(termValues.get("creator"));
+		User user = null;
+
+		String prefix = StringUtil.toUpperCase(
+			_objectDefinition.getShortName());
+
+		Set<String> creatorTermNames = Collections.unmodifiableSet(
+			SetUtil.fromArray(
+				"[%" + prefix + "_CREATOR%]",
+				"[%" + prefix + "_CREATOR_EMAIL%]",
+				"[%" + prefix + "_CREATOR_FIRSTNAME%]",
+				"[%" + prefix + "_CREATOR_ID%]",
+				"[%" + prefix + "_CREATOR_LASTNAME%]",
+				"[%" + prefix + "_CREATOR_MIDDLENAME%]",
+				"[%" + prefix + "_CREATOR_PREFIX%]",
+				"[%" + prefix + "_CREATOR_SUFFIX%]"));
+
+		if (creatorTermNames.contains(termName)) {
+			if (!FeatureFlagManagerUtil.isEnabled("LPS-171625")) {
+				if (context.equals(Context.RECIPIENT)) {
+					return String.valueOf(termValues.get("creator"));
+				}
+
+				user = _userLocalService.getUser(
+					GetterUtil.getLong(termValues.get("creator")));
+
+				return user.getFullName(true, true);
 			}
 
-			User user = _userLocalService.getUser(
+			user = _userLocalService.getUser(
 				GetterUtil.getLong(termValues.get("creator")));
+		}
 
-			return user.getFullName(true, true);
+		if (_currentUserTermName.contains(termName)) {
+			user = _userLocalService.getUser(
+				GetterUtil.getLong(termValues.get("currentUserId")));
+		}
+
+		if (user != null) {
+			Map<String, String> userTermValuesMap = _getUserTermValuesMap(
+				context, user);
+
+			return userTermValuesMap.get(
+				StringUtil.removeSubstring(
+					StringUtil.extractLast(termName, StringPool.UNDERLINE),
+					"%]"));
 		}
 
 		Map<String, Long> objectFieldIds = _getObjectFieldIds();
@@ -81,6 +126,36 @@ public class ObjectDefinitionNotificationTermEvaluator
 		}
 
 		return String.valueOf(termValues.get(objectField.getDBColumnName()));
+	}
+
+	private String _getListTypeName(boolean prefix, User user)
+		throws PortalException {
+
+		Contact contact = user.fetchContact();
+
+		if (contact == null) {
+			return StringPool.BLANK;
+		}
+
+		if (prefix) {
+			if (Validator.isNull(contact.getPrefixListTypeId())) {
+				return StringPool.BLANK;
+			}
+
+			ListType listType = ListTypeServiceUtil.getListType(
+				contact.getPrefixListTypeId());
+
+			return listType.getName();
+		}
+
+		if (Validator.isNull(contact.getSuffixListTypeId())) {
+			return StringPool.BLANK;
+		}
+
+		ListType listType = ListTypeServiceUtil.getListType(
+			contact.getSuffixListTypeId());
+
+		return listType.getName();
 	}
 
 	private Map<String, Long> _getObjectFieldIds() {
@@ -115,6 +190,39 @@ public class ObjectDefinitionNotificationTermEvaluator
 
 		return objectFieldIds;
 	}
+
+	private Map<String, String> _getUserTermValuesMap(
+			Context context, User user)
+		throws PortalException {
+
+		return HashMapBuilder.put(
+			"CREATOR",
+			() -> context.equals(Context.RECIPIENT) ?
+				String.valueOf(user.getUserId()) : user.getFullName(true, true)
+		).put(
+			"EMAIL", user.getEmailAddress()
+		).put(
+			"FIRSTNAME", user.getFirstName()
+		).put(
+			"ID", String.valueOf(user.getUserId())
+		).put(
+			"LASTNAME", user.getLastName()
+		).put(
+			"MIDDLENAME", user.getMiddleName()
+		).put(
+			"PREFIX", _getListTypeName(true, user)
+		).put(
+			"SUFFIX", _getListTypeName(false, user)
+		).build();
+	}
+
+	private static final Set<String> _currentUserTermName =
+		Collections.unmodifiableSet(
+			SetUtil.fromArray(
+				"[%CURRENT_USER_EMAIL%]", "[%CURRENT_USER_FIRSTNAME%]",
+				"[%CURRENT_USER_ID%]", "[%CURRENT_USER_LASTNAME%]",
+				"[%CURRENT_USER_MIDDLENAME%]", "[%CURRENT_USER_PREFIX%]",
+				"[%CURRENT_USER_SUFFIX%]"));
 
 	private final ObjectDefinition _objectDefinition;
 	private volatile Map<String, Long> _objectFieldIds;
