@@ -94,7 +94,11 @@ export function ActionContainer({
 
 	const updateParameters = useCallback(
 		async (value: string) => {
-			const [externalReferenceCode, definitionIdValue, definitionName] = value.split(',');
+			const [
+				externalReferenceCode,
+				definitionIdValue,
+				definitionName,
+			] = value.split(',');
 
 			const definitionId = Number(definitionIdValue);
 

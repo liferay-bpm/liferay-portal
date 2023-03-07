@@ -190,12 +190,14 @@ export function ThenContainer({
 							error={errors.objectDefinitionExternalReferenceCode}
 							items={objectsOptions}
 							onSelectChange={(label, value) => {
-								updateParameters(value+','+label)				
+								updateParameters(value + ',' + label);
 							}}
 							placeholder={Liferay.Language.get(
 								'choose-an-object'
 							)}
-							value={values.parameters?.objectDefinitionName ?? ''}
+							value={
+								values.parameters?.objectDefinitionName ?? ''
+							}
 						/>
 						{values.parameters?.relatedObjectEntries !==
 							undefined && (
