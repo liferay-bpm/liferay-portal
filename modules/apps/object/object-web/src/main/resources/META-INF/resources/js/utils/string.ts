@@ -81,13 +81,13 @@ export function toCamelCase(
 ): string {
 	const split = str.split(' ');
 	const capitalizeFirstLetters = split.map((str: string) =>
-		firstLetterUppercase(str)
+		str
 	);
 	const join = capitalizeFirstLetters.join('');
 
 	if (removeSpecialCharacters) {
-		return firstLetterLowercase(removeAllSpecialCharacters(join));
+		return removeAllSpecialCharacters(join);
 	}
 
-	return firstLetterLowercase(join);
+	return join;
 }
