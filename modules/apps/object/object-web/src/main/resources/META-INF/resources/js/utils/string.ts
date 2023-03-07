@@ -13,20 +13,6 @@
  */
 
 /**
- * Transform first letter in lowercase
- */
-export function firstLetterLowercase(str: string): string {
-	return str.charAt(0).toLowerCase() + str.slice(1);
-}
-
-/**
- * Transform first letter in uppercase
- */
-export function firstLetterUppercase(str: string): string {
-	return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-/**
  *
  * Check if the first letter of a string is uppercase
  */
@@ -80,14 +66,12 @@ export function toCamelCase(
 	removeSpecialCharacters?: boolean
 ): string {
 	const split = str.split(' ');
-	const capitalizeFirstLetters = split.map((str: string) =>
-		firstLetterUppercase(str)
-	);
+	const capitalizeFirstLetters = split.map((str: string) => str);
 	const join = capitalizeFirstLetters.join('');
 
 	if (removeSpecialCharacters) {
-		return firstLetterLowercase(removeAllSpecialCharacters(join));
+		return removeAllSpecialCharacters(join);
 	}
 
-	return firstLetterLowercase(join);
+	return join;
 }
