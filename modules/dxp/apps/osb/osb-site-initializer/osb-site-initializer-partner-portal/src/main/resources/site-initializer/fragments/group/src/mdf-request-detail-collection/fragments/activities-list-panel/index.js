@@ -161,7 +161,7 @@ const ActivityStatus = {
 };
 
 const activityStatusClassName = {
-	[ActivityStatus.ACTIVE]: 'label label-tonal-success ml-2',
+	[ActivityStatus.ACTIVE]: 'label label-tonal-info ml-2',
 	[ActivityStatus.SUBMITTED]: 'label label-tonal-warning ml-2',
 	[ActivityStatus.APPROVED]: 'label label-tonal-success ml-2',
 	[ActivityStatus.EXPIRED]: 'label label-tonal-danger ml-2',
@@ -169,7 +169,7 @@ const activityStatusClassName = {
 
 const activityClaimStatusClassName = {
 	[ActivityStatus.CLAIMED]: 'ml-3 label label-tonal-info ml-2',
-	[ActivityStatus.UNCLAIMED]: 'ml-3 label label-tonal-danger ml-2',
+	[ActivityStatus.UNCLAIMED]: 'ml-3 label label-tonal-warning ml-2',
 };
 
 const CampaignActivityTable = ({mdfRequestActivity}) => {
