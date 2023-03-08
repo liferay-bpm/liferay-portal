@@ -152,10 +152,6 @@ public class ObjectEntryDTOConverter
 
 		if (objectDefinition.isSystem()) {
 			if (FeatureFlagManagerUtil.isEnabled("LPS-172094")) {
-				value = _objectEntryLocalService.getSystemModelAttributes(
-					objectDefinition, primaryKey);
-			}
-			else {
 				SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
 					_systemObjectDefinitionMetadataRegistry.
 						getSystemObjectDefinitionMetadata(
@@ -171,6 +167,10 @@ public class ObjectEntryDTOConverter
 					systemObjectDefinitionMetadata.
 						getJaxRsApplicationDescriptor(),
 					dtoConverterContext.getUser());
+			}
+			else {
+				value = _objectEntryLocalService.getSystemModelAttributes(
+					objectDefinition, primaryKey);
 			}
 		}
 		else {
