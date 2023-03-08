@@ -13,6 +13,11 @@
  */
 
 /**
+ * Transform first letter in uppercase
+ */
+export declare function firstLetterUppercase(str: string): string;
+
+/**
  *
  * Check if the first letter of a string is uppercase
  */
