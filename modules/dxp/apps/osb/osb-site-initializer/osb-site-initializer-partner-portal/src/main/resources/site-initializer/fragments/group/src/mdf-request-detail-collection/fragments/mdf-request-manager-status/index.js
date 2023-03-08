@@ -64,11 +64,11 @@ const updateStatus = async (status) => {
 	if (statusManagerResponse.ok) {
 		if (status === 'approved') {
 			await updateStatusActivities(status);
-
-			location.reload();
-
-			return;
 		}
+
+		location.reload();
+
+		return;
 	}
 
 	Liferay.Util.openToast({
@@ -167,18 +167,26 @@ const statusResponse = async () => {
 const updateStatusActivities = async (status) => {
 	const mdfRequest = await statusResponse();
 
-	mdfRequest.mdfReqToActs.map((activity) => {
-		if (activity.activityStatus.key === 'submitted') {
-			// eslint-disable-next-line @liferay/portal/no-global-fetch
-			fetch(`/o/c/activities/${activity.id}`, {
-				body: `{"activityStatus": "${status}"}`,
-				headers: {
-					'content-type': 'application/json',
-					'x-csrf-token': Liferay.authToken,
-				},
-				method: 'PUT',
-			});
-		}
+	return await Promise.all(
+		mdfRequest.mdfReqToActs.map((activity) => {
+			if (activity.activityStatus.key === 'submitted') {
+				// eslint-disable-next-line @liferay/portal/no-global-fetch
+				return fetch(`/o/c/activities/${activity.id}`, {
+					body: `{"activityStatus": "${status}"}`,
+					headers: {
+						'content-type': 'application/json',
+						'x-csrf-token': Liferay.authToken,
+					},
+					method: 'PUT',
+				});
+			}
+		}),
+		location.reload()
+	).catch(() => {
+		Liferay.Util.openToast({
+			message: 'An unexpected error occured.',
+			type: 'danger',
+		});
 	});
 };
 
@@ -188,10 +196,10 @@ const getMDFRequestStatus = async () => {
 		fragmentElement.querySelector(
 			'#mdf-request-status-display'
 		).innerHTML = `Status: ${Liferay.Util.escape(
-			data.mdfRequestStatus.name
+			mdfRequest.mdfRequestStatus.name
 		)}`;
 
-		updateButtons(data.mdfRequestStatus.key);
+		updateButtons(mdfRequest.mdfRequestStatus.key);
 
 		return;
 	}
