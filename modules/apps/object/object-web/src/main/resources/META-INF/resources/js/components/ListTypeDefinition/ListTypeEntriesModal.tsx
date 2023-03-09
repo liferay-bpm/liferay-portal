@@ -25,7 +25,7 @@ import {
 import {openToast} from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
 
-import {specialCharactersInString, toCamelCase} from '../../utils/string';
+import {specialCharactersInString} from '../../utils/string';
 import {ObjectValidationErrors} from './ListTypeFormBase';
 import {fixLocaleKeys} from './utils';
 
@@ -73,7 +73,7 @@ function ListTypeEntriesModal() {
 		}
 		setState((previousValues) => ({
 			...previousValues,
-			itemKey: toCamelCase(value),
+			itemKey: value,
 		}));
 	};
 
@@ -81,7 +81,7 @@ function ListTypeEntriesModal() {
 		let newItemKey = itemKey;
 
 		if (modalType !== 'edit' && keyChanged === false) {
-			newItemKey = toCamelCase(newName_i18n[defaultLanguageId] as string);
+			newItemKey = newName_i18n[defaultLanguageId] as string;
 		}
 
 		setState((previousValues) => ({
