@@ -134,7 +134,7 @@ public class ObjectEntryRowInfoItemRenderer
 			ObjectDefinition objectDefinition, ObjectEntry objectEntry)
 		throws PortalException {
 
-		Map<String, Serializable> stringSerializableMap = new TreeMap<>();
+		Map<String, Serializable> sortedValues = new TreeMap<>();
 
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
@@ -160,7 +160,7 @@ public class ObjectEntryRowInfoItemRenderer
 			}
 
 			if (entry.getValue() == null) {
-				stringSerializableMap.put(entry.getKey(), StringPool.BLANK);
+				sortedValues.put(entry.getKey(), StringPool.BLANK);
 
 				continue;
 			}
@@ -171,7 +171,7 @@ public class ObjectEntryRowInfoItemRenderer
 						objectField.getListTypeDefinitionId(),
 						(String)entry.getValue());
 
-				stringSerializableMap.put(
+				sortedValues.put(
 					entry.getKey(),
 					listTypeEntry.getName(serviceContext.getLocale()));
 
@@ -186,7 +186,7 @@ public class ObjectEntryRowInfoItemRenderer
 					values.get(objectField.getName()));
 
 				if (dlFileEntryId == GetterUtil.DEFAULT_LONG) {
-					stringSerializableMap.put(entry.getKey(), StringPool.BLANK);
+					sortedValues.put(entry.getKey(), StringPool.BLANK);
 
 					continue;
 				}
@@ -195,12 +195,12 @@ public class ObjectEntryRowInfoItemRenderer
 					_dlFileEntryLocalService.fetchDLFileEntry(dlFileEntryId);
 
 				if (dlFileEntry == null) {
-					stringSerializableMap.put(entry.getKey(), StringPool.BLANK);
+					sortedValues.put(entry.getKey(), StringPool.BLANK);
 
 					continue;
 				}
 
-				stringSerializableMap.put(
+				sortedValues.put(
 					entry.getKey(),
 					LinkUtil.toLink(
 						_dlAppService, dlFileEntry, _dlURLHelper,
@@ -217,7 +217,7 @@ public class ObjectEntryRowInfoItemRenderer
 				Format dateFormat = FastDateFormatFactoryUtil.getDate(
 					serviceContext.getLocale());
 
-				stringSerializableMap.put(
+				sortedValues.put(
 					entry.getKey(), dateFormat.format(entry.getValue()));
 
 				continue;
@@ -227,7 +227,7 @@ public class ObjectEntryRowInfoItemRenderer
 				Object value = values.get(objectField.getName());
 
 				if (GetterUtil.getLong(value) <= 0) {
-					stringSerializableMap.put(entry.getKey(), StringPool.BLANK);
+					sortedValues.put(entry.getKey(), StringPool.BLANK);
 
 					continue;
 				}
@@ -238,7 +238,7 @@ public class ObjectEntryRowInfoItemRenderer
 							fetchObjectRelationshipByObjectFieldId2(
 								objectField.getObjectFieldId());
 
-					stringSerializableMap.put(
+					sortedValues.put(
 						entry.getKey(),
 						_objectEntryLocalService.getTitleValue(
 							objectRelationship.getObjectDefinitionId1(),
@@ -254,15 +254,15 @@ public class ObjectEntryRowInfoItemRenderer
 			Object value = entry.getValue();
 
 			if (value != null) {
-				stringSerializableMap.put(entry.getKey(), (Serializable)value);
+				sortedValues.put(entry.getKey(), (Serializable)value);
 
 				continue;
 			}
 
-			stringSerializableMap.put(entry.getKey(), StringPool.BLANK);
+			sortedValues.put(entry.getKey(), StringPool.BLANK);
 		}
 
-		return stringSerializableMap;
+		return sortedValues;
 	}
 
 	private final AssetDisplayPageFriendlyURLProvider
