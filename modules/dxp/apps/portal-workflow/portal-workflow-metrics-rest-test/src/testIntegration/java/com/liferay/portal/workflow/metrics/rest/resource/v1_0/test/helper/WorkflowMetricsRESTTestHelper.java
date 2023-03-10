@@ -138,25 +138,24 @@ public class WorkflowMetricsRESTTestHelper {
 
 		Creator creator = instance.getCreator();
 
-		Date dateCreated = instance.getDateCreated();
+		Date createDate = instance.getDateCreated();
 
-		if (dateCreated == null) {
-			dateCreated = new Date();
+		if (createDate == null) {
+			createDate = new Date();
 		}
 
-		Date dateModified = instance.getDateModified();
+		Date modifiedDate = instance.getDateModified();
 
-		if (dateModified == null) {
-			dateModified = new Date();
+		if (modifiedDate == null) {
+			modifiedDate = new Date();
 		}
 
 		_instanceWorkflowMetricsIndexer.addInstance(
 			_createLocalizationMap(instance.getAssetTitle()),
 			_createLocalizationMap(instance.getAssetType()), StringPool.BLANK,
 			GetterUtil.getLong(instance.getClassPK()), companyId, null,
-			dateCreated, instance.getId(), dateModified,
-			instance.getProcessId(), instance.getProcessVersion(),
-			creator.getId(), creator.getName());
+			createDate, instance.getId(), modifiedDate, instance.getProcessId(),
+			instance.getProcessVersion(), creator.getId(), creator.getName());
 
 		_assertCount(
 			_instanceWorkflowMetricsIndexNameBuilder.getIndexName(companyId),
@@ -203,16 +202,16 @@ public class WorkflowMetricsRESTTestHelper {
 
 		AddNodeRequest.Builder builder = new AddNodeRequest.Builder();
 
-		Date dateCreated = node.getDateCreated();
+		Date createDate = node.getDateCreated();
 
-		if (dateCreated == null) {
-			dateCreated = new Date();
+		if (createDate == null) {
+			createDate = new Date();
 		}
 
-		Date dateModified = node.getDateModified();
+		Date modifiedDate = node.getDateModified();
 
-		if (dateModified == null) {
-			dateModified = new Date();
+		if (modifiedDate == null) {
+			modifiedDate = new Date();
 		}
 
 		String type = node.getType();
@@ -225,11 +224,11 @@ public class WorkflowMetricsRESTTestHelper {
 			builder.companyId(
 				companyId
 			).createDate(
-				dateCreated
+				createDate
 			).initial(
 				false
 			).modifiedDate(
-				dateModified
+				modifiedDate
 			).name(
 				node.getName()
 			).nodeId(
@@ -361,16 +360,16 @@ public class WorkflowMetricsRESTTestHelper {
 			active = Boolean.TRUE;
 		}
 
-		Date dateCreated = process.getDateCreated();
+		Date createDate = process.getDateCreated();
 
-		if (dateCreated == null) {
-			dateCreated = new Date();
+		if (createDate == null) {
+			createDate = new Date();
 		}
 
-		Date dateModified = process.getDateModified();
+		Date modifiedDate = process.getDateModified();
 
-		if (dateModified == null) {
-			dateModified = new Date();
+		if (modifiedDate == null) {
+			modifiedDate = new Date();
 		}
 
 		_processWorkflowMetricsIndexer.addProcess(
@@ -379,11 +378,11 @@ public class WorkflowMetricsRESTTestHelper {
 			).companyId(
 				companyId
 			).createDate(
-				dateCreated
+				createDate
 			).description(
 				process.getDescription()
 			).modifiedDate(
-				dateModified
+				modifiedDate
 			).name(
 				process.getName()
 			).processId(
@@ -928,15 +927,15 @@ public class WorkflowMetricsRESTTestHelper {
 			duration = 1000L;
 		}
 
-		Date dateModified = instance.getDateModified();
+		Date modifiedDate = instance.getDateModified();
 
-		if (dateModified == null) {
-			dateModified = new Date();
+		if (modifiedDate == null) {
+			modifiedDate = new Date();
 		}
 
 		_instanceWorkflowMetricsIndexer.completeInstance(
 			companyId, dateCompletion, duration, instance.getId(),
-			dateModified);
+			modifiedDate);
 
 		_assertCount(
 			_instanceWorkflowMetricsIndexNameBuilder.getIndexName(companyId),
