@@ -136,8 +136,6 @@ public class WorkflowMetricsRESTTestHelper {
 	public Instance addInstance(long companyId, Instance instance)
 		throws Exception {
 
-		Creator creator = instance.getCreator();
-
 		Date createDate = instance.getDateCreated();
 
 		if (createDate == null) {
@@ -149,6 +147,8 @@ public class WorkflowMetricsRESTTestHelper {
 		if (modifiedDate == null) {
 			modifiedDate = new Date();
 		}
+
+		Creator creator = instance.getCreator();
 
 		_instanceWorkflowMetricsIndexer.addInstance(
 			_createLocalizationMap(instance.getAssetTitle()),
@@ -915,10 +915,10 @@ public class WorkflowMetricsRESTTestHelper {
 	public void completeInstance(long companyId, Instance instance)
 		throws Exception {
 
-		Date dateCompletion = instance.getDateCompletion();
+		Date completionDate = instance.getDateCompletion();
 
-		if (dateCompletion == null) {
-			dateCompletion = new Date();
+		if (completionDate == null) {
+			completionDate = new Date();
 		}
 
 		Long duration = instance.getDuration();
@@ -934,7 +934,7 @@ public class WorkflowMetricsRESTTestHelper {
 		}
 
 		_instanceWorkflowMetricsIndexer.completeInstance(
-			companyId, dateCompletion, duration, instance.getId(),
+			companyId, completionDate, duration, instance.getId(),
 			modifiedDate);
 
 		_assertCount(
