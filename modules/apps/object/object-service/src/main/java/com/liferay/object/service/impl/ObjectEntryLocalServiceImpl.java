@@ -3595,10 +3595,10 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		if (objectField.getListTypeDefinitionId() != 0) {
+			ListTypeEntry listTypeEntry = null;
+
 			String value = _getValue(
 				String.valueOf(values.get(entry.getKey())));
-
-			ListTypeEntry listTypeEntry = null;
 
 			for (ListTypeEntry curListTypeEntry :
 					_listTypeEntryLocalService.getListTypeEntries(
@@ -3611,8 +3611,8 @@ public class ObjectEntryLocalServiceImpl
 				}
 			}
 
-			if ((!value.isEmpty() || objectField.isRequired()) &&
-				(listTypeEntry == null)) {
+			if ((listTypeEntry == null) &&
+				(!value.isEmpty() || objectField.isRequired())) {
 
 				throw new ObjectEntryValuesException.ListTypeEntry(
 					entry.getKey());
