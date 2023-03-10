@@ -181,11 +181,11 @@ public class DDMFormFactoryHelper {
 
 	protected Locale getDefaultLocale() {
 		if (Validator.isNull(_ddmForm.defaultLanguageId())) {
-			Locale themeDisplayLocal =
+			Locale themeDisplayLocale =
 				LocaleThreadLocal.getThemeDisplayLocale();
 
-			if (themeDisplayLocal != null) {
-				return themeDisplayLocal;
+			if (themeDisplayLocale != null) {
+				return themeDisplayLocale;
 			}
 
 			Locale siteDefaultLocale = LocaleThreadLocal.getSiteDefaultLocale();
