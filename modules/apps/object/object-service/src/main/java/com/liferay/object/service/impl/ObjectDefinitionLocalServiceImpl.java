@@ -883,7 +883,7 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectDefinition.class.getName(),
 			objectDefinition.getObjectDefinitionId(), false, true, true);
 
-		if (!objectDefinition.isSystem() || objectDefinition.isModifiable()) {
+		if (objectDefinition.isModifiable() || !objectDefinition.isSystem()) {
 			dbTableName = "ObjectEntry";
 		}
 
@@ -1055,7 +1055,7 @@ public class ObjectDefinitionLocalServiceImpl
 	private String _getName(String name, boolean modifiable, boolean system) {
 		name = StringUtil.trim(name);
 
-		if (!system || modifiable) {
+		if (modifiable || !system) {
 			name = "C_" + name;
 		}
 
@@ -1534,7 +1534,7 @@ public class ObjectDefinitionLocalServiceImpl
 		char[] nameCharArray = name.toCharArray();
 
 		for (int i = 0; i < nameCharArray.length; i++) {
-			if (!system || modifiable) {
+			if (modifiable || !system) {
 
 				// Skip C_
 
