@@ -62,6 +62,7 @@ import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
@@ -175,7 +176,14 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	public List<ServiceRegistration<?>> deploy(
 		ObjectDefinition objectDefinition) {
 
-		if (objectDefinition.isUnmodifiableSystemObject()) {
+		boolean unmodifiableSystemObject = objectDefinition.isSystem();
+
+		if (FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
+			unmodifiableSystemObject =
+				objectDefinition.isUnmodifiableSystemObject();
+		}
+
+		if (unmodifiableSystemObject) {
 			return Collections.emptyList();
 		}
 

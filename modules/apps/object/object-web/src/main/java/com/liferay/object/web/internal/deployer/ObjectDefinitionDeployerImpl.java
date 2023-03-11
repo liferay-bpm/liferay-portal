@@ -85,6 +85,7 @@ import com.liferay.object.web.internal.object.entries.upload.AttachmentUploadFil
 import com.liferay.object.web.internal.object.entries.upload.AttachmentUploadResponseHandler;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
 import com.liferay.portal.kernel.notifications.UserNotificationHandler;
@@ -128,7 +129,14 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	public List<ServiceRegistration<?>> deploy(
 		ObjectDefinition objectDefinition) {
 
-		if (objectDefinition.isUnmodifiableSystemObject()) {
+		boolean unmodifiableSystemObject = objectDefinition.isSystem();
+
+		if (FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
+			unmodifiableSystemObject =
+				objectDefinition.isUnmodifiableSystemObject();
+		}
+
+		if (unmodifiableSystemObject) {
 			return Collections.emptyList();
 		}
 

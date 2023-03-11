@@ -20,6 +20,7 @@ import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.web.internal.object.definitions.constants.ObjectDefinitionsScreenNavigationEntryConstants;
 import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsLayoutsDisplayContext;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
@@ -73,7 +74,11 @@ public class ObjectDefinitionsLayoutsScreenNavigationCategory
 
 	@Override
 	public boolean isVisible(User user, ObjectDefinition objectDefinition) {
-		return objectDefinition.isModifiable();
+		if (FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
+			return objectDefinition.isModifiable();
+		}
+
+		return !objectDefinition.isSystem();
 	}
 
 	@Override
