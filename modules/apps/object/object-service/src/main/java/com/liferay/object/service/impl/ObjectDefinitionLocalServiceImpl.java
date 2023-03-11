@@ -892,7 +892,8 @@ public class ObjectDefinitionLocalServiceImpl
 
 		if (objectFields != null) {
 			for (ObjectField objectField : objectFields) {
-				if (system || objectField.isSystem()) {
+				if (objectDefinition.isUnmodifiableSystemObject() ||
+					objectField.isSystem()) {
 					_objectFieldLocalService.addOrUpdateSystemObjectField(
 						userId, objectDefinition.getObjectDefinitionId(),
 						objectField.getBusinessType(),
