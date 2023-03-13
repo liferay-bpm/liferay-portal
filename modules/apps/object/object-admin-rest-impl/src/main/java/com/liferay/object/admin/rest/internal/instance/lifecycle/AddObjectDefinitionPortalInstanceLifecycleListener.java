@@ -19,22 +19,20 @@ import com.liferay.object.admin.rest.dto.v1_0.Status;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectDefinitionResource;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Release;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.util.PropsUtil;
-
-import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -47,27 +45,20 @@ public class AddObjectDefinitionPortalInstanceLifecycleListener
 	extends BasePortalInstanceLifecycleListener {
 
 	@Override
-	public void portalInstanceRegistered(Company company) {
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-167253"))) {
+	public void portalInstanceRegistered(Company company) throws Exception {
+		if (FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
 			_importJSONObjectDefinition(company);
 		}
 	}
 
-	private void _importJSONObjectDefinition(Company company) {
-		JSONObject objectDefinitionJSONObject = null;
+	private void _importJSONObjectDefinition(Company company) throws Exception {
+		Role role = _roleLocalService.getRole(
+			company.getCompanyId(), RoleConstants.ADMINISTRATOR);
 
-		try {
-			objectDefinitionJSONObject = _jsonFactory.createJSONObject(
-				StringUtil.read(getClass(), "dependencies/bookmarks.json"));
-		}
-		catch (JSONException jsonException) {
-			throw new RuntimeException(jsonException);
-		}
+		long[] currentUserId = _roleLocalService.getUserPrimaryKeys(
+			role.getRoleId());
 
-		List<User> users = _userLocalService.getCompanyUsers(
-			company.getCompanyId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-
-		User currentUser = users.get(0);
+		User currentUser = _userLocalService.getUser(currentUserId[0]);
 
 		PermissionThreadLocal.setPermissionChecker(
 			_defaultPermissionCheckerFactory.create(currentUser));
@@ -82,25 +73,21 @@ public class AddObjectDefinitionPortalInstanceLifecycleListener
 				currentUser
 			).build();
 
+		JSONObject objectDefinitionJSONObject = _jsonFactory.createJSONObject(
+			StringUtil.read(getClass(), "dependencies/bookmarks.json"));
+
 		ObjectDefinition objectDefinition = ObjectDefinition.toDTO(
 			objectDefinitionJSONObject.toString());
 
-		try {
-			objectDefinition =
-				objectDefinitionResource.
-					putObjectDefinitionByExternalReferenceCode(
-						objectDefinition.getExternalReferenceCode(),
-						objectDefinition);
+		objectDefinition =
+			objectDefinitionResource.putObjectDefinitionByExternalReferenceCode(
+				objectDefinition.getExternalReferenceCode(), objectDefinition);
 
-			Status status = objectDefinition.getStatus();
+		Status status = objectDefinition.getStatus();
 
-			if (status.getCode() != 0) {
-				objectDefinitionResource.postObjectDefinitionPublish(
-					objectDefinition.getId());
-			}
-		}
-		catch (Exception exception) {
-			throw new RuntimeException(exception);
+		if (status.getCode() != 0) {
+			objectDefinitionResource.postObjectDefinitionPublish(
+				objectDefinition.getId());
 		}
 	}
 
@@ -114,9 +101,12 @@ public class AddObjectDefinitionPortalInstanceLifecycleListener
 	private ObjectDefinitionResource.Factory _objectDefinitionResourceFactory;
 
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.object.service)(release.schema.version>=1.0.0))"
+		target = "(&(release.bundle.symbolic.name=com.liferay.object.service)(release.schema.version>=4.1.0))"
 	)
 	private Release _release;
+
+	@Reference
+	private RoleLocalService _roleLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;
