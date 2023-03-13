@@ -21,6 +21,14 @@ import com.liferay.portal.kernel.exception.PortalException;
  */
 public class ObjectFieldNameException extends PortalException {
 
+	public static class KeyNotExpected extends ObjectFieldNameException {
+
+		public KeyNotExpected(String parameter) {
+			super("Key " + parameter + " is not an expected parameter");
+		}
+
+	}
+
 	public static class MustBeginWithLowerCaseLetter
 		extends ObjectFieldNameException {
 
