@@ -25,46 +25,6 @@
 	],
 	"objectFields": [
 		{
-			"DBType": "Date",
-			"businessType": "Date",
-			"defaultValue": "",
-			"externalReferenceCode": "83fd6793-02e2-8413-73be-20619790f50a",
-			"indexed": false,
-			"indexedAsKeyword": false,
-			"indexedLanguageId": "",
-			"label": {
-				"en_US": "Create Date"
-			},
-			"listTypeDefinitionExternalReferenceCode": "",
-			"name": "createDate",
-			"objectFieldSettings": [
-			],
-			"required": false,
-			"state": false,
-			"system": true,
-			"type": "Date"
-		},
-		{
-			"DBType": "String",
-			"businessType": "Text",
-			"defaultValue": "",
-			"externalReferenceCode": "5a617add-f4e4-3cfb-9aaa-87fa82aee12a",
-			"indexed": false,
-			"indexedAsKeyword": false,
-			"indexedLanguageId": "",
-			"label": {
-				"en_US": "Author"
-			},
-			"listTypeDefinitionExternalReferenceCode": "",
-			"name": "creator",
-			"objectFieldSettings": [
-			],
-			"required": false,
-			"state": false,
-			"system": true,
-			"type": "String"
-		},
-		{
 			"DBType": "Clob",
 			"businessType": "LongText",
 			"defaultValue": "",
@@ -92,66 +52,6 @@
 			"DBType": "String",
 			"businessType": "Text",
 			"defaultValue": "",
-			"externalReferenceCode": "ef8537f5-9858-95a7-140a-6ba579fb6f68",
-			"indexed": false,
-			"indexedAsKeyword": false,
-			"indexedLanguageId": "",
-			"label": {
-				"en_US": "External Reference Code"
-			},
-			"listTypeDefinitionExternalReferenceCode": "",
-			"name": "externalReferenceCode",
-			"objectFieldSettings": [
-			],
-			"required": false,
-			"state": false,
-			"system": true,
-			"type": "String"
-		},
-		{
-			"DBType": "Long",
-			"businessType": "LongInteger",
-			"defaultValue": "",
-			"externalReferenceCode": "4c2b8ec5-4033-e512-2a41-edc3cbfa93ea",
-			"indexed": true,
-			"indexedAsKeyword": true,
-			"indexedLanguageId": "",
-			"label": {
-				"en_US": "ID"
-			},
-			"listTypeDefinitionExternalReferenceCode": "",
-			"name": "id",
-			"objectFieldSettings": [
-			],
-			"required": false,
-			"state": false,
-			"system": true,
-			"type": "Long"
-		},
-		{
-			"DBType": "Date",
-			"businessType": "Date",
-			"defaultValue": "",
-			"externalReferenceCode": "dbbce037-12ec-a27c-4954-f4877729132d",
-			"indexed": false,
-			"indexedAsKeyword": false,
-			"indexedLanguageId": "",
-			"label": {
-				"en_US": "Modified Date"
-			},
-			"listTypeDefinitionExternalReferenceCode": "",
-			"name": "modifiedDate",
-			"objectFieldSettings": [
-			],
-			"required": false,
-			"state": false,
-			"system": true,
-			"type": "Date"
-		},
-		{
-			"DBType": "String",
-			"businessType": "Text",
-			"defaultValue": "",
 			"externalReferenceCode": "f526a2c1-1228-1c1b-e5a8-06266d5ef9c9",
 			"indexed": true,
 			"indexedAsKeyword": false,
@@ -170,26 +70,6 @@
 			"required": false,
 			"state": false,
 			"system": false,
-			"type": "String"
-		},
-		{
-			"DBType": "String",
-			"businessType": "Text",
-			"defaultValue": "",
-			"externalReferenceCode": "e28f9669-a916-a45c-681a-b365fbf4c50d",
-			"indexed": false,
-			"indexedAsKeyword": false,
-			"indexedLanguageId": "",
-			"label": {
-				"en_US": "Status"
-			},
-			"listTypeDefinitionExternalReferenceCode": "",
-			"name": "status",
-			"objectFieldSettings": [
-			],
-			"required": false,
-			"state": false,
-			"system": true,
 			"type": "String"
 		},
 		{
@@ -327,6 +207,6 @@
 		"label": "approved",
 		"label_i18n": "Approved"
 	},
-	"system": false,
+	"system": true,
 	"titleObjectFieldName": "name"
 }
