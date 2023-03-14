@@ -26,6 +26,7 @@ import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -121,26 +122,34 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 
 					ObjectDefinition relatedObjectDefinition = entry.getValue();
 
-					String relatedSchemaName = getSchemaName(
-						relatedObjectDefinition);
+					String relatedSchemaName = null;
 
-					if (_addRelatedSchemas) {
-						_addObjectRelationshipSchema(
-							relatedObjectDefinition, openAPI,
-							relatedSchemaName);
-					}
+					if (!relatedObjectDefinition.isUnmodifiableSystemObject() ||
+						FeatureFlagManagerUtil.isEnabled("LPS-162966")) {
 
-					if (Objects.equals(
-							objectRelationship.getType(),
-							ObjectRelationshipConstants.TYPE_MANY_TO_MANY) ||
-						(Objects.equals(
-							objectRelationship.getType(),
-							ObjectRelationshipConstants.TYPE_ONE_TO_MANY) &&
-						 (objectRelationship.getObjectDefinitionId1() ==
-							 _objectDefinition.getObjectDefinitionId()))) {
+						relatedSchemaName = getSchemaName(
+							relatedObjectDefinition);
 
-						_addObjectRelationshipPathItem(
-							key, objectRelationship, paths, relatedSchemaName);
+						if (_addRelatedSchemas) {
+							_addObjectRelationshipSchema(
+								relatedObjectDefinition, openAPI,
+								relatedSchemaName);
+						}
+
+						if (Objects.equals(
+								objectRelationship.getType(),
+								ObjectRelationshipConstants.
+									TYPE_MANY_TO_MANY) ||
+							(Objects.equals(
+								objectRelationship.getType(),
+								ObjectRelationshipConstants.TYPE_ONE_TO_MANY) &&
+							 (objectRelationship.getObjectDefinitionId1() ==
+								 _objectDefinition.getObjectDefinitionId()))) {
+
+							_addObjectRelationshipPathItem(
+								key, objectRelationship, paths,
+								relatedSchemaName);
+						}
 					}
 
 					if (_addRelatedSchemas && (relatedSchemaName != null)) {
@@ -225,7 +234,7 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 
 		Map<String, Schema> sourceSchemas = null;
 
-		if (objectDefinition.isSystem()) {
+		if (objectDefinition.isUnmodifiableSystemObject()) {
 			sourceSchemas = OpenAPIContributorUtil.getSystemObjectSchemas(
 				_bundleContext, getExternalDTOClassName(objectDefinition),
 				_openAPIResource);
@@ -239,7 +248,8 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 		}
 
 		OpenAPIContributorUtil.copySchemas(
-			schemaName, sourceSchemas, objectDefinition.isSystem(), openAPI);
+			schemaName, sourceSchemas,
+			objectDefinition.isUnmodifiableSystemObject(), openAPI);
 	}
 
 	private PathItem _createObjectActionPathItem(

@@ -840,7 +840,7 @@ public class ObjectEntryLocalServiceImpl
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
-		if (!objectDefinition.isSystem()) {
+		if (!objectDefinition.isUnmodifiableSystemObject()) {
 			ObjectEntry objectEntry = getObjectEntry(primaryKey);
 
 			return objectEntry.getTitleValue();
@@ -1384,7 +1384,7 @@ public class ObjectEntryLocalServiceImpl
 						NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME,
 					objectField);
 
-			if (objectDefinition.isSystem()) {
+			if (objectDefinition.isUnmodifiableSystemObject()) {
 				SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
 					_systemObjectDefinitionMetadataRegistry.
 						getSystemObjectDefinitionMetadata(
@@ -2361,7 +2361,7 @@ public class ObjectEntryLocalServiceImpl
 						)
 				);
 
-				if (!relatedObjectDefinition.isSystem()) {
+				if (!relatedObjectDefinition.isUnmodifiableSystemObject()) {
 					joinStep = joinStep.innerJoinON(
 						ObjectEntryTable.INSTANCE,
 						ObjectEntryTable.INSTANCE.objectEntryId.eq(
