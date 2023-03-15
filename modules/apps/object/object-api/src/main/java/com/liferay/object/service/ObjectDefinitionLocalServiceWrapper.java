@@ -513,6 +513,15 @@ public class ObjectDefinitionLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.object.model.ObjectDefinition getSystemObjectDefinition(
+			long companyId, String name)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectDefinitionLocalService.getSystemObjectDefinition(
+			companyId, name);
+	}
+
+	@Override
 	public java.util.List<com.liferay.object.model.ObjectDefinition>
 		getSystemObjectDefinitions() {
 

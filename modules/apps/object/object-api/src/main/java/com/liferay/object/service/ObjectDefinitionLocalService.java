@@ -363,6 +363,11 @@ public interface ObjectDefinitionLocalService
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ObjectDefinition getSystemObjectDefinition(
+			long companyId, String name)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<ObjectDefinition> getSystemObjectDefinitions();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)

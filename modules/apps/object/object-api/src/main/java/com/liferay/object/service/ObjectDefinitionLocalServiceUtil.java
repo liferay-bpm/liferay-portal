@@ -446,6 +446,13 @@ public class ObjectDefinitionLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
+	public static ObjectDefinition getSystemObjectDefinition(
+			long companyId, String name)
+		throws PortalException {
+
+		return getService().getSystemObjectDefinition(companyId, name);
+	}
+
 	public static List<ObjectDefinition> getSystemObjectDefinitions() {
 		return getService().getSystemObjectDefinitions();
 	}
