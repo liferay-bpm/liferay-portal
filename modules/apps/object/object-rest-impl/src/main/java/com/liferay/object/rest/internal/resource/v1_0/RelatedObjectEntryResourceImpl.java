@@ -29,6 +29,7 @@ import com.liferay.object.system.JaxRsApplicationDescriptor;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.GuestOrUserUtil;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
@@ -283,21 +284,15 @@ public class RelatedObjectEntryResourceImpl
 			relatedObjectDefinition, relatedObjectEntryId);
 	}
 
-	private ObjectDefinition _getSystemObjectDefinition(String previousPath) {
+	private ObjectDefinition _getSystemObjectDefinition(String previousPath)
+		throws Exception {
+
 		SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
 			_getSystemObjectDefinitionMetadata(previousPath);
 
-		ObjectDefinition systemObjectDefinition =
-			_objectDefinitionLocalService.fetchSystemObjectDefinition(
-				systemObjectDefinitionMetadata.getName());
-
-		if (systemObjectDefinition != null) {
-			return systemObjectDefinition;
-		}
-
-		throw new NotFoundException(
-			"No system object definition metadata for name \"" +
-				systemObjectDefinitionMetadata.getName() + "\"");
+		return _objectDefinitionLocalService.getSystemObjectDefinition(
+			CompanyThreadLocal.getCompanyId(),
+			systemObjectDefinitionMetadata.getName());
 	}
 
 	private SystemObjectDefinitionMetadata _getSystemObjectDefinitionMetadata(
