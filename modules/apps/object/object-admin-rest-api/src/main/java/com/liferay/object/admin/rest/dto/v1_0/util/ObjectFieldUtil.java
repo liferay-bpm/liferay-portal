@@ -17,7 +17,10 @@ package com.liferay.object.admin.rest.dto.v1_0.util;
 import com.liferay.list.type.model.ListTypeDefinition;
 import com.liferay.list.type.service.ListTypeDefinitionService;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectFieldSetting;
+import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -29,14 +32,27 @@ public class ObjectFieldUtil {
 
 	public static JSONObject toJSONObject(
 		ListTypeDefinitionService listTypeDefinitionService,
-		ObjectField objectField) {
+		ObjectField objectField,
+		ObjectFieldSettingLocalService objectFieldSettingLocalService) {
 
 		return JSONUtil.put(
 			"businessType", objectField.getBusinessType()
 		).put(
 			"DBType", objectField.getDBType()
 		).put(
-			"defaultValue", objectField.getDefaultValue()
+			"defaultValue",
+			() -> {
+				ObjectFieldSetting objectFieldSetting =
+					objectFieldSettingLocalService.fetchObjectFieldSetting(
+						objectField.getObjectFieldId(),
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE);
+
+				if (objectFieldSetting != null) {
+					return objectFieldSetting.getValue();
+				}
+
+				return null;
+			}
 		).put(
 			"externalReferenceCode", objectField.getExternalReferenceCode()
 		).put(

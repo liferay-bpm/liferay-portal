@@ -19,7 +19,10 @@ import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectField;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectFieldSetting;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldSettingUtil;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
@@ -58,7 +61,6 @@ public class ObjectFieldDTOConverter
 				businessType = ObjectField.BusinessType.create(
 					objectField.getBusinessType());
 				DBType = ObjectField.DBType.create(objectField.getDBType());
-				defaultValue = objectField.getDefaultValue();
 				externalReferenceCode = objectField.getExternalReferenceCode();
 				id = objectField.getObjectFieldId();
 				indexed = objectField.getIndexed();
@@ -81,6 +83,23 @@ public class ObjectFieldDTOConverter
 				system = objectField.getSystem();
 				type = ObjectField.Type.create(objectField.getDBType());
 
+				setDefaultValue(
+					() -> {
+						com.liferay.object.model.ObjectFieldSetting
+							objectFieldSetting =
+								_objectFieldSettingLocalService.
+									fetchObjectFieldSetting(
+										objectField.getObjectFieldId(),
+										ObjectFieldSettingConstants.
+											NAME_DEFAULT_VALUE);
+
+						if (objectFieldSetting != null) {
+							return objectFieldSetting.getValue();
+						}
+
+						return StringPool.BLANK;
+					});
+
 				setListTypeDefinitionExternalReferenceCode(
 					() -> {
 						if (objectField.getListTypeDefinitionId() == 0) {
@@ -100,5 +119,8 @@ public class ObjectFieldDTOConverter
 
 	@Reference
 	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;
+
+	@Reference
+	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
 
 }
