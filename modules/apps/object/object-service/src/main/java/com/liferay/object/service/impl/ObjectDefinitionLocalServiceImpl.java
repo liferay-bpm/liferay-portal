@@ -27,6 +27,7 @@ import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
+import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedObjectFieldIdException;
@@ -526,6 +527,25 @@ public class ObjectDefinitionLocalServiceImpl
 		throws PortalException {
 
 		return objectDefinitionPersistence.countByCompanyId(companyId);
+	}
+
+	@Override
+	public ObjectDefinition getSystemObjectDefinition(
+			long companyId, String name)
+		throws PortalException {
+
+		for (ObjectDefinition systemObjectDefinition :
+				getSystemObjectDefinitions()) {
+
+			if (Objects.equals(name, systemObjectDefinition.getName()) &&
+				Objects.equals(
+					companyId, systemObjectDefinition.getCompanyId())) {
+
+				return systemObjectDefinition;
+			}
+		}
+
+		throw new NoSuchObjectDefinitionException();
 	}
 
 	@Override
