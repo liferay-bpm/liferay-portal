@@ -61,7 +61,7 @@ public class ObjectFieldSettingUtil {
 		List<com.liferay.object.model.ObjectFieldSetting>
 			objectFieldSettings = TransformUtil.transformToList(
 				objectField.getObjectFieldSettings(),
-				objectFieldSetting -> toObjectFieldSetting(
+				objectFieldSetting -> _toObjectFieldSetting(
 					objectField.getBusinessTypeAsString(),
 					ObjectFieldUtil.addListTypeDefinition(
 						companyId, listTypeDefinitionLocalService,
@@ -98,8 +98,48 @@ public class ObjectFieldSettingUtil {
 		return objectFieldSettings;
 	}
 
-	public static com.liferay.object.model.ObjectFieldSetting
-			toObjectFieldSetting(
+	public static ObjectFieldSetting toObjectFieldSetting(
+		String businessType,
+		com.liferay.object.model.ObjectFieldSetting
+			serviceBuilderObjectFieldSetting) {
+
+		if (serviceBuilderObjectFieldSetting == null) {
+			return null;
+		}
+
+		ObjectFieldSetting objectFieldSetting = new ObjectFieldSetting() {
+			{
+				name = serviceBuilderObjectFieldSetting.getName();
+				value = serviceBuilderObjectFieldSetting.getValue();
+			}
+		};
+
+		if (Objects.equals(
+				businessType, ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) &&
+			Objects.equals(
+				objectFieldSetting.getName(),
+				ObjectFieldSettingConstants.NAME_FILTERS)) {
+
+			objectFieldSetting.setValue(
+				ObjectFilterUtil.getObjectFiltersJSONArray(
+					serviceBuilderObjectFieldSetting.getObjectFilters()));
+		}
+		else if (Objects.equals(
+					ObjectFieldSettingConstants.NAME_STATE_FLOW,
+					objectFieldSetting.getName())) {
+
+			objectFieldSetting.setValue(
+				ObjectStateFlowUtil.toObjectStateFlow(
+					ObjectStateFlowLocalServiceUtil.fetchObjectStateFlow(
+						GetterUtil.getLong(
+							serviceBuilderObjectFieldSetting.getValue()))));
+		}
+
+		return objectFieldSetting;
+	}
+
+	private static com.liferay.object.model.ObjectFieldSetting
+			_toObjectFieldSetting(
 				String businessType, long listTypeDefinitionId,
 				ObjectFieldSetting objectFieldSetting,
 				ObjectFieldSettingLocalService objectFieldSettingLocalService,
@@ -173,46 +213,6 @@ public class ObjectFieldSettingUtil {
 		}
 
 		return serviceBuilderObjectFieldSetting;
-	}
-
-	public static ObjectFieldSetting toObjectFieldSetting(
-		String businessType,
-		com.liferay.object.model.ObjectFieldSetting
-			serviceBuilderObjectFieldSetting) {
-
-		if (serviceBuilderObjectFieldSetting == null) {
-			return null;
-		}
-
-		ObjectFieldSetting objectFieldSetting = new ObjectFieldSetting() {
-			{
-				name = serviceBuilderObjectFieldSetting.getName();
-				value = serviceBuilderObjectFieldSetting.getValue();
-			}
-		};
-
-		if (Objects.equals(
-				businessType, ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) &&
-			Objects.equals(
-				objectFieldSetting.getName(),
-				ObjectFieldSettingConstants.NAME_FILTERS)) {
-
-			objectFieldSetting.setValue(
-				ObjectFilterUtil.getObjectFiltersJSONArray(
-					serviceBuilderObjectFieldSetting.getObjectFilters()));
-		}
-		else if (Objects.equals(
-					ObjectFieldSettingConstants.NAME_STATE_FLOW,
-					objectFieldSetting.getName())) {
-
-			objectFieldSetting.setValue(
-				ObjectStateFlowUtil.toObjectStateFlow(
-					ObjectStateFlowLocalServiceUtil.fetchObjectStateFlow(
-						GetterUtil.getLong(
-							serviceBuilderObjectFieldSetting.getValue()))));
-		}
-
-		return objectFieldSetting;
 	}
 
 }
