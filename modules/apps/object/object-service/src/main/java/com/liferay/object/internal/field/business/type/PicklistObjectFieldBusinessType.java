@@ -199,7 +199,7 @@ public class PicklistObjectFieldBusinessType
 				objectFieldSettingDefaultValue.getValue());
 
 		if (listTypeEntry == null) {
-			throw new ObjectFieldSettingValueException(
+			throw new ObjectFieldDefaultValueException(
 				StringBundler.concat(
 					"Default value \"",
 					objectFieldSettingDefaultValue.getValue(),
