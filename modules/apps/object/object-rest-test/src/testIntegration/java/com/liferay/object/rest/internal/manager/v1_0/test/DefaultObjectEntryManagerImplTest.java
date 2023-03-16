@@ -607,6 +607,26 @@ public class DefaultObjectEntryManagerImplTest {
 			"{\"le\": \"2020-01-02\", \"ge\": \"2020-01-02\"}");
 
 		_assertCountAggregationObjectFieldValue(1, parentObjectEntry1);
+
+		try {
+			_objectEntryManager.addObjectEntry(
+				_dtoConverterContext, _objectDefinition2,
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							"paramNotExpected", "test"
+						).build();
+					}
+				},
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+			Assert.fail();
+		}
+		catch (Exception exception) {
+			Assert.assertEquals(
+				"Key paramNotExpected is not an expected parameter",
+				exception.getMessage());
+		}
 	}
 
 	@Test
