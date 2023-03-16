@@ -153,18 +153,11 @@ public class ObjectFieldResourceImpl
 				LocalizedMapUtil.getLocalizedMap(objectField.getLabel()),
 				objectField.getName(), objectField.getRequired(),
 				GetterUtil.getBoolean(objectField.getState()),
-				transformToList(
-					objectField.getObjectFieldSettings(),
-					objectFieldSetting ->
-						ObjectFieldSettingUtil.toObjectFieldSetting(
-							objectField.getBusinessTypeAsString(),
-							ObjectFieldUtil.addListTypeDefinition(
-								contextUser.getCompanyId(),
-								_listTypeDefinitionLocalService,
-								_listTypeEntryLocalService, objectField,
-								contextUser.getUserId()),
-							objectFieldSetting, _objectFieldSettingLocalService,
-							_objectFilterLocalService))));
+				ObjectFieldSettingUtil.getObjectFieldSettings(
+					contextUser.getCompanyId(), _listTypeDefinitionLocalService,
+					_listTypeEntryLocalService, objectField,
+					_objectFieldSettingLocalService, _objectFilterLocalService,
+					contextUser.getUserId())));
 	}
 
 	@Override
@@ -218,14 +211,11 @@ public class ObjectFieldResourceImpl
 				LocalizedMapUtil.getLocalizedMap(objectField.getLabel()),
 				objectField.getName(), objectField.getRequired(),
 				GetterUtil.getBoolean(objectField.getState()),
-				transformToList(
-					objectField.getObjectFieldSettings(),
-					objectFieldSetting ->
-						ObjectFieldSettingUtil.toObjectFieldSetting(
-							objectField.getBusinessTypeAsString(),
-							objectField.getListTypeDefinitionId(),
-							objectFieldSetting, _objectFieldSettingLocalService,
-							_objectFilterLocalService))));
+				ObjectFieldSettingUtil.getObjectFieldSettings(
+					contextUser.getCompanyId(), _listTypeDefinitionLocalService,
+					_listTypeEntryLocalService, objectField,
+					_objectFieldSettingLocalService, _objectFilterLocalService,
+					contextUser.getUserId())));
 	}
 
 	private Page<ObjectField> _getObjectFieldsPage(

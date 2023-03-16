@@ -14,21 +14,29 @@
 
 package com.liferay.object.admin.rest.internal.dto.v1_0.util;
 
+import com.liferay.list.type.service.ListTypeDefinitionLocalService;
+import com.liferay.list.type.service.ListTypeEntryLocalService;
+import com.liferay.object.admin.rest.dto.v1_0.ObjectField;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectFieldSetting;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectStateFlow;
 import com.liferay.object.admin.rest.dto.v1_0.util.ObjectStateFlowUtil;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.field.setting.builder.ObjectFieldSettingBuilder;
 import com.liferay.object.filter.util.ObjectFilterUtil;
+import com.liferay.object.model.ObjectFieldSettingModel;
 import com.liferay.object.model.ObjectFilter;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectFilterLocalService;
 import com.liferay.object.service.ObjectStateFlowLocalServiceUtil;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
 
 import java.util.ArrayList;
@@ -40,6 +48,55 @@ import java.util.Objects;
  * @author Carolina Barbosa
  */
 public class ObjectFieldSettingUtil {
+
+	public static List<com.liferay.object.model.ObjectFieldSetting>
+		getObjectFieldSettings(
+			long companyId,
+			ListTypeDefinitionLocalService listTypeDefinitionLocalService,
+			ListTypeEntryLocalService listTypeEntryLocalService,
+			ObjectField objectField,
+			ObjectFieldSettingLocalService objectFieldSettingLocalService,
+			ObjectFilterLocalService objectFilterLocalService, long userId) {
+
+		List<com.liferay.object.model.ObjectFieldSetting>
+			objectFieldSettings = TransformUtil.transformToList(
+				objectField.getObjectFieldSettings(),
+				objectFieldSetting -> toObjectFieldSetting(
+					objectField.getBusinessTypeAsString(),
+					ObjectFieldUtil.addListTypeDefinition(
+						companyId, listTypeDefinitionLocalService,
+						listTypeEntryLocalService, objectField, userId),
+					objectFieldSetting, objectFieldSettingLocalService,
+					objectFilterLocalService));
+
+		List<String> objectFieldSettingNames = ListUtil.toList(
+			objectFieldSettings,
+			ObjectFieldSettingModel::getName);
+
+		if (objectFieldSettingNames.contains(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE) ||
+			Validator.isNull(objectField.getDefaultValue())) {
+
+			return objectFieldSettings;
+		}
+
+		objectFieldSettings.add(
+			new ObjectFieldSettingBuilder(
+			).name(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE
+			).value(
+				objectField.getDefaultValue()
+			).build());
+		objectFieldSettings.add(
+			new ObjectFieldSettingBuilder(
+			).name(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE
+			).value(
+				ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
+			).build());
+
+		return objectFieldSettings;
+	}
 
 	public static com.liferay.object.model.ObjectFieldSetting
 			toObjectFieldSetting(
