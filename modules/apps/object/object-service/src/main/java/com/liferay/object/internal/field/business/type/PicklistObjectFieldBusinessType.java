@@ -21,6 +21,7 @@ import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.exception.ObjectFieldDefaultValueException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.render.ObjectFieldRenderingContext;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.extension.PropertyDefinition;
 
@@ -155,6 +157,55 @@ public class PicklistObjectFieldBusinessType
 		}
 
 		_objectStateFlowLocalService.addDefaultObjectStateFlow(newObjectField);
+	}
+
+	@Override
+	public void validateObjectFieldSettingsDefaultValue(
+			ObjectField objectField,
+			List<ObjectFieldSetting> objectFieldSettings)
+		throws PortalException {
+
+		if (objectFieldSettings.isEmpty()) {
+			return;
+		}
+
+		ObjectFieldSetting objectFieldSettingDefaultValue = null;
+
+		for (ObjectFieldSetting objectFieldSetting : objectFieldSettings) {
+			if (StringUtil.equals(
+					objectFieldSetting.getName(),
+					ObjectFieldSettingConstants.NAME_DEFAULT_VALUE)) {
+
+				objectFieldSettingDefaultValue = objectFieldSetting;
+			}
+
+			if (objectFieldSetting.compareName(
+					ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE) &&
+				StringUtil.equals(
+					objectFieldSetting.getValue(),
+					ObjectFieldSettingConstants.VALUE_EXPRESSION_BUILDER)) {
+
+				return;
+			}
+		}
+
+		if (objectFieldSettingDefaultValue == null) {
+			return;
+		}
+
+		ListTypeEntry listTypeEntry =
+			_listTypeEntryLocalService.fetchListTypeEntry(
+				objectField.getListTypeDefinitionId(),
+				objectFieldSettingDefaultValue.getValue());
+
+		if (listTypeEntry == null) {
+			throw new ObjectFieldSettingValueException(
+				StringBundler.concat(
+					"Default value \"",
+					objectFieldSettingDefaultValue.getValue(),
+					"\" is not a list entry in list definition ",
+					String.valueOf(objectField.getListTypeDefinitionId())));
+		}
 	}
 
 	private DDMFormFieldOptions _getDDMFormFieldOptions(
