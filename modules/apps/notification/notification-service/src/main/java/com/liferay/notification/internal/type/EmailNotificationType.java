@@ -362,6 +362,16 @@ public class EmailNotificationType extends BaseNotificationType {
 		}
 	}
 
+	private void _checkEmailMatch(String email) throws PortalException {
+		Matcher matcher = _emailAddressPattern.matcher(email);
+
+		boolean matchFound = matcher.find();
+
+		if (!matchFound) {
+			throw new NotificationRecipientSettingValueException();
+		}
+	}
+
 	private String _formatBody(
 			Map<Locale, String> bodyMap,
 			NotificationContext notificationContext)
@@ -570,6 +580,14 @@ public class EmailNotificationType extends BaseNotificationType {
 					MessageBusUtil.sendMessage(
 						DestinationNames.MAIL, mailMessage);
 
+					_checkEmailMatch(
+						String.valueOf(
+							notificationRecipientSettingsMap.get("to")));
+
+					_checkEmailMatch(
+						String.valueOf(
+							notificationRecipientSettingsMap.get("from")));
+
 					notificationQueueEntryLocalService.updateStatus(
 						notificationQueueEntry.getNotificationQueueEntryId(),
 						NotificationQueueEntryConstants.STATUS_SENT);
@@ -609,8 +627,8 @@ public class EmailNotificationType extends BaseNotificationType {
 		EmailNotificationType.class);
 
 	private static final Pattern _emailAddressPattern = Pattern.compile(
-		"[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@" +
-			"(?:\\w(?:[\\w-]*\\w)?\\.)+(\\w(?:[\\w-]*\\w))");
+		"^[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@" +
+			"(?:\\w(?:[\\w-]*\\w)?\\.)+(\\w(?:[\\w-]*\\w))$");
 
 	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
