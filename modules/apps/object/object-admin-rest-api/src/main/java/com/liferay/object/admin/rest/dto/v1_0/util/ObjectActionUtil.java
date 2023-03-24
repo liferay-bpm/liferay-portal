@@ -20,6 +20,7 @@ import com.liferay.object.admin.rest.dto.v1_0.ObjectAction;
 import com.liferay.object.admin.rest.dto.v1_0.Status;
 import com.liferay.object.constants.ObjectActionConstants;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.service.ObjectActionService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -29,6 +30,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
+import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.util.ArrayList;
@@ -173,6 +175,24 @@ public class ObjectActionUtil {
 			map, true
 		).build();
 	}
+
+	public static void toServiceBuilderObjectDefinitionObjectAction(
+			long objectDefinitionId, ObjectAction objectAction,
+			ObjectActionService serviceBuilderObjectAction)
+		throws Exception {
+
+		serviceBuilderObjectAction.addObjectAction(
+			objectAction.getExternalReferenceCode(), objectDefinitionId,
+			objectAction.getActive(), objectAction.getConditionExpression(),
+			objectAction.getDescription(),
+			LocalizedMapUtil.getLocalizedMap(objectAction.getErrorMessage()),
+			LocalizedMapUtil.getLocalizedMap(objectAction.getLabel()),
+			objectAction.getName(), objectAction.getObjectActionExecutorKey(),
+			objectAction.getObjectActionTriggerKey(),
+			toParametersUnicodeProperties(objectAction.getParameters()));
+	}
+
+	protected AcceptLanguage contextAcceptLanguage;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectActionUtil.class);

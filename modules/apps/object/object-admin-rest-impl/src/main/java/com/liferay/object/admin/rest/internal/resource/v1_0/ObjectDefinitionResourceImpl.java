@@ -608,16 +608,9 @@ public class ObjectDefinitionResourceImpl
 		throws Exception {
 
 		if (objectActions != null) {
-			ObjectActionResource.Builder builder =
-				_objectActionResourceFactory.create();
-
-			ObjectActionResource objectActionResource = builder.user(
-				contextUser
-			).build();
-
 			for (ObjectAction objectAction : objectActions) {
-				objectActionResource.postObjectDefinitionObjectAction(
-					objectDefinitionId, objectAction);
+				ObjectActionUtil.toServiceBuilderObjectDefinitionObjectAction(
+					objectDefinitionId, objectAction, _objectActionService);
 			}
 		}
 
