@@ -419,11 +419,17 @@ export default function ObjectFieldFormBase({
 					label={Liferay.Language.get('picklist')}
 					onChangeQuery={setPicklistQuery}
 					onSelectItem={(item) => {
+						const newObjectFieldSettings = values.objectFieldSettings?.filter(
+							(fieldSettings) =>
+								fieldSettings.name !== 'stateFlow'
+						);
+
 						setValues({
 							defaultValue: '',
 							listTypeDefinitionExternalReferenceCode:
 								item.externalReferenceCode,
 							listTypeDefinitionId: item.id,
+							objectFieldSettings: newObjectFieldSettings,
 							state: false,
 						});
 					}}
