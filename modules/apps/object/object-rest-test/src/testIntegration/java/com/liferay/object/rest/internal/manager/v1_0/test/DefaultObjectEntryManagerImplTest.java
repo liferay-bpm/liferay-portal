@@ -607,6 +607,58 @@ public class DefaultObjectEntryManagerImplTest {
 			"{\"le\": \"2020-01-02\", \"ge\": \"2020-01-02\"}");
 
 		_assertCountAggregationObjectFieldValue(1, parentObjectEntry1);
+
+		ObjectDefinition objectDefinitionPickList = _createObjectDefinition(
+			Arrays.asList(
+				new PicklistObjectFieldBuilder(
+				).indexed(
+					true
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString())
+				).listTypeDefinitionId(
+					_listTypeDefinition.getListTypeDefinitionId()
+				).name(
+					"picklistObjectFieldName"
+				).objectFieldSettings(
+					Collections.emptyList()
+				).build()));
+
+		ListTypeEntry listTypeEntry =
+			_listTypeEntryLocalService.addListTypeEntry(
+				null, _adminUser.getUserId(),
+				_listTypeDefinition.getListTypeDefinitionId(),
+				RandomTestUtil.randomString(),
+				Collections.singletonMap(
+					LocaleUtil.US, RandomTestUtil.randomString()));
+
+		ListEntry pickListListEntry = new ListEntry();
+
+		pickListListEntry.setKey(listTypeEntry.getKey());
+		pickListListEntry.setName(listTypeEntry.getName(LocaleUtil.US));
+
+		ObjectEntry childObjectEntryListEntry = new ObjectEntry() {
+			{
+				properties = HashMapBuilder.<String, Object>put(
+					"picklistObjectFieldName", pickListListEntry
+				).build();
+			}
+		};
+
+		ObjectEntry actualObjectEntryListEntry =
+			_objectEntryManager.addObjectEntry(
+				_dtoConverterContext, objectDefinitionPickList,
+				childObjectEntryListEntry,
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		_assertEquals(
+			actualObjectEntryListEntry,
+			_objectEntryManager.getObjectEntry(
+				_simpleDTOConverterContext, objectDefinitionPickList,
+				actualObjectEntryListEntry.getId()));
+
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionPickList);
 	}
 
 	@Test
