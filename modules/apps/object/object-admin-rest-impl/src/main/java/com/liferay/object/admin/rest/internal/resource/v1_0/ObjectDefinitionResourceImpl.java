@@ -34,6 +34,7 @@ import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldSettingUt
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldUtil;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectLayoutUtil;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectRelationshipUtil;
+import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectValidationRuleUtil;
 import com.liferay.object.admin.rest.internal.odata.entity.v1_0.ObjectDefinitionEntityModel;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectActionResource;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectDefinitionResource;
@@ -58,6 +59,7 @@ import com.liferay.object.service.ObjectLayoutService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.object.service.ObjectValidationRuleLocalService;
+import com.liferay.object.service.ObjectValidationRuleService;
 import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.object.service.ObjectViewService;
 import com.liferay.object.service.persistence.ObjectLayoutBoxPersistence;
@@ -641,20 +643,12 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		if (objectValidationRules != null) {
-			ObjectValidationRuleResource.Builder builder =
-				_objectValidationRuleResourceFactory.create();
-
-			ObjectValidationRuleResource objectValidationRuleResource =
-				builder.user(
-					contextUser
-				).build();
-
 			for (ObjectValidationRule objectValidationRule :
 					objectValidationRules) {
 
-				objectValidationRuleResource.
-					postObjectDefinitionObjectValidationRule(
-						objectDefinitionId, objectValidationRule);
+				ObjectValidationRuleUtil.toServiceBuilderValidationRule(
+					objectDefinitionId, objectValidationRule,
+					_objectValidationRuleService);
 			}
 		}
 
@@ -982,6 +976,9 @@ public class ObjectDefinitionResourceImpl
 	@Reference
 	private ObjectValidationRuleResource.Factory
 		_objectValidationRuleResourceFactory;
+
+	@Reference
+	private ObjectValidationRuleService _objectValidationRuleService;
 
 	@Reference
 	private ObjectViewDTOConverter _objectViewDTOConverter;
