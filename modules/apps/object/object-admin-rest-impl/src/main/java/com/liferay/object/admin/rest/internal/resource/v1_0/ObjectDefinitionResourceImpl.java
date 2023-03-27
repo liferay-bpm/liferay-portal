@@ -33,6 +33,7 @@ import com.liferay.object.admin.rest.internal.dto.v1_0.converter.ObjectViewDTOCo
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldSettingUtil;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldUtil;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectLayoutUtil;
+import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectRelationshipUtil;
 import com.liferay.object.admin.rest.internal.odata.entity.v1_0.ObjectDefinitionEntityModel;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectActionResource;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectDefinitionResource;
@@ -55,6 +56,7 @@ import com.liferay.object.service.ObjectFilterLocalService;
 import com.liferay.object.service.ObjectLayoutLocalService;
 import com.liferay.object.service.ObjectLayoutService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.object.service.ObjectValidationRuleLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.object.service.ObjectViewService;
@@ -630,18 +632,11 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		if (objectRelationships != null) {
-			ObjectRelationshipResource.Builder builder =
-				_objectRelationshipResourceFactory.create();
-
-			ObjectRelationshipResource objectRelationshipResource =
-				builder.user(
-					contextUser
-				).build();
-
 			for (ObjectRelationship objectRelationship : objectRelationships) {
-				objectRelationshipResource.
-					postObjectDefinitionObjectRelationship(
-						objectDefinitionId, objectRelationship);
+				ObjectRelationshipUtil.toServiceBuilderRelationship(
+					objectDefinitionId, objectRelationship,
+					_objectRelationshipService, _objectDefinitionLocalService,
+					contextCompany, contextUser);
 			}
 		}
 
@@ -974,6 +969,9 @@ public class ObjectDefinitionResourceImpl
 	@Reference
 	private ObjectRelationshipResource.Factory
 		_objectRelationshipResourceFactory;
+
+	@Reference
+	private ObjectRelationshipService _objectRelationshipService;
 
 	@Reference
 	private ObjectValidationRuleDTOConverter _objectValidationRuleDTOConverter;
