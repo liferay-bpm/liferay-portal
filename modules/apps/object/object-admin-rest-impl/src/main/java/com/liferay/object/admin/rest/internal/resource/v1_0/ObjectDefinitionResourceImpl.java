@@ -35,6 +35,7 @@ import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldUtil;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectLayoutUtil;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectRelationshipUtil;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectValidationRuleUtil;
+import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectViewUtil;
 import com.liferay.object.admin.rest.internal.odata.entity.v1_0.ObjectDefinitionEntityModel;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectActionResource;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectDefinitionResource;
@@ -66,6 +67,9 @@ import com.liferay.object.service.persistence.ObjectLayoutBoxPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutColumnPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutRowPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutTabPersistence;
+import com.liferay.object.service.persistence.ObjectViewColumnPersistence;
+import com.liferay.object.service.persistence.ObjectViewFilterColumnPersistence;
+import com.liferay.object.service.persistence.ObjectViewSortColumnPersistence;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
@@ -653,16 +657,12 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		if (objectViews != null) {
-			ObjectViewResource.Builder builder =
-				_objectViewResourceFactory.create();
-
-			ObjectViewResource objectViewResource = builder.user(
-				contextUser
-			).build();
-
 			for (ObjectView objectView : objectViews) {
-				objectViewResource.postObjectDefinitionObjectView(
-					objectDefinitionId, objectView);
+				ObjectViewUtil.toServiceBuilderView(
+					objectDefinitionId, objectView,
+					_objectViewColumnPersistence,
+					_objectViewFilterColumnPersistence, _objectViewService,
+					_objectViewSortColumnPersistence);
 			}
 		}
 	}
@@ -981,7 +981,14 @@ public class ObjectDefinitionResourceImpl
 	private ObjectValidationRuleService _objectValidationRuleService;
 
 	@Reference
+	private ObjectViewColumnPersistence _objectViewColumnPersistence;
+
+	@Reference
 	private ObjectViewDTOConverter _objectViewDTOConverter;
+
+	@Reference
+	private ObjectViewFilterColumnPersistence
+		_objectViewFilterColumnPersistence;
 
 	@Reference
 	private ObjectViewLocalService _objectViewLocalService;
@@ -991,6 +998,9 @@ public class ObjectDefinitionResourceImpl
 
 	@Reference
 	private ObjectViewService _objectViewService;
+
+	@Reference
+	private ObjectViewSortColumnPersistence _objectViewSortColumnPersistence;
 
 	@Reference
 	private SystemObjectDefinitionMetadataRegistry

@@ -26,8 +26,8 @@ import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 public class ObjectValidationRuleUtil {
 
 	public static void toServiceBuilderValidationRule(
-		long objectDefinitionId, ObjectValidationRule objectValidationRule,
-		ObjectValidationRuleService objectValidationRuleService)
+			long objectDefinitionId, ObjectValidationRule objectValidationRule,
+			ObjectValidationRuleService objectValidationRuleService)
 		throws PortalException {
 
 		objectValidationRuleService.addObjectValidationRule(
@@ -36,8 +36,7 @@ public class ObjectValidationRuleUtil {
 			objectValidationRule.getEngine(),
 			LocalizedMapUtil.getLocalizedMap(
 				objectValidationRule.getErrorLabel()),
-			LocalizedMapUtil.getLocalizedMap(
-				objectValidationRule.getName()),
+			LocalizedMapUtil.getLocalizedMap(objectValidationRule.getName()),
 			objectValidationRule.getScript());
 	}
 
