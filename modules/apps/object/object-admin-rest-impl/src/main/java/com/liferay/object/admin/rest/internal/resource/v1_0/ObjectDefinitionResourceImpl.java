@@ -53,10 +53,15 @@ import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectFilterLocalService;
 import com.liferay.object.service.ObjectLayoutLocalService;
+import com.liferay.object.service.ObjectLayoutService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectValidationRuleLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.object.service.ObjectViewService;
+import com.liferay.object.service.persistence.ObjectLayoutBoxPersistence;
+import com.liferay.object.service.persistence.ObjectLayoutColumnPersistence;
+import com.liferay.object.service.persistence.ObjectLayoutRowPersistence;
+import com.liferay.object.service.persistence.ObjectLayoutTabPersistence;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
@@ -615,16 +620,12 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		if (objectLayouts != null) {
-			ObjectLayoutResource.Builder builder =
-				_objectLayoutResourceFactory.create();
-
-			ObjectLayoutResource objectLayoutResource = builder.user(
-				contextUser
-			).build();
-
 			for (ObjectLayout objectLayout : objectLayouts) {
-				objectLayoutResource.postObjectDefinitionObjectLayout(
-					objectDefinitionId, objectLayout);
+				ObjectLayoutUtil.toServiceBuilderObjectLayout(
+					objectDefinitionId, objectLayout, _objectLayoutService,
+					_objectLayoutBoxPersistence, _objectLayoutColumnPersistence,
+					_objectFieldLocalService, _objectLayoutRowPersistence,
+					_objectLayoutTabPersistence);
 			}
 		}
 
@@ -944,10 +945,25 @@ public class ObjectDefinitionResourceImpl
 	private ObjectFilterLocalService _objectFilterLocalService;
 
 	@Reference
+	private ObjectLayoutBoxPersistence _objectLayoutBoxPersistence;
+
+	@Reference
+	private ObjectLayoutColumnPersistence _objectLayoutColumnPersistence;
+
+	@Reference
 	private ObjectLayoutLocalService _objectLayoutLocalService;
 
 	@Reference
 	private ObjectLayoutResource.Factory _objectLayoutResourceFactory;
+
+	@Reference
+	private ObjectLayoutRowPersistence _objectLayoutRowPersistence;
+
+	@Reference
+	private ObjectLayoutService _objectLayoutService;
+
+	@Reference
+	private ObjectLayoutTabPersistence _objectLayoutTabPersistence;
 
 	@Reference
 	private ObjectRelationshipDTOConverter _objectRelationshipDTOConverter;

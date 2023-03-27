@@ -38,7 +38,7 @@ import java.util.Map;
 /**
  * @author Gabriel Albuquerque
  */
-public class ObjectLayoutUtil {
+public class ObjectRelationshipUtil {
 
 	public static ObjectLayout toObjectLayout(
 			Map<String, Map<String, String>> actions,
@@ -120,7 +120,7 @@ public class ObjectLayoutUtil {
 			objectDefinitionId,
 			GetterUtil.getBoolean(objectLayout.getDefaultObjectLayout()),
 			LocalizedMapUtil.getLocalizedMap(objectLayout.getName()),
-			TransformUtil.transformToList(
+			transformToList(
 				objectLayout.getObjectLayoutTabs(),
 				objectLayoutTab -> _toServiceBuilderObjectLayoutTab(
 					objectDefinitionId, objectLayoutTab,
@@ -149,7 +149,7 @@ public class ObjectLayoutUtil {
 						objectFieldLocalService, objectLayoutRow),
 					ObjectLayoutRow.class);
 				priority = objectLayoutBox.getPriority();
-				type = ObjectLayoutBox.Type.create(objectLayoutBox.getType());
+				type = Type.create(objectLayoutBox.getType());
 			}
 		};
 	}
@@ -214,7 +214,7 @@ public class ObjectLayoutUtil {
 		serviceBuilderObjectLayoutBox.setNameMap(
 			LocalizedMapUtil.getLocalizedMap(objectLayoutBox.getName()));
 		serviceBuilderObjectLayoutBox.setObjectLayoutRows(
-			TransformUtil.transformToList(
+			transformToList(
 				objectLayoutBox.getObjectLayoutRows(),
 				objectLayoutRow -> _toServiceBuilderObjectLayoutRow(
 					objectDefinitionId, objectLayoutRow,
@@ -263,7 +263,7 @@ public class ObjectLayoutUtil {
 			objectLayoutRowPersistence.create(0L);
 
 		serviceBuilderObjectLayoutRow.setObjectLayoutColumns(
-			TransformUtil.transformToList(
+			transformToList(
 				objectLayoutRow.getObjectLayoutColumns(),
 				objectLayoutColumn -> _toServiceBuilderObjectLayoutColumn(
 					objectDefinitionId, objectLayoutColumn,
@@ -289,7 +289,7 @@ public class ObjectLayoutUtil {
 		serviceBuilderObjectLayoutTab.setNameMap(
 			LocalizedMapUtil.getLocalizedMap(objectLayoutTab.getName()));
 		serviceBuilderObjectLayoutTab.setObjectLayoutBoxes(
-			TransformUtil.transformToList(
+			transformToList(
 				objectLayoutTab.getObjectLayoutBoxes(),
 				objectLayoutBox -> _toServiceBuilderObjectLayoutBox(
 					objectDefinitionId, objectLayoutBox,
