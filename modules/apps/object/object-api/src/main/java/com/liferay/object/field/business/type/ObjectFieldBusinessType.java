@@ -26,6 +26,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.extension.PropertyDefinition;
 
@@ -154,6 +155,23 @@ public interface ObjectFieldBusinessType {
 			ObjectField objectField,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
+
+		for (ObjectFieldSetting objectFieldSetting : objectFieldSettings) {
+			if (StringUtil.equals(
+					objectFieldSetting.getName(),
+					ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE) &&
+				!(StringUtil.equals(
+					objectFieldSetting.getValue(),
+					ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE) ||
+				  StringUtil.equals(
+					  objectFieldSetting.getValue(),
+					  ObjectFieldSettingConstants.VALUE_EXPRESSION_BUILDER))) {
+
+				throw new ObjectFieldSettingValueException.InvalidValue(
+					objectField.getName(), objectFieldSetting.getName(),
+					objectFieldSetting.getValue());
+			}
+		}
 	}
 
 }
