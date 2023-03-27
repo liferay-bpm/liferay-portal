@@ -156,20 +156,24 @@ public interface ObjectFieldBusinessType {
 			Map<String, String> objectFieldSettingsValuesMap)
 		throws PortalException {
 
-		for (ObjectFieldSetting objectFieldSetting : objectFieldSettings) {
-			if (objectFieldSetting.compareName(
-					ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE) &&
-				!(StringUtil.equals(
-					objectFieldSetting.getValue(),
-					ObjectFieldSettingConstants.VALUE_EXPRESSION_BUILDER) ||
-				  StringUtil.equals(
-					  objectFieldSetting.getValue(),
-					  ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE))) {
+		String defaultValueType = objectFieldSettingsValuesMap.get(
+			ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE);
 
-				throw new ObjectFieldSettingValueException.InvalidValue(
-					objectField.getName(), objectFieldSetting.getName(),
-					objectFieldSetting.getValue());
-			}
+		if (defaultValueType == null) {
+			return;
+		}
+
+		if (!(StringUtil.equals(
+				defaultValueType,
+				ObjectFieldSettingConstants.VALUE_EXPRESSION_BUILDER) ||
+			  StringUtil.equals(
+				  defaultValueType,
+				  ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE))) {
+
+			throw new ObjectFieldSettingValueException.InvalidValue(
+				objectField.getName(),
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+				defaultValueType);
 		}
 	}
 
