@@ -39,7 +39,6 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.portlet.ResourceRequest;
@@ -91,13 +90,12 @@ public class GetNotificationTemplateInitDataMVCResourceCommand
 			"author-suffix", "AUTHOR_SUFFIX"
 		).build();
 
-		List<ObjectField> objectFields =
-			_objectFieldLocalService.getObjectFields(
-				_objectDefinition.getObjectDefinitionId());
-
 		JSONArray termsJSONArray = _jsonFactory.createJSONArray();
 
-		for (ObjectField objectField : objectFields) {
+		for (ObjectField objectField :
+				_objectFieldLocalService.getObjectFields(
+					_objectDefinition.getObjectDefinitionId())) {
+
 			if (StringUtil.equals(objectField.getName(), "creator") &&
 				FeatureFlagManagerUtil.isEnabled("LPS-171625")) {
 
@@ -120,15 +118,14 @@ public class GetNotificationTemplateInitDataMVCResourceCommand
 			}
 		}
 
-		List<ObjectRelationship> objectRelationships =
-			_objectRelationshipLocalService.
-				getObjectRelationshipsByObjectDefinitionId2(
-					_objectDefinition.getObjectDefinitionId());
-
 		JSONArray relationshipSectionsJSONArray =
 			_jsonFactory.createJSONArray();
 
-		for (ObjectRelationship objectRelationship : objectRelationships) {
+		for (ObjectRelationship objectRelationship :
+				_objectRelationshipLocalService.
+					getObjectRelationshipsByObjectDefinitionId2(
+						_objectDefinition.getObjectDefinitionId())) {
+
 			ObjectDefinition objectDefinition =
 				_objectDefinitionLocalService.getObjectDefinition(
 					objectRelationship.getObjectDefinitionId1());
