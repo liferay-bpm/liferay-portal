@@ -29,15 +29,14 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
-import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
-import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Map;
 
@@ -72,7 +71,8 @@ public class GetNotificationTemplateInitDataMVCResourceCommand
 			return;
 		}
 
-		User user = _userLocalService.getUser(PrincipalThreadLocal.getUserId());
+		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
 		Map<String, String> authorObjectFieldNames = HashMapBuilder.put(
 			"author-email-address", "AUTHOR_EMAIL_ADDRESS"
@@ -103,7 +103,7 @@ public class GetNotificationTemplateInitDataMVCResourceCommand
 					(termLabel, objectFieldName) -> termsJSONArray.put(
 						JSONUtil.put(
 							"termLabel",
-							_language.get(user.getLocale(), termLabel)
+							_language.get(themeDisplay.getLocale(), termLabel)
 						).put(
 							"termName", _getTermName(objectFieldName)
 						)));
@@ -111,7 +111,8 @@ public class GetNotificationTemplateInitDataMVCResourceCommand
 			else {
 				termsJSONArray.put(
 					JSONUtil.put(
-						"termLabel", objectField.getLabel(user.getLocale())
+						"termLabel",
+						objectField.getLabel(themeDisplay.getLocale())
 					).put(
 						"termName", _getTermName(objectField.getName())
 					));
@@ -137,10 +138,11 @@ public class GetNotificationTemplateInitDataMVCResourceCommand
 				).put(
 					"sectionLabel",
 					StringBundler.concat(
-						objectRelationship.getLabel(user.getLocale()),
+						objectRelationship.getLabel(themeDisplay.getLocale()),
 						StringPool.SPACE, StringPool.OPEN_PARENTHESIS,
 						StringUtil.upperCase(
-							objectDefinition.getLabel(user.getLocale())),
+							objectDefinition.getLabel(
+								themeDisplay.getLocale())),
 						StringPool.CLOSE_PARENTHESIS)
 				));
 		}
@@ -175,8 +177,5 @@ public class GetNotificationTemplateInitDataMVCResourceCommand
 
 	@Reference
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }
