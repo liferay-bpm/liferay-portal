@@ -157,15 +157,14 @@ public interface ObjectFieldBusinessType {
 		throws PortalException {
 
 		for (ObjectFieldSetting objectFieldSetting : objectFieldSettings) {
-			if (StringUtil.equals(
-					objectFieldSetting.getName(),
+			if (objectFieldSetting.compareName(
 					ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE) &&
 				!(StringUtil.equals(
 					objectFieldSetting.getValue(),
-					ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE) ||
+					ObjectFieldSettingConstants.VALUE_EXPRESSION_BUILDER) ||
 				  StringUtil.equals(
 					  objectFieldSetting.getValue(),
-					  ObjectFieldSettingConstants.VALUE_EXPRESSION_BUILDER))) {
+					  ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE))) {
 
 				throw new ObjectFieldSettingValueException.InvalidValue(
 					objectField.getName(), objectFieldSetting.getName(),
