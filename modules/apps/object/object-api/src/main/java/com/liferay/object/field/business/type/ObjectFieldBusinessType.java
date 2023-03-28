@@ -148,12 +148,12 @@ public interface ObjectFieldBusinessType {
 		}
 
 		validateObjectFieldSettingsDefaultValue(
-			objectField, objectFieldSettings);
+			objectField, objectFieldSettingsValuesMap);
 	}
 
 	public default void validateObjectFieldSettingsDefaultValue(
 			ObjectField objectField,
-			List<ObjectFieldSetting> objectFieldSettings)
+			Map<String, String> objectFieldSettingsValuesMap)
 		throws PortalException {
 
 		for (ObjectFieldSetting objectFieldSetting : objectFieldSettings) {
