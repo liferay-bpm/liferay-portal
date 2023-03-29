@@ -189,6 +189,20 @@ public class SalesforceObjectEntryManagerImpl
 			objectDefinition, scopeKey);
 	}
 
+	@Override
+	public ObjectDefinition getObjectRelationshipObjectDefinition1(
+		ObjectDefinition objectDefinition2, String objectField2Name)
+		throws Exception {
+		return null;
+	}
+
+	@Override
+	public Object getSystemObjectData(
+		DTOConverterContext dtoConverterContext,
+		ObjectDefinition objectDefinition, long primaryKey) throws Exception {
+		return null;
+	}
+
 	private void _checkPortletResourcePermission(
 			ObjectDefinition objectDefinition, String scopeKey, User user,
 			String actionId)

@@ -58,4 +58,13 @@ public interface ObjectEntryManager {
 			ObjectEntry objectEntry, String scopeKey)
 		throws Exception;
 
+	public ObjectDefinition getObjectRelationshipObjectDefinition1(
+		ObjectDefinition objectDefinition2, String objectField2Name)
+		throws Exception;
+
+	public Object getSystemObjectData(
+		DTOConverterContext dtoConverterContext,
+		ObjectDefinition objectDefinition, long primaryKey)
+		throws Exception;
+
 }

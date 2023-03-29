@@ -567,6 +567,23 @@ public class DefaultObjectEntryManagerImpl
 	}
 
 	@Override
+	public ObjectDefinition getObjectRelationshipObjectDefinition1(
+			ObjectDefinition objectDefinition2, String objectField2Name)
+		throws Exception {
+
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			objectDefinition2.getObjectDefinitionId(), objectField2Name);
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.
+				fetchObjectRelationshipByObjectFieldId2(
+					objectField.getObjectFieldId());
+
+		return _objectDefinitionLocalService.getObjectDefinition(
+			objectRelationship.getObjectDefinitionId1());
+	}
+
+	@Override
 	public Page<Object> getRelatedSystemObjectEntries(
 			ObjectDefinition objectDefinition, Long objectEntryId,
 			String objectRelationshipName, Pagination pagination)
@@ -608,6 +625,32 @@ public class DefaultObjectEntryManagerImpl
 				serviceBuilderObjectEntry.getGroupId(),
 				objectRelationship.getObjectRelationshipId(),
 				serviceBuilderObjectEntry.getPrimaryKey()));
+	}
+
+	@Override
+	public Object getSystemObjectData(
+			DTOConverterContext dtoConverterContext,
+			ObjectDefinition objectDefinition, long primaryKey)
+		throws Exception {
+
+		if (FeatureFlagManagerUtil.isEnabled("LPS-172094")) {
+			SystemObjectDefinitionManager systemObjectDefinitionManager =
+				_systemObjectDefinitionManagerRegistry.
+					getSystemObjectDefinitionManager(
+						objectDefinition.getName());
+
+			return DTOConverterUtil.toDTO(
+				systemObjectDefinitionManager.
+					getBaseModelByExternalReferenceCode(
+						systemObjectDefinitionManager.getExternalReferenceCode(
+							primaryKey),
+						objectDefinition.getCompanyId()),
+				_dtoConverterRegistry, systemObjectDefinitionManager,
+				dtoConverterContext.getUser());
+		}
+
+		return _objectEntryLocalService.getSystemModelAttributes(
+			objectDefinition, primaryKey);
 	}
 
 	@Override
