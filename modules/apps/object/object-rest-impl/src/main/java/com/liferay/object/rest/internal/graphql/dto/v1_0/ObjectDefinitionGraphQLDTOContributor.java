@@ -260,17 +260,43 @@ public class ObjectDefinitionGraphQLDTOContributor
 		ObjectEntry objectEntry = _objectEntryManager.getObjectEntry(
 			dtoConverterContext, _objectDefinition, id);
 
-		long relationshipId = _getRelationshipId(objectEntry.getProperties());
+		Map<String, Object> properties = objectEntry.getProperties();
+
+		long relationshipId = _getRelationshipId(properties);
 
 		if (relationshipId <= 0) {
-			Page<ObjectEntry> page =
-				_objectEntryManager.getObjectEntryRelatedObjectEntries(
-					dtoConverterContext, _objectDefinition, id,
-					relationshipName,
-					Pagination.of(QueryUtil.ALL_POS, QueryUtil.ALL_POS));
+			String objectField2Name = _getObjectField2Name(
+				properties, relationshipName);
 
-			return (T)TransformUtil.transform(
-				page.getItems(), itemObjectEntry -> _toMap(itemObjectEntry));
+			if (objectField2Name == null) {
+				Page<ObjectEntry> page =
+					_objectEntryManager.getObjectEntryRelatedObjectEntries(
+						dtoConverterContext, _objectDefinition, id,
+						relationshipName,
+						Pagination.of(QueryUtil.ALL_POS, QueryUtil.ALL_POS));
+
+				return (T)TransformUtil.transform(
+					page.getItems(),
+					itemObjectEntry -> _toMap(itemObjectEntry));
+			}
+
+			ObjectDefinition objectDefinition =
+				_objectEntryManager.getObjectRelationshipObjectDefinition1(
+					_objectDefinition, objectField2Name);
+
+			long relatedObjectEntryId = (long)properties.get(objectField2Name);
+
+			if (objectDefinition.isSystem()) {
+				return (T)_objectEntryManager.getSystemBaseModel(
+					dtoConverterContext, objectDefinition,
+					relatedObjectEntryId);
+			}
+
+			return (T)_toMap(
+				_objectEntryManager.fetchObjectEntry(
+					dtoConverterContext, objectDefinition,
+					relatedObjectEntryId),
+				objectField2Name);
 		}
 
 		return (T)_toMap(
@@ -345,6 +371,22 @@ public class ObjectDefinitionGraphQLDTOContributor
 		_relationshipGraphQLDTOProperties = relationshipGraphQLDTOProperties;
 		_resourceName = resourceName;
 		_typeName = typeName;
+	}
+
+	private String _getObjectField2Name(
+		Map<String, Object> properties, String relationshipName) {
+
+		for (Map.Entry<String, Object> entry : properties.entrySet()) {
+			String key = entry.getKey();
+
+			if (key.contains(relationshipName) &&
+				(entry.getValue() instanceof Long)) {
+
+				return key;
+			}
+		}
+
+		return null;
 	}
 
 	private long _getRelationshipId(Map<String, Object> properties) {
