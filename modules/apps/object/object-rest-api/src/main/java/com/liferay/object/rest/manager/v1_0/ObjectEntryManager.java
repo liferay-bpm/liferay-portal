@@ -119,9 +119,18 @@ public interface ObjectEntryManager {
 			String objectRelationshipName, Pagination pagination)
 		throws Exception;
 
+	public ObjectDefinition getObjectRelationshipObjectDefinition1(
+			ObjectDefinition objectDefinition2, String objectField2Name)
+		throws Exception;
+
 	public Page<Object> getRelatedSystemObjectEntries(
 			ObjectDefinition objectDefinition, Long objectEntryId,
 			String objectRelationshipName, Pagination pagination)
+		throws Exception;
+
+	public Object getSystemObjectData(
+			DTOConverterContext dtoConverterContext,
+			ObjectDefinition objectDefinition, long primaryKey)
 		throws Exception;
 
 	public ObjectEntry updateObjectEntry(
