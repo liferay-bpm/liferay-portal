@@ -255,22 +255,15 @@ public class ObjectDefinitionGraphQLDTOContributor
 			return null;
 		}
 
-		String relationshipIdName = null;
-
 		ObjectEntry objectEntry = _objectEntryManager.getObjectEntry(
 			dtoConverterContext, _objectDefinition, id);
 
 		Map<String, Object> properties = objectEntry.getProperties();
 
-		for (String key : properties.keySet()) {
-			if (key.contains(relationshipName)) {
-				relationshipIdName = key;
+		String objectField2Name = _getObjectField2Name(
+			properties, relationshipName);
 
-				break;
-			}
-		}
-
-		if (relationshipIdName == null) {
+		if (objectField2Name == null) {
 			Page<ObjectEntry> page =
 				_objectEntryManager.getObjectEntryRelatedObjectEntries(
 					dtoConverterContext, _objectDefinition, id,
@@ -281,16 +274,21 @@ public class ObjectDefinitionGraphQLDTOContributor
 				page.getItems(), itemObjectEntry -> _toMap(itemObjectEntry));
 		}
 
-		Object relationshipId = properties.get(relationshipIdName);
+		ObjectDefinition objectDefinition =
+			_objectEntryManager.getObjectRelationshipObjectDefinition1(
+				_objectDefinition, objectField2Name);
 
-		if (!(relationshipId instanceof Long)) {
-			return null;
+		long relatedObjectEntryId = (long)properties.get(objectField2Name);
+
+		if (objectDefinition.isSystem()) {
+			return (T)_objectEntryManager.getSystemBaseModel(
+				dtoConverterContext, objectDefinition, relatedObjectEntryId);
 		}
 
 		return (T)_toMap(
 			_objectEntryManager.fetchObjectEntry(
-				dtoConverterContext, null, (long)relationshipId),
-			relationshipIdName);
+				dtoConverterContext, objectDefinition, relatedObjectEntryId),
+			objectField2Name);
 	}
 
 	@Override
@@ -359,6 +357,22 @@ public class ObjectDefinitionGraphQLDTOContributor
 		_relationshipGraphQLDTOProperties = relationshipGraphQLDTOProperties;
 		_resourceName = resourceName;
 		_typeName = typeName;
+	}
+
+	private String _getObjectField2Name(
+		Map<String, Object> properties, String relationshipName) {
+
+		for (Map.Entry<String, Object> entry : properties.entrySet()) {
+			String key = entry.getKey();
+
+			if (key.contains(relationshipName) &&
+				(entry.getValue() instanceof Long)) {
+
+				return key;
+			}
+		}
+
+		return null;
 	}
 
 	private Map<String, Object> _toMap(ObjectEntry objectEntry) {
