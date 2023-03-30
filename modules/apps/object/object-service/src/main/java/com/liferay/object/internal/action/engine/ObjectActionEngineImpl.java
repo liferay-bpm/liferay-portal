@@ -21,6 +21,7 @@ import com.liferay.object.action.engine.ObjectActionEngine;
 import com.liferay.object.action.executor.ObjectActionExecutor;
 import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
 import com.liferay.object.constants.ObjectActionConstants;
+import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.internal.action.util.ObjectActionThreadLocal;
 import com.liferay.object.internal.action.util.ObjectEntryVariablesUtil;
@@ -40,6 +41,8 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 
@@ -181,18 +184,54 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 			Map<String, Object> variables)
 		throws Exception {
 
-		Set<Long> objectActionIds =
+		Map<Long, Set<Long>> objectActionIds =
 			ObjectActionThreadLocal.getObjectActionIds();
 
+		Set<Long> objectEntryIds = objectActionIds.get(
+			objectAction.getObjectActionId());
+
+		Map<String, Object> objectEntryMap = null;
+
+		long objectEntryId = 0;
+
+		if (objectDefinition.isUnmodifiableSystemObject()) {
+			objectEntryMap = (Map<String, Object>)payloadJSONObject.get(
+				"model" + objectDefinition.getName());
+
+			objectEntryId = (long)objectEntryMap.get(
+				objectDefinition.getPKObjectFieldName());
+		}
+		else {
+			objectEntryMap = (Map<String, Object>)payloadJSONObject.get(
+				"objectEntry");
+
+			if (objectEntryMap.containsKey("id")) {
+				objectEntryId = (long)objectEntryMap.get("id");
+			}
+			else {
+				objectEntryId = (long)objectEntryMap.get("objectEntryId");
+			}
+		}
+
 		try {
-			if (objectActionIds.contains(objectAction.getObjectActionId()) ||
+			if ((StringUtil.equals(
+					objectAction.getObjectActionExecutorKey(),
+					ObjectActionExecutorConstants.KEY_UPDATE_OBJECT_ENTRY) &&
+				 SetUtil.isNotEmpty(objectEntryIds) &&
+				 objectEntryIds.contains(objectEntryId)) ||
+				(!StringUtil.equals(
+					objectAction.getObjectActionExecutorKey(),
+					ObjectActionExecutorConstants.KEY_UPDATE_OBJECT_ENTRY) &&
+				 objectActionIds.containsKey(
+					 objectAction.getObjectActionId())) ||
 				!_evaluateConditionExpression(
 					objectAction.getConditionExpression(), variables)) {
 
 				return;
 			}
 
-			objectActionIds.add(objectAction.getObjectActionId());
+			ObjectActionThreadLocal.addObjectActionId(
+				objectAction.getObjectActionId(), objectEntryId);
 
 			ObjectActionExecutor objectActionExecutor =
 				_objectActionExecutorRegistry.getObjectActionExecutor(
