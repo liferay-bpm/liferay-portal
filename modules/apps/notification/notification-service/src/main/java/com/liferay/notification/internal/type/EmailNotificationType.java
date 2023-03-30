@@ -362,16 +362,6 @@ public class EmailNotificationType extends BaseNotificationType {
 		}
 	}
 
-	private void _checkEmailMatch(String email) throws PortalException {
-		Matcher matcher = _emailAddressPattern.matcher(email);
-
-		boolean matchFound = matcher.find();
-
-		if (!matchFound) {
-			throw new NotificationRecipientSettingValueException();
-		}
-	}
-
 	private String _formatBody(
 			Map<Locale, String> bodyMap,
 			NotificationContext notificationContext)
@@ -580,13 +570,12 @@ public class EmailNotificationType extends BaseNotificationType {
 					MessageBusUtil.sendMessage(
 						DestinationNames.MAIL, mailMessage);
 
-					_checkEmailMatch(
-						String.valueOf(
-							notificationRecipientSettingsMap.get("to")));
-
-					_checkEmailMatch(
+					_validateEmailAddress(
 						String.valueOf(
 							notificationRecipientSettingsMap.get("from")));
+					_validateEmailAddress(
+						String.valueOf(
+							notificationRecipientSettingsMap.get("to")));
 
 					notificationQueueEntryLocalService.updateStatus(
 						notificationQueueEntry.getNotificationQueueEntryId(),
@@ -623,12 +612,32 @@ public class EmailNotificationType extends BaseNotificationType {
 		return internetAddresses.toArray(new InternetAddress[0]);
 	}
 
+	private void _validateEmailAddress(String emailAddress)
+		throws PortalException {
+
+		String[] splitEmailAddresses = emailAddress.split(";");
+
+		if (splitEmailAddresses.length == 1) {
+			splitEmailAddresses = emailAddress.split(", ");
+		}
+
+		for (String singleEmailAddress : splitEmailAddresses) {
+			Matcher matcher = _emailAddressPattern.matcher(singleEmailAddress);
+
+			if (!matcher.find()) {
+				matcher.reset();
+
+				throw new PortalException();
+			}
+		}
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		EmailNotificationType.class);
 
 	private static final Pattern _emailAddressPattern = Pattern.compile(
-		"^[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@" +
-			"(?:\\w(?:[\\w-]*\\w)?\\.)+(\\w(?:[\\w-]*\\w))$");
+		"[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@" +
+			"(?:\\w(?:[\\w-]*\\w)?\\.)+(\\w(?:[\\w-]*\\w))");
 
 	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
