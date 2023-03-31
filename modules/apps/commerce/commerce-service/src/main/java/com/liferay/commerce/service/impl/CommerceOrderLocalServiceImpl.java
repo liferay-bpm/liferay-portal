@@ -1564,21 +1564,22 @@ public class CommerceOrderLocalServiceImpl
 			String transactionId)
 		throws PortalException {
 
-		CommerceOrder commerceOrder = commerceOrderPersistence.findByPrimaryKey(
-			commerceOrderId);
+		CommerceOrder oldCommerceOrder =
+			commerceOrderPersistence.findByPrimaryKey(commerceOrderId);
 
-		int previousPaymentStatus = commerceOrder.getPaymentStatus();
+		CommerceOrder newCommerceOrder =
+			(CommerceOrder)oldCommerceOrder.clone();
 
-		commerceOrder.setPaymentStatus(paymentStatus);
-		commerceOrder.setTransactionId(transactionId);
+		newCommerceOrder.setPaymentStatus(paymentStatus);
+		newCommerceOrder.setTransactionId(transactionId);
 
-		commerceOrder = commerceOrderPersistence.update(commerceOrder);
+		newCommerceOrder = commerceOrderPersistence.update(newCommerceOrder);
 
 		// Messaging
 
-		_sendPaymentStatusMessage(commerceOrder, previousPaymentStatus);
+		_sendPaymentStatusMessage(newCommerceOrder, oldCommerceOrder);
 
-		return commerceOrder;
+		return newCommerceOrder;
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -1888,7 +1889,7 @@ public class CommerceOrderLocalServiceImpl
 	}
 
 	private void _sendPaymentStatusMessage(
-		CommerceOrder commerceOrder, int previousPaymentStatus) {
+		CommerceOrder newCommerceOrder, CommerceOrder oldCommerceOrder) {
 
 		TransactionCommitCallbackUtil.registerCallback(
 			() -> {
@@ -1900,33 +1901,37 @@ public class CommerceOrderLocalServiceImpl
 
 				message.setPayload(
 					JSONUtil.put(
-						"classPK", commerceOrder.getCommerceOrderId()
+						"classPK", newCommerceOrder.getCommerceOrderId()
 					).put(
 						"commerceOrder",
 						() -> {
 							Object object = commerceOrderDTOConverter.toDTO(
 								new DefaultDTOConverterContext(
 									_dtoConverterRegistry,
-									commerceOrder.getCommerceOrderId(),
+									newCommerceOrder.getCommerceOrderId(),
 									LocaleUtil.getSiteDefault(), null, null));
 
 							return _jsonFactory.createJSONObject(
 								_jsonFactory.looseSerializeDeep(object));
 						}
 					).put(
-						"commerceOrderId", commerceOrder.getCommerceOrderId()
+						"commerceOrderId", newCommerceOrder.getCommerceOrderId()
 					).put(
 						"model" + CommerceOrder.class.getSimpleName(),
-						commerceOrder.getModelAttributes()
+						newCommerceOrder.getModelAttributes()
 					).put(
 						"modelDTO" + commerceOrderDTOConverter.getContentType(),
 						_commerceModelAttributesProvider.getModelAttributes(
-							commerceOrder, commerceOrderDTOConverter,
-							commerceOrder.getUserId())
+							newCommerceOrder, commerceOrderDTOConverter,
+							newCommerceOrder.getUserId())
 					).put(
-						"paymentStatus", commerceOrder.getPaymentStatus()
+						"original" + CommerceOrder.class.getSimpleName(),
+						oldCommerceOrder.getModelAttributes()
 					).put(
-						"previousPaymentStatus", previousPaymentStatus
+						"paymentStatus", newCommerceOrder.getPaymentStatus()
+					).put(
+						"previousPaymentStatus",
+						oldCommerceOrder.getPaymentStatus()
 					));
 
 				MessageBusUtil.sendMessage(
