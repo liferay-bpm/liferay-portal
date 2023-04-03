@@ -85,6 +85,7 @@ import java.sql.Connection;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -205,55 +206,6 @@ public class ObjectFieldLocalServiceTest {
 					reservedName
 				).build());
 		}
-
-		String objectFieldName = "a" + RandomTestUtil.randomString();
-
-		_testAddCustomObjectField(
-			ObjectFieldSettingNameException.NotAllowedNames.class,
-			StringBundler.concat(
-				"The settings defaultValue, defaultValueType are not allowed ",
-				"for object field ", objectFieldName),
-			new TextObjectFieldBuilder(
-			).labelMap(
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
-			).name(
-				objectFieldName
-			).objectFieldSettings(
-				Arrays.asList(
-					_createObjectFieldSetting(
-						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
-						_listTypeEntryKey),
-					_createObjectFieldSetting(
-						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
-						ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE),
-					_createObjectFieldSetting("showCounter", "false"))
-			).build());
-
-		String defaultValue = RandomTestUtil.randomString();
-		objectFieldName = "a" + RandomTestUtil.randomString();
-
-		_testAddCustomObjectField(
-			ObjectFieldSettingValueException.InvalidValue.class,
-			StringBundler.concat(
-				"The value ", defaultValue, " of setting ",
-				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
-				" is invalid for object field ", objectFieldName),
-			new PicklistObjectFieldBuilder(
-			).labelMap(
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
-			).listTypeDefinitionId(
-				_listTypeDefinition.getListTypeDefinitionId()
-			).name(
-				objectFieldName
-			).objectFieldSettings(
-				Arrays.asList(
-					_createObjectFieldSetting(
-						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
-						defaultValue),
-					_createObjectFieldSetting(
-						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
-						ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE))
-			).build());
 
 		_testAddCustomObjectField(
 			ObjectFieldStateException.class,
@@ -1039,6 +991,10 @@ public class ObjectFieldLocalServiceTest {
 
 		_objectDefinitionLocalService.deleteObjectDefinition(
 			objectDefinition.getObjectDefinitionId());
+
+		// Default value
+
+		_testObjectFieldDefaultValue();
 	}
 
 	@Test
@@ -1263,6 +1219,35 @@ public class ObjectFieldLocalServiceTest {
 		Assert.assertTrue(objectField.isRequired());
 	}
 
+	private ObjectField _addCustomObjectField(ObjectField objectField)
+		throws Exception {
+
+		return _objectFieldLocalService.addCustomObjectField(
+			objectField.getExternalReferenceCode(), TestPropsValues.getUserId(),
+			objectField.getListTypeDefinitionId(),
+			objectField.getObjectDefinitionId(), objectField.getBusinessType(),
+			objectField.getDBType(), objectField.isIndexed(),
+			objectField.isIndexedAsKeyword(),
+			objectField.getIndexedLanguageId(), objectField.getLabelMap(),
+			objectField.isLocalized(), objectField.getName(),
+			objectField.isRequired(), objectField.isState(),
+			objectField.getObjectFieldSettings());
+	}
+
+	private void _assertDefaultValue(
+			String expectedDefaultValue, ObjectField objectField)
+		throws Exception {
+
+		ObjectEntry objectEntry = _objectEntryLocalService.addObjectEntry(
+			TestPropsValues.getUserId(), 0, objectField.getObjectDefinitionId(),
+			new HashMap<>(), ServiceContextTestUtil.getServiceContext());
+
+		Map<String, Serializable> values = objectEntry.getValues();
+
+		Assert.assertEquals(
+			expectedDefaultValue, values.get(objectField.getName()));
+	}
+
 	private void _assertObjectFieldSetting(
 			String name, long objectFieldId, String value)
 		throws Exception {
@@ -1273,6 +1258,34 @@ public class ObjectFieldLocalServiceTest {
 
 		Assert.assertEquals(name, objectFieldSetting.getName());
 		Assert.assertEquals(value, objectFieldSetting.getValue());
+	}
+
+	private void _assertObjectFieldSettingDefaultValue(
+		String expectedDefaultValue, String expectedDefaultValueType,
+		ObjectField objectField) {
+
+		String defaultValue = null;
+		String defaultValueType = null;
+
+		for (ObjectFieldSetting objectFieldSetting :
+				objectField.getObjectFieldSettings()) {
+
+			if (StringUtil.equals(
+					objectFieldSetting.getName(),
+					ObjectFieldSettingConstants.NAME_DEFAULT_VALUE)) {
+
+				defaultValue = objectFieldSetting.getValue();
+			}
+			else if (StringUtil.equals(
+						objectFieldSetting.getName(),
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE)) {
+
+				defaultValueType = objectFieldSetting.getValue();
+			}
+		}
+
+		Assert.assertEquals(expectedDefaultValue, defaultValue);
+		Assert.assertEquals(expectedDefaultValueType, defaultValueType);
 	}
 
 	private ObjectFieldSetting _createObjectFieldSetting(
@@ -1393,6 +1406,273 @@ public class ObjectFieldLocalServiceTest {
 		return objectDefinitionName;
 	}
 
+	private void _testObjectFieldDefaultValue() throws Exception {
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.addObjectDefinition(
+				_objectDefinitionLocalService,
+				Collections.singletonList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING, true, false, null,
+						"able", "able", false)));
+
+		_objectDefinitionLocalService.publishCustomObjectDefinition(
+			TestPropsValues.getUserId(),
+			objectDefinition.getObjectDefinitionId());
+
+		// Add field with default value input as value
+
+		ObjectField objectField = _addCustomObjectField(
+			new PicklistObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).listTypeDefinitionId(
+				_listTypeDefinition.getListTypeDefinitionId()
+			).name(
+				"a" + RandomTestUtil.randomString()
+			).objectDefinitionId(
+				objectDefinition.getObjectDefinitionId()
+			).objectFieldSettings(
+				Arrays.asList(
+					_createObjectFieldSetting(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
+						_listTypeEntryKey),
+					_createObjectFieldSetting(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+						ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE))
+			).build());
+
+		_assertObjectFieldSettingDefaultValue(
+			_listTypeEntryKey, ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE,
+			objectField);
+
+		_assertDefaultValue(_listTypeEntryKey, objectField);
+
+		_objectFieldLocalService.deleteObjectField(objectField);
+
+		// Add field with default value as expression builder
+
+		String expressionBuilderDefaultValue = String.format(
+			"\"%s\"", _listTypeEntryKey);
+
+		objectField = _addCustomObjectField(
+			new PicklistObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).listTypeDefinitionId(
+				_listTypeDefinition.getListTypeDefinitionId()
+			).name(
+				"a" + RandomTestUtil.randomString()
+			).objectDefinitionId(
+				objectDefinition.getObjectDefinitionId()
+			).objectFieldSettings(
+				Arrays.asList(
+					_createObjectFieldSetting(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
+						expressionBuilderDefaultValue),
+					_createObjectFieldSetting(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+						ObjectFieldSettingConstants.VALUE_EXPRESSION_BUILDER))
+			).build());
+
+		_assertObjectFieldSettingDefaultValue(
+			expressionBuilderDefaultValue,
+			ObjectFieldSettingConstants.VALUE_EXPRESSION_BUILDER, objectField);
+
+		_assertDefaultValue(_listTypeEntryKey, objectField);
+
+		// Update field's default value
+
+		objectField.setObjectFieldSettings(
+			Arrays.asList(
+				_createObjectFieldSetting(
+					ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
+					_listTypeEntryKey),
+				_createObjectFieldSetting(
+					ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+					ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE)));
+
+		objectField = _updateCustomObjectField(objectField);
+
+		_assertObjectFieldSettingDefaultValue(
+			_listTypeEntryKey, ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE,
+			objectField);
+
+		_assertDefaultValue(_listTypeEntryKey, objectField);
+
+		objectField.setObjectFieldSettings(
+			Arrays.asList(
+				_createObjectFieldSetting(
+					ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
+					expressionBuilderDefaultValue),
+				_createObjectFieldSetting(
+					ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+					ObjectFieldSettingConstants.VALUE_EXPRESSION_BUILDER)));
+
+		objectField = _updateCustomObjectField(objectField);
+
+		_assertObjectFieldSettingDefaultValue(
+			expressionBuilderDefaultValue,
+			ObjectFieldSettingConstants.VALUE_EXPRESSION_BUILDER, objectField);
+
+		_assertDefaultValue(_listTypeEntryKey, objectField);
+
+		_objectFieldLocalService.deleteObjectField(objectField);
+
+		// Add field as state
+
+		objectField = _addCustomObjectField(
+			new PicklistObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).listTypeDefinitionId(
+				_listTypeDefinition.getListTypeDefinitionId()
+			).name(
+				"a" + RandomTestUtil.randomString()
+			).objectDefinitionId(
+				objectDefinition.getObjectDefinitionId()
+			).objectFieldSettings(
+				Arrays.asList(
+					_createObjectFieldSetting(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
+						_listTypeEntryKey),
+					_createObjectFieldSetting(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+						ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE))
+			).required(
+				true
+			).state(
+				true
+			).build());
+
+		_assertObjectFieldSettingDefaultValue(
+			_listTypeEntryKey, ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE,
+			objectField);
+
+		_assertDefaultValue(_listTypeEntryKey, objectField);
+
+		_objectFieldLocalService.deleteObjectField(objectField);
+
+		// Try to add field as state without default value
+
+		String objectFieldName = "a" + RandomTestUtil.randomString();
+
+		_testAddCustomObjectField(
+			ObjectFieldSettingValueException.MissingRequiredValues.class,
+			String.format(
+				"The settings %s, %s are required for object field %s",
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+				objectFieldName),
+			new PicklistObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).listTypeDefinitionId(
+				_listTypeDefinition.getListTypeDefinitionId()
+			).name(
+				objectFieldName
+			).objectDefinitionId(
+				objectDefinition.getObjectDefinitionId()
+			).objectFieldSettings(
+				Collections.emptyList()
+			).required(
+				true
+			).state(
+				true
+			).build());
+
+		// Try to add field as state with default value as expression builder
+
+		objectFieldName = "a" + RandomTestUtil.randomString();
+
+		_testAddCustomObjectField(
+			ObjectFieldSettingValueException.InvalidValue.class,
+			StringBundler.concat(
+				"The value ",
+				ObjectFieldSettingConstants.VALUE_EXPRESSION_BUILDER,
+				" of setting ",
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+				" is invalid for object field ", objectFieldName),
+			new PicklistObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).listTypeDefinitionId(
+				_listTypeDefinition.getListTypeDefinitionId()
+			).name(
+				objectFieldName
+			).objectDefinitionId(
+				objectDefinition.getObjectDefinitionId()
+			).objectFieldSettings(
+				Arrays.asList(
+					_createObjectFieldSetting(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
+						_listTypeEntryKey),
+					_createObjectFieldSetting(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+						ObjectFieldSettingConstants.VALUE_EXPRESSION_BUILDER))
+			).required(
+				true
+			).state(
+				true
+			).build());
+
+		// Try to add field with invalid list type entry key as default value
+
+		String randomString = RandomTestUtil.randomString();
+
+		objectFieldName = "a" + RandomTestUtil.randomString();
+
+		_testAddCustomObjectField(
+			ObjectFieldSettingValueException.InvalidValue.class,
+			StringBundler.concat(
+				"The value ", randomString, " of setting ",
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
+				" is invalid for object field ", objectFieldName),
+			new PicklistObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).listTypeDefinitionId(
+				_listTypeDefinition.getListTypeDefinitionId()
+			).name(
+				objectFieldName
+			).objectFieldSettings(
+				Arrays.asList(
+					_createObjectFieldSetting(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
+						randomString),
+					_createObjectFieldSetting(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+						ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE))
+			).build());
+
+		// Try to add non picklist field with default value
+
+		_testAddCustomObjectField(
+			ObjectFieldSettingNameException.NotAllowedNames.class,
+			String.format(
+				"The settings %s, %s are not allowed for object field %s",
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+				objectFieldName),
+			new TextObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				objectFieldName
+			).objectFieldSettings(
+				Arrays.asList(
+					_createObjectFieldSetting(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
+						_listTypeEntryKey),
+					_createObjectFieldSetting(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+						ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE),
+					_createObjectFieldSetting("showCounter", "false"))
+			).build());
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+	}
+
 	private void _testUpdateCustomObjectField(ObjectField expectedObjectField)
 		throws Exception {
 
@@ -1488,6 +1768,20 @@ public class ObjectFieldLocalServiceTest {
 			_objectDefinitionLocalService.deleteObjectDefinition(
 				objectDefinition2);
 		}
+	}
+
+	private ObjectField _updateCustomObjectField(ObjectField objectField)
+		throws Exception {
+
+		return _objectFieldLocalService.updateCustomObjectField(
+			StringPool.BLANK, objectField.getObjectFieldId(),
+			objectField.getListTypeDefinitionId(),
+			objectField.getBusinessType(), objectField.getDBType(),
+			objectField.isIndexed(), objectField.isIndexedAsKeyword(),
+			objectField.getIndexedLanguageId(), objectField.getLabelMap(),
+			objectField.isLocalized(), objectField.getName(),
+			objectField.isRequired(), objectField.isState(),
+			objectField.getObjectFieldSettings());
 	}
 
 	@Inject
