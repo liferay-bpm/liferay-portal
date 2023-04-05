@@ -100,6 +100,9 @@ public interface ObjectEntryService extends BaseService {
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<ObjectEntry> getObjectEntries(long objectDefinitionId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ObjectEntry getObjectEntry(long objectEntryId)
 		throws PortalException;
 

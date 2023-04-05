@@ -124,6 +124,13 @@ public class ObjectEntryServiceWrapper
 	}
 
 	@Override
+	public java.util.List<com.liferay.object.model.ObjectEntry>
+		getObjectEntries(long objectDefinitionId) {
+
+		return _objectEntryService.getObjectEntries(objectDefinitionId);
+	}
+
+	@Override
 	public com.liferay.object.model.ObjectEntry getObjectEntry(
 			long objectEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {

@@ -117,6 +117,10 @@ public class ObjectEntryServiceUtil {
 		return getService().getModelResourcePermission(objectEntry);
 	}
 
+	public static List<ObjectEntry> getObjectEntries(long objectDefinitionId) {
+		return getService().getObjectEntries(objectDefinitionId);
+	}
+
 	public static ObjectEntry getObjectEntry(long objectEntryId)
 		throws PortalException {
 
