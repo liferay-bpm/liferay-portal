@@ -54,12 +54,13 @@ public class GetGeneralNotificationTemplateTermsMVCResourceCommand
 
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse,
-			getTermsJSONArray(user.getLocale(), null, null));
+			getTermsJSONArray(false, user.getLocale(), null, null));
 	}
 
 	@Override
 	protected Set<Map.Entry<String, String>> getTermNamesEntries(
-		Locale locale, List<ObjectField> objectFields, String partialTermName) {
+		boolean authorTerms, Locale locale, List<ObjectField> objectFields,
+		String partialTermName) {
 
 		return _termNames.entrySet();
 	}

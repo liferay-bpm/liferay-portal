@@ -73,7 +73,7 @@ public class GetParentObjectFieldNotificationTemplateTermsMVCResourceCommand
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse,
 			getTermsJSONArray(
-				user.getLocale(),
+				false, user.getLocale(),
 				_objectFieldLocalService.getObjectFields(
 					objectDefinition.getObjectDefinitionId()),
 				StringBundler.concat(

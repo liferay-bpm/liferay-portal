@@ -71,7 +71,7 @@ public class GetObjectFieldNotificationTemplateTermsMVCResourceCommand
 		Locale locale = user.getLocale();
 
 		JSONArray termsJSONArray = getTermsJSONArray(
-			locale,
+			true, locale,
 			_objectFieldLocalService.getObjectFields(
 				objectDefinition.getObjectDefinitionId()),
 			objectDefinition.getShortName());

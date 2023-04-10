@@ -41,13 +41,14 @@ public abstract class BaseNotificationTemplateTermsMVCResourceCommand
 	extends BaseMVCResourceCommand {
 
 	protected Set<Map.Entry<String, String>> getTermNamesEntries(
-		Locale locale, List<ObjectField> objectFields, String partialTermName) {
+		boolean authorTerms, Locale locale, List<ObjectField> objectFields,
+		String partialTermName) {
 
 		Map<String, String> termNames = new LinkedHashMap<>();
 
 		for (ObjectField objectField : objectFields) {
 			if (StringUtil.equals(objectField.getName(), "creator") &&
-				FeatureFlagManagerUtil.isEnabled("LPS-171625")) {
+				FeatureFlagManagerUtil.isEnabled("LPS-171625") && authorTerms) {
 
 				authorObjectFieldNames.forEach(
 					(termLabel, objectFieldName) -> termNames.put(
@@ -68,14 +69,15 @@ public abstract class BaseNotificationTemplateTermsMVCResourceCommand
 	}
 
 	protected JSONArray getTermsJSONArray(
-			Locale locale, List<ObjectField> objectFields,
+			boolean authorTerms, Locale locale, List<ObjectField> objectFields,
 			String partialTermName)
 		throws PortalException {
 
 		JSONArray termsJSONArray = jsonFactory.createJSONArray();
 
 		for (Map.Entry<String, String> entry :
-				getTermNamesEntries(locale, objectFields, partialTermName)) {
+				getTermNamesEntries(
+					authorTerms, locale, objectFields, partialTermName)) {
 
 			termsJSONArray.put(
 				JSONUtil.put(
