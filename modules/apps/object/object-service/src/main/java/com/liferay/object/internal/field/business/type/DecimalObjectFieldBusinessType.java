@@ -15,6 +15,7 @@
 package com.liferay.object.internal.field.business.type;
 
 import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
+import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.storage.constants.FieldConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
@@ -72,6 +73,17 @@ public class DecimalObjectFieldBusinessType implements ObjectFieldBusinessType {
 
 		return HashMapBuilder.<String, Object>put(
 			FieldConstants.DATA_TYPE, FieldConstants.DOUBLE
+		).put(
+			"predefinedValue",
+			() -> {
+				LocalizedValue localizedValue = new LocalizedValue(
+					objectFieldRenderingContext.getLocale());
+
+				localizedValue.addString(
+					objectFieldRenderingContext.getLocale(), "0");
+
+				return localizedValue;
+			}
 		).build();
 	}
 
