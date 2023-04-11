@@ -30,6 +30,7 @@ import com.liferay.object.internal.related.models.SystemObject1toMObjectRelatedM
 import com.liferay.object.internal.related.models.SystemObjectMtoMObjectRelatedModelsProviderImpl;
 import com.liferay.object.internal.rest.context.path.RESTContextPathResolverImpl;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.modifiable.system.ModifiableSystemObjectDefinitionManager;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.context.path.RESTContextPathResolver;
@@ -44,7 +45,6 @@ import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.osgi.service.tracker.collections.EagerServiceTrackerCustomizer;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
-import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
@@ -53,6 +53,8 @@ import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
@@ -63,12 +65,8 @@ import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringUtil;
 
-import java.net.URL;
-
-import java.util.Enumeration;
-
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
@@ -97,8 +95,16 @@ public class SystemObjectDefinitionManagerPortalInstanceLifecycleListener
 			_apply(company.getCompanyId(), systemObjectDefinitionManager);
 		}
 
-		if (FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
-			_addModifiableSystemObjectDefinitions(company);
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
+			return;
+		}
+
+		for (ModifiableSystemObjectDefinitionManager
+				modifiableSystemObjectDefinitionManager :
+					_modifiableSystemObjectDefinitionManagerServiceTrackerList) {
+
+			_addModifiableSystemObjectDefinition(
+				company, modifiableSystemObjectDefinitionManager);
 		}
 	}
 
@@ -111,6 +117,10 @@ public class SystemObjectDefinitionManagerPortalInstanceLifecycleListener
 		_bundleContext = bundleContext;
 
 		_openingThreadLocal.set(Boolean.TRUE);
+
+		_modifiableSystemObjectDefinitionManagerServiceTrackerList =
+			ServiceTrackerListFactory.open(
+				bundleContext, ModifiableSystemObjectDefinitionManager.class);
 
 		_serviceTrackerList = ServiceTrackerListFactory.open(
 			bundleContext, SystemObjectDefinitionManager.class, null,
@@ -166,17 +176,27 @@ public class SystemObjectDefinitionManagerPortalInstanceLifecycleListener
 
 	@Deactivate
 	protected void deactivate() {
+		_modifiableSystemObjectDefinitionManagerServiceTrackerList.close();
 		_serviceTrackerList.close();
 	}
 
 	private void _addModifiableSystemObjectDefinition(
-			Company company, String objectDefinitionJSON)
+			Company company,
+			ModifiableSystemObjectDefinitionManager
+				modifiableSystemObjectDefinitionManager)
 		throws Exception {
+
+		Class<?> clazz = modifiableSystemObjectDefinitionManager.getClass();
+
+		JSONObject objectDefinitionJSONObject = _jsonFactory.createJSONObject(
+			StringUtil.read(
+				clazz.getClassLoader(),
+				modifiableSystemObjectDefinitionManager.getResourcePath()));
 
 		com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition
 			objectDefinition =
 				com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition.toDTO(
-					objectDefinitionJSON);
+					objectDefinitionJSONObject.toString());
 
 		ObjectDefinition serviceBuilderObjectDefinition =
 			_objectDefinitionLocalService.fetchObjectDefinition(
@@ -209,22 +229,6 @@ public class SystemObjectDefinitionManagerPortalInstanceLifecycleListener
 			_log.error(
 				"Unable to publish modifiable system object definition " +
 					objectDefinition.getName());
-		}
-	}
-
-	private void _addModifiableSystemObjectDefinitions(Company company)
-		throws Exception {
-
-		Bundle bundle = _bundleContext.getBundle();
-
-		Enumeration<URL> enumeration = bundle.findEntries(
-			"com/liferay/object/internal/system/dependencies", "*.json", false);
-
-		while (enumeration.hasMoreElements()) {
-			URL url = enumeration.nextElement();
-
-			_addModifiableSystemObjectDefinition(
-				company, StreamUtil.toString(url.openStream()));
 		}
 	}
 
@@ -347,7 +351,13 @@ public class SystemObjectDefinitionManagerPortalInstanceLifecycleListener
 		_itemSelectorViewDescriptorRenderer;
 
 	@Reference
+	private JSONFactory _jsonFactory;
+
+	@Reference
 	private ListTypeLocalService _listTypeLocalService;
+
+	private ServiceTrackerList<ModifiableSystemObjectDefinitionManager>
+		_modifiableSystemObjectDefinitionManagerServiceTrackerList;
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
