@@ -91,7 +91,7 @@ if ((cpDefinition != null) && (cpDefinition.getExpirationDate() != null)) {
 					</c:otherwise>
 				</c:choose>
 
-				<aui:input defaultLanguageId="<%= defaultLanguageId %>" label="name" localized="<%= true %>" name="nameMapAsXML" type="text">
+				<aui:input defaultLanguageId="<%= defaultLanguageId %>" label="name" localized="<%= true %>" name="urlTitleMapAsXML" required="<%= true %>" type="text" value="<%= HttpComponentsUtil.decodeURL(cpDefinitionsDisplayContext.getUrlTitleMapAsXML()) %>">
 					<aui:validator name="required" />
 				</aui:input>
 
