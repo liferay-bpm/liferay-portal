@@ -22,9 +22,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Marco Leo
  * @author Gabriel Albuquerque
  */
-@Component(
-	service = BookmarksEntryModifiableSystemObjectDefinitionManager.class
-)
+@Component(service = ModifiableSystemObjectDefinitionManager.class)
 public class BookmarksEntryModifiableSystemObjectDefinitionManager
 	implements ModifiableSystemObjectDefinitionManager {
 
