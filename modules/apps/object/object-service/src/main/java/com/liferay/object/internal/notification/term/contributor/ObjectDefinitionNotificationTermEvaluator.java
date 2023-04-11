@@ -262,19 +262,15 @@ public class ObjectDefinitionNotificationTermEvaluator
 			Context context, String termName, Map<String, Object> termValues)
 		throws PortalException {
 
-		boolean found = false;
 		ObjectDefinition objectDefinition = null;
 		ObjectField objectField2 = null;
 		String objectFieldName = StringPool.BLANK;
 
+		outerLoop:
 		for (ObjectRelationship objectRelationship :
 				_objectRelationshipLocalService.
 					getObjectRelationshipsByObjectDefinitionId2(
 						_objectDefinition.getObjectDefinitionId())) {
-
-			if (found) {
-				break;
-			}
 
 			objectDefinition =
 				_objectDefinitionLocalService.getObjectDefinition(
@@ -310,11 +306,11 @@ public class ObjectDefinitionNotificationTermEvaluator
 
 				objectFieldName = objectField.getName();
 
-				found = true;
+				break outerLoop;
 			}
 		}
 
-		if (Objects.isNull(objectFieldName)) {
+		if (Validator.isNull(objectFieldName)) {
 			return null;
 		}
 
