@@ -15,9 +15,7 @@
 package com.liferay.object.internal.action.util;
 
 import com.liferay.petra.lang.CentralizedThreadLocal;
-import com.liferay.portal.kernel.util.SetUtil;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -35,26 +33,21 @@ public class ObjectActionThreadLocal {
 
 		Set<Long> objectEntryIds = objectActionIds.get(objectActionId);
 
-		if (SetUtil.isEmpty(objectEntryIds)) {
-			objectEntryIds = Collections.singleton(objectEntryId);
-		}
-		else {
-			objectEntryIds = new HashSet<>(objectEntryIds);
+		if (objectEntryIds == null) {
+			objectEntryIds = new HashSet<>();
 
-			objectEntryIds.add(objectEntryId);
+			objectActionIds.put(objectActionId, objectEntryIds);
 		}
+
+		objectEntryIds.add(objectEntryId);
 
 		objectActionIds.put(objectActionId, objectEntryIds);
-
-		setObjectActionIds(objectActionIds);
 	}
 
 	public static void clearObjectActionIds() {
 		Map<Long, Set<Long>> objectActionIds = getObjectActionIds();
 
 		objectActionIds.clear();
-
-		setObjectActionIds(objectActionIds);
 	}
 
 	public static Map<Long, Set<Long>> getObjectActionIds() {

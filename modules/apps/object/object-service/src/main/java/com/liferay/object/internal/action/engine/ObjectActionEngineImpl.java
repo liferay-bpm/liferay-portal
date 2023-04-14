@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -187,44 +188,33 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 		Map<Long, Set<Long>> objectActionIds =
 			ObjectActionThreadLocal.getObjectActionIds();
 
-		Set<Long> objectEntryIds = objectActionIds.get(
-			objectAction.getObjectActionId());
+		if (!StringUtil.equals(
+				objectAction.getObjectActionExecutorKey(),
+				ObjectActionExecutorConstants.KEY_UPDATE_OBJECT_ENTRY) &&
+			objectActionIds.containsKey(objectAction.getObjectActionId())) {
 
-		Map<String, Object> objectEntryMap = null;
-
-		long objectEntryId = 0;
-
-		if (objectDefinition.isUnmodifiableSystemObject()) {
-			objectEntryMap = (Map<String, Object>)payloadJSONObject.get(
-				"model" + objectDefinition.getName());
-
-			objectEntryId = (long)objectEntryMap.get(
-				objectDefinition.getPKObjectFieldName());
+			return;
 		}
-		else {
-			objectEntryMap = (Map<String, Object>)payloadJSONObject.get(
-				"objectEntry");
 
-			if (objectEntryMap.containsKey("id")) {
-				objectEntryId = (long)objectEntryMap.get("id");
-			}
-			else {
-				objectEntryId = (long)objectEntryMap.get("objectEntryId");
+		long objectEntryId = _getObjectEntryId(
+			objectDefinition, payloadJSONObject);
+
+		if (StringUtil.equals(
+				objectAction.getObjectActionExecutorKey(),
+				ObjectActionExecutorConstants.KEY_UPDATE_OBJECT_ENTRY)) {
+
+			Set<Long> objectEntryIds = objectActionIds.get(
+				objectAction.getObjectActionId());
+
+			if (SetUtil.isNotEmpty(objectEntryIds) &&
+				objectEntryIds.contains(objectEntryId)) {
+
+				return;
 			}
 		}
 
 		try {
-			if ((StringUtil.equals(
-					objectAction.getObjectActionExecutorKey(),
-					ObjectActionExecutorConstants.KEY_UPDATE_OBJECT_ENTRY) &&
-				 SetUtil.isNotEmpty(objectEntryIds) &&
-				 objectEntryIds.contains(objectEntryId)) ||
-				(!StringUtil.equals(
-					objectAction.getObjectActionExecutorKey(),
-					ObjectActionExecutorConstants.KEY_UPDATE_OBJECT_ENTRY) &&
-				 objectActionIds.containsKey(
-					 objectAction.getObjectActionId())) ||
-				!_evaluateConditionExpression(
+			if (!_evaluateConditionExpression(
 					objectAction.getConditionExpression(), variables)) {
 
 				return;
@@ -253,6 +243,24 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 
 			throw exception;
 		}
+	}
+
+	private long _getObjectEntryId(
+		ObjectDefinition objectDefinition, JSONObject payloadJSONObject) {
+
+		if (objectDefinition.isUnmodifiableSystemObject()) {
+			Map<String, Object> map =
+				(Map<String, Object>)payloadJSONObject.get(
+					"model" + objectDefinition.getName());
+
+			return (long)map.get(objectDefinition.getPKObjectFieldName());
+		}
+
+		Map<String, Object> map = (Map<String, Object>)payloadJSONObject.get(
+			"objectEntry");
+
+		return GetterUtil.getLong(
+			map.get("id"), (long)map.get("objectEntryId"));
 	}
 
 	private void _updatePayloadJSONObject(
