@@ -48,7 +48,7 @@ import com.liferay.object.exception.ObjectRelationshipDeletionTypeException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
-import com.liferay.object.internal.action.util.ObjectActionThreadLocal;
+import com.liferay.object.internal.action.util.ObjectActionExecutionMapThreadLocal;
 import com.liferay.object.internal.filter.parser.ObjectFilterParser;
 import com.liferay.object.internal.filter.parser.ObjectFilterParserServiceRegistry;
 import com.liferay.object.model.ObjectDefinition;
@@ -276,7 +276,7 @@ public class ObjectEntryLocalServiceImpl
 
 		_reindex(objectEntry);
 
-		ObjectActionThreadLocal.clearObjectActionIds();
+		ObjectActionExecutionMapThreadLocal.clearObjectActionExecutionMap();
 
 		return objectEntry;
 	}
@@ -443,7 +443,7 @@ public class ObjectEntryLocalServiceImpl
 
 		indexer.delete(objectEntry);
 
-		ObjectActionThreadLocal.clearObjectActionIds();
+		ObjectActionExecutionMapThreadLocal.clearObjectActionExecutionMap();
 
 		return objectEntry;
 	}

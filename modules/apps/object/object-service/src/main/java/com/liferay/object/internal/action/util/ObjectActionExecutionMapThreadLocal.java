@@ -24,45 +24,47 @@ import java.util.Set;
 /**
  * @author Guilherme Camacho
  */
-public class ObjectActionThreadLocal {
+public class ObjectActionExecutionMapThreadLocal {
 
-	public static void addObjectActionId(
+	public static void addObjectActionExecutionItem(
 		long objectActionId, long objectEntryId) {
 
-		Map<Long, Set<Long>> objectActionIds = getObjectActionIds();
+		Map<Long, Set<Long>> objectActionExecutionMap =
+			getObjectActionExecutionMap();
 
-		Set<Long> objectEntryIds = objectActionIds.get(objectActionId);
+		Set<Long> objectEntryIds = objectActionExecutionMap.get(objectActionId);
 
 		if (objectEntryIds == null) {
 			objectEntryIds = new HashSet<>();
 
-			objectActionIds.put(objectActionId, objectEntryIds);
+			objectActionExecutionMap.put(objectActionId, objectEntryIds);
 		}
 
 		objectEntryIds.add(objectEntryId);
 
-		objectActionIds.put(objectActionId, objectEntryIds);
+		objectActionExecutionMap.put(objectActionId, objectEntryIds);
 	}
 
-	public static void clearObjectActionIds() {
-		Map<Long, Set<Long>> objectActionIds = getObjectActionIds();
+	public static void clearObjectActionExecutionMap() {
+		Map<Long, Set<Long>> objectActionExecutionMap =
+			getObjectActionExecutionMap();
 
-		objectActionIds.clear();
+		objectActionExecutionMap.clear();
 	}
 
-	public static Map<Long, Set<Long>> getObjectActionIds() {
-		return _objectActionIdsThreadLocal.get();
+	public static Map<Long, Set<Long>> getObjectActionExecutionMap() {
+		return _objectActionExecutionMapThreadLocal.get();
 	}
 
-	public static void setObjectActionIds(
-		Map<Long, Set<Long>> objectActionIds) {
+	public static void setObjectActionExecutionMap(
+		Map<Long, Set<Long>> objectActionExecutionMap) {
 
-		_objectActionIdsThreadLocal.set(objectActionIds);
+		_objectActionExecutionMapThreadLocal.set(objectActionExecutionMap);
 	}
 
 	private static final ThreadLocal<Map<Long, Set<Long>>>
-		_objectActionIdsThreadLocal = new CentralizedThreadLocal<>(
-			ObjectActionThreadLocal.class.getName() +
+		_objectActionExecutionMapThreadLocal = new CentralizedThreadLocal<>(
+			ObjectActionExecutionMapThreadLocal.class.getName() +
 				"._objectActionIdsThreadLocal",
 			HashMap::new);
 

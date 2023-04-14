@@ -23,7 +23,7 @@ import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
 import com.liferay.object.constants.ObjectActionConstants;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.entry.util.ObjectEntryThreadLocal;
-import com.liferay.object.internal.action.util.ObjectActionThreadLocal;
+import com.liferay.object.internal.action.util.ObjectActionExecutionMapThreadLocal;
 import com.liferay.object.internal.action.util.ObjectEntryVariablesUtil;
 import com.liferay.object.internal.dynamic.data.mapping.expression.ObjectEntryDDMExpressionFieldAccessor;
 import com.liferay.object.internal.dynamic.data.mapping.expression.ObjectEntryDDMExpressionParameterAccessor;
@@ -186,7 +186,7 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 		throws Exception {
 
 		Map<Long, Set<Long>> objectActionIds =
-			ObjectActionThreadLocal.getObjectActionIds();
+			ObjectActionExecutionMapThreadLocal.getObjectActionExecutionMap();
 
 		if (!StringUtil.equals(
 				objectAction.getObjectActionExecutorKey(),
@@ -220,7 +220,7 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 				return;
 			}
 
-			ObjectActionThreadLocal.addObjectActionId(
+			ObjectActionExecutionMapThreadLocal.addObjectActionExecutionItem(
 				objectAction.getObjectActionId(), objectEntryId);
 
 			ObjectActionExecutor objectActionExecutor =
