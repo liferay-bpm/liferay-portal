@@ -3267,15 +3267,13 @@ public class ObjectEntryLocalServiceImpl
 
 	private void _validateObjectStateTransition(
 			Map.Entry<String, Serializable> entry, long listTypeDefinitionId,
-			ObjectEntry objectEntry, long objectFieldId, long userId)
+			long objectFieldId, long userId)
 		throws PortalException {
-
-		Map<String, Serializable> values = objectEntry.getValues();
 
 		ListTypeEntry originalListTypeEntry =
 			_listTypeEntryLocalService.getListTypeEntry(
 				listTypeDefinitionId,
-				_getValue(String.valueOf(values.get(entry.getKey()))));
+				_getValue(String.valueOf(entry.getValue())));
 
 		ObjectStateFlow objectStateFlow =
 			_objectStateFlowLocalService.fetchObjectFieldObjectStateFlow(
@@ -3609,9 +3607,9 @@ public class ObjectEntryLocalServiceImpl
 					entry.getKey());
 			}
 
-			if ((objectEntry != null) && objectField.isState()) {
+			if ((entry != null) && objectField.isState()) {
 				_validateObjectStateTransition(
-					entry, objectField.getListTypeDefinitionId(), objectEntry,
+					entry, objectField.getListTypeDefinitionId(),
 					objectField.getObjectFieldId(), userId);
 			}
 		}
