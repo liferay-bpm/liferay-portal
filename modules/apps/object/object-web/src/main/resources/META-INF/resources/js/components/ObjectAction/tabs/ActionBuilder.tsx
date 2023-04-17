@@ -225,7 +225,7 @@ export default function ActionBuilder({
 
 					<a
 						className="alert-link"
-						href="https://learn.liferay.com/dxp/latest/en/building-applications/objects/creating-and-managing-objects/expression-builder-validations-reference.html"
+						href="https://learn.liferay.com/en/w/dxp/building-applications/objects/creating-and-managing-objects/actions"
 						target="_blank"
 					>
 						{Liferay.Language.get('click-here-for-documentation')}
