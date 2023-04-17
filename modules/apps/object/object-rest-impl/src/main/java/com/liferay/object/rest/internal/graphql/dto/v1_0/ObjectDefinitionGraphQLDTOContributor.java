@@ -260,9 +260,12 @@ public class ObjectDefinitionGraphQLDTOContributor
 		ObjectEntry objectEntry = _objectEntryManager.getObjectEntry(
 			dtoConverterContext, _objectDefinition, id);
 
-		long relationshipId = _getRelationshipId(objectEntry.getProperties());
+		Map<String, Object> properties = objectEntry.getProperties();
 
-		if (relationshipId <= 0) {
+		String relationshipIdKey = _getRelationshipId(
+			properties, relationshipName);
+
+		if (relationshipIdKey == null) {
 			Page<ObjectEntry> page =
 				_objectEntryManager.getObjectEntryRelatedObjectEntries(
 					dtoConverterContext, _objectDefinition, id,
@@ -273,10 +276,21 @@ public class ObjectDefinitionGraphQLDTOContributor
 				page.getItems(), itemObjectEntry -> _toMap(itemObjectEntry));
 		}
 
+		ObjectDefinition objectDefinition =
+			_objectEntryManager.getObjectRelationshipObjectDefinition1(
+				_objectDefinition, relationshipIdKey);
+
+		long relatedObjectEntryId = (long)properties.get(relationshipIdKey);
+
+		if (objectDefinition.isUnmodifiableSystemObject()) {
+			return (T)_objectEntryManager.getSystemObjectData(
+				dtoConverterContext, objectDefinition, relatedObjectEntryId);
+		}
+
 		return (T)_toMap(
 			_objectEntryManager.fetchObjectEntry(
-				dtoConverterContext, null, relationshipId),
-			relationshipName);
+				dtoConverterContext, objectDefinition, relatedObjectEntryId),
+			relationshipIdKey);
 	}
 
 	@Override
@@ -347,21 +361,22 @@ public class ObjectDefinitionGraphQLDTOContributor
 		_typeName = typeName;
 	}
 
-	private long _getRelationshipId(Map<String, Object> properties) {
+	private String _getRelationshipId(
+		Map<String, Object> properties, String relationshipName) {
+
 		for (Map.Entry<String, Object> entry : properties.entrySet()) {
 			Matcher matcher = _relationshipIdNamePattern.matcher(
 				entry.getKey());
+			String key = entry.getKey();
 
-			if (matcher.matches()) {
-				if (entry.getValue() instanceof Long) {
-					return (long)entry.getValue();
-				}
+			if (matcher.matches() && key.contains(relationshipName) &&
+				(entry.getValue() instanceof Long)) {
 
-				return 0;
+				return key;
 			}
 		}
 
-		return 0;
+		return null;
 	}
 
 	private Map<String, Object> _toMap(ObjectEntry objectEntry) {
@@ -412,7 +427,7 @@ public class ObjectDefinitionGraphQLDTOContributor
 	}
 
 	private static final Pattern _relationshipIdNamePattern = Pattern.compile(
-		"r_.+_c_.+Id");
+		"r_.+_.+Id");
 	private static final Map<Operation, String> _resourceMethods =
 		HashMapBuilder.<Operation, String>put(
 			Operation.CREATE, "postObjectEntry"
