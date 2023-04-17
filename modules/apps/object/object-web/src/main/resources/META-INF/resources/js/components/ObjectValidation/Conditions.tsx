@@ -12,6 +12,8 @@
  * details.
  */
 
+import ClayAlert from '@clayui/alert';
+
 import 'codemirror/mode/groovy/groovy';
 import {
 	Card,
@@ -59,6 +61,23 @@ export function Conditions({
 
 	return (
 		<>
+			<ClayAlert
+				className="lfr-objects__side-panel-content-container"
+				displayType="info"
+				title={`${Liferay.Language.get('info')}:`}
+			>
+				{Liferay.Language.get(
+					'create-conditions-and-predefined-values-using-expressions'
+				) + ' '}
+
+				<a
+					className="alert-link"
+					href="https://learn.liferay.com/en/w/dxp/building-applications/objects/creating-and-managing-objects/validations/expression-builder-validations-reference"
+					target="_blank"
+				>
+					{Liferay.Language.get('click-here-for-documentation')}
+				</a>
+			</ClayAlert>
 			<Card
 				title={values.engineLabel!}
 				tooltip={engine === 'ddm' ? ddmTooltip : null}
