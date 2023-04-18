@@ -373,9 +373,9 @@ public abstract class Base${schemaName}ResourceImpl
 						if (${schemaVarName}.get${propertyName?cap_first}() != null) {
 							<#assign propertySchema = freeMarkerTool.getDTOPropertySchema(propertyName, schema) />
 							<#if propertySchema.isJsonMap()>
-								${properties[propertyName]} ${propertyName} = ${schemaVarName}.get${propertyName?cap_first}();
+								${properties[propertyName]} ${propertyName} = existing${schemaName}.get${propertyName?cap_first}();
 
-								${propertyName}.putAll(existing${schemaName}.get${propertyName?cap_first}());
+								${propertyName}.putAll(${schemaVarName}.get${propertyName?cap_first}());
 								existing${schemaName}.set${propertyName?cap_first}(${propertyName});
 							<#else>
 								existing${schemaName}.set${propertyName?cap_first}(${schemaVarName}.get${propertyName?cap_first}());
