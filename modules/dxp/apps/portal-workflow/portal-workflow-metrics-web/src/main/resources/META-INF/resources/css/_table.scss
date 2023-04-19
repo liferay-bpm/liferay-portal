@@ -1,9 +1,7 @@
 .table-list {
 	.bounded-column {
-		max-width: 12ch;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+		white-space: pre-wrap;
+		word-wrap: break-word;
 	}
 
 	td:first-child,
