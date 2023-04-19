@@ -35,6 +35,7 @@
 }
 
 @include responsiveCards(3840px, 40rem);
+@include responsiveCards(2560px, 40rem);
 @include responsiveCards(2160px, 29rem);
 @include responsiveCards(1920px, 21rem);
 @include responsiveCards(1600px, 11rem);
