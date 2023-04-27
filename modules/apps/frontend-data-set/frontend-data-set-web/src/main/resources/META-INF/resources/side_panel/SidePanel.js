@@ -353,24 +353,7 @@ export default class SidePanel extends React.Component {
 						visibility
 					)}
 					style={{top: this.state.menuCoverTopDistance}}
-				>
-					<div
-						className={classNames(!isPageInIframe() && 'container')}
-					>
-						<ul className="navbar-nav">
-							<li className="nav-item">
-								<button
-									aria-label={Liferay.Language.get('back')}
-									className="btn btn-unstyled nav-link"
-									onClick={() => this.close()}
-									title={Liferay.Language.get('back')}
-								>
-									<ClayIcon symbol="angle-left" />
-								</button>
-							</li>
-						</ul>
-					</div>
-				</div>
+				></div>
 				<div
 					className={classNames(
 						'fds-side-panel',
