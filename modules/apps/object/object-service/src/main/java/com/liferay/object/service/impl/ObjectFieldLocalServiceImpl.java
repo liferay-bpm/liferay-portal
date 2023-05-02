@@ -586,7 +586,8 @@ public class ObjectFieldLocalServiceImpl
 
 		ObjectField newObjectField = (ObjectField)oldObjectField.clone();
 
-		_validateEncryptedBusinessType(businessType);
+		_validateEncryptedBusinessType(
+			businessType, newObjectField.getObjectDefinitionId());
 		_validateExternalReferenceCode(
 			externalReferenceCode, newObjectField.getObjectFieldId(),
 			newObjectField.getCompanyId(),
@@ -714,7 +715,7 @@ public class ObjectFieldLocalServiceImpl
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
-		_validateEncryptedBusinessType(businessType);
+		_validateEncryptedBusinessType(businessType, objectDefinitionId);
 		_validateExternalReferenceCode(
 			externalReferenceCode, 0, objectDefinition.getCompanyId(),
 			objectDefinitionId);
@@ -1009,7 +1010,8 @@ public class ObjectFieldLocalServiceImpl
 		}
 	}
 
-	private void _validateEncryptedBusinessType(String businessType)
+	private void _validateEncryptedBusinessType(
+			String businessType, long objectDefinitionId)
 		throws PortalException {
 
 		if (!StringUtil.equals(
@@ -1027,6 +1029,15 @@ public class ObjectFieldLocalServiceImpl
 						PropsKeys.OBJECT_FIELD_ENCRYPTION_ALGORITHM)))) {
 
 			throw new NoSuchPropertiesException("Required property is missing");
+		}
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
+
+		if (!objectDefinition.isDefaultStorageType()) {
+			throw new ObjectFieldBusinessTypeException(
+				"Encrypted business type object field can only be created in " +
+					"object definitions with default storage type");
 		}
 	}
 
