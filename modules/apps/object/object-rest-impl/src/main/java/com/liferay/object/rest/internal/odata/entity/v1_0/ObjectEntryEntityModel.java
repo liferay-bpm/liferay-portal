@@ -104,6 +104,14 @@ public class ObjectEntryEntityModel implements EntityModel {
 				new StringEntityField(
 					objectField.getName(), locale -> objectField.getName()));
 		}
+		else if (Objects.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_DATE_TIME)) {
+
+			return new DateTimeEntityField(
+				objectField.getName(), locale -> objectField.getName(),
+				locale -> objectField.getName());
+		}
 
 		if (Objects.equals(
 				objectField.getDBType(),
