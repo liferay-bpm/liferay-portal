@@ -15,7 +15,6 @@
 package com.liferay.object.rest.manager.v1_0;
 
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.portal.kernel.search.Sort;
@@ -36,22 +35,10 @@ public interface ObjectEntryManager {
 			String scopeKey)
 		throws Exception;
 
-	public ObjectEntry addObjectRelationshipMappingTableValues(
-			DTOConverterContext dtoConverterContext,
-			ObjectRelationship objectRelationship, long primaryKey1,
-			long primaryKey2)
-		throws Exception;
-
 	public ObjectEntry addOrUpdateObjectEntry(
 			long companyId, DTOConverterContext dtoConverterContext,
 			String externalReferenceCode, ObjectDefinition objectDefinition,
 			ObjectEntry objectEntry, String scopeKey)
-		throws Exception;
-
-	public Object addSystemObjectRelationshipMappingTableValues(
-			ObjectDefinition objectDefinition,
-			ObjectRelationship objectRelationship, long primaryKey1,
-			long primaryKey2)
 		throws Exception;
 
 	public void deleteObjectEntry(
@@ -60,17 +47,6 @@ public interface ObjectEntryManager {
 
 	public void deleteObjectEntry(
 			String externalReferenceCode, long companyId,
-			ObjectDefinition objectDefinition, String scopeKey)
-		throws Exception;
-
-	public void executeObjectAction(
-			DTOConverterContext dtoConverterContext, String objectActionName,
-			ObjectDefinition objectDefinition, long objectEntryId)
-		throws Exception;
-
-	public void executeObjectAction(
-			long companyId, DTOConverterContext dtoConverterContext,
-			String externalReferenceCode, String objectActionName,
 			ObjectDefinition objectDefinition, String scopeKey)
 		throws Exception;
 
@@ -108,17 +84,6 @@ public interface ObjectEntryManager {
 			DTOConverterContext dtoConverterContext,
 			String externalReferenceCode, long companyId,
 			ObjectDefinition objectDefinition, String scopeKey)
-		throws Exception;
-
-	public Page<ObjectEntry> getObjectEntryRelatedObjectEntries(
-			DTOConverterContext dtoConverterContext,
-			ObjectDefinition objectDefinition, Long objectEntryId,
-			String objectRelationshipName, Pagination pagination)
-		throws Exception;
-
-	public Page<Object> getRelatedSystemObjectEntries(
-			ObjectDefinition objectDefinition, Long objectEntryId,
-			String objectRelationshipName, Pagination pagination)
 		throws Exception;
 
 	public ObjectEntry updateObjectEntry(
