@@ -22,7 +22,6 @@ import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
-import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.dto.v1_0.Status;
@@ -99,16 +98,6 @@ public class SalesforceObjectEntryManagerImpl
 	}
 
 	@Override
-	public ObjectEntry addObjectRelationshipMappingTableValues(
-			DTOConverterContext dtoConverterContext,
-			ObjectRelationship objectRelationship, long primaryKey1,
-			long primaryKey2)
-		throws Exception {
-
-		return null;
-	}
-
-	@Override
 	public ObjectEntry addOrUpdateObjectEntry(
 			long companyId, DTOConverterContext dtoConverterContext,
 			String externalReferenceCode, ObjectDefinition objectDefinition,
@@ -128,16 +117,6 @@ public class SalesforceObjectEntryManagerImpl
 	}
 
 	@Override
-	public Object addSystemObjectRelationshipMappingTableValues(
-			ObjectDefinition objectDefinition,
-			ObjectRelationship objectRelationship, long primaryKey1,
-			long primaryKey2)
-		throws Exception {
-
-		return null;
-	}
-
-	@Override
 	public void deleteObjectEntry(
 			ObjectDefinition objectDefinition, long objectEntryId)
 		throws Exception {
@@ -154,21 +133,6 @@ public class SalesforceObjectEntryManagerImpl
 			StringBundler.concat(
 				"sobjects/", objectDefinition.getExternalReferenceCode(), "/",
 				externalReferenceCode));
-	}
-
-	@Override
-	public void executeObjectAction(
-			DTOConverterContext dtoConverterContext, String objectActionName,
-			ObjectDefinition objectDefinition, long objectEntryId)
-		throws Exception {
-	}
-
-	@Override
-	public void executeObjectAction(
-			long companyId, DTOConverterContext dtoConverterContext,
-			String externalReferenceCode, String objectActionName,
-			ObjectDefinition objectDefinition, String scopeKey)
-		throws Exception {
 	}
 
 	@Override
@@ -246,25 +210,6 @@ public class SalesforceObjectEntryManagerImpl
 					"sobjects/", objectDefinition.getExternalReferenceCode(),
 					"/", externalReferenceCode)),
 			objectDefinition);
-	}
-
-	@Override
-	public Page<ObjectEntry> getObjectEntryRelatedObjectEntries(
-			DTOConverterContext dtoConverterContext,
-			ObjectDefinition objectDefinition, Long objectEntryId,
-			String objectRelationshipName, Pagination pagination)
-		throws Exception {
-
-		return null;
-	}
-
-	@Override
-	public Page<Object> getRelatedSystemObjectEntries(
-			ObjectDefinition objectDefinition, Long objectEntryId,
-			String objectRelationshipName, Pagination pagination)
-		throws Exception {
-
-		return null;
 	}
 
 	@Override
