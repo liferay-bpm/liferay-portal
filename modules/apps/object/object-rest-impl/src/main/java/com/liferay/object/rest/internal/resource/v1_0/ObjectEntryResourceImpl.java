@@ -20,6 +20,8 @@ import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.internal.odata.entity.v1_0.ObjectEntryEntityModel;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryRelatedObjectsManager;
+import com.liferay.object.rest.manager.v1_0.StandaloneObjectActionManager;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -302,14 +304,21 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 				String relatedExternalReferenceCode)
 		throws Exception {
 
+		ObjectEntryManager objectEntryManager =
+			_objectEntryManagerRegistry.getObjectEntryManager(
+				_objectDefinition.getStorageType());
+
+		if (!(objectEntryManager instanceof ObjectEntryRelatedObjectsManager)) {
+			throw new UnsupportedOperationException();
+		}
+
+		ObjectEntryRelatedObjectsManager objectEntryRelatedObjectsManager =
+			(ObjectEntryRelatedObjectsManager)objectEntryManager;
+
 		ObjectRelationship objectRelationship =
 			_objectRelationshipService.getObjectRelationship(
 				_objectDefinition.getObjectDefinitionId(),
 				objectRelationshipName);
-
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
 
 		long primaryKey1 = _getPrimaryKey(
 			currentExternalReferenceCode,
@@ -321,9 +330,10 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		return _getRelatedObjectEntry(
 			_objectDefinitionLocalService.getObjectDefinition(
 				objectRelationship.getObjectDefinitionId2()),
-			objectEntryManager.addObjectRelationshipMappingTableValues(
-				_getDTOConverterContext(primaryKey1), objectRelationship,
-				primaryKey1, primaryKey2));
+			objectEntryRelatedObjectsManager.
+				addObjectRelationshipMappingTableValues(
+					_getDTOConverterContext(primaryKey1), objectRelationship,
+					primaryKey1, primaryKey2));
 	}
 
 	@Override
@@ -336,7 +346,14 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
-		objectEntryManager.executeObjectAction(
+		if (!(objectEntryManager instanceof StandaloneObjectActionManager)) {
+			throw new UnsupportedOperationException();
+		}
+
+		StandaloneObjectActionManager standaloneObjectActionManager =
+			(StandaloneObjectActionManager)objectEntryManager;
+
+		standaloneObjectActionManager.executeObjectAction(
 			contextCompany.getCompanyId(), _getDTOConverterContext(null),
 			externalReferenceCode, objectActionName, _objectDefinition, null);
 	}
@@ -364,7 +381,14 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
-		objectEntryManager.executeObjectAction(
+		if (!(objectEntryManager instanceof StandaloneObjectActionManager)) {
+			throw new UnsupportedOperationException();
+		}
+
+		StandaloneObjectActionManager standaloneObjectActionManager =
+			(StandaloneObjectActionManager)objectEntryManager;
+
+		standaloneObjectActionManager.executeObjectAction(
 			_getDTOConverterContext(objectEntryId), objectActionName,
 			_objectDefinition, objectEntryId);
 	}
@@ -395,7 +419,14 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
-		objectEntryManager.executeObjectAction(
+		if (!(objectEntryManager instanceof StandaloneObjectActionManager)) {
+			throw new UnsupportedOperationException();
+		}
+
+		StandaloneObjectActionManager standaloneObjectActionManager =
+			(StandaloneObjectActionManager)objectEntryManager;
+
+		standaloneObjectActionManager.executeObjectAction(
 			contextCompany.getCompanyId(), _getDTOConverterContext(null),
 			externalReferenceCode, objectActionName, _objectDefinition,
 			scopeKey);

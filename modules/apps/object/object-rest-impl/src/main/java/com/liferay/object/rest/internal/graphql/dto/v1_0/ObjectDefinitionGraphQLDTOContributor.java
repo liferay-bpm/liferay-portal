@@ -26,6 +26,7 @@ import com.liferay.object.rest.internal.odata.entity.v1_0.ObjectEntryEntityModel
 import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryRelatedObjectsResourceImpl;
 import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryResourceImpl;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryRelatedObjectsManager;
 import com.liferay.object.rest.petra.sql.dsl.expression.FilterPredicateFactory;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -259,6 +260,15 @@ public class ObjectDefinitionGraphQLDTOContributor
 			return null;
 		}
 
+		if (!(_objectEntryManager instanceof
+				ObjectEntryRelatedObjectsManager)) {
+
+			throw new UnsupportedOperationException();
+		}
+
+		ObjectEntryRelatedObjectsManager objectEntryRelatedObjectsManager =
+			(ObjectEntryRelatedObjectsManager)_objectEntryManager;
+
 		ObjectEntry objectEntry = _objectEntryManager.getObjectEntry(
 			dtoConverterContext, _objectDefinition, id);
 
@@ -266,10 +276,11 @@ public class ObjectDefinitionGraphQLDTOContributor
 
 		if (relationshipId <= 0) {
 			Page<ObjectEntry> page =
-				_objectEntryManager.getObjectEntryRelatedObjectEntries(
-					dtoConverterContext, _objectDefinition, id,
-					relationshipName,
-					Pagination.of(QueryUtil.ALL_POS, QueryUtil.ALL_POS));
+				objectEntryRelatedObjectsManager.
+					getObjectEntryRelatedObjectEntries(
+						dtoConverterContext, _objectDefinition, id,
+						relationshipName,
+						Pagination.of(QueryUtil.ALL_POS, QueryUtil.ALL_POS));
 
 			return (T)TransformUtil.transform(
 				page.getItems(), itemObjectEntry -> _toMap(itemObjectEntry));
