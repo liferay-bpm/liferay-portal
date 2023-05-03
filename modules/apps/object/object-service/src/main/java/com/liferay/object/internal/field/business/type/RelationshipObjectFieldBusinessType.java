@@ -174,6 +174,14 @@ public class RelationshipObjectFieldBusinessType
 	}
 
 	@Override
+	public Object getValueToDisplayContext(
+			ObjectField objectField, long userId, Map<String, Object> values)
+		throws PortalException {
+
+		return getValue(objectField, userId, values);
+	}
+
+	@Override
 	public boolean isVisible() {
 		return true;
 	}

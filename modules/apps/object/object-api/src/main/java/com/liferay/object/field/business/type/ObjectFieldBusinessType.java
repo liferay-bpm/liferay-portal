@@ -86,6 +86,13 @@ public interface ObjectFieldBusinessType {
 		return values.get(objectField.getName());
 	}
 
+	public default Object getValueToDisplayContext(
+			ObjectField objectField, long userId, Map<String, Object> values)
+		throws PortalException {
+
+		return values.get(objectField.getName());
+	}
+
 	public default boolean isVisible() {
 		return true;
 	}

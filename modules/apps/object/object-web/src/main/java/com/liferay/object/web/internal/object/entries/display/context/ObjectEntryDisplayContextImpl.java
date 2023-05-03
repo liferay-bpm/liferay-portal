@@ -87,6 +87,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
@@ -876,8 +877,6 @@ public class ObjectEntryDisplayContextImpl
 			return null;
 		}
 
-		_setDateDDMFormFieldValue(ddmForm.getDDMFormFields(), values);
-
 		DDMFormValues ddmFormValues = new DDMFormValues(ddmForm);
 
 		ddmFormValues.addAvailableLocale(_objectRequestHelper.getLocale());
@@ -1100,7 +1099,8 @@ public class ObjectEntryDisplayContextImpl
 				_objectFieldBusinessTypeRegistry.getObjectFieldBusinessType(
 					objectField.getBusinessType());
 
-			return objectFieldBusinessType.getValue(objectField, values);
+			return objectFieldBusinessType.getValueToDisplayContext(
+				objectField, PrincipalThreadLocal.getUserId(), values);
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
@@ -1137,37 +1137,6 @@ public class ObjectEntryDisplayContextImpl
 				objectRelationship.getObjectDefinitionId1());
 
 		return relatedObjectDefinition.isActive();
-	}
-
-	private void _removeTimeFromDateString(
-		DDMFormField ddmFormField, Map<String, Object> values) {
-
-		Object value = values.get(ddmFormField.getName());
-
-		if (value == null) {
-			return;
-		}
-
-		String valueString = String.valueOf(value);
-
-		values.put(
-			ddmFormField.getName(),
-			valueString.replaceAll(
-				" [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}.[0-9]", ""));
-	}
-
-	private void _setDateDDMFormFieldValue(
-		List<DDMFormField> ddmFormFields, Map<String, Object> values) {
-
-		for (DDMFormField ddmFormField : ddmFormFields) {
-			if (StringUtil.equals(ddmFormField.getType(), "date")) {
-				_removeTimeFromDateString(ddmFormField, values);
-			}
-			else if (StringUtil.equals(ddmFormField.getType(), "fieldset")) {
-				_setDateDDMFormFieldValue(
-					ddmFormField.getNestedDDMFormFields(), values);
-			}
-		}
 	}
 
 	private void _setDDMFormFieldValueValue(
