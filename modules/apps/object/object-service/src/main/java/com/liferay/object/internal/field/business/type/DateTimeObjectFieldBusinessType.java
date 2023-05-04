@@ -22,6 +22,7 @@ import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.model.ObjectField;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -159,6 +160,11 @@ public class DateTimeObjectFieldBusinessType
 		}
 
 		return value.replaceAll(":[0-9]{1,2}\\.[0-9]$", "");
+	}
+
+	@Override
+	public boolean isVisible() {
+		return FeatureFlagManagerUtil.isEnabled("LPS-143068");
 	}
 
 	private String _getDateTimePattern(String value) {
