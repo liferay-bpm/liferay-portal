@@ -25,8 +25,8 @@ import com.liferay.object.rest.dto.v1_0.Status;
 import com.liferay.object.rest.internal.odata.entity.v1_0.ObjectEntryEntityModel;
 import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryRelatedObjectsResourceImpl;
 import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryResourceImpl;
+import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
-import com.liferay.object.rest.manager.v1_0.ObjectEntryRelatedObjectsManager;
 import com.liferay.object.rest.petra.sql.dsl.expression.FilterPredicateFactory;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -183,7 +183,10 @@ public class ObjectDefinitionGraphQLDTOContributor
 
 	@Override
 	public boolean deleteDTO(long id) throws Exception {
-		_objectEntryManager.deleteObjectEntry(_objectDefinition, id);
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			(DefaultObjectEntryManager)_objectEntryManager;
+
+		defaultObjectEntryManager.deleteObjectEntry(_objectDefinition, id);
 
 		return true;
 	}
@@ -203,8 +206,11 @@ public class ObjectDefinitionGraphQLDTOContributor
 			DTOConverterContext dtoConverterContext, long id)
 		throws Exception {
 
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			(DefaultObjectEntryManager)_objectEntryManager;
+
 		return _toMap(
-			_objectEntryManager.getObjectEntry(
+			defaultObjectEntryManager.getObjectEntry(
 				dtoConverterContext, _objectDefinition, id));
 	}
 
@@ -260,34 +266,31 @@ public class ObjectDefinitionGraphQLDTOContributor
 			return null;
 		}
 
-		if (!(_objectEntryManager instanceof
-				ObjectEntryRelatedObjectsManager)) {
-
+		if (!(_objectEntryManager instanceof DefaultObjectEntryManager)) {
 			throw new UnsupportedOperationException();
 		}
 
-		ObjectEntryRelatedObjectsManager objectEntryRelatedObjectsManager =
-			(ObjectEntryRelatedObjectsManager)_objectEntryManager;
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			(DefaultObjectEntryManager)_objectEntryManager;
 
-		ObjectEntry objectEntry = _objectEntryManager.getObjectEntry(
+		ObjectEntry objectEntry = defaultObjectEntryManager.getObjectEntry(
 			dtoConverterContext, _objectDefinition, id);
 
 		long relationshipId = _getRelationshipId(objectEntry.getProperties());
 
 		if (relationshipId <= 0) {
 			Page<ObjectEntry> page =
-				objectEntryRelatedObjectsManager.
-					getObjectEntryRelatedObjectEntries(
-						dtoConverterContext, _objectDefinition, id,
-						relationshipName,
-						Pagination.of(QueryUtil.ALL_POS, QueryUtil.ALL_POS));
+				defaultObjectEntryManager.getObjectEntryRelatedObjectEntries(
+					dtoConverterContext, _objectDefinition, id,
+					relationshipName,
+					Pagination.of(QueryUtil.ALL_POS, QueryUtil.ALL_POS));
 
 			return (T)TransformUtil.transform(
 				page.getItems(), itemObjectEntry -> _toMap(itemObjectEntry));
 		}
 
 		return (T)_toMap(
-			_objectEntryManager.fetchObjectEntry(
+			defaultObjectEntryManager.fetchObjectEntry(
 				dtoConverterContext, null, relationshipId),
 			relationshipName);
 	}
@@ -347,8 +350,11 @@ public class ObjectDefinitionGraphQLDTOContributor
 			long id)
 		throws Exception {
 
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			(DefaultObjectEntryManager)_objectEntryManager;
+
 		return _toMap(
-			_objectEntryManager.updateObjectEntry(
+			defaultObjectEntryManager.updateObjectEntry(
 				dtoConverterContext, _objectDefinition, id,
 				_toObjectEntry(dto)));
 	}

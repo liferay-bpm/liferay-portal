@@ -19,6 +19,7 @@ import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
+import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryRelatedObjectsManager;
@@ -194,7 +195,14 @@ public class ObjectEntryRelatedObjectsResourceImpl
 			ObjectEntryManager objectEntryManager, long relatedObjectEntryId)
 		throws Exception {
 
-		objectEntryManager.getObjectEntry(
+		if (!(objectEntryManager instanceof DefaultObjectEntryManager)) {
+			throw new UnsupportedOperationException();
+		}
+
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			(DefaultObjectEntryManager)objectEntryManager;
+
+		defaultObjectEntryManager.getObjectEntry(
 			_getDTOConverterContext(relatedObjectEntryId), _objectDefinition,
 			relatedObjectEntryId);
 	}
@@ -204,7 +212,14 @@ public class ObjectEntryRelatedObjectsResourceImpl
 			String objectRelationshipName, long relatedObjectEntryId)
 		throws Exception {
 
-		objectEntryManager.getObjectEntry(
+		if (!(objectEntryManager instanceof DefaultObjectEntryManager)) {
+			throw new UnsupportedOperationException();
+		}
+
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			(DefaultObjectEntryManager)objectEntryManager;
+
+		defaultObjectEntryManager.getObjectEntry(
 			_getDTOConverterContext(relatedObjectEntryId),
 			_getRelatedObjectDefinition(
 				_objectRelationshipService.getObjectRelationship(
