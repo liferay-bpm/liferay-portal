@@ -1687,10 +1687,7 @@ public class DefaultObjectEntryManagerImplTest {
 			new DefaultDTOConverterContext(
 				false, Collections.emptyMap(), _dtoConverterRegistry, null,
 				LocaleUtil.getDefault(), null, _user),
-			null,
-			_filterPredicateFactory.create(
-				null, _objectDefinition1.getObjectDefinitionId()),
-			null, null);
+			null, null, null, null);
 
 		List<Facet> facets = page.getFacets();
 
@@ -2231,10 +2228,7 @@ public class DefaultObjectEntryManagerImplTest {
 			new DefaultDTOConverterContext(
 				false, Collections.emptyMap(), _dtoConverterRegistry, null,
 				LocaleUtil.getDefault(), null, _user),
-			null,
-			_filterPredicateFactory.create(
-				null, _objectDefinition3.getObjectDefinitionId()),
-			null, null);
+			null, null, null, null);
 
 		Collection<ObjectEntry> objectEntries = page.getItems();
 
@@ -2431,11 +2425,7 @@ public class DefaultObjectEntryManagerImplTest {
 
 		Page<ObjectEntry> page = _objectEntryManager.getObjectEntries(
 			_companyId, _objectDefinition2, null, null, _dtoConverterContext,
-			null,
-			_filterPredicateFactory.create(
-				context.get("filter"),
-				_objectDefinition2.getObjectDefinitionId()),
-			context.get("search"), sorts);
+			context.get("filter"), null, context.get("search"), sorts);
 
 		_assertEquals(
 			ListUtil.fromArray(expectedObjectEntries),

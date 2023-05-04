@@ -367,9 +367,12 @@ public class DefaultObjectEntryManagerImpl
 	public Page<ObjectEntry> getObjectEntries(
 			long companyId, ObjectDefinition objectDefinition, String scopeKey,
 			Aggregation aggregation, DTOConverterContext dtoConverterContext,
-			Pagination pagination, Predicate predicate, String search,
+			String filterString, Pagination pagination, String search,
 			Sort[] sorts)
 		throws Exception {
+
+		Predicate predicate = _filterPredicateFactory.create(
+			filterString, objectDefinition.getObjectDefinitionId());
 
 		long groupId = getGroupId(objectDefinition, scopeKey);
 
@@ -466,22 +469,6 @@ public class DefaultObjectEntryManagerImpl
 			_objectEntryLocalService.getValuesListCount(
 				groupId, companyId, dtoConverterContext.getUserId(),
 				objectDefinition.getObjectDefinitionId(), predicate, search));
-	}
-
-	@Override
-	public Page<ObjectEntry> getObjectEntries(
-			long companyId, ObjectDefinition objectDefinition, String scopeKey,
-			Aggregation aggregation, DTOConverterContext dtoConverterContext,
-			String filterString, Pagination pagination, String search,
-			Sort[] sorts)
-		throws Exception {
-
-		return getObjectEntries(
-			companyId, objectDefinition, scopeKey, aggregation,
-			dtoConverterContext, pagination,
-			_filterPredicateFactory.create(
-				filterString, objectDefinition.getObjectDefinitionId()),
-			search, sorts);
 	}
 
 	@Override

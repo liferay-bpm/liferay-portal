@@ -31,7 +31,6 @@ import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.storage.salesforce.internal.http.SalesforceHttp;
 import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -113,26 +112,37 @@ public class SalesforceObjectEntryManagerImpl
 	public Page<ObjectEntry> getObjectEntries(
 			long companyId, ObjectDefinition objectDefinition, String scopeKey,
 			Aggregation aggregation, DTOConverterContext dtoConverterContext,
-			Pagination pagination, Predicate predicate, String search,
-			Sort[] sorts)
-		throws Exception {
-
-		return _getObjectEntries(
-			companyId, objectDefinition, scopeKey, dtoConverterContext,
-			pagination, search, sorts);
-	}
-
-	@Override
-	public Page<ObjectEntry> getObjectEntries(
-			long companyId, ObjectDefinition objectDefinition, String scopeKey,
-			Aggregation aggregation, DTOConverterContext dtoConverterContext,
 			String filterString, Pagination pagination, String search,
 			Sort[] sorts)
 		throws Exception {
 
-		return _getObjectEntries(
-			companyId, objectDefinition, scopeKey, dtoConverterContext,
-			pagination, search, sorts);
+		JSONObject responseJSONObject = _salesforceHttp.get(
+			companyId, getGroupId(objectDefinition, scopeKey),
+			_getLocation(
+				objectDefinition, pagination,
+				_getAccountRestrictionPredicateString(
+					companyId, dtoConverterContext, objectDefinition, scopeKey),
+				search, sorts));
+
+		if ((responseJSONObject == null) ||
+			(responseJSONObject.length() == 0)) {
+
+			return Page.of(Collections.emptyList());
+		}
+
+		JSONArray jsonArray = Validator.isNotNull(search) ?
+			responseJSONObject.getJSONArray("searchRecords") :
+				responseJSONObject.getJSONArray("records");
+
+		return Page.of(
+			_toObjectEntries(
+				companyId, dtoConverterContext, jsonArray, objectDefinition),
+			pagination,
+			_getTotalCount(
+				companyId, objectDefinition,
+				_getAccountRestrictionPredicateString(
+					companyId, dtoConverterContext, objectDefinition, scopeKey),
+				scopeKey, search));
 	}
 
 	@Override
@@ -233,41 +243,6 @@ public class SalesforceObjectEntryManagerImpl
 				objectDefinition.getExternalReferenceCode(), predicateString,
 				_getSorts(objectDefinition.getObjectDefinitionId(), sorts),
 				_getSalesforcePagination(pagination)));
-	}
-
-	private Page<ObjectEntry> _getObjectEntries(
-			long companyId, ObjectDefinition objectDefinition, String scopeKey,
-			DTOConverterContext dtoConverterContext, Pagination pagination,
-			String search, Sort[] sorts)
-		throws Exception {
-
-		JSONObject responseJSONObject = _salesforceHttp.get(
-			companyId, getGroupId(objectDefinition, scopeKey),
-			_getLocation(
-				objectDefinition, pagination,
-				_getAccountRestrictionPredicateString(
-					companyId, dtoConverterContext, objectDefinition, scopeKey),
-				search, sorts));
-
-		if ((responseJSONObject == null) ||
-			(responseJSONObject.length() == 0)) {
-
-			return Page.of(Collections.emptyList());
-		}
-
-		JSONArray jsonArray = Validator.isNotNull(search) ?
-			responseJSONObject.getJSONArray("searchRecords") :
-				responseJSONObject.getJSONArray("records");
-
-		return Page.of(
-			_toObjectEntries(
-				companyId, dtoConverterContext, jsonArray, objectDefinition),
-			pagination,
-			_getTotalCount(
-				companyId, objectDefinition,
-				_getAccountRestrictionPredicateString(
-					companyId, dtoConverterContext, objectDefinition, scopeKey),
-				scopeKey, search));
 	}
 
 	private ObjectField _getObjectFieldByExternalReferenceCode(
