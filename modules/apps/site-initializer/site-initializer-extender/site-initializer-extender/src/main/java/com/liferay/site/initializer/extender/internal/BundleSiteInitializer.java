@@ -2720,7 +2720,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 				ObjectEntry objectEntry = ObjectEntry.toDTO(
 					JSONUtil.toString(objectEntryJSONObject));
 
-				objectEntry = _objectEntryManager.addOrUpdateObjectEntry(
+				objectEntry = _objectEntryManager.updateObjectEntry(
 					serviceContext.getCompanyId(), defaultDTOConverterContext,
 					externalReferenceCode, objectDefinition, objectEntry,
 					String.valueOf(serviceContext.getScopeGroupId()));

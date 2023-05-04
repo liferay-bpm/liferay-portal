@@ -35,12 +35,6 @@ public interface ObjectEntryManager {
 			String scopeKey)
 		throws Exception;
 
-	public ObjectEntry addOrUpdateObjectEntry(
-			long companyId, DTOConverterContext dtoConverterContext,
-			String externalReferenceCode, ObjectDefinition objectDefinition,
-			ObjectEntry objectEntry, String scopeKey)
-		throws Exception;
-
 	public void deleteObjectEntry(
 			ObjectDefinition objectDefinition, long objectEntryId)
 		throws Exception;
@@ -90,6 +84,12 @@ public interface ObjectEntryManager {
 			DTOConverterContext dtoConverterContext,
 			ObjectDefinition objectDefinition, long objectEntryId,
 			ObjectEntry objectEntry)
+		throws Exception;
+
+	public ObjectEntry updateObjectEntry(
+			long companyId, DTOConverterContext dtoConverterContext,
+			String externalReferenceCode, ObjectDefinition objectDefinition,
+			ObjectEntry objectEntry, String scopeKey)
 		throws Exception;
 
 }

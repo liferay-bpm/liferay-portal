@@ -98,25 +98,6 @@ public class SalesforceObjectEntryManagerImpl
 	}
 
 	@Override
-	public ObjectEntry addOrUpdateObjectEntry(
-			long companyId, DTOConverterContext dtoConverterContext,
-			String externalReferenceCode, ObjectDefinition objectDefinition,
-			ObjectEntry objectEntry, String scopeKey)
-		throws Exception {
-
-		_salesforceHttp.patch(
-			companyId, getGroupId(objectDefinition, scopeKey),
-			StringBundler.concat(
-				"sobjects/", objectDefinition.getExternalReferenceCode(), "/",
-				externalReferenceCode),
-			_toJSONObject(objectDefinition, objectEntry));
-
-		return getObjectEntry(
-			dtoConverterContext, externalReferenceCode, companyId,
-			objectDefinition, scopeKey);
-	}
-
-	@Override
 	public void deleteObjectEntry(
 			ObjectDefinition objectDefinition, long objectEntryId)
 		throws Exception {
@@ -220,6 +201,25 @@ public class SalesforceObjectEntryManagerImpl
 		throws Exception {
 
 		return null;
+	}
+
+	@Override
+	public ObjectEntry updateObjectEntry(
+			long companyId, DTOConverterContext dtoConverterContext,
+			String externalReferenceCode, ObjectDefinition objectDefinition,
+			ObjectEntry objectEntry, String scopeKey)
+		throws Exception {
+
+		_salesforceHttp.patch(
+			companyId, getGroupId(objectDefinition, scopeKey),
+			StringBundler.concat(
+				"sobjects/", objectDefinition.getExternalReferenceCode(), "/",
+				externalReferenceCode),
+			_toJSONObject(objectDefinition, objectEntry));
+
+		return getObjectEntry(
+			dtoConverterContext, externalReferenceCode, companyId,
+			objectDefinition, scopeKey);
 	}
 
 	private String _getAccountRestrictionPredicateString(
