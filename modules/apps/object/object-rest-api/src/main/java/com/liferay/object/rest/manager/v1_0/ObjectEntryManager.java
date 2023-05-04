@@ -36,17 +36,8 @@ public interface ObjectEntryManager {
 		throws Exception;
 
 	public void deleteObjectEntry(
-			ObjectDefinition objectDefinition, long objectEntryId)
-		throws Exception;
-
-	public void deleteObjectEntry(
 			String externalReferenceCode, long companyId,
 			ObjectDefinition objectDefinition, String scopeKey)
-		throws Exception;
-
-	public ObjectEntry fetchObjectEntry(
-			DTOConverterContext dtoConverterContext,
-			ObjectDefinition objectDefinition, long objectEntryId)
 		throws Exception;
 
 	public Page<ObjectEntry> getObjectEntries(
@@ -71,19 +62,8 @@ public interface ObjectEntryManager {
 
 	public ObjectEntry getObjectEntry(
 			DTOConverterContext dtoConverterContext,
-			ObjectDefinition objectDefinition, long objectEntryId)
-		throws Exception;
-
-	public ObjectEntry getObjectEntry(
-			DTOConverterContext dtoConverterContext,
 			String externalReferenceCode, long companyId,
 			ObjectDefinition objectDefinition, String scopeKey)
-		throws Exception;
-
-	public ObjectEntry updateObjectEntry(
-			DTOConverterContext dtoConverterContext,
-			ObjectDefinition objectDefinition, long objectEntryId,
-			ObjectEntry objectEntry)
 		throws Exception;
 
 	public ObjectEntry updateObjectEntry(

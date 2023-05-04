@@ -39,12 +39,11 @@ import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryResourceImpl;
 import com.liferay.object.rest.internal.util.DTOConverterUtil;
 import com.liferay.object.rest.internal.util.ObjectEntryValuesUtil;
 import com.liferay.object.rest.manager.v1_0.BaseObjectEntryManager;
+import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
-import com.liferay.object.rest.manager.v1_0.ObjectEntryRelatedObjectsManager;
 import com.liferay.object.rest.manager.v1_0.ObjectRelationshipElementsParser;
 import com.liferay.object.rest.manager.v1_0.ObjectRelationshipElementsParserRegistry;
-import com.liferay.object.rest.manager.v1_0.StandaloneObjectActionManager;
 import com.liferay.object.rest.petra.sql.dsl.expression.FilterPredicateFactory;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -133,12 +132,10 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "object.entry.manager.storage.type=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
-	service = ObjectEntryManager.class
+	service = {DefaultObjectEntryManager.class, ObjectEntryManager.class}
 )
 public class DefaultObjectEntryManagerImpl
-	extends BaseObjectEntryManager
-	implements ObjectEntryManager, ObjectEntryRelatedObjectsManager,
-			   StandaloneObjectActionManager {
+	extends BaseObjectEntryManager implements DefaultObjectEntryManager {
 
 	@Override
 	public ObjectEntry addObjectEntry(

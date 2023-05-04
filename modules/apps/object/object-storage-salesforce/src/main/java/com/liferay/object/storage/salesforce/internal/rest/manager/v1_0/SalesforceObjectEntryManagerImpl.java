@@ -99,12 +99,6 @@ public class SalesforceObjectEntryManagerImpl
 
 	@Override
 	public void deleteObjectEntry(
-			ObjectDefinition objectDefinition, long objectEntryId)
-		throws Exception {
-	}
-
-	@Override
-	public void deleteObjectEntry(
 			String externalReferenceCode, long companyId,
 			ObjectDefinition objectDefinition, String scopeKey)
 		throws Exception {
@@ -114,15 +108,6 @@ public class SalesforceObjectEntryManagerImpl
 			StringBundler.concat(
 				"sobjects/", objectDefinition.getExternalReferenceCode(), "/",
 				externalReferenceCode));
-	}
-
-	@Override
-	public ObjectEntry fetchObjectEntry(
-			DTOConverterContext dtoConverterContext,
-			ObjectDefinition objectDefinition, long objectEntryId)
-		throws Exception {
-
-		return null;
 	}
 
 	@Override
@@ -166,15 +151,6 @@ public class SalesforceObjectEntryManagerImpl
 	@Override
 	public ObjectEntry getObjectEntry(
 			DTOConverterContext dtoConverterContext,
-			ObjectDefinition objectDefinition, long objectEntryId)
-		throws Exception {
-
-		return null;
-	}
-
-	@Override
-	public ObjectEntry getObjectEntry(
-			DTOConverterContext dtoConverterContext,
 			String externalReferenceCode, long companyId,
 			ObjectDefinition objectDefinition, String scopeKey)
 		throws Exception {
@@ -191,16 +167,6 @@ public class SalesforceObjectEntryManagerImpl
 					"sobjects/", objectDefinition.getExternalReferenceCode(),
 					"/", externalReferenceCode)),
 			objectDefinition);
-	}
-
-	@Override
-	public ObjectEntry updateObjectEntry(
-			DTOConverterContext dtoConverterContext,
-			ObjectDefinition objectDefinition, long objectEntryId,
-			ObjectEntry objectEntry)
-		throws Exception {
-
-		return null;
 	}
 
 	@Override
