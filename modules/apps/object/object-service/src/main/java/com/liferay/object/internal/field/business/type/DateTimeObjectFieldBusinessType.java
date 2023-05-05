@@ -137,6 +137,9 @@ public class DateTimeObjectFieldBusinessType
 			return StringPool.BLANK;
 		}
 
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
+			"yyyy-MM-dd HH:mm");
+
 		if (StringUtil.equals(
 				ObjectFieldSettingUtil.getValue(
 					ObjectFieldSettingConstants.NAME_TIME_STORAGE, objectField),
@@ -144,22 +147,11 @@ public class DateTimeObjectFieldBusinessType
 
 			User user = _userLocalService.getUser(userId);
 
-			value = StringUtil.replace(
-				String.valueOf(
-					_getLocalDateTime(
-						StringPool.UTC, user.getTimeZoneId(), value)),
-				'T', ' ');
-
-			if (StringUtil.equals(
-					"yyyy-MM-dd HH:mm", _getDateTimePattern(value))) {
-
-				return value;
-			}
-
-			return value.replaceAll(":[0-9]{1,2}$", "");
+			return dateTimeFormatter.format(
+				_getLocalDateTime(StringPool.UTC, user.getTimeZoneId(), value));
 		}
 
-		return value.replaceAll(":[0-9]{1,2}\\.[0-9]$", "");
+		return dateTimeFormatter.format(LocalDateTime.parse(value));
 	}
 
 	@Override
