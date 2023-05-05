@@ -89,6 +89,10 @@ import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.io.Serializable;
 
+import java.sql.Timestamp;
+
+import java.text.SimpleDateFormat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -629,6 +633,33 @@ public class ObjectEntryDTOConverter
 						key -> _getListEntry(
 							dtoConverterContext, key,
 							objectField.getListTypeDefinitionId())));
+			}
+			else if (Objects.equals(
+						objectField.getBusinessType(),
+						ObjectFieldConstants.BUSINESS_TYPE_DATE_TIME)) {
+
+				Timestamp dateTimeField = (Timestamp)serializable;
+
+				if (dateTimeField == null) {
+					continue;
+				}
+
+				String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+
+				if (StringUtil.equals(
+						ObjectFieldSettingUtil.getValue(
+							"timeStorage",
+							objectField.getObjectFieldSettings()),
+						ObjectFieldSettingConstants.VALUE_CONVERT_TO_UTC)) {
+
+					pattern += "'Z'";
+				}
+
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
+					pattern);
+
+				map.put(
+					objectFieldName, simpleDateFormat.format(dateTimeField));
 			}
 			else if (StringUtil.equals(
 						objectField.getBusinessType(),
