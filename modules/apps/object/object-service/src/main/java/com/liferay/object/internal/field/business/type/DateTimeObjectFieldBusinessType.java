@@ -24,10 +24,8 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.DateUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.extension.PropertyDefinition;
 
@@ -140,18 +138,13 @@ public class DateTimeObjectFieldBusinessType
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
 			"yyyy-MM-dd HH:mm");
 
-		if (StringUtil.equals(
-				ObjectFieldSettingUtil.getValue(
-					ObjectFieldSettingConstants.NAME_TIME_STORAGE, objectField),
-				ObjectFieldSettingConstants.VALUE_CONVERT_TO_UTC)) {
-
-			User user = _userLocalService.getUser(userId);
-
-			return dateTimeFormatter.format(
-				_getLocalDateTime(StringPool.UTC, user.getTimeZoneId(), value));
-		}
-
-		return dateTimeFormatter.format(LocalDateTime.parse(value));
+		return dateTimeFormatter.format(
+			_getLocalDateTime(
+				StringPool.UTC,
+				ObjectFieldSettingUtil.getTimeZoneId(
+					objectField.getObjectFieldSettings(),
+					_userLocalService.getUser(userId)),
+				value));
 	}
 
 	@Override
@@ -184,10 +177,17 @@ public class DateTimeObjectFieldBusinessType
 	private LocalDateTime _getLocalDateTime(
 		String sourceTimeZoneId, String targetTimeZoneId, String value) {
 
+		LocalDateTime localDateTime = LocalDateTime.parse(
+			value, DateTimeFormatter.ofPattern(_getDateTimePattern(value)));
+
+		if (Validator.isNull(sourceTimeZoneId) ||
+			Validator.isNull(targetTimeZoneId)) {
+
+			return localDateTime;
+		}
+
 		ZonedDateTime zonedDateTime = ZonedDateTime.of(
-			LocalDateTime.parse(
-				value, DateTimeFormatter.ofPattern(_getDateTimePattern(value))),
-			ZoneId.of(sourceTimeZoneId));
+			localDateTime, ZoneId.of(sourceTimeZoneId));
 
 		return LocalDateTime.ofInstant(
 			zonedDateTime.toInstant(), ZoneId.of(targetTimeZoneId));
