@@ -1143,6 +1143,10 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 					schema.setFormat("date");
 					schema.setType("string");
 				}
+				else if (type.equals("DateTime")) {
+					schema.setFormat("date-time");
+					schema.setType("string");
+				}
 				else if (type.equals("Double")) {
 					schema.setFormat("double");
 					schema.setType("number");
