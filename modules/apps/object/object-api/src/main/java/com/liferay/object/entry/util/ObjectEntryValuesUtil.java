@@ -18,22 +18,70 @@ import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalServiceUtil;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.BaseModel;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlParserUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
+import com.liferay.portal.vulcan.util.ObjectMapperUtil;
 
 import java.io.Serializable;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Feliphe Marinho
  */
 public class ObjectEntryValuesUtil {
+
+	public static String getLocalizableValue(
+		String defaultLanguageId, Map<String, Object> values,
+		String siteDefaultLanguageId, String userLanguageId) {
+
+		Object value = null;
+
+		if (values.containsKey(siteDefaultLanguageId)) {
+			value = values.get(siteDefaultLanguageId);
+		}
+		else if (values.containsKey(userLanguageId)) {
+			value = values.get(userLanguageId);
+		}
+		else {
+			value = values.get(defaultLanguageId);
+		}
+
+		return value.toString();
+	}
+
+	public static Map<String, Object> getObjectEntryValues(
+		BaseModel<?> baseModel, DTOConverterRegistry dtoConverterRegistry,
+		String objectDefinitionName,
+		SystemObjectDefinitionManagerRegistry
+			systemObjectDefinitionManagerRegistry,
+		User user) {
+
+		try {
+			Object dtoModel = ObjectEntryDTOConverterUtil.toDTO(
+				baseModel, dtoConverterRegistry,
+				systemObjectDefinitionManagerRegistry.
+					getSystemObjectDefinitionManager(objectDefinitionName),
+				user);
+
+			return ObjectMapperUtil.readValue(Map.class, dtoModel.toString());
+		}
+		catch (Exception exception) {
+			_log.error(exception);
+		}
+
+		return new HashMap<>();
+	}
 
 	public static String getValueString(
 		ObjectField objectField, Map<String, Serializable> values) {
