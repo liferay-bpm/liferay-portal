@@ -1044,20 +1044,14 @@ public class ObjectFieldLocalServiceImpl
 				PropsValues.ENCRYPTED_OBJECT_FIELD_ENCRYPTION_ALGORITHM)) {
 
 			throw new RequiredEncryptedObjectFieldPropertyException(
-				StringBundler.concat(
-					"The property ",
-					PropsKeys.ENCRYPTED_OBJECT_FIELD_ENCRYPTION_ALGORITHM,
-					" is required for encrypted object fields"));
+				PropsKeys.ENCRYPTED_OBJECT_FIELD_ENCRYPTION_ALGORITHM);
 		}
 
 		if (Validator.isNull(
 				PropsValues.ENCRYPTED_OBJECT_FIELD_ENCRYPTION_KEY)) {
 
 			throw new RequiredEncryptedObjectFieldPropertyException(
-				StringBundler.concat(
-					"The property ",
-					PropsKeys.ENCRYPTED_OBJECT_FIELD_ENCRYPTION_KEY,
-					" is required for encrypted object fields"));
+				PropsKeys.ENCRYPTED_OBJECT_FIELD_ENCRYPTION_KEY);
 		}
 	}
 
