@@ -25,8 +25,13 @@ public class RequiredEncryptedObjectFieldPropertyException
 	public RequiredEncryptedObjectFieldPropertyException() {
 	}
 
-	public RequiredEncryptedObjectFieldPropertyException(String msg) {
-		super(msg);
+	public RequiredEncryptedObjectFieldPropertyException(String property) {
+		super(
+			String.format(
+				"The property %s is required for encrypted object fields",
+				property));
+
+		_property = property;
 	}
 
 	public RequiredEncryptedObjectFieldPropertyException(
@@ -38,5 +43,11 @@ public class RequiredEncryptedObjectFieldPropertyException
 	public RequiredEncryptedObjectFieldPropertyException(Throwable throwable) {
 		super(throwable);
 	}
+
+	public String getProperty() {
+		return _property;
+	}
+
+	private String _property;
 
 }
