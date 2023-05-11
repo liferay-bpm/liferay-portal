@@ -514,6 +514,10 @@ public class ObjectDefinitionResourceImpl
 						serviceBuilderObjectDefinition.getCompanyId(),
 						_listTypeDefinitionLocalService, objectField);
 
+				ObjectFieldUtil.readOnlyFeatureFlag(
+					objectField.getReadOnlyAsString(),
+					objectField.getReadOnlyConditionExpression());
+
 				_objectFieldLocalService.updateObjectField(
 					objectField.getExternalReferenceCode(),
 					GetterUtil.getLong(objectField.getId()),
