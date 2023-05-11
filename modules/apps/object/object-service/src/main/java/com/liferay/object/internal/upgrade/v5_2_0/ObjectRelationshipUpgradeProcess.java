@@ -28,8 +28,6 @@ public class ObjectRelationshipUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		DBInspector dbInspector = new DBInspector(connection);
-
 		processConcurrently(
 			StringBundler.concat(
 				"select ObjectDefinition.pkObjectFieldDBColumnName, ",
@@ -42,14 +40,14 @@ public class ObjectRelationshipUpgradeProcess extends UpgradeProcess {
 				resultSet.getString(1), resultSet.getString(2)
 			},
 			values -> _createIndex(
-				String.valueOf(values[0]), dbInspector,
-				String.valueOf(values[1])),
+				String.valueOf(values[0]), String.valueOf(values[1])),
 			null);
 	}
 
-	private void _createIndex(
-			String columnName, DBInspector dbInspector, String tableName)
+	private void _createIndex(String columnName, String tableName)
 		throws Exception {
+
+		DBInspector dbInspector = new DBInspector(connection);
 
 		IndexMetadata indexMetadata =
 			IndexMetadataFactoryUtil.createIndexMetadata(
