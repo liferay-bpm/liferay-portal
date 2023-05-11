@@ -180,7 +180,10 @@ public class ObjectFieldResourceImpl
 				GetterUtil.getBoolean(objectField.getIndexedAsKeyword()),
 				objectField.getIndexedLanguageId(),
 				LocalizedMapUtil.getLocalizedMap(objectField.getLabel()),
-				localized, objectField.getName(), objectField.getRequired(),
+				localized, objectField.getName(),
+				objectField.getReadOnlyAsString(),
+				objectField.getReadOnlyConditionExpression(),
+				objectField.getRequired(),
 				GetterUtil.getBoolean(objectField.getState()),
 				ObjectFieldSettingUtil.toObjectFieldSettings(
 					ObjectFieldUtil.addListTypeDefinition(
@@ -239,7 +242,9 @@ public class ObjectFieldResourceImpl
 				objectField.getIndexedLanguageId(),
 				LocalizedMapUtil.getLocalizedMap(objectField.getLabel()),
 				GetterUtil.getBoolean(objectField.getLocalized()),
-				objectField.getName(), objectField.getRequired(),
+				objectField.getName(), objectField.getReadOnlyAsString(),
+				objectField.getReadOnlyConditionExpression(),
+				objectField.getRequired(),
 				GetterUtil.getBoolean(objectField.getState()),
 				ObjectFieldSettingUtil.toObjectFieldSettings(
 					objectField.getListTypeDefinitionId(), objectField,
