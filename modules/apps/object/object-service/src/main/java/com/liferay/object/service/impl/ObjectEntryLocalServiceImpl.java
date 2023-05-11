@@ -45,7 +45,7 @@ import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectEntryValuesException;
 import com.liferay.object.exception.ObjectRelationshipDeletionTypeException;
-import com.liferay.object.exception.RequiredEncryptedObjectFieldPropertyException;
+import com.liferay.object.exception.RequiredPropertyException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
@@ -1920,14 +1920,14 @@ public class ObjectEntryLocalServiceImpl
 		if (Validator.isNull(
 				PropsValues.ENCRYPTED_OBJECT_FIELD_ENCRYPTION_ALGORITHM)) {
 
-			throw new RequiredEncryptedObjectFieldPropertyException(
+			throw new RequiredPropertyException(
 				PropsKeys.ENCRYPTED_OBJECT_FIELD_ENCRYPTION_ALGORITHM);
 		}
 
 		if (Validator.isNull(
 				PropsValues.ENCRYPTED_OBJECT_FIELD_ENCRYPTION_KEY)) {
 
-			throw new RequiredEncryptedObjectFieldPropertyException(
+			throw new RequiredPropertyException(
 				PropsKeys.ENCRYPTED_OBJECT_FIELD_ENCRYPTION_KEY);
 		}
 

@@ -12,9 +12,9 @@
  * details.
  */
 
-package com.liferay.object.rest.internal.jaxrs.exception.mapper;
+package com.liferay.object.admin.rest.internal.jaxrs.exception.mapper;
 
-import com.liferay.object.exception.RequiredEncryptedObjectFieldPropertyException;
+import com.liferay.object.exception.RequiredPropertyException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
@@ -22,37 +22,41 @@ import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import javax.ws.rs.ext.ExceptionMapper;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Marco Leo
+ * @author Paulo Albuquerque
  */
-@Provider
-public class RequiredEncryptedObjectFieldPropertyExceptionMapper
-	extends BaseExceptionMapper<RequiredEncryptedObjectFieldPropertyException> {
-
-	public RequiredEncryptedObjectFieldPropertyExceptionMapper(
-		Language language) {
-
-		_language = language;
-	}
+@Component(
+	property = {
+		"osgi.jaxrs.application.select=(osgi.jaxrs.name=Liferay.Object.Admin.REST)",
+		"osgi.jaxrs.extension=true",
+		"osgi.jaxrs.name=Liferay.Object.Admin.REST.RequiredPropertyExceptionMapper"
+	},
+	service = ExceptionMapper.class
+)
+public class RequiredPropertyExceptionMapper
+	extends BaseExceptionMapper<RequiredPropertyException> {
 
 	@Override
 	protected Problem getProblem(
-		RequiredEncryptedObjectFieldPropertyException
-			requiredEncryptedObjectFieldPropertyException) {
+		RequiredPropertyException requiredPropertyException) {
 
 		return new Problem(
 			Response.Status.BAD_REQUEST,
 			_language.format(
 				_acceptLanguage.getPreferredLocale(),
 				"the-property-x-is-required-for-encrypted-object-fields",
-				requiredEncryptedObjectFieldPropertyException.getProperty()));
+				requiredPropertyException.getProperty()));
 	}
 
 	@Context
 	private AcceptLanguage _acceptLanguage;
 
-	private final Language _language;
+	@Reference
+	private Language _language;
 
 }

@@ -27,8 +27,8 @@ import com.liferay.object.rest.internal.jaxrs.exception.mapper.ObjectEntryManage
 import com.liferay.object.rest.internal.jaxrs.exception.mapper.ObjectEntryValuesExceptionMapper;
 import com.liferay.object.rest.internal.jaxrs.exception.mapper.ObjectRelationshipDeletionTypeExceptionMapper;
 import com.liferay.object.rest.internal.jaxrs.exception.mapper.ObjectValidationRuleEngineExceptionMapper;
-import com.liferay.object.rest.internal.jaxrs.exception.mapper.RequiredEncryptedObjectFieldPropertyExceptionMapper;
 import com.liferay.object.rest.internal.jaxrs.exception.mapper.RequiredObjectRelationshipExceptionMapper;
+import com.liferay.object.rest.internal.jaxrs.exception.mapper.RequiredPropertyExceptionMapper;
 import com.liferay.object.rest.internal.jaxrs.exception.mapper.UnsupportedOperationExceptionMapper;
 import com.liferay.object.rest.internal.manager.v1_0.ObjectEntry1toMObjectRelationshipElementsParserImpl;
 import com.liferay.object.rest.internal.manager.v1_0.ObjectEntryMtoMObjectRelationshipElementsParserImpl;
@@ -81,7 +81,23 @@ import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.graphql.dto.GraphQLDTOContributor;
 import com.liferay.portal.vulcan.resource.OpenAPIResource;
+
+import java.lang.reflect.Method;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.ext.ExceptionMapper;
+
 import org.apache.cxf.jaxrs.ext.ContextProvider;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.PrototypeServiceFactory;
@@ -93,18 +109,6 @@ import org.osgi.service.component.ComponentInstance;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.ext.ExceptionMapper;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Brian Wing Shun Chan
@@ -461,20 +465,6 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					).build()),
 				_bundleContext.registerService(
 					ExceptionMapper.class,
-					new RequiredEncryptedObjectFieldPropertyExceptionMapper(
-						_language),
-					HashMapDictionaryBuilder.<String, Object>put(
-						"osgi.jaxrs.application.select",
-						"(osgi.jaxrs.name=" + osgiJaxRsName + ")"
-					).put(
-						"osgi.jaxrs.extension", "true"
-					).put(
-						"osgi.jaxrs.name",
-						objectDefinition.getOSGiJaxRsName(
-							"RequiredEncryptedObjectFieldPropertyExceptionMapper")
-					).build()),
-				_bundleContext.registerService(
-					ExceptionMapper.class,
 					new RequiredObjectRelationshipExceptionMapper(),
 					HashMapDictionaryBuilder.<String, Object>put(
 						"osgi.jaxrs.application.select",
@@ -485,6 +475,19 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 						"osgi.jaxrs.name",
 						objectDefinition.getOSGiJaxRsName(
 							"RequiredObjectRelationshipExceptionMapper")
+					).build()),
+				_bundleContext.registerService(
+					ExceptionMapper.class,
+					new RequiredPropertyExceptionMapper(_language),
+					HashMapDictionaryBuilder.<String, Object>put(
+						"osgi.jaxrs.application.select",
+						"(osgi.jaxrs.name=" + osgiJaxRsName + ")"
+					).put(
+						"osgi.jaxrs.extension", "true"
+					).put(
+						"osgi.jaxrs.name",
+						objectDefinition.getOSGiJaxRsName(
+							"RequiredPropertyExceptionMapper")
 					).build()),
 				_bundleContext.registerService(
 					ExceptionMapper.class,

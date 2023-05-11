@@ -24,8 +24,13 @@ public class RequiredPropertyException extends PortalException {
 	public RequiredPropertyException() {
 	}
 
-	public RequiredPropertyException(String msg) {
-		super(msg);
+	public RequiredPropertyException(String property) {
+		super(
+			String.format(
+				"The property %s is required for encrypted object fields",
+				property));
+
+		_property = property;
 	}
 
 	public RequiredPropertyException(String msg, Throwable throwable) {
@@ -35,5 +40,11 @@ public class RequiredPropertyException extends PortalException {
 	public RequiredPropertyException(Throwable throwable) {
 		super(throwable);
 	}
+
+	public String getProperty() {
+		return _property;
+	}
+
+	private String _property;
 
 }

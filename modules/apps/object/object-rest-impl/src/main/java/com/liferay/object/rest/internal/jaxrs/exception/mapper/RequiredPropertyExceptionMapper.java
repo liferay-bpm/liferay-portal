@@ -12,51 +12,44 @@
  * details.
  */
 
-package com.liferay.object.admin.rest.internal.jaxrs.exception.mapper;
+package com.liferay.object.rest.internal.jaxrs.exception.mapper;
 
-import com.liferay.object.exception.RequiredEncryptedObjectFieldPropertyException;
+import com.liferay.object.exception.RequiredPropertyException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
 /**
- * @author Paulo Albuquerque
+ * @author Marco Leo
  */
-@Component(
-	property = {
-		"osgi.jaxrs.application.select=(osgi.jaxrs.name=Liferay.Object.Admin.REST)",
-		"osgi.jaxrs.extension=true",
-		"osgi.jaxrs.name=Liferay.Object.Admin.REST.RequiredEncryptedObjectFieldPropertyExceptionMapper"
-	},
-	service = ExceptionMapper.class
-)
-public class RequiredEncryptedObjectFieldPropertyExceptionMapper
-	extends BaseExceptionMapper<RequiredEncryptedObjectFieldPropertyException> {
+@Provider
+public class RequiredPropertyExceptionMapper
+	extends BaseExceptionMapper<RequiredPropertyException> {
+
+	public RequiredPropertyExceptionMapper(Language language) {
+		_language = language;
+	}
 
 	@Override
 	protected Problem getProblem(
-		RequiredEncryptedObjectFieldPropertyException
-			requiredEncryptedObjectFieldPropertyException) {
+		RequiredPropertyException requiredPropertyException) {
 
 		return new Problem(
 			Response.Status.BAD_REQUEST,
 			_language.format(
 				_acceptLanguage.getPreferredLocale(),
 				"the-property-x-is-required-for-encrypted-object-fields",
-				requiredEncryptedObjectFieldPropertyException.getProperty()));
+				requiredPropertyException.getProperty()));
 	}
 
 	@Context
 	private AcceptLanguage _acceptLanguage;
 
-	@Reference
-	private Language _language;
+	private final Language _language;
 
 }
