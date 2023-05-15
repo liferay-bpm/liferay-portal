@@ -17,6 +17,7 @@ package com.liferay.object.web.internal.object.definitions.portlet.action;
 import com.liferay.object.constants.ObjectPortletKeys;
 import com.liferay.object.constants.ObjectWebKeys;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsDetailsDisplayContext;
@@ -68,7 +69,7 @@ public class EditObjectDefinitionMVCRenderCommand implements MVCRenderCommand {
 				WebKeys.PORTLET_DISPLAY_CONTEXT,
 				new ObjectDefinitionsDetailsDisplayContext(
 					_portal.getHttpServletRequest(renderRequest),
-					_objectDefinitionLocalService,
+					_objectDefinitionLocalService, _objectEntryManagerRegistry,
 					_objectDefinitionModelResourcePermission, null, null,
 					null));
 		}
@@ -87,6 +88,9 @@ public class EditObjectDefinitionMVCRenderCommand implements MVCRenderCommand {
 	)
 	private ModelResourcePermission<ObjectDefinition>
 		_objectDefinitionModelResourcePermission;
+
+	@Reference
+	private ObjectEntryManagerRegistry _objectEntryManagerRegistry;
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
