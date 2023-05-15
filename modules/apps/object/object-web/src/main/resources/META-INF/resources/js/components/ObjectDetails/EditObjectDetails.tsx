@@ -257,12 +257,14 @@ export default function EditObjectDetails({
 						values={values}
 					/>
 
-					<ExternalDataSourceCotainer
-						errors={errors}
-						setValues={setValues}
-						storageTypes={storageTypes}
-						values={values}
-					/>
+					{Liferay.FeatureFlags['LPS-135430'] && (
+						<ExternalDataSourceCotainer
+							errors={errors}
+							setValues={setValues}
+							storageTypes={storageTypes}
+							values={values}
+						/>
+					)}
 
 					<ScopeContainer
 						companyKeyValuePair={companyKeyValuePair}
