@@ -14,6 +14,7 @@
 
 import {
 	API,
+	BetaButton,
 	getLocalizableLabel,
 	openToast,
 } from '@liferay/object-js-components-web';
@@ -258,12 +259,20 @@ export default function EditObjectDetails({
 					/>
 
 					{Liferay.FeatureFlags['LPS-135430'] && (
-						<ExternalDataSourceCotainer
-							errors={errors}
-							setValues={setValues}
-							storageTypes={storageTypes}
-							values={values}
-						/>
+						<div className="lfr__object-web-edit-object-details-external-data-source-container">
+							<ExternalDataSourceCotainer
+								errors={errors}
+								setValues={setValues}
+								storageTypes={storageTypes}
+								values={values}
+							/>
+
+							<div className="lfr__object-web-edit-object-details-external-data-source-container-beta">
+								<BetaButton
+									show={values.storageType === 'salesforce'}
+								/>
+							</div>
+						</div>
 					)}
 
 					<ScopeContainer
