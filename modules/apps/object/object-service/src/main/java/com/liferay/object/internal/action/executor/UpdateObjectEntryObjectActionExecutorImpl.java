@@ -142,6 +142,12 @@ public class UpdateObjectEntryObjectActionExecutorImpl
 		Map<String, Object> baseModel = (Map<String, Object>)variables.get(
 			"baseModel");
 
+		String paramentsName = parametersUnicodeProperties.get("name");
+
+		if (paramentsName.equals("")) {
+			parametersUnicodeProperties.put("name", "objectField.getName()");
+		}
+
 		for (ObjectField objectField :
 				_objectFieldLocalService.getObjectFields(
 					objectDefinition.getObjectDefinitionId(),
