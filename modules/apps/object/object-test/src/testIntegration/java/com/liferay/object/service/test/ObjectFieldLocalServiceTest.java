@@ -597,7 +597,8 @@ public class ObjectFieldLocalServiceTest {
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT, null,
 					ObjectFieldConstants.DB_TYPE_STRING, true, true, "en_US",
-					"", 0, "able", Collections.emptyList(), false, true)));
+					"", 0, "able", Collections.emptyList(),
+					ObjectFieldConstants.READ_ONLY_FALSE, null, false, true)));
 
 		// Invalid DB type
 
@@ -1477,6 +1478,8 @@ public class ObjectFieldLocalServiceTest {
 			objectField.isIndexedAsKeyword(),
 			objectField.getIndexedLanguageId(), objectField.getLabelMap(),
 			objectField.isLocalized(), objectField.getName(),
+			objectField.getReadOnly(),
+			objectField.getReadOnlyConditionExpression(),
 			objectField.isRequired(), objectField.isState(),
 			objectField.getObjectFieldSettings());
 	}
@@ -1684,6 +1687,8 @@ public class ObjectFieldLocalServiceTest {
 			objectField.isIndexed(), objectField.isIndexedAsKeyword(),
 			objectField.getIndexedLanguageId(), objectField.getLabelMap(),
 			objectField.isLocalized(), objectField.getName(),
+			objectField.getReadOnly(),
+			objectField.getReadOnlyConditionExpression(),
 			objectField.isRequired(), objectField.isState(),
 			objectFieldSettings);
 	}
