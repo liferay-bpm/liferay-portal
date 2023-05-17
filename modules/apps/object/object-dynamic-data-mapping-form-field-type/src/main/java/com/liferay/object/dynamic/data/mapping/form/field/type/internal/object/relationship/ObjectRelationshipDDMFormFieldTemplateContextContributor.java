@@ -205,10 +205,14 @@ public class ObjectRelationshipDDMFormFieldTemplateContextContributor
 			if (objectField != null) {
 				String objectFieldName = objectField.getName();
 
-				objectFieldName = StringUtil.replace(
-					objectFieldName, "createDate", "dateCreated");
-				objectFieldName = StringUtil.replace(
-					objectFieldName, "modifiedDate", "dateModified");
+				if (!StringUtil.equals(
+						objectDefinition.getName(), "CPDefinition")) {
+
+					objectFieldName = StringUtil.replace(
+						objectFieldName, "createDate", "dateCreated");
+					objectFieldName = StringUtil.replace(
+						objectFieldName, "modifiedDate", "dateModified");
+				}
 
 				return objectFieldName;
 			}
