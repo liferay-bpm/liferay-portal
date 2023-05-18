@@ -96,7 +96,7 @@ public class ViewObjectDefinitionsDisplayContext {
 				).setParameter(
 					"objectDefinitionId", "{id}"
 				).buildString(),
-				"pencil", "pencil",
+				"pencil", "edit",
 				LanguageUtil.get(_objectRequestHelper.getRequest(), "edit"),
 				"get", null, null),
 			new FDSActionDropdownItem(
