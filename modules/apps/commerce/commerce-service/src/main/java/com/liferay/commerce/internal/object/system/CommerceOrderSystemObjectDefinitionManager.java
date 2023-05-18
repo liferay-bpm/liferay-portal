@@ -126,17 +126,20 @@ public class CommerceOrderSystemObjectDefinitionManager
 	public List<ObjectField> getObjectFields() {
 		return Arrays.asList(
 			createObjectField(
-				"LongInteger", "Long", "account-id", "accountId", true, true),
+				"LongInteger", "Long", "ACCOUNT_ID", "account-id", "accountId",
+				true, true),
 			createObjectField(
-				"LongInteger", "Long", "channel-id", "channelId", true, true),
+				"LongInteger", "Long", "CHANNEL_ID", "channel-id", "channelId",
+				true, true),
 			createObjectField(
-				"Text", "String", "currency-code", "currencyCode", true, true),
+				"Text", "String", "CURRENCY_CODE", "currency-code",
+				"currencyCode", true, true),
 			createObjectField(
-				"Integer", "Integer", "order-status", "orderStatus", true,
-				true),
+				"Integer", "Integer", "ORDER_STATUS", "order-status",
+				"orderStatus", true, true),
 			createObjectField(
-				"PrecisionDecimal", "BigDecimal", "shipping-amount",
-				"shippingAmount", true, true));
+				"PrecisionDecimal", "BigDecimal", "SHIPPING_AMOUNT",
+				"shipping-amount", "shippingAmount", true, true));
 	}
 
 	@Override
