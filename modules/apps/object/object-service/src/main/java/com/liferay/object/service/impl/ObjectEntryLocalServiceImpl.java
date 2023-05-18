@@ -157,6 +157,7 @@ import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -175,6 +176,7 @@ import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.sort.SortOrder;
 import com.liferay.portal.search.sort.Sorts;
+import com.liferay.portal.vulcan.util.ObjectMapperUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -957,6 +959,13 @@ public class ObjectEntryLocalServiceImpl
 		_addObjectRelationshipERCFieldValue(
 			objectEntry.getObjectDefinitionId(), values);
 
+		if (dynamicObjectDefinitionLocalizationTable != null) {
+			_addLocalizedFieldValues(
+				dynamicObjectDefinitionLocalizationTable,
+				objectEntry.getObjectDefinitionId(),
+				objectEntry.getObjectEntryId(), values);
+		}
+
 		return values;
 	}
 
@@ -1442,6 +1451,72 @@ public class ObjectEntryLocalServiceImpl
 				TempFileEntryUtil.deleteTempFileEntry(
 					dlFileEntry.getFileEntryId());
 			}
+		}
+	}
+
+	private void _addLocalizedFieldValues(
+			DynamicObjectDefinitionLocalizationTable
+				dynamicObjectDefinitionLocalizationTable,
+			long objectDefinitionId, long objectEntryId,
+			Map<String, Serializable> values)
+		throws PortalException {
+
+		List<Column<DynamicObjectDefinitionLocalizationTable, ?>>
+			objectFieldColumns =
+				dynamicObjectDefinitionLocalizationTable.
+					getObjectFieldColumns();
+
+		List<Expression<?>> selectExpressions = new ArrayList<>(
+			objectFieldColumns);
+
+		selectExpressions.add(
+			dynamicObjectDefinitionLocalizationTable.getLanguageIdColumn());
+
+		List<Object[]> localizedValues = ObjectMapperUtil.readValue(
+			List.class,
+			(Serializable)objectEntryPersistence.dslQuery(
+				DSLQueryFactoryUtil.select(
+					selectExpressions.toArray(new Expression<?>[0])
+				).from(
+					dynamicObjectDefinitionLocalizationTable
+				).where(
+					dynamicObjectDefinitionLocalizationTable.
+						getForeignKeyColumn(
+						).eq(
+							objectEntryId
+						)
+				)));
+
+		if (ListUtil.isEmpty(localizedValues)) {
+			return;
+		}
+
+		List<Map<String, String>> temp = new ArrayList<>();
+
+		for (int i = 0; i < objectFieldColumns.size(); i++) {
+			Map<String, String> map = new HashMap<>();
+
+			for (Object[] localizedValue : localizedValues) {
+				map.put(
+					String.valueOf(localizedValue[objectFieldColumns.size()]),
+					String.valueOf(localizedValue[i]));
+			}
+
+			temp.add(map);
+		}
+
+		for (int i = 0; i < objectFieldColumns.size(); i++) {
+			Column<DynamicObjectDefinitionLocalizationTable, ?> column =
+				objectFieldColumns.get(i);
+
+			ObjectField objectField = _objectFieldLocalService.getObjectField(
+				objectDefinitionId,
+				StringUtil.removeSubstring(
+					column.getName(), StringPool.UNDERLINE));
+
+			values.put(
+				objectField.getI18nObjectFieldName(),
+				(Serializable)temp.get(i));
 		}
 	}
 
