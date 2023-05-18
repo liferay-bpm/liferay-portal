@@ -121,25 +121,32 @@ public class CPDefinitionSystemObjectDefinitionManager
 	public List<ObjectField> getObjectFields() {
 		return Arrays.asList(
 			createObjectField(
-				"Boolean", "Boolean", "active", "active", true, true),
+				"Boolean", "Boolean", "ACTIVE", "active", "active", true, true),
 			createObjectField(
-				"LongInteger", "Long", "catalog-id", "catalogId", true, true),
+				"LongInteger", "Long", "CATALOG_ID", "catalog-id", "catalogId",
+				true, true),
 			createObjectField(
-				"Text", "String", "description", "description", false, true),
-			createObjectField("Text", "String", "name", "name", true, true),
-			createObjectField(
-				"Text", "CPDefinitionId", "String", "product-id", "productId",
+				"Text", "String", "DESCRIPTION", "description", "description",
 				false, true),
 			createObjectField(
-				"Text", "String", "product-type", "productType", true, true),
+				"Text", "String", "NAME", "name", "name", true, true),
 			createObjectField(
-				"Text", "String", "short-description", "shortDescription",
-				false, true),
+				"Text", "CPDefinitionId", "String", "PRODUCT_ID", "product-id",
+				"productId", false, true),
 			createObjectField(
-				"Text", "String", "sku", "skuFormatted", false, true),
+				"Text", "String", "PRODUCT_TYPE", "product-type", "productType",
+				true, true),
 			createObjectField(
-				"Text", "String", "thumbnail", "thumbnail", false, true),
-			createObjectField("Text", "String", "uuid", "uuid", false, true));
+				"Text", "String", "SHORT_DESCRIPTION", "short-description",
+				"shortDescription", false, true),
+			createObjectField(
+				"Text", "String", "SKU_FORMATTED", "sku", "skuFormatted", false,
+				true),
+			createObjectField(
+				"Text", "String", "THUMBNAIL", "thumbnail", "thumbnail", false,
+				true),
+			createObjectField(
+				"Text", "String", "UUID", "uuid", "uuid", false, true));
 	}
 
 	@Override
