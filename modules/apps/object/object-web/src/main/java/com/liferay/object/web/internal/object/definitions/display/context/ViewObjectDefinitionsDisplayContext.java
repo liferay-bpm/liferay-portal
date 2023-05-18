@@ -96,8 +96,8 @@ public class ViewObjectDefinitionsDisplayContext {
 				).setParameter(
 					"objectDefinitionId", "{id}"
 				).buildString(),
-				"view", "view",
-				LanguageUtil.get(_objectRequestHelper.getRequest(), "view"),
+				"pencil", "pencil",
+				LanguageUtil.get(_objectRequestHelper.getRequest(), "edit"),
 				"get", null, null),
 			new FDSActionDropdownItem(
 				ResourceURLBuilder.createResourceURL(
