@@ -465,17 +465,17 @@ public class ObjectDefinitionLocalServiceTest {
 						return Arrays.asList(
 							createObjectField(
 								ObjectFieldConstants.BUSINESS_TYPE_BOOLEAN,
-								ObjectFieldConstants.DB_TYPE_BOOLEAN,
+								ObjectFieldConstants.DB_TYPE_BOOLEAN, null,
 								"Action Required", "actionRequired", true,
 								false),
 							createObjectField(
 								ObjectFieldConstants.BUSINESS_TYPE_LONG_INTEGER,
-								ObjectFieldConstants.DB_TYPE_LONG,
+								ObjectFieldConstants.DB_TYPE_LONG, null,
 								"Delivery Type", "deliveryType", false, false),
 							createObjectField(
 								ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 								"type_", ObjectFieldConstants.DB_TYPE_STRING,
-								"Type", "type", true, false));
+								null, "Type", "type", true, false));
 					}
 
 					@Override
@@ -619,16 +619,16 @@ public class ObjectDefinitionLocalServiceTest {
 						return Arrays.asList(
 							createObjectField(
 								ObjectFieldConstants.BUSINESS_TYPE_BOOLEAN,
-								ObjectFieldConstants.DB_TYPE_BOOLEAN,
+								ObjectFieldConstants.DB_TYPE_BOOLEAN, null,
 								"Archived", "archived", true, false),
 							createObjectField(
 								ObjectFieldConstants.BUSINESS_TYPE_LONG_INTEGER,
-								ObjectFieldConstants.DB_TYPE_LONG,
+								ObjectFieldConstants.DB_TYPE_LONG, null,
 								"Delivery Type", "deliveryType", true, false),
 							createObjectField(
 								ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 								"type_", ObjectFieldConstants.DB_TYPE_STRING,
-								"Type", "type", false, false));
+								null, "Type", "type", false, false));
 					}
 
 					@Override
