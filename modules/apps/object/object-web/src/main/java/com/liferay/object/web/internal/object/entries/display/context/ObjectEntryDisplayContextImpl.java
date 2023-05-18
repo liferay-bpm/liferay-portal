@@ -707,7 +707,8 @@ public class ObjectEntryDisplayContextImpl
 
 		DDMFormField ddmFormField = new DDMFormField(
 			objectField.getName(),
-			objectFieldBusinessType.getDDMFormFieldTypeName());
+			objectFieldBusinessType.getDDMFormFieldTypeName(
+				objectField.isLocalized()));
 
 		Map<String, Object> properties = objectFieldBusinessType.getProperties(
 			objectField, _createObjectFieldRenderingContext(objectEntry));
@@ -725,6 +726,8 @@ public class ObjectEntryDisplayContextImpl
 			objectField.getLabel(_objectRequestHelper.getLocale()));
 
 		ddmFormField.setLabel(ddmFormFieldLabelLocalizedValue);
+
+		ddmFormField.setLocalizable(objectField.isLocalized());
 
 		properties.forEach(
 			(key, value) -> ddmFormField.setProperty(key, value));
