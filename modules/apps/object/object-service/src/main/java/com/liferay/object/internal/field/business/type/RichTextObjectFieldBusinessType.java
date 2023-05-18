@@ -53,6 +53,15 @@ public class RichTextObjectFieldBusinessType
 	}
 
 	@Override
+	public String getDDMFormFieldTypeName(boolean localized) {
+		if (localized) {
+			return DDMFormFieldTypeConstants.LOCALIZABLE_RICH_TEXT;
+		}
+
+		return getDDMFormFieldTypeName();
+	}
+
+	@Override
 	public String getDescription(Locale locale) {
 		return _language.get(locale, "create-rich-text-content");
 	}
