@@ -109,7 +109,8 @@ public interface ObjectFieldLocalService
 	public ObjectField addOrUpdateSystemObjectField(
 			long userId, long objectDefinitionId, String businessType,
 			String dbColumnName, String dbTableName, String dbType,
-			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
+			String externalReferenceCode, boolean indexed,
+			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, String name, boolean required,
 			boolean state)
 		throws PortalException;
@@ -118,7 +119,8 @@ public interface ObjectFieldLocalService
 	public ObjectField addSystemObjectField(
 			long userId, long objectDefinitionId, String businessType,
 			String dbColumnName, String dbTableName, String dbType,
-			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
+			String externalReferenceCode, boolean indexed,
+			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, String name, boolean required,
 			boolean state)
 		throws PortalException;
