@@ -4551,7 +4551,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 						jsonObject.getString("objectField"));
 			}
 
-				_objectDefinitionLocalService.enableAccountEntryRestricted(
+				_objectDefinitionLocalService.enableObjectRestricted(
 					objectDefinition2, objectField);
 		}
 	}
