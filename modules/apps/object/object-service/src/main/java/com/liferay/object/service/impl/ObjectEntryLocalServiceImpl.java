@@ -159,6 +159,7 @@ import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -178,6 +179,7 @@ import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.sort.SortOrder;
 import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.vulcan.util.ObjectMapperUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -974,6 +976,12 @@ public class ObjectEntryLocalServiceImpl
 		_addObjectRelationshipERCFieldValue(
 			objectEntry.getObjectDefinitionId(), values);
 
+		if (dynamicObjectDefinitionLocalizationTable != null) {
+			_addLocalizedObjectFieldValues(
+				dynamicObjectDefinitionLocalizationTable,
+				objectEntry.getObjectEntryId(), values);
+		}
+
 		return values;
 	}
 
@@ -1459,6 +1467,57 @@ public class ObjectEntryLocalServiceImpl
 				TempFileEntryUtil.deleteTempFileEntry(
 					dlFileEntry.getFileEntryId());
 			}
+		}
+	}
+
+	private void _addLocalizedObjectFieldValues(
+		DynamicObjectDefinitionLocalizationTable
+			dynamicObjectDefinitionLocalizationTable,
+		long objectEntryId, Map<String, Serializable> values) {
+
+		Column<DynamicObjectDefinitionLocalizationTable, Long>
+			foreignKeyColumn =
+				dynamicObjectDefinitionLocalizationTable.getForeignKeyColumn();
+
+		List<Object[]> localizedValues = ObjectMapperUtil.readValue(
+			List.class,
+			(Serializable)objectEntryPersistence.dslQuery(
+				DSLQueryFactoryUtil.select(
+					ArrayUtil.append(
+						_getSelectExpressions(
+							dynamicObjectDefinitionLocalizationTable),
+						dynamicObjectDefinitionLocalizationTable.
+							getLanguageIdColumn())
+				).from(
+					dynamicObjectDefinitionLocalizationTable
+				).where(
+					foreignKeyColumn.eq(objectEntryId)
+				)));
+
+		if (ListUtil.isEmpty(localizedValues)) {
+			return;
+		}
+
+		List<Column<DynamicObjectDefinitionLocalizationTable, ?>>
+			objectFieldColumns =
+				dynamicObjectDefinitionLocalizationTable.
+					getObjectFieldColumns();
+
+		for (int i = 0; i < objectFieldColumns.size(); i++) {
+			Map<String, String> localizedObjectFieldValue = new HashMap<>();
+
+			for (Object[] localizedValue : localizedValues) {
+				localizedObjectFieldValue.put(
+					String.valueOf(localizedValue[objectFieldColumns.size()]),
+					String.valueOf(localizedValue[i]));
+			}
+
+			Column<DynamicObjectDefinitionLocalizationTable, ?>
+				objectFieldColumn = objectFieldColumns.get(i);
+
+			values.put(
+				objectFieldColumn.getName() + "i18n",
+				(Serializable)localizedObjectFieldValue);
 		}
 	}
 
