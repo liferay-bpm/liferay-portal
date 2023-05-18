@@ -184,9 +184,10 @@ public class ObjectEntryResourceTest {
 				ObjectFieldUtil.createObjectField(
 					_listTypeDefinition.getListTypeDefinitionId(),
 					ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST,
-					null, ObjectFieldConstants.DB_TYPE_STRING, true, false,
+					null, ObjectFieldConstants.DB_TYPE_STRING, null, false,
 					null, RandomTestUtil.randomString(),
-					_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST, false, false)));
+					_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST, false, false,
+					true)));
 
 		_objectEntry1 = ObjectEntryTestUtil.addObjectEntry(
 			_objectDefinition1, _OBJECT_FIELD_NAME_1, _OBJECT_FIELD_VALUE_1);
@@ -199,9 +200,10 @@ public class ObjectEntryResourceTest {
 				ObjectFieldUtil.createObjectField(
 					_listTypeDefinition.getListTypeDefinitionId(),
 					ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST,
-					null, ObjectFieldConstants.DB_TYPE_STRING, true, false,
+					null, ObjectFieldConstants.DB_TYPE_STRING, null, false,
 					null, RandomTestUtil.randomString(),
-					_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST, false, false)));
+					_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST, false, false,
+					true)));
 
 		_objectEntry2 = ObjectEntryTestUtil.addObjectEntry(
 			_objectDefinition2, _OBJECT_FIELD_NAME_2, _OBJECT_FIELD_VALUE_2);
@@ -214,9 +216,10 @@ public class ObjectEntryResourceTest {
 				ObjectFieldUtil.createObjectField(
 					_listTypeDefinition.getListTypeDefinitionId(),
 					ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST,
-					null, ObjectFieldConstants.DB_TYPE_STRING, true, false,
+					null, ObjectFieldConstants.DB_TYPE_STRING, null, false,
 					null, RandomTestUtil.randomString(),
-					_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST, false, false)));
+					_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST, false, false,
+					true)));
 
 		_objectEntry3 = ObjectEntryTestUtil.addObjectEntry(
 			_objectDefinition3, _OBJECT_FIELD_NAME_3, _OBJECT_FIELD_VALUE_3);
@@ -3592,9 +3595,9 @@ public class ObjectEntryResourceTest {
 					ObjectFieldUtil.createObjectField(
 						listTypeDefinition.getListTypeDefinitionId(),
 						ObjectFieldConstants.BUSINESS_TYPE_PICKLIST, null,
-						ObjectFieldConstants.DB_TYPE_STRING, true, false, null,
-						"List Type Entry Key", "listTypeEntryKey", false,
-						false),
+						ObjectFieldConstants.DB_TYPE_STRING, null, false, null,
+						"List Type Entry Key", "listTypeEntryKey", false, false,
+						true),
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT,
 						ObjectFieldConstants.DB_TYPE_LONG, true, false, null,

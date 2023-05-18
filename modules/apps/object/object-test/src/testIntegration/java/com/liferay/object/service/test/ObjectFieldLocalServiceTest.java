@@ -564,8 +564,8 @@ public class ObjectFieldLocalServiceTest {
 			() -> _addUnmodifiableSystemObjectDefinition(
 				ObjectFieldUtil.createObjectField(
 					0, ObjectFieldConstants.BUSINESS_TYPE_LARGE_FILE, null,
-					ObjectFieldConstants.DB_TYPE_BLOB, true, false, "", "",
-					"able", false, true)));
+					ObjectFieldConstants.DB_TYPE_BLOB, null, false, "", "",
+					"able", false, true, true)));
 
 		// Indexed language ID can only be applied with type \"String\" that
 		// is not indexed as a keyword
@@ -579,22 +579,23 @@ public class ObjectFieldLocalServiceTest {
 			() -> _addUnmodifiableSystemObjectDefinition(
 				ObjectFieldUtil.createObjectField(
 					0, ObjectFieldConstants.BUSINESS_TYPE_LONG_INTEGER, null,
-					ObjectFieldConstants.DB_TYPE_LONG, true, false, "en_US", "",
-					"able", false, true)));
+					ObjectFieldConstants.DB_TYPE_LONG, null, false, "en_US", "",
+					"able", false, true, true)));
 		_assertFailure(
 			ObjectFieldDBTypeException.class, errorMessage,
 			() -> _addUnmodifiableSystemObjectDefinition(
 				ObjectFieldUtil.createObjectField(
 					0, ObjectFieldConstants.BUSINESS_TYPE_LONG_INTEGER, null,
-					ObjectFieldConstants.DB_TYPE_LONG, true, true, "en_US", "",
-					"able", false, true)));
+					ObjectFieldConstants.DB_TYPE_LONG, null, true, "en_US", "",
+					"able", false, true, true)));
 		_assertFailure(
 			ObjectFieldDBTypeException.class, errorMessage,
 			() -> _addUnmodifiableSystemObjectDefinition(
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT, null,
-					ObjectFieldConstants.DB_TYPE_STRING, true, true, "en_US",
-					"", 0, "able", Collections.emptyList(), false, true)));
+					ObjectFieldConstants.DB_TYPE_STRING, null, true, "en_US",
+					"", 0, "able", Collections.emptyList(), false, true,
+					true)));
 
 		// Invalid DB type
 
@@ -639,7 +640,7 @@ public class ObjectFieldLocalServiceTest {
 				objectDefinition.getObjectDefinitionId(),
 				ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-				ObjectFieldConstants.DB_TYPE_STRING, false, true, "",
+				ObjectFieldConstants.DB_TYPE_STRING, null, false, true, "",
 				LocalizedMapUtil.getLocalizedMap("Able"), "able", false,
 				false));
 
