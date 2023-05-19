@@ -733,6 +733,15 @@ public class ObjectEntryDisplayContextImpl
 		ddmFormField.setProperty(
 			"objectFieldId", String.valueOf(objectField.getObjectFieldId()));
 
+		ddmFormField.setLocalizable(objectField.isLocalized());
+
+		if (objectField.isLocalized() &&
+			StringUtil.equals(
+				ddmFormField.getType(), DDMFormFieldTypeConstants.TEXT)) {
+
+			ddmFormField.setType(DDMFormFieldTypeConstants.LOCALIZABLE_TEXT);
+		}
+
 		if (Validator.isNotNull(objectField.getRelationshipType())) {
 			ObjectRelationship objectRelationship =
 				_objectRelationshipLocalService.
