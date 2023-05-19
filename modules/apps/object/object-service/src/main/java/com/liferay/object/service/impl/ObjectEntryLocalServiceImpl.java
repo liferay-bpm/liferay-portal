@@ -1506,7 +1506,8 @@ public class ObjectEntryLocalServiceImpl
 
 	private void _addObjectRelationshipERCFieldValue(
 		long objectDefinitionId, Map<String, Serializable> values) {
-
+sadsafdsafdas
+	afsdsda
 		for (ObjectField objectField :
 				_objectFieldLocalService.getObjectFields(
 					objectDefinitionId, false)) {
