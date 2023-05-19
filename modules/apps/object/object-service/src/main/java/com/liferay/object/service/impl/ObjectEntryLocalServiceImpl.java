@@ -962,7 +962,6 @@ public class ObjectEntryLocalServiceImpl
 		if (dynamicObjectDefinitionLocalizationTable != null) {
 			_addLocalizedFieldValues(
 				dynamicObjectDefinitionLocalizationTable,
-				objectEntry.getObjectDefinitionId(),
 				objectEntry.getObjectEntryId(), values);
 		}
 
@@ -1455,68 +1454,53 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	private void _addLocalizedFieldValues(
-			DynamicObjectDefinitionLocalizationTable
-				dynamicObjectDefinitionLocalizationTable,
-			long objectDefinitionId, long objectEntryId,
-			Map<String, Serializable> values)
-		throws PortalException {
+		DynamicObjectDefinitionLocalizationTable
+			dynamicObjectDefinitionLocalizationTable,
+		long objectEntryId, Map<String, Serializable> values) {
 
-		List<Column<DynamicObjectDefinitionLocalizationTable, ?>>
-			objectFieldColumns =
-				dynamicObjectDefinitionLocalizationTable.
-					getObjectFieldColumns();
-
-		List<Expression<?>> selectExpressions = new ArrayList<>(
-			objectFieldColumns);
-
-		selectExpressions.add(
-			dynamicObjectDefinitionLocalizationTable.getLanguageIdColumn());
+		Column<DynamicObjectDefinitionLocalizationTable, Long>
+			foreignKeyColumn =
+				dynamicObjectDefinitionLocalizationTable.getForeignKeyColumn();
 
 		List<Object[]> localizedValues = ObjectMapperUtil.readValue(
 			List.class,
 			(Serializable)objectEntryPersistence.dslQuery(
 				DSLQueryFactoryUtil.select(
-					selectExpressions.toArray(new Expression<?>[0])
+					ArrayUtil.append(
+						_getSelectExpressions(
+							dynamicObjectDefinitionLocalizationTable),
+						dynamicObjectDefinitionLocalizationTable.
+							getLanguageIdColumn())
 				).from(
 					dynamicObjectDefinitionLocalizationTable
 				).where(
-					dynamicObjectDefinitionLocalizationTable.
-						getForeignKeyColumn(
-						).eq(
-							objectEntryId
-						)
+					foreignKeyColumn.eq(objectEntryId)
 				)));
 
 		if (ListUtil.isEmpty(localizedValues)) {
 			return;
 		}
 
-		List<Map<String, String>> temp = new ArrayList<>();
+		List<Column<DynamicObjectDefinitionLocalizationTable, ?>>
+			objectFieldColumns =
+				dynamicObjectDefinitionLocalizationTable.
+					getObjectFieldColumns();
 
 		for (int i = 0; i < objectFieldColumns.size(); i++) {
-			Map<String, String> map = new HashMap<>();
+			Map<String, String> localizedObjectFieldValue = new HashMap<>();
 
 			for (Object[] localizedValue : localizedValues) {
-				map.put(
+				localizedObjectFieldValue.put(
 					String.valueOf(localizedValue[objectFieldColumns.size()]),
 					String.valueOf(localizedValue[i]));
 			}
 
-			temp.add(map);
-		}
-
-		for (int i = 0; i < objectFieldColumns.size(); i++) {
 			Column<DynamicObjectDefinitionLocalizationTable, ?> column =
 				objectFieldColumns.get(i);
 
-			ObjectField objectField = _objectFieldLocalService.getObjectField(
-				objectDefinitionId,
-				StringUtil.removeSubstring(
-					column.getName(), StringPool.UNDERLINE));
-
 			values.put(
-				objectField.getI18nObjectFieldName(),
-				(Serializable)temp.get(i));
+				column.getName() + "i18n",
+				(Serializable)localizedObjectFieldValue);
 		}
 	}
 
