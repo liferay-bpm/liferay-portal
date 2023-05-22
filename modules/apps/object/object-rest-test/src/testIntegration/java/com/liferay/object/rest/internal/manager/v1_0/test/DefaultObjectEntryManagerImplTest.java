@@ -206,8 +206,6 @@ public class DefaultObjectEntryManagerImplTest {
 						RandomTestUtil.randomString())
 				).name(
 					"textObjectFieldName"
-				).objectFieldSettings(
-					Collections.emptyList()
 				).build()));
 
 		_listTypeDefinition =
@@ -239,8 +237,6 @@ public class DefaultObjectEntryManagerImplTest {
 						RandomTestUtil.randomString())
 				).name(
 					"dateObjectFieldName"
-				).objectFieldSettings(
-					Collections.emptyList()
 				).build(),
 				new DecimalObjectFieldBuilder(
 				).labelMap(
@@ -248,8 +244,6 @@ public class DefaultObjectEntryManagerImplTest {
 						RandomTestUtil.randomString())
 				).name(
 					"decimalObjectFieldName"
-				).objectFieldSettings(
-					Collections.emptyList()
 				).build(),
 				new IntegerObjectFieldBuilder(
 				).labelMap(
@@ -257,8 +251,6 @@ public class DefaultObjectEntryManagerImplTest {
 						RandomTestUtil.randomString())
 				).name(
 					"integerObjectFieldName"
-				).objectFieldSettings(
-					Collections.emptyList()
 				).build(),
 				new LongIntegerObjectFieldBuilder(
 				).labelMap(
@@ -266,8 +258,6 @@ public class DefaultObjectEntryManagerImplTest {
 						RandomTestUtil.randomString())
 				).name(
 					"longIntegerObjectFieldName"
-				).objectFieldSettings(
-					Collections.emptyList()
 				).build(),
 				new PicklistObjectFieldBuilder(
 				).indexed(
@@ -279,8 +269,6 @@ public class DefaultObjectEntryManagerImplTest {
 					_listTypeDefinition.getListTypeDefinitionId()
 				).name(
 					"picklistObjectFieldName"
-				).objectFieldSettings(
-					Collections.emptyList()
 				).build(),
 				new PrecisionDecimalObjectFieldBuilder(
 				).labelMap(
@@ -288,8 +276,6 @@ public class DefaultObjectEntryManagerImplTest {
 						RandomTestUtil.randomString())
 				).name(
 					"precisionDecimalObjectFieldName"
-				).objectFieldSettings(
-					Collections.emptyList()
 				).build(),
 				new RichTextObjectFieldBuilder(
 				).labelMap(
@@ -297,8 +283,6 @@ public class DefaultObjectEntryManagerImplTest {
 						RandomTestUtil.randomString())
 				).name(
 					"richTextObjectFieldName"
-				).objectFieldSettings(
-					Collections.emptyList()
 				).build(),
 				new TextObjectFieldBuilder(
 				).indexed(
@@ -308,8 +292,6 @@ public class DefaultObjectEntryManagerImplTest {
 						RandomTestUtil.randomString())
 				).name(
 					"textObjectFieldName"
-				).objectFieldSettings(
-					Collections.emptyList()
 				).build()));
 
 		ObjectRelationship objectRelationship1 =
@@ -1092,8 +1074,6 @@ public class DefaultObjectEntryManagerImplTest {
 						RandomTestUtil.randomString())
 				).name(
 					"textObjectFieldName"
-				).objectFieldSettings(
-					Collections.emptyList()
 				).build()));
 		ObjectDefinition objectDefinition2 = _createObjectDefinition(
 			Collections.singletonList(
@@ -1103,8 +1083,6 @@ public class DefaultObjectEntryManagerImplTest {
 						RandomTestUtil.randomString())
 				).name(
 					"a" + RandomTestUtil.randomString()
-				).objectFieldSettings(
-					Collections.emptyList()
 				).build()));
 
 		// Relationship type cascade
@@ -1932,8 +1910,6 @@ public class DefaultObjectEntryManagerImplTest {
 					"AggregationObjectFieldName"
 			).objectDefinitionId(
 				_objectDefinition1.getObjectDefinitionId()
-			).objectFieldSettings(
-				objectFieldSettings
 			).build());
 	}
 

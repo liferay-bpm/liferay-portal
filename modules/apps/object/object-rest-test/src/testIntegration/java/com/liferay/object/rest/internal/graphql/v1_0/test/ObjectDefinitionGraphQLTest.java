@@ -114,8 +114,6 @@ public class ObjectDefinitionGraphQLTest {
 				_listFieldName
 			).objectDefinitionId(
 				_parentObjectDefinition.getObjectDefinitionId()
-			).objectFieldSettings(
-				Collections.emptyList()
 			).required(
 				true
 			).build());
@@ -506,8 +504,6 @@ public class ObjectDefinitionGraphQLTest {
 				_objectFieldName
 			).objectDefinitionId(
 				objectDefinition.getObjectDefinitionId()
-			).objectFieldSettings(
-				Collections.emptyList()
 			).build());
 
 		return objectDefinition;

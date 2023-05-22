@@ -261,8 +261,6 @@ public class ObjectEntryLocalServiceTest {
 				"speed"
 			).objectDefinitionId(
 				_objectDefinition.getObjectDefinitionId()
-			).objectFieldSettings(
-				Collections.emptyList()
 			).build());
 		_addCustomObjectField(
 			new PicklistObjectFieldBuilder(
@@ -331,8 +329,6 @@ public class ObjectEntryLocalServiceTest {
 				"weight"
 			).objectDefinitionId(
 				_objectDefinition.getObjectDefinitionId()
-			).objectFieldSettings(
-				Collections.emptyList()
 			).build());
 	}
 
@@ -1130,8 +1126,6 @@ public class ObjectEntryLocalServiceTest {
 				"longField"
 			).objectDefinitionId(
 				objectDefinition.getObjectDefinitionId()
-			).objectFieldSettings(
-				Collections.emptyList()
 			).build());
 		_addCustomObjectField(
 			new TextObjectFieldBuilder(
@@ -1141,8 +1135,6 @@ public class ObjectEntryLocalServiceTest {
 				"textField"
 			).objectDefinitionId(
 				objectDefinition.getObjectDefinitionId()
-			).objectFieldSettings(
-				Collections.emptyList()
 			).required(
 				true
 			).build());
