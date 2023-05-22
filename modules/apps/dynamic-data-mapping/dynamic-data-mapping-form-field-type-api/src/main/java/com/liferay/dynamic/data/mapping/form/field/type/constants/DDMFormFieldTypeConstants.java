@@ -51,6 +51,8 @@ public class DDMFormFieldTypeConstants {
 
 	public static final String LINK_TO_LAYOUT = "link_to_layout";
 
+	public static final String LOCALIZABLE_RICH_TEXT = "localizable_rich_text";
+
 	public static final String LOCALIZABLE_TEXT = "localizable_text";
 
 	public static final String MULTI_LANGUAGE_OPTION_SELECT =
