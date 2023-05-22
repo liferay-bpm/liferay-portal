@@ -1,0 +1,183 @@
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
+package com.liferay.dynamic.data.mapping.form.field.type.internal.localizable.rich.text;
+
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
+import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
+import com.liferay.dynamic.data.mapping.model.DDMForm;
+import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.dynamic.data.mapping.model.LocalizedValue;
+import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
+import com.liferay.portal.kernel.editor.configuration.EditorConfiguration;
+import com.liferay.portal.kernel.editor.configuration.EditorConfigurationFactory;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.WebKeys;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+/**
+ * @author Pedro Leite
+ */
+@Component(
+	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.LOCALIZABLE_RICH_TEXT,
+	service = DDMFormFieldTemplateContextContributor.class
+)
+public class LocalizableRichTextDDMFormFieldTemplateContextContributor
+	implements DDMFormFieldTemplateContextContributor {
+
+	@Override
+	public Map<String, Object> getParameters(
+		DDMFormField ddmFormField,
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
+
+		Map<String, Object> parameters = new HashMap<>();
+
+		if (ddmFormFieldRenderingContext.isReturnFullContext()) {
+			parameters.put(
+				"availableLocales",
+				JSONUtil.toJSONArray(
+					_language.getAvailableLocales(), this::_getLocaleJSONObject,
+					_log));
+
+			DDMForm ddmForm = ddmFormField.getDDMForm();
+
+			JSONObject localeJSONObject = _getLocaleJSONObject(
+				ddmForm.getDefaultLocale());
+
+			parameters.put("defaultLocale", localeJSONObject);
+			parameters.put("editingLocale", localeJSONObject);
+		}
+
+		parameters.putAll(
+			_getData(ddmFormFieldRenderingContext, ddmFormField.getType()));
+
+		String predefinedValue = _getPredefinedValue(
+			ddmFormField, ddmFormFieldRenderingContext);
+
+		if (predefinedValue != null) {
+			parameters.put("predefinedValue", predefinedValue);
+		}
+
+		parameters.put(
+			"value", _getValueJSONObject(ddmFormFieldRenderingContext));
+
+		return parameters;
+	}
+
+	@Reference
+	protected JSONFactory jsonFactory;
+
+	private Map<String, Object> _getData(
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext,
+		String ddmFormFieldType) {
+
+		HttpServletRequest httpServletRequest =
+			ddmFormFieldRenderingContext.getHttpServletRequest();
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		EditorConfiguration editorConfiguration =
+			_editorConfigurationFactory.getEditorConfiguration(
+				themeDisplay.getPpid(), ddmFormFieldType, "ckeditor_classic",
+				HashMapBuilder.<String, Object>put(
+					"liferay-ui:input-editor:allowBrowseDocuments", true
+				).put(
+					"liferay-ui:input-editor:name",
+					ddmFormFieldRenderingContext.getName()
+				).build(),
+				(ThemeDisplay)httpServletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY),
+				RequestBackedPortletURLFactoryUtil.create(httpServletRequest));
+
+		return editorConfiguration.getData();
+	}
+
+	private JSONObject _getLocaleJSONObject(Locale locale) {
+		JSONObject jsonObject = jsonFactory.createJSONObject();
+
+		String languageId = LocaleUtil.toLanguageId(locale);
+
+		jsonObject.put(
+			"displayName", locale.getDisplayName(locale)
+		).put(
+			"icon",
+			StringUtil.toLowerCase(StringUtil.replace(languageId, '_', "-"))
+		).put(
+			"localeId", languageId
+		);
+
+		return jsonObject;
+	}
+
+	private String _getPredefinedValue(
+		DDMFormField ddmFormField,
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
+
+		LocalizedValue localizedValue = ddmFormField.getPredefinedValue();
+
+		if (localizedValue == null) {
+			return null;
+		}
+
+		return localizedValue.getString(
+			ddmFormFieldRenderingContext.getLocale());
+	}
+
+	private JSONObject _getValueJSONObject(
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
+
+		try {
+			return jsonFactory.createJSONObject(
+				ddmFormFieldRenderingContext.getValue());
+		}
+		catch (JSONException jsonException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(jsonException);
+			}
+		}
+
+		return jsonFactory.createJSONObject();
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		LocalizableRichTextDDMFormFieldTemplateContextContributor.class);
+
+	@Reference
+	private EditorConfigurationFactory _editorConfigurationFactory;
+
+	@Reference
+	private Language _language;
+
+}
