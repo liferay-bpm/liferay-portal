@@ -1910,6 +1910,8 @@ public class DefaultObjectEntryManagerImplTest {
 					"AggregationObjectFieldName"
 			).objectDefinitionId(
 				_objectDefinition1.getObjectDefinitionId()
+			).objectFieldSettings(
+				objectFieldSettings
 			).build());
 	}
 
