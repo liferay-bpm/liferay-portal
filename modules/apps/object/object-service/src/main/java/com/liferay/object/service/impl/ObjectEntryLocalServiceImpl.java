@@ -3072,11 +3072,22 @@ public class ObjectEntryLocalServiceImpl
 				value = BigDecimal.ZERO;
 			}
 
+			String decimalValue = String.valueOf(value);
+
+			String decimalWithPointSeparator = StringUtil.replace(
+				decimalValue, ',', '.');
+
 			preparedStatement.setBigDecimal(
-				index, new BigDecimal(String.valueOf(value)));
+				index, new BigDecimal(decimalWithPointSeparator));
 		}
 		else if (sqlType == Types.DOUBLE) {
-			preparedStatement.setDouble(index, GetterUtil.getDouble(value));
+			String doubleValue = String.valueOf(value);
+
+			String doubleWithPointSeparator = StringUtil.replace(
+				doubleValue, ',', '.');
+
+			preparedStatement.setDouble(
+				index, GetterUtil.getDouble(doubleWithPointSeparator));
 		}
 		else if (sqlType == Types.INTEGER) {
 			preparedStatement.setInt(index, GetterUtil.getInteger(value));
