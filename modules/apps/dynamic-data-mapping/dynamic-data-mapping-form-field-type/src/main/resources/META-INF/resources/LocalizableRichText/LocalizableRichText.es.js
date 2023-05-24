@@ -34,7 +34,6 @@ const INITIAL_EDITING_LOCALE = {
 	icon: normalizeLocaleId(themeDisplay.getDefaultLanguageId()),
 	localeId: themeDisplay.getDefaultLanguageId(),
 };
-
 const LocalizableRichText = ({
 	availableLocales,
 	defaultLocale = INITIAL_DEFAULT_LOCALE,
@@ -54,10 +53,6 @@ const LocalizableRichText = ({
 	...otherProps
 }) => {
 	const editorRef = useRef();
-	const contents = useMemo(
-		() => (editable ? predefinedValue : value ?? predefinedValue),
-		[editable, predefinedValue, value]
-	);
 	const [currentAvailableLocales, setCurrentAvailableLocales] = useState(
 		availableLocales
 	);
@@ -87,7 +82,7 @@ const LocalizableRichText = ({
 			...transformAvailableLocalesAndValue({
 				availableLocales: currentAvailableLocales,
 				defaultLocale,
-				value: newData ? newData : value,
+				value: currentValue,
 			}),
 		};
 
@@ -107,36 +102,35 @@ const LocalizableRichText = ({
 			<ClayInput.Group>
 				<ClayInput.GroupItem>
 					<ClassicEditor
-						contents={contents}
+						contents={currentValue[currentEditingLocale.localeId]}
 						editorConfig={editorConfig}
 						name={name}
 						onBlur={onBlur}
 						onChange={(content) => {
-							if (contents !== content) {
-								const valueJSON = convertValueToJSON(
-									currentValue
-								);
+							const valueJSON = convertValueToJSON(
+								currentValue
+							);
 
-								const newValue = JSON.stringify({
-									...valueJSON,
-									[currentEditingLocale.localeId]: content,
-								});
+							const newValue = JSON.stringify({
+								...valueJSON,
+								[currentEditingLocale.localeId]: content,
+							});
 
-								setCurrentValue(newValue);
-								setCurrentInternalValue(content);
+							setCurrentValue(newValue);
+							setCurrentInternalValue(content);
 
-								const {availableLocales} = {
-									...transformAvailableLocalesAndValue({
-										availableLocales: currentAvailableLocales,
-										defaultLocale,
-										value: newValue,
-									}),
-								};
+							const {availableLocales} = {
+								...transformAvailableLocalesAndValue({
+									availableLocales: currentAvailableLocales,
+									defaultLocale,
+									value: newValue,
+								}),
+							};
 
-								setCurrentAvailableLocales(availableLocales);
+							setCurrentAvailableLocales(availableLocales);
 
-								onChange({target: {value: content}});
-							}
+							onChange({target: {value: newValue}});
+							
 						}}
 						onFocus={onFocus}
 						onSetData={({
@@ -152,7 +146,7 @@ const LocalizableRichText = ({
 					/>
 				</ClayInput.GroupItem>
 
-				<input name={name} type="hidden" value={contents} />
+				<input id={id} name={name} type="hidden" value={JSON.stringify(currentValue) || ''} />
 
 				<ClayInput.GroupItem
 					className="liferay-ddm-form-field-localizable-text"
