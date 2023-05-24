@@ -103,6 +103,7 @@ const LocalizableRichText = ({
 				<ClayInput.GroupItem>
 					<ClassicEditor
 						contents={currentValue[currentEditingLocale.localeId]}
+						className="w-100"
 						editorConfig={editorConfig}
 						name={name}
 						onBlur={onBlur}
@@ -144,10 +145,8 @@ const LocalizableRichText = ({
 						readOnly={readOnly}
 						ref={editorRef}
 					/>
+					<input id={id} name={name} type="hidden" value={JSON.stringify(currentValue) || ''} />
 				</ClayInput.GroupItem>
-
-				<input id={id} name={name} type="hidden" value={JSON.stringify(currentValue) || ''} />
-
 				<ClayInput.GroupItem
 					className="liferay-ddm-form-field-localizable-text"
 					shrink

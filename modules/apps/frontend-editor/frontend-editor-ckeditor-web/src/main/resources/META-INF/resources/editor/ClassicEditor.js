@@ -30,7 +30,7 @@ const ClassicEditor = forwardRef(
 		ref
 	) => {
 		return (
-			<div id={`${name}Container`}>
+			<div id={`${name}Container`} className = {otherProps?.className}>
 				{title && (
 					<label className="control-label" htmlFor={name}>
 						{title}
