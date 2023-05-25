@@ -594,6 +594,10 @@ public class ObjectEntryInfoItemFormProvider
 						_objectFieldLocalService.getObjectFields(
 							objectDefinition.getObjectDefinitionId(), false)) {
 
+					if (objectField.isLocalized()) {
+						continue;
+					}
+
 					if (Validator.isNotNull(
 							objectField.getRelationshipType())) {
 
