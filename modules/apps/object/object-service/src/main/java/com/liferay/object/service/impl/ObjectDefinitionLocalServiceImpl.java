@@ -534,8 +534,8 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectField objectField)
 		throws PortalException {
 
-		if (!Objects.equals(objectField.getBusinessType(), "Integer") ||
-			!Objects.equals(objectField.getBusinessType(), "LongInteger") ||
+		if (!Objects.equals(objectField.getBusinessType(), "Integer") &&
+			!Objects.equals(objectField.getBusinessType(), "LongInteger") &&
 			!Objects.equals(objectField.getBusinessType(), "Text")) {
 
 			throw new ObjectDefinitionAccountEntryRestrictedException(
@@ -543,7 +543,7 @@ public class ObjectDefinitionLocalServiceImpl
 					"Integer, Long Integer or Text field");
 		}
 
-		ObjectDefinition objectDefinition = objectField.getObjectDefinition();
+		ObjectDefinition objectDefinition = getObjectDefinition(objectField.getObjectDefinitionId());
 
 		if (objectDefinition.isDefaultStorageType() ||
 			objectDefinition.isAccountEntryRestricted()) {
