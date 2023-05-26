@@ -12,30 +12,19 @@
  * details.
  */
 
-package com.liferay.frontend.data.set.view.table;
+package com.liferay.object.field.builder;
 
-import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.object.constants.ObjectFieldConstants;
 
 /**
- * @author Guilherme Camacho
+ * @author Pedro Tavares
  */
-public class BaseDateFDSTableSchemaField extends FDSTableSchemaField {
+public class DateTimeObjectFieldBuilder extends ObjectFieldBuilder {
 
-	public JSONObject getFormat() {
-		return _formatJSONObject;
+	public DateTimeObjectFieldBuilder() {
+		objectField.setBusinessType(
+			ObjectFieldConstants.BUSINESS_TYPE_DATE_TIME);
+		objectField.setDBType(ObjectFieldConstants.DB_TYPE_DATE_TIME);
 	}
-
-	public void setFormat(JSONObject formatJSONObject) {
-		_formatJSONObject = formatJSONObject;
-	}
-
-	@Override
-	public JSONObject toJSONObject() {
-		JSONObject jsonObject = super.toJSONObject();
-
-		return jsonObject.put("format", getFormat());
-	}
-
-	private JSONObject _formatJSONObject;
 
 }
