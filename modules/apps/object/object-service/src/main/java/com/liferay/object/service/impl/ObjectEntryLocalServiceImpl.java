@@ -204,6 +204,7 @@ import java.sql.Types;
 import java.time.LocalDateTime;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -3870,6 +3871,23 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
+	private void _validateListTypeEntryKey(
+			String listTypeEntryKey, ObjectField objectField)
+		throws PortalException {
+
+		ListTypeEntry listTypeEntry =
+			_listTypeEntryLocalService.fetchListTypeEntry(
+				objectField.getListTypeDefinitionId(), listTypeEntryKey);
+
+		if ((listTypeEntry == null) &&
+			(Validator.isNotNull(listTypeEntryKey) ||
+			 objectField.isRequired())) {
+
+			throw new ObjectEntryValuesException.ListTypeEntry(
+				objectField.getName());
+		}
+	}
+
 	private void _validateObjectStateTransition(
 			Map.Entry<String, Serializable> entry, long listTypeDefinitionId,
 			ObjectEntry objectEntry, long objectFieldId, long userId)
@@ -4288,30 +4306,40 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		if (objectField.getListTypeDefinitionId() != 0) {
-			ListTypeEntry listTypeEntry = null;
+			Serializable value = entry.getValue();
 
-			String value = String.valueOf(values.get(entry.getKey()));
+			if (objectField.compareBusinessType(
+					ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST)) {
 
-			for (ListTypeEntry curListTypeEntry :
-					_listTypeEntryLocalService.getListTypeEntries(
-						objectField.getListTypeDefinitionId())) {
+				List<String> listTypeEntryKeys;
 
-				if (Objects.equals(value, curListTypeEntry.getKey())) {
-					listTypeEntry = curListTypeEntry;
+				if (value instanceof List) {
+					listTypeEntryKeys = (List<String>)value;
+				}
+				else {
+					listTypeEntryKeys = Arrays.asList(
+						StringUtil.split(
+							GetterUtil.getString(String.valueOf(value)),
+							StringPool.COMMA_AND_SPACE));
+				}
 
-					break;
+				if (listTypeEntryKeys.isEmpty() && objectField.isRequired()) {
+					throw new ObjectEntryValuesException.Required(
+						objectField.getName());
+				}
+
+				for (String listTypeEntryKey : listTypeEntryKeys) {
+					_validateListTypeEntryKey(listTypeEntryKey, objectField);
 				}
 			}
+			else {
+				_validateListTypeEntryKey(String.valueOf(value), objectField);
 
-			if ((listTypeEntry == null) && objectField.isRequired()) {
-				throw new ObjectEntryValuesException.ListTypeEntry(
-					entry.getKey());
-			}
-
-			if ((objectEntry != null) && objectField.isState()) {
-				_validateObjectStateTransition(
-					entry, objectField.getListTypeDefinitionId(), objectEntry,
-					objectField.getObjectFieldId(), userId);
+				if ((objectEntry != null) && objectField.isState()) {
+					_validateObjectStateTransition(
+						entry, objectField.getListTypeDefinitionId(),
+						objectEntry, objectField.getObjectFieldId(), userId);
+				}
 			}
 		}
 	}
