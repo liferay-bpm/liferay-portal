@@ -501,9 +501,8 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectRelationship objectRelationship)
 		throws PortalException {
 
-		ObjectDefinition objectDefinition1 =
-			objectDefinitionLocalService.getObjectDefinition(
-				objectRelationship.getObjectDefinitionId1());
+		ObjectDefinition objectDefinition1 = getObjectDefinition(
+			objectRelationship.getObjectDefinitionId1());
 
 		if (!Objects.equals(objectDefinition1.getShortName(), "AccountEntry")) {
 			throw new ObjectDefinitionAccountEntryRestrictedException(
@@ -543,7 +542,8 @@ public class ObjectDefinitionLocalServiceImpl
 					"Integer, Long Integer or Text field");
 		}
 
-		ObjectDefinition objectDefinition = getObjectDefinition(objectField.getObjectDefinitionId());
+		ObjectDefinition objectDefinition = getObjectDefinition(
+			objectField.getObjectDefinitionId());
 
 		if (objectDefinition.isDefaultStorageType() ||
 			objectDefinition.isAccountEntryRestricted()) {
