@@ -17,7 +17,7 @@ import {ClassicEditor} from 'frontend-editor-ckeditor-web';
 import React, {useEffect, useRef, useState} from 'react';
 
 import {FieldBase} from '../FieldBase/ReactFieldBase.es';
-import LocalesDropdown from '../util/localizable/LocalesDropdown.es';
+import LocalesDropdown from '../util/localizable/LocalesDropdown';
 import {
 	getEditingValue,
 	getInitialInternalValue,
@@ -160,7 +160,7 @@ const LocalizableRichText = ({
 						availableLocales={currentAvailableLocales}
 						editingLocale={currentEditingLocale}
 						fieldName={fieldName}
-						onLanguageClicked={({localeId}) => {
+						onLanguageClicked={(localeId) => {
 							const newEditingLocale = currentAvailableLocales.find(
 								(availableLocale) =>
 									availableLocale.localeId === localeId
