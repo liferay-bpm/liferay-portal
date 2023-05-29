@@ -12,16 +12,28 @@
  * details.
  */
 
-import slugify from 'commerce-frontend-js/utilities/slugify';
-import {debounce} from 'frontend-js-web';
+package com.liferay.commerce.product.exception;
 
-export default function ({namespace}) {
-	const form = document.getElementById(namespace + 'fm');
-	const keyInput = form.querySelector('#' + namespace + 'key');
+import com.liferay.portal.kernel.exception.PortalException;
 
-	const handleOnKeyInput = function () {
-		keyInput.value = slugify(keyInput.value);
-	};
+/**
+ * @author Marco Leo
+ */
+public class CPOptionValueNameException extends PortalException {
 
-	keyInput.addEventListener('input', debounce(handleOnKeyInput, 200));
+	public CPOptionValueNameException() {
+	}
+
+	public CPOptionValueNameException(String msg) {
+		super(msg);
+	}
+
+	public CPOptionValueNameException(String msg, Throwable throwable) {
+		super(msg, throwable);
+	}
+
+	public CPOptionValueNameException(Throwable throwable) {
+		super(throwable);
+	}
+
 }
