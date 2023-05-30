@@ -12,25 +12,27 @@
  * details.
  */
 
-package com.liferay.layout.internal.helper;
+package com.liferay.layout.util;
 
 import com.liferay.info.pagination.Pagination;
-import com.liferay.layout.helper.CollectionPaginationHelper;
 import com.liferay.portal.util.PropsValues;
 
 import java.util.Objects;
 
-import org.osgi.service.component.annotations.Component;
-
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = CollectionPaginationHelper.class)
-public class CollectionPaginationHelperImpl
-	implements CollectionPaginationHelper {
+public class CollectionPaginationUtil {
 
-	@Override
-	public Pagination getPagination(
+	public static final String PAGINATION_TYPE_NONE = "none";
+
+	public static final String PAGINATION_TYPE_NUMERIC = "numeric";
+
+	public static final String PAGINATION_TYPE_REGULAR = "regular";
+
+	public static final String PAGINATION_TYPE_SIMPLE = "simple";
+
+	public static Pagination getPagination(
 		int activePage, int count, boolean displayAllPages,
 		boolean displayAllItems, int numberOfItems, int numberOfItemsPerPage,
 		int numberOfPages, String paginationType) {
@@ -65,8 +67,7 @@ public class CollectionPaginationHelperImpl
 		return Pagination.of(end, start);
 	}
 
-	@Override
-	public int getTotalNumberOfItems(
+	public static int getTotalNumberOfItems(
 		int count, boolean displayAllPages, boolean displayAllItems,
 		int numberOfItems, int numberOfItemsPerPage, int numberOfPages,
 		String paginationType) {
@@ -93,17 +94,16 @@ public class CollectionPaginationHelperImpl
 		return Math.min(count, numberOfPages * numberOfItemsPerPage);
 	}
 
-	@Override
-	public boolean isPaginationEnabled(String paginationType) {
+	public static boolean isPaginationEnabled(String paginationType) {
 		if (Objects.equals(
 				paginationType,
-				CollectionPaginationHelper.PAGINATION_TYPE_NUMERIC) ||
+				CollectionPaginationUtil.PAGINATION_TYPE_NUMERIC) ||
 			Objects.equals(
 				paginationType,
-				CollectionPaginationHelper.PAGINATION_TYPE_REGULAR) ||
+				CollectionPaginationUtil.PAGINATION_TYPE_REGULAR) ||
 			Objects.equals(
 				paginationType,
-				CollectionPaginationHelper.PAGINATION_TYPE_SIMPLE)) {
+				CollectionPaginationUtil.PAGINATION_TYPE_SIMPLE)) {
 
 			return true;
 		}
