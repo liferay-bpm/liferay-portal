@@ -1,5 +1,17 @@
 definition {
 
+	macro addFields {
+		LexiconEntry.gotoAdd();
+
+		for (var key_fieldItem : list ${key_fieldList}) {
+			Check.checkNotVisible(
+				checkboxName = ${key_fieldItem},
+				locator1 = "Checkbox#ANY_CHECKBOX");
+		}
+
+		Button.clickSave();
+	}
+
 	macro assertDataSetEntry {
 		for (var key_dataSetName : list ${key_dataSetNameList}) {
 			AssertElementPresent(
@@ -66,9 +78,11 @@ definition {
 	}
 
 	macro checkFields {
-		Check.checkNotVisible(
-			checkboxName = ${checkboxName},
-			locator1 = "Checkbox#ANY_CHECKBOX");
+		for (var key_fieldItem : list ${key_fieldList}) {
+			Check.checkNotVisible(
+				checkboxName = ${key_fieldItem},
+				locator1 = "Checkbox#ANY_CHECKBOX");
+		}
 	}
 
 	macro createDataSet {
@@ -182,6 +196,22 @@ definition {
 			locator1 = "FrontendDataSetAdmin#DELETE_DATA_SET_MODAL_BODY");
 
 		Button.clickDelete();
+	}
+
+	macro deleteDataSetViewsFields {
+		Click(
+			key_fieldName = ${fieldName},
+			locator1 = "FrontendDataSetAdmin#VERTICAL_ELLIPSIS_BY_FIELDS_NAME");
+
+		ClickNoError(locator1 = "ObjectPortlet#DELETE_ENTRY_BUTTON");
+
+		AssertElementPresent(
+			key_modalText = "Are you sure you want to delete this field? It will be removed immediately. Fragments using it will be affected. This action cannot be undone.",
+			locator1 = "FrontendDataSetAdmin#DELETE_DATA_SET_MODAL_BODY");
+
+		Button.clickDelete();
+
+		Alert.viewSuccessMessage();
 	}
 
 	macro deleteDataSetViewViaAPI {
@@ -302,6 +332,14 @@ definition {
 		Click(
 			locator1 = "FrontendDataSet#SELECT_TYPE_PROVIDER",
 			value1 = ${key_type});
+	}
+
+	macro uncheckFields {
+		for (var key_fieldItem : list ${key_fieldList}) {
+			Uncheck.uncheckNotVisible(
+				checkboxName = ${key_fieldItem},
+				locator1 = "Checkbox#ANY_CHECKBOX");
+		}
 	}
 
 }

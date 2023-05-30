@@ -56,6 +56,13 @@ public interface ObjectFieldBusinessType {
 		return StringPool.BLANK;
 	}
 
+	public default Object getDisplayContextValue(
+			ObjectField objectField, long userId, Map<String, Object> values)
+		throws PortalException {
+
+		return getValue(objectField, userId, values);
+	}
+
 	public String getLabel(Locale locale);
 
 	public String getName();
@@ -76,12 +83,12 @@ public interface ObjectFieldBusinessType {
 		return Collections.emptySet();
 	}
 
-	public default Set<String> getUnmodifiablObjectFieldSettingsNames() {
+	public default Set<String> getUnmodifiableObjectFieldSettingsNames() {
 		return Collections.emptySet();
 	}
 
 	public default Object getValue(
-			ObjectField objectField, Map<String, Object> values)
+			ObjectField objectField, long userId, Map<String, Object> values)
 		throws PortalException {
 
 		return values.get(objectField.getName());
