@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Alessio Antonio Rendina
  */
-public interface CommerceHealthHttpStatus {
+public interface CommerceHealthStatus {
 
 	public void fixIssue(HttpServletRequest httpServletRequest)
 		throws PortalException;
@@ -35,6 +35,8 @@ public interface CommerceHealthHttpStatus {
 	public String getName(Locale locale);
 
 	public int getType();
+
+	public boolean isActive();
 
 	public boolean isFixed(long companyId, long commerceChannelId)
 		throws PortalException;

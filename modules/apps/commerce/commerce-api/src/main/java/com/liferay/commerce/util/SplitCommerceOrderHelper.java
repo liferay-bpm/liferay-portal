@@ -12,17 +12,13 @@
  * details.
  */
 
-package com.liferay.commerce.health.status;
-
-import java.util.List;
+package com.liferay.commerce.util;
 
 /**
- * @author Marco Leo
+ * @author Crescenzo Rega
  */
-public interface CommerceHealthHttpStatusRegistry {
+public interface SplitCommerceOrderHelper {
 
-	public CommerceHealthHttpStatus getCommerceHealthStatus(String key);
-
-	public List<CommerceHealthHttpStatus> getCommerceHealthStatuses(int type);
+	public void splitByCatalog(long commerceOrderId) throws Exception;
 
 }
