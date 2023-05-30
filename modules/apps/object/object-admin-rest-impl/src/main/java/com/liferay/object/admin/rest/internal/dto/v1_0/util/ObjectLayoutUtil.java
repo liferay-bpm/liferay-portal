@@ -12,8 +12,10 @@ import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutRow;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutTab;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
@@ -29,6 +31,7 @@ public class ObjectLayoutUtil {
 			Map<String, Map<String, String>> actions,
 			ObjectDefinitionLocalService objectDefinitionLocalService,
 			ObjectFieldLocalService objectFieldLocalService,
+			ObjectRelationshipLocalService objectRelationshipLocalService,
 			com.liferay.object.model.ObjectLayout serviceBuilderObjectLayout)
 		throws PortalException {
 
@@ -56,7 +59,8 @@ public class ObjectLayoutUtil {
 				objectLayoutTabs = TransformUtil.transformToArray(
 					serviceBuilderObjectLayout.getObjectLayoutTabs(),
 					objectLayoutTab -> toObjectLayoutTab(
-						objectFieldLocalService, objectLayoutTab),
+						objectFieldLocalService, objectLayoutTab,
+						objectRelationshipLocalService),
 					ObjectLayoutTab.class);
 			}
 		};
@@ -68,11 +72,16 @@ public class ObjectLayoutUtil {
 
 	public static ObjectLayoutTab toObjectLayoutTab(
 		ObjectFieldLocalService objectFieldLocalService,
-		com.liferay.object.model.ObjectLayoutTab objectLayoutTab) {
+		com.liferay.object.model.ObjectLayoutTab objectLayoutTab,
+		ObjectRelationshipLocalService objectRelationshipLocalService) {
 
 		if (objectLayoutTab == null) {
 			return null;
 		}
+
+		ObjectRelationship objectRelationship =
+			objectRelationshipLocalService.fetchObjectRelationship(
+				objectLayoutTab.getObjectRelationshipId());
 
 		return new ObjectLayoutTab() {
 			{
@@ -84,6 +93,9 @@ public class ObjectLayoutUtil {
 					objectLayoutBox -> _toObjectLayoutBox(
 						objectFieldLocalService, objectLayoutBox),
 					ObjectLayoutBox.class);
+				objectRelationshipExternalReferenceCode =
+					(objectRelationship != null) ?
+						objectRelationship.getExternalReferenceCode() : null;
 				objectRelationshipId =
 					objectLayoutTab.getObjectRelationshipId();
 				priority = objectLayoutTab.getPriority();
