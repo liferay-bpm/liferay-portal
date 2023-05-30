@@ -25,6 +25,7 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.BucketInfo;
+import com.google.cloud.storage.CopyWriter;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 
@@ -178,6 +179,26 @@ public class GCSStore implements Store, StoreAreaProcessor {
 	}
 
 	@Override
+	public void copy(String sourceFileName, String destinationFileName) {
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-174816")) {
+			return;
+		}
+
+		CopyWriter copyWriter = _gcsStore.copy(
+			Storage.CopyRequest.newBuilder(
+			).setSource(
+				_gcsStoreConfiguration.bucketName(), sourceFileName
+			).setTarget(
+				BlobId.of(
+					_gcsStoreConfiguration.bucketName(), destinationFileName)
+			).build());
+
+		while (!copyWriter.isDone()) {
+			copyWriter.copyChunk();
+		}
+	}
+
+	@Override
 	public void deleteDirectory(
 		long companyId, long repositoryId, String dirName) {
 
@@ -229,7 +250,8 @@ public class GCSStore implements Store, StoreAreaProcessor {
 		long companyId, long repositoryId, String dirName) {
 
 		String prefix =
-			StoreArea.getPath(companyId, repositoryId) + StringPool.SLASH;
+			StoreArea.getCurrentStoreAreaPath(companyId, repositoryId) +
+				StringPool.SLASH;
 
 		return TransformUtil.transform(
 			_getFilePaths(companyId, repositoryId, dirName),
@@ -338,7 +360,8 @@ public class GCSStore implements Store, StoreAreaProcessor {
 	private String _getFileKey(
 		long companyId, long repositoryId, String fileName) {
 
-		return StoreArea.getPath(companyId, repositoryId, fileName);
+		return StoreArea.getCurrentStoreAreaPath(
+			companyId, repositoryId, fileName);
 	}
 
 	private String[] _getFilePaths(
@@ -372,7 +395,7 @@ public class GCSStore implements Store, StoreAreaProcessor {
 		long companyId, long repositoryId, String fileName,
 		String versionLabel) {
 
-		return StoreArea.getPath(
+		return StoreArea.getCurrentStoreAreaPath(
 			companyId, repositoryId, fileName, versionLabel);
 	}
 
@@ -414,7 +437,7 @@ public class GCSStore implements Store, StoreAreaProcessor {
 	}
 
 	private String _getRepositoryKey(long companyId, long repositoryId) {
-		return StoreArea.getPath(companyId, repositoryId);
+		return StoreArea.getCurrentStoreAreaPath(companyId, repositoryId);
 	}
 
 	private WriteChannel _getWriteChannel(BlobInfo blobInfo) {
