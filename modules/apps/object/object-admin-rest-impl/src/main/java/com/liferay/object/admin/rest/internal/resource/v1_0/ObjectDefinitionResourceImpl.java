@@ -1033,7 +1033,8 @@ public class ObjectDefinitionResourceImpl
 						objectDefinition.getObjectDefinitionId()),
 					objectLayout -> ObjectLayoutUtil.toObjectLayout(
 						null, _objectDefinitionLocalService,
-						_objectFieldLocalService, objectLayout),
+						_objectFieldLocalService,
+						_objectRelationshipLocalService, objectLayout),
 					ObjectLayout.class);
 				objectRelationships = transformToArray(
 					_objectRelationshipLocalService.getObjectRelationships(
