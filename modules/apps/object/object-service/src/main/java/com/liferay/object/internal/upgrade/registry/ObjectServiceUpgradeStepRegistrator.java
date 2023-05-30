@@ -365,6 +365,19 @@ public class ObjectServiceUpgradeStepRegistrator
 			"8.5.0", "8.6.0",
 			new com.liferay.object.internal.upgrade.v8_6_0.
 				ObjectActionUpgradeProcess());
+
+		registry.register(
+			"8.6.0", "8.7.0",
+			new BaseExternalReferenceCodeUpgradeProcess() {
+
+				@Override
+				protected String[][] getTableAndPrimaryKeyColumnNames() {
+					return new String[][] {
+						{"ObjectRelationship", "objectRelationshipId"}
+					};
+				}
+
+			});
 	}
 
 	@Reference
