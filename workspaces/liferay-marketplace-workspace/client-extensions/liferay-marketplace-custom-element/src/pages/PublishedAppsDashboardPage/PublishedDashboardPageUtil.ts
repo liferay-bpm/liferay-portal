@@ -12,14 +12,13 @@
  * details.
  */
 
-import {DashboardListItems} from 'liferay-marketplace-custom-element/src/components/DashboardNavigation/DashboardNavigation';
-import {AppProps} from 'liferay-marketplace-custom-element/src/components/DashboardTable/DashboardTable';
-
 import solutionsIcon from '../../assets/icons/analytics_icon.svg';
 import appsIcon from '../../assets/icons/apps_fill_icon.svg';
 import businessIcon from '../../assets/icons/business_center_icon.svg';
 import membersIcon from '../../assets/icons/person_fill_icon.svg';
 import projectsIcon from '../../assets/icons/projects_icon.svg';
+import {DashboardListItems} from '../../components/DashboardNavigation/DashboardNavigation';
+import {AppProps} from '../../components/DashboardTable/DashboardTable';
 import {Liferay} from '../../liferay/liferay';
 import {getProductSpecifications} from '../../utils/api';
 

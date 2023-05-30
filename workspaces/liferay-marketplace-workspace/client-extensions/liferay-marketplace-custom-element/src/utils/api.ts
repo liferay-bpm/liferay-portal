@@ -13,6 +13,7 @@
  */
 
 import {Liferay} from '../liferay/liferay';
+
 const headers = {
 	'Content-Type': 'application/json',
 	'X-CSRF-Token': Liferay.authToken,
@@ -560,7 +561,9 @@ export async function getProductSpecifications({
 		}
 	);
 
-	const {items} = (await response.json()) as {items: ProductSpecification[]};
+	const {items} = (await response.json()) as {
+		items: ProductSpecification[];
+	};
 
 	return items;
 }
@@ -667,6 +670,18 @@ export async function getUserAccountsById() {
 	);
 
 	return response;
+}
+
+export async function getUserAccountsByAccountId(accountId: number) {
+	const response = await fetch(
+		`${baseURL}/o/headless-admin-user/v1.0/accounts/${accountId}/user-accounts`,
+		{
+			headers,
+			method: 'GET',
+		}
+	);
+
+	return response.json();
 }
 
 export async function getVocabularies() {

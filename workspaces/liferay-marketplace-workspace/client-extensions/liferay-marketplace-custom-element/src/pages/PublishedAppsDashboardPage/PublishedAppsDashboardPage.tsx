@@ -29,7 +29,7 @@ import {
 	getAccounts,
 	getMyUserAccount,
 	getProducts,
-	getUserAccounts,
+	getUserAccountsByAccountId,
 } from '../../utils/api';
 import {
 	getProductVersionFromSpecifications,
@@ -252,7 +252,6 @@ export function PublishedAppsDashboardPage() {
 		};
 
 		makeFetch();
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [page, publishedAppTable.pageSize, selectedAccount]);
 
@@ -313,9 +312,11 @@ export function PublishedAppsDashboardPage() {
 					});
 				}
 
-				const accountsListResponse = await getUserAccounts();
+				const accountsListResponse = await getUserAccountsByAccountId(
+					selectedAccount.id
+				);
 
-				const membersList = accountsListResponse.items.map(
+				const membersList = accountsListResponse?.items.map(
 					(member: UserAccountProps) => {
 						return {
 							accountBriefs: member.accountBriefs,
