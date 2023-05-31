@@ -29,6 +29,9 @@ import com.liferay.headless.admin.taxonomy.client.dto.v1_0.TaxonomyCategory;
 import com.liferay.headless.admin.taxonomy.client.dto.v1_0.TaxonomyVocabulary;
 import com.liferay.headless.admin.taxonomy.client.pagination.Page;
 import com.liferay.headless.admin.taxonomy.client.pagination.Pagination;
+import com.liferay.headless.admin.taxonomy.client.serdes.v1_0.TaxonomyCategorySerDes;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -112,6 +115,8 @@ public class TaxonomyCategoryResourceTest
 			_globalAssetVocabulary);
 		_testGetTaxonomyVocabularyTaxonomyCategoriesPageFlatten(
 			_internalAssetVocabulary);
+		_testGetTaxonomyVocabularyTaxonomyCategoriesPageFlattenWithOnlyNameField(
+			_assetVocabulary);
 	}
 
 	@Override
@@ -409,6 +414,68 @@ public class TaxonomyCategoryResourceTest
 				getTaxonomyCategory1.getName(),
 				String.valueOf(parentTaxonomyCategory2.getName()));
 		}
+
+		taxonomyCategoryResource.deleteTaxonomyCategory(
+			irrelevantTaxonomyCategory.getId());
+
+		taxonomyCategoryResource.deleteTaxonomyCategory(
+			taxonomyCategory2.getId());
+
+		taxonomyCategoryResource.deleteTaxonomyCategory(
+			taxonomyCategory1.getId());
+	}
+
+	private void
+			_testGetTaxonomyVocabularyTaxonomyCategoriesPageFlattenWithOnlyNameField(
+				AssetVocabulary assetVocabulary)
+		throws Exception {
+
+		AssetVocabulary irrelevantAssetVocabulary = _addAssetVocabulary();
+
+		TaxonomyCategory taxonomyCategory1 =
+			_addTaxonomyCategoryWithParentAssetVocabulary(assetVocabulary);
+
+		TaxonomyCategory taxonomyCategory2 =
+			_addTaxonomyCategoryWithParentTaxonomyCategory(
+				taxonomyCategory1.getId(), randomTaxonomyCategory());
+
+		TaxonomyCategory irrelevantTaxonomyCategory =
+			_addTaxonomyCategoryWithParentAssetVocabulary(
+				irrelevantAssetVocabulary);
+
+		GraphQLField graphQLField = new GraphQLField(
+			"taxonomyVocabularyTaxonomyCategories",
+			HashMapBuilder.<String, Object>put(
+				"flatten", true
+			).put(
+				"taxonomyVocabularyId", assetVocabulary.getVocabularyId()
+			).build(),
+			new GraphQLField("items", new GraphQLField("name")),
+			new GraphQLField("totalCount"));
+
+		JSONObject taxonomyCategoriesJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(graphQLField), "JSONObject/data",
+			"JSONObject/taxonomyVocabularyTaxonomyCategories");
+
+		Assert.assertEquals(
+			2, taxonomyCategoriesJSONObject.getLong("totalCount"));
+
+		TaxonomyCategory getTaxonomyCategory1 = new TaxonomyCategory() {
+			{
+				name = taxonomyCategory1.getName();
+			}
+		};
+		TaxonomyCategory getTaxonomyCategory2 = new TaxonomyCategory() {
+			{
+				name = taxonomyCategory2.getName();
+			}
+		};
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(getTaxonomyCategory1, getTaxonomyCategory2),
+			Arrays.asList(
+				TaxonomyCategorySerDes.toDTOs(
+					taxonomyCategoriesJSONObject.getString("items"))));
 
 		taxonomyCategoryResource.deleteTaxonomyCategory(
 			irrelevantTaxonomyCategory.getId());

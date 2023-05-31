@@ -317,6 +317,11 @@ public class ObjectFieldWrapper
 		return model.getExternalReferenceCode();
 	}
 
+	@Override
+	public String getI18nObjectFieldName() {
+		return model.getI18nObjectFieldName();
+	}
+
 	/**
 	 * Returns the indexed of this object field.
 	 *
@@ -593,6 +598,13 @@ public class ObjectFieldWrapper
 	@Override
 	public String getUuid() {
 		return model.getUuid();
+	}
+
+	@Override
+	public boolean isDeletionAllowed()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.isDeletionAllowed();
 	}
 
 	/**

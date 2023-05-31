@@ -182,29 +182,31 @@ public class FriendlyURLServlet extends HttpServlet {
 					layoutFriendlyURLSeparatorComposite.getURLSeparator());
 
 				if (pos != 1) {
-					HttpServletRequest originalHttpServletRequest =
-						portal.getOriginalServletRequest(httpServletRequest);
-
-					String requestURL = HttpComponentsUtil.getRequestURL(
-						originalHttpServletRequest);
+					String requestURL = portal.getCurrentCompleteURL(
+						httpServletRequest);
 
 					int friendlyURLPos = requestURL.indexOf(layoutFriendlyURL);
 
 					String friendlyURL =
 						layoutFriendlyURLSeparatorComposite.getFriendlyURL();
 
-					String redirectURL =
-						PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING +
-							path.substring(0, pos) + friendlyURL;
+					String redirectURL = null;
 
 					if (friendlyURLPos > 0) {
 						redirectURL =
 							requestURL.substring(0, friendlyURLPos) +
 								friendlyURL;
 					}
+					else {
+						redirectURL = StringBundler.concat(
+							portal.getPathContext(),
+							PropsValues.
+								LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING,
+							path.substring(0, pos), friendlyURL);
+					}
 
 					String queryString = HttpComponentsUtil.getQueryString(
-						originalHttpServletRequest);
+						portal.getOriginalServletRequest(httpServletRequest));
 
 					if (Validator.isNotNull(queryString)) {
 						redirectURL += StringPool.QUESTION + queryString;

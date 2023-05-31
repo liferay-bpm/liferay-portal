@@ -35,6 +35,7 @@ import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.internal.field.setting.contributor.ObjectFieldSettingContributor;
 import com.liferay.object.internal.field.setting.contributor.ObjectFieldSettingContributorRegistry;
+import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionLocalizationTableFactory;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryTable;
@@ -42,6 +43,7 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTable;
+import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTableUtil;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectStateFlowLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
@@ -63,6 +65,7 @@ import com.liferay.portal.kernel.dao.db.IndexMetadataFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.CurrentConnection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.SystemEventConstants;
@@ -139,14 +142,23 @@ public class ObjectFieldLocalServiceImpl
 		_addOrUpdateObjectFieldSettings(
 			objectDefinition, objectField, null, objectFieldSettings);
 
-		if (objectDefinition.isApproved() &&
-			!objectField.compareBusinessType(
-				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) &&
-			!objectField.compareBusinessType(
-				ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
+		if (!objectDefinition.isApproved()) {
+			return objectField;
+		}
+
+		if (localized) {
+			runSQL(
+				DynamicObjectDefinitionTableUtil.getAlterTableAddColumnSQL(
+					objectDefinition.getLocalizationDBTableName(),
+					objectField.getDBColumnName(), dbType));
+		}
+		else if (!objectField.compareBusinessType(
+					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) &&
+				 !objectField.compareBusinessType(
+					 ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
 
 			runSQL(
-				DynamicObjectDefinitionTable.getAlterTableAddColumnSQL(
+				DynamicObjectDefinitionTableUtil.getAlterTableAddColumnSQL(
 					dbTableName, objectField.getDBColumnName(), dbType));
 
 			if (GetterUtil.getBoolean(
@@ -277,13 +289,7 @@ public class ObjectFieldLocalServiceImpl
 	public ObjectField deleteObjectField(ObjectField objectField)
 		throws PortalException {
 
-		if (Validator.isNotNull(objectField.getRelationshipType())) {
-			throw new ObjectFieldRelationshipTypeException(
-				"Object field cannot be deleted because it has a " +
-					"relationship type");
-		}
-
-		return _deleteObjectField(objectField);
+		return _deleteObjectField(objectField, false);
 	}
 
 	@Override
@@ -310,16 +316,8 @@ public class ObjectFieldLocalServiceImpl
 	public ObjectField deleteRelationshipTypeObjectField(long objectFieldId)
 		throws PortalException {
 
-		ObjectField objectField = objectFieldPersistence.findByPrimaryKey(
-			objectFieldId);
-
-		if (Validator.isNull(objectField.getRelationshipType())) {
-			throw new ObjectFieldRelationshipTypeException(
-				"Object field cannot be deleted because it does not have a " +
-					"relationship type");
-		}
-
-		return _deleteObjectField(objectField);
+		return _deleteObjectField(
+			objectFieldPersistence.findByPrimaryKey(objectFieldId), true);
 	}
 
 	@Override
@@ -422,18 +420,8 @@ public class ObjectFieldLocalServiceImpl
 	}
 
 	@Override
-	public List<ObjectField> getCustomObjectFields(long objectFieldId) {
-		List<ObjectField> objectFields = objectFieldPersistence.findByODI_S(
-			objectFieldId, false);
-
-		for (ObjectField objectField : objectFields) {
-			objectField.setObjectFieldSettings(
-				_objectFieldSettingLocalService.
-					getObjectFieldObjectFieldSettings(
-						objectField.getObjectFieldId()));
-		}
-
-		return objectFields;
+	public List<ObjectField> getCustomObjectFields(long objectDefinitionId) {
+		return getObjectFields(objectDefinitionId, false);
 	}
 
 	@Override
@@ -441,6 +429,11 @@ public class ObjectFieldLocalServiceImpl
 		long listTypeDefinitionId, boolean state) {
 
 		return objectFieldPersistence.findByLTDI_S(listTypeDefinitionId, state);
+	}
+
+	@Override
+	public List<ObjectField> getLocalizedObjectFields(long objectDefinitionId) {
+		return objectFieldPersistence.findByODI_L(objectDefinitionId, true);
 	}
 
 	@Override
@@ -527,6 +520,11 @@ public class ObjectFieldLocalServiceImpl
 	}
 
 	@Override
+	public int getObjectFieldsCount(long objectDefinitionId, boolean system) {
+		return objectFieldPersistence.countByODI_S(objectDefinitionId, system);
+	}
+
+	@Override
 	public int getObjectFieldsCountByListTypeDefinitionId(
 		long listTypeDefinitionId) {
 
@@ -552,6 +550,11 @@ public class ObjectFieldLocalServiceImpl
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.fetchByPrimaryKey(objectDefinitionId);
+
+		if (objectField.isLocalized()) {
+			return DynamicObjectDefinitionLocalizationTableFactory.create(
+				objectDefinition, this);
+		}
 
 		if (Objects.equals(
 				objectField.getDBTableName(),
@@ -872,23 +875,41 @@ public class ObjectFieldLocalServiceImpl
 		}
 	}
 
-	private ObjectField _deleteObjectField(ObjectField objectField)
+	private ObjectField _deleteObjectField(
+			ObjectField objectField, boolean deleteRelationshipObjectField)
 		throws PortalException {
+
+		if (Validator.isNull(objectField.getRelationshipType())) {
+			if (deleteRelationshipObjectField) {
+				throw new ObjectFieldRelationshipTypeException(
+					"Object field cannot be deleted because it does not have " +
+						"a relationship type");
+			}
+			else if (!objectField.isDeletionAllowed()) {
+				throw new RequiredObjectFieldException();
+			}
+		}
+		else if (!deleteRelationshipObjectField) {
+			throw new ObjectFieldRelationshipTypeException(
+				"Object field cannot be deleted because it has a " +
+					"relationship type");
+		}
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(
 				objectField.getObjectDefinitionId());
 
-		if ((objectDefinition.isApproved() ||
-			 objectDefinition.isUnmodifiableSystemObject()) &&
-			!Objects.equals(
-				objectDefinition.getExtensionDBTableName(),
-				objectField.getDBTableName()) &&
-			!Objects.equals(
-				objectField.getBusinessType(),
-				ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
+		if (FeatureFlagManagerUtil.isEnabled("LPS-179803")) {
+			int customObjectFieldsCount =
+				objectFieldLocalService.getObjectFieldsCount(
+					objectField.getObjectDefinitionId(), false);
 
-			throw new RequiredObjectFieldException();
+			if (objectDefinition.isApproved() &&
+				!objectDefinition.isUnmodifiableSystemObject() &&
+				(customObjectFieldsCount == 1)) {
+
+				throw new RequiredObjectFieldException();
+			}
 		}
 
 		if (Objects.equals(
@@ -949,13 +970,7 @@ public class ObjectFieldLocalServiceImpl
 
 		_objectViewLocalService.unassociateObjectField(objectField);
 
-		if ((Objects.equals(
-				objectDefinition.getExtensionDBTableName(),
-				objectField.getDBTableName()) ||
-			 (objectDefinition.isApproved() &&
-			  Objects.equals(
-				  objectField.getBusinessType(),
-				  ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP))) &&
+		if (objectDefinition.isApproved() &&
 			!objectField.compareBusinessType(
 				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) &&
 			!objectField.compareBusinessType(
@@ -963,6 +978,15 @@ public class ObjectFieldLocalServiceImpl
 
 			_alterTableDropColumn(
 				objectField.getDBTableName(), objectField.getDBColumnName());
+		}
+
+		if (objectDefinition.isApproved() &&
+			objectDefinition.isEnableLocalization() &&
+			objectField.isLocalized()) {
+
+			_alterTableDropColumn(
+				objectDefinition.getLocalizationDBTableName(),
+				objectField.getDBColumnName());
 		}
 
 		return objectField;

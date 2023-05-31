@@ -335,8 +335,10 @@ public class ObjectFieldLocalServiceUtil {
 		return getService().getColumn(objectDefinitionId, name);
 	}
 
-	public static List<ObjectField> getCustomObjectFields(long objectFieldId) {
-		return getService().getCustomObjectFields(objectFieldId);
+	public static List<ObjectField> getCustomObjectFields(
+		long objectDefinitionId) {
+
+		return getService().getCustomObjectFields(objectDefinitionId);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery
@@ -359,6 +361,12 @@ public class ObjectFieldLocalServiceUtil {
 
 		return getService().getListTypeDefinitionObjectFields(
 			listTypeDefinitionId, state);
+	}
+
+	public static List<ObjectField> getLocalizedObjectFields(
+		long objectDefinitionId) {
+
+		return getService().getLocalizedObjectFields(objectDefinitionId);
 	}
 
 	/**
@@ -438,6 +446,12 @@ public class ObjectFieldLocalServiceUtil {
 
 	public static int getObjectFieldsCount(long objectDefinitionId) {
 		return getService().getObjectFieldsCount(objectDefinitionId);
+	}
+
+	public static int getObjectFieldsCount(
+		long objectDefinitionId, boolean system) {
+
+		return getService().getObjectFieldsCount(objectDefinitionId, system);
 	}
 
 	public static int getObjectFieldsCountByListTypeDefinitionId(
