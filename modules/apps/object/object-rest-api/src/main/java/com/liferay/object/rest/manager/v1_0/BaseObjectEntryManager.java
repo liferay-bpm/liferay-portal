@@ -15,10 +15,14 @@
 package com.liferay.object.rest.manager.v1_0;
 
 import com.liferay.depot.service.DepotEntryLocalService;
+import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
+import com.liferay.object.entry.util.ObjectEntryReadOnlyUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
+import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -28,9 +32,11 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.util.GroupUtil;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -39,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Guilherme Camacho
  */
-public abstract class BaseObjectEntryManager {
+public abstract class BaseObjectEntryManager implements ObjectEntryManager {
 
 	protected Map<String, String> addDeleteAction(
 		ObjectDefinition objectDefinition, String scopeKey, User user) {
@@ -100,6 +106,48 @@ public abstract class BaseObjectEntryManager {
 		return modelResourcePermission.getPortletResourcePermission();
 	}
 
+	protected void validateReadOnly(
+			long companyId, DTOConverterContext dtoConverterContext,
+			String externalReferenceCode, ObjectDefinition objectDefinition,
+			com.liferay.object.rest.dto.v1_0.ObjectEntry objectEntry,
+			String scopeKey)
+		throws Exception {
+
+		Map<String, Object> existingValues = new HashMap<>();
+
+		if (!Objects.isNull(externalReferenceCode)) {
+			companyId =
+				(companyId == 0) ? objectDefinition.getCompanyId() : companyId;
+			scopeKey =
+				Objects.isNull(scopeKey) ? objectDefinition.getScope() :
+					scopeKey;
+
+			com.liferay.object.rest.dto.v1_0.ObjectEntry existingObjectEntry =
+				getObjectEntry(
+					companyId, dtoConverterContext, externalReferenceCode,
+					objectDefinition, scopeKey);
+
+			ObjectEntry serviceBuilderObjectEntry =
+				objectEntryLocalService.getObjectEntry(
+					existingObjectEntry.getId());
+
+			existingValues.putAll(
+				objectEntryLocalService.getValues(serviceBuilderObjectEntry));
+
+			existingValues.putAll(
+				objectEntryLocalService.getSystemValues(
+					serviceBuilderObjectEntry));
+		}
+
+		ObjectEntryReadOnlyUtil.validateReadOnly(
+			objectDefinition.getObjectDefinitionId(), existingValues,
+			objectEntry.getProperties(), ddmExpressionFactory,
+			objectFieldLocalService);
+	}
+
+	@Reference
+	protected DDMExpressionFactory ddmExpressionFactory;
+
 	@Reference
 	protected DepotEntryLocalService depotEntryLocalService;
 
@@ -108,6 +156,12 @@ public abstract class BaseObjectEntryManager {
 
 	@Reference
 	protected Language language;
+
+	@Reference
+	protected ObjectEntryLocalService objectEntryLocalService;
+
+	@Reference
+	protected ObjectFieldLocalService objectFieldLocalService;
 
 	@Reference
 	protected ObjectScopeProviderRegistry objectScopeProviderRegistry;

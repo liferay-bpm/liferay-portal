@@ -17,6 +17,7 @@ package com.liferay.object.internal.system.model.listener;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
 import com.liferay.object.action.engine.ObjectActionEngine;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
+import com.liferay.object.entry.util.ObjectEntryReadOnlyUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
@@ -46,7 +47,9 @@ import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.extension.EntityExtensionThreadLocal;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -358,6 +361,50 @@ public class SystemObjectDefinitionManagerModelListener<T extends BaseModel<T>>
 
 			if (userId == 0) {
 				userId = _getUserId(model);
+			}
+
+			Map<String, Object> existingValues = new HashMap<>();
+
+			Map<String, Object> extendedPorperties =
+				HashMapBuilder.<String, Object>putAll(
+					EntityExtensionThreadLocal.getExtendedProperties()
+				).build();
+
+			boolean newValues = true;
+
+			Map<String, Object> originalModelAttributes = new HashMap<>();
+
+			Map<String, Object> modelAttributes = model.getModelAttributes();
+
+			modelAttributes.remove("status");
+			modelAttributes.remove("statusDate");
+
+			if (originalModel != null) {
+				existingValues.putAll(
+					_objectEntryLocalService.
+						getExtensionDynamicObjectDefinitionTableValues(
+							objectDefinition,
+							GetterUtil.getLong(
+								originalModel.getPrimaryKeyObj())));
+
+				newValues = !Objects.equals(existingValues, extendedPorperties);
+
+				originalModelAttributes = originalModel.getModelAttributes();
+
+				existingValues.putAll(originalModelAttributes);
+
+				originalModelAttributes.remove("status");
+				originalModelAttributes.remove("statusDate");
+			}
+
+			if (!Objects.isNull(extendedPorperties) &&
+				!Objects.equals(modelAttributes, originalModelAttributes) &&
+				newValues) {
+
+				ObjectEntryReadOnlyUtil.validateReadOnly(
+					objectDefinition.getObjectDefinitionId(), existingValues,
+					extendedPorperties, _ddmExpressionFactory,
+					_objectFieldLocalService);
 			}
 
 			_objectValidationRuleLocalService.validate(

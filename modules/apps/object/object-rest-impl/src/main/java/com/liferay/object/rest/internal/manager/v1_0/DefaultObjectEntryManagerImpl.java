@@ -142,6 +142,10 @@ public class DefaultObjectEntryManagerImpl
 			String scopeKey)
 		throws Exception {
 
+		validateReadOnly(
+			0, dtoConverterContext, null, objectDefinition, objectEntry,
+			scopeKey);
+
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
 			_objectEntryService.addObjectEntry(
 				getGroupId(objectDefinition, scopeKey),
@@ -702,6 +706,11 @@ public class DefaultObjectEntryManagerImpl
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
 
+		validateReadOnly(
+			0, dtoConverterContext,
+			serviceBuilderObjectEntry.getExternalReferenceCode(),
+			objectDefinition, objectEntry, null);
+
 		serviceBuilderObjectEntry = _objectEntryService.updateObjectEntry(
 			objectEntryId,
 			_toObjectValues(
@@ -727,6 +736,10 @@ public class DefaultObjectEntryManagerImpl
 			String externalReferenceCode, ObjectDefinition objectDefinition,
 			ObjectEntry objectEntry, String scopeKey)
 		throws Exception {
+
+		validateReadOnly(
+			companyId, dtoConverterContext, externalReferenceCode,
+			objectDefinition, objectEntry, scopeKey);
 
 		long groupId = getGroupId(objectDefinition, scopeKey);
 
