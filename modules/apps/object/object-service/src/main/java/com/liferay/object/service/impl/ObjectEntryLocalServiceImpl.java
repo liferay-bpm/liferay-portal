@@ -546,6 +546,32 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
+	public ObjectEntry fetchManyToOneObjectEntry(
+			long groupId, long objectRelationshipId, long primaryKey, int start,
+			int end)
+		throws PortalException {
+
+		DSLQuery dslQuery = _getManyToOneObjectEntriesGroupByStep(
+			groupId, objectRelationshipId, primaryKey,
+			DSLQueryFactoryUtil.selectDistinct(ObjectEntryTable.INSTANCE)
+		).limit(
+			start, end
+		);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Get one to many related object entries: " + dslQuery);
+		}
+
+		List<ObjectEntry> objectEntries = objectEntryPersistence.dslQuery(
+			dslQuery);
+
+		if (objectEntries.isEmpty()) {
+			return null;
+		}
+
+		return objectEntries.get(0);
+	}
+
 	@Override
 	public ObjectEntry fetchObjectEntry(
 		String externalReferenceCode, long objectDefinitionId) {
@@ -2230,6 +2256,41 @@ public class ObjectEntryLocalServiceImpl
 
 					return null;
 				}
+			)
+		);
+	}
+
+	private GroupByStep _getManyToOneObjectEntriesGroupByStep(
+			long groupId, long objectRelationshipId, long primaryKey,
+			FromStep fromStep)
+		throws PortalException {
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipPersistence.findByPrimaryKey(
+				objectRelationshipId);
+
+		DynamicObjectDefinitionTable extensionDynamicObjectDefinitionTable =
+			_getExtensionDynamicObjectDefinitionTable(
+				objectRelationship.getObjectDefinitionId2());
+		ObjectField objectField = _objectFieldPersistence.fetchByPrimaryKey(
+			objectRelationship.getObjectFieldId2());
+
+		Column<DynamicObjectDefinitionTable, Long> primaryKeyColumn =
+			extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn();
+
+		return fromStep.from(
+			extensionDynamicObjectDefinitionTable
+		).innerJoinON(
+			ObjectEntryTable.INSTANCE,
+			ObjectEntryTable.INSTANCE.objectEntryId.eq(
+				(Expression<Long>)
+					extensionDynamicObjectDefinitionTable.getColumn(
+						objectField.getName()))
+		).where(
+			primaryKeyColumn.eq(
+				primaryKey
+			).and(
+				ObjectEntryTable.INSTANCE.groupId.eq(groupId)
 			)
 		);
 	}
