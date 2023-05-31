@@ -29,6 +29,7 @@ import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.related.models.ManyToOneObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.dto.v1_0.ListEntry;
@@ -602,6 +603,54 @@ public class DefaultObjectEntryManagerImpl
 				serviceBuilderObjectEntry.getGroupId(),
 				objectRelationship.getObjectRelationshipId(),
 				serviceBuilderObjectEntry.getPrimaryKey()));
+	}
+
+	@Override
+	public ObjectEntry getObjectEntryRelatedSystemObjectEntry(
+			DTOConverterContext dtoConverterContext,
+			ObjectDefinition objectDefinition, Long objectEntryId,
+			String objectRelationshipName, Pagination pagination)
+		throws Exception {
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.
+				getObjectRelationshipByObjectDefinitionId(
+					objectDefinition.getObjectDefinitionId(),
+					objectRelationshipName);
+
+		ObjectDefinition relatedObjectDefinition = _getRelatedObjectDefinition(
+			objectDefinition, objectRelationship);
+
+		ObjectRelatedModelsProvider objectRelatedModelsProvider =
+			_objectRelatedModelsProviderRegistry.getObjectRelatedModelsProvider(
+				relatedObjectDefinition.getClassName(),
+				relatedObjectDefinition.getCompanyId(),
+				objectRelationship.getType());
+
+		ManyToOneObjectRelatedModelsProvider
+			manyToOneObjectRelatedModelsProvider =
+				(ManyToOneObjectRelatedModelsProvider)
+					objectRelatedModelsProvider;
+
+		com.liferay.object.model.ObjectEntry objectEntry =
+			(com.liferay.object.model.ObjectEntry)
+				manyToOneObjectRelatedModelsProvider.getRelatedModel(
+					GroupThreadLocal.getGroupId(),
+					objectRelationship.getObjectRelationshipId(),
+					objectEntryId);
+
+		if (objectEntry == null) {
+			return null;
+		}
+
+		return _toObjectEntry(
+			dtoConverterContext,
+			_getRelatedObjectDefinition(objectDefinition, objectRelationship),
+			(com.liferay.object.model.ObjectEntry)
+				manyToOneObjectRelatedModelsProvider.getRelatedModel(
+					GroupThreadLocal.getGroupId(),
+					objectRelationship.getObjectRelationshipId(),
+					objectEntryId));
 	}
 
 	@Override
