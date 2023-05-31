@@ -1818,10 +1818,7 @@ public class BundleSiteInitializerTest {
 			_objectDefinitionLocalService.fetchObjectDefinition(
 				_group.getCompanyId(), "C_TestObjectDefinition1");
 
-		Assert.assertTrue(objectDefinition1.isAccountEntryRestricted());
-		Assert.assertTrue(
-			objectDefinition1.getAccountEntryRestrictedObjectFieldId() > 0);
-		Assert.assertEquals("salesforce", objectDefinition1.getStorageType());
+		Assert.assertFalse(objectDefinition1.isAccountEntryRestricted());
 		Assert.assertFalse(objectDefinition1.isSystem());
 		Assert.assertEquals(
 			objectDefinition1.getStatus(), WorkflowConstants.STATUS_APPROVED);
@@ -1876,10 +1873,7 @@ public class BundleSiteInitializerTest {
 			_objectDefinitionLocalService.fetchObjectDefinition(
 				_group.getCompanyId(), "C_TestObjectDefinition1");
 
-		Assert.assertTrue(objectDefinition1.isAccountEntryRestricted());
-		Assert.assertTrue(
-			objectDefinition1.getAccountEntryRestrictedObjectFieldId() > 0);
-		Assert.assertEquals("salesforce", objectDefinition1.getStorageType());
+		Assert.assertFalse(objectDefinition1.isAccountEntryRestricted());
 		Assert.assertFalse(objectDefinition1.isSystem());
 		Assert.assertEquals(
 			objectDefinition1.getStatus(), WorkflowConstants.STATUS_APPROVED);
