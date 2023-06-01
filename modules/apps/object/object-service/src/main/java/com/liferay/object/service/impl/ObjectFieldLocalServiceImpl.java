@@ -666,7 +666,7 @@ public class ObjectFieldLocalServiceImpl
 		newObjectField.setIndexedAsKeyword(indexedAsKeyword);
 		newObjectField.setIndexedLanguageId(indexedLanguageId);
 		newObjectField.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
-		newObjectField.setReadOnly(_getReadOnly(businessType, readOnly, false));
+		newObjectField.setReadOnly(_getReadOnly(businessType, readOnly));
 		newObjectField.setReadOnlyConditionExpression(
 			_getReadOnlyConditionExpression(
 				readOnly, readOnlyConditionExpression));
@@ -803,7 +803,7 @@ public class ObjectFieldLocalServiceImpl
 		objectField.setLocalized(localized);
 		objectField.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
 		objectField.setName(name);
-		objectField.setReadOnly(_getReadOnly(businessType, readOnly, system));
+		objectField.setReadOnly(_getReadOnly(businessType, readOnly));
 		objectField.setReadOnlyConditionExpression(
 			_getReadOnlyConditionExpression(
 				readOnly, readOnlyConditionExpression));
@@ -1056,13 +1056,7 @@ public class ObjectFieldLocalServiceImpl
 		return null;
 	}
 
-	private String _getReadOnly(
-		String businessType, String readOnly, boolean system) {
-
-		if (system || FeatureFlagManagerUtil.isEnabled("LPS-170122")) {
-			return readOnly;
-		}
-
+	private String _getReadOnly(String businessType, String readOnly) {
 		if (Objects.equals(
 				businessType, ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
 			Objects.equals(
@@ -1071,7 +1065,11 @@ public class ObjectFieldLocalServiceImpl
 			return ObjectFieldConstants.READ_ONLY_TRUE;
 		}
 
-		return ObjectFieldConstants.READ_ONLY_FALSE;
+		if (Validator.isNull(readOnly)) {
+			return ObjectFieldConstants.READ_ONLY_FALSE;
+		}
+
+		return readOnly;
 	}
 
 	private String _getReadOnlyConditionExpression(
@@ -1345,7 +1343,12 @@ public class ObjectFieldLocalServiceImpl
 			String readOnlyConditionExpression)
 		throws PortalException {
 
-		if (!FeatureFlagManagerUtil.isEnabled("LPS-170122")) {
+		if (Objects.equals(
+				businessType, ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
+			Objects.equals(
+				businessType, ObjectFieldConstants.BUSINESS_TYPE_FORMULA) ||
+			Validator.isNull(readOnly)) {
+
 			return;
 		}
 
@@ -1356,19 +1359,6 @@ public class ObjectFieldLocalServiceImpl
 
 			throw new ObjectFieldReadOnlyException(
 				"Unknown read only: " + readOnly);
-		}
-
-		if ((Objects.equals(
-				businessType, ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
-			 Objects.equals(
-				 businessType, ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) &&
-			!Objects.equals(readOnly, ObjectFieldConstants.READ_ONLY_TRUE)) {
-
-			throw new ObjectFieldReadOnlyException(
-				StringBundler.concat(
-					"Read only \"", readOnly,
-					"\" is not allowed for business type \"", businessType,
-					"\""));
 		}
 
 		if (Objects.equals(
