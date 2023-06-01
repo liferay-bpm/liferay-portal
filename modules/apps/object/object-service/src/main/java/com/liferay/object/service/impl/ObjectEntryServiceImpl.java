@@ -173,6 +173,27 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 	}
 
 	@Override
+	public ObjectEntry fetchManyToOneObjectEntry(
+			long groupId, long objectRelationshipId, long primaryKey, int start,
+			int end)
+		throws PortalException {
+
+		ObjectEntry objectEntry =
+			objectEntryLocalService.fetchManyToOneObjectEntry(
+				groupId, objectRelationshipId, primaryKey, start, end);
+
+		if ((objectEntry != null) &&
+			!ObjectEntryThreadLocal.isSkipObjectEntryResourcePermission()) {
+
+			objectEntryService.checkModelResourcePermission(
+				objectEntry.getObjectDefinitionId(),
+				objectEntry.getObjectEntryId(), ActionKeys.VIEW);
+		}
+
+		return objectEntry;
+	}
+
+	@Override
 	public ObjectEntry fetchObjectEntry(long objectEntryId)
 		throws PortalException {
 
