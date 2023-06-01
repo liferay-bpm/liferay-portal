@@ -40,6 +40,7 @@ import com.liferay.object.field.builder.AttachmentObjectFieldBuilder;
 import com.liferay.object.field.builder.DateObjectFieldBuilder;
 import com.liferay.object.field.builder.IntegerObjectFieldBuilder;
 import com.liferay.object.field.builder.LongIntegerObjectFieldBuilder;
+import com.liferay.object.field.builder.MultiselectPicklistObjectFieldBuilder;
 import com.liferay.object.field.builder.ObjectFieldBuilder;
 import com.liferay.object.field.builder.PicklistObjectFieldBuilder;
 import com.liferay.object.field.builder.TextObjectFieldBuilder;
@@ -156,9 +157,7 @@ public class ObjectFieldLocalServiceTest {
 			() -> ObjectDefinitionTestUtil.addObjectDefinition(
 				_objectDefinitionLocalService,
 				Arrays.asList(
-					new ObjectFieldBuilder(
-					).businessType(
-						ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST
+					new MultiselectPicklistObjectFieldBuilder(
 					).labelMap(
 						LocalizedMapUtil.getLocalizedMap(
 							RandomTestUtil.randomString())
@@ -322,8 +321,6 @@ public class ObjectFieldLocalServiceTest {
 							RandomTestUtil.randomString())
 					).name(
 						"upload"
-					).objectFieldSettings(
-						Collections.emptyList()
 					).build())));
 
 		_assertFailure(
@@ -341,8 +338,6 @@ public class ObjectFieldLocalServiceTest {
 						_listTypeDefinition.getListTypeDefinitionId()
 					).name(
 						"picklist"
-					).objectFieldSettings(
-						Collections.emptyList()
 					).required(
 						true
 					).state(
@@ -617,7 +612,8 @@ public class ObjectFieldLocalServiceTest {
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT, null,
 					ObjectFieldConstants.DB_TYPE_STRING, true, true, "en_US",
-					"", 0, "able", Collections.emptyList(), false, true)));
+					"", 0, "able", Collections.emptyList(),
+					ObjectFieldConstants.READ_ONLY_FALSE, null, false, true)));
 
 		// Invalid DB type
 
@@ -765,8 +761,6 @@ public class ObjectFieldLocalServiceTest {
 				"able"
 			).objectDefinitionId(
 				customObjectDefinition.getObjectDefinitionId()
-			).objectFieldSettings(
-				Collections.emptyList()
 			).build());
 
 		Assert.assertFalse(
@@ -793,8 +787,6 @@ public class ObjectFieldLocalServiceTest {
 				"baker"
 			).objectDefinitionId(
 				customObjectDefinition.getObjectDefinitionId()
-			).objectFieldSettings(
-				Collections.emptyList()
 			).build());
 
 		_assertDeleteObjectField(true, customObjectDefinition, "baker");
@@ -897,8 +889,6 @@ public class ObjectFieldLocalServiceTest {
 				"baker"
 			).objectDefinitionId(
 				systemObjectDefinition.getObjectDefinitionId()
-			).objectFieldSettings(
-				Collections.emptyList()
 			).build());
 
 		_assertDeleteObjectField(true, systemObjectDefinition, "baker");
@@ -1224,8 +1214,6 @@ public class ObjectFieldLocalServiceTest {
 						LocalizedMapUtil.getLocalizedMap("able")
 					).name(
 						"able"
-					).objectFieldSettings(
-						Collections.emptyList()
 					).build()));
 
 		ObjectField objectField = _objectFieldLocalService.fetchObjectField(
@@ -1324,8 +1312,6 @@ public class ObjectFieldLocalServiceTest {
 				LocalizedMapUtil.getLocalizedMap("charlie")
 			).name(
 				"charlie"
-			).objectFieldSettings(
-				Collections.emptyList()
 			).build());
 
 		Assert.assertEquals("baker_", objectField.getDBColumnName());
@@ -1411,8 +1397,6 @@ public class ObjectFieldLocalServiceTest {
 					"able"
 				).objectFieldId(
 					relationshipObjectFieldId
-				).objectFieldSettings(
-					Collections.emptyList()
 				).build()));
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
@@ -1497,6 +1481,8 @@ public class ObjectFieldLocalServiceTest {
 			objectField.isIndexedAsKeyword(),
 			objectField.getIndexedLanguageId(), objectField.getLabelMap(),
 			objectField.isLocalized(), objectField.getName(),
+			objectField.getReadOnly(),
+			objectField.getReadOnlyConditionExpression(),
 			objectField.isRequired(), objectField.isState(),
 			objectField.getObjectFieldSettings());
 	}
@@ -1704,6 +1690,8 @@ public class ObjectFieldLocalServiceTest {
 			objectField.isIndexed(), objectField.isIndexedAsKeyword(),
 			objectField.getIndexedLanguageId(), objectField.getLabelMap(),
 			objectField.isLocalized(), objectField.getName(),
+			objectField.getReadOnly(),
+			objectField.getReadOnlyConditionExpression(),
 			objectField.isRequired(), objectField.isState(),
 			objectFieldSettings);
 	}

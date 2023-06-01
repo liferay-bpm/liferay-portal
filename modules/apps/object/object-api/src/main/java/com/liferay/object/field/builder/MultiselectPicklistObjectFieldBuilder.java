@@ -12,28 +12,19 @@
  * details.
  */
 
-package com.liferay.notification.exception;
+package com.liferay.object.field.builder;
 
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.object.constants.ObjectFieldConstants;
 
 /**
- * @author Gabriel Albuquerque
+ * @author Guilherme Camacho
  */
-public class NotificationTemplateFromException extends PortalException {
+public class MultiselectPicklistObjectFieldBuilder extends ObjectFieldBuilder {
 
-	public NotificationTemplateFromException() {
-	}
-
-	public NotificationTemplateFromException(String msg) {
-		super(msg);
-	}
-
-	public NotificationTemplateFromException(String msg, Throwable throwable) {
-		super(msg, throwable);
-	}
-
-	public NotificationTemplateFromException(Throwable throwable) {
-		super(throwable);
+	public MultiselectPicklistObjectFieldBuilder() {
+		objectField.setBusinessType(
+			ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST);
+		objectField.setDBType(ObjectFieldConstants.DB_TYPE_STRING);
 	}
 
 }

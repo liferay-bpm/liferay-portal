@@ -25,23 +25,23 @@ import com.liferay.portal.kernel.security.permission.resource.PortletResourcePer
 import org.osgi.service.component.annotations.Component;
 
 /**
- * @author Gustavo Lima
+ * @author Murilo Stodolni
  */
 @Component(
-	property = "resource.name=" + NotificationConstants.RESOURCE_NAME,
+	property = "resource.name=" + NotificationConstants.RESOURCE_NAME_NOTIFICATION_QUEUE,
 	service = PortletResourcePermission.class
 )
-public class NotificationPortletResourcePermissionWrapper
+public class NotificationQueueEntryPortletResourcePermissionWrapper
 	extends BasePortletResourcePermissionWrapper {
 
 	@Override
 	protected PortletResourcePermission doGetPortletResourcePermission() {
 		return PortletResourcePermissionFactory.create(
-			NotificationConstants.RESOURCE_NAME,
-			new NotificationPortletResourcePermissionLogic());
+			NotificationConstants.RESOURCE_NAME_NOTIFICATION_QUEUE,
+			new NotificationQueueEntryPortletResourcePermissionLogic());
 	}
 
-	private static class NotificationPortletResourcePermissionLogic
+	private static class NotificationQueueEntryPortletResourcePermissionLogic
 		implements PortletResourcePermissionLogic {
 
 		@Override

@@ -15,6 +15,8 @@
 package com.liferay.object.service.impl;
 
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
+import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
@@ -26,6 +28,8 @@ import com.liferay.object.exception.ObjectFieldLabelException;
 import com.liferay.object.exception.ObjectFieldListTypeDefinitionIdException;
 import com.liferay.object.exception.ObjectFieldLocalizedException;
 import com.liferay.object.exception.ObjectFieldNameException;
+import com.liferay.object.exception.ObjectFieldReadOnlyConditionExpressionException;
+import com.liferay.object.exception.ObjectFieldReadOnlyException;
 import com.liferay.object.exception.ObjectFieldRelationshipTypeException;
 import com.liferay.object.exception.ObjectFieldSettingValueException;
 import com.liferay.object.exception.ObjectFieldStateException;
@@ -118,6 +122,7 @@ public class ObjectFieldLocalServiceImpl
 			String businessType, String dbType, boolean indexed,
 			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, boolean localized, String name,
+			String readOnly, String readOnlyConditionExpression,
 			boolean required, boolean state,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
@@ -137,7 +142,8 @@ public class ObjectFieldLocalServiceImpl
 			externalReferenceCode, userId, listTypeDefinitionId,
 			objectDefinitionId, businessType, name + StringPool.UNDERLINE,
 			dbTableName, dbType, indexed, indexedAsKeyword, indexedLanguageId,
-			labelMap, localized, name, required, state, false);
+			labelMap, localized, name, readOnly, readOnlyConditionExpression,
+			required, state, false);
 
 		_addOrUpdateObjectFieldSettings(
 			objectDefinition, objectField, null, objectFieldSettings);
@@ -185,6 +191,7 @@ public class ObjectFieldLocalServiceImpl
 			String businessType, String dbType, boolean indexed,
 			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, boolean localized, String name,
+			String readOnly, String readOnlyConditionExpression,
 			boolean required, boolean state,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
@@ -213,14 +220,16 @@ public class ObjectFieldLocalServiceImpl
 				externalReferenceCode, userId, listTypeDefinitionId,
 				objectDefinitionId, businessType, dbType, indexed,
 				indexedAsKeyword, indexedLanguageId, labelMap, localized, name,
-				required, state, objectFieldSettings);
+				readOnly, readOnlyConditionExpression, required, state,
+				objectFieldSettings);
 		}
 
 		return objectFieldLocalService.updateCustomObjectField(
 			externalReferenceCode, existingObjectField.getObjectFieldId(),
 			listTypeDefinitionId, businessType, dbType, indexed,
 			indexedAsKeyword, indexedLanguageId, labelMap, localized, name,
-			required, state, objectFieldSettings);
+			readOnly, readOnlyConditionExpression, required, state,
+			objectFieldSettings);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -266,10 +275,16 @@ public class ObjectFieldLocalServiceImpl
 			dbColumnName = name;
 		}
 
+		String readOnly = ObjectFieldConstants.READ_ONLY_FALSE;
+
+		if (_readOnlyObjectFieldNames.contains(name)) {
+			readOnly = ObjectFieldConstants.READ_ONLY_TRUE;
+		}
+
 		return _addObjectField(
 			null, userId, 0, objectDefinitionId, businessType, dbColumnName,
 			dbTableName, dbType, indexed, indexedAsKeyword, indexedLanguageId,
-			labelMap, false, name, required, state, true);
+			labelMap, false, name, readOnly, null, required, state, true);
 	}
 
 	@Indexable(type = IndexableType.DELETE)
@@ -596,6 +611,7 @@ public class ObjectFieldLocalServiceImpl
 			long listTypeDefinitionId, String businessType, String dbType,
 			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, boolean localized, String name,
+			String readOnly, String readOnlyConditionExpression,
 			boolean required, boolean state,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
@@ -640,6 +656,9 @@ public class ObjectFieldLocalServiceImpl
 			_validateName(objectFieldId, objectDefinition, name, false);
 		}
 
+		_validateReadOnlyAndReadOnlyConditionExpression(
+			businessType, readOnly, readOnlyConditionExpression);
+
 		_validateState(required, state);
 
 		newObjectField.setExternalReferenceCode(externalReferenceCode);
@@ -647,6 +666,10 @@ public class ObjectFieldLocalServiceImpl
 		newObjectField.setIndexedAsKeyword(indexedAsKeyword);
 		newObjectField.setIndexedLanguageId(indexedLanguageId);
 		newObjectField.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
+		newObjectField.setReadOnly(_getReadOnly(businessType, readOnly, false));
+		newObjectField.setReadOnlyConditionExpression(
+			_getReadOnlyConditionExpression(
+				readOnly, readOnlyConditionExpression));
 
 		if (objectDefinition.isApproved()) {
 			newObjectField = objectFieldPersistence.update(newObjectField);
@@ -689,7 +712,8 @@ public class ObjectFieldLocalServiceImpl
 			String businessType, String dbColumnName, String dbTableName,
 			String dbType, boolean indexed, boolean indexedAsKeyword,
 			String indexedLanguageId, Map<Locale, String> labelMap,
-			boolean localized, String name, boolean required, boolean state,
+			boolean localized, String name, String readOnly,
+			String readOnlyConditionExpression, boolean required, boolean state,
 			boolean system, List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
 
@@ -703,8 +727,8 @@ public class ObjectFieldLocalServiceImpl
 		return objectFieldLocalService.addOrUpdateCustomObjectField(
 			externalReferenceCode, objectFieldId, userId, listTypeDefinitionId,
 			objectDefinitionId, businessType, dbType, indexed, indexedAsKeyword,
-			indexedLanguageId, labelMap, localized, name, required, state,
-			objectFieldSettings);
+			indexedLanguageId, labelMap, localized, name, readOnly,
+			readOnlyConditionExpression, required, state, objectFieldSettings);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -733,7 +757,8 @@ public class ObjectFieldLocalServiceImpl
 			String businessType, String dbColumnName, String dbTableName,
 			String dbType, boolean indexed, boolean indexedAsKeyword,
 			String indexedLanguageId, Map<Locale, String> labelMap,
-			boolean localized, String name, boolean required, boolean state,
+			boolean localized, String name, String readOnly,
+			String readOnlyConditionExpression, boolean required, boolean state,
 			boolean system)
 		throws PortalException {
 
@@ -751,6 +776,8 @@ public class ObjectFieldLocalServiceImpl
 		_validateLabel(labelMap, null);
 		_validateLocalized(businessType, localized, objectDefinition);
 		_validateName(0, objectDefinition, name, system);
+		_validateReadOnlyAndReadOnlyConditionExpression(
+			businessType, readOnly, readOnlyConditionExpression);
 		_validateState(required, state);
 
 		ObjectField objectField = objectFieldPersistence.create(
@@ -776,6 +803,10 @@ public class ObjectFieldLocalServiceImpl
 		objectField.setLocalized(localized);
 		objectField.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
 		objectField.setName(name);
+		objectField.setReadOnly(_getReadOnly(businessType, readOnly, system));
+		objectField.setReadOnlyConditionExpression(
+			_getReadOnlyConditionExpression(
+				readOnly, readOnlyConditionExpression));
 		objectField.setRelationshipType(null);
 		objectField.setRequired(required);
 		objectField.setState(state);
@@ -1023,6 +1054,36 @@ public class ObjectFieldLocalServiceImpl
 		}
 
 		return null;
+	}
+
+	private String _getReadOnly(
+		String businessType, String readOnly, boolean system) {
+
+		if (system || FeatureFlagManagerUtil.isEnabled("LPS-170122")) {
+			return readOnly;
+		}
+
+		if (Objects.equals(
+				businessType, ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
+			Objects.equals(
+				businessType, ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
+
+			return ObjectFieldConstants.READ_ONLY_TRUE;
+		}
+
+		return ObjectFieldConstants.READ_ONLY_FALSE;
+	}
+
+	private String _getReadOnlyConditionExpression(
+		String readOnly, String readOnlyConditionExpression) {
+
+		if (Objects.equals(readOnly, ObjectFieldConstants.READ_ONLY_TRUE) ||
+			Objects.equals(readOnly, ObjectFieldConstants.READ_ONLY_FALSE)) {
+
+			return StringPool.BLANK;
+		}
+
+		return readOnlyConditionExpression;
 	}
 
 	private void _setBusinessTypeAndDBType(
@@ -1279,6 +1340,62 @@ public class ObjectFieldLocalServiceImpl
 		}
 	}
 
+	private void _validateReadOnlyAndReadOnlyConditionExpression(
+			String businessType, String readOnly,
+			String readOnlyConditionExpression)
+		throws PortalException {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-170122")) {
+			return;
+		}
+
+		if (!(Objects.equals(
+				readOnly, ObjectFieldConstants.READ_ONLY_CONDITIONAL) ||
+			  Objects.equals(readOnly, ObjectFieldConstants.READ_ONLY_FALSE) ||
+			  Objects.equals(readOnly, ObjectFieldConstants.READ_ONLY_TRUE))) {
+
+			throw new ObjectFieldReadOnlyException(
+				"Unknown read only: " + readOnly);
+		}
+
+		if ((Objects.equals(
+				businessType, ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
+			 Objects.equals(
+				 businessType, ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) &&
+			!Objects.equals(readOnly, ObjectFieldConstants.READ_ONLY_TRUE)) {
+
+			throw new ObjectFieldReadOnlyException(
+				StringBundler.concat(
+					"Read only \"", readOnly,
+					"\" is not allowed for business type \"", businessType,
+					"\""));
+		}
+
+		if (Objects.equals(
+				readOnly, ObjectFieldConstants.READ_ONLY_CONDITIONAL)) {
+
+			if (Validator.isNull(readOnlyConditionExpression)) {
+				throw new ObjectFieldReadOnlyConditionExpressionException(
+					"Read only condition expression is required");
+			}
+
+			try {
+				_ddmExpressionFactory.createExpression(
+					CreateExpressionRequest.Builder.newBuilder(
+						readOnlyConditionExpression
+					).build());
+			}
+			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception);
+				}
+
+				throw new ObjectFieldReadOnlyConditionExpressionException(
+					"Syntax error in: " + readOnlyConditionExpression);
+			}
+		}
+	}
+
 	private void _validateState(boolean required, boolean state)
 		throws PortalException {
 
@@ -1317,6 +1434,9 @@ public class ObjectFieldLocalServiceImpl
 	private CurrentConnection _currentConnection;
 
 	@Reference
+	private DDMExpressionFactory _ddmExpressionFactory;
+
+	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
 
 	@Reference
@@ -1350,6 +1470,8 @@ public class ObjectFieldLocalServiceImpl
 	@Reference
 	private ObjectViewLocalService _objectViewLocalService;
 
+	private final Set<String> _readOnlyObjectFieldNames = SetUtil.fromArray(
+		"createDate", "creator", "id", "modifiedDate", "status");
 	private final Set<String> _reservedNames = SetUtil.fromArray(
 		"actions", "companyid", "createdate", "creator", "datecreated",
 		"datemodified", "externalreferencecode", "groupid", "id",
