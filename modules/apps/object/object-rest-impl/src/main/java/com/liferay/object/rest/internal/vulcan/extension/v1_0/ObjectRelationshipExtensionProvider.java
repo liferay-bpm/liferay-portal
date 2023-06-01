@@ -76,7 +76,7 @@ public class ObjectRelationshipExtensionProvider
 			nestedFieldName -> {
 				ObjectRelationship objectRelationship =
 					_objectRelationshipLocalService.
-						fetchObjectRelationshipByObjectDefinitionId1(
+						fetchObjectRelationshipByObjectDefinitionId(
 							objectDefinition.getObjectDefinitionId(),
 							nestedFieldName);
 
@@ -99,6 +99,24 @@ public class ObjectRelationshipExtensionProvider
 					relatedObjectDefinition.isUnmodifiableSystemObject()) {
 
 					return null;
+				}
+
+				if (_isManyToOneRelationship(
+						objectDefinition, objectRelationship)) {
+
+					DefaultObjectEntryManager defaultObjectEntryManager =
+						DefaultObjectEntryManagerProvider.provide(
+							_objectEntryManagerRegistry.getObjectEntryManager(
+								objectDefinition.getStorageType()));
+
+					return defaultObjectEntryManager.
+						getObjectEntryRelatedSystemObjectEntry(
+							_getDefaultDTOConverterContext(
+								objectDefinition, getPrimaryKey(entity), null),
+							objectDefinition, getPrimaryKey(entity),
+							objectRelationship.getName(),
+							Pagination.of(
+								QueryUtil.ALL_POS, QueryUtil.ALL_POS));
 				}
 
 				DefaultObjectEntryManager defaultObjectEntryManager =
@@ -304,6 +322,28 @@ public class ObjectRelationshipExtensionProvider
 
 		return _objectDefinitionLocalService.getObjectDefinition(
 			relatedObjectDefinitionId);
+	}
+
+	private boolean _isManyToOneRelationship(
+			ObjectDefinition objectDefinition,
+			ObjectRelationship objectRelationship)
+		throws Exception {
+
+		ObjectDefinition relatedObjectDefinition = _getRelatedObjectDefinition(
+			objectDefinition, objectRelationship);
+
+		if (Objects.equals(
+				objectRelationship.getType(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY) &&
+			(objectRelationship.getObjectDefinitionId1() ==
+				relatedObjectDefinition.getObjectDefinitionId()) &&
+			(objectRelationship.getObjectDefinitionId2() ==
+				objectDefinition.getObjectDefinitionId())) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private void _relateNestedObjectEntry(
