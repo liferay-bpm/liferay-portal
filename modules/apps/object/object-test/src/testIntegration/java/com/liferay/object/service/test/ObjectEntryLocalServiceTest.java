@@ -37,6 +37,7 @@ import com.liferay.object.exception.ObjectValidationRuleEngineException;
 import com.liferay.object.field.builder.AttachmentObjectFieldBuilder;
 import com.liferay.object.field.builder.DateTimeObjectFieldBuilder;
 import com.liferay.object.field.builder.DecimalObjectFieldBuilder;
+import com.liferay.object.field.builder.EncryptedObjectFieldBuilder;
 import com.liferay.object.field.builder.FormulaObjectFieldBuilder;
 import com.liferay.object.field.builder.LongIntegerObjectFieldBuilder;
 import com.liferay.object.field.builder.PicklistObjectFieldBuilder;
@@ -69,7 +70,10 @@ import com.liferay.portal.kernel.audit.AuditRouter;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.encryptor.EncryptorException;
 import com.liferay.portal.kernel.exception.ModelListenerException;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.User;
@@ -83,10 +87,12 @@ import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.PropsValuesTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
@@ -113,6 +119,9 @@ import java.io.Serializable;
 
 import java.math.BigDecimal;
 
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -131,6 +140,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+
+import javax.crypto.KeyGenerator;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -585,6 +596,144 @@ public class ObjectEntryLocalServiceTest {
 				).put(
 					"listTypeEntryKeyRequired", "listTypeEntryKey1"
 				).build()));
+	}
+
+	@Test
+	public void testAddObjectEntryWithEncryptedObjectField() throws Exception {
+		String objectEncryptionAlgorithm = "AES";
+
+		KeyGenerator keyGenerator = KeyGenerator.getInstance(
+			objectEncryptionAlgorithm);
+
+		keyGenerator.init(128);
+
+		Key key = keyGenerator.generateKey();
+
+		PropsValuesTestUtil.swapWithSafeCloseable(
+			"OBJECT_ENCRYPTION_ENABLED", true);
+		PropsValuesTestUtil.swapWithSafeCloseable(
+			"OBJECT_ENCRYPTION_ALGORITHM", objectEncryptionAlgorithm);
+		PropsValuesTestUtil.swapWithSafeCloseable(
+			"OBJECT_ENCRYPTION_KEY", Base64.encode(key.getEncoded()));
+
+		ObjectField objectField = _addCustomObjectField(
+			new EncryptedObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"encrypted"
+			).objectDefinitionId(
+				_objectDefinition.getObjectDefinitionId()
+			).build());
+
+		ObjectEntry objectEntry = _addObjectEntry(
+			HashMapBuilder.<String, Serializable>put(
+				"emailAddress", RandomTestUtil.randomString()
+			).put(
+				"emailAddressRequired", "athanasius@liferay.com"
+			).put(
+				"encrypted", "test"
+			).put(
+				"listTypeEntryKeyRequired", "listTypeEntryKey1"
+			).build());
+
+		_assertCount(1);
+
+		Assert.assertEquals(
+			"test",
+			MapUtil.getString(
+				_objectEntryLocalService.getValues(
+					objectEntry.getObjectEntryId()),
+				"encrypted"));
+
+		PropsValuesTestUtil.swapWithSafeCloseable(
+			"OBJECT_ENCRYPTION_ALGORITHM", "");
+
+		_assertFailure(
+			PortalException.class,
+			StringBundler.concat(
+				EncryptorException.class.getName(), ": ",
+				EncryptorException.class.getName(), ": ",
+				NoSuchAlgorithmException.class.getName(),
+				": Invalid transformation format:"),
+			() -> _objectEntryLocalService.getValues(
+				objectEntry.getObjectEntryId()));
+
+		_assertFailure(
+			SystemException.class,
+			StringBundler.concat(
+				EncryptorException.class.getName(), ": ",
+				EncryptorException.class.getName(), ": ",
+				NoSuchAlgorithmException.class.getName(),
+				": Invalid transformation format:"),
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"emailAddress", RandomTestUtil.randomString()
+				).put(
+					"emailAddressRequired", "athanasius@liferay.com"
+				).put(
+					"encrypted", RandomTestUtil.randomString()
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).build()));
+
+		_assertCount(1);
+
+		PropsValuesTestUtil.swapWithSafeCloseable(
+			"OBJECT_ENCRYPTION_ALGORITHM", objectEncryptionAlgorithm);
+		PropsValuesTestUtil.swapWithSafeCloseable("OBJECT_ENCRYPTION_KEY", "");
+
+		_assertFailure(
+			IllegalArgumentException.class,
+			"Please insert an encryption key or remove the object's " +
+				"encryption field to recover these entries.",
+			() -> _objectEntryLocalService.getValues(
+				objectEntry.getObjectEntryId()));
+
+		_assertFailure(
+			SystemException.class,
+			IllegalArgumentException.class.getName() + ": Empty key",
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"emailAddress", RandomTestUtil.randomString()
+				).put(
+					"emailAddressRequired", "athanasius@liferay.com"
+				).put(
+					"encrypted", RandomTestUtil.randomString()
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).build()));
+
+		_assertCount(1);
+
+		PropsValuesTestUtil.swapWithSafeCloseable(
+			"OBJECT_ENCRYPTION_ALGORITHM", "");
+		PropsValuesTestUtil.swapWithSafeCloseable("OBJECT_ENCRYPTION_KEY", "");
+
+		_assertFailure(
+			IllegalArgumentException.class,
+			"Please insert an encryption key or remove the object's " +
+				"encryption field to recover these entries.",
+			() -> _objectEntryLocalService.getValues(
+				objectEntry.getObjectEntryId()));
+
+		_assertFailure(
+			SystemException.class,
+			IllegalArgumentException.class.getName() + ": Empty key",
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"emailAddress", RandomTestUtil.randomString()
+				).put(
+					"emailAddressRequired", "athanasius@liferay.com"
+				).put(
+					"encrypted", RandomTestUtil.randomString()
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).build()));
+
+		_assertCount(1);
+
+		_objectFieldLocalService.deleteObjectField(objectField);
 	}
 
 	@Test
