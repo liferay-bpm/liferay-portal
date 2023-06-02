@@ -113,8 +113,6 @@ import com.liferay.portal.kernel.encryptor.Encryptor;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -160,6 +158,7 @@ import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Localization;
@@ -977,6 +976,9 @@ public class ObjectEntryLocalServiceImpl
 			objectEntry.getObjectDefinitionId(), rows.get(0),
 			selectExpressions);
 
+		_addLocalizedObjectFieldValues(
+			dynamicObjectDefinitionLocalizationTable,
+			objectEntry.getObjectEntryId(), values);
 		_addObjectRelationshipERCFieldValue(
 			objectEntry.getObjectDefinitionId(), values);
 
@@ -1465,6 +1467,66 @@ public class ObjectEntryLocalServiceImpl
 				TempFileEntryUtil.deleteTempFileEntry(
 					dlFileEntry.getFileEntryId());
 			}
+		}
+	}
+
+	private void _addLocalizedObjectFieldValues(
+		DynamicObjectDefinitionLocalizationTable
+			dynamicObjectDefinitionLocalizationTable,
+		long objectEntryId, Map<String, Serializable> values) {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-172017") ||
+			(dynamicObjectDefinitionLocalizationTable == null)) {
+
+			return;
+		}
+
+		List<Object[]> rows = objectEntryPersistence.dslQuery(
+			DSLQueryFactoryUtil.select(
+				ArrayUtil.append(
+					_getSelectExpressions(
+						dynamicObjectDefinitionLocalizationTable),
+					dynamicObjectDefinitionLocalizationTable.
+						getLanguageIdColumn())
+			).from(
+				dynamicObjectDefinitionLocalizationTable
+			).where(
+				dynamicObjectDefinitionLocalizationTable.getForeignKeyColumn(
+				).eq(
+					objectEntryId
+				)
+			));
+
+		if (ListUtil.isEmpty(rows)) {
+			return;
+		}
+
+		List<Column<DynamicObjectDefinitionLocalizationTable, ?>>
+			objectFieldColumns =
+				dynamicObjectDefinitionLocalizationTable.
+					getObjectFieldColumns();
+
+		for (int i = 0; i < objectFieldColumns.size(); i++) {
+			Map<String, String> localizedValues = new HashMap<>();
+
+			for (Object[] row : rows) {
+				Object localizedValue = row[i];
+
+				if (localizedValue == null) {
+					continue;
+				}
+
+				localizedValues.put(
+					String.valueOf(row[objectFieldColumns.size()]),
+					String.valueOf(localizedValue));
+			}
+
+			Column<DynamicObjectDefinitionLocalizationTable, ?>
+				objectFieldColumn = objectFieldColumns.get(i);
+
+			values.put(
+				objectFieldColumn.getName() + "i18n",
+				(Serializable)localizedValues);
 		}
 	}
 
@@ -2756,21 +2818,6 @@ public class ObjectEntryLocalServiceImpl
 			"Unable to get value with SQL type " + sqlType);
 	}
 
-	private String _getValue(String valueString) {
-		try {
-			JSONArray jsonArray = _jsonFactory.createJSONArray(valueString);
-
-			return GetterUtil.getString(jsonArray.getString(0));
-		}
-		catch (JSONException jsonException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
-			}
-		}
-
-		return GetterUtil.getString(valueString);
-	}
-
 	private Map<String, Serializable> _getValues(
 			long objectDefinitionId, Object[] objects,
 			Expression<?>[] selectExpressions)
@@ -3830,10 +3877,15 @@ public class ObjectEntryLocalServiceImpl
 
 		Map<String, Serializable> values = objectEntry.getValues();
 
+		Serializable value = values.get(entry.getKey());
+
+		if (value == null) {
+			return;
+		}
+
 		ListTypeEntry originalListTypeEntry =
 			_listTypeEntryLocalService.getListTypeEntry(
-				listTypeDefinitionId,
-				_getValue(String.valueOf(values.get(entry.getKey()))));
+				listTypeDefinitionId, String.valueOf(value));
 
 		ObjectStateFlow objectStateFlow =
 			_objectStateFlowLocalService.fetchObjectFieldObjectStateFlow(
@@ -4238,8 +4290,7 @@ public class ObjectEntryLocalServiceImpl
 		if (objectField.getListTypeDefinitionId() != 0) {
 			ListTypeEntry listTypeEntry = null;
 
-			String value = _getValue(
-				String.valueOf(values.get(entry.getKey())));
+			String value = String.valueOf(values.get(entry.getKey()));
 
 			for (ListTypeEntry curListTypeEntry :
 					_listTypeEntryLocalService.getListTypeEntries(
@@ -4252,9 +4303,7 @@ public class ObjectEntryLocalServiceImpl
 				}
 			}
 
-			if ((listTypeEntry == null) &&
-				(!value.isEmpty() || objectField.isRequired())) {
-
+			if ((listTypeEntry == null) && objectField.isRequired()) {
 				throw new ObjectEntryValuesException.ListTypeEntry(
 					entry.getKey());
 			}

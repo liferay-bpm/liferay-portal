@@ -4088,6 +4088,55 @@ tell application "Safari" to quit
 		</sequential>
 	</macrodef>
 
+	<macrodef name="prepare-selenium-object-storage-salesforce-properties">
+		<sequential>
+			<if>
+				<isset property="object.storage.salesforce.consumer.key" />
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						object.storage.salesforce.consumer.key=${object.storage.salesforce.consumer.key}
+					</echo>
+				</then>
+			</if>
+
+			<if>
+				<isset property="object.storage.salesforce.consumer.secret" />
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						object.storage.salesforce.consumer.secret=${object.storage.salesforce.consumer.secret}
+					</echo>
+				</then>
+			</if>
+
+			<if>
+				<isset property="object.storage.salesforce.login.url" />
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						object.storage.salesforce.login.url=${object.storage.salesforce.login.url}
+					</echo>
+				</then>
+			</if>
+
+			<if>
+				<isset property="object.storage.salesforce.password" />
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						object.storage.salesforce.password=${object.storage.salesforce.password}
+					</echo>
+				</then>
+			</if>
+
+			<if>
+				<isset property="object.storage.salesforce.username" />
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						object.storage.salesforce.username=${object.storage.salesforce.username}
+					</echo>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="prepare-selenium-onedrive-properties">
 		<sequential>
 			<if>
@@ -9470,6 +9519,10 @@ org.apache.catalina.tribes.level = FINE]]>
 		</execute>
 	</target>
 
+	<target name="delete-symbolic-link">
+		<symlink action="delete" link="${symbolic.link}" />
+	</target>
+
 	<target name="deploy-commerce-license-xml">
 		<if>
 			<matches pattern="https?://" string="${test.commerce.license.url}" />
@@ -12257,6 +12310,51 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 		</if>
 
 		<if>
+			<isset property="object.storage.salesforce.consumer.key" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					object.storage.salesforce.consumer.key=${object.storage.salesforce.consumer.key}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="object.storage.salesforce.consumer.secret" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					object.storage.salesforce.consumer.secret=${object.storage.salesforce.consumer.secret}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="object.storage.salesforce.login.url" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					object.storage.salesforce.login.url=${object.storage.salesforce.login.url}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="object.storage.salesforce.password" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					object.storage.salesforce.password=${object.storage.salesforce.password}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="object.storage.salesforce.username" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					object.storage.salesforce.username=${object.storage.salesforce.username}
+				</echo>
+			</then>
+		</if>
+
+		<if>
 			<isset property="site.initializer.partner.portal.login.url" />
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
@@ -12599,6 +12697,7 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 		<prepare-selenium-google-cloud-autotagging-properties />
 		<prepare-selenium-google-cloud-translation-properties />
 		<prepare-selenium-google-properties />
+		<prepare-selenium-object-storage-salesforce-properties />
 		<prepare-selenium-onedrive-properties />
 		<prepare-selenium-openid-properties />
 		<prepare-selenium-recaptcha-properties />

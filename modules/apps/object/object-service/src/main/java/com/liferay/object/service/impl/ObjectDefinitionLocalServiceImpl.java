@@ -387,12 +387,6 @@ public class ObjectDefinitionLocalServiceImpl
 			}
 		}
 
-		_objectFieldLocalService.deleteObjectFieldByObjectDefinitionId(
-			objectDefinition.getObjectDefinitionId());
-
-		_objectLayoutLocalService.deleteObjectLayouts(
-			objectDefinition.getObjectDefinitionId());
-
 		for (ObjectRelationship objectRelationship :
 				_objectRelationshipPersistence.findByODI1_R(
 					objectDefinition.getObjectDefinitionId(), false)) {
@@ -408,6 +402,12 @@ public class ObjectDefinitionLocalServiceImpl
 			_objectRelationshipLocalService.deleteObjectRelationship(
 				objectRelationship);
 		}
+
+		_objectFieldLocalService.deleteObjectFieldByObjectDefinitionId(
+			objectDefinition.getObjectDefinitionId());
+
+		_objectLayoutLocalService.deleteObjectLayouts(
+			objectDefinition.getObjectDefinitionId());
 
 		_objectValidationRuleLocalService.deleteObjectValidationRules(
 			objectDefinition.getObjectDefinitionId());
@@ -913,7 +913,7 @@ public class ObjectDefinitionLocalServiceImpl
 		_validateLabel(labelMap);
 		_validateName(0, user.getCompanyId(), modifiable, name, system);
 		_validatePluralLabel(pluralLabelMap);
-		_validateScope(scope);
+		_validateScope(scope, storageType);
 		_validateVersion(system, version);
 
 		ObjectDefinition objectDefinition = objectDefinitionPersistence.create(
@@ -1434,7 +1434,7 @@ public class ObjectDefinitionLocalServiceImpl
 			objectDefinition.getObjectDefinitionId(),
 			objectDefinition.getCompanyId(), objectDefinition.isModifiable(),
 			name, objectDefinition.isSystem());
-		_validateScope(scope);
+		_validateScope(scope, objectDefinition.getStorageType());
 
 		objectDefinition.setDBTableName(dbTableName);
 		objectDefinition.setEnableLocalization(enableLocalization);
@@ -1732,7 +1732,9 @@ public class ObjectDefinitionLocalServiceImpl
 		}
 	}
 
-	private void _validateScope(String scope) throws PortalException {
+	private void _validateScope(String scope, String storageType)
+		throws PortalException {
+
 		if (Validator.isNull(scope)) {
 			throw new ObjectDefinitionScopeException("Scope is null");
 		}
@@ -1743,6 +1745,18 @@ public class ObjectDefinitionLocalServiceImpl
 		catch (IllegalArgumentException illegalArgumentException) {
 			throw new ObjectDefinitionScopeException(
 				illegalArgumentException.getMessage());
+		}
+
+		if (StringUtil.equals(scope, ObjectDefinitionConstants.SCOPE_SITE) &&
+			StringUtil.equals(
+				storageType,
+				ObjectDefinitionConstants.STORAGE_TYPE_SALESFORCE)) {
+
+			throw new ObjectDefinitionScopeException(
+				StringBundler.concat(
+					"Scope \"", ObjectDefinitionConstants.SCOPE_SITE,
+					"\" cannot be associated with storage type \"",
+					ObjectDefinitionConstants.STORAGE_TYPE_SALESFORCE));
 		}
 	}
 
