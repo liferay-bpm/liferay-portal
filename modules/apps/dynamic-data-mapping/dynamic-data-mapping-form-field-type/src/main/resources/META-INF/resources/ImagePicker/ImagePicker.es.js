@@ -265,10 +265,10 @@ const Main = ({
 	editingLanguageId,
 	errorMessage,
 	id,
-	localizable,
-	localizedValue = {},
 	inputValue,
 	itemSelectorURL,
+	localizable,
+	localizedValue,
 	message,
 	name,
 	onBlur,
@@ -323,6 +323,7 @@ const Main = ({
 			displayErrors={isSignedIn ? displayErrors : true}
 			errorMessage={getErrorMessages(errorMessage, isSignedIn)}
 			id={id}
+			localizedValue={localizedValue}
 			name={name}
 			readOnly={isSignedIn ? readOnly : true}
 			valid={isSignedIn ? valid : false}
