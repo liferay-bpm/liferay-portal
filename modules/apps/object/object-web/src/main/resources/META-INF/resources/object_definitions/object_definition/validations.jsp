@@ -31,7 +31,7 @@ renderResponse.setTitle(objectDefinition.getLabel(locale, true));
 
 <div>
 	<react:component
-		module="js/components/ObjectValidation/Validation"
+		module="js/components/ObjectValidation/Validations"
 		props='<%=
 			HashMapBuilder.<String, Object>put(
 				"apiURL", objectDefinitionsValidationsDisplayContext.getAPIURL()

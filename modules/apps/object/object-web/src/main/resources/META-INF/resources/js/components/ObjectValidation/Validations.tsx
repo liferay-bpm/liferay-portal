@@ -26,7 +26,7 @@ import moment from 'moment/min/moment-with-locales';
 import React, {useEffect, useState} from 'react';
 
 import {
-	IField,
+	IFDSTableProps,
 	defaultDataSetProps,
 	fdsItem,
 	formatActionURL,
@@ -39,7 +39,7 @@ interface ItemData {
 
 const language = Liferay.ThemeDisplay.getBCP47LanguageId();
 
-export default function Validation({
+export default function Validations({
 	apiURL,
 	creationMenu,
 	formName,
@@ -48,7 +48,7 @@ export default function Validation({
 	objectDefinitionExternalReferenceCode,
 	style,
 	url,
-}: IField) {
+}: IFDSTableProps) {
 	const [creationLanguageId, setCreationLanguageId] = useState<
 		Liferay.Language.Locale
 	>();

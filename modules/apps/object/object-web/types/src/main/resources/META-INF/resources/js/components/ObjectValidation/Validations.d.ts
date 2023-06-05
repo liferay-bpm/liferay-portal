@@ -14,8 +14,8 @@
 
 /// <reference types="react" />
 
-import {IField} from '../../utils/fds';
-export default function Validation({
+import {IFDSTableProps} from '../../utils/fds';
+export default function Validations({
 	apiURL,
 	creationMenu,
 	formName,
@@ -24,4 +24,4 @@ export default function Validation({
 	objectDefinitionExternalReferenceCode,
 	style,
 	url,
-}: IField): JSX.Element;
+}: IFDSTableProps): JSX.Element;
