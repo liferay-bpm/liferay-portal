@@ -211,7 +211,7 @@ public class ObjectEntryVariablesUtil {
 						(Map<String, Object>)payloadJSONObject.get(
 							"objectEntry");
 
-					return objectEntry.get("userId");
+					return String.valueOf(objectEntry.get("userId"));
 				}
 			).put(
 				"currentUserId", payloadJSONObject.get("userId")
