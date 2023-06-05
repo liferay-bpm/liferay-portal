@@ -201,7 +201,7 @@ public class NotificationQueueEntryLocalServiceImpl
 			throw new NotificationQueueEntryStatusException(
 				"Notification queue entry " +
 					notificationQueueEntry.getNotificationQueueEntryId() +
-						" has already been sent");
+						" was already sent");
 		}
 
 		NotificationType notificationType =

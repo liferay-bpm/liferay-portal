@@ -35,6 +35,7 @@ import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
 import com.liferay.headless.admin.user.dto.v1_0.UserAccountContactInformation;
 import com.liferay.headless.admin.user.dto.v1_0.UserGroupBrief;
 import com.liferay.headless.admin.user.dto.v1_0.WebUrl;
+import com.liferay.headless.admin.user.internal.dto.v1_0.converter.constants.DTOConverterConstants;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.EmailAddressUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.PhoneUtil;
@@ -78,7 +79,7 @@ import org.osgi.service.component.annotations.Reference;
 		"application.name=Liferay.Headless.Admin.User",
 		"dto.class.name=com.liferay.portal.kernel.model.User", "version=v1.0"
 	},
-	service = {DTOConverter.class, UserResourceDTOConverter.class}
+	service = DTOConverter.class
 )
 public class UserResourceDTOConverter
 	implements DTOConverter<User, UserAccount> {
@@ -99,12 +100,6 @@ public class UserResourceDTOConverter
 		}
 
 		return user;
-	}
-
-	public long getUserId(String externalReferenceCode) throws Exception {
-		User user = getObject(externalReferenceCode);
-
-		return user.getUserId();
 	}
 
 	@Override
@@ -412,8 +407,10 @@ public class UserResourceDTOConverter
 	@Reference
 	private UserGroupLocalService _userGroupLocalService;
 
-	@Reference
-	private UserGroupResourceDTOConverter _userGroupResourceDTOConverter;
+	@Reference(target = DTOConverterConstants.USER_GROUP_RESOURCE_DTO_CONVERTER)
+	private DTOConverter
+		<UserGroup, com.liferay.headless.admin.user.dto.v1_0.UserGroup>
+			_userGroupResourceDTOConverter;
 
 	@Reference
 	private UserLocalService _userLocalService;
