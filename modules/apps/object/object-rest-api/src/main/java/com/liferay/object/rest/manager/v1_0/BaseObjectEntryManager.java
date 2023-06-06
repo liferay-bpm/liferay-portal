@@ -115,7 +115,11 @@ public abstract class BaseObjectEntryManager implements ObjectEntryManager {
 
 		Map<String, Object> existingValues = new HashMap<>();
 
-		if (!Objects.isNull(externalReferenceCode)) {
+		if (!Objects.isNull(
+				objectEntryLocalService.fetchObjectEntry(
+					externalReferenceCode,
+					objectDefinition.getObjectDefinitionId()))) {
+
 			companyId =
 				(companyId == 0) ? objectDefinition.getCompanyId() : companyId;
 			scopeKey =
