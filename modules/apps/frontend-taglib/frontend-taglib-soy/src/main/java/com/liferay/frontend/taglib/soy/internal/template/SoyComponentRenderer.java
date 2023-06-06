@@ -16,7 +16,6 @@ package com.liferay.frontend.taglib.soy.internal.template;
 
 import com.liferay.portal.kernel.template.TemplateException;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.url.builder.AbsolutePortalURLBuilderFactory;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -42,15 +41,10 @@ public class SoyComponentRenderer {
 
 		SoyComponentRendererHelper soyComponentRendererHelper =
 			new SoyComponentRendererHelper(
-				_absolutePortalURLBuilderFactory.getAbsolutePortalURLBuilder(
-					httpServletRequest),
 				httpServletRequest, componentDescriptor, context, _portal);
 
 		soyComponentRendererHelper.renderSoyComponent(writer);
 	}
-
-	@Reference
-	private AbsolutePortalURLBuilderFactory _absolutePortalURLBuilderFactory;
 
 	@Reference
 	private Portal _portal;
