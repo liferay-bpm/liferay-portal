@@ -104,6 +104,12 @@ public class SpSsoSamlPortalFilter extends BaseSamlPortalFilter {
 			httpServletRequest);
 
 		if (requestPath.equals("/c/portal/login")) {
+			if (_portal.getUser(httpServletRequest) != null) {
+				filterChain.doFilter(httpServletRequest, httpServletResponse);
+
+				return;
+			}
+
 			RequestDispatcher requestDispatcher =
 				_servletContext.getRequestDispatcher("/c/portal/saml/login");
 
