@@ -61,10 +61,11 @@ public class ObjectEntryReadOnlyUtil {
 				continue;
 			}
 
-			ObjectField objectField = objectFieldLocalService.getObjectField(
+			ObjectField objectField = objectFieldLocalService.fetchObjectField(
 				objectDefinitionId, entry.getKey());
 
-			if (Objects.equals(
+			if ((objectField == null) ||
+				Objects.equals(
 					objectField.getReadOnly(),
 					ObjectFieldConstants.READ_ONLY_FALSE)) {
 
