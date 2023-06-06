@@ -23,6 +23,7 @@ import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.frontend.data.set.view.FDSView;
 import com.liferay.frontend.data.set.view.table.FDSTableSchemaBuilderFactory;
+import com.liferay.info.item.capability.InfoItemCapability;
 import com.liferay.info.item.creator.InfoItemCreator;
 import com.liferay.info.item.field.reader.InfoItemFieldReaderFieldSetProvider;
 import com.liferay.info.item.provider.InfoItemCapabilitiesProvider;
@@ -175,7 +176,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				InfoItemCapabilitiesProvider.class,
 				new ObjectEntryInfoItemCapabilitiesProvider(
 					_displayPageInfoItemCapability, _editPageInfoItemCapability,
-					_templatePageInfoItemCapability),
+					_templateInfoItemCapability),
 				HashMapDictionaryBuilder.<String, Object>put(
 					"company.id", objectDefinition.getCompanyId()
 				).put(
@@ -453,8 +454,10 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 
 	private BundleContext _bundleContext;
 
-	@Reference
-	private DisplayPageInfoItemCapability _displayPageInfoItemCapability;
+	@Reference(
+		target = "(info.item.capability.key=" + DisplayPageInfoItemCapability.KEY + ")"
+	)
+	private InfoItemCapability _displayPageInfoItemCapability;
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
@@ -468,8 +471,10 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	@Reference
 	private DLURLHelper _dlURLHelper;
 
-	@Reference
-	private EditPageInfoItemCapability _editPageInfoItemCapability;
+	@Reference(
+		target = "(info.item.capability.key=" + EditPageInfoItemCapability.KEY + ")"
+	)
+	private InfoItemCapability _editPageInfoItemCapability;
 
 	@Reference
 	private FDSTableSchemaBuilderFactory _fdsTableSchemaBuilderFactory;
@@ -553,11 +558,13 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	@Reference(target = "(osgi.web.symbolicname=com.liferay.object.web)")
 	private ServletContext _servletContext;
 
-	@Reference
-	private TemplateInfoItemFieldSetProvider _templateInfoItemFieldSetProvider;
+	@Reference(
+		target = "(info.item.capability.key=" + TemplateInfoItemCapability.KEY + ")"
+	)
+	private InfoItemCapability _templateInfoItemCapability;
 
 	@Reference
-	private TemplateInfoItemCapability _templatePageInfoItemCapability;
+	private TemplateInfoItemFieldSetProvider _templateInfoItemFieldSetProvider;
 
 	@Reference
 	private UploadHandler _uploadHandler;
