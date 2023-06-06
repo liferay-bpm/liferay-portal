@@ -17,7 +17,7 @@
 </tr>
 <tr>
 	<td>TABLE_CELL</td>
-	<td>//div[contains(@class,'dnd-table')]//div[normalize-space(text())='${key_itemName}']</td>
+	<td>//div[contains(@class,'dnd-tr')]//*[normalize-space(text())='${key_itemName}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -60,7 +60,7 @@
 </tr>
 <tr>
 	<td>DATA_SET_VIEW_ENTRY_NAME</td>
-	<td>//li[contains(@class,'list-group-item')]//div[contains(@class,'justify-content-center')]//p[(@class="list-group-title") and contains (.,'${entryName}')]</td>
+	<td>//li[contains(@class,'list-group-item')]//div[contains(@class,'justify-content-center')]//*[(@class="table-list-title") and contains (.,'${entryName}')]</td>
 	<td></td>
 </tr>
 <tr>
