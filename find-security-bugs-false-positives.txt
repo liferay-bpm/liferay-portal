@@ -3948,11 +3948,6 @@ com/liferay/commerce/product/internal/util/CPInstanceHelperImpl.getDefaultCPSku(
 com/liferay/commerce/product/internal/util/DDMFormValuesHelperImpl._toJSONObject(Lcom/liferay/dynamic/data/mapping/storage/DDMFormFieldValue;)Lcom/liferay/portal/kernel/json/JSONObject;:SAFE
 com/liferay/commerce/product/internal/util/DDMFormValuesHelperImpl.cleanDDMFormValuesJSON(Ljava/lang/String;)Ljava/lang/String;:0
 com/liferay/commerce/product/internal/util/DDMFormValuesHelperImpl.serialize(Lcom/liferay/dynamic/data/mapping/storage/DDMFormValues;)Ljava/lang/String;:SAFE
-com/liferay/commerce/product/internal/util/JsonHelperImpl._toJSONArray(Ljava/lang/String;)Lcom/liferay/portal/kernel/json/JSONArray;:SAFE
-com/liferay/commerce/product/internal/util/JsonHelperImpl.getFirstElementStringValue(Ljava/lang/String;)Ljava/lang/String;:0
-com/liferay/commerce/product/internal/util/JsonHelperImpl.getJSONArray(Ljava/lang/String;)Lcom/liferay/portal/kernel/json/JSONArray;:SAFE
-com/liferay/commerce/product/internal/util/JsonHelperImpl.getValueAsJSONArray(Ljava/lang/String;Lcom/liferay/portal/kernel/json/JSONObject;)Lcom/liferay/portal/kernel/json/JSONArray;:SAFE
-com/liferay/commerce/product/internal/util/JsonHelperImpl.toJSONArray(Ljava/util/Map;)Lcom/liferay/portal/kernel/json/JSONArray;:SAFE
 com/liferay/commerce/product/item/selector/web/internal/CPDefinitionItemSelectorView.getItemSelectorCriterionClass()Ljava/lang/Class;:SAFE
 com/liferay/commerce/product/item/selector/web/internal/CPDefinitionItemSelectorView.getTitle(Ljava/util/Locale;)Ljava/lang/String;:SAFE
 com/liferay/commerce/product/item/selector/web/internal/CPInstanceItemSelectorView.getItemSelectorCriterionClass()Ljava/lang/Class;:SAFE

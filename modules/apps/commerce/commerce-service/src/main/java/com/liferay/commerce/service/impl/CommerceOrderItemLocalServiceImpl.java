@@ -52,7 +52,7 @@ import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CPDefinitionOptionRelLocalService;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.commerce.product.service.CPMeasurementUnitLocalService;
-import com.liferay.commerce.product.util.JsonHelper;
+import com.liferay.commerce.product.util.CPJSONUtil;
 import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.service.base.CommerceOrderItemLocalServiceBaseImpl;
 import com.liferay.commerce.tax.CommerceTaxCalculation;
@@ -1487,7 +1487,7 @@ public class CommerceOrderItemLocalServiceImpl
 	private String _getCPInstanceOptionValueRelsJSONString(long cpInstanceId)
 		throws PortalException {
 
-		JSONArray jsonArray = _jsonHelper.toJSONArray(
+		JSONArray jsonArray = CPJSONUtil.toJSONArray(
 			_cpDefinitionOptionRelLocalService.
 				getCPDefinitionOptionRelKeysCPDefinitionOptionValueRelKeys(
 					cpInstanceId));
@@ -2481,9 +2481,6 @@ public class CommerceOrderItemLocalServiceImpl
 
 	@Reference
 	private IndexerRegistry _indexerRegistry;
-
-	@Reference
-	private JsonHelper _jsonHelper;
 
 	@Reference
 	private Portal _portal;
