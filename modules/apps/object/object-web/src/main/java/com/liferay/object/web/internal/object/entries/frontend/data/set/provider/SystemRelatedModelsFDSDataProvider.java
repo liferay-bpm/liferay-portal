@@ -99,43 +99,35 @@ public class SystemRelatedModelsFDSDataProvider
 				fdsPagination.getStartPosition(),
 				fdsPagination.getEndPosition()),
 			relatedModel -> {
-				String businessType = null;
+				ObjectField titleObjectField =
+					_objectFieldLocalService.fetchObjectField(
+						objectDefinition.getTitleObjectFieldId());
 
-				String objectFieldName =
-					objectDefinition.getPKObjectFieldDBColumnName();
-
-				if (objectDefinition.getTitleObjectFieldId() > 0) {
-					ObjectField objectField =
-						_objectFieldLocalService.getObjectField(
-							objectDefinition.getTitleObjectFieldId());
-
-					businessType = objectField.getBusinessType();
-					objectFieldName = objectField.getName();
+				if (titleObjectField == null) {
+					titleObjectField =
+						_objectFieldLocalService.fetchObjectField(
+							objectDefinition.getObjectDefinitionId(), "id");
 				}
 
-				Map<String, Object> objectEntryValues =
-					ObjectEntryValuesUtil.getObjectEntryValues(
-						relatedModel, _dtoConverterRegistry,
-						objectDefinition.getName(),
-						_systemObjectDefinitionManagerRegistry, user);
+				Map<String, Object> values = ObjectEntryValuesUtil.getValues(
+					relatedModel, _dtoConverterRegistry,
+					objectDefinition.getName(),
+					_systemObjectDefinitionManagerRegistry, user);
 
 				if (!StringUtil.equals(
 						objectDefinition.getName(), "CPDefinition")) {
 
-					objectEntryValues.put(
-						"createDate", objectEntryValues.get("dateCreated"));
-					objectEntryValues.put(
-						"modifiedDate", objectEntryValues.get("dateModified"));
+					values.put("createDate", values.get("dateCreated"));
+					values.put("modifiedDate", values.get("dateModified"));
 				}
 
 				return new RelatedModel(
 					objectDefinition.getClassName(),
-					GetterUtil.getLong(objectEntryValues.get("id")),
+					GetterUtil.getLong(values.get("id")),
 					String.valueOf(
 						ObjectEntryValuesUtil.getTitleFieldValue(
-							businessType,
-							objectEntryValues.get(objectFieldName),
-							user.getLanguageId())),
+							titleObjectField.getBusinessType(), user,
+							values.get(titleObjectField.getName()))),
 					true);
 			});
 	}
