@@ -530,7 +530,7 @@ public class ObjectDefinitionLocalServiceImpl
 	}
 
 	@Override
-	public ObjectDefinition enableSalesForceAccountEntryRestricted(
+	public ObjectDefinition enableAccountEntryRestrictedForExternalStorageType(
 			ObjectField objectField)
 		throws PortalException {
 
