@@ -12,15 +12,16 @@ definition {
 	}
 
 	tearDown {
-		ObjectAdmin.deleteAllCustomObjectsViaAPI();
-
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
 		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
+		else {
+			ObjectAdmin.deleteAllCustomObjectsViaAPI();
 
-		ObjectAdmin.deleteAllCommerceOrdersAndSitesViaAPI();
+			ObjectAdmin.deleteAllCommerceOrdersAndSitesViaAPI();
+		}
 	}
 
 	@description = "LPS-145665 - Verify that it's possible to activate and deactivate an Action"
