@@ -10,6 +10,7 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.DuplicateObjectRelationshipException;
+import com.liferay.object.exception.DuplicateObjectRelationshipExternalReferenceCodeException;
 import com.liferay.object.exception.NoSuchObjectRelationshipException;
 import com.liferay.object.exception.ObjectRelationshipNameException;
 import com.liferay.object.exception.ObjectRelationshipParameterObjectFieldIdException;
@@ -710,6 +711,11 @@ public class ObjectRelationshipLocalServiceImpl
 				"Reverse object relationships cannot be updated");
 		}
 
+		_validateExternalReferenceCode(
+			externalReferenceCode, objectRelationshipId,
+			objectRelationship.getCompanyId(),
+			objectRelationship.getObjectDefinitionId1());
+
 		_validateParameterObjectFieldId(
 			_objectDefinitionLocalService.getObjectDefinition(
 				objectRelationship.getObjectDefinitionId1()),
@@ -876,6 +882,12 @@ public class ObjectRelationshipLocalServiceImpl
 			boolean reverse, String type)
 		throws PortalException {
 
+		User user = _userLocalService.getUser(userId);
+
+		_validateExternalReferenceCode(
+			externalReferenceCode, 0L, user.getCompanyId(),
+			objectDefinitionId1);
+
 		_validateName(objectDefinitionId1, name);
 
 		ObjectDefinition objectDefinition1 =
@@ -894,8 +906,6 @@ public class ObjectRelationshipLocalServiceImpl
 				counterLocalService.increment());
 
 		objectRelationship.setExternalReferenceCode(externalReferenceCode);
-
-		User user = _userLocalService.getUser(userId);
 
 		objectRelationship.setCompanyId(user.getCompanyId());
 		objectRelationship.setUserId(user.getUserId());
@@ -1036,6 +1046,26 @@ public class ObjectRelationshipLocalServiceImpl
 		objectRelationship.setLabelMap(labelMap);
 
 		return objectRelationshipPersistence.update(objectRelationship);
+	}
+
+	private void _validateExternalReferenceCode(
+		String externalReferenceCode, long objectRelationshipId, long companyId,
+		long objectDefinitionId1) {
+
+		if (Validator.isNull(externalReferenceCode)) {
+			return;
+		}
+
+		ObjectRelationship objectRelationship =
+			objectRelationshipPersistence.fetchByERC_C_ODI1(
+				externalReferenceCode, companyId, objectDefinitionId1);
+
+		if ((objectRelationship != null) &&
+			(objectRelationship.getObjectRelationshipId() !=
+				objectRelationshipId)) {
+
+			throw new DuplicateObjectRelationshipExternalReferenceCodeException();
+		}
 	}
 
 	private void _validateName(long objectDefinitionId1, String name)
