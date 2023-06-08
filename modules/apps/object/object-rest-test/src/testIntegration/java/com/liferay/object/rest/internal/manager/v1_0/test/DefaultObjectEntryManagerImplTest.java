@@ -1962,14 +1962,14 @@ public class DefaultObjectEntryManagerImplTest {
 			).build(),
 			"pt_BR", objectEntry.getId());
 
-		Map<String, String> localizedLongTextObjectFieldNameI18nValue =
+		Map<String, String> localizedLongTextObjectFieldI18nValue =
 			HashMapBuilder.put(
 				"en_US", "en_US localizedLongTextObjectFieldValue"
 			).put(
 				"pt_BR", ""
 			).build();
 
-		Map<String, String> localizedRichTextObjectFieldNameI18nValue =
+		Map<String, String> localizedRichTextObjectFieldI18nValue =
 			HashMapBuilder.put(
 				"ar_SA", "ar_SA localizedRichTextObjectFieldValue"
 			).put(
@@ -1984,10 +1984,10 @@ public class DefaultObjectEntryManagerImplTest {
 				{
 					properties = HashMapBuilder.<String, Object>put(
 						"localizedLongTextObjectFieldName_i18n",
-						localizedLongTextObjectFieldNameI18nValue
+						localizedLongTextObjectFieldI18nValue
 					).put(
 						"localizedRichTextObjectFieldName_i18n",
-						localizedRichTextObjectFieldNameI18nValue
+						localizedRichTextObjectFieldI18nValue
 					).put(
 						"localizedTextObjectFieldName_i18n",
 						_localizedObjectFieldI18nValues.get(
@@ -1996,9 +1996,9 @@ public class DefaultObjectEntryManagerImplTest {
 				}
 			});
 
-		localizedLongTextObjectFieldNameI18nValue.remove("pt_BR");
+		localizedLongTextObjectFieldI18nValue.remove("pt_BR");
 
-		localizedRichTextObjectFieldNameI18nValue.put(
+		localizedRichTextObjectFieldI18nValue.put(
 			"pt_BR", "pt_BR <i>localizedRichTextObjectFieldValue</i>");
 
 		_assertLocalizedValues(
@@ -2006,13 +2006,13 @@ public class DefaultObjectEntryManagerImplTest {
 				"localizedLongTextObjectFieldName", ""
 			).put(
 				"localizedLongTextObjectFieldName_i18n",
-				localizedLongTextObjectFieldNameI18nValue
+				localizedLongTextObjectFieldI18nValue
 			).put(
 				"localizedRichTextObjectFieldName",
 				"ar_SA localizedRichTextObjectFieldValue"
 			).put(
 				"localizedRichTextObjectFieldName_i18n",
-				localizedRichTextObjectFieldNameI18nValue
+				localizedRichTextObjectFieldI18nValue
 			).put(
 				"localizedRichTextObjectFieldNameRawText",
 				"ar_SA localizedRichTextObjectFieldValue"
@@ -2029,13 +2029,13 @@ public class DefaultObjectEntryManagerImplTest {
 				"localizedLongTextObjectFieldName", ""
 			).put(
 				"localizedLongTextObjectFieldName_i18n",
-				localizedLongTextObjectFieldNameI18nValue
+				localizedLongTextObjectFieldI18nValue
 			).put(
 				"localizedRichTextObjectFieldName",
 				"ca_ES localizedRichTextObjectFieldValue"
 			).put(
 				"localizedRichTextObjectFieldName_i18n",
-				localizedRichTextObjectFieldNameI18nValue
+				localizedRichTextObjectFieldI18nValue
 			).put(
 				"localizedRichTextObjectFieldNameRawText",
 				"ca_ES localizedRichTextObjectFieldValue"
@@ -2053,13 +2053,13 @@ public class DefaultObjectEntryManagerImplTest {
 				"en_US localizedLongTextObjectFieldValue"
 			).put(
 				"localizedLongTextObjectFieldName_i18n",
-				localizedLongTextObjectFieldNameI18nValue
+				localizedLongTextObjectFieldI18nValue
 			).put(
 				"localizedRichTextObjectFieldName",
 				"en_US <i>localizedRichTextObjectFieldValue</i>"
 			).put(
 				"localizedRichTextObjectFieldName_i18n",
-				localizedRichTextObjectFieldNameI18nValue
+				localizedRichTextObjectFieldI18nValue
 			).put(
 				"localizedRichTextObjectFieldNameRawText",
 				"en_US localizedRichTextObjectFieldValue"
@@ -2077,12 +2077,12 @@ public class DefaultObjectEntryManagerImplTest {
 				"localizedLongTextObjectFieldName", ""
 			).put(
 				"localizedLongTextObjectFieldName_i18n",
-				localizedLongTextObjectFieldNameI18nValue
+				localizedLongTextObjectFieldI18nValue
 			).put(
 				"localizedRichTextObjectFieldName", ""
 			).put(
 				"localizedRichTextObjectFieldName_i18n",
-				localizedRichTextObjectFieldNameI18nValue
+				localizedRichTextObjectFieldI18nValue
 			).put(
 				"localizedRichTextObjectFieldNameRawText", ""
 			).put(
