@@ -255,14 +255,14 @@ public class SystemObjectEntryItemSelectorView
 			User user = _userLocalService.fetchUser(
 				PrincipalThreadLocal.getUserId());
 
-			Map<String, Object> values = ObjectEntryDTOConverterUtil.toDTO(
-				_baseModel, _dtoConverterRegistry, _objectDefinition.getName(),
-				_systemObjectDefinitionManagerRegistry, user);
-
 			return String.valueOf(
 				ObjectEntryValuesUtil.getTitleFieldValue(
-					objectField.getBusinessType(), user,
-					values.get(objectField.getName())));
+					objectField.getBusinessType(),
+					_baseModel.getModelAttributes(), objectField, user,
+					ObjectEntryDTOConverterUtil.toDTO(
+						_baseModel, _dtoConverterRegistry,
+						_objectDefinition.getName(),
+						_systemObjectDefinitionManagerRegistry, user)));
 		}
 
 		@Override
