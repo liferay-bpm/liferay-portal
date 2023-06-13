@@ -21,6 +21,7 @@ export function FrontendDataSet({
 	creationMenu,
 	currentURL,
 	customDataRenderers,
+	customEmptyState,
 	customViews,
 	customViewsEnabled,
 	filters,
@@ -121,6 +122,7 @@ export interface IFrontendDataSetProps {
 	};
 	currentURL?: string;
 	customDataRenderers?: any;
+	customEmptyState?: JSX.Element;
 	customViews?: string;
 	customViewsEnabled?: boolean;
 	enableInlineAddModeSetting?: {

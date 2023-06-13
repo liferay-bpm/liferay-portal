@@ -61,6 +61,7 @@ const FrontendDataSet = ({
 	creationMenu,
 	currentURL,
 	customDataRenderers,
+	customEmptyState,
 	customViews,
 	customViewsEnabled,
 	filters: initialFilters,
@@ -486,13 +487,15 @@ const FrontendDataSet = ({
 						{...currentViewProps}
 					/>
 				) : (
-					<ClayEmptyState
-						description={Liferay.Language.get(
-							'sorry,-no-results-were-found'
-						)}
-						imgSrc={`${themeDisplay.getPathThemeImages()}/states/search_state.gif`}
-						title={Liferay.Language.get('no-results-found')}
-					/>
+					customEmptyState ?? (
+						<ClayEmptyState
+							description={Liferay.Language.get(
+								'sorry,-no-results-were-found'
+							)}
+							imgSrc={`${themeDisplay.getPathThemeImages()}/states/search_state.gif`}
+							title={Liferay.Language.get('no-results-found')}
+						/>
+					)
 				)}
 			</div>
 		) : (
