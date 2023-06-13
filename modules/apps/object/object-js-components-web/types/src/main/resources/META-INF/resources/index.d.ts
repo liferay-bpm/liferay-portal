@@ -59,6 +59,7 @@ export {createAutoCorrectedDatePipe} from './utils/createAutoCorrectedDatePipe';
 export {Panel} from './components/Panel/Panel';
 export {PanelBody, PanelSimpleBody} from './components/Panel/PanelBody';
 export {PanelHeader} from './components/Panel/PanelHeader';
+export {CustomEmptyState} from './components/CustomEmptyState';
 export * as API from './utils/api';
 export * from './utils/string';
 export * from './utils/array';

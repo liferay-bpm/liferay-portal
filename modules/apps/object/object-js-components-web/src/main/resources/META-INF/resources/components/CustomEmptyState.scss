@@ -1,0 +1,26 @@
+@import 'atlas-variables';
+
+.lfr-objects__custom-empty-state {
+	display: block;
+	margin: 5rem auto 1.5rem;
+	max-width: 340px;
+	text-align: center;
+
+	&-description {
+		color: $secondary;
+		margin-bottom: 1rem;
+		margin-top: 0.5rem;
+		max-width: 100%;
+		word-wrap: break-word;
+	}
+
+	&-title {
+		font-size: 1.25rem;
+		font-weight: 600;
+		line-height: 1.2;
+		margin-bottom: 0;
+		margin-top: 2.5rem;
+		max-width: 100%;
+		word-wrap: break-word;
+	}
+}
