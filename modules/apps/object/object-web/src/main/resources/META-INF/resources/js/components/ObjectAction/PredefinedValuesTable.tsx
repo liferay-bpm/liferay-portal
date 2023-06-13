@@ -18,13 +18,14 @@ import {ClayTooltipProvider} from '@clayui/tooltip';
 import {FrontendDataSet} from '@liferay/frontend-data-set-web';
 import {
 	Card,
+	CustomEmptyState,
 	DatePicker,
 	ExpressionBuilder,
 	getLocalizableLabel,
 	onActionDropdownItemClick,
 	openToast,
 } from '@liferay/object-js-components-web';
-import React, {useEffect, useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo} from 'react';
 
 import './PredefinedValuesTable.scss';
 
@@ -214,21 +215,78 @@ export default function PredefinedValuesTable({
 		values.parameters,
 	]);
 
-	useEffect(() => {
-		const getSelectedFields = () => {
-			const objectFields: ObjectField[] = [];
+	const getSelectedFields = useCallback(() => {
+		const objectFields: ObjectField[] = [];
 
-			predefinedValues?.forEach(({name}) => {
-				if (objectFieldsMap.has(name)) {
-					const field = objectFieldsMap.get(name);
-					objectFields.push(field as ObjectField);
-				}
-			});
+		predefinedValues?.forEach(({name}) => {
+			if (objectFieldsMap.has(name)) {
+				const field = objectFieldsMap.get(name);
+				objectFields.push(field as ObjectField);
+			}
+		});
 
-			return objectFields;
-		};
+		return objectFields;
+	}, [predefinedValues, objectFieldsMap]);
 
-		const deletePredefinedValueField = ({itemData}: {itemData: Item}) => {
+	const handleAddFields = useCallback(() => {
+		const parentWindow = Liferay.Util.getOpener();
+
+		parentWindow.Liferay.fire('openModalAddColumns', {
+			disableRequired: true,
+			disableRequiredChecked,
+			getLabel: ({label, name}: ObjectField) =>
+				getLocalizableLabel(creationLanguageId, label, name),
+			getName: ({name}: ObjectField) => name,
+			header: Liferay.Language.get('add-fields'),
+			items: currentObjectDefinitionFields.filter(
+				({localized}) => !localized
+			),
+			onSave: (items: ObjectField[]) => {
+				const predefinedValuesMap = new Map<string, PredefinedValue>();
+
+				predefinedValues.forEach((field) => {
+					predefinedValuesMap.set(field.name, field);
+				});
+
+				const newPredefinedValues = items.map(
+					({businessType, label, name}) => {
+						const value = predefinedValuesMap.get(name);
+						const inputAsValue =
+							businessType === 'DateTime' ? true : false;
+
+						return value
+							? value
+							: {
+									businessType,
+									inputAsValue,
+									label,
+									name,
+									value: '',
+							  };
+					}
+				);
+				setValues({
+					parameters: {
+						...values.parameters,
+						predefinedValues: newPredefinedValues,
+					},
+				});
+			},
+			selected: getSelectedFields(),
+			title: Liferay.Language.get('select-the-fields'),
+		});
+	}, [
+		creationLanguageId,
+		currentObjectDefinitionFields,
+		disableRequiredChecked,
+		predefinedValues,
+		setValues,
+		values.parameters,
+		getSelectedFields,
+	]);
+
+	const deletePredefinedValueField = useCallback(
+		({itemData}: {itemData: Item}) => {
 			const {name} = itemData;
 
 			if (objectFieldsMap.get(name)?.required) {
@@ -252,60 +310,11 @@ export default function PredefinedValuesTable({
 					predefinedValues: newPredefinedValues,
 				},
 			});
-		};
+		},
+		[objectFieldsMap, predefinedValues, setValues, values.parameters]
+	);
 
-		const handleAddFields = () => {
-			const parentWindow = Liferay.Util.getOpener();
-
-			parentWindow.Liferay.fire('openModalAddColumns', {
-				disableRequired: true,
-				disableRequiredChecked,
-				getLabel: ({label, name}: ObjectField) =>
-					getLocalizableLabel(creationLanguageId, label, name),
-				getName: ({name}: ObjectField) => name,
-				header: Liferay.Language.get('add-fields'),
-				items: currentObjectDefinitionFields.filter(
-					({localized}) => !localized
-				),
-				onSave: (items: ObjectField[]) => {
-					const predefinedValuesMap = new Map<
-						string,
-						PredefinedValue
-					>();
-
-					predefinedValues.forEach((field) => {
-						predefinedValuesMap.set(field.name, field);
-					});
-
-					const newPredefinedValues = items.map(
-						({businessType, label, name}) => {
-							const value = predefinedValuesMap.get(name);
-							const inputAsValue =
-								businessType === 'DateTime' ? true : false;
-
-							return value
-								? value
-								: {
-										businessType,
-										inputAsValue,
-										label,
-										name,
-										value: '',
-								  };
-						}
-					);
-					setValues({
-						parameters: {
-							...values.parameters,
-							predefinedValues: newPredefinedValues,
-						},
-					});
-				},
-				selected: getSelectedFields(),
-				title: Liferay.Language.get('select-the-fields'),
-			});
-		};
-
+	useEffect(() => {
 		Liferay.on('deletePredefinedValueField', deletePredefinedValueField);
 		Liferay.on('handleAddFields', handleAddFields);
 
@@ -313,15 +322,7 @@ export default function PredefinedValuesTable({
 			Liferay.detach('deletePredefinedValueField');
 			Liferay.detach('handleAddFields');
 		};
-	}, [
-		creationLanguageId,
-		currentObjectDefinitionFields,
-		disableRequiredChecked,
-		objectFieldsMap,
-		predefinedValues,
-		setValues,
-		values.parameters,
-	]);
+	}, [handleAddFields, deletePredefinedValueField]);
 
 	return (
 		<>
@@ -342,6 +343,20 @@ export default function PredefinedValuesTable({
 								},
 							],
 						}}
+						customEmptyState={
+							<CustomEmptyState
+								actionButtonLabel={Liferay.Language.get(
+									'add-field'
+								)}
+								description={Liferay.Language.get(
+									'set-predefined-values-for-new-entries'
+								)}
+								handleActionButton={handleAddFields}
+								title={Liferay.Language.get(
+									'no-fields-added-yet'
+								)}
+							/>
+						}
 						id="PredefinedValuesTable"
 						items={items}
 						itemsActions={[
