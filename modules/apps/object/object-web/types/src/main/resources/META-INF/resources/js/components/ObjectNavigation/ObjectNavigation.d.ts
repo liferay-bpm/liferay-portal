@@ -12,19 +12,15 @@
  * details.
  */
 
-import {FormError} from '@liferay/object-js-components-web';
-import React from 'react';
-import './ObjectDetails.scss';
-export declare type KeyValuePair = {
-	key: string;
-	value: string;
-};
-interface EditObjectDetailsProps {
+/// <reference types="react" />
+
+import {KeyValuePair} from '../ObjectDetails/EditObjectDetails';
+import './ObjectNavigation.scss';
+interface ObjectNavigationProps {
+	backURL: string;
 	companyKeyValuePair: KeyValuePair[];
 	dbTableName: string;
-	errors: FormError<Partial<ObjectDefinition>>;
 	externalReferenceCode: string;
-	handleChange: React.ChangeEventHandler<HTMLInputElement>;
 	hasPublishObjectPermission: boolean;
 	hasUpdateObjectDefinitionPermission: boolean;
 	isApproved: boolean;
@@ -34,27 +30,33 @@ interface EditObjectDetailsProps {
 		name: string;
 	}[];
 	objectDefinitionId: number;
-	objectFields: ObjectField[];
+	onSubmit: (draft: boolean) => void;
 	pluralLabel: LocalizedValue<string>;
 	portletNamespace: string;
-	setValues: any;
+	screenNavigationCategoryKey: string;
+	setValues: (values: Partial<ObjectDefinition>) => void;
 	shortName: string;
 	siteKeyValuePair: KeyValuePair[];
 	storageTypes: LabelValueObject[];
-	values: any;
+	system: boolean;
 }
-export default function EditObjectDetails({
+declare function ObjectNavigation({
+	backURL,
 	companyKeyValuePair,
 	dbTableName,
-	errors,
-	handleChange,
+	externalReferenceCode,
+	hasPublishObjectPermission,
 	hasUpdateObjectDefinitionPermission,
 	isApproved,
+	label,
 	nonRelationshipObjectFieldsInfo,
-	objectFields,
-	setValues,
+	objectDefinitionId,
+	pluralLabel,
+	portletNamespace,
+	screenNavigationCategoryKey,
+	shortName,
 	siteKeyValuePair,
 	storageTypes,
-	values,
-}: EditObjectDetailsProps): JSX.Element;
-export {};
+	system,
+}: ObjectNavigationProps): JSX.Element;
+export default ObjectNavigation;
