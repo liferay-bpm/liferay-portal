@@ -551,10 +551,10 @@ public class ObjectDefinitionLocalServiceImpl
 			throw new UnsupportedOperationException();
 		}
 
+		objectDefinition.setAccountEntryRestricted(true);
+
 		objectDefinition.setAccountEntryRestrictedObjectFieldId(
 			objectField.getObjectFieldId());
-
-		objectDefinition.setAccountEntryRestricted(true);
 
 		return objectDefinitionPersistence.update(objectDefinition);
 	}
