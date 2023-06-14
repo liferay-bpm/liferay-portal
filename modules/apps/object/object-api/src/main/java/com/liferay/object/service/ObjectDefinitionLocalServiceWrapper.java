@@ -320,12 +320,12 @@ public class ObjectDefinitionLocalServiceWrapper
 
 	@Override
 	public com.liferay.object.model.ObjectDefinition
-			enableAccountEntryRestrictedForExternalStorageType(
+			enableAccountEntryRestrictedForNondefaultStorageType(
 				com.liferay.object.model.ObjectField objectField)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectDefinitionLocalService.
-			enableAccountEntryRestrictedForExternalStorageType(objectField);
+			enableAccountEntryRestrictedForNondefaultStorageType(objectField);
 	}
 
 	@Override
