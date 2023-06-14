@@ -1052,7 +1052,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 		ObjectDefinition objectDefinition2 =
 			_objectDefinitionLocalService.addObjectDefinition(
-				RandomTestUtil.randomString(), user.getUserId());
+				RandomTestUtil.randomString(), user.getUserId(), true, false);
 
 		ObjectRelationship objectRelationship =
 			_objectRelationshipLocalService.addObjectRelationship(
@@ -1075,7 +1075,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 		ObjectDefinition objectDefinition3 =
 			_objectDefinitionLocalService.addObjectDefinition(
-				RandomTestUtil.randomString(), user.getUserId());
+				RandomTestUtil.randomString(), user.getUserId(), true, false);
 
 		objectRelationship =
 			_objectRelationshipLocalService.addObjectRelationship(
