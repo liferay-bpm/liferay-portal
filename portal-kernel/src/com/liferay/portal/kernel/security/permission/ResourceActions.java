@@ -130,4 +130,6 @@ public interface ResourceActions {
 
 	public void removeModelResource(String name, String action);
 
+	public void removeResourceReference(Portlet portlet, String resourceName);
+
 }

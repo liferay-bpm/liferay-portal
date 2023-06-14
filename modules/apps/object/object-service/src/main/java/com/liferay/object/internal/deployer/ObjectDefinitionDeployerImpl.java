@@ -396,6 +396,11 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 
 		_persistedModelLocalServiceRegistry.unregister(
 			objectDefinition.getClassName());
+
+		_resourceActions.removeResourceReference(
+			_portletLocalService.getPortletById(
+				objectDefinition.getPortletId()),
+			objectDefinition.getResourceName());
 	}
 
 	private final AccountEntryLocalService _accountEntryLocalService;
