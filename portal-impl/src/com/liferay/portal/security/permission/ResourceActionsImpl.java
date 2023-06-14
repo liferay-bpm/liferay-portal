@@ -609,6 +609,16 @@ public class ResourceActionsImpl implements ResourceActions {
 		}
 	}
 
+	@Override
+	public void removeResourceReference(Portlet portlet, String resourceName) {
+		_resourceReferences.remove(resourceName);
+
+		if (portlet != null) {
+			_portletRootModelResources.remove(portlet.getPortletId());
+			_resourceReferences.remove(portlet.getPortletName());
+		}
+	}
+
 	@BeanReference(type = PortletLocalService.class)
 	protected PortletLocalService portletLocalService;
 
