@@ -1159,7 +1159,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 		objectDefinition1 =
 			_objectDefinitionLocalService.
-				enableAccountEntryRestrictedForExternalStorageType(
+				enableAccountEntryRestrictedForNondefaultStorageType(
 					objectField1);
 
 		Assert.assertTrue(objectDefinition1.isAccountEntryRestricted());
@@ -1213,7 +1213,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 		objectDefinition2 =
 			_objectDefinitionLocalService.
-				enableAccountEntryRestrictedForExternalStorageType(
+				enableAccountEntryRestrictedForNondefaultStorageType(
 					objectField2);
 
 		Assert.assertTrue(objectDefinition2.isAccountEntryRestricted());
@@ -1226,7 +1226,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 		objectDefinition2 =
 			_objectDefinitionLocalService.
-				enableAccountEntryRestrictedForExternalStorageType(
+				enableAccountEntryRestrictedForNondefaultStorageType(
 					objectField3);
 
 		Assert.assertTrue(objectDefinition2.isAccountEntryRestricted());
@@ -1259,7 +1259,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 		objectDefinition3 =
 			_objectDefinitionLocalService.
-				enableAccountEntryRestrictedForExternalStorageType(
+				enableAccountEntryRestrictedForNondefaultStorageType(
 					objectField4);
 
 		Assert.assertFalse(objectDefinition3.isAccountEntryRestricted());
@@ -1292,7 +1292,7 @@ public class ObjectDefinitionLocalServiceTest {
 		try {
 			objectDefinition4 =
 				_objectDefinitionLocalService.
-					enableAccountEntryRestrictedForExternalStorageType(
+					enableAccountEntryRestrictedForNondefaultStorageType(
 						objectField5);
 
 			Assert.fail();

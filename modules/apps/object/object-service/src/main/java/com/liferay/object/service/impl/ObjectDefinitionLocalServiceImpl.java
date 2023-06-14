@@ -529,8 +529,9 @@ public class ObjectDefinitionLocalServiceImpl
 	}
 
 	@Override
-	public ObjectDefinition enableAccountEntryRestrictedForExternalStorageType(
-			ObjectField objectField)
+	public ObjectDefinition
+			enableAccountEntryRestrictedForNondefaultStorageType(
+				ObjectField objectField)
 		throws PortalException {
 
 		if (!Objects.equals(objectField.getBusinessType(), "Integer") &&
@@ -546,7 +547,7 @@ public class ObjectDefinitionLocalServiceImpl
 			objectField.getObjectDefinitionId());
 
 		if (objectDefinition.isDefaultStorageType()) {
-			return objectDefinition;
+			throw new UnsupportedOperationException();
 		}
 
 		objectDefinition.setAccountEntryRestrictedObjectFieldId(
