@@ -13,8 +13,10 @@ import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutTab;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectLayoutUtil;
 import com.liferay.object.admin.rest.internal.odata.entity.v1_0.ObjectLayoutEntityModel;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectLayoutResource;
+import com.liferay.object.exception.NoSuchObjectRelationshipException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectLayoutService;
@@ -295,7 +297,28 @@ public class ObjectLayoutResourceImpl
 	}
 
 	private com.liferay.object.model.ObjectLayoutTab _toObjectLayoutTab(
-		long objectDefinitionId, ObjectLayoutTab objectLayoutTab) {
+			long objectDefinitionId, ObjectLayoutTab objectLayoutTab)
+		throws PortalException {
+
+		long objectRelationshipId = GetterUtil.getLong(
+			objectLayoutTab.getObjectRelationshipId());
+
+		if (Validator.isNotNull(
+				objectLayoutTab.getObjectRelationshipExternalReferenceCode())) {
+
+			ObjectRelationship objectRelationship =
+				_objectRelationshipLocalService.
+					fetchObjectRelationshipByExternalReferenceCode(
+						objectLayoutTab.
+							getObjectRelationshipExternalReferenceCode(),
+						contextCompany.getCompanyId(), objectDefinitionId);
+
+			if (objectRelationship == null) {
+				throw new NoSuchObjectRelationshipException();
+			}
+
+			objectRelationshipId = objectRelationship.getObjectRelationshipId();
+		}
 
 		com.liferay.object.model.ObjectLayoutTab serviceBuilderObjectLayoutTab =
 			_objectLayoutTabPersistence.create(0L);
@@ -308,7 +331,7 @@ public class ObjectLayoutResourceImpl
 				objectLayoutBox -> _toObjectLayoutBox(
 					objectDefinitionId, objectLayoutBox)));
 		serviceBuilderObjectLayoutTab.setObjectRelationshipId(
-			GetterUtil.getLong(objectLayoutTab.getObjectRelationshipId()));
+			objectRelationshipId);
 		serviceBuilderObjectLayoutTab.setPriority(
 			objectLayoutTab.getPriority());
 
