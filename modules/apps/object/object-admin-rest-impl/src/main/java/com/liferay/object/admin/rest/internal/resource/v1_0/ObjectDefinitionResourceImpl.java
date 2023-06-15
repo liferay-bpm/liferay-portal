@@ -685,20 +685,6 @@ public class ObjectDefinitionResourceImpl
 			}
 		}
 
-		if (objectLayouts != null) {
-			ObjectLayoutResource.Builder builder =
-				_objectLayoutResourceFactory.create();
-
-			ObjectLayoutResource objectLayoutResource = builder.user(
-				contextUser
-			).build();
-
-			for (ObjectLayout objectLayout : objectLayouts) {
-				objectLayoutResource.postObjectDefinitionObjectLayout(
-					objectDefinitionId, objectLayout);
-			}
-		}
-
 		if (objectRelationships != null) {
 			Set<String> deleteObjectRelationshipsNames =
 				SetUtil.asymmetricDifference(
@@ -760,6 +746,20 @@ public class ObjectDefinitionResourceImpl
 						_objectRelationshipLocalService.getObjectRelationship(
 							objectRelationship.getId()));
 				}
+			}
+		}
+
+		if (objectLayouts != null) {
+			ObjectLayoutResource.Builder builder =
+				_objectLayoutResourceFactory.create();
+
+			ObjectLayoutResource objectLayoutResource = builder.user(
+				contextUser
+			).build();
+
+			for (ObjectLayout objectLayout : objectLayouts) {
+				objectLayoutResource.postObjectDefinitionObjectLayout(
+					objectDefinitionId, objectLayout);
 			}
 		}
 
