@@ -1828,9 +1828,8 @@ public class BundleSiteInitializerTest {
 		_assertObjectFields(objectDefinition, 10);
 		_assertObjectRelationships1(objectDefinition, _serviceContext);
 
-		objectDefinition =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				_group.getCompanyId(), "C_TestObjectDefinition2");
+		objectDefinition = _objectDefinitionLocalService.fetchObjectDefinition(
+			_group.getCompanyId(), "C_TestObjectDefinition2");
 
 		Assert.assertFalse(objectDefinition.isAccountEntryRestricted());
 		Assert.assertFalse(objectDefinition.isSystem());
@@ -1841,9 +1840,8 @@ public class BundleSiteInitializerTest {
 		_assertObjectEntries(_group.getGroupId(), objectDefinition, 0);
 		_assertObjectFields(objectDefinition, 8);
 
-		objectDefinition =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				_group.getCompanyId(), "C_TestObjectDefinition3");
+		objectDefinition = _objectDefinitionLocalService.fetchObjectDefinition(
+			_group.getCompanyId(), "C_TestObjectDefinition3");
 
 		Assert.assertEquals(
 			objectDefinition.getScope(),
@@ -1856,9 +1854,8 @@ public class BundleSiteInitializerTest {
 		_assertObjectEntries(0, objectDefinition, 5);
 		_assertObjectFields(objectDefinition, 7);
 
-		objectDefinition =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				_group.getCompanyId(), "C_TestObjectDefinition4");
+		objectDefinition = _objectDefinitionLocalService.fetchObjectDefinition(
+			_group.getCompanyId(), "C_TestObjectDefinition4");
 
 		Assert.assertTrue(objectDefinition.isAccountEntryRestricted());
 		Assert.assertTrue(
@@ -1883,9 +1880,8 @@ public class BundleSiteInitializerTest {
 		_assertObjectFields(objectDefinition, 10);
 		_assertObjectRelationships2(objectDefinition, _serviceContext);
 
-		objectDefinition =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				_group.getCompanyId(), "C_TestObjectDefinition2");
+		objectDefinition = _objectDefinitionLocalService.fetchObjectDefinition(
+			_group.getCompanyId(), "C_TestObjectDefinition2");
 
 		Assert.assertFalse(objectDefinition.isAccountEntryRestricted());
 		Assert.assertEquals(
@@ -1902,9 +1898,8 @@ public class BundleSiteInitializerTest {
 		_assertObjectEntries(_group.getGroupId(), objectDefinition, 0);
 		_assertObjectFields(objectDefinition, 8);
 
-		objectDefinition =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				_group.getCompanyId(), "C_TestObjectDefinition3");
+		objectDefinition = _objectDefinitionLocalService.fetchObjectDefinition(
+			_group.getCompanyId(), "C_TestObjectDefinition3");
 
 		Assert.assertFalse(objectDefinition.isAccountEntryRestricted());
 		Assert.assertEquals(
@@ -1918,9 +1913,8 @@ public class BundleSiteInitializerTest {
 		_assertObjectEntries(0, objectDefinition, 5);
 		_assertObjectFields(objectDefinition, 7);
 
-		objectDefinition =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				_group.getCompanyId(), "C_TestObjectDefinition4");
+		objectDefinition = _objectDefinitionLocalService.fetchObjectDefinition(
+			_group.getCompanyId(), "C_TestObjectDefinition4");
 
 		Assert.assertTrue(objectDefinition.isAccountEntryRestricted());
 		Assert.assertTrue(
@@ -1930,9 +1924,8 @@ public class BundleSiteInitializerTest {
 		Assert.assertEquals(
 			objectDefinition.getStatus(), WorkflowConstants.STATUS_APPROVED);
 
-		objectDefinition =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				_group.getCompanyId(), "C_TestObjectDefinition5");
+		objectDefinition = _objectDefinitionLocalService.fetchObjectDefinition(
+			_group.getCompanyId(), "C_TestObjectDefinition5");
 
 		Assert.assertTrue(objectDefinition.isAccountEntryRestricted());
 		Assert.assertTrue(
