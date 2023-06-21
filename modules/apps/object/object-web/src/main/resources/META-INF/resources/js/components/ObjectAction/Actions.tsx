@@ -152,7 +152,7 @@ export default function Actions({
 							fieldName: 'label',
 							label: Liferay.Language.get('label'),
 							localizeLabel: true,
-							sortable: false,
+							sortable: true,
 						},
 						{
 							expand: false,
@@ -185,5 +185,10 @@ export default function Actions({
 		],
 	};
 
-	return <FrontendDataSet {...dataSetProps} />;
+	return (
+		<FrontendDataSet
+			sorting={[{direction: 'asc', key: 'label'}]}
+			{...dataSetProps}
+		/>
+	);
 }
