@@ -44,13 +44,13 @@ public interface ObjectRelationshipResource {
 	public Page<ObjectRelationship>
 			getObjectDefinitionByExternalReferenceCodeObjectRelationshipsPage(
 				String externalReferenceCode, String search,
-				String filterString, Pagination pagination)
+				String filterString, Pagination pagination, String sortString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			getObjectDefinitionByExternalReferenceCodeObjectRelationshipsPageHttpResponse(
 				String externalReferenceCode, String search,
-				String filterString, Pagination pagination)
+				String filterString, Pagination pagination, String sortString)
 		throws Exception;
 
 	public ObjectRelationship
@@ -67,24 +67,26 @@ public interface ObjectRelationshipResource {
 
 	public Page<ObjectRelationship> getObjectDefinitionObjectRelationshipsPage(
 			Long objectDefinitionId, String search, String filterString,
-			Pagination pagination)
+			Pagination pagination, String sortString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			getObjectDefinitionObjectRelationshipsPageHttpResponse(
 				Long objectDefinitionId, String search, String filterString,
-				Pagination pagination)
+				Pagination pagination, String sortString)
 		throws Exception;
 
 	public void postObjectDefinitionObjectRelationshipsPageExportBatch(
 			Long objectDefinitionId, String search, String filterString,
-			String callbackURL, String contentType, String fieldNames)
+			String sortString, String callbackURL, String contentType,
+			String fieldNames)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postObjectDefinitionObjectRelationshipsPageExportBatchHttpResponse(
 				Long objectDefinitionId, String search, String filterString,
-				String callbackURL, String contentType, String fieldNames)
+				String sortString, String callbackURL, String contentType,
+				String fieldNames)
 		throws Exception;
 
 	public ObjectRelationship postObjectDefinitionObjectRelationship(
@@ -249,12 +251,14 @@ public interface ObjectRelationshipResource {
 		public Page<ObjectRelationship>
 				getObjectDefinitionByExternalReferenceCodeObjectRelationshipsPage(
 					String externalReferenceCode, String search,
-					String filterString, Pagination pagination)
+					String filterString, Pagination pagination,
+					String sortString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				getObjectDefinitionByExternalReferenceCodeObjectRelationshipsPageHttpResponse(
-					externalReferenceCode, search, filterString, pagination);
+					externalReferenceCode, search, filterString, pagination,
+					sortString);
 
 			String content = httpResponse.getContent();
 
@@ -318,7 +322,8 @@ public interface ObjectRelationshipResource {
 		public HttpInvoker.HttpResponse
 				getObjectDefinitionByExternalReferenceCodeObjectRelationshipsPageHttpResponse(
 					String externalReferenceCode, String search,
-					String filterString, Pagination pagination)
+					String filterString, Pagination pagination,
+					String sortString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -355,6 +360,10 @@ public interface ObjectRelationshipResource {
 					"page", String.valueOf(pagination.getPage()));
 				httpInvoker.parameter(
 					"pageSize", String.valueOf(pagination.getPageSize()));
+			}
+
+			if (sortString != null) {
+				httpInvoker.parameter("sort", sortString);
 			}
 
 			httpInvoker.path(
@@ -484,12 +493,13 @@ public interface ObjectRelationshipResource {
 		public Page<ObjectRelationship>
 				getObjectDefinitionObjectRelationshipsPage(
 					Long objectDefinitionId, String search, String filterString,
-					Pagination pagination)
+					Pagination pagination, String sortString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				getObjectDefinitionObjectRelationshipsPageHttpResponse(
-					objectDefinitionId, search, filterString, pagination);
+					objectDefinitionId, search, filterString, pagination,
+					sortString);
 
 			String content = httpResponse.getContent();
 
@@ -553,7 +563,7 @@ public interface ObjectRelationshipResource {
 		public HttpInvoker.HttpResponse
 				getObjectDefinitionObjectRelationshipsPageHttpResponse(
 					Long objectDefinitionId, String search, String filterString,
-					Pagination pagination)
+					Pagination pagination, String sortString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -592,6 +602,10 @@ public interface ObjectRelationshipResource {
 					"pageSize", String.valueOf(pagination.getPageSize()));
 			}
 
+			if (sortString != null) {
+				httpInvoker.parameter("sort", sortString);
+			}
+
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
@@ -607,13 +621,14 @@ public interface ObjectRelationshipResource {
 
 		public void postObjectDefinitionObjectRelationshipsPageExportBatch(
 				Long objectDefinitionId, String search, String filterString,
-				String callbackURL, String contentType, String fieldNames)
+				String sortString, String callbackURL, String contentType,
+				String fieldNames)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postObjectDefinitionObjectRelationshipsPageExportBatchHttpResponse(
-					objectDefinitionId, search, filterString, callbackURL,
-					contentType, fieldNames);
+					objectDefinitionId, search, filterString, sortString,
+					callbackURL, contentType, fieldNames);
 
 			String content = httpResponse.getContent();
 
@@ -666,7 +681,8 @@ public interface ObjectRelationshipResource {
 		public HttpInvoker.HttpResponse
 				postObjectDefinitionObjectRelationshipsPageExportBatchHttpResponse(
 					Long objectDefinitionId, String search, String filterString,
-					String callbackURL, String contentType, String fieldNames)
+					String sortString, String callbackURL, String contentType,
+					String fieldNames)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -696,6 +712,10 @@ public interface ObjectRelationshipResource {
 
 			if (filterString != null) {
 				httpInvoker.parameter("filter", filterString);
+			}
+
+			if (sortString != null) {
+				httpInvoker.parameter("sort", sortString);
 			}
 
 			if (callbackURL != null) {

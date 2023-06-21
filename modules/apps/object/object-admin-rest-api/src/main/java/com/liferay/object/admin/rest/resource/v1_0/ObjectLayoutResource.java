@@ -60,7 +60,7 @@ public interface ObjectLayoutResource {
 	public Page<ObjectLayout>
 			getObjectDefinitionByExternalReferenceCodeObjectLayoutsPage(
 				String externalReferenceCode, String search,
-				Pagination pagination)
+				Pagination pagination, Sort[] sorts)
 		throws Exception;
 
 	public ObjectLayout postObjectDefinitionByExternalReferenceCodeObjectLayout(
@@ -68,12 +68,13 @@ public interface ObjectLayoutResource {
 		throws Exception;
 
 	public Page<ObjectLayout> getObjectDefinitionObjectLayoutsPage(
-			Long objectDefinitionId, String search, Pagination pagination)
+			Long objectDefinitionId, String search, Pagination pagination,
+			Sort[] sorts)
 		throws Exception;
 
 	public Response postObjectDefinitionObjectLayoutsPageExportBatch(
-			Long objectDefinitionId, String search, String callbackURL,
-			String contentType, String fieldNames)
+			Long objectDefinitionId, String search, Sort[] sorts,
+			String callbackURL, String contentType, String fieldNames)
 		throws Exception;
 
 	public ObjectLayout postObjectDefinitionObjectLayout(

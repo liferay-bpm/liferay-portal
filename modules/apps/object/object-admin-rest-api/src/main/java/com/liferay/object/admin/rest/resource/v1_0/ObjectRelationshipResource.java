@@ -60,7 +60,7 @@ public interface ObjectRelationshipResource {
 	public Page<ObjectRelationship>
 			getObjectDefinitionByExternalReferenceCodeObjectRelationshipsPage(
 				String externalReferenceCode, String search, Filter filter,
-				Pagination pagination)
+				Pagination pagination, Sort[] sorts)
 		throws Exception;
 
 	public ObjectRelationship
@@ -71,11 +71,11 @@ public interface ObjectRelationshipResource {
 
 	public Page<ObjectRelationship> getObjectDefinitionObjectRelationshipsPage(
 			Long objectDefinitionId, String search, Filter filter,
-			Pagination pagination)
+			Pagination pagination, Sort[] sorts)
 		throws Exception;
 
 	public Response postObjectDefinitionObjectRelationshipsPageExportBatch(
-			Long objectDefinitionId, String search, Filter filter,
+			Long objectDefinitionId, String search, Filter filter, Sort[] sorts,
 			String callbackURL, String contentType, String fieldNames)
 		throws Exception;
 
