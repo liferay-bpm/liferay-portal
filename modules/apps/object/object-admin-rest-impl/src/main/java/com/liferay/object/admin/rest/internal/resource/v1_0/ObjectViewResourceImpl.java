@@ -156,7 +156,7 @@ public class ObjectViewResourceImpl
 
 		return _toObjectView(
 			_objectViewService.addObjectView(
-				objectDefinitionId,
+				objectView.getExternalReferenceCode(), objectDefinitionId,
 				GetterUtil.getBoolean(objectView.getDefaultObjectView()),
 				LocalizedMapUtil.getLocalizedMap(objectView.getName()),
 				transformToList(
@@ -177,6 +177,7 @@ public class ObjectViewResourceImpl
 
 		return _toObjectView(
 			_objectViewService.addObjectView(
+				objectView.getExternalReferenceCode(),
 				objectView.getObjectDefinitionId(), false,
 				NameMapUtil.copy(objectView.getNameMap()),
 				objectView.getObjectViewColumns(),
@@ -190,7 +191,8 @@ public class ObjectViewResourceImpl
 
 		return _toObjectView(
 			_objectViewService.updateObjectView(
-				objectViewId, objectView.getDefaultObjectView(),
+				objectView.getExternalReferenceCode(), objectViewId,
+				objectView.getDefaultObjectView(),
 				LocalizedMapUtil.getLocalizedMap(objectView.getName()),
 				transformToList(
 					objectView.getObjectViewColumns(),
