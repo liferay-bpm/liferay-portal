@@ -51,8 +51,8 @@ import com.liferay.portal.kernel.util.MethodKey;
 public class ObjectLayoutServiceHttp {
 
 	public static com.liferay.object.model.ObjectLayout addObjectLayout(
-			HttpPrincipal httpPrincipal, long objectDefinitionId,
-			boolean defaultObjectLayout,
+			HttpPrincipal httpPrincipal, String externalReferenceCode,
+			long objectDefinitionId, boolean defaultObjectLayout,
 			java.util.Map<java.util.Locale, String> nameMap,
 			java.util.List<com.liferay.object.model.ObjectLayoutTab>
 				objectLayoutTabs)
@@ -64,8 +64,53 @@ public class ObjectLayoutServiceHttp {
 				_addObjectLayoutParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, objectDefinitionId, defaultObjectLayout, nameMap,
-				objectLayoutTabs);
+				methodKey, externalReferenceCode, objectDefinitionId,
+				defaultObjectLayout, nameMap, objectLayoutTabs);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return (com.liferay.object.model.ObjectLayout)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
+	public static com.liferay.object.model.ObjectLayout addOrUpdateObjectLayout(
+			HttpPrincipal httpPrincipal, String externalReferenceCode,
+			long userId, long objectDefinitionId, boolean defaultObjectLayout,
+			java.util.Map<java.util.Locale, String> nameMap,
+			java.util.List<com.liferay.object.model.ObjectLayoutTab>
+				objectLayoutTabs)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				ObjectLayoutServiceUtil.class, "addOrUpdateObjectLayout",
+				_addOrUpdateObjectLayoutParameterTypes1);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, externalReferenceCode, userId, objectDefinitionId,
+				defaultObjectLayout, nameMap, objectLayoutTabs);
 
 			Object returnObj = null;
 
@@ -102,7 +147,7 @@ public class ObjectLayoutServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectLayoutServiceUtil.class, "deleteObjectLayout",
-				_deleteObjectLayoutParameterTypes1);
+				_deleteObjectLayoutParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectLayoutId);
@@ -142,7 +187,7 @@ public class ObjectLayoutServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectLayoutServiceUtil.class, "getObjectLayout",
-				_getObjectLayoutParameterTypes2);
+				_getObjectLayoutParameterTypes3);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectLayoutId);
@@ -176,8 +221,8 @@ public class ObjectLayoutServiceHttp {
 	}
 
 	public static com.liferay.object.model.ObjectLayout updateObjectLayout(
-			HttpPrincipal httpPrincipal, long objectLayoutId,
-			boolean defaultObjectLayout,
+			HttpPrincipal httpPrincipal, String externalReferenceCode,
+			long objectLayoutId, boolean defaultObjectLayout,
 			java.util.Map<java.util.Locale, String> nameMap,
 			java.util.List<com.liferay.object.model.ObjectLayoutTab>
 				objectLayoutTabs)
@@ -186,11 +231,11 @@ public class ObjectLayoutServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectLayoutServiceUtil.class, "updateObjectLayout",
-				_updateObjectLayoutParameterTypes3);
+				_updateObjectLayoutParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, objectLayoutId, defaultObjectLayout, nameMap,
-				objectLayoutTabs);
+				methodKey, externalReferenceCode, objectLayoutId,
+				defaultObjectLayout, nameMap, objectLayoutTabs);
 
 			Object returnObj = null;
 
@@ -225,15 +270,22 @@ public class ObjectLayoutServiceHttp {
 
 	private static final Class<?>[] _addObjectLayoutParameterTypes0 =
 		new Class[] {
-			long.class, boolean.class, java.util.Map.class, java.util.List.class
+			String.class, long.class, boolean.class, java.util.Map.class,
+			java.util.List.class
 		};
-	private static final Class<?>[] _deleteObjectLayoutParameterTypes1 =
-		new Class[] {long.class};
-	private static final Class<?>[] _getObjectLayoutParameterTypes2 =
-		new Class[] {long.class};
-	private static final Class<?>[] _updateObjectLayoutParameterTypes3 =
+	private static final Class<?>[] _addOrUpdateObjectLayoutParameterTypes1 =
 		new Class[] {
-			long.class, boolean.class, java.util.Map.class, java.util.List.class
+			String.class, long.class, long.class, boolean.class,
+			java.util.Map.class, java.util.List.class
+		};
+	private static final Class<?>[] _deleteObjectLayoutParameterTypes2 =
+		new Class[] {long.class};
+	private static final Class<?>[] _getObjectLayoutParameterTypes3 =
+		new Class[] {long.class};
+	private static final Class<?>[] _updateObjectLayoutParameterTypes4 =
+		new Class[] {
+			String.class, long.class, boolean.class, java.util.Map.class,
+			java.util.List.class
 		};
 
 }

@@ -40,13 +40,25 @@ public class ObjectLayoutServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.object.service.impl.ObjectLayoutServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static ObjectLayout addObjectLayout(
-			long objectDefinitionId, boolean defaultObjectLayout,
-			Map<java.util.Locale, String> nameMap,
+			String externalReferenceCode, long objectDefinitionId,
+			boolean defaultObjectLayout, Map<java.util.Locale, String> nameMap,
 			List<com.liferay.object.model.ObjectLayoutTab> objectLayoutTabs)
 		throws PortalException {
 
 		return getService().addObjectLayout(
-			objectDefinitionId, defaultObjectLayout, nameMap, objectLayoutTabs);
+			externalReferenceCode, objectDefinitionId, defaultObjectLayout,
+			nameMap, objectLayoutTabs);
+	}
+
+	public static ObjectLayout addOrUpdateObjectLayout(
+			String externalReferenceCode, long userId, long objectDefinitionId,
+			boolean defaultObjectLayout, Map<java.util.Locale, String> nameMap,
+			List<com.liferay.object.model.ObjectLayoutTab> objectLayoutTabs)
+		throws PortalException {
+
+		return getService().addOrUpdateObjectLayout(
+			externalReferenceCode, userId, objectDefinitionId,
+			defaultObjectLayout, nameMap, objectLayoutTabs);
 	}
 
 	public static ObjectLayout deleteObjectLayout(long objectLayoutId)
@@ -71,13 +83,14 @@ public class ObjectLayoutServiceUtil {
 	}
 
 	public static ObjectLayout updateObjectLayout(
-			long objectLayoutId, boolean defaultObjectLayout,
-			Map<java.util.Locale, String> nameMap,
+			String externalReferenceCode, long objectLayoutId,
+			boolean defaultObjectLayout, Map<java.util.Locale, String> nameMap,
 			List<com.liferay.object.model.ObjectLayoutTab> objectLayoutTabs)
 		throws PortalException {
 
 		return getService().updateObjectLayout(
-			objectLayoutId, defaultObjectLayout, nameMap, objectLayoutTabs);
+			externalReferenceCode, objectLayoutId, defaultObjectLayout, nameMap,
+			objectLayoutTabs);
 	}
 
 	public static ObjectLayoutService getService() {

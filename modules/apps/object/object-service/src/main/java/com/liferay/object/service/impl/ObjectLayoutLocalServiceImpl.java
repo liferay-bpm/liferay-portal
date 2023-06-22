@@ -265,7 +265,7 @@ public class ObjectLayoutLocalServiceImpl
 			objectLayoutId);
 
 		_validateExternalReferenceCode(
-			externalReferenceCode, 0, objectLayout.getCompanyId(),
+			externalReferenceCode, objectLayoutId, objectLayout.getCompanyId(),
 			objectLayout.getObjectDefinitionId());
 
 		_validate(

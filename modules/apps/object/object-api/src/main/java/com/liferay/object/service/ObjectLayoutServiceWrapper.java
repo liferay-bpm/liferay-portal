@@ -36,14 +36,30 @@ public class ObjectLayoutServiceWrapper
 
 	@Override
 	public com.liferay.object.model.ObjectLayout addObjectLayout(
-			long objectDefinitionId, boolean defaultObjectLayout,
+			String externalReferenceCode, long objectDefinitionId,
+			boolean defaultObjectLayout,
 			java.util.Map<java.util.Locale, String> nameMap,
 			java.util.List<com.liferay.object.model.ObjectLayoutTab>
 				objectLayoutTabs)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectLayoutService.addObjectLayout(
-			objectDefinitionId, defaultObjectLayout, nameMap, objectLayoutTabs);
+			externalReferenceCode, objectDefinitionId, defaultObjectLayout,
+			nameMap, objectLayoutTabs);
+	}
+
+	@Override
+	public com.liferay.object.model.ObjectLayout addOrUpdateObjectLayout(
+			String externalReferenceCode, long userId, long objectDefinitionId,
+			boolean defaultObjectLayout,
+			java.util.Map<java.util.Locale, String> nameMap,
+			java.util.List<com.liferay.object.model.ObjectLayoutTab>
+				objectLayoutTabs)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectLayoutService.addOrUpdateObjectLayout(
+			externalReferenceCode, userId, objectDefinitionId,
+			defaultObjectLayout, nameMap, objectLayoutTabs);
 	}
 
 	@Override
@@ -74,14 +90,16 @@ public class ObjectLayoutServiceWrapper
 
 	@Override
 	public com.liferay.object.model.ObjectLayout updateObjectLayout(
-			long objectLayoutId, boolean defaultObjectLayout,
+			String externalReferenceCode, long objectLayoutId,
+			boolean defaultObjectLayout,
 			java.util.Map<java.util.Locale, String> nameMap,
 			java.util.List<com.liferay.object.model.ObjectLayoutTab>
 				objectLayoutTabs)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectLayoutService.updateObjectLayout(
-			objectLayoutId, defaultObjectLayout, nameMap, objectLayoutTabs);
+			externalReferenceCode, objectLayoutId, defaultObjectLayout, nameMap,
+			objectLayoutTabs);
 	}
 
 	@Override
