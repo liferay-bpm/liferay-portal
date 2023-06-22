@@ -1818,10 +1818,10 @@ public class BundleSiteInitializerTest {
 			_objectDefinitionLocalService.fetchObjectDefinition(
 				_group.getCompanyId(), "C_TestObjectDefinition1");
 
-		Assert.assertFalse(objectDefinition.isAccountEntryRestricted());
-		Assert.assertFalse(objectDefinition.isSystem());
 		Assert.assertEquals(
 			objectDefinition.getStatus(), WorkflowConstants.STATUS_APPROVED);
+		Assert.assertFalse(objectDefinition.isAccountEntryRestricted());
+		Assert.assertFalse(objectDefinition.isSystem());
 
 		_assertObjectActions(3, objectDefinition);
 		_assertObjectEntries(_group.getGroupId(), objectDefinition, 0);
@@ -1831,10 +1831,10 @@ public class BundleSiteInitializerTest {
 		objectDefinition = _objectDefinitionLocalService.fetchObjectDefinition(
 			_group.getCompanyId(), "C_TestObjectDefinition2");
 
-		Assert.assertFalse(objectDefinition.isAccountEntryRestricted());
-		Assert.assertFalse(objectDefinition.isSystem());
 		Assert.assertEquals(
 			objectDefinition.getStatus(), WorkflowConstants.STATUS_APPROVED);
+		Assert.assertFalse(objectDefinition.isAccountEntryRestricted());
+		Assert.assertFalse(objectDefinition.isSystem());
 
 		_assertObjectActions(2, objectDefinition);
 		_assertObjectEntries(_group.getGroupId(), objectDefinition, 0);
@@ -1846,9 +1846,9 @@ public class BundleSiteInitializerTest {
 		Assert.assertEquals(
 			objectDefinition.getScope(),
 			ObjectDefinitionConstants.SCOPE_COMPANY);
-		Assert.assertFalse(objectDefinition.isSystem());
 		Assert.assertEquals(
 			objectDefinition.getStatus(), WorkflowConstants.STATUS_APPROVED);
+		Assert.assertFalse(objectDefinition.isSystem());
 
 		_assertObjectActions(0, objectDefinition);
 		_assertObjectEntries(0, objectDefinition, 5);
@@ -1857,12 +1857,12 @@ public class BundleSiteInitializerTest {
 		objectDefinition = _objectDefinitionLocalService.fetchObjectDefinition(
 			_group.getCompanyId(), "C_TestObjectDefinition4");
 
-		Assert.assertTrue(objectDefinition.isAccountEntryRestricted());
-		Assert.assertTrue(
-			objectDefinition.getAccountEntryRestrictedObjectFieldId() > 0);
-		Assert.assertFalse(objectDefinition.isSystem());
 		Assert.assertEquals(
 			objectDefinition.getStatus(), WorkflowConstants.STATUS_APPROVED);
+		Assert.assertFalse(objectDefinition.isSystem());
+		Assert.assertTrue(
+			objectDefinition.getAccountEntryRestrictedObjectFieldId() > 0);
+		Assert.assertTrue(objectDefinition.isAccountEntryRestricted());
 	}
 
 	private void _assertObjectDefinitions2() throws Exception {
@@ -1870,10 +1870,10 @@ public class BundleSiteInitializerTest {
 			_objectDefinitionLocalService.fetchObjectDefinition(
 				_group.getCompanyId(), "C_TestObjectDefinition1");
 
-		Assert.assertFalse(objectDefinition.isAccountEntryRestricted());
-		Assert.assertFalse(objectDefinition.isSystem());
 		Assert.assertEquals(
 			objectDefinition.getStatus(), WorkflowConstants.STATUS_APPROVED);
+		Assert.assertFalse(objectDefinition.isAccountEntryRestricted());
+		Assert.assertFalse(objectDefinition.isSystem());
 
 		_assertObjectActions(3, objectDefinition);
 		_assertObjectEntries(_group.getGroupId(), objectDefinition, 0);
@@ -1883,16 +1883,16 @@ public class BundleSiteInitializerTest {
 		objectDefinition = _objectDefinitionLocalService.fetchObjectDefinition(
 			_group.getCompanyId(), "C_TestObjectDefinition2");
 
-		Assert.assertFalse(objectDefinition.isAccountEntryRestricted());
 		Assert.assertEquals(
 			"Test Object Definition 2 Update",
 			objectDefinition.getLabel(LocaleUtil.getSiteDefault()));
 		Assert.assertEquals(
 			"Test Object Definitions 2 Update",
 			objectDefinition.getPluralLabel(LocaleUtil.getSiteDefault()));
-		Assert.assertFalse(objectDefinition.isSystem());
 		Assert.assertEquals(
 			objectDefinition.getStatus(), WorkflowConstants.STATUS_APPROVED);
+		Assert.assertFalse(objectDefinition.isAccountEntryRestricted());
+		Assert.assertFalse(objectDefinition.isSystem());
 
 		_assertObjectActions(2, objectDefinition);
 		_assertObjectEntries(_group.getGroupId(), objectDefinition, 0);
@@ -1901,13 +1901,13 @@ public class BundleSiteInitializerTest {
 		objectDefinition = _objectDefinitionLocalService.fetchObjectDefinition(
 			_group.getCompanyId(), "C_TestObjectDefinition3");
 
-		Assert.assertFalse(objectDefinition.isAccountEntryRestricted());
 		Assert.assertEquals(
 			objectDefinition.getScope(),
 			ObjectDefinitionConstants.SCOPE_COMPANY);
-		Assert.assertFalse(objectDefinition.isSystem());
 		Assert.assertEquals(
 			objectDefinition.getStatus(), WorkflowConstants.STATUS_APPROVED);
+		Assert.assertFalse(objectDefinition.isAccountEntryRestricted());
+		Assert.assertFalse(objectDefinition.isSystem());
 
 		_assertObjectActions(0, objectDefinition);
 		_assertObjectEntries(0, objectDefinition, 5);
@@ -1916,24 +1916,24 @@ public class BundleSiteInitializerTest {
 		objectDefinition = _objectDefinitionLocalService.fetchObjectDefinition(
 			_group.getCompanyId(), "C_TestObjectDefinition4");
 
-		Assert.assertTrue(objectDefinition.isAccountEntryRestricted());
-		Assert.assertTrue(
-			objectDefinition.getAccountEntryRestrictedObjectFieldId() > 0);
-		Assert.assertTrue(objectDefinition.isDefaultStorageType());
-		Assert.assertFalse(objectDefinition.isSystem());
 		Assert.assertEquals(
 			objectDefinition.getStatus(), WorkflowConstants.STATUS_APPROVED);
+		Assert.assertFalse(objectDefinition.isSystem());
+		Assert.assertTrue(
+			objectDefinition.getAccountEntryRestrictedObjectFieldId() > 0);
+		Assert.assertTrue(objectDefinition.isAccountEntryRestricted());
+		Assert.assertTrue(objectDefinition.isDefaultStorageType());
 
 		objectDefinition = _objectDefinitionLocalService.fetchObjectDefinition(
 			_group.getCompanyId(), "C_TestObjectDefinition5");
 
-		Assert.assertTrue(objectDefinition.isAccountEntryRestricted());
-		Assert.assertTrue(
-			objectDefinition.getAccountEntryRestrictedObjectFieldId() > 0);
-		Assert.assertTrue(objectDefinition.isDefaultStorageType());
-		Assert.assertFalse(objectDefinition.isSystem());
 		Assert.assertEquals(
 			objectDefinition.getStatus(), WorkflowConstants.STATUS_APPROVED);
+		Assert.assertFalse(objectDefinition.isSystem());
+		Assert.assertTrue(
+			objectDefinition.getAccountEntryRestrictedObjectFieldId() > 0);
+		Assert.assertTrue(objectDefinition.isAccountEntryRestricted());
+		Assert.assertTrue(objectDefinition.isDefaultStorageType());
 	}
 
 	private void _assertObjectEntries(
