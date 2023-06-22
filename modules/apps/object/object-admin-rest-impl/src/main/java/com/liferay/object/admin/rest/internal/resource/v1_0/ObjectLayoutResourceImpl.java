@@ -160,7 +160,7 @@ public class ObjectLayoutResourceImpl
 
 		return _toObjectLayout(
 			_objectLayoutService.addObjectLayout(
-				objectDefinitionId,
+				objectLayout.getExternalReferenceCode(), objectDefinitionId,
 				GetterUtil.getBoolean(objectLayout.getDefaultObjectLayout()),
 				LocalizedMapUtil.getLocalizedMap(objectLayout.getName()),
 				transformToList(
@@ -189,7 +189,8 @@ public class ObjectLayoutResourceImpl
 
 		return _toObjectLayout(
 			_objectLayoutService.updateObjectLayout(
-				objectLayoutId, objectLayout.getDefaultObjectLayout(),
+				objectLayout.getExternalReferenceCode(), objectLayoutId,
+				objectLayout.getDefaultObjectLayout(),
 				LocalizedMapUtil.getLocalizedMap(objectLayout.getName()),
 				transformToList(
 					objectLayout.getObjectLayoutTabs(),
