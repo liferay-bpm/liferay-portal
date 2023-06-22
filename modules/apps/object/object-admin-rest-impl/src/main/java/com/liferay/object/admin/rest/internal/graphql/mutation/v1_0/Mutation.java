@@ -943,6 +943,7 @@ public class Mutation {
 	public Response createObjectDefinitionObjectViewsPageExportBatch(
 			@GraphQLName("objectDefinitionId") Long objectDefinitionId,
 			@GraphQLName("search") String search,
+			@GraphQLName("sort") String sortsString,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("contentType") String contentType,
 			@GraphQLName("fieldNames") String fieldNames)
@@ -954,8 +955,9 @@ public class Mutation {
 			objectViewResource ->
 				objectViewResource.
 					postObjectDefinitionObjectViewsPageExportBatch(
-						objectDefinitionId, search, callbackURL, contentType,
-						fieldNames));
+						objectDefinitionId, search,
+						_sortsBiFunction.apply(objectViewResource, sortsString),
+						callbackURL, contentType, fieldNames));
 	}
 
 	@GraphQLField
