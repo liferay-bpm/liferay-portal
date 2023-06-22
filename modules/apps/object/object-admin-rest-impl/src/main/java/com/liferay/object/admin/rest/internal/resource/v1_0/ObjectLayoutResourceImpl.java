@@ -170,6 +170,33 @@ public class ObjectLayoutResourceImpl
 	}
 
 	@Override
+	public ObjectLayout
+			putObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectLayoutByExternalReferenceCodeObjectLayoutExternalReferenceCode(
+				String objectDefinitionExternalReferenceCode,
+				String objectLayoutExternalReferenceCode,
+				ObjectLayout objectLayout)
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.
+				getObjectDefinitionByExternalReferenceCode(
+					objectDefinitionExternalReferenceCode,
+					contextCompany.getCompanyId());
+
+		return _toObjectLayout(
+			_objectLayoutService.addOrUpdateObjectLayout(
+				objectLayoutExternalReferenceCode, contextUser.getUserId(),
+				objectDefinition.getObjectDefinitionId(),
+				GetterUtil.getBoolean(objectLayout.getDefaultObjectLayout()),
+				LocalizedMapUtil.getLocalizedMap(objectLayout.getName()),
+				transformToList(
+					objectLayout.getObjectLayoutTabs(),
+					objectLayoutTab -> _toObjectLayoutTab(
+						objectDefinition.getObjectDefinitionId(),
+						objectLayoutTab))));
+	}
+
+	@Override
 	public ObjectLayout putObjectLayout(
 			Long objectLayoutId, ObjectLayout objectLayout)
 		throws Exception {
