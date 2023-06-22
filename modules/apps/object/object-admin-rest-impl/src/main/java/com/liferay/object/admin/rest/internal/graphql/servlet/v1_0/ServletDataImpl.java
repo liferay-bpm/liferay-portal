@@ -263,6 +263,11 @@ public class ServletDataImpl implements ServletData {
 							ObjectLayoutResourceImpl.class,
 							"postObjectDefinitionByExternalReferenceCodeObjectLayout"));
 					put(
+						"mutation#updateObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectLayoutByExternalReferenceCodeObjectLayoutExternalReferenceCode",
+						new ObjectValuePair<>(
+							ObjectLayoutResourceImpl.class,
+							"putObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectLayoutByExternalReferenceCodeObjectLayoutExternalReferenceCode"));
+					put(
 						"mutation#createObjectDefinitionObjectLayoutsPageExportBatch",
 						new ObjectValuePair<>(
 							ObjectLayoutResourceImpl.class,

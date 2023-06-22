@@ -182,6 +182,7 @@ public abstract class BaseObjectLayoutResourceTestCase {
 
 		ObjectLayout objectLayout = randomObjectLayout();
 
+		objectLayout.setExternalReferenceCode(regex);
 		objectLayout.setObjectDefinitionExternalReferenceCode(regex);
 
 		String json = ObjectLayoutSerDes.toJSON(objectLayout);
@@ -190,6 +191,7 @@ public abstract class BaseObjectLayoutResourceTestCase {
 
 		objectLayout = ObjectLayoutSerDes.toDTO(json);
 
+		Assert.assertEquals(regex, objectLayout.getExternalReferenceCode());
 		Assert.assertEquals(
 			regex, objectLayout.getObjectDefinitionExternalReferenceCode());
 	}
@@ -365,6 +367,69 @@ public abstract class BaseObjectLayoutResourceTestCase {
 	protected ObjectLayout
 			testPostObjectDefinitionByExternalReferenceCodeObjectLayout_addObjectLayout(
 				ObjectLayout objectLayout)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectLayoutByExternalReferenceCodeObjectLayoutExternalReferenceCode()
+		throws Exception {
+
+		ObjectLayout postObjectLayout =
+			testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectLayoutByExternalReferenceCodeObjectLayoutExternalReferenceCode_addObjectLayout();
+
+		ObjectLayout randomObjectLayout = randomObjectLayout();
+
+		ObjectLayout putObjectLayout =
+			objectLayoutResource.
+				putObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectLayoutByExternalReferenceCodeObjectLayoutExternalReferenceCode(
+					testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectLayoutByExternalReferenceCodeObjectLayoutExternalReferenceCode_getObjectDefinitionExternalReferenceCode(
+						postObjectLayout),
+					testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectLayoutByExternalReferenceCodeObjectLayoutExternalReferenceCode_getObjectLayoutExternalReferenceCode(),
+					randomObjectLayout);
+
+		assertEquals(randomObjectLayout, putObjectLayout);
+		assertValid(putObjectLayout);
+
+		ObjectLayout getObjectLayout =
+			testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectLayoutByExternalReferenceCodeObjectLayoutExternalReferenceCode_getObjectLayout(
+				testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectLayoutByExternalReferenceCodeObjectLayoutExternalReferenceCode_getObjectDefinitionExternalReferenceCode(
+					putObjectLayout),
+				testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectLayoutByExternalReferenceCodeObjectLayoutExternalReferenceCode_getObjectLayoutExternalReferenceCode());
+
+		assertEquals(randomObjectLayout, getObjectLayout);
+		assertValid(getObjectLayout);
+	}
+
+	protected ObjectLayout
+		testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectLayoutByExternalReferenceCodeObjectLayoutExternalReferenceCode_getObjectLayout(
+			String objectDefinitionExternalReferenceCode,
+			String objectLayoutExternalReferenceCode) {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected String
+			testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectLayoutByExternalReferenceCodeObjectLayoutExternalReferenceCode_getObjectDefinitionExternalReferenceCode(
+				ObjectLayout objectLayout)
+		throws Exception {
+
+		return objectLayout.getObjectDefinitionExternalReferenceCode();
+	}
+
+	protected String
+			testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectLayoutByExternalReferenceCodeObjectLayoutExternalReferenceCode_getObjectLayoutExternalReferenceCode()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected ObjectLayout
+			testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectLayoutByExternalReferenceCodeObjectLayoutExternalReferenceCode_addObjectLayout()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -814,6 +879,16 @@ public abstract class BaseObjectLayoutResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (objectLayout.getExternalReferenceCode() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("name", additionalAssertFieldName)) {
 				if (objectLayout.getName() == null) {
 					valid = false;
@@ -1011,6 +1086,19 @@ public abstract class BaseObjectLayoutResourceTestCase {
 				if (!Objects.deepEquals(
 						objectLayout1.getDefaultObjectLayout(),
 						objectLayout2.getDefaultObjectLayout())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						objectLayout1.getExternalReferenceCode(),
+						objectLayout2.getExternalReferenceCode())) {
 
 					return false;
 				}
@@ -1258,6 +1346,14 @@ public abstract class BaseObjectLayoutResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("externalReferenceCode")) {
+			sb.append("'");
+			sb.append(String.valueOf(objectLayout.getExternalReferenceCode()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("id")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -1335,6 +1431,8 @@ public abstract class BaseObjectLayoutResourceTestCase {
 				dateCreated = RandomTestUtil.nextDate();
 				dateModified = RandomTestUtil.nextDate();
 				defaultObjectLayout = RandomTestUtil.randomBoolean();
+				externalReferenceCode = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
 				objectDefinitionExternalReferenceCode = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
