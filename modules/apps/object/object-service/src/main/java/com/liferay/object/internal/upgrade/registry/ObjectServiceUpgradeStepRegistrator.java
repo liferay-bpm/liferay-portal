@@ -305,6 +305,17 @@ public class ObjectServiceUpgradeStepRegistrator
 			"5.3.0", "5.3.1",
 			new com.liferay.object.internal.upgrade.v5_3_1.
 				SchemaUpgradeProcess());
+
+		registry.register(
+			"5.3.1", "5.3.2",
+			new BaseExternalReferenceCodeUpgradeProcess() {
+
+				@Override
+				protected String[][] getTableAndPrimaryKeyColumnNames() {
+					return new String[][] {{"ObjectView", "objectViewId"}};
+				}
+
+			});
 	}
 
 	@Reference
