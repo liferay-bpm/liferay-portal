@@ -182,6 +182,7 @@ public abstract class BaseObjectViewResourceTestCase {
 
 		ObjectView objectView = randomObjectView();
 
+		objectView.setExternalReferenceCode(regex);
 		objectView.setObjectDefinitionExternalReferenceCode(regex);
 
 		String json = ObjectViewSerDes.toJSON(objectView);
@@ -190,6 +191,7 @@ public abstract class BaseObjectViewResourceTestCase {
 
 		objectView = ObjectViewSerDes.toDTO(json);
 
+		Assert.assertEquals(regex, objectView.getExternalReferenceCode());
 		Assert.assertEquals(
 			regex, objectView.getObjectDefinitionExternalReferenceCode());
 	}
@@ -361,6 +363,69 @@ public abstract class BaseObjectViewResourceTestCase {
 	protected ObjectView
 			testPostObjectDefinitionByExternalReferenceCodeObjectView_addObjectView(
 				ObjectView objectView)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectViewByExternalReferenceCodeObjectViewExternalReferenceCode()
+		throws Exception {
+
+		ObjectView postObjectView =
+			testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectViewByExternalReferenceCodeObjectViewExternalReferenceCode_addObjectView();
+
+		ObjectView randomObjectView = randomObjectView();
+
+		ObjectView putObjectView =
+			objectViewResource.
+				putObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectViewByExternalReferenceCodeObjectViewExternalReferenceCode(
+					testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectViewByExternalReferenceCodeObjectViewExternalReferenceCode_getObjectDefinitionExternalReferenceCode(
+						postObjectView),
+					testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectViewByExternalReferenceCodeObjectViewExternalReferenceCode_getObjectViewExternalReferenceCode(),
+					randomObjectView);
+
+		assertEquals(randomObjectView, putObjectView);
+		assertValid(putObjectView);
+
+		ObjectView getObjectView =
+			testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectViewByExternalReferenceCodeObjectViewExternalReferenceCode_getObjectView(
+				testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectViewByExternalReferenceCodeObjectViewExternalReferenceCode_getObjectDefinitionExternalReferenceCode(
+					putObjectView),
+				testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectViewByExternalReferenceCodeObjectViewExternalReferenceCode_getObjectViewExternalReferenceCode());
+
+		assertEquals(randomObjectView, getObjectView);
+		assertValid(getObjectView);
+	}
+
+	protected ObjectView
+		testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectViewByExternalReferenceCodeObjectViewExternalReferenceCode_getObjectView(
+			String objectDefinitionExternalReferenceCode,
+			String objectViewExternalReferenceCode) {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected String
+			testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectViewByExternalReferenceCodeObjectViewExternalReferenceCode_getObjectDefinitionExternalReferenceCode(
+				ObjectView objectView)
+		throws Exception {
+
+		return objectView.getObjectDefinitionExternalReferenceCode();
+	}
+
+	protected String
+			testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectViewByExternalReferenceCodeObjectViewExternalReferenceCode_getObjectViewExternalReferenceCode()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected ObjectView
+			testPutObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectViewByExternalReferenceCodeObjectViewExternalReferenceCode_addObjectView()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -810,6 +875,16 @@ public abstract class BaseObjectViewResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (objectView.getExternalReferenceCode() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("name", additionalAssertFieldName)) {
 				if (objectView.getName() == null) {
 					valid = false;
@@ -1026,6 +1101,19 @@ public abstract class BaseObjectViewResourceTestCase {
 				if (!Objects.deepEquals(
 						objectView1.getDefaultObjectView(),
 						objectView2.getDefaultObjectView())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						objectView1.getExternalReferenceCode(),
+						objectView2.getExternalReferenceCode())) {
 
 					return false;
 				}
@@ -1297,6 +1385,14 @@ public abstract class BaseObjectViewResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("externalReferenceCode")) {
+			sb.append("'");
+			sb.append(String.valueOf(objectView.getExternalReferenceCode()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("id")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -1384,6 +1480,8 @@ public abstract class BaseObjectViewResourceTestCase {
 				dateCreated = RandomTestUtil.nextDate();
 				dateModified = RandomTestUtil.nextDate();
 				defaultObjectView = RandomTestUtil.randomBoolean();
+				externalReferenceCode = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
 				objectDefinitionExternalReferenceCode = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());

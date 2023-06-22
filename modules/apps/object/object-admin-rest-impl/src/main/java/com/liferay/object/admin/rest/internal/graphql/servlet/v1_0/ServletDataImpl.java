@@ -387,6 +387,11 @@ public class ServletDataImpl implements ServletData {
 							ObjectViewResourceImpl.class,
 							"postObjectDefinitionByExternalReferenceCodeObjectView"));
 					put(
+						"mutation#updateObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectViewByExternalReferenceCodeObjectViewExternalReferenceCode",
+						new ObjectValuePair<>(
+							ObjectViewResourceImpl.class,
+							"putObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectViewByExternalReferenceCodeObjectViewExternalReferenceCode"));
+					put(
 						"mutation#createObjectDefinitionObjectViewsPageExportBatch",
 						new ObjectValuePair<>(
 							ObjectViewResourceImpl.class,

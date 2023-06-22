@@ -67,6 +67,12 @@ public interface ObjectViewResource {
 			String externalReferenceCode, ObjectView objectView)
 		throws Exception;
 
+	public ObjectView
+			putObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectViewByExternalReferenceCodeObjectViewExternalReferenceCode(
+				String objectDefinitionExternalReferenceCode,
+				String objectViewExternalReferenceCode, ObjectView objectView)
+		throws Exception;
+
 	public Page<ObjectView> getObjectDefinitionObjectViewsPage(
 			Long objectDefinitionId, String search, Pagination pagination)
 		throws Exception;
