@@ -113,10 +113,12 @@ import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectLayout;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectLayoutLocalService;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
@@ -1826,6 +1828,7 @@ public class BundleSiteInitializerTest {
 		_assertObjectActions(3, objectDefinition1);
 		_assertObjectEntries(_group.getGroupId(), objectDefinition1, 0);
 		_assertObjectFields(objectDefinition1, 10);
+		_assertObjectLayouts(2, objectDefinition1);
 		_assertObjectRelationships1(objectDefinition1, _serviceContext);
 
 		ObjectDefinition objectDefinition2 =
@@ -1840,6 +1843,7 @@ public class BundleSiteInitializerTest {
 		_assertObjectActions(2, objectDefinition2);
 		_assertObjectEntries(_group.getGroupId(), objectDefinition2, 0);
 		_assertObjectFields(objectDefinition2, 8);
+		_assertObjectLayouts(0, objectDefinition2);
 
 		ObjectDefinition objectDefinition3 =
 			_objectDefinitionLocalService.fetchObjectDefinition(
@@ -1855,6 +1859,7 @@ public class BundleSiteInitializerTest {
 		_assertObjectActions(0, objectDefinition3);
 		_assertObjectEntries(0, objectDefinition3, 5);
 		_assertObjectFields(objectDefinition3, 7);
+		_assertObjectLayouts(1, objectDefinition3);
 
 		ObjectDefinition objectDefinition4 =
 			_objectDefinitionLocalService.fetchObjectDefinition(
@@ -1864,6 +1869,8 @@ public class BundleSiteInitializerTest {
 		Assert.assertFalse(objectDefinition4.isSystem());
 		Assert.assertEquals(
 			objectDefinition4.getStatus(), WorkflowConstants.STATUS_APPROVED);
+
+		_assertObjectLayouts(0, objectDefinition4);
 	}
 
 	private void _assertObjectDefinitions2() throws Exception {
@@ -1974,6 +1981,17 @@ public class BundleSiteInitializerTest {
 			objectFieldsCount,
 			_objectFieldLocalService.getObjectFieldsCount(
 				objectDefinition.getObjectDefinitionId()));
+	}
+
+	private void _assertObjectLayouts(
+		int objectLayoutsCount, ObjectDefinition objectDefinition) {
+
+		List<ObjectLayout> objectLayouts =
+			_objectLayoutLocalService.getObjectLayouts(
+				objectDefinition.getObjectDefinitionId());
+
+		Assert.assertEquals(
+			objectLayouts.toString(), objectLayoutsCount, objectLayouts.size());
 	}
 
 	private void _assertObjectRelationships1(
@@ -3552,6 +3570,9 @@ public class BundleSiteInitializerTest {
 
 	@Inject
 	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Inject
+	private ObjectLayoutLocalService _objectLayoutLocalService;
 
 	@Inject
 	private ObjectRelationshipResource.Factory
