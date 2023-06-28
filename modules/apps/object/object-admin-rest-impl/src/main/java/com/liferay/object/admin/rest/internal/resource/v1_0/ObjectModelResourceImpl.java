@@ -16,6 +16,7 @@ package com.liferay.object.admin.rest.internal.resource.v1_0;
 
 import com.liferay.object.admin.rest.dto.v1_0.ObjectModel;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectModelResource;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -35,10 +36,17 @@ public class ObjectModelResourceImpl extends BaseObjectModelResourceImpl {
 
 	@Override
 	public void deleteObjectModel(Long objectModelId) throws Exception {
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	@Override
 	public ObjectModel getObjectModel(Long objectModelId) throws Exception {
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
+
 		return new ObjectModel();
 	}
 
@@ -46,6 +54,10 @@ public class ObjectModelResourceImpl extends BaseObjectModelResourceImpl {
 	public ObjectModel getObjectModelByExternalReferenceCode(
 			String externalReferenceCode)
 		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
 
 		return new ObjectModel();
 	}
@@ -55,12 +67,20 @@ public class ObjectModelResourceImpl extends BaseObjectModelResourceImpl {
 			String search, Pagination pagination)
 		throws Exception {
 
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
+
 		return Page.of(Collections.emptyList());
 	}
 
 	@Override
 	public ObjectModel postObjectModel(ObjectModel objectModel)
 		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
 
 		return new ObjectModel();
 	}
@@ -70,6 +90,10 @@ public class ObjectModelResourceImpl extends BaseObjectModelResourceImpl {
 			Long objectModelId, ObjectModel objectModel)
 		throws Exception {
 
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
+
 		return new ObjectModel();
 	}
 
@@ -77,6 +101,10 @@ public class ObjectModelResourceImpl extends BaseObjectModelResourceImpl {
 	public ObjectModel putObjectModelByExternalReferenceCode(
 			String externalReferenceCode, ObjectModel objectModel)
 		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
 
 		return new ObjectModel();
 	}

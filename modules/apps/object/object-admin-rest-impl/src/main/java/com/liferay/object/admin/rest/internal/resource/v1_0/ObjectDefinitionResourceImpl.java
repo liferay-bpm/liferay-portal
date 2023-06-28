@@ -236,6 +236,10 @@ public class ObjectDefinitionResourceImpl
 				Pagination pagination)
 		throws Exception {
 
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
+
 		return Page.of(Collections.emptyList());
 	}
 
@@ -243,6 +247,10 @@ public class ObjectDefinitionResourceImpl
 	public Page<ObjectDefinition> getObjectModelObjectDefinitionsPage(
 			Long objectModelId, String search, Pagination pagination)
 		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
 
 		return Page.of(Collections.emptyList());
 	}
