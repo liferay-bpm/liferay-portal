@@ -14,8 +14,8 @@
 
 package com.liferay.object.admin.rest.internal.resource.v1_0;
 
-import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
-import com.liferay.object.admin.rest.resource.v1_0.ObjectDefinitionResource;
+import com.liferay.object.admin.rest.dto.v1_0.ObjectModel;
+import com.liferay.object.admin.rest.resource.v1_0.ObjectModelResource;
 import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
@@ -71,30 +71,22 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 /**
- * @author Javier Gamarra
+ * @author Murilo Stodolni
  * @generated
  */
 @Generated("")
 @javax.ws.rs.Path("/v1.0")
-public abstract class BaseObjectDefinitionResourceImpl
-	implements EntityModelResource, ObjectDefinitionResource,
-			   VulcanBatchEngineTaskItemDelegate<ObjectDefinition> {
+public abstract class BaseObjectModelResourceImpl
+	implements EntityModelResource, ObjectModelResource,
+			   VulcanBatchEngineTaskItemDelegate<ObjectModel> {
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/object-admin/v1.0/object-definitions'  -u 'test@liferay.com:test'
+	 * curl -X 'GET' 'http://localhost:8080/o/object-admin/v1.0/object-models'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "aggregationTerms"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "filter"
-			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
 				name = "page"
@@ -106,31 +98,21 @@ public abstract class BaseObjectDefinitionResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
 				name = "search"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "sort"
 			)
 		}
 	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectDefinition")
-		}
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectModel")}
 	)
 	@javax.ws.rs.GET
-	@javax.ws.rs.Path("/object-definitions")
+	@javax.ws.rs.Path("/object-models")
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public Page<ObjectDefinition> getObjectDefinitionsPage(
+	public Page<ObjectModel> getObjectModelsPage(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("search")
 			String search,
-			@javax.ws.rs.core.Context
-				com.liferay.portal.vulcan.aggregation.Aggregation aggregation,
-			@javax.ws.rs.core.Context Filter filter,
-			@javax.ws.rs.core.Context Pagination pagination,
-			@javax.ws.rs.core.Context Sort[] sorts)
+			@javax.ws.rs.core.Context Pagination pagination)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
@@ -139,21 +121,13 @@ public abstract class BaseObjectDefinitionResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/export-batch'  -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/object-admin/v1.0/object-models/export-batch'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "filter"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
 				name = "search"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "sort"
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
@@ -170,21 +144,17 @@ public abstract class BaseObjectDefinitionResourceImpl
 		}
 	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectDefinition")
-		}
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectModel")}
 	)
 	@javax.ws.rs.Consumes("application/json")
-	@javax.ws.rs.Path("/object-definitions/export-batch")
+	@javax.ws.rs.Path("/object-models/export-batch")
 	@javax.ws.rs.POST
 	@javax.ws.rs.Produces("application/json")
 	@Override
-	public Response postObjectDefinitionsPageExportBatch(
+	public Response postObjectModelsPageExportBatch(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("search")
 			String search,
-			@javax.ws.rs.core.Context Filter filter,
-			@javax.ws.rs.core.Context Sort[] sorts,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
@@ -211,7 +181,7 @@ public abstract class BaseObjectDefinitionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineExportTaskResource.postExportTask(
-				ObjectDefinition.class.getName(), callbackURL, contentType,
+				ObjectModel.class.getName(), callbackURL, contentType,
 				fieldNames)
 		).build();
 	}
@@ -219,29 +189,26 @@ public abstract class BaseObjectDefinitionResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/object-admin/v1.0/object-definitions' -d $'{"accountEntryRestricted": ___, "accountEntryRestrictedObjectFieldName": ___, "active": ___, "defaultLanguageId": ___, "enableCategorization": ___, "enableComments": ___, "enableLocalization": ___, "enableObjectEntryHistory": ___, "externalReferenceCode": ___, "label": ___, "modifiable": ___, "name": ___, "objectActions": ___, "objectFields": ___, "objectLayouts": ___, "objectModelExternalReferenceCode": ___, "objectRelationships": ___, "objectValidationRules": ___, "objectViews": ___, "panelAppOrder": ___, "panelCategoryKey": ___, "pluralLabel": ___, "portlet": ___, "scope": ___, "status": ___, "storageType": ___, "system": ___, "titleObjectFieldName": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/object-admin/v1.0/object-models' -d $'{"externalReferenceCode": ___, "label": ___, "name": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectDefinition")
-		}
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectModel")}
 	)
 	@javax.ws.rs.Consumes({"application/json", "application/xml"})
-	@javax.ws.rs.Path("/object-definitions")
+	@javax.ws.rs.Path("/object-models")
 	@javax.ws.rs.POST
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public ObjectDefinition postObjectDefinition(
-			ObjectDefinition objectDefinition)
+	public ObjectModel postObjectModel(ObjectModel objectModel)
 		throws Exception {
 
-		return new ObjectDefinition();
+		return new ObjectModel();
 	}
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/batch'  -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/object-admin/v1.0/object-models/batch'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -252,16 +219,14 @@ public abstract class BaseObjectDefinitionResourceImpl
 		}
 	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectDefinition")
-		}
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectModel")}
 	)
 	@javax.ws.rs.Consumes("application/json")
-	@javax.ws.rs.Path("/object-definitions/batch")
+	@javax.ws.rs.Path("/object-models/batch")
 	@javax.ws.rs.POST
 	@javax.ws.rs.Produces("application/json")
 	@Override
-	public Response postObjectDefinitionBatch(
+	public Response postObjectModelBatch(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
@@ -280,14 +245,14 @@ public abstract class BaseObjectDefinitionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				ObjectDefinition.class.getName(), callbackURL, null, object)
+				ObjectModel.class.getName(), callbackURL, null, object)
 		).build();
 	}
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/by-external-reference-code/{externalReferenceCode}'  -u 'test@liferay.com:test'
+	 * curl -X 'GET' 'http://localhost:8080/o/object-admin/v1.0/object-models/by-external-reference-code/{externalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -298,30 +263,28 @@ public abstract class BaseObjectDefinitionResourceImpl
 		}
 	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectDefinition")
-		}
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectModel")}
 	)
 	@javax.ws.rs.GET
 	@javax.ws.rs.Path(
-		"/object-definitions/by-external-reference-code/{externalReferenceCode}"
+		"/object-models/by-external-reference-code/{externalReferenceCode}"
 	)
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public ObjectDefinition getObjectDefinitionByExternalReferenceCode(
+	public ObjectModel getObjectModelByExternalReferenceCode(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("externalReferenceCode")
 			String externalReferenceCode)
 		throws Exception {
 
-		return new ObjectDefinition();
+		return new ObjectModel();
 	}
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PUT' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/by-external-reference-code/{externalReferenceCode}' -d $'{"accountEntryRestricted": ___, "accountEntryRestrictedObjectFieldName": ___, "active": ___, "defaultLanguageId": ___, "enableCategorization": ___, "enableComments": ___, "enableLocalization": ___, "enableObjectEntryHistory": ___, "externalReferenceCode": ___, "label": ___, "modifiable": ___, "name": ___, "objectActions": ___, "objectFields": ___, "objectLayouts": ___, "objectModelExternalReferenceCode": ___, "objectRelationships": ___, "objectValidationRules": ___, "objectViews": ___, "panelAppOrder": ___, "panelCategoryKey": ___, "pluralLabel": ___, "portlet": ___, "scope": ___, "status": ___, "storageType": ___, "system": ___, "titleObjectFieldName": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PUT' 'http://localhost:8080/o/object-admin/v1.0/object-models/by-external-reference-code/{externalReferenceCode}' -d $'{"externalReferenceCode": ___, "label": ___, "name": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -332,62 +295,58 @@ public abstract class BaseObjectDefinitionResourceImpl
 		}
 	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectDefinition")
-		}
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectModel")}
 	)
 	@javax.ws.rs.Consumes({"application/json", "application/xml"})
 	@javax.ws.rs.Path(
-		"/object-definitions/by-external-reference-code/{externalReferenceCode}"
+		"/object-models/by-external-reference-code/{externalReferenceCode}"
 	)
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@javax.ws.rs.PUT
 	@Override
-	public ObjectDefinition putObjectDefinitionByExternalReferenceCode(
+	public ObjectModel putObjectModelByExternalReferenceCode(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("externalReferenceCode")
 			String externalReferenceCode,
-			ObjectDefinition objectDefinition)
+			ObjectModel objectModel)
 		throws Exception {
 
-		return new ObjectDefinition();
+		return new ObjectModel();
 	}
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'DELETE' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/{objectDefinitionId}'  -u 'test@liferay.com:test'
+	 * curl -X 'DELETE' 'http://localhost:8080/o/object-admin/v1.0/object-models/{objectModelId}'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "objectDefinitionId"
+				name = "objectModelId"
 			)
 		}
 	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectDefinition")
-		}
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectModel")}
 	)
 	@javax.ws.rs.DELETE
-	@javax.ws.rs.Path("/object-definitions/{objectDefinitionId}")
+	@javax.ws.rs.Path("/object-models/{objectModelId}")
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public void deleteObjectDefinition(
+	public void deleteObjectModel(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("objectDefinitionId")
-			Long objectDefinitionId)
+			@javax.ws.rs.PathParam("objectModelId")
+			Long objectModelId)
 		throws Exception {
 	}
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'DELETE' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/batch'  -u 'test@liferay.com:test'
+	 * curl -X 'DELETE' 'http://localhost:8080/o/object-admin/v1.0/object-models/batch'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -398,16 +357,14 @@ public abstract class BaseObjectDefinitionResourceImpl
 		}
 	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectDefinition")
-		}
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectModel")}
 	)
 	@javax.ws.rs.Consumes("application/json")
 	@javax.ws.rs.DELETE
-	@javax.ws.rs.Path("/object-definitions/batch")
+	@javax.ws.rs.Path("/object-models/batch")
 	@javax.ws.rs.Produces("application/json")
 	@Override
-	public Response deleteObjectDefinitionBatch(
+	public Response deleteObjectModelBatch(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
@@ -426,221 +383,125 @@ public abstract class BaseObjectDefinitionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				ObjectDefinition.class.getName(), callbackURL, object)
+				ObjectModel.class.getName(), callbackURL, object)
 		).build();
 	}
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/{objectDefinitionId}'  -u 'test@liferay.com:test'
+	 * curl -X 'GET' 'http://localhost:8080/o/object-admin/v1.0/object-models/{objectModelId}'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "objectDefinitionId"
+				name = "objectModelId"
 			)
 		}
 	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectDefinition")
-		}
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectModel")}
 	)
 	@javax.ws.rs.GET
-	@javax.ws.rs.Path("/object-definitions/{objectDefinitionId}")
+	@javax.ws.rs.Path("/object-models/{objectModelId}")
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public ObjectDefinition getObjectDefinition(
+	public ObjectModel getObjectModel(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("objectDefinitionId")
-			Long objectDefinitionId)
+			@javax.ws.rs.PathParam("objectModelId")
+			Long objectModelId)
 		throws Exception {
 
-		return new ObjectDefinition();
+		return new ObjectModel();
 	}
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PATCH' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/{objectDefinitionId}' -d $'{"accountEntryRestricted": ___, "accountEntryRestrictedObjectFieldName": ___, "active": ___, "defaultLanguageId": ___, "enableCategorization": ___, "enableComments": ___, "enableLocalization": ___, "enableObjectEntryHistory": ___, "externalReferenceCode": ___, "label": ___, "modifiable": ___, "name": ___, "objectActions": ___, "objectFields": ___, "objectLayouts": ___, "objectModelExternalReferenceCode": ___, "objectRelationships": ___, "objectValidationRules": ___, "objectViews": ___, "panelAppOrder": ___, "panelCategoryKey": ___, "pluralLabel": ___, "portlet": ___, "scope": ___, "status": ___, "storageType": ___, "system": ___, "titleObjectFieldName": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PATCH' 'http://localhost:8080/o/object-admin/v1.0/object-models/{objectModelId}' -d $'{"externalReferenceCode": ___, "label": ___, "name": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "objectDefinitionId"
+				name = "objectModelId"
 			)
 		}
 	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectDefinition")
-		}
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectModel")}
 	)
 	@javax.ws.rs.Consumes({"application/json", "application/xml"})
 	@javax.ws.rs.PATCH
-	@javax.ws.rs.Path("/object-definitions/{objectDefinitionId}")
+	@javax.ws.rs.Path("/object-models/{objectModelId}")
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public ObjectDefinition patchObjectDefinition(
+	public ObjectModel patchObjectModel(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("objectDefinitionId")
-			Long objectDefinitionId,
-			ObjectDefinition objectDefinition)
+			@javax.ws.rs.PathParam("objectModelId")
+			Long objectModelId,
+			ObjectModel objectModel)
 		throws Exception {
 
-		ObjectDefinition existingObjectDefinition = getObjectDefinition(
-			objectDefinitionId);
+		ObjectModel existingObjectModel = getObjectModel(objectModelId);
 
-		if (objectDefinition.getAccountEntryRestricted() != null) {
-			existingObjectDefinition.setAccountEntryRestricted(
-				objectDefinition.getAccountEntryRestricted());
+		if (objectModel.getExternalReferenceCode() != null) {
+			existingObjectModel.setExternalReferenceCode(
+				objectModel.getExternalReferenceCode());
 		}
 
-		if (objectDefinition.getAccountEntryRestrictedObjectFieldName() !=
-				null) {
-
-			existingObjectDefinition.setAccountEntryRestrictedObjectFieldName(
-				objectDefinition.getAccountEntryRestrictedObjectFieldName());
+		if (objectModel.getLabel() != null) {
+			existingObjectModel.setLabel(objectModel.getLabel());
 		}
 
-		if (objectDefinition.getActive() != null) {
-			existingObjectDefinition.setActive(objectDefinition.getActive());
+		if (objectModel.getName() != null) {
+			existingObjectModel.setName(objectModel.getName());
 		}
 
-		if (objectDefinition.getDefaultLanguageId() != null) {
-			existingObjectDefinition.setDefaultLanguageId(
-				objectDefinition.getDefaultLanguageId());
-		}
+		preparePatch(objectModel, existingObjectModel);
 
-		if (objectDefinition.getEnableCategorization() != null) {
-			existingObjectDefinition.setEnableCategorization(
-				objectDefinition.getEnableCategorization());
-		}
-
-		if (objectDefinition.getEnableComments() != null) {
-			existingObjectDefinition.setEnableComments(
-				objectDefinition.getEnableComments());
-		}
-
-		if (objectDefinition.getEnableLocalization() != null) {
-			existingObjectDefinition.setEnableLocalization(
-				objectDefinition.getEnableLocalization());
-		}
-
-		if (objectDefinition.getEnableObjectEntryHistory() != null) {
-			existingObjectDefinition.setEnableObjectEntryHistory(
-				objectDefinition.getEnableObjectEntryHistory());
-		}
-
-		if (objectDefinition.getExternalReferenceCode() != null) {
-			existingObjectDefinition.setExternalReferenceCode(
-				objectDefinition.getExternalReferenceCode());
-		}
-
-		if (objectDefinition.getLabel() != null) {
-			existingObjectDefinition.setLabel(objectDefinition.getLabel());
-		}
-
-		if (objectDefinition.getModifiable() != null) {
-			existingObjectDefinition.setModifiable(
-				objectDefinition.getModifiable());
-		}
-
-		if (objectDefinition.getName() != null) {
-			existingObjectDefinition.setName(objectDefinition.getName());
-		}
-
-		if (objectDefinition.getObjectModelExternalReferenceCode() != null) {
-			existingObjectDefinition.setObjectModelExternalReferenceCode(
-				objectDefinition.getObjectModelExternalReferenceCode());
-		}
-
-		if (objectDefinition.getPanelAppOrder() != null) {
-			existingObjectDefinition.setPanelAppOrder(
-				objectDefinition.getPanelAppOrder());
-		}
-
-		if (objectDefinition.getPanelCategoryKey() != null) {
-			existingObjectDefinition.setPanelCategoryKey(
-				objectDefinition.getPanelCategoryKey());
-		}
-
-		if (objectDefinition.getPluralLabel() != null) {
-			existingObjectDefinition.setPluralLabel(
-				objectDefinition.getPluralLabel());
-		}
-
-		if (objectDefinition.getPortlet() != null) {
-			existingObjectDefinition.setPortlet(objectDefinition.getPortlet());
-		}
-
-		if (objectDefinition.getScope() != null) {
-			existingObjectDefinition.setScope(objectDefinition.getScope());
-		}
-
-		if (objectDefinition.getStorageType() != null) {
-			existingObjectDefinition.setStorageType(
-				objectDefinition.getStorageType());
-		}
-
-		if (objectDefinition.getSystem() != null) {
-			existingObjectDefinition.setSystem(objectDefinition.getSystem());
-		}
-
-		if (objectDefinition.getTitleObjectFieldName() != null) {
-			existingObjectDefinition.setTitleObjectFieldName(
-				objectDefinition.getTitleObjectFieldName());
-		}
-
-		preparePatch(objectDefinition, existingObjectDefinition);
-
-		return putObjectDefinition(
-			objectDefinitionId, existingObjectDefinition);
+		return putObjectModel(objectModelId, existingObjectModel);
 	}
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PUT' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/{objectDefinitionId}' -d $'{"accountEntryRestricted": ___, "accountEntryRestrictedObjectFieldName": ___, "active": ___, "defaultLanguageId": ___, "enableCategorization": ___, "enableComments": ___, "enableLocalization": ___, "enableObjectEntryHistory": ___, "externalReferenceCode": ___, "label": ___, "modifiable": ___, "name": ___, "objectActions": ___, "objectFields": ___, "objectLayouts": ___, "objectModelExternalReferenceCode": ___, "objectRelationships": ___, "objectValidationRules": ___, "objectViews": ___, "panelAppOrder": ___, "panelCategoryKey": ___, "pluralLabel": ___, "portlet": ___, "scope": ___, "status": ___, "storageType": ___, "system": ___, "titleObjectFieldName": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PUT' 'http://localhost:8080/o/object-admin/v1.0/object-models/{objectModelId}' -d $'{"externalReferenceCode": ___, "label": ___, "name": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "objectDefinitionId"
+				name = "objectModelId"
 			)
 		}
 	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectDefinition")
-		}
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectModel")}
 	)
 	@javax.ws.rs.Consumes({"application/json", "application/xml"})
-	@javax.ws.rs.Path("/object-definitions/{objectDefinitionId}")
+	@javax.ws.rs.Path("/object-models/{objectModelId}")
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@javax.ws.rs.PUT
 	@Override
-	public ObjectDefinition putObjectDefinition(
+	public ObjectModel putObjectModel(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("objectDefinitionId")
-			Long objectDefinitionId,
-			ObjectDefinition objectDefinition)
+			@javax.ws.rs.PathParam("objectModelId")
+			Long objectModelId,
+			ObjectModel objectModel)
 		throws Exception {
 
-		return new ObjectDefinition();
+		return new ObjectModel();
 	}
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PUT' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/batch'  -u 'test@liferay.com:test'
+	 * curl -X 'PUT' 'http://localhost:8080/o/object-admin/v1.0/object-models/batch'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -651,16 +512,14 @@ public abstract class BaseObjectDefinitionResourceImpl
 		}
 	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectDefinition")
-		}
+		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectModel")}
 	)
 	@javax.ws.rs.Consumes("application/json")
-	@javax.ws.rs.Path("/object-definitions/batch")
+	@javax.ws.rs.Path("/object-models/batch")
 	@javax.ws.rs.Produces("application/json")
 	@javax.ws.rs.PUT
 	@Override
-	public Response putObjectDefinitionBatch(
+	public Response putObjectModelBatch(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
@@ -679,235 +538,25 @@ public abstract class BaseObjectDefinitionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				ObjectDefinition.class.getName(), callbackURL, object)
-		).build();
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/object-admin/v1.0/object-definitions/{objectDefinitionId}/publish'  -u 'test@liferay.com:test'
-	 */
-	@io.swagger.v3.oas.annotations.Parameters(
-		value = {
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "objectDefinitionId"
-			)
-		}
-	)
-	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectDefinition")
-		}
-	)
-	@javax.ws.rs.Path("/object-definitions/{objectDefinitionId}/publish")
-	@javax.ws.rs.POST
-	@javax.ws.rs.Produces({"application/json", "application/xml"})
-	@Override
-	public void postObjectDefinitionPublish(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("objectDefinitionId")
-			Long objectDefinitionId)
-		throws Exception {
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/object-admin/v1.0/object-models/by-external-reference-code/{externalReferenceCode}/object-definitions'  -u 'test@liferay.com:test'
-	 */
-	@io.swagger.v3.oas.annotations.Parameters(
-		value = {
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "externalReferenceCode"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "page"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "pageSize"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "search"
-			)
-		}
-	)
-	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectDefinition")
-		}
-	)
-	@javax.ws.rs.GET
-	@javax.ws.rs.Path(
-		"/object-models/by-external-reference-code/{externalReferenceCode}/object-definitions"
-	)
-	@javax.ws.rs.Produces({"application/json", "application/xml"})
-	@Override
-	public Page<ObjectDefinition>
-			getObjectModelByExternalReferenceCodeObjectDefinitionsPage(
-				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-				@javax.validation.constraints.NotNull
-				@javax.ws.rs.PathParam("externalReferenceCode")
-				String externalReferenceCode,
-				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-				@javax.ws.rs.QueryParam("search")
-				String search,
-				@javax.ws.rs.core.Context Pagination pagination)
-		throws Exception {
-
-		return Page.of(Collections.emptyList());
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/object-admin/v1.0/object-models/{objectModelId}/object-definitions'  -u 'test@liferay.com:test'
-	 */
-	@io.swagger.v3.oas.annotations.Parameters(
-		value = {
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "objectModelId"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "page"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "pageSize"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "search"
-			)
-		}
-	)
-	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectDefinition")
-		}
-	)
-	@javax.ws.rs.GET
-	@javax.ws.rs.Path("/object-models/{objectModelId}/object-definitions")
-	@javax.ws.rs.Produces({"application/json", "application/xml"})
-	@Override
-	public Page<ObjectDefinition> getObjectModelObjectDefinitionsPage(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("objectModelId")
-			Long objectModelId,
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.ws.rs.QueryParam("search")
-			String search,
-			@javax.ws.rs.core.Context Pagination pagination)
-		throws Exception {
-
-		return Page.of(Collections.emptyList());
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/object-admin/v1.0/object-models/{objectModelId}/object-definitions/export-batch'  -u 'test@liferay.com:test'
-	 */
-	@io.swagger.v3.oas.annotations.Parameters(
-		value = {
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "objectModelId"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "search"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "callbackURL"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "contentType"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "fieldNames"
-			)
-		}
-	)
-	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ObjectDefinition")
-		}
-	)
-	@javax.ws.rs.Consumes("application/json")
-	@javax.ws.rs.Path(
-		"/object-models/{objectModelId}/object-definitions/export-batch"
-	)
-	@javax.ws.rs.POST
-	@javax.ws.rs.Produces("application/json")
-	@Override
-	public Response postObjectModelObjectDefinitionsPageExportBatch(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("objectModelId")
-			Long objectModelId,
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.ws.rs.QueryParam("search")
-			String search,
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.ws.rs.QueryParam("callbackURL")
-			String callbackURL,
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.ws.rs.DefaultValue("JSON")
-			@javax.ws.rs.QueryParam("contentType")
-			String contentType,
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.ws.rs.QueryParam("fieldNames")
-			String fieldNames)
-		throws Exception {
-
-		vulcanBatchEngineExportTaskResource.setContextAcceptLanguage(
-			contextAcceptLanguage);
-		vulcanBatchEngineExportTaskResource.setContextCompany(contextCompany);
-		vulcanBatchEngineExportTaskResource.setContextHttpServletRequest(
-			contextHttpServletRequest);
-		vulcanBatchEngineExportTaskResource.setContextUriInfo(contextUriInfo);
-		vulcanBatchEngineExportTaskResource.setContextUser(contextUser);
-		vulcanBatchEngineExportTaskResource.setGroupLocalService(
-			groupLocalService);
-
-		Response.ResponseBuilder responseBuilder = Response.accepted();
-
-		return responseBuilder.entity(
-			vulcanBatchEngineExportTaskResource.postExportTask(
-				ObjectDefinition.class.getName(), callbackURL, contentType,
-				fieldNames)
+				ObjectModel.class.getName(), callbackURL, object)
 		).build();
 	}
 
 	@Override
 	@SuppressWarnings("PMD.UnusedLocalVariable")
 	public void create(
-			Collection<ObjectDefinition> objectDefinitions,
+			Collection<ObjectModel> objectModels,
 			Map<String, Serializable> parameters)
 		throws Exception {
 
-		UnsafeConsumer<ObjectDefinition, Exception>
-			objectDefinitionUnsafeConsumer = null;
+		UnsafeConsumer<ObjectModel, Exception> objectModelUnsafeConsumer = null;
 
 		String createStrategy = (String)parameters.getOrDefault(
 			"createStrategy", "INSERT");
 
 		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
-			objectDefinitionUnsafeConsumer =
-				objectDefinition -> postObjectDefinition(objectDefinition);
+			objectModelUnsafeConsumer = objectModel -> postObjectModel(
+				objectModel);
 		}
 
 		if (StringUtil.equalsIgnoreCase(createStrategy, "UPSERT")) {
@@ -915,60 +564,58 @@ public abstract class BaseObjectDefinitionResourceImpl
 				"updateStrategy", "UPDATE");
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				objectDefinitionUnsafeConsumer =
-					objectDefinition ->
-						putObjectDefinitionByExternalReferenceCode(
-							objectDefinition.getExternalReferenceCode(),
-							objectDefinition);
+				objectModelUnsafeConsumer =
+					objectModel -> putObjectModelByExternalReferenceCode(
+						objectModel.getExternalReferenceCode(), objectModel);
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
-				objectDefinitionUnsafeConsumer = objectDefinition -> {
+				objectModelUnsafeConsumer = objectModel -> {
 					try {
-						ObjectDefinition getObjectDefinition =
-							getObjectDefinitionByExternalReferenceCode(
-								objectDefinition.getExternalReferenceCode());
+						ObjectModel getObjectModel =
+							getObjectModelByExternalReferenceCode(
+								objectModel.getExternalReferenceCode());
 
-						patchObjectDefinition(
-							getObjectDefinition.getId() != null ?
-								getObjectDefinition.getId() :
+						patchObjectModel(
+							getObjectModel.getId() != null ?
+								getObjectModel.getId() :
 									_parseLong(
 										(String)parameters.get(
-											"objectDefinitionId")),
-							objectDefinition);
+											"objectModelId")),
+							objectModel);
 					}
 					catch (NoSuchModelException noSuchModelException) {
-						postObjectDefinition(objectDefinition);
+						postObjectModel(objectModel);
 					}
 				};
 			}
 		}
 
-		if (objectDefinitionUnsafeConsumer == null) {
+		if (objectModelUnsafeConsumer == null) {
 			throw new NotSupportedException(
 				"Create strategy \"" + createStrategy +
-					"\" is not supported for ObjectDefinition");
+					"\" is not supported for ObjectModel");
 		}
 
 		if (contextBatchUnsafeConsumer != null) {
 			contextBatchUnsafeConsumer.accept(
-				objectDefinitions, objectDefinitionUnsafeConsumer);
+				objectModels, objectModelUnsafeConsumer);
 		}
 		else {
-			for (ObjectDefinition objectDefinition : objectDefinitions) {
-				objectDefinitionUnsafeConsumer.accept(objectDefinition);
+			for (ObjectModel objectModel : objectModels) {
+				objectModelUnsafeConsumer.accept(objectModel);
 			}
 		}
 	}
 
 	@Override
 	public void delete(
-			Collection<ObjectDefinition> objectDefinitions,
+			Collection<ObjectModel> objectModels,
 			Map<String, Serializable> parameters)
 		throws Exception {
 
-		for (ObjectDefinition objectDefinition : objectDefinitions) {
-			deleteObjectDefinition(objectDefinition.getId());
+		for (ObjectModel objectModel : objectModels) {
+			deleteObjectModel(objectModel.getId());
 		}
 	}
 
@@ -1000,20 +647,12 @@ public abstract class BaseObjectDefinitionResourceImpl
 	}
 
 	@Override
-	public Page<ObjectDefinition> read(
+	public Page<ObjectModel> read(
 			Filter filter, Pagination pagination, Sort[] sorts,
 			Map<String, Serializable> parameters, String search)
 		throws Exception {
 
-		if (parameters.containsKey("objectModelId")) {
-			return getObjectModelObjectDefinitionsPage(
-				_parseLong((String)parameters.get("objectModelId")), search,
-				pagination);
-		}
-		else {
-			return getObjectDefinitionsPage(
-				search, null, filter, pagination, sorts);
-		}
+		return getObjectModelsPage(search, pagination);
 	}
 
 	@Override
@@ -1040,49 +679,42 @@ public abstract class BaseObjectDefinitionResourceImpl
 
 	@Override
 	public void update(
-			Collection<ObjectDefinition> objectDefinitions,
+			Collection<ObjectModel> objectModels,
 			Map<String, Serializable> parameters)
 		throws Exception {
 
-		UnsafeConsumer<ObjectDefinition, Exception>
-			objectDefinitionUnsafeConsumer = null;
+		UnsafeConsumer<ObjectModel, Exception> objectModelUnsafeConsumer = null;
 
 		String updateStrategy = (String)parameters.getOrDefault(
 			"updateStrategy", "UPDATE");
 
 		if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
-			objectDefinitionUnsafeConsumer =
-				objectDefinition -> patchObjectDefinition(
-					objectDefinition.getId() != null ?
-						objectDefinition.getId() :
-							_parseLong(
-								(String)parameters.get("objectDefinitionId")),
-					objectDefinition);
+			objectModelUnsafeConsumer = objectModel -> patchObjectModel(
+				objectModel.getId() != null ? objectModel.getId() :
+					_parseLong((String)parameters.get("objectModelId")),
+				objectModel);
 		}
 
 		if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-			objectDefinitionUnsafeConsumer =
-				objectDefinition -> putObjectDefinition(
-					objectDefinition.getId() != null ?
-						objectDefinition.getId() :
-							_parseLong(
-								(String)parameters.get("objectDefinitionId")),
-					objectDefinition);
+			objectModelUnsafeConsumer = objectModel -> putObjectModel(
+				objectModel.getId() != null ? objectModel.getId() :
+					_parseLong((String)parameters.get("objectModelId")),
+				objectModel);
 		}
 
-		if (objectDefinitionUnsafeConsumer == null) {
+		if (objectModelUnsafeConsumer == null) {
 			throw new NotSupportedException(
 				"Update strategy \"" + updateStrategy +
-					"\" is not supported for ObjectDefinition");
+					"\" is not supported for ObjectModel");
 		}
 
 		if (contextBatchUnsafeConsumer != null) {
 			contextBatchUnsafeConsumer.accept(
-				objectDefinitions, objectDefinitionUnsafeConsumer);
+				objectModels, objectModelUnsafeConsumer);
 		}
 		else {
-			for (ObjectDefinition objectDefinition : objectDefinitions) {
-				objectDefinitionUnsafeConsumer.accept(objectDefinition);
+			for (ObjectModel objectModel : objectModels) {
+				objectModelUnsafeConsumer.accept(objectModel);
 			}
 		}
 	}
@@ -1101,9 +733,8 @@ public abstract class BaseObjectDefinitionResourceImpl
 
 	public void setContextBatchUnsafeConsumer(
 		UnsafeBiConsumer
-			<Collection<ObjectDefinition>,
-			 UnsafeConsumer<ObjectDefinition, Exception>, Exception>
-				contextBatchUnsafeConsumer) {
+			<Collection<ObjectModel>, UnsafeConsumer<ObjectModel, Exception>,
+			 Exception> contextBatchUnsafeConsumer) {
 
 		this.contextBatchUnsafeConsumer = contextBatchUnsafeConsumer;
 	}
@@ -1288,8 +919,7 @@ public abstract class BaseObjectDefinitionResourceImpl
 	}
 
 	protected void preparePatch(
-		ObjectDefinition objectDefinition,
-		ObjectDefinition existingObjectDefinition) {
+		ObjectModel objectModel, ObjectModel existingObjectModel) {
 	}
 
 	protected <T, R, E extends Throwable> List<R> transform(
@@ -1364,9 +994,8 @@ public abstract class BaseObjectDefinitionResourceImpl
 
 	protected AcceptLanguage contextAcceptLanguage;
 	protected UnsafeBiConsumer
-		<Collection<ObjectDefinition>,
-		 UnsafeConsumer<ObjectDefinition, Exception>, Exception>
-			contextBatchUnsafeConsumer;
+		<Collection<ObjectModel>, UnsafeConsumer<ObjectModel, Exception>,
+		 Exception> contextBatchUnsafeConsumer;
 	protected com.liferay.portal.kernel.model.Company contextCompany;
 	protected HttpServletRequest contextHttpServletRequest;
 	protected HttpServletResponse contextHttpServletResponse;
@@ -1386,6 +1015,6 @@ public abstract class BaseObjectDefinitionResourceImpl
 		vulcanBatchEngineImportTaskResource;
 
 	private static final com.liferay.portal.kernel.log.Log _log =
-		LogFactoryUtil.getLog(BaseObjectDefinitionResourceImpl.class);
+		LogFactoryUtil.getLog(BaseObjectModelResourceImpl.class);
 
 }

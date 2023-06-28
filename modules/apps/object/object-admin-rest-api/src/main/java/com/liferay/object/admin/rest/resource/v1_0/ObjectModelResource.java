@@ -14,7 +14,7 @@
 
 package com.liferay.object.admin.rest.resource.v1_0;
 
-import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
+import com.liferay.object.admin.rest.dto.v1_0.ObjectModel;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -50,76 +50,52 @@ import org.osgi.annotation.versioning.ProviderType;
  *
  *     curl -u your@email.com:yourpassword -D - http://localhost:8080/o/object-admin/v1.0
  *
- * @author Javier Gamarra
+ * @author Murilo Stodolni
  * @generated
  */
 @Generated("")
 @ProviderType
-public interface ObjectDefinitionResource {
+public interface ObjectModelResource {
 
-	public Page<ObjectDefinition> getObjectDefinitionsPage(
-			String search,
-			com.liferay.portal.vulcan.aggregation.Aggregation aggregation,
-			Filter filter, Pagination pagination, Sort[] sorts)
+	public Page<ObjectModel> getObjectModelsPage(
+			String search, Pagination pagination)
 		throws Exception;
 
-	public Response postObjectDefinitionsPageExportBatch(
-			String search, Filter filter, Sort[] sorts, String callbackURL,
-			String contentType, String fieldNames)
+	public Response postObjectModelsPageExportBatch(
+			String search, String callbackURL, String contentType,
+			String fieldNames)
 		throws Exception;
 
-	public ObjectDefinition postObjectDefinition(
-			ObjectDefinition objectDefinition)
+	public ObjectModel postObjectModel(ObjectModel objectModel)
 		throws Exception;
 
-	public Response postObjectDefinitionBatch(String callbackURL, Object object)
+	public Response postObjectModelBatch(String callbackURL, Object object)
 		throws Exception;
 
-	public ObjectDefinition getObjectDefinitionByExternalReferenceCode(
+	public ObjectModel getObjectModelByExternalReferenceCode(
 			String externalReferenceCode)
 		throws Exception;
 
-	public ObjectDefinition putObjectDefinitionByExternalReferenceCode(
-			String externalReferenceCode, ObjectDefinition objectDefinition)
+	public ObjectModel putObjectModelByExternalReferenceCode(
+			String externalReferenceCode, ObjectModel objectModel)
 		throws Exception;
 
-	public void deleteObjectDefinition(Long objectDefinitionId)
+	public void deleteObjectModel(Long objectModelId) throws Exception;
+
+	public Response deleteObjectModelBatch(String callbackURL, Object object)
 		throws Exception;
 
-	public Response deleteObjectDefinitionBatch(
-			String callbackURL, Object object)
+	public ObjectModel getObjectModel(Long objectModelId) throws Exception;
+
+	public ObjectModel patchObjectModel(
+			Long objectModelId, ObjectModel objectModel)
 		throws Exception;
 
-	public ObjectDefinition getObjectDefinition(Long objectDefinitionId)
+	public ObjectModel putObjectModel(
+			Long objectModelId, ObjectModel objectModel)
 		throws Exception;
 
-	public ObjectDefinition patchObjectDefinition(
-			Long objectDefinitionId, ObjectDefinition objectDefinition)
-		throws Exception;
-
-	public ObjectDefinition putObjectDefinition(
-			Long objectDefinitionId, ObjectDefinition objectDefinition)
-		throws Exception;
-
-	public Response putObjectDefinitionBatch(String callbackURL, Object object)
-		throws Exception;
-
-	public void postObjectDefinitionPublish(Long objectDefinitionId)
-		throws Exception;
-
-	public Page<ObjectDefinition>
-			getObjectModelByExternalReferenceCodeObjectDefinitionsPage(
-				String externalReferenceCode, String search,
-				Pagination pagination)
-		throws Exception;
-
-	public Page<ObjectDefinition> getObjectModelObjectDefinitionsPage(
-			Long objectModelId, String search, Pagination pagination)
-		throws Exception;
-
-	public Response postObjectModelObjectDefinitionsPageExportBatch(
-			Long objectModelId, String search, String callbackURL,
-			String contentType, String fieldNames)
+	public Response putObjectModelBatch(String callbackURL, Object object)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(
@@ -187,7 +163,7 @@ public interface ObjectDefinitionResource {
 	@ProviderType
 	public interface Builder {
 
-		public ObjectDefinitionResource build();
+		public ObjectModelResource build();
 
 		public Builder checkPermissions(boolean checkPermissions);
 

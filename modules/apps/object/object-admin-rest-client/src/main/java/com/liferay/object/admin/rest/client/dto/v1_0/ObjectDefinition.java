@@ -440,6 +440,32 @@ public class ObjectDefinition implements Cloneable, Serializable {
 
 	protected ObjectLayout[] objectLayouts;
 
+	public String getObjectModelExternalReferenceCode() {
+		return objectModelExternalReferenceCode;
+	}
+
+	public void setObjectModelExternalReferenceCode(
+		String objectModelExternalReferenceCode) {
+
+		this.objectModelExternalReferenceCode =
+			objectModelExternalReferenceCode;
+	}
+
+	public void setObjectModelExternalReferenceCode(
+		UnsafeSupplier<String, Exception>
+			objectModelExternalReferenceCodeUnsafeSupplier) {
+
+		try {
+			objectModelExternalReferenceCode =
+				objectModelExternalReferenceCodeUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String objectModelExternalReferenceCode;
+
 	public ObjectRelationship[] getObjectRelationships() {
 		return objectRelationships;
 	}

@@ -14,15 +14,14 @@
 
 package com.liferay.object.admin.rest.client.resource.v1_0;
 
-import com.liferay.object.admin.rest.client.dto.v1_0.ObjectDefinition;
+import com.liferay.object.admin.rest.client.dto.v1_0.ObjectModel;
 import com.liferay.object.admin.rest.client.http.HttpInvoker;
 import com.liferay.object.admin.rest.client.pagination.Page;
 import com.liferay.object.admin.rest.client.pagination.Pagination;
 import com.liferay.object.admin.rest.client.problem.Problem;
-import com.liferay.object.admin.rest.client.serdes.v1_0.ObjectDefinitionSerDes;
+import com.liferay.object.admin.rest.client.serdes.v1_0.ObjectModelSerDes;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -32,151 +31,106 @@ import java.util.logging.Logger;
 import javax.annotation.Generated;
 
 /**
- * @author Javier Gamarra
+ * @author Murilo Stodolni
  * @generated
  */
 @Generated("")
-public interface ObjectDefinitionResource {
+public interface ObjectModelResource {
 
 	public static Builder builder() {
 		return new Builder();
 	}
 
-	public Page<ObjectDefinition> getObjectDefinitionsPage(
-			String search, List<String> aggregations, String filterString,
-			Pagination pagination, String sortString)
+	public Page<ObjectModel> getObjectModelsPage(
+			String search, Pagination pagination)
 		throws Exception;
 
-	public HttpInvoker.HttpResponse getObjectDefinitionsPageHttpResponse(
-			String search, List<String> aggregations, String filterString,
-			Pagination pagination, String sortString)
+	public HttpInvoker.HttpResponse getObjectModelsPageHttpResponse(
+			String search, Pagination pagination)
 		throws Exception;
 
-	public void postObjectDefinitionsPageExportBatch(
-			String search, String filterString, String sortString,
-			String callbackURL, String contentType, String fieldNames)
+	public void postObjectModelsPageExportBatch(
+			String search, String callbackURL, String contentType,
+			String fieldNames)
 		throws Exception;
 
-	public HttpInvoker.HttpResponse
-			postObjectDefinitionsPageExportBatchHttpResponse(
-				String search, String filterString, String sortString,
-				String callbackURL, String contentType, String fieldNames)
+	public HttpInvoker.HttpResponse postObjectModelsPageExportBatchHttpResponse(
+			String search, String callbackURL, String contentType,
+			String fieldNames)
 		throws Exception;
 
-	public ObjectDefinition postObjectDefinition(
-			ObjectDefinition objectDefinition)
+	public ObjectModel postObjectModel(ObjectModel objectModel)
 		throws Exception;
 
-	public HttpInvoker.HttpResponse postObjectDefinitionHttpResponse(
-			ObjectDefinition objectDefinition)
+	public HttpInvoker.HttpResponse postObjectModelHttpResponse(
+			ObjectModel objectModel)
 		throws Exception;
 
-	public void postObjectDefinitionBatch(String callbackURL, Object object)
+	public void postObjectModelBatch(String callbackURL, Object object)
 		throws Exception;
 
-	public HttpInvoker.HttpResponse postObjectDefinitionBatchHttpResponse(
+	public HttpInvoker.HttpResponse postObjectModelBatchHttpResponse(
 			String callbackURL, Object object)
 		throws Exception;
 
-	public ObjectDefinition getObjectDefinitionByExternalReferenceCode(
+	public ObjectModel getObjectModelByExternalReferenceCode(
 			String externalReferenceCode)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getObjectDefinitionByExternalReferenceCodeHttpResponse(
+			getObjectModelByExternalReferenceCodeHttpResponse(
 				String externalReferenceCode)
 		throws Exception;
 
-	public ObjectDefinition putObjectDefinitionByExternalReferenceCode(
-			String externalReferenceCode, ObjectDefinition objectDefinition)
+	public ObjectModel putObjectModelByExternalReferenceCode(
+			String externalReferenceCode, ObjectModel objectModel)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			putObjectDefinitionByExternalReferenceCodeHttpResponse(
-				String externalReferenceCode, ObjectDefinition objectDefinition)
+			putObjectModelByExternalReferenceCodeHttpResponse(
+				String externalReferenceCode, ObjectModel objectModel)
 		throws Exception;
 
-	public void deleteObjectDefinition(Long objectDefinitionId)
+	public void deleteObjectModel(Long objectModelId) throws Exception;
+
+	public HttpInvoker.HttpResponse deleteObjectModelHttpResponse(
+			Long objectModelId)
 		throws Exception;
 
-	public HttpInvoker.HttpResponse deleteObjectDefinitionHttpResponse(
-			Long objectDefinitionId)
+	public void deleteObjectModelBatch(String callbackURL, Object object)
 		throws Exception;
 
-	public void deleteObjectDefinitionBatch(String callbackURL, Object object)
-		throws Exception;
-
-	public HttpInvoker.HttpResponse deleteObjectDefinitionBatchHttpResponse(
+	public HttpInvoker.HttpResponse deleteObjectModelBatchHttpResponse(
 			String callbackURL, Object object)
 		throws Exception;
 
-	public ObjectDefinition getObjectDefinition(Long objectDefinitionId)
+	public ObjectModel getObjectModel(Long objectModelId) throws Exception;
+
+	public HttpInvoker.HttpResponse getObjectModelHttpResponse(
+			Long objectModelId)
 		throws Exception;
 
-	public HttpInvoker.HttpResponse getObjectDefinitionHttpResponse(
-			Long objectDefinitionId)
+	public ObjectModel patchObjectModel(
+			Long objectModelId, ObjectModel objectModel)
 		throws Exception;
 
-	public ObjectDefinition patchObjectDefinition(
-			Long objectDefinitionId, ObjectDefinition objectDefinition)
+	public HttpInvoker.HttpResponse patchObjectModelHttpResponse(
+			Long objectModelId, ObjectModel objectModel)
 		throws Exception;
 
-	public HttpInvoker.HttpResponse patchObjectDefinitionHttpResponse(
-			Long objectDefinitionId, ObjectDefinition objectDefinition)
+	public ObjectModel putObjectModel(
+			Long objectModelId, ObjectModel objectModel)
 		throws Exception;
 
-	public ObjectDefinition putObjectDefinition(
-			Long objectDefinitionId, ObjectDefinition objectDefinition)
+	public HttpInvoker.HttpResponse putObjectModelHttpResponse(
+			Long objectModelId, ObjectModel objectModel)
 		throws Exception;
 
-	public HttpInvoker.HttpResponse putObjectDefinitionHttpResponse(
-			Long objectDefinitionId, ObjectDefinition objectDefinition)
+	public void putObjectModelBatch(String callbackURL, Object object)
 		throws Exception;
 
-	public void putObjectDefinitionBatch(String callbackURL, Object object)
-		throws Exception;
-
-	public HttpInvoker.HttpResponse putObjectDefinitionBatchHttpResponse(
+	public HttpInvoker.HttpResponse putObjectModelBatchHttpResponse(
 			String callbackURL, Object object)
-		throws Exception;
-
-	public void postObjectDefinitionPublish(Long objectDefinitionId)
-		throws Exception;
-
-	public HttpInvoker.HttpResponse postObjectDefinitionPublishHttpResponse(
-			Long objectDefinitionId)
-		throws Exception;
-
-	public Page<ObjectDefinition>
-			getObjectModelByExternalReferenceCodeObjectDefinitionsPage(
-				String externalReferenceCode, String search,
-				Pagination pagination)
-		throws Exception;
-
-	public HttpInvoker.HttpResponse
-			getObjectModelByExternalReferenceCodeObjectDefinitionsPageHttpResponse(
-				String externalReferenceCode, String search,
-				Pagination pagination)
-		throws Exception;
-
-	public Page<ObjectDefinition> getObjectModelObjectDefinitionsPage(
-			Long objectModelId, String search, Pagination pagination)
-		throws Exception;
-
-	public HttpInvoker.HttpResponse
-			getObjectModelObjectDefinitionsPageHttpResponse(
-				Long objectModelId, String search, Pagination pagination)
-		throws Exception;
-
-	public void postObjectModelObjectDefinitionsPageExportBatch(
-			Long objectModelId, String search, String callbackURL,
-			String contentType, String fieldNames)
-		throws Exception;
-
-	public HttpInvoker.HttpResponse
-			postObjectModelObjectDefinitionsPageExportBatchHttpResponse(
-				Long objectModelId, String search, String callbackURL,
-				String contentType, String fieldNames)
 		throws Exception;
 
 	public static class Builder {
@@ -192,8 +146,8 @@ public interface ObjectDefinitionResource {
 			return header("Authorization", "Bearer " + token);
 		}
 
-		public ObjectDefinitionResource build() {
-			return new ObjectDefinitionResourceImpl(this);
+		public ObjectModelResource build() {
+			return new ObjectModelResourceImpl(this);
 		}
 
 		public Builder contextPath(String contextPath) {
@@ -281,17 +235,14 @@ public interface ObjectDefinitionResource {
 
 	}
 
-	public static class ObjectDefinitionResourceImpl
-		implements ObjectDefinitionResource {
+	public static class ObjectModelResourceImpl implements ObjectModelResource {
 
-		public Page<ObjectDefinition> getObjectDefinitionsPage(
-				String search, List<String> aggregations, String filterString,
-				Pagination pagination, String sortString)
+		public Page<ObjectModel> getObjectModelsPage(
+				String search, Pagination pagination)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getObjectDefinitionsPageHttpResponse(
-					search, aggregations, filterString, pagination, sortString);
+				getObjectModelsPageHttpResponse(search, pagination);
 
 			String content = httpResponse.getContent();
 
@@ -341,7 +292,7 @@ public interface ObjectDefinitionResource {
 			}
 
 			try {
-				return Page.of(content, ObjectDefinitionSerDes::toDTO);
+				return Page.of(content, ObjectModelSerDes::toDTO);
 			}
 			catch (Exception e) {
 				_logger.log(
@@ -352,9 +303,8 @@ public interface ObjectDefinitionResource {
 			}
 		}
 
-		public HttpInvoker.HttpResponse getObjectDefinitionsPageHttpResponse(
-				String search, List<String> aggregations, String filterString,
-				Pagination pagination, String sortString)
+		public HttpInvoker.HttpResponse getObjectModelsPageHttpResponse(
+				String search, Pagination pagination)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -382,10 +332,6 @@ public interface ObjectDefinitionResource {
 				httpInvoker.parameter("search", String.valueOf(search));
 			}
 
-			if (filterString != null) {
-				httpInvoker.parameter("filter", filterString);
-			}
-
 			if (pagination != null) {
 				httpInvoker.parameter(
 					"page", String.valueOf(pagination.getPage()));
@@ -393,14 +339,10 @@ public interface ObjectDefinitionResource {
 					"pageSize", String.valueOf(pagination.getPageSize()));
 			}
 
-			if (sortString != null) {
-				httpInvoker.parameter("sort", sortString);
-			}
-
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
-						"/o/object-admin/v1.0/object-definitions");
+						"/o/object-admin/v1.0/object-models");
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);
@@ -408,15 +350,14 @@ public interface ObjectDefinitionResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postObjectDefinitionsPageExportBatch(
-				String search, String filterString, String sortString,
-				String callbackURL, String contentType, String fieldNames)
+		public void postObjectModelsPageExportBatch(
+				String search, String callbackURL, String contentType,
+				String fieldNames)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postObjectDefinitionsPageExportBatchHttpResponse(
-					search, filterString, sortString, callbackURL, contentType,
-					fieldNames);
+				postObjectModelsPageExportBatchHttpResponse(
+					search, callbackURL, contentType, fieldNames);
 
 			String content = httpResponse.getContent();
 
@@ -467,9 +408,9 @@ public interface ObjectDefinitionResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				postObjectDefinitionsPageExportBatchHttpResponse(
-					String search, String filterString, String sortString,
-					String callbackURL, String contentType, String fieldNames)
+				postObjectModelsPageExportBatchHttpResponse(
+					String search, String callbackURL, String contentType,
+					String fieldNames)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -497,14 +438,6 @@ public interface ObjectDefinitionResource {
 				httpInvoker.parameter("search", String.valueOf(search));
 			}
 
-			if (filterString != null) {
-				httpInvoker.parameter("filter", filterString);
-			}
-
-			if (sortString != null) {
-				httpInvoker.parameter("sort", sortString);
-			}
-
 			if (callbackURL != null) {
 				httpInvoker.parameter(
 					"callbackURL", String.valueOf(callbackURL));
@@ -522,7 +455,7 @@ public interface ObjectDefinitionResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
-						"/o/object-admin/v1.0/object-definitions/export-batch");
+						"/o/object-admin/v1.0/object-models/export-batch");
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);
@@ -530,12 +463,11 @@ public interface ObjectDefinitionResource {
 			return httpInvoker.invoke();
 		}
 
-		public ObjectDefinition postObjectDefinition(
-				ObjectDefinition objectDefinition)
+		public ObjectModel postObjectModel(ObjectModel objectModel)
 			throws Exception {
 
-			HttpInvoker.HttpResponse httpResponse =
-				postObjectDefinitionHttpResponse(objectDefinition);
+			HttpInvoker.HttpResponse httpResponse = postObjectModelHttpResponse(
+				objectModel);
 
 			String content = httpResponse.getContent();
 
@@ -585,7 +517,7 @@ public interface ObjectDefinitionResource {
 			}
 
 			try {
-				return ObjectDefinitionSerDes.toDTO(content);
+				return ObjectModelSerDes.toDTO(content);
 			}
 			catch (Exception e) {
 				_logger.log(
@@ -596,13 +528,13 @@ public interface ObjectDefinitionResource {
 			}
 		}
 
-		public HttpInvoker.HttpResponse postObjectDefinitionHttpResponse(
-				ObjectDefinition objectDefinition)
+		public HttpInvoker.HttpResponse postObjectModelHttpResponse(
+				ObjectModel objectModel)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(objectDefinition.toString(), "application/json");
+			httpInvoker.body(objectModel.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -626,7 +558,7 @@ public interface ObjectDefinitionResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
-						"/o/object-admin/v1.0/object-definitions");
+						"/o/object-admin/v1.0/object-models");
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);
@@ -634,11 +566,11 @@ public interface ObjectDefinitionResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postObjectDefinitionBatch(String callbackURL, Object object)
+		public void postObjectModelBatch(String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postObjectDefinitionBatchHttpResponse(callbackURL, object);
+				postObjectModelBatchHttpResponse(callbackURL, object);
 
 			String content = httpResponse.getContent();
 
@@ -688,7 +620,7 @@ public interface ObjectDefinitionResource {
 			}
 		}
 
-		public HttpInvoker.HttpResponse postObjectDefinitionBatchHttpResponse(
+		public HttpInvoker.HttpResponse postObjectModelBatchHttpResponse(
 				String callbackURL, Object object)
 			throws Exception {
 
@@ -723,7 +655,7 @@ public interface ObjectDefinitionResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
-						"/o/object-admin/v1.0/object-definitions/batch");
+						"/o/object-admin/v1.0/object-models/batch");
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);
@@ -731,12 +663,12 @@ public interface ObjectDefinitionResource {
 			return httpInvoker.invoke();
 		}
 
-		public ObjectDefinition getObjectDefinitionByExternalReferenceCode(
+		public ObjectModel getObjectModelByExternalReferenceCode(
 				String externalReferenceCode)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getObjectDefinitionByExternalReferenceCodeHttpResponse(
+				getObjectModelByExternalReferenceCodeHttpResponse(
 					externalReferenceCode);
 
 			String content = httpResponse.getContent();
@@ -787,7 +719,7 @@ public interface ObjectDefinitionResource {
 			}
 
 			try {
-				return ObjectDefinitionSerDes.toDTO(content);
+				return ObjectModelSerDes.toDTO(content);
 			}
 			catch (Exception e) {
 				_logger.log(
@@ -799,7 +731,7 @@ public interface ObjectDefinitionResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getObjectDefinitionByExternalReferenceCodeHttpResponse(
+				getObjectModelByExternalReferenceCodeHttpResponse(
 					String externalReferenceCode)
 			throws Exception {
 
@@ -827,7 +759,7 @@ public interface ObjectDefinitionResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
-						"/o/object-admin/v1.0/object-definitions/by-external-reference-code/{externalReferenceCode}");
+						"/o/object-admin/v1.0/object-models/by-external-reference-code/{externalReferenceCode}");
 
 			httpInvoker.path("externalReferenceCode", externalReferenceCode);
 
@@ -837,13 +769,13 @@ public interface ObjectDefinitionResource {
 			return httpInvoker.invoke();
 		}
 
-		public ObjectDefinition putObjectDefinitionByExternalReferenceCode(
-				String externalReferenceCode, ObjectDefinition objectDefinition)
+		public ObjectModel putObjectModelByExternalReferenceCode(
+				String externalReferenceCode, ObjectModel objectModel)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putObjectDefinitionByExternalReferenceCodeHttpResponse(
-					externalReferenceCode, objectDefinition);
+				putObjectModelByExternalReferenceCodeHttpResponse(
+					externalReferenceCode, objectModel);
 
 			String content = httpResponse.getContent();
 
@@ -893,7 +825,7 @@ public interface ObjectDefinitionResource {
 			}
 
 			try {
-				return ObjectDefinitionSerDes.toDTO(content);
+				return ObjectModelSerDes.toDTO(content);
 			}
 			catch (Exception e) {
 				_logger.log(
@@ -905,14 +837,13 @@ public interface ObjectDefinitionResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				putObjectDefinitionByExternalReferenceCodeHttpResponse(
-					String externalReferenceCode,
-					ObjectDefinition objectDefinition)
+				putObjectModelByExternalReferenceCodeHttpResponse(
+					String externalReferenceCode, ObjectModel objectModel)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(objectDefinition.toString(), "application/json");
+			httpInvoker.body(objectModel.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -936,7 +867,7 @@ public interface ObjectDefinitionResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
-						"/o/object-admin/v1.0/object-definitions/by-external-reference-code/{externalReferenceCode}");
+						"/o/object-admin/v1.0/object-models/by-external-reference-code/{externalReferenceCode}");
 
 			httpInvoker.path("externalReferenceCode", externalReferenceCode);
 
@@ -946,11 +877,9 @@ public interface ObjectDefinitionResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteObjectDefinition(Long objectDefinitionId)
-			throws Exception {
-
+		public void deleteObjectModel(Long objectModelId) throws Exception {
 			HttpInvoker.HttpResponse httpResponse =
-				deleteObjectDefinitionHttpResponse(objectDefinitionId);
+				deleteObjectModelHttpResponse(objectModelId);
 
 			String content = httpResponse.getContent();
 
@@ -1011,8 +940,8 @@ public interface ObjectDefinitionResource {
 			}
 		}
 
-		public HttpInvoker.HttpResponse deleteObjectDefinitionHttpResponse(
-				Long objectDefinitionId)
+		public HttpInvoker.HttpResponse deleteObjectModelHttpResponse(
+				Long objectModelId)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -1039,9 +968,9 @@ public interface ObjectDefinitionResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
-						"/o/object-admin/v1.0/object-definitions/{objectDefinitionId}");
+						"/o/object-admin/v1.0/object-models/{objectModelId}");
 
-			httpInvoker.path("objectDefinitionId", objectDefinitionId);
+			httpInvoker.path("objectModelId", objectModelId);
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);
@@ -1049,12 +978,11 @@ public interface ObjectDefinitionResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteObjectDefinitionBatch(
-				String callbackURL, Object object)
+		public void deleteObjectModelBatch(String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteObjectDefinitionBatchHttpResponse(callbackURL, object);
+				deleteObjectModelBatchHttpResponse(callbackURL, object);
 
 			String content = httpResponse.getContent();
 
@@ -1104,7 +1032,7 @@ public interface ObjectDefinitionResource {
 			}
 		}
 
-		public HttpInvoker.HttpResponse deleteObjectDefinitionBatchHttpResponse(
+		public HttpInvoker.HttpResponse deleteObjectModelBatchHttpResponse(
 				String callbackURL, Object object)
 			throws Exception {
 
@@ -1139,7 +1067,7 @@ public interface ObjectDefinitionResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
-						"/o/object-admin/v1.0/object-definitions/batch");
+						"/o/object-admin/v1.0/object-models/batch");
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);
@@ -1147,11 +1075,9 @@ public interface ObjectDefinitionResource {
 			return httpInvoker.invoke();
 		}
 
-		public ObjectDefinition getObjectDefinition(Long objectDefinitionId)
-			throws Exception {
-
-			HttpInvoker.HttpResponse httpResponse =
-				getObjectDefinitionHttpResponse(objectDefinitionId);
+		public ObjectModel getObjectModel(Long objectModelId) throws Exception {
+			HttpInvoker.HttpResponse httpResponse = getObjectModelHttpResponse(
+				objectModelId);
 
 			String content = httpResponse.getContent();
 
@@ -1201,7 +1127,7 @@ public interface ObjectDefinitionResource {
 			}
 
 			try {
-				return ObjectDefinitionSerDes.toDTO(content);
+				return ObjectModelSerDes.toDTO(content);
 			}
 			catch (Exception e) {
 				_logger.log(
@@ -1212,8 +1138,8 @@ public interface ObjectDefinitionResource {
 			}
 		}
 
-		public HttpInvoker.HttpResponse getObjectDefinitionHttpResponse(
-				Long objectDefinitionId)
+		public HttpInvoker.HttpResponse getObjectModelHttpResponse(
+				Long objectModelId)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -1240,9 +1166,9 @@ public interface ObjectDefinitionResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
-						"/o/object-admin/v1.0/object-definitions/{objectDefinitionId}");
+						"/o/object-admin/v1.0/object-models/{objectModelId}");
 
-			httpInvoker.path("objectDefinitionId", objectDefinitionId);
+			httpInvoker.path("objectModelId", objectModelId);
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);
@@ -1250,13 +1176,12 @@ public interface ObjectDefinitionResource {
 			return httpInvoker.invoke();
 		}
 
-		public ObjectDefinition patchObjectDefinition(
-				Long objectDefinitionId, ObjectDefinition objectDefinition)
+		public ObjectModel patchObjectModel(
+				Long objectModelId, ObjectModel objectModel)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				patchObjectDefinitionHttpResponse(
-					objectDefinitionId, objectDefinition);
+				patchObjectModelHttpResponse(objectModelId, objectModel);
 
 			String content = httpResponse.getContent();
 
@@ -1306,7 +1231,7 @@ public interface ObjectDefinitionResource {
 			}
 
 			try {
-				return ObjectDefinitionSerDes.toDTO(content);
+				return ObjectModelSerDes.toDTO(content);
 			}
 			catch (Exception e) {
 				_logger.log(
@@ -1317,13 +1242,13 @@ public interface ObjectDefinitionResource {
 			}
 		}
 
-		public HttpInvoker.HttpResponse patchObjectDefinitionHttpResponse(
-				Long objectDefinitionId, ObjectDefinition objectDefinition)
+		public HttpInvoker.HttpResponse patchObjectModelHttpResponse(
+				Long objectModelId, ObjectModel objectModel)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(objectDefinition.toString(), "application/json");
+			httpInvoker.body(objectModel.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1347,9 +1272,9 @@ public interface ObjectDefinitionResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
-						"/o/object-admin/v1.0/object-definitions/{objectDefinitionId}");
+						"/o/object-admin/v1.0/object-models/{objectModelId}");
 
-			httpInvoker.path("objectDefinitionId", objectDefinitionId);
+			httpInvoker.path("objectModelId", objectModelId);
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);
@@ -1357,13 +1282,12 @@ public interface ObjectDefinitionResource {
 			return httpInvoker.invoke();
 		}
 
-		public ObjectDefinition putObjectDefinition(
-				Long objectDefinitionId, ObjectDefinition objectDefinition)
+		public ObjectModel putObjectModel(
+				Long objectModelId, ObjectModel objectModel)
 			throws Exception {
 
-			HttpInvoker.HttpResponse httpResponse =
-				putObjectDefinitionHttpResponse(
-					objectDefinitionId, objectDefinition);
+			HttpInvoker.HttpResponse httpResponse = putObjectModelHttpResponse(
+				objectModelId, objectModel);
 
 			String content = httpResponse.getContent();
 
@@ -1413,7 +1337,7 @@ public interface ObjectDefinitionResource {
 			}
 
 			try {
-				return ObjectDefinitionSerDes.toDTO(content);
+				return ObjectModelSerDes.toDTO(content);
 			}
 			catch (Exception e) {
 				_logger.log(
@@ -1424,13 +1348,13 @@ public interface ObjectDefinitionResource {
 			}
 		}
 
-		public HttpInvoker.HttpResponse putObjectDefinitionHttpResponse(
-				Long objectDefinitionId, ObjectDefinition objectDefinition)
+		public HttpInvoker.HttpResponse putObjectModelHttpResponse(
+				Long objectModelId, ObjectModel objectModel)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(objectDefinition.toString(), "application/json");
+			httpInvoker.body(objectModel.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1454,9 +1378,9 @@ public interface ObjectDefinitionResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
-						"/o/object-admin/v1.0/object-definitions/{objectDefinitionId}");
+						"/o/object-admin/v1.0/object-models/{objectModelId}");
 
-			httpInvoker.path("objectDefinitionId", objectDefinitionId);
+			httpInvoker.path("objectModelId", objectModelId);
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);
@@ -1464,11 +1388,11 @@ public interface ObjectDefinitionResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putObjectDefinitionBatch(String callbackURL, Object object)
+		public void putObjectModelBatch(String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putObjectDefinitionBatchHttpResponse(callbackURL, object);
+				putObjectModelBatchHttpResponse(callbackURL, object);
 
 			String content = httpResponse.getContent();
 
@@ -1518,7 +1442,7 @@ public interface ObjectDefinitionResource {
 			}
 		}
 
-		public HttpInvoker.HttpResponse putObjectDefinitionBatchHttpResponse(
+		public HttpInvoker.HttpResponse putObjectModelBatchHttpResponse(
 				String callbackURL, Object object)
 			throws Exception {
 
@@ -1553,7 +1477,7 @@ public interface ObjectDefinitionResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
-						"/o/object-admin/v1.0/object-definitions/batch");
+						"/o/object-admin/v1.0/object-models/batch");
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);
@@ -1561,468 +1485,12 @@ public interface ObjectDefinitionResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postObjectDefinitionPublish(Long objectDefinitionId)
-			throws Exception {
-
-			HttpInvoker.HttpResponse httpResponse =
-				postObjectDefinitionPublishHttpResponse(objectDefinitionId);
-
-			String content = httpResponse.getContent();
-
-			if ((httpResponse.getStatusCode() / 100) != 2) {
-				_logger.log(
-					Level.WARNING,
-					"Unable to process HTTP response content: " + content);
-				_logger.log(
-					Level.WARNING,
-					"HTTP response message: " + httpResponse.getMessage());
-				_logger.log(
-					Level.WARNING,
-					"HTTP response status code: " +
-						httpResponse.getStatusCode());
-
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
-			}
-			else {
-				_logger.fine("HTTP response content: " + content);
-				_logger.fine(
-					"HTTP response message: " + httpResponse.getMessage());
-				_logger.fine(
-					"HTTP response status code: " +
-						httpResponse.getStatusCode());
-			}
-
-			try {
-				return;
-			}
-			catch (Exception e) {
-				_logger.log(
-					Level.WARNING,
-					"Unable to process HTTP response: " + content, e);
-
-				throw new Problem.ProblemException(Problem.toDTO(content));
-			}
-		}
-
-		public HttpInvoker.HttpResponse postObjectDefinitionPublishHttpResponse(
-				Long objectDefinitionId)
-			throws Exception {
-
-			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-			if (_builder._locale != null) {
-				httpInvoker.header(
-					"Accept-Language", _builder._locale.toLanguageTag());
-			}
-
-			for (Map.Entry<String, String> entry :
-					_builder._headers.entrySet()) {
-
-				httpInvoker.header(entry.getKey(), entry.getValue());
-			}
-
-			for (Map.Entry<String, String> entry :
-					_builder._parameters.entrySet()) {
-
-				httpInvoker.parameter(entry.getKey(), entry.getValue());
-			}
-
-			httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
-
-			httpInvoker.path(
-				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
-						"/o/object-admin/v1.0/object-definitions/{objectDefinitionId}/publish");
-
-			httpInvoker.path("objectDefinitionId", objectDefinitionId);
-
-			httpInvoker.userNameAndPassword(
-				_builder._login + ":" + _builder._password);
-
-			return httpInvoker.invoke();
-		}
-
-		public Page<ObjectDefinition>
-				getObjectModelByExternalReferenceCodeObjectDefinitionsPage(
-					String externalReferenceCode, String search,
-					Pagination pagination)
-			throws Exception {
-
-			HttpInvoker.HttpResponse httpResponse =
-				getObjectModelByExternalReferenceCodeObjectDefinitionsPageHttpResponse(
-					externalReferenceCode, search, pagination);
-
-			String content = httpResponse.getContent();
-
-			if ((httpResponse.getStatusCode() / 100) != 2) {
-				_logger.log(
-					Level.WARNING,
-					"Unable to process HTTP response content: " + content);
-				_logger.log(
-					Level.WARNING,
-					"HTTP response message: " + httpResponse.getMessage());
-				_logger.log(
-					Level.WARNING,
-					"HTTP response status code: " +
-						httpResponse.getStatusCode());
-
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
-			}
-			else {
-				_logger.fine("HTTP response content: " + content);
-				_logger.fine(
-					"HTTP response message: " + httpResponse.getMessage());
-				_logger.fine(
-					"HTTP response status code: " +
-						httpResponse.getStatusCode());
-			}
-
-			try {
-				return Page.of(content, ObjectDefinitionSerDes::toDTO);
-			}
-			catch (Exception e) {
-				_logger.log(
-					Level.WARNING,
-					"Unable to process HTTP response: " + content, e);
-
-				throw new Problem.ProblemException(Problem.toDTO(content));
-			}
-		}
-
-		public HttpInvoker.HttpResponse
-				getObjectModelByExternalReferenceCodeObjectDefinitionsPageHttpResponse(
-					String externalReferenceCode, String search,
-					Pagination pagination)
-			throws Exception {
-
-			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-			if (_builder._locale != null) {
-				httpInvoker.header(
-					"Accept-Language", _builder._locale.toLanguageTag());
-			}
-
-			for (Map.Entry<String, String> entry :
-					_builder._headers.entrySet()) {
-
-				httpInvoker.header(entry.getKey(), entry.getValue());
-			}
-
-			for (Map.Entry<String, String> entry :
-					_builder._parameters.entrySet()) {
-
-				httpInvoker.parameter(entry.getKey(), entry.getValue());
-			}
-
-			httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
-
-			if (search != null) {
-				httpInvoker.parameter("search", String.valueOf(search));
-			}
-
-			if (pagination != null) {
-				httpInvoker.parameter(
-					"page", String.valueOf(pagination.getPage()));
-				httpInvoker.parameter(
-					"pageSize", String.valueOf(pagination.getPageSize()));
-			}
-
-			httpInvoker.path(
-				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
-						"/o/object-admin/v1.0/object-models/by-external-reference-code/{externalReferenceCode}/object-definitions");
-
-			httpInvoker.path("externalReferenceCode", externalReferenceCode);
-
-			httpInvoker.userNameAndPassword(
-				_builder._login + ":" + _builder._password);
-
-			return httpInvoker.invoke();
-		}
-
-		public Page<ObjectDefinition> getObjectModelObjectDefinitionsPage(
-				Long objectModelId, String search, Pagination pagination)
-			throws Exception {
-
-			HttpInvoker.HttpResponse httpResponse =
-				getObjectModelObjectDefinitionsPageHttpResponse(
-					objectModelId, search, pagination);
-
-			String content = httpResponse.getContent();
-
-			if ((httpResponse.getStatusCode() / 100) != 2) {
-				_logger.log(
-					Level.WARNING,
-					"Unable to process HTTP response content: " + content);
-				_logger.log(
-					Level.WARNING,
-					"HTTP response message: " + httpResponse.getMessage());
-				_logger.log(
-					Level.WARNING,
-					"HTTP response status code: " +
-						httpResponse.getStatusCode());
-
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
-			}
-			else {
-				_logger.fine("HTTP response content: " + content);
-				_logger.fine(
-					"HTTP response message: " + httpResponse.getMessage());
-				_logger.fine(
-					"HTTP response status code: " +
-						httpResponse.getStatusCode());
-			}
-
-			try {
-				return Page.of(content, ObjectDefinitionSerDes::toDTO);
-			}
-			catch (Exception e) {
-				_logger.log(
-					Level.WARNING,
-					"Unable to process HTTP response: " + content, e);
-
-				throw new Problem.ProblemException(Problem.toDTO(content));
-			}
-		}
-
-		public HttpInvoker.HttpResponse
-				getObjectModelObjectDefinitionsPageHttpResponse(
-					Long objectModelId, String search, Pagination pagination)
-			throws Exception {
-
-			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-			if (_builder._locale != null) {
-				httpInvoker.header(
-					"Accept-Language", _builder._locale.toLanguageTag());
-			}
-
-			for (Map.Entry<String, String> entry :
-					_builder._headers.entrySet()) {
-
-				httpInvoker.header(entry.getKey(), entry.getValue());
-			}
-
-			for (Map.Entry<String, String> entry :
-					_builder._parameters.entrySet()) {
-
-				httpInvoker.parameter(entry.getKey(), entry.getValue());
-			}
-
-			httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
-
-			if (search != null) {
-				httpInvoker.parameter("search", String.valueOf(search));
-			}
-
-			if (pagination != null) {
-				httpInvoker.parameter(
-					"page", String.valueOf(pagination.getPage()));
-				httpInvoker.parameter(
-					"pageSize", String.valueOf(pagination.getPageSize()));
-			}
-
-			httpInvoker.path(
-				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
-						"/o/object-admin/v1.0/object-models/{objectModelId}/object-definitions");
-
-			httpInvoker.path("objectModelId", objectModelId);
-
-			httpInvoker.userNameAndPassword(
-				_builder._login + ":" + _builder._password);
-
-			return httpInvoker.invoke();
-		}
-
-		public void postObjectModelObjectDefinitionsPageExportBatch(
-				Long objectModelId, String search, String callbackURL,
-				String contentType, String fieldNames)
-			throws Exception {
-
-			HttpInvoker.HttpResponse httpResponse =
-				postObjectModelObjectDefinitionsPageExportBatchHttpResponse(
-					objectModelId, search, callbackURL, contentType,
-					fieldNames);
-
-			String content = httpResponse.getContent();
-
-			if ((httpResponse.getStatusCode() / 100) != 2) {
-				_logger.log(
-					Level.WARNING,
-					"Unable to process HTTP response content: " + content);
-				_logger.log(
-					Level.WARNING,
-					"HTTP response message: " + httpResponse.getMessage());
-				_logger.log(
-					Level.WARNING,
-					"HTTP response status code: " +
-						httpResponse.getStatusCode());
-
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
-			}
-			else {
-				_logger.fine("HTTP response content: " + content);
-				_logger.fine(
-					"HTTP response message: " + httpResponse.getMessage());
-				_logger.fine(
-					"HTTP response status code: " +
-						httpResponse.getStatusCode());
-			}
-		}
-
-		public HttpInvoker.HttpResponse
-				postObjectModelObjectDefinitionsPageExportBatchHttpResponse(
-					Long objectModelId, String search, String callbackURL,
-					String contentType, String fieldNames)
-			throws Exception {
-
-			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-			if (_builder._locale != null) {
-				httpInvoker.header(
-					"Accept-Language", _builder._locale.toLanguageTag());
-			}
-
-			for (Map.Entry<String, String> entry :
-					_builder._headers.entrySet()) {
-
-				httpInvoker.header(entry.getKey(), entry.getValue());
-			}
-
-			for (Map.Entry<String, String> entry :
-					_builder._parameters.entrySet()) {
-
-				httpInvoker.parameter(entry.getKey(), entry.getValue());
-			}
-
-			httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
-
-			if (search != null) {
-				httpInvoker.parameter("search", String.valueOf(search));
-			}
-
-			if (callbackURL != null) {
-				httpInvoker.parameter(
-					"callbackURL", String.valueOf(callbackURL));
-			}
-
-			if (contentType != null) {
-				httpInvoker.parameter(
-					"contentType", String.valueOf(contentType));
-			}
-
-			if (fieldNames != null) {
-				httpInvoker.parameter("fieldNames", String.valueOf(fieldNames));
-			}
-
-			httpInvoker.path(
-				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
-						"/o/object-admin/v1.0/object-models/{objectModelId}/object-definitions/export-batch");
-
-			httpInvoker.path("objectModelId", objectModelId);
-
-			httpInvoker.userNameAndPassword(
-				_builder._login + ":" + _builder._password);
-
-			return httpInvoker.invoke();
-		}
-
-		private ObjectDefinitionResourceImpl(Builder builder) {
+		private ObjectModelResourceImpl(Builder builder) {
 			_builder = builder;
 		}
 
 		private static final Logger _logger = Logger.getLogger(
-			ObjectDefinitionResource.class.getName());
+			ObjectModelResource.class.getName());
 
 		private Builder _builder;
 
