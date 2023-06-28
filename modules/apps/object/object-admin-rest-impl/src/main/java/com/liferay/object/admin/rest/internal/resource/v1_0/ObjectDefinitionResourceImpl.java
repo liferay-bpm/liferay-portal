@@ -230,6 +230,24 @@ public class ObjectDefinitionResourceImpl
 	}
 
 	@Override
+	public Page<ObjectDefinition>
+			getObjectModelByExternalReferenceCodeObjectDefinitionsPage(
+				String externalReferenceCode, String search,
+				Pagination pagination)
+		throws Exception {
+
+		return Page.of(Collections.emptyList());
+	}
+
+	@Override
+	public Page<ObjectDefinition> getObjectModelObjectDefinitionsPage(
+			Long objectModelId, String search, Pagination pagination)
+		throws Exception {
+
+		return Page.of(Collections.emptyList());
+	}
+
+	@Override
 	public ObjectDefinition postObjectDefinition(
 			ObjectDefinition objectDefinition)
 		throws Exception {
