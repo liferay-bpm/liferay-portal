@@ -14,7 +14,12 @@
 
 package com.liferay.object.admin.rest.internal.resource.v1_0;
 
+import com.liferay.object.admin.rest.dto.v1_0.ObjectModel;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectModelResource;
+import com.liferay.portal.vulcan.pagination.Page;
+import com.liferay.portal.vulcan.pagination.Pagination;
+
+import java.util.Collections;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -27,4 +32,53 @@ import org.osgi.service.component.annotations.ServiceScope;
 	scope = ServiceScope.PROTOTYPE, service = ObjectModelResource.class
 )
 public class ObjectModelResourceImpl extends BaseObjectModelResourceImpl {
+
+	@Override
+	public void deleteObjectModel(Long objectModelId) throws Exception {
+	}
+
+	@Override
+	public ObjectModel getObjectModel(Long objectModelId) throws Exception {
+		return new ObjectModel();
+	}
+
+	@Override
+	public ObjectModel getObjectModelByExternalReferenceCode(
+			String externalReferenceCode)
+		throws Exception {
+
+		return new ObjectModel();
+	}
+
+	@Override
+	public Page<ObjectModel> getObjectModelsPage(
+			String search, Pagination pagination)
+		throws Exception {
+
+		return Page.of(Collections.emptyList());
+	}
+
+	@Override
+	public ObjectModel postObjectModel(ObjectModel objectModel)
+		throws Exception {
+
+		return new ObjectModel();
+	}
+
+	@Override
+	public ObjectModel putObjectModel(
+			Long objectModelId, ObjectModel objectModel)
+		throws Exception {
+
+		return new ObjectModel();
+	}
+
+	@Override
+	public ObjectModel putObjectModelByExternalReferenceCode(
+			String externalReferenceCode, ObjectModel objectModel)
+		throws Exception {
+
+		return new ObjectModel();
+	}
+
 }
