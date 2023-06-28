@@ -102,6 +102,8 @@ public class OpenAPIResourceImpl {
 
 			add(ObjectLayoutResourceImpl.class);
 
+			add(ObjectModelResourceImpl.class);
+
 			add(ObjectRelationshipResourceImpl.class);
 
 			add(ObjectValidationRuleResourceImpl.class);

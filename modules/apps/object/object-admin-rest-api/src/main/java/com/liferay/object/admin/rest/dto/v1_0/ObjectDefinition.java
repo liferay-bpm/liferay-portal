@@ -605,6 +605,39 @@ public class ObjectDefinition implements Serializable {
 	protected ObjectLayout[] objectLayouts;
 
 	@Schema
+	public String getObjectModelExternalReferenceCode() {
+		return objectModelExternalReferenceCode;
+	}
+
+	public void setObjectModelExternalReferenceCode(
+		String objectModelExternalReferenceCode) {
+
+		this.objectModelExternalReferenceCode =
+			objectModelExternalReferenceCode;
+	}
+
+	@JsonIgnore
+	public void setObjectModelExternalReferenceCode(
+		UnsafeSupplier<String, Exception>
+			objectModelExternalReferenceCodeUnsafeSupplier) {
+
+		try {
+			objectModelExternalReferenceCode =
+				objectModelExternalReferenceCodeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String objectModelExternalReferenceCode;
+
+	@Schema
 	@Valid
 	public ObjectRelationship[] getObjectRelationships() {
 		return objectRelationships;
@@ -1280,6 +1313,20 @@ public class ObjectDefinition implements Serializable {
 			}
 
 			sb.append("]");
+		}
+
+		if (objectModelExternalReferenceCode != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"objectModelExternalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(objectModelExternalReferenceCode));
+
+			sb.append("\"");
 		}
 
 		if (objectRelationships != null) {

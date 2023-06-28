@@ -190,6 +190,7 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 		objectDefinition.setDefaultLanguageId(regex);
 		objectDefinition.setExternalReferenceCode(regex);
 		objectDefinition.setName(regex);
+		objectDefinition.setObjectModelExternalReferenceCode(regex);
 		objectDefinition.setPanelAppOrder(regex);
 		objectDefinition.setPanelCategoryKey(regex);
 		objectDefinition.setRestContextPath(regex);
@@ -208,6 +209,8 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 		Assert.assertEquals(regex, objectDefinition.getDefaultLanguageId());
 		Assert.assertEquals(regex, objectDefinition.getExternalReferenceCode());
 		Assert.assertEquals(regex, objectDefinition.getName());
+		Assert.assertEquals(
+			regex, objectDefinition.getObjectModelExternalReferenceCode());
 		Assert.assertEquals(regex, objectDefinition.getPanelAppOrder());
 		Assert.assertEquals(regex, objectDefinition.getPanelCategoryKey());
 		Assert.assertEquals(regex, objectDefinition.getRestContextPath());
@@ -997,6 +1000,308 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 			"This method needs to be implemented");
 	}
 
+	@Test
+	public void testGetObjectModelByExternalReferenceCodeObjectDefinitionsPage()
+		throws Exception {
+
+		String externalReferenceCode =
+			testGetObjectModelByExternalReferenceCodeObjectDefinitionsPage_getExternalReferenceCode();
+		String irrelevantExternalReferenceCode =
+			testGetObjectModelByExternalReferenceCodeObjectDefinitionsPage_getIrrelevantExternalReferenceCode();
+
+		Page<ObjectDefinition> page =
+			objectDefinitionResource.
+				getObjectModelByExternalReferenceCodeObjectDefinitionsPage(
+					externalReferenceCode, null, Pagination.of(1, 10));
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		if (irrelevantExternalReferenceCode != null) {
+			ObjectDefinition irrelevantObjectDefinition =
+				testGetObjectModelByExternalReferenceCodeObjectDefinitionsPage_addObjectDefinition(
+					irrelevantExternalReferenceCode,
+					randomIrrelevantObjectDefinition());
+
+			page =
+				objectDefinitionResource.
+					getObjectModelByExternalReferenceCodeObjectDefinitionsPage(
+						irrelevantExternalReferenceCode, null,
+						Pagination.of(1, 2));
+
+			Assert.assertEquals(1, page.getTotalCount());
+
+			assertEquals(
+				Arrays.asList(irrelevantObjectDefinition),
+				(List<ObjectDefinition>)page.getItems());
+			assertValid(
+				page,
+				testGetObjectModelByExternalReferenceCodeObjectDefinitionsPage_getExpectedActions(
+					irrelevantExternalReferenceCode));
+		}
+
+		ObjectDefinition objectDefinition1 =
+			testGetObjectModelByExternalReferenceCodeObjectDefinitionsPage_addObjectDefinition(
+				externalReferenceCode, randomObjectDefinition());
+
+		ObjectDefinition objectDefinition2 =
+			testGetObjectModelByExternalReferenceCodeObjectDefinitionsPage_addObjectDefinition(
+				externalReferenceCode, randomObjectDefinition());
+
+		page =
+			objectDefinitionResource.
+				getObjectModelByExternalReferenceCodeObjectDefinitionsPage(
+					externalReferenceCode, null, Pagination.of(1, 10));
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(objectDefinition1, objectDefinition2),
+			(List<ObjectDefinition>)page.getItems());
+		assertValid(
+			page,
+			testGetObjectModelByExternalReferenceCodeObjectDefinitionsPage_getExpectedActions(
+				externalReferenceCode));
+
+		objectDefinitionResource.deleteObjectDefinition(
+			objectDefinition1.getId());
+
+		objectDefinitionResource.deleteObjectDefinition(
+			objectDefinition2.getId());
+	}
+
+	protected Map<String, Map<String, String>>
+			testGetObjectModelByExternalReferenceCodeObjectDefinitionsPage_getExpectedActions(
+				String externalReferenceCode)
+		throws Exception {
+
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
+
+		return expectedActions;
+	}
+
+	@Test
+	public void testGetObjectModelByExternalReferenceCodeObjectDefinitionsPageWithPagination()
+		throws Exception {
+
+		String externalReferenceCode =
+			testGetObjectModelByExternalReferenceCodeObjectDefinitionsPage_getExternalReferenceCode();
+
+		ObjectDefinition objectDefinition1 =
+			testGetObjectModelByExternalReferenceCodeObjectDefinitionsPage_addObjectDefinition(
+				externalReferenceCode, randomObjectDefinition());
+
+		ObjectDefinition objectDefinition2 =
+			testGetObjectModelByExternalReferenceCodeObjectDefinitionsPage_addObjectDefinition(
+				externalReferenceCode, randomObjectDefinition());
+
+		ObjectDefinition objectDefinition3 =
+			testGetObjectModelByExternalReferenceCodeObjectDefinitionsPage_addObjectDefinition(
+				externalReferenceCode, randomObjectDefinition());
+
+		Page<ObjectDefinition> page1 =
+			objectDefinitionResource.
+				getObjectModelByExternalReferenceCodeObjectDefinitionsPage(
+					externalReferenceCode, null, Pagination.of(1, 2));
+
+		List<ObjectDefinition> objectDefinitions1 =
+			(List<ObjectDefinition>)page1.getItems();
+
+		Assert.assertEquals(
+			objectDefinitions1.toString(), 2, objectDefinitions1.size());
+
+		Page<ObjectDefinition> page2 =
+			objectDefinitionResource.
+				getObjectModelByExternalReferenceCodeObjectDefinitionsPage(
+					externalReferenceCode, null, Pagination.of(2, 2));
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<ObjectDefinition> objectDefinitions2 =
+			(List<ObjectDefinition>)page2.getItems();
+
+		Assert.assertEquals(
+			objectDefinitions2.toString(), 1, objectDefinitions2.size());
+
+		Page<ObjectDefinition> page3 =
+			objectDefinitionResource.
+				getObjectModelByExternalReferenceCodeObjectDefinitionsPage(
+					externalReferenceCode, null, Pagination.of(1, 3));
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(
+				objectDefinition1, objectDefinition2, objectDefinition3),
+			(List<ObjectDefinition>)page3.getItems());
+	}
+
+	protected ObjectDefinition
+			testGetObjectModelByExternalReferenceCodeObjectDefinitionsPage_addObjectDefinition(
+				String externalReferenceCode, ObjectDefinition objectDefinition)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected String
+			testGetObjectModelByExternalReferenceCodeObjectDefinitionsPage_getExternalReferenceCode()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected String
+			testGetObjectModelByExternalReferenceCodeObjectDefinitionsPage_getIrrelevantExternalReferenceCode()
+		throws Exception {
+
+		return null;
+	}
+
+	@Test
+	public void testGetObjectModelObjectDefinitionsPage() throws Exception {
+		Long objectModelId =
+			testGetObjectModelObjectDefinitionsPage_getObjectModelId();
+		Long irrelevantObjectModelId =
+			testGetObjectModelObjectDefinitionsPage_getIrrelevantObjectModelId();
+
+		Page<ObjectDefinition> page =
+			objectDefinitionResource.getObjectModelObjectDefinitionsPage(
+				objectModelId, null, Pagination.of(1, 10));
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		if (irrelevantObjectModelId != null) {
+			ObjectDefinition irrelevantObjectDefinition =
+				testGetObjectModelObjectDefinitionsPage_addObjectDefinition(
+					irrelevantObjectModelId,
+					randomIrrelevantObjectDefinition());
+
+			page = objectDefinitionResource.getObjectModelObjectDefinitionsPage(
+				irrelevantObjectModelId, null, Pagination.of(1, 2));
+
+			Assert.assertEquals(1, page.getTotalCount());
+
+			assertEquals(
+				Arrays.asList(irrelevantObjectDefinition),
+				(List<ObjectDefinition>)page.getItems());
+			assertValid(
+				page,
+				testGetObjectModelObjectDefinitionsPage_getExpectedActions(
+					irrelevantObjectModelId));
+		}
+
+		ObjectDefinition objectDefinition1 =
+			testGetObjectModelObjectDefinitionsPage_addObjectDefinition(
+				objectModelId, randomObjectDefinition());
+
+		ObjectDefinition objectDefinition2 =
+			testGetObjectModelObjectDefinitionsPage_addObjectDefinition(
+				objectModelId, randomObjectDefinition());
+
+		page = objectDefinitionResource.getObjectModelObjectDefinitionsPage(
+			objectModelId, null, Pagination.of(1, 10));
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(objectDefinition1, objectDefinition2),
+			(List<ObjectDefinition>)page.getItems());
+		assertValid(
+			page,
+			testGetObjectModelObjectDefinitionsPage_getExpectedActions(
+				objectModelId));
+
+		objectDefinitionResource.deleteObjectDefinition(
+			objectDefinition1.getId());
+
+		objectDefinitionResource.deleteObjectDefinition(
+			objectDefinition2.getId());
+	}
+
+	protected Map<String, Map<String, String>>
+			testGetObjectModelObjectDefinitionsPage_getExpectedActions(
+				Long objectModelId)
+		throws Exception {
+
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
+
+		return expectedActions;
+	}
+
+	@Test
+	public void testGetObjectModelObjectDefinitionsPageWithPagination()
+		throws Exception {
+
+		Long objectModelId =
+			testGetObjectModelObjectDefinitionsPage_getObjectModelId();
+
+		ObjectDefinition objectDefinition1 =
+			testGetObjectModelObjectDefinitionsPage_addObjectDefinition(
+				objectModelId, randomObjectDefinition());
+
+		ObjectDefinition objectDefinition2 =
+			testGetObjectModelObjectDefinitionsPage_addObjectDefinition(
+				objectModelId, randomObjectDefinition());
+
+		ObjectDefinition objectDefinition3 =
+			testGetObjectModelObjectDefinitionsPage_addObjectDefinition(
+				objectModelId, randomObjectDefinition());
+
+		Page<ObjectDefinition> page1 =
+			objectDefinitionResource.getObjectModelObjectDefinitionsPage(
+				objectModelId, null, Pagination.of(1, 2));
+
+		List<ObjectDefinition> objectDefinitions1 =
+			(List<ObjectDefinition>)page1.getItems();
+
+		Assert.assertEquals(
+			objectDefinitions1.toString(), 2, objectDefinitions1.size());
+
+		Page<ObjectDefinition> page2 =
+			objectDefinitionResource.getObjectModelObjectDefinitionsPage(
+				objectModelId, null, Pagination.of(2, 2));
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<ObjectDefinition> objectDefinitions2 =
+			(List<ObjectDefinition>)page2.getItems();
+
+		Assert.assertEquals(
+			objectDefinitions2.toString(), 1, objectDefinitions2.size());
+
+		Page<ObjectDefinition> page3 =
+			objectDefinitionResource.getObjectModelObjectDefinitionsPage(
+				objectModelId, null, Pagination.of(1, 3));
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(
+				objectDefinition1, objectDefinition2, objectDefinition3),
+			(List<ObjectDefinition>)page3.getItems());
+	}
+
+	protected ObjectDefinition
+			testGetObjectModelObjectDefinitionsPage_addObjectDefinition(
+				Long objectModelId, ObjectDefinition objectDefinition)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long testGetObjectModelObjectDefinitionsPage_getObjectModelId()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long
+			testGetObjectModelObjectDefinitionsPage_getIrrelevantObjectModelId()
+		throws Exception {
+
+		return null;
+	}
+
 	@Rule
 	public SearchTestRule searchTestRule = new SearchTestRule();
 
@@ -1241,6 +1546,19 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 
 			if (Objects.equals("objectLayouts", additionalAssertFieldName)) {
 				if (objectDefinition.getObjectLayouts() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"objectModelExternalReferenceCode",
+					additionalAssertFieldName)) {
+
+				if (objectDefinition.getObjectModelExternalReferenceCode() ==
+						null) {
+
 					valid = false;
 				}
 
@@ -1714,6 +2032,21 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 			}
 
 			if (Objects.equals(
+					"objectModelExternalReferenceCode",
+					additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						objectDefinition1.getObjectModelExternalReferenceCode(),
+						objectDefinition2.
+							getObjectModelExternalReferenceCode())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
 					"objectRelationships", additionalAssertFieldName)) {
 
 				if (!Objects.deepEquals(
@@ -2148,6 +2481,16 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("objectModelExternalReferenceCode")) {
+			sb.append("'");
+			sb.append(
+				String.valueOf(
+					objectDefinition.getObjectModelExternalReferenceCode()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("objectRelationships")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -2298,6 +2641,8 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				id = RandomTestUtil.randomLong();
 				modifiable = RandomTestUtil.randomBoolean();
 				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				objectModelExternalReferenceCode = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 				panelAppOrder = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				panelCategoryKey = StringUtil.toLowerCase(

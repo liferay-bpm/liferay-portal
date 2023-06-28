@@ -329,6 +329,22 @@ public class ObjectDefinitionSerDes {
 			sb.append("]");
 		}
 
+		if (objectDefinition.getObjectModelExternalReferenceCode() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"objectModelExternalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(
+				_escape(
+					objectDefinition.getObjectModelExternalReferenceCode()));
+
+			sb.append("\"");
+		}
+
 		if (objectDefinition.getObjectRelationships() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -723,6 +739,16 @@ public class ObjectDefinitionSerDes {
 				String.valueOf(objectDefinition.getObjectLayouts()));
 		}
 
+		if (objectDefinition.getObjectModelExternalReferenceCode() == null) {
+			map.put("objectModelExternalReferenceCode", null);
+		}
+		else {
+			map.put(
+				"objectModelExternalReferenceCode",
+				String.valueOf(
+					objectDefinition.getObjectModelExternalReferenceCode()));
+		}
+
 		if (objectDefinition.getObjectRelationships() == null) {
 			map.put("objectRelationships", null);
 		}
@@ -1015,6 +1041,15 @@ public class ObjectDefinitionSerDes {
 					}
 
 					objectDefinition.setObjectLayouts(objectLayoutsArray);
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName,
+						"objectModelExternalReferenceCode")) {
+
+				if (jsonParserFieldValue != null) {
+					objectDefinition.setObjectModelExternalReferenceCode(
+						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(
