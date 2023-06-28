@@ -49,7 +49,7 @@ function getLabel<T extends ObjectMap<any>>(
 	const value = item[key];
 
 	if (typeof value !== 'object') {
-		if (objectFieldBusinessType === 'Date') {
+		if (objectFieldBusinessType === 'Date' && value) {
 			return DateTimeRenderer({
 				options: {
 					format: {
