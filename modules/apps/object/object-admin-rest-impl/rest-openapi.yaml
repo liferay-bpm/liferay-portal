@@ -109,6 +109,8 @@ components:
                     items:
                         $ref: "#/components/schemas/ObjectLayout"
                     type: array
+                objectModelExternalReferenceCode:
+                    type: string
                 objectRelationships:
                     items:
                         $ref: "#/components/schemas/ObjectRelationship"
@@ -332,6 +334,35 @@ components:
                 priority:
                     format: int32
                     type: integer
+        ObjectModel:
+            properties:
+                actions:
+                    additionalProperties:
+                        additionalProperties:
+                            type: string
+                        type: object
+                    readOnly: true
+                    type: object
+                dateCreated:
+                    format: date
+                    readOnly: true
+                    type: string
+                dateModified:
+                    format: date
+                    readOnly: true
+                    type: string
+                externalReferenceCode:
+                    type: string
+                id:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                label:
+                    additionalProperties:
+                        type: string
+                    type: object
+                name:
+                    type: string
         ObjectRelationship:
             properties:
                 actions:
@@ -1809,6 +1840,265 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/ObjectLayout"
             tags: ["ObjectLayout"]
+    "/object-models":
+        get:
+            operationId: getObjectModelsPage
+            parameters:
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+                - in: header
+                  name: Accept-Language
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectModel"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectModel"
+                                type: array
+            tags: ["ObjectModel"]
+        post:
+            operationId: postObjectModel
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ObjectModel"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/ObjectModel"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ObjectModel"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ObjectModel"
+            tags: ["ObjectModel"]
+    "/object-models/by-external-reference-code/{externalReferenceCode}":
+        get:
+            operationId: getObjectModelByExternalReferenceCode
+            parameters:
+                - in: path
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ObjectModel"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ObjectModel"
+            tags: ["ObjectModel"]
+        put:
+            operationId: putObjectModelByExternalReferenceCode
+            parameters:
+                - in: path
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ObjectModel"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/ObjectModel"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ObjectModel"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ObjectModel"
+            tags: ["ObjectModel"]
+    "/object-models/by-external-reference-code/{externalReferenceCode}/object-definitions":
+        get:
+            operationId: getObjectModelByExternalReferenceCodeObjectDefinitionsPage
+            parameters:
+                - in: path
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectDefinition"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectDefinition"
+                                type: array
+            tags: ["ObjectDefinition"]
+    "/object-models/{objectModelId}":
+        delete:
+            operationId: deleteObjectModel
+            parameters:
+                - in: path
+                  name: objectModelId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            responses:
+                204:
+                    content:
+                        application/json: {}
+                        application/xml: {}
+            tags: ["ObjectModel"]
+        get:
+            operationId: getObjectModel
+            parameters:
+                - in: path
+                  name: objectModelId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ObjectModel"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ObjectModel"
+            tags: ["ObjectModel"]
+        patch:
+            operationId: patchObjectModel
+            parameters:
+                - in: path
+                  name: objectModelId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ObjectModel"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/ObjectModel"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ObjectModel"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ObjectModel"
+            tags: ["ObjectModel"]
+        put:
+            operationId: putObjectModel
+            parameters:
+                - in: path
+                  name: objectModelId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ObjectModel"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/ObjectModel"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ObjectModel"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ObjectModel"
+            tags: ["ObjectModel"]
+    "/object-models/{objectModelId}/object-definitions":
+        get:
+            operationId: getObjectModelObjectDefinitionsPage
+            parameters:
+                - in: path
+                  name: objectModelId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectDefinition"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectDefinition"
+                                type: array
+            tags: ["ObjectDefinition"]
     "/object-relationships/{objectRelationshipId}":
         delete:
             operationId: deleteObjectRelationship
