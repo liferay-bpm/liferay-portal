@@ -3,12 +3,12 @@
 
 <resource-action-mapping>
 	<model-resource>
-		<model-name>com.liferay.object</model-name>
+		<model-name>com.liferay.object.definition</model-name>
 		<portlet-ref>
 			<portlet-name>com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet</portlet-name>
 		</portlet-ref>
 		<root>true</root>
-		<weight>1</weight>
+		<weight>2</weight>
 		<permissions>
 			<supports>
 				<action-key>ADD_OBJECT_DEFINITION</action-key>
@@ -23,11 +23,26 @@
 		</permissions>
 	</model-resource>
 	<model-resource>
-		<model-name>com.liferay.object.model.ObjectDefinition</model-name>
+		<model-name>com.liferay.object.model</model-name>
 		<portlet-ref>
 			<portlet-name>com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet</portlet-name>
 		</portlet-ref>
 		<weight>1</weight>
+		<permissions>
+			<supports>
+				<action-key>MANAGE_MODELS</action-key>
+			</supports>
+			<guest-unsupported>
+				<action-key>MANAGE_MODELS</action-key>
+			</guest-unsupported>
+		</permissions>
+	</model-resource>
+	<model-resource>
+		<model-name>com.liferay.object.model.ObjectDefinition</model-name>
+		<portlet-ref>
+			<portlet-name>com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet</portlet-name>
+		</portlet-ref>
+		<weight>3</weight>
 		<permissions>
 			<supports>
 				<action-key>DELETE</action-key>

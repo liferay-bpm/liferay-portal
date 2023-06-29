@@ -19,6 +19,10 @@ package com.liferay.object.constants;
  */
 public class ObjectConstants {
 
-	public static final String RESOURCE_NAME = "com.liferay.object";
+	public static final String RESOURCE_NAME_OBJECT_DEFINITION =
+		"com.liferay.object.definition";
+
+	public static final String RESOURCE_NAME_OBJECT_MODEL =
+		"com.liferay.object.model";
 
 }
