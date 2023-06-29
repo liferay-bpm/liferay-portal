@@ -14,6 +14,7 @@
 
 package com.liferay.object.model.impl;
 
+import com.liferay.object.constants.ObjectConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.internal.definition.util.ObjectDefinitionUtil;
 import com.liferay.petra.string.StringBundler;
@@ -106,7 +107,8 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 			throw new UnsupportedOperationException();
 		}
 
-		return "com.liferay.object#" + getObjectDefinitionId();
+		return ObjectConstants.RESOURCE_NAME_OBJECT_DEFINITION +
+			StringPool.POUND + getObjectDefinitionId();
 	}
 
 	@Override

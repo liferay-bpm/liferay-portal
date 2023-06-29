@@ -28,20 +28,20 @@ import org.osgi.service.component.annotations.Component;
  * @author Gabriel Albuquerque
  */
 @Component(
-	property = "resource.name=" + ObjectConstants.RESOURCE_NAME,
+	property = "resource.name=" + ObjectConstants.RESOURCE_NAME_OBJECT_DEFINITION,
 	service = PortletResourcePermission.class
 )
-public class ObjectPortletResourcePermissionWrapper
+public class ObjectDefinitionPortletResourcePermissionWrapper
 	extends BasePortletResourcePermissionWrapper {
 
 	@Override
 	protected PortletResourcePermission doGetPortletResourcePermission() {
 		return PortletResourcePermissionFactory.create(
-			ObjectConstants.RESOURCE_NAME,
-			new ObjectPortletResourcePermissionLogic());
+			ObjectConstants.RESOURCE_NAME_OBJECT_DEFINITION,
+			new ObjectDefinitionPortletResourcePermissionLogic());
 	}
 
-	private static class ObjectPortletResourcePermissionLogic
+	private static class ObjectDefinitionPortletResourcePermissionLogic
 		implements PortletResourcePermissionLogic {
 
 		@Override

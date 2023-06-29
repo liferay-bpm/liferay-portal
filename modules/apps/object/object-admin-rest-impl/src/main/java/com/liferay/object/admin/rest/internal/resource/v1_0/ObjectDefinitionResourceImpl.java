@@ -187,30 +187,32 @@ public class ObjectDefinitionResourceImpl
 				"create",
 				addAction(
 					ObjectActionKeys.ADD_OBJECT_DEFINITION,
-					"postObjectDefinition", ObjectConstants.RESOURCE_NAME,
+					"postObjectDefinition",
+					ObjectConstants.RESOURCE_NAME_OBJECT_DEFINITION,
 					contextCompany.getCompanyId())
 			).put(
 				"createBatch",
 				addAction(
 					ObjectActionKeys.ADD_OBJECT_DEFINITION,
-					"postObjectDefinitionBatch", ObjectConstants.RESOURCE_NAME,
+					"postObjectDefinitionBatch",
+					ObjectConstants.RESOURCE_NAME_OBJECT_DEFINITION,
 					contextCompany.getCompanyId())
 			).put(
 				"deleteBatch",
 				addAction(
 					ActionKeys.DELETE, "deleteObjectDefinitionBatch",
-					ObjectConstants.RESOURCE_NAME, null)
+					ObjectConstants.RESOURCE_NAME_OBJECT_DEFINITION, null)
 			).put(
 				"get",
 				addAction(
 					ActionKeys.VIEW, "getObjectDefinitionsPage",
-					ObjectConstants.RESOURCE_NAME,
+					ObjectConstants.RESOURCE_NAME_OBJECT_DEFINITION,
 					contextCompany.getCompanyId())
 			).put(
 				"updateBatch",
 				addAction(
 					ActionKeys.UPDATE, "putObjectDefinitionBatch",
-					ObjectConstants.RESOURCE_NAME, null)
+					ObjectConstants.RESOURCE_NAME_OBJECT_DEFINITION, null)
 			).build(),
 			booleanQuery -> {
 			},

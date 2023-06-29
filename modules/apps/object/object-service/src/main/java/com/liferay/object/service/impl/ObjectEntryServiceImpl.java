@@ -408,7 +408,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 		_portletResourcePermissionsServiceTrackerMap =
 			ServiceTrackerMapFactory.openSingleValueMap(
 				bundleContext, PortletResourcePermission.class,
-				"(&(com.liferay.object=true)(resource.name=*))",
+				"(&(com.liferay.object.definition=true)(resource.name=*))",
 				(serviceReference, emitter) -> emitter.emit(
 					(String)serviceReference.getProperty("resource.name")));
 	}
