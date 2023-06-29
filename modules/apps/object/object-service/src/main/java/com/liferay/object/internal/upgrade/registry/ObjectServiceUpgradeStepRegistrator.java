@@ -305,6 +305,11 @@ public class ObjectServiceUpgradeStepRegistrator
 			"5.3.0", "5.3.1",
 			new com.liferay.object.internal.upgrade.v5_3_1.
 				SchemaUpgradeProcess());
+
+		registry.register(
+			"5.3.1", "5.4.0",
+			new com.liferay.object.internal.upgrade.v5_4_0.
+				ResourcePermissionUpgradeProcess());
 	}
 
 	@Reference
