@@ -109,7 +109,9 @@ public class ObjectDefinitionModelResourcePermission
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
-	@Reference(target = "(resource.name=" + ObjectConstants.RESOURCE_NAME + ")")
+	@Reference(
+		target = "(resource.name=" + ObjectConstants.RESOURCE_NAME_OBJECT_DEFINITION + ")"
+	)
 	private PortletResourcePermission _portletResourcePermission;
 
 }

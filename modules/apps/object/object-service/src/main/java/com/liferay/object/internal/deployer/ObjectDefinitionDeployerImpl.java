@@ -19,6 +19,7 @@ import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.notification.handler.NotificationHandler;
 import com.liferay.notification.term.evaluator.NotificationTermEvaluator;
+import com.liferay.object.constants.ObjectConstants;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
 import com.liferay.object.internal.notification.handler.ObjectDefinitionNotificationHandler;
 import com.liferay.object.internal.notification.term.contributor.ObjectDefinitionNotificationTermEvaluator;
@@ -243,7 +244,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					_resourcePermissionLocalService,
 					_userGroupRoleLocalService),
 				HashMapDictionaryBuilder.<String, Object>put(
-					"com.liferay.object", "true"
+					ObjectConstants.RESOURCE_NAME_OBJECT_DEFINITION, "true"
 				).put(
 					"model.class.name", objectDefinition.getClassName()
 				).build()),
@@ -297,7 +298,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			_bundleContext.registerService(
 				PortletResourcePermission.class, portletResourcePermission,
 				HashMapDictionaryBuilder.<String, Object>put(
-					"com.liferay.object", "true"
+					ObjectConstants.RESOURCE_NAME_OBJECT_DEFINITION, "true"
 				).put(
 					"resource.name", objectDefinition.getResourceName()
 				).build()),

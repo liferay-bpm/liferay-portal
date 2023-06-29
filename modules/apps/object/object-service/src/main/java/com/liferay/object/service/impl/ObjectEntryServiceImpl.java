@@ -21,6 +21,7 @@ import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.object.configuration.ObjectConfiguration;
 import com.liferay.object.constants.ObjectActionKeys;
+import com.liferay.object.constants.ObjectConstants;
 import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectEntryCountException;
@@ -408,7 +409,8 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 		_portletResourcePermissionsServiceTrackerMap =
 			ServiceTrackerMapFactory.openSingleValueMap(
 				bundleContext, PortletResourcePermission.class,
-				"(&(com.liferay.object=true)(resource.name=*))",
+				"(&(" + ObjectConstants.RESOURCE_NAME_OBJECT_DEFINITION +
+					"=true)(resource.name=*))",
 				(serviceReference, emitter) -> emitter.emit(
 					(String)serviceReference.getProperty("resource.name")));
 	}

@@ -1064,7 +1064,8 @@ public class DefaultObjectEntryManagerImpl
 	}
 
 	private String _getObjectEntriesPermissionName(long objectDefinitionId) {
-		return ObjectConstants.RESOURCE_NAME + "#" + objectDefinitionId;
+		return ObjectConstants.RESOURCE_NAME_OBJECT_DEFINITION +
+			StringPool.POUND + objectDefinitionId;
 	}
 
 	private ObjectEntry _getObjectEntry(

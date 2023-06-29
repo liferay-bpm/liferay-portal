@@ -141,7 +141,9 @@ public class ObjectFieldServiceImpl extends ObjectFieldServiceBaseImpl {
 	@Reference
 	private ObjectDefinitionPersistence _objectDefinitionPersistence;
 
-	@Reference(target = "(resource.name=" + ObjectConstants.RESOURCE_NAME + ")")
+	@Reference(
+		target = "(resource.name=" + ObjectConstants.RESOURCE_NAME_OBJECT_DEFINITION + ")"
+	)
 	private PortletResourcePermission _portletResourcePermission;
 
 }

@@ -273,7 +273,9 @@ public class ObjectDefinitionServiceImpl
 	private ModelResourcePermission<ObjectDefinition>
 		_objectDefinitionModelResourcePermission;
 
-	@Reference(target = "(resource.name=" + ObjectConstants.RESOURCE_NAME + ")")
+	@Reference(
+		target = "(resource.name=" + ObjectConstants.RESOURCE_NAME_OBJECT_DEFINITION + ")"
+	)
 	private PortletResourcePermission _portletResourcePermission;
 
 }
