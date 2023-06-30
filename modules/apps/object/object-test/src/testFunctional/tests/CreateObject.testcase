@@ -404,7 +404,7 @@ definition {
 
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "ADD_OBJECT_DEFINITION",
-			resourceName = "com.liferay.object",
+			resourceName = "com.liferay.object.definition",
 			roleTitle = "Regular Role",
 			roleType = "regular");
 
@@ -2800,7 +2800,7 @@ definition {
 
 			Permissions.definePermissionViaJSONAPI(
 				resourceAction = "ADD_OBJECT_ENTRY",
-				resourceName = "com.liferay.object#${objectId}",
+				resourceName = "com.liferay.object.definition#${objectId}",
 				roleTitle = "Regular Role",
 				roleType = "regular");
 		}
@@ -2922,7 +2922,7 @@ definition {
 
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "PUBLISH_OBJECT_DEFINITION",
-			resourceName = "com.liferay.object",
+			resourceName = "com.liferay.object.definition",
 			roleTitle = "Regular Role");
 
 		for (var resourceAction : list "UPDATE,VIEW") {
@@ -4242,7 +4242,7 @@ definition {
 
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "ADD_OBJECT_DEFINITION",
-			resourceName = "com.liferay.object",
+			resourceName = "com.liferay.object.definition",
 			roleTitle = "Regular Role");
 
 		for (var resourceAction : list "UPDATE,VIEW") {

@@ -455,7 +455,7 @@ definition {
 
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "ADD_OBJECT_ENTRY",
-			resourceName = "com.liferay.object#${objectId}",
+			resourceName = "com.liferay.object.definition#${objectId}",
 			roleTitle = "Regular Role",
 			roleType = "regular");
 
@@ -1438,7 +1438,7 @@ definition {
 
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "ADD_OBJECT_ENTRY",
-			resourceName = "com.liferay.object#${objectId}",
+			resourceName = "com.liferay.object.definition#${objectId}",
 			roleTitle = "Regular Role",
 			roleType = "regular");
 
