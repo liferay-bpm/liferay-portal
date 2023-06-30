@@ -456,7 +456,7 @@ definition {
 				var objectDefinitionId = JSONObject.getObjectId(objectName = ${objectName});
 
 				Permissions.definePermissionsViaJSONAPI(
-					resourceNameActionList = "com.liferay.portal.kernel.model.Layout,UPDATE,VIEW:com.liferay.object#${objectDefinitionId},ADD_OBJECT_ENTRY",
+					resourceNameActionList = "com.liferay.portal.kernel.model.Layout,UPDATE,VIEW:com.liferay.object.definition#${objectDefinitionId},ADD_OBJECT_ENTRY",
 					roleTitle = ${randomRoleKey},
 					roleType = "regular");
 			}
@@ -1058,7 +1058,7 @@ definition {
 				var objectDefinitionId = JSONObject.getObjectId(objectName = ${objectName});
 
 				Permissions.definePermissionsViaJSONAPI(
-					resourceNameActionList = "com.liferay.portal.kernel.model.Layout,UPDATE,VIEW:com.liferay.object#${objectDefinitionId},ADD_OBJECT_ENTRY:com.liferay.object.model.ObjectDefinition#${objectDefinitionId},VIEW",
+					resourceNameActionList = "com.liferay.portal.kernel.model.Layout,UPDATE,VIEW:com.liferay.object.definition#${objectDefinitionId},ADD_OBJECT_ENTRY:com.liferay.object.model.ObjectDefinition#${objectDefinitionId},VIEW",
 					roleTitle = ${randomRoleKey},
 					roleType = "regular");
 			}
