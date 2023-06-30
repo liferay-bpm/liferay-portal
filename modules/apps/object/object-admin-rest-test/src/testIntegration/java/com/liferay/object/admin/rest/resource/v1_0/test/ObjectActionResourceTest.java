@@ -23,11 +23,16 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
+import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
+import java.lang.reflect.Method;
+
 import java.util.Collections;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -67,6 +72,26 @@ public class ObjectActionResourceTest extends BaseObjectActionResourceTestCase {
 			_objectDefinitionLocalService.deleteObjectDefinition(
 				_objectDefinition.getObjectDefinitionId());
 		}
+	}
+
+	@Override
+	@Test
+	public void testGetObjectDefinitionByExternalReferenceCodeObjectActionsPageWithSortString()
+		throws Exception {
+
+		testGetObjectDefinitionByExternalReferenceCodeObjectActionsPageWithSort(
+			EntityField.Type.STRING,
+			this::_getPageWithSortStringUnsafeTriConsumer);
+	}
+
+	@Override
+	@Test
+	public void testGetObjectDefinitionObjectActionsPageWithSortString()
+		throws Exception {
+
+		testGetObjectDefinitionByExternalReferenceCodeObjectActionsPageWithSort(
+			EntityField.Type.STRING,
+			this::_getPageWithSortStringUnsafeTriConsumer);
 	}
 
 	@Ignore
@@ -190,6 +215,48 @@ public class ObjectActionResourceTest extends BaseObjectActionResourceTestCase {
 	private ObjectAction _addObjectAction() throws Exception {
 		return objectActionResource.postObjectDefinitionObjectAction(
 			_objectDefinition.getObjectDefinitionId(), randomObjectAction());
+	}
+
+	private void _getPageWithSortStringUnsafeTriConsumer(
+			EntityField entityField, ObjectAction objectAction1,
+			ObjectAction objectAction2)
+		throws Exception {
+
+		Class<?> clazz = objectAction1.getClass();
+
+		String entityFieldName = entityField.getName();
+
+		Method method = clazz.getMethod(
+			"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
+
+		Class<?> returnType = method.getReturnType();
+
+		if (returnType.isAssignableFrom(Map.class)) {
+			BeanTestUtil.setProperty(
+				objectAction1, entityFieldName,
+				Collections.singletonMap("en_US", "Aaa"));
+			BeanTestUtil.setProperty(
+				objectAction2, entityFieldName,
+				Collections.singletonMap("en_US", "Bbb"));
+		}
+		else if (entityFieldName.contains("email")) {
+			BeanTestUtil.setProperty(
+				objectAction1, entityFieldName,
+				"aaa" + StringUtil.toLowerCase(RandomTestUtil.randomString()) +
+					"@liferay.com");
+			BeanTestUtil.setProperty(
+				objectAction2, entityFieldName,
+				"bbb" + StringUtil.toLowerCase(RandomTestUtil.randomString()) +
+					"@liferay.com");
+		}
+		else {
+			BeanTestUtil.setProperty(
+				objectAction1, entityFieldName,
+				"aaa" + StringUtil.toLowerCase(RandomTestUtil.randomString()));
+			BeanTestUtil.setProperty(
+				objectAction2, entityFieldName,
+				"bbb" + StringUtil.toLowerCase(RandomTestUtil.randomString()));
+		}
 	}
 
 	private ObjectDefinition _objectDefinition;
