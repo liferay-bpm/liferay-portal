@@ -3,7 +3,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:EVPRequest$]",
+		"resourceName": "com.liferay.object.definition#[$OBJECT_DEFINITION_ID:EVPRequest$]",
 		"roleName": "Employee",
 		"scope": "1"
 	},
@@ -11,7 +11,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:EVPUploadReceipt$]",
+		"resourceName": "com.liferay.object.definition#[$OBJECT_DEFINITION_ID:EVPUploadReceipt$]",
 		"roleName": "Employee",
 		"scope": "1"
 	},
@@ -19,7 +19,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:EVPGrantRequest$]",
+		"resourceName": "com.liferay.object.definition#[$OBJECT_DEFINITION_ID:EVPGrantRequest$]",
 		"roleName": "Employee",
 		"scope": "1"
 	},
@@ -27,7 +27,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:EVPOrganization$]",
+		"resourceName": "com.liferay.object.definition#[$OBJECT_DEFINITION_ID:EVPOrganization$]",
 		"roleName": "Employee",
 		"scope": "1"
 	},
@@ -61,7 +61,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:EVPRequest$]",
+		"resourceName": "com.liferay.object.definition#[$OBJECT_DEFINITION_ID:EVPRequest$]",
 		"roleName": "EVP Manager",
 		"scope": "1"
 	},
@@ -69,7 +69,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:EVPOrganization$]",
+		"resourceName": "com.liferay.object.definition#[$OBJECT_DEFINITION_ID:EVPOrganization$]",
 		"roleName": "EVP Manager",
 		"scope": "1"
 	},
@@ -77,7 +77,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:EVPGrantRequest$]",
+		"resourceName": "com.liferay.object.definition#[$OBJECT_DEFINITION_ID:EVPGrantRequest$]",
 		"roleName": "EVP Manager",
 		"scope": "1"
 	},
@@ -119,7 +119,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:EVPRequest$]",
+		"resourceName": "com.liferay.object.definition#[$OBJECT_DEFINITION_ID:EVPRequest$]",
 		"roleName": "Liferay Manager",
 		"scope": "1"
 	},
@@ -127,7 +127,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:EVPOrganization$]",
+		"resourceName": "com.liferay.object.definition#[$OBJECT_DEFINITION_ID:EVPOrganization$]",
 		"roleName": "Liferay Manager",
 		"scope": "1"
 	},
@@ -135,7 +135,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:EVPGrantRequest$]",
+		"resourceName": "com.liferay.object.definition#[$OBJECT_DEFINITION_ID:EVPGrantRequest$]",
 		"roleName": "Liferay Manager",
 		"scope": "1"
 	},
@@ -186,7 +186,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:EVPGrantRequest$]",
+		"resourceName": "com.liferay.object.definition#[$OBJECT_DEFINITION_ID:EVPGrantRequest$]",
 		"roleName": "Finance User",
 		"scope": "1"
 	},
@@ -194,7 +194,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:EVPPaymentConfirmation$]",
+		"resourceName": "com.liferay.object.definition#[$OBJECT_DEFINITION_ID:EVPPaymentConfirmation$]",
 		"roleName": "Finance User",
 		"scope": "1"
 	},
@@ -202,7 +202,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:EVPOrganization$]",
+		"resourceName": "com.liferay.object.definition#[$OBJECT_DEFINITION_ID:EVPOrganization$]",
 		"roleName": "Finance User",
 		"scope": "1"
 	},
