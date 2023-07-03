@@ -19,10 +19,13 @@ import com.liferay.object.admin.rest.client.dto.v1_0.ObjectRelationship;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
@@ -125,10 +128,41 @@ public class ObjectRelationshipResourceTest
 	}
 
 	@Override
+	protected String getFilterString(
+		EntityField entityField, String operator,
+		ObjectRelationship objectRelationship) {
+
+		String entityFieldName = entityField.getName();
+
+		if (entityFieldName.equals("label")) {
+			StringBundler sb = new StringBundler(6);
+
+			sb.append(entityFieldName);
+
+			sb.append(" ");
+			sb.append(operator);
+			sb.append(" '");
+			sb.append(
+				objectRelationship.getLabel(
+				).get(
+					"en_US"
+				));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		return super.getFilterString(entityField, operator, objectRelationship);
+	}
+
+	@Override
 	protected ObjectRelationship randomObjectRelationship() throws Exception {
 		ObjectRelationship objectRelationship =
 			super.randomObjectRelationship();
 
+		objectRelationship.setLabel(
+			Collections.singletonMap(
+				LocaleUtil.US.toString(), "a" + RandomTestUtil.randomString()));
 		objectRelationship.setName("a" + RandomTestUtil.randomString());
 		objectRelationship.setObjectDefinitionExternalReferenceCode1(
 			_objectDefinition1.getExternalReferenceCode());
