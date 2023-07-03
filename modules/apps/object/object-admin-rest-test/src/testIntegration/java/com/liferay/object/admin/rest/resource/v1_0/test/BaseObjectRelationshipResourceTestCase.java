@@ -1380,6 +1380,14 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 
 		boolean valid = true;
 
+		if (objectRelationship.getDateCreated() == null) {
+			valid = false;
+		}
+
+		if (objectRelationship.getDateModified() == null) {
+			valid = false;
+		}
+
 		if (objectRelationship.getId() == null) {
 			valid = false;
 		}
@@ -1533,6 +1541,14 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("userId", additionalAssertFieldName)) {
+				if (objectRelationship.getUserId() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			throw new IllegalArgumentException(
 				"Invalid additional assert field name " +
 					additionalAssertFieldName);
@@ -1658,6 +1674,28 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 				if (!equals(
 						(Map)objectRelationship1.getActions(),
 						(Map)objectRelationship2.getActions())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("dateCreated", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						objectRelationship1.getDateCreated(),
+						objectRelationship2.getDateCreated())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("dateModified", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						objectRelationship1.getDateModified(),
+						objectRelationship2.getDateModified())) {
 
 					return false;
 				}
@@ -1854,6 +1892,17 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("userId", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						objectRelationship1.getUserId(),
+						objectRelationship2.getUserId())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			throw new IllegalArgumentException(
 				"Invalid additional assert field name " +
 					additionalAssertFieldName);
@@ -1963,6 +2012,74 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("dateCreated")) {
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							objectRelationship.getDateCreated(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							objectRelationship.getDateCreated(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(
+					_dateFormat.format(objectRelationship.getDateCreated()));
+			}
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("dateModified")) {
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							objectRelationship.getDateModified(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							objectRelationship.getDateModified(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(
+					_dateFormat.format(objectRelationship.getDateModified()));
+			}
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("deletionType")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -2062,6 +2179,11 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("userId")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		throw new IllegalArgumentException(
 			"Invalid entity field " + entityFieldName);
 	}
@@ -2106,6 +2228,8 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 	protected ObjectRelationship randomObjectRelationship() throws Exception {
 		return new ObjectRelationship() {
 			{
+				dateCreated = RandomTestUtil.nextDate();
+				dateModified = RandomTestUtil.nextDate();
 				id = RandomTestUtil.randomLong();
 				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				objectDefinitionExternalReferenceCode1 = StringUtil.toLowerCase(
@@ -2122,6 +2246,7 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 				parameterObjectFieldName = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				reverse = RandomTestUtil.randomBoolean();
+				userId = RandomTestUtil.randomLong();
 			}
 		};
 	}

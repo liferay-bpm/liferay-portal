@@ -17,6 +17,9 @@ package com.liferay.object.admin.rest.client.serdes.v1_0;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectRelationship;
 import com.liferay.object.admin.rest.client.json.BaseJSONParser;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -55,6 +58,9 @@ public class ObjectRelationshipSerDes {
 
 		sb.append("{");
 
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ssXX");
+
 		if (objectRelationship.getActions() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -63,6 +69,38 @@ public class ObjectRelationshipSerDes {
 			sb.append("\"actions\": ");
 
 			sb.append(_toJSON(objectRelationship.getActions()));
+		}
+
+		if (objectRelationship.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dateCreated\": ");
+
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					objectRelationship.getDateCreated()));
+
+			sb.append("\"");
+		}
+
+		if (objectRelationship.getDateModified() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dateModified\": ");
+
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					objectRelationship.getDateModified()));
+
+			sb.append("\"");
 		}
 
 		if (objectRelationship.getDeletionType() != null) {
@@ -254,6 +292,16 @@ public class ObjectRelationshipSerDes {
 			sb.append("\"");
 		}
 
+		if (objectRelationship.getUserId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"userId\": ");
+
+			sb.append(objectRelationship.getUserId());
+		}
+
 		sb.append("}");
 
 		return sb.toString();
@@ -275,11 +323,34 @@ public class ObjectRelationshipSerDes {
 
 		Map<String, String> map = new TreeMap<>();
 
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ssXX");
+
 		if (objectRelationship.getActions() == null) {
 			map.put("actions", null);
 		}
 		else {
 			map.put("actions", String.valueOf(objectRelationship.getActions()));
+		}
+
+		if (objectRelationship.getDateCreated() == null) {
+			map.put("dateCreated", null);
+		}
+		else {
+			map.put(
+				"dateCreated",
+				liferayToJSONDateFormat.format(
+					objectRelationship.getDateCreated()));
+		}
+
+		if (objectRelationship.getDateModified() == null) {
+			map.put("dateModified", null);
+		}
+		else {
+			map.put(
+				"dateModified",
+				liferayToJSONDateFormat.format(
+					objectRelationship.getDateModified()));
 		}
 
 		if (objectRelationship.getDeletionType() == null) {
@@ -418,6 +489,13 @@ public class ObjectRelationshipSerDes {
 			map.put("type", String.valueOf(objectRelationship.getType()));
 		}
 
+		if (objectRelationship.getUserId() == null) {
+			map.put("userId", null);
+		}
+		else {
+			map.put("userId", String.valueOf(objectRelationship.getUserId()));
+		}
+
 		return map;
 	}
 
@@ -444,6 +522,18 @@ public class ObjectRelationshipSerDes {
 					objectRelationship.setActions(
 						(Map)ObjectRelationshipSerDes.toMap(
 							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
+				if (jsonParserFieldValue != null) {
+					objectRelationship.setDateCreated(
+						toDate((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
+				if (jsonParserFieldValue != null) {
+					objectRelationship.setDateModified(
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "deletionType")) {
@@ -558,6 +648,12 @@ public class ObjectRelationshipSerDes {
 					objectRelationship.setType(
 						ObjectRelationship.Type.create(
 							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "userId")) {
+				if (jsonParserFieldValue != null) {
+					objectRelationship.setUserId(
+						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
 		}

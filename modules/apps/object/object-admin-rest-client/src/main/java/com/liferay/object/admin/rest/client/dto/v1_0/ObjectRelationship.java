@@ -19,6 +19,7 @@ import com.liferay.object.admin.rest.client.serdes.v1_0.ObjectRelationshipSerDes
 
 import java.io.Serializable;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
@@ -56,6 +57,48 @@ public class ObjectRelationship implements Cloneable, Serializable {
 	}
 
 	protected Map<String, Map<String, String>> actions;
+
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+	public void setDateCreated(
+		UnsafeSupplier<Date, Exception> dateCreatedUnsafeSupplier) {
+
+		try {
+			dateCreated = dateCreatedUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Date dateCreated;
+
+	public Date getDateModified() {
+		return dateModified;
+	}
+
+	public void setDateModified(Date dateModified) {
+		this.dateModified = dateModified;
+	}
+
+	public void setDateModified(
+		UnsafeSupplier<Date, Exception> dateModifiedUnsafeSupplier) {
+
+		try {
+			dateModified = dateModifiedUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Date dateModified;
 
 	public DeletionType getDeletionType() {
 		return deletionType;
@@ -399,6 +442,27 @@ public class ObjectRelationship implements Cloneable, Serializable {
 	}
 
 	protected Type type;
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public void setUserId(
+		UnsafeSupplier<Long, Exception> userIdUnsafeSupplier) {
+
+		try {
+			userId = userIdUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Long userId;
 
 	@Override
 	public ObjectRelationship clone() throws CloneNotSupportedException {
