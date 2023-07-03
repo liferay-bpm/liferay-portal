@@ -67,6 +67,9 @@ public class ObjectRelationshipDTOConverter
 		return new ObjectRelationship() {
 			{
 				actions = dtoConverterContext.getActions();
+				dateCreated = serviceBuilderObjectRelationship.getCreateDate();
+				dateModified =
+					serviceBuilderObjectRelationship.getModifiedDate();
 				deletionType = ObjectRelationship.DeletionType.create(
 					serviceBuilderObjectRelationship.getDeletionType());
 				id = serviceBuilderObjectRelationship.getObjectRelationshipId();
@@ -99,6 +102,7 @@ public class ObjectRelationshipDTOConverter
 				reverse = serviceBuilderObjectRelationship.isReverse();
 				type = ObjectRelationship.Type.create(
 					serviceBuilderObjectRelationship.getType());
+				userId = serviceBuilderObjectRelationship.getUserId();
 
 				setParameterObjectFieldName(
 					() -> {
