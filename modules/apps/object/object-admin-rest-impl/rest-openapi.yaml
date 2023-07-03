@@ -341,6 +341,14 @@ components:
                         type: object
                     readOnly: true
                     type: object
+                dateCreated:
+                    format: date
+                    readOnly: true
+                    type: string
+                dateModified:
+                    format: date
+                    readOnly: true
+                    type: string
                 deletionType:
                     enum: [cascade, disassociate, prevent]
                     type: string
@@ -381,6 +389,9 @@ components:
                 type:
                     enum: [oneToMany, oneToOne, manyToMany]
                     type: string
+                userId:
+                    format: int64
+                    type: integer
         ObjectState:
             properties:
                 id:
