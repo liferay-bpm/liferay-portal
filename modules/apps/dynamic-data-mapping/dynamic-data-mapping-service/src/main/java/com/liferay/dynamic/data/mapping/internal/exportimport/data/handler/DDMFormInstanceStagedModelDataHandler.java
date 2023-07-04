@@ -94,11 +94,20 @@ public class DDMFormInstanceStagedModelDataHandler
 			"settings-ddm-form-values-path", settingsDDMFormValuesPath);
 
 		if (StringUtil.equals(ddmStructure.getStorageType(), "object")) {
-			portletDataContext.addZipEntry(
-				settingsDDMFormValuesPath,
+			String settingsDDMFormValues =
 				_addObjectDefinitionExternalReferenceCode(
 					_jsonFactory.createJSONObject(
-						ddmFormInstance.getSettings())));
+						ddmFormInstance.getSettings()));
+
+			portletDataContext.addZipEntry(
+				settingsDDMFormValuesPath, settingsDDMFormValues);
+
+			ddmFormInstance = _ddmFormInstanceLocalService.updateFormInstance(
+				ddmFormInstance.getFormInstanceId(),
+				DDMFormValuesDeserializeUtil.deserialize(
+					settingsDDMFormValues,
+					DDMFormFactory.create(DDMFormInstanceSettings.class),
+					_jsonDDMFormValuesDeserializer));
 		}
 		else {
 			portletDataContext.addZipEntry(
@@ -228,17 +237,49 @@ public class DDMFormInstanceStagedModelDataHandler
 			return jsonObject.toString();
 		}
 
-		return jsonObject.put(
-			"objectDefinitionExternalReferenceCode",
-			objectDefinition.getExternalReferenceCode()
-		).toString();
+		JSONArray fieldValuesJSONArray = jsonObject.getJSONArray("fieldValues");
+
+		fieldValuesJSONArray.put(
+			_jsonFactory.createJSONObject(
+			).put(
+				"name", "objectDefinitionExternalReferenceCode"
+			).put(
+				"value",
+				JSONUtil.put(objectDefinition.getExternalReferenceCode())
+			));
+
+		return jsonObject.toString();
 	}
 
 	private String _addObjectDefinitionId(JSONObject jsonObject) {
-		String objectDefinitionExternalReferenceCode = jsonObject.getString(
-			"objectDefinitionExternalReferenceCode");
+		JSONArray fieldValuesJSONArray = jsonObject.getJSONArray("fieldValues");
+		String objectDefinitionExternalReferenceCode = null;
+		JSONArray updatedFieldValuesJSONArray = _jsonFactory.createJSONArray();
 
-		jsonObject.remove("objectDefinitionExternalReferenceCode");
+		for (int i = 0; i < fieldValuesJSONArray.length(); i++) {
+			JSONObject fieldValueJSONObject =
+				fieldValuesJSONArray.getJSONObject(i);
+
+			if (StringUtil.equals(
+					fieldValueJSONObject.getString("name"),
+					"objectDefinitionExternalReferenceCode")) {
+
+				objectDefinitionExternalReferenceCode =
+					fieldValueJSONObject.getJSONArray(
+						"value"
+					).getString(
+						0
+					);
+
+				continue;
+			}
+
+			updatedFieldValuesJSONArray.put(fieldValueJSONObject);
+		}
+
+		if (objectDefinitionExternalReferenceCode == null) {
+			return jsonObject.toString();
+		}
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.
@@ -251,7 +292,7 @@ public class DDMFormInstanceStagedModelDataHandler
 		}
 
 		JSONObject fieldValueJSONObject = _getFieldValueJSONObject(
-			jsonObject.getJSONArray("fieldValues"), "objectDefinitionId");
+			updatedFieldValuesJSONArray, "objectDefinitionId");
 
 		if (fieldValueJSONObject == null) {
 			return jsonObject.toString();
@@ -262,7 +303,9 @@ public class DDMFormInstanceStagedModelDataHandler
 			JSONUtil.put(
 				String.valueOf(objectDefinition.getObjectDefinitionId())));
 
-		return jsonObject.toString();
+		return jsonObject.put(
+			"fieldValues", updatedFieldValuesJSONArray
+		).toString();
 	}
 
 	private JSONObject _getFieldValueJSONObject(
