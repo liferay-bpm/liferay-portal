@@ -32,6 +32,7 @@ import {defaultLanguageId} from '../../utils/constants';
 interface ObjectRelationshipFormBaseProps {
 	errors: FormError<ObjectRelationship>;
 	handleChange: React.ChangeEventHandler<HTMLInputElement>;
+	objectRelationshipTypes?: string[];
 	readonly?: boolean;
 	setValues: (values: Partial<ObjectRelationship>) => void;
 	values: Partial<ObjectRelationship>;
@@ -120,6 +121,7 @@ export function useObjectRelationshipForm({
 export function ObjectRelationshipFormBase({
 	errors,
 	handleChange,
+	objectRelationshipTypes,
 	readonly,
 	setValues,
 	values,
@@ -134,10 +136,15 @@ export function ObjectRelationshipFormBase({
 	const [query, setQuery] = useState<string>('');
 
 	const [types, selectedType] = useMemo(() => {
-		const types = [ONE_TO_MANY, MANY_TO_MANY];
+		const types = [MANY_TO_MANY, ONE_TO_MANY, ONE_TO_ONE];
 
-		return [types, types.find(({value}) => value === values.type)?.label];
-	}, [values.type]);
+		return [
+			types.filter((relationshipType) =>
+				objectRelationshipTypes?.includes(relationshipType.value)
+			),
+			types.find(({value}) => value === values.type)?.label,
+		];
+	}, [objectRelationshipTypes, values.type]);
 
 	const filteredRelationships = useMemo(() => {
 		return filterArrayByQuery({
