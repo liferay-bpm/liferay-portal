@@ -714,9 +714,11 @@ public class ObjectRelationshipLocalServiceImpl
 		}
 
 		_validateParameterObjectFieldId(
-			objectRelationship.getObjectDefinitionId1(),
-			objectRelationship.getObjectDefinitionId2(), parameterObjectFieldId,
-			objectRelationship.getType());
+			_objectDefinitionLocalService.getObjectDefinition(
+				objectRelationship.getObjectDefinitionId1()),
+			_objectDefinitionLocalService.getObjectDefinition(
+				objectRelationship.getObjectDefinitionId2()),
+			parameterObjectFieldId, objectRelationship.getType());
 
 		if (Objects.equals(
 				objectRelationship.getType(),
@@ -844,9 +846,18 @@ public class ObjectRelationshipLocalServiceImpl
 			String type)
 		throws PortalException {
 
-		_validate(
-			objectDefinitionId1, objectDefinitionId2, parameterObjectFieldId,
-			name, type);
+		_validateName(objectDefinitionId1, name);
+
+		ObjectDefinition objectDefinition1 =
+			_objectDefinitionLocalService.getObjectDefinition(
+				objectDefinitionId1);
+		ObjectDefinition objectDefinition2 =
+			_objectDefinitionLocalService.getObjectDefinition(
+				objectDefinitionId2);
+
+		_validateType(
+			objectDefinition1, objectDefinition2, name, parameterObjectFieldId,
+			type);
 
 		ObjectRelationship objectRelationship =
 			objectRelationshipPersistence.create(
@@ -869,13 +880,6 @@ public class ObjectRelationshipLocalServiceImpl
 		objectRelationship.setName(name);
 		objectRelationship.setReverse(reverse);
 		objectRelationship.setType(type);
-
-		ObjectDefinition objectDefinition1 =
-			_objectDefinitionLocalService.getObjectDefinition(
-				objectDefinitionId1);
-		ObjectDefinition objectDefinition2 =
-			_objectDefinitionLocalService.getObjectDefinition(
-				objectDefinitionId2);
 
 		if (Objects.equals(type, ObjectRelationshipConstants.TYPE_ONE_TO_ONE) ||
 			Objects.equals(
@@ -1000,9 +1004,7 @@ public class ObjectRelationshipLocalServiceImpl
 		return objectRelationshipPersistence.update(objectRelationship);
 	}
 
-	private void _validate(
-			long objectDefinitionId1, long objectDefinitionId2,
-			long parameterObjectFieldId, String name, String type)
+	private void _validateName(long objectDefinitionId1, String name)
 		throws PortalException {
 
 		if (Validator.isNull(name)) {
@@ -1035,53 +1037,6 @@ public class ObjectRelationshipLocalServiceImpl
 			throw new DuplicateObjectRelationshipException(
 				"Duplicate name " + name);
 		}
-
-		if (!Objects.equals(
-				type, ObjectRelationshipConstants.TYPE_MANY_TO_MANY) &&
-			!Objects.equals(
-				type, ObjectRelationshipConstants.TYPE_ONE_TO_MANY) &&
-			!Objects.equals(
-				type, ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
-
-			throw new ObjectRelationshipTypeException("Invalid type " + type);
-		}
-
-		ObjectDefinition objectDefinition1 =
-			_objectDefinitionPersistence.fetchByPrimaryKey(objectDefinitionId1);
-		ObjectDefinition objectDefinition2 =
-			_objectDefinitionPersistence.fetchByPrimaryKey(objectDefinitionId2);
-
-		if (objectDefinition1.isUnmodifiableSystemObject() &&
-			objectDefinition2.isUnmodifiableSystemObject()) {
-
-			throw new ObjectRelationshipTypeException(
-				"Relationships are not allowed between system objects");
-		}
-
-		if (objectDefinition1.isUnmodifiableSystemObject() &&
-			Objects.equals(type, ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
-
-			throw new ObjectRelationshipTypeException(
-				"Invalid type for system object definition " +
-					objectDefinitionId1);
-		}
-
-		if (Objects.equals(
-				type, ObjectRelationshipConstants.TYPE_MANY_TO_MANY) ||
-			Objects.equals(type, ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
-
-			count = objectRelationshipPersistence.countByODI1_ODI2_N_T(
-				objectDefinitionId2, objectDefinitionId1, name, type);
-
-			if (count > 0) {
-				throw new ObjectRelationshipTypeException(
-					"Inverse type already exists");
-			}
-		}
-
-		_validateParameterObjectFieldId(
-			objectDefinitionId1, objectDefinitionId2, parameterObjectFieldId,
-			type);
 	}
 
 	private void _validateObjectEntryId(
@@ -1103,12 +1058,10 @@ public class ObjectRelationshipLocalServiceImpl
 	}
 
 	private void _validateParameterObjectFieldId(
-			long objectDefinitionId1, long objectDefinitionId2,
-			long parameterObjectFieldId, String type)
+			ObjectDefinition objectDefinition1,
+			ObjectDefinition objectDefinition2, long parameterObjectFieldId,
+			String type)
 		throws PortalException {
-
-		ObjectDefinition objectDefinition1 =
-			_objectDefinitionPersistence.fetchByPrimaryKey(objectDefinitionId1);
 
 		String restContextPath = StringPool.BLANK;
 
@@ -1163,10 +1116,6 @@ public class ObjectRelationshipLocalServiceImpl
 						" does not exist");
 			}
 
-			ObjectDefinition objectDefinition2 =
-				_objectDefinitionPersistence.fetchByPrimaryKey(
-					objectDefinitionId2);
-
 			if (objectDefinition2.getObjectDefinitionId() !=
 					objectField.getObjectDefinitionId()) {
 
@@ -1186,6 +1135,59 @@ public class ObjectRelationshipLocalServiceImpl
 						" does not belong to a relationship object field");
 			}
 		}
+	}
+
+	private void _validateType(
+			ObjectDefinition objectDefinition1,
+			ObjectDefinition objectDefinition2, String name,
+			long parameterObjectFieldId, String type)
+		throws PortalException {
+
+		Set<String> defaultObjectRelationshipTypes =
+			ObjectRelationshipUtil.getDefaultObjectRelationshipTypes();
+
+		if (!defaultObjectRelationshipTypes.contains(type)) {
+			throw new ObjectRelationshipTypeException("Invalid type " + type);
+		}
+
+		if (Objects.equals(
+				type, ObjectRelationshipConstants.TYPE_MANY_TO_MANY) ||
+			Objects.equals(type, ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
+
+			int count = objectRelationshipPersistence.countByODI1_ODI2_N_T(
+				objectDefinition2.getObjectDefinitionId(),
+				objectDefinition1.getObjectDefinitionId(), name, type);
+
+			if (count > 0) {
+				throw new ObjectRelationshipTypeException(
+					"Inverse type already exists");
+			}
+		}
+
+		if (objectDefinition1.isUnmodifiableSystemObject()) {
+			if (objectDefinition2.isUnmodifiableSystemObject()) {
+				throw new ObjectRelationshipTypeException(
+					"Relationships are not allowed between system objects");
+			}
+
+			SystemObjectDefinitionManager systemObjectDefinitionManager =
+				_systemObjectDefinitionManagerRegistry.
+					getSystemObjectDefinitionManager(
+						objectDefinition1.getName());
+
+			Set<String> allowedObjectRelationshipTypes =
+				systemObjectDefinitionManager.
+					getAllowedObjectRelationshipTypes();
+
+			if (!allowedObjectRelationshipTypes.contains(type)) {
+				throw new ObjectRelationshipTypeException(
+					"Invalid type for system object definition " +
+						objectDefinition1.getObjectDefinitionId());
+			}
+		}
+
+		_validateParameterObjectFieldId(
+			objectDefinition1, objectDefinition2, parameterObjectFieldId, type);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
