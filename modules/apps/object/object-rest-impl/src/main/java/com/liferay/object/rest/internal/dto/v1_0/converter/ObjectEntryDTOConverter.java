@@ -35,6 +35,7 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
+import com.liferay.object.relationship.util.ObjectRelationshipUtil;
 import com.liferay.object.rest.dto.v1_0.AuditEvent;
 import com.liferay.object.rest.dto.v1_0.AuditFieldChange;
 import com.liferay.object.rest.dto.v1_0.FileEntry;
@@ -98,6 +99,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.ws.rs.core.UriInfo;
@@ -340,13 +342,12 @@ public class ObjectEntryDTOConverter
 							objectDefinition.getObjectDefinitionId(),
 							nestedFieldName);
 
+				Set<String> defaultObjectRelationshipTypes =
+					ObjectRelationshipUtil.getDefaultObjectRelationshipTypes();
+
 				if ((objectRelationship == null) ||
-					(!Objects.equals(
-						objectRelationship.getType(),
-						ObjectRelationshipConstants.TYPE_MANY_TO_MANY) &&
-					 !Objects.equals(
-						 objectRelationship.getType(),
-						 ObjectRelationshipConstants.TYPE_ONE_TO_MANY))) {
+					!defaultObjectRelationshipTypes.contains(
+						objectRelationship.getType())) {
 
 					return null;
 				}
