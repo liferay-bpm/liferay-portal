@@ -71,7 +71,6 @@ import com.liferay.portal.kernel.dao.db.IndexMetadataFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.CurrentConnection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.SystemEventConstants;
@@ -971,17 +970,15 @@ public class ObjectFieldLocalServiceImpl
 			_objectDefinitionPersistence.findByPrimaryKey(
 				objectField.getObjectDefinitionId());
 
-		if (FeatureFlagManagerUtil.isEnabled("LPS-179803")) {
-			int customObjectFieldsCount =
-				objectFieldLocalService.getObjectFieldsCount(
-					objectField.getObjectDefinitionId(), false);
+		int customObjectFieldsCount =
+			objectFieldLocalService.getObjectFieldsCount(
+				objectField.getObjectDefinitionId(), false);
 
-			if (objectDefinition.isApproved() &&
-				!objectDefinition.isUnmodifiableSystemObject() &&
-				(customObjectFieldsCount == 1)) {
+		if (objectDefinition.isApproved() &&
+			!objectDefinition.isUnmodifiableSystemObject() &&
+			(customObjectFieldsCount == 1)) {
 
-				throw new RequiredObjectFieldException();
-			}
+			throw new RequiredObjectFieldException();
 		}
 
 		if (Objects.equals(
