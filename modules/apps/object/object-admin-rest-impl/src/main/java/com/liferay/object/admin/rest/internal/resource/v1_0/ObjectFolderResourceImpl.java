@@ -16,6 +16,7 @@ package com.liferay.object.admin.rest.internal.resource.v1_0;
 
 import com.liferay.object.admin.rest.dto.v1_0.ObjectFolder;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectFolderResource;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -35,10 +36,17 @@ public class ObjectFolderResourceImpl extends BaseObjectFolderResourceImpl {
 
 	@Override
 	public void deleteObjectFolder(Long objectFolderId) throws Exception {
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	@Override
 	public ObjectFolder getObjectFolder(Long objectFolderId) throws Exception {
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
+
 		return new ObjectFolder();
 	}
 
@@ -46,6 +54,10 @@ public class ObjectFolderResourceImpl extends BaseObjectFolderResourceImpl {
 	public ObjectFolder getObjectFolderByExternalReferenceCode(
 			String externalReferenceCode)
 		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
 
 		return new ObjectFolder();
 	}
@@ -55,12 +67,20 @@ public class ObjectFolderResourceImpl extends BaseObjectFolderResourceImpl {
 			String search, Pagination pagination)
 		throws Exception {
 
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
+
 		return Page.of(Collections.emptyList());
 	}
 
 	@Override
 	public ObjectFolder postObjectFolder(ObjectFolder objectFolder)
 		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
 
 		return new ObjectFolder();
 	}
@@ -70,6 +90,10 @@ public class ObjectFolderResourceImpl extends BaseObjectFolderResourceImpl {
 			Long objectFolderId, ObjectFolder objectFolder)
 		throws Exception {
 
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
+
 		return new ObjectFolder();
 	}
 
@@ -77,6 +101,10 @@ public class ObjectFolderResourceImpl extends BaseObjectFolderResourceImpl {
 	public ObjectFolder putObjectFolderByExternalReferenceCode(
 			String externalReferenceCode, ObjectFolder objectFolder)
 		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
 
 		return new ObjectFolder();
 	}
