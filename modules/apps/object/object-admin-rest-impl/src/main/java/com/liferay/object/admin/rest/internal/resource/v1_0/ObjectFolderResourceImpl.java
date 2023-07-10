@@ -14,7 +14,12 @@
 
 package com.liferay.object.admin.rest.internal.resource.v1_0;
 
+import com.liferay.object.admin.rest.dto.v1_0.ObjectFolder;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectFolderResource;
+import com.liferay.portal.vulcan.pagination.Page;
+import com.liferay.portal.vulcan.pagination.Pagination;
+
+import java.util.Collections;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -27,4 +32,53 @@ import org.osgi.service.component.annotations.ServiceScope;
 	scope = ServiceScope.PROTOTYPE, service = ObjectFolderResource.class
 )
 public class ObjectFolderResourceImpl extends BaseObjectFolderResourceImpl {
+
+	@Override
+	public void deleteObjectFolder(Long objectFolderId) throws Exception {
+	}
+
+	@Override
+	public ObjectFolder getObjectFolder(Long objectFolderId) throws Exception {
+		return new ObjectFolder();
+	}
+
+	@Override
+	public ObjectFolder getObjectFolderByExternalReferenceCode(
+			String externalReferenceCode)
+		throws Exception {
+
+		return new ObjectFolder();
+	}
+
+	@Override
+	public Page<ObjectFolder> getObjectFoldersPage(
+			String search, Pagination pagination)
+		throws Exception {
+
+		return Page.of(Collections.emptyList());
+	}
+
+	@Override
+	public ObjectFolder postObjectFolder(ObjectFolder objectFolder)
+		throws Exception {
+
+		return new ObjectFolder();
+	}
+
+	@Override
+	public ObjectFolder putObjectFolder(
+			Long objectFolderId, ObjectFolder objectFolder)
+		throws Exception {
+
+		return new ObjectFolder();
+	}
+
+	@Override
+	public ObjectFolder putObjectFolderByExternalReferenceCode(
+			String externalReferenceCode, ObjectFolder objectFolder)
+		throws Exception {
+
+		return new ObjectFolder();
+	}
+
 }
