@@ -17,6 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
+ObjectFolderDisplayContext objectFolderDisplayContext = (ObjectFolderDisplayContext)request.getAttribute(ObjectWebKeys.OBJECT_FOLDER);
 ViewObjectDefinitionsDisplayContext viewObjectDefinitionsDisplayContext = (ViewObjectDefinitionsDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 %>
 
@@ -32,6 +33,8 @@ ViewObjectDefinitionsDisplayContext viewObjectDefinitionsDisplayContext = (ViewO
 				"baseResourceURL", String.valueOf(baseResourceURL)
 			).put(
 				"creationMenu", viewObjectDefinitionsDisplayContext.getCreationMenu()
+			).put(
+				"editObjectFolderURL", objectFolderDisplayContext.getEditObjectFolderURL()
 			).put(
 				"id", ObjectDefinitionsFDSNames.OBJECT_DEFINITIONS
 			).put(
