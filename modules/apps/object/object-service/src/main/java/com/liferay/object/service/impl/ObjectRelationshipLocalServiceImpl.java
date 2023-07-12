@@ -98,14 +98,16 @@ public class ObjectRelationshipLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectRelationship addObjectRelationship(
-			long userId, long objectDefinitionId1, long objectDefinitionId2,
-			long parameterObjectFieldId, String deletionType,
-			Map<Locale, String> labelMap, String name, String type)
+			String externalReferenceCode, long userId, long objectDefinitionId1,
+			long objectDefinitionId2, long parameterObjectFieldId,
+			String deletionType, Map<Locale, String> labelMap, String name,
+			String type)
 		throws PortalException {
 
 		return _addObjectRelationship(
-			userId, objectDefinitionId1, objectDefinitionId2,
-			parameterObjectFieldId, deletionType, labelMap, name, false, type);
+			externalReferenceCode, userId, objectDefinitionId1,
+			objectDefinitionId2, parameterObjectFieldId, deletionType, labelMap,
+			name, false, type);
 	}
 
 	@Override
@@ -690,8 +692,9 @@ public class ObjectRelationshipLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectRelationship updateObjectRelationship(
-			long objectRelationshipId, long parameterObjectFieldId,
-			String deletionType, Map<Locale, String> labelMap)
+			String externalReferenceCode, long objectRelationshipId,
+			long parameterObjectFieldId, String deletionType,
+			Map<Locale, String> labelMap)
 		throws PortalException {
 
 		if (Validator.isNull(deletionType)) {
@@ -722,6 +725,7 @@ public class ObjectRelationshipLocalServiceImpl
 				fetchReverseObjectRelationship(objectRelationship, true);
 
 			_updateObjectRelationship(
+				reverseObjectRelationship.getExternalReferenceCode(),
 				parameterObjectFieldId, deletionType, labelMap,
 				reverseObjectRelationship);
 
@@ -733,7 +737,8 @@ public class ObjectRelationshipLocalServiceImpl
 		}
 
 		objectRelationship = _updateObjectRelationship(
-			parameterObjectFieldId, deletionType, labelMap, objectRelationship);
+			externalReferenceCode, parameterObjectFieldId, deletionType,
+			labelMap, objectRelationship);
 
 		if ((objectRelationship.getObjectFieldId2() != 0) &&
 			StringUtil.equals(
@@ -834,10 +839,10 @@ public class ObjectRelationshipLocalServiceImpl
 	}
 
 	private ObjectRelationship _addObjectRelationship(
-			long userId, long objectDefinitionId1, long objectDefinitionId2,
-			long parameterObjectFieldId, String deletionType,
-			Map<Locale, String> labelMap, String name, boolean reverse,
-			String type)
+			String externalReferenceCode, long userId, long objectDefinitionId1,
+			long objectDefinitionId2, long parameterObjectFieldId,
+			String deletionType, Map<Locale, String> labelMap, String name,
+			boolean reverse, String type)
 		throws PortalException {
 
 		_validateName(objectDefinitionId1, name);
@@ -856,6 +861,8 @@ public class ObjectRelationshipLocalServiceImpl
 		ObjectRelationship objectRelationship =
 			objectRelationshipPersistence.create(
 				counterLocalService.increment());
+
+		objectRelationship.setExternalReferenceCode(externalReferenceCode);
 
 		User user = _userLocalService.getUser(userId);
 
@@ -894,7 +901,7 @@ public class ObjectRelationshipLocalServiceImpl
 				objectDefinition1, objectDefinition2, objectRelationship);
 
 			_addObjectRelationship(
-				userId, objectDefinitionId2, objectDefinitionId1,
+				null, userId, objectDefinitionId2, objectDefinitionId1,
 				parameterObjectFieldId, deletionType, labelMap, name, true,
 				type);
 
@@ -988,9 +995,11 @@ public class ObjectRelationshipLocalServiceImpl
 	}
 
 	private ObjectRelationship _updateObjectRelationship(
-		long parameterObjectFieldId, String deletionType,
-		Map<Locale, String> labelMap, ObjectRelationship objectRelationship) {
+		String externalReferenceCode, long parameterObjectFieldId,
+		String deletionType, Map<Locale, String> labelMap,
+		ObjectRelationship objectRelationship) {
 
+		objectRelationship.setExternalReferenceCode(externalReferenceCode);
 		objectRelationship.setParameterObjectFieldId(parameterObjectFieldId);
 		objectRelationship.setDeletionType(deletionType);
 		objectRelationship.setLabelMap(labelMap);
