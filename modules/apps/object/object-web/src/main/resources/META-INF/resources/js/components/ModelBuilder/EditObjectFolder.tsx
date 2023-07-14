@@ -14,6 +14,18 @@
 
 import React from 'react';
 
+import Header from './Header/Header';
+import LeftSidebar from './LeftSidebar/LeftSidebar';
+
 export default function EditObjectFolder() {
-	return <></>;
+	return (
+		<>
+			<Header
+				folderExternalReferenceCode="uncategorized"
+				hasDraftObjectDefinitions={false}
+			/>
+
+			<LeftSidebar />
+		</>
+	);
 }
