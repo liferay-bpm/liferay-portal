@@ -1,0 +1,29 @@
+@import 'atlas-variables';
+
+.lfr-objects__model-builder-left-sidebar {
+	text-align: center;
+
+	&-body {
+		padding: 1rem;
+
+		&-create-new-object-button {
+			margin: 1rem 0;
+			width: 100%;
+		}
+
+		.navbar-form,
+		.container-fluid {
+			padding: 0 !important;
+		}
+	}
+
+	&-header {
+		border-bottom: 1px solid $gray-300;
+		height: 3.313rem;
+		padding: 1rem;
+	}
+}
+
+.lfr__objects-custom-vertical-bar--left-open {
+	top: 8.063rem;
+}
