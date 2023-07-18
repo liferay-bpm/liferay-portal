@@ -17,7 +17,7 @@ import ClayButton from '@clayui/button';
 import ClayForm, {ClayInput} from '@clayui/form';
 import ClayModal, {useModal} from '@clayui/modal';
 import {API, Input} from '@liferay/object-js-components-web';
-import {fetch} from 'frontend-js-web';
+import {fetch, sub} from 'frontend-js-web';
 import React, {FormEvent, useEffect, useRef, useState} from 'react';
 
 import {FormDataJSONFormat, jsonToFormData} from '../utils/formData';
@@ -222,8 +222,13 @@ export default function ModalImportObjectDefinition({
 					{externalReferenceCode && (
 						<Input
 							disabled
-							feedbackMessage={Liferay.Language.get(
-								'unique-key-for-referencing-the-object-definition'
+							feedbackMessage={sub(
+								Liferay.Language.get(
+									'unique-key-for-referencing-the-x'
+								),
+								Liferay.Language.get(
+									'object-definition'
+								)
 							)}
 							id="externalReferenceCode"
 							label={Liferay.Language.get(

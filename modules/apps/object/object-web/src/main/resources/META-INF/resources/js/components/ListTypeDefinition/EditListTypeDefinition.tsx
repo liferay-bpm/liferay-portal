@@ -22,6 +22,7 @@ import {
 	openToast,
 	saveAndReload,
 } from '@liferay/object-js-components-web';
+import {sub} from 'frontend-js-web';
 import React, {useEffect} from 'react';
 
 import {useListTypeForm} from './ListTypeFormBase';
@@ -95,8 +96,13 @@ export default function EditListTypeDefinition({
 						<Input
 							autoComplete="off"
 							error={errors.externalReferenceCode}
-							feedbackMessage={Liferay.Language.get(
-								'unique-key-for-referencing-the-picklist-definition'
+							feedbackMessage={sub(
+								Liferay.Language.get(
+									'unique-key-for-referencing-the-x'
+								),
+								Liferay.Language.get(
+									'picklist-definition'
+								)
 							)}
 							label={Liferay.Language.get(
 								'external-reference-code'

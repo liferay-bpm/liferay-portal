@@ -13,6 +13,7 @@
  */
 
 import {API, ManagementToolbar} from '@liferay/object-js-components-web';
+import {sub} from 'frontend-js-web';
 import React from 'react';
 
 interface ObjectManagementToolbarProps {
@@ -60,8 +61,13 @@ export default function ObjectManagementToolbar({
 			externalReferenceCodeSaveURL={`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}`}
 			hasPublishPermission={hasPublishObjectPermission}
 			hasUpdatePermission={hasUpdateObjectDefinitionPermission}
-			helpMessage={Liferay.Language.get(
-				'unique-key-for-referencing-the-object-definition'
+			helpMessage={sub(
+				Liferay.Language.get(
+					'unique-key-for-referencing-the-x'
+				),
+				Liferay.Language.get(
+					'object-definition'
+				)
 			)}
 			isApproved={isApproved}
 			label={label}
