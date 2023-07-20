@@ -86,11 +86,14 @@ public class ObjectDefinitionResourcePermissionUtil {
 				}));
 
 		resourceActions.populateModelResources(document);
-		resourceActions.populatePortletResource(
-			portletLocalService.getPortletById(
-				objectDefinition.getCompanyId(),
-				objectDefinition.getPortletId()),
-			classLoader, document);
+
+		if (objectDefinition.isPortlet() == true) {
+			resourceActions.populatePortletResource(
+				portletLocalService.getPortletById(
+					objectDefinition.getCompanyId(),
+					objectDefinition.getPortletId()),
+				classLoader, document);
+		}
 	}
 
 	private static String _getPermissionsGuestUnsupported(
