@@ -396,7 +396,7 @@ public class DefaultObjectEntryManagerImplTest {
 			_objectDefinition1.getObjectDefinitionId(),
 			objectRelationship1.getName());
 		_addAggregationObjectField(
-			null, "COUNT", "countAggregationObjectFieldName",
+			null, "COUNT", "countAggregationObjectFieldName1",
 			_objectDefinition1.getObjectDefinitionId(),
 			objectRelationship1.getName());
 		_addAggregationObjectField(
@@ -587,7 +587,7 @@ public class DefaultObjectEntryManagerImplTest {
 
 		ObjectField objectField = _objectFieldLocalService.getObjectField(
 			_objectDefinition1.getObjectDefinitionId(),
-			"countAggregationObjectFieldName");
+			"countAggregationObjectFieldName1");
 
 		DateFormat dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd");
@@ -687,7 +687,7 @@ public class DefaultObjectEntryManagerImplTest {
 						"averageAggregationObjectFieldName",
 						"0.55555555544444440000"
 					).put(
-						"countAggregationObjectFieldName", "2"
+						"countAggregationObjectFieldName1", "2"
 					).put(
 						"maxAggregationObjectFieldName", "15"
 					).put(
@@ -716,7 +716,7 @@ public class DefaultObjectEntryManagerImplTest {
 						"averageAggregationObjectFieldName",
 						"0.12345678912345670000"
 					).put(
-						"countAggregationObjectFieldName", "1"
+						"countAggregationObjectFieldName1", "1"
 					).put(
 						"maxAggregationObjectFieldName", "10"
 					).put(
@@ -744,7 +744,7 @@ public class DefaultObjectEntryManagerImplTest {
 					properties = HashMapBuilder.<String, Object>put(
 						"averageAggregationObjectFieldName", "0"
 					).put(
-						"countAggregationObjectFieldName", "0"
+						"countAggregationObjectFieldName1", "0"
 					).put(
 						"maxAggregationObjectFieldName", "0"
 					).put(
@@ -2663,7 +2663,7 @@ public class DefaultObjectEntryManagerImplTest {
 			new ObjectEntry() {
 				{
 					properties = HashMapBuilder.<String, Object>put(
-						"countAggregationObjectFieldName",
+						"countAggregationObjectFieldName1",
 						String.valueOf(expectedValue)
 					).build();
 				}
