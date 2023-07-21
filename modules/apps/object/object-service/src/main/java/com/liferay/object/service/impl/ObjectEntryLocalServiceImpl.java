@@ -2722,15 +2722,18 @@ public class ObjectEntryLocalServiceImpl
 						relatedDynamicObjectDefinitionTable)
 				).from(
 					relatedDynamicObjectDefinitionTable
-				).innerJoinON(
-					relatedExtensionDynamicObjectDefinitionTable,
-					relatedExtensionDynamicObjectDefinitionTable.
-						getPrimaryKeyColumn(
-						).eq(
-							relatedDynamicObjectDefinitionTable.
-								getPrimaryKeyColumn()
-						)
 				);
+
+				if (!objectRelationship.isSelf()) {
+					joinStep = joinStep.innerJoinON(
+						relatedExtensionDynamicObjectDefinitionTable,
+						relatedExtensionDynamicObjectDefinitionTable.
+							getPrimaryKeyColumn(
+							).eq(
+								relatedDynamicObjectDefinitionTable.
+									getPrimaryKeyColumn()
+							));
+				}
 
 				if (!relatedObjectDefinition.isUnmodifiableSystemObject()) {
 					joinStep = joinStep.innerJoinON(
