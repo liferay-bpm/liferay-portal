@@ -98,6 +98,12 @@ public interface ObjectDefinitionResource {
 	public void postObjectDefinitionPublish(Long objectDefinitionId)
 		throws Exception;
 
+	public Page<ObjectDefinition>
+			getObjectFolderByExternalReferenceCodeObjectDefinitionsPage(
+				String externalReferenceCode, String search,
+				Pagination pagination)
+		throws Exception;
+
 	public default void setContextAcceptLanguage(
 		AcceptLanguage contextAcceptLanguage) {
 	}
