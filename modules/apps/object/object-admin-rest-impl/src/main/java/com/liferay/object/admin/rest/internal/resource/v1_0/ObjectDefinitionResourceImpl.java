@@ -176,35 +176,7 @@ public class ObjectDefinitionResourceImpl
 		throws Exception {
 
 		return SearchUtil.search(
-			HashMapBuilder.put(
-				"create",
-				addAction(
-					ObjectActionKeys.ADD_OBJECT_DEFINITION,
-					"postObjectDefinition", ObjectConstants.RESOURCE_NAME,
-					contextCompany.getCompanyId())
-			).put(
-				"createBatch",
-				addAction(
-					ObjectActionKeys.ADD_OBJECT_DEFINITION,
-					"postObjectDefinitionBatch", ObjectConstants.RESOURCE_NAME,
-					contextCompany.getCompanyId())
-			).put(
-				"deleteBatch",
-				addAction(
-					ActionKeys.DELETE, "deleteObjectDefinitionBatch",
-					ObjectConstants.RESOURCE_NAME, null)
-			).put(
-				"get",
-				addAction(
-					ActionKeys.VIEW, "getObjectDefinitionsPage",
-					ObjectConstants.RESOURCE_NAME,
-					contextCompany.getCompanyId())
-			).put(
-				"updateBatch",
-				addAction(
-					ActionKeys.UPDATE, "putObjectDefinitionBatch",
-					ObjectConstants.RESOURCE_NAME, null)
-			).build(),
+			_getActions(),
 			booleanQuery -> {
 			},
 			filter, com.liferay.object.model.ObjectDefinition.class.getName(),
@@ -217,6 +189,37 @@ public class ObjectDefinitionResourceImpl
 				searchContext.setCompanyId(contextCompany.getCompanyId());
 			},
 			sorts,
+			document -> _toObjectDefinition(
+				_objectDefinitionService.getObjectDefinition(
+					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))));
+	}
+
+	@Override
+	public Page<ObjectDefinition>
+			getObjectFolderByExternalReferenceCodeObjectDefinitionsPage(
+				String externalReferenceCode, String search,
+				Pagination pagination)
+		throws Exception {
+
+		ObjectFolder objectFolder =
+			_objectFolderLocalService.getObjectFolderByExternalReferenceCode(
+				externalReferenceCode, contextCompany.getCompanyId());
+
+		return SearchUtil.search(
+			_getActions(),
+			booleanQuery -> {
+			},
+			null, com.liferay.object.model.ObjectDefinition.class.getName(),
+			search, pagination,
+			queryConfig -> queryConfig.setSelectedFieldNames(
+				Field.ENTRY_CLASS_PK),
+			searchContext -> {
+				searchContext.setAttribute(Field.NAME, search);
+				searchContext.setAttribute(
+					"objectFolderId", objectFolder.getObjectFolderId());
+				searchContext.setCompanyId(contextCompany.getCompanyId());
+			},
+			null,
 			document -> _toObjectDefinition(
 				_objectDefinitionService.getObjectDefinition(
 					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))));
@@ -817,6 +820,36 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		return accountEntryRestrictedObjectRelationshipsNames;
+	}
+
+	private Map<String, Map<String, String>> _getActions() {
+		return HashMapBuilder.<String, Map<String, String>>put(
+			"create",
+			addAction(
+				ObjectActionKeys.ADD_OBJECT_DEFINITION, "postObjectDefinition",
+				ObjectConstants.RESOURCE_NAME, contextCompany.getCompanyId())
+		).put(
+			"createBatch",
+			addAction(
+				ObjectActionKeys.ADD_OBJECT_DEFINITION,
+				"postObjectDefinitionBatch", ObjectConstants.RESOURCE_NAME,
+				contextCompany.getCompanyId())
+		).put(
+			"deleteBatch",
+			addAction(
+				ActionKeys.DELETE, "deleteObjectDefinitionBatch",
+				ObjectConstants.RESOURCE_NAME, null)
+		).put(
+			"get",
+			addAction(
+				ActionKeys.VIEW, "getObjectDefinitionsPage",
+				ObjectConstants.RESOURCE_NAME, contextCompany.getCompanyId())
+		).put(
+			"updateBatch",
+			addAction(
+				ActionKeys.UPDATE, "putObjectDefinitionBatch",
+				ObjectConstants.RESOURCE_NAME, null)
+		).build();
 	}
 
 	private long _getObjectFolderId(String objectFolderExternalReferenceCode)
