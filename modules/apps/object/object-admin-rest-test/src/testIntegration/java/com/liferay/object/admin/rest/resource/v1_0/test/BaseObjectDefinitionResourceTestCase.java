@@ -987,6 +987,163 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 			"This method needs to be implemented");
 	}
 
+	@Test
+	public void testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage()
+		throws Exception {
+
+		String externalReferenceCode =
+			testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_getExternalReferenceCode();
+		String irrelevantExternalReferenceCode =
+			testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_getIrrelevantExternalReferenceCode();
+
+		Page<ObjectDefinition> page =
+			objectDefinitionResource.
+				getObjectFolderByExternalReferenceCodeObjectDefinitionsPage(
+					externalReferenceCode, null, Pagination.of(1, 10));
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		if (irrelevantExternalReferenceCode != null) {
+			ObjectDefinition irrelevantObjectDefinition =
+				testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_addObjectDefinition(
+					irrelevantExternalReferenceCode,
+					randomIrrelevantObjectDefinition());
+
+			page =
+				objectDefinitionResource.
+					getObjectFolderByExternalReferenceCodeObjectDefinitionsPage(
+						irrelevantExternalReferenceCode, null,
+						Pagination.of(1, 2));
+
+			Assert.assertEquals(1, page.getTotalCount());
+
+			assertEquals(
+				Arrays.asList(irrelevantObjectDefinition),
+				(List<ObjectDefinition>)page.getItems());
+			assertValid(
+				page,
+				testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_getExpectedActions(
+					irrelevantExternalReferenceCode));
+		}
+
+		ObjectDefinition objectDefinition1 =
+			testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_addObjectDefinition(
+				externalReferenceCode, randomObjectDefinition());
+
+		ObjectDefinition objectDefinition2 =
+			testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_addObjectDefinition(
+				externalReferenceCode, randomObjectDefinition());
+
+		page =
+			objectDefinitionResource.
+				getObjectFolderByExternalReferenceCodeObjectDefinitionsPage(
+					externalReferenceCode, null, Pagination.of(1, 10));
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(objectDefinition1, objectDefinition2),
+			(List<ObjectDefinition>)page.getItems());
+		assertValid(
+			page,
+			testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_getExpectedActions(
+				externalReferenceCode));
+
+		objectDefinitionResource.deleteObjectDefinition(
+			objectDefinition1.getId());
+
+		objectDefinitionResource.deleteObjectDefinition(
+			objectDefinition2.getId());
+	}
+
+	protected Map<String, Map<String, String>>
+			testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_getExpectedActions(
+				String externalReferenceCode)
+		throws Exception {
+
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
+
+		return expectedActions;
+	}
+
+	@Test
+	public void testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPageWithPagination()
+		throws Exception {
+
+		String externalReferenceCode =
+			testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_getExternalReferenceCode();
+
+		ObjectDefinition objectDefinition1 =
+			testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_addObjectDefinition(
+				externalReferenceCode, randomObjectDefinition());
+
+		ObjectDefinition objectDefinition2 =
+			testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_addObjectDefinition(
+				externalReferenceCode, randomObjectDefinition());
+
+		ObjectDefinition objectDefinition3 =
+			testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_addObjectDefinition(
+				externalReferenceCode, randomObjectDefinition());
+
+		Page<ObjectDefinition> page1 =
+			objectDefinitionResource.
+				getObjectFolderByExternalReferenceCodeObjectDefinitionsPage(
+					externalReferenceCode, null, Pagination.of(1, 2));
+
+		List<ObjectDefinition> objectDefinitions1 =
+			(List<ObjectDefinition>)page1.getItems();
+
+		Assert.assertEquals(
+			objectDefinitions1.toString(), 2, objectDefinitions1.size());
+
+		Page<ObjectDefinition> page2 =
+			objectDefinitionResource.
+				getObjectFolderByExternalReferenceCodeObjectDefinitionsPage(
+					externalReferenceCode, null, Pagination.of(2, 2));
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<ObjectDefinition> objectDefinitions2 =
+			(List<ObjectDefinition>)page2.getItems();
+
+		Assert.assertEquals(
+			objectDefinitions2.toString(), 1, objectDefinitions2.size());
+
+		Page<ObjectDefinition> page3 =
+			objectDefinitionResource.
+				getObjectFolderByExternalReferenceCodeObjectDefinitionsPage(
+					externalReferenceCode, null, Pagination.of(1, 3));
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(
+				objectDefinition1, objectDefinition2, objectDefinition3),
+			(List<ObjectDefinition>)page3.getItems());
+	}
+
+	protected ObjectDefinition
+			testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_addObjectDefinition(
+				String externalReferenceCode, ObjectDefinition objectDefinition)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected String
+			testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_getExternalReferenceCode()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected String
+			testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_getIrrelevantExternalReferenceCode()
+		throws Exception {
+
+		return null;
+	}
+
 	@Rule
 	public SearchTestRule searchTestRule = new SearchTestRule();
 
