@@ -1930,6 +1930,41 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/ObjectFolder"
             tags: ["ObjectFolder"]
+    "/object-folders/by-external-reference-code/{externalReferenceCode}/object-definitions":
+        get:
+            operationId: getObjectFolderByExternalReferenceCodeObjectDefinitionsPage
+            parameters:
+                - in: path
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectDefinition"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectDefinition"
+                                type: array
+            tags: ["ObjectDefinition"]
     "/object-folders/{objectFolderId}":
         delete:
             operationId: deleteObjectFolder
