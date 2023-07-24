@@ -28,6 +28,8 @@ import com.liferay.object.internal.dao.db.ObjectDBManagerUtil;
 import com.liferay.object.internal.info.collection.provider.RelatedInfoCollectionProviderFactory;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectFieldSettingTable;
+import com.liferay.object.model.ObjectFieldTable;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.model.ObjectRelationshipTable;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTableUtil;
@@ -291,6 +293,38 @@ public class ObjectRelationshipLocalServiceImpl
 		if (objectRelationship.isReverse()) {
 			throw new ObjectRelationshipReverseException(
 				"Reverse object relationships cannot be deleted");
+		}
+
+		for (long objectFieldId :
+				(List<Long>)objectRelationshipPersistence.dslQuery(
+					DSLQueryFactoryUtil.selectDistinct(
+						ObjectFieldSettingTable.INSTANCE.objectFieldId
+					).from(
+						ObjectRelationshipTable.INSTANCE
+					).innerJoinON(
+						ObjectFieldTable.INSTANCE,
+						ObjectFieldTable.INSTANCE.objectDefinitionId.eq(
+							ObjectRelationshipTable.INSTANCE.objectDefinitionId1
+						).or(
+							ObjectFieldTable.INSTANCE.objectDefinitionId.eq(
+								ObjectRelationshipTable.INSTANCE.
+									objectDefinitionId2)
+						)
+					).innerJoinON(
+						ObjectFieldSettingTable.INSTANCE,
+						ObjectFieldSettingTable.INSTANCE.objectFieldId.eq(
+							ObjectFieldTable.INSTANCE.objectFieldId)
+					).where(
+						ObjectRelationshipTable.INSTANCE.objectRelationshipId.
+							eq(
+								objectRelationship.getObjectRelationshipId()
+							).and(
+								ObjectRelationshipTable.INSTANCE.name.eq(
+									ObjectFieldSettingTable.INSTANCE.value)
+							)
+					))) {
+
+			_objectFieldLocalService.deleteObjectField(objectFieldId);
 		}
 
 		objectRelationship = objectRelationshipPersistence.remove(
