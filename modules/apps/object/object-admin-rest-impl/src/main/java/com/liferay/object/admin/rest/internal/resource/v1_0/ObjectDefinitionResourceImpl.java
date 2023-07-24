@@ -52,6 +52,7 @@ import com.liferay.object.service.ObjectViewService;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
 import com.liferay.object.system.SystemObjectDefinitionManager;
 import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
+import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
@@ -176,51 +177,36 @@ public class ObjectDefinitionResourceImpl
 			Pagination pagination, Sort[] sorts)
 		throws Exception {
 
-		return SearchUtil.search(
-			HashMapBuilder.put(
-				"create",
-				addAction(
-					ObjectActionKeys.ADD_OBJECT_DEFINITION,
-					"postObjectDefinition", ObjectConstants.RESOURCE_NAME,
-					contextCompany.getCompanyId())
-			).put(
-				"createBatch",
-				addAction(
-					ObjectActionKeys.ADD_OBJECT_DEFINITION,
-					"postObjectDefinitionBatch", ObjectConstants.RESOURCE_NAME,
-					contextCompany.getCompanyId())
-			).put(
-				"deleteBatch",
-				addAction(
-					ActionKeys.DELETE, "deleteObjectDefinitionBatch",
-					ObjectConstants.RESOURCE_NAME, null)
-			).put(
-				"get",
-				addAction(
-					ActionKeys.VIEW, "getObjectDefinitionsPage",
-					ObjectConstants.RESOURCE_NAME,
-					contextCompany.getCompanyId())
-			).put(
-				"updateBatch",
-				addAction(
-					ActionKeys.UPDATE, "putObjectDefinitionBatch",
-					ObjectConstants.RESOURCE_NAME, null)
-			).build(),
-			booleanQuery -> {
-			},
-			filter, com.liferay.object.model.ObjectDefinition.class.getName(),
-			search, pagination,
-			queryConfig -> queryConfig.setSelectedFieldNames(
-				Field.ENTRY_CLASS_PK),
+		return _getObjectDefinitionsPage(
+			filter, pagination, search,
 			searchContext -> {
 				searchContext.addVulcanAggregation(aggregation);
 				searchContext.setAttribute(Field.NAME, search);
 				searchContext.setCompanyId(contextCompany.getCompanyId());
 			},
-			sorts,
-			document -> _toObjectDefinition(
-				_objectDefinitionService.getObjectDefinition(
-					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))));
+			sorts);
+	}
+
+	@Override
+	public Page<ObjectDefinition>
+			getObjectFolderByExternalReferenceCodeObjectDefinitionsPage(
+				String externalReferenceCode, String search,
+				Pagination pagination)
+		throws Exception {
+
+		ObjectFolder objectFolder =
+			_objectFolderLocalService.getObjectFolderByExternalReferenceCode(
+				externalReferenceCode, contextCompany.getCompanyId());
+
+		return _getObjectDefinitionsPage(
+			null, pagination, search,
+			searchContext -> {
+				searchContext.setAttribute(Field.NAME, search);
+				searchContext.setAttribute(
+					"objectFolderId", objectFolder.getObjectFolderId());
+				searchContext.setCompanyId(contextCompany.getCompanyId());
+			},
+			null);
 	}
 
 	@Override
@@ -852,6 +838,55 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		return accountEntryRestrictedObjectRelationshipsNames;
+	}
+
+	private Page<ObjectDefinition> _getObjectDefinitionsPage(
+			Filter filter, Pagination pagination, String search,
+			UnsafeConsumer<SearchUtil.SearchContext, Exception>
+				searchContextUnsafeConsumer,
+			Sort[] sorts)
+		throws Exception {
+
+		return SearchUtil.search(
+			HashMapBuilder.put(
+				"create",
+				addAction(
+					ObjectActionKeys.ADD_OBJECT_DEFINITION,
+					"postObjectDefinition", ObjectConstants.RESOURCE_NAME,
+					contextCompany.getCompanyId())
+			).put(
+				"createBatch",
+				addAction(
+					ObjectActionKeys.ADD_OBJECT_DEFINITION,
+					"postObjectDefinitionBatch", ObjectConstants.RESOURCE_NAME,
+					contextCompany.getCompanyId())
+			).put(
+				"deleteBatch",
+				addAction(
+					ActionKeys.DELETE, "deleteObjectDefinitionBatch",
+					ObjectConstants.RESOURCE_NAME, null)
+			).put(
+				"get",
+				addAction(
+					ActionKeys.VIEW, "getObjectDefinitionsPage",
+					ObjectConstants.RESOURCE_NAME,
+					contextCompany.getCompanyId())
+			).put(
+				"updateBatch",
+				addAction(
+					ActionKeys.UPDATE, "putObjectDefinitionBatch",
+					ObjectConstants.RESOURCE_NAME, null)
+			).build(),
+			booleanQuery -> {
+			},
+			filter, com.liferay.object.model.ObjectDefinition.class.getName(),
+			search, pagination,
+			queryConfig -> queryConfig.setSelectedFieldNames(
+				Field.ENTRY_CLASS_PK),
+			searchContextUnsafeConsumer, sorts,
+			document -> _toObjectDefinition(
+				_objectDefinitionService.getObjectDefinition(
+					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))));
 	}
 
 	private long _getObjectFolderId(String objectFolderExternalReferenceCode)
