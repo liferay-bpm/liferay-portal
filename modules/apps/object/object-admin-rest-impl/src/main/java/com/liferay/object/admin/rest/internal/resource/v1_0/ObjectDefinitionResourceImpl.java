@@ -194,6 +194,10 @@ public class ObjectDefinitionResourceImpl
 				Pagination pagination)
 		throws Exception {
 
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+			throw new UnsupportedOperationException();
+		}
+
 		ObjectFolder objectFolder =
 			_objectFolderLocalService.getObjectFolderByExternalReferenceCode(
 				externalReferenceCode, contextCompany.getCompanyId());
@@ -978,10 +982,18 @@ public class ObjectDefinitionResourceImpl
 					}
 				).put(
 					"update",
-					addAction(
-						ActionKeys.UPDATE, "putObjectDefinition",
-						permissionName,
-						objectDefinition.getObjectDefinitionId())
+					() -> {
+						if (!FeatureFlagManagerUtil.isEnabled("LPS-148856") &&
+							objectDefinition.isUnmodifiableSystemObject()) {
+
+							return null;
+						}
+
+						return addAction(
+							ActionKeys.UPDATE, "putObjectDefinition",
+							permissionName,
+							objectDefinition.getObjectDefinitionId());
+					}
 				).build();
 				active = objectDefinition.isActive();
 				dateCreated = objectDefinition.getCreateDate();
