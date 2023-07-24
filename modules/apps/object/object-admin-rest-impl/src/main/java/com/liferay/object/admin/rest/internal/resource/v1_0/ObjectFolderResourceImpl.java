@@ -180,14 +180,26 @@ public class ObjectFolderResourceImpl extends BaseObjectFolderResourceImpl {
 			{
 				actions = HashMapBuilder.put(
 					"delete",
-					addAction(
-						ActionKeys.DELETE, "deleteObjectFolder", permissionName,
-						objectFolder.getObjectFolderId())
+					() -> {
+						if (objectFolder.isUncategorized()) {
+							return null;
+						}
+
+						return addAction(
+							ActionKeys.DELETE, "deleteObjectFolder",
+							permissionName, objectFolder.getObjectFolderId());
+					}
 				).put(
 					"get",
-					addAction(
-						ActionKeys.VIEW, "getObjectFolder", permissionName,
-						objectFolder.getObjectFolderId())
+					() -> {
+						if (objectFolder.isUncategorized()) {
+							return null;
+						}
+
+						return addAction(
+							ActionKeys.VIEW, "getObjectFolder", permissionName,
+							objectFolder.getObjectFolderId());
+					}
 				).put(
 					"permissions",
 					addAction(
@@ -195,9 +207,15 @@ public class ObjectFolderResourceImpl extends BaseObjectFolderResourceImpl {
 						permissionName, objectFolder.getObjectFolderId())
 				).put(
 					"update",
-					addAction(
-						ActionKeys.UPDATE, "putObjectFolder", permissionName,
-						objectFolder.getObjectFolderId())
+					() -> {
+						if (objectFolder.isUncategorized()) {
+							return null;
+						}
+
+						return addAction(
+							ActionKeys.UPDATE, "putObjectFolder",
+							permissionName, objectFolder.getObjectFolderId());
+					}
 				).build();
 				dateCreated = objectFolder.getCreateDate();
 				dateModified = objectFolder.getModifiedDate();
