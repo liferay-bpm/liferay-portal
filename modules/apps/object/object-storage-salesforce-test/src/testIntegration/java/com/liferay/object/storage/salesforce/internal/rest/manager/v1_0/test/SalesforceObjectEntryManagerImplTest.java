@@ -17,6 +17,7 @@ import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
+import com.liferay.object.rest.dto.v1_0.util.ObjectEntryTestUtil;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -35,7 +36,6 @@ import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -332,8 +332,11 @@ public class SalesforceObjectEntryManagerImplTest {
 
 		_testGetObjectEntries(
 			StringBundler.concat(
-				_buildEqualsExpressionFilterString("customStatus", "queued"),
-				" and ", _buildEqualsExpressionFilterString("title", title1)),
+				ObjectEntryTestUtil.buildEqualsExpressionFilterString(
+					"customStatus", "queued"),
+				" and ",
+				ObjectEntryTestUtil.buildEqualsExpressionFilterString(
+					"title", title1)),
 			objectEntry1);
 
 		_testGetObjectEntries(
@@ -345,8 +348,11 @@ public class SalesforceObjectEntryManagerImplTest {
 
 		_testGetObjectEntries(
 			StringBundler.concat(
-				_buildEqualsExpressionFilterString("customStatus", "queued"),
-				" or ", _buildEqualsExpressionFilterString("title", title1)),
+				ObjectEntryTestUtil.buildEqualsExpressionFilterString(
+					"customStatus", "queued"),
+				" or ",
+				ObjectEntryTestUtil.buildEqualsExpressionFilterString(
+					"title", title1)),
 			objectEntry1, objectEntry4);
 
 		_testGetObjectEntries(
@@ -358,7 +364,8 @@ public class SalesforceObjectEntryManagerImplTest {
 		// Equals/not equals expression
 
 		_testGetObjectEntries(
-			_buildEqualsExpressionFilterString("customStatus", "queued"),
+			ObjectEntryTestUtil.buildEqualsExpressionFilterString(
+				"customStatus", "queued"),
 			objectEntry1, objectEntry4);
 
 		_testGetObjectEntries(
@@ -366,7 +373,9 @@ public class SalesforceObjectEntryManagerImplTest {
 			objectEntry2, objectEntry3);
 
 		_testGetObjectEntries(
-			_buildEqualsExpressionFilterString("title", title1), objectEntry1);
+			ObjectEntryTestUtil.buildEqualsExpressionFilterString(
+				"title", title1),
+			objectEntry1);
 
 		_testGetObjectEntries(
 			_buildNotEqualsExpressionFilterString("title", title1),
@@ -431,30 +440,17 @@ public class SalesforceObjectEntryManagerImplTest {
 		}
 	}
 
-	private String _buildEqualsExpressionFilterString(
-		String fieldName, Object value) {
-
-		return StringBundler.concat(fieldName, " eq ", _getValue(value));
-	}
-
 	private String _buildNotEqualsExpressionFilterString(
 		String fieldName, Object value) {
 
-		return StringBundler.concat(fieldName, " ne ", _getValue(value));
+		return StringBundler.concat(
+			fieldName, " ne ", ObjectEntryTestUtil.getValue(value));
 	}
 
-	private DTOConverterContext _getDTOConverterContext() throws Exception {
+	private DTOConverterContext _getDTOConverterContext() {
 		return new DefaultDTOConverterContext(
 			false, Collections.emptyMap(), _dtoConverterRegistry, null,
 			LocaleUtil.getDefault(), null, _user);
-	}
-
-	private Object _getValue(Object value) {
-		if (value instanceof String) {
-			return StringUtil.quote(String.valueOf(value));
-		}
-
-		return value;
 	}
 
 	private void _testGetObjectEntries(

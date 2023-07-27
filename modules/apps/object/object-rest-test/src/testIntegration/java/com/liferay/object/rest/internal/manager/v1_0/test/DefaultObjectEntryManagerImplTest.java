@@ -56,6 +56,7 @@ import com.liferay.object.rest.dto.v1_0.FileEntry;
 import com.liferay.object.rest.dto.v1_0.Link;
 import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
+import com.liferay.object.rest.dto.v1_0.util.ObjectEntryTestUtil;
 import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -1434,13 +1435,13 @@ public class DefaultObjectEntryManagerImplTest {
 			HashMapBuilder.put(
 				"filter",
 				StringBundler.concat(
-					_buildEqualsExpressionFilterString(
+					ObjectEntryTestUtil.buildEqualsExpressionFilterString(
 						"picklistObjectFieldName", picklistObjectFieldValue1),
 					" and (",
-					_buildEqualsExpressionFilterString(
+					ObjectEntryTestUtil.buildEqualsExpressionFilterString(
 						"picklistObjectFieldName", picklistObjectFieldValue1),
 					" or ",
-					_buildEqualsExpressionFilterString(
+					ObjectEntryTestUtil.buildEqualsExpressionFilterString(
 						"picklistObjectFieldName", picklistObjectFieldValue2),
 					")")
 			).build(),
@@ -1458,7 +1459,7 @@ public class DefaultObjectEntryManagerImplTest {
 		_testGetObjectEntries(
 			HashMapBuilder.put(
 				"filter",
-				_buildEqualsExpressionFilterString(
+				ObjectEntryTestUtil.buildEqualsExpressionFilterString(
 					"picklistObjectFieldName", picklistObjectFieldValue1)
 			).put(
 				"search", "aa"
@@ -1467,7 +1468,7 @@ public class DefaultObjectEntryManagerImplTest {
 		_testGetObjectEntries(
 			HashMapBuilder.put(
 				"filter",
-				_buildEqualsExpressionFilterString(
+				ObjectEntryTestUtil.buildEqualsExpressionFilterString(
 					"picklistObjectFieldName", picklistObjectFieldValue2)
 			).put(
 				"search", "aa"
@@ -1476,7 +1477,7 @@ public class DefaultObjectEntryManagerImplTest {
 		_testGetObjectEntries(
 			HashMapBuilder.put(
 				"filter",
-				_buildEqualsExpressionFilterString(
+				ObjectEntryTestUtil.buildEqualsExpressionFilterString(
 					_objectRelationshipERCObjectFieldName,
 					parentObjectEntry1.getExternalReferenceCode())
 			).build(),
@@ -1484,7 +1485,7 @@ public class DefaultObjectEntryManagerImplTest {
 		_testGetObjectEntries(
 			HashMapBuilder.put(
 				"filter",
-				_buildEqualsExpressionFilterString(
+				ObjectEntryTestUtil.buildEqualsExpressionFilterString(
 					_objectRelationshipERCObjectFieldName,
 					parentObjectEntry2.getExternalReferenceCode())
 			).build(),
@@ -1492,7 +1493,7 @@ public class DefaultObjectEntryManagerImplTest {
 		_testGetObjectEntries(
 			HashMapBuilder.put(
 				"filter",
-				_buildEqualsExpressionFilterString(
+				ObjectEntryTestUtil.buildEqualsExpressionFilterString(
 					"localizedLongTextObjectFieldName",
 					"en_US localizedLongTextObjectFieldValue")
 			).build(),
@@ -1568,7 +1569,7 @@ public class DefaultObjectEntryManagerImplTest {
 		_testGetObjectEntries(
 			HashMapBuilder.put(
 				"filter",
-				_buildEqualsExpressionFilterString(
+				ObjectEntryTestUtil.buildEqualsExpressionFilterString(
 					"creatorId", _adminUser.getUserId())
 			).build(),
 			childObjectEntry1, childObjectEntry2);
@@ -2773,16 +2774,6 @@ public class DefaultObjectEntryManagerImplTest {
 		String fieldName, String value) {
 
 		return StringBundler.concat("contains( ", fieldName, ",'", value, "')");
-	}
-
-	private String _buildEqualsExpressionFilterString(
-		String fieldName, Object value) {
-
-		if (value instanceof String) {
-			value = StringUtil.quote(String.valueOf(value));
-		}
-
-		return StringBundler.concat("( ", fieldName, " eq ", value, ")");
 	}
 
 	private String _buildInExpressionFilterString(
