@@ -34,6 +34,8 @@ import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
+import com.liferay.portal.vulcan.pagination.Page;
+import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.util.Collections;
@@ -148,6 +150,17 @@ public class SalesforceObjectEntryManagerImplTest {
 
 	@After
 	public void tearDown() throws Exception {
+		Page<ObjectEntry> page = _objectEntryManager.getObjectEntries(
+			TestPropsValues.getCompanyId(), _objectDefinition, null, null,
+			_getDTOConverterContext(), null, Pagination.of(1, 20), null, null);
+
+		for (ObjectEntry objectEntry : page.getItems()) {
+			_objectEntryManager.deleteObjectEntry(
+				TestPropsValues.getCompanyId(), _getDTOConverterContext(),
+				objectEntry.getExternalReferenceCode(), _objectDefinition,
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+		}
+
 		if (_objectDefinition != null) {
 			_objectDefinitionLocalService.deleteObjectDefinition(
 				_objectDefinition.getObjectDefinitionId());
@@ -168,11 +181,6 @@ public class SalesforceObjectEntryManagerImplTest {
 			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		Assert.assertNotNull(objectEntry.getExternalReferenceCode());
-
-		_objectEntryManager.deleteObjectEntry(
-			TestPropsValues.getCompanyId(), _getDTOConverterContext(),
-			objectEntry.getExternalReferenceCode(), _objectDefinition,
-			ObjectDefinitionConstants.SCOPE_COMPANY);
 	}
 
 	@Test
@@ -203,11 +211,6 @@ public class SalesforceObjectEntryManagerImplTest {
 
 		Assert.assertEquals(
 			title, MapUtil.getString(objectEntry.getProperties(), "title"));
-
-		_objectEntryManager.deleteObjectEntry(
-			TestPropsValues.getCompanyId(), _getDTOConverterContext(),
-			objectEntry.getExternalReferenceCode(), _objectDefinition,
-			ObjectDefinitionConstants.SCOPE_COMPANY);
 	}
 
 	@Test
@@ -234,11 +237,6 @@ public class SalesforceObjectEntryManagerImplTest {
 
 		Assert.assertEquals(
 			title, MapUtil.getString(objectEntry.getProperties(), "title"));
-
-		_objectEntryManager.deleteObjectEntry(
-			TestPropsValues.getCompanyId(), _getDTOConverterContext(),
-			objectEntry.getExternalReferenceCode(), _objectDefinition,
-			ObjectDefinitionConstants.SCOPE_COMPANY);
 	}
 
 	private DTOConverterContext _getDTOConverterContext() throws Exception {

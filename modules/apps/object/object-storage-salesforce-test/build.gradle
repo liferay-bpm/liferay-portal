@@ -3,6 +3,7 @@ dependencies {
 	testIntegrationCompile project(":apps:object:object-api")
 	testIntegrationCompile project(":apps:object:object-rest-api")
 	testIntegrationCompile project(":apps:object:object-storage-salesforce-api")
+	testIntegrationCompile project(":apps:portal-configuration:portal-configuration-test-util")
 	testIntegrationCompile project(":apps:portal-vulcan:portal-vulcan-api")
 	testIntegrationCompile project(":test:arquillian-extension-junit-bridge")
 }
