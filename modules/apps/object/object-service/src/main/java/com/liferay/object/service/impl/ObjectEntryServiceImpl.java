@@ -26,7 +26,6 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
@@ -35,6 +34,8 @@ import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroupRole;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -394,10 +395,11 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 	@Activate
 	@Modified
 	protected void activate(
-		BundleContext bundleContext, Map<String, Object> properties) {
+			BundleContext bundleContext, Map<String, Object> properties)
+		throws ConfigurationException {
 
-		_objectConfiguration = ConfigurableUtil.createConfigurable(
-			ObjectConfiguration.class, properties);
+		_objectConfiguration = _configurationProvider.getSystemConfiguration(
+			ObjectConfiguration.class);
 		_portletResourcePermissionsServiceTrackerMap =
 			ServiceTrackerMapFactory.openSingleValueMap(
 				bundleContext, PortletResourcePermission.class,
@@ -587,6 +589,9 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 	@Reference
 	private AccountEntryOrganizationRelLocalService
 		_accountEntryOrganizationRelLocalService;
+
+	@Reference
+	private ConfigurationProvider _configurationProvider;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
