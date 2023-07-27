@@ -488,6 +488,7 @@ public class SQLServerDB extends BaseDB {
 		}
 
 		runSQL(
+			connection,
 			StringBundler.concat(
 				"alter table ", tableName, " drop constraint ",
 				defaultConstraintName));
