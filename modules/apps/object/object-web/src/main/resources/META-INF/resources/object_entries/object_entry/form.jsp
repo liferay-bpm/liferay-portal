@@ -124,6 +124,15 @@ portletDisplay.setURLBack(backURL);
 
 				const current = DDMFormInstance.reactComponentRef.current;
 
+				const loadingElement = document.createElement('span');
+
+				loadingElement.className =
+					'loading-animation loading-animation-secondary loading-animation-sm';
+
+				loadingElement.ariaHidden = 'true';
+
+				form.insertAdjacentElement('afterbegin', loadingElement);
+
 				current.validate().then((result) => {
 					if (result) {
 						const fields = current.getFields();
@@ -136,6 +145,8 @@ portletDisplay.setURLBack(backURL);
 								field.value.length > 280
 							) {
 								shouldSubmitForm = false;
+
+								loadingElement.remove();
 
 								Liferay.Util.openToast({
 									message: Liferay.Util.sub(
@@ -237,10 +248,6 @@ portletDisplay.setURLBack(backURL);
 										);
 
 										for (const error of errorMessageArray) {
-											const portletBody = document.querySelector(
-												'.portlet-body'
-											);
-
 											const alertElement = document.createElement(
 												'div'
 											);
@@ -250,6 +257,7 @@ portletDisplay.setURLBack(backURL);
 											alertElement.setAttribute('role', 'alert');
 											alertElement.style.width = '800px';
 											alertElement.style.margin = '2rem auto 0';
+											alertElement.style.bottom = '20px';
 
 											alertElement.insertAdjacentHTML(
 												'afterbegin',
@@ -279,27 +287,12 @@ portletDisplay.setURLBack(backURL);
 
 											alertElement.appendChild(closeButton);
 
-											const pageHeader = portletBody.querySelector(
-												'.page-header'
+											form.insertAdjacentElement(
+												'afterbegin',
+												alertElement
 											);
 
-											if (pageHeader) {
-												const firstChild =
-													portletBody.firstElementChild;
-
-												portletBody.insertBefore(
-													alertElement,
-													firstChild.nextSibling
-												);
-											}
-											else {
-												portletBody.insertAdjacentElement(
-													'afterbegin',
-													alertElement
-												);
-											}
 										}
-
 										scroll(0, 0);
 									}
 									else {
@@ -310,6 +303,7 @@ portletDisplay.setURLBack(backURL);
 											});
 										}
 									}
+									loadingElement.remove();
 								});
 						}
 					}
