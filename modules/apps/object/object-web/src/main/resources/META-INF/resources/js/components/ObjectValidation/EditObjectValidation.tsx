@@ -169,13 +169,17 @@ export default function EditObjectValidation({
 		>
 			<ClayTabs className="side-panel-iframe__tabs">
 				{TABS.map(({label}, index) => (
-					<ClayTabs.Item
-						active={activeIndex === index}
-						key={index}
-						onClick={() => setActiveIndex(index)}
-					>
-						{label}
-					</ClayTabs.Item>
+					values.engine?.startsWith("function#") && index === 1 ? (
+						<React.Fragment key={index} />
+					) : (
+						<ClayTabs.Item
+							active={activeIndex === index}
+							key={index}
+							onClick={() => setActiveIndex(index)}
+						>
+							{label}
+						</ClayTabs.Item>
+					)
 				))}
 			</ClayTabs>
 
