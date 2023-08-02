@@ -206,14 +206,14 @@ public class FDSViewsPortlet extends MVCPortlet {
 			userId, fdsActionObjectDefinition.getObjectDefinitionId());
 
 		_objectRelationshipLocalService.addObjectRelationship(
-			userId, fdsViewObjectDefinition.getObjectDefinitionId(),
+			null, userId, fdsViewObjectDefinition.getObjectDefinitionId(),
 			fdsActionObjectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 			LocalizedMapUtil.getLocalizedMap(
 				"FDSView FDSCreationAction Relationship"),
 			"fdsViewFDSCreationActionRelationship", false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
-		_objectRelationshipLocalService.addObjectRelationship(
+		_objectRelationshipLocalService.addObjectRelationship(null,
 			userId, fdsViewObjectDefinition.getObjectDefinitionId(),
 			fdsActionObjectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
@@ -260,7 +260,7 @@ public class FDSViewsPortlet extends MVCPortlet {
 			userId,
 			fdsClientExtensionFilterObjectDefinition.getObjectDefinitionId());
 
-		_objectRelationshipLocalService.addObjectRelationship(
+		_objectRelationshipLocalService.addObjectRelationship(null,
 			userId, fdsViewObjectDefinition.getObjectDefinitionId(),
 			fdsClientExtensionFilterObjectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
@@ -311,7 +311,7 @@ public class FDSViewsPortlet extends MVCPortlet {
 			userId, fdsDateFilterObjectDefinition.getObjectDefinitionId());
 
 		_objectRelationshipLocalService.addObjectRelationship(
-			userId, fdsViewObjectDefinition.getObjectDefinitionId(),
+			null, userId, fdsViewObjectDefinition.getObjectDefinitionId(),
 			fdsDateFilterObjectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 			LocalizedMapUtil.getLocalizedMap(
@@ -368,7 +368,7 @@ public class FDSViewsPortlet extends MVCPortlet {
 			userId, fdsDynamicFilterObjectDefinition.getObjectDefinitionId());
 
 		_objectRelationshipLocalService.addObjectRelationship(
-			userId, fdsViewObjectDefinition.getObjectDefinitionId(),
+			null, userId, fdsViewObjectDefinition.getObjectDefinitionId(),
 			fdsDynamicFilterObjectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 			LocalizedMapUtil.getLocalizedMap(
@@ -461,7 +461,7 @@ public class FDSViewsPortlet extends MVCPortlet {
 		_objectDefinitionLocalService.publishSystemObjectDefinition(
 			userId, fdsFieldObjectDefinition.getObjectDefinitionId());
 
-		_objectRelationshipLocalService.addObjectRelationship(
+		_objectRelationshipLocalService.addObjectRelationship(null,
 			userId, fdsViewObjectDefinition.getObjectDefinitionId(),
 			fdsFieldObjectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
@@ -498,7 +498,7 @@ public class FDSViewsPortlet extends MVCPortlet {
 			userId, fdsSortObjectDefinition.getObjectDefinitionId());
 
 		_objectRelationshipLocalService.addObjectRelationship(
-			userId, fdsViewObjectDefinition.getObjectDefinitionId(),
+			null, userId, fdsViewObjectDefinition.getObjectDefinitionId(),
 			fdsSortObjectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 			LocalizedMapUtil.getLocalizedMap("FDSView FDSSort Relationship"),
@@ -580,7 +580,7 @@ public class FDSViewsPortlet extends MVCPortlet {
 			userId, fdsViewObjectDefinition.getObjectDefinitionId());
 
 		_objectRelationshipLocalService.addObjectRelationship(
-			userId, fdsEntryObjectDefinition.getObjectDefinitionId(),
+			null,userId, fdsEntryObjectDefinition.getObjectDefinitionId(),
 			fdsViewObjectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 			LocalizedMapUtil.getLocalizedMap("FDSEntry FDSView Relationship"),
