@@ -368,6 +368,7 @@ public class ObjectRelatedModelsProviderTest {
 		// Object relationship deletion type disassociate
 
 		ObjectRelationshipTestUtil.updateObjectRelationship(
+			_objectRelationship.getExternalReferenceCode(),
 			_objectRelationship.getObjectRelationshipId(),
 			ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE,
 			_objectRelationship.getLabelMap());
@@ -402,6 +403,7 @@ public class ObjectRelatedModelsProviderTest {
 		// Object relationship deletion type prevent
 
 		ObjectRelationshipTestUtil.updateObjectRelationship(
+			_objectRelationship.getExternalReferenceCode(),
 			_objectRelationship.getObjectRelationshipId(),
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
 			_objectRelationship.getLabelMap());
@@ -494,7 +496,7 @@ public class ObjectRelatedModelsProviderTest {
 
 		_objectRelationship =
 			_objectRelationshipLocalService.addObjectRelationship(
-				TestPropsValues.getUserId(),
+				null, TestPropsValues.getUserId(),
 				objectDefinition1.getObjectDefinitionId(),
 				objectDefinition2.getObjectDefinitionId(), 0, deletionType,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -736,6 +738,7 @@ public class ObjectRelatedModelsProviderTest {
 		// Object relationship deletion type cascade
 
 		ObjectRelationshipTestUtil.updateObjectRelationship(
+			_objectRelationship.getExternalReferenceCode(),
 			_objectRelationship.getObjectRelationshipId(),
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 			_objectRelationship.getLabelMap());
@@ -766,6 +769,7 @@ public class ObjectRelatedModelsProviderTest {
 		// Object relationship deletion type disassociate
 
 		ObjectRelationshipTestUtil.updateObjectRelationship(
+			_objectRelationship.getExternalReferenceCode(),
 			_objectRelationship.getObjectRelationshipId(),
 			ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE,
 			_objectRelationship.getLabelMap());
@@ -799,6 +803,7 @@ public class ObjectRelatedModelsProviderTest {
 		// Object relationship deletion type prevent
 
 		ObjectRelationshipTestUtil.updateObjectRelationship(
+			_objectRelationship.getExternalReferenceCode(),
 			_objectRelationship.getObjectRelationshipId(),
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
 			_objectRelationship.getLabelMap());
