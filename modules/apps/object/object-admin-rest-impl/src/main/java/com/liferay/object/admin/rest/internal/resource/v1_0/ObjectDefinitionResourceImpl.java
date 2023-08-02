@@ -817,17 +817,42 @@ public class ObjectDefinitionResourceImpl
 						_objectRelationshipLocalService.
 							fetchObjectRelationshipByExternalReferenceCode(
 								objectRelationship.getExternalReferenceCode(),
+								contextCompany.getCompanyId(),
 								objectDefinitionId);
 
-				if (serviceBuilderObjectRelationship != null) {
-					if (serviceBuilderObjectRelationship.isReverse()) {
-						continue;
-					}
+				if ((serviceBuilderObjectRelationship != null) &&
+					!serviceBuilderObjectRelationship.isReverse()) {
 
 					objectRelationshipResource.putObjectRelationship(
 						serviceBuilderObjectRelationship.
 							getObjectRelationshipId(),
 						objectRelationship);
+
+					continue;
+				}
+
+				serviceBuilderObjectRelationship =
+					_objectRelationshipLocalService.
+						fetchObjectRelationshipByObjectDefinitionId1(
+							objectDefinitionId, objectRelationship.getName());
+
+				if ((serviceBuilderObjectRelationship != null) &&
+					!serviceBuilderObjectRelationship.isReverse() &&
+					!serviceBuilderObjectRelationship.isSelf()) {
+
+					objectRelationshipResource.putObjectRelationship(
+						serviceBuilderObjectRelationship.
+							getObjectRelationshipId(),
+						objectRelationship);
+
+					continue;
+				}
+
+				if (serviceBuilderObjectRelationship != null) {
+					_objectRelationshipLocalService.
+						updateReverseObjectRelationshipExternalReferenceCode(
+							objectRelationship.getExternalReferenceCode(),
+							serviceBuilderObjectRelationship);
 
 					continue;
 				}
