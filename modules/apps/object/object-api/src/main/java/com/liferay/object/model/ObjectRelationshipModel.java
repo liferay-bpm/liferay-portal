@@ -89,6 +89,21 @@ public interface ObjectRelationshipModel
 	public void setUuid(String uuid);
 
 	/**
+	 * Returns the external reference code of this object relationship.
+	 *
+	 * @return the external reference code of this object relationship
+	 */
+	@AutoEscape
+	public String getExternalReferenceCode();
+
+	/**
+	 * Sets the external reference code of this object relationship.
+	 *
+	 * @param externalReferenceCode the external reference code of this object relationship
+	 */
+	public void setExternalReferenceCode(String externalReferenceCode);
+
+	/**
 	 * Returns the object relationship ID of this object relationship.
 	 *
 	 * @return the object relationship ID of this object relationship

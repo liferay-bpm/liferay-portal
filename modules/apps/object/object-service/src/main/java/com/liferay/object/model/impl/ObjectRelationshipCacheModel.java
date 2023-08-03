@@ -69,12 +69,14 @@ public class ObjectRelationshipCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(37);
+		StringBundler sb = new StringBundler(39);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
 		sb.append(", uuid=");
 		sb.append(uuid);
+		sb.append(", externalReferenceCode=");
+		sb.append(externalReferenceCode);
 		sb.append(", objectRelationshipId=");
 		sb.append(objectRelationshipId);
 		sb.append(", companyId=");
@@ -124,6 +126,14 @@ public class ObjectRelationshipCacheModel
 		}
 		else {
 			objectRelationshipImpl.setUuid(uuid);
+		}
+
+		if (externalReferenceCode == null) {
+			objectRelationshipImpl.setExternalReferenceCode("");
+		}
+		else {
+			objectRelationshipImpl.setExternalReferenceCode(
+				externalReferenceCode);
 		}
 
 		objectRelationshipImpl.setObjectRelationshipId(objectRelationshipId);
@@ -203,6 +213,7 @@ public class ObjectRelationshipCacheModel
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
 		uuid = objectInput.readUTF();
+		externalReferenceCode = objectInput.readUTF();
 
 		objectRelationshipId = objectInput.readLong();
 
@@ -238,6 +249,13 @@ public class ObjectRelationshipCacheModel
 		}
 		else {
 			objectOutput.writeUTF(uuid);
+		}
+
+		if (externalReferenceCode == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(externalReferenceCode);
 		}
 
 		objectOutput.writeLong(objectRelationshipId);
@@ -304,6 +322,7 @@ public class ObjectRelationshipCacheModel
 
 	public long mvccVersion;
 	public String uuid;
+	public String externalReferenceCode;
 	public long objectRelationshipId;
 	public long companyId;
 	public long userId;

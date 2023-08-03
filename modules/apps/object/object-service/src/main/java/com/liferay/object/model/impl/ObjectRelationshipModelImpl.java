@@ -73,6 +73,7 @@ public class ObjectRelationshipModelImpl
 
 	public static final Object[][] TABLE_COLUMNS = {
 		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
+		{"externalReferenceCode", Types.VARCHAR},
 		{"objectRelationshipId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
@@ -90,6 +91,7 @@ public class ObjectRelationshipModelImpl
 	static {
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("externalReferenceCode", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("objectRelationshipId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
@@ -109,7 +111,7 @@ public class ObjectRelationshipModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table ObjectRelationship (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,objectRelationshipId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,objectDefinitionId1 LONG,objectDefinitionId2 LONG,objectFieldId2 LONG,parameterObjectFieldId LONG,deletionType VARCHAR(75) null,dbTableName VARCHAR(75) null,label STRING null,name VARCHAR(75) null,reverse BOOLEAN,type_ VARCHAR(75) null)";
+		"create table ObjectRelationship (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,objectRelationshipId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,objectDefinitionId1 LONG,objectDefinitionId2 LONG,objectFieldId2 LONG,parameterObjectFieldId LONG,deletionType VARCHAR(75) null,dbTableName VARCHAR(75) null,label STRING null,name VARCHAR(75) null,reverse BOOLEAN,type_ VARCHAR(75) null)";
 
 	public static final String TABLE_SQL_DROP = "drop table ObjectRelationship";
 
@@ -141,50 +143,56 @@ public class ObjectRelationshipModelImpl
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long NAME_COLUMN_BITMASK = 4L;
+	public static final long EXTERNALREFERENCECODE_COLUMN_BITMASK = 4L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long OBJECTDEFINITIONID1_COLUMN_BITMASK = 8L;
+	public static final long NAME_COLUMN_BITMASK = 8L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long OBJECTDEFINITIONID2_COLUMN_BITMASK = 16L;
+	public static final long OBJECTDEFINITIONID1_COLUMN_BITMASK = 16L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long OBJECTFIELDID2_COLUMN_BITMASK = 32L;
+	public static final long OBJECTDEFINITIONID2_COLUMN_BITMASK = 32L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long REVERSE_COLUMN_BITMASK = 64L;
+	public static final long OBJECTFIELDID2_COLUMN_BITMASK = 64L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long TYPE_COLUMN_BITMASK = 128L;
+	public static final long REVERSE_COLUMN_BITMASK = 128L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long UUID_COLUMN_BITMASK = 256L;
+	public static final long TYPE_COLUMN_BITMASK = 256L;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long UUID_COLUMN_BITMASK = 512L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *		#getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long OBJECTRELATIONSHIPID_COLUMN_BITMASK = 512L;
+	public static final long OBJECTRELATIONSHIPID_COLUMN_BITMASK = 1024L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -300,6 +308,9 @@ public class ObjectRelationshipModelImpl
 				"mvccVersion", ObjectRelationship::getMvccVersion);
 			attributeGetterFunctions.put("uuid", ObjectRelationship::getUuid);
 			attributeGetterFunctions.put(
+				"externalReferenceCode",
+				ObjectRelationship::getExternalReferenceCode);
+			attributeGetterFunctions.put(
 				"objectRelationshipId",
 				ObjectRelationship::getObjectRelationshipId);
 			attributeGetterFunctions.put(
@@ -358,6 +369,10 @@ public class ObjectRelationshipModelImpl
 				"uuid",
 				(BiConsumer<ObjectRelationship, String>)
 					ObjectRelationship::setUuid);
+			attributeSetterBiConsumers.put(
+				"externalReferenceCode",
+				(BiConsumer<ObjectRelationship, String>)
+					ObjectRelationship::setExternalReferenceCode);
 			attributeSetterBiConsumers.put(
 				"objectRelationshipId",
 				(BiConsumer<ObjectRelationship, Long>)
@@ -471,6 +486,35 @@ public class ObjectRelationshipModelImpl
 	@Deprecated
 	public String getOriginalUuid() {
 		return getColumnOriginalValue("uuid_");
+	}
+
+	@JSON
+	@Override
+	public String getExternalReferenceCode() {
+		if (_externalReferenceCode == null) {
+			return "";
+		}
+		else {
+			return _externalReferenceCode;
+		}
+	}
+
+	@Override
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_externalReferenceCode = externalReferenceCode;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
+	public String getOriginalExternalReferenceCode() {
+		return getColumnOriginalValue("externalReferenceCode");
 	}
 
 	@JSON
@@ -1069,6 +1113,8 @@ public class ObjectRelationshipModelImpl
 
 		objectRelationshipImpl.setMvccVersion(getMvccVersion());
 		objectRelationshipImpl.setUuid(getUuid());
+		objectRelationshipImpl.setExternalReferenceCode(
+			getExternalReferenceCode());
 		objectRelationshipImpl.setObjectRelationshipId(
 			getObjectRelationshipId());
 		objectRelationshipImpl.setCompanyId(getCompanyId());
@@ -1102,6 +1148,8 @@ public class ObjectRelationshipModelImpl
 			this.<Long>getColumnOriginalValue("mvccVersion"));
 		objectRelationshipImpl.setUuid(
 			this.<String>getColumnOriginalValue("uuid_"));
+		objectRelationshipImpl.setExternalReferenceCode(
+			this.<String>getColumnOriginalValue("externalReferenceCode"));
 		objectRelationshipImpl.setObjectRelationshipId(
 			this.<Long>getColumnOriginalValue("objectRelationshipId"));
 		objectRelationshipImpl.setCompanyId(
@@ -1220,6 +1268,18 @@ public class ObjectRelationshipModelImpl
 
 		if ((uuid != null) && (uuid.length() == 0)) {
 			objectRelationshipCacheModel.uuid = null;
+		}
+
+		objectRelationshipCacheModel.externalReferenceCode =
+			getExternalReferenceCode();
+
+		String externalReferenceCode =
+			objectRelationshipCacheModel.externalReferenceCode;
+
+		if ((externalReferenceCode != null) &&
+			(externalReferenceCode.length() == 0)) {
+
+			objectRelationshipCacheModel.externalReferenceCode = null;
 		}
 
 		objectRelationshipCacheModel.objectRelationshipId =
@@ -1372,6 +1432,7 @@ public class ObjectRelationshipModelImpl
 
 	private long _mvccVersion;
 	private String _uuid;
+	private String _externalReferenceCode;
 	private long _objectRelationshipId;
 	private long _companyId;
 	private long _userId;
@@ -1424,6 +1485,8 @@ public class ObjectRelationshipModelImpl
 		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put(
+			"externalReferenceCode", _externalReferenceCode);
+		_columnOriginalValues.put(
 			"objectRelationshipId", _objectRelationshipId);
 		_columnOriginalValues.put("companyId", _companyId);
 		_columnOriginalValues.put("userId", _userId);
@@ -1469,37 +1532,39 @@ public class ObjectRelationshipModelImpl
 
 		columnBitmasks.put("uuid_", 2L);
 
-		columnBitmasks.put("objectRelationshipId", 4L);
+		columnBitmasks.put("externalReferenceCode", 4L);
 
-		columnBitmasks.put("companyId", 8L);
+		columnBitmasks.put("objectRelationshipId", 8L);
 
-		columnBitmasks.put("userId", 16L);
+		columnBitmasks.put("companyId", 16L);
 
-		columnBitmasks.put("userName", 32L);
+		columnBitmasks.put("userId", 32L);
 
-		columnBitmasks.put("createDate", 64L);
+		columnBitmasks.put("userName", 64L);
 
-		columnBitmasks.put("modifiedDate", 128L);
+		columnBitmasks.put("createDate", 128L);
 
-		columnBitmasks.put("objectDefinitionId1", 256L);
+		columnBitmasks.put("modifiedDate", 256L);
 
-		columnBitmasks.put("objectDefinitionId2", 512L);
+		columnBitmasks.put("objectDefinitionId1", 512L);
 
-		columnBitmasks.put("objectFieldId2", 1024L);
+		columnBitmasks.put("objectDefinitionId2", 1024L);
 
-		columnBitmasks.put("parameterObjectFieldId", 2048L);
+		columnBitmasks.put("objectFieldId2", 2048L);
 
-		columnBitmasks.put("deletionType", 4096L);
+		columnBitmasks.put("parameterObjectFieldId", 4096L);
 
-		columnBitmasks.put("dbTableName", 8192L);
+		columnBitmasks.put("deletionType", 8192L);
 
-		columnBitmasks.put("label", 16384L);
+		columnBitmasks.put("dbTableName", 16384L);
 
-		columnBitmasks.put("name", 32768L);
+		columnBitmasks.put("label", 32768L);
 
-		columnBitmasks.put("reverse", 65536L);
+		columnBitmasks.put("name", 65536L);
 
-		columnBitmasks.put("type_", 131072L);
+		columnBitmasks.put("reverse", 131072L);
+
+		columnBitmasks.put("type_", 262144L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

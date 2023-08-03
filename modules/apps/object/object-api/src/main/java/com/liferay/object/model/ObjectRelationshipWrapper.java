@@ -36,6 +36,7 @@ public class ObjectRelationshipWrapper
 
 		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
+		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("objectRelationshipId", getObjectRelationshipId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
@@ -68,6 +69,13 @@ public class ObjectRelationshipWrapper
 
 		if (uuid != null) {
 			setUuid(uuid);
+		}
+
+		String externalReferenceCode = (String)attributes.get(
+			"externalReferenceCode");
+
+		if (externalReferenceCode != null) {
+			setExternalReferenceCode(externalReferenceCode);
 		}
 
 		Long objectRelationshipId = (Long)attributes.get(
@@ -222,6 +230,16 @@ public class ObjectRelationshipWrapper
 	@Override
 	public String getDeletionType() {
 		return model.getDeletionType();
+	}
+
+	/**
+	 * Returns the external reference code of this object relationship.
+	 *
+	 * @return the external reference code of this object relationship
+	 */
+	@Override
+	public String getExternalReferenceCode() {
+		return model.getExternalReferenceCode();
 	}
 
 	/**
@@ -528,6 +546,16 @@ public class ObjectRelationshipWrapper
 	@Override
 	public void setDeletionType(String deletionType) {
 		model.setDeletionType(deletionType);
+	}
+
+	/**
+	 * Sets the external reference code of this object relationship.
+	 *
+	 * @param externalReferenceCode the external reference code of this object relationship
+	 */
+	@Override
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		model.setExternalReferenceCode(externalReferenceCode);
 	}
 
 	/**
