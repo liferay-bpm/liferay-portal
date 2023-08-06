@@ -16,6 +16,7 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
+import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedObjectFieldIdException;
@@ -28,6 +29,7 @@ import com.liferay.object.exception.ObjectDefinitionLabelException;
 import com.liferay.object.exception.ObjectDefinitionModifiableException;
 import com.liferay.object.exception.ObjectDefinitionNameException;
 import com.liferay.object.exception.ObjectDefinitionPluralLabelException;
+import com.liferay.object.exception.ObjectDefinitionRootObjectDefinitionIdException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectDefinitionStatusException;
 import com.liferay.object.exception.ObjectDefinitionVersionException;
@@ -851,6 +853,22 @@ public class ObjectDefinitionLocalServiceImpl
 			objectDefinition.getName(), objectDefinition.isSystem());
 
 		objectDefinition.setExternalReferenceCode(externalReferenceCode);
+
+		return objectDefinitionPersistence.update(objectDefinition);
+	}
+
+	@Override
+	public ObjectDefinition updateRootObjectDefinitionId(
+			long objectDefinitionId, long rootObjectDefinitionId)
+		throws PortalException {
+
+		ObjectDefinition objectDefinition =
+			objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
+
+		_validateRootObjectDefinitionId(
+			objectDefinitionId, rootObjectDefinitionId);
+
+		objectDefinition.setRootObjectDefinitionId(rootObjectDefinitionId);
 
 		return objectDefinitionPersistence.update(objectDefinition);
 	}
@@ -1888,6 +1906,26 @@ public class ObjectDefinitionLocalServiceImpl
 
 			throw new ObjectDefinitionPluralLabelException(
 				"Plural label is null for locale " + locale.getDisplayName());
+		}
+	}
+
+	private void _validateRootObjectDefinitionId(
+			long objectDefinitionId, long rootObjectDefinitionId)
+		throws PortalException {
+
+		ObjectDefinition objectDefinition =
+			objectDefinitionPersistence.fetchByPrimaryKey(
+				rootObjectDefinitionId);
+
+		if (objectDefinition == null) {
+			throw new NoSuchObjectDefinitionException();
+		}
+
+		if ((objectDefinitionId != rootObjectDefinitionId) &&
+			Validator.isNull(objectDefinition.getRootObjectDefinitionId())) {
+
+			throw new ObjectDefinitionRootObjectDefinitionIdException(
+				"Object definition must be a root object definition");
 		}
 	}
 
