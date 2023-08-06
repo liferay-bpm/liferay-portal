@@ -11,6 +11,7 @@ import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectDefinitionActiveException;
@@ -20,6 +21,7 @@ import com.liferay.object.exception.ObjectDefinitionLabelException;
 import com.liferay.object.exception.ObjectDefinitionModifiableException;
 import com.liferay.object.exception.ObjectDefinitionNameException;
 import com.liferay.object.exception.ObjectDefinitionPluralLabelException;
+import com.liferay.object.exception.ObjectDefinitionRootObjectDefinitionIdException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectDefinitionStatusException;
 import com.liferay.object.exception.ObjectDefinitionVersionException;
@@ -1549,6 +1551,38 @@ public class ObjectDefinitionLocalServiceTest {
 			customObjectDefinition);
 		_objectDefinitionLocalService.deleteObjectDefinition(
 			unmodifiableSystemObjectDefinition);
+	}
+
+	@Test
+	public void testUpdateRootObjectDefinitionId() throws Exception {
+		ObjectDefinition customObjectDefinition1 =
+			ObjectDefinitionTestUtil.addObjectDefinition(
+				_objectDefinitionLocalService);
+
+		_assertFailure(
+			NoSuchObjectDefinitionException.class, null,
+			customObjectDefinition1,
+			objectDefinitionId ->
+				_objectDefinitionLocalService.updateRootObjectDefinitionId(
+					objectDefinitionId, 0));
+
+		ObjectDefinition customObjectDefinition2 =
+			ObjectDefinitionTestUtil.addObjectDefinition(
+				_objectDefinitionLocalService);
+
+		_assertFailure(
+			ObjectDefinitionRootObjectDefinitionIdException.class,
+			"Object definition must be a root object definition",
+			customObjectDefinition1,
+			objectDefinitionId ->
+				_objectDefinitionLocalService.updateRootObjectDefinitionId(
+					objectDefinitionId,
+					customObjectDefinition2.getObjectDefinitionId()));
+
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			customObjectDefinition1);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			customObjectDefinition2);
 	}
 
 	@Test
