@@ -11,6 +11,7 @@ import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.DuplicateObjectRelationshipException;
 import com.liferay.object.exception.NoSuchObjectRelationshipException;
+import com.liferay.object.exception.ObjectRelationshipEdgeException;
 import com.liferay.object.exception.ObjectRelationshipNameException;
 import com.liferay.object.exception.ObjectRelationshipParameterObjectFieldIdException;
 import com.liferay.object.exception.ObjectRelationshipReverseException;
@@ -699,6 +700,10 @@ public class ObjectRelationshipLocalServiceImpl
 				"Reverse object relationships cannot be updated");
 		}
 
+		_validateEdge(
+			edge, objectRelationship.getObjectDefinitionId1(),
+			objectRelationship.getObjectDefinitionId2(),
+			objectRelationship.getType());
 		_validateParameterObjectFieldId(
 			_objectDefinitionLocalService.getObjectDefinition(
 				objectRelationship.getObjectDefinitionId1()),
@@ -990,6 +995,30 @@ public class ObjectRelationshipLocalServiceImpl
 		objectRelationship.setLabelMap(labelMap);
 
 		return objectRelationshipPersistence.update(objectRelationship);
+	}
+
+	private void _validateEdge(
+			boolean edge, long objectDefinitionId1, long objectDefinitionId2,
+			String type)
+		throws ObjectRelationshipEdgeException {
+
+		if (!edge) {
+			return;
+		}
+
+		if (!Objects.equals(
+				type, ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
+
+			throw new ObjectRelationshipEdgeException(
+				"Object relationship must be one to many to be an edge of a " +
+					"root context");
+		}
+
+		if (objectDefinitionId1 == objectDefinitionId2) {
+			throw new ObjectRelationshipEdgeException(
+				"Object relationship must not be a self-relationship to be " +
+					"an edge of a root context");
+		}
 	}
 
 	private void _validateName(long objectDefinitionId1, String name)
