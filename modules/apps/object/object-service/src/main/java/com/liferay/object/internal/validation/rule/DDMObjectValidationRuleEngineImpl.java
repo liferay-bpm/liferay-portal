@@ -34,9 +34,9 @@ public class DDMObjectValidationRuleEngineImpl
 		Map<String, Object> inputObjects, String script) {
 
 		Map<String, Object> results = HashMapBuilder.<String, Object>put(
-			"invalidFields", false
-		).put(
 			"invalidScript", false
+		).put(
+			"validationCriteriaMet", true
 		).build();
 
 		try {
@@ -66,7 +66,7 @@ public class DDMObjectValidationRuleEngineImpl
 		catch (Exception exception) {
 			_log.error(exception);
 
-			results.put("invalidFields", true);
+			results.put("validationCriteriaMet", false);
 		}
 
 		return results;
