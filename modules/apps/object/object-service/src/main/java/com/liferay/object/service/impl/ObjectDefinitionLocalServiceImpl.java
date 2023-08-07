@@ -1278,9 +1278,14 @@ public class ObjectDefinitionLocalServiceImpl
 		List<ObjectDefinition> objectDefinitions = new ArrayList<>();
 
 		_companyLocalService.forEachCompanyId(
-			companyId -> objectDefinitions.addAll(
-				objectDefinitionLocalService.getObjectDefinitions(
-					companyId, true, WorkflowConstants.STATUS_APPROVED)));
+			companyId -> {
+				objectDefinitions.addAll(
+					objectDefinitionLocalService.getObjectDefinitions(
+						companyId, true, WorkflowConstants.STATUS_APPROVED));
+				objectDefinitions.addAll(
+					objectDefinitionLocalService.getObjectDefinitions(
+						companyId, false, WorkflowConstants.STATUS_APPROVED));
+			});
 
 		return objectDefinitions;
 	}
@@ -1525,14 +1530,8 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setPluralLabelMap(pluralLabelMap);
 
 		if (objectDefinition.isApproved()) {
-			if (!active && originalActive) {
-				objectDefinitionLocalService.undeployObjectDefinition(
-					objectDefinition);
-			}
-			else if (active) {
-				objectDefinitionLocalService.deployObjectDefinition(
-					objectDefinition);
-			}
+			objectDefinitionLocalService.deployObjectDefinition(
+				objectDefinition);
 
 			if (active != originalActive) {
 				_updateWorkflowInstances(objectDefinition);
