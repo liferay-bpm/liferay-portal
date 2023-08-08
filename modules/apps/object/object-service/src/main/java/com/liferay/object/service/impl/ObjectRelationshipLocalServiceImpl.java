@@ -700,10 +700,7 @@ public class ObjectRelationshipLocalServiceImpl
 				"Reverse object relationships cannot be updated");
 		}
 
-		_validateEdge(
-			edge, objectRelationship.getObjectDefinitionId1(),
-			objectRelationship.getObjectDefinitionId2(),
-			objectRelationship.getType());
+		_validateEdge(edge, objectRelationship);
 		_validateParameterObjectFieldId(
 			_objectDefinitionLocalService.getObjectDefinition(
 				objectRelationship.getObjectDefinitionId1()),
@@ -998,23 +995,23 @@ public class ObjectRelationshipLocalServiceImpl
 	}
 
 	private void _validateEdge(
-			boolean edge, long objectDefinitionId1, long objectDefinitionId2,
-			String type)
-		throws ObjectRelationshipEdgeException {
+			boolean edge, ObjectRelationship objectRelationship)
+		throws PortalException {
 
 		if (!edge) {
 			return;
 		}
 
 		if (!Objects.equals(
-				type, ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
+				objectRelationship.getType(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
 
 			throw new ObjectRelationshipEdgeException(
 				"Object relationship must be one to many to be an edge of a " +
 					"root context");
 		}
 
-		if (objectDefinitionId1 == objectDefinitionId2) {
+		if (objectRelationship.isSelf()) {
 			throw new ObjectRelationshipEdgeException(
 				"Object relationship must not be a self-relationship to be " +
 					"an edge of a root context");
