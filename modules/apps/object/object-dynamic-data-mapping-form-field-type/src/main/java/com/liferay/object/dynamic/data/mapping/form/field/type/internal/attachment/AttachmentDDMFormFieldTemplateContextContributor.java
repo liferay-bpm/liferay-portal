@@ -154,13 +154,6 @@ public class AttachmentDDMFormFieldTemplateContextContributor
 	private long _getGroupId(
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
-		long groupId = GetterUtil.getLong(
-			ddmFormFieldRenderingContext.getProperty("groupId"));
-
-		if (groupId != 0) {
-			return groupId;
-		}
-
 		HttpServletRequest httpServletRequest =
 			ddmFormFieldRenderingContext.getHttpServletRequest();
 
