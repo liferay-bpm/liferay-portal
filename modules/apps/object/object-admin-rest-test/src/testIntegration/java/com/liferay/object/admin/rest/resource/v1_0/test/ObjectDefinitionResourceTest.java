@@ -17,7 +17,9 @@ import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFolderConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectDefinitionException;
+import com.liferay.object.model.ObjectFolder;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectFolderLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
@@ -44,6 +46,7 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,6 +58,17 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class ObjectDefinitionResourceTest
 	extends BaseObjectDefinitionResourceTestCase {
+
+	@Before
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+
+		_objectFolder = _objectFolderLocalService.addObjectFolder(
+			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			RandomTestUtil.randomString());
+	}
 
 	@After
 	@Override
@@ -73,6 +87,11 @@ public class ObjectDefinitionResourceTest
 					_log.debug(noSuchObjectDefinitionException);
 				}
 			}
+		}
+
+		if (_objectFolder != null) {
+			_objectFolderLocalService.deleteObjectFolder(
+				_objectFolder.getObjectFolderId());
 		}
 	}
 
@@ -415,6 +434,27 @@ public class ObjectDefinitionResourceTest
 	}
 
 	@Override
+	protected ObjectDefinition
+			testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_addObjectDefinition(
+				String externalReferenceCode, ObjectDefinition objectDefinition)
+		throws Exception {
+
+		ObjectDefinition randomObjectDefinition = randomObjectDefinition();
+
+		randomObjectDefinition.setObjectFolderExternalReferenceCode(
+			externalReferenceCode);
+
+		return _addObjectDefinition(randomObjectDefinition);
+	}
+
+	@Override
+	protected String
+		testGetObjectFolderByExternalReferenceCodeObjectDefinitionsPage_getExternalReferenceCode() {
+
+		return _objectFolder.getExternalReferenceCode();
+	}
+
+	@Override
 	protected ObjectDefinition testGraphQLObjectDefinition_addObjectDefinition()
 		throws Exception {
 
@@ -479,6 +519,11 @@ public class ObjectDefinitionResourceTest
 
 	@Inject
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	private ObjectFolder _objectFolder;
+
+	@Inject
+	private ObjectFolderLocalService _objectFolderLocalService;
 
 	@Inject
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
