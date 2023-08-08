@@ -16,7 +16,6 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
-import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedObjectFieldIdException;
@@ -865,8 +864,17 @@ public class ObjectDefinitionLocalServiceImpl
 		ObjectDefinition objectDefinition =
 			objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
-		_validateRootObjectDefinitionId(
-			objectDefinitionId, rootObjectDefinitionId);
+		ObjectDefinition rootObjectDefinition =
+			objectDefinitionPersistence.findByPrimaryKey(
+				rootObjectDefinitionId);
+
+		if ((objectDefinitionId != rootObjectDefinitionId) &&
+			(rootObjectDefinition.getRootObjectDefinitionId() == 0)) {
+
+			throw new ObjectDefinitionRootObjectDefinitionIdException(
+				"Object definition " + rootObjectDefinitionId +
+					" is not a root object definition");
+		}
 
 		objectDefinition.setRootObjectDefinitionId(rootObjectDefinitionId);
 
@@ -1906,26 +1914,6 @@ public class ObjectDefinitionLocalServiceImpl
 
 			throw new ObjectDefinitionPluralLabelException(
 				"Plural label is null for locale " + locale.getDisplayName());
-		}
-	}
-
-	private void _validateRootObjectDefinitionId(
-			long objectDefinitionId, long rootObjectDefinitionId)
-		throws PortalException {
-
-		ObjectDefinition objectDefinition =
-			objectDefinitionPersistence.fetchByPrimaryKey(
-				rootObjectDefinitionId);
-
-		if (objectDefinition == null) {
-			throw new NoSuchObjectDefinitionException();
-		}
-
-		if ((objectDefinitionId != rootObjectDefinitionId) &&
-			Validator.isNull(objectDefinition.getRootObjectDefinitionId())) {
-
-			throw new ObjectDefinitionRootObjectDefinitionIdException(
-				"Object definition must be a root object definition");
 		}
 	}
 
