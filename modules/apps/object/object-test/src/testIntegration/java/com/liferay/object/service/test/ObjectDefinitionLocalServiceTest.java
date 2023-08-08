@@ -1555,34 +1555,30 @@ public class ObjectDefinitionLocalServiceTest {
 
 	@Test
 	public void testUpdateRootObjectDefinitionId() throws Exception {
-		ObjectDefinition customObjectDefinition1 =
+		ObjectDefinition objectDefinition1 =
 			ObjectDefinitionTestUtil.addObjectDefinition(
 				_objectDefinitionLocalService);
 
-		_assertFailure(
-			NoSuchObjectDefinitionException.class, null,
-			customObjectDefinition1,
-			objectDefinitionId ->
-				_objectDefinitionLocalService.updateRootObjectDefinitionId(
-					objectDefinitionId, 0));
+		AssertUtils.assertFailure(
+			NoSuchObjectDefinitionException.class,
+			"No ObjectDefinition exists with the primary key 0",
+			() -> _objectDefinitionLocalService.updateRootObjectDefinitionId(
+				objectDefinition1.getObjectDefinitionId(), 0));
 
-		ObjectDefinition customObjectDefinition2 =
+		ObjectDefinition objectDefinition2 =
 			ObjectDefinitionTestUtil.addObjectDefinition(
 				_objectDefinitionLocalService);
 
-		_assertFailure(
+		AssertUtils.assertFailure(
 			ObjectDefinitionRootObjectDefinitionIdException.class,
-			"Object definition must be a root object definition",
-			customObjectDefinition1,
-			objectDefinitionId ->
-				_objectDefinitionLocalService.updateRootObjectDefinitionId(
-					objectDefinitionId,
-					customObjectDefinition2.getObjectDefinitionId()));
+			"Object definition " + objectDefinition2.getObjectDefinitionId() +
+				" is not a root object definition",
+			() -> _objectDefinitionLocalService.updateRootObjectDefinitionId(
+				objectDefinition1.getObjectDefinitionId(),
+				objectDefinition2.getObjectDefinitionId()));
 
-		_objectDefinitionLocalService.deleteObjectDefinition(
-			customObjectDefinition1);
-		_objectDefinitionLocalService.deleteObjectDefinition(
-			customObjectDefinition2);
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition1);
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition2);
 	}
 
 	@Test
