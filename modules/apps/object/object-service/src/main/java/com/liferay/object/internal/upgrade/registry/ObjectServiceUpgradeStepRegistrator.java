@@ -316,6 +316,11 @@ public class ObjectServiceUpgradeStepRegistrator
 			"7.0.0", "7.1.0",
 			new com.liferay.object.internal.upgrade.v7_1_0.
 				SchemaUpgradeProcess());
+
+		registry.register(
+			"7.1.0", "7.2.0",
+			UpgradeProcessFactory.addColumns(
+				"ObjectDefinition", "enableObjectEntryDraft BOOLEAN"));
 	}
 
 	@Reference
