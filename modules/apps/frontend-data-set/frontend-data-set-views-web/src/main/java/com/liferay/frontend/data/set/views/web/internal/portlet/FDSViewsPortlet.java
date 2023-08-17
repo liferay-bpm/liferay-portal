@@ -265,7 +265,7 @@ public class FDSViewsPortlet extends MVCPortlet {
 			fdsViewObjectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 			LocalizedMapUtil.getLocalizedMap("FDSEntry FDSView Relationship"),
-			"fdsEntryFDSViewRelationship",
+			"fdsEntryFDSViewRelationship", false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
 		ObjectDefinition fdsFieldObjectDefinition =
@@ -313,7 +313,7 @@ public class FDSViewsPortlet extends MVCPortlet {
 			fdsFieldObjectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 			LocalizedMapUtil.getLocalizedMap("FDSView FDSField Relationship"),
-			"fdsViewFDSFieldRelationship",
+			"fdsViewFDSFieldRelationship", false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
 		ObjectDefinition fdsDateFilterObjectDefinition =
@@ -355,7 +355,7 @@ public class FDSViewsPortlet extends MVCPortlet {
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 			LocalizedMapUtil.getLocalizedMap(
 				"FDSView FDSDateFilter Relationship"),
-			"fdsViewFDSDateFilterRelationship",
+			"fdsViewFDSDateFilterRelationship", false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
 		ObjectDefinition fdsDynamicFilterObjectDefinition =
@@ -404,7 +404,7 @@ public class FDSViewsPortlet extends MVCPortlet {
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 			LocalizedMapUtil.getLocalizedMap(
 				"FDSView FDSDynamicFilter Relationship"),
-			"fdsViewFDSDynamicFilterRelationship",
+			"fdsViewFDSDynamicFilterRelationship", false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
 		ObjectDefinition fdsSortObjectDefinition =
@@ -434,7 +434,7 @@ public class FDSViewsPortlet extends MVCPortlet {
 			fdsSortObjectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 			LocalizedMapUtil.getLocalizedMap("FDSView FDSSort Relationship"),
-			"fdsViewFDSSortRelationship",
+			"fdsViewFDSSortRelationship", false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
 		ObjectDefinition fdsActionObjectDefinition =
@@ -499,7 +499,7 @@ public class FDSViewsPortlet extends MVCPortlet {
 			fdsActionObjectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 			LocalizedMapUtil.getLocalizedMap("FDSView FDSAction Relationship"),
-			"fdsViewFDSActionRelationship",
+			"fdsViewFDSActionRelationship", false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 	}
 
