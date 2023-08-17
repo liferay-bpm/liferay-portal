@@ -215,6 +215,7 @@ interface ObjectRelationship {
 	objectRelationshipId: number;
 	parameterObjectFieldName?: string;
 	reverse: boolean;
+	system?: boolean;
 	type: ObjectRelationshipType;
 }
 
