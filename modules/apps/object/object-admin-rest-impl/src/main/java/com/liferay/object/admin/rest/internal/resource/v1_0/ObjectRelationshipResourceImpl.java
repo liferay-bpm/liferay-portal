@@ -294,11 +294,17 @@ public class ObjectRelationshipResourceImpl
 				false,
 				HashMapBuilder.put(
 					"delete",
-					addAction(
-						ActionKeys.DELETE, "deleteObjectRelationship",
-						com.liferay.object.model.ObjectDefinition.class.
-							getName(),
-						objectRelationship.getObjectDefinitionId1())
+					() -> {
+						if (objectRelationship.isSystem()) {
+							return null;
+						}
+
+						return addAction(
+							ActionKeys.DELETE, "deleteObjectRelationship",
+							com.liferay.object.model.ObjectDefinition.class.
+								getName(),
+							objectRelationship.getObjectDefinitionId1());
+					}
 				).build(),
 				null, null, contextAcceptLanguage.getPreferredLocale(), null,
 				null),
