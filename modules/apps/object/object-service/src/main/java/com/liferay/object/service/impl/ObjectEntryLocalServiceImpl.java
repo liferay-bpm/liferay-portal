@@ -275,7 +275,7 @@ public class ObjectEntryLocalServiceImpl
 		objectEntry.setUserName(user.getFullName());
 		objectEntry.setCreateDate(new Date());
 		objectEntry.setObjectDefinitionId(objectDefinitionId);
-		objectEntry.setStatus(WorkflowConstants.STATUS_DRAFT);
+		objectEntry.setStatus(status);
 		objectEntry.setStatusByUserId(user.getUserId());
 		objectEntry.setStatusDate(serviceContext.getModifiedDate(null));
 
@@ -293,7 +293,9 @@ public class ObjectEntryLocalServiceImpl
 			serviceContext.getAssetLinkEntryIds(),
 			serviceContext.getAssetPriority());
 
-		_startWorkflowInstance(userId, objectEntry, serviceContext);
+		if (objectEntry.getStatus() != WorkflowConstants.STATUS_DRAFT) {
+			_startWorkflowInstance(userId, objectEntry, serviceContext);
+		}
 
 		_reindex(objectEntry);
 
@@ -1384,6 +1386,7 @@ public class ObjectEntryLocalServiceImpl
 		_setExternalReferenceCode(objectEntry, values);
 
 		objectEntry.setModifiedDate(serviceContext.getModifiedDate(null));
+		objectEntry.setStatus(status);
 		objectEntry.setTransientValues(transientValues);
 
 		objectEntry = objectEntryPersistence.update(objectEntry);
@@ -1395,7 +1398,9 @@ public class ObjectEntryLocalServiceImpl
 			serviceContext.getAssetLinkEntryIds(),
 			serviceContext.getAssetPriority());
 
-		_startWorkflowInstance(userId, objectEntry, serviceContext);
+		if (objectEntry.getStatus() != WorkflowConstants.STATUS_DRAFT) {
+			_startWorkflowInstance(userId, objectEntry, serviceContext);
+		}
 
 		_deleteFileEntries(
 			objectEntry.getValues(), objectEntry.getObjectDefinitionId(),
