@@ -38,6 +38,7 @@ import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
+import com.liferay.object.exception.ObjectEntryStatusException;
 import com.liferay.object.exception.ObjectEntryValuesException;
 import com.liferay.object.exception.ObjectRelationshipDeletionTypeException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
@@ -242,6 +243,7 @@ public class ObjectEntryLocalServiceImpl
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
 		_validateGroupId(groupId, objectDefinition.getScope());
+		_validateStatus(objectDefinition, status, null);
 
 		User user = _userLocalService.getUser(userId);
 
@@ -1355,6 +1357,8 @@ public class ObjectEntryLocalServiceImpl
 			_objectDefinitionPersistence.findByPrimaryKey(
 				objectEntry.getObjectDefinitionId());
 
+		_validateStatus(objectDefinition, status, objectEntry.getStatus());
+
 		_validateValues(
 			user.isGuestUser(), objectEntry.getObjectDefinitionId(),
 			objectEntry, objectDefinition.getPortletId(), serviceContext,
@@ -1415,6 +1419,12 @@ public class ObjectEntryLocalServiceImpl
 			return objectEntry;
 		}
 
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.fetchByPrimaryKey(
+				objectEntry.getObjectDefinitionId());
+
+		_validateStatus(objectDefinition, status, objectEntry.getStatus());
+
 		objectEntry.setStatus(status);
 
 		User user = _userLocalService.getUser(userId);
@@ -1437,10 +1447,6 @@ public class ObjectEntryLocalServiceImpl
 		else {
 			objectEntry = objectEntryPersistence.update(objectEntry);
 		}
-
-		ObjectDefinition objectDefinition =
-			_objectDefinitionPersistence.fetchByPrimaryKey(
-				objectEntry.getObjectDefinitionId());
 
 		_assetEntryLocalService.updateEntry(
 			objectDefinition.getClassName(), objectEntry.getObjectEntryId(),
@@ -4004,6 +4010,22 @@ public class ObjectEntryLocalServiceImpl
 			throw new ObjectEntryValuesException.OneToOneConstraintViolation(
 				dbColumnName, dbColumnValue,
 				dynamicObjectDefinitionTable.getTableName());
+		}
+	}
+
+	private void _validateStatus(
+			ObjectDefinition objectDefinition, Integer newStatus,
+			Integer oldStatus)
+		throws PortalException {
+
+		if ((newStatus == WorkflowConstants.STATUS_DRAFT) &&
+			(((oldStatus != null) &&
+			  (oldStatus != WorkflowConstants.STATUS_DRAFT)) ||
+			 !objectDefinition.isEnableObjectEntryDraft())) {
+
+			throw new ObjectEntryStatusException(
+				"Not allowed status " +
+					WorkflowConstants.getStatusLabel(newStatus));
 		}
 	}
 
