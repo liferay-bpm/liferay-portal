@@ -1590,7 +1590,11 @@ public class DefaultObjectEntryManagerImpl
 				continue;
 			}
 
-			if ((value == null) && !objectField.isRequired()) {
+			if ((value == null) &&
+				(!objectField.isRequired() ||
+				 (_getStatus(objectEntry.getStatus()) ==
+					 WorkflowConstants.STATUS_DRAFT))) {
+
 				continue;
 			}
 
