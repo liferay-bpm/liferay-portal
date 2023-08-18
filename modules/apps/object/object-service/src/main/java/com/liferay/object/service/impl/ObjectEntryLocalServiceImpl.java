@@ -367,13 +367,14 @@ public class ObjectEntryLocalServiceImpl
 
 			if (objectEntry != null) {
 				return updateObjectEntry(
-					userId, objectEntry.getObjectEntryId(), values,
+					userId, objectEntry.getObjectEntryId(), status, values,
 					serviceContext);
 			}
 		}
 
 		objectEntry = addObjectEntry(
-			userId, groupId, objectDefinitionId, values, serviceContext);
+			userId, groupId, objectDefinitionId, status, values,
+			serviceContext);
 
 		if (Validator.isNotNull(externalReferenceCode)) {
 			objectEntry.setExternalReferenceCode(externalReferenceCode);

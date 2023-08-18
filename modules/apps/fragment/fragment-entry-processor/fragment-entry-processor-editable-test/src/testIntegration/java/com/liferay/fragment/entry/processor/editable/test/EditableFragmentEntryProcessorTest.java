@@ -729,6 +729,7 @@ public class EditableFragmentEntryProcessorTest {
 		ObjectEntry objectEntry = _objectEntryLocalService.addObjectEntry(
 			TestPropsValues.getUserId(), _group.getGroupId(),
 			objectDefinition.getObjectDefinitionId(),
+			WorkflowConstants.STATUS_APPROVED,
 			HashMapBuilder.<String, Serializable>put(
 				"text", RandomTestUtil.randomString()
 			).build(),

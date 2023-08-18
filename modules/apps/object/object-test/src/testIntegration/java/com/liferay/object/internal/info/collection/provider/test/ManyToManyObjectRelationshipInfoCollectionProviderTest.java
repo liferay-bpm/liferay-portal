@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -111,6 +112,7 @@ public class ManyToManyObjectRelationshipInfoCollectionProviderTest {
 			_objectEntryLocalService.addObjectEntry(
 				TestPropsValues.getUserId(), _group.getGroupId(),
 				_objectDefinition1.getObjectDefinitionId(),
+				WorkflowConstants.STATUS_APPROVED,
 				HashMapBuilder.<String, Serializable>put(
 					"objectDefinition1TextObjectFieldName",
 					RandomTestUtil.randomString()
@@ -121,6 +123,7 @@ public class ManyToManyObjectRelationshipInfoCollectionProviderTest {
 			_objectEntryLocalService.addObjectEntry(
 				TestPropsValues.getUserId(), _group.getGroupId(),
 				_objectDefinition1.getObjectDefinitionId(),
+				WorkflowConstants.STATUS_APPROVED,
 				HashMapBuilder.<String, Serializable>put(
 					"objectDefinition1TextObjectFieldName",
 					RandomTestUtil.randomString()
@@ -131,6 +134,7 @@ public class ManyToManyObjectRelationshipInfoCollectionProviderTest {
 			_objectEntryLocalService.addObjectEntry(
 				TestPropsValues.getUserId(), _group.getGroupId(),
 				_objectDefinition2.getObjectDefinitionId(),
+				WorkflowConstants.STATUS_APPROVED,
 				HashMapBuilder.<String, Serializable>put(
 					"objectDefinition2TextObjectFieldName",
 					RandomTestUtil.randomString()

@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -133,6 +134,7 @@ public class ObjectDefinitionGraphQLTest {
 		_parentObjectEntry = ObjectEntryLocalServiceUtil.addObjectEntry(
 			TestPropsValues.getUserId(), 0,
 			_parentObjectDefinition.getObjectDefinitionId(),
+			WorkflowConstants.STATUS_APPROVED,
 			HashMapBuilder.<String, Serializable>put(
 				_listFieldName, _listFieldValueKey
 			).put(
@@ -143,6 +145,7 @@ public class ObjectDefinitionGraphQLTest {
 		_childObjectEntry = ObjectEntryLocalServiceUtil.addObjectEntry(
 			TestPropsValues.getUserId(), 0,
 			childObjectDefinition.getObjectDefinitionId(),
+			WorkflowConstants.STATUS_APPROVED,
 			HashMapBuilder.<String, Serializable>put(
 				StringBundler.concat(
 					"r_", _RELATIONSHIP_NAME, "_",

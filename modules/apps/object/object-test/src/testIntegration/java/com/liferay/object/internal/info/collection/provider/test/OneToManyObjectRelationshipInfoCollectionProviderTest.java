@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -106,6 +107,7 @@ public class OneToManyObjectRelationshipInfoCollectionProviderTest {
 		ObjectEntry parentObjectEntry = _objectEntryLocalService.addObjectEntry(
 			TestPropsValues.getUserId(), _group.getGroupId(),
 			_parentObjectDefinition.getObjectDefinitionId(),
+			WorkflowConstants.STATUS_APPROVED,
 			HashMapBuilder.<String, Serializable>put(
 				"parentTextObjectFieldName", RandomTestUtil.randomString()
 			).build(),
@@ -156,6 +158,7 @@ public class OneToManyObjectRelationshipInfoCollectionProviderTest {
 		return _objectEntryLocalService.addObjectEntry(
 			TestPropsValues.getUserId(), group.getGroupId(),
 			objectDefinition.getObjectDefinitionId(),
+			WorkflowConstants.STATUS_APPROVED,
 			HashMapBuilder.<String, Serializable>put(
 				"childTextObjectFieldName", RandomTestUtil.randomString()
 			).put(

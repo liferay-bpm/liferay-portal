@@ -8,6 +8,7 @@ package com.liferay.object.web.internal.object.entries.portlet.action;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectEntryValuesException;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
@@ -25,6 +26,7 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
@@ -107,13 +109,18 @@ public class EditObjectEntryMVCActionCommand extends BaseMVCActionCommand {
 				_objectEntryService.addObjectEntry(
 					_getGroupId(actionRequest, objectDefinition),
 					objectDefinition.getObjectDefinitionId(),
+					WorkflowConstants.STATUS_APPROVED,
 					_getValues(actionRequest),
 					ServiceContextFactory.getInstance(
 						objectDefinition.getClassName(), actionRequest));
 			}
 			else {
+				ObjectEntry objectEntry = _objectEntryService.getObjectEntry(
+					objectEntryId);
+
 				_objectEntryService.updateObjectEntry(
-					objectEntryId, _getValues(actionRequest),
+					objectEntry.getObjectEntryId(), objectEntry.getStatus(),
+					_getValues(actionRequest),
 					ServiceContextFactory.getInstance(
 						objectDefinition.getClassName(), actionRequest));
 			}

@@ -149,7 +149,7 @@
 	  long userId = UserLocalServiceUtil.getUserIdByEmailAddress(serviceContext.getCompanyId(),
 		"ryan.underwriter@mailinator.com");
 
-	  ObjectEntryLocalServiceUtil.updateObjectEntry(userId, classPK, values, serviceContext);
+	  ObjectEntryLocalServiceUtil.updateObjectEntry(userId, classPK, objectEntry.getStatus(), values, serviceContext);
 
 	  WorkflowStatusManagerUtil.updateStatus(WorkflowConstants.getLabelStatus("approved"), workflowContext);]]>
 				</script>
@@ -206,7 +206,7 @@ values.put("applicationStatus", "rejected");
 
 long userId = UserLocalServiceUtil.getUserIdByEmailAddress(serviceContext.getCompanyId(), "ryan.underwriter@mailinator.com");
 
-ObjectEntryLocalServiceUtil.updateObjectEntry(userId, classPK, values, serviceContext);
+ObjectEntryLocalServiceUtil.updateObjectEntry(userId, classPK, objectEntry.getStatus(), values, serviceContext);
 
 WorkflowStatusManagerUtil.updateStatus(WorkflowConstants.getLabelStatus("denied"), workflowContext);]]>
 				</script>

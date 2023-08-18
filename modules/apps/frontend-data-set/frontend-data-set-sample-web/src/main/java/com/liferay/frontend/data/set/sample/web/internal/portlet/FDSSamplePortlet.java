@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.io.IOException;
@@ -153,6 +154,7 @@ public class FDSSamplePortlet extends MVCPortlet {
 		for (int i = 1; i <= 100; i++) {
 			_objectEntryLocalService.addObjectEntry(
 				user.getUserId(), 0, objectDefinition.getObjectDefinitionId(),
+				WorkflowConstants.STATUS_APPROVED,
 				HashMapBuilder.<String, Serializable>put(
 					"color", colors[i % 4]
 				).put(

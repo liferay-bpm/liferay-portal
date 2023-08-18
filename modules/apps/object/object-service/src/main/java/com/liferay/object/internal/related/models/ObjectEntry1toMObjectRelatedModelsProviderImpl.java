@@ -85,7 +85,7 @@ public class ObjectEntry1toMObjectRelatedModelsProviderImpl
 
 			for (ObjectEntry objectEntry : relatedModels) {
 				_objectEntryService.updateObjectEntry(
-					objectEntry.getObjectEntryId(),
+					objectEntry.getObjectEntryId(), objectEntry.getStatus(),
 					HashMapBuilder.<String, Serializable>put(
 						objectField.getName(), 0
 					).build(),
@@ -110,8 +110,11 @@ public class ObjectEntry1toMObjectRelatedModelsProviderImpl
 			long primaryKey2)
 		throws PortalException {
 
+		ObjectEntry objectEntry = _objectEntryService.getObjectEntry(
+			primaryKey2);
+
 		_objectEntryService.updateObjectEntry(
-			primaryKey2,
+			objectEntry.getObjectEntryId(), objectEntry.getStatus(),
 			HashMapBuilder.<String, Serializable>put(
 				() -> {
 					ObjectRelationship objectRelationship =

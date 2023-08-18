@@ -19,6 +19,7 @@ import com.liferay.object.exception.ObjectRelationshipTypeException;
 import com.liferay.object.internal.dao.db.ObjectDBManagerUtil;
 import com.liferay.object.internal.info.collection.provider.RelatedInfoCollectionProviderFactory;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.model.ObjectRelationship;
@@ -172,8 +173,11 @@ public class ObjectRelationshipLocalServiceImpl
 				).build());
 		}
 		else {
+			ObjectEntry objectEntry = _objectEntryLocalService.getObjectEntry(
+				primaryKey2);
+
 			_objectEntryLocalService.updateObjectEntry(
-				userId, primaryKey2,
+				userId, objectEntry.getObjectEntryId(), objectEntry.getStatus(),
 				HashMapBuilder.<String, Serializable>put(
 					objectField2.getName(), primaryKey1
 				).build(),

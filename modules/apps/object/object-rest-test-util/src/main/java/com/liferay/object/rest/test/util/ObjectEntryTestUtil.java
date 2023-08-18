@@ -14,6 +14,7 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
@@ -38,7 +39,8 @@ public class ObjectEntryTestUtil {
 
 		return ObjectEntryLocalServiceUtil.addObjectEntry(
 			TestPropsValues.getUserId(), groupId,
-			objectDefinition.getObjectDefinitionId(), values, serviceContext);
+			objectDefinition.getObjectDefinitionId(),
+			WorkflowConstants.STATUS_APPROVED, values, serviceContext);
 	}
 
 	public static ObjectEntry addObjectEntry(

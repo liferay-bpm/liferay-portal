@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
@@ -71,6 +72,7 @@ public class SaveFDSFieldsMVCResourceCommand
 
 			ObjectEntry objectEntry = _objectEntryService.addObjectEntry(
 				0, objectDefinition.getObjectDefinitionId(),
+				WorkflowConstants.STATUS_APPROVED,
 				HashMapBuilder.<String, Serializable>put(
 					"label", String.valueOf(creationDataJSONObject.get("name"))
 				).put(

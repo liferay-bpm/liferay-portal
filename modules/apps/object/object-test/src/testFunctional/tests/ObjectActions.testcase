@@ -1993,7 +1993,7 @@ definition {
 
 			System.out.println(objectEntry);
 
-			ObjectEntryLocalServiceUtil.updateObjectEntry(objectEntry.getUserId(), id, values, new ServiceContext());
+			ObjectEntryLocalServiceUtil.updateObjectEntry(objectEntry.getUserId(), id, objectEntry.getStatus(), values, new ServiceContext());
 			''';
 		}
 
@@ -2289,7 +2289,7 @@ definition {
 
 			System.out.println(objectEntry);
 
-			ObjectEntryLocalServiceUtil.updateObjectEntry(objectEntry.getUserId(), id, values, new ServiceContext());
+			ObjectEntryLocalServiceUtil.updateObjectEntry(objectEntry.getUserId(), id, objectEntry.getStatus(), values, new ServiceContext());
 			''';
 		}
 

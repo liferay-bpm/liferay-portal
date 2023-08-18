@@ -73,6 +73,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -188,7 +189,7 @@ public class BatchEngineBrokerTest {
 		throws Exception {
 
 		return _objectEntryLocalService.addObjectEntry(
-			userId, 0, objectDefinitionId,
+			userId, 0, objectDefinitionId, WorkflowConstants.STATUS_APPROVED,
 			HashMapBuilder.<String, Serializable>put(
 				"testAttachmentField", _getAttachmentFieldValue()
 			).put(

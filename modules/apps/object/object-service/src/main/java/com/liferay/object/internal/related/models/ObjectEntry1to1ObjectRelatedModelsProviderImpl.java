@@ -77,7 +77,7 @@ public class ObjectEntry1to1ObjectRelatedModelsProviderImpl
 					ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE)) {
 
 			_objectEntryService.updateObjectEntry(
-				objectEntry.getObjectEntryId(),
+				objectEntry.getObjectEntryId(), objectEntry.getStatus(),
 				HashMapBuilder.<String, Serializable>put(
 					() -> {
 						ObjectField objectField =
@@ -108,8 +108,11 @@ public class ObjectEntry1to1ObjectRelatedModelsProviderImpl
 			long primaryKey2)
 		throws PortalException {
 
+		ObjectEntry objectEntry = _objectEntryService.getObjectEntry(
+			primaryKey1);
+
 		_objectEntryService.updateObjectEntry(
-			primaryKey1,
+			objectEntry.getObjectEntryId(), objectEntry.getStatus(),
 			HashMapBuilder.<String, Serializable>put(
 				() -> {
 					ObjectRelationship objectRelationship =

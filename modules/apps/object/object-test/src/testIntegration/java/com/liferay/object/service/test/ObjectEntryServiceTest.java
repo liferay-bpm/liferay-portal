@@ -116,6 +116,7 @@ public class ObjectEntryServiceTest {
 		Assert.assertNotNull(
 			_objectEntryService.addObjectEntry(
 				0, _objectDefinition.getObjectDefinitionId(),
+				WorkflowConstants.STATUS_APPROVED,
 				HashMapBuilder.<String, Serializable>put(
 					"firstName", RandomStringUtils.randomAlphabetic(5)
 				).build(),
@@ -144,6 +145,7 @@ public class ObjectEntryServiceTest {
 		Assert.assertNotNull(
 			_objectEntryService.addObjectEntry(
 				0, _objectDefinition.getObjectDefinitionId(),
+				WorkflowConstants.STATUS_APPROVED,
 				HashMapBuilder.<String, Serializable>put(
 					"firstName", RandomStringUtils.randomAlphabetic(5)
 				).build(),
@@ -155,6 +157,7 @@ public class ObjectEntryServiceTest {
 		Assert.assertNotNull(
 			_objectEntryService.addObjectEntry(
 				0, _objectDefinition.getObjectDefinitionId(),
+				WorkflowConstants.STATUS_APPROVED,
 				HashMapBuilder.<String, Serializable>put(
 					"firstName", RandomStringUtils.randomAlphabetic(5)
 				).build(),
@@ -261,6 +264,7 @@ public class ObjectEntryServiceTest {
 		ObjectEntry objectEntry = _objectEntryLocalService.addObjectEntry(
 			TestPropsValues.getUserId(), 0,
 			_objectDefinition.getObjectDefinitionId(),
+			WorkflowConstants.STATUS_APPROVED,
 			HashMapBuilder.<String, Serializable>put(
 				"r_relationship_accountEntryId",
 				accountEntry.getAccountEntryId()
@@ -316,6 +320,7 @@ public class ObjectEntryServiceTest {
 	private ObjectEntry _addObjectEntry(User user) throws Exception {
 		return _objectEntryLocalService.addObjectEntry(
 			user.getUserId(), 0, _objectDefinition.getObjectDefinitionId(),
+			WorkflowConstants.STATUS_APPROVED,
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", RandomStringUtils.randomAlphabetic(5)
 			).put(
@@ -340,6 +345,7 @@ public class ObjectEntryServiceTest {
 			else {
 				_objectEntryService.addObjectEntry(
 					0, _objectDefinition.getObjectDefinitionId(),
+					WorkflowConstants.STATUS_APPROVED,
 					HashMapBuilder.<String, Serializable>put(
 						"firstName", RandomStringUtils.randomAlphabetic(5)
 					).build(),
