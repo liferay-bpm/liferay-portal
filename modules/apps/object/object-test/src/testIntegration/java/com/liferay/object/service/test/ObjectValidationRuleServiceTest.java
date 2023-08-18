@@ -94,6 +94,7 @@ public class ObjectValidationRuleServiceTest {
 	public void testAddObjectValidationRule() throws Exception {
 		try {
 			_testAddObjectValidationRule(
+				ObjectValidationRuleConstants.ENGINE_TYPE_DDM,
 				_objectDefinition.getObjectDefinitionId(), _guestUser);
 
 			Assert.fail();
@@ -108,6 +109,7 @@ public class ObjectValidationRuleServiceTest {
 		}
 
 		_testAddObjectValidationRule(
+			ObjectValidationRuleConstants.ENGINE_TYPE_DDM,
 			_objectDefinition.getObjectDefinitionId(), _user);
 	}
 
@@ -150,7 +152,8 @@ public class ObjectValidationRuleServiceTest {
 	@Test
 	public void testUpdateObjectValidationRule() throws Exception {
 		try {
-			_testUpdateObjectValidationRule(_guestUser);
+			_testUpdateObjectValidationRule(
+				ObjectValidationRuleConstants.ENGINE_TYPE_DDM, _guestUser);
 
 			Assert.fail();
 		}
@@ -163,7 +166,8 @@ public class ObjectValidationRuleServiceTest {
 						" must have UPDATE permission for"));
 		}
 
-		_testUpdateObjectValidationRule(_user);
+		_testUpdateObjectValidationRule(
+			ObjectValidationRuleConstants.ENGINE_TYPE_DDM, _user);
 	}
 
 	private ObjectValidationRule _addObjectValidationRule(User user)
@@ -186,7 +190,7 @@ public class ObjectValidationRuleServiceTest {
 	}
 
 	private void _testAddObjectValidationRule(
-			long objectDefinitionId, User user)
+			String engine, long objectDefinitionId, User user)
 		throws Exception {
 
 		ObjectValidationRule objectValidationRule = null;
@@ -196,8 +200,7 @@ public class ObjectValidationRuleServiceTest {
 
 			objectValidationRule =
 				_objectValidationRuleService.addObjectValidationRule(
-					objectDefinitionId, true,
-					ObjectValidationRuleConstants.ENGINE_TYPE_DDM,
+					objectDefinitionId, true, engine,
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
 					LocalizedMapUtil.getLocalizedMap(
@@ -253,7 +256,9 @@ public class ObjectValidationRuleServiceTest {
 		}
 	}
 
-	private void _testUpdateObjectValidationRule(User user) throws Exception {
+	private void _testUpdateObjectValidationRule(String engine, User user)
+		throws Exception {
+
 		ObjectValidationRule objectValidationRule = null;
 
 		try {
@@ -264,7 +269,7 @@ public class ObjectValidationRuleServiceTest {
 			objectValidationRule =
 				_objectValidationRuleService.updateObjectValidationRule(
 					objectValidationRule.getObjectValidationRuleId(), false,
-					ObjectValidationRuleConstants.ENGINE_TYPE_DDM,
+					engine,
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
 					LocalizedMapUtil.getLocalizedMap(
