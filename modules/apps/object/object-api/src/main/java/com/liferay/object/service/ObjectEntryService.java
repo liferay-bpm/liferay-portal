@@ -49,13 +49,14 @@ public interface ObjectEntryService extends BaseService {
 	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.object.service.impl.ObjectEntryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the object entry remote service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link ObjectEntryServiceUtil} if injection and service tracking are not available.
 	 */
 	public ObjectEntry addObjectEntry(
-			long groupId, long objectDefinitionId,
+			long groupId, long objectDefinitionId, int status,
 			Map<String, Serializable> values, ServiceContext serviceContext)
 		throws PortalException;
 
 	public ObjectEntry addOrUpdateObjectEntry(
 			String externalReferenceCode, long groupId, long objectDefinitionId,
-			Map<String, Serializable> values, ServiceContext serviceContext)
+			int status, Map<String, Serializable> values,
+			ServiceContext serviceContext)
 		throws PortalException;
 
 	public void checkModelResourcePermission(
@@ -144,7 +145,7 @@ public interface ObjectEntryService extends BaseService {
 		throws PortalException;
 
 	public ObjectEntry updateObjectEntry(
-			long objectEntryId, Map<String, Serializable> values,
+			long objectEntryId, int status, Map<String, Serializable> values,
 			ServiceContext serviceContext)
 		throws PortalException;
 
