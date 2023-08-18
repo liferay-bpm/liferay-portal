@@ -81,7 +81,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 	@Override
 	public ObjectEntry addObjectEntry(
-			long groupId, long objectDefinitionId,
+			long groupId, long objectDefinitionId, int status,
 			Map<String, Serializable> values, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -94,13 +94,15 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 		_validateSubmissionLimit(objectDefinitionId, getUser());
 
 		return objectEntryLocalService.addObjectEntry(
-			getUserId(), groupId, objectDefinitionId, values, serviceContext);
+			getUserId(), groupId, objectDefinitionId, status, values,
+			serviceContext);
 	}
 
 	@Override
 	public ObjectEntry addOrUpdateObjectEntry(
 			String externalReferenceCode, long groupId, long objectDefinitionId,
-			Map<String, Serializable> values, ServiceContext serviceContext)
+			int status, Map<String, Serializable> values,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		ObjectEntry objectEntry = objectEntryPersistence.fetchByERC_C_ODI(
@@ -120,7 +122,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 		return objectEntryLocalService.addOrUpdateObjectEntry(
 			externalReferenceCode, getUserId(), groupId, objectDefinitionId,
-			values, serviceContext);
+			status, values, serviceContext);
 	}
 
 	@Override
@@ -376,7 +378,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 	@Override
 	public ObjectEntry updateObjectEntry(
-			long objectEntryId, Map<String, Serializable> values,
+			long objectEntryId, int status, Map<String, Serializable> values,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -390,7 +392,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 		}
 
 		return objectEntryLocalService.updateObjectEntry(
-			getUserId(), objectEntryId, values, serviceContext);
+			getUserId(), objectEntryId, status, values, serviceContext);
 	}
 
 	@Activate

@@ -234,7 +234,7 @@ public class ObjectEntryLocalServiceImpl
 
 	@Override
 	public ObjectEntry addObjectEntry(
-			long userId, long groupId, long objectDefinitionId,
+			long userId, long groupId, long objectDefinitionId, int status,
 			Map<String, Serializable> values, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -345,8 +345,8 @@ public class ObjectEntryLocalServiceImpl
 	@Override
 	public ObjectEntry addOrUpdateObjectEntry(
 			String externalReferenceCode, long userId, long groupId,
-			long objectDefinitionId, Map<String, Serializable> values,
-			ServiceContext serviceContext)
+			long objectDefinitionId, int status,
+			Map<String, Serializable> values, ServiceContext serviceContext)
 		throws PortalException {
 
 		User user = _userLocalService.getUser(userId);
@@ -1341,8 +1341,8 @@ public class ObjectEntryLocalServiceImpl
 
 	@Override
 	public ObjectEntry updateObjectEntry(
-			long userId, long objectEntryId, Map<String, Serializable> values,
-			ServiceContext serviceContext)
+			long userId, long objectEntryId, int status,
+			Map<String, Serializable> values, ServiceContext serviceContext)
 		throws PortalException {
 
 		User user = _userLocalService.getUser(userId);
