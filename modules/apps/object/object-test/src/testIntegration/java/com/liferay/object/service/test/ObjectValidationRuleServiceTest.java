@@ -248,6 +248,35 @@ public class ObjectValidationRuleServiceTest {
 		_testUpdateObjectValidationRule(
 			ObjectValidationRuleConstants.ENGINE_TYPE_DDM,
 			_objectDefinition.getObjectDefinitionId(), _user);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.addCustomObjectDefinition(
+				_companyAdminUser.getUserId(), 0, false, false,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"A" + RandomTestUtil.randomString(), null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				true, ObjectDefinitionConstants.SCOPE_COMPANY,
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Collections.emptyList());
+
+		AssertUtils.assertFailure(
+			ObjectValidationRuleEngineException.class,
+			"The user must have permission to choose engine groovy.",
+			() -> _testUpdateObjectValidationRule(
+				ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY,
+				objectDefinition.getObjectDefinitionId(), _companyAdminUser));
+
+		ConfigurationTestUtil.saveConfiguration(
+			_configuration,
+			HashMapDictionaryBuilder.<String, Object>put(
+				"allowInstanceAdminExecuteCode", true
+			).build());
+
+		_testUpdateObjectValidationRule(
+			ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY,
+			objectDefinition.getObjectDefinitionId(), _companyAdminUser);
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
 	private ObjectValidationRule _addObjectValidationRule(
