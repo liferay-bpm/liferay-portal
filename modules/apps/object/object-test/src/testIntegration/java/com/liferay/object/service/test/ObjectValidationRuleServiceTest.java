@@ -83,7 +83,7 @@ public class ObjectValidationRuleServiceTest {
 			"com.liferay.object.configuration.ObjectScriptConfiguration",
 			StringPool.QUESTION);
 
-		_name = PrincipalThreadLocal.getName();
+		_originalName = PrincipalThreadLocal.getName();
 
 		PrincipalThreadLocal.setName(TestPropsValues.getUserId());
 	}
@@ -94,7 +94,7 @@ public class ObjectValidationRuleServiceTest {
 
 		ConfigurationTestUtil.deleteConfiguration(_configuration);
 
-		PrincipalThreadLocal.setName(_name);
+		PrincipalThreadLocal.setName(_originalName);
 	}
 
 	@Before
@@ -108,9 +108,8 @@ public class ObjectValidationRuleServiceTest {
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 					ObjectFieldConstants.DB_TYPE_STRING,
 					RandomTestUtil.randomString(), "textField")));
-		_originalName = PrincipalThreadLocal.getName();
-		_originalPermissionChecker =
-			PermissionThreadLocal.getPermissionChecker();
+		_name = PrincipalThreadLocal.getName();
+		_permissionChecker = PermissionThreadLocal.getPermissionChecker();
 		_systemObjectDefinition =
 			ObjectDefinitionTestUtil.addUnmodifiableSystemObjectDefinition(
 				null, TestPropsValues.getUserId(), "Test", null,
@@ -135,9 +134,9 @@ public class ObjectValidationRuleServiceTest {
 
 	@After
 	public void tearDown() {
-		PermissionThreadLocal.setPermissionChecker(_originalPermissionChecker);
+		PermissionThreadLocal.setPermissionChecker(_permissionChecker);
 
-		PrincipalThreadLocal.setName(_originalName);
+		PrincipalThreadLocal.setName(_name);
 	}
 
 	@Test
@@ -375,9 +374,10 @@ public class ObjectValidationRuleServiceTest {
 	@Inject
 	private static ConfigurationAdmin _configurationAdmin;
 
-	private static String _name;
+	private static String _originalName;
 
 	private User _guestUser;
+	private String _name;
 
 	@DeleteAfterTestRun
 	private ObjectDefinition _objectDefinition;
@@ -391,8 +391,7 @@ public class ObjectValidationRuleServiceTest {
 	@Inject
 	private ObjectValidationRuleService _objectValidationRuleService;
 
-	private String _originalName;
-	private PermissionChecker _originalPermissionChecker;
+	private PermissionChecker _permissionChecker;
 
 	@DeleteAfterTestRun
 	private ObjectDefinition _systemObjectDefinition;
