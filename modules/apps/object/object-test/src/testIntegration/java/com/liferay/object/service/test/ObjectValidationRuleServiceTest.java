@@ -231,7 +231,8 @@ public class ObjectValidationRuleServiceTest {
 	public void testUpdateObjectValidationRule() throws Exception {
 		try {
 			_testUpdateObjectValidationRule(
-				ObjectValidationRuleConstants.ENGINE_TYPE_DDM, _guestUser);
+				ObjectValidationRuleConstants.ENGINE_TYPE_DDM,
+				_objectDefinition.getObjectDefinitionId(), _guestUser);
 
 			Assert.fail();
 		}
@@ -245,19 +246,28 @@ public class ObjectValidationRuleServiceTest {
 		}
 
 		_testUpdateObjectValidationRule(
-			ObjectValidationRuleConstants.ENGINE_TYPE_DDM, _user);
+			ObjectValidationRuleConstants.ENGINE_TYPE_DDM,
+			_objectDefinition.getObjectDefinitionId(), _user);
 	}
 
-	private ObjectValidationRule _addObjectValidationRule(User user)
+	private ObjectValidationRule _addObjectValidationRule(
+			long objectDefinitionId, User user)
 		throws Exception {
 
 		return _objectValidationRuleLocalService.addObjectValidationRule(
-			user.getUserId(), _objectDefinition.getObjectDefinitionId(), true,
+			user.getUserId(), objectDefinitionId, true,
 			ObjectValidationRuleConstants.ENGINE_TYPE_DDM,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			ObjectValidationRuleConstants.OUTPUT_TYPE_FULL_VALIDATION,
 			"isEmailAddress(textField)", Collections.emptyList());
+	}
+
+	private ObjectValidationRule _addObjectValidationRule(User user)
+		throws Exception {
+
+		return _addObjectValidationRule(
+			_objectDefinition.getObjectDefinitionId(), user);
 	}
 
 	private void _setUser(User user) {
@@ -334,7 +344,8 @@ public class ObjectValidationRuleServiceTest {
 		}
 	}
 
-	private void _testUpdateObjectValidationRule(String engine, User user)
+	private void _testUpdateObjectValidationRule(
+			String engine, long objectDefinitionId, User user)
 		throws Exception {
 
 		ObjectValidationRule objectValidationRule = null;
@@ -342,7 +353,8 @@ public class ObjectValidationRuleServiceTest {
 		try {
 			_setUser(user);
 
-			objectValidationRule = _addObjectValidationRule(user);
+			objectValidationRule = _addObjectValidationRule(
+				objectDefinitionId, user);
 
 			objectValidationRule =
 				_objectValidationRuleService.updateObjectValidationRule(
