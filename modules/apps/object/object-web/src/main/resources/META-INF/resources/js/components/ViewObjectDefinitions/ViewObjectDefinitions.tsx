@@ -20,6 +20,7 @@ import {
 	fdsItem,
 	formatActionURL,
 } from '../../utils/fds';
+import {ModalDeletionNotAllowed} from '../ModalDeletionNotAllowed';
 import CardHeader from './CardHeader';
 import objectDefinitionModifiedDateDataRenderer from './FDSDataRenderers/ObjectDefinitionModifiedDateDataRenderer';
 import objectDefinitionStatusDataRenderer from './FDSDataRenderers/ObjectDefinitionStatusDataRenderer';
@@ -27,13 +28,13 @@ import objectDefinitionSystemDataRenderer from './FDSDataRenderers/ObjectDefinit
 import FoldersListSideBar from './FoldersListSidebar';
 import {ModalAddFolder} from './ModalAddFolder';
 import {ModalAddObjectDefinition} from './ModalAddObjectDefinition';
+import {ModalDeleteFolder} from './ModalDeleteFolder';
 import {ModalDeleteObjectDefinition} from './ModalDeleteObjectDefinition';
 import {ModalEditFolder} from './ModalEditFolder';
+import {ModalMoveObjectDefinition} from './ModalMoveObjectDefinition';
 import {deleteObjectDefinition, getFolderActions} from './objectDefinitionUtil';
 
 import './ViewObjectDefinitions.scss';
-import {ModalDeleteFolder} from './ModalDeleteFolder';
-import {ModalMoveObjectDefinition} from './ModalMoveObjectDefinition';
 
 interface ViewObjectDefinitionsProps extends IFDSTableProps {
 	baseResourceURL: string;
@@ -47,6 +48,7 @@ export type ViewObjectDefinitionsModals = {
 	addObjectDefinition: boolean;
 	deleteFolder: boolean;
 	deleteObjectDefinition: boolean;
+	deletionNotAllowed: boolean;
 	editFolder: boolean;
 	moveObjectDefinition: boolean;
 };
@@ -82,6 +84,7 @@ export default function ViewObjectDefinitions({
 		addObjectDefinition: false,
 		deleteFolder: false,
 		deleteObjectDefinition: false,
+		deletionNotAllowed: false,
 		editFolder: false,
 		moveObjectDefinition: false,
 	});
@@ -100,6 +103,10 @@ export default function ViewObjectDefinitions({
 		moveObjectDefinition,
 		setMoveObjectDefinition,
 	] = useState<ObjectDefinition | null>();
+
+	const [selectedObjectDefinition, setSelectedObjectDefinition] = useState<
+		ObjectDefinition
+	>();
 
 	const [loading, setLoading] = useState(true);
 
@@ -163,6 +170,20 @@ export default function ViewObjectDefinitions({
 			itemData: ObjectDefinition;
 		}) {
 			if (action.data.id === 'deleteObjectDefinition') {
+				if (
+					itemData.rootObjectDefinitionExternalReferenceCode &&
+					Liferay.FeatureFlags['LPS-187142']
+				) {
+					setSelectedObjectDefinition(itemData);
+
+					setShowModal((previousState) => ({
+						...previousState,
+						deletionNotAllowed: true,
+					}));
+
+					return;
+				}
+
 				const getDeleteObjectDefinition = async () => {
 					const url = createResourceURL(baseResourceURL, {
 						objectDefinitionId: itemData.id,
@@ -381,6 +402,28 @@ export default function ViewObjectDefinitions({
 					setDeletedObjectDefinition={setDeletedObjectDefinition}
 				/>
 			)}
+
+			{showModal.deletionNotAllowed &&
+				selectedObjectDefinition &&
+				Liferay.FeatureFlags['LPS-187142'] && (
+					<ModalDeletionNotAllowed
+						onVisibilityChange={() =>
+							setShowModal(
+								(
+									previousState: ViewObjectDefinitionsModals
+								) => ({
+									...previousState,
+									deletionNotAllowed: false,
+								})
+							)
+						}
+						selectedItemLabel={getLocalizableLabel(
+							selectedObjectDefinition.defaultLanguageId,
+							selectedObjectDefinition.label,
+							selectedObjectDefinition.name
+						)}
+					/>
+				)}
 
 			{showModal.addFolder && (
 				<ModalAddFolder
