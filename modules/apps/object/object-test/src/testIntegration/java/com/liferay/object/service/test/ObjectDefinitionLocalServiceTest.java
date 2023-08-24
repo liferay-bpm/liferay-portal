@@ -11,6 +11,10 @@ import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.definition.tree.Edge;
+import com.liferay.object.definition.tree.Node;
+import com.liferay.object.definition.tree.Tree;
+import com.liferay.object.definition.tree.TreeFactory;
 import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
@@ -42,6 +46,7 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.test.util.ObjectDefinitionTestUtil;
+import com.liferay.object.service.test.util.TreeTestUtil;
 import com.liferay.object.system.BaseSystemObjectDefinitionManager;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
 import com.liferay.petra.function.UnsafeConsumer;
@@ -80,8 +85,10 @@ import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.sql.Connection;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -274,11 +281,32 @@ public class ObjectDefinitionLocalServiceTest {
 
 		Assert.assertEquals("C_Test", objectDefinition.getName());
 
+		// Before publish, create tree
+
+		Tree tree = TreeTestUtil.createTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			_treeFactory);
+
 		// Before publish, database table
 
 		Assert.assertFalse(_hasTable(objectDefinition.getDBTableName()));
 		Assert.assertFalse(
 			_hasTable(objectDefinition.getExtensionDBTableName()));
+
+		Iterator<Node> iterator = tree.iterator();
+
+		while (iterator.hasNext()) {
+			Node node = iterator.next();
+
+			ObjectDefinition nodeObjectDefinition =
+				_objectDefinitionLocalService.getObjectDefinition(
+					node.getObjectDefinitionId());
+
+			Assert.assertFalse(
+				_hasTable(nodeObjectDefinition.getDBTableName()));
+			Assert.assertFalse(
+				_hasTable(nodeObjectDefinition.getExtensionDBTableName()));
+		}
 
 		// Before publish, resources
 
@@ -302,10 +330,55 @@ public class ObjectDefinitionLocalServiceTest {
 				ResourceConstants.SCOPE_INDIVIDUAL,
 				String.valueOf(objectDefinition.getObjectDefinitionId())));
 
+		iterator = tree.iterator();
+
+		while (iterator.hasNext()) {
+			Node node = iterator.next();
+
+			ObjectDefinition nodeObjectDefinition =
+				_objectDefinitionLocalService.getObjectDefinition(
+					node.getObjectDefinitionId());
+
+			Assert.assertEquals(
+				0,
+				_resourceActionLocalService.getResourceActionsCount(
+					nodeObjectDefinition.getClassName()));
+			Assert.assertEquals(
+				0,
+				_resourceActionLocalService.getResourceActionsCount(
+					nodeObjectDefinition.getPortletId()));
+			Assert.assertEquals(
+				0,
+				_resourceActionLocalService.getResourceActionsCount(
+					nodeObjectDefinition.getResourceName()));
+			Assert.assertEquals(
+				1,
+				_resourcePermissionLocalService.getResourcePermissionsCount(
+					nodeObjectDefinition.getCompanyId(),
+					ObjectDefinition.class.getName(),
+					ResourceConstants.SCOPE_INDIVIDUAL,
+					String.valueOf(
+						nodeObjectDefinition.getObjectDefinitionId())));
+		}
+
 		// Before publish, status
 
 		Assert.assertEquals(
 			WorkflowConstants.STATUS_DRAFT, objectDefinition.getStatus());
+
+		iterator = tree.iterator();
+
+		while (iterator.hasNext()) {
+			Node node = iterator.next();
+
+			ObjectDefinition nodeObjectDefinition =
+				_objectDefinitionLocalService.getObjectDefinition(
+					node.getObjectDefinitionId());
+
+			Assert.assertEquals(
+				WorkflowConstants.STATUS_DRAFT,
+				nodeObjectDefinition.getStatus());
+		}
 
 		// Publish
 
@@ -327,6 +400,54 @@ public class ObjectDefinitionLocalServiceTest {
 			).required(
 				true
 			).build());
+
+		ObjectDefinition rootObjectDefinition = null;
+
+		iterator = tree.iterator();
+
+		while (iterator.hasNext()) {
+			Node node = iterator.next();
+
+			ObjectDefinition nodeObjectDefinition =
+				_objectDefinitionLocalService.getObjectDefinition(
+					node.getObjectDefinitionId());
+
+			ObjectFieldUtil.addCustomObjectField(
+				new TextObjectFieldBuilder(
+				).userId(
+					TestPropsValues.getUserId()
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap("Able")
+				).name(
+					"able"
+				).objectDefinitionId(
+					nodeObjectDefinition.getObjectDefinitionId()
+				).build());
+
+			if (nodeObjectDefinition.getObjectDefinitionId() ==
+					nodeObjectDefinition.getRootObjectDefinitionId()) {
+
+				rootObjectDefinition = nodeObjectDefinition;
+
+				continue;
+			}
+
+			AssertUtils.assertFailure(
+				ObjectDefinitionStatusException.class,
+				"Node ObjectDefinition cannot be directly published",
+				() ->
+					_objectDefinitionLocalService.publishCustomObjectDefinition(
+						TestPropsValues.getUserId(),
+						nodeObjectDefinition.getObjectDefinitionId()));
+
+			Assert.assertEquals(
+				WorkflowConstants.STATUS_DRAFT,
+				nodeObjectDefinition.getStatus());
+		}
+
+		_objectDefinitionLocalService.publishCustomObjectDefinition(
+			TestPropsValues.getUserId(),
+			rootObjectDefinition.getObjectDefinitionId());
 
 		// After publish, database table
 
@@ -350,6 +471,19 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertTrue(
 			_hasTable(objectDefinition.getExtensionDBTableName()));
 
+		iterator = tree.iterator();
+
+		while (iterator.hasNext()) {
+			Node node = iterator.next();
+
+			ObjectDefinition nodeObjectDefinition =
+				_objectDefinitionLocalService.getObjectDefinition(
+					node.getObjectDefinitionId());
+
+			Assert.assertFalse(
+				_hasColumn(nodeObjectDefinition.getDBTableName(), "able"));
+		}
+
 		// After publish, resources
 
 		Assert.assertEquals(
@@ -372,12 +506,91 @@ public class ObjectDefinitionLocalServiceTest {
 				ResourceConstants.SCOPE_INDIVIDUAL,
 				String.valueOf(objectDefinition.getObjectDefinitionId())));
 
+		iterator = tree.iterator();
+
+		while (iterator.hasNext()) {
+			Node node = iterator.next();
+
+			ObjectDefinition nodeObjectDefinition =
+				_objectDefinitionLocalService.getObjectDefinition(
+					node.getObjectDefinitionId());
+
+			Assert.assertEquals(
+				4,
+				_resourceActionLocalService.getResourceActionsCount(
+					nodeObjectDefinition.getClassName()));
+			Assert.assertEquals(
+				6,
+				_resourceActionLocalService.getResourceActionsCount(
+					nodeObjectDefinition.getPortletId()));
+			Assert.assertEquals(
+				2,
+				_resourceActionLocalService.getResourceActionsCount(
+					nodeObjectDefinition.getResourceName()));
+			Assert.assertEquals(
+				1,
+				_resourcePermissionLocalService.getResourcePermissionsCount(
+					nodeObjectDefinition.getCompanyId(),
+					ObjectDefinition.class.getName(),
+					ResourceConstants.SCOPE_INDIVIDUAL,
+					String.valueOf(
+						nodeObjectDefinition.getObjectDefinitionId())));
+		}
+
 		// After publish, status
 
 		Assert.assertEquals(
 			WorkflowConstants.STATUS_APPROVED, objectDefinition.getStatus());
 
+		iterator = tree.iterator();
+
+		while (iterator.hasNext()) {
+			Node node = iterator.next();
+
+			ObjectDefinition nodeObjectDefinition =
+				_objectDefinitionLocalService.getObjectDefinition(
+					node.getObjectDefinitionId());
+
+			Assert.assertEquals(
+				WorkflowConstants.STATUS_APPROVED,
+				nodeObjectDefinition.getStatus());
+		}
+
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+
+		List<Long> objectDefinitionIds = new ArrayList<>();
+
+		iterator = tree.iterator();
+
+		while (iterator.hasNext()) {
+			Node node = iterator.next();
+
+			objectDefinitionIds.add(node.getObjectDefinitionId());
+
+			_objectDefinitionLocalService.updateRootObjectDefinitionId(
+				node.getObjectDefinitionId(), 0);
+
+			if (node.isRoot()) {
+				return;
+			}
+
+			Edge edge = node.getEdge();
+
+			ObjectRelationship objectRelationship =
+				_objectRelationshipLocalService.getObjectRelationship(
+					edge.getObjectRelationshipId());
+
+			_objectRelationshipLocalService.updateObjectRelationship(
+				objectRelationship.getObjectRelationshipId(),
+				objectRelationship.getParameterObjectFieldId(),
+				objectRelationship.getDeletionType(), false,
+				objectRelationship.getLabelMap());
+		}
+
+		for (long objectDefinitionId : objectDefinitionIds) {
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinitionId);
+		}
 	}
 
 	@Test
@@ -2194,5 +2407,8 @@ public class ObjectDefinitionLocalServiceTest {
 
 	@Inject
 	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Inject
+	private TreeFactory _treeFactory;
 
 }
