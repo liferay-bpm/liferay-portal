@@ -21,7 +21,12 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.portlet.MockLiferayResourceRequest;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.TimeZoneUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -137,6 +142,43 @@ public class TreeTestUtil {
 
 		return objectRelationshipLocalService.getObjectRelationship(
 			edge.getObjectRelationshipId());
+	}
+
+	public static void unbind(
+			ObjectDefinitionLocalService objectDefinitionLocalService,
+			String objectDefinitionName,
+			PortletLocalService portletLocalService,
+			MVCResourceCommand unbindObjectDefinitionMVCResourceCommand)
+		throws Exception {
+
+		MockLiferayResourceRequest mockLiferayResourceRequest =
+			new MockLiferayResourceRequest();
+
+		ObjectDefinition objectDefinition =
+			objectDefinitionLocalService.fetchObjectDefinition(
+				TestPropsValues.getCompanyId(), objectDefinitionName);
+
+		mockLiferayResourceRequest.addParameter(
+			"objectDefinitionId",
+			String.valueOf(objectDefinition.getObjectDefinitionId()));
+
+		mockLiferayResourceRequest.setAttribute(
+			JavaConstants.JAVAX_PORTLET_CONFIG,
+			PortletConfigFactoryUtil.create(
+				portletLocalService.getPortletById(
+					ObjectPortletKeys.OBJECT_DEFINITIONS),
+				null));
+
+		ThemeDisplay themeDisplay = new ThemeDisplay();
+
+		themeDisplay.setLocale(LocaleUtil.getSiteDefault());
+		themeDisplay.setTimeZone(TimeZoneUtil.getDefault());
+
+		mockLiferayResourceRequest.setAttribute(
+			WebKeys.THEME_DISPLAY, themeDisplay);
+
+		unbindObjectDefinitionMVCResourceCommand.serveResource(
+			mockLiferayResourceRequest, null);
 	}
 
 	private static String _getShortName(

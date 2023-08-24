@@ -6,25 +6,17 @@
 package com.liferay.object.web.internal.portlet.action.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.object.constants.ObjectPortletKeys;
 import com.liferay.object.definition.tree.TreeFactory;
 import com.liferay.object.exception.ObjectDefinitionRootObjectDefinitionIdException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.test.util.TreeTestUtil;
-import com.liferay.portal.kernel.portlet.PortletConfigFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
-import com.liferay.portal.kernel.test.portlet.MockLiferayResourceRequest;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
-import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.TimeZoneUtil;
-import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -67,7 +59,9 @@ public class UnbindObjectDefinitionMVCResourceCommandTest {
 				_portletLocalService, _treeFactory),
 			_objectDefinitionLocalService);
 
-		_unbind("C_AA");
+		TreeTestUtil.unbind(
+			_objectDefinitionLocalService, "C_AA", _portletLocalService,
+			_unbindObjectDefinitionMVCResourceCommand);
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.fetchObjectDefinition(
@@ -84,7 +78,9 @@ public class UnbindObjectDefinitionMVCResourceCommandTest {
 
 		// Unbind object definition leaf node
 
-		_unbind("C_AB");
+		TreeTestUtil.unbind(
+			_objectDefinitionLocalService, "C_AB", _portletLocalService,
+			_unbindObjectDefinitionMVCResourceCommand);
 
 		TreeTestUtil.assertTree(
 			LinkedHashMapBuilder.put(
@@ -95,7 +91,9 @@ public class UnbindObjectDefinitionMVCResourceCommandTest {
 
 		// Unbind object definition root node
 
-		_unbind("C_A");
+		TreeTestUtil.unbind(
+			_objectDefinitionLocalService, "C_A", _portletLocalService,
+			_unbindObjectDefinitionMVCResourceCommand);
 
 		AssertUtils.assertFailure(
 			ObjectDefinitionRootObjectDefinitionIdException.class,
@@ -104,37 +102,6 @@ public class UnbindObjectDefinitionMVCResourceCommandTest {
 					" is not inside a hierarchical structure.",
 			() -> _treeFactory.create(
 				objectDefinition.getObjectDefinitionId()));
-	}
-
-	private void _unbind(String objectDefinitionName) throws Exception {
-		MockLiferayResourceRequest mockLiferayResourceRequest =
-			new MockLiferayResourceRequest();
-
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				TestPropsValues.getCompanyId(), objectDefinitionName);
-
-		mockLiferayResourceRequest.addParameter(
-			"objectDefinitionId",
-			String.valueOf(objectDefinition.getObjectDefinitionId()));
-
-		mockLiferayResourceRequest.setAttribute(
-			JavaConstants.JAVAX_PORTLET_CONFIG,
-			PortletConfigFactoryUtil.create(
-				_portletLocalService.getPortletById(
-					ObjectPortletKeys.OBJECT_DEFINITIONS),
-				null));
-
-		ThemeDisplay themeDisplay = new ThemeDisplay();
-
-		themeDisplay.setLocale(LocaleUtil.getSiteDefault());
-		themeDisplay.setTimeZone(TimeZoneUtil.getDefault());
-
-		mockLiferayResourceRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, themeDisplay);
-
-		_unbindObjectDefinitionMVCResourceCommand.serveResource(
-			mockLiferayResourceRequest, null);
 	}
 
 	@Inject(
