@@ -84,7 +84,7 @@ public class ObjectActionServiceTest {
 			"com.liferay.object.configuration.ObjectScriptConfiguration",
 			StringPool.QUESTION);
 
-		_name = PrincipalThreadLocal.getName();
+		_originalName = PrincipalThreadLocal.getName();
 
 		PrincipalThreadLocal.setName(TestPropsValues.getUserId());
 	}
@@ -95,7 +95,7 @@ public class ObjectActionServiceTest {
 
 		ConfigurationTestUtil.deleteConfiguration(_configuration);
 
-		PrincipalThreadLocal.setName(_name);
+		PrincipalThreadLocal.setName(_originalName);
 	}
 
 	@Before
@@ -104,9 +104,8 @@ public class ObjectActionServiceTest {
 			TestPropsValues.getCompanyId());
 		_objectDefinition = ObjectDefinitionTestUtil.addObjectDefinition(
 			_objectDefinitionLocalService);
-		_originalName = PrincipalThreadLocal.getName();
-		_originalPermissionChecker =
-			PermissionThreadLocal.getPermissionChecker();
+		_name = PrincipalThreadLocal.getName();
+		_permissionChecker = PermissionThreadLocal.getPermissionChecker();
 		_user = TestPropsValues.getUser();
 
 		ConfigurationTestUtil.saveConfiguration(
@@ -118,9 +117,9 @@ public class ObjectActionServiceTest {
 
 	@After
 	public void tearDown() {
-		PermissionThreadLocal.setPermissionChecker(_originalPermissionChecker);
+		PermissionThreadLocal.setPermissionChecker(_permissionChecker);
 
-		PrincipalThreadLocal.setName(_originalName);
+		PrincipalThreadLocal.setName(_name);
 	}
 
 	@Test
@@ -400,9 +399,10 @@ public class ObjectActionServiceTest {
 	@Inject
 	private static ConfigurationAdmin _configurationAdmin;
 
-	private static String _name;
+	private static String _originalName;
 
 	private User _guestUser;
+	private String _name;
 
 	@Inject
 	private ObjectActionLocalService _objectActionLocalService;
@@ -416,8 +416,7 @@ public class ObjectActionServiceTest {
 	@Inject
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
-	private String _originalName;
-	private PermissionChecker _originalPermissionChecker;
+	private PermissionChecker _permissionChecker;
 	private User _user;
 
 	@Inject(type = UserLocalService.class)
