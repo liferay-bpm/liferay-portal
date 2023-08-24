@@ -1235,7 +1235,8 @@ public class ObjectEntryLocalServiceImpl
 
 		if (count > 0) {
 			_updateTable(
-				dynamicObjectDefinitionTable, primaryKey, user, values);
+				dynamicObjectDefinitionTable, primaryKey,
+				WorkflowConstants.STATUS_APPROVED, user, values);
 		}
 		else {
 			_insertIntoTable(
@@ -1378,11 +1379,11 @@ public class ObjectEntryLocalServiceImpl
 		_updateTable(
 			_getDynamicObjectDefinitionTable(
 				objectEntry.getObjectDefinitionId()),
-			objectEntryId, user, values);
+			objectEntryId, status, user, values);
 		_updateTable(
 			_getExtensionDynamicObjectDefinitionTable(
 				objectEntry.getObjectDefinitionId()),
-			objectEntryId, user, values);
+			objectEntryId, status, user, values);
 
 		objectEntryPersistence.clearCache(SetUtil.fromArray(objectEntryId));
 
@@ -3670,7 +3671,8 @@ public class ObjectEntryLocalServiceImpl
 
 	private void _updateTable(
 			DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
-			long objectEntryId, User user, Map<String, Serializable> values)
+			long objectEntryId, int status, User user,
+			Map<String, Serializable> values)
 		throws PortalException {
 
 		StringBundler sb = new StringBundler();
@@ -3695,6 +3697,22 @@ public class ObjectEntryLocalServiceImpl
 			}
 
 			if (!values.containsKey(objectField.getName())) {
+				if (objectField.isRequired() &&
+					(status != WorkflowConstants.STATUS_DRAFT)) {
+
+					ObjectEntry objectEntry = fetchObjectEntry(objectEntryId);
+
+					if ((objectEntry != null) &&
+						Validator.isNull(
+							MapUtil.getString(
+								objectEntry.getValues(),
+								objectField.getName()))) {
+
+						throw new ObjectEntryValuesException.Required(
+							objectField.getName());
+					}
+				}
+
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"No value was provided for object field \"" +
