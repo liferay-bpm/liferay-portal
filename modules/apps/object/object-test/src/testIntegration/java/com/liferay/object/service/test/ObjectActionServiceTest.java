@@ -8,6 +8,8 @@ package com.liferay.object.service.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
+import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.exception.ObjectActionExecutorKeyException;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectActionLocalService;
@@ -15,31 +17,47 @@ import com.liferay.object.service.ObjectActionService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.test.util.ObjectDefinitionTestUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.configuration.test.util.ConfigurationTestUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
+import java.util.Collections;
+
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 /**
  * @author Brian Wing Shun Chan
@@ -50,7 +68,35 @@ public class ObjectActionServiceTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new LiferayIntegrationTestRule();
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			PermissionCheckerMethodTestRule.INSTANCE);
+
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_company = CompanyTestUtil.addCompany();
+
+		PortalInstances.initCompany(_company);
+
+		_companyAdminUser = UserTestUtil.addCompanyAdminUser(_company);
+
+		_configuration = _configurationAdmin.getConfiguration(
+			"com.liferay.object.configuration.ObjectScriptConfiguration",
+			StringPool.QUESTION);
+
+		_name = PrincipalThreadLocal.getName();
+
+		PrincipalThreadLocal.setName(TestPropsValues.getUserId());
+	}
+
+	@AfterClass
+	public static void tearDownClass() throws Exception {
+		_companyLocalService.deleteCompany(_company);
+
+		ConfigurationTestUtil.deleteConfiguration(_configuration);
+
+		PrincipalThreadLocal.setName(_name);
+	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -62,6 +108,12 @@ public class ObjectActionServiceTest {
 		_originalPermissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 		_user = TestPropsValues.getUser();
+
+		ConfigurationTestUtil.saveConfiguration(
+			_configuration,
+			HashMapDictionaryBuilder.<String, Object>put(
+				"allowInstanceAdminExecuteCode", false
+			).build());
 	}
 
 	@After
@@ -92,6 +144,36 @@ public class ObjectActionServiceTest {
 		_testAddObjectAction(
 			ObjectActionExecutorConstants.KEY_WEBHOOK,
 			_objectDefinition.getObjectDefinitionId(), _user);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.addCustomObjectDefinition(
+				_companyAdminUser.getUserId(), 0, false, false,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"A" + RandomTestUtil.randomString(), null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				true, ObjectDefinitionConstants.SCOPE_COMPANY,
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Collections.emptyList());
+
+		AssertUtils.assertFailure(
+			ObjectActionExecutorKeyException.class,
+			"The user must have permission to choose object action executor " +
+				"key groovy",
+			() -> _testAddObjectAction(
+				ObjectActionExecutorConstants.KEY_GROOVY,
+				objectDefinition.getObjectDefinitionId(), _companyAdminUser));
+
+		ConfigurationTestUtil.saveConfiguration(
+			_configuration,
+			HashMapDictionaryBuilder.<String, Object>put(
+				"allowInstanceAdminExecuteCode", true
+			).build());
+
+		_testAddObjectAction(
+			ObjectActionExecutorConstants.KEY_GROOVY,
+			objectDefinition.getObjectDefinitionId(), _companyAdminUser);
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
 	@Test
@@ -268,6 +350,19 @@ public class ObjectActionServiceTest {
 			}
 		}
 	}
+
+	private static Company _company;
+	private static User _companyAdminUser;
+
+	@Inject
+	private static CompanyLocalService _companyLocalService;
+
+	private static Configuration _configuration;
+
+	@Inject
+	private static ConfigurationAdmin _configurationAdmin;
+
+	private static String _name;
 
 	private User _guestUser;
 
