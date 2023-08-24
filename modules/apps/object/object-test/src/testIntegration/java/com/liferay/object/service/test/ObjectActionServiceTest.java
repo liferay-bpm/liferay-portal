@@ -231,11 +231,12 @@ public class ObjectActionServiceTest {
 		_testUpdateObjectAction(_user);
 	}
 
-	private ObjectAction _addObjectAction(User user) throws Exception {
+	private ObjectAction _addObjectAction(long objectDefinitionId, User user)
+		throws Exception {
+
 		return _objectActionLocalService.addObjectAction(
-			RandomTestUtil.randomString(), user.getUserId(),
-			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
-			RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), user.getUserId(), objectDefinitionId,
+			true, StringPool.BLANK, RandomTestUtil.randomString(),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			RandomTestUtil.randomString(),
@@ -244,6 +245,11 @@ public class ObjectActionServiceTest {
 			UnicodePropertiesBuilder.put(
 				"url", RandomTestUtil.randomString()
 			).build());
+	}
+
+	private ObjectAction _addObjectAction(User user) throws Exception {
+		return _addObjectAction(
+			_objectDefinition.getObjectDefinitionId(), user);
 	}
 
 	private void _setUser(User user) {
