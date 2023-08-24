@@ -172,6 +172,28 @@ public class ObjectActionServiceTest {
 			ObjectActionExecutorConstants.KEY_GROOVY,
 			objectDefinition.getObjectDefinitionId(), _companyAdminUser);
 
+		ObjectAction objectAction = _objectActionService.addObjectAction(
+			RandomTestUtil.randomString(),
+			objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
+			RandomTestUtil.randomString(),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			RandomTestUtil.randomString(),
+			ObjectActionExecutorConstants.KEY_GROOVY,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			new UnicodeProperties());
+
+		ConfigurationTestUtil.saveConfiguration(
+			_configuration,
+			HashMapDictionaryBuilder.<String, Object>put(
+				"allowInstanceAdminExecuteCode", false
+			).build());
+
+		objectAction = _objectActionService.getObjectAction(
+			objectAction.getObjectActionId());
+
+		Assert.assertFalse(objectAction.isActive());
+
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 

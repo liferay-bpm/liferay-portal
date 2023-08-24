@@ -188,6 +188,28 @@ public class ObjectValidationRuleServiceTest {
 			ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY,
 			objectDefinition.getObjectDefinitionId(), _companyAdminUser);
 
+		ObjectValidationRule objectValidationRule =
+			_objectValidationRuleLocalService.addObjectValidationRule(
+				_companyAdminUser.getUserId(),
+				objectDefinition.getObjectDefinitionId(), true,
+				ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				ObjectValidationRuleConstants.OUTPUT_TYPE_FULL_VALIDATION,
+				"isEmailAddress(textField)", Collections.emptyList());
+
+		ConfigurationTestUtil.saveConfiguration(
+			_configuration,
+			HashMapDictionaryBuilder.<String, Object>put(
+				"allowInstanceAdminExecuteCode", false
+			).build());
+
+		objectValidationRule =
+			_objectValidationRuleService.getObjectValidationRule(
+				objectValidationRule.getObjectValidationRuleId());
+
+		Assert.assertFalse(objectValidationRule.isActive());
+
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
