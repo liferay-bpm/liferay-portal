@@ -231,6 +231,34 @@ public class ObjectActionServiceTest {
 
 		_testUpdateObjectAction(
 			_objectDefinition.getObjectDefinitionId(), _user);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.addCustomObjectDefinition(
+				_companyAdminUser.getUserId(), 0, false, false,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"A" + RandomTestUtil.randomString(), null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				true, ObjectDefinitionConstants.SCOPE_COMPANY,
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Collections.emptyList());
+
+		AssertUtils.assertFailure(
+			ObjectActionExecutorKeyException.class,
+			"The user must have permission to choose object action executor " +
+				"key groovy",
+			() -> _testUpdateObjectAction(
+				objectDefinition.getObjectDefinitionId(), _companyAdminUser));
+
+		ConfigurationTestUtil.saveConfiguration(
+			_configuration,
+			HashMapDictionaryBuilder.<String, Object>put(
+				"allowInstanceAdminExecuteCode", true
+			).build());
+
+		_testUpdateObjectAction(
+			objectDefinition.getObjectDefinitionId(), _companyAdminUser);
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
 	private ObjectAction _addObjectAction(long objectDefinitionId, User user)
