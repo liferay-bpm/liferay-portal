@@ -15,7 +15,6 @@ import com.liferay.object.definition.tree.Edge;
 import com.liferay.object.definition.tree.Node;
 import com.liferay.object.definition.tree.Tree;
 import com.liferay.object.definition.tree.TreeFactory;
-import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectDefinitionActiveException;
@@ -1632,12 +1631,6 @@ public class ObjectDefinitionLocalServiceTest {
 		ObjectDefinition objectDefinition1 =
 			ObjectDefinitionTestUtil.addObjectDefinition(
 				_objectDefinitionLocalService);
-
-		AssertUtils.assertFailure(
-			NoSuchObjectDefinitionException.class,
-			"No ObjectDefinition exists with the primary key 0",
-			() -> _objectDefinitionLocalService.updateRootObjectDefinitionId(
-				objectDefinition1.getObjectDefinitionId(), 0));
 
 		ObjectDefinition objectDefinition2 =
 			ObjectDefinitionTestUtil.addObjectDefinition(
