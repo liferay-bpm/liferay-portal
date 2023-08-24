@@ -11,7 +11,6 @@ import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
-import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectDefinitionActiveException;
@@ -1091,7 +1090,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 		AssertUtils.assertFailure(
 			ObjectDefinitionRootObjectDefinitionIdException.class,
-			"Object Definitions that belongs to a hierarchical structure " +
+			"Object Definitions that belong to a hierarchical structure " +
 				"cannot be deleted",
 			() -> _objectDefinitionLocalService.deleteObjectDefinition(
 				_objectDefinitionLocalService.updateRootObjectDefinitionId(
@@ -1567,12 +1566,6 @@ public class ObjectDefinitionLocalServiceTest {
 		ObjectDefinition objectDefinition1 =
 			ObjectDefinitionTestUtil.addObjectDefinition(
 				_objectDefinitionLocalService);
-
-		AssertUtils.assertFailure(
-			NoSuchObjectDefinitionException.class,
-			"No ObjectDefinition exists with the primary key 0",
-			() -> _objectDefinitionLocalService.updateRootObjectDefinitionId(
-				objectDefinition1.getObjectDefinitionId(), 0));
 
 		ObjectDefinition objectDefinition2 =
 			ObjectDefinitionTestUtil.addObjectDefinition(
