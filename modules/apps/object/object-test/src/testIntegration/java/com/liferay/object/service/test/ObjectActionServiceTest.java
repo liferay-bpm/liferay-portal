@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
@@ -73,7 +74,9 @@ public class ObjectActionServiceTest {
 	@Test
 	public void testAddObjectAction() throws Exception {
 		try {
-			_testAddObjectAction(_guestUser);
+			_testAddObjectAction(
+				ObjectActionExecutorConstants.KEY_WEBHOOK,
+				_objectDefinition.getObjectDefinitionId(), _guestUser);
 
 			Assert.fail();
 		}
@@ -86,7 +89,9 @@ public class ObjectActionServiceTest {
 						" must have UPDATE permission for"));
 		}
 
-		_testAddObjectAction(_user);
+		_testAddObjectAction(
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
+			_objectDefinition.getObjectDefinitionId(), _user);
 	}
 
 	@Test
@@ -166,24 +171,34 @@ public class ObjectActionServiceTest {
 		PrincipalThreadLocal.setName(user.getUserId());
 	}
 
-	private void _testAddObjectAction(User user) throws Exception {
+	private void _testAddObjectAction(
+			String objectActionExecutorKey, long objectDefinitionId, User user)
+		throws Exception {
+
 		ObjectAction objectAction = null;
+
+		UnicodeProperties parametersUnicodeProperties = new UnicodeProperties();
+
+		if (StringUtil.equals(
+				objectActionExecutorKey,
+				ObjectActionExecutorConstants.KEY_WEBHOOK)) {
+
+			parametersUnicodeProperties = UnicodePropertiesBuilder.put(
+				"url", RandomTestUtil.randomString()
+			).build();
+		}
 
 		try {
 			_setUser(user);
 
 			objectAction = _objectActionService.addObjectAction(
-				RandomTestUtil.randomString(),
-				_objectDefinition.getObjectDefinitionId(), true,
+				RandomTestUtil.randomString(), objectDefinitionId, true,
 				StringPool.BLANK, RandomTestUtil.randomString(),
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				RandomTestUtil.randomString(),
-				ObjectActionExecutorConstants.KEY_WEBHOOK,
+				RandomTestUtil.randomString(), objectActionExecutorKey,
 				ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
-				UnicodePropertiesBuilder.put(
-					"url", RandomTestUtil.randomString()
-				).build());
+				parametersUnicodeProperties);
 		}
 		finally {
 			if (objectAction != null) {
