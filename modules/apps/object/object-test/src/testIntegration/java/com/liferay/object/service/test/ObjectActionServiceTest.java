@@ -215,7 +215,8 @@ public class ObjectActionServiceTest {
 	@Test
 	public void testUpdateObjectAction() throws Exception {
 		try {
-			_testUpdateObjectAction(_guestUser);
+			_testUpdateObjectAction(
+				_objectDefinition.getObjectDefinitionId(), _guestUser);
 
 			Assert.fail();
 		}
@@ -228,7 +229,8 @@ public class ObjectActionServiceTest {
 						" must have UPDATE permission for"));
 		}
 
-		_testUpdateObjectAction(_user);
+		_testUpdateObjectAction(
+			_objectDefinition.getObjectDefinitionId(), _user);
 	}
 
 	private ObjectAction _addObjectAction(long objectDefinitionId, User user)
@@ -332,13 +334,15 @@ public class ObjectActionServiceTest {
 		}
 	}
 
-	private void _testUpdateObjectAction(User user) throws Exception {
+	private void _testUpdateObjectAction(long objectDefinitionId, User user)
+		throws Exception {
+
 		ObjectAction objectAction = null;
 
 		try {
 			_setUser(user);
 
-			objectAction = _addObjectAction(user);
+			objectAction = _addObjectAction(objectDefinitionId, user);
 
 			objectAction = _objectActionService.updateObjectAction(
 				RandomTestUtil.randomString(), objectAction.getObjectActionId(),
