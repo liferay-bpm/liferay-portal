@@ -16,6 +16,9 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectFolderConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.definition.tree.Node;
+import com.liferay.object.definition.tree.Tree;
+import com.liferay.object.definition.tree.TreeFactory;
 import com.liferay.object.deployer.InactiveObjectDefinitionDeployer;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
 import com.liferay.object.exception.NoSuchObjectFieldException;
@@ -70,6 +73,7 @@ import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.service.persistence.ObjectFolderPersistence;
 import com.liferay.object.service.persistence.ObjectRelationshipPersistence;
 import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.Table;
@@ -134,6 +138,7 @@ import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -721,6 +726,11 @@ public class ObjectDefinitionLocalServiceImpl
 
 		ObjectDefinition objectDefinition =
 			objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
+
+		if (objectDefinition.isNode()) {
+			throw new ObjectDefinitionStatusException(
+				"Node ObjectDefinition cannot be directly published");
+		}
 
 		if (objectDefinition.isUnmodifiableSystemObject()) {
 			throw new ObjectDefinitionStatusException();
@@ -1527,6 +1537,27 @@ public class ObjectDefinitionLocalServiceImpl
 			throw new RequiredObjectFieldException();
 		}
 
+		if (objectDefinition.isRoot()) {
+			TreeFactory treeFactory = _treeFactorySnapshot.get();
+
+			Tree tree = treeFactory.create(
+				objectDefinition.getObjectDefinitionId());
+
+			Iterator<Node> iterator = tree.iterator();
+
+			while (iterator.hasNext()) {
+				Node node = iterator.next();
+
+				if (node.getObjectDefinitionId() !=
+						objectDefinition.getObjectDefinitionId()) {
+
+					_publishObjectDefinition(
+						userId,
+						getObjectDefinition(node.getObjectDefinitionId()));
+				}
+			}
+		}
+
 		objectDefinition.setActive(true);
 		objectDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
@@ -2070,6 +2101,10 @@ public class ObjectDefinitionLocalServiceImpl
 		new MethodKey(
 			ObjectDefinitionLocalServiceUtil.class, "deployObjectDefinition",
 			ObjectDefinition.class);
+	private static final Snapshot<TreeFactory> _treeFactorySnapshot =
+		new Snapshot<>(
+			ObjectDefinitionLocalServiceImpl.class, TreeFactory.class, null,
+			true);
 	private static final MethodKey _undeployObjectDefinitionMethodKey =
 		new MethodKey(
 			ObjectDefinitionLocalServiceUtil.class, "undeployObjectDefinition",
