@@ -47,11 +47,17 @@ export function ModalAddObjectRelationship({
 		objectDefinitionExternalReferenceCode1: objectDefinitionExternalReferenceCode,
 	};
 
-	const onSubmit = async ({label, name, ...others}: ObjectRelationship) => {
+	const onSubmit = async ({
+		label,
+		name,
+		objectDefinitionExternalReferenceCode1,
+		...others
+	}: ObjectRelationship) => {
 		try {
 			await API.save(
-				`/o/object-admin/v1.0/object-definitions/by-external-reference-code/${objectDefinitionExternalReferenceCode}/object-relationships`,
+				`/o/object-admin/v1.0/object-definitions/by-external-reference-code/${objectDefinitionExternalReferenceCode1}/object-relationships`,
 				{
+					objectDefinitionExternalReferenceCode1,
 					...others,
 					label,
 					name: name ?? toCamelCase(label[defaultLanguageId]!, true),

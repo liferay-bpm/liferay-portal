@@ -1,0 +1,24 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2023 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ */
+
+/// <reference types="react" />
+
+interface CurrentObjectDefinitionProps {
+	currentObjectDefinition?: Partial<ObjectDefinition>;
+	disabled?: boolean;
+	error?: string;
+	handleReverseOrder: () => void;
+	hideReverseButton: boolean;
+	label?: string;
+}
+export default function CurrentObjectDefinition({
+	currentObjectDefinition,
+	disabled,
+	error,
+	handleReverseOrder,
+	hideReverseButton,
+	label,
+}: CurrentObjectDefinitionProps): JSX.Element;
+export {};
