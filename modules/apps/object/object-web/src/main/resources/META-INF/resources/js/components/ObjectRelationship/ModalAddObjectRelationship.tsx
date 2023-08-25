@@ -21,6 +21,7 @@ import SelectRelationship from './SelectRelationship';
 import './ModalAddObjectRelationship.scss';
 
 interface ModalAddObjectRelationshipProps {
+	baseResourceURL: string;
 	handleOnClose: () => void;
 	objectDefinitionExternalReferenceCode: string;
 	objectRelationshipTypes: string[];
@@ -28,6 +29,7 @@ interface ModalAddObjectRelationshipProps {
 }
 
 export function ModalAddObjectRelationship({
+	baseResourceURL,
 	handleOnClose,
 	objectDefinitionExternalReferenceCode,
 	objectRelationshipTypes,
@@ -99,8 +101,12 @@ export function ModalAddObjectRelationship({
 						/>
 
 						<ObjectRelationshipFormBase
+							baseResourceURL={baseResourceURL}
 							errors={errors}
 							handleChange={handleChange}
+							objectDefinitionExternalReferenceCode={
+								objectDefinitionExternalReferenceCode
+							}
 							objectRelationshipTypes={objectRelationshipTypes}
 							setValues={setValues}
 							values={{
