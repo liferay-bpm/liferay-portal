@@ -109,6 +109,11 @@ export default function EditObjectDetails({
 		onSubmit: () => {},
 	});
 
+	const isNode =
+		!!values.rootObjectDefinitionExternalReferenceCode &&
+		values.rootObjectDefinitionExternalReferenceCode !==
+			values.externalReferenceCode;
+
 	const onSubmit = async (draft: boolean) => {
 		const validationErrors = handleValidate();
 
@@ -212,6 +217,7 @@ export default function EditObjectDetails({
 						hasUpdateObjectDefinitionPermission
 					}
 					isApproved={isApproved}
+					isNode={isNode}
 					label={getLocalizableLabel(
 						values.defaultLanguageId as Liferay.Language.Locale,
 						values.label,
