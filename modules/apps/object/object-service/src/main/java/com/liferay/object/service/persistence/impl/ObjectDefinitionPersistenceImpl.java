@@ -10887,10 +10887,7 @@ public class ObjectDefinitionPersistenceImpl
 			if (isNew) {
 				if (ercObjectDefinition != null) {
 					throw new DuplicateObjectDefinitionExternalReferenceCodeException(
-						"Duplicate object definition with external reference code " +
-							objectDefinition.getExternalReferenceCode() +
-								" and company " +
-									objectDefinition.getCompanyId());
+						"This ERC is already in use. Try another one.");
 				}
 			}
 			else {
@@ -10899,10 +10896,7 @@ public class ObjectDefinitionPersistenceImpl
 						ercObjectDefinition.getObjectDefinitionId())) {
 
 					throw new DuplicateObjectDefinitionExternalReferenceCodeException(
-						"Duplicate object definition with external reference code " +
-							objectDefinition.getExternalReferenceCode() +
-								" and company " +
-									objectDefinition.getCompanyId());
+						"This ERC is already in use. Try another one.");
 				}
 			}
 		}
