@@ -112,7 +112,9 @@ export function useObjectActionForm({
 
 		if (Object.keys(errors).length) {
 			openToast({
-				message: REQUIRED_MSG,
+				message: Liferay.Language.get(
+					'only-41-characters-are-allowed-in-the-name-field'
+				),
 				type: 'danger',
 			});
 		}
