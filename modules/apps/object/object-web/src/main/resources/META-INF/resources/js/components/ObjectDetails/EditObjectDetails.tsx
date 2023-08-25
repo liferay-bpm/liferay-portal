@@ -337,6 +337,7 @@ export default function EditObjectDetails({
 								<AccountRestrictionContainer
 									errors={errors}
 									isApproved={isApproved}
+									isNode={isNode}
 									objectFields={objectFields}
 									setValues={setValues}
 									values={values}
