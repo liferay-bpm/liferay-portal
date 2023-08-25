@@ -10,8 +10,8 @@ import com.liferay.object.definition.tree.Node;
 import com.liferay.object.definition.tree.Tree;
 import com.liferay.object.definition.tree.TreeFactory;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
+import com.liferay.object.service.persistence.ObjectRelationshipPersistence;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -32,8 +32,7 @@ public class TreeFactoryImpl implements TreeFactory {
 	@Override
 	public Tree create(long objectDefinitionId) throws PortalException {
 		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.getObjectDefinition(
-				objectDefinitionId);
+			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
 		if (objectDefinition.getRootObjectDefinitionId() == 0) {
 			return null;
@@ -62,7 +61,7 @@ public class TreeFactoryImpl implements TreeFactory {
 
 	private List<Node> _getChildrenNodes(Node node) {
 		return TransformUtil.transform(
-			_objectRelationshipLocalService.getObjectRelationships(
+			_objectRelationshipPersistence.findByODI1_E(
 				node.getObjectDefinitionId(), true),
 			objectRelationship -> new Node(
 				new Edge(objectRelationship.getObjectRelationshipId()),
@@ -70,9 +69,9 @@ public class TreeFactoryImpl implements TreeFactory {
 	}
 
 	@Reference
-	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+	private ObjectDefinitionPersistence _objectDefinitionPersistence;
 
 	@Reference
-	private ObjectRelationshipLocalService _objectRelationshipLocalService;
+	private ObjectRelationshipPersistence _objectRelationshipPersistence;
 
 }
