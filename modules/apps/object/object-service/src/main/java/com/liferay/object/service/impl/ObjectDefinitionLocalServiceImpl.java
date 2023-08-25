@@ -917,7 +917,9 @@ public class ObjectDefinitionLocalServiceImpl
 				"Object definition " + objectDefinition);
 		}
 
-		if (objectDefinition.isChildNode()) {
+		if (FeatureFlagManagerUtil.isEnabled("LPS-187142") &&
+			objectDefinition.isChildNode()) {
+
 			String errorMessage =
 				"cannot be changed when the object definition is a child node";
 

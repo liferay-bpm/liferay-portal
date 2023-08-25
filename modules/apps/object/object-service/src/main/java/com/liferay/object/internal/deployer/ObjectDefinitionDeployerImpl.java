@@ -59,6 +59,7 @@ import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
@@ -389,7 +390,9 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				objectDefinition, _objectDefinitionLocalService);
 
 		try {
-			if (objectDefinition.isRootNode()) {
+			if (FeatureFlagManagerUtil.isEnabled("LPS-187142") &&
+				objectDefinition.isRootNode()) {
+
 				_registerRootObjectLayoutTabScreenNavigationCategories(
 					objectDefinition.getRootObjectDefinitionId());
 			}
