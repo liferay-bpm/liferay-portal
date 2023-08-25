@@ -22,7 +22,7 @@ public class ObjectFolderNameException extends PortalException {
 		public MustBeLessThan41Characters() {
 			super(
 				"Name must be less than 41 characters",
-				"only-41-characters-are-allowed");
+				"only-41-characters-are-allowed-in-the-name-field");
 		}
 
 	}

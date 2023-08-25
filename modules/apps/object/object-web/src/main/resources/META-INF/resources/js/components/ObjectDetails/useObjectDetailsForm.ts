@@ -43,7 +43,9 @@ const getNameErrors = (
 	}
 
 	if (name.length > 41) {
-		errors.name = Liferay.Language.get('only-41-characters-are-allowed');
+		errors.name = Liferay.Language.get(
+			'only-41-characters-are-allowed-in-the-name-field'
+		);
 
 		return;
 	}
