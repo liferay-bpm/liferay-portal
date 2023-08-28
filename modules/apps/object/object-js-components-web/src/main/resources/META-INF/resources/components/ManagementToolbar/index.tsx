@@ -30,7 +30,7 @@ interface ManagementToolbarProps {
 	hasUpdatePermission: boolean;
 	helpMessage: string;
 	isApproved?: boolean;
-	isNode?: boolean;
+	isRootDescendant?: boolean;
 	label: string;
 	onExternalReferenceCodeChange?: (value: string) => void;
 	onGetEntity: () => Promise<Entity>;
@@ -53,7 +53,7 @@ export function ManagementToolbar({
 	hasUpdatePermission,
 	helpMessage,
 	isApproved,
-	isNode,
+	isRootDescendant,
 	label,
 	onExternalReferenceCodeChange,
 	onGetEntity,
@@ -175,7 +175,7 @@ export function ManagementToolbar({
 
 							{isApproved !== undefined &&
 								!isApproved &&
-								!isNode && (
+								!isRootDescendant && (
 									<ClayButton
 										disabled={
 											!hasUpdatePermission || disabled

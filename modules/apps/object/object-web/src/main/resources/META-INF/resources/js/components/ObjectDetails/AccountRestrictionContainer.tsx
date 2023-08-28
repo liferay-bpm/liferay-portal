@@ -16,7 +16,7 @@ import {defaultLanguageId} from '../../utils/constants';
 interface AccountRestrictionContainerProps {
 	errors: FormError<ObjectDefinition>;
 	isApproved: boolean;
-	isNode: boolean;
+	isRootDescendant: boolean;
 	objectFields: ObjectField[];
 	setValues: (values: Partial<ObjectDefinition>) => void;
 	values: Partial<ObjectDefinition>;
@@ -25,7 +25,7 @@ interface AccountRestrictionContainerProps {
 export function AccountRestrictionContainer({
 	errors,
 	isApproved,
-	isNode,
+	isRootDescendant,
 	objectFields,
 	setValues,
 	values,
@@ -86,13 +86,13 @@ export function AccountRestrictionContainer({
 				currentAccountRelationship?.label[defaultLanguageId] ?? ''
 			);
 
-			if ((isApproved && values.accountEntryRestricted) || isNode) {
+			if ((isApproved && values.accountEntryRestricted) || isRootDescendant) {
 				setDisableAccountToggle(true);
 			}
 
 			if (
 				(isApproved && values.accountEntryRestrictedObjectFieldName) ||
-				isNode
+				isRootDescendant
 			) {
 				setDisableAccountSelect(true);
 			}

@@ -109,7 +109,7 @@ export default function EditObjectDetails({
 		onSubmit: () => {},
 	});
 
-	const isNode =
+	const isRootDescendant =
 		!!values.rootObjectDefinitionExternalReferenceCode &&
 		values.rootObjectDefinitionExternalReferenceCode !==
 			values.externalReferenceCode;
@@ -217,7 +217,7 @@ export default function EditObjectDetails({
 						hasUpdateObjectDefinitionPermission
 					}
 					isApproved={isApproved}
-					isNode={isNode}
+					isRootDescendant={isRootDescendant}
 					label={getLocalizableLabel(
 						values.defaultLanguageId as Liferay.Language.Locale,
 						values.label,
@@ -337,7 +337,7 @@ export default function EditObjectDetails({
 								<AccountRestrictionContainer
 									errors={errors}
 									isApproved={isApproved}
-									isNode={isNode}
+									isRootDescendant={isRootDescendant}
 									objectFields={objectFields}
 									setValues={setValues}
 									values={values}

@@ -12,7 +12,7 @@ interface ObjectManagementToolbarProps {
 	hasPublishObjectPermission: boolean;
 	hasUpdateObjectDefinitionPermission: boolean;
 	isApproved: boolean;
-	isNode: boolean;
+	isRootDescendant: boolean;
 	label: string;
 	objectDefinitionId: number;
 	onSubmit: (draft: boolean) => void;
@@ -28,7 +28,7 @@ export default function ObjectManagementToolbar({
 	hasPublishObjectPermission,
 	hasUpdateObjectDefinitionPermission,
 	isApproved,
-	isNode,
+	isRootDescendant,
 	label,
 	objectDefinitionId,
 	onSubmit,
@@ -57,7 +57,7 @@ export default function ObjectManagementToolbar({
 				'unique-key-for-referencing-the-object-definition'
 			)}
 			isApproved={isApproved}
-			isNode={isNode}
+			isRootDescendant={isRootDescendant}
 			label={label}
 			onExternalReferenceCodeChange={(externalReferenceCode: string) => {
 				setValues({

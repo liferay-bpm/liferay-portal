@@ -21,7 +21,7 @@ interface ManagementToolbarProps {
 	hasUpdatePermission: boolean;
 	helpMessage: string;
 	isApproved?: boolean;
-	isNode?: boolean;
+	isRootDescendant?: boolean;
 	label: string;
 	onExternalReferenceCodeChange?: (value: string) => void;
 	onGetEntity: () => Promise<Entity>;
@@ -43,7 +43,7 @@ export declare function ManagementToolbar({
 	hasUpdatePermission,
 	helpMessage,
 	isApproved,
-	isNode,
+	isRootDescendant,
 	label,
 	onExternalReferenceCodeChange,
 	onGetEntity,

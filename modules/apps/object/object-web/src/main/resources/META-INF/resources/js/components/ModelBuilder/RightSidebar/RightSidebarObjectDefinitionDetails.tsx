@@ -86,13 +86,13 @@ export function RightSidebarObjectDefinitionDetails({
 						isApproved={
 							selectedDefinitionNode.status.label === 'approved'
 						}
-						isNode={
-							!!selectedDefinitionNode.rootObjectDefinitionExternalReferenceCode &&
-							selectedDefinitionNode.rootObjectDefinitionExternalReferenceCode !==
-								selectedDefinitionNode.externalReferenceCode
+						isRootDescendant={
+							 !!selectedDefinitionNode.rootObjectDefinitionExternalReferenceCode &&
+							 selectedDefinitionNode.rootObjectDefinitionExternalReferenceCode !==
+							 selectedDefinitionNode.externalReferenceCode
 						}
 						objectFields={selectedDefinitionNode.objectFields}
-						setValues={() => {}}
+                        setValues={() => {}}
 						values={selectedDefinitionNode}
 					/>
 				</div>
