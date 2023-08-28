@@ -4225,16 +4225,6 @@ public class ObjectEntryLocalServiceImpl
 
 				return;
 			}
-
-			Map<String, Serializable> originalValues = objectEntry.getValues();
-
-			if (!Objects.equals(
-					GetterUtil.getLong(originalValues.get(entry.getKey())),
-					GetterUtil.getLong(entry.getValue()))) {
-
-				throw new ObjectEntryValuesException.
-					UnmodifiableAccountEntryObjectField(objectField.getName());
-			}
 		}
 		else if (StringUtil.equals(
 					objectField.getDBType(),
