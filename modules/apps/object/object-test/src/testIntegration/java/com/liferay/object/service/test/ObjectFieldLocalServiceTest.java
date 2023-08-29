@@ -28,6 +28,7 @@ import com.liferay.object.exception.ObjectFieldRelationshipTypeException;
 import com.liferay.object.exception.ObjectFieldSettingNameException;
 import com.liferay.object.exception.ObjectFieldSettingValueException;
 import com.liferay.object.exception.ObjectFieldStateException;
+import com.liferay.object.exception.ObjectFieldSystemException;
 import com.liferay.object.exception.RequiredObjectFieldException;
 import com.liferay.object.field.builder.AggregationObjectFieldBuilder;
 import com.liferay.object.field.builder.AttachmentObjectFieldBuilder;
@@ -694,8 +695,14 @@ public class ObjectFieldLocalServiceTest {
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 					ObjectFieldConstants.DB_TYPE_STRING, "abl-e")));
 		AssertUtils.assertFailure(
-			ObjectFieldNameException.MustNotBeDuplicate.class,
-			"Duplicate name able",
+			ObjectFieldNameException.MustNotBeNull.class, "Name is null",
+			() -> _addUnmodifiableSystemObjectDefinition(
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+					ObjectFieldConstants.DB_TYPE_STRING, "Able", "")));
+		AssertUtils.assertFailure(
+			ObjectFieldSystemException.class,
+			"Only allowed bundles can create system fields",
 			() -> _objectFieldLocalService.addSystemObjectField(
 				TestPropsValues.getUserId(),
 				objectDefinition.getObjectDefinitionId(),
@@ -704,12 +711,6 @@ public class ObjectFieldLocalServiceTest {
 				ObjectFieldConstants.DB_TYPE_STRING, false, true, "",
 				LocalizedMapUtil.getLocalizedMap("Able"), "able", false,
 				false));
-		AssertUtils.assertFailure(
-			ObjectFieldNameException.MustNotBeNull.class, "Name is null",
-			() -> _addUnmodifiableSystemObjectDefinition(
-				ObjectFieldUtil.createObjectField(
-					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-					ObjectFieldConstants.DB_TYPE_STRING, "Able", "")));
 
 		String objectDefinitionName = "A" + RandomTestUtil.randomString();
 
