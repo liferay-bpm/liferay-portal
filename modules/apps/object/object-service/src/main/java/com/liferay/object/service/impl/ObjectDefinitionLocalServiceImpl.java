@@ -1881,10 +1881,8 @@ public class ObjectDefinitionLocalServiceImpl
 			externalReferenceCode.startsWith("L_")) {
 
 			throw new ObjectDefinitionExternalReferenceCodeException.
-				MustNotStartWithPrefix();
+				MustNotStartWithPrefix("L_");
 		}
-<<<<<<< Updated upstream
-=======
 
 		char[] externalReferenceCodeCharArrayCharArray =
 			externalReferenceCode.toCharArray();
@@ -1893,7 +1891,6 @@ public class ObjectDefinitionLocalServiceImpl
 			throw new ObjectDefinitionExternalReferenceCodeException.
 				MustBeLessThan75Characters(75);
 		}
->>>>>>> Stashed changes
 	}
 
 	private void _validateLabel(Map<Locale, String> labelMap)
