@@ -37,6 +37,7 @@ import com.liferay.object.exception.ObjectDefinitionPluralLabelException;
 import com.liferay.object.exception.ObjectDefinitionRootObjectDefinitionIdException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectDefinitionStatusException;
+import com.liferay.object.exception.ObjectDefinitionSystemException;
 import com.liferay.object.exception.ObjectDefinitionVersionException;
 import com.liferay.object.exception.ObjectFieldRelationshipTypeException;
 import com.liferay.object.exception.RequiredObjectDefinitionException;
@@ -75,6 +76,7 @@ import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.service.persistence.ObjectFolderPersistence;
 import com.liferay.object.service.persistence.ObjectRelationshipPersistence;
 import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.object.system.util.SystemObjectDefinitionsUtil;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.Table;
@@ -461,6 +463,14 @@ public class ObjectDefinitionLocalServiceImpl
 			throw new ObjectDefinitionRootObjectDefinitionIdException(
 				"Object definitions that belong to a hierarchical structure " +
 					"cannot be deleted");
+		}
+
+		if (objectDefinition.isSystem() &&
+			!SystemObjectDefinitionsUtil.
+				isAllowedManageSystemObjectDefinitions()) {
+
+			throw new ObjectDefinitionSystemException(
+				"Only allowed bundles can delete system object definitions");
 		}
 
 		_objectActionLocalService.deleteObjectActions(
