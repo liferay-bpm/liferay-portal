@@ -12,6 +12,7 @@ import React from 'react';
 import './ObjectDefinitionNodeFooter.scss';
 
 interface ObjectDefinitionNodeFooterProps {
+	handleSelectedNode: () => void;
 	isLinkedObjectDefinition: boolean;
 	setShowAllObjectFields: (value: boolean) => void;
 	setShowModal: React.Dispatch<
@@ -21,6 +22,7 @@ interface ObjectDefinitionNodeFooterProps {
 }
 
 export default function ObjectDefinitionNodeFooter({
+	handleSelectedNode,
 	isLinkedObjectDefinition,
 	setShowAllObjectFields,
 	setShowModal,
@@ -28,7 +30,10 @@ export default function ObjectDefinitionNodeFooter({
 }: ObjectDefinitionNodeFooterProps) {
 	return (
 		<>
-			<div className="lfr-objects__model-builder-node-button-container">
+			<div
+				className="lfr-objects__model-builder-node-button-container"
+				onClick={handleSelectedNode}
+			>
 				{!isLinkedObjectDefinition && (
 					<DropDown
 						alignmentPosition={4}

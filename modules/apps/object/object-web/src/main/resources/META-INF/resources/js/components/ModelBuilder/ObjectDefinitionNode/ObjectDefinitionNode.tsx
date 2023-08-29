@@ -105,6 +105,18 @@ export function ObjectDefinitionNode({
 
 	const viewObjectDetailsURL = formatActionURL(editObjectDefinitionURL, id);
 
+	const handleSelectedNode = () => {
+		const {edges, nodes} = store.getState();
+		dispatch({
+			payload: {
+				edges,
+				nodes,
+				selectedObjectDefinitionId: id.toString(),
+			},
+			type: TYPES.SET_SELECTED_NODE,
+		});
+	};
+
 	return (
 		<>
 			<div
@@ -142,6 +154,7 @@ export function ObjectDefinitionNode({
 						setDeletedObjectDefinition,
 						status,
 					})}
+					handleSelectedNode={handleSelectedNode}
 					isLinkedObjectDefinition={linkedObjectDefinition}
 					objectDefinitionLabel={getLocalizableLabel(
 						defaultLanguageId,
@@ -155,10 +168,12 @@ export function ObjectDefinitionNode({
 				<ObjectDefinitionNodeFields
 					defaultLanguageId={defaultLanguageId}
 					objectFields={objectFields}
+					selectedObjectDefinitionId={id}
 					showAllObjectFields={showAllObjectFields}
 				/>
 
 				<ObjectDefinitionNodeFooter
+					handleSelectedNode={handleSelectedNode}
 					isLinkedObjectDefinition={linkedObjectDefinition}
 					setShowAllObjectFields={setShowAllObjectFields}
 					setShowModal={setShowModal}
