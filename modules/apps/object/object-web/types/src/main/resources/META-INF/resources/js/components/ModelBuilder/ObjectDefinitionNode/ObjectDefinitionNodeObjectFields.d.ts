@@ -9,10 +9,12 @@ import './ObjectDefinitionNodeObjectFields.scss';
 interface ObjectDefinitionNodeFieldsProps {
 	defaultLanguageId: Liferay.Language.Locale;
 	objectFields: ObjectFieldNode[];
+	selectedObjectDefinitionId: number;
 	showAllObjectFields: boolean;
 }
 export default function ObjectDefinitionNodeFields({
 	objectFields,
+	selectedObjectDefinitionId,
 	showAllObjectFields,
 }: ObjectDefinitionNodeFieldsProps): JSX.Element;
 export {};

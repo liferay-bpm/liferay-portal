@@ -90,6 +90,15 @@ export declare type TAction =
 			payload: {
 				edges: Edge<ObjectRelationshipEdgeData>[];
 				nodes: Node<ObjectDefinitionNodeData>[];
+				selectedFieldDefinitionName: string;
+				selectedObjectDefinitionId: number;
+			};
+			type: TYPES.SET_SELECTED_FIELD;
+	  }
+	| {
+			payload: {
+				edges: Edge<ObjectRelationshipEdgeData>[];
+				nodes: Node<ObjectDefinitionNodeData>[];
 				selectedObjectDefinitionId: string;
 			};
 			type: TYPES.SET_SELECTED_OBJECT_DEFINITION_NODE;
@@ -120,6 +129,7 @@ export declare type TState = {
 	editObjectDefinitionURL: string;
 	elements: Elements<ObjectDefinitionNodeData | ObjectRelationshipEdgeData>;
 	isLoadingObjectFolder: boolean;
+	filterOperators: TFilterOperators;
 	leftSidebarItems: LeftSidebarItem[];
 	objectDefinitionPermissionsURL: string;
 	objectDefinitions: ObjectDefinition[];
@@ -131,6 +141,7 @@ export declare type TState = {
 	selectedObjectFolder: ObjectFolder;
 	selectedObjectRelationship: ObjectRelationship;
 	showChangesSaved: boolean;
+	workflowStatusJSONArray: LabelValueObject[];
 };
 export interface LeftSidebarItem {
 	hiddenObjectFolderObjectDefinitionNodes: boolean;
@@ -166,6 +177,7 @@ export declare type nonRelationshipObjectFieldsInfo = {
 };
 export declare type RightSidebarType =
 	| 'empty'
+	| 'objectFieldDetails'
 	| 'objectDefinitionDetails'
 	| 'objectRelationshipDetails';
 export {};
