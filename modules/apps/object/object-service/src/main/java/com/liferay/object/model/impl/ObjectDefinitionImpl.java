@@ -161,6 +161,10 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 
 	@Override
 	public boolean isChildNode() {
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-187142")) {
+			return false;
+		}
+
 		if ((getRootObjectDefinitionId() > 0) && !isRootNode()) {
 			return true;
 		}
@@ -190,6 +194,10 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 
 	@Override
 	public boolean isRootNode() {
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-187142")) {
+			return false;
+		}
+
 		if (getObjectDefinitionId() == getRootObjectDefinitionId()) {
 			return true;
 		}
