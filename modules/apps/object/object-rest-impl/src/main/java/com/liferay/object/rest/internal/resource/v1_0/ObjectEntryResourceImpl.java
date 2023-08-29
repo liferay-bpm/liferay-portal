@@ -35,6 +35,7 @@ import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.permission.Permission;
 
 import java.io.Serializable;
 
@@ -233,6 +234,18 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		return defaultObjectEntryManager.getObjectEntry(
 			_getDTOConverterContext(objectEntryId), _objectDefinition,
 			objectEntryId);
+	}
+
+	@Override
+	public Page<Permission> getObjectEntryPermissionsPage(
+			Long objectEntryId, String roleNames)
+		throws Exception {
+
+		if (_objectDefinition.isChildNode()) {
+			throw new UnsupportedOperationException();
+		}
+
+		return super.getObjectEntryPermissionsPage(objectEntryId, roleNames);
 	}
 
 	@Override
@@ -462,6 +475,18 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		defaultObjectEntryManager.executeObjectAction(
 			_getDTOConverterContext(objectEntryId), objectActionName,
 			_objectDefinition, objectEntryId);
+	}
+
+	@Override
+	public Page<Permission> putObjectEntryPermissionsPage(
+			Long objectEntryId, Permission[] permissions)
+		throws Exception {
+
+		if (_objectDefinition.isChildNode()) {
+			throw new UnsupportedOperationException();
+		}
+
+		return super.putObjectEntryPermissionsPage(objectEntryId, permissions);
 	}
 
 	@Override

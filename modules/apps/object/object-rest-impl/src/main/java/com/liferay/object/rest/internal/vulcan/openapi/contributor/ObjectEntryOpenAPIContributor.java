@@ -98,6 +98,14 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 		Paths paths = openAPI.getPaths();
 
 		for (String key : new ArrayList<>(paths.keySet())) {
+			if (_objectDefinition.isChildNode() &&
+				key.endsWith("/permissions")) {
+
+				paths.remove(key);
+
+				continue;
+			}
+
 			if (!key.contains("objectActionName") &&
 				!key.contains("objectRelationshipName")) {
 
