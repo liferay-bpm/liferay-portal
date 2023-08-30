@@ -6,6 +6,7 @@
 package com.liferay.object.system.util;
 
 import com.liferay.batch.engine.util.BatchEngineThreadLocal;
+import com.liferay.portal.kernel.util.PortalRunMode;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -17,6 +18,10 @@ import java.util.Set;
 public class SystemObjectDefinitionsUtil {
 
 	public static boolean isAllowedManageSystemObjectDefinitions() {
+		if (PortalRunMode.isTestMode()) {
+			return true;
+		}
+
 		String bundleNamespace = BatchEngineThreadLocal.getBundleNamespace();
 
 		for (String allowedBundle : _allowedBundles) {
