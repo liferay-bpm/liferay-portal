@@ -481,19 +481,22 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		// Register ObjectEntriesPanelApp after ObjectEntriesPortlet. See
 		// LPS-140379.
 
-		serviceRegistrations.add(
-			_bundleContext.registerService(
-				PanelApp.class,
-				new ObjectEntriesPanelApp(
-					objectDefinition,
-					() -> _portletLocalService.getPortletById(
-						objectDefinition.getPortletId())),
-				HashMapDictionaryBuilder.<String, Object>put(
-					"panel.app.order:Integer",
-					objectDefinition.getPanelAppOrder()
-				).put(
-					"panel.category.key", objectDefinition.getPanelCategoryKey()
-				).build()));
+		if (!objectDefinition.isRootDescendantNode()) {
+			serviceRegistrations.add(
+				_bundleContext.registerService(
+					PanelApp.class,
+					new ObjectEntriesPanelApp(
+						objectDefinition,
+						() -> _portletLocalService.getPortletById(
+							objectDefinition.getPortletId())),
+					HashMapDictionaryBuilder.<String, Object>put(
+						"panel.app.order:Integer",
+						objectDefinition.getPanelAppOrder()
+					).put(
+						"panel.category.key",
+						objectDefinition.getPanelCategoryKey()
+					).build()));
+		}
 
 		return serviceRegistrations;
 	}
