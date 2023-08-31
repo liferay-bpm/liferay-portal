@@ -155,12 +155,27 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 		return false;
 	}
 
+	@Override
+	public boolean isHierarchical() {
+		if (getRootObjectDefinitionId() != 0) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public boolean isLinkedToObjectFolder(long objectFolderId) {
 		if (getObjectFolderId() == objectFolderId) {
 			return false;
 		}
 
 		return true;
+	}
+
+	@Override
+	public boolean isRoot() {
+		return Objects.equals(
+			getObjectDefinitionId(), getRootObjectDefinitionId());
 	}
 
 	@Override
