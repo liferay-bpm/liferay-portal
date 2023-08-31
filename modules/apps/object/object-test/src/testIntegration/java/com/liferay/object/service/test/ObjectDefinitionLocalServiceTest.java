@@ -11,6 +11,8 @@ import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.definition.tree.Node;
+import com.liferay.object.definition.tree.Tree;
 import com.liferay.object.definition.tree.TreeFactory;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
@@ -85,6 +87,7 @@ import java.sql.Connection;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -283,6 +286,21 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertFalse(
 			_hasTable(objectDefinition.getExtensionDBTableName()));
 
+		Tree tree = TreeTestUtil.createTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			_treeFactory);
+
+		_assertHierarchicalObjectDefinitions(
+			tree,
+			hierarchicalObjectDefinition -> {
+				Assert.assertFalse(
+					_hasTable(
+						hierarchicalObjectDefinition.
+							getExtensionDBTableName()));
+				Assert.assertFalse(
+					_hasTable(hierarchicalObjectDefinition.getDBTableName()));
+			});
+
 		// Before publish, resources
 
 		Assert.assertEquals(
@@ -305,10 +323,42 @@ public class ObjectDefinitionLocalServiceTest {
 				ResourceConstants.SCOPE_INDIVIDUAL,
 				String.valueOf(objectDefinition.getObjectDefinitionId())));
 
+		_assertHierarchicalObjectDefinitions(
+			tree,
+			hierarchicalObjectDefinition -> {
+				Assert.assertEquals(
+					0,
+					_resourceActionLocalService.getResourceActionsCount(
+						hierarchicalObjectDefinition.getClassName()));
+				Assert.assertEquals(
+					0,
+					_resourceActionLocalService.getResourceActionsCount(
+						hierarchicalObjectDefinition.getPortletId()));
+				Assert.assertEquals(
+					0,
+					_resourceActionLocalService.getResourceActionsCount(
+						hierarchicalObjectDefinition.getResourceName()));
+				Assert.assertEquals(
+					1,
+					_resourcePermissionLocalService.getResourcePermissionsCount(
+						hierarchicalObjectDefinition.getCompanyId(),
+						ObjectDefinition.class.getName(),
+						ResourceConstants.SCOPE_INDIVIDUAL,
+						String.valueOf(
+							hierarchicalObjectDefinition.
+								getObjectDefinitionId())));
+			});
+
 		// Before publish, status
 
 		Assert.assertEquals(
 			WorkflowConstants.STATUS_DRAFT, objectDefinition.getStatus());
+
+		_assertHierarchicalObjectDefinitions(
+			tree,
+			hierarchicalObjectDefinition -> Assert.assertEquals(
+				WorkflowConstants.STATUS_DRAFT,
+				hierarchicalObjectDefinition.getStatus()));
 
 		// Publish
 
@@ -330,6 +380,31 @@ public class ObjectDefinitionLocalServiceTest {
 			).required(
 				true
 			).build());
+
+		_assertHierarchicalObjectDefinitions(
+			tree,
+			hierarchicalObjectDefinition -> {
+				if (!hierarchicalObjectDefinition.isRoot()) {
+					AssertUtils.assertFailure(
+						ObjectDefinitionStatusException.class,
+						"Non root object definitions within a hierarchical " +
+							"structure are ineligible for publication",
+						() ->
+							_objectDefinitionLocalService.
+								publishCustomObjectDefinition(
+									TestPropsValues.getUserId(),
+									hierarchicalObjectDefinition.
+										getObjectDefinitionId()));
+				}
+			});
+
+		ObjectDefinition rootObjectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				TestPropsValues.getCompanyId(), "C_A");
+
+		_objectDefinitionLocalService.publishCustomObjectDefinition(
+			TestPropsValues.getUserId(),
+			rootObjectDefinition.getObjectDefinitionId());
 
 		// After publish, database table
 
@@ -353,6 +428,18 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertTrue(
 			_hasTable(objectDefinition.getExtensionDBTableName()));
 
+		_assertHierarchicalObjectDefinitions(
+			tree,
+			hierarchicalObjectDefinition -> {
+				Assert.assertFalse(
+					_hasColumn(
+						hierarchicalObjectDefinition.getDBTableName(), "able"));
+				Assert.assertTrue(
+					_hasColumn(
+						hierarchicalObjectDefinition.getDBTableName(),
+						"able_"));
+			});
+
 		// After publish, resources
 
 		Assert.assertEquals(
@@ -375,12 +462,46 @@ public class ObjectDefinitionLocalServiceTest {
 				ResourceConstants.SCOPE_INDIVIDUAL,
 				String.valueOf(objectDefinition.getObjectDefinitionId())));
 
+		_assertHierarchicalObjectDefinitions(
+			tree,
+			hierarchicalObjectDefinition -> {
+				Assert.assertEquals(
+					4,
+					_resourceActionLocalService.getResourceActionsCount(
+						hierarchicalObjectDefinition.getClassName()));
+				Assert.assertEquals(
+					6,
+					_resourceActionLocalService.getResourceActionsCount(
+						hierarchicalObjectDefinition.getPortletId()));
+				Assert.assertEquals(
+					2,
+					_resourceActionLocalService.getResourceActionsCount(
+						hierarchicalObjectDefinition.getResourceName()));
+				Assert.assertEquals(
+					1,
+					_resourcePermissionLocalService.getResourcePermissionsCount(
+						hierarchicalObjectDefinition.getCompanyId(),
+						ObjectDefinition.class.getName(),
+						ResourceConstants.SCOPE_INDIVIDUAL,
+						String.valueOf(
+							hierarchicalObjectDefinition.
+								getObjectDefinitionId())));
+			});
+
 		// After publish, status
 
 		Assert.assertEquals(
 			WorkflowConstants.STATUS_APPROVED, objectDefinition.getStatus());
 
+		_assertHierarchicalObjectDefinitions(
+			tree,
+			hierarchicalObjectDefinition -> Assert.assertEquals(
+				WorkflowConstants.STATUS_APPROVED,
+				hierarchicalObjectDefinition.getStatus()));
+
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+
+		_deleteObjectDefinitionHierarchy(_objectDefinitionLocalService);
 	}
 
 	@Test
@@ -1958,6 +2079,22 @@ public class ObjectDefinitionLocalServiceTest {
 		catch (Exception exception) {
 			Assert.assertTrue(clazz.isInstance(exception));
 			Assert.assertEquals(exception.getMessage(), message);
+		}
+	}
+
+	private void _assertHierarchicalObjectDefinitions(
+			Tree tree,
+			UnsafeConsumer<ObjectDefinition, Exception> unsafeConsumer)
+		throws Exception {
+
+		Iterator<Node> iterator = tree.iterator();
+
+		while (iterator.hasNext()) {
+			Node node = iterator.next();
+
+			unsafeConsumer.accept(
+				_objectDefinitionLocalService.getObjectDefinition(
+					node.getObjectDefinitionId()));
 		}
 	}
 
