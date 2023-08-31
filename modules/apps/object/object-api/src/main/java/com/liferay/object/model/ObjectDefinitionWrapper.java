@@ -956,6 +956,11 @@ public class ObjectDefinitionWrapper
 	}
 
 	@Override
+	public boolean isHierarchical() {
+		return model.isHierarchical();
+	}
+
+	@Override
 	public boolean isLinkedToObjectFolder(long objectFolderId) {
 		return model.isLinkedToObjectFolder(objectFolderId);
 	}
@@ -978,6 +983,11 @@ public class ObjectDefinitionWrapper
 	@Override
 	public boolean isPortlet() {
 		return model.isPortlet();
+	}
+
+	@Override
+	public boolean isRoot() {
+		return model.isRoot();
 	}
 
 	/**
