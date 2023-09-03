@@ -7,11 +7,14 @@ package com.liferay.list.type.service.impl;
 
 import com.liferay.list.type.exception.DuplicateListTypeEntryException;
 import com.liferay.list.type.exception.DuplicateListTypeEntryExternalReferenceCodeException;
+import com.liferay.list.type.exception.ListTypeDefinitionSystemException;
 import com.liferay.list.type.exception.ListTypeEntryKeyException;
 import com.liferay.list.type.exception.ListTypeEntryNameException;
+import com.liferay.list.type.model.ListTypeDefinition;
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.base.ListTypeEntryLocalServiceBaseImpl;
 import com.liferay.list.type.service.persistence.ListTypeDefinitionPersistence;
+import com.liferay.list.type.system.util.ListTypeDefinitionManagementChecker;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
@@ -47,6 +50,8 @@ public class ListTypeEntryLocalServiceImpl
 
 		User user = _userLocalService.getUser(userId);
 
+		_validateBundleNamespace(listTypeDefinitionId);
+
 		_validateExternalReferenceCode(
 			externalReferenceCode, user.getCompanyId(), listTypeDefinitionId,
 			0);
@@ -68,9 +73,25 @@ public class ListTypeEntryLocalServiceImpl
 		return listTypeEntryPersistence.update(listTypeEntry);
 	}
 
+	@Indexable(type = IndexableType.DELETE)
+	@Override
+	public ListTypeEntry deleteListTypeEntry(long listTypeEntryId)
+		throws PortalException {
+
+		ListTypeEntry listTypeEntry = listTypeEntryPersistence.findByPrimaryKey(
+			listTypeEntryId);
+
+		_validateBundleNamespace(listTypeEntry.getListTypeDefinitionId());
+
+		return listTypeEntryPersistence.remove(listTypeEntryId);
+	}
+
 	@Override
 	public void deleteListTypeEntryByListTypeDefinitionId(
-		long listTypeDefinitionId) {
+			long listTypeDefinitionId)
+		throws PortalException {
+
+		_validateBundleNamespace(listTypeDefinitionId);
 
 		for (ListTypeEntry listTypeEntry :
 				listTypeEntryPersistence.findByListTypeDefinitionId(
@@ -144,6 +165,8 @@ public class ListTypeEntryLocalServiceImpl
 		ListTypeEntry listTypeEntry = listTypeEntryPersistence.findByPrimaryKey(
 			listTypeEntryId);
 
+		_validateBundleNamespace(listTypeEntry.getListTypeDefinitionId());
+
 		_validateExternalReferenceCode(
 			externalReferenceCode, listTypeEntry.getCompanyId(),
 			listTypeEntry.getListTypeDefinitionId(), listTypeEntryId);
@@ -154,6 +177,21 @@ public class ListTypeEntryLocalServiceImpl
 		listTypeEntry.setNameMap(nameMap);
 
 		return listTypeEntryPersistence.update(listTypeEntry);
+	}
+
+	private void _validateBundleNamespace(long listTypeDefinitionId)
+		throws PortalException {
+
+		ListTypeDefinition listTypeDefinition =
+			_listTypeDefinitionPersistence.findByPrimaryKey(
+				listTypeDefinitionId);
+
+		if (listTypeDefinition.isSystem() &&
+			!ListTypeDefinitionManagementChecker.isInvokerBundleAllowed()) {
+
+			throw new ListTypeDefinitionSystemException(
+				"Only allowed bundles can create system picklists");
+		}
 	}
 
 	private void _validateExternalReferenceCode(
