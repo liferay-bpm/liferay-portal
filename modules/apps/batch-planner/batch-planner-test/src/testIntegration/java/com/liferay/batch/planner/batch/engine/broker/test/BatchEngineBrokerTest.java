@@ -353,7 +353,7 @@ public class BatchEngineBrokerTest {
 					null, user.getUserId(),
 					Collections.singletonMap(
 						LocaleUtil.US, RandomTestUtil.randomString()),
-					Arrays.asList(listTypeEntry1, listTypeEntry2));
+					false, Arrays.asList(listTypeEntry1, listTypeEntry2));
 
 			ObjectDefinition objectDefinition =
 				_objectDefinitionLocalService.addCustomObjectDefinition(
