@@ -133,7 +133,8 @@ public abstract class ListTypeEntryLocalServiceBaseImpl
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public ListTypeEntry deleteListTypeEntry(ListTypeEntry listTypeEntry) {
+	public ListTypeEntry deleteListTypeEntry(ListTypeEntry listTypeEntry)
+		throws PortalException {
 		return listTypeEntryPersistence.remove(listTypeEntry);
 	}
 

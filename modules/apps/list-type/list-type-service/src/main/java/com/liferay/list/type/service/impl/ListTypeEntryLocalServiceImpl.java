@@ -73,6 +73,15 @@ public class ListTypeEntryLocalServiceImpl
 		return listTypeEntryPersistence.update(listTypeEntry);
 	}
 
+	@Override
+	public ListTypeEntry deleteListTypeEntry(ListTypeEntry listTypeEntry)
+		throws PortalException {
+
+		_validateBundleNamespace(listTypeEntry.getListTypeDefinitionId());
+
+		return listTypeEntryPersistence.remove(listTypeEntry);
+	}
+
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public ListTypeEntry deleteListTypeEntry(long listTypeEntryId)
@@ -90,8 +99,6 @@ public class ListTypeEntryLocalServiceImpl
 	public void deleteListTypeEntryByListTypeDefinitionId(
 			long listTypeDefinitionId)
 		throws PortalException {
-
-		_validateBundleNamespace(listTypeDefinitionId);
 
 		for (ListTypeEntry listTypeEntry :
 				listTypeEntryPersistence.findByListTypeDefinitionId(
@@ -165,16 +172,25 @@ public class ListTypeEntryLocalServiceImpl
 		ListTypeEntry listTypeEntry = listTypeEntryPersistence.findByPrimaryKey(
 			listTypeEntryId);
 
-		_validateBundleNamespace(listTypeEntry.getListTypeDefinitionId());
+		ListTypeDefinition listTypeDefinition =
+			_listTypeDefinitionPersistence.findByPrimaryKey(
+				listTypeEntry.getListTypeDefinitionId());
+
+		_validateName(nameMap);
+
+		listTypeEntry.setNameMap(nameMap);
+
+		if (listTypeDefinition.isSystem() &&
+			!ListTypeDefinitionManagementChecker.isInvokerBundleAllowed()) {
+
+			return listTypeEntryPersistence.update(listTypeEntry);
+		}
 
 		_validateExternalReferenceCode(
 			externalReferenceCode, listTypeEntry.getCompanyId(),
 			listTypeEntry.getListTypeDefinitionId(), listTypeEntryId);
 
-		_validateName(nameMap);
-
 		listTypeEntry.setExternalReferenceCode(externalReferenceCode);
-		listTypeEntry.setNameMap(nameMap);
 
 		return listTypeEntryPersistence.update(listTypeEntry);
 	}
