@@ -77,10 +77,14 @@ export function ModalAddObjectField({
 			delete field.listTypeDefinitionId;
 
 			try {
-				await API.save({item: field, method: 'POST', url: apiURL});
+				const fieldResponse = await API.save<ObjectField>({
+					item: field,
+					method: 'POST',
+					returnValue: true,
+					url: `/o/object-admin/v1.0/object-definitions/by-external-reference-code/${objectDefinitionExternalReferenceCode}/object-fields`,
+				});
 
-				onClose();
-				window.location.reload();
+				onAfterSubmit(fieldResponse);
 			}
 			catch (error) {
 				setError((error as Error).message);
