@@ -73,7 +73,7 @@ public class ListTypeDefinitionLocalServiceImpl
 			List<ListTypeEntry> listTypeEntries)
 		throws PortalException {
 
-		_validateBundleNamespace(system);
+		_validateBundleNamespace("create", system);
 		_validateName(nameMap, LocaleUtil.getSiteDefault());
 
 		ListTypeDefinition listTypeDefinition =
@@ -105,7 +105,7 @@ public class ListTypeDefinitionLocalServiceImpl
 			throw new RequiredListTypeDefinitionException();
 		}
 
-		_validateBundleNamespace(listTypeDefinition.isSystem());
+		_validateBundleNamespace("delete", listTypeDefinition.isSystem());
 
 		_resourceLocalService.deleteResource(
 			listTypeDefinition, ResourceConstants.SCOPE_INDIVIDUAL);
@@ -244,14 +244,15 @@ public class ListTypeDefinitionLocalServiceImpl
 		}
 	}
 
-	private void _validateBundleNamespace(boolean system)
+	private void _validateBundleNamespace(String messageType, boolean system)
 		throws PortalException {
 
 		if (system &&
 			!ListTypeDefinitionManagementChecker.isInvokerBundleAllowed()) {
 
 			throw new ListTypeDefinitionSystemException(
-				"Only allowed bundles can create system picklists");
+				"Only allowed bundles can " + messageType +
+					" system picklists");
 		}
 	}
 

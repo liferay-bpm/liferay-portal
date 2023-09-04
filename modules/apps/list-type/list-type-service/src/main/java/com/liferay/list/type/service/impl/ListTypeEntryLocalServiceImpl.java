@@ -50,7 +50,7 @@ public class ListTypeEntryLocalServiceImpl
 
 		User user = _userLocalService.getUser(userId);
 
-		_validateBundleNamespace(listTypeDefinitionId);
+		_validateBundleNamespace("create", listTypeDefinitionId);
 
 		_validateExternalReferenceCode(
 			externalReferenceCode, user.getCompanyId(), listTypeDefinitionId,
@@ -77,7 +77,8 @@ public class ListTypeEntryLocalServiceImpl
 	public ListTypeEntry deleteListTypeEntry(ListTypeEntry listTypeEntry)
 		throws PortalException {
 
-		_validateBundleNamespace(listTypeEntry.getListTypeDefinitionId());
+		_validateBundleNamespace(
+			"delete", listTypeEntry.getListTypeDefinitionId());
 
 		return listTypeEntryPersistence.remove(listTypeEntry);
 	}
@@ -90,7 +91,8 @@ public class ListTypeEntryLocalServiceImpl
 		ListTypeEntry listTypeEntry = listTypeEntryPersistence.findByPrimaryKey(
 			listTypeEntryId);
 
-		_validateBundleNamespace(listTypeEntry.getListTypeDefinitionId());
+		_validateBundleNamespace(
+			"delete", listTypeEntry.getListTypeDefinitionId());
 
 		return listTypeEntryPersistence.remove(listTypeEntryId);
 	}
@@ -195,7 +197,8 @@ public class ListTypeEntryLocalServiceImpl
 		return listTypeEntryPersistence.update(listTypeEntry);
 	}
 
-	private void _validateBundleNamespace(long listTypeDefinitionId)
+	private void _validateBundleNamespace(
+			String messageType, long listTypeDefinitionId)
 		throws PortalException {
 
 		ListTypeDefinition listTypeDefinition =
@@ -206,7 +209,8 @@ public class ListTypeEntryLocalServiceImpl
 			!ListTypeDefinitionManagementChecker.isInvokerBundleAllowed()) {
 
 			throw new ListTypeDefinitionSystemException(
-				"Only allowed bundles can create system picklists");
+				"Only allowed bundles can " + messageType +
+					" system picklists entrys");
 		}
 	}
 
