@@ -119,7 +119,8 @@ public class ListTypeEntryLocalServiceWrapper
 
 	@Override
 	public void deleteListTypeEntryByListTypeDefinitionId(
-		long listTypeDefinitionId) {
+			long listTypeDefinitionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_listTypeEntryLocalService.deleteListTypeEntryByListTypeDefinitionId(
 			listTypeDefinitionId);
