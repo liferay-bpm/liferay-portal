@@ -14,9 +14,9 @@ import java.util.Set;
 /**
  * @author Gabriel Albuquerque
  */
-public class SystemUtil {
+public class SystemObjectDefinitionsUtil {
 
-	public static boolean allowManageSystemEntities() {
+	public static boolean isAllowedManageSystemObjectDefinitions() {
 		String bundleNamespace = BatchEngineThreadLocal.getBundleNamespace();
 
 		for (String allowedBundle : _allowedBundles) {

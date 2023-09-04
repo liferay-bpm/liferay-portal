@@ -13,15 +13,15 @@ import com.liferay.petra.lang.CentralizedThreadLocal;
 public class BatchEngineThreadLocal {
 
 	public static String getBundleNamespace() {
-		return _bundleNamespaceThreadLocal.get();
+		return _bundleNamespace.get();
 	}
 
 	public static void setBundleNamespace(String bundleNamespace) {
-		_bundleNamespaceThreadLocal.set(bundleNamespace);
+		_bundleNamespace.set(bundleNamespace);
 	}
 
-	private static final ThreadLocal<String> _bundleNamespaceThreadLocal =
+	private static final ThreadLocal<String> _bundleNamespace =
 		new CentralizedThreadLocal<>(
-			BatchEngineThreadLocal.class + "._bundleNamespaceThreadLocal");
+			BatchEngineThreadLocal.class + "._bundleNamespace");
 
 }
