@@ -146,9 +146,12 @@ public class ListTypeDefinitionLocalServiceImpl
 			listTypeDefinitionPersistence.findByPrimaryKey(
 				listTypeDefinitionId);
 
-		_validateBundleNamespace(listTypeDefinition.isSystem());
+		if (!listTypeDefinition.isSystem() ||
+			ListTypeDefinitionManagementChecker.isInvokerBundleAllowed()) {
 
-		listTypeDefinition.setExternalReferenceCode(externalReferenceCode);
+			listTypeDefinition.setExternalReferenceCode(externalReferenceCode);
+		}
+
 		listTypeDefinition.setNameMap(nameMap);
 
 		listTypeDefinition = listTypeDefinitionPersistence.update(

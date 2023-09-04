@@ -165,16 +165,25 @@ public class ListTypeEntryLocalServiceImpl
 		ListTypeEntry listTypeEntry = listTypeEntryPersistence.findByPrimaryKey(
 			listTypeEntryId);
 
-		_validateBundleNamespace(listTypeEntry.getListTypeDefinitionId());
+		ListTypeDefinition listTypeDefinition =
+			_listTypeDefinitionPersistence.findByPrimaryKey(
+				listTypeEntry.getListTypeDefinitionId());
+
+		_validateName(nameMap);
+
+		listTypeEntry.setNameMap(nameMap);
+
+		if (listTypeDefinition.isSystem() &&
+			!ListTypeDefinitionManagementChecker.isInvokerBundleAllowed()) {
+
+			return listTypeEntryPersistence.update(listTypeEntry);
+		}
 
 		_validateExternalReferenceCode(
 			externalReferenceCode, listTypeEntry.getCompanyId(),
 			listTypeEntry.getListTypeDefinitionId(), listTypeEntryId);
 
-		_validateName(nameMap);
-
 		listTypeEntry.setExternalReferenceCode(externalReferenceCode);
-		listTypeEntry.setNameMap(nameMap);
 
 		return listTypeEntryPersistence.update(listTypeEntry);
 	}
