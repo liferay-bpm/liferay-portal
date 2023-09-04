@@ -141,6 +141,9 @@ export type TState = {
 	editObjectDefinitionURL: string;
 	elements: Elements<ObjectDefinitionNodeData | ObjectRelationshipEdgeData>;
 	filterOperators: TFilterOperators;
+	forbiddenChars: string[];
+	forbiddenLastChars: string[];
+	forbiddenNames: string[];
 	isLoadingObjectFolder: boolean;
 	leftSidebarItems: LeftSidebarItem[];
 	objectDefinitionPermissionsURL: string;
@@ -148,6 +151,7 @@ export type TState = {
 	objectDefinitionsStorageTypes: LabelValueObject[];
 	objectFolderName: string;
 	objectFolders: ObjectFolder[];
+	objectWebLearnResources: ObjectWebLearnResources;
 	rightSidebarType: RightSidebarType;
 	selectedObjectDefinitionNode: Node<ObjectDefinitionNodeData> | null;
 	selectedObjectFolder: ObjectFolder;
