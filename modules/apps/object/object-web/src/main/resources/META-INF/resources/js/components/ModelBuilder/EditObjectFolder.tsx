@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {API, getLocalizableLabel} from '@liferay/object-js-components-web';
+import {API} from '@liferay/object-js-components-web';
 import React, {useEffect, useState} from 'react';
 import {FlowElement} from 'react-flow-renderer';
 
@@ -134,11 +134,7 @@ export default function EditObjectFolder({
 												businessType,
 												externalReferenceCode,
 												id,
-												label: getLocalizableLabel(
-													objectDefinition.defaultLanguageId,
-													label,
-													name
-												),
+												label,
 												name,
 												primaryKey: name === 'id',
 												required,

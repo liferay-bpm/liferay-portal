@@ -178,21 +178,32 @@ export declare function putObjectDefinitionByExternalReferenceCode(
 export declare function putObjectFolderByExternalReferenceCode(
 	objectFolder: Partial<ObjectFolder>
 ): Promise<Response>;
-export declare function putListTypeDefinition({
+export declare function save<T>({
+	item,
+	method,
+	returnValue,
+	url,
+}: saveProps): Promise<T>;
+export declare function addPickListItem({
+	id,
+	key,
+	name_i18n,
+}: Partial<PickListItem>): Promise<unknown>;
+export declare function updatePickList({
 	externalReferenceCode,
 	id,
 	listTypeEntries,
 	name_i18n,
-}: Partial<ListTypeDefinition>): Promise<any>;
+}: Partial<ListTypeDefinition>): Promise<unknown>;
 export declare function putListTypeEntry({
 	externalReferenceCode,
 	id,
 	name_i18n,
-}: Partial<ListTypeEntry>): Promise<any>;
+}: Partial<ListTypeEntry>): Promise<unknown>;
 export declare function putObjectRelationship({
 	id,
 	...others
-}: ObjectRelationship): Promise<any>;
+}: ObjectRelationship): Promise<unknown>;
 export declare function save({
 	item,
 	method,
