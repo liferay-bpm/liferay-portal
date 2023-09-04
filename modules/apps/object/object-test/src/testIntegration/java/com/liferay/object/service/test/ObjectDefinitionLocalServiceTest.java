@@ -1215,8 +1215,7 @@ public class ObjectDefinitionLocalServiceTest {
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING,
-						StringUtil.randomId(),
-						Collections.emptyList())));
+						StringUtil.randomId(), Collections.emptyList())));
 
 		_objectDefinitionLocalService.publishCustomObjectDefinition(
 			TestPropsValues.getUserId(),
@@ -2062,7 +2061,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 	private void _deleteObjectDefinitionHierarchy(
 			ObjectDefinitionLocalService objectDefinitionLocalService)
-		throws PortalException {
+		throws Exception {
 
 		for (String objectDefinitionName :
 				new String[] {"C_A", "C_AA", "C_AAA", "C_AAB", "C_AB"}) {

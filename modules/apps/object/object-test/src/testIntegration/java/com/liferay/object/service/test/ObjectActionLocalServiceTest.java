@@ -312,7 +312,7 @@ public class ObjectActionLocalServiceTest {
 			Assert.fail();
 		}
 		catch (ObjectActionParametersException
-			objectActionParametersException) {
+					objectActionParametersException) {
 
 			Assert.assertEquals(
 				"invalid",
