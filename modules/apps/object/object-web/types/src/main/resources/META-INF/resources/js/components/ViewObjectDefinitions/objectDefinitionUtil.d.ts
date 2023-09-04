@@ -31,18 +31,18 @@ export declare function getFolderActions(
 	actions?: folderActions
 ): (
 	| {
-			label: string;
-			onClick: () => void;
-			symbolLeft: string;
-			value: string;
-			type?: undefined;
-	  }
-	| {
 			type: string;
 			label?: undefined;
 			onClick?: undefined;
 			symbolLeft?: undefined;
 			value?: undefined;
+	  }
+	| {
+			label: string;
+			onClick: () => void;
+			symbolLeft: string;
+			value: string;
+			type?: undefined;
 	  }
 )[];
 export declare function normalizeName(str: string): string;

@@ -76,15 +76,7 @@ export function getFolderActions(
 	actions?: folderActions
 ) {
 	const url = formatActionURL(objectFolderPermissionsURL, id);
-	const kebabOptions = [
-		{
-			label: Liferay.Language.get('import-object'),
-			onClick: () => {},
-			symbolLeft: 'import',
-			value: 'importObject',
-		},
-		{type: 'divider'},
-	];
+	const kebabOptions = [];
 
 	if (actions?.update) {
 		kebabOptions.unshift({type: 'divider'});
