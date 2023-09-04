@@ -93,7 +93,7 @@ public class ObjectViewLocalServiceTest {
 			TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			Arrays.asList(_createObjectViewColumn("Able", "able")),
+			Arrays.asList(_createObjectViewColumn("Able", "able", false)),
 			Collections.emptyList(), Collections.emptyList());
 
 		_assertFailureAddOrUpdateObjectView(
@@ -134,8 +134,8 @@ public class ObjectViewLocalServiceTest {
 			_objectDefinition.getObjectDefinitionId(), true,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			Arrays.asList(
-				_createObjectViewColumn("Able", "able"),
-				_createObjectViewColumn("Baker", "baker")),
+				_createObjectViewColumn("Able", "able", false),
+				_createObjectViewColumn("Baker", "baker", false)),
 			Arrays.asList(
 				_createObjectViewFilterColumn(
 					ObjectViewFilterColumnConstants.FILTER_TYPE_INCLUDES,
@@ -203,14 +203,14 @@ public class ObjectViewLocalServiceTest {
 		_assertFailureAddOrUpdateObjectView(
 			ObjectViewSortColumnException.class, false,
 			"There is no object view column with the name: zulu", null,
-			Arrays.asList(_createObjectViewColumn("Item", "item")),
+			Arrays.asList(_createObjectViewColumn("Item", "item", false)),
 			Collections.emptyList(),
 			Arrays.asList(
 				_createObjectViewSortColumnWithWrongObjectFieldName()));
 		_assertFailureAddOrUpdateObjectView(
 			ObjectViewSortColumnException.class, false,
 			"There is no sort order of type: zulu", null,
-			Arrays.asList(_createObjectViewColumn("King", "king")),
+			Arrays.asList(_createObjectViewColumn("King", "king", false)),
 			Collections.emptyList(),
 			Arrays.asList(_createObjectViewSortColumn("king", "zulu")));
 
@@ -265,7 +265,8 @@ public class ObjectViewLocalServiceTest {
 		objectView = _objectViewLocalService.updateObjectView(
 			objectView.getObjectViewId(), objectView.isDefaultObjectView(),
 			objectView.getNameMap(),
-			Collections.singletonList(_createObjectViewColumn("Fox", "fox")),
+			Collections.singletonList(
+				_createObjectViewColumn("Fox", "fox", false)),
 			Collections.emptyList(),
 			Collections.singletonList(
 				_createObjectViewSortColumn("fox", "desc")));
@@ -340,7 +341,8 @@ public class ObjectViewLocalServiceTest {
 			ObjectViewSortColumnException.class,
 			objectView.isDefaultObjectView(),
 			"There is no object view column with the name: king", objectView,
-			Collections.singletonList(_createObjectViewColumn("Jig", "jig")),
+			Collections.singletonList(
+				_createObjectViewColumn("Jig", "jig", false)),
 			Collections.emptyList(),
 			Collections.singletonList(
 				_createObjectViewSortColumn("king", "desc")));
@@ -348,7 +350,8 @@ public class ObjectViewLocalServiceTest {
 			ObjectViewSortColumnException.class,
 			objectView.isDefaultObjectView(),
 			"There is no sort order of type: zulu", objectView,
-			Collections.singletonList(_createObjectViewColumn("Love", "love")),
+			Collections.singletonList(
+				_createObjectViewColumn("Love", "love", false)),
 			Collections.emptyList(),
 			Collections.singletonList(
 				_createObjectViewSortColumn("love", "zulu")));
@@ -405,7 +408,8 @@ public class ObjectViewLocalServiceTest {
 	}
 
 	private String _addObjectField(
-			String objectFieldLabel, String objectFieldName)
+			String objectFieldLabel, String objectFieldName,
+			boolean objectFieldSystem)
 		throws Exception {
 
 		ObjectField objectField = ObjectFieldUtil.addCustomObjectField(
@@ -420,6 +424,8 @@ public class ObjectViewLocalServiceTest {
 				_objectDefinition.getObjectDefinitionId()
 			).required(
 				true
+			).system(
+				objectFieldSystem
 			).build());
 
 		return objectField.getName();
@@ -451,8 +457,9 @@ public class ObjectViewLocalServiceTest {
 			_objectDefinition.getObjectDefinitionId(), true,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			Arrays.asList(
-				_createObjectViewColumn("Able", "able"),
-				_createObjectViewColumn("Baker", "baker")),
+				_createObjectViewColumn("Able", "able", false),
+				_createObjectViewColumn("Baker", "baker", false),
+				_createObjectViewColumn("Charlie", "charlie", true)),
 			Arrays.asList(
 				_createObjectViewFilterColumn(
 					ObjectViewFilterColumnConstants.FILTER_TYPE_EXCLUDES,
@@ -503,7 +510,7 @@ public class ObjectViewLocalServiceTest {
 			objectView.getObjectViewColumns();
 
 		Assert.assertEquals(
-			objectViewColumns.toString(), 2, objectViewColumns.size());
+			objectViewColumns.toString(), 3, objectViewColumns.size());
 
 		List<ObjectViewFilterColumn> objectViewFilterColumns =
 			objectView.getObjectViewFilterColumns();
@@ -533,7 +540,8 @@ public class ObjectViewLocalServiceTest {
 	}
 
 	private ObjectViewColumn _createObjectViewColumn(
-			String objectFieldLabel, String objectFieldName)
+			String objectFieldLabel, String objectFieldName,
+			boolean objectFieldSystem)
 		throws Exception {
 
 		ObjectViewColumn objectViewColumn = _objectViewColumnPersistence.create(
@@ -542,7 +550,8 @@ public class ObjectViewLocalServiceTest {
 		objectViewColumn.setLabelMap(
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()));
 		objectViewColumn.setObjectFieldName(
-			_addObjectField(objectFieldLabel, objectFieldName));
+			_addObjectField(
+				objectFieldLabel, objectFieldName, objectFieldSystem));
 		objectViewColumn.setPriority(0);
 
 		return objectViewColumn;
@@ -553,11 +562,12 @@ public class ObjectViewLocalServiceTest {
 		throws Exception {
 
 		ObjectViewColumn objectViewColumn1 = _createObjectViewColumn(
-			"Roger", "roger");
+			"Roger", "roger", false);
 
 		ObjectViewColumn objectViewColumn2 = _createObjectViewColumn(
 			RandomTestUtil.randomString(),
-			StringUtil.toLowerCase(RandomStringUtils.randomAlphabetic(5)));
+			StringUtil.toLowerCase(RandomStringUtils.randomAlphabetic(5)),
+			false);
 
 		objectViewColumn2.setObjectFieldName("roger");
 
@@ -569,7 +579,8 @@ public class ObjectViewLocalServiceTest {
 
 		ObjectViewColumn objectViewColumn = _createObjectViewColumn(
 			RandomTestUtil.randomString(),
-			StringUtil.toLowerCase(RandomStringUtils.randomAlphabetic(5)));
+			StringUtil.toLowerCase(RandomStringUtils.randomAlphabetic(5)),
+			false);
 
 		objectViewColumn.setLabelMap(LocalizedMapUtil.getLocalizedMap(""));
 
@@ -582,7 +593,8 @@ public class ObjectViewLocalServiceTest {
 
 		ObjectViewColumn objectViewColumn = _createObjectViewColumn(
 			RandomTestUtil.randomString(),
-			StringUtil.toLowerCase(RandomStringUtils.randomAlphabetic(5)));
+			StringUtil.toLowerCase(RandomStringUtils.randomAlphabetic(5)),
+			false);
 
 		objectViewColumn.setObjectFieldName("zebra");
 
@@ -629,7 +641,7 @@ public class ObjectViewLocalServiceTest {
 	private void _deleteObjectFields() throws Exception {
 		List<ObjectField> objectFields =
 			_objectFieldLocalService.getObjectFields(
-				_objectDefinition.getObjectDefinitionId(), false);
+				_objectDefinition.getObjectDefinitionId());
 
 		for (ObjectField objectField : objectFields) {
 			_objectFieldLocalService.deleteObjectField(objectField);
@@ -659,7 +671,7 @@ public class ObjectViewLocalServiceTest {
 				TestPropsValues.getUserId(),
 				_objectDefinition.getObjectDefinitionId(), false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				Arrays.asList(_createObjectViewColumn("Golf", "golf")),
+				Arrays.asList(_createObjectViewColumn("Golf", "golf", false)),
 				Arrays.asList(
 					_createObjectViewFilterColumn(
 						ObjectViewFilterColumnConstants.FILTER_TYPE_INCLUDES,
@@ -696,7 +708,7 @@ public class ObjectViewLocalServiceTest {
 			TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			Arrays.asList(_createObjectViewColumn("How", "how")),
+			Arrays.asList(_createObjectViewColumn("How", "how", false)),
 			Arrays.asList(
 				_createObjectViewFilterColumn(
 					ObjectViewFilterColumnConstants.FILTER_TYPE_INCLUDES,
@@ -737,7 +749,7 @@ public class ObjectViewLocalServiceTest {
 				TestPropsValues.getUserId(),
 				_objectDefinition.getObjectDefinitionId(), false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				Arrays.asList(_createObjectViewColumn("India", "india")),
+				Arrays.asList(_createObjectViewColumn("India", "india", false)),
 				Arrays.asList(
 					_createObjectViewFilterColumn(
 						ObjectViewFilterColumnConstants.FILTER_TYPE_INCLUDES,
@@ -766,7 +778,7 @@ public class ObjectViewLocalServiceTest {
 			TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			Arrays.asList(_createObjectViewColumn("York", "york")),
+			Arrays.asList(_createObjectViewColumn("York", "york", false)),
 			Arrays.asList(
 				_createObjectViewFilterColumn(
 					ObjectViewFilterColumnConstants.FILTER_TYPE_INCLUDES,
