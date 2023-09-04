@@ -151,7 +151,11 @@ public class ObjectActionLocalServiceTest {
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 					ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
-					"First Name", "firstName", true)));
+					"First Name", "firstName", true),
+				ObjectFieldUtil.createObjectField(
+					0, ObjectFieldConstants.BUSINESS_TYPE_TEXT, null,
+					ObjectFieldConstants.DB_TYPE_STRING, true, false, null,
+					"Last Name", "lastName", false, true)));
 		_originalHttp = (Http)_getAndSetFieldValue(
 			Http.class, "_http", ObjectActionExecutorConstants.KEY_WEBHOOK);
 		_originalObjectScriptingExecutor =
@@ -285,6 +289,13 @@ public class ObjectActionLocalServiceTest {
 				JSONUtil.put(
 					"inputAsValue", true
 				).put(
+					"name", "lastName"
+				).put(
+					"value", "White"
+				),
+				JSONUtil.put(
+					"inputAsValue", true
+				).put(
 					"name", "time"
 				).put(
 					"value", "2023-06-01 06:42:08.0"
@@ -335,14 +346,16 @@ public class ObjectActionLocalServiceTest {
 				_objectDefinition.getObjectDefinitionId(),
 				HashMapBuilder.<String, Serializable>put(
 					"firstName", "John"
+				).put(
+					"lastName", "Smith"
 				).build(),
 				ServiceContextTestUtil.getServiceContext());
 
 			// On after create
 
 			_assertWebhookObjectAction(
-				"John", ObjectActionTriggerConstants.KEY_ON_AFTER_ADD, null,
-				WorkflowConstants.STATUS_DRAFT);
+				"John", "Smith", ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+				null, null, WorkflowConstants.STATUS_DRAFT);
 
 			// Execute standalone action to run a Groovy script
 
@@ -381,14 +394,17 @@ public class ObjectActionLocalServiceTest {
 				TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
 				HashMapBuilder.<String, Serializable>put(
 					"firstName", "João"
+				).put(
+					"lastName", "Silva"
 				).build(),
 				ServiceContextTestUtil.getServiceContext());
 
 			// On after update
 
 			_assertWebhookObjectAction(
-				"João", ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE,
-				"John", WorkflowConstants.STATUS_APPROVED);
+				"João", "Silva",
+				ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE, "John",
+				"Smith", WorkflowConstants.STATUS_APPROVED);
 
 			// Execute standalone action to update the current object entry
 
@@ -424,6 +440,7 @@ public class ObjectActionLocalServiceTest {
 
 			Assert.assertEquals(
 				"Peter", MapUtil.getString(values, "firstName"));
+			Assert.assertEquals("White", MapUtil.getString(values, "lastName"));
 			Assert.assertEquals(
 				"2023-06-01 06:42:08.0", MapUtil.getString(values, "time"));
 
@@ -436,8 +453,9 @@ public class ObjectActionLocalServiceTest {
 			// On after remove
 
 			_assertWebhookObjectAction(
-				"Peter", ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE,
-				"Peter", WorkflowConstants.STATUS_APPROVED);
+				"Peter", "White",
+				ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE, "Peter",
+				"White", WorkflowConstants.STATUS_APPROVED);
 		}
 		finally {
 			PrincipalThreadLocal.setName(originalName);
@@ -531,24 +549,28 @@ public class ObjectActionLocalServiceTest {
 			_objectDefinition.getObjectDefinitionId(),
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", "John"
+			).put(
+				"lastName", "Smith"
 			).build(),
 			ServiceContextTestUtil.getServiceContext());
 
 		_assertWebhookObjectAction(
-			"John", ObjectActionTriggerConstants.KEY_ON_AFTER_ADD, null,
-			WorkflowConstants.STATUS_DRAFT);
+			"John", "Smith", ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			null, null, WorkflowConstants.STATUS_DRAFT);
 
 		ObjectEntry objectEntry2 = _objectEntryLocalService.addObjectEntry(
 			TestPropsValues.getUserId(), 0,
 			_objectDefinition.getObjectDefinitionId(),
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", "Peter"
+			).put(
+				"lastName", "White"
 			).build(),
 			ServiceContextTestUtil.getServiceContext());
 
 		_assertWebhookObjectAction(
-			"Peter", ObjectActionTriggerConstants.KEY_ON_AFTER_ADD, null,
-			WorkflowConstants.STATUS_DRAFT);
+			"Peter", "White", ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			null, null, WorkflowConstants.STATUS_DRAFT);
 
 		_objectEntryLocalService.deleteObjectEntry(objectEntry1);
 		_objectEntryLocalService.deleteObjectEntry(objectEntry2);
@@ -579,6 +601,8 @@ public class ObjectActionLocalServiceTest {
 			_objectDefinition.getObjectDefinitionId(),
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", "John"
+			).put(
+				"lastName", "Smith"
 			).build(),
 			ServiceContextTestUtil.getServiceContext());
 		ObjectEntry objectEntry4 = _objectEntryLocalService.addObjectEntry(
@@ -586,20 +610,22 @@ public class ObjectActionLocalServiceTest {
 			_objectDefinition.getObjectDefinitionId(),
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", "Peter"
+			).put(
+				"lastName", "White"
 			).build(),
 			ServiceContextTestUtil.getServiceContext());
 
 		_objectEntryLocalService.deleteObjectEntry(objectEntry3);
 
 		_assertWebhookObjectAction(
-			"John", ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE, "John",
-			WorkflowConstants.STATUS_APPROVED);
+			"John", "Smith", ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE,
+			"John", "Smith", WorkflowConstants.STATUS_APPROVED);
 
 		_objectEntryLocalService.deleteObjectEntry(objectEntry4);
 
 		_assertWebhookObjectAction(
-			"Peter", ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE, "Peter",
-			WorkflowConstants.STATUS_APPROVED);
+			"Peter", "White", ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE,
+			"Peter", "White", WorkflowConstants.STATUS_APPROVED);
 
 		_objectActionLocalService.deleteObjectAction(objectAction2);
 
@@ -625,6 +651,8 @@ public class ObjectActionLocalServiceTest {
 			_objectDefinition.getObjectDefinitionId(),
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", "Peter"
+			).put(
+				"lastName", "White"
 			).build(),
 			ServiceContextTestUtil.getServiceContext());
 		ObjectEntry objectEntry6 = _objectEntryLocalService.addObjectEntry(
@@ -632,6 +660,8 @@ public class ObjectActionLocalServiceTest {
 			_objectDefinition.getObjectDefinitionId(),
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", "Peter"
+			).put(
+				"lastName", "White"
 			).build(),
 			ServiceContextTestUtil.getServiceContext());
 
@@ -639,23 +669,27 @@ public class ObjectActionLocalServiceTest {
 			TestPropsValues.getUserId(), objectEntry5.getObjectEntryId(),
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", "John"
+			).put(
+				"lastName", "Smith"
 			).build(),
 			ServiceContextTestUtil.getServiceContext());
 
 		_assertWebhookObjectAction(
-			"John", ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE, "Peter",
-			WorkflowConstants.STATUS_APPROVED);
+			"John", "Smith", ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE,
+			"Peter", "White", WorkflowConstants.STATUS_APPROVED);
 
 		objectEntry6 = _objectEntryLocalService.updateObjectEntry(
 			TestPropsValues.getUserId(), objectEntry6.getObjectEntryId(),
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", "João"
+			).put(
+				"lastName", "Silva"
 			).build(),
 			ServiceContextTestUtil.getServiceContext());
 
 		_assertWebhookObjectAction(
-			"João", ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE, "Peter",
-			WorkflowConstants.STATUS_APPROVED);
+			"João", "Silva", ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE,
+			"Peter", "White", WorkflowConstants.STATUS_APPROVED);
 
 		_objectEntryLocalService.deleteObjectEntry(objectEntry5);
 		_objectEntryLocalService.deleteObjectEntry(objectEntry6);
@@ -1340,8 +1374,8 @@ public class ObjectActionLocalServiceTest {
 	}
 
 	private void _assertWebhookObjectAction(
-			String firstName, String objectActionTriggerKey,
-			String originalFirstName, int status)
+			String firstName, String lastName, String objectActionTriggerKey,
+			String originalFirstName, String originalLastName, int status)
 		throws Exception {
 
 		Assert.assertEquals(1, _argumentsList.size());
@@ -1385,6 +1419,11 @@ public class ObjectActionLocalServiceTest {
 				payloadJSONObject,
 				"JSONObject/objectEntryDTO" + _objectDefinition.getShortName(),
 				"JSONObject/properties", "Object/firstName"));
+		Assert.assertEquals(
+			lastName,
+			JSONUtil.getValue(
+				payloadJSONObject, "JSONObject/objectEntry",
+				"JSONObject/values", "Object/lastName"));
 
 		if (StringUtil.equals(
 				objectActionTriggerKey,
@@ -1398,6 +1437,11 @@ public class ObjectActionLocalServiceTest {
 				JSONUtil.getValue(
 					payloadJSONObject, "JSONObject/originalObjectEntry",
 					"JSONObject/values", "Object/firstName"));
+			Assert.assertEquals(
+				originalLastName,
+				JSONUtil.getValue(
+					payloadJSONObject, "JSONObject/originalObjectEntry",
+					"JSONObject/values", "Object/lastName"));
 		}
 		else {
 			Assert.assertNull(
