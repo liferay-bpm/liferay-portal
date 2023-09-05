@@ -100,6 +100,7 @@ public interface ListTypeEntryLocalService
 	 *
 	 * @param listTypeEntry the list type entry
 	 * @return the list type entry that was removed
+	 * @throws PortalException
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	public ListTypeEntry deleteListTypeEntry(ListTypeEntry listTypeEntry)
