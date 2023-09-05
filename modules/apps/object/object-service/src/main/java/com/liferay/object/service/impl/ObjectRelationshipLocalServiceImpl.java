@@ -745,7 +745,8 @@ public class ObjectRelationshipLocalServiceImpl
 		if (objectRelationship.isSystem() &&
 			!SystemUtil.allowManageSystemEntities()) {
 
-			return _updateSystemObjectRelationship(labelMap, objectRelationship);
+			return _updateSystemObjectRelationship(
+				labelMap, objectRelationship);
 		}
 
 		if (objectRelationship.isReverse()) {
@@ -804,7 +805,7 @@ public class ObjectRelationshipLocalServiceImpl
 	private ObjectField _addObjectField(
 			User user, Map<Locale, String> labelMap, String name,
 			ObjectDefinition objectDefinition1,
-			ObjectDefinition objectDefinition2, String type)
+			ObjectDefinition objectDefinition2, String type, boolean system)
 		throws PortalException {
 
 		ObjectField objectField = _objectFieldPersistence.create(
@@ -818,6 +819,7 @@ public class ObjectRelationshipLocalServiceImpl
 			objectDefinition2.getObjectDefinitionId());
 		objectField.setBusinessType(
 			ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP);
+		objectField.setSystem(system);
 
 		String dbColumnName = StringBundler.concat(
 			"r_", name, "_", objectDefinition1.getPKObjectFieldName());
@@ -956,7 +958,7 @@ public class ObjectRelationshipLocalServiceImpl
 
 			ObjectField objectField = _addObjectField(
 				user, objectRelationship.getLabelMap(), name, objectDefinition1,
-				objectDefinition2, type);
+				objectDefinition2, type, system);
 
 			objectRelationship.setObjectFieldId2(
 				objectField.getObjectFieldId());
