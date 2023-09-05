@@ -12,6 +12,7 @@ import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.DuplicateObjectRelationshipException;
 import com.liferay.object.exception.NoSuchObjectRelationshipException;
 import com.liferay.object.exception.ObjectRelationshipEdgeException;
+import com.liferay.object.exception.ObjectRelationshipLabelException;
 import com.liferay.object.exception.ObjectRelationshipNameException;
 import com.liferay.object.exception.ObjectRelationshipParameterObjectFieldIdException;
 import com.liferay.object.exception.ObjectRelationshipReverseException;
@@ -299,7 +300,7 @@ public class ObjectRelationshipLocalServiceImpl
 			!SystemUtil.allowManageSystemEntities()) {
 
 			throw new ObjectRelationshipSystemException(
-				"Only allowed bundles can delete system relationships");
+				"Only allowed bundles can delete system object relationships");
 		}
 
 		objectRelationship = objectRelationshipPersistence.remove(
@@ -744,8 +745,7 @@ public class ObjectRelationshipLocalServiceImpl
 		if (objectRelationship.isSystem() &&
 			!SystemUtil.allowManageSystemEntities()) {
 
-			throw new ObjectRelationshipSystemException(
-				"Only allowed bundles can update system relationships");
+			return _updateSystemObjectRelationship(labelMap, objectRelationship);
 		}
 
 		if (objectRelationship.isReverse()) {
@@ -760,6 +760,7 @@ public class ObjectRelationshipLocalServiceImpl
 				objectRelationship.getObjectDefinitionId2()),
 			parameterObjectFieldId, objectRelationship.getType());
 		_validateEdge(edge, objectRelationship);
+		_validateLabel(labelMap);
 
 		if (Objects.equals(
 				objectRelationship.getType(),
@@ -1096,6 +1097,17 @@ public class ObjectRelationshipLocalServiceImpl
 		return objectRelationshipPersistence.update(objectRelationship);
 	}
 
+	private ObjectRelationship _updateSystemObjectRelationship(
+			Map<Locale, String> labelMap, ObjectRelationship objectRelationship)
+		throws PortalException {
+
+		_validateLabel(labelMap);
+
+		objectRelationship.setLabelMap(labelMap);
+
+		return objectRelationshipPersistence.update(objectRelationship);
+	}
+
 	private void _validateEdge(
 			boolean edge, ObjectRelationship objectRelationship)
 		throws PortalException {
@@ -1135,6 +1147,17 @@ public class ObjectRelationshipLocalServiceImpl
 			throw new ObjectRelationshipEdgeException(
 				"Object relationship must not be between unmodifiable system " +
 					"object definitions to be an edge of a root context");
+		}
+	}
+
+	private void _validateLabel(Map<Locale, String> labelMap)
+		throws PortalException {
+
+		Locale locale = LocaleUtil.getSiteDefault();
+
+		if ((labelMap == null) || Validator.isNull(labelMap.get(locale))) {
+			throw new ObjectRelationshipLabelException(
+				"Label is null for locale " + locale.getDisplayName());
 		}
 	}
 
