@@ -13,6 +13,7 @@ import com.liferay.object.definition.util.ObjectDefinitionUtil;
 import com.liferay.object.exception.DuplicateObjectRelationshipException;
 import com.liferay.object.exception.NoSuchObjectRelationshipException;
 import com.liferay.object.exception.ObjectRelationshipEdgeException;
+import com.liferay.object.exception.ObjectRelationshipLabelException;
 import com.liferay.object.exception.ObjectRelationshipNameException;
 import com.liferay.object.exception.ObjectRelationshipParameterObjectFieldIdException;
 import com.liferay.object.exception.ObjectRelationshipReverseException;
@@ -299,7 +300,7 @@ public class ObjectRelationshipLocalServiceImpl
 			!ObjectDefinitionUtil.isInvokerBundleAllowed()) {
 
 			throw new ObjectRelationshipSystemException(
-				"Only allowed bundles can delete system relationships");
+				"Only allowed bundles can delete system object relationships");
 		}
 
 		objectRelationship = objectRelationshipPersistence.remove(
@@ -744,8 +745,11 @@ public class ObjectRelationshipLocalServiceImpl
 		if (objectRelationship.isSystem() &&
 			!ObjectDefinitionUtil.isInvokerBundleAllowed()) {
 
-			throw new ObjectRelationshipSystemException(
-				"Only allowed bundles can update system relationships");
+			_validateLabel(labelMap);
+
+			objectRelationship.setLabelMap(labelMap);
+
+			return objectRelationshipPersistence.update(objectRelationship);
 		}
 
 		if (objectRelationship.isReverse()) {
@@ -760,6 +764,7 @@ public class ObjectRelationshipLocalServiceImpl
 				objectRelationship.getObjectDefinitionId2()),
 			parameterObjectFieldId, objectRelationship.getType());
 		_validateEdge(edge, objectRelationship);
+		_validateLabel(labelMap);
 
 		if (Objects.equals(
 				objectRelationship.getType(),
@@ -803,7 +808,7 @@ public class ObjectRelationshipLocalServiceImpl
 	private ObjectField _addObjectField(
 			User user, Map<Locale, String> labelMap, String name,
 			ObjectDefinition objectDefinition1,
-			ObjectDefinition objectDefinition2, String type)
+			ObjectDefinition objectDefinition2, boolean system, String type)
 		throws PortalException {
 
 		ObjectField objectField = _objectFieldPersistence.create(
@@ -817,6 +822,7 @@ public class ObjectRelationshipLocalServiceImpl
 			objectDefinition2.getObjectDefinitionId());
 		objectField.setBusinessType(
 			ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP);
+		objectField.setSystem(system);
 
 		String dbColumnName = StringBundler.concat(
 			"r_", name, "_", objectDefinition1.getPKObjectFieldName());
@@ -905,9 +911,10 @@ public class ObjectRelationshipLocalServiceImpl
 
 		if (system && !ObjectDefinitionUtil.isInvokerBundleAllowed()) {
 			throw new ObjectRelationshipSystemException(
-				"Only allowed bundles can create system relationships");
+				"Only allowed bundles can create system object relationships");
 		}
 
+		_validateLabel(labelMap);
 		_validateName(objectDefinitionId1, name);
 
 		ObjectDefinition objectDefinition1 =
@@ -955,7 +962,7 @@ public class ObjectRelationshipLocalServiceImpl
 
 			ObjectField objectField = _addObjectField(
 				user, objectRelationship.getLabelMap(), name, objectDefinition1,
-				objectDefinition2, type);
+				objectDefinition2, system, type);
 
 			objectRelationship.setObjectFieldId2(
 				objectField.getObjectFieldId());
@@ -1135,6 +1142,17 @@ public class ObjectRelationshipLocalServiceImpl
 			throw new ObjectRelationshipEdgeException(
 				"Object relationship must not be between unmodifiable system " +
 					"object definitions to be an edge of a root context");
+		}
+	}
+
+	private void _validateLabel(Map<Locale, String> labelMap)
+		throws PortalException {
+
+		Locale locale = LocaleUtil.getSiteDefault();
+
+		if ((labelMap == null) || Validator.isNull(labelMap.get(locale))) {
+			throw new ObjectRelationshipLabelException(
+				"Label is null for locale " + locale.getDisplayName());
 		}
 	}
 
