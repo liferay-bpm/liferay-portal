@@ -7,7 +7,7 @@ import ClayButton from '@clayui/button';
 import React from 'react';
 import {NodeProps} from 'react-flow-renderer';
 
-import './DefinitionNode.scss';
+import './ObjectDefinitionNode.scss';
 
 import './EmptyNode.scss';
 

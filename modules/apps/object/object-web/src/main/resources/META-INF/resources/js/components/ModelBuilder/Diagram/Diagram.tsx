@@ -14,8 +14,8 @@ import ReactFlow, {
 	addEdge,
 } from 'react-flow-renderer';
 
-import {DefinitionNode} from '../DefinitionNode/DefinitionNode';
-import {EmptyNode} from '../DefinitionNode/EmptyNode';
+import {EmptyNode} from '../ObjectDefinitionNode/EmptyNode';
+import {ObjectDefinitionNode} from '../ObjectDefinitionNode/ObjectDefinitionNode';
 
 import './Diagram.scss';
 
@@ -29,7 +29,7 @@ import {TYPES} from '../ModelBuilderContext/typesEnum';
 
 const NODE_TYPES = {
 	emptyNode: EmptyNode,
-	objectDefinition: DefinitionNode,
+	objectDefinition: ObjectDefinitionNode,
 };
 
 const EDGE_TYPES = {

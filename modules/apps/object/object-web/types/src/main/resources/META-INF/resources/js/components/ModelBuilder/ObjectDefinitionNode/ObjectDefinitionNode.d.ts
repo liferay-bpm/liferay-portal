@@ -6,8 +6,8 @@
 /// <reference types="react" />
 
 import {NodeProps} from 'react-flow-renderer';
-import './DefinitionNode.scss';
-export declare function DefinitionNode({
+import './ObjectDefinitionNode.scss';
+export declare function ObjectDefinitionNode({
 	data: {
 		defaultLanguageId,
 		externalReferenceCode,

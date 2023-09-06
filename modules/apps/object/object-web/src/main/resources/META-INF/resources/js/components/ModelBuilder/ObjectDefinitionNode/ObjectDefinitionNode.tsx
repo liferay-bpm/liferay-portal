@@ -14,7 +14,7 @@ import {
 	useStore,
 } from 'react-flow-renderer';
 
-import './DefinitionNode.scss';
+import './ObjectDefinitionNode.scss';
 
 import {
 	API,
@@ -25,12 +25,12 @@ import {
 import {formatActionURL} from '../../../utils/fds';
 import {ModalDeleteObjectDefinition} from '../../ViewObjectDefinitions/ModalDeleteObjectDefinition';
 import {DeletedObjectDefinition} from '../../ViewObjectDefinitions/ViewObjectDefinitions';
-import {getDefinitionNodeActions} from '../../ViewObjectDefinitions/objectDefinitionUtil';
+import {getObjectDefinitionNodeActions} from '../../ViewObjectDefinitions/objectDefinitionUtil';
 import {useObjectFolderContext} from '../ModelBuilderContext/objectFolderContext';
 import {TYPES} from '../ModelBuilderContext/typesEnum';
-import NodeFields from './NodeFields';
-import NodeFooter from './NodeFooter';
-import NodeHeader from './NodeHeader';
+import ObjectDefinitionNodeFooter from './ObjectDefinitionNodeFooter';
+import ObjectDefinitionNodeHeader from './ObjectDefinitionNodeHeader';
+import ObjectDefinitionNodeFields from './ObjectDefinitionNodeObjectFields';
 import {RedirectModal} from './RedirectModal';
 
 const selfRelationshipHandleStyle = {
@@ -39,7 +39,7 @@ const selfRelationshipHandleStyle = {
 	borderRadius: '50%',
 };
 
-export function DefinitionNode({
+export function ObjectDefinitionNode({
 	data: {
 		defaultLanguageId,
 		externalReferenceCode,
@@ -56,7 +56,9 @@ export function DefinitionNode({
 		system,
 	},
 }: NodeProps<ObjectDefinitionNodeData>) {
-	const [showAllFields, setShowAllFields] = useState<boolean>(false);
+	const [showAllObjectFields, setShowAllObjectFields] = useState<boolean>(
+		false
+	);
 	const [
 		{
 			baseResourceURL,
@@ -81,19 +83,19 @@ export function DefinitionNode({
 		externalReferenceCode
 	);
 
-	const handleShowDeleteModal = () => {
+	const handleShowDeleteObjectDefinitionModal = () => {
 		setShowModal({
 			deleteObjectDefinition: true,
 		});
 	};
 
-	const handleShowEditERCModal = () => {
+	const handleShowEditObjectDefinitionERCModal = () => {
 		setShowModal({
 			editObjectDefinitionERC: true,
 		});
 	};
 
-	const handleShowRedirectModal = () => {
+	const handleShowRedirectObjectDefinitionModal = () => {
 		setShowModal({
 			redirectEditObjectDefinition: true,
 		});
@@ -124,12 +126,12 @@ export function DefinitionNode({
 					});
 				}}
 			>
-				<NodeHeader
-					dropDownItems={getDefinitionNodeActions({
+				<ObjectDefinitionNodeHeader
+					dropDownItems={getObjectDefinitionNodeActions({
 						baseResourceURL,
-						handleShowDeleteModal,
-						handleShowEditERCModal,
-						handleShowRedirectModal,
+						handleShowDeleteObjectDefinitionModal,
+						handleShowEditObjectDefinitionERCModal,
+						handleShowRedirectObjectDefinitionModal,
 						hasObjectDefinitionDeleteResourcePermission,
 						hasObjectDefinitionManagePermissionsResourcePermission,
 						objectDefinitionId: id,
@@ -148,16 +150,16 @@ export function DefinitionNode({
 					system={system}
 				/>
 
-				<NodeFields
+				<ObjectDefinitionNodeFields
 					defaultLanguageId={defaultLanguageId}
 					objectFields={objectFields}
-					showAll={showAllFields}
+					showAllObjectFields={showAllObjectFields}
 				/>
 
-				<NodeFooter
+				<ObjectDefinitionNodeFooter
 					isLinkedObjectDefinition={linked}
-					setShowAllFields={setShowAllFields}
-					showAllFields={showAllFields}
+					setShowAllObjectFields={setShowAllObjectFields}
+					showAllObjectFields={showAllObjectFields}
 				/>
 
 				<Handle

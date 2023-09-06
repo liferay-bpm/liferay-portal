@@ -11,8 +11,8 @@ import React, {SetStateAction} from 'react';
 
 import {defaultLanguageId} from '../../utils/constants';
 
-interface FoldersListSidebarProps {
-	foldersList: ObjectFolder[];
+interface ObjectFoldersListSidebarProps {
+	objectFoldersList: ObjectFolder[];
 	selectedObjectFolder: ObjectFolder;
 	setSelectedObjectFolder: (
 		value: SetStateAction<Partial<ObjectFolder>>
@@ -20,16 +20,16 @@ interface FoldersListSidebarProps {
 	setShowModal: (value: SetStateAction<ViewObjectDefinitionsModals>) => void;
 }
 
-export default function FoldersListSideBar({
-	foldersList,
+export default function ObjectFoldersListSideBar({
+	objectFoldersList,
 	selectedObjectFolder,
 	setSelectedObjectFolder,
 	setShowModal,
-}: FoldersListSidebarProps) {
+}: ObjectFoldersListSidebarProps) {
 	return (
-		<div className="lfr__object-web-view-object-definitions-folder-list-container">
-			<div className="lfr__object-web-view-object-definitions-folder-list-header">
-				<span className="lfr__object-web-view-object-definitions-folder-list-title mb-0">
+		<div className="lfr__object-web-view-object-definitions-object-folder-list-container">
+			<div className="lfr__object-web-view-object-definitions-object-folder-list-header">
+				<span className="lfr__object-web-view-object-definitions-object-folder-list-title mb-0">
 					{Liferay.Language.get('object-folders').toUpperCase()}
 				</span>
 
@@ -55,26 +55,26 @@ export default function FoldersListSideBar({
 				</div>
 			</div>
 
-			<ClayList className="lfr__object-web-view-object-definitions-folder-list">
-				{foldersList.map((currentFolder) => (
+			<ClayList className="lfr__object-web-view-object-definitions-object-folder-list">
+				{objectFoldersList.map((currentObjectFolder) => (
 					<ClayList.Item
 						action
 						active={
 							selectedObjectFolder.externalReferenceCode ===
-							currentFolder.externalReferenceCode
+							currentObjectFolder.externalReferenceCode
 						}
-						className="cursor-pointer lfr__object-web-view-object-definitions-folder-list-item"
+						className="cursor-pointer lfr__object-web-view-object-definitions-object-folder-list-item"
 						flex
-						key={currentFolder.name}
+						key={currentObjectFolder.name}
 						onClick={() => {
-							setSelectedObjectFolder(currentFolder);
+							setSelectedObjectFolder(currentObjectFolder);
 						}}
 					>
-						<span className="lfr__object-web-view-object-definitions-folder-list-item-label">
+						<span className="lfr__object-web-view-object-definitions-object-folder-list-item-label">
 							{getLocalizableLabel(
 								defaultLanguageId,
-								currentFolder.label,
-								currentFolder.name
+								currentObjectFolder.label,
+								currentObjectFolder.name
 							)}
 						</span>
 					</ClayList.Item>

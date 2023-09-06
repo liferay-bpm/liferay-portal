@@ -5,9 +5,9 @@
 
 /// <reference types="react" />
 
-import './NodeHeader.scss';
+import './ObjectDefinitionNodeHeader.scss';
 import {DropDownItems} from '../types';
-interface NodeHeaderProps {
+interface ObjectDefinitionNodeHeaderProps {
 	dropDownItems: DropDownItems[];
 	isLinkedObjectDefinition: boolean;
 	objectDefinitionLabel: string;
@@ -18,11 +18,11 @@ interface NodeHeaderProps {
 	};
 	system: boolean;
 }
-export default function NodeHeader({
+export default function ObjectDefinitionNodeHeader({
 	dropDownItems,
 	isLinkedObjectDefinition,
 	objectDefinitionLabel,
 	status,
 	system,
-}: NodeHeaderProps): JSX.Element;
+}: ObjectDefinitionNodeHeaderProps): JSX.Element;
 export {};

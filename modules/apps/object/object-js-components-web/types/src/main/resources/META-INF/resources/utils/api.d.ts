@@ -97,9 +97,9 @@ interface saveProps {
 	returnValue?: boolean;
 	url: string;
 }
-export declare function deleteFolder(id: number): Promise<void>;
 export declare function deleteObjectDefinitions(id: number): Promise<void>;
 export declare function deleteObjectField(id: number): Promise<void>;
+export declare function deleteObjectFolder(id: number): Promise<void>;
 export declare function deleteObjectRelationships(id: number): Promise<void>;
 export declare function deletePickList(pickListId: number): Promise<void>;
 export declare function deletePickListItem(id: number): Promise<void>;

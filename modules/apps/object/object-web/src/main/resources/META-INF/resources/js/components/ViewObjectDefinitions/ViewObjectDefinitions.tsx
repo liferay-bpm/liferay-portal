@@ -24,16 +24,19 @@ import CardHeader from './CardHeader';
 import objectDefinitionModifiedDateDataRenderer from './FDSDataRenderers/ObjectDefinitionModifiedDateDataRenderer';
 import objectDefinitionStatusDataRenderer from './FDSDataRenderers/ObjectDefinitionStatusDataRenderer';
 import objectDefinitionSystemDataRenderer from './FDSDataRenderers/ObjectDefinitionSystemDataRenderer';
-import FoldersListSideBar from './FoldersListSidebar';
-import {ModalAddFolder} from './ModalAddFolder';
 import {ModalAddObjectDefinition} from './ModalAddObjectDefinition';
+import {ModalAddObjectFolder} from './ModalAddObjectFolder';
 import {ModalBindToRootObjectDefinition} from './ModalBindToRootObjectDefinition';
 import {ModalDeleteObjectDefinition} from './ModalDeleteObjectDefinition';
 import {ModalDeleteObjectFolder} from './ModalDeleteObjectFolder';
 import {ModalEditObjectFolder} from './ModalEditObjectFolder';
 import {ModalMoveObjectDefinition} from './ModalMoveObjectDefinition';
 import {ModalUnbindObjectDefinition} from './ModalUnbindObjectDefinition';
-import {deleteObjectDefinition, getFolderActions} from './objectDefinitionUtil';
+import ObjectFoldersListSideBar from './ObjectFoldersListSidebar';
+import {
+	deleteObjectDefinition,
+	getObjectFolderActions,
+} from './objectDefinitionUtil';
 
 import './ViewObjectDefinitions.scss';
 
@@ -94,9 +97,9 @@ export default function ViewObjectDefinitions({
 	const [selectedObjectFolder, setSelectedObjectFolder] = useState<
 		Partial<ObjectFolder>
 	>(initialValues);
-	const [foldersList, setFoldersList] = useState<Partial<ObjectFolder>[]>([
-		initialValues,
-	]);
+	const [objectFoldersList, setObjectFoldersList] = useState<
+		Partial<ObjectFolder>[]
+	>([initialValues]);
 	const [
 		deletedObjectDefinition,
 		setDeletedObjectDefinition,
@@ -113,7 +116,7 @@ export default function ViewObjectDefinitions({
 
 	const [loading, setLoading] = useState(true);
 
-	function handleShowDeleteModal() {
+	function handleShowDeleteObjectDefinitionModal() {
 		setShowModal((previousState: ViewObjectDefinitionsModals) => ({
 			...previousState,
 			deleteObjectDefinition: true,
@@ -124,13 +127,13 @@ export default function ViewObjectDefinitions({
 		itemData,
 		value,
 	}: fdsItem<ObjectDefinition>) {
-		const handleEditDefinition = () => {
+		const handleEditObjectDefinition = () => {
 			window.location.href = formatActionURL(url, itemData.id);
 		};
 
 		return (
 			<div className="table-list-title">
-				<a href="#" onClick={handleEditDefinition}>
+				<a href="#" onClick={handleEditObjectDefinition}>
 					{getLocalizableLabel(
 						itemData.defaultLanguageId as Liferay.Language.Locale,
 						value
@@ -194,7 +197,7 @@ export default function ViewObjectDefinitions({
 			if (action.data.id === 'deleteObjectDefinition') {
 				deleteObjectDefinition({
 					baseResourceURL,
-					handleShowDeleteModal,
+					handleShowDeleteObjectDefinitionModal,
 					objectDefinitionId: itemData.id,
 					objectDefinitionName: itemData.name,
 					setDeletedObjectDefinition,
@@ -289,7 +292,7 @@ export default function ViewObjectDefinitions({
 		if (Liferay.FeatureFlags['LPS-148856']) {
 			const makeFetch = async () => {
 				API.getAllObjectFolders().then((response) => {
-					setFoldersList(response);
+					setObjectFoldersList(response);
 					setSelectedObjectFolder(response[0]);
 					setLoading(false);
 				});
@@ -320,8 +323,10 @@ export default function ViewObjectDefinitions({
 						/>
 					) : (
 						<>
-							<FoldersListSideBar
-								foldersList={foldersList as ObjectFolder[]}
+							<ObjectFoldersListSideBar
+								objectFoldersList={
+									objectFoldersList as ObjectFolder[]
+								}
 								selectedObjectFolder={
 									selectedObjectFolder as ObjectFolder
 								}
@@ -338,7 +343,7 @@ export default function ViewObjectDefinitions({
 											selectedObjectFolder.externalReferenceCode
 										}
 										items={
-											getFolderActions(
+											getObjectFolderActions(
 												selectedObjectFolder.id ?? 0,
 												objectFolderPermissionsURL,
 												setShowModal,
@@ -419,7 +424,7 @@ export default function ViewObjectDefinitions({
 				)}
 
 			{showModal.addObjectFolder && (
-				<ModalAddFolder
+				<ModalAddObjectFolder
 					handleOnClose={() => {
 						setShowModal(
 							(previousState: ViewObjectDefinitionsModals) => ({
@@ -433,7 +438,6 @@ export default function ViewObjectDefinitions({
 
 			{showModal.deleteObjectFolder && (
 				<ModalDeleteObjectFolder
-					folder={selectedObjectFolder as ObjectFolder}
 					handleOnClose={() => {
 						setShowModal(
 							(previousState: ViewObjectDefinitionsModals) => ({
@@ -442,6 +446,7 @@ export default function ViewObjectDefinitions({
 							})
 						);
 					}}
+					objectFolder={selectedObjectFolder as ObjectFolder}
 				/>
 			)}
 
@@ -466,7 +471,6 @@ export default function ViewObjectDefinitions({
 
 			{showModal.moveObjectDefinition && (
 				<ModalMoveObjectDefinition
-					foldersList={foldersList as ObjectFolder[]}
 					handleOnClose={() => {
 						setShowModal(
 							(previousState: ViewObjectDefinitionsModals) => ({
@@ -476,6 +480,7 @@ export default function ViewObjectDefinitions({
 						);
 					}}
 					objectDefinition={moveObjectDefinition as ObjectDefinition}
+					objectFoldersList={objectFoldersList as ObjectFolder[]}
 					selectedObjectFolder={selectedObjectFolder}
 					setMoveObjectDefinition={setMoveObjectDefinition}
 				/>

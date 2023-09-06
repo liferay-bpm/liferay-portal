@@ -7,7 +7,7 @@ import '@testing-library/jest-dom/extend-expect';
 import {render, screen} from '@testing-library/react';
 import React from 'react';
 
-import FoldersListSideBar from '../components/ViewObjectDefinitions/FoldersListSidebar';
+import ObjectFoldersListSideBar from '../components/ViewObjectDefinitions/ObjectFoldersListSidebar';
 const emptyAction = {href: '', method: ''};
 
 const folderActions = {
@@ -42,12 +42,12 @@ const uncategorizedFolder = {
 describe('The FoldersListSidebar component should', () => {
 	it('render all the folders created', () => {
 		render(
-			<FoldersListSideBar
-				foldersList={[uncategorizedFolder, ticketFolder]}
+			<ObjectFoldersListSideBar
+				objectFoldersList={[uncategorizedFolder, ticketFolder]}
 				selectedObjectFolder={uncategorizedFolder}
 				setSelectedObjectFolder={() => {}}
 				setShowModal={() => {}}
-			></FoldersListSideBar>
+			></ObjectFoldersListSideBar>
 		);
 
 		expect(screen.getAllByRole('listitem')).toHaveLength(2);

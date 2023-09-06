@@ -34,15 +34,15 @@ function setAccountRelationshipFieldMandatory(
 ) {
 	const {objectFields} = values;
 
-	const newObjectFields = objectFields?.map((field) => {
-		if (field.name === values.accountEntryRestrictedObjectFieldName) {
+	const newObjectFields = objectFields?.map((objectField) => {
+		if (objectField.name === values.accountEntryRestrictedObjectFieldName) {
 			return {
-				...field,
+				...objectField,
 				required: true,
 			};
 		}
 
-		return field;
+		return objectField;
 	});
 
 	return {

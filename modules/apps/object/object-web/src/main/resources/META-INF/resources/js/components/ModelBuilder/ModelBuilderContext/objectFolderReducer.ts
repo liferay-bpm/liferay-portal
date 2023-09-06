@@ -61,7 +61,7 @@ export function ObjectFolderReducer(state: TState, action: TAction) {
 			let linkedObjectDefinition = false;
 
 			const newLeftSidebarItems = leftSidebarItems.map((item) => {
-				let newDefinition;
+				let newLeftSidebarObjectDefinitionItem;
 
 				if (item.objectFolderName === selectedObjectFolderName) {
 					linkedObjectDefinition =
@@ -71,7 +71,7 @@ export function ObjectFolderReducer(state: TState, action: TAction) {
 						)?.type === 'objectLink';
 
 					if (!linkedObjectDefinition) {
-						newDefinition = {
+						newLeftSidebarObjectDefinitionItem = {
 							id: newObjectDefinition.id,
 							label: getLocalizableLabel(
 								newObjectDefinition.defaultLanguageId,
@@ -106,8 +106,11 @@ export function ObjectFolderReducer(state: TState, action: TAction) {
 
 					return {
 						...item,
-						objectDefinitions: newDefinition
-							? [...updatedObjectDefinitions!, newDefinition]
+						objectDefinitions: newLeftSidebarObjectDefinitionItem
+							? [
+									...updatedObjectDefinitions!,
+									newLeftSidebarObjectDefinitionItem,
+							  ]
 							: [...updatedObjectDefinitions!],
 					};
 				}
@@ -118,18 +121,19 @@ export function ObjectFolderReducer(state: TState, action: TAction) {
 				}
 			}) as LeftSidebarItemType[];
 			const objectFields = newObjectDefinition.objectFields.map(
-				(field) => {
+				(objectField) => {
 					return {
-						businessType: field.businessType,
-						externalReferenceCode: field.externalReferenceCode,
+						businessType: objectField.businessType,
+						externalReferenceCode:
+							objectField.externalReferenceCode,
 						label: getLocalizableLabel(
 							newObjectDefinition.defaultLanguageId,
-							field.label,
-							field.name
+							objectField.label,
+							objectField.name
 						),
-						name: field.name,
-						primaryKey: field.name === 'id',
-						required: field.required,
+						name: objectField.name,
+						primaryKey: objectField.name === 'id',
+						required: objectField.required,
 						selected: false,
 					} as ObjectFieldNode;
 				}
@@ -146,23 +150,26 @@ export function ObjectFolderReducer(state: TState, action: TAction) {
 
 			let newObjectDefinitionNodes = [];
 
-			let newNode = {} as Node<ObjectDefinitionNodeData>;
+			let newObjectDefinitionNode = {} as Node<ObjectDefinitionNodeData>;
 
 			if (linkedObjectDefinition) {
 				const objectDefinitionNodes = updatedObjectDefinitionsNodes.map(
-					(node) => {
-						if (node.id === newObjectDefinition.id.toString()) {
+					(objectDefinitionNode) => {
+						if (
+							objectDefinitionNode.id ===
+							newObjectDefinition.id.toString()
+						) {
 							return {
-								...node,
+								...objectDefinitionNode,
 								data: {
-									...node.data,
+									...objectDefinitionNode.data,
 									linked: false,
 									nodeSelected: true,
 								},
 							} as Node<ObjectDefinitionNodeData>;
 						}
 
-						return node;
+						return objectDefinitionNode;
 					}
 				);
 
@@ -171,7 +178,7 @@ export function ObjectFolderReducer(state: TState, action: TAction) {
 				>[];
 			}
 			else {
-				newNode = {
+				newObjectDefinitionNode = {
 					data: {
 						...newObjectDefinition,
 						hasObjectDefinitionDeleteResourcePermission: !!newObjectDefinition
@@ -198,7 +205,7 @@ export function ObjectFolderReducer(state: TState, action: TAction) {
 
 				newObjectDefinitionNodes = [
 					...updatedObjectDefinitionsNodes,
-					newNode,
+					newObjectDefinitionNode,
 				] as Node<ObjectDefinitionNodeData>[];
 			}
 
@@ -206,7 +213,7 @@ export function ObjectFolderReducer(state: TState, action: TAction) {
 				...state,
 				elements: [...newObjectDefinitionNodes],
 				leftSidebarItems: newLeftSidebarItems,
-				selectedDefinitionNode: newNode,
+				selectedDefinitionNode: newObjectDefinitionNode,
 				showChangesSaved: true,
 			};
 		}
@@ -419,11 +426,11 @@ export function ObjectFolderReducer(state: TState, action: TAction) {
 
 						if (objectDefinition.objectRelationships.length) {
 							objectDefinition.objectRelationships.forEach(
-								(relationship) => {
-									if (!relationship.reverse) {
+								(objectRelationship) => {
+									if (!objectRelationship.reverse) {
 										const isSelfRelationship =
 											objectDefinition.name ===
-											relationship.objectDefinitionName2;
+											objectRelationship.objectDefinitionName2;
 
 										allEdges.push({
 											arrowHeadType: isSelfRelationship
@@ -439,32 +446,32 @@ export function ObjectFolderReducer(state: TState, action: TAction) {
 														hasOneSelfRelationship)
 														? getLocalizableLabel(
 																objectDefinition.defaultLanguageId,
-																relationship.label,
-																relationship.name
+																objectRelationship.label,
+																objectRelationship.name
 														  )
 														: selfRelationships.length.toString(),
 												markerEndId: manyMarkerId,
 												markerStartId:
-													relationship.type ===
+													objectRelationship.type ===
 													'manyToMany'
 														? manyMarkerId
 														: oneMarkerId,
 												objectRelationshipId:
-													relationship.id,
+													objectRelationship.id,
 												selfRelationships,
 												sourceY: 0,
 												targetY: 0,
-												type: relationship.type,
+												type: objectRelationship.type,
 											},
-											id: `reactflow__edge-object-relationship-${relationship.name}-parent-${relationship.objectDefinitionId1}-child-${relationship.objectDefinitionId2}`,
+											id: `reactflow__edge-object-relationship-${objectRelationship.name}-parent-${objectRelationship.objectDefinitionId1}-child-${objectRelationship.objectDefinitionId2}`,
 											source: `${objectDefinition.id}`,
 											sourceHandle: isSelfRelationship
 												? 'fixedLeftHandle'
 												: `${objectDefinition.id}`,
-											target: `${relationship.objectDefinitionId2}`,
+											target: `${objectRelationship.objectDefinitionId2}`,
 											targetHandle: isSelfRelationship
 												? 'fixedRightHandle'
-												: `${relationship.objectDefinitionId2}`,
+												: `${objectRelationship.objectDefinitionId2}`,
 											type: isSelfRelationship
 												? 'self'
 												: 'default',

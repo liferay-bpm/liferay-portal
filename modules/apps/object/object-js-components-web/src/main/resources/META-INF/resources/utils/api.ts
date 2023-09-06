@@ -144,16 +144,16 @@ async function deleteItem(url: string) {
 	}
 }
 
-export function deleteFolder(id: number) {
-	return deleteItem(`/o/object-admin/v1.0/object-folders/${id}`);
-}
-
 export function deleteObjectDefinitions(id: number) {
 	return deleteItem(`/o/object-admin/v1.0/object-definitions/${id}`);
 }
 
 export function deleteObjectField(id: number) {
 	return deleteItem(`/o/object-admin/v1.0/object-fields/${id}`);
+}
+
+export function deleteObjectFolder(id: number) {
+	return deleteItem(`/o/object-admin/v1.0/object-folders/${id}`);
 }
 
 export function deleteObjectRelationships(id: number) {

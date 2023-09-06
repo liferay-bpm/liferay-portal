@@ -198,7 +198,7 @@ export default function EditObjectFolder({
 					handleOnClose={() => {
 						setShowModal((previousState: ModelBuilderModals) => ({
 							...previousState,
-							editFolder: false,
+							editObjectFolder: false,
 						}));
 					}}
 					initialLabel={selectedObjectFolder.label}

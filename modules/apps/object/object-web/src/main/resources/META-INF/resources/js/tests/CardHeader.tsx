@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import CardHeader from '../components/ViewObjectDefinitions/CardHeader';
-import {getFolderActions} from '../components/ViewObjectDefinitions/objectDefinitionUtil';
+import {getObjectFolderActions} from '../components/ViewObjectDefinitions/objectDefinitionUtil';
 
 describe('The CardHeader component should', () => {
 	it('render all the folder actions', () => {
@@ -17,7 +17,7 @@ describe('The CardHeader component should', () => {
 			<CardHeader
 				externalReferenceCode="ticketERC"
 				items={
-					getFolderActions(1010, '', () => {}, {
+					getObjectFolderActions(1010, '', () => {}, {
 						delete: {href: '', method: 'DELETE'},
 						get: {href: 'GET', method: ''},
 						permissions: {href: 'PATCH', method: ''},
@@ -45,7 +45,7 @@ describe('The CardHeader component should', () => {
 			<CardHeader
 				externalReferenceCode="uncategorized"
 				items={
-					getFolderActions(1010, '', () => {}, {
+					getObjectFolderActions(1010, '', () => {}, {
 						get: {href: 'GET', method: ''},
 						permissions: {href: 'PATCH', method: ''},
 					}) as IItem[]

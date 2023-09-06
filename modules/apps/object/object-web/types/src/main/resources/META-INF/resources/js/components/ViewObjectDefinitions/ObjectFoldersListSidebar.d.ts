@@ -4,18 +4,18 @@
  */
 
 import {SetStateAction} from 'react';
-interface FoldersListSidebarProps {
-	foldersList: ObjectFolder[];
+interface ObjectFoldersListSidebarProps {
+	objectFoldersList: ObjectFolder[];
 	selectedObjectFolder: ObjectFolder;
 	setSelectedObjectFolder: (
 		value: SetStateAction<Partial<ObjectFolder>>
 	) => void;
 	setShowModal: (value: SetStateAction<ViewObjectDefinitionsModals>) => void;
 }
-export default function FoldersListSideBar({
-	foldersList,
+export default function ObjectFoldersListSideBar({
+	objectFoldersList,
 	selectedObjectFolder,
 	setSelectedObjectFolder,
 	setShowModal,
-}: FoldersListSidebarProps): JSX.Element;
+}: ObjectFoldersListSidebarProps): JSX.Element;
 export {};

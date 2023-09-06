@@ -5,10 +5,10 @@
 
 /// <reference types="react" />
 
-interface ModalAddFolderProps {
+interface ModalAddObjectFolderProps {
 	handleOnClose: () => void;
 }
-export declare function ModalAddFolder({
+export declare function ModalAddObjectFolder({
 	handleOnClose,
-}: ModalAddFolderProps): JSX.Element;
+}: ModalAddObjectFolderProps): JSX.Element;
 export {};
