@@ -398,16 +398,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					"com.liferay.portlet.company",
 					objectDefinition.getCompanyId()
 				).put(
-					"com.liferay.portlet.display-category",
-					() -> {
-						if (objectDefinition.isPortlet() &&
-							!objectDefinition.isRootDescendantNode()) {
-
-							return "category.object";
-						}
-
-						return "category.hidden";
-					}
+					"com.liferay.portlet.display-category", "category.object"
 				).put(
 					"javax.portlet.display-name",
 					objectDefinition.getPluralLabel(LocaleUtil.getSiteDefault())
