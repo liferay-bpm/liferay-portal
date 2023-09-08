@@ -92,14 +92,20 @@ public class ListTypeEntryLocalServiceImpl
 			long listTypeDefinitionId)
 		throws PortalException {
 
-		_validateBundleNamespace("delete", listTypeDefinitionId);
-
 		for (ListTypeEntry listTypeEntry :
 				listTypeEntryPersistence.findByListTypeDefinitionId(
 					listTypeDefinitionId)) {
 
 			listTypeEntryLocalService.deleteListTypeEntry(listTypeEntry);
 		}
+	}
+
+	@Override
+	public ListTypeEntry deleteListTypeEntry(ListTypeEntry listTypeEntry)
+		throws PortalException {
+		_validateBundleNamespace("delete", listTypeEntry.getListTypeDefinitionId());
+
+		return listTypeEntryPersistence.remove(listTypeEntry);
 	}
 
 	@Override
