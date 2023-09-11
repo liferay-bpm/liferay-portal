@@ -84,7 +84,7 @@ export function ModalAddObjectField({
 					url: `/o/object-admin/v1.0/object-definitions/by-external-reference-code/${objectDefinitionExternalReferenceCode}/object-fields`,
 				});
 
-				onAfterSubmit(fieldResponse);
+				onAfterSubmit(fieldResponse as ObjectField);
 			}
 			catch (error) {
 				setError((error as Error).message);

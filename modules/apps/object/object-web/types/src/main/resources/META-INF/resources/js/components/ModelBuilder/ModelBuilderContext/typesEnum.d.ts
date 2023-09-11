@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: (c) 2000 Liferay, Inc. https://liferay.com
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
+
 export declare enum TYPES {
 	ADD_OBJECT_DEFINITION_TO_OBJECT_FOLDER = 'ADD_OBJECT_DEFINITION_TO_OBJECT_FOLDER',
 	BULK_CHANGE_NODE_VIEW = 'BULK_CHANGE_NODE_VIEW',
