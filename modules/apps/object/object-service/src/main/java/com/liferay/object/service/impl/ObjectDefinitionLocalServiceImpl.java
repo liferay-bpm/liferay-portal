@@ -1158,9 +1158,7 @@ public class ObjectDefinitionLocalServiceImpl
 			objectDefinitionPersistence.findByPrimaryKey(
 				rootObjectDefinitionId);
 
-		if ((objectDefinitionId != rootObjectDefinitionId) &&
-			(rootObjectDefinition.getRootObjectDefinitionId() == 0)) {
-
+		if (rootObjectDefinition.isRootDescendantNode()) {
 			throw new ObjectDefinitionRootObjectDefinitionIdException(
 				"Object definition " + rootObjectDefinitionId +
 					" is not a root object definition");
@@ -1168,7 +1166,15 @@ public class ObjectDefinitionLocalServiceImpl
 
 		objectDefinition.setRootObjectDefinitionId(rootObjectDefinitionId);
 
-		return objectDefinitionPersistence.update(objectDefinition);
+		objectDefinition = objectDefinitionPersistence.update(objectDefinition);
+
+		if (objectDefinition.isRootDescendantNode() &&
+			objectDefinition.isApproved()) {
+
+			deployObjectDefinition(objectDefinition);
+		}
+
+		return objectDefinition;
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
