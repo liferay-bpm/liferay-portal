@@ -35,6 +35,9 @@ import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectFieldValidationConstants;
 import com.liferay.object.constants.ObjectFilterConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.definition.tree.Node;
+import com.liferay.object.definition.tree.Tree;
+import com.liferay.object.definition.tree.TreeFactory;
 import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
@@ -127,6 +130,7 @@ import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.Users_OrgsTable;
 import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.module.service.Snapshot;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -275,6 +279,8 @@ public class ObjectEntryLocalServiceImpl
 		ObjectEntry objectEntry = objectEntryPersistence.create(objectEntryId);
 
 		_setExternalReferenceCode(objectEntry, values);
+
+		_setRootObjectEntryId(objectDefinition, objectEntry, values);
 
 		objectEntry.setGroupId(groupId);
 		objectEntry.setCompanyId(user.getCompanyId());
@@ -1415,6 +1421,8 @@ public class ObjectEntryLocalServiceImpl
 		objectEntry = objectEntryPersistence.findByPrimaryKey(objectEntryId);
 
 		_setExternalReferenceCode(objectEntry, values);
+
+		_setRootObjectEntryId(objectDefinition, objectEntry, values);
 
 		objectEntry.setModifiedDate(serviceContext.getModifiedDate(null));
 		objectEntry.setTransientValues(transientValues);
@@ -3680,6 +3688,45 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
+	private void _setRootObjectEntryId(
+			ObjectDefinition objectDefinition, ObjectEntry objectEntry,
+			Map<String, Serializable> values)
+		throws PortalException {
+
+		if (objectDefinition.getRootObjectDefinitionId() == 0) {
+			objectEntry.setRootObjectEntryId(0);
+
+			return;
+		}
+
+		if (objectDefinition.isRootNode()) {
+			objectEntry.setRootObjectEntryId(objectEntry.getObjectEntryId());
+
+			return;
+		}
+
+		TreeFactory treeFactory = _treeFactorySnapshot.get();
+
+		Tree tree = treeFactory.create(
+			objectDefinition.getRootObjectDefinitionId());
+
+		Node node = tree.getNode(objectDefinition.getObjectDefinitionId());
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipPersistence.findByPrimaryKey(
+				node.getEdge(
+				).getObjectRelationshipId());
+
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			objectRelationship.getObjectFieldId2());
+
+		ObjectEntry parentObjectEntry = getObjectEntry(
+			MapUtil.getLong(values, objectField.getName()));
+
+		objectEntry.setRootObjectEntryId(
+			parentObjectEntry.getRootObjectEntryId());
+	}
+
 	private void _startWorkflowInstance(
 			long userId, ObjectEntry objectEntry, ServiceContext serviceContext)
 		throws PortalException {
@@ -4491,6 +4538,9 @@ public class ObjectEntryLocalServiceImpl
 		new CentralizedThreadLocal<>(
 			ObjectEntryLocalServiceImpl.class + "._skipModelListeners",
 			() -> false);
+	private static final Snapshot<TreeFactory> _treeFactorySnapshot =
+		new Snapshot<>(
+			ObjectEntryLocalServiceImpl.class, TreeFactory.class, null, true);
 
 	@Reference
 	private AccountEntryLocalService _accountEntryLocalService;
