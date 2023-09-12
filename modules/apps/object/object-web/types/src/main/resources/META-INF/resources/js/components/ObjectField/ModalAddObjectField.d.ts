@@ -7,18 +7,16 @@
 
 import './ModalAddObjectField.scss';
 interface ModalAddObjectField {
-	apiURL: string;
+	baseResourceURL: string;
 	creationLanguageId: Liferay.Language.Locale;
 	objectDefinitionExternalReferenceCode: string;
-	objectFieldTypes: ObjectFieldType[];
 	objectName?: string;
 	setVisibility: (value: boolean) => void;
 }
 export declare function ModalAddObjectField({
-	apiURL,
+	baseResourceURL,
 	creationLanguageId,
 	objectDefinitionExternalReferenceCode,
-	objectFieldTypes,
 	objectName,
 	setVisibility,
 }: ModalAddObjectField): JSX.Element;
