@@ -111,6 +111,7 @@ export type TAction =
 				edges: Edge<ObjectRelationshipEdgeData>[];
 				nodes: Node<ObjectDefinitionNodeData>[];
 				selectedFieldDefinitionName: string;
+				selectedObjectDefinitionField: ObjectFieldNode;
 				selectedObjectDefinitionId: number;
 			};
 			type: TYPES.SET_SELECTED_FIELD;
@@ -171,6 +172,7 @@ export type TState = {
 	objectFolders: ObjectFolder[];
 	objectWebLearnResources: ObjectWebLearnResources;
 	rightSidebarType: RightSidebarType;
+	selectedObjectDefinitionField?: ObjectFieldNode;
 	selectedObjectDefinitionNode: Node<ObjectDefinitionNodeData> | null;
 	selectedObjectFolder: ObjectFolder;
 	selectedObjectRelationship: ObjectRelationship;
