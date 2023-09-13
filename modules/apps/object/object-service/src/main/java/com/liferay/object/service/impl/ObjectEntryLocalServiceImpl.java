@@ -2602,10 +2602,19 @@ public class ObjectEntryLocalServiceImpl
 			return null;
 		}
 
+		Column<?, Long> primKeyColumn =
+			dynamicObjectDefinitionTable.getPrimaryKeyColumn();
+
+		if (objectDefinition.isRootDescendantNode()) {
+			objectDefinition = _objectDefinitionPersistence.findByPrimaryKey(
+				objectDefinition.getRootObjectDefinitionId());
+
+			primKeyColumn = ObjectEntryTable.INSTANCE.rootObjectEntryId;
+		}
+
 		Predicate individualScopePredicate =
 			_inlineSQLHelper.getPermissionWherePredicate(
-				objectDefinition.getClassName(),
-				dynamicObjectDefinitionTable.getPrimaryKeyColumn(), groupId);
+				objectDefinition.getClassName(), primKeyColumn, groupId);
 
 		if (individualScopePredicate == null) {
 			return null;
