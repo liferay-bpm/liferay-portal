@@ -1109,6 +1109,9 @@ public class ObjectEntryLocalServiceImpl
 				extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn()),
 			_EXPRESSIONS);
 
+		DynamicObjectDefinitionTable dynamicRootObjectDefinitionTable =
+			_getDynamicRootObjectDefinitionTable(objectDefinitionId);
+
 		List<Object[]> rows = _list(
 			DSLQueryFactoryUtil.select(
 				selectExpressions
@@ -1124,6 +1127,10 @@ public class ObjectEntryLocalServiceImpl
 				).eq(
 					dynamicObjectDefinitionTable.getPrimaryKeyColumn()
 				)
+			).innerJoinON(
+				dynamicRootObjectDefinitionTable,
+				_getInnerJoinRootObjectDefinitionTablePredicate(
+					dynamicRootObjectDefinitionTable)
 			).leftJoinOn(
 				dynamicObjectDefinitionLocalizationTable,
 				_getLeftJoinLocalizationTablePredicate(
@@ -1181,45 +1188,51 @@ public class ObjectEntryLocalServiceImpl
 		DynamicObjectDefinitionTable extensionDynamicObjectDefinitionTable =
 			_getExtensionDynamicObjectDefinitionTable(objectDefinitionId);
 
-		DSLQuery dslQuery = DSLQueryFactoryUtil.countDistinct(
-			ObjectEntryTable.INSTANCE.objectEntryId
-		).from(
-			dynamicObjectDefinitionTable
-		).innerJoinON(
-			ObjectEntryTable.INSTANCE,
-			ObjectEntryTable.INSTANCE.objectEntryId.eq(
-				dynamicObjectDefinitionTable.getPrimaryKeyColumn())
-		).innerJoinON(
-			extensionDynamicObjectDefinitionTable,
-			extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn(
-			).eq(
-				dynamicObjectDefinitionTable.getPrimaryKeyColumn()
-			)
-		).leftJoinOn(
-			dynamicObjectDefinitionLocalizationTable,
-			_getLeftJoinLocalizationTablePredicate(
+		DynamicObjectDefinitionTable dynamicRootObjectDefinitionTable =
+			_getDynamicRootObjectDefinitionTable(objectDefinitionId);
+
+		return objectEntryPersistence.dslQueryCount(
+			DSLQueryFactoryUtil.countDistinct(
+				ObjectEntryTable.INSTANCE.objectEntryId
+			).from(
+				dynamicObjectDefinitionTable
+			).innerJoinON(
+				ObjectEntryTable.INSTANCE,
+				ObjectEntryTable.INSTANCE.objectEntryId.eq(
+					dynamicObjectDefinitionTable.getPrimaryKeyColumn())
+			).innerJoinON(
+				extensionDynamicObjectDefinitionTable,
+				extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn(
+				).eq(
+					dynamicObjectDefinitionTable.getPrimaryKeyColumn()
+				)
+			).innerJoinON(
+				dynamicRootObjectDefinitionTable,
+				_getInnerJoinRootObjectDefinitionTablePredicate(
+					dynamicRootObjectDefinitionTable)
+			).leftJoinOn(
 				dynamicObjectDefinitionLocalizationTable,
-				dynamicObjectDefinitionTable)
-		).where(
-			ObjectEntryTable.INSTANCE.objectDefinitionId.eq(
-				objectDefinitionId
-			).and(
-				() -> {
-					if (groupId == 0) {
-						return null;
+				_getLeftJoinLocalizationTablePredicate(
+					dynamicObjectDefinitionLocalizationTable,
+					dynamicObjectDefinitionTable)
+			).where(
+				ObjectEntryTable.INSTANCE.objectDefinitionId.eq(
+					objectDefinitionId
+				).and(
+					() -> {
+						if (groupId == 0) {
+							return null;
+						}
+
+						return ObjectEntryTable.INSTANCE.groupId.eq(groupId);
 					}
-
-					return ObjectEntryTable.INSTANCE.groupId.eq(groupId);
-				}
-			).and(
-				_fillPredicate(objectDefinitionId, predicate, search)
-			).and(
-				_getPermissionWherePredicate(
-					dynamicObjectDefinitionTable, groupId)
-			)
-		);
-
-		return objectEntryPersistence.dslQueryCount(dslQuery);
+				).and(
+					_fillPredicate(objectDefinitionId, predicate, search)
+				).and(
+					_getPermissionWherePredicate(
+						dynamicObjectDefinitionTable, groupId)
+				)
+			));
 	}
 
 	@Override
@@ -2088,6 +2101,40 @@ public class ObjectEntryLocalServiceImpl
 			objectDefinition.getDBTableName());
 	}
 
+	private DynamicObjectDefinitionTable _getDynamicRootObjectDefinitionTable(
+			long objectDefinitionId)
+		throws PortalException {
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
+
+		if (!objectDefinition.isRootDescendantNode()) {
+			return null;
+		}
+
+		ObjectDefinition rootObjectDefinition =
+			_objectDefinitionPersistence.findByPrimaryKey(
+				objectDefinition.getRootObjectDefinitionId());
+
+		if (!rootObjectDefinition.isAccountEntryRestricted()) {
+			return null;
+		}
+
+		ObjectField objectField = _objectFieldPersistence.findByPrimaryKey(
+			rootObjectDefinition.getAccountEntryRestrictedObjectFieldId());
+
+		if (Objects.equals(
+				objectField.getDBTableName(),
+				rootObjectDefinition.getDBTableName())) {
+
+			return _getDynamicObjectDefinitionTable(
+				rootObjectDefinition.getObjectDefinitionId());
+		}
+
+		return _getExtensionDynamicObjectDefinitionTable(
+			rootObjectDefinition.getObjectDefinitionId());
+	}
+
 	private DynamicObjectDefinitionTable
 			_getExtensionDynamicObjectDefinitionTable(long objectDefinitionId)
 		throws PortalException {
@@ -2212,6 +2259,19 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		throw new IllegalArgumentException("Invalid function " + function);
+	}
+
+	private Predicate _getInnerJoinRootObjectDefinitionTablePredicate(
+		DynamicObjectDefinitionTable dynamicObjectDefinitionTable) {
+
+		if (dynamicObjectDefinitionTable == null) {
+			return null;
+		}
+
+		return dynamicObjectDefinitionTable.getPrimaryKeyColumn(
+		).eq(
+			ObjectEntryTable.INSTANCE.rootObjectEntryId
+		);
 	}
 
 	private Key _getKey() throws PortalException {
@@ -2607,10 +2667,19 @@ public class ObjectEntryLocalServiceImpl
 			return null;
 		}
 
+		Column<?, Long> primaryKeyColumn =
+			dynamicObjectDefinitionTable.getPrimaryKeyColumn();
+
+		if (objectDefinition.isRootDescendantNode()) {
+			objectDefinition = _objectDefinitionPersistence.findByPrimaryKey(
+				objectDefinition.getRootObjectDefinitionId());
+
+			primaryKeyColumn = ObjectEntryTable.INSTANCE.rootObjectEntryId;
+		}
+
 		Predicate individualScopePredicate =
 			_inlineSQLHelper.getPermissionWherePredicate(
-				objectDefinition.getClassName(),
-				dynamicObjectDefinitionTable.getPrimaryKeyColumn(), groupId);
+				objectDefinition.getClassName(), primaryKeyColumn, groupId);
 
 		if (individualScopePredicate == null) {
 			return null;
