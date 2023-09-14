@@ -5,10 +5,12 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.object.exception.ObjectRelationshipDeletionTypeException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.base.ObjectRelationshipServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -18,6 +20,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -82,6 +85,36 @@ public class ObjectRelationshipServiceImpl
 		ObjectRelationship objectRelationship =
 			objectRelationshipPersistence.findByPrimaryKey(
 				objectRelationshipId);
+
+		if (Objects.equals(
+				objectRelationship.getObjectDefinitionId1(),
+				objectRelationship.getObjectDefinitionId2())) {
+
+			List<ObjectRelationship> byObjectDefinitionId2 =
+				objectRelationshipPersistence.findByObjectDefinitionId2(
+					objectRelationship.getObjectDefinitionId2());
+
+			ObjectDefinition lPostalAddressObjectDefinition =
+				_objectDefinitionPersistence.findByERC_C(
+					"L_POSTAL_ADDRESS", objectRelationship.getCompanyId());
+
+			for (ObjectRelationship objectRelationshipByObjectDefinitionId2 :
+					byObjectDefinitionId2) {
+
+				if (Objects.equals(
+						objectRelationshipByObjectDefinitionId2.
+							getObjectDefinitionId1(),
+						lPostalAddressObjectDefinition.
+							getObjectDefinitionId())) {
+
+					throw new ObjectRelationshipDeletionTypeException(
+						StringBundler.concat(
+							"Error: Deletion of ", objectRelationship.getName(),
+							" is not allowed. To proceed first delete the ",
+							"relationship with Postal Address."));
+				}
+			}
+		}
 
 		_objectDefinitionModelResourcePermission.check(
 			getPermissionChecker(), objectRelationship.getObjectDefinitionId1(),
