@@ -30,6 +30,7 @@ interface ItemData {
 	id: number;
 	label: LocalizedValue<string>;
 	status: Status;
+	system: boolean;
 }
 
 export default function Actions({
@@ -92,6 +93,67 @@ export default function Actions({
 		);
 	}
 
+	function objectActionSourceDataRenderer({itemData}: {itemData: ItemData}) {
+		return (
+			<strong
+				className={classNames(
+					itemData.system ? 'label-info' : 'label-warning',
+					'label'
+				)}
+			>
+				{itemData.system
+					? Liferay.Language.get('system')
+					: Liferay.Language.get('custom')}
+			</strong>
+		);
+	}
+
+	const fdsFields = [
+		{
+			contentRenderer: 'objectActionLabelDataRenderer',
+			expand: false,
+			fieldName: 'label',
+			label: Liferay.Language.get('label'),
+			localizeLabel: true,
+			sortable: true,
+		},
+		{
+			expand: false,
+			fieldName: 'description',
+			label: Liferay.Language.get('description'),
+			localizeLabel: true,
+			sortable: false,
+		},
+		{
+			contentRenderer: 'objectActionActiveDataRenderer',
+			expand: false,
+			fieldName: 'active',
+			label: Liferay.Language.get('active'),
+			localizeLabel: true,
+			sortable: false,
+		},
+	];
+
+	if (Liferay.FeatureFlags['LPS-193355']) {
+		fdsFields.push({
+			contentRenderer: 'objectActionSourceDataRenderer',
+			expand: false,
+			fieldName: 'source',
+			label: Liferay.Language.get('source'),
+			localizeLabel: true,
+			sortable: false,
+		});
+	}
+
+	fdsFields.push({
+		contentRenderer: 'objectActionLastExecutionDataRenderer',
+		expand: false,
+		fieldName: 'status',
+		label: Liferay.Language.get('last-execution'),
+		localizeLabel: true,
+		sortable: false,
+	});
+
 	const dataSetProps = {
 		...defaultDataSetProps,
 		apiURL,
@@ -100,6 +162,7 @@ export default function Actions({
 			objectActionActiveDataRenderer,
 			objectActionLabelDataRenderer,
 			objectActionLastExecutionDataRenderer,
+			objectActionSourceDataRenderer,
 		},
 		formName,
 		id,
@@ -115,40 +178,7 @@ export default function Actions({
 				label: 'Table',
 				name: 'table',
 				schema: {
-					fields: [
-						{
-							contentRenderer: 'objectActionLabelDataRenderer',
-							expand: false,
-							fieldName: 'label',
-							label: Liferay.Language.get('label'),
-							localizeLabel: true,
-							sortable: true,
-						},
-						{
-							expand: false,
-							fieldName: 'description',
-							label: Liferay.Language.get('description'),
-							localizeLabel: true,
-							sortable: false,
-						},
-						{
-							contentRenderer: 'objectActionActiveDataRenderer',
-							expand: false,
-							fieldName: 'active',
-							label: Liferay.Language.get('active'),
-							localizeLabel: true,
-							sortable: false,
-						},
-						{
-							contentRenderer:
-								'objectActionLastExecutionDataRenderer',
-							expand: false,
-							fieldName: 'status',
-							label: Liferay.Language.get('last-execution'),
-							localizeLabel: true,
-							sortable: false,
-						},
-					],
+					fields: fdsFields,
 				},
 				thumbnail: 'table',
 			},
