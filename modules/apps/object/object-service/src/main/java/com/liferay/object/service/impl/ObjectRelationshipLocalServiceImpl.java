@@ -296,12 +296,9 @@ public class ObjectRelationshipLocalServiceImpl
 				"Reverse object relationships cannot be deleted");
 		}
 
-		if (objectRelationship.isSystem() &&
-			!ObjectDefinitionUtil.isInvokerBundleAllowed()) {
-
-			throw new ObjectRelationshipSystemException(
-				"Only allowed bundles can delete system object relationships");
-		}
+		_validateInvokerBundle(
+			"Only allowed bundles can delete system object relationships",
+			objectRelationship.isSystem());
 
 		objectRelationship = objectRelationshipPersistence.remove(
 			objectRelationship);
@@ -909,16 +906,18 @@ public class ObjectRelationshipLocalServiceImpl
 			boolean system, String type)
 		throws PortalException {
 
-		if (system && !ObjectDefinitionUtil.isInvokerBundleAllowed()) {
-			throw new ObjectRelationshipSystemException(
-				"Only allowed bundles can create system object relationships");
+		ObjectDefinition objectDefinition1 =
+			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId1);
+
+		if (objectDefinition1.isModifiable() && objectDefinition1.isSystem()) {
+			_validateInvokerBundle(
+				"Only allowed bundles can add system object relationships",
+				system);
 		}
 
 		_validateLabel(labelMap);
 		_validateName(objectDefinitionId1, name);
 
-		ObjectDefinition objectDefinition1 =
-			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId1);
 		ObjectDefinition objectDefinition2 =
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId2);
 
@@ -1143,6 +1142,16 @@ public class ObjectRelationshipLocalServiceImpl
 				"Object relationship must not be between unmodifiable system " +
 					"object definitions to be an edge of a root context");
 		}
+	}
+
+	private void _validateInvokerBundle(String message, boolean system)
+		throws PortalException {
+
+		if (!system || ObjectDefinitionUtil.isInvokerBundleAllowed()) {
+			return;
+		}
+
+		throw new ObjectRelationshipSystemException(message);
 	}
 
 	private void _validateLabel(Map<Locale, String> labelMap)
