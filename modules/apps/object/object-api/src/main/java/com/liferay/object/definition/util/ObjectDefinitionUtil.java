@@ -60,6 +60,7 @@ public class ObjectDefinitionUtil {
 
 		if (StringUtil.startsWith(
 				fileName, "com.liferay.headless.builder.impl") ||
+		StringUtil.startsWith(fileName, "com.liferay.list.type.service") ||
 			StringUtil.startsWith(fileName, "com.liferay.object.service")) {
 
 			return true;
