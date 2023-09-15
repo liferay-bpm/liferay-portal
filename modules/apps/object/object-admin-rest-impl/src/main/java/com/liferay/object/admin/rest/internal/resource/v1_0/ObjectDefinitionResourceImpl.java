@@ -558,6 +558,9 @@ public class ObjectDefinitionResourceImpl
 			new ArrayList<>(
 				_objectFieldLocalService.getObjectFields(objectDefinitionId));
 
+		List<ObjectRelationship> objectRelationships = ListUtil.fromArray(
+			objectDefinition.getObjectRelationships());
+
 		if (serviceBuilderObjectDefinition.isModifiable() &&
 			serviceBuilderObjectDefinition.isSystem() &&
 			ObjectDefinitionUtil.isInvokerBundleAllowed()) {
@@ -569,12 +572,20 @@ public class ObjectDefinitionResourceImpl
 				serviceBuilderObjectField ->
 					serviceBuilderObjectField.isMetadata() ||
 					!serviceBuilderObjectField.isSystem());
+
+			objectRelationships.removeIf(
+				objectRelationship -> !GetterUtil.getBoolean(
+					objectRelationship.getSystem()));
 		}
 		else {
 			objectFields.removeIf(
 				objectField -> GetterUtil.getBoolean(objectField.getSystem()));
 
 			serviceBuilderObjectFields.removeIf(ObjectFieldModel::isSystem);
+
+			objectRelationships.removeIf(
+				objectRelationship -> GetterUtil.getBoolean(
+					objectRelationship.getSystem()));
 		}
 
 		for (ObjectField objectField : objectFields) {
@@ -634,12 +645,10 @@ public class ObjectDefinitionResourceImpl
 			_objectLayoutLocalService.deleteObjectLayouts(objectDefinitionId);
 		}
 
-		ObjectRelationship[] objectRelationships =
-			objectDefinition.getObjectRelationships();
-
 		Set<String> accountEntryRestrictedObjectRelationshipsNames =
 			_getAccountEntryRestrictedObjectRelationshipsNames(
-				serviceBuilderObjectDefinition, objectRelationships);
+				serviceBuilderObjectDefinition,
+				objectRelationships.toArray(new ObjectRelationship[0]));
 
 		ObjectValidationRule[] objectValidationRules =
 			objectDefinition.getObjectValidationRules();
@@ -657,7 +666,9 @@ public class ObjectDefinitionResourceImpl
 
 		_addObjectDefinitionResources(
 			accountEntryRestrictedObjectRelationshipsNames, objectActions,
-			objectDefinitionId, objectLayouts, objectRelationships,
+			serviceBuilderObjectDefinition.getObjectDefinitionId(),
+			objectLayouts,
+			objectRelationships.toArray(new ObjectRelationship[0]),
 			objectValidationRules, objectViews);
 
 		return _toObjectDefinition(serviceBuilderObjectDefinition);
