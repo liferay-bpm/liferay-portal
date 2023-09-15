@@ -3,24 +3,36 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import SourceDataRenderer from './FDSDataRenderers/SourceDataRenderer';
-interface ObjecEntriesDataRendererProps {
-	value: {
+interface ObjectEntriesDataRendererProps {
+	values: {
 		key: string;
 		name: string;
 		name_i18n: string;
 	}[];
 }
+declare type ActionProps = {
+	data: {
+		id: string;
+	};
+};
 export default function ObjectEntriesFDSPropsTransformer({
 	...otherProps
 }: {
 	[x: string]: any;
 }): {
 	customDataRenderers: {
-		objectEntrieDataRenderer: ({
-			value,
-		}: ObjecEntriesDataRendererProps) => string;
-		sourceDataRenderer: typeof SourceDataRenderer;
+		objectEntriesDataRenderer: ({
+			values,
+		}: ObjectEntriesDataRendererProps) => string;
 	};
+	onActionDropdownItemClick({
+		action,
+		itemData,
+		loadData,
+	}: {
+		action: ActionProps;
+		itemData: ItemData;
+		loadData: voidReturn;
+	}): void;
 };
 export {};
