@@ -5,6 +5,7 @@
 
 package com.liferay.frontend.data.set.views.web.internal.portlet;
 
+import com.liferay.batch.engine.unit.BatchEngineUnitThreadLocal;
 import com.liferay.client.extension.type.manager.CETManager;
 import com.liferay.frontend.data.set.views.web.internal.constants.FDSViewsPortletKeys;
 import com.liferay.frontend.data.set.views.web.internal.constants.FDSViewsWebKeys;
@@ -153,6 +154,9 @@ public class FDSViewsPortlet extends MVCPortlet {
 		if (fdsEntryObjectDefinition != null) {
 			return;
 		}
+
+		BatchEngineUnitThreadLocal.setFileName(
+			"com.liferay.frontend.data.set.views");
 
 		fdsEntryObjectDefinition =
 			_objectDefinitionLocalService.addSystemObjectDefinition(

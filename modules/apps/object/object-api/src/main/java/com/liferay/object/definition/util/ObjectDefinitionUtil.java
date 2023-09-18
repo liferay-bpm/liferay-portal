@@ -6,7 +6,6 @@
 package com.liferay.object.definition.util;
 
 import com.liferay.batch.engine.unit.BatchEngineUnitThreadLocal;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PortalRunMode;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -61,7 +60,9 @@ public class ObjectDefinitionUtil {
 
 		if (StringUtil.startsWith(
 				fileName, "com.liferay.headless.builder.impl") ||
-			StringUtil.startsWith(fileName, "com.liferay.object.service")) {
+			StringUtil.startsWith(fileName, "com.liferay.object.service") ||
+			StringUtil.startsWith(
+				fileName, "com.liferay.frontend.data.set.views")) {
 
 			return true;
 		}
