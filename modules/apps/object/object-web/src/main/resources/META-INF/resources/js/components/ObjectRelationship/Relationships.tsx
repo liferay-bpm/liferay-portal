@@ -37,6 +37,40 @@ interface RelationshipsProps extends IFDSTableProps {
 	parameterRequired: boolean;
 }
 
+function ObjectFieldHierarchyDataRenderer({itemData}: {itemData: ItemData}) {
+	return (
+		<strong
+			className={classNames(
+				itemData.reverse ? 'label-info' : 'label-success',
+				'label'
+			)}
+		>
+			{itemData.reverse
+				? Liferay.Language.get('child')
+				: Liferay.Language.get('parent')}
+		</strong>
+	);
+}
+
+function ObjectRelationshipSourceDataRenderer({
+	itemData,
+}: {
+	itemData: ItemData;
+}) {
+	return (
+		<strong
+			className={classNames(
+				itemData.system ? 'label-info' : 'label-warning',
+				'label'
+			)}
+		>
+			{itemData.system
+				? Liferay.Language.get('system')
+				: Liferay.Language.get('custom')}
+		</strong>
+	);
+}
+
 export default function Relationships({
 	apiURL,
 	baseResourceURL,
@@ -83,26 +117,7 @@ export default function Relationships({
 		makeFetch();
 	}, [objectDefinitionExternalReferenceCode]);
 
-	function ObjectFieldHierarchyDataRenderer({
-		itemData,
-	}: {
-		itemData: ItemData;
-	}) {
-		return (
-			<strong
-				className={classNames(
-					itemData.reverse ? 'label-info' : 'label-success',
-					'label'
-				)}
-			>
-				{itemData.reverse
-					? Liferay.Language.get('child')
-					: Liferay.Language.get('parent')}
-			</strong>
-		);
-	}
-
-	function objectFieldLabelDataRenderer({
+	function ObjectFieldLabelDataRenderer({
 		itemData,
 		openSidePanel,
 		value,
@@ -125,28 +140,9 @@ export default function Relationships({
 		);
 	}
 
-	function objectRelationshipSourceDataRenderer({
-		itemData,
-	}: {
-		itemData: ItemData;
-	}) {
-		return (
-			<strong
-				className={classNames(
-					itemData.system ? 'label-info' : 'label-warning',
-					'label'
-				)}
-			>
-				{itemData.system
-					? Liferay.Language.get('system')
-					: Liferay.Language.get('custom')}
-			</strong>
-		);
-	}
-
 	const fdsFields = [
 		{
-			contentRenderer: 'objectFieldLabelDataRenderer',
+			contentRenderer: 'ObjectFieldLabelDataRenderer',
 			expand: false,
 			fieldName: 'label',
 			label: Liferay.Language.get('label'),
@@ -179,7 +175,7 @@ export default function Relationships({
 
 	if (Liferay.FeatureFlags['LPS-193355']) {
 		fdsFields.push({
-			contentRenderer: 'objectRelationshipSourceDataRenderer',
+			contentRenderer: 'ObjectRelationshipSourceDataRenderer',
 			expand: false,
 			fieldName: 'source',
 			label: Liferay.Language.get('source'),
@@ -194,8 +190,8 @@ export default function Relationships({
 		creationMenu,
 		customDataRenderers: {
 			ObjectFieldHierarchyDataRenderer,
-			objectFieldLabelDataRenderer,
-			objectRelationshipSourceDataRenderer,
+			ObjectFieldLabelDataRenderer,
+			ObjectRelationshipSourceDataRenderer,
 		},
 		formName,
 		id,
