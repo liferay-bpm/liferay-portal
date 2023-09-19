@@ -165,10 +165,10 @@ export declare function postListTypeEntry({
 	key,
 	listTypeDefinitionId,
 	name_i18n,
-}: Partial<ListTypeEntry>): Promise<any>;
+}: Partial<ListTypeEntry>): Promise<unknown>;
 export declare function postObjectDefinition(
 	objectDefinition: Partial<ObjectDefinition>
-): Promise<any>;
+): Promise<ObjectDefinition | undefined>;
 export declare function postObjectDefinitionPublish(
 	objectDefinitionId: number
 ): Promise<Response>;
@@ -178,18 +178,7 @@ export declare function putObjectDefinitionByExternalReferenceCode(
 export declare function putObjectFolderByExternalReferenceCode(
 	objectFolder: Partial<ObjectFolder>
 ): Promise<Response>;
-export declare function save<T>({
-	item,
-	method,
-	returnValue,
-	url,
-}: saveProps): Promise<T | undefined>;
-export declare function addPickListItem({
-	id,
-	key,
-	name_i18n,
-}: Partial<PickListItem>): Promise<unknown>;
-export declare function updatePickList({
+export declare function putListTypeDefinition({
 	externalReferenceCode,
 	id,
 	listTypeEntries,
@@ -204,10 +193,10 @@ export declare function putObjectRelationship({
 	id,
 	...others
 }: ObjectRelationship): Promise<unknown>;
-export declare function save({
+export declare function save<T>({
 	item,
 	method,
 	returnValue,
 	url,
-}: saveProps): Promise<any>;
+}: saveProps): Promise<T | undefined>;
 export {};

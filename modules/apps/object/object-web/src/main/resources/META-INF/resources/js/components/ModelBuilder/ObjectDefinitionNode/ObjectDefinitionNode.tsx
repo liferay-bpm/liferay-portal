@@ -111,7 +111,7 @@ export function ObjectDefinitionNode({
 				nodes,
 				selectedObjectDefinitionId: id.toString(),
 			},
-			type: TYPES.SET_SELECTED_NODE,
+			type: TYPES.SET_SELECTED_OBJECT_DEFINITION_NODE,
 		});
 	};
 
@@ -125,18 +125,6 @@ export function ObjectDefinitionNode({
 						'lfr-objects__model-builder-node-container--selected': selected,
 					}
 				)}
-				onClick={() => {
-					const {edges, nodes} = store.getState();
-
-					dispatch({
-						payload: {
-							edges,
-							nodes,
-							selectedObjectDefinitionId: id.toString(),
-						},
-						type: TYPES.SET_SELECTED_OBJECT_DEFINITION_NODE,
-					});
-				}}
 			>
 				<ObjectDefinitionNodeHeader
 					dropDownItems={getObjectDefinitionNodeActions({
