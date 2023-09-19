@@ -45,6 +45,11 @@ interface IItem extends LabelValueObject {
 	checked?: boolean;
 }
 
+interface ItemData {
+	actions: {delete: HTTPMethod};
+	id: number;
+}
+
 type IncludesFilterOperator = {
 	in: string[] | number[];
 };
@@ -439,3 +444,5 @@ interface ViewObjectDefinitionsModals {
 	moveObjectDefinition: boolean;
 	unbindFromRootObjectDefinition: boolean;
 }
+
+type voidReturn = () => void;
