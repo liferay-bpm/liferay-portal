@@ -16,41 +16,81 @@ async function fetchPRStatistics() {
       state: "open",
     });
 
-    const prCount = pullRequests.length;
-    const countSquads = [0, 0, 0];
+    const prCount = {
+      'totalCount': pullRequests.length,
+      'squad-alpha': 0,
+      'squad-bravo': 0,
+      'squad-zulu': 0,
+      'External Team': 0,
+      'Author Action Required': 0,
+      'Dev Approved': 0,
+    }
+    
     let assignees = {};
+    let assignee;
+
+    const countLabel = (labels, tagetLabel) => {
+      if (labels.some(e => e.name === tagetLabel)) {
+        prCount[tagetLabel] += 1;
+      }
+    }
 
 
     for(i in pullRequests){
       let labels = pullRequests[i].labels;
 
-      if (labels.some(e => e.name === 'squad-alpha')) {
-        countSquads[0] += 1;
-      }
+      countLabel(labels, 'squad-alpha')
+      countLabel(labels, 'squad-bravo')
+      countLabel(labels, 'squad-zulu')
+      countLabel(labels, 'External Team')
+      countLabel(labels, 'Author Action Required')
+      countLabel(labels, 'Dev Approved')
 
-      if (labels.some(e => e.name === 'squad-bravo')) {
-        countSquads[1] += 1;
-      }
-
-      if (labels.some(e => e.name === 'squad-zulu')) {
-        countSquads[2] += 1;
-      }
-
-      if(assignees[pullRequests[i].assignee.login]){
-        assignees[pullRequests[i].assignee.login] += 1
+      if(!pullRequests[i].assignee){
+        assignee = "No-ASSIGNEE"
       }else{
-        assignees[pullRequests[i].assignee.login] = 1
+        assignee = pullRequests[i].assignee.login
+      }
+
+      if(!assignees[assignee]){
+
+        assignees[assignee] = {}
+
+        assignees[assignee].total = 0
+        assignees[assignee].reviewed = 0
+
+      }
+
+      assignees[assignee].total += 1
+
+      if (labels.some(e => e.name === 'Author Action Required' ||
+          labels.some(e => e.name === 'Dev Approved'))) {
+        assignees[assignee].reviewed += 1
       }
 
     }
 
-    console.log(`Total Open Pull Requests: ${prCount}`);
-    console.log(`Open Pull Requests - Squad Alpha: ${countSquads[0]}`);
-    console.log(`Open Pull Requests - Squad Bravo: ${countSquads[1]}`);
-    console.log(`Open Pull Requests - Squad Zulu: ${countSquads[2]}`);
+    console.log(`--------------------------Open Pull Requests---------------------------`);
+    console.log(`Total: ${prCount['totalCount']}`);
+    console.log(`-----------------------------------------------------------------------`);
+    console.log(`Squad Alpha: ${prCount['squad-alpha']}`);
+    console.log(`Squad Bravo: ${prCount['squad-bravo']}`);
+    console.log(`Squad Zulu: ${prCount['squad-zulu']}`);
+    console.log(`-----------------------------------------------------------------------`);
+    console.log(`External Teams: ${prCount['External Team']}`);
+    console.log(`-----------------------------------------------------------------------`);
+    console.log(`Author Action Required: ${prCount['Author Action Required']}`);
+    console.log(`Dev Approved: ${prCount['Dev Approved']}`);
+    console.log(`-----------------------------------------------------`);
     console.log(`Assignees: `);
-    console.log(assignees);
+
+    for (const key in assignees) {
+      console.log(`${key} : ${assignees[key].total} (${assignees[key].total - assignees[key].reviewed} to review)`);
+
+    }
+
   } catch (error) {
+    
     console.error(error);
     process.exit(1);
   }
