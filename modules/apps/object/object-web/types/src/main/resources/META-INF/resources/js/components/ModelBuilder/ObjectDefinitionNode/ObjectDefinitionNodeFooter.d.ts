@@ -6,7 +6,7 @@
 import React from 'react';
 import './ObjectDefinitionNodeFooter.scss';
 interface ObjectDefinitionNodeFooterProps {
-	handleSelectedNode: () => void;
+	handleSelectObjectDefinitionNode: () => void;
 	isLinkedObjectDefinition: boolean;
 	setShowAllObjectFields: (value: boolean) => void;
 	setShowModal: React.Dispatch<
@@ -15,7 +15,7 @@ interface ObjectDefinitionNodeFooterProps {
 	showAllObjectFields: boolean;
 }
 export default function ObjectDefinitionNodeFooter({
-	handleSelectedNode,
+	handleSelectObjectDefinitionNode,
 	isLinkedObjectDefinition,
 	setShowAllObjectFields,
 	setShowModal,
