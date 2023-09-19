@@ -30,7 +30,6 @@ export declare function BasicInfoContainer({
 	handleChange,
 	isApproved,
 	modelBuilder,
-	objectDefinition,
 	objectDefinitionExternalReferenceCode,
 	objectDefinitionName,
 	objectFieldTypes,

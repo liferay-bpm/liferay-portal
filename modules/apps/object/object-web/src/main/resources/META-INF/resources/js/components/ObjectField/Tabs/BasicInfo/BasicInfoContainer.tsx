@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import {API} from '@liferay/object-js-components-web';
 import classNames from 'classnames';
 import {InputLocalized} from 'frontend-js-components-web';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {updateFieldSettings} from '../../../../utils/fieldSettings';
 import ObjectFieldFormBase, {
@@ -41,7 +42,6 @@ export function BasicInfoContainer({
 	handleChange,
 	isApproved,
 	modelBuilder = false,
-	objectDefinition,
 	objectDefinitionExternalReferenceCode,
 	objectDefinitionName,
 	objectFieldTypes,
@@ -52,6 +52,9 @@ export function BasicInfoContainer({
 	setValues,
 	values,
 }: BasicInfoContainerProps) {
+	const [objectDefinition, setObjectDefinition] = useState<
+		ObjectDefinition
+	>();
 	const disableFieldFormBase = !!(
 		isApproved ||
 		values.system ||
@@ -65,6 +68,18 @@ export function BasicInfoContainer({
 				{name, value}
 			),
 		});
+
+	useEffect(() => {
+		const makeFetch = async () => {
+			const objectDefinitionResponse = await API.getObjectDefinitionByExternalReferenceCode(
+				objectDefinitionExternalReferenceCode
+			);
+
+			setObjectDefinition(objectDefinitionResponse);
+		};
+
+		makeFetch();
+	}, [objectDefinitionExternalReferenceCode]);
 
 	return (
 		<div
