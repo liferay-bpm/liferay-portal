@@ -233,7 +233,7 @@ public class BatchEngineBrokerTest {
 			RandomTestUtil.randomString(),
 			ObjectActionExecutorConstants.KEY_GROOVY,
 			ObjectActionTriggerConstants.KEY_STANDALONE,
-			new UnicodeProperties());
+			new UnicodeProperties(), false);
 
 		ObjectFolder objectFolder = _objectFolderLocalService.addObjectFolder(
 			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
