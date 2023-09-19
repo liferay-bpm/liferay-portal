@@ -24,14 +24,14 @@ import {TYPES} from '../ModelBuilderContext/typesEnum';
 import './RightSidebarObjectFieldDetails.scss';
 
 export function RightSidebarObjectFieldDetails() {
-	const [showDeletionModal, setShowDeletionModal] = useState(false);
 	const [
-		showDeletionNotAllowedModal,
-		setShowDeletionNotAllowedModal,
+		showDeletionObjectFieldModal,
+		setShowDeletionObjectFieldModal,
+	] = useState(false);
+	const [
+		showObjectFieldDeletionNotAllowedModal,
+		setShowObjectFieldDeletionNotAllowedModal,
 	] = useState<boolean>(false);
-	const store = useStore();
-	const {edges, nodes} = store.getState();
-
 	const [
 		{
 			baseResourceURL,
@@ -45,15 +45,18 @@ export function RightSidebarObjectFieldDetails() {
 		},
 		dispatch,
 	] = useObjectFolderContext();
+	const store = useStore();
 
-	const selectedNode = elements.find((element) => {
+	const {edges, nodes} = store.getState();
+
+	const selectedObjectDefinitionNode = elements.find((element) => {
 		if (isNode(element)) {
 			return (element as Node<ObjectDefinitionNodeData>).data?.selected;
 		}
 	}) as Node<ObjectDefinitionNodeData>;
 
-	const selectedField = selectedNode.data?.objectFields.find(
-		(field) => field.selected
+	const selectedObjectField = selectedObjectDefinitionNode.data?.objectFields.find(
+		({selected}) => selected
 	);
 
 	const {
@@ -71,20 +74,24 @@ export function RightSidebarObjectFieldDetails() {
 	});
 
 	const handleTriggerDeleteObjectFieldModal = async () => {
-		const url = createResourceURL(baseResourceURL, {
-			objectFieldId: values.id,
-			p_p_resource_id: '/object_definitions/get_object_field_delete_info',
-		}).href;
+		const objectFieldModalDeletionModalUrl = createResourceURL(
+			baseResourceURL,
+			{
+				objectFieldId: values.id,
+				p_p_resource_id:
+					'/object_definitions/get_object_field_delete_info',
+			}
+		).href;
 
-		const showModalResponse = await API.fetchJSON<{
+		const objectFieldModalDeletionModalResponse = await API.fetchJSON<{
 			showDeletionModal: boolean;
 			showDeletionNotAllowedModal: boolean;
-		}>(url);
+		}>(objectFieldModalDeletionModalUrl);
 
-		setShowDeletionModal(true);
+		setShowDeletionObjectFieldModal(true);
 
-		setShowDeletionNotAllowedModal(
-			showModalResponse.showDeletionNotAllowedModal
+		setShowObjectFieldDeletionNotAllowedModal(
+			objectFieldModalDeletionModalResponse.showDeletionNotAllowedModal
 		);
 	};
 
@@ -107,10 +114,10 @@ export function RightSidebarObjectFieldDetails() {
 
 				dispatch({
 					payload: {
-						edges,
-						nodes,
-						selectedNode,
-						updatedField: updatedFieldResponse as ObjectField,
+						objectDefinitionNodes: nodes,
+						objectRelationshipEdges: edges,
+						selectedObjectDefinitionNode,
+						updatedObjectField: updatedFieldResponse as ObjectField,
 					},
 					type: TYPES.UPDATE_OBJECT_FIELD,
 				});
@@ -132,9 +139,9 @@ export function RightSidebarObjectFieldDetails() {
 
 	useEffect(() => {
 		const makeFetch = async () => {
-			if (selectedField) {
+			if (selectedObjectField) {
 				const objectFieldResponse = await API.getObjectField(
-					selectedField?.id as number
+					selectedObjectField?.id as number
 				);
 
 				setValues(objectFieldResponse);
@@ -143,17 +150,17 @@ export function RightSidebarObjectFieldDetails() {
 
 		makeFetch();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [selectedField]);
+	}, [selectedObjectField]);
 
 	return (
 		<>
 			<div className="lfr-objects__model-builder-right-sidebar-definition-node-title">
 				<span>
 					{getLocalizableLabel(
-						selectedNode.data
+						selectedObjectDefinitionNode.data
 							?.defaultLanguageId as Liferay.Language.Locale,
-						selectedField?.label,
-						selectedField?.name
+						selectedObjectField?.label,
+						selectedObjectField?.name
 					)}
 				</span>
 
@@ -189,25 +196,28 @@ export function RightSidebarObjectFieldDetails() {
 						baseResourceURL={baseResourceURL}
 						containerWrapper={ClayPanel}
 						creationLanguageId={
-							selectedNode.data?.defaultLanguageId ?? 'en_US'
+							selectedObjectDefinitionNode.data
+								?.defaultLanguageId ?? 'en_US'
 						}
 						errors={errors}
 						filterOperators={filterOperators}
 						handleChange={handleChange}
 						isApproved={
-							selectedNode.data?.status.label === 'approved'
+							selectedObjectDefinitionNode.data?.status.label ===
+							'approved'
 						}
 						isDefaultStorageType={
-							selectedNode.data?.storageType === 'default' ?? true
+							selectedObjectDefinitionNode.data?.storageType ===
+								'default' ?? true
 						}
 						learnResources={objectWebLearnResources}
 						modelBuilder
 						objectDefinitionExternalReferenceCode={
-							selectedNode.data?.externalReferenceCode ?? ''
+							selectedObjectDefinitionNode.data
+								?.externalReferenceCode ?? ''
 						}
-						objectName={selectedNode.data?.name as string}
 						readOnly={
-							!selectedNode.data
+							!selectedObjectDefinitionNode.data
 								?.hasObjectDefinitionUpdateResourcePermission ??
 							false
 						}
@@ -218,24 +228,26 @@ export function RightSidebarObjectFieldDetails() {
 				</div>
 			</div>
 
-			{showDeletionModal && (
+			{showDeletionObjectFieldModal && (
 				<ModalDeleteObjectField
 					objectField={values as ObjectField}
 					onAfterSubmit={() => {
-						if (selectedField) {
+						if (selectedObjectField) {
 							dispatch({
 								payload: {
-									edges,
-									nodes,
-									selectedField,
-									selectedNode,
+									objectDefinitionNodes: nodes,
+									objectRelationshipEdges: edges,
+									selectedObjectDefinitionNode,
+									selectedObjectField,
 								},
 								type: TYPES.DELETE_OBJECT_FIELD,
 							});
 						}
 					}}
-					setModalVisibility={setShowDeletionModal}
-					showDeletionNotAllowedModal={showDeletionNotAllowedModal}
+					setModalVisibility={setShowDeletionObjectFieldModal}
+					showObjectFieldDeletionNotAllowedModal={
+						showObjectFieldDeletionNotAllowedModal
+					}
 				/>
 			)}
 		</>

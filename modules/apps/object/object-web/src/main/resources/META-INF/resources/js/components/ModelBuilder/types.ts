@@ -42,6 +42,15 @@ export type TAction =
 	  }
 	| {
 			payload: {
+				newObjectField: ObjectField;
+				objectDefinitionExternalReferenceCode: string;
+				objectDefinitionNodes: Node<ObjectDefinitionNodeData>[];
+				objectRelationshipEdges: Edge<ObjectRelationshipEdgeData>[];
+			};
+			type: TYPES.ADD_OBJECT_FIELD;
+	  }
+	| {
+			payload: {
 				hiddenObjectFolderObjectDefinitionNodes: boolean;
 				leftSidebarItem: LeftSidebarItem;
 			};
@@ -72,10 +81,10 @@ export type TAction =
 	  }
 	| {
 			payload: {
-				edges: Edge<ObjectRelationshipEdgeData>[];
-				nodes: Node<ObjectDefinitionNodeData>[];
-				selectedField: ObjectFieldNode;
-				selectedNode: Node<ObjectDefinitionNodeData>;
+				objectDefinitionNodes: Node<ObjectDefinitionNodeData>[];
+				objectRelationshipEdges: Edge<ObjectRelationshipEdgeData>[];
+				selectedObjectDefinitionNode: Node<ObjectDefinitionNodeData>;
+				selectedObjectField: ObjectFieldNode;
 			};
 			type: TYPES.DELETE_OBJECT_FIELD;
 	  }
@@ -99,26 +108,26 @@ export type TAction =
 	  }
 	| {
 			payload: {
-				edges: Edge<ObjectRelationshipEdgeData>[];
-				nodes: Node<ObjectDefinitionNodeData>[];
-				selectedFieldDefinitionName: string;
-				selectedObjectDefinitionField: ObjectFieldNode;
-				selectedObjectDefinitionId: number;
-			};
-			type: TYPES.SET_SELECTED_FIELD;
-	  }
-	| {
-			payload: {
-				edges: Edge<ObjectRelationshipEdgeData>[];
-				nodes: Node<ObjectDefinitionNodeData>[];
+				objectDefinitionNodes: Node<ObjectDefinitionNodeData>[];
+				objectRelationshipEdges: Edge<ObjectRelationshipEdgeData>[];
 				selectedObjectDefinitionId: string;
 			};
 			type: TYPES.SET_SELECTED_OBJECT_DEFINITION_NODE;
 	  }
 	| {
 			payload: {
-				edges: Edge<ObjectRelationshipEdgeData>[];
-				nodes: Node<ObjectDefinitionNodeData>[];
+				objectDefinitionNodes: Node<ObjectDefinitionNodeData>[];
+				objectRelationshipEdges: Edge<ObjectRelationshipEdgeData>[];
+				selectedObjectDefinitionId: number;
+				selectedObjectField: ObjectFieldNode;
+				selectedObjectFieldName: string;
+			};
+			type: TYPES.SET_SELECTED_OBJECT_FIELD;
+	  }
+	| {
+			payload: {
+				objectDefinitionNodes: Node<ObjectDefinitionNodeData>[];
+				objectRelationshipEdges: Edge<ObjectRelationshipEdgeData>[];
 				selectedObjectRelationshipId: string;
 			};
 			type: TYPES.SET_SELECTED_OBJECT_RELATIONSHIP_EDGE;
@@ -131,19 +140,19 @@ export type TAction =
 	  }
 	| {
 			payload: {
-				edges: Edge<ObjectRelationshipEdgeData>[];
-				nodes: Node<ObjectDefinitionNodeData>[];
-				selectedNode: Node<ObjectDefinitionNodeData>;
-				updatedField: ObjectField;
-			};
-			type: TYPES.UPDATE_OBJECT_FIELD;
-	  }
-	| {
-			payload: {
 				currentObjectFolderName: string;
 				updatedObjectDefinitionNode: Partial<ObjectDefinition>;
 			};
 			type: TYPES.UPDATE_OBJECT_DEFINITION_NODE;
+	  }
+	| {
+			payload: {
+				objectDefinitionNodes: Node<ObjectDefinitionNodeData>[];
+				objectRelationshipEdges: Edge<ObjectRelationshipEdgeData>[];
+				selectedObjectDefinitionNode: Node<ObjectDefinitionNodeData>;
+				updatedObjectField: ObjectField;
+			};
+			type: TYPES.UPDATE_OBJECT_FIELD;
 	  };
 
 export type TState = {
@@ -163,8 +172,8 @@ export type TState = {
 	objectFolders: ObjectFolder[];
 	objectWebLearnResources: ObjectWebLearnResources;
 	rightSidebarType: RightSidebarType;
-	selectedObjectDefinitionField?: ObjectFieldNode;
 	selectedObjectDefinitionNode: Node<ObjectDefinitionNodeData>;
+	selectedObjectField?: ObjectFieldNode;
 	selectedObjectFolder: ObjectFolder;
 	selectedObjectRelationship: ObjectRelationship;
 	showChangesSaved: boolean;

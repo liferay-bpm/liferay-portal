@@ -45,9 +45,9 @@ interface ObjectFieldFormBaseProps {
 	handleChange: ChangeEventHandler<HTMLInputElement>;
 	objectDefinition?: Partial<ObjectDefinition>;
 	objectDefinitionExternalReferenceCode: string;
+	objectDefinitionName: string;
 	objectField: Partial<ObjectField>;
 	objectFieldTypes: ObjectFieldType[];
-	objectName: string;
 	objectRelationshipId?: number;
 	onAggregationFilterChange?: (aggregationFilterArray: []) => void;
 	onRelationshipChange?: (
@@ -161,9 +161,9 @@ export default function ObjectFieldFormBase({
 	handleChange,
 	objectDefinition,
 	objectDefinitionExternalReferenceCode,
+	objectDefinitionName,
 	objectField: values,
 	objectFieldTypes,
-	objectName,
 	objectRelationshipId,
 	onAggregationFilterChange,
 	onRelationshipChange,
@@ -369,10 +369,10 @@ export default function ObjectFieldFormBase({
 				<AttachmentFormBase
 					disabled={disabled}
 					error={errors.fileSource}
+					objectDefinitionName={objectDefinitionName}
 					objectFieldSettings={
 						values.objectFieldSettings as ObjectFieldSetting[]
 					}
-					objectName={objectName}
 					setValues={setValues}
 				/>
 			)}

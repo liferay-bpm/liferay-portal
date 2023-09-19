@@ -242,7 +242,9 @@ export default function Fields({
 					}}
 					setModalVisibility={setShowDeletionModal}
 					setObjectField={setDeletedObjectField}
-					showDeletionNotAllowedModal={showDeletionNotAllowedModal}
+					showObjectFieldDeletionNotAllowedModal={
+						showDeletionNotAllowedModal
+					}
 				/>
 			)}
 		</>
