@@ -20,6 +20,7 @@ import BuilderListItem from './BuilderListItem';
 import './BuilderScreen.scss';
 
 export function BuilderScreen({
+	buildScreenItems,
 	creationLanguageId,
 	defaultSort,
 	disableEdit,
@@ -27,7 +28,6 @@ export function BuilderScreen({
 	filter,
 	firstColumnHeader,
 	hasDragAndDrop,
-	objectColumns,
 	onChangeColumnOrder,
 	onDeleteColumn,
 	onEditing,
@@ -41,13 +41,13 @@ export function BuilderScreen({
 
 	const filteredItems = useMemo(() => {
 		return filterArrayByQuery({
-			array: objectColumns,
+			array: buildScreenItems,
 			query,
 			str: 'fieldLabel',
 		});
-	}, [objectColumns, query]);
+	}, [buildScreenItems, query]);
 
-	const tableItems = query ? filteredItems : objectColumns;
+	const tableItems = query ? filteredItems : buildScreenItems;
 
 	return (
 		<>
@@ -189,7 +189,7 @@ type TLabelValueObject = {
 	value: string;
 };
 
-type TBuilderScreenColumn = {
+type TBuilderScreenItem = {
 	defaultSort?: boolean;
 	disableEdit?: boolean;
 	fieldLabel?: string;
@@ -205,6 +205,7 @@ type TBuilderScreenColumn = {
 };
 
 interface IProps {
+	buildScreenItems: TBuilderScreenItem[];
 	creationLanguageId?: Liferay.Language.Locale;
 	defaultSort?: boolean;
 	disableEdit?: boolean;
@@ -216,7 +217,6 @@ interface IProps {
 	filter?: boolean;
 	firstColumnHeader: string;
 	hasDragAndDrop?: boolean;
-	objectColumns: TBuilderScreenColumn[];
 	onChangeColumnOrder?: (draggedIndex: number, targetIndex: number) => void;
 	onDeleteColumn: (objectFieldName: string) => void;
 	onEditing?: (boolean: boolean) => void;
