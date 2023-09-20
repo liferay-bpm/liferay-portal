@@ -16,6 +16,7 @@ import React, {useEffect, useState} from 'react';
 
 import {BasicInfo} from './BasicInfo';
 import {Conditions} from './Conditions';
+import {UniqueComposedKey} from './UniqueComposedKey';
 import {
 	ObjectValidationErrors,
 	useObjectValidationForm,
@@ -40,17 +41,6 @@ export interface PartialValidationFields {
 interface ErrorDetails extends Error {
 	detail?: string;
 }
-
-const TABS = [
-	{
-		Component: BasicInfo,
-		label: Liferay.Language.get('basic-info'),
-	},
-	{
-		Component: Conditions,
-		label: Liferay.Language.get('conditions'),
-	},
-];
 
 const initialValues: ObjectValidation = {
 	active: false,
@@ -116,6 +106,22 @@ export default function EditObjectValidation({
 		setValues,
 		values,
 	} = useObjectValidationForm({initialValues, onSubmit});
+
+	const TABS = [
+		{
+			Component: BasicInfo,
+			label: Liferay.Language.get('basic-info'),
+		},
+		values.engine !== 'composedKey'
+			? {
+					Component: Conditions,
+					label: Liferay.Language.get('conditions'),
+			  }
+			: {
+					Component: UniqueComposedKey,
+					label: Liferay.Language.get('unique-composed-key'),
+			  },
+	];
 
 	useEffect(() => {
 		if (Object.keys(errors).length) {
