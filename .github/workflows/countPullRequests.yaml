@@ -2,9 +2,9 @@ name: Count Pull Request
 
 on:
   workflow_dispatch:
-  schedule:
-    # * is a special character in YAML so you have to quote this string
-    - cron:  '40 19 * * *'
+  # schedule:
+  #   # * is a special character in YAML so you have to quote this string
+  #   - cron:  '40 19 * * *'
 
 # on:
 #   push:
