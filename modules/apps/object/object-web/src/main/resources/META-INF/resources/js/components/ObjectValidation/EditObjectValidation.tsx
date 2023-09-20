@@ -65,6 +65,10 @@ export default function EditObjectValidation({
 		{}
 	);
 	const [objectFields, setObjectFields] = useState<ObjectField[]>([]);
+	const [
+		showUniqueComposedKeyCardAlert,
+		setShowUniqueComposedKeyCardAlert,
+	] = useState(true);
 
 	const onSubmit = async (objectValidation: ObjectValidation) => {
 		delete objectValidation.lineCount;
@@ -204,7 +208,13 @@ export default function EditObjectValidation({
 								objectValidationRuleElements={
 									objectValidationRuleElements
 								}
+								setShowUniqueComposedKeyCardAlert={
+									setShowUniqueComposedKeyCardAlert
+								}
 								setValues={setValues}
+								showUniqueComposedKeyCardAlert={
+									showUniqueComposedKeyCardAlert
+								}
 								values={values}
 							/>
 						</ClayTabs.TabPane>
