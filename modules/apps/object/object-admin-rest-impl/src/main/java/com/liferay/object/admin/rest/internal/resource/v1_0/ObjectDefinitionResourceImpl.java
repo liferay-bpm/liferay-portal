@@ -645,6 +645,29 @@ public class ObjectDefinitionResourceImpl
 			_objectLayoutLocalService.deleteObjectLayouts(objectDefinitionId);
 		}
 
+		Set<String> deleteObjectRelationshipsNames =
+			SetUtil.asymmetricDifference(
+				transform(
+					_objectRelationshipLocalService.getObjectRelationships(
+						objectDefinitionId),
+					com.liferay.object.model.ObjectRelationship::getName),
+				transformToList(
+					objectRelationships, ObjectRelationship::getName));
+
+		for (String deleteObjectRelationshipsName :
+			deleteObjectRelationshipsNames) {
+
+			com.liferay.object.model.ObjectRelationship
+				serviceBuilderObjectRelationship =
+				_objectRelationshipLocalService.
+					fetchObjectRelationshipByObjectDefinitionId(
+						objectDefinitionId,
+						deleteObjectRelationshipsName);
+
+			_objectRelationshipLocalService.deleteObjectRelationship(
+				serviceBuilderObjectRelationship.getObjectRelationshipId());
+		}
+
 		Set<String> accountEntryRestrictedObjectRelationshipsNames =
 			_getAccountEntryRestrictedObjectRelationshipsNames(
 				serviceBuilderObjectDefinition,
@@ -750,29 +773,6 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		if (objectRelationships != null) {
-			Set<String> deleteObjectRelationshipsNames =
-				SetUtil.asymmetricDifference(
-					transform(
-						_objectRelationshipLocalService.getObjectRelationships(
-							objectDefinitionId),
-						com.liferay.object.model.ObjectRelationship::getName),
-					transformToList(
-						objectRelationships, ObjectRelationship::getName));
-
-			for (String deleteObjectRelationshipsName :
-					deleteObjectRelationshipsNames) {
-
-				com.liferay.object.model.ObjectRelationship
-					serviceBuilderObjectRelationship =
-						_objectRelationshipLocalService.
-							fetchObjectRelationshipByObjectDefinitionId(
-								objectDefinitionId,
-								deleteObjectRelationshipsName);
-
-				_objectRelationshipLocalService.deleteObjectRelationship(
-					serviceBuilderObjectRelationship.getObjectRelationshipId());
-			}
-
 			ObjectRelationshipResource.Builder builder =
 				_objectRelationshipResourceFactory.create();
 
