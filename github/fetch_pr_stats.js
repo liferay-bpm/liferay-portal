@@ -58,6 +58,7 @@ async function fetchPRStatistics() {
 
         assignees[assignee].total = 0
         assignees[assignee].reviewed = 0
+        assignees[assignee].blocked = 0
 
       }
 
@@ -66,6 +67,10 @@ async function fetchPRStatistics() {
       if (labels.some(e => e.name === 'Author Action Required' ||
           labels.some(e => e.name === 'Dev Approved'))) {
         assignees[assignee].reviewed += 1
+      }
+
+      if (labels.some(e => e.name === 'Blocked')){
+        assignees[assignee].blocked += 1
       }
 
     }
@@ -85,7 +90,7 @@ async function fetchPRStatistics() {
     console.log(`Assignees: `);
 
     for (const key in assignees) {
-      console.log(`${key} : ${assignees[key].total} (${assignees[key].total - assignees[key].reviewed} to review)`);
+      console.log(`${key} : ${assignees[key].total} (${assignees[key].total - assignees[key].reviewed} to review - ${assignees[key].blocked} Blocked)`);
 
     }
 
