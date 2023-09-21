@@ -64,7 +64,9 @@ export default function EditObjectValidation({
 	const [errorMessage, setErrorMessage] = useState<ObjectValidationErrors>(
 		{}
 	);
-	const [objectFields, setObjectFields] = useState<ObjectField[]>([]);
+	const [customObjectFields, setCustomObjectFields] = useState<ObjectField[]>(
+		[]
+	);
 	const [
 		showUniqueComposedKeyCardAlert,
 		setShowUniqueComposedKeyCardAlert,
@@ -156,7 +158,7 @@ export default function EditObjectValidation({
 				objectDefinitionId
 			);
 
-			setObjectFields(
+			setCustomObjectFields(
 				fieldsResponseJSON.filter((field) => !field.system)
 			);
 			setValues(newObjectValidation);
@@ -196,6 +198,7 @@ export default function EditObjectValidation({
 							<Component
 								componentLabel={label}
 								creationLanguageId={creationLanguageId}
+								customObjectFields={customObjectFields ?? []}
 								disabled={disabled}
 								errors={
 									Object.keys(errors).length !== 0
@@ -204,7 +207,6 @@ export default function EditObjectValidation({
 								}
 								handleChange={handleChange}
 								learnResources={learnResources}
-								objectFields={objectFields ?? []}
 								objectValidationRuleElements={
 									objectValidationRuleElements
 								}

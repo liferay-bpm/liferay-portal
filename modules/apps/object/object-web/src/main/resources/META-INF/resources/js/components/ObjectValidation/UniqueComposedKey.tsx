@@ -13,7 +13,7 @@ import React, {useEffect, useState} from 'react';
 
 interface UniqueComposedKeyProps {
 	creationLanguageId: Liferay.Language.Locale;
-	objectFields: ObjectField[];
+	customObjectFields: ObjectField[];
 	setShowUniqueComposedKeyCardAlert: (value: boolean) => void;
 	setValues: (values: Partial<ObjectValidation>) => void;
 	showUniqueComposedKeyCardAlert: boolean;
@@ -22,7 +22,7 @@ interface UniqueComposedKeyProps {
 
 export function UniqueComposedKey({
 	creationLanguageId,
-	objectFields,
+	customObjectFields,
 	setShowUniqueComposedKeyCardAlert,
 	setValues,
 	showUniqueComposedKeyCardAlert,
@@ -32,7 +32,7 @@ export function UniqueComposedKey({
 		TBuilderScreenItem[]
 	>([]);
 
-	const filteredObjectFields = objectFields.filter(
+	const filteredCustomObjectFields = customObjectFields.filter(
 		(objectField) =>
 			objectField.businessType === 'Integer' ||
 			'Picklist' ||
@@ -47,10 +47,12 @@ export function UniqueComposedKey({
 			getName: ({label, name}: ObjectField) =>
 				getLocalizableLabel(creationLanguageId, label, name),
 			header: Liferay.Language.get('add-fields'),
-			items: filteredObjectFields.map((filteredObjectField) => ({
-				...filteredObjectField,
-				checked: false,
-			})),
+			items: filteredCustomObjectFields.map(
+				(filteredCustomObjectField) => ({
+					...filteredCustomObjectField,
+					checked: false,
+				})
+			),
 			onSave: (selectedObjectFields: ObjectField[]) => {
 				const newObjectValidationRuleSettings = selectedObjectFields.map(
 					(selectedObjectField) => ({
@@ -71,10 +73,10 @@ export function UniqueComposedKey({
 	useEffect(() => {
 		const newBuildScreenItems = values?.objectValidationRuleSettings?.map(
 			(objectValidationRuleSetting) => {
-				const filteredObjectFieldsInValidationRuleSetting = filteredObjectFields.find(
-					(filteredObjectField) => {
+				const filteredCustomObjectFieldsInValidationRuleSetting = filteredCustomObjectFields.find(
+					(filteredCustomObjectField) => {
 						return (
-							filteredObjectField.externalReferenceCode ===
+							filteredCustomObjectField.externalReferenceCode ===
 							objectValidationRuleSetting.value
 						);
 					}
@@ -83,14 +85,15 @@ export function UniqueComposedKey({
 				return {
 					fieldLabel: getLocalizableLabel(
 						creationLanguageId,
-						filteredObjectFieldsInValidationRuleSetting?.label,
-						filteredObjectFieldsInValidationRuleSetting?.name
+						filteredCustomObjectFieldsInValidationRuleSetting?.label,
+						filteredCustomObjectFieldsInValidationRuleSetting?.name
 					),
-					label: filteredObjectFieldsInValidationRuleSetting?.label,
+					label:
+						filteredCustomObjectFieldsInValidationRuleSetting?.label,
 					objectFieldBusinessType:
-						filteredObjectFieldsInValidationRuleSetting?.businessType,
+						filteredCustomObjectFieldsInValidationRuleSetting?.businessType,
 					objectFieldName:
-						filteredObjectFieldsInValidationRuleSetting?.name,
+						filteredCustomObjectFieldsInValidationRuleSetting?.name,
 				};
 			}
 		) as TBuilderScreenItem[];

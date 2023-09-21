@@ -22,7 +22,7 @@ import {TabProps} from './useObjectValidationForm';
 interface BasicInfoProps extends TabProps {
 	componentLabel: string;
 	creationLanguageId: Liferay.Language.Locale;
-	objectFields: ObjectField[];
+	customObjectFields: ObjectField[];
 }
 
 const outputValidationTypeArray = [
@@ -39,30 +39,30 @@ const outputValidationTypeArray = [
 export function BasicInfo({
 	componentLabel,
 	creationLanguageId,
+	customObjectFields,
 	disabled,
 	errors,
-	objectFields,
 	setValues,
 	values,
 }: BasicInfoProps) {
 	const [query, setQuery] = useState<string>('');
 
-	const filteredObjectFields = useMemo(() => {
-		if (objectFields) {
+	const searchedCustomObjectFields = useMemo(() => {
+		if (customObjectFields) {
 			return filterArrayByQuery({
-				array: objectFields,
+				array: customObjectFields,
 				query,
 				str: 'label',
 			});
 		}
-	}, [objectFields, query]);
+	}, [customObjectFields, query]);
 	const getSelectedPartialValidationField = () => {
 		if (values.objectValidationRuleSettings?.length) {
 			const [
 				partialValidationField,
 			] = values.objectValidationRuleSettings;
 
-			const objectField = objectFields.find(
+			const objectField = customObjectFields.find(
 				(field) =>
 					field.externalReferenceCode === partialValidationField.value
 			);
@@ -164,7 +164,7 @@ export function BasicInfo({
 									'no-fields-were-found'
 								)}
 								error={errors.outputType}
-								items={filteredObjectFields ?? []}
+								items={searchedCustomObjectFields ?? []}
 								label={Liferay.Language.get('fields')}
 								onChangeQuery={setQuery}
 								onSelectItem={(item) => {
