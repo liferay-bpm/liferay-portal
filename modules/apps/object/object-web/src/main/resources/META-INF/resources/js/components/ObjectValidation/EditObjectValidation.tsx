@@ -154,12 +154,14 @@ export default function EditObjectValidation({
 						: validationResponseJSON.script,
 			};
 
-			const fieldsResponseJSON = await API.getObjectDefinitionObjectFields(
+			const objectFieldsResponseJSON = await API.getObjectDefinitionObjectFields(
 				objectDefinitionId
 			);
 
 			setCustomObjectFields(
-				fieldsResponseJSON.filter((field) => !field.system)
+				objectFieldsResponseJSON.filter(
+					(objectField) => !objectField.system
+				)
 			);
 			setValues(newObjectValidation);
 		};
