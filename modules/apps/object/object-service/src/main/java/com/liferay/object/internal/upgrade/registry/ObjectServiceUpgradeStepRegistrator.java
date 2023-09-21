@@ -368,6 +368,11 @@ public class ObjectServiceUpgradeStepRegistrator
 			"8.5.0", "8.6.0",
 			new com.liferay.object.internal.upgrade.v8_6_0.
 				ObjectActionUpgradeProcess());
+
+		registry.register(
+			"8.6.0", "8.7.0",
+			UpgradeProcessFactory.addColumns(
+				"ObjectEntry", "rootObjectEntryId LONG"));
 	}
 
 	@Reference
