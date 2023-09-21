@@ -356,7 +356,8 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		_addObjectDefinitionResources(
-			Collections.emptySet(), objectDefinition.getObjectActions(),
+			Collections.emptySet(),
+			ListUtil.fromArray(objectDefinition.getObjectActions()),
 			serviceBuilderObjectDefinition.getObjectDefinitionId(),
 			objectDefinition.getObjectLayouts(),
 			objectDefinition.getObjectRelationships(),
@@ -740,24 +741,33 @@ public class ObjectDefinitionResourceImpl
 
 	private void _addObjectDefinitionResources(
 			Set<String> accountEntryRestrictedObjectRelationshipsNames,
-			ObjectAction[] objectActions, long objectDefinitionId,
+			List<ObjectAction> objectActions, long objectDefinitionId,
 			ObjectLayout[] objectLayouts,
 			ObjectRelationship[] objectRelationships,
 			ObjectValidationRule[] objectValidationRules,
 			ObjectView[] objectViews)
 		throws Exception {
 
-		if (objectActions != null) {
-			ObjectActionResource.Builder builder =
-				_objectActionResourceFactory.create();
-
-			ObjectActionResource objectActionResource = builder.user(
-				contextUser
-			).build();
-
+		if (!objectActions.isEmpty()) {
 			for (ObjectAction objectAction : objectActions) {
-				objectActionResource.postObjectDefinitionObjectAction(
-					objectDefinitionId, objectAction);
+				_objectActionLocalService.addOrUpdateObjectAction(
+					objectAction.getExternalReferenceCode(),
+					GetterUtil.getLong(objectAction.getId()),
+					contextUser.getUserId(), objectDefinitionId,
+					GetterUtil.getBoolean(objectAction.getActive()),
+					GetterUtil.getString(objectAction.getConditionExpression()),
+					GetterUtil.getString(objectAction.getDescription()),
+					LocalizedMapUtil.getLocalizedMap(
+						objectAction.getErrorMessage()),
+					LocalizedMapUtil.getLocalizedMap(objectAction.getLabel()),
+					GetterUtil.getString(objectAction.getName()),
+					GetterUtil.getString(
+						objectAction.getObjectActionExecutorKey()),
+					GetterUtil.getString(
+						objectAction.getObjectActionTriggerKey()),
+					ObjectActionUtil.toParametersUnicodeProperties(
+						objectAction.getParameters()),
+					GetterUtil.getBoolean(objectAction.getSystem()));
 			}
 		}
 
