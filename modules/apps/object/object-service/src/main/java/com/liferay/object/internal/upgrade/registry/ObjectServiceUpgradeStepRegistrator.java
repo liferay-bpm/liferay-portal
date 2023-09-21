@@ -358,6 +358,11 @@ public class ObjectServiceUpgradeStepRegistrator
 				}
 
 			});
+
+		registry.register(
+			"8.4.0", "8.5.0",
+			UpgradeProcessFactory.addColumns(
+				"ObjectEntry", "rootObjectEntryId LONG"));
 	}
 
 	@Reference
