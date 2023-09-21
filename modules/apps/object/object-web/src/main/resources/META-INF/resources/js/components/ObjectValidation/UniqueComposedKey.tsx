@@ -6,14 +6,20 @@
 import {
 	BuilderScreen,
 	Card,
+	MultipleSelect,
 	getLocalizableLabel,
 } from '@liferay/object-js-components-web';
 import {TBuilderScreenItem} from '@liferay/object-js-components-web/src/main/resources/META-INF/resources/components/BuilderScreen/BuilderScreen';
 import React, {useEffect, useState} from 'react';
 
+import {ErrorMessage} from './ErrorMessage';
+import {ObjectValidationErrors} from './useObjectValidationForm';
+
 interface UniqueComposedKeyProps {
 	creationLanguageId: Liferay.Language.Locale;
 	customObjectFields: ObjectField[];
+	disabled: boolean;
+	errors: ObjectValidationErrors;
 	setShowUniqueComposedKeyCardAlert: (value: boolean) => void;
 	setValues: (values: Partial<ObjectValidation>) => void;
 	showUniqueComposedKeyCardAlert: boolean;
@@ -23,6 +29,8 @@ interface UniqueComposedKeyProps {
 export function UniqueComposedKey({
 	creationLanguageId,
 	customObjectFields,
+	disabled,
+	errors,
 	setShowUniqueComposedKeyCardAlert,
 	setValues,
 	showUniqueComposedKeyCardAlert,
@@ -31,6 +39,9 @@ export function UniqueComposedKey({
 	const [buildScreenItems, setBuildScreenItems] = useState<
 		TBuilderScreenItem[]
 	>([]);
+	const [multipleSelectOptions, setMultipleSelectOptions] = useState<IItem[]>(
+		[]
+	);
 
 	const filteredCustomObjectFields = customObjectFields.filter(
 		(objectField) =>
@@ -137,6 +148,21 @@ export function UniqueComposedKey({
 					secondColumnHeader={Liferay.Language.get('type')}
 				/>
 			</Card>
+
+			<ErrorMessage
+				disabled={disabled}
+				errors={errors}
+				setValues={setValues}
+				values={values}
+			>
+				<MultipleSelect
+					error={errors.errorLabel}
+					label={Liferay.Language.get('field')}
+					options={multipleSelectOptions}
+					required
+					setOptions={setMultipleSelectOptions}
+				/>
+			</ErrorMessage>
 		</>
 	);
 }

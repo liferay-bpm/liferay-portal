@@ -5,9 +5,12 @@
 
 /// <reference types="react" />
 
+import {ObjectValidationErrors} from './useObjectValidationForm';
 interface UniqueComposedKeyProps {
 	creationLanguageId: Liferay.Language.Locale;
 	customObjectFields: ObjectField[];
+	disabled: boolean;
+	errors: ObjectValidationErrors;
 	setShowUniqueComposedKeyCardAlert: (value: boolean) => void;
 	setValues: (values: Partial<ObjectValidation>) => void;
 	showUniqueComposedKeyCardAlert: boolean;
@@ -16,6 +19,8 @@ interface UniqueComposedKeyProps {
 export declare function UniqueComposedKey({
 	creationLanguageId,
 	customObjectFields,
+	disabled,
+	errors,
 	setShowUniqueComposedKeyCardAlert,
 	setValues,
 	showUniqueComposedKeyCardAlert,
