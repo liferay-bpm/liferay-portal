@@ -36,6 +36,7 @@ import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.definition.util.ObjectDefinitionUtil;
 import com.liferay.object.exception.ObjectDefinitionEnableLocalizationException;
 import com.liferay.object.exception.ObjectDefinitionStorageTypeException;
+import com.liferay.object.model.ObjectActionModel;
 import com.liferay.object.model.ObjectFieldModel;
 import com.liferay.object.model.ObjectFolder;
 import com.liferay.object.model.ObjectValidationRuleModel;
@@ -552,9 +553,14 @@ public class ObjectDefinitionResourceImpl
 					objectDefinition.getScope());
 		}
 
+		List<ObjectAction> objectActions = ListUtil.fromArray(
+			objectDefinition.getObjectActions());
 		List<ObjectField> objectFields = ListUtil.fromArray(
 			objectDefinition.getObjectFields());
 
+		List<com.liferay.object.model.ObjectAction>
+			serviceBuilderObjectActions = new ArrayList<>(
+				_objectActionLocalService.getObjectActions(objectDefinitionId));
 		List<com.liferay.object.model.ObjectField> serviceBuilderObjectFields =
 			new ArrayList<>(
 				_objectFieldLocalService.getObjectFields(objectDefinitionId));
@@ -567,9 +573,15 @@ public class ObjectDefinitionResourceImpl
 			serviceBuilderObjectDefinition.isSystem() &&
 			ObjectDefinitionUtil.isInvokerBundleAllowed()) {
 
+			objectActions.removeIf(
+				objectAction -> !GetterUtil.getBoolean(
+					objectAction.getSystem()));
 			objectFields.removeIf(
 				objectField -> !GetterUtil.getBoolean(objectField.getSystem()));
 
+			serviceBuilderObjectActions.removeIf(
+				serviceBuilderObjectAction ->
+					!serviceBuilderObjectAction.isSystem());
 			serviceBuilderObjectFields.removeIf(
 				serviceBuilderObjectField ->
 					serviceBuilderObjectField.isMetadata() ||
@@ -579,9 +591,13 @@ public class ObjectDefinitionResourceImpl
 					!serviceBuilderObjectValidationRule.isSystem());
 		}
 		else {
+			objectActions.removeIf(
+				objectAction -> GetterUtil.getBoolean(
+					objectAction.getSystem()));
 			objectFields.removeIf(
 				objectField -> GetterUtil.getBoolean(objectField.getSystem()));
 
+			serviceBuilderObjectActions.removeIf(ObjectActionModel::isSystem);
 			serviceBuilderObjectFields.removeIf(ObjectFieldModel::isSystem);
 			serviceBuilderObjectValidationRules.removeIf(
 				ObjectValidationRuleModel::isSystem);
@@ -632,10 +648,16 @@ public class ObjectDefinitionResourceImpl
 				serviceBuilderObjectField);
 		}
 
-		ObjectAction[] objectActions = objectDefinition.getObjectActions();
+		Set<String> deleteObjectActionsERCs = SetUtil.asymmetricDifference(
+			transform(
+				serviceBuilderObjectActions,
+				ObjectActionModel::getExternalReferenceCode),
+			transform(objectActions, ObjectAction::getExternalReferenceCode));
 
-		if (objectActions != null) {
-			_objectActionLocalService.deleteObjectActions(objectDefinitionId);
+		for (String deleteObjectActionsERC : deleteObjectActionsERCs) {
+			_objectActionLocalService.deleteObjectAction(
+				_objectActionLocalService.fetchObjectAction(
+					deleteObjectActionsERC, objectDefinitionId));
 		}
 
 		ObjectLayout[] objectLayouts = objectDefinition.getObjectLayouts();
