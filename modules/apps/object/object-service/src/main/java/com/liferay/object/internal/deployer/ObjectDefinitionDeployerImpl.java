@@ -55,6 +55,7 @@ import com.liferay.object.service.ObjectLayoutLocalService;
 import com.liferay.object.service.ObjectLayoutTabLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
+import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -182,7 +183,9 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		try {
 			ObjectDefinitionResourcePermissionUtil.populateResourceActions(
 				_objectActionLocalService, objectDefinition,
-				_portletLocalService, _resourceActions);
+				(ObjectDefinitionPersistence)
+					_objectDefinitionLocalService.getBasePersistence(),
+				_portletLocalService, _resourceActions, _treeFactory);
 		}
 		catch (Exception exception) {
 			return ReflectionUtil.throwException(exception);
