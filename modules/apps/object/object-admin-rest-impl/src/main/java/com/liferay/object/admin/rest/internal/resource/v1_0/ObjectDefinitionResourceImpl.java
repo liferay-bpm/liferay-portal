@@ -38,8 +38,8 @@ import com.liferay.object.exception.ObjectDefinitionEnableLocalizationException;
 import com.liferay.object.exception.ObjectDefinitionStorageTypeException;
 import com.liferay.object.model.ObjectFieldModel;
 import com.liferay.object.model.ObjectFolder;
-import com.liferay.object.model.ObjectValidationRuleModel;
 import com.liferay.object.model.ObjectRelationshipModel;
+import com.liferay.object.model.ObjectValidationRuleModel;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectActionService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -560,16 +560,13 @@ public class ObjectDefinitionResourceImpl
 		List<com.liferay.object.model.ObjectField> serviceBuilderObjectFields =
 			new ArrayList<>(
 				_objectFieldLocalService.getObjectFields(objectDefinitionId));
-		List<com.liferay.object.model.ObjectValidationRule>
-			serviceBuilderObjectValidationRules = new ArrayList<>(
-				_objectValidationRuleLocalService.getObjectValidationRules(
-					objectDefinitionId));
-
-		List<ObjectRelationship> objectRelationships = ListUtil.fromArray(
-			objectDefinition.getObjectRelationships());
 		List<com.liferay.object.model.ObjectRelationship>
 			serviceBuilderObjectRelationships = new ArrayList<>(
 				_objectRelationshipLocalService.getObjectRelationships(
+					objectDefinitionId));
+		List<com.liferay.object.model.ObjectValidationRule>
+			serviceBuilderObjectValidationRules = new ArrayList<>(
+				_objectValidationRuleLocalService.getObjectValidationRules(
 					objectDefinitionId));
 
 		if (serviceBuilderObjectDefinition.isModifiable() &&
@@ -585,30 +582,24 @@ public class ObjectDefinitionResourceImpl
 				serviceBuilderObjectField ->
 					serviceBuilderObjectField.isMetadata() ||
 					!serviceBuilderObjectField.isSystem());
-			serviceBuilderObjectValidationRules.removeIf(
-				serviceBuilderObjectValidationRule ->
-					!serviceBuilderObjectValidationRule.isSystem());
-
-			objectRelationships.removeIf(
-				objectRelationship -> !GetterUtil.getBoolean(
-					objectRelationship.getSystem()));
 			serviceBuilderObjectRelationships.removeIf(
 				serviceBuilderObjectRelationship ->
 					!serviceBuilderObjectRelationship.isSystem());
+			serviceBuilderObjectValidationRules.removeIf(
+				serviceBuilderObjectValidationRule ->
+					!serviceBuilderObjectValidationRule.isSystem());
 		}
 		else {
 			objectFields.removeIf(
 				objectField -> GetterUtil.getBoolean(objectField.getSystem()));
-
-			serviceBuilderObjectValidationRules.removeIf(
-				ObjectValidationRuleModel::isSystem);
-
 			objectRelationships.removeIf(
 				objectRelationship -> GetterUtil.getBoolean(
 					objectRelationship.getSystem()));
 			serviceBuilderObjectFields.removeIf(ObjectFieldModel::isSystem);
 			serviceBuilderObjectRelationships.removeIf(
 				ObjectRelationshipModel::isSystem);
+			serviceBuilderObjectValidationRules.removeIf(
+				ObjectValidationRuleModel::isSystem);
 		}
 
 		for (ObjectField objectField : objectFields) {
