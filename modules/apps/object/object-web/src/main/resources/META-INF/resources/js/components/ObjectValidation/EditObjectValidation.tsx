@@ -25,6 +25,7 @@ import {
 interface EditObjectValidationProps {
 	creationLanguageId: Liferay.Language.Locale;
 	learnResources: ObjectWebLearnResources;
+	objectDefinitionExternalReferenceCode: string;
 	objectDefinitionId: number;
 	objectValidationRuleElements: SidebarCategory[];
 	objectValidationRuleId: number;
@@ -55,6 +56,7 @@ const initialValues: ObjectValidation = {
 export default function EditObjectValidation({
 	creationLanguageId,
 	learnResources,
+	objectDefinitionExternalReferenceCode,
 	objectDefinitionId,
 	objectValidationRuleElements,
 	objectValidationRuleId,
@@ -209,6 +211,9 @@ export default function EditObjectValidation({
 								}
 								handleChange={handleChange}
 								learnResources={learnResources}
+								objectDefinitionExternalReferenceCode={
+									objectDefinitionExternalReferenceCode
+								}
 								objectValidationRuleElements={
 									objectValidationRuleElements
 								}

@@ -73,6 +73,7 @@ export function MultipleSelect<
 		<BaseSelect
 			{...restProps}
 			dropdownActive={dropdownActive}
+			required={required}
 			setDropdownActive={setDropdownActive}
 			trigger={
 				<ClayMultiSelect
