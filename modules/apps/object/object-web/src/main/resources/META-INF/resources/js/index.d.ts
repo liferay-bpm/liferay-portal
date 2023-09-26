@@ -88,6 +88,7 @@ interface ModelBuilderModals
 		| 'deletionNotAllowed'
 		| 'unbindFromRootObjectDefinition'
 	> {
+	addObjectField: boolean;
 	addObjectRelationship: boolean;
 	editObjectDefinitionExternalReferenceCode: boolean;
 	publishObjectDefinitions: boolean;
