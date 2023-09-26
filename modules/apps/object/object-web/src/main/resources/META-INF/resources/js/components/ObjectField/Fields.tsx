@@ -230,6 +230,10 @@ export default function Fields({
 					objectDefinitionExternalReferenceCode={
 						objectDefinitionExternalReferenceCode
 					}
+					onAfterSubmit={() => {
+						setShowAddFieldModal(false);
+						window.location.reload();
+					}}
 					setVisibility={setShowAddFieldModal}
 				/>
 			)}

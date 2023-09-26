@@ -20,9 +20,11 @@ import {
 	API,
 	ModalEditExternalReferenceCode,
 	getLocalizableLabel,
+	openToast,
 } from '@liferay/object-js-components-web';
 
 import {formatActionURL} from '../../../utils/fds';
+import {ModalAddObjectField} from '../../ObjectField/ModalAddObjectField';
 import {ModalDeleteObjectDefinition} from '../../ViewObjectDefinitions/ModalDeleteObjectDefinition';
 import {DeletedObjectDefinition} from '../../ViewObjectDefinitions/ViewObjectDefinitions';
 import {getObjectDefinitionNodeActions} from '../../ViewObjectDefinitions/objectDefinitionUtil';
@@ -72,6 +74,7 @@ export function ObjectDefinitionNode({
 	const store = useStore();
 
 	const [showModal, setShowModal] = useState<Partial<ModelBuilderModals>>({
+		addObjectField: false,
 		deleteObjectDefinition: false,
 		editObjectDefinitionExternalReferenceCode: false,
 	});
@@ -169,6 +172,7 @@ export function ObjectDefinitionNode({
 					}
 					isLinkedObjectDefinition={linkedObjectDefinition}
 					setShowAllObjectFields={setShowAllObjectFields}
+					setShowModal={setShowModal}
 					showAllObjectFields={showAllObjectFields}
 				/>
 

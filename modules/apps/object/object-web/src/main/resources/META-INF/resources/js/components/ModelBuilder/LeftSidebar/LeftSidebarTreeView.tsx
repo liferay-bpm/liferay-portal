@@ -87,7 +87,7 @@ export default function LeftSidebarTreeView({
 				leftSidebarObjectDefinitionItems: newLeftSidebarObjectDefinitionItems,
 			};
 		});
-	}, [leftSidebarItems, query, setEmptySearch]);
+	}, [leftSidebarItems, query]);
 
 	const handleMove = async ({
 		objectDefinitionId,

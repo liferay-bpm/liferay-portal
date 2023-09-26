@@ -13,6 +13,7 @@ interface ObjectDefinitionNodeFieldsProps {
 	showAllObjectFields: boolean;
 }
 export default function ObjectDefinitionNodeFields({
+	defaultLanguageId,
 	objectFields,
 	selectedObjectDefinitionId,
 	showAllObjectFields,

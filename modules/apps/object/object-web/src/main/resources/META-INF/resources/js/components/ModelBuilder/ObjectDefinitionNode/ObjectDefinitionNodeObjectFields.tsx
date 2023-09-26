@@ -13,6 +13,8 @@ import {TYPES} from '../ModelBuilderContext/typesEnum';
 
 import './ObjectDefinitionNodeObjectFields.scss';
 
+import {getLocalizableLabel} from '@liferay/object-js-components-web';
+
 interface ObjectDefinitionNodeFieldsProps {
 	defaultLanguageId: Liferay.Language.Locale;
 	objectFields: ObjectFieldNode[];
@@ -21,6 +23,7 @@ interface ObjectDefinitionNodeFieldsProps {
 }
 
 export default function ObjectDefinitionNodeFields({
+	defaultLanguageId,
 	objectFields,
 	selectedObjectDefinitionId,
 	showAllObjectFields,
@@ -61,7 +64,13 @@ export default function ObjectDefinitionNodeFields({
 							onClick={() => handleSelectObjectField(objectField)}
 						>
 							<div className="lfr-objects__model-builder-node-field-label">
-								<span>{objectField.label}</span>
+								<span>
+									{getLocalizableLabel(
+										defaultLanguageId,
+										objectField.label,
+										objectField.name
+									)}
+								</span>
 							</div>
 
 							<div className="lfr-objects__model-builder-node-field-business-type">

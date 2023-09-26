@@ -3,19 +3,22 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-/// <reference types="react" />
-
+import React from 'react';
 import './ObjectDefinitionNodeFooter.scss';
 interface ObjectDefinitionNodeFooterProps {
 	handleSelectObjectDefinitionNode: () => void;
 	isLinkedObjectDefinition: boolean;
 	setShowAllObjectFields: (value: boolean) => void;
+	setShowModal: React.Dispatch<
+		React.SetStateAction<Partial<ViewObjectDefinitionsModals>>
+	>;
 	showAllObjectFields: boolean;
 }
 export default function ObjectDefinitionNodeFooter({
 	handleSelectObjectDefinitionNode,
 	isLinkedObjectDefinition,
 	setShowAllObjectFields,
+	setShowModal,
 	showAllObjectFields,
 }: ObjectDefinitionNodeFooterProps): JSX.Element;
 export {};
