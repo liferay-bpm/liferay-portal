@@ -301,4 +301,10 @@ public interface ObjectValidationRuleSettingLocalService
 	public ObjectValidationRuleSetting updateObjectValidationRuleSetting(
 		ObjectValidationRuleSetting objectValidationRuleSetting);
 
+	public List<ObjectValidationRuleSetting> updateObjectValidationRuleSettings(
+			long objectValidationRuleId,
+			List<ObjectValidationRuleSetting> objectValidationRuleSettings,
+			long userId)
+		throws PortalException;
+
 }

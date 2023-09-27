@@ -350,6 +350,17 @@ public class ObjectValidationRuleSettingLocalServiceUtil {
 			objectValidationRuleSetting);
 	}
 
+	public static List<ObjectValidationRuleSetting>
+			updateObjectValidationRuleSettings(
+				long objectValidationRuleId,
+				List<ObjectValidationRuleSetting> objectValidationRuleSettings,
+				long userId)
+		throws PortalException {
+
+		return getService().updateObjectValidationRuleSettings(
+			objectValidationRuleId, objectValidationRuleSettings, userId);
+	}
+
 	public static ObjectValidationRuleSettingLocalService getService() {
 		return _service;
 	}
