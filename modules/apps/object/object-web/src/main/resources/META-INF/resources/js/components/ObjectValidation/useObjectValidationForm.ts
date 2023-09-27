@@ -47,6 +47,7 @@ export function useObjectValidationForm({
 		}
 
 		if (
+			validation.engine !== 'composedKey' &&
 			!validation.engine?.startsWith('function#') &&
 			invalidateRequired(script)
 		) {
