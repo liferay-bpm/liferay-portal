@@ -130,9 +130,22 @@ export async function deleteRelationship(id: number) {
 		});
 	}
 	catch (error) {
-		Liferay.Util.openToast({
-			message: (error as Error).message,
-			type: 'danger',
+		const errorMessage = (error as Error).message;
+
+		Liferay.Util.openModal({
+			bodyHTML: `<p>${errorMessage}</p>`,
+			buttons: [
+				{
+					displayType: 'warning',
+					label: Liferay.Language.get('done'),
+					type: 'cancel',
+				},
+			],
+			center: true,
+			id: 'deleteRelationship',
+			size: 'md',
+			status: 'warning',
+			title: Liferay.Language.get('deletion-not-allowed'),
 		});
 	}
 }
