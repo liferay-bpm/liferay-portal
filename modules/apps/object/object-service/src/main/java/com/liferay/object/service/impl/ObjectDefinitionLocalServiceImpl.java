@@ -1771,7 +1771,7 @@ public class ObjectDefinitionLocalServiceImpl
 					objectDefinition.getObjectDefinitionId()),
 				objectField -> !objectField.isMetadata())) {
 
-			throw new RequiredObjectFieldException();
+			throw new RequiredObjectFieldException.MustAddAtLeastOneField();
 		}
 
 		objectDefinition.setActive(true);
