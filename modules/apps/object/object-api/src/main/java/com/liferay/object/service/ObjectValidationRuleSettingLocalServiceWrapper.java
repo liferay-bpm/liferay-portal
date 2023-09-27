@@ -405,6 +405,21 @@ public class ObjectValidationRuleSettingLocalServiceWrapper
 	}
 
 	@Override
+	public java.util.List<com.liferay.object.model.ObjectValidationRuleSetting>
+			updateObjectValidationRuleSettings(
+				com.liferay.object.model.ObjectValidationRule
+					objectValidationRule,
+				java.util.List
+					<com.liferay.object.model.ObjectValidationRuleSetting>
+						objectValidationRuleSettings)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectValidationRuleSettingLocalService.
+			updateObjectValidationRuleSettings(
+				objectValidationRule, objectValidationRuleSettings);
+	}
+
+	@Override
 	public BasePersistence<?> getBasePersistence() {
 		return _objectValidationRuleSettingLocalService.getBasePersistence();
 	}

@@ -350,6 +350,17 @@ public class ObjectValidationRuleSettingLocalServiceUtil {
 			objectValidationRuleSetting);
 	}
 
+	public static List<ObjectValidationRuleSetting>
+			updateObjectValidationRuleSettings(
+				com.liferay.object.model.ObjectValidationRule
+					objectValidationRule,
+				List<ObjectValidationRuleSetting> objectValidationRuleSettings)
+		throws PortalException {
+
+		return getService().updateObjectValidationRuleSettings(
+			objectValidationRule, objectValidationRuleSettings);
+	}
+
 	public static ObjectValidationRuleSettingLocalService getService() {
 		return _service;
 	}

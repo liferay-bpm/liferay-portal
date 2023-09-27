@@ -6,6 +6,7 @@
 package com.liferay.object.service;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.object.model.ObjectValidationRule;
 import com.liferay.object.model.ObjectValidationRuleSetting;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
@@ -300,5 +301,10 @@ public interface ObjectValidationRuleSettingLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public ObjectValidationRuleSetting updateObjectValidationRuleSetting(
 		ObjectValidationRuleSetting objectValidationRuleSetting);
+
+	public List<ObjectValidationRuleSetting> updateObjectValidationRuleSettings(
+			ObjectValidationRule objectValidationRule,
+			List<ObjectValidationRuleSetting> objectValidationRuleSettings)
+		throws PortalException;
 
 }
