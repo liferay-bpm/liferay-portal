@@ -30,6 +30,12 @@ type DefinitionActions = {
 	update: DefinitionAction;
 };
 
+type DeletionNotAllowedModal = {
+	deleteLastPublishedObjectDefinitionObjectField: boolean;
+	deleteObjectFieldObjectValidationRuleSetting: boolean;
+	showModal: boolean;
+};
+
 type ExcludesFilterOperator = {
 	not: {
 		in: string[] | number[];
@@ -450,7 +456,6 @@ interface PickList {
 	name: string;
 	name_i18n: LocalizedValue<string>;
 }
-
 
 interface PredefinedValue {
 	businessType: ObjectFieldBusinessType;

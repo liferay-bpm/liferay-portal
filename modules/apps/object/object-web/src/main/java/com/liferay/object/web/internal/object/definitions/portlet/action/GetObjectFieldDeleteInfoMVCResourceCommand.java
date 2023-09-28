@@ -6,15 +6,22 @@
 package com.liferay.object.web.internal.object.definitions.portlet.action;
 
 import com.liferay.object.constants.ObjectPortletKeys;
+import com.liferay.object.constants.ObjectValidationRuleConstants;
+import com.liferay.object.constants.ObjectValidationRuleSettingConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectValidationRule;
+import com.liferay.object.model.ObjectValidationRuleSetting;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectValidationRuleLocalService;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -50,34 +57,85 @@ public class GetObjectFieldDeleteInfoMVCResourceCommand
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse,
 			JSONUtil.put(
-				"showDeletionModal",
-				() -> {
-					if (!objectDefinition.isApproved()) {
-						return false;
-					}
-
-					return true;
-				}
+				"deleteObjectFieldObjectValidationRuleSetting",
+				() ->
+					_shouldDeleteObjectFieldObjectValidationRuleSetting(
+						objectDefinition, objectField)
 			).put(
-				"showDeletionNotAllowedModal",
-				() -> {
-					if (!objectDefinition.isApproved() ||
-						objectDefinition.isSystem()) {
-
-						return false;
-					}
-
-					int customObjectFieldsCount =
-						_objectFieldLocalService.getObjectFieldsCount(
-							objectField.getObjectDefinitionId(), false);
-
-					if (customObjectFieldsCount > 1) {
-						return false;
-					}
-
-					return true;
-				}
+				"deleteLastPublishedObjectDefinitionObjectField",
+				() ->
+					_shouldDeleteLastPublishedObjectDefinitionObjectField(objectDefinition, objectField)
+			).put(
+				"showDeletionModal",
+				() -> _shouldShowDeletionModal(objectDefinition, objectField)
 			));
+	}
+
+	private boolean _shouldDeleteLastPublishedObjectDefinitionObjectField(
+		ObjectDefinition objectDefinition, ObjectField objectField) {
+
+		if (!objectDefinition.isApproved() || objectDefinition.isSystem()) {
+			return true;
+		}
+
+		int customObjectFieldsCount =
+			_objectFieldLocalService.getObjectFieldsCount(
+				objectField.getObjectDefinitionId(), false);
+
+		if (customObjectFieldsCount <= 1) {
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean _shouldDeleteObjectFieldObjectValidationRuleSetting(
+		ObjectDefinition objectDefinition, ObjectField objectField) {
+
+		for (ObjectValidationRule objectValidationRule :
+				_objectValidationRuleLocalService.getObjectValidationRules(
+					objectDefinition.getObjectDefinitionId(), true)) {
+
+			if (StringUtil.equals(
+					objectValidationRule.getEngine(),
+					ObjectValidationRuleConstants.ENGINE_TYPE_COMPOSED_KEY)) {
+
+				for (ObjectValidationRuleSetting objectValidationRuleSetting :
+						objectValidationRule.
+							getObjectValidationRuleSettings()) {
+
+					if (objectValidationRuleSetting.compareName(
+							ObjectValidationRuleSettingConstants.
+								NAME_KEY_OBJECT_FIELD_ID)) {
+
+						if (GetterUtil.getLong(
+								objectValidationRuleSetting.getValue()) ==
+									objectField.getObjectFieldId()) {
+
+							return false;
+						}
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+	private boolean _shouldShowDeletionModal(
+		ObjectDefinition objectDefinition, ObjectField objectField) {
+
+		if (objectDefinition.isApproved() &&
+			_shouldDeleteLastPublishedObjectDefinitionObjectField(
+				objectDefinition, objectField) &&
+			  _shouldDeleteObjectFieldObjectValidationRuleSetting(
+				objectDefinition, objectField)
+			  ) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	@Reference
@@ -85,5 +143,8 @@ public class GetObjectFieldDeleteInfoMVCResourceCommand
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
+	private ObjectValidationRuleLocalService _objectValidationRuleLocalService;
 
 }
