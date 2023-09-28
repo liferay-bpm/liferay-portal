@@ -252,7 +252,7 @@ public class ObjectFieldLocalServiceImpl
 			!ObjectDefinitionUtil.isInvokerBundleAllowed()) {
 
 			throw new ObjectFieldSystemException(
-				"Only allowed bundles can add system object fields");
+				"Only allowed bundles can create system object fields");
 		}
 
 		name = StringUtil.trim(name);
