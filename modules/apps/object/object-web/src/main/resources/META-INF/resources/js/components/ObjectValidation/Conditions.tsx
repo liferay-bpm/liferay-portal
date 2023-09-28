@@ -189,6 +189,7 @@ export function Conditions({
 								'no-fields-were-found'
 							)}
 							error={errors.outputType}
+							id="conditions"
 							items={filteredObjectFields ?? []}
 							label={Liferay.Language.get('fields')}
 							onChangeQuery={setQuery}

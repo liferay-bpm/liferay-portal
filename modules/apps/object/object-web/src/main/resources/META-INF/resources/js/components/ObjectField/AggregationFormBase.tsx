@@ -345,6 +345,7 @@ export function AggregationFormBase({
 					'no-relationships-were-found'
 				)}
 				error={errors.objectRelationshipName}
+				id="aggregation-relationship"
 				items={filteredObjectRelationships ?? []}
 				label={Liferay.Language.get('relationship')}
 				onActive={(item) =>
@@ -391,6 +392,7 @@ export function AggregationFormBase({
 						'no-fields-were-found'
 					)}
 					error={errors.objectFieldName}
+					id="aggregation-field"
 					items={filteredObjectRelationshipFields ?? []}
 					label={Liferay.Language.get('field')}
 					onActive={(item) =>

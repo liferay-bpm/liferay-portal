@@ -261,6 +261,7 @@ export function ModalAddObjectLayoutTab({
 								'there-are-no-relationship-for-this-object'
 							)}
 							error={errors.objectRelationshipId}
+							id="modal-add-object-layout-tab"
 							items={filteredRelationships}
 							label={Liferay.Language.get('relationship')}
 							onActive={(item) =>

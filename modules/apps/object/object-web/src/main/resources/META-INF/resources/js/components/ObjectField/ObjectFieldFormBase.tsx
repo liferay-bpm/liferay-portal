@@ -411,6 +411,7 @@ export default function ObjectFieldFormBase({
 					disabled={disabled}
 					emptyStateMessage={Liferay.Language.get('option-not-found')}
 					error={errors.listTypeDefinitionId}
+					id="object-field-form-base"
 					items={filteredPicklist}
 					label={Liferay.Language.get('picklist')}
 					onActive={(item) => item.name === selectedPicklist?.name}

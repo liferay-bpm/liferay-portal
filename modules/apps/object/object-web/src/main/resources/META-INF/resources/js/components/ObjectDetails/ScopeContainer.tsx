@@ -134,6 +134,7 @@ export function ScopeContainer({
 					'no-options-were-found'
 				)}
 				error={errors.titleObjectFieldId}
+				id="scope-container"
 				items={filteredPanelCategoryKey}
 				label={Liferay.Language.get('panel-link')}
 				onActive={(item) => selectedPanelCategoryKey === item.value}

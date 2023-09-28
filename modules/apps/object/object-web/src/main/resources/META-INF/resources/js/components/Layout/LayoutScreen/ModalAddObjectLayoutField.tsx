@@ -179,6 +179,7 @@ export default function ModalAddObjectLayoutField({
 							'there-are-no-fields-for-this-object'
 						)}
 						error={errors.objectFieldName}
+						id="modal-add-object-layout-field"
 						items={filteredObjectFields}
 						label={Liferay.Language.get('field')}
 						onActive={(item) =>
