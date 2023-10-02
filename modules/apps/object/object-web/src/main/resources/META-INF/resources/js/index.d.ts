@@ -374,7 +374,7 @@ interface ObjectFolderItem {
 
 interface ObjectRelationship {
 	deletionType: string;
-	edge: boolean;
+	edge?: boolean;
 	id: number;
 	label: LocalizedValue<string>;
 	name: string;
