@@ -8,7 +8,6 @@ package com.liferay.object.service;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
-import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.petra.sql.dsl.query.sort.OrderByExpression;
@@ -347,14 +346,14 @@ public interface ObjectEntryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getObjectEntriesCount();
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public long getObjectEntriesCount(
-		long groupId, DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
-		DynamicObjectDefinitionTable extensionDynamicObjectDefinitionTable,
-		String objectDefinitionScope, Predicate predicate);
-
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getObjectEntriesCount(long groupId, long objectDefinitionId);
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public long getObjectEntriesCount(
+			long groupId, ObjectDefinition objectDefinition,
+			Predicate predicate)
+		throws PortalException;
 
 	/**
 	 * Returns the object entry with the primary key.
