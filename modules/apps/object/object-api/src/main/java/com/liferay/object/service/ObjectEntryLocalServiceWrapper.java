@@ -492,25 +492,20 @@ public class ObjectEntryLocalServiceWrapper
 	}
 
 	@Override
-	public long getObjectEntriesCount(
-		long groupId,
-		com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTable
-			dynamicObjectDefinitionTable,
-		com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTable
-			extensionDynamicObjectDefinitionTable,
-		String objectDefinitionScope,
-		com.liferay.petra.sql.dsl.expression.Predicate predicate) {
-
-		return _objectEntryLocalService.getObjectEntriesCount(
-			groupId, dynamicObjectDefinitionTable,
-			extensionDynamicObjectDefinitionTable, objectDefinitionScope,
-			predicate);
-	}
-
-	@Override
 	public int getObjectEntriesCount(long groupId, long objectDefinitionId) {
 		return _objectEntryLocalService.getObjectEntriesCount(
 			groupId, objectDefinitionId);
+	}
+
+	@Override
+	public long getObjectEntriesCount(
+			long groupId,
+			com.liferay.object.model.ObjectDefinition objectDefinition,
+			com.liferay.petra.sql.dsl.expression.Predicate predicate)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectEntryLocalService.getObjectEntriesCount(
+			groupId, objectDefinition, predicate);
 	}
 
 	/**

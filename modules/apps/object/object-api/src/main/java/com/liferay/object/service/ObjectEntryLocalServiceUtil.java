@@ -428,25 +428,20 @@ public class ObjectEntryLocalServiceUtil {
 		return getService().getObjectEntriesCount();
 	}
 
-	public static long getObjectEntriesCount(
-		long groupId,
-		com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTable
-			dynamicObjectDefinitionTable,
-		com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTable
-			extensionDynamicObjectDefinitionTable,
-		String objectDefinitionScope,
-		com.liferay.petra.sql.dsl.expression.Predicate predicate) {
-
-		return getService().getObjectEntriesCount(
-			groupId, dynamicObjectDefinitionTable,
-			extensionDynamicObjectDefinitionTable, objectDefinitionScope,
-			predicate);
-	}
-
 	public static int getObjectEntriesCount(
 		long groupId, long objectDefinitionId) {
 
 		return getService().getObjectEntriesCount(groupId, objectDefinitionId);
+	}
+
+	public static long getObjectEntriesCount(
+			long groupId,
+			com.liferay.object.model.ObjectDefinition objectDefinition,
+			com.liferay.petra.sql.dsl.expression.Predicate predicate)
+		throws PortalException {
+
+		return getService().getObjectEntriesCount(
+			groupId, objectDefinition, predicate);
 	}
 
 	/**
