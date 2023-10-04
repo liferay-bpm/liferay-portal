@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -93,27 +92,23 @@ public class GetObjectFieldDeleteInfoMVCResourceCommand
 		ObjectDefinition objectDefinition, ObjectField objectField) {
 
 		for (ObjectValidationRule objectValidationRule :
-				_objectValidationRuleLocalService.getObjectValidationRules(
-					objectDefinition.getObjectDefinitionId(), true)) {
+				_objectValidationRuleLocalService.
+					getObjectValidationRulesByObjectValidationRuleEngine(
+						ObjectValidationRuleConstants.ENGINE_TYPE_COMPOSED_KEY,
+						objectDefinition.getObjectDefinitionId())) {
 
-			if (StringUtil.equals(
-					objectValidationRule.getEngine(),
-					ObjectValidationRuleConstants.ENGINE_TYPE_COMPOSED_KEY)) {
+			for (ObjectValidationRuleSetting objectValidationRuleSetting :
+					objectValidationRule.getObjectValidationRuleSettings()) {
 
-				for (ObjectValidationRuleSetting objectValidationRuleSetting :
-						objectValidationRule.
-							getObjectValidationRuleSettings()) {
+				if (objectValidationRuleSetting.compareName(
+						ObjectValidationRuleSettingConstants.
+							NAME_KEY_OBJECT_FIELD_ID)) {
 
-					if (objectValidationRuleSetting.compareName(
-							ObjectValidationRuleSettingConstants.
-								NAME_KEY_OBJECT_FIELD_ID)) {
+					if (GetterUtil.getLong(
+							objectValidationRuleSetting.getValue()) ==
+								objectField.getObjectFieldId()) {
 
-						if (GetterUtil.getLong(
-								objectValidationRuleSetting.getValue()) ==
-									objectField.getObjectFieldId()) {
-
-							return false;
-						}
+						return false;
 					}
 				}
 			}
