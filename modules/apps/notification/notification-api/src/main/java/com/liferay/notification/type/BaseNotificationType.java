@@ -98,7 +98,8 @@ public abstract class BaseNotificationType implements NotificationType {
 			new ArrayList<>();
 
 		for (Object recipient : recipients) {
-			Map<String, Object> recipientMap = (Map<String, Object>)recipient;
+			Map<String, Object> recipientMap = _fillDefaultRecipientValues(
+				(Map<String, Object>)recipient);
 
 			for (Map.Entry<String, Object> entry : recipientMap.entrySet()) {
 				NotificationRecipientSetting notificationRecipientSetting =
@@ -421,6 +422,24 @@ public abstract class BaseNotificationType implements NotificationType {
 
 	@Reference
 	protected UserLocalService userLocalService;
+
+	private Map<String, Object> _fillDefaultRecipientValues(
+		Map<String, Object> recipient) {
+
+		if (!recipient.containsKey("bcc")) {
+			recipient.put("bcc", "");
+		}
+
+		if (!recipient.containsKey("cc")) {
+			recipient.put("cc", "");
+		}
+
+		if (!recipient.containsKey("singleRecipient")) {
+			recipient.put("singleRecipient", "false");
+		}
+
+		return recipient;
+	}
 
 	private static final Pattern _termNamePattern = Pattern.compile(
 		"\\[%[^\\[%]+%\\]", Pattern.CASE_INSENSITIVE);
