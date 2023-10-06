@@ -1034,6 +1034,7 @@
 		<exception>ObjectValidationRuleName</exception>
 		<exception>ObjectValidationRuleOutputType</exception>
 		<exception>ObjectValidationRuleScript</exception>
+		<exception>ObjectValidationRuleSettingCount</exception>
 		<exception>ObjectValidationRuleSettingName</exception>
 		<exception>ObjectValidationRuleSettingValue</exception>
 		<exception>ObjectValidationRuleSystem</exception>
