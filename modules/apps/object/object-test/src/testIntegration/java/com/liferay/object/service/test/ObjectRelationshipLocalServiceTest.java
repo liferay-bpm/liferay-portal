@@ -21,6 +21,7 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.relationship.ObjectRelationshipDBTableNameSuffixGenerator;
 import com.liferay.object.relationship.util.ObjectRelationshipUtil;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -585,11 +586,14 @@ public class ObjectRelationshipLocalServiceTest {
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				name, false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
 
+		int relationshipCount =
+			_objectRelationshipLocalService.getObjectRelationshipsCount();
+		String expectedTableName = "R_" +
+								   _objectRelationshipDBTableNameSuffixGenerator.generate(
+									   relationshipCount);
+
 		Assert.assertEquals(
-			StringBundler.concat(
-				"R_", objectRelationship.getCompanyId(),
-				objectDefinition1.getShortName(), "_",
-				objectDefinition2.getShortName(), "_", name),
+			expectedTableName,
 			objectRelationship.getDBTableName());
 
 		Map<String, String> pkObjectFieldDBColumnNames =
@@ -746,11 +750,14 @@ public class ObjectRelationshipLocalServiceTest {
 			objectRelationship.getDBTableName(),
 			reverseObjectRelationship.getDBTableName());
 
+		int relationshipCount =
+			_objectRelationshipLocalService.getObjectRelationshipsCount();
+		String expectedTableName = "R_" +
+								   _objectRelationshipDBTableNameSuffixGenerator.generate(
+									   relationshipCount);
+
 		Assert.assertEquals(
-			StringBundler.concat(
-				"R_", objectRelationship.getCompanyId(),
-				objectDefinition.getShortName(), "_",
-				relatedObjectDefinition.getShortName(), "_", name),
+			expectedTableName,
 			objectRelationship.getDBTableName());
 
 		Map<String, String> pkObjectFieldDBColumnNames =
@@ -873,6 +880,10 @@ public class ObjectRelationshipLocalServiceTest {
 
 	@Inject
 	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
+
+	@Inject
+	private ObjectRelationshipDBTableNameSuffixGenerator
+		_objectRelationshipDBTableNameSuffixGenerator;
 
 	@Inject
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
