@@ -21,6 +21,7 @@ import com.liferay.object.exception.ObjectRelationshipSystemException;
 import com.liferay.object.exception.ObjectRelationshipTypeException;
 import com.liferay.object.internal.dao.db.ObjectDBManagerUtil;
 import com.liferay.object.internal.info.collection.provider.RelatedInfoCollectionProviderFactory;
+import com.liferay.object.internal.relationship.ObjectRelationshipDBTableNameSuffixGeneratorImpl;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
@@ -29,6 +30,7 @@ import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.model.ObjectRelationshipTable;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTableUtil;
 import com.liferay.object.petra.sql.dsl.DynamicObjectRelationshipMappingTable;
+import com.liferay.object.relationship.ObjectRelationshipDBTableNameSuffixGenerator;
 import com.liferay.object.relationship.util.ObjectRelationshipUtil;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
@@ -215,11 +217,10 @@ public class ObjectRelationshipLocalServiceImpl
 
 		User user = _userLocalService.getUser(userId);
 
-		objectRelationship.setDBTableName(
-			StringBundler.concat(
-				"R_", user.getCompanyId(), objectDefinition1.getShortName(),
-				"_", objectDefinition2.getShortName(), "_",
-				objectRelationship.getName()));
+		int relationshipCount = getObjectRelationshipsCount();
+		objectRelationship.setDBTableName(StringBundler.concat(
+			"R_", _objectRelationshipDBTableNameSuffixGenerator.generate(
+				relationshipCount)));
 
 		objectRelationship =
 			objectRelationshipLocalService.updateObjectRelationship(
@@ -1379,6 +1380,10 @@ public class ObjectRelationshipLocalServiceImpl
 
 	@Reference
 	private ObjectLayoutTabPersistence _objectLayoutTabPersistence;
+
+	@Reference
+	private ObjectRelationshipDBTableNameSuffixGenerator
+		_objectRelationshipDBTableNameSuffixGenerator;
 
 	@Reference
 	private RelatedInfoCollectionProviderFactory
