@@ -311,8 +311,7 @@ public class ObjectValidationRuleLocalServiceImpl
 		objectValidationRule.setObjectValidationRuleSettings(
 			_objectValidationRuleSettingLocalService.
 				updateObjectValidationRuleSettings(
-					objectValidationRuleId, objectValidationRuleSettings,
-					objectValidationRule.getUserId()));
+					objectValidationRule, objectValidationRuleSettings));
 
 		return objectValidationRule;
 	}

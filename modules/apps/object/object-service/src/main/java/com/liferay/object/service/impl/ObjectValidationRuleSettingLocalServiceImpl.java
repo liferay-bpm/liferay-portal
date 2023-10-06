@@ -5,16 +5,21 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.object.constants.ObjectValidationRuleConstants;
 import com.liferay.object.constants.ObjectValidationRuleSettingConstants;
+import com.liferay.object.exception.ObjectValidationRuleSettingCountException;
+import com.liferay.object.model.ObjectValidationRule;
 import com.liferay.object.model.ObjectValidationRuleSetting;
 import com.liferay.object.service.base.ObjectValidationRuleSettingLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectValidationRulePersistence;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,9 +67,8 @@ public class ObjectValidationRuleSettingLocalServiceImpl
 
 	@Override
 	public List<ObjectValidationRuleSetting> updateObjectValidationRuleSettings(
-			long objectValidationRuleId,
-			List<ObjectValidationRuleSetting> objectValidationRuleSettings,
-			long userId)
+			ObjectValidationRule objectValidationRule,
+			List<ObjectValidationRuleSetting> objectValidationRuleSettings)
 		throws PortalException {
 
 		List<ObjectValidationRuleSetting> keyObjectValidationRuleSettings =
@@ -77,11 +81,14 @@ public class ObjectValidationRuleSettingLocalServiceImpl
 			keyObjectValidationRuleSettings, objectValidationRuleSettings,
 			outputObjectValidationRuleSettings);
 
-		if (keyObjectValidationRuleSettings.size() < 2) {
-			throw new PortalException(
-				"Unique Composed Key Object Validation Rule must have at " +
-					"least two composing a unique composed key");
-		}
+		long userId = objectValidationRule.getUserId();
+
+		_validate(
+			objectValidationRule, userId, keyObjectValidationRuleSettings,
+			outputObjectValidationRuleSettings);
+
+		long objectValidationRuleId =
+			objectValidationRule.getObjectValidationRuleId();
 
 		List<ObjectValidationRuleSetting> oldKeyObjectValidationRuleSettings =
 			objectValidationRuleSettingPersistence.findByOVRI_N(
@@ -212,6 +219,41 @@ public class ObjectValidationRuleSettingLocalServiceImpl
 			}
 
 			outputObjectValidationRuleSettings.add(objectValidationRuleSetting);
+		}
+	}
+
+	private void _validate(
+			ObjectValidationRule objectValidationRule, long userId,
+			List<ObjectValidationRuleSetting> keyObjectValidationRuleSettings,
+			List<ObjectValidationRuleSetting>
+				outputObjectValidationRuleSettings)
+		throws PortalException {
+
+		User user = _userLocalService.getUser(userId);
+
+		if (StringUtil.equals(
+				objectValidationRule.getEngine(),
+				ObjectValidationRuleConstants.ENGINE_TYPE_COMPOSED_KEY) &&
+			(keyObjectValidationRuleSettings.size() < 2)) {
+
+			throw new ObjectValidationRuleSettingCountException(
+				StringBundler.concat(
+					"The ", objectValidationRule.getName(user.getLocale()),
+					" Unique Composed Key Object Validation Rule must have at ",
+					"least two Object Validation Rule Settings to compose the ",
+					"object validation rule"));
+		}
+
+		if (StringUtil.equals(
+				objectValidationRule.getOutputType(),
+				ObjectValidationRuleConstants.OUTPUT_TYPE_PARTIAL_VALIDATION) &&
+			outputObjectValidationRuleSettings.isEmpty()) {
+
+			throw new ObjectValidationRuleSettingCountException(
+				StringBundler.concat(
+					"The ", objectValidationRule.getName(user.getLocale()),
+					" Object Validation Rule must have at least one Object ",
+					"Validation Rule Setting"));
 		}
 	}
 
