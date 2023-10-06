@@ -21,7 +21,6 @@ import com.liferay.object.exception.ObjectRelationshipSystemException;
 import com.liferay.object.exception.ObjectRelationshipTypeException;
 import com.liferay.object.internal.dao.db.ObjectDBManagerUtil;
 import com.liferay.object.internal.info.collection.provider.RelatedInfoCollectionProviderFactory;
-import com.liferay.object.internal.relationship.ObjectRelationshipDBTableNameSuffixGeneratorImpl;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
@@ -215,12 +214,13 @@ public class ObjectRelationshipLocalServiceImpl
 				objectRelationship);
 		}
 
-		User user = _userLocalService.getUser(userId);
-
 		int relationshipCount = getObjectRelationshipsCount();
-		objectRelationship.setDBTableName(StringBundler.concat(
-			"R_", _objectRelationshipDBTableNameSuffixGenerator.generate(
-				relationshipCount)));
+
+		String tableNameSuffix =
+			_objectRelationshipDBTableNameSuffixGenerator.generate(
+				relationshipCount);
+
+		objectRelationship.setDBTableName("R_" + tableNameSuffix);
 
 		objectRelationship =
 			objectRelationshipLocalService.updateObjectRelationship(
