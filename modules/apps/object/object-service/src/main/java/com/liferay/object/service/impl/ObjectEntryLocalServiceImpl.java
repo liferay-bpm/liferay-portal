@@ -2567,9 +2567,7 @@ public class ObjectEntryLocalServiceImpl
 					}
 
 					return _getPermissionWherePredicate(
-						_objectDefinitionPersistence.findByPrimaryKey(
-							objectRelationship.getObjectDefinitionId2()),
-						primaryKeyColumn);
+						dynamicObjectDefinitionTable, groupId);
 				}
 			).and(
 				ObjectEntrySearchUtil.getRelatedModelsPredicate(
