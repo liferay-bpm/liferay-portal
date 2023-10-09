@@ -39,12 +39,14 @@ import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.transaction.Propagation;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.TransactionalTestRule;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -140,6 +142,7 @@ public class ObjectLayoutLocalServiceTest {
 					Arrays.asList(
 						_addObjectLayoutBox(),
 						_addObjectLayoutBox(
+							Collections.emptyList(),
 							ObjectLayoutBoxConstants.TYPE_CATEGORIZATION)));
 
 				_objectLayoutLocalService.addObjectLayout(
@@ -174,6 +177,7 @@ public class ObjectLayoutLocalServiceTest {
 					Arrays.asList(
 						_addObjectLayoutBox(),
 						_addObjectLayoutBox(
+							Collections.emptyList(),
 							ObjectLayoutBoxConstants.TYPE_CATEGORIZATION)));
 				objectLayoutTab.setPriority(0);
 
@@ -204,6 +208,7 @@ public class ObjectLayoutLocalServiceTest {
 				objectLayoutTab.setPriority(0);
 
 				ObjectLayoutBox objectLayoutBox = _addObjectLayoutBox(
+					Collections.emptyList(),
 					ObjectLayoutBoxConstants.TYPE_CATEGORIZATION);
 
 				objectLayoutBox.setObjectLayoutRows(
@@ -239,7 +244,8 @@ public class ObjectLayoutLocalServiceTest {
 				objectLayoutTab.setPriority(0);
 				objectLayoutTab.setObjectLayoutBoxes(
 					Arrays.asList(
-						_addObjectLayoutBox(), _addObjectLayoutBox(null)));
+						_addObjectLayoutBox(),
+						_addObjectLayoutBox(Collections.emptyList(), null)));
 
 				_objectLayoutLocalService.addObjectLayout(
 					TestPropsValues.getUserId(),
@@ -302,6 +308,7 @@ public class ObjectLayoutLocalServiceTest {
 					Arrays.asList(
 						_addObjectLayoutBox(),
 						_addObjectLayoutBox(
+							Collections.emptyList(),
 							ObjectLayoutBoxConstants.TYPE_CATEGORIZATION)));
 
 				ObjectLayoutTab objectLayoutTab2 =
@@ -314,6 +321,7 @@ public class ObjectLayoutLocalServiceTest {
 					Arrays.asList(
 						_addObjectLayoutBox(),
 						_addObjectLayoutBox(
+							Collections.emptyList(),
 							ObjectLayoutBoxConstants.TYPE_CATEGORIZATION)));
 
 				_objectLayoutLocalService.addObjectLayout(
@@ -374,8 +382,8 @@ public class ObjectLayoutLocalServiceTest {
 
 		_assertObjectLayout(objectLayout);
 
-		_objectLayoutLocalService.deleteObjectLayout(
-			objectLayout.getObjectLayoutId());
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			_objectDefinition.getObjectDefinitionId());
 	}
 
 	@Test
@@ -520,10 +528,14 @@ public class ObjectLayoutLocalServiceTest {
 	}
 
 	private ObjectLayoutBox _addObjectLayoutBox() throws Exception {
-		return _addObjectLayoutBox(ObjectLayoutBoxConstants.TYPE_REGULAR);
+		return _addObjectLayoutBox(
+			Collections.emptyList(), ObjectLayoutBoxConstants.TYPE_REGULAR);
 	}
 
-	private ObjectLayoutBox _addObjectLayoutBox(String type) throws Exception {
+	private ObjectLayoutBox _addObjectLayoutBox(
+			List<Long> objectFieldIds, String type)
+		throws Exception {
+
 		ObjectLayoutBox objectLayoutBox = _objectLayoutBoxPersistence.create(0);
 
 		objectLayoutBox.setCollapsable(false);
@@ -533,33 +545,64 @@ public class ObjectLayoutLocalServiceTest {
 		objectLayoutBox.setType(type);
 
 		if (StringUtil.equals(type, ObjectLayoutBoxConstants.TYPE_REGULAR)) {
-			objectLayoutBox.setObjectLayoutRows(
+			List<ObjectLayoutRow> objectLayoutRows = new ArrayList<>(
 				Arrays.asList(
 					_addObjectLayoutRow(), _addObjectLayoutRow(),
 					_addObjectLayoutRow()));
+
+			if (!objectFieldIds.isEmpty()) {
+				objectLayoutRows.add(
+					_addObjectLayoutRow(
+						ListUtil.toList(
+							objectFieldIds, this::_addObjectLayoutColumn)));
+			}
+
+			objectLayoutBox.setObjectLayoutRows(objectLayoutRows);
 		}
 
 		return objectLayoutBox;
 	}
 
+	private ObjectLayoutBox _addObjectLayoutBoxWithSystemObjectFields()
+		throws Exception {
+
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			_objectDefinition.getObjectDefinitionId(), "id");
+
+		return _addObjectLayoutBox(
+			Arrays.asList(
+				objectField.getObjectFieldId(), _addSystemObjectField()),
+			ObjectLayoutBoxConstants.TYPE_REGULAR);
+	}
+
 	private ObjectLayoutColumn _addObjectLayoutColumn() throws Exception {
+		return _addObjectLayoutColumn(_addObjectField());
+	}
+
+	private ObjectLayoutColumn _addObjectLayoutColumn(long objectFieldId) {
 		ObjectLayoutColumn objectLayoutColumn =
 			_objectLayoutColumnPersistence.create(0);
 
-		objectLayoutColumn.setObjectFieldId(_addObjectField());
+		objectLayoutColumn.setObjectFieldId(objectFieldId);
 		objectLayoutColumn.setPriority(0);
 
 		return objectLayoutColumn;
 	}
 
 	private ObjectLayoutRow _addObjectLayoutRow() throws Exception {
-		ObjectLayoutRow objectLayoutRow = _objectLayoutRowPersistence.create(0);
-
-		objectLayoutRow.setPriority(0);
-		objectLayoutRow.setObjectLayoutColumns(
+		return _addObjectLayoutRow(
 			Arrays.asList(
 				_addObjectLayoutColumn(), _addObjectLayoutColumn(),
 				_addObjectLayoutColumn(), _addObjectLayoutColumn()));
+	}
+
+	private ObjectLayoutRow _addObjectLayoutRow(
+		List<ObjectLayoutColumn> objectLayoutColumns) {
+
+		ObjectLayoutRow objectLayoutRow = _objectLayoutRowPersistence.create(0);
+
+		objectLayoutRow.setPriority(0);
+		objectLayoutRow.setObjectLayoutColumns(objectLayoutColumns);
 
 		return objectLayoutRow;
 	}
@@ -570,9 +613,25 @@ public class ObjectLayoutLocalServiceTest {
 		objectLayoutTab.setNameMap(
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()));
 		objectLayoutTab.setObjectLayoutBoxes(
-			Arrays.asList(_addObjectLayoutBox(), _addObjectLayoutBox()));
+			Arrays.asList(
+				_addObjectLayoutBox(), _addObjectLayoutBox(),
+				_addObjectLayoutBoxWithSystemObjectFields()));
 
 		return objectLayoutTab;
+	}
+
+	private long _addSystemObjectField() throws Exception {
+		ObjectField objectField = _objectFieldLocalService.addSystemObjectField(
+			null, TestPropsValues.getUserId(), 0L,
+			_objectDefinition.getObjectDefinitionId(),
+			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			ObjectFieldConstants.DB_TYPE_STRING, false, true, "",
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			StringUtil.randomId(), ObjectFieldConstants.READ_ONLY_FALSE, null,
+			false, false, Collections.emptyList());
+
+		return objectField.getObjectFieldId();
 	}
 
 	private void _assertObjectLayout(ObjectLayout objectLayout) {
@@ -588,7 +647,7 @@ public class ObjectLayoutLocalServiceTest {
 			objectLayoutTab.getObjectLayoutBoxes();
 
 		Assert.assertEquals(
-			objectLayoutBoxes.toString(), 2, objectLayoutBoxes.size());
+			objectLayoutBoxes.toString(), 3, objectLayoutBoxes.size());
 
 		ObjectLayoutBox objectLayoutBox = objectLayoutBoxes.get(0);
 
@@ -605,6 +664,20 @@ public class ObjectLayoutLocalServiceTest {
 
 		Assert.assertEquals(
 			objectLayoutColumns.toString(), 4, objectLayoutColumns.size());
+
+		objectLayoutBox = objectLayoutBoxes.get(2);
+
+		objectLayoutRows = objectLayoutBox.getObjectLayoutRows();
+
+		Assert.assertEquals(
+			objectLayoutRows.toString(), 4, objectLayoutRows.size());
+
+		objectLayoutRow = objectLayoutRows.get(3);
+
+		objectLayoutColumns = objectLayoutRow.getObjectLayoutColumns();
+
+		Assert.assertEquals(
+			objectLayoutColumns.toString(), 2, objectLayoutColumns.size());
 	}
 
 	private void _deleteObjectFields() throws Exception {
