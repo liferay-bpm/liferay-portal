@@ -9,7 +9,6 @@ import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.constants.AccountRoleConstants;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountEntryUserRel;
-import com.liferay.account.model.AccountRole;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.account.service.AccountEntryUserRelLocalService;
@@ -1983,6 +1982,8 @@ public class DefaultObjectEntryManagerImplTest
 	public void testGetObjectEntryRelatedObjectEntriesWithAccountEntryRestricted()
 		throws Exception {
 
+		// Account entry restricted scope
+
 		ObjectDefinition childObjectDefinition = _createObjectDefinition(
 			Arrays.asList(
 				new TextObjectFieldBuilder(
@@ -2026,48 +2027,26 @@ public class DefaultObjectEntryManagerImplTest
 			objectDefinitionLocalService.updateObjectDefinition(
 				childObjectDefinition);
 
-		_addRelatedObjectEntries(
-			_objectDefinition3, childObjectDefinition,
-			"parentExternalReferenceCode", StringUtil.randomId(),
-			objectRelationship1);
-
 		AccountEntry accountEntry = _addAccountEntry();
 
-		AccountRole accountRole = _accountRoleLocalService.addAccountRole(
-			TestPropsValues.getUserId(), accountEntry.getAccountEntryId(),
-			RandomTestUtil.randomString(), null, null);
+		_addRelatedObjectEntriesWithAccountEntry(
+			accountEntry, childObjectDefinition, objectRelationship1,
+			objectRelationship2, true);
 
-		User user = _addUser();
+		_user = _addUser();
 
 		_accountEntryUserRelLocalService.addAccountEntryUserRel(
-			accountEntry.getAccountEntryId(), user.getUserId());
+			accountEntry.getAccountEntryId(), _user.getUserId());
 
-		_accountRoleLocalService.associateUser(
-			accountEntry.getAccountEntryId(), accountRole.getAccountRoleId(),
-			user.getUserId());
+		_assertObjectEntryRelatedObjectEntries(
+			objectRelationship1.getName(), 1);
 
-		Role role = accountRole.getRole();
+		_addRelatedObjectEntriesWithAccountEntry(
+			accountEntry, childObjectDefinition, objectRelationship1,
+			objectRelationship2, false);
 
-		_addResourcePermission(ActionKeys.VIEW, role);
-
-		_resourcePermissionLocalService.addResourcePermission(
-			companyId, childObjectDefinition.getClassName(),
-			ResourceConstants.SCOPE_GROUP_TEMPLATE, "0", role.getRoleId(),
-			ActionKeys.VIEW);
-
-		ObjectEntry parentObjectEntry =
-			_defaultObjectEntryManager.getObjectEntry(
-				companyId, _simpleDTOConverterContext,
-				"parentExternalReferenceCode", _objectDefinition3, null);
-
-		Page<ObjectEntry> page =
-			_defaultObjectEntryManager.getObjectEntryRelatedObjectEntries(
-				_simpleDTOConverterContext, _objectDefinition3,
-				parentObjectEntry.getId(), objectRelationship1.getName(), null);
-
-		Collection<ObjectEntry> objectEntries = page.getItems();
-
-		Assert.assertEquals(objectEntries.toString(), 1, objectEntries.size());
+		_assertObjectEntryRelatedObjectEntries(
+			objectRelationship1.getName(), 0);
 
 		objectDefinitionLocalService.deleteObjectDefinition(
 			childObjectDefinition);
@@ -2786,6 +2765,57 @@ public class DefaultObjectEntryManagerImplTest
 			ObjectDefinitionConstants.SCOPE_COMPANY);
 	}
 
+	private void _addRelatedObjectEntriesWithAccountEntry(
+			AccountEntry accountEntry, ObjectDefinition objectDefinition,
+			ObjectRelationship objectRelationship1,
+			ObjectRelationship objectRelationship2, boolean sameAccountEntry)
+		throws Exception {
+
+		ObjectEntry objectEntry = _defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext, _objectDefinition3,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						"externalReferenceCode", "parentExternalReferenceCode"
+					).put(
+						"r_oneToManyRelationshipName_accountEntryId",
+						accountEntry.getAccountEntryId()
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		_defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext, objectDefinition,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						() -> {
+							ObjectField objectField =
+								objectFieldLocalService.getObjectField(
+									objectRelationship1.getObjectFieldId2());
+
+							return objectField.getName();
+						},
+						objectEntry.getId()
+					).put(
+						() -> {
+							ObjectField objectField =
+								objectFieldLocalService.getObjectField(
+									objectRelationship2.getObjectFieldId2());
+
+							return objectField.getName();
+						},
+						() ->
+							sameAccountEntry ?
+								accountEntry.getAccountEntryId() :
+									_addAccountEntry().getAccountEntryId()
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+	}
+
 	private void _addResourcePermission(String actionId, Role role)
 		throws Exception {
 
@@ -2879,6 +2909,38 @@ public class DefaultObjectEntryManagerImplTest
 
 		Assert.assertEquals(
 			objectEntries.toString(), size, objectEntries.size());
+	}
+
+	private void _assertObjectEntryRelatedObjectEntries(
+			String objectRelationshipName, int size)
+		throws Exception {
+
+		PermissionThreadLocal.setPermissionChecker(
+			PermissionCheckerFactoryUtil.create(_user));
+
+		PrincipalThreadLocal.setName(_user.getUserId());
+
+		ObjectEntry objectEntry = _defaultObjectEntryManager.getObjectEntry(
+			companyId, _simpleDTOConverterContext,
+			"parentExternalReferenceCode", _objectDefinition3, null);
+
+		Page<ObjectEntry> page =
+			_defaultObjectEntryManager.getObjectEntryRelatedObjectEntries(
+				_simpleDTOConverterContext, _objectDefinition3,
+				objectEntry.getId(), objectRelationshipName, null);
+
+		Collection<ObjectEntry> objectEntries = page.getItems();
+
+		Assert.assertEquals(
+			objectEntries.toString(), size, objectEntries.size());
+
+		PermissionThreadLocal.setPermissionChecker(
+			PermissionCheckerFactoryUtil.create(adminUser));
+
+		PrincipalThreadLocal.setName(adminUser.getUserId());
+
+		_defaultObjectEntryManager.deleteObjectEntry(
+			_objectDefinition3, objectEntry.getId());
 	}
 
 	private void _assertPicklistOjectField(
