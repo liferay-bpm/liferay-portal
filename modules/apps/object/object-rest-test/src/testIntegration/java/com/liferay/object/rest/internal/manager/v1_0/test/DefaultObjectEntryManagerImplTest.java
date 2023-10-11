@@ -502,7 +502,7 @@ public class DefaultObjectEntryManagerImplTest
 				_rootObjectDefinition.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"rootOneToManyRelationshipName", false,
+				"oneToManyRelationshipName", false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
 		_rootObjectDefinition.setAccountEntryRestricted(true);
@@ -1016,7 +1016,7 @@ public class DefaultObjectEntryManagerImplTest
 				new ObjectEntry() {
 					{
 						properties = HashMapBuilder.<String, Object>put(
-							"r_rootOneToManyRelationshipName_accountEntryId",
+							"r_oneToManyRelationshipName_accountEntryId",
 							accountEntry2.getAccountEntryId()
 						).build();
 					}
