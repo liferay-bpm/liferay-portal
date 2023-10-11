@@ -2048,6 +2048,31 @@ public class DefaultObjectEntryManagerImplTest
 		_assertObjectEntryRelatedObjectEntries(
 			objectRelationship1.getName(), 0);
 
+		// Organization scope
+
+		_addRelatedObjectEntriesWithAccountEntry(
+			accountEntry, childObjectDefinition, objectRelationship1,
+			objectRelationship2, true);
+
+		Organization organization = OrganizationTestUtil.addOrganization();
+
+		_addAccountEntryOrganizationRel(accountEntry, organization);
+
+		_user = _addUser();
+
+		_organizationLocalService.addUserOrganization(
+			_user.getUserId(), organization.getOrganizationId());
+
+		_assertObjectEntryRelatedObjectEntries(
+			objectRelationship1.getName(), 1);
+
+		_addRelatedObjectEntriesWithAccountEntry(
+			accountEntry, childObjectDefinition, objectRelationship1,
+			objectRelationship2, false);
+
+		_assertObjectEntryRelatedObjectEntries(
+			objectRelationship1.getName(), 0);
+
 		objectDefinitionLocalService.deleteObjectDefinition(
 			childObjectDefinition);
 	}
