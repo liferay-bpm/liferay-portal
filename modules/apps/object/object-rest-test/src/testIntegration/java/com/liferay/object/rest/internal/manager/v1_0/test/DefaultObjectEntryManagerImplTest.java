@@ -986,7 +986,7 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
-	public void testAddObjectEntryHierarchyWithAccountEntryRestricted()
+	public void testAddObjectEntryHierarchyWithAccountRestriction()
 		throws Exception {
 
 		// Root account entry restricted must be inherited
@@ -1025,8 +1025,7 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
-	public void testAddObjectEntryWithAccountEntryRestricted()
-		throws Exception {
+	public void testAddObjectEntryWithAccountRestriction() throws Exception {
 
 		// Account entry restricted scope
 
@@ -1297,7 +1296,7 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
-	public void testDeleteObjectEntryHierarchyWithAccountEntryRestricted()
+	public void testDeleteObjectEntryHierarchyWithAccountRestriction()
 		throws Exception {
 
 		// Root account entry restricted must be inherited
@@ -1351,8 +1350,7 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
-	public void testDeleteObjectEntryWithAccountEntryRestricted()
-		throws Exception {
+	public void testDeleteObjectEntryWithAccountRestriction() throws Exception {
 
 		// Regular roles' company scope permissions should not be restricted by
 		// account entry
@@ -1925,7 +1923,7 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
-	public void testGetObjectEntriesHierarchyWithAccountEntryRestricted()
+	public void testGetObjectEntriesHierarchyWithAccountRestriction()
 		throws Exception {
 
 		// Root account entry restricted must be inherited
@@ -1961,8 +1959,7 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
-	public void testGetObjectEntriesWithAccountEntryRestricted()
-		throws Exception {
+	public void testGetObjectEntriesWithAccountRestriction() throws Exception {
 
 		// Regular roles permissions should not be restricted by account entry
 
@@ -2148,7 +2145,7 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
-	public void testGetObjectEntryRelatedObjectEntriesWithAccountEntryRestricted()
+	public void testGetObjectEntryRelatedObjectEntriesWithAccountRestriction()
 		throws Exception {
 
 		ObjectDefinition childObjectDefinition = _createObjectDefinition(
@@ -2534,7 +2531,7 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
-	public void testUpdateObjectEntryHierarchyWithAccountEntryRestricted()
+	public void testUpdateObjectEntryHierarchyWithAccountRestriction()
 		throws Exception {
 
 		// Root account entry restricted must be inherited
@@ -2590,8 +2587,7 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
-	public void testUpdateObjectEntryWithAccountEntryRestricted()
-		throws Exception {
+	public void testUpdateObjectEntryWithAccountRestriction() throws Exception {
 
 		// Regular roles' company scope permissions should not be restricted by
 		// account entry
