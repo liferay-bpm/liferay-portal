@@ -43,7 +43,6 @@ import com.liferay.object.exception.ObjectDefinitionSystemException;
 import com.liferay.object.exception.ObjectDefinitionVersionException;
 import com.liferay.object.exception.ObjectFieldRelationshipTypeException;
 import com.liferay.object.exception.RequiredObjectDefinitionException;
-import com.liferay.object.exception.RequiredObjectFieldException;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.internal.dao.db.ObjectDBManagerUtil;
@@ -819,7 +818,8 @@ public class ObjectDefinitionLocalServiceImpl
 			objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
 		if (objectDefinition.isUnmodifiableSystemObject()) {
-			throw new ObjectDefinitionStatusException();
+			throw new ObjectDefinitionStatusException(
+				"Unmodifiable system object definition cannot be published");
 		}
 
 		if (objectDefinition.getRootObjectDefinitionId() == 0) {
@@ -1769,7 +1769,10 @@ public class ObjectDefinitionLocalServiceImpl
 					objectDefinition.getObjectDefinitionId()),
 				objectField -> !objectField.isMetadata())) {
 
-			throw new RequiredObjectFieldException.MustAddAtLeastOneField();
+			throw new ObjectDefinitionStatusException(
+				"Object definition cannot be published without at least one " +
+					"custom object field",
+				"at-least-one-object-field-must-be-added");
 		}
 
 		objectDefinition.setActive(true);

@@ -883,7 +883,8 @@ public class ObjectFieldLocalServiceImpl
 						"a relationship type");
 			}
 			else if (!objectField.isDeletionAllowed()) {
-				throw new RequiredObjectFieldException.MustAddAtLeastOneField();
+				throw new RequiredObjectFieldException.MustNotDeleteObjectField(
+					objectField);
 			}
 		}
 		else if (!deleteRelationshipObjectField) {
@@ -909,12 +910,9 @@ public class ObjectFieldLocalServiceImpl
 			objectField1 -> !objectField1.isMetadata());
 
 		if (objectDefinition.isApproved() && (objectFields.size() == 1)) {
-			if (deleteRelationshipObjectField) {
-				throw new RequiredObjectFieldException.
-					MustIntroduceNewCustomField(objectDefinition);
-			}
-
-			throw new RequiredObjectFieldException.MustAddAtLeastOneField();
+			throw new RequiredObjectFieldException.
+				MustNotDeleteLastCustomObjectField(
+					objectDefinition, objectField);
 		}
 
 		if (Objects.equals(
