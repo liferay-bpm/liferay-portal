@@ -6,8 +6,10 @@
 package com.liferay.object.exception;
 
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectField;
 import com.liferay.portal.kernel.exception.PortalException;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,42 +26,49 @@ public class RequiredObjectFieldException extends PortalException {
 		return _messageKey;
 	}
 
-	public static class MustAddAtLeastOneField
+	public static class MustNotDeleteLastCustomObjectField
 		extends RequiredObjectFieldException {
 
-		public MustAddAtLeastOneField() {
+		public MustNotDeleteLastCustomObjectField(
+			ObjectDefinition objectDefinition, ObjectField objectField) {
+
 			super(
-				"At least one object field must be added",
-				"at-least-one-object-field-must-be-added");
+				Arrays.asList(
+					objectField.getName(), objectDefinition.getShortName()),
+				String.format(
+					"\"%s\" cannot be deleted because it is the only custom " +
+						"object field of the object definition \"%s\"",
+					objectField.getName(), objectDefinition.getShortName()),
+				"x-is-the-only-custom-object-field-of-the-published-object-" +
+					"definition-x-and-cannot-be-deleted");
 		}
 
 	}
 
-	public static class MustIntroduceNewCustomField
+	public static class MustNotDeleteObjectField
 		extends RequiredObjectFieldException {
 
-		public MustIntroduceNewCustomField(ObjectDefinition objectDefinition) {
+		public MustNotDeleteObjectField(ObjectField objectField) {
 			super(
-				"Deletion not allowed because a relationship field is being ",
-				"used in the object definition " +
-					objectDefinition.getShortName());
-
-			_arguments = Collections.singletonList(
-				objectDefinition.getShortName());
-			_messageKey =
-				"deletion-not-allowed-because-a-relationship-field-is-being-" +
-					"used-in-the-object-definition-x";
+				Collections.singletonList(objectField.getName()),
+				String.format(
+					"Object field \"%s\" cannot be deleted",
+					objectField.getName()),
+				"object-field-x-cannot-be-deleted");
 		}
 
 	}
 
-	private RequiredObjectFieldException(String message, String messageKey) {
+	private RequiredObjectFieldException(
+		List<Object> arguments, String message, String messageKey) {
+
 		super(message);
 
+		_arguments = arguments;
 		_messageKey = messageKey;
 	}
 
-	private static List<Object> _arguments;
-	private static String _messageKey;
+	private final List<Object> _arguments;
+	private final String _messageKey;
 
 }
