@@ -2981,8 +2981,7 @@ public class DefaultObjectEntryManagerImplTest
 					new ObjectEntry() {
 						{
 							properties = HashMapBuilder.<String, Object>put(
-								"r_rootOneToManyRelationshipName_" +
-									"accountEntryId",
+								"r_oneToManyRelationshipName_accountEntryId",
 								accountEntry.getAccountEntryId()
 							).build();
 						}
