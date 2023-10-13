@@ -1001,7 +1001,7 @@ public class DefaultObjectEntryManagerImplTest
 
 		_assignAccountEntryRole(accountEntry1, _buyerRole, _user);
 
-		_addObjectEntryHierarchyWithAccountEntry(accountEntry1, _tree);
+		_addObjectEntryHierarchyWithAccountEntry(accountEntry1);
 
 		AccountEntry accountEntry2 = _addAccountEntry();
 
@@ -1304,7 +1304,7 @@ public class DefaultObjectEntryManagerImplTest
 		AccountEntry accountEntry1 = _addAccountEntry();
 
 		Map<Long, ObjectEntry> objectEntries =
-			_addObjectEntryHierarchyWithAccountEntry(accountEntry1, _tree);
+			_addObjectEntryHierarchyWithAccountEntry(accountEntry1);
 
 		_addResourcePermission(
 			_rootObjectDefinition, ActionKeys.VIEW, _buyerRole);
@@ -1930,11 +1930,11 @@ public class DefaultObjectEntryManagerImplTest
 
 		AccountEntry accountEntry1 = _addAccountEntry();
 
-		_addObjectEntryHierarchyWithAccountEntry(accountEntry1, _tree);
+		_addObjectEntryHierarchyWithAccountEntry(accountEntry1);
 
 		AccountEntry accountEntry2 = _addAccountEntry();
 
-		_addObjectEntryHierarchyWithAccountEntry(accountEntry2, _tree);
+		_addObjectEntryHierarchyWithAccountEntry(accountEntry2);
 
 		_user = _addUser();
 
@@ -2539,7 +2539,7 @@ public class DefaultObjectEntryManagerImplTest
 		AccountEntry accountEntry1 = _addAccountEntry();
 
 		Map<Long, ObjectEntry> objectEntries =
-			_addObjectEntryHierarchyWithAccountEntry(accountEntry1, _tree);
+			_addObjectEntryHierarchyWithAccountEntry(accountEntry1);
 
 		_addResourcePermission(
 			_rootObjectDefinition, ActionKeys.VIEW, _accountAdministratorRole);
@@ -2964,10 +2964,10 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	private Map<Long, ObjectEntry> _addObjectEntryHierarchyWithAccountEntry(
-			AccountEntry accountEntry, Tree tree)
+			AccountEntry accountEntry)
 		throws Exception {
 
-		Iterator<Node> iterator = tree.iterator();
+		Iterator<Node> iterator = _tree.iterator();
 
 		Node rootNode = iterator.next();
 
