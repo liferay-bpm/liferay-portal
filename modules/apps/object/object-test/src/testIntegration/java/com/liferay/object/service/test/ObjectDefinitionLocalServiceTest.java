@@ -1648,7 +1648,8 @@ public class ObjectDefinitionLocalServiceTest {
 			).put(
 				"AB", new String[0]
 			).build(),
-			_treeFactory.create(objectDefinition.getRootObjectDefinitionId()),
+			_treeFactory.createObjectDefinitionTree(
+				objectDefinition.getRootObjectDefinitionId()),
 			_objectDefinitionLocalService);
 
 		// Unbind object definition leaf node
@@ -1659,7 +1660,8 @@ public class ObjectDefinitionLocalServiceTest {
 			LinkedHashMapBuilder.put(
 				"A", new String[0]
 			).build(),
-			_treeFactory.create(objectDefinition.getRootObjectDefinitionId()),
+			_treeFactory.createObjectDefinitionTree(
+				objectDefinition.getRootObjectDefinitionId()),
 			_objectDefinitionLocalService);
 
 		// Unbind object definition root node
@@ -2368,7 +2370,8 @@ public class ObjectDefinitionLocalServiceTest {
 		}
 
 		TreeTestUtil.assertTree(
-			expectedMap, _treeFactory.create(rootObjectDefinitionId),
+			expectedMap,
+			_treeFactory.createObjectDefinitionTree(rootObjectDefinitionId),
 			_objectDefinitionLocalService);
 	}
 
