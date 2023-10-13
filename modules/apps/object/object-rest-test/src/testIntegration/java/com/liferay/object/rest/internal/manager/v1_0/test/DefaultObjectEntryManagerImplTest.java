@@ -1285,7 +1285,7 @@ public class DefaultObjectEntryManagerImplTest
 	public void testDeleteObjectEntryHierarchyWithAccountRestriction()
 		throws Exception {
 
-		// Root account entry restricted must be inherited
+		// Root account restriction must be inherited
 
 		AccountEntry accountEntry1 = _addAccountEntry();
 
@@ -1299,7 +1299,7 @@ public class DefaultObjectEntryManagerImplTest
 
 		_assignAccountEntryRole(accountEntry1, _buyerRole, _user);
 
-		ObjectEntry contextObjectEntry = objectEntries.get(
+		ObjectEntry rootObjectEntry = objectEntries.get(
 			_rootObjectDefinition.getObjectDefinitionId());
 
 		TreeTestUtil.forEachNodeObjectDefinition(
@@ -1315,7 +1315,7 @@ public class DefaultObjectEntryManagerImplTest
 						"User ", _user.getUserId(),
 						" must have DELETE permission for ",
 						_rootObjectDefinition.getClassName(), StringPool.SPACE,
-						contextObjectEntry.getId()),
+						rootObjectEntry.getId()),
 					() -> _defaultObjectEntryManager.deleteObjectEntry(
 						objectDefinition, objectEntry.getId()));
 			});
@@ -1912,7 +1912,7 @@ public class DefaultObjectEntryManagerImplTest
 	public void testGetObjectEntriesHierarchyWithAccountRestriction()
 		throws Exception {
 
-		// Root account entry restricted must be inherited
+		// Root account restrictions must be inherited
 
 		AccountEntry accountEntry1 = _addAccountEntry();
 
@@ -2520,7 +2520,7 @@ public class DefaultObjectEntryManagerImplTest
 	public void testUpdateObjectEntryHierarchyWithAccountRestriction()
 		throws Exception {
 
-		// Root account entry restricted must be inherited
+		// Root account restrictions must be inherited
 
 		AccountEntry accountEntry1 = _addAccountEntry();
 
@@ -2535,7 +2535,7 @@ public class DefaultObjectEntryManagerImplTest
 		_assignAccountEntryRole(
 			accountEntry1, _accountAdministratorRole, _user);
 
-		ObjectEntry contextObjectEntry = objectEntries.get(
+		ObjectEntry rootObjectEntry = objectEntries.get(
 			_rootObjectDefinition.getObjectDefinitionId());
 
 		TreeTestUtil.forEachNodeObjectDefinition(
@@ -2550,7 +2550,7 @@ public class DefaultObjectEntryManagerImplTest
 						"User ", _user.getUserId(),
 						" must have UPDATE permission for ",
 						_rootObjectDefinition.getClassName(), StringPool.SPACE,
-						contextObjectEntry.getId()),
+						rootObjectEntry.getId()),
 					() -> _defaultObjectEntryManager.updateObjectEntry(
 						_simpleDTOConverterContext, objectDefinition,
 						objectEntry.getId(), objectEntry));
