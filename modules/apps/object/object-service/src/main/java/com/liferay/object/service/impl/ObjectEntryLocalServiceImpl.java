@@ -3830,7 +3830,7 @@ public class ObjectEntryLocalServiceImpl
 
 		TreeFactory treeFactory = _treeFactorySnapshot.get();
 
-		Tree tree = treeFactory.create(
+		Tree tree = treeFactory.createObjectDefinitionTree(
 			objectDefinition.getRootObjectDefinitionId());
 
 		Node node = tree.getNode(objectDefinition.getObjectDefinitionId());
@@ -3898,7 +3898,8 @@ public class ObjectEntryLocalServiceImpl
 			TreeFactory treeFactory)
 		throws PortalException {
 
-		Tree tree = treeFactory.create(objectEntry.getObjectEntryId(), false);
+		Tree tree = treeFactory.createObjectEntryTree(
+			objectEntry.getObjectEntryId());
 
 		Iterator<Node> iterator = tree.iterator();
 
