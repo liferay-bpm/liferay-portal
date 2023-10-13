@@ -174,8 +174,8 @@ public class SystemObjectMtoMObjectRelatedModelsProviderImpl
 
 	@Override
 	public List<T> getUnrelatedModels(
-		long companyId, long groupId, ObjectDefinition objectDefinition,
-		long objectEntryId, long objectRelationshipId, int start, int end)
+			long companyId, long groupId, ObjectDefinition objectDefinition,
+			long objectEntryId, long objectRelationshipId, int start, int end)
 		throws PortalException {
 
 		Column<?, Long> companyIdColumn = (Column<?, Long>)_table.getColumn(
@@ -251,7 +251,9 @@ public class SystemObjectMtoMObjectRelatedModelsProviderImpl
 								dynamicObjectRelationshipMappingTable
 							).where(
 								primaryKeyColumn1.eq(objectEntryId)
-							).limit(start, end));
+							).limit(
+								start, end
+							));
 					}
 				)
 			));
@@ -259,8 +261,9 @@ public class SystemObjectMtoMObjectRelatedModelsProviderImpl
 
 	@Override
 	public int getUnrelatedModelsCount(
-		long companyId, long groupId, ObjectDefinition objectDefinition,
-		long objectEntryId, long objectRelationshipId) throws PortalException {
+			long companyId, long groupId, ObjectDefinition objectDefinition,
+			long objectEntryId, long objectRelationshipId)
+		throws PortalException {
 
 		Column<?, Long> companyIdColumn = (Column<?, Long>)_table.getColumn(
 			"companyId");
@@ -275,10 +278,10 @@ public class SystemObjectMtoMObjectRelatedModelsProviderImpl
 
 		DynamicObjectRelationshipMappingTable
 			dynamicObjectRelationshipMappingTable =
-			new DynamicObjectRelationshipMappingTable(
-				objectDefinition1.getPKObjectFieldDBColumnName(),
-				objectDefinition.getPKObjectFieldDBColumnName(),
-				objectRelationship.getDBTableName());
+				new DynamicObjectRelationshipMappingTable(
+					objectDefinition1.getPKObjectFieldDBColumnName(),
+					objectDefinition.getPKObjectFieldDBColumnName(),
+					objectRelationship.getDBTableName());
 
 		PersistedModelLocalService persistedModelLocalService =
 			_persistedModelLocalServiceRegistry.getPersistedModelLocalService(
@@ -313,11 +316,11 @@ public class SystemObjectMtoMObjectRelatedModelsProviderImpl
 
 						Column<DynamicObjectRelationshipMappingTable, Long>
 							primaryKeyColumn1 =
-							(Column
-								<DynamicObjectRelationshipMappingTable,
-									Long>)
-								dynamicObjectRelationshipMappingTable.
-									getColumn(primaryKeyColumnName1);
+								(Column
+									<DynamicObjectRelationshipMappingTable,
+									 Long>)
+										 dynamicObjectRelationshipMappingTable.
+											 getColumn(primaryKeyColumnName1);
 
 						String primaryKeyColumnName2 =
 							objectDefinition.getPKObjectFieldDBColumnName();
