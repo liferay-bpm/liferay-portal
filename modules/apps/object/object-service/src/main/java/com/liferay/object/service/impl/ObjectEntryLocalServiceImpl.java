@@ -3798,7 +3798,7 @@ public class ObjectEntryLocalServiceImpl
 			MapUtil.getLong(values, objectField.getName()));
 
 		if (objectEntry.getRootObjectEntryId() != 0) {
-			_updateChildrenRootObjectEntryId(
+			_updateDescendantsRootObjectEntryId(
 				objectEntry, parentObjectEntry.getRootObjectEntryId(),
 				treeFactory);
 		}
@@ -3844,7 +3844,7 @@ public class ObjectEntryLocalServiceImpl
 			'.');
 	}
 
-	private void _updateChildrenRootObjectEntryId(
+	private void _updateDescendantsRootObjectEntryId(
 			ObjectEntry objectEntry, long rootObjectEntryId,
 			TreeFactory treeFactory)
 		throws PortalException {
