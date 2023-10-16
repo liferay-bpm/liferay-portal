@@ -450,7 +450,7 @@ public class DefaultObjectEntryManagerImplTest
 				_objectDefinition3.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"oneToManyRelationshipName", false,
+				"oneToManyRelationshipName1", false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
 		_objectDefinition3.setAccountEntryRestrictedObjectFieldId(
@@ -502,7 +502,7 @@ public class DefaultObjectEntryManagerImplTest
 				_rootObjectDefinition.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"oneToManyRelationshipName", false,
+				"oneToManyRelationshipName2", false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
 		_rootObjectDefinition.setAccountEntryRestricted(true);
@@ -995,19 +995,95 @@ public class DefaultObjectEntryManagerImplTest
 			_rootObjectDefinition, ObjectActionKeys.ADD_OBJECT_ENTRY,
 			_buyerRole);
 
-		_user = _addUser();
-
 		AccountEntry accountEntry = _addAccountEntry();
+
+		_user = _addUser();
 
 		_assignAccountEntryRole(accountEntry, _buyerRole, _user);
 
-		_addAccountRestrictedObjectEntryHierarchy(accountEntry);
+		Iterator<Node> iterator = _tree.iterator();
+
+		Node rootNode = iterator.next();
+
+		ObjectEntry objectEntry = _defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext,
+			objectDefinitionLocalService.getObjectDefinition(
+				rootNode.getPrimaryKey()),
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						"r_oneToManyRelationshipName2_accountEntryId",
+						accountEntry.getAccountEntryId()
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		Node node = iterator.next();
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.getObjectRelationship(
+				node.getEdge(
+				).getObjectRelationshipId());
+
+		ObjectField objectField = objectFieldLocalService.getObjectField(
+			objectRelationship.getObjectFieldId2());
+
+		_defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext,
+			objectDefinitionLocalService.getObjectDefinition(
+				node.getPrimaryKey()),
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						objectField.getName(), objectEntry.getId()
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		_removeResourcePermission(
 			_rootObjectDefinition, ObjectActionKeys.ADD_OBJECT_ENTRY,
 			_buyerRole);
 
-		// TODO Assert for each descendant that is not possible to add an entry
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", _user.getUserId(),
+				" must have ADD_OBJECT_ENTRY permission for ",
+				_rootObjectDefinition.getResourceName(), StringPool.SPACE),
+			() -> _defaultObjectEntryManager.addObjectEntry(
+				_simpleDTOConverterContext,
+				objectDefinitionLocalService.getObjectDefinition(
+					rootNode.getPrimaryKey()),
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							"r_oneToManyRelationshipName2_accountEntryId",
+							accountEntry.getAccountEntryId()
+						).build();
+					}
+				},
+				ObjectDefinitionConstants.SCOPE_COMPANY));
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", _user.getUserId(),
+				" must have ADD_OBJECT_ENTRY permission for ",
+				_rootObjectDefinition.getResourceName(), StringPool.SPACE),
+			() -> _defaultObjectEntryManager.addObjectEntry(
+				_simpleDTOConverterContext,
+				objectDefinitionLocalService.getObjectDefinition(
+					node.getPrimaryKey()),
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							objectField.getName(), objectEntry.getId()
+						).build();
+					}
+				},
+				ObjectDefinitionConstants.SCOPE_COMPANY));
 	}
 
 	@Test
@@ -2888,7 +2964,7 @@ public class DefaultObjectEntryManagerImplTest
 					new ObjectEntry() {
 						{
 							properties = HashMapBuilder.<String, Object>put(
-								"r_oneToManyRelationshipName_accountEntryId",
+								"r_oneToManyRelationshipName2_accountEntryId",
 								accountEntry.getAccountEntryId()
 							).build();
 						}
@@ -3009,7 +3085,7 @@ public class DefaultObjectEntryManagerImplTest
 			new ObjectEntry() {
 				{
 					properties = HashMapBuilder.<String, Object>put(
-						"r_oneToManyRelationshipName_accountEntryId",
+						"r_oneToManyRelationshipName1_accountEntryId",
 						accountEntry.getAccountEntryId()
 					).build();
 				}
@@ -3319,12 +3395,6 @@ public class DefaultObjectEntryManagerImplTest
 		return dlFileEntry.getFileEntryId();
 	}
 
-	private void _removeResourcePermission(String actionId, Role role)
-		throws Exception {
-
-		_removeResourcePermission(_objectDefinition3, actionId, role);
-	}
-
 	private void _removeResourcePermission(
 			ObjectDefinition objectDefinition, String actionId, Role role)
 		throws Exception {
@@ -3338,6 +3408,12 @@ public class DefaultObjectEntryManagerImplTest
 		_resourcePermissionLocalService.removeResourcePermission(
 			companyId, name, ResourceConstants.SCOPE_GROUP_TEMPLATE, "0",
 			role.getRoleId(), actionId);
+	}
+
+	private void _removeResourcePermission(String actionId, Role role)
+		throws Exception {
+
+		_removeResourcePermission(_objectDefinition3, actionId, role);
 	}
 
 	private void _testAddObjectEntryAccountEntryRestriction(
