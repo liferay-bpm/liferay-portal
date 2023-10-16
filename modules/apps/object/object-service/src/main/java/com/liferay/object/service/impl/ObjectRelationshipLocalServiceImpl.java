@@ -60,6 +60,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.security.RandomUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
@@ -213,13 +214,7 @@ public class ObjectRelationshipLocalServiceImpl
 				objectRelationship);
 		}
 
-		User user = _userLocalService.getUser(userId);
-
-		objectRelationship.setDBTableName(
-			StringBundler.concat(
-				"R_", user.getCompanyId(), objectDefinition1.getShortName(),
-				"_", objectDefinition2.getShortName(), "_",
-				objectRelationship.getName()));
+		objectRelationship.setDBTableName(_generateDBTableName());
 
 		objectRelationship =
 			objectRelationshipLocalService.updateObjectRelationship(
@@ -1011,6 +1006,33 @@ public class ObjectRelationshipLocalServiceImpl
 					objectField.getObjectFieldId());
 			}
 		}
+	}
+
+	private String _generateDBTableName() {
+		boolean invalidSequence = true;
+		String dbTableName = null;
+
+		while (invalidSequence) {
+			dbTableName = StringBundler.concat(
+				"R_",
+				StringUtil.randomAlphabeticString(
+					1
+				).toUpperCase(),
+				RandomUtil.nextInt(10),
+				StringUtil.randomAlphabeticString(
+					1
+				).toUpperCase(),
+				RandomUtil.nextInt(10));
+
+			ObjectRelationship objectRelationship =
+				objectRelationshipPersistence.fetchByDTN_R(dbTableName, false);
+
+			if (objectRelationship == null) {
+				invalidSequence = false;
+			}
+		}
+
+		return dbTableName;
 	}
 
 	private String _getServiceRegistrationKey(

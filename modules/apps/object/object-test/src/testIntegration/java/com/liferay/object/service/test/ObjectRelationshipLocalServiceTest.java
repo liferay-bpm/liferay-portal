@@ -58,6 +58,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -679,6 +681,13 @@ public class ObjectRelationshipLocalServiceTest {
 		}
 	}
 
+	private boolean _matchesWithRegex(String dbTableName) {
+		Matcher matcher = _manyToManyRelationshipTableNamePattern.matcher(
+			dbTableName);
+
+		return matcher.matches();
+	}
+
 	private void _testAddObjectRelationshipManyToMany(
 			String deletionType, ObjectDefinition objectDefinition1,
 			ObjectDefinition objectDefinition2, boolean system)
@@ -693,13 +702,6 @@ public class ObjectRelationshipLocalServiceTest {
 				objectDefinition2.getObjectDefinitionId(), 0, deletionType,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				name, system, ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
-
-		Assert.assertEquals(
-			StringBundler.concat(
-				"R_", objectRelationship.getCompanyId(),
-				objectDefinition1.getShortName(), "_",
-				objectDefinition2.getShortName(), "_", name),
-			objectRelationship.getDBTableName());
 
 		Map<String, String> pkObjectFieldDBColumnNames =
 			ObjectRelationshipUtil.getPKObjectFieldDBColumnNames(
@@ -855,12 +857,8 @@ public class ObjectRelationshipLocalServiceTest {
 			objectRelationship.getDBTableName(),
 			reverseObjectRelationship.getDBTableName());
 
-		Assert.assertEquals(
-			StringBundler.concat(
-				"R_", objectRelationship.getCompanyId(),
-				objectDefinition.getShortName(), "_",
-				relatedObjectDefinition.getShortName(), "_", name),
-			objectRelationship.getDBTableName());
+		Assert.assertTrue(
+			_matchesWithRegex(objectRelationship.getDBTableName()));
 
 		Map<String, String> pkObjectFieldDBColumnNames =
 			ObjectRelationshipUtil.getPKObjectFieldDBColumnNames(
@@ -965,6 +963,9 @@ public class ObjectRelationshipLocalServiceTest {
 
 		_addObjectRelationshipSystemObjectDefinition();
 	}
+
+	private static final Pattern _manyToManyRelationshipTableNamePattern =
+		Pattern.compile("R_[A-Z][0-9][A-Z][0-9]$");
 
 	@Inject
 	private static ObjectDefinitionLocalService _objectDefinitionLocalService;
