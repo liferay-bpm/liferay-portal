@@ -2744,14 +2744,14 @@ public class ObjectEntryLocalServiceTest {
 		_objectDefinitionLocalService.publishCustomObjectDefinition(
 			TestPropsValues.getUserId(), rootNode.getPrimaryKey());
 
-		ObjectEntry contextObjectEntry1 =
+		ObjectEntry rootObjectEntry1 =
 			_objectEntryLocalService.addObjectEntry(
 				TestPropsValues.getUserId(), 0, rootNode.getPrimaryKey(),
 				Collections.emptyMap(),
 				ServiceContextTestUtil.getServiceContext());
 
 		Map<Long, Long> objectEntriesId = HashMapBuilder.put(
-			rootNode.getPrimaryKey(), contextObjectEntry1.getObjectEntryId()
+			rootNode.getPrimaryKey(), rootObjectEntry1.getObjectEntryId()
 		).build();
 
 		while (iterator.hasNext()) {
@@ -2793,7 +2793,7 @@ public class ObjectEntryLocalServiceTest {
 							objectDefinition.getObjectDefinitionId()));
 
 				Assert.assertEquals(
-					contextObjectEntry1.getObjectEntryId(),
+					rootObjectEntry1.getObjectEntryId(),
 					objectEntry.getRootObjectEntryId());
 			});
 
@@ -2854,7 +2854,7 @@ public class ObjectEntryLocalServiceTest {
 					nodeObjectDefinition.getName())) {
 
 				Assert.assertEquals(
-					contextObjectEntry1.getObjectEntryId(),
+					rootObjectEntry1.getObjectEntryId(),
 					nodeObjectEntry.getRootObjectEntryId());
 			}
 			else {
