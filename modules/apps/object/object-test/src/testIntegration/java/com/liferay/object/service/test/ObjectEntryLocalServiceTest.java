@@ -2744,11 +2744,9 @@ public class ObjectEntryLocalServiceTest {
 		_objectDefinitionLocalService.publishCustomObjectDefinition(
 			TestPropsValues.getUserId(), rootNode.getPrimaryKey());
 
-		ObjectEntry rootObjectEntry1 =
-			_objectEntryLocalService.addObjectEntry(
-				TestPropsValues.getUserId(), 0, rootNode.getPrimaryKey(),
-				Collections.emptyMap(),
-				ServiceContextTestUtil.getServiceContext());
+		ObjectEntry rootObjectEntry1 = _objectEntryLocalService.addObjectEntry(
+			TestPropsValues.getUserId(), 0, rootNode.getPrimaryKey(),
+			Collections.emptyMap(), ServiceContextTestUtil.getServiceContext());
 
 		Map<Long, Long> objectEntryIds = HashMapBuilder.put(
 			rootNode.getPrimaryKey(), rootObjectEntry1.getObjectEntryId()
@@ -2820,18 +2818,16 @@ public class ObjectEntryLocalServiceTest {
 			}
 		}
 
-		ObjectEntry contextObjectEntry2 =
-			_objectEntryLocalService.addObjectEntry(
-				TestPropsValues.getUserId(), 0, rootNode.getPrimaryKey(),
-				Collections.emptyMap(),
-				ServiceContextTestUtil.getServiceContext());
+		ObjectEntry rootObjectEntry2 = _objectEntryLocalService.addObjectEntry(
+			TestPropsValues.getUserId(), 0, rootNode.getPrimaryKey(),
+			Collections.emptyMap(), ServiceContextTestUtil.getServiceContext());
 
 		ObjectEntry objectEntry = _objectEntryLocalService.getObjectEntry(
 			objectEntryIds.get(objectDefinition.getObjectDefinitionId()));
 
 		Map<String, Serializable> values = objectEntry.getValues();
 
-		values.put(objectFieldName, contextObjectEntry2.getObjectEntryId());
+		values.put(objectFieldName, rootObjectEntry2.getObjectEntryId());
 
 		_objectEntryLocalService.updateObjectEntry(
 			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(), values,
@@ -2859,7 +2855,7 @@ public class ObjectEntryLocalServiceTest {
 			}
 			else {
 				Assert.assertEquals(
-					contextObjectEntry2.getObjectEntryId(),
+					rootObjectEntry2.getObjectEntryId(),
 					nodeObjectEntry.getRootObjectEntryId());
 			}
 		}
