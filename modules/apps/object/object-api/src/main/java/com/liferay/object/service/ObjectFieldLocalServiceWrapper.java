@@ -476,6 +476,14 @@ public class ObjectFieldLocalServiceWrapper
 			uuid, companyId);
 	}
 
+	@Override
+	public int getObjectFieldCompositeKeyCount(
+		com.liferay.object.model.ObjectField objectField) {
+
+		return _objectFieldLocalService.getObjectFieldCompositeKeyCount(
+			objectField);
+	}
+
 	/**
 	 * Returns a range of all the object fields.
 	 *

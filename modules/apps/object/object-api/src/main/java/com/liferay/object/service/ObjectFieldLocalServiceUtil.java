@@ -417,6 +417,10 @@ public class ObjectFieldLocalServiceUtil {
 		return getService().getObjectFieldByUuidAndCompanyId(uuid, companyId);
 	}
 
+	public static int getObjectFieldCompositeKeyCount(ObjectField objectField) {
+		return getService().getObjectFieldCompositeKeyCount(objectField);
+	}
+
 	/**
 	 * Returns a range of all the object fields.
 	 *
