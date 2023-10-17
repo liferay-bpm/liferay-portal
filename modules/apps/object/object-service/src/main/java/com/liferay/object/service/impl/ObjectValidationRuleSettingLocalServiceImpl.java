@@ -112,7 +112,7 @@ public class ObjectValidationRuleSettingLocalServiceImpl
 		long objectValidationRuleId =
 			objectValidationRule.getObjectValidationRuleId();
 
-		_deleteOldObjectValidationRuleSettings(
+		_deleteObjectValidationRuleSettings(
 			objectValidationRuleId,
 			ObjectValidationRuleSettingConstants.
 				NAME_COMPOSITE_KEY_OBJECT_FIELD_ID,
@@ -122,7 +122,7 @@ public class ObjectValidationRuleSettingLocalServiceImpl
 				ObjectValidationRuleSettingConstants.
 					NAME_COMPOSITE_KEY_OBJECT_FIELD_ID));
 
-		_deleteOldObjectValidationRuleSettings(
+		_deleteObjectValidationRuleSettings(
 			objectValidationRuleId,
 			ObjectValidationRuleSettingConstants.NAME_OUTPUT_OBJECT_FIELD_ID,
 			outputObjectValidationRuleSettings,
@@ -178,13 +178,13 @@ public class ObjectValidationRuleSettingLocalServiceImpl
 		return updatedObjectValidationRuleSettings;
 	}
 
-	private void _deleteOldObjectValidationRuleSettings(
+	private void _deleteObjectValidationRuleSettings(
 			long objectValidationRuleId, String objectValidationRuleSettingName,
 			List<ObjectValidationRuleSetting> objectValidationRuleSettings,
 			List<ObjectValidationRuleSetting> oldObjectValidationRuleSettings)
 		throws PortalException {
 
-		Set<String> deleteOldObjectObjectValidationRuleSettingValues =
+		Set<String> deleteObjectObjectValidationRuleSettingValues =
 			SetUtil.asymmetricDifference(
 				TransformUtil.transform(
 					oldObjectValidationRuleSettings,
@@ -193,18 +193,14 @@ public class ObjectValidationRuleSettingLocalServiceImpl
 					objectValidationRuleSettings,
 					ObjectValidationRuleSetting::getValue));
 
-		for (String deleteOldObjectObjectValidationRuleSettingValue :
-				deleteOldObjectObjectValidationRuleSettingValues) {
-
-			ObjectValidationRuleSetting
-				serviceBuilderObjectValidationRuleSetting =
-					objectValidationRuleSettingPersistence.findByOVRI_N_V(
-						objectValidationRuleId, objectValidationRuleSettingName,
-						deleteOldObjectObjectValidationRuleSettingValue);
+		for (String deleteObjectObjectValidationRuleSettingValue :
+				deleteObjectObjectValidationRuleSettingValues) {
 
 			deleteObjectValidationRuleSetting(
-				serviceBuilderObjectValidationRuleSetting.
-					getObjectValidationRuleSettingId());
+				objectValidationRuleSettingPersistence.findByOVRI_N_V(
+					objectValidationRuleId, objectValidationRuleSettingName,
+					deleteObjectObjectValidationRuleSettingValue
+				).getObjectValidationRuleSettingId());
 		}
 	}
 

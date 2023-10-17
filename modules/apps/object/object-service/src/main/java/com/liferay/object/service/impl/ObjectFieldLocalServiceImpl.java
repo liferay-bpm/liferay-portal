@@ -12,6 +12,7 @@ import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.constants.ObjectValidationRuleSettingConstants;
 import com.liferay.object.definition.util.ObjectDefinitionUtil;
 import com.liferay.object.exception.DuplicateObjectFieldExternalReferenceCodeException;
 import com.liferay.object.exception.ObjectDefinitionEnableLocalizationException;
@@ -28,6 +29,7 @@ import com.liferay.object.exception.ObjectFieldRequiredException;
 import com.liferay.object.exception.ObjectFieldSettingValueException;
 import com.liferay.object.exception.ObjectFieldStateException;
 import com.liferay.object.exception.ObjectFieldSystemException;
+import com.liferay.object.exception.ObjectValidationRuleSettingValueException;
 import com.liferay.object.exception.RequiredObjectFieldException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
@@ -42,6 +44,7 @@ import com.liferay.object.model.ObjectEntryTable;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.model.ObjectValidationRuleSettingTable;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTableUtil;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
@@ -61,6 +64,7 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.sql.dsl.Column;
+import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.Table;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -477,6 +481,23 @@ public class ObjectFieldLocalServiceImpl
 			objectDefinitionId);
 	}
 
+	public int getObjectFieldCompositeKeyCount(ObjectField objectField) {
+		return dslQueryCount(
+			DSLQueryFactoryUtil.countDistinct(
+				ObjectValidationRuleSettingTable.INSTANCE.value
+			).from(
+				ObjectValidationRuleSettingTable.INSTANCE
+			).where(
+				ObjectValidationRuleSettingTable.INSTANCE.value.eq(
+					String.valueOf(objectField.getObjectFieldId())
+				).and(
+					ObjectValidationRuleSettingTable.INSTANCE.name.eq(
+						ObjectValidationRuleSettingConstants.
+							NAME_COMPOSITE_KEY_OBJECT_FIELD_ID)
+				)
+			));
+	}
+
 	@Override
 	public List<ObjectField> getObjectFields(long objectDefinitionId) {
 		return _getObjectFields(
@@ -890,6 +911,15 @@ public class ObjectFieldLocalServiceImpl
 			throw new ObjectFieldRelationshipTypeException(
 				"Object field cannot be deleted because it has a " +
 					"relationship type");
+		}
+
+		if (getObjectFieldCompositeKeyCount(objectField) > 0) {
+			throw new ObjectValidationRuleSettingValueException(
+				StringBundler.concat(
+					"This field cannot be deleted as it is used in a ",
+					"Composite Unique Key Validation. To remove this field, ",
+					"you must first delete the associated Composite Unique ",
+					"Key Validation."));
 		}
 
 		ObjectDefinition objectDefinition =
