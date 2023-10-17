@@ -27,7 +27,12 @@ export default function LeftSidebar({setShowModal}: LeftSidebarProps) {
 	);
 	const [query, setQuery] = useState('');
 	const [
-		{isLoadingObjectFolder, leftSidebarItems, selectedObjectFolder},
+		{
+			isLoadingObjectFolder,
+			leftSidebarItems,
+			selectedObjectFolder,
+			showSidebars,
+		},
 	] = useObjectFolderContext();
 
 	const filteredLeftSidebarItems = useMemo(() => {
@@ -86,7 +91,7 @@ export default function LeftSidebar({setShowModal}: LeftSidebarProps) {
 			panelWidth={300}
 			position="left"
 			resize={false}
-			triggerSideBarAnimation={true}
+			triggerSideBarAnimation={showSidebars}
 			verticalBarItems={[
 				{
 					title: 'objectsModelBuilderLeftSidebar',
