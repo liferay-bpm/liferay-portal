@@ -838,24 +838,20 @@ public class ObjectEntryLocalServiceImpl
 		);
 
 		if (!StringUtil.equals(objectDefinition.getScope(), "site")) {
-			return dslQueryCount(joinStep.where(predicate));
+			joinStep.where(predicate);
+
+			return dslQueryCount(joinStep);
 		}
+		
+		joinStep.innerJoinON(
+			ObjectEntryTable.INSTANCE,
+			ObjectEntryTable.INSTANCE.objectEntryId.eq(
+				dynamicObjectDefinitionTable.getPrimaryKeyColumn())
+		).where(
+			predicate.and(ObjectEntryTable.INSTANCE.groupId.eq(groupId))
+		);
 
-		return dslQueryCount(
-			joinStep.innerJoinON(
-				ObjectEntryTable.INSTANCE,
-				ObjectEntryTable.INSTANCE.objectEntryId.eq(
-					dynamicObjectDefinitionTable.getPrimaryKeyColumn())
-			).where(
-				predicate.and(
-					() -> {
-						if (groupId == 0) {
-							return null;
-						}
-
-						return ObjectEntryTable.INSTANCE.groupId.eq(groupId);
-					})
-			));
+		return dslQueryCount(joinStep);
 	}
 
 	@Override
