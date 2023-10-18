@@ -392,7 +392,7 @@ export function UniqueCompositeKey({
 					filter={true}
 					firstColumnHeader={Liferay.Language.get('label')}
 					onDeleteColumn={(objectFieldName) => {
-						const canNotDeleteObjectField = builderScreenItems.some(
+						const cannotDeleteObjectField = builderScreenItems.some(
 							(builderScreenItem) =>
 								(persistedObjectValidation.objectValidationRuleSettings as ObjectValidationRuleSetting[]).some(
 									(objectValidationRuleSetting) =>
@@ -405,7 +405,7 @@ export function UniqueCompositeKey({
 									.label === 'approved'
 						);
 
-						if (canNotDeleteObjectField) {
+						if (cannotDeleteObjectField) {
 							const parentWindow = Liferay.Util.getOpener();
 
 							parentWindow.Liferay.fire(
