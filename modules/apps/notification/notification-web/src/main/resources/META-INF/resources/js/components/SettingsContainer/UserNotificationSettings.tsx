@@ -116,7 +116,7 @@ export function UserNotificationSettings({
 			recipients: newRecipients,
 		});
 
-		setMultiSelectItems(items);
+		setMultiSelectItems([...new Set(items)]);
 	};
 
 	useEffect(() => {
