@@ -59,7 +59,7 @@ export function UserNotificationSettings({
 	const [searchTerm, setSearchTerm] = useState('');
 
 	const getRoles = async (searchTerm: string) => {
-		const query = `/o/headless-admin-user/v1.0/roles?page=1&pageSize=10${
+		const query = `/o/headless-admin-user/v1.0/roles?${
 			searchTerm ? `&search=${searchTerm}` : ''
 		}`;
 
