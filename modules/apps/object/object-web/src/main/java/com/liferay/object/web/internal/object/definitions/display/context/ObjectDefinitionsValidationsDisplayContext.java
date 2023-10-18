@@ -158,8 +158,7 @@ public class ObjectDefinitionsValidationsDisplayContext
 		return ObjectCodeEditorUtil.getCodeEditorElements(
 			includeDDMExpressionBuilderElements, true,
 			objectRequestHelper.getLocale(), getObjectDefinitionId(),
-			objectField -> !objectField.compareBusinessType(
-				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION));
+			objectField -> true);
 	}
 
 	private final ObjectValidationRuleEngineRegistry
