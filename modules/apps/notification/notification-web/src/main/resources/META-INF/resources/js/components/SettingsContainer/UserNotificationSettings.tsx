@@ -71,10 +71,12 @@ export function UserNotificationSettings({
 		const responseJSON = await response.json();
 
 		const roles = responseJSON.items.map(({name}: Role) => {
-			return {
-				label: name,
-				value: name,
-			};
+			if (name !== 'Guest') {
+				return {
+					label: name,
+					value: name,
+				};
+			}
 		});
 
 		setRolesList(roles);
