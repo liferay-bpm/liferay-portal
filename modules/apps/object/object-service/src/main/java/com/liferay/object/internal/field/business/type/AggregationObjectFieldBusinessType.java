@@ -60,12 +60,12 @@ public class AggregationObjectFieldBusinessType
 
 	@Override
 	public String getDBType() {
-		return ObjectFieldConstants.DB_TYPE_STRING;
+		return ObjectFieldConstants.DB_TYPE_BIG_DECIMAL;
 	}
 
 	@Override
 	public String getDDMFormFieldTypeName() {
-		return DDMFormFieldTypeConstants.TEXT;
+		return DDMFormFieldTypeConstants.NUMERIC;
 	}
 
 	@Override
@@ -97,7 +97,7 @@ public class AggregationObjectFieldBusinessType
 
 	@Override
 	public PropertyDefinition.PropertyType getPropertyType() {
-		return PropertyDefinition.PropertyType.TEXT;
+		return PropertyDefinition.PropertyType.BIG_DECIMAL;
 	}
 
 	@Override
