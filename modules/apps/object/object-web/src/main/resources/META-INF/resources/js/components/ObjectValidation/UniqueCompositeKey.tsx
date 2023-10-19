@@ -7,6 +7,7 @@ import {
 	API,
 	BuilderScreen,
 	Card,
+	MultiSelectItem,
 	MultipleSelect,
 	getLocalizableLabel,
 } from '@liferay/object-js-components-web';
@@ -28,13 +29,6 @@ interface isMatchingObjectFieldObjectValidationRuleSettingProps {
 interface ModalSelectObjectFieldItem extends ObjectField {
 	checked: boolean;
 }
-
-interface MultipleSelectOption {
-	checked: boolean;
-	externalReferenceCode: string;
-	label: string;
-}
-
 export interface UniqueCompositeKeyProps {
 	creationLanguageId: Liferay.Language.Locale;
 	customObjectFields: ObjectField[];
@@ -79,7 +73,7 @@ export function UniqueCompositeKey({
 		setModalSelectObjectFieldsItems,
 	] = useState<ModalSelectObjectFieldItem[]>([]);
 	const [multipleSelectOptions, setMultipleSelectOptions] = useState<
-		MultipleSelectOption[]
+		MultiSelectItem[]
 	>([]);
 	const [objectDefinition, setObjectDefinition] = useState<
 		ObjectDefinition
@@ -184,7 +178,7 @@ export function UniqueCompositeKey({
 
 		const newBuilderScreenItems: TBuilderScreenItem[] = [];
 		const newModalSelectObjectFieldsItems: ModalSelectObjectFieldItem[] = [];
-		const newMultipleSelectOptions: MultipleSelectOption[] = [];
+		const newMultipleSelectOptions: MultiSelectItem[] = [];
 
 		values.objectValidationRuleSettings.forEach(
 			(objectValidationRuleSetting) => {
@@ -229,9 +223,9 @@ export function UniqueCompositeKey({
 									}
 								)
 						),
-						externalReferenceCode:
-							filteredObjectFieldObjectValidationRuleSetting.externalReferenceCode,
 						label,
+						value:
+							filteredObjectFieldObjectValidationRuleSetting.externalReferenceCode,
 					});
 				}
 			}
@@ -364,7 +358,7 @@ export function UniqueCompositeKey({
 				setValues={setValues}
 				values={values}
 			>
-				<MultipleSelect<MultipleSelectOption>
+				<MultipleSelect
 					disabled={!builderScreenItems.length}
 					label={Liferay.Language.get('field')}
 					options={multipleSelectOptions}
@@ -381,8 +375,7 @@ export function UniqueCompositeKey({
 									objectValidationRuleSettings?.push({
 										name:
 											'outputObjectFieldExternalReferenceCode',
-										value:
-											newOutputObjectFieldOption.externalReferenceCode,
+										value: newOutputObjectFieldOption.value,
 									});
 								}
 							}
