@@ -1001,9 +1001,7 @@ public class DefaultObjectEntryManagerImplTest
 
 		_assignAccountEntryRole(accountEntry, _buyerRole, _user);
 
-		Iterator<Node> iterator = _tree.iterator();
-
-		Node rootNode = iterator.next();
+		Node rootNode = _tree.getRootNode();
 
 		ObjectEntry objectEntry = _defaultObjectEntryManager.addObjectEntry(
 			_simpleDTOConverterContext,
@@ -1019,11 +1017,16 @@ public class DefaultObjectEntryManagerImplTest
 			},
 			ObjectDefinitionConstants.SCOPE_COMPANY);
 
-		Node node = iterator.next();
+		ObjectDefinition objectDefinition =
+			objectDefinitionLocalService.fetchObjectDefinition(
+				companyId, "C_AA");
+
+		Node childNode = _tree.getNode(
+			objectDefinition.getObjectDefinitionId());
 
 		ObjectRelationship objectRelationship =
 			_objectRelationshipLocalService.getObjectRelationship(
-				node.getEdge(
+				childNode.getEdge(
 				).getObjectRelationshipId());
 
 		ObjectField objectField = objectFieldLocalService.getObjectField(
@@ -1032,7 +1035,7 @@ public class DefaultObjectEntryManagerImplTest
 		_defaultObjectEntryManager.addObjectEntry(
 			_simpleDTOConverterContext,
 			objectDefinitionLocalService.getObjectDefinition(
-				node.getPrimaryKey()),
+				childNode.getPrimaryKey()),
 			new ObjectEntry() {
 				{
 					properties = HashMapBuilder.<String, Object>put(
@@ -1075,7 +1078,7 @@ public class DefaultObjectEntryManagerImplTest
 			() -> _defaultObjectEntryManager.addObjectEntry(
 				_simpleDTOConverterContext,
 				objectDefinitionLocalService.getObjectDefinition(
-					node.getPrimaryKey()),
+					childNode.getPrimaryKey()),
 				new ObjectEntry() {
 					{
 						properties = HashMapBuilder.<String, Object>put(
