@@ -29,13 +29,31 @@ public class SalesforceAccessTokenWebCacheItem implements WebCacheItem {
 	public static JSONObject get(
 		SalesforceConfiguration salesforceConfiguration) {
 
-		return (JSONObject)WebCachePoolUtil.get(
-			StringBundler.concat(
-				SalesforceAccessTokenWebCacheItem.class.getName(),
-				StringPool.POUND, salesforceConfiguration.consumerKey(),
-				StringPool.POUND, salesforceConfiguration.consumerSecret(),
-				StringPool.POUND, salesforceConfiguration.username()),
+		String key = StringBundler.concat(
+			SalesforceAccessTokenWebCacheItem.class.getName(), StringPool.POUND,
+			salesforceConfiguration.consumerKey(), StringPool.POUND,
+			salesforceConfiguration.consumerSecret(), StringPool.POUND,
+			salesforceConfiguration.username());
+
+		JSONObject jsonObject = (JSONObject)WebCachePoolUtil.get(
+			key,
 			new SalesforceAccessTokenWebCacheItem(salesforceConfiguration));
+
+		if (jsonObject == null) {
+			return null;
+		}
+
+		if ((jsonObject.getLong("issued_at") + _REFRESH_TIME) <
+				System.currentTimeMillis()) {
+
+			WebCachePoolUtil.remove(key);
+
+			jsonObject = (JSONObject)WebCachePoolUtil.get(
+				key,
+				new SalesforceAccessTokenWebCacheItem(salesforceConfiguration));
+		}
+
+		return jsonObject;
 	}
 
 	public SalesforceAccessTokenWebCacheItem(
