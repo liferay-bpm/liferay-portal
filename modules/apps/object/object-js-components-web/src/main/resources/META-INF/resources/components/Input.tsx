@@ -47,6 +47,7 @@ export const Input = React.forwardRef<HTMLInputElement, IProps>(
 					name={name}
 					onBlur={onBlur}
 					onChange={onChange}
+					required={required}
 					onInput={onInput}
 					readOnly={readOnly}
 					ref={ref}
