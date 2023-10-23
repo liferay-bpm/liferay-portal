@@ -1111,7 +1111,7 @@ public class ObjectEntryLocalServiceTest {
 		_assertCount(1);
 
 		_assertObjectEntryValues(
-			21, values,
+			22, values,
 			_objectEntryLocalService.getValues(objectEntry.getObjectEntryId()));
 
 		values = HashMapBuilder.<String, Serializable>put(
@@ -1127,7 +1127,7 @@ public class ObjectEntryLocalServiceTest {
 		_assertCount(1);
 
 		_assertObjectEntryValues(
-			21, values,
+			22, values,
 			_objectEntryLocalService.getValues(objectEntry.getObjectEntryId()));
 
 		_addOrUpdateObjectEntry(
@@ -1603,7 +1603,7 @@ public class ObjectEntryLocalServiceTest {
 		_assertCount(1);
 
 		_assertObjectEntryValues(
-			21, values1, _getValuesFromDatabase(objectEntries.get(0)));
+			22, values1, _getValuesFromDatabase(objectEntries.get(0)));
 
 		// Add second object entry
 
@@ -1627,9 +1627,9 @@ public class ObjectEntryLocalServiceTest {
 		_assertCount(2);
 
 		_assertObjectEntryValues(
-			21, values1, _getValuesFromDatabase(objectEntries.get(0)));
+			22, values1, _getValuesFromDatabase(objectEntries.get(0)));
 		_assertObjectEntryValues(
-			21, values2, _getValuesFromDatabase(objectEntries.get(1)));
+			22, values2, _getValuesFromDatabase(objectEntries.get(1)));
 
 		// Add third object entry
 
@@ -1653,11 +1653,11 @@ public class ObjectEntryLocalServiceTest {
 		_assertCount(3);
 
 		_assertObjectEntryValues(
-			21, values1, _getValuesFromDatabase(objectEntries.get(0)));
+			22, values1, _getValuesFromDatabase(objectEntries.get(0)));
 		_assertObjectEntryValues(
-			21, values2, _getValuesFromDatabase(objectEntries.get(1)));
+			22, values2, _getValuesFromDatabase(objectEntries.get(1)));
 		_assertObjectEntryValues(
-			21, values3, _getValuesFromDatabase(objectEntries.get(2)));
+			22, values3, _getValuesFromDatabase(objectEntries.get(2)));
 
 		// Irrelevant object definition
 
@@ -1726,7 +1726,7 @@ public class ObjectEntryLocalServiceTest {
 		Assert.assertEquals(
 			objectEntry.getObjectEntryId(),
 			values.get(_objectDefinition.getPKObjectFieldName()));
-		Assert.assertEquals(values.toString(), 21, values.size());
+		Assert.assertEquals(values.toString(), 22, values.size());
 
 		AssertUtils.assertFailure(
 			NoSuchObjectEntryException.class,
@@ -1768,7 +1768,7 @@ public class ObjectEntryLocalServiceTest {
 
 		_assertCount(1);
 
-		_assertObjectEntryValues(27, values1, valuesList.get(0));
+		_assertObjectEntryValues(28, values1, valuesList.get(0));
 
 		// Add second object entry
 
@@ -1792,8 +1792,8 @@ public class ObjectEntryLocalServiceTest {
 
 		_assertCount(2);
 
-		_assertObjectEntryValues(27, values1, valuesList.get(0));
-		_assertObjectEntryValues(27, values2, valuesList.get(1));
+		_assertObjectEntryValues(28, values1, valuesList.get(0));
+		_assertObjectEntryValues(28, values2, valuesList.get(1));
 
 		// Add third object entry
 
@@ -1817,9 +1817,9 @@ public class ObjectEntryLocalServiceTest {
 
 		_assertCount(3);
 
-		_assertObjectEntryValues(27, values1, valuesList.get(0));
-		_assertObjectEntryValues(27, values2, valuesList.get(1));
-		_assertObjectEntryValues(27, values3, valuesList.get(2));
+		_assertObjectEntryValues(28, values1, valuesList.get(0));
+		_assertObjectEntryValues(28, values2, valuesList.get(1));
+		_assertObjectEntryValues(28, values3, valuesList.get(2));
 
 		// Irrelevant object definition
 
@@ -1907,7 +1907,7 @@ public class ObjectEntryLocalServiceTest {
 		List<ObjectEntry> objectEntries = baseModelSearchResult.getBaseModels();
 
 		_assertObjectEntryValues(
-			21, values1, _getValuesFromDatabase(objectEntries.get(0)));
+			22, values1, _getValuesFromDatabase(objectEntries.get(0)));
 
 		// Add second object entry
 
@@ -1932,9 +1932,9 @@ public class ObjectEntryLocalServiceTest {
 		objectEntries = baseModelSearchResult.getBaseModels();
 
 		_assertObjectEntryValues(
-			21, values1, _getValuesFromDatabase(objectEntries.get(0)));
+			22, values1, _getValuesFromDatabase(objectEntries.get(0)));
 		_assertObjectEntryValues(
-			21, values2, _getValuesFromDatabase(objectEntries.get(1)));
+			22, values2, _getValuesFromDatabase(objectEntries.get(1)));
 
 		// Add third object entry
 
@@ -1959,11 +1959,11 @@ public class ObjectEntryLocalServiceTest {
 		objectEntries = baseModelSearchResult.getBaseModels();
 
 		_assertObjectEntryValues(
-			21, values1, _getValuesFromDatabase(objectEntries.get(0)));
+			22, values1, _getValuesFromDatabase(objectEntries.get(0)));
 		_assertObjectEntryValues(
-			21, values2, _getValuesFromDatabase(objectEntries.get(1)));
+			22, values2, _getValuesFromDatabase(objectEntries.get(1)));
 		_assertObjectEntryValues(
-			21, values3, _getValuesFromDatabase(objectEntries.get(2)));
+			22, values3, _getValuesFromDatabase(objectEntries.get(2)));
 
 		// With keywords
 
@@ -2094,7 +2094,7 @@ public class ObjectEntryLocalServiceTest {
 		Assert.assertEquals(
 			objectEntry.getObjectEntryId(),
 			values.get(_objectDefinition.getPKObjectFieldName()));
-		Assert.assertEquals(values.toString(), 21, values.size());
+		Assert.assertEquals(values.toString(), 22, values.size());
 
 		Calendar calendar = new GregorianCalendar();
 
@@ -2174,7 +2174,7 @@ public class ObjectEntryLocalServiceTest {
 		Assert.assertEquals(
 			objectEntry.getObjectEntryId(),
 			values.get(_objectDefinition.getPKObjectFieldName()));
-		Assert.assertEquals(values.toString(), 21, values.size());
+		Assert.assertEquals(values.toString(), 22, values.size());
 
 		// LPS-180587 Partial updates should not delete existing files
 
@@ -2241,7 +2241,7 @@ public class ObjectEntryLocalServiceTest {
 		Assert.assertEquals(
 			objectEntry.getObjectEntryId(),
 			values.get(_objectDefinition.getPKObjectFieldName()));
-		Assert.assertEquals(values.toString(), 21, values.size());
+		Assert.assertEquals(values.toString(), 22, values.size());
 
 		AssertUtils.assertFailure(
 			NoSuchFileEntryException.class,
