@@ -60,6 +60,9 @@ export default function ObjectManagementToolbar({
 			isRootDescendantNode={isRootDescendantNode}
 			label={label}
 			onExternalReferenceCodeChange={(externalReferenceCode: string) => {
+				if (!setValues) {
+					return;
+				}
 				setValues({
 					externalReferenceCode,
 				});
