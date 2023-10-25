@@ -349,9 +349,13 @@ public class NotificationTemplateResourceImpl
 								getNotificationTemplateId()),
 					notificationTemplateAttachment -> {
 						ObjectField objectField =
-							_objectFieldLocalService.getObjectField(
+							_objectFieldLocalService.fetchObjectField(
 								notificationTemplateAttachment.
 									getObjectFieldId());
+
+						if (objectField == null) {
+							return null;
+						}
 
 						return objectField.getExternalReferenceCode();
 					},
