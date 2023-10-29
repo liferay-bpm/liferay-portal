@@ -413,4 +413,11 @@ public interface ObjectRelationshipLocalService
 			Map<Locale, String> labelMap)
 		throws PortalException;
 
+	@Indexable(type = IndexableType.REINDEX)
+	public ObjectRelationship
+			updateReverseObjectRelationshipExternalReferenceCode(
+				String externalReferenceCode,
+				ObjectRelationship objectRelationship)
+		throws PortalException;
+
 }
