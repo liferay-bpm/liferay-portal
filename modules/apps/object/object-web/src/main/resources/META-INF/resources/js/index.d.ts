@@ -298,6 +298,13 @@ type ObjectFieldDateRangeFilterSettings = {
 	[key: string]: string;
 };
 
+interface objectFieldBusinessType {
+	businessType: ObjectFieldBusinessType;
+	dbType: string;
+	description: string;
+	label: string;
+}
+
 type ObjectFieldFilterSetting = {
 	filterBy?: string;
 	filterType?: string;
@@ -364,13 +371,6 @@ type ObjectFieldSettingValue =
 	| boolean
 	| number
 	| string;
-
-interface ObjectFieldType {
-	businessType: ObjectFieldBusinessType;
-	dbType: string;
-	description: string;
-	label: string;
-}
 
 interface ObjectFieldView extends ObjectField {
 	checked?: boolean;

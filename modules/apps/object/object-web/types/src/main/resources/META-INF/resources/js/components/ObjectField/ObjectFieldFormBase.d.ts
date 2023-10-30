@@ -17,7 +17,7 @@ interface ObjectFieldFormBaseProps {
 	objectDefinitionExternalReferenceCode: string;
 	objectDefinitionName: string;
 	objectField: Partial<ObjectField>;
-	objectFieldTypes: ObjectFieldType[];
+	objectFieldBusinessTypes: objectFieldBusinessType[];
 	objectRelationshipId?: number;
 	onAggregationFilterChange?: (aggregationFilterArray: []) => void;
 	onObjectRelationshipChange?: (
@@ -43,7 +43,7 @@ export default function ObjectFieldFormBase({
 	objectDefinitionExternalReferenceCode,
 	objectDefinitionName,
 	objectField: values,
-	objectFieldTypes,
+	objectFieldBusinessTypes,
 	objectRelationshipId,
 	onAggregationFilterChange,
 	onObjectRelationshipChange,

@@ -29,7 +29,7 @@ interface BasicInfoTabProps {
 	isDefaultStorageType: boolean;
 	modelBuilder?: boolean;
 	objectDefinitionExternalReferenceCode: string;
-	objectFieldTypes: ObjectFieldType[];
+	objectFieldBusinessTypes: objectFieldBusinessType[];
 	objectRelationshipId: number;
 	onSubmit?: (editedObjectField?: Partial<ObjectField>) => void;
 	readOnly: boolean;
@@ -47,7 +47,7 @@ export declare function BasicInfoTab({
 	isDefaultStorageType,
 	modelBuilder,
 	objectDefinitionExternalReferenceCode,
-	objectFieldTypes,
+	objectFieldBusinessTypes,
 	objectRelationshipId,
 	onSubmit,
 	readOnly,

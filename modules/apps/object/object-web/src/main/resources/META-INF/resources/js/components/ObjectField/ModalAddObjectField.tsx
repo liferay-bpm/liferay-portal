@@ -41,9 +41,9 @@ export function ModalAddObjectField({
 	const [objectDefinition, setObjectDefinition] = useState<
 		ObjectDefinition
 	>();
-	const [objectFieldTypes, setObjectFieldTypes] = useState<ObjectFieldType[]>(
-		[]
-	);
+	const [objectFieldBusinessTypes, setObjectFieldBusinessTypes] = useState<
+		objectFieldBusinessType[]
+	>([]);
 	const {observer, onClose} = useModal({onClose: () => setVisibility(false)});
 
 	const initialValues: Partial<ObjectField> = {
@@ -118,20 +118,21 @@ export function ModalAddObjectField({
 
 			const url = createResourceURL(baseResourceURL, {
 				objectDefinitionId: objectDefinitionResponse.id,
-				p_p_resource_id: '/object_definitions/get_object_field_types',
+				p_p_resource_id:
+					'/object_definitions/get_object_field_business_types',
 			}).href;
 
-			const objectFieldTypesResponse = await fetch(url, {
+			const objectFieldBusinessTypesResponse = await fetch(url, {
 				method: 'GET',
 			});
 
 			const {
-				objectFieldTypes,
-			} = (await objectFieldTypesResponse.json()) as {
-				objectFieldTypes: ObjectFieldType[];
+				objectFieldBusinessTypes: newObjectFieldBusinessTypes,
+			} = (await objectFieldBusinessTypesResponse.json()) as {
+				objectFieldBusinessTypes: objectFieldBusinessType[];
 			};
 
-			setObjectFieldTypes(objectFieldTypes);
+			setObjectFieldBusinessTypes(newObjectFieldBusinessTypes);
 		};
 
 		makeFetch();
@@ -179,7 +180,7 @@ export function ModalAddObjectField({
 							}
 							objectDefinitionName={objectDefinitionName ?? ''}
 							objectField={values}
-							objectFieldTypes={objectFieldTypes}
+							objectFieldBusinessTypes={objectFieldBusinessTypes}
 							setValues={setValues}
 						>
 							{showEnableTranslationToggle && (

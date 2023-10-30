@@ -26,7 +26,7 @@ interface BasicInfoContainerProps {
 	objectDefinition: Partial<ObjectDefinition>;
 	objectDefinitionExternalReferenceCode: string;
 	objectDefinitionName: string;
-	objectFieldTypes: ObjectFieldType[];
+	objectFieldBusinessTypes: objectFieldBusinessType[];
 	objectRelationshipId: number;
 	onSubmit?: () => void;
 	readOnly: boolean;
@@ -45,7 +45,7 @@ export function BasicInfoContainer({
 	objectDefinition,
 	objectDefinitionExternalReferenceCode,
 	objectDefinitionName,
-	objectFieldTypes,
+	objectFieldBusinessTypes,
 	objectRelationshipId,
 	onSubmit,
 	readOnly,
@@ -106,7 +106,7 @@ export function BasicInfoContainer({
 				}
 				objectDefinitionName={objectDefinitionName}
 				objectField={values}
-				objectFieldTypes={objectFieldTypes}
+				objectFieldBusinessTypes={objectFieldBusinessTypes}
 				objectRelationshipId={objectRelationshipId}
 				onAggregationFilterChange={setAggregationFilters}
 				onObjectRelationshipChange={
