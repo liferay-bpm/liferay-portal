@@ -135,7 +135,7 @@ public class ObjectEntryModelResourcePermission
 		User user = permissionChecker.getUser();
 
 		if (!_isObjectActionName(
-				objectEntry.getObjectDefinitionId(), actionId)) {
+				actionId, objectEntry.getObjectDefinitionId())) {
 
 			objectEntry = _getContextObjectEntry(objectEntry);
 		}
@@ -304,7 +304,7 @@ public class ObjectEntryModelResourcePermission
 	}
 
 	private boolean _isObjectActionName(
-		long objectDefinitionId, String actionId) {
+		String actionId, long objectDefinitionId) {
 
 		for (ObjectAction objectAction :
 				_objectActionLocalService.getObjectActions(
