@@ -13,6 +13,7 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.Table;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -25,7 +26,6 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,13 +101,42 @@ public class AddObjectFieldCompositeKeyCandidatesMVCResourceCommand
 						return StringPool.BLANK;
 					}
 
+					String fieldKey = "field";
+					String objectFieldLabelsArgument = objectFieldLabels.get(0);
+
+					if (objectFieldLabels.size() > 1) {
+						fieldKey = "fields";
+
+						StringBuilder stringBuilder = new StringBuilder(
+							objectFieldLabels.get(0));
+
+						for (int i = 1; i < (objectFieldLabels.size() - 1);
+							 i++) {
+
+							stringBuilder.append(StringPool.COMMA_AND_SPACE);
+							stringBuilder.append(objectFieldLabels.get(i));
+						}
+
+						stringBuilder.append(StringPool.SPACE);
+						stringBuilder.append(
+							_language.get(
+								_portal.getHttpServletRequest(resourceRequest),
+								"and"
+							).toLowerCase());
+						stringBuilder.append(StringPool.SPACE);
+						stringBuilder.append(
+							objectFieldLabels.get(
+								objectFieldLabels.size() - 1));
+
+						objectFieldLabelsArgument = stringBuilder.toString();
+					}
+
 					return _language.format(
 						_portal.getHttpServletRequest(resourceRequest),
-						"the-selected-fields-x-cannot-be-added-to-the-unique-" +
-							"composite-key",
-						StringUtil.merge(
-							objectFieldLabels, StringPool.COMMA_AND_SPACE),
-						false);
+						StringBundler.concat(
+							"the-selected-", fieldKey,
+							"-x-cannot-be-added-to-the-unique-composite-key"),
+						objectFieldLabelsArgument, false);
 				}
 			).put(
 				"status",
