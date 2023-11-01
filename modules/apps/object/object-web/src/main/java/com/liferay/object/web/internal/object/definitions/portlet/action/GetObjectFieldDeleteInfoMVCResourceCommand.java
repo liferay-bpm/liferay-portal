@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -66,7 +67,9 @@ public class GetObjectFieldDeleteInfoMVCResourceCommand
 			).put(
 				"showDeletionModal",
 				() -> {
-					if (objectDefinition.isApproved() &&
+					if ((objectDefinition.isApproved() ||
+						 (objectDefinition.getStatus() ==
+							 WorkflowConstants.STATUS_DRAFT)) &&
 						_shouldDeleteLastPublishedObjectDefinitionObjectField(
 							objectDefinition, objectField) &&
 						_shouldDeleteObjectFieldObjectValidationRuleSetting(
