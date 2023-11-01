@@ -371,6 +371,7 @@ export default function LeftSidebarTreeView({
 										'lfr-objects__model-builder-left-sidebar-item': selected,
 										'lfr-objects__model-builder-left-sidebar-item-linked': linked,
 									})}
+									onClick={(event) => event.preventDefault()}
 								>
 									<Icon symbol={TYPES_TO_SYMBOLS[type]} />
 
