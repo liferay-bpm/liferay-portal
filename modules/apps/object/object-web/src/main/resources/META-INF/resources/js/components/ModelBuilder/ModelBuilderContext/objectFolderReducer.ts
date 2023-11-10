@@ -970,7 +970,7 @@ export function ObjectFolderReducer(state: TState, action: TAction): TState {
 				(objectDefinitionNode) => {
 					if (
 						objectDefinitionNode.data?.id ===
-						updatedObjectDefinition.id?.toString()
+						updatedObjectDefinition.id
 					) {
 						return {
 							...objectDefinitionNode,
@@ -1000,8 +1000,8 @@ export function ObjectFolderReducer(state: TState, action: TAction): TState {
 						updatedObjectDefinitions = leftSidebarItem.leftSidebarObjectDefinitionItems?.map(
 							(leftSidebarObjectDefinitionItem) => {
 								if (
-									leftSidebarObjectDefinitionItem.id.toString() ===
-									updatedObjectDefinition.id?.toString()
+									leftSidebarObjectDefinitionItem.id ===
+									updatedObjectDefinition.id
 								) {
 									return {
 										...leftSidebarObjectDefinitionItem,
