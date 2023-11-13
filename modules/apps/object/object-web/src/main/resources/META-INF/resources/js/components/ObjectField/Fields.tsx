@@ -4,6 +4,7 @@
  */
 
 import {Text} from '@clayui/core';
+import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {FrontendDataSet} from '@liferay/frontend-data-set-web';
 import {API, getLocalizableLabel} from '@liferay/object-js-components-web';
 import {sub} from 'frontend-js-web';
@@ -51,6 +52,8 @@ export default function Fields({
 		deletedObjectField,
 		setDeletedObjectField,
 	] = useState<ObjectField | null>(null);
+
+	const [reloadFDS, setReloadFDS] = useState(false);
 
 	const [showAddFieldModal, setShowAddFieldModal] = useState(false);
 
@@ -221,9 +224,19 @@ export default function Fields({
 		],
 	};
 
+	useEffect(() => {
+		if (reloadFDS) {
+			setTimeout(() => setReloadFDS(false), 200);
+		}
+	}, [reloadFDS]);
+
 	return (
 		<>
-			<FrontendDataSet {...dataSetProps} />
+			{reloadFDS ? (
+				<ClayLoadingIndicator displayType="secondary" size="sm" />
+			) : (
+				<FrontendDataSet {...dataSetProps} />
+			)}
 
 			{showAddFieldModal && (
 				<ModalAddObjectField
@@ -236,7 +249,7 @@ export default function Fields({
 					}
 					onAfterSubmit={() => {
 						setShowAddFieldModal(false);
-						window.location.reload();
+						setReloadFDS(true);
 					}}
 					setVisibility={setShowAddFieldModal}
 				/>
