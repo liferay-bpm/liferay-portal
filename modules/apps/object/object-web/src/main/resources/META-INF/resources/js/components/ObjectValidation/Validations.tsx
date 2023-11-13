@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {FrontendDataSet} from '@liferay/frontend-data-set-web';
 
 // @ts-ignore
@@ -46,6 +47,7 @@ export default function Validations({
 	style,
 	url,
 }: ValidationsProps) {
+	const [reloadFDS, setReloadFDS] = useState(false);
 	const [
 		showAddObjectRelationshipModal,
 		setShowAddObjectRelationshipModal,
@@ -167,9 +169,19 @@ export default function Validations({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	useEffect(() => {
+		if (reloadFDS) {
+			setTimeout(() => setReloadFDS(false), 200);
+		}
+	}, [reloadFDS]);
+
 	return (
 		<>
-			<FrontendDataSet {...dataSetProps} />
+			{reloadFDS ? (
+				<ClayLoadingIndicator displayType="secondary" size="sm" />
+			) : (
+				<FrontendDataSet {...dataSetProps} />
+			)}
 
 			{showAddObjectRelationshipModal && (
 				<ModalAddObjectValidation
@@ -177,6 +189,9 @@ export default function Validations({
 					objectValidationRuleEngines={
 						objectValidationRuleEnginesItems
 					}
+					onAfterSubmit={() => {
+						setReloadFDS(true);
+					}}
 					setShowAddObjectRelationshipModal={
 						setShowAddObjectRelationshipModal
 					}

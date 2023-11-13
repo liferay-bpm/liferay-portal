@@ -23,6 +23,7 @@ import {defaultLanguageId} from '../../utils/constants';
 interface ModalAddObjectValidationProps {
 	apiURL: string;
 	objectValidationRuleEngines: LabelValueObject[];
+	onAfterSubmit: () => void;
 	setShowAddObjectRelationshipModal: (value: boolean) => void;
 }
 
@@ -36,6 +37,7 @@ const initialValues: Partial<ObjectValidation> = {
 export function ModalAddObjectValidation({
 	apiURL,
 	objectValidationRuleEngines,
+	onAfterSubmit,
 	setShowAddObjectRelationshipModal,
 }: ModalAddObjectValidationProps) {
 	const [error, setError] = useState<string>('');
@@ -63,7 +65,9 @@ export function ModalAddObjectValidation({
 
 			onClose();
 
-			window.location.reload();
+			if (onAfterSubmit) {
+				onAfterSubmit();
+			}
 		}
 		catch (error) {
 			setError((error as Error).message);
