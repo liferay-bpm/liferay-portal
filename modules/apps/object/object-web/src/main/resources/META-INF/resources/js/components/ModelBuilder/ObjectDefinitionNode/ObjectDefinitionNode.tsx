@@ -372,7 +372,6 @@ export function ObjectDefinitionNode({
 					onAfterSubmit={(newObjectRelationshipId: number) =>
 						updateModelBuilderStructure(newObjectRelationshipId)
 					}
-					reload={false}
 				/>
 			)}
 

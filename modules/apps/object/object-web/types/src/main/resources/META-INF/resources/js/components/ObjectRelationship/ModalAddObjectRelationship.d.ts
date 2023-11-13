@@ -14,7 +14,6 @@ interface ModalAddObjectRelationshipProps {
 	objectDefinitionExternalReferenceCode2?: string;
 	objectRelationshipParameterRequired: boolean;
 	onAfterSubmit?: (objectRelationshipId: number) => void;
-	reload?: boolean;
 }
 export declare function ModalAddObjectRelationship({
 	baseResourceURL,
@@ -24,6 +23,5 @@ export declare function ModalAddObjectRelationship({
 	objectDefinitionExternalReferenceCode2,
 	objectRelationshipParameterRequired,
 	onAfterSubmit,
-	reload,
 }: ModalAddObjectRelationshipProps): JSX.Element;
 export {};

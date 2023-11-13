@@ -191,7 +191,6 @@ function DiagramBuilder() {
 					onAfterSubmit={(newObjectRelationshipId: number) =>
 						updateModelBuilderStructure(newObjectRelationshipId)
 					}
-					reload={false}
 				/>
 			)}
 

@@ -3,12 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {
-	FrontendDataSet,
-
-	// @ts-ignore
-
-} from '@liferay/frontend-data-set-web';
+import ClayLoadingIndicator from '@clayui/loading-indicator';
+import {FrontendDataSet} from '@liferay/frontend-data-set-web';
 import {API, getLocalizableLabel} from '@liferay/object-js-components-web';
 import classNames from 'classnames';
 import {sub} from 'frontend-js-web';
@@ -94,6 +90,7 @@ export default function Relationships({
 		objectRelationship,
 		setObjectRelationship,
 	] = useState<ObjectRelationship | null>();
+	const [reloadFDS, setReloadFDS] = useState(false);
 	const [showAddModal, setShowAddModal] = useState(false);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -242,14 +239,27 @@ export default function Relationships({
 		};
 	}, []);
 
+	useEffect(() => {
+		if (reloadFDS) {
+			setTimeout(() => setReloadFDS(false), 200);
+		}
+	}, [reloadFDS]);
+
 	return (
 		<>
-			<FrontendDataSet {...dataSetProps} />
+			{reloadFDS ? (
+				<ClayLoadingIndicator displayType="secondary" size="sm" />
+			) : (
+				<FrontendDataSet {...dataSetProps} />
+			)}
 
 			{showAddModal && (
 				<ModalAddObjectRelationship
 					baseResourceURL={baseResourceURL}
-					handleOnClose={() => setShowAddModal(false)}
+					handleOnClose={() => {
+						setShowAddModal(false);
+						setReloadFDS(true);
+					}}
 					objectDefinitionExternalReferenceCode1={
 						objectDefinitionExternalReferenceCode
 					}
