@@ -22,4 +22,8 @@ public class ObjectPortletKeys {
 		"com_liferay_object_web_internal_object_entries_portlet_" +
 			"ObjectEntriesPortlet";
 
+	public static final String OBJECT_FOLDERS =
+		"com_liferay_object_web_internal_object_folders_portlet_" +
+			"ObjectFoldersPortlet";
+
 }
