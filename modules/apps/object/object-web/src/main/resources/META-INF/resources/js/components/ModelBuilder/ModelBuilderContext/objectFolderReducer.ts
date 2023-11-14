@@ -16,7 +16,7 @@ import {
 	TAction,
 	TState,
 } from '../types';
-import {updateURLParam} from '../utils';
+import {getObjectFolderDiagramCenter, updateURLParam} from '../utils';
 import {
 	convertAllObjectFieldsToUnselected,
 	getNonOverlappingEdges,
@@ -33,10 +33,8 @@ export function ObjectFolderReducer(state: TState, action: TAction): TState {
 				selectedObjectFolderName,
 			} = action.payload;
 			const {elements, leftSidebarItems} = state;
-			let newPosition = {
-				x: 2 * 300,
-				y: 2 * 400,
-			};
+
+			let newPosition = getObjectFolderDiagramCenter();
 
 			if (objectDefinitionNodes.length) {
 				const yPositions = objectDefinitionNodes.map(
@@ -56,7 +54,7 @@ export function ObjectFolderReducer(state: TState, action: TAction): TState {
 						objectDefinitionNode.position.x === maximumX
 				)!.position;
 				newPosition = {
-					x: mostBottomRightNodePosition!.x + 300,
+					x: mostBottomRightNodePosition!.x + 380,
 					y: mostBottomRightNodePosition!.y,
 				};
 			}

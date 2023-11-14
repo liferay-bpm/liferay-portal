@@ -174,6 +174,24 @@ export function getObjectFolderName(): string {
 	return urlSearchParams.get('objectFolderName') || '';
 }
 
+export function getObjectFolderDiagramCenter() {
+	const diagramAreaPositionInfo = document
+		.querySelector('.lfr-objects__model-builder-diagram-area')
+		?.getBoundingClientRect();
+	const objectDefinitionNodePositionInfo = {height: 352, width: 284};
+
+	if (diagramAreaPositionInfo) {
+		return {
+			x:
+				diagramAreaPositionInfo.width / 2 -
+				objectDefinitionNodePositionInfo.width / 2,
+			y:
+				diagramAreaPositionInfo.height / 2 -
+				objectDefinitionNodePositionInfo.height / 2,
+		};
+	}
+}
+
 export function updateURLParam(paramType: string, paramValue: string) {
 	const currentURL = window.location.href;
 

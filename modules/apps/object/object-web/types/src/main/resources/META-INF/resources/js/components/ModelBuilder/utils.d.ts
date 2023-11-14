@@ -43,6 +43,12 @@ export declare function getEdgeParams(
 	targetY: number;
 };
 export declare function getObjectFolderName(): string;
+export declare function getObjectFolderDiagramCenter():
+	| {
+			x: number;
+			y: number;
+	  }
+	| undefined;
 export declare function updateURLParam(
 	paramType: string,
 	paramValue: string
