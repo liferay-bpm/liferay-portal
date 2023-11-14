@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import React from 'react';
-import {TObjectLayoutRow} from '../types';
-interface ObjectLayoutRowsProps extends React.HTMLAttributes<HTMLElement> {
+/// <reference types="react" />
+
+interface ObjectLayoutRowsProps {
 	boxIndex: number;
-	objectLayoutRows: TObjectLayoutRow[];
+	objectLayoutRows: ObjectLayoutRow[];
 	tabIndex: number;
 }
 export declare function ObjectLayoutRows({

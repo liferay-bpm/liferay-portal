@@ -3,18 +3,10 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {
-	TObjectLayout,
-	TObjectLayoutBox,
-	TObjectLayoutColumn,
-	TObjectLayoutRow,
-	TObjectLayoutTab,
-} from '../components/Layout/types';
-
 class TabsVisitor {
-	private _layout: TObjectLayout | null = null;
+	private _layout: ObjectLayout | null = null;
 
-	constructor(layout: TObjectLayout) {
+	constructor(layout: ObjectLayout) {
 		this.setLayout(layout);
 	}
 
@@ -22,13 +14,13 @@ class TabsVisitor {
 		this._layout = null;
 	}
 
-	setLayout(layout: TObjectLayout) {
+	setLayout(layout: ObjectLayout) {
 		this._layout = {...layout};
 	}
 
-	mapFields(mapper: (field: TObjectLayoutColumn) => void) {
+	mapFields(mapper: (field: ObjectLayoutColumn) => void) {
 		return this._layout?.objectLayoutTabs.map(
-			({objectLayoutBoxes}: TObjectLayoutTab) => {
+			({objectLayoutBoxes}: ObjectLayoutTab) => {
 				return objectLayoutBoxes.map(({objectLayoutRows}) => {
 					return objectLayoutRows.map(({objectLayoutColumns}) => {
 						return objectLayoutColumns.map((field) => {
@@ -42,9 +34,9 @@ class TabsVisitor {
 }
 
 class BoxesVisitor {
-	private _tab: TObjectLayoutTab | null = null;
+	private _tab: ObjectLayoutTab | null = null;
 
-	constructor(tab: TObjectLayoutTab) {
+	constructor(tab: ObjectLayoutTab) {
 		this.setTab(tab);
 	}
 
@@ -52,13 +44,13 @@ class BoxesVisitor {
 		this._tab = null;
 	}
 
-	setTab(tab: TObjectLayoutTab) {
+	setTab(tab: ObjectLayoutTab) {
 		this._tab = {...tab};
 	}
 
-	mapFields(mapper: (field: TObjectLayoutColumn) => void) {
+	mapFields(mapper: (field: ObjectLayoutColumn) => void) {
 		return this._tab?.objectLayoutBoxes.map(
-			({objectLayoutRows}: TObjectLayoutBox) => {
+			({objectLayoutRows}: ObjectLayoutBox) => {
 				return objectLayoutRows.map(({objectLayoutColumns}) => {
 					return objectLayoutColumns.map((field) => {
 						return field && mapper(field);
@@ -70,9 +62,9 @@ class BoxesVisitor {
 }
 
 class RowsVisitor {
-	private _box: TObjectLayoutBox | null = null;
+	private _box: ObjectLayoutBox | null = null;
 
-	constructor(box: TObjectLayoutBox) {
+	constructor(box: ObjectLayoutBox) {
 		this.setBox(box);
 	}
 
@@ -80,13 +72,13 @@ class RowsVisitor {
 		this._box = null;
 	}
 
-	setBox(box: TObjectLayoutBox) {
+	setBox(box: ObjectLayoutBox) {
 		this._box = {...box};
 	}
 
-	mapFields(mapper: (field: TObjectLayoutColumn) => void) {
+	mapFields(mapper: (field: ObjectLayoutColumn) => void) {
 		return this._box?.objectLayoutRows.map(
-			({objectLayoutColumns}: TObjectLayoutRow) => {
+			({objectLayoutColumns}: ObjectLayoutRow) => {
 				return objectLayoutColumns.map((field) => {
 					return field && mapper(field);
 				});

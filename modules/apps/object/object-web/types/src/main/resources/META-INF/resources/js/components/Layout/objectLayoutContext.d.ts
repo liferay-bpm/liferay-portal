@@ -4,29 +4,24 @@
  */
 
 import React from 'react';
-import {
-	BoxType,
-	TObjectField,
-	TObjectLayout,
-	TObjectRelationship,
-} from './types';
+import {ObjectLayoutField, ObjectLayoutRelationship} from './types';
 declare type TState = {
 	creationLanguageId: Liferay.Language.Locale;
 	enableCategorization: boolean;
 	isViewOnly: boolean;
 	objectFieldTypes: ObjectFieldType[];
-	objectFields: TObjectField[];
-	objectLayout: TObjectLayout;
+	objectFields: ObjectLayoutField[];
+	objectLayout: ObjectLayout;
 	objectLayoutId: string;
-	objectRelationships: TObjectRelationship[];
+	objectRelationships: ObjectLayoutRelationship[];
 };
 declare type TAction =
 	| {
 			payload: {
 				creationLanguageId: Liferay.Language.Locale;
 				enableCategorization: boolean;
-				objectLayout: TObjectLayout;
-				objectRelationships: TObjectRelationship[];
+				objectLayout: ObjectLayout;
+				objectRelationships: ObjectLayoutRelationship[];
 			};
 			type: TYPES.ADD_OBJECT_LAYOUT;
 	  }
@@ -41,13 +36,13 @@ declare type TAction =
 			payload: {
 				name: LocalizedValue<string>;
 				tabIndex?: number;
-				type: BoxType;
+				type: ObjectLayoutBoxType;
 			};
 			type: TYPES.ADD_OBJECT_LAYOUT_BOX;
 	  }
 	| {
 			payload: {
-				objectFields: TObjectField[];
+				objectFields: ObjectLayoutField[];
 			};
 			type: TYPES.ADD_OBJECT_FIELDS;
 	  }

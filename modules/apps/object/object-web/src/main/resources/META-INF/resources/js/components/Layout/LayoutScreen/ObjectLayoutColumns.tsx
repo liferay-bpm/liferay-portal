@@ -6,12 +6,11 @@
 import classNames from 'classnames';
 import React from 'react';
 
-import {TObjectLayoutColumn} from '../types';
 import {ObjectLayoutField} from './ObjectLayoutField';
 
-interface ObjectLayoutColumnsProps extends React.HTMLAttributes<HTMLElement> {
+interface ObjectLayoutColumnsProps {
 	boxIndex: number;
-	objectLayoutColumns?: TObjectLayoutColumn[];
+	objectLayoutColumns?: ObjectLayoutColumn[];
 	rowIndex: number;
 	tabIndex: number;
 }

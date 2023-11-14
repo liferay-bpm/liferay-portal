@@ -13,8 +13,7 @@ import React from 'react';
 
 import {useLayoutContext} from '../objectLayoutContext';
 
-interface ObjectLayoutRelationshipProps
-	extends React.HTMLAttributes<HTMLElement> {
+interface ObjectLayoutRelationshipProps {
 	objectRelationshipId: number;
 }
 

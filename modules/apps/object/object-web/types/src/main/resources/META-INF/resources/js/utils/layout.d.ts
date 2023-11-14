@@ -4,19 +4,18 @@
  */
 
 import {
-	TObjectField,
-	TObjectLayoutRow,
-	TObjectRelationship,
+	ObjectLayoutField,
+	ObjectLayoutRelationship,
 } from '../components/Layout/types';
 export declare function findObjectLayoutRowIndex(
-	objectLayoutRows: TObjectLayoutRow[],
+	objectLayoutRows: ObjectLayoutRow[],
 	fieldSize: number
 ): number;
 export declare function findObjectFieldIndexById(
-	objectFields: TObjectField[] | TObjectRelationship[],
+	objectFields: ObjectLayoutField[] | ObjectLayoutRelationship[],
 	objectFieldId: number
 ): number;
 export declare function findObjectFieldIndexByName(
-	objectFields: TObjectField[] | TObjectRelationship[],
+	objectFields: ObjectLayoutField[] | ObjectLayoutRelationship[],
 	objectFieldName: string
 ): number;

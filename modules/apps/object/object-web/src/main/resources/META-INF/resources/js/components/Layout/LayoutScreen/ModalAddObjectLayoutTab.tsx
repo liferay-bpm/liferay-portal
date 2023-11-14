@@ -23,7 +23,7 @@ import React, {useMemo, useState} from 'react';
 
 import {defaultLanguageId} from '../../../utils/constants';
 import {TYPES as EVENT_TYPES, useLayoutContext} from '../objectLayoutContext';
-import {TObjectLayoutTab, TObjectRelationship} from '../types';
+import {ObjectLayoutRelationship} from '../types';
 
 import './ModalAddObjectLayoutTab.scss';
 
@@ -140,7 +140,7 @@ export function ModalAddObjectLayoutTab({
 	] = useLayoutContext();
 	const [selectedType, setSelectedType] = useState(TYPES.FIELDS);
 	const [selectedRelationship, setSelectedRelationship] = useState<
-		TObjectRelationship
+		ObjectLayoutRelationship
 	>();
 
 	const objectRelationshipItems = useMemo(() => {
@@ -159,7 +159,7 @@ export function ModalAddObjectLayoutTab({
 		return availableObjectRelationships;
 	}, [creationLanguageId, objectRelationships]);
 
-	const onSubmit = (values: TObjectLayoutTab) => {
+	const onSubmit = (values: ObjectLayoutTab) => {
 		dispatch({
 			payload: {
 				name: {
@@ -173,8 +173,8 @@ export function ModalAddObjectLayoutTab({
 		onClose();
 	};
 
-	const onValidate = (values: Partial<TObjectLayoutTab>) => {
-		const errors: FormError<TObjectLayoutTab> = {};
+	const onValidate = (values: Partial<ObjectLayoutTab>) => {
+		const errors: FormError<ObjectLayoutTab> = {};
 
 		if (!getLocalizableLabel(creationLanguageId, values.name)) {
 			errors.name = REQUIRED_MSG;
@@ -190,13 +190,11 @@ export function ModalAddObjectLayoutTab({
 		return errors;
 	};
 
-	const {errors, handleSubmit, setValues, values} = useForm<TObjectLayoutTab>(
-		{
-			initialValues: {},
-			onSubmit,
-			validate: onValidate,
-		}
-	);
+	const {errors, handleSubmit, setValues, values} = useForm<ObjectLayoutTab>({
+		initialValues: {},
+		onSubmit,
+		validate: onValidate,
+	});
 
 	return (
 		<ClayModal observer={observer}>

@@ -4,13 +4,12 @@
  */
 
 import {
-	TObjectField,
-	TObjectLayoutRow,
-	TObjectRelationship,
+	ObjectLayoutField,
+	ObjectLayoutRelationship,
 } from '../components/Layout/types';
 
 export function findObjectLayoutRowIndex(
-	objectLayoutRows: TObjectLayoutRow[],
+	objectLayoutRows: ObjectLayoutRow[],
 	fieldSize: number
 ): number {
 	let objectLayoutRowIndex = -1;
@@ -35,7 +34,7 @@ export function findObjectLayoutRowIndex(
 }
 
 export function findObjectFieldIndexById(
-	objectFields: TObjectField[] | TObjectRelationship[],
+	objectFields: ObjectLayoutField[] | ObjectLayoutRelationship[],
 	objectFieldId: number
 ): number {
 	const objIds = objectFields.map(({id}) => id);
@@ -45,7 +44,7 @@ export function findObjectFieldIndexById(
 }
 
 export function findObjectFieldIndexByName(
-	objectFields: TObjectField[] | TObjectRelationship[],
+	objectFields: ObjectLayoutField[] | ObjectLayoutRelationship[],
 	objectFieldName: string
 ): number {
 	const objIds = objectFields.map(({name}) => name);

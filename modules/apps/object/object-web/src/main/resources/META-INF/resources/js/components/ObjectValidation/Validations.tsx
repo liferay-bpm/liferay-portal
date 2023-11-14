@@ -20,12 +20,11 @@ import {
 import FDSSourceDataRenderer from '../FDSPropsTransformer/FDSSourceDataRenderer';
 import {ModalAddObjectValidation} from './ModalAddObjectValidation';
 
-interface ItemData {
-	active: boolean;
-	id: number;
-}
-
-function ObjectFieldActiveDataRenderer({itemData}: {itemData: ItemData}) {
+function ObjectFieldActiveDataRenderer({
+	itemData,
+}: {
+	itemData: ObjectValidation;
+}) {
 	return itemData.active
 		? Liferay.Language.get('yes')
 		: Liferay.Language.get('no');
@@ -64,7 +63,7 @@ export default function Validations({
 		itemData,
 		openSidePanel,
 		value,
-	}: fdsItem<ItemData>) {
+	}: fdsItem<ObjectValidation>) {
 		const handleEditField = () => {
 			openSidePanel({
 				url: formatActionURL(url, itemData.id),

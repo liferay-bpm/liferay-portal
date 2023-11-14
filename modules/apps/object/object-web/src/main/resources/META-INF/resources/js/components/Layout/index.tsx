@@ -22,12 +22,7 @@ import {
 	TYPES,
 	useLayoutContext,
 } from './objectLayoutContext';
-import {
-	TObjectField,
-	TObjectLayout,
-	TObjectLayoutTab,
-	TObjectRelationship,
-} from './types';
+import {ObjectLayoutField, ObjectLayoutRelationship} from './types';
 
 const TABS = [
 	{
@@ -44,9 +39,9 @@ type TNormalizeObjectFields = ({
 	objectFields,
 	objectLayout,
 }: {
-	objectFields: TObjectField[];
-	objectLayout: TObjectLayout;
-}) => TObjectField[];
+	objectFields: ObjectLayoutField[];
+	objectLayout: ObjectLayout;
+}) => ObjectLayoutField[];
 
 const normalizeObjectFields: TNormalizeObjectFields = ({
 	objectFields,
@@ -72,9 +67,9 @@ type TNormalizeObjectRelationships = ({
 	objectLayoutTabs,
 	objectRelationships,
 }: {
-	objectLayoutTabs: TObjectLayoutTab[];
-	objectRelationships: TObjectRelationship[];
-}) => TObjectRelationship[];
+	objectLayoutTabs: ObjectLayoutTab[];
+	objectRelationships: ObjectLayoutRelationship[];
+}) => ObjectLayoutRelationship[];
 
 const normalizeObjectRelationships: TNormalizeObjectRelationships = ({
 	objectLayoutTabs,
@@ -114,7 +109,7 @@ const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 				name,
 				objectDefinitionExternalReferenceCode,
 				objectLayoutTabs,
-			} = await API.fetchJSON<TObjectLayout>(
+			} = await API.fetchJSON<ObjectLayout>(
 				`/o/object-admin/v1.0/object-layouts/${objectLayoutId}`
 			);
 

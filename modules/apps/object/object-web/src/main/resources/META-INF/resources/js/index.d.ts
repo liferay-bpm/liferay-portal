@@ -146,7 +146,7 @@ interface ObjectAction {
 	conditionExpression?: string;
 	description?: string;
 	errorMessage: LocalizedValue<string>;
-	id?: number;
+	id: number;
 	label: LocalizedValue<string>;
 	name: string;
 	objectActionExecutorKey: string;
@@ -155,6 +155,11 @@ interface ObjectAction {
 	objectDefinitionsRelationshipsURL: string;
 	parameters: ObjectActionParameters;
 	script?: string;
+	status: {
+		code: number;
+		label: string;
+		label_i18n: string;
+	};
 	system: boolean;
 }
 
@@ -398,6 +403,42 @@ interface ObjectFolderItem {
 	positionY: number;
 }
 
+interface ObjectLayout {
+	defaultObjectLayout: boolean;
+	id?: number;
+	name: LocalizedValue<string>;
+	objectDefinitionExternalReferenceCode: string;
+	objectLayoutTabs: ObjectLayoutTab[];
+}
+
+interface ObjectLayoutBox {
+	collapsable: boolean;
+	name: LocalizedValue<string>;
+	objectLayoutRows: ObjectLayoutRow[];
+	priority: number;
+	type: ObjectLayoutBoxType;
+}
+
+type ObjectLayoutBoxType = 'regular' | 'categorization';
+
+interface ObjectLayoutColumn {
+	objectFieldName: string;
+	priority: number;
+	size: number;
+}
+
+interface ObjectLayoutRow {
+	objectLayoutColumns: ObjectLayoutColumn[];
+	priority: number;
+}
+
+interface ObjectLayoutTab {
+	name: LocalizedValue<string>;
+	objectLayoutBoxes: ObjectLayoutBox[];
+	objectRelationshipId: number;
+	priority: number;
+}
+
 interface ObjectRelationship {
 	deletionType: string;
 	edge?: boolean;
@@ -442,6 +483,46 @@ interface ObjectValidationRuleSetting {
 		| 'compositeKeyObjectFieldExternalReferenceCode'
 		| 'outputObjectFieldExternalReferenceCode';
 	value: string;
+}
+
+interface ObjectView {
+	defaultObjectView: boolean;
+	id?: number;
+	name: LocalizedValue<string>;
+	objectDefinitionId: number;
+	objectViewColumns: ObjectViewColumn[];
+	objectViewFilterColumns: ObjectViewFilterColumn[];
+	objectViewSortColumns: ObjectViewSortColumn[];
+}
+
+interface ObjectViewColumn {
+	defaultSort?: boolean;
+	fieldLabel?: string;
+	label: LocalizedValue<string>;
+	objectFieldBusinessType?: string;
+	objectFieldName: string;
+	priority?: number;
+}
+
+interface ObjectViewFilterColumn {
+	definition: {[key: string]: string[]} | null;
+	disableEdit?: boolean;
+	fieldLabel?: string;
+	filterBy?: string;
+	filterType: string | null;
+	label: LocalizedValue<string>;
+	objectFieldBusinessType?: string;
+	objectFieldName: string;
+	value?: string;
+	valueList?: LabelValueObject[];
+}
+
+interface ObjectViewSortColumn {
+	fieldLabel?: string;
+	label: LocalizedValue<string>;
+	objectFieldName: string;
+	priority?: number;
+	sortOrder?: string;
 }
 
 type ObjectWebLearnResources = {

@@ -4,14 +4,13 @@
  */
 
 import React from 'react';
-import {BoxType, TObjectLayoutRow} from '../types';
 interface ObjectLayoutBoxProps extends React.HTMLAttributes<HTMLElement> {
 	boxIndex: number;
 	collapsable: boolean;
 	label: string;
-	objectLayoutRows?: TObjectLayoutRow[];
+	objectLayoutRows?: ObjectLayoutRow[];
 	tabIndex: number;
-	type: BoxType;
+	type: ObjectLayoutBoxType;
 }
 export declare function ObjectLayoutBox({
 	boxIndex,

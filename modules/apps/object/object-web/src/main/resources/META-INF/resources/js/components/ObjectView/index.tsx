@@ -19,7 +19,7 @@ import {DefaultSortScreen} from './DefaultSortScreen/DefaultSortScreen';
 import {FilterScreen} from './FilterScreen/FilterScreen';
 import ViewBuilderScreen from './ViewBuilderScreen/ViewBuilderScreen';
 import {TYPES, ViewContextProvider, useViewContext} from './objectViewContext';
-import {TObjectView, TWorkflowStatus} from './types';
+import {TWorkflowStatus} from './types';
 
 const TABS = [
 	{
@@ -63,7 +63,7 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 				objectViewColumns,
 				objectViewFilterColumns,
 				objectViewSortColumns,
-			} = await API.fetchJSON<TObjectView>(
+			} = await API.fetchJSON<ObjectView>(
 				`/o/object-admin/v1.0/object-views/${objectViewId}`
 			);
 
@@ -100,7 +100,7 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 	}, [objectDefinitionExternalReferenceCode, objectViewId, dispatch]);
 
 	const removeUnnecessaryPropertiesFromObjectView = (
-		objectView: TObjectView
+		objectView: ObjectView
 	) => {
 		const {
 			objectViewColumns,

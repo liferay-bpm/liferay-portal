@@ -21,12 +21,6 @@ import {deleteRelationship} from '../ViewObjectDefinitions/objectDefinitionUtil'
 import {ModalAddObjectRelationship} from './ModalAddObjectRelationship';
 import {ModalDeleteObjectRelationship} from './ModalDeleteObjectRelationship';
 
-interface ItemData {
-	id: number;
-	reverse: boolean;
-	system?: boolean;
-}
-
 interface RelationshipsProps extends IFDSTableProps {
 	baseResourceURL: string;
 	isApproved: boolean;
@@ -35,7 +29,11 @@ interface RelationshipsProps extends IFDSTableProps {
 	parameterRequired: boolean;
 }
 
-function ObjectFieldHierarchyDataRenderer({itemData}: {itemData: ItemData}) {
+function ObjectFieldHierarchyDataRenderer({
+	itemData,
+}: {
+	itemData: ObjectRelationship;
+}) {
 	return (
 		<strong
 			className={classNames(
@@ -53,7 +51,7 @@ function ObjectFieldHierarchyDataRenderer({itemData}: {itemData: ItemData}) {
 function ObjectRelationshipSourceDataRenderer({
 	itemData,
 }: {
-	itemData: ItemData;
+	itemData: ObjectRelationship;
 }) {
 	return (
 		<strong
@@ -120,7 +118,7 @@ export default function Relationships({
 		itemData,
 		openSidePanel,
 		value,
-	}: fdsItem<ItemData>) {
+	}: fdsItem<ObjectRelationship>) {
 		const handleEditField = () => {
 			openSidePanel({
 				url: formatActionURL(url, itemData.id),

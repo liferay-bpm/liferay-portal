@@ -15,11 +15,6 @@ import {
 } from '../../utils/fds';
 import {ModalBasicWithFieldName} from '../ModalBasicWithFieldName';
 
-interface ItemData {
-	defaultObjectView: boolean;
-	id: number;
-}
-
 export default function Views({
 	apiURL,
 	creationMenu,
@@ -36,10 +31,10 @@ export default function Views({
 		itemData,
 		openSidePanel,
 		value,
-	}: fdsItem<ItemData>) {
+	}: fdsItem<ObjectView>) {
 		const handleEditField = () => {
 			openSidePanel({
-				url: formatActionURL(url, itemData.id),
+				url: formatActionURL(url, itemData.id as number),
 			});
 		};
 
@@ -52,7 +47,11 @@ export default function Views({
 		);
 	}
 
-	function objectLayoutDefaultDataRenderer({itemData}: {itemData: ItemData}) {
+	function objectLayoutDefaultDataRenderer({
+		itemData,
+	}: {
+		itemData: ObjectView;
+	}) {
 		return itemData.defaultObjectView
 			? Liferay.Language.get('yes')
 			: Liferay.Language.get('no');

@@ -7,21 +7,14 @@ import {getLocalizableLabel} from '@liferay/object-js-components-web';
 import React, {createContext, useContext, useReducer} from 'react';
 
 import {defaultLanguageId} from '../../utils/constants';
-import {
-	TObjectView,
-	TObjectViewColumn,
-	TObjectViewFilterColumn,
-	TObjectViewSortColumn,
-	TState,
-	TWorkflowStatus,
-} from './types';
+import {TState, TWorkflowStatus} from './types';
 
 interface IViewContextProps extends Array<TState | Function> {
 	0: typeof initialState;
 	1: React.Dispatch<React.ReducerAction<React.Reducer<TState, TAction>>>;
 }
 
-interface TInitialFilterColumn extends TObjectViewFilterColumn {
+interface TInitialFilterColumn extends ObjectViewFilterColumn {
 	json: string;
 	valueSummary: string;
 }
@@ -50,13 +43,13 @@ export enum TYPES {
 
 const initialState = {
 	objectFields: [] as ObjectField[],
-	objectView: {} as TObjectView,
+	objectView: {} as ObjectView,
 } as TState;
 
 const handleChangeColumnOrder = (
 	draggedIndex: number,
 	targetIndex: number,
-	columns: TObjectViewSortColumn[]
+	columns: ObjectViewSortColumn[]
 ) => {
 	const dragged = columns[draggedIndex];
 
@@ -78,7 +71,7 @@ export type TAction =
 			payload: {
 				creationLanguageId: Liferay.Language.Locale;
 				objectFields: ObjectField[];
-				objectView: TObjectView;
+				objectView: ObjectView;
 			};
 			type: TYPES.ADD_OBJECT_VIEW;
 	  }
@@ -103,7 +96,7 @@ export type TAction =
 				creationLanguageId: Liferay.Language.Locale;
 				objectFieldName: string;
 				objectFields: ObjectField[];
-				objectViewSortColumns?: TObjectViewSortColumn[];
+				objectViewSortColumns?: ObjectViewSortColumn[];
 				selectedObjetSortValue: string;
 			};
 			type: TYPES.ADD_OBJECT_VIEW_SORT_COLUMN;
@@ -226,10 +219,10 @@ const viewReducer = (state: TState, action: TAction) => {
 				field.hasFilter = !!existingFilter;
 			});
 
-			const newObjectViewColumns: TObjectViewColumn[] = [];
-			const newObjectViewSortColumns: TObjectViewSortColumn[] = [];
+			const newObjectViewColumns: ObjectViewColumn[] = [];
+			const newObjectViewSortColumns: ObjectViewSortColumn[] = [];
 
-			objectViewColumns.forEach((viewColumn: TObjectViewColumn) => {
+			objectViewColumns.forEach((viewColumn: ObjectViewColumn) => {
 				newObjectFields.forEach((objectField: ObjectField) => {
 					if (objectField.name === viewColumn.objectFieldName) {
 						newObjectViewColumns.push({
@@ -248,7 +241,7 @@ const viewReducer = (state: TState, action: TAction) => {
 			});
 
 			objectViewSortColumns.forEach(
-				(sortColumn: TObjectViewSortColumn) => {
+				(sortColumn: ObjectViewSortColumn) => {
 					newObjectFields.forEach((objectField: ObjectField) => {
 						if (objectField.name === sortColumn.objectFieldName) {
 							newObjectViewSortColumns.push({
@@ -265,9 +258,9 @@ const viewReducer = (state: TState, action: TAction) => {
 			);
 
 			newObjectViewSortColumns.forEach(
-				(sortColumn: TObjectViewSortColumn) => {
+				(sortColumn: ObjectViewSortColumn) => {
 					newObjectViewColumns.forEach(
-						(viewColumn: TObjectViewColumn) => {
+						(viewColumn: ObjectViewColumn) => {
 							if (
 								sortColumn.objectFieldName ===
 								viewColumn.objectFieldName
@@ -419,7 +412,7 @@ const viewReducer = (state: TState, action: TAction) => {
 				filterTypeValue = null;
 			}
 
-			const newFilterColumnItem: TObjectViewFilterColumn = {
+			const newFilterColumnItem: ObjectViewFilterColumn = {
 				definition: filterTypeValue
 					? {
 							[filterTypeValue]: valueList
@@ -448,7 +441,7 @@ const viewReducer = (state: TState, action: TAction) => {
 			const {objectViewFilterColumns} = state.objectView;
 
 			if (!objectViewFilterColumns) {
-				const filterColumns: TObjectViewFilterColumn[] = [];
+				const filterColumns: ObjectViewFilterColumn[] = [];
 
 				filterColumns.push(newFilterColumnItem);
 
@@ -498,7 +491,7 @@ const viewReducer = (state: TState, action: TAction) => {
 			});
 			const [label] = labels;
 
-			const newSortColumnItem: TObjectViewSortColumn = {
+			const newSortColumnItem: ObjectViewSortColumn = {
 				fieldLabel: getLocalizableLabel(creationLanguageId, label),
 				label,
 				objectFieldName,
@@ -506,7 +499,7 @@ const viewReducer = (state: TState, action: TAction) => {
 			};
 
 			if (!objectViewSortColumns) {
-				const sortColumn: TObjectViewSortColumn[] = [];
+				const sortColumn: ObjectViewSortColumn[] = [];
 
 				sortColumn.push(newSortColumnItem);
 
@@ -531,7 +524,7 @@ const viewReducer = (state: TState, action: TAction) => {
 			objectViewSortColumns.push(newSortColumnItem);
 
 			const newSortColumn = objectViewSortColumns.map(
-				(sortColumn: TObjectViewSortColumn, index: number) => {
+				(sortColumn: ObjectViewSortColumn, index: number) => {
 					return {
 						...sortColumn,
 						priority: index,

@@ -14,7 +14,6 @@ import {
 import React, {useState} from 'react';
 
 import {TYPES, useLayoutContext} from '../objectLayoutContext';
-import {BoxType, TObjectLayoutRow} from '../types';
 import {HeaderDropdown} from './HeaderDropdown';
 import ModalAddObjectLayoutField from './ModalAddObjectLayoutField';
 import {ObjectLayoutRows} from './ObjectLayoutRows';
@@ -23,9 +22,9 @@ interface ObjectLayoutBoxProps extends React.HTMLAttributes<HTMLElement> {
 	boxIndex: number;
 	collapsable: boolean;
 	label: string;
-	objectLayoutRows?: TObjectLayoutRow[];
+	objectLayoutRows?: ObjectLayoutRow[];
 	tabIndex: number;
-	type: BoxType;
+	type: ObjectLayoutBoxType;
 }
 
 export function ObjectLayoutBox({

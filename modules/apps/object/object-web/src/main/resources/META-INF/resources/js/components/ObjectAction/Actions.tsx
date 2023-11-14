@@ -3,12 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {
-	FrontendDataSet,
-
-	// @ts-ignore
-
-} from '@liferay/frontend-data-set-web';
+import {FrontendDataSet} from '@liferay/frontend-data-set-web';
 import classNames from 'classnames';
 import React from 'react';
 
@@ -19,21 +14,7 @@ import {
 	formatActionURL,
 } from '../../utils/fds';
 
-type Status = {
-	code: number;
-	label: string;
-	label_i18n: string;
-};
-interface ItemData {
-	active: boolean;
-	defaultObjectAction: boolean;
-	id: number;
-	label: LocalizedValue<string>;
-	status: Status;
-	system: boolean;
-}
-
-function ObjectActionActiveDataRenderer({itemData}: {itemData: ItemData}) {
+function ObjectActionActiveDataRenderer({itemData}: {itemData: ObjectAction}) {
 	return itemData.active
 		? Liferay.Language.get('yes')
 		: Liferay.Language.get('no');
@@ -42,7 +23,7 @@ function ObjectActionActiveDataRenderer({itemData}: {itemData: ItemData}) {
 function ObjectActionLastExecutionDataRenderer({
 	itemData,
 }: {
-	itemData: ItemData;
+	itemData: ObjectAction;
 }) {
 	return (
 		<strong
@@ -64,7 +45,7 @@ function ObjectActionLastExecutionDataRenderer({
 	);
 }
 
-function ObjectActionSourceDataRenderer({itemData}: {itemData: ItemData}) {
+function ObjectActionSourceDataRenderer({itemData}: {itemData: ObjectAction}) {
 	return (
 		<strong
 			className={classNames(
@@ -92,7 +73,7 @@ export default function Actions({
 		itemData,
 		openSidePanel,
 		value,
-	}: fdsItem<ItemData>) {
+	}: fdsItem<ObjectAction>) {
 		const handleEditAction = () => {
 			openSidePanel({
 				url: formatActionURL(url, itemData.id),

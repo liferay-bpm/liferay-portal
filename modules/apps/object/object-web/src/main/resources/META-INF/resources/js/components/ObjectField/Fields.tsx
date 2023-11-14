@@ -22,13 +22,6 @@ import {ModalAddObjectField} from './ModalAddObjectField';
 import {ModalDeleteObjectField} from './ModalDeleteObjectField';
 import {handleTriggerDeleteObjectField} from './deleteObjectFieldUtil';
 
-interface ItemData {
-	id: number;
-	localized: boolean;
-	required: boolean;
-	system?: boolean;
-}
-
 interface FieldsProps extends IFDSTableProps {
 	baseResourceURL: string;
 }
@@ -88,7 +81,7 @@ export default function Fields({
 		itemData,
 		openSidePanel,
 		value,
-	}: fdsItem<ItemData>) {
+	}: fdsItem<ObjectField>) {
 		const handleEditField = () => {
 			openSidePanel({
 				url: formatActionURL(url, itemData.id),
@@ -107,7 +100,7 @@ export default function Fields({
 	function objectFieldLocalizedDataRenderer({
 		itemData,
 	}: {
-		itemData: ItemData;
+		itemData: ObjectField;
 	}) {
 		return itemData.localized
 			? Liferay.Language.get('yes')
@@ -117,7 +110,7 @@ export default function Fields({
 	function objectFieldMandatoryDataRenderer({
 		itemData,
 	}: {
-		itemData: ItemData;
+		itemData: ObjectField;
 	}) {
 		return itemData.required
 			? Liferay.Language.get('yes')

@@ -14,7 +14,7 @@ import React from 'react';
 import {TYPES, useLayoutContext} from '../objectLayoutContext';
 import {HeaderDropdown} from './HeaderDropdown';
 
-interface ObjectLayoutFieldProps extends React.HTMLAttributes<HTMLElement> {
+interface ObjectLayoutFieldProps {
 	boxIndex: number;
 	columnIndex: number;
 	objectFieldName: string;

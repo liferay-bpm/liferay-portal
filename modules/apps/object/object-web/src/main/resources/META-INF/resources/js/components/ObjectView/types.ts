@@ -22,52 +22,13 @@ export type TObjectColumn = {
 	valueList?: LabelValueObject[];
 };
 
-export type TObjectViewColumn = {
-	defaultSort?: boolean;
-	fieldLabel?: string;
-	label: LocalizedValue<string>;
-	objectFieldBusinessType?: string;
-	objectFieldName: string;
-	priority?: number;
-};
-
-export type TObjectViewSortColumn = {
-	fieldLabel?: string;
-	label: LocalizedValue<string>;
-	objectFieldName: string;
-	priority?: number;
-	sortOrder?: string;
-};
-
-export type TObjectViewFilterColumn = {
-	definition: {[key: string]: string[]} | null;
-	disableEdit?: boolean;
-	fieldLabel?: string;
-	filterBy?: string;
-	filterType: string | null;
-	label: LocalizedValue<string>;
-	objectFieldBusinessType?: string;
-	objectFieldName: string;
-	value?: string;
-	valueList?: LabelValueObject[];
-};
-
-export type TObjectView = {
-	defaultObjectView: boolean;
-	name: LocalizedValue<string>;
-	objectDefinitionId: number;
-	objectViewColumns: TObjectViewColumn[];
-	objectViewFilterColumns: TObjectViewFilterColumn[];
-	objectViewSortColumns: TObjectViewSortColumn[];
-};
-
 export type TState = {
 	creationLanguageId: Liferay.Language.Locale;
 	filterOperators: TFilterOperators;
 	isViewOnly: boolean;
 	objectDefinitionExternalReferenceCode: string;
 	objectFields: ObjectField[];
-	objectView: TObjectView;
+	objectView: ObjectView;
 	objectViewId: string;
 	workflowStatuses: TWorkflowStatus[];
 };

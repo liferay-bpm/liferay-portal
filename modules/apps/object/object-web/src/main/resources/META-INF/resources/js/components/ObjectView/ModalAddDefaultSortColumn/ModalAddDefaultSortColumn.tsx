@@ -11,7 +11,6 @@ import {SingleSelect} from '@liferay/object-js-components-web';
 import React, {FormEvent, useEffect, useMemo, useState} from 'react';
 
 import {TYPES, useViewContext} from '../objectViewContext';
-import {TObjectViewColumn} from '../types';
 
 interface ModalAddDefaultSortColumnProps {
 	editingObjectFieldName?: string;
@@ -49,7 +48,7 @@ export function ModalAddDefaultSortColumn({
 	] = useViewContext();
 
 	const [availableViewColumns, setAvailableViewColumns] = useState<
-		TObjectViewColumn[]
+		ObjectViewColumn[]
 	>(objectViewColumns);
 
 	const [
