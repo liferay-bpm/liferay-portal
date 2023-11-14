@@ -9,7 +9,6 @@ import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderRequest;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderResponse;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
 import com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceLocalService;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.Portal;
@@ -117,10 +116,12 @@ public class DDMDataProviderInstancesDataProviderTest {
 			1
 		).build();
 
+		long[] groups = {};
+
 		Mockito.when(
 			_portal.getCurrentAndAncestorSiteGroupIds(1)
-		).thenThrow(
-			PortalException.class
+		).thenReturn(
+			groups
 		);
 
 		DDMDataProviderResponse ddmDataProviderResponse =
