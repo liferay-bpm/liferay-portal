@@ -3,13 +3,9 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {
-	FrontendDataSet,
-
-	// @ts-ignore
-
-} from '@liferay/frontend-data-set-web';
-import React from 'react';
+import ClayLoadingIndicator from '@clayui/loading-indicator';
+import {FrontendDataSet} from '@liferay/frontend-data-set-web';
+import React, {useEffect, useState} from 'react';
 
 import {
 	IFDSTableProps,
@@ -17,6 +13,7 @@ import {
 	fdsItem,
 	formatActionURL,
 } from '../../utils/fds';
+import {ModalBasicWithFieldName} from '../ModalBasicWithFieldName';
 
 interface ItemData {
 	defaultObjectView: boolean;
@@ -32,6 +29,9 @@ export default function Views({
 	style,
 	url,
 }: IFDSTableProps) {
+	const [showAddModal, setShowAddModal] = useState(false);
+	const [reloadFDS, setReloadFDS] = useState(false);
+
 	function objectLayoutLabelDataRenderer({
 		itemData,
 		openSidePanel,
@@ -104,5 +104,37 @@ export default function Views({
 		],
 	};
 
-	return <FrontendDataSet {...dataSetProps} />;
+	useEffect(() => {
+		Liferay.on('addObjectView', () => setShowAddModal(true));
+
+		return () => {
+			Liferay.detach('addObjectView');
+		};
+	}, []);
+
+	useEffect(() => {
+		if (reloadFDS) {
+			setTimeout(() => setReloadFDS(false), 200);
+		}
+	}, [reloadFDS]);
+
+	return (
+		<>
+			{showAddModal && (
+				<ModalBasicWithFieldName
+					apiURL={apiURL as string}
+					inputId="listObjectCustomViewName"
+					label={Liferay.Language.get('new-view')}
+					onAfterSubmit={() => setReloadFDS(true)}
+					setVisibility={setShowAddModal}
+				/>
+			)}
+
+			{reloadFDS ? (
+				<ClayLoadingIndicator displayType="secondary" size="sm" />
+			) : (
+				<FrontendDataSet {...dataSetProps} />
+			)}
+		</>
+	);
 }

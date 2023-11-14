@@ -6,8 +6,7 @@
 import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
 import ClayForm from '@clayui/form';
-import ClayModal from '@clayui/modal';
-import {Observer} from '@clayui/modal/lib/types';
+import ClayModal, {ClayModalProvider, useModal} from '@clayui/modal';
 import {
 	API,
 	FormError,
@@ -19,12 +18,12 @@ import React, {useState} from 'react';
 
 import {defaultLanguageId} from '../utils/constants';
 
-interface IProps extends React.HTMLAttributes<HTMLElement> {
+interface ModalBasicWithFieldNameProps {
 	apiURL: string;
 	inputId: string;
 	label: string;
-	observer: Observer;
-	onClose: () => void;
+	onAfterSubmit: () => void;
+	setVisibility: (value: boolean) => void;
 }
 
 type TInitialValues = {
@@ -35,13 +34,17 @@ export function ModalBasicWithFieldName({
 	apiURL,
 	inputId,
 	label,
-	observer,
-	onClose,
-}: IProps) {
+	onAfterSubmit,
+	setVisibility,
+}: ModalBasicWithFieldNameProps) {
 	const initialValues: TInitialValues = {
 		name: {[defaultLanguageId]: ''},
 	};
 	const [error, setError] = useState<string>('');
+
+	const {observer, onClose} = useModal({
+		onClose: () => setVisibility(false),
+	});
 
 	const onSubmit = async ({name}: TInitialValues) => {
 		try {
@@ -52,7 +55,7 @@ export function ModalBasicWithFieldName({
 			});
 
 			onClose();
-			window.location.reload();
+			onAfterSubmit();
 		}
 		catch (error) {
 			setError((error as Error).message);
@@ -76,8 +79,8 @@ export function ModalBasicWithFieldName({
 	});
 
 	return (
-		<>
-			<ClayModal observer={observer}>
+		<ClayModalProvider>
+			<ClayModal center observer={observer}>
 				<ClayForm onSubmit={handleSubmit}>
 					<ClayModal.Header>{label}</ClayModal.Header>
 
@@ -115,8 +118,6 @@ export function ModalBasicWithFieldName({
 					/>
 				</ClayForm>
 			</ClayModal>
-		</>
+		</ClayModalProvider>
 	);
 }
-
-export default ModalBasicWithFieldName;

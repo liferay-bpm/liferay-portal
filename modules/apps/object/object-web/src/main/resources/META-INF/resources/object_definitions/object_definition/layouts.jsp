@@ -44,14 +44,3 @@ renderResponse.setTitle(objectDefinition.getLabel(locale, true));
 		%>'
 	/>
 </div>
-
-<div id="<portlet:namespace />AddObjectLayout">
-	<react:component
-		module="js/components/ModalAddObjectLayout"
-		props='<%=
-			HashMapBuilder.<String, Object>put(
-				"apiURL", objectDefinitionsLayoutsDisplayContext.getAPIURL()
-			).build()
-		%>'
-	/>
-</div>
