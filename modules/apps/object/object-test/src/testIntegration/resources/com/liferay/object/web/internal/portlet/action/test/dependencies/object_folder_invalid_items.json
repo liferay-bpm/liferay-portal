@@ -1,0 +1,34 @@
+{
+	"actions": {
+		"delete": {
+		},
+		"get": {
+		},
+		"permissions": {
+		},
+		"update": {
+		}
+	},
+	"externalReferenceCode": "EMPTY_OBJECT_FOLDER",
+	"label": {
+		"en_US": "Folder Empty"
+	},
+	"name": "EmptyObjectFolder",
+	"objectFolderItems": [
+		{
+			"linkedObjectDefinition": true,
+			"objectDefinition": {
+			},
+			"objectDefinitionExternalReferenceCode": "nonExistentObjectERC",
+			"positionX": 50,
+			"positionY": 35
+		},
+		{
+			"linkedObjectDefinition": false,
+			"objectDefinition": null,
+			"objectDefinitionExternalReferenceCode": "nonExistentObjectDefinition",
+			"positionX": 400,
+			"positionY": 92
+		}
+	]
+}
