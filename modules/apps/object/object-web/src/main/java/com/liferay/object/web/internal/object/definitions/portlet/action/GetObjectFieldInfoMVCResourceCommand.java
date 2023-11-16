@@ -19,8 +19,11 @@ import com.liferay.object.web.internal.util.ObjectFieldBusinessTypeUtil;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
+import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
+import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
+import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -72,6 +75,30 @@ public class GetObjectFieldInfoMVCResourceCommand
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse,
 			JSONUtil.put(
+				"listTypeDefinitionsURL",
+				() -> {
+					if (StringUtil.equals(
+							objectField.getBusinessType(),
+							ObjectFieldConstants.BUSINESS_TYPE_PICKLIST)) {
+
+						RequestBackedPortletURLFactory
+							requestBackedPortletURLFactory =
+								RequestBackedPortletURLFactoryUtil.create(
+									resourceRequest);
+
+						return PortletURLBuilder.create(
+							requestBackedPortletURLFactory.
+								createControlPanelRenderURL(
+									ObjectPortletKeys.LIST_TYPE_DEFINITIONS,
+									null, 0, 0)
+						).setMVCRenderCommandName(
+							"/object_definitions/view_list_type_definitions"
+						).buildString();
+					}
+
+					return null;
+				}
+			).put(
 				"objectFieldTypes",
 				ObjectFieldBusinessTypeUtil.getObjectFieldBusinessTypeMaps(
 					locale,
