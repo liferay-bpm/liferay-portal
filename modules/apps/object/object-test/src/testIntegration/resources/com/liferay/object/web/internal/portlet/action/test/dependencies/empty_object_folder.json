@@ -1,0 +1,19 @@
+{
+	"actions": {
+		"delete": {
+		},
+		"get": {
+		},
+		"permissions": {
+		},
+		"update": {
+		}
+	},
+	"externalReferenceCode": "EMPTY_OBJECT_FOLDER",
+	"label": {
+		"en_US": "Folder Empty"
+	},
+	"name": "EmptyObjectFolder",
+	"objectFolderItems": [
+	]
+}

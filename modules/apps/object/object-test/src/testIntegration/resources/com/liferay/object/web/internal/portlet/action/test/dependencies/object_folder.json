@@ -1,0 +1,282 @@
+{
+	"actions": {
+		"delete": {
+		},
+		"get": {
+		},
+		"permissions": {
+		},
+		"update": {
+		}
+	},
+	"externalReferenceCode": "OBJECT_FOLDER",
+	"label": {
+		"en_US": "ObjectFolder"
+	},
+	"name": "ObjectFolder",
+	"objectFolderItems": [
+		{
+			"linkedObjectDefinition": false,
+			"objectDefinition": {
+				"accountEntryRestricted": false,
+				"accountEntryRestrictedObjectFieldName": "",
+				"actions": {
+					"delete": {
+					},
+					"get": {
+					},
+					"permissions": {
+					},
+					"update": {
+					}
+				},
+				"active": true,
+				"defaultLanguageId": "en_US",
+				"enableCategorization": true,
+				"enableComments": false,
+				"enableLocalization": false,
+				"enableObjectEntryHistory": false,
+				"externalReferenceCode": "customERC",
+				"label": {
+					"en_US": "My Custom"
+				},
+				"modifiable": true,
+				"name": "MyCustom",
+				"objectActions": [
+				],
+				"objectFields": [
+					{
+						"DBType": "String",
+						"businessType": "Text",
+						"indexed": false,
+						"indexedAsKeyword": false,
+						"indexedLanguageId": "",
+						"label": {
+							"en_US": "Author"
+						},
+						"localized": false,
+						"name": "creator",
+						"objectFieldSettings": [
+						],
+						"readOnly": "true",
+						"readOnlyConditionExpression": "",
+						"required": false,
+						"state": false,
+						"system": true,
+						"type": "String",
+						"unique": false
+					},
+					{
+						"DBType": "Date",
+						"businessType": "Date",
+						"indexed": false,
+						"indexedAsKeyword": false,
+						"indexedLanguageId": "",
+						"label": {
+							"en_US": "Create Date"
+						},
+						"localized": false,
+						"name": "createDate",
+						"objectFieldSettings": [
+						],
+						"readOnly": "true",
+						"readOnlyConditionExpression": "",
+						"required": false,
+						"state": false,
+						"system": true,
+						"type": "Date",
+						"unique": false
+					},
+					{
+						"DBType": "String",
+						"businessType": "Text",
+						"indexed": false,
+						"indexedAsKeyword": false,
+						"indexedLanguageId": "",
+						"label": {
+							"en_US": "External Reference Code"
+						},
+						"localized": false,
+						"name": "externalReferenceCode",
+						"objectFieldSettings": [
+						],
+						"readOnly": "false",
+						"readOnlyConditionExpression": "",
+						"required": false,
+						"state": false,
+						"system": true,
+						"type": "String",
+						"unique": false
+					},
+					{
+						"DBType": "Long",
+						"businessType": "LongInteger",
+						"indexed": true,
+						"indexedAsKeyword": true,
+						"indexedLanguageId": "",
+						"label": {
+							"en_US": "ID"
+						},
+						"localized": false,
+						"name": "id",
+						"objectFieldSettings": [
+						],
+						"readOnly": "true",
+						"readOnlyConditionExpression": "",
+						"required": false,
+						"state": false,
+						"system": true,
+						"type": "Long",
+						"unique": false
+					},
+					{
+						"DBType": "Date",
+						"businessType": "Date",
+						"indexed": false,
+						"indexedAsKeyword": false,
+						"indexedLanguageId": "",
+						"label": {
+							"en_US": "Modified Date"
+						},
+						"localized": false,
+						"name": "modifiedDate",
+						"objectFieldSettings": [
+						],
+						"readOnly": "true",
+						"readOnlyConditionExpression": "",
+						"required": false,
+						"state": false,
+						"system": true,
+						"type": "Date",
+						"unique": false
+					},
+					{
+						"DBType": "String",
+						"businessType": "Text",
+						"indexed": false,
+						"indexedAsKeyword": false,
+						"indexedLanguageId": "",
+						"label": {
+							"en_US": "Status"
+						},
+						"localized": false,
+						"name": "status",
+						"objectFieldSettings": [
+						],
+						"readOnly": "true",
+						"readOnlyConditionExpression": "",
+						"required": false,
+						"state": false,
+						"system": true,
+						"type": "String",
+						"unique": false
+					},
+					{
+						"DBType": "String",
+						"businessType": "Text",
+						"externalReferenceCode": "CUSTOM_TRALALA",
+						"indexed": true,
+						"indexedAsKeyword": false,
+						"indexedLanguageId": "",
+						"label": {
+							"en_US": "Custom tralala"
+						},
+						"localized": false,
+						"name": "customTralala",
+						"objectFieldSettings": [
+						],
+						"readOnly": "false",
+						"readOnlyConditionExpression": "",
+						"required": false,
+						"state": false,
+						"system": false,
+						"type": "String",
+						"unique": false
+					}
+				],
+				"objectFolderExternalReferenceCode": "OBJECT_FOLDER",
+				"objectLayouts": [
+				],
+				"objectRelationships": [
+					{
+						"deletionType": "prevent",
+						"externalReferenceCode": "WITH_DUMMY_RELATIONSHIP",
+						"label": {
+							"en_US": "With Dummy"
+						},
+						"name": "withDummy",
+						"objectDefinitionExternalReferenceCode1": "customERC",
+						"objectDefinitionExternalReferenceCode2": "linkedERC",
+						"objectDefinitionModifiable2": true,
+						"objectDefinitionName2": "linkedERC",
+						"objectDefinitionSystem2": false,
+						"objectField": {
+							"DBType": "Long",
+							"businessType": "Relationship",
+							"externalReferenceCode": "RELA_LINKED",
+							"indexed": true,
+							"indexedAsKeyword": false,
+							"indexedLanguageId": "",
+							"label": {
+								"en_US": "With Dummy"
+							},
+							"localized": false,
+							"name": "r_withDummy_c_myCustomId",
+							"objectFieldSettings": [
+								{
+									"name": "objectDefinition1ShortName",
+									"value": "MyCustom"
+								},
+								{
+									"name": "objectRelationshipERCObjectFieldName",
+									"value": "r_withDummy_c_myCustomERC"
+								}
+							],
+							"readOnly": "false",
+							"readOnlyConditionExpression": "",
+							"relationshipType": "oneToMany",
+							"required": false,
+							"state": false,
+							"system": false,
+							"type": "Long",
+							"unique": false
+						},
+						"parameterObjectFieldId": 0,
+						"parameterObjectFieldName": "",
+						"reverse": false,
+						"system": false,
+						"type": "oneToMany"
+					}
+				],
+				"objectValidationRules": [
+				],
+				"objectViews": [
+				],
+				"panelCategoryKey": "",
+				"parameterRequired": false,
+				"pluralLabel": {
+					"en_US": "Mycustoms"
+				},
+				"portlet": true,
+				"restContextPath": "/o/c/mycustoms",
+				"scope": "company",
+				"status": {
+					"code": 0,
+					"label": "approved",
+					"label_i18n": "Approved"
+				},
+				"system": false,
+				"titleObjectFieldName": "id"
+			},
+			"objectDefinitionExternalReferenceCode": "customERC",
+			"positionX": 432,
+			"positionY": 591
+		},
+		{
+			"linkedObjectDefinition": true,
+			"objectDefinitionExternalReferenceCode": "linkedERC",
+			"positionX": 850,
+			"positionY": 408
+		}
+	]
+}
