@@ -10,6 +10,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.list.type.service.ListTypeDefinitionService;
 import com.liferay.object.admin.rest.dto.v1_0.util.ObjectFieldUtil;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.constants.ObjectPortletKeys;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
@@ -19,6 +20,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
+import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
+import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -126,6 +129,19 @@ public class ObjectDefinitionsFieldsDisplayContext
 		}
 
 		return forbiddenLastCharacters.toArray(new String[0]);
+	}
+
+	public String getListTypeDefinitionsURL() {
+		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
+			RequestBackedPortletURLFactoryUtil.create(
+				objectRequestHelper.getRequest());
+
+		return PortletURLBuilder.create(
+			requestBackedPortletURLFactory.createControlPanelRenderURL(
+				ObjectPortletKeys.LIST_TYPE_DEFINITIONS, null, 0, 0)
+		).setMVCRenderCommandName(
+			"/object_definitions/view_list_type_definitions"
+		).buildString();
 	}
 
 	public List<Map<String, String>> getObjectFieldBusinessTypeMaps(

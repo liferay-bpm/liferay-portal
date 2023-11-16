@@ -40,6 +40,8 @@ renderResponse.setTitle(LanguageUtil.get(request, "object-model-builder"));
 			).put(
 				"forbiddenNames", PropsUtil.getArray(PropsKeys.DL_NAME_BLACKLIST)
 			).put(
+				"listTypeDefinitionsURL", objectDefinitionsFieldsDisplayContext.getListTypeDefinitionsURL()
+			).put(
 				"objectDefinitionPermissionsURL", objectDefinitionsDetailsDisplayContext.getPermissionsURL(ObjectDefinition.class.getName())
 			).put(
 				"objectDefinitionsStorageTypes", objectDefinitionsDetailsDisplayContext.getStorageTypesJSONArray()
