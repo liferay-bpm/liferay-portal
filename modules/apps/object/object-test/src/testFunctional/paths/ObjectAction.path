@@ -29,7 +29,7 @@
 	</tr>
 	<tr>
 		<td>SELECT_TRIGGER</td>
-		<td>//input[@placeholder="Choose a Trigger"]</td>
+		<td>//button[@role="combobox"][normalize-space()='${key_text}']</td>
 		<td></td>
 	</tr>
 	<tr>
