@@ -155,6 +155,15 @@ export declare type TAction =
 	  }
 	| {
 			payload: {
+				objectDefinitionExternalReferenceCode: string;
+				objectDefinitionNodes: Node<ObjectDefinitionNodeData>[];
+				objectRelationshipEdges: Edge<ObjectRelationshipEdgeData>[];
+				showAllObjectFields: boolean;
+			};
+			type: TYPES.SET_SHOW_ALL_OBJECT_FIELDS;
+	  }
+	| {
+			payload: {
 				updatedShowChangesSaved: boolean;
 			};
 			type: TYPES.SET_SHOW_CHANGES_SAVED;

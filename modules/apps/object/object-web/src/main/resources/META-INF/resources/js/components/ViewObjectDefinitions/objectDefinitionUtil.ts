@@ -363,6 +363,7 @@ export async function getUpdatedModelBuilderStructurePayload(
 									} as ObjectFieldNodeRow)
 							),
 							selected: false,
+							showAllObjectFields: false,
 						});
 					}
 				});
