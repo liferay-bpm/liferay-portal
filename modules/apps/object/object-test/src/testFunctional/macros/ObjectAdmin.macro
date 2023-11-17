@@ -1258,10 +1258,11 @@ definition {
 			}
 
 			if (${thenAction} == "Notification") {
-				ObjectAdmin.selectDropdownItem(
-					currentOption = "Select an option",
-					labelName = "",
-					optionName = ${notificationName});
+				Click(
+					key_text = "Select an option",
+					locator1 = "ObjectAction#SELECT_TRIGGER");
+
+				MenuItem.click(menuItem = ${notificationName});
 			}
 		}
 
