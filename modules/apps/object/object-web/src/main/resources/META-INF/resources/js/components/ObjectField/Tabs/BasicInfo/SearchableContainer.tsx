@@ -9,14 +9,13 @@ import {SingleSelect, Toggle} from '@liferay/object-js-components-web';
 import classNames from 'classnames';
 import React, {useEffect} from 'react';
 
-import {defaultLanguageId} from '../../../../utils/constants';
-
 import '../../EditObjectFieldContent.scss';
 
 const languages = Liferay.Language.available;
 const languageLabels = Object.entries(languages).map(([key, value]) => {
 	return {label: value, value: key};
 });
+const userLanguageId = Liferay.ThemeDisplay.getLanguageId();
 
 interface SearchableProps {
 	isApproved: boolean;
@@ -43,13 +42,13 @@ export function SearchableContainer({
 		values.businessType !== 'Aggregation';
 
 	useEffect(() => {
-		if (!values.indexedLanguageId) {
+		if (!values.indexedLanguageId && isSearchableString) {
 			setValues({
-				indexedLanguageId: defaultLanguageId,
+				indexedLanguageId: userLanguageId,
 			});
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [values.indexedLanguageId]);
 
 	return (
 		<div
@@ -101,7 +100,7 @@ export function SearchableContainer({
 							const indexedAsKeyword = selected === 'true';
 							const indexedLanguageId = indexedAsKeyword
 								? ''
-								: defaultLanguageId;
+								: userLanguageId;
 
 							setValues({
 								indexedAsKeyword,
