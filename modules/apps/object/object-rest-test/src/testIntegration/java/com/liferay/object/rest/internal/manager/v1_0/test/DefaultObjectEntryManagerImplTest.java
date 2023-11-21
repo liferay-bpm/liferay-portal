@@ -58,7 +58,6 @@ import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.test.util.BaseObjectEntryManagerImplTestCase;
 import com.liferay.object.rest.test.util.ObjectRelationshipTestUtil;
-import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectFilterLocalService;
@@ -179,6 +178,8 @@ public class DefaultObjectEntryManagerImplTest
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
+		BaseObjectEntryManagerImplTestCase.setUpClass();
+
 		companyId = TestPropsValues.getCompanyId();
 		_defaultObjectEntryManager =
 			(DefaultObjectEntryManager)_objectEntryManager;
@@ -186,6 +187,7 @@ public class DefaultObjectEntryManagerImplTest
 		_originalName = PrincipalThreadLocal.getName();
 		_originalPermissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
+
 		_simpleDateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd");
 
@@ -203,6 +205,8 @@ public class DefaultObjectEntryManagerImplTest
 
 	@AfterClass
 	public static void tearDownClass() throws Exception {
+		BaseObjectEntryManagerImplTestCase.tearDownClass();
+
 		GroupLocalServiceUtil.deleteGroup(_group);
 
 		PermissionThreadLocal.setPermissionChecker(_originalPermissionChecker);
@@ -537,13 +541,15 @@ public class DefaultObjectEntryManagerImplTest
 
 	@After
 	public void tearDown() throws Exception {
+		super.tearDown();
+
 		NestedFieldsContextThreadLocal.setNestedFieldsContext(
 			_originalNestedFieldsContext);
 
 		TreeTestUtil.deleteObjectDefinitionHierarchy(
 			objectDefinitionLocalService,
 			new String[] {"C_A", "C_AA", "C_AB", "C_AAA", "C_AAB"},
-			_objectEntryLocalService);
+			objectEntryLocalService);
 	}
 
 	@Test
@@ -1669,7 +1675,7 @@ public class DefaultObjectEntryManagerImplTest
 
 		TreeTestUtil.forEachNodeObjectEntry(
 			tree.iterator(TreeConstants.ITERATOR_TYPE_POST_ORDER),
-			_objectEntryLocalService,
+			objectEntryLocalService,
 			objectEntry -> {
 				ObjectDefinition objectDefinition =
 					objectDefinitionLocalService.fetchObjectDefinition(
@@ -1691,7 +1697,7 @@ public class DefaultObjectEntryManagerImplTest
 
 		TreeTestUtil.forEachNodeObjectEntry(
 			tree.iterator(TreeConstants.ITERATOR_TYPE_POST_ORDER),
-			_objectEntryLocalService,
+			objectEntryLocalService,
 			objectEntry -> {
 				ObjectDefinition objectDefinition =
 					objectDefinitionLocalService.fetchObjectDefinition(
@@ -2685,7 +2691,7 @@ public class DefaultObjectEntryManagerImplTest
 
 		AccountEntry accountEntry1 = _addAccountEntry();
 
-		_objectEntryLocalService.addObjectEntry(
+		objectEntryLocalService.addObjectEntry(
 			adminUser.getUserId(), 0,
 			_objectDefinition3.getObjectDefinitionId(),
 			HashMapBuilder.<String, Serializable>put(
@@ -2700,7 +2706,7 @@ public class DefaultObjectEntryManagerImplTest
 
 		AccountEntry accountEntry2 = _addAccountEntry();
 
-		_objectEntryLocalService.addObjectEntry(
+		objectEntryLocalService.addObjectEntry(
 			adminUser.getUserId(), 0,
 			_objectDefinition3.getObjectDefinitionId(),
 			HashMapBuilder.<String, Serializable>put(
@@ -3132,7 +3138,7 @@ public class DefaultObjectEntryManagerImplTest
 		Node rootNode = tree.getRootNode();
 
 		TreeTestUtil.forEachNodeObjectEntry(
-			tree.iterator(), _objectEntryLocalService,
+			tree.iterator(), objectEntryLocalService,
 			objectEntry -> {
 				ObjectDefinition objectDefinition =
 					objectDefinitionLocalService.fetchObjectDefinition(
@@ -3157,7 +3163,7 @@ public class DefaultObjectEntryManagerImplTest
 			ActionKeys.UPDATE, _rootObjectDefinition, _buyerRole);
 
 		TreeTestUtil.forEachNodeObjectEntry(
-			tree.iterator(), _objectEntryLocalService,
+			tree.iterator(), objectEntryLocalService,
 			objectEntry -> {
 				ObjectDefinition objectDefinition =
 					objectDefinitionLocalService.fetchObjectDefinition(
@@ -3673,14 +3679,14 @@ public class DefaultObjectEntryManagerImplTest
 		throws Exception {
 
 		Tree tree = TreeTestUtil.createObjectEntryTree(
-			externalReferenceCodeSuffix, _objectEntryLocalService,
+			externalReferenceCodeSuffix, objectEntryLocalService,
 			objectFieldLocalService,
 			_rootObjectDefinition.getObjectDefinitionId(),
 			_objectRelationshipLocalService, _treeFactory);
 
 		Node node = tree.getRootNode();
 
-		_objectEntryLocalService.updateObjectEntry(
+		objectEntryLocalService.updateObjectEntry(
 			adminUser.getUserId(), node.getPrimaryKey(),
 			HashMapBuilder.<String, Serializable>put(
 				() -> {
@@ -3861,9 +3867,6 @@ public class DefaultObjectEntryManagerImplTest
 
 	@DeleteAfterTestRun
 	private ObjectDefinition _objectDefinition3;
-
-	@Inject
-	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Inject
 	private ObjectFieldService _objectFieldService;
