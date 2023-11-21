@@ -26,16 +26,21 @@ public class DefaultWorkflowTransition implements WorkflowTransition {
 			return HtmlUtil.escape(label);
 		}
 
+		Language language = LanguageUtil.getLanguage();
+
+		label = language.get(locale, (_name != null) ? _name : "proceed");
+
+		if (label != null) {
+			return HtmlUtil.escape(label);
+		}
+
 		label = _labelMap.get(LocaleUtil.getSiteDefault());
 
 		if (label != null) {
 			return HtmlUtil.escape(label);
 		}
 
-		Language language = LanguageUtil.getLanguage();
-
-		return HtmlUtil.escape(
-			language.get(locale, (_name != null) ? _name : "proceed"));
+		return _name;
 	}
 
 	@Override

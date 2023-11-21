@@ -26,15 +26,21 @@ public abstract class BaseWorkflowNode implements WorkflowNode {
 			return HtmlUtil.escape(label);
 		}
 
+		Language language = LanguageUtil.getLanguage();
+
+		label = language.get(locale, _name);
+
+		if (label != null) {
+			return HtmlUtil.escape(label);
+		}
+
 		label = _labelMap.get(LocaleUtil.getSiteDefault());
 
 		if (label != null) {
 			return HtmlUtil.escape(label);
 		}
 
-		Language language = LanguageUtil.getLanguage();
-
-		return HtmlUtil.escape(language.get(locale, _name));
+		return _name;
 	}
 
 	@Override
