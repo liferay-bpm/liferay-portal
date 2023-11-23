@@ -779,6 +779,95 @@ public class ObjectActionLocalServiceTest {
 	}
 
 	@Test
+	public void testAddObjectActionWithCircularReference() throws Exception {
+		_publishCustomObjectDefinition();
+
+		UnicodeProperties unicodeProperties = UnicodePropertiesBuilder.put(
+			"objectDefinitionId", _objectDefinition.getObjectDefinitionId()
+		).put(
+			"predefinedValues",
+			JSONUtil.putAll(
+				JSONUtil.put(
+					"inputAsValue", true
+				).put(
+					"name", "firstName"
+				).put(
+					"value", RandomTestUtil.randomString()
+				)
+			).toString()
+		).build();
+
+		// When you add a new object entry that belongs to "_objectDefinition",
+		// update the newly added object entry
+
+		ObjectAction objectAction1 = _addObjectAction(
+			RandomTestUtil.randomString(),
+			ObjectActionExecutorConstants.KEY_UPDATE_OBJECT_ENTRY,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD, unicodeProperties,
+			false);
+
+		Assert.assertEquals(
+			objectAction1.getStatus(), ObjectActionConstants.STATUS_NEVER_RAN);
+
+		// When you update an object entry that belongs to "_objectDefinition",
+		// add a new object entry to "_objectDefinition"
+
+		ObjectAction objectAction2 = _addObjectAction(
+			RandomTestUtil.randomString(),
+			ObjectActionExecutorConstants.KEY_ADD_OBJECT_ENTRY,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE, unicodeProperties,
+			false);
+
+		Assert.assertEquals(
+			objectAction2.getStatus(), ObjectActionConstants.STATUS_NEVER_RAN);
+
+		// The actions should not be triggered indefinitely
+
+		PermissionChecker originalPermissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+		String originalName = PrincipalThreadLocal.getName();
+
+		try {
+			PermissionThreadLocal.setPermissionChecker(
+				PermissionCheckerFactoryUtil.create(_user));
+			PrincipalThreadLocal.setName(_user.getUserId());
+
+			_objectEntryLocalService.addObjectEntry(
+				TestPropsValues.getUserId(), 0,
+				_objectDefinition.getObjectDefinitionId(),
+				Collections.singletonMap(
+					"firstName", RandomTestUtil.randomString()),
+				ServiceContextTestUtil.getServiceContext());
+		}
+		catch (StackOverflowError stackOverflowError) {
+			Assert.fail();
+		}
+		finally {
+			PermissionThreadLocal.setPermissionChecker(
+				originalPermissionChecker);
+			PrincipalThreadLocal.setName(originalName);
+		}
+
+		Assert.assertEquals(
+			2,
+			_objectEntryLocalService.getObjectEntriesCount(
+				0, _objectDefinition.getObjectDefinitionId()));
+
+		objectAction1 = _objectActionLocalService.getObjectAction(
+			objectAction1.getObjectActionId());
+		objectAction2 = _objectActionLocalService.getObjectAction(
+			objectAction2.getObjectActionId());
+
+		Assert.assertEquals(
+			objectAction1.getStatus(), ObjectActionConstants.STATUS_SUCCESS);
+		Assert.assertEquals(
+			objectAction2.getStatus(), ObjectActionConstants.STATUS_SUCCESS);
+
+		_objectActionLocalService.deleteObjectAction(objectAction1);
+		_objectActionLocalService.deleteObjectAction(objectAction2);
+	}
+
+	@Test
 	public void testAddObjectActionWithConditionExpression() throws Exception {
 		_publishCustomObjectDefinition();
 
