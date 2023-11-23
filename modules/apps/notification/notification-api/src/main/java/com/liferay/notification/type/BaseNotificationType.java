@@ -5,9 +5,12 @@
 
 package com.liferay.notification.type;
 
+import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.constants.NotificationQueueEntryConstants;
+import com.liferay.notification.constants.NotificationRecipientConstants;
 import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.exception.NotificationQueueEntrySubjectException;
+import com.liferay.notification.exception.NotificationRecipientSettingNameException;
 import com.liferay.notification.exception.NotificationTemplateAttachmentObjectFieldIdException;
 import com.liferay.notification.exception.NotificationTemplateDescriptionException;
 import com.liferay.notification.exception.NotificationTemplateEditorTypeException;
@@ -91,13 +94,26 @@ public abstract class BaseNotificationType implements NotificationType {
 
 	@Override
 	public List<NotificationRecipientSetting>
-		createNotificationRecipientSettings(
-			long notificationRecipientId, Object[] recipients, User user) {
+			createNotificationRecipientSettings(
+				long notificationRecipientId, NotificationType notificationType,
+				Object[] recipients, User user)
+		throws NotificationRecipientSettingNameException {
 
 		List<NotificationRecipientSetting> notificationRecipientSettings =
 			new ArrayList<>();
 
+		String notificationsType = notificationType.getType();
+
 		for (Object recipient : recipients) {
+			if (notificationsType.equals(
+					NotificationConstants.TYPE_USER_NOTIFICATION) &&
+				!Objects.equals(
+					recipient, NotificationRecipientConstants.TYPE_TERM)) {
+
+				throw new NotificationRecipientSettingNameException(
+					"Notification recipient setting name is invalid");
+			}
+
 			Map<String, Object> recipientMap = (Map<String, Object>)recipient;
 
 			for (Map.Entry<String, Object> entry : recipientMap.entrySet()) {

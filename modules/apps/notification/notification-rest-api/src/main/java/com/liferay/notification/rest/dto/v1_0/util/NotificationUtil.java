@@ -7,6 +7,7 @@ package com.liferay.notification.rest.dto.v1_0.util;
 
 import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
 import com.liferay.notification.context.NotificationContext;
+import com.liferay.notification.exception.NotificationRecipientSettingNameException;
 import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.notification.model.NotificationTemplate;
@@ -105,12 +106,13 @@ public class NotificationUtil {
 	}
 
 	public static List<NotificationRecipientSetting>
-		toNotificationRecipientSetting(
-			long notificationRecipientId, NotificationType notificationType,
-			Object[] recipients, User user) {
+			toNotificationRecipientSetting(
+				long notificationRecipientId, NotificationType notificationType,
+				Object[] recipients, User user)
+		throws NotificationRecipientSettingNameException {
 
 		return notificationType.createNotificationRecipientSettings(
-			notificationRecipientId, recipients, user);
+			notificationRecipientId, notificationType, recipients, user);
 	}
 
 	public static NotificationTemplate toNotificationTemplate(
