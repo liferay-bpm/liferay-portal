@@ -6,6 +6,7 @@
 package com.liferay.notification.type;
 
 import com.liferay.notification.context.NotificationContext;
+import com.liferay.notification.exception.NotificationRecipientSettingNameException;
 import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -23,8 +24,10 @@ public interface NotificationType {
 		String subject);
 
 	public List<NotificationRecipientSetting>
-		createNotificationRecipientSettings(
-			long notificationRecipientId, Object[] recipients, User user);
+			createNotificationRecipientSettings(
+				long notificationRecipientId, NotificationType notificationType,
+				Object[] recipients, User user)
+		throws NotificationRecipientSettingNameException;
 
 	public default String getFromName(
 		NotificationQueueEntry notificationQueueEntry) {

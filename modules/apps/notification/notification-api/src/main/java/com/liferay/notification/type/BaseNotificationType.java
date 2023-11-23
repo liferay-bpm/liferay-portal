@@ -8,6 +8,7 @@ package com.liferay.notification.type;
 import com.liferay.notification.constants.NotificationQueueEntryConstants;
 import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.exception.NotificationQueueEntrySubjectException;
+import com.liferay.notification.exception.NotificationRecipientSettingNameException;
 import com.liferay.notification.exception.NotificationTemplateAttachmentObjectFieldIdException;
 import com.liferay.notification.exception.NotificationTemplateDescriptionException;
 import com.liferay.notification.exception.NotificationTemplateEditorTypeException;
@@ -23,6 +24,7 @@ import com.liferay.notification.service.NotificationRecipientLocalService;
 import com.liferay.notification.service.NotificationRecipientSettingLocalService;
 import com.liferay.notification.term.evaluator.NotificationTermEvaluator;
 import com.liferay.notification.term.evaluator.NotificationTermEvaluatorTracker;
+import com.liferay.notification.util.NotificationRecipientSettingUtil;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
@@ -91,8 +93,10 @@ public abstract class BaseNotificationType implements NotificationType {
 
 	@Override
 	public List<NotificationRecipientSetting>
-		createNotificationRecipientSettings(
-			long notificationRecipientId, Object[] recipients, User user) {
+			createNotificationRecipientSettings(
+				long notificationRecipientId, NotificationType notificationType,
+				Object[] recipients, User user)
+		throws NotificationRecipientSettingNameException {
 
 		List<NotificationRecipientSetting> notificationRecipientSettings =
 			new ArrayList<>();
@@ -101,6 +105,14 @@ public abstract class BaseNotificationType implements NotificationType {
 			Map<String, Object> recipientMap = (Map<String, Object>)recipient;
 
 			for (Map.Entry<String, Object> entry : recipientMap.entrySet()) {
+				if (!NotificationRecipientSettingUtil.
+						isAllowedNotificationRecipientSettingName(
+							entry.getKey(), notificationType.getType())) {
+
+					throw new NotificationRecipientSettingNameException(
+						"Notification recipient setting name is invalid");
+				}
+
 				NotificationRecipientSetting notificationRecipientSetting =
 					notificationRecipientSettingLocalService.
 						createNotificationRecipientSetting(0);
