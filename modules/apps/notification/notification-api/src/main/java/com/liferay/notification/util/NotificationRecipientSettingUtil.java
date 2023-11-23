@@ -5,9 +5,11 @@
 
 package com.liferay.notification.util;
 
+import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -28,6 +30,29 @@ public class NotificationRecipientSettingUtil {
 			notificationQueueEntry.getNotificationRecipient();
 
 		return toMap(notificationRecipient.getNotificationRecipientSettings());
+	}
+
+	public static boolean isAllowedNotificationRecipientSettingName(
+		String notificationRecipientSetting, String notificationType) {
+
+		if (StringUtil.equals(
+				notificationType, NotificationConstants.TYPE_EMAIL)) {
+
+			return ArrayUtil.contains(
+				_ALLOWED_EMAIL_NOTIFICATION_RECIPIENT_SETTING_NAMES,
+				notificationRecipientSetting);
+		}
+
+		if (StringUtil.equals(
+				notificationType,
+				NotificationConstants.TYPE_USER_NOTIFICATION)) {
+
+			return ArrayUtil.contains(
+				_ALLOWED_USER_NOTIFICATION_RECIPIENT_SETTING_NAMES,
+				notificationRecipientSetting);
+		}
+
+		return true;
 	}
 
 	public static Map<String, Object> toMap(
@@ -56,5 +81,15 @@ public class NotificationRecipientSettingUtil {
 
 		return map;
 	}
+
+	private static final String[]
+		_ALLOWED_EMAIL_NOTIFICATION_RECIPIENT_SETTING_NAMES = {
+			"cc", "bcc", "from", "fromName", "singleRecipient", "to"
+		};
+
+	private static final String[]
+		_ALLOWED_USER_NOTIFICATION_RECIPIENT_SETTING_NAMES = {
+			"roleName", "term", "userScreenName"
+		};
 
 }
