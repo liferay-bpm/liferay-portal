@@ -8,6 +8,7 @@ package com.liferay.notification.service.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.constants.NotificationTemplateConstants;
+import com.liferay.notification.exception.NotificationRecipientSettingNameException;
 import com.liferay.notification.exception.NotificationTemplateDescriptionException;
 import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
@@ -16,6 +17,7 @@ import com.liferay.notification.service.NotificationRecipientSettingLocalService
 import com.liferay.notification.service.NotificationTemplateLocalService;
 import com.liferay.notification.service.test.util.NotificationTemplateUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -23,6 +25,9 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -51,21 +56,48 @@ public class NotificationTemplateLocalServiceTest {
 	public void testAddNotificationTemplate() throws Exception {
 		User user = TestPropsValues.getUser();
 
-		try {
-			_notificationTemplateLocalService.addNotificationTemplate(
+		AssertUtils.assertFailure(
+			NotificationRecipientSettingNameException.class,
+			"Notification recipient setting name is invalid",
+			() -> _notificationTemplateLocalService.addNotificationTemplate(
+				NotificationTemplateUtil.createNotificationContext(
+					TestPropsValues.getUser(), StringUtil.randomString(255),
+					RandomTestUtil.randomString(),
+					Arrays.asList(
+						NotificationTemplateUtil.
+							createNotificationRecipientSetting(
+								"from", "[%CURRENT_USER_EMAIL_ADDRESS%]"),
+						NotificationTemplateUtil.
+							createNotificationRecipientSetting(
+								"fromName", "[%CURRENT_USER_FIRST_NAME%]"),
+						NotificationTemplateUtil.
+							createNotificationRecipientSetting(
+								"to", "test@liferay.com"),
+						NotificationTemplateUtil.
+							createNotificationRecipientSetting(
+								"userScreenName", "userScreenName")),
+					StringUtil.randomString(255),
+					NotificationConstants.TYPE_EMAIL)));
+		AssertUtils.assertFailure(
+			NotificationRecipientSettingNameException.class,
+			"Notification recipient setting name is invalid",
+			() -> _notificationTemplateLocalService.addNotificationTemplate(
+				NotificationTemplateUtil.createNotificationContext(
+					user, RandomTestUtil.randomString(),
+					StringUtil.randomString(255),
+					Collections.singletonList(
+						NotificationTemplateUtil.
+							createNotificationRecipientSetting(
+								"singleRecipient", user.getScreenName())),
+					RandomTestUtil.randomString(),
+					NotificationConstants.TYPE_USER_NOTIFICATION)));
+		AssertUtils.assertFailure(
+			NotificationTemplateDescriptionException.class,
+			"The description cannot contain more than 255 characters",
+			() -> _notificationTemplateLocalService.addNotificationTemplate(
 				NotificationTemplateUtil.createNotificationContext(
 					user, StringUtil.randomString(256),
-					NotificationConstants.TYPE_USER_NOTIFICATION));
-
-			Assert.fail();
-		}
-		catch (NotificationTemplateDescriptionException
-					notificationTemplateDescriptionException) {
-
-			Assert.assertEquals(
-				"The description cannot contain more than 255 characters",
-				notificationTemplateDescriptionException.getMessage());
-		}
+					NotificationConstants.TYPE_USER_NOTIFICATION)));
 
 		_notificationTemplateLocalService.addNotificationTemplate(
 			NotificationTemplateUtil.createNotificationContext(
