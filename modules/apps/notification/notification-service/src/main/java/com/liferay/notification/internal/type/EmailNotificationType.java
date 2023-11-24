@@ -56,6 +56,7 @@ import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.templateparser.TemplateNode;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -119,6 +120,15 @@ public class EmailNotificationType extends BaseNotificationType {
 	@Override
 	public String getTypeLanguageKey() {
 		return "email";
+	}
+
+	@Override
+	public boolean isAllowedNotificationRecipientSettingName(
+		String notificationRecipientSetting) {
+
+		return ArrayUtil.contains(
+			_ALLOWED_EMAIL_NOTIFICATION_RECIPIENT_SETTING_NAMES,
+			notificationRecipientSetting);
 	}
 
 	@Override
@@ -644,6 +654,11 @@ public class EmailNotificationType extends BaseNotificationType {
 				ToMustNotBeNull();
 		}
 	}
+
+	private static final String[]
+		_ALLOWED_EMAIL_NOTIFICATION_RECIPIENT_SETTING_NAMES = {
+			"bcc", "cc", "from", "fromName", "singleRecipient", "to"
+		};
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		EmailNotificationType.class);

@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 
@@ -86,6 +87,15 @@ public class UserNotificationType extends BaseNotificationType {
 	@Override
 	public String getTypeLanguageKey() {
 		return "user-notification";
+	}
+
+	@Override
+	public boolean isAllowedNotificationRecipientSettingName(
+		String notificationRecipientSetting) {
+
+		return ArrayUtil.contains(
+			_ALLOWED_USER_NOTIFICATION_RECIPIENT_SETTING_NAMES,
+			notificationRecipientSetting);
 	}
 
 	@Override
@@ -160,6 +170,11 @@ public class UserNotificationType extends BaseNotificationType {
 	protected void deactivate() {
 		_serviceTrackerMap.close();
 	}
+
+	private static final String[]
+		_ALLOWED_USER_NOTIFICATION_RECIPIENT_SETTING_NAMES = {
+			"roleName", "term", "userScreenName"
+		};
 
 	@Reference
 	private ObjectEntryService _objectEntryService;

@@ -140,6 +140,13 @@ public abstract class BaseNotificationType implements NotificationType {
 	}
 
 	@Override
+	public boolean isAllowedNotificationRecipientSettingName(
+		String notificationRecipientSetting) {
+
+		return true;
+	}
+
+	@Override
 	public void sendNotification(NotificationContext notificationContext)
 		throws PortalException {
 

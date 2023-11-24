@@ -42,6 +42,9 @@ public interface NotificationType {
 
 	public String getTypeLanguageKey();
 
+	public boolean isAllowedNotificationRecipientSettingName(
+		String notificationRecipientSetting);
+
 	public default void resendNotification(
 			NotificationQueueEntry notificationQueueEntry)
 		throws PortalException {
