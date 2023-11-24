@@ -7,6 +7,7 @@ package com.liferay.notification.service.impl;
 
 import com.liferay.notification.constants.NotificationTemplateConstants;
 import com.liferay.notification.context.NotificationContext;
+import com.liferay.notification.exception.NotificationRecipientSettingNameException;
 import com.liferay.notification.internal.template.util.NotificationTemplateUtil;
 import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationRecipient;
@@ -96,8 +97,19 @@ public class NotificationTemplateLocalServiceImpl
 			_notificationRecipientLocalService.updateNotificationRecipient(
 				notificationRecipient);
 
+		NotificationType notificationType =
+			_notificationTypeServiceTracker.getNotificationType(
+				notificationTemplate.getType());
+
 		for (NotificationRecipientSetting notificationRecipientSetting :
 				notificationContext.getNotificationRecipientSettings()) {
+
+			if (!notificationType.isAllowedNotificationRecipientSettingName(
+					notificationRecipientSetting.getName())) {
+
+				throw new NotificationRecipientSettingNameException(
+					"Notification recipient setting name is invalid");
+			}
 
 			notificationRecipientSetting.setNotificationRecipientSettingId(
 				counterLocalService.increment());
