@@ -1,5 +1,14 @@
 definition {
 
+	@summary = "Add Field or Relationship in Model Builder View"
+	macro addFieldOrRelationshipInModelBuilder(optionMenu = null) {
+		Click(locator1 = "ObjectModelBuilder#ADD_FIELD_OR_RELATIONSHIP_BUTTON");
+
+		Click(
+			key_optionMenu = ${optionMenu},
+			locator1 = "ObjectModelBuilder#ADD_FIELD_OR_RELATIONSHIP_BUTTON_OPTION");
+	}
+
 	@summary = "Default summary"
 	macro openObjectFolderInModelBuilder(baseURL = null) {
 		if (!(isSet(objectFolderName))) {
