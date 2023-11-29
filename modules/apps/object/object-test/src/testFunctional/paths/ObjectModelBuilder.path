@@ -65,6 +65,31 @@
 		<td>//div[contains(@class,"view-object-definitions-actions")]</td>
 		<td></td>
 	</tr>
+	<tr>
+		<td>ADD_FIELD_OR_RELATIONSHIP_BUTTON</td>
+		<td>//button[contains(@class, 'dropdown-toggle btn btn-sm btn-secondary') and contains(., 'Add Field or Relationship')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>ADD_FIELD_OR_RELATIONSHIP_BUTTON_OPTION</td>
+		<td>//div[contains(@class, 'dropdown-menu show')]//button[contains(., '${key_optionMenu}')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>LABEL_OBJECT_RELATIONSHIP</td>
+		<td>//div[contains(@aria-labelledby,'clay-modal-label')]//div[contains(@class, 'form-group') and contains(., '${key_inputMenu}')]//input[contains(@class, 'form-control')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>OBJECT_DEFINITION_NODE_CONTAINER</td>
+		<td>//div[contains(@class, 'model-builder-node-container') and contains(., '${key_nodeContainer}')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>SELECT_OBJECT_IN_LEFT_SIDEBAR_IN_SPECIFIC_FOLDER</td>
+		<td>//div[contains(@id, '${key_folderName}')]//span[contains(@class, 'text-truncate') and contains(., '${key_label}')]</td>
+		<td></td>
+	</tr>
 </tbody>
 </table>
 </body>
