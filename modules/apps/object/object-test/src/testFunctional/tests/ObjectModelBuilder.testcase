@@ -15,10 +15,84 @@ definition {
 	tearDown {
 		ObjectAdmin.deleteAllCustomObjectsViaAPI();
 
+		JSONObjectFolder.tearDown();
+
 		var testLiferayVirtualInstance = PropsUtil.get("test.liferay.virtual.instance");
 
 		if (${testLiferayVirtualInstance} == "true") {
 			PortalInstances.tearDownCP();
+		}
+	}
+
+	@description = "LPS-185676 - Verify that the user is able to establish a relationship with an object from another folder"
+	@priority = 4
+	test CanCreateRelationshipWithObjectDefinitionInAnotherFolder {
+		task ("Given a custom object in an object Folder") {
+			JSONObjectFolder.addFolder(
+				folderLabel = "Custom Folder 2210",
+				folderName = "CustomFolder2210");
+
+			ObjectAdmin.openObjectAdmin();
+
+			Click.javaScriptClick(
+				folderLabel = "Custom Folder 2210",
+				locator1 = "ObjectAdmin#SIDEBAR_ITEM");
+
+			ObjectAdmin.addNewObject(
+				fieldLabelName = "Custom Object 148937",
+				pluralLabelName = "Custom Objects 148937");
+
+			CreateObject.saveObject();
+		}
+
+		task ("When the user is creating a relationship using the Add Relationship Button") {
+			Click.javaScriptClick(
+				folderLabel = "Custom Folder 2210",
+				locator1 = "ObjectAdmin#SIDEBAR_ITEM");
+
+			ObjectModelBuilder.openObjectFolderInModelBuilder(objectFolderName = "CustomFolder2210");
+
+			ObjectModelBuilder.selectObjectNode(objectLabel = "Custom Object 148937");
+
+			ObjectModelBuilder.addFieldOrRelationshipInModelBuilder(optionMenu = "Add Relationship");
+
+			SelectFrameTop();
+
+			Type(
+				key_inputMenu = "Label",
+				locator1 = "ObjectModelBuilder#LABEL_OBJECT_RELATIONSHIP",
+				value1 = "Relationship");
+
+			ObjectAdmin.selectDropdownItem(
+				labelName = "Type",
+				optionName = "One to Many");
+
+			ObjectAdmin.selectDropdownItem(
+				labelName = "Many Records Of",
+				optionName = "Account");
+
+			Button.clickSave();
+		}
+
+		task ("and When the user selects an object definition from another folder") {
+			Click(
+				objectLabel = "Account",
+				locator1 = "ObjectModelBuilder#OBJECT_DEFINITION_NODE");
+		}
+
+		task ("Then the other object is displayed with dashed border") {
+			AssertCssValue(
+				key_nodeContainer = "Account",
+				locator1 = "ObjectModelBuilder#OBJECT_DEFINITION_NODE_CONTAINER",
+				locator2 = "border-style",
+				value1 = "dashed");
+		}
+
+		task ("and Then the linked object icon is displayed at the sidebar") {
+			AssertElementPresent(
+				key_folderName = "Custom Folder 2210",
+				key_label = "Account",
+				locator1 = "ObjectModelBuilder#SELECT_OBJECT_IN_LEFT_SIDEBAR_IN_SPECIFIC_FOLDER");
 		}
 	}
 
