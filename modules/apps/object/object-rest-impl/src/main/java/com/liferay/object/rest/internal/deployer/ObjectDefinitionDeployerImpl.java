@@ -14,6 +14,7 @@ import com.liferay.object.rest.internal.graphql.dto.v1_0.ObjectDefinitionGraphQL
 import com.liferay.object.rest.internal.jaxrs.application.ObjectEntryApplication;
 import com.liferay.object.rest.internal.jaxrs.context.provider.ObjectDefinitionContextProvider;
 import com.liferay.object.rest.internal.jaxrs.exception.mapper.ObjectAssetCategoryExceptionMapper;
+import com.liferay.object.rest.internal.jaxrs.exception.mapper.ObjectEntryCountExceptionMapper;
 import com.liferay.object.rest.internal.jaxrs.exception.mapper.ObjectEntryManagerHttpExceptionMapper;
 import com.liferay.object.rest.internal.jaxrs.exception.mapper.ObjectEntryStatusExceptionMapper;
 import com.liferay.object.rest.internal.jaxrs.exception.mapper.ObjectEntryValuesExceptionMapper;
@@ -596,6 +597,18 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					"osgi.jaxrs.name",
 					objectDefinition.getOSGiJaxRsName(
 						"ObjectAssetCategoryExceptionMapper")
+				).build()),
+			_bundleContext.registerService(
+				ExceptionMapper.class, new ObjectEntryCountExceptionMapper(),
+				HashMapDictionaryBuilder.<String, Object>put(
+					"osgi.jaxrs.application.select",
+					"(osgi.jaxrs.name=" + jaxRsApplicationName + ")"
+				).put(
+					"osgi.jaxrs.extension", "true"
+				).put(
+					"osgi.jaxrs.name",
+					objectDefinition.getOSGiJaxRsName(
+						"ObjectEntryCountExceptionMapper")
 				).build()),
 			_bundleContext.registerService(
 				ExceptionMapper.class,
