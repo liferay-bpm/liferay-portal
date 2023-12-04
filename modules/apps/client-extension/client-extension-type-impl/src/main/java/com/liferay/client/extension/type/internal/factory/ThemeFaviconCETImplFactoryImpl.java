@@ -23,7 +23,7 @@ import javax.portlet.PortletRequest;
  * @author Iván Zaera Avellón
  */
 public class ThemeFaviconCETImplFactoryImpl
-	extends BaseCETImplFactory<ThemeFaviconCET> {
+	extends BaseCETImplFactoryImpl<ThemeFaviconCET> {
 
 	public ThemeFaviconCETImplFactoryImpl() {
 		super(ThemeFaviconCET.class);

@@ -23,7 +23,7 @@ import javax.portlet.PortletRequest;
  * @author Gregory Amerson
  */
 public class StaticContentCETImplFactoryImpl
-	extends BaseCETImplFactory<StaticContentCET> {
+	extends BaseCETImplFactoryImpl<StaticContentCET> {
 
 	public StaticContentCETImplFactoryImpl() {
 		super(StaticContentCET.class);

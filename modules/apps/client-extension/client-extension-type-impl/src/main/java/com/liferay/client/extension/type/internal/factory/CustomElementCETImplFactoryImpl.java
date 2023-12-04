@@ -30,7 +30,7 @@ import javax.portlet.PortletRequest;
  * @author Iván Zaera Avellón
  */
 public class CustomElementCETImplFactoryImpl
-	extends BaseCETImplFactory<CustomElementCET> {
+	extends BaseCETImplFactoryImpl<CustomElementCET> {
 
 	public CustomElementCETImplFactoryImpl() {
 		super(CustomElementCET.class);

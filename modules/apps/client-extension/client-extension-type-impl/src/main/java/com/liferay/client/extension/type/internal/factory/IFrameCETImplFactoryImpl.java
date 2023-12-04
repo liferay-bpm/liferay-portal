@@ -24,7 +24,7 @@ import javax.portlet.PortletRequest;
 /**
  * @author Iván Zaera Avellón
  */
-public class IFrameCETImplFactoryImpl extends BaseCETImplFactory<IFrameCET> {
+public class IFrameCETImplFactoryImpl extends BaseCETImplFactoryImpl<IFrameCET> {
 
 	public IFrameCETImplFactoryImpl() {
 		super(IFrameCET.class);

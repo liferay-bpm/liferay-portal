@@ -17,10 +17,10 @@ import java.util.Set;
 /**
  * @author Iván Zaera Avellón
  */
-public abstract class BaseCETImplFactory<T extends CET>
+public abstract class BaseCETImplFactoryImpl<T extends CET>
 	implements CETImplFactory<T> {
 
-	public BaseCETImplFactory(Class<T> cetClass) {
+	public BaseCETImplFactoryImpl(Class<T> cetClass) {
 		_urlCETPropertyNames = _getURLCETPropertyNames(cetClass);
 	}
 

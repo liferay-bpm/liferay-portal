@@ -23,7 +23,7 @@ import javax.portlet.PortletRequest;
  * @author Bryce Osterhaus
  */
 public class FDSFilterCETImplFactoryImpl
-	extends BaseCETImplFactory<FDSFilterCET> {
+	extends BaseCETImplFactoryImpl<FDSFilterCET> {
 
 	public FDSFilterCETImplFactoryImpl() {
 		super(FDSFilterCET.class);

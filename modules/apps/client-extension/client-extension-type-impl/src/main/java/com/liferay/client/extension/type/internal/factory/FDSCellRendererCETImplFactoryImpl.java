@@ -23,7 +23,7 @@ import javax.portlet.PortletRequest;
  * @author Iván Zaera Avellón
  */
 public class FDSCellRendererCETImplFactoryImpl
-	extends BaseCETImplFactory<FDSCellRendererCET> {
+	extends BaseCETImplFactoryImpl<FDSCellRendererCET> {
 
 	public FDSCellRendererCETImplFactoryImpl() {
 		super(FDSCellRendererCET.class);

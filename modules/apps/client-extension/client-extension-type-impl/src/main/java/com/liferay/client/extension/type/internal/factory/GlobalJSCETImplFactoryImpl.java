@@ -23,7 +23,7 @@ import javax.portlet.PortletRequest;
  * @author Iván Zaera Avellón
  */
 public class GlobalJSCETImplFactoryImpl
-	extends BaseCETImplFactory<GlobalJSCET> {
+	extends BaseCETImplFactoryImpl<GlobalJSCET> {
 
 	public GlobalJSCETImplFactoryImpl() {
 		super(GlobalJSCET.class);

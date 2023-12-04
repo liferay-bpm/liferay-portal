@@ -23,7 +23,7 @@ import javax.portlet.PortletRequest;
  * @author Iván Zaera Avellón
  */
 public class ThemeCSSCETImplFactoryImpl
-	extends BaseCETImplFactory<ThemeCSSCET> {
+	extends BaseCETImplFactoryImpl<ThemeCSSCET> {
 
 	public ThemeCSSCETImplFactoryImpl() {
 		super(ThemeCSSCET.class);

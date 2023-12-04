@@ -23,7 +23,7 @@ import javax.portlet.PortletRequest;
  * @author Iván Zaera Avellón
  */
 public class JSImportMapsEntryCETImplFactoryImpl
-	extends BaseCETImplFactory<JSImportMapsEntryCET> {
+	extends BaseCETImplFactoryImpl<JSImportMapsEntryCET> {
 
 	public JSImportMapsEntryCETImplFactoryImpl() {
 		super(JSImportMapsEntryCET.class);

@@ -23,7 +23,7 @@ import javax.portlet.PortletRequest;
  * @author Iván Zaera Avellón
  */
 public class ThemeSpritemapCETImplFactoryImpl
-	extends BaseCETImplFactory<ThemeSpritemapCET> {
+	extends BaseCETImplFactoryImpl<ThemeSpritemapCET> {
 
 	public ThemeSpritemapCETImplFactoryImpl() {
 		super(ThemeSpritemapCET.class);
