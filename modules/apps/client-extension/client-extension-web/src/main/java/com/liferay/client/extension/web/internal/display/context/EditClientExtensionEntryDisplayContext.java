@@ -193,7 +193,7 @@ public class EditClientExtensionEntryDisplayContext<T extends CET> {
 		return CETLabelUtil.getTypeLabel(themeDisplay.getLocale(), getType());
 	}
 
-	public boolean isNew() {
+	public boolean isAdding() {
 		return _adding;
 	}
 
