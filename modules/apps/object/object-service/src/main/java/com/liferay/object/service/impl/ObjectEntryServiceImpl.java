@@ -583,7 +583,6 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 	private LocalDate _getStartDateInterval() {
 		if (Objects.equals(_objectConfiguration.timeScale(), "days")) {
-
 			return LocalDate.now(
 			).minusDays(
 				_objectConfiguration.duration()

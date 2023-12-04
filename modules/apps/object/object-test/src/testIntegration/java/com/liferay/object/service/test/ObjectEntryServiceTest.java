@@ -60,7 +60,6 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.FeatureFlags;
@@ -78,7 +77,6 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -662,17 +660,18 @@ public class ObjectEntryServiceTest {
 		_setUser(_guestUser);
 
 		HashMapDictionaryBuilder.HashMapDictionaryWrapper<String, Object>
-			objectConfigurationDictionary =
-			HashMapDictionaryBuilder.create(Collections.emptyMap());
+			objectConfigurationDictionary = HashMapDictionaryBuilder.create(
+				Collections.emptyMap());
 
-		objectConfigurationDictionary.put(
-			"maximumNumberOfGuestUserObjectEntriesPerObjectDefinition", 1);
-		objectConfigurationDictionary.put("duration", 1);
-		objectConfigurationDictionary.put("timeScale", "days");
-		objectConfigurationDictionary.put("maximumFileSizeForGuestUsers", 25);
+		HashMapDictionaryBuilder.put(
+			"maximumNumberOfGuestUserObjectEntriesPerObjectDefinition", 1)
+		HashMapDictionaryBuilder.put("duration", 1);
+		HashMapDictionaryBuilder.put("timeScale", "days");
+		HashMapDictionaryBuilder.put("maximumFileSizeForGuestUsers", 25);
 
 		ConfigurationTestUtil.saveConfiguration(
-			ObjectConfiguration.class.getName(), objectConfigurationDictionary.build());
+			ObjectConfiguration.class.getName(),
+			objectConfigurationDictionary.build());
 
 		Role guestRole = _roleLocalService.getRole(
 			TestPropsValues.getCompanyId(), RoleConstants.GUEST);
@@ -705,12 +704,13 @@ public class ObjectEntryServiceTest {
 		ConfigurationTestUtil.deleteConfiguration(
 			ObjectConfiguration.class.getName());
 
-		objectConfigurationDictionary.put(
+		HashMapDictionaryBuilder.put(
 			"maximumNumberOfGuestUserObjectEntriesPerObjectDefinition", 2);
-		objectConfigurationDictionary.put("timeScale", "weeks");
+		HashMapDictionaryBuilder.put("timeScale", "weeks");
 
 		ConfigurationTestUtil.saveConfiguration(
-			ObjectConfiguration.class.getName(), objectConfigurationDictionary.build());
+			ObjectConfiguration.class.getName(),
+			objectConfigurationDictionary.build());
 
 		LocalDate beginningDate = LocalDate.now(
 		).minusDays(
