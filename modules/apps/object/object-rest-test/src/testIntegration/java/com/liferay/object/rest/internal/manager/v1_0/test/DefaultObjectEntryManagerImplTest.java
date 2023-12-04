@@ -45,6 +45,7 @@ import com.liferay.object.field.builder.PrecisionDecimalObjectFieldBuilder;
 import com.liferay.object.field.builder.RichTextObjectFieldBuilder;
 import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
+import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
@@ -1963,6 +1964,67 @@ public class DefaultObjectEntryManagerImplTest
 				"search", "aa"
 			).build(),
 			childObjectEntry1, childObjectEntry2);
+
+		ObjectField objectField = objectFieldLocalService.fetchObjectField(
+			_objectDefinition1.getObjectDefinitionId(), "textObjectFieldName");
+
+		_objectDefinition1.setTitleObjectFieldId(
+			objectField.getObjectFieldId());
+
+		_objectDefinition1 =
+			objectDefinitionLocalService.updateObjectDefinition(
+				_objectDefinition1);
+
+		testGetObjectEntries(
+			HashMapBuilder.put(
+				"search", "Able"
+			).build(),
+			childObjectEntry1);
+
+		objectField = ObjectFieldUtil.addCustomObjectField(
+			new TextObjectFieldBuilder(
+			).userId(
+				adminUser.getUserId()
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"a" + RandomTestUtil.randomString()
+			).objectDefinitionId(
+				_objectDefinition1.getObjectDefinitionId()
+			).build());
+
+		_objectDefinition1.setTitleObjectFieldId(
+			objectField.getObjectFieldId());
+
+		_objectDefinition1 =
+			objectDefinitionLocalService.updateObjectDefinition(
+				_objectDefinition1);
+
+		String objectFieldName = objectField.getName();
+
+		_defaultObjectEntryManager.partialUpdateObjectEntry(
+			_simpleDTOConverterContext, _objectDefinition1,
+			parentObjectEntry1.getId(),
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						objectFieldName, "Baker"
+					).build();
+				}
+			});
+
+		childObjectEntry1 = _defaultObjectEntryManager.getObjectEntry(
+			dtoConverterContext, _objectDefinition2, childObjectEntry1.getId());
+
+		testGetObjectEntries(
+			HashMapBuilder.put(
+				"search", "Baker"
+			).build(),
+			childObjectEntry1);
+
+		childObjectEntry2 = _defaultObjectEntryManager.getObjectEntry(
+			dtoConverterContext, _objectDefinition2, childObjectEntry2.getId());
+
 		testGetObjectEntries(
 			HashMapBuilder.put(
 				"sort", "createDate:asc"
