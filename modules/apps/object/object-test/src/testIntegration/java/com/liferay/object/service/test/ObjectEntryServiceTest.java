@@ -61,6 +61,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
@@ -660,8 +661,9 @@ public class ObjectEntryServiceTest {
 	public void testValidateMaximumNumberOfObjectEntries() throws Exception {
 		_setUser(_guestUser);
 
-		Dictionary<String, Object> objectConfigurationDictionary =
-			new HashMapDictionary<>();
+		HashMapDictionaryBuilder.HashMapDictionaryWrapper<String, Object>
+			objectConfigurationDictionary =
+			HashMapDictionaryBuilder.create(Collections.emptyMap());
 
 		objectConfigurationDictionary.put(
 			"maximumNumberOfGuestUserObjectEntriesPerObjectDefinition", 1);
@@ -670,7 +672,7 @@ public class ObjectEntryServiceTest {
 		objectConfigurationDictionary.put("maximumFileSizeForGuestUsers", 25);
 
 		ConfigurationTestUtil.saveConfiguration(
-			ObjectConfiguration.class.getName(), objectConfigurationDictionary);
+			ObjectConfiguration.class.getName(), objectConfigurationDictionary.build());
 
 		Role guestRole = _roleLocalService.getRole(
 			TestPropsValues.getCompanyId(), RoleConstants.GUEST);
@@ -708,7 +710,7 @@ public class ObjectEntryServiceTest {
 		objectConfigurationDictionary.put("timeScale", "weeks");
 
 		ConfigurationTestUtil.saveConfiguration(
-			ObjectConfiguration.class.getName(), objectConfigurationDictionary);
+			ObjectConfiguration.class.getName(), objectConfigurationDictionary.build());
 
 		LocalDate beginningDate = LocalDate.now(
 		).minusDays(

@@ -69,6 +69,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.osgi.service.component.annotations.Activate;
@@ -581,10 +582,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 	}
 
 	private LocalDate _getStartDateInterval() {
-		if (_objectConfiguration.timeScale(
-			).equals(
-				"days"
-			)) {
+		if (Objects.equals(_objectConfiguration.timeScale(), "days")) {
 
 			return LocalDate.now(
 			).minusDays(
