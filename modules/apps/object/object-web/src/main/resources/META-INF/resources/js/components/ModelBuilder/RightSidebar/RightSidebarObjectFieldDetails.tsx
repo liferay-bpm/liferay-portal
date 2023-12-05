@@ -86,15 +86,14 @@ export function RightSidebarObjectFieldDetails() {
 			let objectField: Partial<ObjectField>;
 
 			if (!editedObjectField) {
-				objectField = values;
+				objectField = {...values};
 			}
 			else {
-				objectField = editedObjectField;
+				objectField = {...editedObjectField};
 			}
 
 			delete objectField.defaultValue;
 			delete objectField.listTypeDefinitionId;
-			delete objectField.system;
 
 			try {
 				const updatedObjectFieldResponse = await API.save<ObjectField>({
