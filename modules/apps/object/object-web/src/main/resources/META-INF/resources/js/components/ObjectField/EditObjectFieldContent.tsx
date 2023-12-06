@@ -54,7 +54,7 @@ export function EditObjectFieldContent({
 	workflowStatuses,
 }: EditObjectFieldContentProps) {
 	const [activeIndex, setActiveIndex] = useState(0);
-	const [objectFieldTypes, setObjectFieldTypes] = useState<ObjectFieldType[]>(
+	const [objectFieldBusinessTypes, setObjectFieldBusinessTypes] = useState<ObjectFieldBusinessType[]>(
 		[]
 	);
 	const [objectRelationshipId, setObjectRelationshipId] = useState(0);
@@ -86,7 +86,7 @@ export function EditObjectFieldContent({
 				});
 
 				const objectFieldInfoJSON = (await objectFieldInfoResponse.json()) as {
-					objectFieldTypes: ObjectFieldType[];
+					objectFieldBusinessTypes: ObjectFieldBusinessType[];
 					objectRelationshipId: number;
 					readOnlySidebarElements: SidebarCategory[];
 					sidebarElements: SidebarCategory[];
@@ -98,7 +98,7 @@ export function EditObjectFieldContent({
 					);
 				}
 
-				setObjectFieldTypes(objectFieldInfoJSON.objectFieldTypes);
+				setObjectFieldBusinessTypes(objectFieldInfoJSON.objectFieldBusinessTypes);
 				setReadOnlySidebarElements(
 					objectFieldInfoJSON.readOnlySidebarElements
 				);
@@ -144,7 +144,7 @@ export function EditObjectFieldContent({
 								objectDefinitionExternalReferenceCode={
 									objectDefinitionExternalReferenceCode
 								}
-								objectFieldTypes={objectFieldTypes}
+								objectFieldBusinessTypes={objectFieldBusinessTypes}
 								objectRelationshipId={objectRelationshipId}
 								onSubmit={onSubmit}
 								readOnly={readOnly}
@@ -191,7 +191,7 @@ export function EditObjectFieldContent({
 					objectDefinitionExternalReferenceCode={
 						objectDefinitionExternalReferenceCode
 					}
-					objectFieldTypes={objectFieldTypes}
+					objectFieldBusinessTypes={objectFieldBusinessTypes}
 					objectRelationshipId={objectRelationshipId}
 					onSubmit={onSubmit}
 					readOnly={readOnly}

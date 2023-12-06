@@ -55,7 +55,7 @@ public class GetObjectFieldTypesMVCResourceCommand
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse,
 			JSONUtil.put(
-				"objectFieldTypes",
+				"objectFieldBusinessTypes",
 				ObjectFieldBusinessTypeUtil.getObjectFieldBusinessTypeMaps(
 					_portal.getLocale(resourceRequest),
 					ListUtil.filter(

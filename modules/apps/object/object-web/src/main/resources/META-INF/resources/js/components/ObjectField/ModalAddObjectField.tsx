@@ -42,7 +42,7 @@ export function ModalAddObjectField({
 	const [objectDefinition, setObjectDefinition] = useState<
 		ObjectDefinition
 	>();
-	const [objectFieldTypes, setObjectFieldTypes] = useState<ObjectFieldType[]>(
+	const [objectFieldBusinessTypes, setObjectFieldBusinessTypes] = useState<ObjectFieldBusinessType[]>(
 		[]
 	);
 	const {observer, onClose} = useModal({onClose: () => setVisibility(false)});
@@ -122,17 +122,17 @@ export function ModalAddObjectField({
 				p_p_resource_id: '/object_definitions/get_object_field_types',
 			}).href;
 
-			const objectFieldTypesResponse = await fetch(url, {
+			const objectFieldBusinessTypesResponse = await fetch(url, {
 				method: 'GET',
 			});
 
 			const {
-				objectFieldTypes,
-			} = (await objectFieldTypesResponse.json()) as {
-				objectFieldTypes: ObjectFieldType[];
+				objectFieldBusinessTypes,
+			} = (await objectFieldBusinessTypesResponse.json()) as {
+				objectFieldBusinessTypes: ObjectFieldBusinessType[];
 			};
 
-			setObjectFieldTypes(objectFieldTypes);
+			setObjectFieldBusinessTypes(objectFieldBusinessTypes);
 		};
 
 		makeFetch();
@@ -189,7 +189,7 @@ export function ModalAddObjectField({
 										: ''
 								}
 								objectField={values}
-								objectFieldTypes={objectFieldTypes}
+								objectFieldBusinessTypesInfo={objectFieldBusinessTypes}
 								setValues={setValues}
 							>
 								{showEnableTranslationToggle && (

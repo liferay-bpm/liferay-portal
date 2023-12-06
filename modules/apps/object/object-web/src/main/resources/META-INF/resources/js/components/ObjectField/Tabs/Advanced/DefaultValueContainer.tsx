@@ -49,7 +49,7 @@ export interface InputAsValueFieldComponentProps {
 }
 
 type InputAsValueFieldComponents = {
-	[key in ObjectFieldBusinessType]: React.FC<InputAsValueFieldComponentProps>;
+	[key in ObjectFieldBusinessTypeName]: React.FC<InputAsValueFieldComponentProps>;
 };
 
 const InputAsValueFieldComponents: Partial<InputAsValueFieldComponents> = {
