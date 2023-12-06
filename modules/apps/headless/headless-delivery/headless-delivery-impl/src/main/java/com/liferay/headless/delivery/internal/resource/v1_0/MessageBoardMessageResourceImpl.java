@@ -145,6 +145,8 @@ public class MessageBoardMessageResourceImpl
 				Pagination pagination, Sort[] sorts)
 		throws Exception {
 
+		flatten = GetterUtil.getBoolean(flatten);
+
 		MBMessage mbMessage = _mbMessageService.getMessage(
 			parentMessageBoardMessageId);
 
