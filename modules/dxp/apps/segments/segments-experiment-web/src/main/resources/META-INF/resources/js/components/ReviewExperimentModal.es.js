@@ -174,7 +174,7 @@ function ReviewExperimentModal({modalObserver, onModalClose, onRun, variants}) {
 
 								<p className="small">
 									{Liferay.Language.get(
-										'use-the-ab-test-methodology-to-determine-which-variant-performs-better-based-on-statistical-significance,-it-requires-high-traffic-to-reach-conclusive-results'
+										'use-the-ab-test-methodology-to-determine-which-variant-performs-better-based-on-statistical-significance'
 									)}
 								</p>
 
@@ -227,7 +227,7 @@ function ReviewExperimentModal({modalObserver, onModalClose, onRun, variants}) {
 
 								<p className="small">
 									{Liferay.Language.get(
-										'use-the-multi-armed-bandit-method-to-determines-which-variant-performs-better-by-adapting-dynamically,-allocating-traffic-automatically-to-the-most-successful-variant-based-on-ongoing-performance,-potentially-offering-quicker-insights'
+										'use-the-multiarmed-bandit-method-to-determine-which-variant-performs-better-by-adapting-dynamically'
 									)}
 								</p>
 
