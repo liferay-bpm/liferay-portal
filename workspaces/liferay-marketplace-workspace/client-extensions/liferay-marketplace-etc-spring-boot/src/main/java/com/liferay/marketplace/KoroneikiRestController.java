@@ -343,7 +343,7 @@ public class KoroneikiRestController extends BaseRestController {
 			StatusLine statusLine = closeableHttpResponse.getStatusLine();
 
 			if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
-				throw new Exception("Unable to get OAuth oAuthAccessToken");
+				throw new Exception("Unable to get OAuth access token");
 			}
 
 			JSONObject jsonObject = new JSONObject(
