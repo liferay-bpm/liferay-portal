@@ -6,7 +6,7 @@
 import {Text} from '@clayui/core';
 import {FrontendDataSet} from '@liferay/frontend-data-set-web';
 import {API, getLocalizableLabel} from '@liferay/object-js-components-web';
-import {sub} from 'frontend-js-web';
+import {createResourceURL, sub} from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
 
 import {
@@ -21,12 +21,17 @@ import ModalObjectFieldDeletionNotAllowed from '../ModalObjectFieldDeletionNotAl
 import {ModalAddObjectField} from './ModalAddObjectField';
 import {ModalDeleteObjectField} from './ModalDeleteObjectField';
 import {handleTriggerDeleteObjectField} from './deleteObjectFieldUtil';
+import ClayLoadingIndicator from '@clayui/loading-indicator';
 
 interface ItemData {
 	id: number;
 	localized: boolean;
 	required: boolean;
 	system?: boolean;
+}
+
+interface ObjectFieldItemData {
+	itemData: ObjectField;
 }
 
 interface FieldsProps extends IFDSTableProps {
@@ -52,8 +57,12 @@ export default function Fields({
 		deletedObjectField,
 		setDeletedObjectField,
 	] = useState<ObjectField | null>(null);
+	
+	const [loading, setLoading] = useState<boolean>(false);
 
-	const [showAddFieldModal, setShowAddFieldModal] = useState(false);
+	const [objectFieldBusinessTypes, setObjectFieldBusinessTypes] = useState<
+		Map<string, ObjectFieldBusinessType>
+	>();
 
 	const [objectFieldDeleteInfo, setObjectFieldDeleteInfo] = useState<
 		ObjectFieldDeleteInfoProps
@@ -64,6 +73,8 @@ export default function Fields({
 		showObjectFieldDeletionNotAllowedModal: false,
 	});
 
+	const [showAddFieldModal, setShowAddFieldModal] = useState(false);
+
 	useEffect(() => {
 		Liferay.on('addObjectField', () => setShowAddFieldModal(true));
 
@@ -72,21 +83,62 @@ export default function Fields({
 
 	useEffect(() => {
 		const makeFetch = async () => {
-			const objectDefinition = await API.getObjectDefinitionByExternalReferenceCode(
+			setLoading(true);
+
+			const objectDefinitionResponse = await API.getObjectDefinitionByExternalReferenceCode(
 				objectDefinitionExternalReferenceCode
 			);
 
-			setCreationLanguageId(objectDefinition.defaultLanguageId);
+			const MVCResourceCommandUrl = createResourceURL(baseResourceURL, {
+				objectDefinitionId: objectDefinitionResponse.id,
+				p_p_resource_id:
+					'/object_definitions/get_object_field_business_types',
+			}).href;
+
+			const objectFieldBusinessTypesResponse = await fetch(MVCResourceCommandUrl, {
+				method: 'GET',
+			});
+
+			const {
+				objectFieldBusinessTypes: newObjectFieldBusinessTypes,
+			} = (await objectFieldBusinessTypesResponse.json()) as {
+				objectFieldBusinessTypes: ObjectFieldBusinessType[];
+			};
+
+			const objectFieldBusinessTypesMap = new Map<
+				string,
+				ObjectFieldBusinessType
+			>(
+				newObjectFieldBusinessTypes.map((objectFieldBusinessType) => [
+					objectFieldBusinessType.businessType,
+					objectFieldBusinessType,
+				])
+			);
+
+			setCreationLanguageId(objectDefinitionResponse.defaultLanguageId);
+			setObjectFieldBusinessTypes(objectFieldBusinessTypesMap);
+
+			setTimeout(() => {
+				setLoading(false);
+			}, 200);
 		};
 
 		makeFetch();
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [objectDefinitionExternalReferenceCode]);
+
+	function objectFieldBusinessTypeDataRenderer({
+		itemData,
+	}: ObjectFieldItemData) {
+		return objectFieldBusinessTypes?.get(itemData.businessType)?.label;
+	}
 
 	function objectFieldLabelDataRenderer({
 		itemData,
 		openSidePanel,
 		value,
-	}: fdsItem<ItemData>) {
+	}: fdsItem<ObjectField>) {
 		return (
 			<LabelRenderer
 				onClick={() => {
@@ -99,21 +151,13 @@ export default function Fields({
 		);
 	}
 
-	function objectFieldLocalizedDataRenderer({
-		itemData,
-	}: {
-		itemData: ItemData;
-	}) {
+	function objectFieldLocalizedDataRenderer({itemData}: ObjectFieldItemData) {
 		return itemData.localized
 			? Liferay.Language.get('yes')
 			: Liferay.Language.get('no');
 	}
 
-	function objectFieldMandatoryDataRenderer({
-		itemData,
-	}: {
-		itemData: ItemData;
-	}) {
+	function objectFieldMandatoryDataRenderer({itemData}: ObjectFieldItemData) {
 		return itemData.required
 			? Liferay.Language.get('yes')
 			: Liferay.Language.get('no');
@@ -125,6 +169,7 @@ export default function Fields({
 		creationMenu,
 		customDataRenderers: {
 			FDSSourceDataRenderer,
+			objectFieldBusinessTypeDataRenderer,
 			objectFieldLabelDataRenderer,
 			objectFieldLocalizedDataRenderer,
 			objectFieldMandatoryDataRenderer,
@@ -182,6 +227,8 @@ export default function Fields({
 							sortable: true,
 						},
 						{
+							contentRenderer:
+								'objectFieldBusinessTypeDataRenderer',
 							expand: false,
 							fieldName: 'businessType',
 							label: Liferay.Language.get('type'),
@@ -221,7 +268,11 @@ export default function Fields({
 
 	return (
 		<>
-			<FrontendDataSet {...dataSetProps} />
+			{loading ? (
+				<ClayLoadingIndicator />
+			) : (
+				<FrontendDataSet {...dataSetProps} />
+			)}
 
 			{showAddFieldModal && (
 				<ModalAddObjectField

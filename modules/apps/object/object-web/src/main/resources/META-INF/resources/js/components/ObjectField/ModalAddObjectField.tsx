@@ -119,7 +119,7 @@ export function ModalAddObjectField({
 
 			const url = createResourceURL(baseResourceURL, {
 				objectDefinitionId: objectDefinitionResponse.id,
-				p_p_resource_id: '/object_definitions/get_object_field_types',
+				p_p_resource_id: '/object_definitions/get_object_field_business_types',
 			}).href;
 
 			const objectFieldBusinessTypesResponse = await fetch(url, {
