@@ -312,7 +312,7 @@ public class KoroneikiRestController extends BaseRestController {
 		}
 	}
 
-	private String _getOAuthAuthorization() throws Exception {
+	private String _getOAuthAccessToken() throws Exception {
 		if ((_oauthAccessToken != null) &&
 			(System.currentTimeMillis() < (_oauthExpirationMillis - 15000))) {
 
@@ -343,7 +343,7 @@ public class KoroneikiRestController extends BaseRestController {
 			StatusLine statusLine = closeableHttpResponse.getStatusLine();
 
 			if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
-				throw new Exception("Unable to get OAuth authorization");
+				throw new Exception("Unable to get OAuth oAuthAccessToken");
 			}
 
 			JSONObject jsonObject = new JSONObject(
@@ -351,13 +351,12 @@ public class KoroneikiRestController extends BaseRestController {
 					closeableHttpResponse.getEntity(),
 					Charset.defaultCharset()));
 
-			_oauthExpirationMillis =
-				(jsonObject.getLong("expires_in") * 1000) +
-					System.currentTimeMillis();
-
 			_oauthAccessToken =
 				jsonObject.getString("token_type") + " " +
 					jsonObject.getString("access_token");
+			_oauthExpirationMillis =
+				(jsonObject.getLong("expires_in") * 1000) +
+					System.currentTimeMillis();
 
 			return _oauthAccessToken;
 		}
@@ -401,21 +400,22 @@ public class KoroneikiRestController extends BaseRestController {
 			}
 		}
 		catch (Exception exception) {
-			_log.error("Unable to set SKU Version " + exception.getMessage());
+			_log.error(
+				"Unable to get product version " + exception.getMessage());
 		}
 
 		return version;
 	}
 
 	private void _initResourceBuilders() throws Exception {
-		String authorization = _getOAuthAuthorization();
+		String oAuthAccessToken = _getOAuthAccessToken();
 
 		URL liferayDXPURL = new URL(
 			lxcDXPServerProtocol + "://" + lxcDXPMainDomain);
 
 		_accountResource = AccountResource.builder(
 		).header(
-			HttpHeaders.AUTHORIZATION, authorization
+			HttpHeaders.AUTHORIZATION, oAuthAccessToken
 		).endpoint(
 			liferayDXPURL
 		).build();
@@ -433,21 +433,21 @@ public class KoroneikiRestController extends BaseRestController {
 
 		_orderItemResource = OrderItemResource.builder(
 		).header(
-			HttpHeaders.AUTHORIZATION, authorization
+			HttpHeaders.AUTHORIZATION, oAuthAccessToken
 		).endpoint(
 			liferayDXPURL
 		).build();
 
 		_orderResource = OrderResource.builder(
 		).header(
-			HttpHeaders.AUTHORIZATION, authorization
+			HttpHeaders.AUTHORIZATION, oAuthAccessToken
 		).endpoint(
 			liferayDXPURL
 		).build();
 
 		_postalAddressResource = PostalAddressResource.builder(
 		).header(
-			HttpHeaders.AUTHORIZATION, authorization
+			HttpHeaders.AUTHORIZATION, oAuthAccessToken
 		).endpoint(
 			liferayDXPURL
 		).build();
@@ -468,14 +468,14 @@ public class KoroneikiRestController extends BaseRestController {
 
 		_productSpecificationResource = ProductSpecificationResource.builder(
 		).header(
-			HttpHeaders.AUTHORIZATION, authorization
+			HttpHeaders.AUTHORIZATION, oAuthAccessToken
 		).endpoint(
 			liferayDXPURL
 		).build();
 
 		_skuResource = SkuResource.builder(
 		).header(
-			HttpHeaders.AUTHORIZATION, authorization
+			HttpHeaders.AUTHORIZATION, oAuthAccessToken
 		).endpoint(
 			liferayDXPURL
 		).build();
