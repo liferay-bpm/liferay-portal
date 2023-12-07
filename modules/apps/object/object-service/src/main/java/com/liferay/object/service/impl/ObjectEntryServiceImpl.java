@@ -581,18 +581,18 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 			accountEntryRestrictedObjectField.getName());
 	}
 
-	private LocalDate _getStartDateInterval() {
+	private Date _getStartDate() {
 		if (Objects.equals(_objectConfiguration.timeScale(), "days")) {
-			return LocalDate.now(
+			return Date.from(LocalDate.now(
 			).minusDays(
 				_objectConfiguration.duration()
-			);
+			).atStartOfDay(ZoneId.systemDefault()).toInstant());
 		}
 
-		return LocalDate.now(
+		return Date.from(LocalDate.now(
 		).minusDays(
 			_objectConfiguration.duration() * 7
-		);
+		).atStartOfDay(ZoneId.systemDefault()).toInstant());
 	}
 
 	private void _validateSubmissionLimit(long objectDefinitionId, User user)
@@ -623,15 +623,11 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 				throw new RuntimeException(configurationException);
 			}
 
-			LocalDate beginningDate = _getStartDateInterval();
+			Date startDate = _getStartDate();
 
 			long count = objectEntryLocalService.getObjectEntriesCount(
 				user.getUserId(), objectDefinition,
-				ObjectEntryTable.INSTANCE.createDate.gte(
-					Date.from(
-						beginningDate.atStartOfDay(
-							ZoneId.systemDefault()
-						).toInstant())));
+				ObjectEntryTable.INSTANCE.createDate.gte(startDate));
 
 			long maximumNumberOfGuestUserObjectEntriesPerObjectDefinition =
 				_objectConfiguration.

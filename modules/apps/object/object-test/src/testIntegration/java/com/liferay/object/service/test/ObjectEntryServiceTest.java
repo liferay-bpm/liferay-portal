@@ -712,13 +712,10 @@ public class ObjectEntryServiceTest {
 			ObjectConfiguration.class.getName(),
 			objectConfigurationDictionary.build());
 
-		LocalDate beginningDate = LocalDate.now(
-		).minusDays(
-			7
-		);
+		LocalDate localDate = LocalDate.now();
 
 		Date createdDate = Date.from(
-			beginningDate.atStartOfDay(
+			localDate.minusDays(7).atStartOfDay(
 				ZoneId.systemDefault()
 			).toInstant());
 
