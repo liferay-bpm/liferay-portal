@@ -77,7 +77,7 @@ public class MailServiceImpl implements IdentifiableOSGiService, MailService {
 	public Session getSession(Account account) {
 		Session session = Session.getInstance(_getProperties(account));
 
-		_debugLogProperties(session.getProperties());
+		_debug(session.getProperties());
 
 		if (_log.isDebugEnabled()) {
 			session.setDebug(true);
@@ -252,7 +252,7 @@ public class MailServiceImpl implements IdentifiableOSGiService, MailService {
 			session = Session.getInstance(properties);
 		}
 
-		_debugLogProperties(properties);
+		_debug(properties);
 
 		if (_log.isDebugEnabled()) {
 			session.setDebug(true);
@@ -279,20 +279,21 @@ public class MailServiceImpl implements IdentifiableOSGiService, MailService {
 			});
 	}
 
-	private void _debugLogProperties(Properties properties) {
-		if (_log.isDebugEnabled()) {
-			for (String propertyName : properties.stringPropertyNames()) {
-				String propertyValue = properties.getProperty(propertyName);
+	private void _debug(Properties properties) {
+		if (!_log.isDebugEnabled()) {
+			return;
+		}
 
-				if (propertyName.contains("password")) {
-					propertyValue = "***";
-				}
+		_log.debug("Properties:");
 
-				_log.debug(
-					StringBundler.concat(
-						"Property: ", propertyName, StringPool.EQUAL,
-						propertyValue));
+		for (String name : properties.stringPropertyNames()) {
+			String value = properties.getProperty(name);
+
+			if (name.contains("password")) {
+				value = "***";
 			}
+
+			_log.debug(StringBundler.concat(name, StringPool.EQUAL, value));
 		}
 	}
 
