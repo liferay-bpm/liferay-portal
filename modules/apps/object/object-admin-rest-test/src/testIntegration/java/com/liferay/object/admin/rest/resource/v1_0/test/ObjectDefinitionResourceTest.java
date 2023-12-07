@@ -259,6 +259,9 @@ public class ObjectDefinitionResourceTest
 		assertEquals(postObjectDefinition, randomObjectDefinition);
 		assertValid(postObjectDefinition);
 
+		String randomListTypeDefinitionExternalReferenceCode =
+			RandomTestUtil.randomString();
+
 		ObjectDefinition randomModifiableSystemObjectDefinition =
 			_randomModifiableSystemObjectDefinition();
 
@@ -274,7 +277,7 @@ public class ObjectDefinitionResourceTest
 						label = Collections.singletonMap(
 							"en-US", RandomTestUtil.randomString());
 						listTypeDefinitionExternalReferenceCode =
-							"listTypeDefinitionExternalReferenceCode";
+							randomListTypeDefinitionExternalReferenceCode;
 						localized = false;
 						name = "a" + RandomTestUtil.randomString();
 						readOnly = ReadOnly.FALSE;
@@ -290,11 +293,10 @@ public class ObjectDefinitionResourceTest
 		ListTypeDefinition serviceBuilderlistTypeDefinition =
 			_listTypeDefinitionLocalService.
 				fetchListTypeDefinitionByExternalReferenceCode(
-					"listTypeDefinitionExternalReferenceCode",
+					randomListTypeDefinitionExternalReferenceCode,
 					TestPropsValues.getCompanyId());
 
 		Assert.assertNotNull(serviceBuilderlistTypeDefinition);
-
 		Assert.assertTrue(serviceBuilderlistTypeDefinition.isSystem());
 	}
 
