@@ -102,6 +102,7 @@
 
 					<#if productImage?has_content>
 						<#assign productThumbnail = productImage[0].src?split("/o") />
+
 						<#if productThumbnail?has_content && productThumbnail?size gte 2>
 							<#assign productThumbnail1 = "/o/${productThumbnail[1]}"!"" />
 						<#else>
@@ -110,6 +111,7 @@
 					<#else>
 						<#if product.urlImage?has_content>
 							<#assign productThumbnail = product.urlImage?split("/o") />
+
 							<#if productThumbnail?has_content && productThumbnail?size gte 2>
 								<#assign productThumbnail1 = "/o/${productThumbnail[1]}"!"" />
 							<#else>
