@@ -500,8 +500,7 @@ public class UserAccountResourceImpl extends BaseUserAccountResourceImpl {
 
 		if (user.getStatus() == WorkflowConstants.STATUS_PENDING) {
 			throw new BadRequestException(
-				"User " + user.getUserId() +
-					" cannot be updated during the verification process");
+				"Unable to patch pending user account " + user.getUserId());
 		}
 
 		Contact contact = user.getContact();
@@ -938,8 +937,7 @@ public class UserAccountResourceImpl extends BaseUserAccountResourceImpl {
 
 		if (user.getStatus() == WorkflowConstants.STATUS_PENDING) {
 			throw new BadRequestException(
-				"User " + user.getUserId() +
-					" cannot be updated during the verification process");
+				"Unable to put pending user account " + user.getUserId());
 		}
 
 		String status = userAccount.getStatusAsString();
