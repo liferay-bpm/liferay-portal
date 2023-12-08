@@ -221,10 +221,6 @@ public class LayoutStructureRenderer {
 		jspWriter.write("\"");
 
 		if (FeatureFlagManagerUtil.isEnabled("LRAC-14922")) {
-			jspWriter.write(" id=\"analytics-targetable-collection-");
-			jspWriter.write(collectionStyledLayoutStructureItem.getNamespace());
-			jspWriter.write("\"");
-
 			ListObjectReference listObjectReference =
 				renderCollectionLayoutStructureItemDisplayContext.
 					getListObjectReference();
@@ -235,6 +231,10 @@ public class LayoutStructureRenderer {
 					HtmlUtil.escape(listObjectReference.toString()));
 				jspWriter.write("\"");
 			}
+
+			jspWriter.write(" id=\"analytics-targetable-collection-");
+			jspWriter.write(collectionStyledLayoutStructureItem.getNamespace());
+			jspWriter.write("\"");
 		}
 
 		jspWriter.write("\" style=\"");
