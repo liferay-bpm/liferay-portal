@@ -75,7 +75,6 @@ public class DataLayoutRendererTag extends BaseDataLayoutRendererTag {
 			}
 
 			dataLayoutRendererContext.setDisplayType(getDisplayType());
-
 			dataLayoutRendererContext.setHttpServletRequest(httpServletRequest);
 			dataLayoutRendererContext.setHttpServletResponse(
 				PortalUtil.getHttpServletResponse(
