@@ -49,11 +49,11 @@ public class
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		long[] deleteLayoutPageTemplateCollectionIds = ParamUtil.getLongValues(
-			actionRequest, "rowIdsLayoutPageTemplateCollection");
-
 		List<Long> deleteLayoutPageTemplateCollectionIdsList =
 			new ArrayList<>();
+
+		long[] deleteLayoutPageTemplateCollectionIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsLayoutPageTemplateCollection");
 
 		for (long deleteLayoutPageTemplateCollectionId :
 				deleteLayoutPageTemplateCollectionIds) {
@@ -73,10 +73,10 @@ public class
 			}
 		}
 
+		List<Long> deleteLayoutPageTemplateEntryIdsList = new ArrayList<>();
+
 		long[] deleteLayoutPageTemplateEntryIds = ParamUtil.getLongValues(
 			actionRequest, "rowIds");
-
-		List<Long> deleteLayoutPageTemplateEntryIdsList = new ArrayList<>();
 
 		for (long deleteLayoutPageTemplateEntryId :
 				deleteLayoutPageTemplateEntryIds) {
