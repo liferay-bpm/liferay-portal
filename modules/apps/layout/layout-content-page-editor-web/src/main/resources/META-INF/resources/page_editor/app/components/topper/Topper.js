@@ -186,6 +186,8 @@ function TopperContent({
 
 	return (
 		<div
+			aria-label={name}
+			aria-labelledby={isActive ? topperLabelId : null}
 			className={classNames(className, 'page-editor__topper', {
 				'active': isActive,
 				'drag-over-bottom':
