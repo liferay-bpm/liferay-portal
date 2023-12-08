@@ -8,6 +8,8 @@
 <%@ include file="/init.jsp" %>
 
 <%
+String tabs1 = ParamUtil.getString(renderRequest, "tabs1", "assigned-to-me");
+
 String redirect = ParamUtil.getString(request, "redirect");
 
 String backURL = ParamUtil.getString(request, "backURL", redirect);
@@ -19,8 +21,6 @@ if (Validator.isNotNull(backURL)) {
 else {
 	portletDisplay.setShowBackIcon(false);
 }
-
-String tabs1 = ParamUtil.getString(renderRequest, "tabs1", "assigned-to-me");
 %>
 
 <clay:navigation-bar
