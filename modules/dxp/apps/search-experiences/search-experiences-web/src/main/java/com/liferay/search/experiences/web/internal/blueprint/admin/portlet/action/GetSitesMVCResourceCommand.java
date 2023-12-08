@@ -150,11 +150,7 @@ public class GetSitesMVCResourceCommand implements MVCResourceCommand {
 					return;
 				}
 
-				List<Group> children = group.getChildren(true);
-
-				if (!children.isEmpty()) {
-					_addGroupsWithChildren(allGroups, children);
-				}
+				_addGroupsWithChildren(allGroups, group.getChildren(true));
 
 				allGroups.add(group);
 			});
