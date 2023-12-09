@@ -197,14 +197,11 @@ public class ParallelExecutor<T> {
 			}
 
 			_callables = new ArrayList<>(callables);
-
-			_totalTaskCount = callables.size();
-
 			_parallelExecutor = parallelExecutor;
 
 			_callablesMap = _toCallablesMap(callables);
-
-			_executorService = _parallelExecutor._executorService;
+			_executorService = parallelExecutor._executorService;
+			_totalTaskCount = callables.size();
 		}
 
 		public void abort() {
