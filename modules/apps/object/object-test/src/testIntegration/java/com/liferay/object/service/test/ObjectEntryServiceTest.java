@@ -705,12 +705,18 @@ public class ObjectEntryServiceTest {
 		ConfigurationTestUtil.deleteConfiguration(
 			ObjectConfiguration.class.getName());
 
-		HashMapDictionaryBuilder.put(
+		objectConfigurationDictionary.put(
 			"maximumNumberOfGuestUserObjectEntriesPerObjectDefinition", 2);
-		HashMapDictionaryBuilder.put("timeScale", "weeks");
+		objectConfigurationDictionary.put("timeScale", "weeks");
 
 		ConfigurationTestUtil.saveConfiguration(
 			ObjectConfiguration.class.getName(), objectConfigurationDictionary);
+
+		ObjectEntry objectEntry = _objectEntryService.addObjectEntry(
+			0, _objectDefinition.getObjectDefinitionId(),
+			Collections.emptyMap(),
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId(), _guestUser.getUserId()));
 
 		Date createDate = Date.from(
 			LocalDate.now(
@@ -719,12 +725,6 @@ public class ObjectEntryServiceTest {
 			).atStartOfDay(
 				ZoneId.systemDefault()
 			).toInstant());
-
-		ObjectEntry objectEntry = _objectEntryService.addObjectEntry(
-			0, _objectDefinition.getObjectDefinitionId(),
-			Collections.emptyMap(),
-			ServiceContextTestUtil.getServiceContext(
-				TestPropsValues.getGroupId(), _guestUser.getUserId()));
 
 		objectEntry.setCreateDate(createDate);
 
