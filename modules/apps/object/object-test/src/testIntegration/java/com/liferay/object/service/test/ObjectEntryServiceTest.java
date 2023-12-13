@@ -718,15 +718,14 @@ public class ObjectEntryServiceTest {
 			ServiceContextTestUtil.getServiceContext(
 				TestPropsValues.getGroupId(), _guestUser.getUserId()));
 
-		Date createDate = Date.from(
-			LocalDate.now(
-			).minusDays(
-				7
-			).atStartOfDay(
-				ZoneId.systemDefault()
-			).toInstant());
-
-		objectEntry.setCreateDate(createDate);
+		objectEntry.setCreateDate(
+			Date.from(
+				LocalDate.now(
+				).minusDays(
+					7
+				).atStartOfDay(
+					ZoneId.systemDefault()
+				).toInstant()));
 
 		_objectEntryPersistence.update(objectEntry);
 
