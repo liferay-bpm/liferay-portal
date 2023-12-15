@@ -25,7 +25,6 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.object.service.persistence.ObjectEntryPersistence;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.test.util.TreeTestUtil;
 import com.liferay.object.tree.Edge;
@@ -50,6 +49,7 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.service.permission.ModelPermissionsFactory;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -58,15 +58,12 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
-import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.test.rule.PersistenceTestRule;
-import com.liferay.portal.test.rule.TransactionalTestRule;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.io.Serializable;
@@ -94,17 +91,14 @@ import org.junit.runner.RunWith;
 /**
  * @author Marco Leo
  */
-@FeatureFlags("LPS-187142")
+@FeatureFlags("LPS-187142, LPS-192957")
 @RunWith(Arquillian.class)
 public class ObjectEntryServiceTest {
 
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE,
-			new TransactionalTestRule(
-				Propagation.REQUIRED, "com.liferay.object.service"));
+		new LiferayIntegrationTestRule();
 
 	@Before
 	public void setUp() throws Exception {
@@ -693,21 +687,35 @@ public class ObjectEntryServiceTest {
 		AssertUtils.assertFailure(
 			ObjectEntryCountException.class,
 			StringBundler.concat(
-				"Unable to exceed ", 1,
-				" guest object entries for object definition ",
-				_objectDefinition.getObjectDefinitionId()),
+				"The limit of guest entries for ", _objectDefinition.getLabel(),
+				" has been reached and will no longer be accepted. Please ",
+				"contact the administrator for further assistance."),
 			() -> _objectEntryService.addObjectEntry(
 				0, _objectDefinition.getObjectDefinitionId(),
 				Collections.emptyMap(),
 				ServiceContextTestUtil.getServiceContext(
 					TestPropsValues.getGroupId(), _guestUser.getUserId())));
 
+		Role adminRole = _roleLocalService.getRole(
+			_objectDefinition.getCompanyId(), RoleConstants.ADMINISTRATOR);
+
+		long[] adminUserIds = _userLocalService.getRoleUserIds(
+			adminRole.getRoleId());
+
+		for (long adminUserId : adminUserIds) {
+			Assert.assertFalse(
+				_userNotificationLocalService.
+					getDeliveredUserNotificationEvents(
+						adminUserId, true
+					).isEmpty());
+		}
+
 		ConfigurationTestUtil.deleteConfiguration(
 			ObjectConfiguration.class.getName());
 
 		objectConfigurationDictionary.put(
 			"maximumNumberOfGuestUserObjectEntriesPerObjectDefinition", 2);
-		objectConfigurationDictionary.put("timeScale", "weeks");
+		objectConfigurationDictionary.put("timeScale", "days");
 
 		ConfigurationTestUtil.saveConfiguration(
 			ObjectConfiguration.class.getName(), objectConfigurationDictionary);
@@ -722,20 +730,95 @@ public class ObjectEntryServiceTest {
 			Date.from(
 				LocalDate.now(
 				).minusDays(
+					1
+				).atStartOfDay(
+					ZoneId.systemDefault()
+				).toInstant()));
+
+		objectEntry = _objectEntryLocalService.updateObjectEntry(objectEntry);
+
+		Assert.assertNotNull(
+			_objectEntryService.addObjectEntry(
+				0, _objectDefinition.getObjectDefinitionId(),
+				Collections.emptyMap(),
+				ServiceContextTestUtil.getServiceContext(
+					TestPropsValues.getGroupId(), _guestUser.getUserId())));
+
+		_objectEntryLocalService.deleteObjectEntry(
+			objectEntry.getObjectEntryId());
+
+		ConfigurationTestUtil.deleteConfiguration(
+			ObjectConfiguration.class.getName());
+
+		objectConfigurationDictionary.put(
+			"maximumNumberOfGuestUserObjectEntriesPerObjectDefinition", 3);
+		objectConfigurationDictionary.put("timeScale", "weeks");
+
+		ConfigurationTestUtil.saveConfiguration(
+			ObjectConfiguration.class.getName(), objectConfigurationDictionary);
+
+		objectEntry = _objectEntryService.addObjectEntry(
+			0, _objectDefinition.getObjectDefinitionId(),
+			Collections.emptyMap(),
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId(), _guestUser.getUserId()));
+
+		objectEntry.setCreateDate(
+			Date.from(
+				LocalDate.now(
+				).minusDays(
 					7
 				).atStartOfDay(
 					ZoneId.systemDefault()
 				).toInstant()));
 
-		_objectEntryPersistence.update(objectEntry);
+		objectEntry = _objectEntryLocalService.updateObjectEntry(objectEntry);
+
+		Assert.assertNotNull(
+			_objectEntryService.addObjectEntry(
+				0, _objectDefinition.getObjectDefinitionId(),
+				Collections.emptyMap(),
+				ServiceContextTestUtil.getServiceContext(
+					TestPropsValues.getGroupId(), _guestUser.getUserId())));
 
 		AssertUtils.assertFailure(
 			ObjectEntryCountException.class,
 			StringBundler.concat(
-				"Unable to exceed ", 2,
-				" guest object entries for object definition ",
-				_objectDefinition.getObjectDefinitionId()),
+				"The limit of guest entries for ", _objectDefinition.getLabel(),
+				" has been reached and will no longer be accepted. Please ",
+				"contact the administrator for further assistance."),
 			() -> _objectEntryService.addObjectEntry(
+				0, _objectDefinition.getObjectDefinitionId(),
+				Collections.emptyMap(),
+				ServiceContextTestUtil.getServiceContext(
+					TestPropsValues.getGroupId(), _guestUser.getUserId())));
+
+		_objectEntryLocalService.deleteObjectEntry(
+			objectEntry.getObjectEntryId());
+
+		ConfigurationTestUtil.deleteConfiguration(
+			ObjectConfiguration.class.getName());
+
+		objectConfigurationDictionary.put(
+			"maximumNumberOfGuestUserObjectEntriesPerObjectDefinition", 4);
+		objectConfigurationDictionary.put("timeScale", "weeks");
+
+		ConfigurationTestUtil.saveConfiguration(
+			ObjectConfiguration.class.getName(), objectConfigurationDictionary);
+
+		objectEntry.setCreateDate(
+			Date.from(
+				LocalDate.now(
+				).minusDays(
+					14
+				).atStartOfDay(
+					ZoneId.systemDefault()
+				).toInstant()));
+
+		_objectEntryLocalService.updateObjectEntry(objectEntry);
+
+		Assert.assertNotNull(
+			_objectEntryService.addObjectEntry(
 				0, _objectDefinition.getObjectDefinitionId(),
 				Collections.emptyMap(),
 				ServiceContextTestUtil.getServiceContext(
@@ -801,9 +884,6 @@ public class ObjectEntryServiceTest {
 	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Inject
-	private ObjectEntryPersistence _objectEntryPersistence;
-
-	@Inject
 	private ObjectEntryService _objectEntryService;
 
 	@Inject
@@ -830,5 +910,8 @@ public class ObjectEntryServiceTest {
 
 	@Inject(type = UserLocalService.class)
 	private UserLocalService _userLocalService;
+
+	@Inject
+	private UserNotificationEventLocalService _userNotificationLocalService;
 
 }
