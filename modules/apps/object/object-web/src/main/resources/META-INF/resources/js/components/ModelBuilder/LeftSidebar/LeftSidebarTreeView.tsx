@@ -353,7 +353,14 @@ export default function LeftSidebarTreeView({
 												</>
 											)
 										) : (
-											<div className="lfr-objects__model-builder-left-sidebar-show-folders-button">
+											<div
+												className={classNames(
+													'lfr-objects__model-builder-left-sidebar-show-folders-button',
+													{
+														'lfr-objects__model-builder-left-sidebar-show-folders-button-disabled': hiddenObjectDefinitionNode,
+													}
+												)}
+											>
 												<ClayButtonWithIcon
 													aria-label={
 														hiddenObjectDefinitionNode
@@ -416,6 +423,7 @@ export default function LeftSidebarTreeView({
 											type === 'dummyObjectDefinition',
 										'lfr-objects__model-builder-left-sidebar-item-linked': linked,
 									})}
+									disabled={hiddenObjectDefinitionNode}
 								>
 									<Icon symbol={TYPES_TO_SYMBOLS[type]} />
 
