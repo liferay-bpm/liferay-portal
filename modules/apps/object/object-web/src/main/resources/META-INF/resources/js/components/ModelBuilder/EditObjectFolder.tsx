@@ -109,6 +109,7 @@ export default function EditObjectFolder({
 		dispatch({
 			payload: {
 				...payload,
+				dispatch,
 				rightSidebarType: 'objectRelationshipDetails',
 				selectedObjectRelationshipId: newObjectRelationshipId,
 			},
@@ -158,7 +159,7 @@ export default function EditObjectFolder({
 			);
 
 			dispatch({
-				payload,
+				payload: {...payload, dispatch},
 				type: TYPES.UPDATE_MODEL_BUILDER_STRUCTURE,
 			});
 
@@ -195,8 +196,7 @@ export default function EditObjectFolder({
 					handleOnClose={() =>
 						dispatch({
 							payload: {
-								modelBuilderModals: {
-									...modelBuilderModals,
+								updatedModelBuilderModals: {
 									addObjectDefinition: false,
 								},
 							},
@@ -221,6 +221,7 @@ export default function EditObjectFolder({
 						dispatch({
 							payload: {
 								dbTableName,
+								dispatch,
 								newObjectDefinition,
 								objectDefinitionNodes: nodes,
 								selectedObjectFolderName:
@@ -269,8 +270,7 @@ export default function EditObjectFolder({
 
 							dispatch({
 								payload: {
-									modelBuilderModals: {
-										...modelBuilderModals,
+									updatedModelBuilderModals: {
 										addObjectField: false,
 									},
 								},
@@ -291,8 +291,7 @@ export default function EditObjectFolder({
 						setVisibility={() =>
 							dispatch({
 								payload: {
-									modelBuilderModals: {
-										...modelBuilderModals,
+									updatedModelBuilderModals: {
 										addObjectField: false,
 									},
 								},
@@ -310,8 +309,7 @@ export default function EditObjectFolder({
 						handleOnClose={() => {
 							dispatch({
 								payload: {
-									modelBuilderModals: {
-										...modelBuilderModals,
+									updatedModelBuilderModals: {
 										addObjectRelationship: false,
 									},
 								},
@@ -342,8 +340,7 @@ export default function EditObjectFolder({
 						handleOnClose={() => {
 							dispatch({
 								payload: {
-									modelBuilderModals: {
-										...modelBuilderModals,
+									updatedModelBuilderModals: {
 										deleteObjectDefinition: false,
 									},
 								},
@@ -361,8 +358,7 @@ export default function EditObjectFolder({
 						handleOnClose={() => {
 							dispatch({
 								payload: {
-									modelBuilderModals: {
-										...modelBuilderModals,
+									updatedModelBuilderModals: {
 										editObjectDefinitionExternalReferenceCode: false,
 									},
 								},
@@ -423,8 +419,7 @@ export default function EditObjectFolder({
 					handleOnClose={() => {
 						dispatch({
 							payload: {
-								modelBuilderModals: {
-									...modelBuilderModals,
+								updatedModelBuilderModals: {
 									editObjectFolder: false,
 								},
 							},
@@ -445,8 +440,7 @@ export default function EditObjectFolder({
 					handleOnClose={() => {
 						dispatch({
 							payload: {
-								modelBuilderModals: {
-									...modelBuilderModals,
+								updatedModelBuilderModals: {
 									publishObjectDefinitions: false,
 								},
 							},
@@ -462,8 +456,7 @@ export default function EditObjectFolder({
 						handleOnClose={() => {
 							dispatch({
 								payload: {
-									modelBuilderModals: {
-										...modelBuilderModals,
+									updatedModelBuilderModals: {
 										redirectToEditObjectDefinitionDetails: false,
 									},
 								},

@@ -167,6 +167,7 @@ function DiagramBuilder() {
 		dispatch({
 			payload: {
 				...payload,
+				dispatch,
 				rightSidebarType: 'objectRelationshipDetails',
 				selectedObjectRelationshipId: newObjectRelationshipId,
 			},

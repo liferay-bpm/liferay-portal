@@ -36,6 +36,7 @@ export type TAction =
 	| {
 			payload: {
 				dbTableName: string;
+				dispatch: React.Dispatch<TAction>;
 				newObjectDefinition: ObjectDefinition;
 				objectDefinitionNodes: Node<ObjectDefinitionNodeData>[];
 				selectedObjectFolderName: string;
@@ -85,6 +86,7 @@ export type TAction =
 	  }
 	| {
 			payload: {
+				dispatch: React.Dispatch<TAction>;
 				objectFolders: ObjectFolder[];
 				rightSidebarType?: RightSidebarType;
 				selectedObjectFolder: ObjectFolder;
@@ -198,7 +200,7 @@ export type TAction =
 	  }
 	| {
 			payload: {
-				modelBuilderModals: ModelBuilderModals;
+				updatedModelBuilderModals: Partial<ModelBuilderModals>;
 			};
 			type: TYPES.UPDATE_VISIBILITY_MODEL_BUILDER_MODALS;
 	  };
@@ -245,6 +247,7 @@ export interface LeftSidebarObjectDefinitionItem {
 	externalReferenceCode?: string;
 	hiddenObjectDefinitionNode: boolean;
 	id: number;
+	kebabOptions: any[];
 	label: string;
 	linked?: boolean;
 	name: string;
