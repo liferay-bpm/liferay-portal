@@ -793,6 +793,13 @@ public class ObjectEntryServiceTest {
 				ServiceContextTestUtil.getServiceContext(
 					TestPropsValues.getGroupId(), _guestUser.getUserId())));
 
+		for (long adminUserId : adminUserIds) {
+			Assert.assertEquals(
+				1,
+				_userNotificationLocalService.getUserNotificationEventsCount(
+					adminUserId));
+		}
+
 		_objectEntryLocalService.deleteObjectEntry(
 			objectEntry.getObjectEntryId());
 
