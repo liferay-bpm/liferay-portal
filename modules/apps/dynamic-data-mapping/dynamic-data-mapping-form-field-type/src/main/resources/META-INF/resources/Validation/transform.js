@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+const userLanguageId = Liferay.ThemeDisplay.getLanguageId();
+
 const getValidationFromExpression = (validations, validation, expression) => {
 	let mutValidation;
 
@@ -63,7 +65,10 @@ export function normalizeDataType(initialDataType) {
 }
 
 export function getLocalizedValue({defaultLanguageId, editingLanguageId}) {
-	return (value) => value[editingLanguageId] ?? value[defaultLanguageId];
+	return (value) =>
+		value[userLanguageId] ??
+		value[defaultLanguageId] ??
+		value[editingLanguageId];
 }
 
 export function getSelectedValidation(validations) {
