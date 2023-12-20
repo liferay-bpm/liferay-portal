@@ -51,7 +51,7 @@ export function ScopeContainer({
 	const [
 		selectedPanelCategoryValue,
 		setSelectedPanelCategoryValue,
-	] = useState('');
+	] = useState<string>();
 
 	const setPanelCategoryKey = (
 		sites: Scope[],
@@ -104,52 +104,53 @@ export function ScopeContainer({
 						});
 					}
 
-					setSelectedPanelCategoryValue('');
+					setSelectedPanelCategoryValue(undefined);
 				}}
 				selectedKey={values.scope}
 			/>
-
-			<SingleSelect
-				className={className}
-				disabled={
-					(!values.modifiable && values.system) ||
-					!hasUpdateObjectDefinitionPermission ||
-					isRootDescendantNode ||
-					isLinkedObjectDefinition
-				}
-				error={errors.titleObjectFieldId}
-				id="objectDetailsScopeContainer"
-				items={values.scope === 'company' ? companies : sites}
-				label={Liferay.Language.get('panel-link')}
-				onSelectionChange={(value) => {
-					setValues({
-						panelCategoryKey: value as string,
-					});
-
-					if (onSubmit) {
-						onSubmit({
-							...values,
+			{values.scope && (
+				<SingleSelect
+					className={className}
+					disabled={
+						(!values.modifiable && values.system) ||
+						!hasUpdateObjectDefinitionPermission ||
+						isRootDescendantNode ||
+						isLinkedObjectDefinition
+					}
+					error={errors.titleObjectFieldId}
+					id="objectDetailsScopeContainer"
+					items={values.scope === 'company' ? companies : sites}
+					label={Liferay.Language.get('panel-link')}
+					onSelectionChange={(value) => {
+						setValues({
 							panelCategoryKey: value as string,
 						});
-					}
 
-					setSelectedPanelCategoryValue(value as string);
-				}}
-				selectedKey={selectedPanelCategoryValue}
-			>
-				{(group) => (
-					<ClayDropDown.Group
-						header={group.label}
-						items={group.items}
-					>
-						{(item) => (
-							<Option key={item.value} textValue={item.label}>
-								{item.label}
-							</Option>
-						)}
-					</ClayDropDown.Group>
-				)}
-			</SingleSelect>
+						if (onSubmit) {
+							onSubmit({
+								...values,
+								panelCategoryKey: value as string,
+							});
+						}
+
+						setSelectedPanelCategoryValue(value as string);
+					}}
+					selectedKey={selectedPanelCategoryValue}
+				>
+					{(group) => (
+						<ClayDropDown.Group
+							header={group.label}
+							items={group.items}
+						>
+							{(item) => (
+								<Option key={item.value} textValue={item.label}>
+									{item.label}
+								</Option>
+							)}
+						</ClayDropDown.Group>
+					)}
+				</SingleSelect>
+			)}
 		</>
 	);
 }
