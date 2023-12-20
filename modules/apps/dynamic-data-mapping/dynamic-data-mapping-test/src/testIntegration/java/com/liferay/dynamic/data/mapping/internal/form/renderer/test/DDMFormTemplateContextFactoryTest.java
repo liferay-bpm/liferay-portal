@@ -23,6 +23,7 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -381,7 +382,8 @@ public class DDMFormTemplateContextFactoryTest {
 				"futureDates", "futureDates({name}, \"{parameter}\")"
 			).put(
 				"pastDates", "pastDates({name}, \"{parameter}\")"
-			).build());
+			).build(),
+			LocaleUtil.US);
 
 		_assertValidations(
 			actualValidationsMap, "numeric",
@@ -397,7 +399,8 @@ public class DDMFormTemplateContextFactoryTest {
 				"lteq", "{name} <= {parameter}"
 			).put(
 				"neq", "{name} != {parameter}"
-			).build());
+			).build(),
+			LocaleUtil.US);
 
 		_assertValidations(
 			actualValidationsMap, "string",
@@ -411,7 +414,68 @@ public class DDMFormTemplateContextFactoryTest {
 				"regularExpression", "match({name}, \"{parameter}\")"
 			).put(
 				"url", "isURL({name})"
-			).build());
+			).build(),
+			LocaleUtil.US);
+
+		ddmFormTemplateContext = builder.withHttpServletRequest(
+			_httpServletRequest
+		).withLocale(
+			LocaleUtil.BRAZIL
+		).build();
+
+		actualValidationsMap =
+			(HashMap<String, Object>)ddmFormTemplateContext.get("validations");
+
+		Assert.assertEquals(
+			actualValidationsMap.toString(), 3, actualValidationsMap.size());
+		Assert.assertTrue(actualValidationsMap.containsKey("date"));
+		Assert.assertTrue(actualValidationsMap.containsKey("numeric"));
+		Assert.assertTrue(actualValidationsMap.containsKey("string"));
+
+		_assertValidations(
+			actualValidationsMap, "date",
+			HashMapBuilder.put(
+				"dateRange",
+				"futureDates({name}, \"{parameter}\") AND pastDates({name}, " +
+					"\"{parameter}\")"
+			).put(
+				"futureDates", "futureDates({name}, \"{parameter}\")"
+			).put(
+				"pastDates", "pastDates({name}, \"{parameter}\")"
+			).build(),
+			LocaleUtil.BRAZIL);
+
+		_assertValidations(
+			actualValidationsMap, "numeric",
+			HashMapBuilder.put(
+				"eq", "{name} == {parameter}"
+			).put(
+				"gt", "{name} > {parameter}"
+			).put(
+				"gteq", "{name} >= {parameter}"
+			).put(
+				"lt", "{name} < {parameter}"
+			).put(
+				"lteq", "{name} <= {parameter}"
+			).put(
+				"neq", "{name} != {parameter}"
+			).build(),
+			LocaleUtil.BRAZIL);
+
+		_assertValidations(
+			actualValidationsMap, "string",
+			HashMapBuilder.put(
+				"contains", "contains({name}, \"{parameter}\")"
+			).put(
+				"email", "isEmailAddress({name})"
+			).put(
+				"notContains", "NOT(contains({name}, \"{parameter}\"))"
+			).put(
+				"regularExpression", "match({name}, \"{parameter}\")"
+			).put(
+				"url", "isURL({name})"
+			).build(),
+			LocaleUtil.BRAZIL);
 	}
 
 	@Test
@@ -432,9 +496,19 @@ public class DDMFormTemplateContextFactoryTest {
 		Assert.assertTrue((boolean)ddmFormTemplateContext.get("viewMode"));
 	}
 
+	private void _assertValidationLabels(
+		String actualValidationLabel, Locale locale,
+		HashMap<Locale, List<String>> expectedLabels) {
+
+		List<String> expectedLocalizedLabels = expectedLabels.get(locale);
+
+		Assert.assertTrue(
+			expectedLocalizedLabels.contains(actualValidationLabel));
+	}
+
 	private void _assertValidations(
 		HashMap<String, Object> actualValidationsMap, String dataType,
-		HashMap<String, String> expectedValidationsMap) {
+		HashMap<String, String> expectedValidationsMap, Locale locale) {
 
 		Object[] actualValidations = (Object[])actualValidationsMap.get(
 			dataType);
@@ -456,6 +530,52 @@ public class DDMFormTemplateContextFactoryTest {
 			Assert.assertEquals(
 				expectedValidationsMap.remove(actualValidationMap.get("name")),
 				actualValidationMap.get("template"));
+
+			if (StringUtil.equals(dataType, "date")) {
+				_assertValidationLabels(
+					(String)actualValidationMap.get("label"), locale,
+					HashMapBuilder.put(
+						LocaleUtil.BRAZIL,
+						Arrays.asList(
+							"Faixa", "Datas Futuras", "Datas passadas")
+					).put(
+						LocaleUtil.US,
+						Arrays.asList("Range", "Future Dates", "Past Dates")
+					).build());
+			}
+
+			if (StringUtil.equals(dataType, "numeric")) {
+				_assertValidationLabels(
+					(String)actualValidationMap.get("label"), locale,
+					HashMapBuilder.put(
+						LocaleUtil.BRAZIL,
+						Arrays.asList(
+							"É igual a", "É maior ou igual a", "É maior que",
+							"Não é igual", "É menor ou igual a", "É menor que")
+					).put(
+						LocaleUtil.US,
+						Arrays.asList(
+							"Is Equal To", "Is Greater Than",
+							"Is Greater Than Or Equal To", "Is Less Than",
+							"Is Less Than Or Equal To", "Is Not Equal To")
+					).build());
+			}
+
+			if (StringUtil.equals(dataType, "string")) {
+				_assertValidationLabels(
+					(String)actualValidationMap.get("label"), locale,
+					HashMapBuilder.put(
+						LocaleUtil.BRAZIL,
+						Arrays.asList(
+							"Contém", "Não Contém", "É uma URL", "É um e-mail",
+							"Correspondências")
+					).put(
+						LocaleUtil.US,
+						Arrays.asList(
+							"Contains", "Is an email", "Does Not Contain",
+							"Matches", "Is a URL")
+					).build());
+			}
 		}
 
 		Assert.assertEquals(
