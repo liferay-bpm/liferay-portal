@@ -4,6 +4,7 @@
  */
 
 import ClayForm from '@clayui/form';
+import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {
 	FormError,
 	SingleSelect,
@@ -45,7 +46,7 @@ export function AccountRestrictionContainer({
 	const [disableAccountSelect, setDisableAccountSelect] = useState<boolean>(
 		false
 	);
-
+	const [reload, setReload] = useState(true);
 	useEffect(() => {
 		const accountRelationshipFieldsResponse = objectFields.filter(
 			(field) => {
@@ -87,6 +88,9 @@ export function AccountRestrictionContainer({
 			if (isApproved && values.accountEntryRestrictedObjectFieldName) {
 				setDisableAccountSelect(true);
 			}
+			if (reload) {
+				setTimeout(() => setReload(false), 500);
+			}
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [objectFields]);
@@ -125,39 +129,46 @@ export function AccountRestrictionContainer({
 					toggled={values.accountEntryRestricted}
 				/>
 			</ClayForm.Group>
-
-			<SingleSelect<LabelValueObject>
-				disabled={
-					!accountRelationshipFields.length ||
-					!values.accountEntryRestricted ||
-					disableAccountSelect ||
-					isLinkedObjectDefinition ||
-					isRootDescendantNode
-				}
-				error={errors.accountEntryRestrictedObjectFieldName}
-				items={accountRelationshipFields}
-				label={Liferay.Language.get(
-					'account-entry-restricted-object-field-id'
-				)}
-				onSelectionChange={(value) => {
-					setValues({
-						accountEntryRestrictedObjectFieldName: value as string,
-					});
-
-					if (onSubmit) {
-						onSubmit({
-							...values,
+			{reload ? (
+				<ClayLoadingIndicator displayType="secondary" size="sm" />
+			) : (
+				<SingleSelect<LabelValueObject>
+					disabled={
+						!accountRelationshipFields.length ||
+						!values.accountEntryRestricted ||
+						disableAccountSelect ||
+						isLinkedObjectDefinition ||
+						isRootDescendantNode
+					}
+					error={errors.accountEntryRestrictedObjectFieldName}
+					items={accountRelationshipFields}
+					label={Liferay.Language.get(
+						'account-entry-restricted-object-field-id'
+					)}
+					onSelectionChange={(value) => {
+						setValues({
 							accountEntryRestrictedObjectFieldName: value as string,
 						});
+
+						if (onSubmit) {
+							onSubmit({
+								...values,
+								accountEntryRestrictedObjectFieldName: value as string,
+							});
+						}
+					}}
+					required={
+						!!accountRelationshipFields.length &&
+						values.accountEntryRestricted &&
+						!disableAccountSelect
 					}
-				}}
-				required={
-					!!accountRelationshipFields.length &&
-					values.accountEntryRestricted &&
-					!disableAccountSelect
-				}
-				selectedKey={values.accountEntryRestrictedObjectFieldName}
-			/>
+					selectedKey={
+						values.accountEntryRestrictedObjectFieldName
+							? values.accountEntryRestrictedObjectFieldName
+							: undefined
+					}
+				/>
+			)}
 		</>
 	);
 }
