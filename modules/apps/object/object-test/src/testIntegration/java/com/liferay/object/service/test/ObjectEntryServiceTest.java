@@ -690,9 +690,9 @@ public class ObjectEntryServiceTest {
 				ObjectEntryCountException.class,
 				StringBundler.concat(
 					"The limit of guest entries for ",
-					_objectDefinition.getLabel(),
-					" has been reached and will no longer be accepted. Please ",
-					"contact the administrator for further assistance."),
+					_objectDefinition.getLabel(
+						_objectDefinition.getDefaultLanguageId()),
+					" has been reached and will no longer be accepted."),
 				() -> _objectEntryService.addObjectEntry(
 					0, _objectDefinition.getObjectDefinitionId(),
 					Collections.emptyMap(),
@@ -728,8 +728,9 @@ public class ObjectEntryServiceTest {
 				ObjectEntryCountException.class,
 				StringBundler.concat(
 					"The limit of guest entries for ",
-					_objectDefinition.getLabel(),
-					" has been reached and will no longer be accepted"),
+					_objectDefinition.getLabel(
+						_objectDefinition.getDefaultLanguageId()),
+					" has been reached and will no longer be accepted."),
 				() -> _objectEntryService.addObjectEntry(
 					0, _objectDefinition.getObjectDefinitionId(),
 					Collections.emptyMap(),
@@ -738,8 +739,7 @@ public class ObjectEntryServiceTest {
 
 			String portletId =
 				_objectDefinition.isUnmodifiableSystemObject() ?
-					StringPool.BLANK :
-					_objectDefinition.getPortletId();
+					StringPool.BLANK : _objectDefinition.getPortletId();
 
 			Role role = _roleLocalService.getRole(
 				_objectDefinition.getCompanyId(), RoleConstants.ADMINISTRATOR);
@@ -748,24 +748,25 @@ public class ObjectEntryServiceTest {
 
 			for (long userId : userIds) {
 				int count =
-					_userNotificationLocalService.getUserNotificationEventsCount(
-						userId, portletId,
-						LocalDate.now(
-						).atStartOfDay(
-							ZoneId.systemDefault()
-						).toInstant(
-						).getEpochSecond(),
-						true);
+					_userNotificationLocalService.
+						getUserNotificationEventsCount(
+							userId, portletId,
+							LocalDate.now(
+							).atStartOfDay(
+								ZoneId.systemDefault()
+							).toInstant(
+							).getEpochSecond(),
+							true);
 
 				Assert.assertTrue(count > 0);
 			}
 		}
-		finally{
-				_configurationProvider.deleteCompanyConfiguration(
-					ObjectConfiguration.class, TestPropsValues.getCompanyId());
-				_configurationProvider.deleteSystemConfiguration(
-					ObjectConfiguration.class);
-			}
+		finally {
+			_configurationProvider.deleteCompanyConfiguration(
+				ObjectConfiguration.class, TestPropsValues.getCompanyId());
+			_configurationProvider.deleteSystemConfiguration(
+				ObjectConfiguration.class);
+		}
 	}
 
 	@Test
@@ -824,9 +825,9 @@ public class ObjectEntryServiceTest {
 				ObjectEntryCountException.class,
 				StringBundler.concat(
 					"The limit of guest entries for ",
-					_objectDefinition.getLabel(),
-					" has been reached and will no longer be accepted. Please ",
-					"contact the administrator for further assistance."),
+					_objectDefinition.getLabel(
+						_objectDefinition.getDefaultLanguageId()),
+					" has been reached and will no longer be accepted."),
 				() -> _objectEntryService.addObjectEntry(
 					0, _objectDefinition.getObjectDefinitionId(),
 					Collections.emptyMap(),
@@ -906,20 +907,22 @@ public class ObjectEntryServiceTest {
 					ServiceContextTestUtil.getServiceContext(
 						TestPropsValues.getGroupId(), _guestUser.getUserId())));
 
-		AssertUtils.assertFailure(
-			ObjectEntryCountException.class,
-			StringBundler.concat(
-				"The limit of guest entries for ", _objectDefinition.getLabel(),
-				" has been reached and will no longer be accepted"),
-			() -> _objectEntryService.addObjectEntry(
-				0, _objectDefinition.getObjectDefinitionId(),
-				Collections.emptyMap(),
-				ServiceContextTestUtil.getServiceContext(
-					TestPropsValues.getGroupId(), _guestUser.getUserId())));
+			AssertUtils.assertFailure(
+				ObjectEntryCountException.class,
+				StringBundler.concat(
+					"The limit of guest entries for ",
+					_objectDefinition.getLabel(
+						_objectDefinition.getDefaultLanguageId()),
+					" has been reached and will no longer be accepted."),
+				() -> _objectEntryService.addObjectEntry(
+					0, _objectDefinition.getObjectDefinitionId(),
+					Collections.emptyMap(),
+					ServiceContextTestUtil.getServiceContext(
+						TestPropsValues.getGroupId(), _guestUser.getUserId())));
 
-		String portletId =
-				_objectDefinition.isUnmodifiableSystemObject() ? StringPool.BLANK :
-					_objectDefinition.getPortletId();
+			String portletId =
+				_objectDefinition.isUnmodifiableSystemObject() ?
+					StringPool.BLANK : _objectDefinition.getPortletId();
 
 			Role role = _roleLocalService.getRole(
 				_objectDefinition.getCompanyId(), RoleConstants.ADMINISTRATOR);
@@ -928,14 +931,15 @@ public class ObjectEntryServiceTest {
 
 			for (long userId : userIds) {
 				int count =
-					_userNotificationLocalService.getUserNotificationEventsCount(
-						userId, portletId,
-						LocalDate.now(
-						).atStartOfDay(
-							ZoneId.systemDefault()
-						).toInstant(
-						).getEpochSecond(),
-						true);
+					_userNotificationLocalService.
+						getUserNotificationEventsCount(
+							userId, portletId,
+							LocalDate.now(
+							).atStartOfDay(
+								ZoneId.systemDefault()
+							).toInstant(
+							).getEpochSecond(),
+							true);
 
 				Assert.assertTrue(count > 0);
 			}
@@ -1001,8 +1005,10 @@ public class ObjectEntryServiceTest {
 			AssertUtils.assertFailure(
 				ObjectEntryCountException.class,
 				StringBundler.concat(
-					"The limit of guest entries for ", _objectDefinition.getLabel(),
-					" has been reached and will no longer be accepted"),
+					"The limit of guest entries for ",
+					_objectDefinition.getLabel(
+						_objectDefinition.getDefaultLanguageId()),
+					" has been reached and will no longer be accepted."),
 				() -> _objectEntryService.addObjectEntry(
 					0, _objectDefinition.getObjectDefinitionId(),
 					Collections.emptyMap(),
@@ -1010,8 +1016,8 @@ public class ObjectEntryServiceTest {
 						TestPropsValues.getGroupId(), _guestUser.getUserId())));
 
 			String portletId =
-				_objectDefinition.isUnmodifiableSystemObject() ? StringPool.BLANK :
-					_objectDefinition.getPortletId();
+				_objectDefinition.isUnmodifiableSystemObject() ?
+					StringPool.BLANK : _objectDefinition.getPortletId();
 
 			Role role = _roleLocalService.getRole(
 				_objectDefinition.getCompanyId(), RoleConstants.ADMINISTRATOR);
@@ -1020,14 +1026,15 @@ public class ObjectEntryServiceTest {
 
 			for (long userId : userIds) {
 				int count =
-					_userNotificationLocalService.getUserNotificationEventsCount(
-						userId, portletId,
-						LocalDate.now(
-						).atStartOfDay(
-							ZoneId.systemDefault()
-						).toInstant(
-						).getEpochSecond(),
-						true);
+					_userNotificationLocalService.
+						getUserNotificationEventsCount(
+							userId, portletId,
+							LocalDate.now(
+							).atStartOfDay(
+								ZoneId.systemDefault()
+							).toInstant(
+							).getEpochSecond(),
+							true);
 
 				Assert.assertTrue(count > 0);
 			}
