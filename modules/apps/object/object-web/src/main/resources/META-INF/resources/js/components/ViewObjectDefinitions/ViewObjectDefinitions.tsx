@@ -429,7 +429,12 @@ export default function ViewObjectDefinitions({
 										size="sm"
 									/>
 								) : (
-									<FrontendDataSet {...dataSetProps} />
+									<FrontendDataSet
+										{...dataSetProps}
+										key={
+											selectedObjectFolder.externalReferenceCode
+										}
+									/>
 								)}
 							</Card>
 						</>
@@ -443,7 +448,10 @@ export default function ViewObjectDefinitions({
 							size="sm"
 						/>
 					) : (
-						<FrontendDataSet {...dataSetProps} />
+						<FrontendDataSet
+							{...dataSetProps}
+							key={selectedObjectFolder.externalReferenceCode}
+						/>
 					)}
 				</div>
 			)}
