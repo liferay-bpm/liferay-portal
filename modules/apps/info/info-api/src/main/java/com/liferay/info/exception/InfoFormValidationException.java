@@ -57,6 +57,32 @@ public class InfoFormValidationException extends InfoFormException {
 
 	}
 
+	public static class ExceedsMaxEntries extends InfoFormValidationException {
+
+		public ExceedsMaxEntries(
+			String messageKey, String label) {
+
+			_messageKey = messageKey;
+			_label = label;
+		}
+
+		@Override
+		public String getLocalizedMessage(Locale locale) {
+			return LanguageUtil.format(
+				locale, _messageKey, new String[] {_label},
+				false);
+		}
+
+		@Override
+		public String getLocalizedMessage(String fieldLabel, Locale locale) {
+			return getLocalizedMessage(locale);
+		}
+
+		private final String _messageKey;
+		private final String _label;
+
+	}
+
 	public static class ExceedsMaxLength extends InvalidInfoFieldValue {
 
 		public ExceedsMaxLength(String infoFieldUniqueId, int maxLength) {
