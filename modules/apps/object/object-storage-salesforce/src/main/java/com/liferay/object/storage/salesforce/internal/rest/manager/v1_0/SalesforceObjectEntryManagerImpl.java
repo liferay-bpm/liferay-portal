@@ -6,8 +6,10 @@
 package com.liferay.object.storage.salesforce.internal.rest.manager.v1_0;
 
 import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.model.AccountEntryModel;
+import com.liferay.account.model.AccountEntry;
+import com.liferay.account.model.AccountEntryOrganizationRel;
 import com.liferay.account.service.AccountEntryLocalService;
+import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.list.type.entry.util.ListTypeEntryUtil;
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
@@ -15,6 +17,8 @@ import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.entry.util.ObjectEntryThreadLocal;
+import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
@@ -37,16 +41,29 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Organization;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.ResourcePermission;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserGroupRole;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelper;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -55,6 +72,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -74,10 +92,12 @@ import java.text.SimpleDateFormat;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -92,6 +112,17 @@ import org.osgi.service.component.annotations.Reference;
 public class SalesforceObjectEntryManagerImpl
 	extends BaseObjectEntryManager implements ObjectEntryManager {
 
+	private boolean _hasAccountRestrictionPermission(ObjectDefinition objectDefinition, User user)
+		throws PortalException {
+		return objectDefinition.isAccountEntryRestricted() && _accountEntryLocalService.getUserAccountEntries(
+			user.getUserId(),
+			AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT, null,
+			AccountConstants.
+				ACCOUNT_ENTRY_TYPES_DEFAULT_ALLOWED_TYPES,
+			WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS).size() > 0;
+	}
+
 	@Override
 	public ObjectEntry addObjectEntry(
 			DTOConverterContext dtoConverterContext,
@@ -99,9 +130,10 @@ public class SalesforceObjectEntryManagerImpl
 			String scopeKey)
 		throws Exception {
 
-		checkPortletResourcePermission(
-			ObjectActionKeys.ADD_OBJECT_ENTRY, objectDefinition, scopeKey,
-			dtoConverterContext.getUser());
+		if (!ObjectEntryThreadLocal.isSkipObjectEntryResourcePermission()) {
+			_checkChangeObjectEntryPortletResourcePermission(
+				dtoConverterContext.getUser(), getGroupId(objectDefinition, scopeKey), objectDefinition, objectEntry.getProperties(), ObjectActionKeys.ADD_OBJECT_ENTRY);
+		}
 
 		JSONObject responseJSONObject = _salesforceHttp.post(
 			objectDefinition.getCompanyId(),
@@ -121,9 +153,13 @@ public class SalesforceObjectEntryManagerImpl
 			String scopeKey)
 		throws Exception {
 
-		checkPortletResourcePermission(
-			ActionKeys.DELETE, objectDefinition, scopeKey,
-			dtoConverterContext.getUser());
+		if (!ObjectEntryThreadLocal.isSkipObjectEntryResourcePermission()) {
+			ObjectEntry objectEntry = getObjectEntry(objectDefinition.getCompanyId(), dtoConverterContext,
+				externalReferenceCode, objectDefinition, scopeKey);
+
+			_checkChangeObjectEntryPortletResourcePermission(
+				dtoConverterContext.getUser(), getGroupId(objectDefinition, scopeKey), objectDefinition, objectEntry.getProperties(), ActionKeys.DELETE);
+		}
 
 		_salesforceHttp.delete(
 			companyId, getGroupId(objectDefinition, scopeKey),
@@ -140,13 +176,23 @@ public class SalesforceObjectEntryManagerImpl
 			Sort[] sorts)
 		throws Exception {
 
-		checkPortletResourcePermission(
-			ActionKeys.VIEW, objectDefinition, scopeKey,
-			dtoConverterContext.getUser());
+		PortletResourcePermission portletResourcePermission =
+			getPortletResourcePermission(objectDefinition);
+
+		PermissionChecker permissionChecker = permissionCheckerFactory.create(dtoConverterContext.getUser());
+
+		boolean hasViewPermission = portletResourcePermission.contains(
+			permissionChecker, getGroupId(objectDefinition, scopeKey), ActionKeys.VIEW);
+
+		if (!(hasViewPermission || _hasAccountRestrictionPermission(objectDefinition, dtoConverterContext.getUser()))) {
+			return Page.of(Collections.emptyList());
+		}
 
 		return _getObjectEntries(
 			companyId, objectDefinition, scopeKey, dtoConverterContext,
-			pagination, filterString, search, sorts);
+			pagination, filterString, search, sorts, permissionChecker.hasPermission(
+				getGroupId(objectDefinition, scopeKey), portletResourcePermission.getResourceName(), 0,
+				ActionKeys.VIEW));
 	}
 
 	@Override
@@ -156,15 +202,11 @@ public class SalesforceObjectEntryManagerImpl
 			String scopeKey)
 		throws Exception {
 
-		checkPortletResourcePermission(
-			ActionKeys.VIEW, objectDefinition, scopeKey,
-			dtoConverterContext.getUser());
-
 		if (Validator.isNull(externalReferenceCode)) {
 			return null;
 		}
 
-		return _toObjectEntry(
+		ObjectEntry objectEntry = _toObjectEntry(
 			companyId, _getDateFormat(), dtoConverterContext,
 			_salesforceHttp.get(
 				companyId, getGroupId(objectDefinition, scopeKey),
@@ -172,6 +214,14 @@ public class SalesforceObjectEntryManagerImpl
 					"sobjects/", objectDefinition.getExternalReferenceCode(),
 					"/", externalReferenceCode)),
 			objectDefinition);
+
+
+		if (!ObjectEntryThreadLocal.isSkipObjectEntryResourcePermission()) {
+			_checkGetObjectEntryPortletResourcePermission(
+				dtoConverterContext.getUser(), getGroupId(objectDefinition, scopeKey), objectDefinition, objectEntry.getProperties());
+		}
+
+		return objectEntry;
 	}
 
 	@Override
@@ -192,9 +242,13 @@ public class SalesforceObjectEntryManagerImpl
 			ObjectEntry objectEntry, String scopeKey)
 		throws Exception {
 
-		checkPortletResourcePermission(
-			ActionKeys.UPDATE, objectDefinition, scopeKey,
-			dtoConverterContext.getUser());
+		if (!ObjectEntryThreadLocal.isSkipObjectEntryResourcePermission()) {
+			ObjectEntry oldObjectEntry = getObjectEntry(objectDefinition.getCompanyId(), dtoConverterContext,
+				externalReferenceCode, objectDefinition, scopeKey);
+
+			_checkChangeObjectEntryPortletResourcePermission(
+				dtoConverterContext.getUser(), getGroupId(objectDefinition, scopeKey), objectDefinition, oldObjectEntry.getProperties(), ActionKeys.UPDATE);
+		}
 
 		_salesforceHttp.patch(
 			companyId, getGroupId(objectDefinition, scopeKey),
@@ -208,14 +262,179 @@ public class SalesforceObjectEntryManagerImpl
 			objectDefinition, scopeKey);
 	}
 
+	private void _checkGetObjectEntryPortletResourcePermission(
+		User user,
+		long groupId, ObjectDefinition objectDefinition,
+		Map<String, Object> values)
+		throws PortalException {
+
+		if (objectDefinition.isAccountEntryRestricted()) {
+			String accountEntryExternalReferenceCode = "";
+
+			ObjectField objectField = _objectFieldLocalService.getObjectField(
+				objectDefinition.getAccountEntryRestrictedObjectFieldId());
+
+			accountEntryExternalReferenceCode = MapUtil.getString(values, objectField.getName());
+
+			String[] accountEntryExternalReferenceCodes = TransformUtil.transformToArray(
+				_accountEntryLocalService.getUserAccountEntries(
+					user.getUserId(),
+					AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT, null,
+					AccountConstants.
+						ACCOUNT_ENTRY_TYPES_DEFAULT_ALLOWED_TYPES,
+					WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS),
+				AccountEntry::getExternalReferenceCode, String.class);
+
+			if (ArrayUtil.contains(accountEntryExternalReferenceCodes, accountEntryExternalReferenceCode)) {
+				return;
+			}
+		}
+
+		PortletResourcePermission portletResourcePermission =
+			getPortletResourcePermission(objectDefinition);
+
+		PermissionChecker permissionChecker = permissionCheckerFactory.create(user);
+
+		portletResourcePermission.check(
+			permissionChecker, groupId, ActionKeys.VIEW);
+
+		if (permissionChecker.hasPermission(
+			groupId, portletResourcePermission.getResourceName(), 0,
+			ActionKeys.VIEW)) {
+
+			return;
+		}
+
+		throw new PrincipalException.MustHavePermission(
+			permissionChecker, objectDefinition.getResourceName(), 0,
+			ActionKeys.VIEW);
+	}
+
+	private void _checkChangeObjectEntryPortletResourcePermission(
+		User user,
+		long groupId, ObjectDefinition objectDefinition,
+		Map<String, Object> values, String actionId)
+		throws PortalException {
+
+		PortletResourcePermission portletResourcePermission =
+			getPortletResourcePermission(objectDefinition);
+
+		PermissionChecker permissionChecker = permissionCheckerFactory.create(user);
+
+		portletResourcePermission.check(
+			permissionChecker, groupId, actionId);
+
+		if (permissionChecker.hasPermission(
+			groupId, portletResourcePermission.getResourceName(), 0,
+			actionId)) {
+
+			return;
+		}
+
+		if (objectDefinition.isAccountEntryRestricted()) {
+			String accountEntryExternalReferenceCode = "";
+
+			ObjectField objectField = _objectFieldLocalService.getObjectField(
+				objectDefinition.getAccountEntryRestrictedObjectFieldId());
+
+				accountEntryExternalReferenceCode = MapUtil.getString(values, objectField.getName());
+
+			String[] accountEntryExternalReferenceCodes = TransformUtil.transformToArray(
+				_accountEntryLocalService.getUserAccountEntries(
+					user.getUserId(),
+					AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT, null,
+					AccountConstants.
+						ACCOUNT_ENTRY_TYPES_DEFAULT_ALLOWED_TYPES,
+					WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS),
+				AccountEntry::getExternalReferenceCode, String.class);
+
+			AccountEntry accountEntry = _accountEntryLocalService.getAccountEntryByExternalReferenceCode(accountEntryExternalReferenceCode, objectDefinition.getCompanyId());
+
+			if (!ArrayUtil.contains(accountEntryExternalReferenceCodes, accountEntryExternalReferenceCode)) {
+				throw new ObjectDefinitionAccountEntryRestrictedException(
+					StringBundler.concat(
+						"User ", user.getUserId(),
+						" does not have access to account entry ", accountEntry.getAccountEntryId()));
+			}
+
+			Set<Long> rolesIds = new HashSet<>();
+
+			rolesIds.addAll(
+				TransformUtil.transform(
+					_userGroupRoleLocalService.getUserGroupRoles(
+						permissionChecker.getUserId(),
+						accountEntry.getAccountEntryGroupId()),
+					UserGroupRole::getRoleId));
+
+			List<AccountEntryOrganizationRel> accountEntryOrganizationRels =
+				_accountEntryOrganizationRelLocalService.
+					getAccountEntryOrganizationRels(accountEntry.getAccountEntryId());
+
+			for (AccountEntryOrganizationRel accountEntryOrganizationRel :
+				accountEntryOrganizationRels) {
+
+				Organization organization =
+					accountEntryOrganizationRel.getOrganization();
+
+				Group group = _groupLocalService.getOrganizationGroup(
+					objectDefinition.getCompanyId(),
+					organization.getOrganizationId());
+
+				rolesIds.addAll(
+					TransformUtil.transform(
+						_userGroupRoleLocalService.getUserGroupRoles(
+							permissionChecker.getUserId(), group.getGroupId()),
+						UserGroupRole::getRoleId));
+
+				for (Organization ancestorOrganization :
+					organization.getAncestors()) {
+
+					group = _groupLocalService.getOrganizationGroup(
+						objectDefinition.getCompanyId(),
+						ancestorOrganization.getOrganizationId());
+
+					rolesIds.addAll(
+						TransformUtil.transform(
+							_userGroupRoleLocalService.getUserGroupRoles(
+								permissionChecker.getUserId(), group.getGroupId()),
+							UserGroupRole::getRoleId));
+				}
+			}
+
+			for (Long roleId : rolesIds) {
+				ResourcePermission resourcePermission =
+					_resourcePermissionLocalService.fetchResourcePermission(
+						objectDefinition.getCompanyId(),
+						objectDefinition.getResourceName(),
+						ResourceConstants.SCOPE_GROUP_TEMPLATE, "0", roleId);
+
+				if (resourcePermission == null) {
+					continue;
+				}
+
+				if (resourcePermission.hasActionId(
+					actionId)) {
+
+					return;
+				}
+			}
+		}
+
+		throw new PrincipalException.MustHavePermission(
+			permissionChecker, objectDefinition.getResourceName(), 0,
+			actionId);
+	}
+
 	private String _getAccountRestrictionSOSQLString(
 			long companyId, DTOConverterContext dtoConverterContext,
-			ObjectDefinition objectDefinition, String scopeKey)
+			ObjectDefinition objectDefinition, String scopeKey, boolean hasViewPermission)
 		throws Exception {
 
 		if (!_inlineSQLHelper.isEnabled(
 				companyId, getGroupId(objectDefinition, scopeKey)) ||
-			!objectDefinition.isAccountEntryRestricted()) {
+			!objectDefinition.isAccountEntryRestricted() || hasViewPermission) {
 
 			return StringPool.BLANK;
 		}
@@ -234,7 +453,7 @@ public class SalesforceObjectEntryManagerImpl
 							ACCOUNT_ENTRY_TYPES_DEFAULT_ALLOWED_TYPES,
 						WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
 						QueryUtil.ALL_POS),
-					AccountEntryModel::getExternalReferenceCode),
+					AccountEntry::getExternalReferenceCode),
 				"', '"),
 			"')");
 	}
@@ -298,7 +517,7 @@ public class SalesforceObjectEntryManagerImpl
 	private Page<ObjectEntry> _getObjectEntries(
 			long companyId, ObjectDefinition objectDefinition, String scopeKey,
 			DTOConverterContext dtoConverterContext, Pagination pagination,
-			String filterString, String search, Sort[] sorts)
+			String filterString, String search, Sort[] sorts, boolean hasViewPermission)
 		throws Exception {
 
 		JSONObject responseJSONObject = _salesforceHttp.get(
@@ -307,7 +526,7 @@ public class SalesforceObjectEntryManagerImpl
 				objectDefinition, pagination,
 				_getSOSQLString(
 					companyId, dtoConverterContext, objectDefinition,
-					filterString, scopeKey),
+					filterString, scopeKey, hasViewPermission),
 				search, sorts));
 
 		if ((responseJSONObject == null) ||
@@ -328,7 +547,7 @@ public class SalesforceObjectEntryManagerImpl
 				companyId, objectDefinition,
 				_getSOSQLString(
 					companyId, dtoConverterContext, objectDefinition,
-					filterString, scopeKey),
+					filterString, scopeKey, hasViewPermission),
 				scopeKey, search));
 	}
 
@@ -423,12 +642,12 @@ public class SalesforceObjectEntryManagerImpl
 	private String _getSOSQLString(
 			long companyId, DTOConverterContext dtoConverterContext,
 			ObjectDefinition objectDefinition, String filterString,
-			String scopeKey)
+			String scopeKey, boolean hasViewPermission)
 		throws Exception {
 
 		String accountRestrictionSOSQLString =
 			_getAccountRestrictionSOSQLString(
-				companyId, dtoConverterContext, objectDefinition, scopeKey);
+				companyId, dtoConverterContext, objectDefinition, scopeKey, hasViewPermission);
 
 		String filterSOSQLString = _filterFactory.create(
 			filterString, objectDefinition);
@@ -759,6 +978,19 @@ public class SalesforceObjectEntryManagerImpl
 
 	@Reference
 	private UserLocalService _userLocalService;
+
+	@Reference
+	private UserGroupRoleLocalService _userGroupRoleLocalService;
+
+	@Reference
+	private AccountEntryOrganizationRelLocalService
+		_accountEntryOrganizationRelLocalService;
+
+	@Reference
+	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
 
 	private class SalesforceHttp {
 
