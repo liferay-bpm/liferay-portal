@@ -23,7 +23,6 @@ import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectActionKeys;
-import com.liferay.object.constants.ObjectConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectFieldValidationConstants;
@@ -1056,7 +1055,8 @@ public class DefaultObjectEntryManagerImplTest
 		_user = _addUser();
 
 		Role role = _addRoleUser(
-			new String[] {ObjectActionKeys.ADD_OBJECT_ENTRY}, _objectDefinition3, _user);
+			new String[] {ObjectActionKeys.ADD_OBJECT_ENTRY},
+			_objectDefinition3, _user);
 
 		Assert.assertNotNull(_addObjectEntry(accountEntry1));
 
@@ -3476,9 +3476,8 @@ public class DefaultObjectEntryManagerImplTest
 		}
 
 		_resourcePermissionLocalService.setResourcePermissions(
-			companyId, name,
-			ResourceConstants.SCOPE_COMPANY, String.valueOf(companyId),
-			role.getRoleId(), actionIds);
+			companyId, name, ResourceConstants.SCOPE_COMPANY,
+			String.valueOf(companyId), role.getRoleId(), actionIds);
 
 		_userLocalService.addRoleUser(role.getRoleId(), user);
 
