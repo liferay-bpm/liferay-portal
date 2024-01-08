@@ -505,9 +505,10 @@ public class SalesforceObjectEntryManagerImpl
 		ObjectDefinition objectDefinition, Pagination pagination,
 		String predicateString, String search, Sort[] sorts) {
 
-		String ObjectFieldExternalReferenceCodes = StringUtil.merge(
+		String objectFieldExternalReferenceCodes = StringUtil.merge(
 			TransformUtil.transform(
-				_objectFieldLocalService.getObjectFields(objectDefinition.getObjectDefinitionId()),
+				_objectFieldLocalService.getObjectFields(
+					objectDefinition.getObjectDefinitionId()),
 				ObjectField::getExternalReferenceCode),
 			"', '");
 
@@ -516,8 +517,8 @@ public class SalesforceObjectEntryManagerImpl
 				"search", "q",
 				StringBundler.concat(
 					"FIND {`", search, "`} IN ALL FIELDS RETURNING ",
-					objectDefinition.getExternalReferenceCode(), "(" + ObjectFieldExternalReferenceCodes,
-					predicateString,
+					objectDefinition.getExternalReferenceCode(), "(",
+					objectFieldExternalReferenceCodes, predicateString,
 					_getSorts(objectDefinition.getObjectDefinitionId(), sorts),
 					_getSalesforcePagination(pagination), ")"));
 		}
@@ -525,7 +526,7 @@ public class SalesforceObjectEntryManagerImpl
 		return HttpComponentsUtil.addParameter(
 			"query", "q",
 			StringBundler.concat(
-				"SELECT " + ObjectFieldExternalReferenceCodes + " FROM ",
+				"SELECT ", objectFieldExternalReferenceCodes, " FROM ",
 				objectDefinition.getExternalReferenceCode(), predicateString,
 				_getSorts(objectDefinition.getObjectDefinitionId(), sorts),
 				_getSalesforcePagination(pagination)));
