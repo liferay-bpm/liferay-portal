@@ -505,12 +505,18 @@ public class SalesforceObjectEntryManagerImpl
 		ObjectDefinition objectDefinition, Pagination pagination,
 		String predicateString, String search, Sort[] sorts) {
 
+		String ObjectFieldExternalReferenceCodes = StringUtil.merge(
+			TransformUtil.transform(
+				_objectFieldLocalService.getObjectFields(objectDefinition.getObjectDefinitionId()),
+				ObjectField::getExternalReferenceCode),
+			"', '");
+
 		if (Validator.isNotNull(search)) {
 			return HttpComponentsUtil.addParameter(
 				"search", "q",
 				StringBundler.concat(
 					"FIND {`", search, "`} IN ALL FIELDS RETURNING ",
-					objectDefinition.getExternalReferenceCode(), "(FIELDS(ALL)",
+					objectDefinition.getExternalReferenceCode(), "(" + ObjectFieldExternalReferenceCodes,
 					predicateString,
 					_getSorts(objectDefinition.getObjectDefinitionId(), sorts),
 					_getSalesforcePagination(pagination), ")"));
@@ -519,7 +525,7 @@ public class SalesforceObjectEntryManagerImpl
 		return HttpComponentsUtil.addParameter(
 			"query", "q",
 			StringBundler.concat(
-				"SELECT FIELDS(ALL) FROM ",
+				"SELECT " + ObjectFieldExternalReferenceCodes + " FROM ",
 				objectDefinition.getExternalReferenceCode(), predicateString,
 				_getSorts(objectDefinition.getObjectDefinitionId(), sorts),
 				_getSalesforcePagination(pagination)));
@@ -696,7 +702,7 @@ public class SalesforceObjectEntryManagerImpl
 			JSONObject responseJSONObject = _salesforceHttp.get(
 				companyId, getGroupId(objectDefinition, scopeKey),
 				_getLocation(
-					objectDefinition, Pagination.of(1, 200), predicateString,
+					objectDefinition, Pagination.of(1, 2000), predicateString,
 					search, null));
 
 			JSONArray jsonArray = responseJSONObject.getJSONArray(
