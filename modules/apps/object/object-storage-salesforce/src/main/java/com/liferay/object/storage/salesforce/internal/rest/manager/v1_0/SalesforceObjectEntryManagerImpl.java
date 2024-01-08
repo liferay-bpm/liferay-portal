@@ -89,6 +89,8 @@ import java.net.HttpURLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -506,11 +508,10 @@ public class SalesforceObjectEntryManagerImpl
 		String predicateString, String search, Sort[] sorts) {
 
 		String objectFieldExternalReferenceCodes = StringUtil.merge(
-			TransformUtil.transform(
+			_getObjectFieldExternalReferenceCodes(
 				_objectFieldLocalService.getObjectFields(
-					objectDefinition.getObjectDefinitionId()),
-				ObjectField::getExternalReferenceCode),
-			"', '");
+					objectDefinition.getObjectDefinitionId())),
+			", ");
 
 		if (Validator.isNotNull(search)) {
 			return HttpComponentsUtil.addParameter(
@@ -595,6 +596,24 @@ public class SalesforceObjectEntryManagerImpl
 		}
 
 		return null;
+	}
+
+	private ArrayList<String> _getObjectFieldExternalReferenceCodes(
+		List<ObjectField> objectFields) {
+
+		ArrayList<String> objectFieldExternalReferenceCodes = new ArrayList<>(
+			Arrays.asList("OwnerId", "CreatedDate", "LastModifiedDate", "Id"));
+
+		for (ObjectField objectField : objectFields) {
+			String externalReferenceCode =
+				objectField.getExternalReferenceCode();
+
+			if (!externalReferenceCode.matches(_UUID_REGEX_PATTERN)) {
+				objectFieldExternalReferenceCodes.add(externalReferenceCode);
+			}
+		}
+
+		return objectFieldExternalReferenceCodes;
 	}
 
 	private String _getSalesforcePagination(Pagination pagination) {
@@ -959,6 +978,9 @@ public class SalesforceObjectEntryManagerImpl
 	}
 
 	private static final String _CUSTOM_OBJECT_SUFFIX = "__c";
+
+	private static final String _UUID_REGEX_PATTERN =
+		"^(?i)[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$";
 
 	@Reference
 	private AccountEntryLocalService _accountEntryLocalService;
