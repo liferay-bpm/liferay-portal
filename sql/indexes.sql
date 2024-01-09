@@ -387,7 +387,7 @@ create unique index IX_8B6E3ACE on UserNotificationDelivery (userId, portletId[$
 create index IX_BF29100B on UserNotificationEvent (type_[$COLUMN_LENGTH:200$]);
 create index IX_3BE9B7B1 on UserNotificationEvent (userId, delivered, deliveryType, archived, actionRequired);
 create index IX_D8C49479 on UserNotificationEvent (userId, delivered, deliveryType, type_[$COLUMN_LENGTH:200$], archived);
-create index IX_EBF87241 on UserNotificationEvent (userId, delivered, type_[$COLUMN_LENGTH:200$], timestamp);
+create index IX_BAA66C1D on UserNotificationEvent (userId, delivered, type_[$COLUMN_LENGTH:200$], timestamp, payload[$COLUMN_LENGTH:2000000$]);
 create index IX_D60FB085 on UserNotificationEvent (userId, deliveryType, archived, actionRequired);
 create index IX_ECD8CFEA on UserNotificationEvent (uuid_[$COLUMN_LENGTH:75$]);
 

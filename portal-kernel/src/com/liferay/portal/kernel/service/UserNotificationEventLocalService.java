@@ -504,7 +504,8 @@ public interface UserNotificationEventLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getUserNotificationEventsCount(
-		long userId, String type, long timestamp, boolean delivered);
+		long userId, String type, long timestamp, boolean delivered,
+		String payload);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getUserNotificationEventsCount(

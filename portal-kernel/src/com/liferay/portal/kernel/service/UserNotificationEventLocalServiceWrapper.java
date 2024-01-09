@@ -854,10 +854,12 @@ public class UserNotificationEventLocalServiceWrapper
 
 	@Override
 	public int getUserNotificationEventsCount(
-		long userId, String type, long timestamp, boolean delivered) {
+		long userId, String type, long timestamp, boolean delivered,
+		String payload) {
 
 		return _userNotificationEventLocalService.
-			getUserNotificationEventsCount(userId, type, timestamp, delivered);
+			getUserNotificationEventsCount(
+				userId, type, timestamp, delivered, payload);
 	}
 
 	@Override
