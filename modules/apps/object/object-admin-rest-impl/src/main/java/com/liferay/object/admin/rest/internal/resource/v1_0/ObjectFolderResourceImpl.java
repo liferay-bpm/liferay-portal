@@ -313,42 +313,47 @@ public class ObjectFolderResourceImpl extends BaseObjectFolderResourceImpl {
 				serviceBuilderObjectDefinition.getObjectDefinitionId());
 		}
 
-		com.liferay.object.model.ObjectFolder uncategorizedObjectFolder =
-			_objectFolderService.getObjectFolderByExternalReferenceCode(
-				ObjectFolderConstants.EXTERNAL_REFERENCE_CODE_UNCATEGORIZED,
-				contextCompany.getCompanyId());
+		com.liferay.object.model.ObjectFolder
+			uncategorizedServiceBuilderObjectFolder =
+				_objectFolderService.getObjectFolderByExternalReferenceCode(
+					ObjectFolderConstants.EXTERNAL_REFERENCE_CODE_UNCATEGORIZED,
+					contextCompany.getCompanyId());
 
 		for (Long objectDefinitionId : serviceBuilderObjectDefinitionIds) {
-			com.liferay.object.model.ObjectDefinition objectDefinition =
-				_objectDefinitionLocalService.fetchObjectDefinition(
-					objectDefinitionId);
+			com.liferay.object.model.ObjectDefinition
+				serviceBuilderObjectDefinition =
+					_objectDefinitionLocalService.fetchObjectDefinition(
+						objectDefinitionId);
 
-			if (objectDefinition.isLinkedToObjectFolder(objectFolderId)) {
+			if (serviceBuilderObjectDefinition.isLinkedToObjectFolder(
+					objectFolderId)) {
+
 				continue;
 			}
 
 			_objectDefinitionLocalService.updateObjectFolderId(
 				objectDefinitionId,
-				uncategorizedObjectFolder.getObjectFolderId());
+				uncategorizedServiceBuilderObjectFolder.getObjectFolderId());
 		}
 
 		objectFolderItems.removeAll(unlinkedObjectFolderItems);
 
 		for (ObjectFolderItem objectFolderItem : objectFolderItems) {
-			com.liferay.object.model.ObjectDefinition objectDefinition =
-				_objectDefinitionLocalService.
-					fetchObjectDefinitionByExternalReferenceCode(
-						objectFolderItem.
-							getObjectDefinitionExternalReferenceCode(),
-						contextCompany.getCompanyId());
+			com.liferay.object.model.ObjectDefinition
+				serviceBuilderObjectDefinition =
+					_objectDefinitionLocalService.
+						fetchObjectDefinitionByExternalReferenceCode(
+							objectFolderItem.
+								getObjectDefinitionExternalReferenceCode(),
+							contextCompany.getCompanyId());
 
-			if (objectDefinition == null) {
+			if (serviceBuilderObjectDefinition == null) {
 				continue;
 			}
 
 			_objectFolderItemLocalService.updateObjectFolderItem(
-				objectDefinition.getObjectDefinitionId(), objectFolderId,
-				objectFolderItem.getPositionX(),
+				serviceBuilderObjectDefinition.getObjectDefinitionId(),
+				objectFolderId, objectFolderItem.getPositionX(),
 				objectFolderItem.getPositionY());
 		}
 
