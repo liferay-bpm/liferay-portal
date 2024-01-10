@@ -7,8 +7,7 @@ package com.liferay.object.internal.upgrade.v8_8_4;
 
 import com.liferay.object.constants.ObjectFolderConstants;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.dao.orm.common.SQLTransformer;
-import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.upgrade.util.UpgradeProcessUtil;
@@ -16,55 +15,55 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
 /**
  * @author Pedro Leite
  */
 public class ObjectFolderUpgradeProcess extends UpgradeProcess {
 
+	public ObjectFolderUpgradeProcess(CompanyLocalService companyLocalService) {
+		_companyLocalService = companyLocalService;
+	}
+
 	@Override
 	protected void doUpgrade() throws Exception {
-		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
-				SQLTransformer.transform(
-					StringBundler.concat(
-						"select ObjectFolder.objectFolderId, ",
-						"ObjectFolder.companyId from ObjectFolder where ",
-						"ObjectFolder.externalReferenceCode = ",
-						"'uncategorized'")));
-			PreparedStatement preparedStatement2 =
-				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-					connection,
-					StringBundler.concat(
-						"update ObjectFolder set externalReferenceCode = '",
-						ObjectFolderConstants.EXTERNAL_REFERENCE_CODE_DEFAULT,
-						"', label = ?, name = '",
-						ObjectFolderConstants.NAME_DEFAULT,
-						"' where objectFolderId = ?"));
-			ResultSet resultSet = preparedStatement1.executeQuery()) {
+		_companyLocalService.forEachCompany(
+			company -> {
+				try (PreparedStatement preparedStatement =
+						connection.prepareStatement(
+							StringBundler.concat(
+								"update ObjectFolder set ",
+								"externalReferenceCode = ?, label = ?, name = ",
+								"? where companyId = ? and ",
+								"externalReferenceCode = ?"))) {
 
-			while (resultSet.next()) {
-				preparedStatement2.setString(
-					1,
-					LocalizationUtil.getXml(
-						new LocalizedValuesMap() {
-							{
-								put(
-									LocaleUtil.fromLanguageId(
-										UpgradeProcessUtil.getDefaultLanguageId(
-											resultSet.getLong("companyId"))),
-									ObjectFolderConstants.NAME_DEFAULT);
-							}
-						},
-						"Label"));
-				preparedStatement2.setLong(
-					2, resultSet.getLong("objectFolderId"));
+					preparedStatement.setString(
+						1,
+						ObjectFolderConstants.EXTERNAL_REFERENCE_CODE_DEFAULT);
+					preparedStatement.setString(
+						2,
+						LocalizationUtil.getXml(
+							new LocalizedValuesMap() {
+								{
+									put(
+										LocaleUtil.fromLanguageId(
+											UpgradeProcessUtil.
+												getDefaultLanguageId(
+													company.getCompanyId())),
+										ObjectFolderConstants.NAME_DEFAULT);
+								}
+							},
+							"Label"));
+					preparedStatement.setString(
+						3, ObjectFolderConstants.NAME_DEFAULT);
+					preparedStatement.setLong(4, company.getCompanyId());
+					preparedStatement.setString(5, "uncategorized");
 
-				preparedStatement2.addBatch();
-			}
-
-			preparedStatement2.executeBatch();
-		}
+					preparedStatement.executeUpdate();
+				}
+			});
 	}
+
+	private final CompanyLocalService _companyLocalService;
 
 }
