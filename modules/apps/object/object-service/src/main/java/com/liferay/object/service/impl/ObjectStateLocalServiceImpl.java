@@ -13,6 +13,8 @@ import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.UserLocalService;
 
 import java.util.List;
@@ -30,6 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 public class ObjectStateLocalServiceImpl
 	extends ObjectStateLocalServiceBaseImpl {
 
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectState addObjectState(
 			long userId, long listTypeEntryId, long objectStateFlowId)
@@ -63,7 +66,7 @@ public class ObjectStateLocalServiceImpl
 					objectState.getObjectStateId());
 		}
 	}
-
+	
 	@Override
 	public void deleteObjectStateFlowObjectStates(long objectStateFlowId) {
 		objectStatePersistence.removeByObjectStateFlowId(objectStateFlowId);
