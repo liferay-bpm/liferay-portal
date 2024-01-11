@@ -54,6 +54,7 @@ public interface ObjectStateLocalService
 	 *
 	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.object.service.impl.ObjectStateLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the object state local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link ObjectStateLocalServiceUtil} if injection and service tracking are not available.
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public ObjectState addObjectState(
 			long userId, long listTypeEntryId, long objectStateFlowId)
 		throws PortalException;
