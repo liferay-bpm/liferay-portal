@@ -39,7 +39,7 @@ import {useObjectFolderContext} from './ModelBuilderContext/objectFolderContext'
 import {TYPES} from './ModelBuilderContext/typesEnum';
 import {RedirectToEditObjectDetailsModal} from './ObjectDefinitionNode/RedirectToEditObjectDetailsModal';
 import {RightSideBar} from './RightSidebar/index';
-import {ObjectRelationshipEdgeData} from './types';
+import {LeftSidebarItem, ObjectRelationshipEdgeData} from './types';
 import {updatePreviousURLParam} from './utils';
 
 import './EditObjectFolder.scss';
@@ -101,27 +101,57 @@ export default function EditObjectFolder({
 		});
 	};
 
-	const updateModelBuilderStructure = async (
-		newObjectRelationshipId: number
+	const onAfterAddObjectRelationship = async (
+		newObjectRelationship: ObjectRelationship
 	) => {
 		const payload = await getUpdatedModelBuilderStructurePayload(
 			baseResourceURL,
 			selectedObjectFolder.name
 		);
 
+		if (
+			newObjectRelationship.objectDefinitionId1 !==
+			newObjectRelationship.objectDefinitionId2
+		) {
+			const objectDefiniton2 = nodes.find(
+				({data}) =>
+					data?.id === newObjectRelationship.objectDefinitionId2
+			);
+
+			if (objectDefiniton2 && objectDefiniton2.isHidden) {
+				const selectedSidebarItem = leftSidebarItems.find(
+					({objectFolderName}) =>
+						objectFolderName === selectedObjectFolder.name
+				) as LeftSidebarItem;
+
+				dispatch({
+					payload: {
+						hiddenObjectDefinitionNode: objectDefiniton2.isHidden,
+						objectDefinitionId: objectDefiniton2.data?.id as number,
+						objectDefinitionName: objectDefiniton2.data
+							?.name as string,
+						objectDefinitionNodes: nodes,
+						objectRelationshipEdges: edges,
+						selectedSidebarItem,
+					},
+					type: TYPES.CHANGE_NODE_VIEW,
+				});
+			}
+		}
+
 		dispatch({
 			payload: {
 				...payload,
 				dispatch,
 				rightSidebarType: 'objectRelationshipDetails',
-				selectedObjectRelationshipId: newObjectRelationshipId,
+				selectedObjectRelationshipId: newObjectRelationship.id,
 			},
 			type: TYPES.UPDATE_MODEL_BUILDER_STRUCTURE,
 		});
 
 		dispatch({
 			payload: {
-				selectedObjectRelationshipId: newObjectRelationshipId,
+				selectedObjectRelationshipId: newObjectRelationship.id,
 			},
 			type: TYPES.SET_SELECTED_OBJECT_RELATIONSHIP_EDGE,
 		});
@@ -355,8 +385,8 @@ export default function EditObjectFolder({
 						objectRelationshipParameterRequired={
 							objectRelationshipParameterRequired
 						}
-						onAfterSubmit={(newObjectRelationshipId: number) =>
-							updateModelBuilderStructure(newObjectRelationshipId)
+						onAfterAddObjectRelationship={(newObjectRelationship) =>
+							onAfterAddObjectRelationship(newObjectRelationship)
 						}
 						reload={false}
 					/>
