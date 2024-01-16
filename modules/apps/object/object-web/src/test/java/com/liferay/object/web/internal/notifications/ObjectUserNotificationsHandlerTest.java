@@ -109,7 +109,10 @@ public class ObjectUserNotificationsHandlerTest {
 
 			portletURLBuilderMockedStatic.verify(
 				() -> PortletURLBuilder.create(Mockito.any()));
-			Assert.assertTrue(true);
+
+			portletURLBuilderMockedStatic.verify(
+				() -> _portletURLStep.setMVCRenderCommandName(
+					"//edit_configuration"));
 		}
 	}
 
@@ -187,7 +190,8 @@ public class ObjectUserNotificationsHandlerTest {
 			_assetDisplayPageFriendlyURLProvider,
 			Mockito.mock(ObjectDefinition.class));
 
-	private final PortletURLBuilder.PortletURLStep _portletURLStep = new PortletURLBuilder.PortletURLStep(
+	private final PortletURLBuilder.PortletURLStep _portletURLStep =
+		new PortletURLBuilder.PortletURLStep(
 		Mockito.mock(PortletURL.class));
 	private final RequestBackedPortletURLFactory
 		_requestBackedPortletURLFactory = Mockito.mock(
