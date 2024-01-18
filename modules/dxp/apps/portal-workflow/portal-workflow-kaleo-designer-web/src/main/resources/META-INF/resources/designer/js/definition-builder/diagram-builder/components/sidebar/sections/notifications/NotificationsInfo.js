@@ -428,6 +428,7 @@ const NotificationsInfo = ({
 				setSelectedItem={setSelectedItem}
 				setTemplate={setTemplate}
 				setTemplateLanguage={setTemplateLanguage}
+				showAddButton={true}
 				template={template}
 				templateLanguage={templateLanguage}
 				updateNotificationType={updateNotificationType}
