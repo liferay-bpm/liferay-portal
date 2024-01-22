@@ -437,6 +437,9 @@ function appendXMLNotifications(buffer, notifications, nodeName, exporting) {
 				Array.isArray(currentRecipients[index])
 			) {
 				for (const recipientsIndex in currentRecipients[index]) {
+					if (recipientsIndex === 'sectionsData') {
+						continue;
+					}
 					appendXMLRecipients(
 						buffer,
 						exporting,
