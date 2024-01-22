@@ -155,6 +155,56 @@ const NotificationsInfo = ({
 		});
 	};
 
+	const roleRecipientUpdateSelectedItem = (role) => {
+		setSelectedItem((previousItem) => {
+			previousItem.data.notifications.recipients[notificationIndex] = {
+				...previousItem.data.notifications.recipients[
+					notificationIndex
+				],
+				assignmentType: ['roleId'],
+				roleId: role.id,
+				sectionsData: {
+					id: role.id,
+					name: role.name,
+					roleType: role.roleType,
+				},
+			};
+
+			return previousItem;
+		});
+	};
+
+	const roleTypeRecipientUpdateSelectedItem = (values) => {
+		setSelectedItem((previousItem) => {
+			previousItem.data.notifications.recipients[notificationIndex] = {
+				...previousItem.data.notifications.recipients[
+					notificationIndex
+				],
+				assignmentType: ['roleType'],
+				autoCreate: values.map(({autoCreate}) => autoCreate),
+				roleKey: values.map(({roleKey}) => roleKey),
+				roleName: values.map(({roleName}) => roleName),
+				roleType: values.map(({roleType}) => roleType),
+			};
+
+			return previousItem;
+		});
+	};
+
+	const scriptedRecipientUpdateSelectedItem = ({target}) => {
+		setSelectedItem((previousItem) => {
+			previousItem.data.notifications.recipients[notificationIndex] = {
+				...previousItem.data.notifications.recipients[
+					notificationIndex
+				],
+				assignmentType: ['scriptedRecipient'],
+				script: [target.value],
+			};
+
+			return previousItem;
+		});
+	};
+
 	const updateNotificationType = () => {
 		const notificationTypes = [];
 
@@ -249,6 +299,21 @@ const NotificationsInfo = ({
 				return prev;
 			});
 		}
+	};
+
+	const userRecipientUpdateSelectedItem = (values) => {
+		setSelectedItem((previousItem) => {
+			previousItem.data.notifications.recipients[notificationIndex] = {
+				...previousItem.data.notifications.recipients[
+					notificationIndex
+				],
+				assignmentType: ['user'],
+				emailAddress: values.map(({emailAddress}) => emailAddress),
+				sectionsData: values.map((values) => values),
+			};
+
+			return previousItem;
+		});
 	};
 
 	if (selectedItem.type === 'task') {
@@ -392,6 +457,15 @@ const NotificationsInfo = ({
 				}
 				recipientType={recipientType}
 				recipientTypeOptions={recipientTypeOptions}
+				roleRecipientUpdateSelectedItem={
+					roleRecipientUpdateSelectedItem
+				}
+				roleTypeRecipientUpdateSelectedItem={
+					roleTypeRecipientUpdateSelectedItem
+				}
+				scriptedRecipientUpdateSelectedItem={
+					scriptedRecipientUpdateSelectedItem
+				}
 				sectionsLength={sectionsLength}
 				selectedItem={selectedItem}
 				setExecutionType={setExecutionType}
@@ -412,6 +486,9 @@ const NotificationsInfo = ({
 				template={template}
 				templateLanguage={templateLanguage}
 				updateNotificationType={updateNotificationType}
+				userRecipientUpdateSelectedItem={
+					userRecipientUpdateSelectedItem
+				}
 				{...restProps}
 			/>
 		</SidebarPanel>
