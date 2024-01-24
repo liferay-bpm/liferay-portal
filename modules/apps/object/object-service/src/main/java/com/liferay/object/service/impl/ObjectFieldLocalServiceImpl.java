@@ -1384,6 +1384,10 @@ public class ObjectFieldLocalServiceImpl
 				newObjectField.getReadOnly(), readOnlyConditionExpression));
 
 		if (objectDefinition.isApproved()) {
+			if (newObjectField.isSystem()) {
+				newObjectField.setRequired(required);
+			}
+
 			newObjectField = objectFieldPersistence.update(newObjectField);
 
 			_addOrUpdateObjectFieldSettings(
