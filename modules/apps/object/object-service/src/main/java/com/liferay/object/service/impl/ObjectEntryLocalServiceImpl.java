@@ -2887,6 +2887,13 @@ public class ObjectEntryLocalServiceImpl
 			objectDefinition.getObjectDefinitionId(),
 			titleObjectField.getName());
 
+		Column<?, ?> primaryKeyColumn = table.getColumn(
+			objectDefinition.getPKObjectFieldDBColumnName());
+
+		if (primaryKeyColumn == null) {
+			return null;
+		}
+
 		if (Objects.equals(
 				table.getColumn(titleObjectField.getDBColumnName()),
 				ObjectEntryTable.INSTANCE.objectEntryId)) {
