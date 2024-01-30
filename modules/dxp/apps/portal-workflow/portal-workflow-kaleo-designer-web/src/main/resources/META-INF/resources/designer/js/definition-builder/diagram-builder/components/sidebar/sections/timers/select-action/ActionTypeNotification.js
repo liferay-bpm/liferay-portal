@@ -17,7 +17,7 @@ const ActionTypeNotification = ({
 	setActionSections,
 	...restProps
 }) => {
-	const {selectedItem} = useContext(DiagramBuilderContext);
+	const {accountEntryId, selectedItem} = useContext(DiagramBuilderContext);
 
 	const identifier = actionData?.identifier;
 
@@ -243,6 +243,7 @@ const ActionTypeNotification = ({
 
 	return (
 		<BaseNotificationsInfo
+			accountEntryId={accountEntryId}
 			defaultScript={
 				actionData?.recipients?.script ||
 				actionData?.recipients?.[0]?.script?.[0]
