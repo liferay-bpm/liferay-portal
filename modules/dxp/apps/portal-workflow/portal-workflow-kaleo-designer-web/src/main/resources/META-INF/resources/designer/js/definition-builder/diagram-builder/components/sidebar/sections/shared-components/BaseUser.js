@@ -21,6 +21,7 @@ const BaseUser = ({
 	notificationIndex,
 	reassignment,
 	screenName = '',
+	sectionsData,
 	sectionsLength,
 	setSections,
 	setErrors,
@@ -30,9 +31,9 @@ const BaseUser = ({
 	const [search, setSearch] = useState('');
 	const [networkStatus, setNetworkStatus] = useState(4);
 	const [user, setUser] = useState({
-		emailAddress,
-		screenName,
-		userId,
+		emailAddress: emailAddress || sectionsData?.emailAddress,
+		screenName: screenName || sectionsData?.screenName,
+		userId: userId || sectionsData?.userId,
 	});
 
 	const {resource} = useResource({
@@ -88,9 +89,9 @@ const BaseUser = ({
 
 	useEffect(() => {
 		setUser({
-			emailAddress,
-			screenName,
-			userId,
+			emailAddress: emailAddress || sectionsData?.emailAddress,
+			screenName: screenName || sectionsData?.screenName,
+			userId: userId || sectionsData?.userId,
 		});
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
