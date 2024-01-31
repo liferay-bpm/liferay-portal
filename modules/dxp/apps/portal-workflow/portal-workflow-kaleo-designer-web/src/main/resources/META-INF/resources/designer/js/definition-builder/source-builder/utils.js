@@ -290,7 +290,7 @@ export function parseNotifications(node) {
 				}
 			}
 		}
-		else if (item['recipients'] && item['recipients'][0]['user']) {
+		else if (item['recipients'] && item['recipients'][0]?.['user']) {
 			if (item['recipients'][0]['user']['email-address']) {
 				const emailAddress = [
 					item['recipients'][0]['user']['email-address'],
@@ -314,7 +314,8 @@ export function parseNotifications(node) {
 
 		if (
 			item['role-type'] ||
-			(item['recipients'] && item['recipients'][0]['roles']['role-type'])
+			(item['recipients'] &&
+				item['recipients'][0]?.['roles']?.['role-type'])
 		) {
 			const autoCreate =
 				item['auto-create'] ||
@@ -346,7 +347,7 @@ export function parseNotifications(node) {
 
 		if (
 			item['role-id'] ||
-			(item['recipients'] && item['recipients'][0]['roles']['role'])
+			(item['recipients'] && item['recipients'][0]?.['roles']?.['role'])
 		) {
 			const roleId = item['role-id']
 				? item['role-id'][0]
@@ -369,7 +370,8 @@ export function parseNotifications(node) {
 
 		if (
 			item['scripted-recipient'] ||
-			(item['recipients'] && item['recipients'][0]['scripted-recipient'])
+			(item['recipients'] &&
+				item['recipients'][0]?.['scripted-recipient'])
 		) {
 			const scriptedRecipient = item['scripted-recipient']
 				? item['scripted-recipient'][0]
