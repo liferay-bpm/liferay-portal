@@ -372,16 +372,21 @@ export function getUnsupportedObjectRelationshipErrorMessage(
 export function updatePreviousURLParam(paramType: string, paramValue: string) {
 	const previousPath = document.referrer;
 
-	const newPreviousURL = new URL(previousPath);
+	const previousURL = new URL(previousPath);
 
-	const objectFolderNameParam = newPreviousURL.searchParams.get(paramType);
+	const sanitizedParamType = paramType.replace(/[^\w]/g, '');
+	const sanitizedParamValue = paramValue.replace(/[^\w]/g, '');
+
+	const objectFolderNameParam = previousURL.searchParams.get(
+		sanitizedParamType
+	);
 
 	if (objectFolderNameParam) {
-		newPreviousURL.searchParams.set(paramType, paramValue);
+		previousURL.searchParams.set(sanitizedParamType, sanitizedParamValue);
 
-		window.history.pushState(null, '', newPreviousURL.toString());
+		window.history.pushState(null, '', previousURL.toString());
 
-		window.location.href = newPreviousURL.toString();
+		window.location.href = previousURL.toString();
 	}
 }
 
