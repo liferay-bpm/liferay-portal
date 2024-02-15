@@ -347,6 +347,35 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 				Collections.singletonList(objectField.getObjectFieldId())));
 	}
 
+	private void _addObjectEntryOnDefinedScope(String scope, long fileEntryId)
+		throws Exception {
+
+		ObjectEntry objectEntry = objectEntryManager.addObjectEntry(
+			dtoConverterContext, parentObjectDefinition,
+			new ObjectEntry() {
+				{
+					properties = parentObjectEntryValues;
+				}
+			},
+			scope);
+
+		objectEntryManager.addObjectEntry(
+			dtoConverterContext, childObjectDefinition,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.putAll(
+						childObjectEntryValues
+					).put(
+						getObjectRelationshipObjectField2Name(),
+						objectEntry.getId()
+					).put(
+						"attachmentObjectField", fileEntryId
+					).build();
+				}
+			},
+			scope);
+	}
+
 	private void _assertNotificationQueueEntry(
 			String expectedFileName, boolean expectedSingleRecipient,
 			String expectedToEmailAddress,
@@ -417,7 +446,7 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 			notificationQueueEntryAttachment.getFileEntryId());
 	}
 
-	private void _executeNotificationObjectAction(
+	private void _executeNotificationObjectActionOnCompanyScope(
 			long fileEntryId, NotificationTemplate notificationTemplate)
 		throws Exception {
 
@@ -436,30 +465,33 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 			).build(),
 			false);
 
-		ObjectEntry objectEntry = objectEntryManager.addObjectEntry(
-			dtoConverterContext, parentObjectDefinition,
-			new ObjectEntry() {
-				{
-					properties = parentObjectEntryValues;
-				}
-			},
-			ObjectDefinitionConstants.SCOPE_COMPANY);
+		_addObjectEntryOnDefinedScope(
+			ObjectDefinitionConstants.SCOPE_COMPANY, fileEntryId);
 
-		objectEntryManager.addObjectEntry(
-			dtoConverterContext, childObjectDefinition,
-			new ObjectEntry() {
-				{
-					properties = HashMapBuilder.putAll(
-						childObjectEntryValues
-					).put(
-						getObjectRelationshipObjectField2Name(),
-						objectEntry.getId()
-					).put(
-						"attachmentObjectField", fileEntryId
-					).build();
-				}
-			},
-			ObjectDefinitionConstants.SCOPE_COMPANY);
+		objectActionLocalService.deleteObjectAction(
+			objectAction.getObjectActionId());
+	}
+
+	private void _executeNotificationObjectActionOnSiteScope(
+		long fileEntryId, NotificationTemplate notificationTemplate) {
+
+		ObjectAction objectAction = objectActionLocalService.addObjectAction(
+			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+			childObjectDefinition.getObjectDefinitionId(), true,
+			StringPool.BLANK, RandomTestUtil.randomString(),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			RandomTestUtil.randomString(),
+			ObjectActionExecutorConstants.KEY_NOTIFICATION,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			UnicodePropertiesBuilder.put(
+				"notificationTemplateId",
+				notificationTemplate.getNotificationTemplateId()
+			).build(),
+			false);
+
+		_addObjectEntryOnDefinedScope(
+			ObjectDefinitionConstants.SCOPE_SITE, fileEntryId);
 
 		objectActionLocalService.deleteObjectAction(
 			objectAction.getObjectActionId());
@@ -495,7 +527,7 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 			FileUtil.createTempFile(RandomTestUtil.randomBytes()),
 			ContentTypes.TEXT_PLAIN);
 
-		_executeNotificationObjectAction(
+		_executeNotificationObjectActionOnCompanyScope(
 			fileEntry.getFileEntryId(),
 			_addNotificationTemplate(
 				ListUtil.toString(getTermNames(), StringPool.BLANK),
