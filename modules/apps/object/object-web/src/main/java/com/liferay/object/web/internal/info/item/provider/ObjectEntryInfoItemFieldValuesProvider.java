@@ -451,7 +451,7 @@ public class ObjectEntryInfoItemFieldValuesProvider
 					null, themeDisplay.getUser()),
 				objectEntry.getExternalReferenceCode(), objectDefinition,
 				ObjectEntryUtil.getScopeKey(
-					themeDisplay.getScopeGroupId(), objectDefinition,
+					objectEntry.getGroupId(), objectDefinition,
 					_objectScopeProviderRegistry));
 		}
 		catch (Exception exception) {
