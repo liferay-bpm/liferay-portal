@@ -150,13 +150,14 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 				).build()),
 			null, "Body", LanguageUtil.getLanguageId(LocaleUtil.US));
 
-		_executeNotificationObjectAction(
+		_executeNotificationObjectActionOnScope(
 			0,
 			_addNotificationTemplate(
 				body, NotificationTemplateConstants.EDITOR_TYPE_FREEMARKER,
 				false,
 				Collections.singletonMap(
-					LocaleUtil.US, user1.getEmailAddress())));
+					LocaleUtil.US, user1.getEmailAddress())),
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		List<NotificationQueueEntry> notificationQueueEntries =
 			notificationQueueEntryLocalService.getNotificationEntries(
@@ -188,13 +189,14 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 				).build()),
 			null, "Body", LanguageUtil.getLanguageId(LocaleUtil.US));
 
-		_executeNotificationObjectAction(
+		_executeNotificationObjectActionOnScope(
 			0,
 			_addNotificationTemplate(
 				body, NotificationTemplateConstants.EDITOR_TYPE_FREEMARKER,
 				false,
 				Collections.singletonMap(
-					LocaleUtil.US, user1.getEmailAddress())));
+					LocaleUtil.US, user1.getEmailAddress())),
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		List<NotificationQueueEntry> notificationQueueEntries =
 			notificationQueueEntryLocalService.getNotificationEntries(
@@ -230,7 +232,8 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 			true,
 			StringBundler.concat(
 				user1.getEmailAddress(), StringPool.COMMA,
-				user2.getEmailAddress()));
+				user2.getEmailAddress()),
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		// Multiples emails for each main recipient with a ", " separator
 
@@ -242,7 +245,8 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 			true,
 			StringBundler.concat(
 				user1.getEmailAddress(), StringPool.COMMA_AND_SPACE,
-				user2.getEmailAddress()));
+				user2.getEmailAddress()),
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		// Multiples emails for each main recipient with a ";" separator
 
@@ -254,7 +258,8 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 			true,
 			StringBundler.concat(
 				user1.getEmailAddress(), StringPool.SEMICOLON,
-				user2.getEmailAddress()));
+				user2.getEmailAddress()),
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		// Multiples emails for each main recipient and terms with a ","
 		// separator
@@ -268,7 +273,8 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 						childObjectEntryValues.get("emailTextObjectField")))),
 			true,
 			"[%CURRENT_USER_EMAIL_ADDRESS%]," +
-				getTermName("emailTextObjectField"));
+				getTermName("emailTextObjectField"),
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		// Multiples emails for each main recipient and terms with a ", "
 		// separator
@@ -282,7 +288,8 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 						childObjectEntryValues.get("emailTextObjectField")))),
 			true,
 			"[%CURRENT_USER_EMAIL_ADDRESS%], " +
-				getTermName("emailTextObjectField"));
+				getTermName("emailTextObjectField"),
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		// Multiples emails for each main recipient and terms with a ";"
 		// separator
@@ -296,7 +303,8 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 						childObjectEntryValues.get("emailTextObjectField")))),
 			true,
 			"[%CURRENT_USER_EMAIL_ADDRESS%];" +
-				getTermName("emailTextObjectField"));
+				getTermName("emailTextObjectField"),
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		// One email including all main recipients
 
@@ -310,7 +318,22 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 			false,
 			StringBundler.concat(
 				user1.getEmailAddress(), StringPool.COMMA,
-				user2.getEmailAddress()));
+				user2.getEmailAddress()),
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		// Multiples emails for each main recipient with a ";" separator
+		// to a local Object Entry
+
+		_testSendNotification(
+			2,
+			ListUtil.sort(
+				Arrays.asList(
+					user1.getEmailAddress(), user2.getEmailAddress())),
+			true,
+			StringBundler.concat(
+				user1.getEmailAddress(), StringPool.SEMICOLON,
+				user2.getEmailAddress()),
+			ObjectDefinitionConstants.SCOPE_SITE);
 	}
 
 	private NotificationTemplate _addNotificationTemplate(
@@ -347,7 +370,7 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 				Collections.singletonList(objectField.getObjectFieldId())));
 	}
 
-	private void _addObjectEntryOnDefinedScope(String scope, long fileEntryId)
+	private void _addObjectEntryOnDefinedScope(long fileEntryId, String scope)
 		throws Exception {
 
 		ObjectEntry objectEntry = objectEntryManager.addObjectEntry(
@@ -446,8 +469,9 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 			notificationQueueEntryAttachment.getFileEntryId());
 	}
 
-	private void _executeNotificationObjectActionOnCompanyScope(
-			long fileEntryId, NotificationTemplate notificationTemplate)
+	private void _executeNotificationObjectActionOnScope(
+			long fileEntryId, NotificationTemplate notificationTemplate,
+			String scope)
 		throws Exception {
 
 		ObjectAction objectAction = objectActionLocalService.addObjectAction(
@@ -465,33 +489,7 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 			).build(),
 			false);
 
-		_addObjectEntryOnDefinedScope(
-			ObjectDefinitionConstants.SCOPE_COMPANY, fileEntryId);
-
-		objectActionLocalService.deleteObjectAction(
-			objectAction.getObjectActionId());
-	}
-
-	private void _executeNotificationObjectActionOnSiteScope(
-		long fileEntryId, NotificationTemplate notificationTemplate) {
-
-		ObjectAction objectAction = objectActionLocalService.addObjectAction(
-			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
-			childObjectDefinition.getObjectDefinitionId(), true,
-			StringPool.BLANK, RandomTestUtil.randomString(),
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			RandomTestUtil.randomString(),
-			ObjectActionExecutorConstants.KEY_NOTIFICATION,
-			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
-			UnicodePropertiesBuilder.put(
-				"notificationTemplateId",
-				notificationTemplate.getNotificationTemplateId()
-			).build(),
-			false);
-
-		_addObjectEntryOnDefinedScope(
-			ObjectDefinitionConstants.SCOPE_SITE, fileEntryId);
+		_addObjectEntryOnDefinedScope(fileEntryId, scope);
 
 		objectActionLocalService.deleteObjectAction(
 			objectAction.getObjectActionId());
@@ -516,7 +514,7 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 	private void _testSendNotification(
 			int expectedNotificationQueueEntriesCount,
 			List<String> expectedToEmailAddresses, boolean singleRecipient,
-			String to)
+			String to, String scope)
 		throws Exception {
 
 		FileEntry fileEntry = TempFileEntryUtil.addTempFileEntry(
@@ -527,12 +525,24 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 			FileUtil.createTempFile(RandomTestUtil.randomBytes()),
 			ContentTypes.TEXT_PLAIN);
 
-		_executeNotificationObjectActionOnCompanyScope(
+		_executeNotificationObjectActionOnScope(
 			fileEntry.getFileEntryId(),
 			_addNotificationTemplate(
 				ListUtil.toString(getTermNames(), StringPool.BLANK),
 				NotificationTemplateConstants.EDITOR_TYPE_RICH_TEXT,
-				singleRecipient, Collections.singletonMap(LocaleUtil.US, to)));
+				singleRecipient, Collections.singletonMap(LocaleUtil.US, to)),
+			scope);
+
+		_verifyNotificationQueue(
+			expectedNotificationQueueEntriesCount, expectedToEmailAddresses,
+			fileEntry, singleRecipient);
+	}
+
+	private void _verifyNotificationQueue(
+			int expectedNotificationQueueEntriesCount,
+			List<String> expectedToEmailAddresses, FileEntry fileEntry,
+			boolean singleRecipient)
+		throws Exception {
 
 		List<NotificationQueueEntry> notificationQueueEntries = ListUtil.sort(
 			notificationQueueEntryLocalService.getNotificationEntries(
