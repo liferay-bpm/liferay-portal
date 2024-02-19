@@ -32,8 +32,10 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -98,11 +100,66 @@ public class NotificationTemplateObjectActionExecutorImpl
 		return ObjectActionExecutorConstants.KEY_NOTIFICATION;
 	}
 
+	private String _getEntryLanguageId(
+		ObjectDefinition objectDefinition, Map<String, Object> variables) {
+
+		Map<String, Object> entryDTO = (Map<String, Object>)variables.get(
+			"entryDTO");
+
+		if (entryDTO == null) {
+			return null;
+		}
+
+		Map<String, Object> properties = (Map<String, Object>)entryDTO.get(
+			"properties");
+
+		if (properties == null) {
+			return null;
+		}
+
+		Set<String> i18nObjectFieldNames = new HashSet<>();
+
+		for (ObjectField objectField :
+				_objectFieldLocalService.getObjectFields(
+					objectDefinition.getObjectDefinitionId())) {
+
+			if (objectField.isLocalized()) {
+				i18nObjectFieldNames.add(objectField.getI18nObjectFieldName());
+			}
+		}
+
+		for (String i18nObjectFieldName : i18nObjectFieldNames) {
+			Map<String, Object> localizedValue =
+				(Map<String, Object>)properties.get(i18nObjectFieldName);
+
+			if (localizedValue == null) {
+				continue;
+			}
+
+			Set<String> languageIdSet = localizedValue.keySet();
+
+			return languageIdSet.iterator(
+			).next();
+		}
+
+		return null;
+	}
+
 	private Map<String, Object> _getTermValues(
 		ObjectDefinition objectDefinition, Map<String, Object> variables) {
 
 		Map<String, Object> termValues = (Map<String, Object>)variables.get(
 			"baseModel");
+
+		boolean enableLocalization = objectDefinition.isEnableLocalization();
+
+		termValues.put(
+			"enableLocalization", objectDefinition.isEnableLocalization());
+
+		if (enableLocalization) {
+			termValues.put(
+				"languageId", _getEntryLanguageId(objectDefinition, variables));
+		}
 
 		for (ObjectField objectField :
 				_objectFieldLocalService.getObjectFields(
