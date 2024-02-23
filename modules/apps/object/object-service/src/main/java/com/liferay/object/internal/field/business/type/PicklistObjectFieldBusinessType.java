@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.extension.PropertyDefinition;
 
 import java.util.Collections;
@@ -190,6 +191,13 @@ public class PicklistObjectFieldBusinessType
 					newObjectField.getObjectFieldId(),
 					newObjectStateFlow.getObjectStates());
 			}
+
+			return;
+		}
+
+		if (Validator.isNotNull(
+				_objectStateFlowLocalService.fetchObjectFieldObjectStateFlow(
+					newObjectField.getObjectFieldId()))) {
 
 			return;
 		}
