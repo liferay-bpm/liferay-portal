@@ -40,7 +40,14 @@ export class ObjectAdminApiHelper {
 		);
 	}
 
-	async postObjectRelationship(
+	async postObjectRelationship(data: DataObject, objectDefinitionId: number) {
+		return this.apiHelpers.post(
+			`${this.apiHelpers.baseUrl}${this.basePath}/object-definitions/${objectDefinitionId}/object-relationships`,
+			data
+		);
+	}
+
+	async postObjectRelationshipByExternalReferenceCode(
 		objectRelationship: Partial<ObjectRelationship>
 	) {
 		return this.apiHelpers.post(

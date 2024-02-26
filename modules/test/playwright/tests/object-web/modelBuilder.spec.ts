@@ -121,7 +121,9 @@ test('can delete object relationship from different folders', async ({
 		type: 'oneToMany' as ObjectRelationshipType,
 	};
 
-	await apiHelpers.objectAdmin.postObjectRelationship(objectRelationshipData);
+	await apiHelpers.objectAdmin.postObjectRelationshipByExternalReferenceCode(
+		objectRelationshipData
+	);
 
 	await objectDefinitionsPage.goto();
 
