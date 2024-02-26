@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import ClayAlert from '@clayui/alert';
 import ClayDatePicker from '@clayui/date-picker';
 import {ClayTooltipProvider} from '@clayui/tooltip';
 import {
@@ -36,6 +37,7 @@ export default function DatePicker({
 }) {
 	const inputRef = useRef(null);
 	const maskRef = useRef();
+	const [momentFormatValid, setMomentFormatValid] = useState(true);
 	const {
 		clayFormat,
 		firstDayOfWeek,
@@ -97,17 +99,47 @@ export default function DatePicker({
 	 * Updates the rawDate state whenever the prop value or localizedValue changes,
 	 * but it keep user's input case theres no language change.
 	 */
-	useEffect(
-		() =>
-			setDate(({formattedDate, name, predefinedValue, rawDate}) =>
-				name === date.name &&
-				predefinedValue === date.predefinedValue &&
-				rawDate === ''
-					? {...date, formattedDate}
-					: date
-			),
-		[date]
-	);
+	useEffect(() => {
+		const handleClickEvent = () => {
+			const isValidMomentFormat = moment(
+				formattedDate,
+				momentFormat,
+				true
+			).isValid();
+			const saveButton = document.querySelector('.btn-primary');
+			const datePickerDropdown = document.querySelector(
+				'.date-picker-dropdown-menu.show'
+			);
+
+			if (
+				!isValidMomentFormat &&
+				formattedDate !== '' &&
+				!datePickerDropdown
+			) {
+				setMomentFormatValid(false);
+				saveButton.disabled = true;
+			}
+			else {
+				saveButton.disabled = false;
+				setMomentFormatValid(true);
+			}
+		};
+
+		if (isDateTime) {
+			document.addEventListener('click', handleClickEvent);
+			document.addEventListener('keydown', handleClickEvent);
+		}
+
+		setDate(({formattedDate, name, predefinedValue, rawDate}) =>
+			name === date.name &&
+			predefinedValue === date.predefinedValue &&
+			rawDate === ''
+				? {...date, formattedDate}
+				: date
+		);
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [date, formattedDate]);
 
 	/**
 	 * Creates the input mask and update it whenever the format changes
@@ -216,6 +248,23 @@ export default function DatePicker({
 						years={years}
 						yearsCheck={false}
 					/>
+
+					{!momentFormatValid && (
+						<div
+							className="error-container form-feedback-item mt-1"
+							role="alert"
+						>
+							<ClayAlert
+								className="inline-item inline-item-before"
+								displayType="danger"
+								variant="feedback"
+							>
+								{Liferay.Language.get(
+									'please-enter-a-valid-date'
+								)}
+							</ClayAlert>
+						</div>
+					)}
 
 					<input name={name} type="hidden" value={rawDate} />
 				</div>
