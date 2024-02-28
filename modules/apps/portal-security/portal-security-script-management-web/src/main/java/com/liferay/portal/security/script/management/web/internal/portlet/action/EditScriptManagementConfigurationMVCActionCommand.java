@@ -1,0 +1,62 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2024 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ */
+
+package com.liferay.portal.security.script.management.web.internal.portlet.action;
+
+import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
+import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
+import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
+import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
+import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.security.script.management.configuration.ScriptManagementConfiguration;
+
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+/**
+ * @author Feliphe Marinho
+ */
+@Component(
+	property = {
+		"javax.portlet.name=" + ConfigurationAdminPortletKeys.SYSTEM_SETTINGS,
+		"mvc.command.name=/system_settings/edit_script_management_configuration"
+	},
+	service = MVCActionCommand.class
+)
+public class EditScriptManagementConfigurationMVCActionCommand
+	extends BaseMVCActionCommand {
+
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		try {
+			_configurationProvider.saveSystemConfiguration(
+				ScriptManagementConfiguration.class,
+				HashMapDictionaryBuilder.<String, Object>put(
+					"allowAdministratorsIncludeScriptContent",
+					ParamUtil.getBoolean(
+						actionRequest,
+						"allowAdministratorsIncludeScriptContent")
+				).build());
+		}
+		catch (Exception exception) {
+			SessionErrors.add(actionRequest, exception.getClass(), exception);
+
+			actionResponse.sendRedirect(
+				ParamUtil.getString(actionRequest, "redirect"));
+		}
+	}
+
+	@Reference
+	private ConfigurationProvider _configurationProvider;
+
+}
