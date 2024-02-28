@@ -27,6 +27,7 @@ import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
@@ -217,11 +218,20 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 				objectAction.getObjectActionTriggerKey(),
 				ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE)) {
 
+			Set<Long> commonObjectActions = SetUtil.intersect(
+				TransformUtil.transform(
+					_objectActionLocalService.getObjectActions(
+						objectDefinition.getObjectDefinitionId(),
+						ObjectActionTriggerConstants.KEY_ON_AFTER_ADD),
+					ObjectAction::getObjectActionId),
+				objectEntryIdsMap.keySet());
+
 			Set<Long> objectEntryIds = objectEntryIdsMap.get(
 				objectAction.getObjectActionId());
 
-			if (SetUtil.isNotEmpty(objectEntryIds) &&
-				objectEntryIds.contains(objectEntryId)) {
+			if (!commonObjectActions.isEmpty() ||
+				(SetUtil.isNotEmpty(objectEntryIds) &&
+				 objectEntryIds.contains(objectEntryId))) {
 
 				return;
 			}
