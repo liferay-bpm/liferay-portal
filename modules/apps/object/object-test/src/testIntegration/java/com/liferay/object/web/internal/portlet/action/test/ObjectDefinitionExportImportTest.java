@@ -60,6 +60,11 @@ public class ObjectDefinitionExportImportTest extends BaseExportImportTestCase {
 		testExportImport(
 			"test-object-definition.json", "test-object-definition.json", null,
 			"TestObjectDefinition");
+
+		testExportImport(
+			"test-object-definition-state-manager.json",
+			"test-object-definition-state-manager.json", null,
+			"Testobjectdefinitionstatemanager");
 	}
 
 	@Override
