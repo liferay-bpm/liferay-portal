@@ -35,6 +35,7 @@ interface EditObjectValidationProps {
 	objectValidationRuleElements: SidebarCategory[];
 	objectValidationRuleId: number;
 	readOnly: boolean;
+	scriptManagementEnabled: boolean;
 }
 
 export interface PartialValidationFields {
@@ -81,6 +82,7 @@ export default function EditObjectValidation({
 	objectValidationRuleElements,
 	objectValidationRuleId,
 	readOnly,
+	scriptManagementEnabled,
 }: EditObjectValidationProps) {
 	const [activeIndex, setActiveIndex] = useState<number>(0);
 	const [errorMessage, setErrorMessage] = useState<ObjectValidationErrors>(
@@ -155,6 +157,10 @@ export default function EditObjectValidation({
 	}
 
 	const disabled = readOnly || !!values?.system;
+	const disabledGroovyValidation =
+		Liferay.FeatureFlags['LPD-11179'] &&
+		!scriptManagementEnabled &&
+		values.engine === 'groovy';
 
 	useEffect(() => {
 		if (Object.keys(errors).length) {
@@ -254,6 +260,9 @@ export default function EditObjectValidation({
 								creationLanguageId={creationLanguageId}
 								customObjectFields={customObjectFields ?? []}
 								disabled={disabled}
+								disabledGroovyValidation={
+									disabledGroovyValidation
+								}
 								errors={
 									Object.keys(errors).length !== 0
 										? errors

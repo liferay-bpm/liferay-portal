@@ -21,6 +21,7 @@ export interface BasicInfoProps extends TabProps {
 	componentLabel: string;
 	creationLanguageId: Liferay.Language.Locale;
 	customObjectFields: ObjectField[];
+	disabledGroovyValidation: boolean;
 }
 
 const outputValidationTypeArray = [
@@ -46,6 +47,7 @@ export function BasicInfo({
 	creationLanguageId,
 	customObjectFields,
 	disabled,
+	disabledGroovyValidation,
 	errors,
 	selectedPartialValidationField,
 	setValues,
@@ -85,7 +87,7 @@ export function BasicInfo({
 
 				{values.engine !== 'compositeKey' && (
 					<Toggle
-						disabled={disabled}
+						disabled={disabled || disabledGroovyValidation}
 						label={Liferay.Language.get('active-validation')}
 						onToggle={(active) => setValues({active})}
 						toggled={values.active}

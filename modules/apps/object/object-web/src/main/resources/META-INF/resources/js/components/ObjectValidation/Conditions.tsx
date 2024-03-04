@@ -25,6 +25,7 @@ import {TabProps} from './useObjectValidationForm';
 export interface ConditionsProps extends TabProps {
 	creationLanguageId: Liferay.Language.Locale;
 	customObjectFields: ObjectField[];
+	disabledGroovyValidation: boolean;
 	learnResources: ILearnResourceContext;
 	objectValidationRuleElements: SidebarCategory[];
 }
@@ -33,6 +34,7 @@ export function Conditions({
 	creationLanguageId,
 	customObjectFields,
 	disabled,
+	disabledGroovyValidation,
 	errors,
 	learnResources,
 	objectValidationRuleElements,
@@ -104,7 +106,7 @@ export function Conditions({
 						setValues({lineCount, script})
 					}
 					placeholder={placeholder}
-					readOnly={disabled}
+					readOnly={disabled || disabledGroovyValidation}
 					sidebarElements={objectValidationRuleElements}
 					value={values.script ?? ''}
 				/>
