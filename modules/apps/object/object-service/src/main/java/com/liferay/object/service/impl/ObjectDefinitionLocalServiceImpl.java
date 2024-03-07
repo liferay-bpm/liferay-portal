@@ -195,11 +195,21 @@ public class ObjectDefinitionLocalServiceImpl
 			WorkflowConstants.STATUS_DRAFT, objectFields);
 	}
 
-	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectDefinition addObjectDefinition(
+		String externalReferenceCode, long userId, long objectFolderId,
+		boolean modifiable, boolean system)
+		throws PortalException {
+		return addObjectDefinition(
+			externalReferenceCode, userId, objectFolderId, modifiable, false,
+			0, system);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	public ObjectDefinition addObjectDefinition(
 			String externalReferenceCode, long userId, long objectFolderId,
-			boolean modifiable, boolean system)
+			 boolean modifiable, boolean rootNode, long rootObjectDefinitionId,
+			boolean system)
 		throws PortalException {
 
 		_validateExternalReferenceCode(
@@ -223,6 +233,12 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setModifiable(modifiable);
 		objectDefinition.setName(externalReferenceCode);
 		objectDefinition.setPluralLabel(externalReferenceCode);
+		if (rootNode) {
+			objectDefinition.setRootObjectDefinitionId(
+				objectDefinition.getObjectDefinitionId());
+		} else {
+			objectDefinition.setRootObjectDefinitionId(rootObjectDefinitionId);
+		}
 		objectDefinition.setScope(ObjectDefinitionConstants.SCOPE_COMPANY);
 		objectDefinition.setStorageType(
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT);
