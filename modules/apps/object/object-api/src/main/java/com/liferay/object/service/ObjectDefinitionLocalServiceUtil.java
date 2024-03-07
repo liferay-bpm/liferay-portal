@@ -78,6 +78,17 @@ public class ObjectDefinitionLocalServiceUtil {
 			externalReferenceCode, userId, objectFolderId, modifiable, system);
 	}
 
+	public static ObjectDefinition addObjectDefinition(
+			String externalReferenceCode, long userId, long objectFolderId,
+			boolean modifiable, boolean rootNode, long rootObjectDefinitionId,
+			boolean system)
+		throws PortalException {
+
+		return getService().addObjectDefinition(
+			externalReferenceCode, userId, objectFolderId, modifiable, rootNode,
+			rootObjectDefinitionId, system);
+	}
+
 	public static ObjectDefinition addOrUpdateSystemObjectDefinition(
 			long companyId, long objectFolderId,
 			com.liferay.object.system.SystemObjectDefinitionManager

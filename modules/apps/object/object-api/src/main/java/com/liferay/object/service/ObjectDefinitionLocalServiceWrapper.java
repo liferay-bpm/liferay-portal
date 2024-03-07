@@ -76,6 +76,18 @@ public class ObjectDefinitionLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.object.model.ObjectDefinition addObjectDefinition(
+			String externalReferenceCode, long userId, long objectFolderId,
+			boolean modifiable, boolean rootNode, long rootObjectDefinitionId,
+			boolean system)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectDefinitionLocalService.addObjectDefinition(
+			externalReferenceCode, userId, objectFolderId, modifiable, rootNode,
+			rootObjectDefinitionId, system);
+	}
+
+	@Override
 	public com.liferay.object.model.ObjectDefinition
 			addOrUpdateSystemObjectDefinition(
 				long companyId, long objectFolderId,
