@@ -197,18 +197,19 @@ public class ObjectDefinitionLocalServiceImpl
 
 	@Override
 	public ObjectDefinition addObjectDefinition(
-		String externalReferenceCode, long userId, long objectFolderId,
-		boolean modifiable, boolean system)
+			String externalReferenceCode, long userId, long objectFolderId,
+			boolean modifiable, boolean system)
 		throws PortalException {
+
 		return addObjectDefinition(
-			externalReferenceCode, userId, objectFolderId, modifiable, false,
-			0, system);
+			externalReferenceCode, userId, objectFolderId, modifiable, false, 0,
+			system);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
 	public ObjectDefinition addObjectDefinition(
 			String externalReferenceCode, long userId, long objectFolderId,
-			 boolean modifiable, boolean rootNode, long rootObjectDefinitionId,
+			boolean modifiable, boolean rootNode, long rootObjectDefinitionId,
 			boolean system)
 		throws PortalException {
 
@@ -233,12 +234,15 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setModifiable(modifiable);
 		objectDefinition.setName(externalReferenceCode);
 		objectDefinition.setPluralLabel(externalReferenceCode);
+
 		if (rootNode) {
 			objectDefinition.setRootObjectDefinitionId(
 				objectDefinition.getObjectDefinitionId());
-		} else {
+		}
+		else {
 			objectDefinition.setRootObjectDefinitionId(rootObjectDefinitionId);
 		}
+
 		objectDefinition.setScope(ObjectDefinitionConstants.SCOPE_COMPANY);
 		objectDefinition.setStorageType(
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT);
@@ -447,7 +451,7 @@ public class ObjectDefinitionLocalServiceImpl
 						rootObjectDefinitionId);
 			}
 
-			_updateObjectDefinitionPortlet(objectDefinition1);
+			updateObjectDefinitionPortlet(objectDefinition1);
 
 			ObjectDefinition objectDefinition2 =
 				objectDefinitionLocalService.getObjectDefinition(
@@ -461,7 +465,7 @@ public class ObjectDefinitionLocalServiceImpl
 			_objectFieldLocalService.updateRequired(
 				objectRelationship.getObjectFieldId2(), true);
 
-			_updateObjectDefinitionPortlet(objectDefinition2);
+			updateObjectDefinitionPortlet(objectDefinition2);
 		}
 	}
 
@@ -1191,6 +1195,18 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setExternalReferenceCode(externalReferenceCode);
 
 		return objectDefinitionPersistence.update(objectDefinition);
+	}
+
+	public void updateObjectDefinitionPortlet(ObjectDefinition objectDefinition)
+		throws PortalException {
+
+		if (objectDefinition.isPortlet() &&
+			objectDefinition.isRootDescendantNode()) {
+
+			objectDefinition.setPortlet(false);
+
+			objectDefinitionPersistence.update(objectDefinition);
+		}
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -2016,19 +2032,6 @@ public class ObjectDefinitionLocalServiceImpl
 			objectDefinition.getObjectFolderId(), oldObjectFolderId);
 
 		return objectDefinition;
-	}
-
-	private void _updateObjectDefinitionPortlet(
-			ObjectDefinition objectDefinition)
-		throws PortalException {
-
-		if (objectDefinition.isPortlet() &&
-			objectDefinition.isRootDescendantNode()) {
-
-			objectDefinition.setPortlet(false);
-
-			objectDefinitionPersistence.update(objectDefinition);
-		}
 	}
 
 	private ObjectDefinition _updateTitleObjectFieldId(
