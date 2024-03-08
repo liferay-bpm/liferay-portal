@@ -709,6 +709,15 @@ public class ObjectDefinitionLocalServiceWrapper
 	}
 
 	@Override
+	public void updateObjectDefinitionPortlet(
+			com.liferay.object.model.ObjectDefinition objectDefinition)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_objectDefinitionLocalService.updateObjectDefinitionPortlet(
+			objectDefinition);
+	}
+
+	@Override
 	public com.liferay.object.model.ObjectDefinition updateObjectFolderId(
 			long objectDefinitionId, long objectFolderId)
 		throws com.liferay.portal.kernel.exception.PortalException {

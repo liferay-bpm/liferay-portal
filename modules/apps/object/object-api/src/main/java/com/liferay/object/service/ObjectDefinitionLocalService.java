@@ -456,6 +456,9 @@ public interface ObjectDefinitionLocalService
 	public ObjectDefinition updateObjectDefinition(
 		ObjectDefinition objectDefinition);
 
+	public void updateObjectDefinitionPortlet(ObjectDefinition objectDefinition)
+		throws PortalException;
+
 	@Indexable(type = IndexableType.REINDEX)
 	public ObjectDefinition updateObjectFolderId(
 			long objectDefinitionId, long objectFolderId)
