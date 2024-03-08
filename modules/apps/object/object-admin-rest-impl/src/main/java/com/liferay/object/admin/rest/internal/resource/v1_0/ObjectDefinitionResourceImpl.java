@@ -34,6 +34,7 @@ import com.liferay.object.constants.ObjectConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.definition.util.ObjectDefinitionUtil;
+import com.liferay.object.exception.ObjectDefinitionRootObjectDefinitionIdException;
 import com.liferay.object.exception.ObjectDefinitionStorageTypeException;
 import com.liferay.object.model.ObjectActionModel;
 import com.liferay.object.model.ObjectFieldModel;
@@ -59,6 +60,7 @@ import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.object.util.comparator.ObjectFieldCreateDateComparator;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.search.Field;
@@ -204,6 +206,23 @@ public class ObjectDefinitionResourceImpl
 
 		_addListTypeDefinition(objectDefinition);
 
+		String rootObjectDefinitionExternalReferenceCode =
+			objectDefinition.getRootObjectDefinitionExternalReferenceCode();
+
+		if (Validator.isNotNull(rootObjectDefinitionExternalReferenceCode) &&
+			!Objects.equals(
+				objectDefinition.getRootObjectDefinitionExternalReferenceCode(),
+				objectDefinition.getExternalReferenceCode())) {
+
+			objectDefinition.setStatus((Status)null);
+
+			_canConnectWithRoot(
+				WorkflowConstants.STATUS_DRAFT,
+				objectDefinition.getObjectFolderExternalReferenceCode(),
+				objectDefinition.
+					getRootObjectDefinitionExternalReferenceCode());
+		}
+
 		com.liferay.object.model.ObjectDefinition
 			serviceBuilderObjectDefinition;
 
@@ -348,6 +367,21 @@ public class ObjectDefinitionResourceImpl
 						serviceBuilderObjectDefinition.
 							getExternalReferenceCode(),
 						serviceBuilderObjectDefinition.getCompanyId());
+		}
+
+		if (Validator.isNotNull(rootObjectDefinitionExternalReferenceCode)) {
+			com.liferay.object.model.ObjectDefinition rootObjectDefinition =
+				_objectDefinitionService.
+					fetchObjectDefinitionByExternalReferenceCode(
+						rootObjectDefinitionExternalReferenceCode,
+						serviceBuilderObjectDefinition.getCompanyId());
+
+			_objectDefinitionService.updateRootObjectDefinitionId(
+				serviceBuilderObjectDefinition.getObjectDefinitionId(),
+				rootObjectDefinition.getObjectDefinitionId());
+
+			_objectDefinitionLocalService.updateObjectDefinitionPortlet(
+				serviceBuilderObjectDefinition);
 		}
 
 		return _toObjectDefinition(serviceBuilderObjectDefinition);
@@ -896,6 +930,45 @@ public class ObjectDefinitionResourceImpl
 					objectDefinitionId, objectView);
 			}
 		}
+	}
+
+	private void _canConnectWithRoot(
+			int objectDefinitionStatus,
+			String objectFolderExternalReferenceCode,
+			String rootObjectDefinitionExternalReferenceCode)
+		throws Exception {
+
+		com.liferay.object.model.ObjectDefinition rootObjectDefinition =
+			_objectDefinitionService.
+				fetchObjectDefinitionByExternalReferenceCode(
+					rootObjectDefinitionExternalReferenceCode,
+					contextCompany.getCompanyId());
+
+		if (rootObjectDefinition != null) {
+			int rootObjectDefinitionStatus = rootObjectDefinition.getStatus();
+
+			if (rootObjectDefinitionStatus != objectDefinitionStatus) {
+				throw new PortalException(
+					"Unable to bind ObjectDefinition when Root in a " +
+						"different status");
+			}
+
+			if (rootObjectDefinition.getRootObjectDefinitionId() !=
+					rootObjectDefinition.getObjectDefinitionId()) {
+
+				throw new ObjectDefinitionRootObjectDefinitionIdException(
+					"Object definition " +
+						rootObjectDefinition.getObjectDefinitionId() +
+							" is not the root definition of this model");
+			}
+
+			return;
+		}
+
+		_objectDefinitionLocalService.addObjectDefinition(
+			rootObjectDefinitionExternalReferenceCode, contextUser.getUserId(),
+			_getObjectFolderId(objectFolderExternalReferenceCode), true, true,
+			0, false);
 	}
 
 	private Set<String> _getAccountEntryRestrictedObjectRelationshipsNames(
