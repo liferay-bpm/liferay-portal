@@ -10,12 +10,20 @@ import {ClayCheckbox} from '@clayui/form';
 import {createResourceURL, fetch, openToast} from 'frontend-js-web';
 import React, {useState} from 'react';
 
+import {GroovyScriptUsesModal} from './GroovyScriptUsesModal';
+
 import './ScriptManagementContainer.scss';
 
 interface ScriptManagementContainerProps {
 	allowScriptContentBeExecutedOrIncluded: boolean;
 	baseResourceURL: string;
 }
+
+export type GroovyScriptUseItem = {
+	companyWebId: string;
+	redirectURL: string;
+	scriptSource: string;
+};
 
 export default function ScriptManagementContainer({
 	allowScriptContentBeExecutedOrIncluded,
@@ -24,6 +32,9 @@ export default function ScriptManagementContainer({
 	const [allowScriptContent, setAllowScriptContent] = useState(
 		allowScriptContentBeExecutedOrIncluded
 	);
+	const [showGroovyScriptUsesModal, setShowGroovyScriptUsesModal] = useState<
+		boolean
+	>(false);
 
 	const handleSaveSystemConfiguration = async () => {
 		const response = await fetch(
@@ -81,7 +92,11 @@ export default function ScriptManagementContainer({
 			<ClayButton.Group key={1} spaced>
 				<ClayButton
 					displayType="primary"
-					onClick={() => handleSaveSystemConfiguration()}
+					onClick={() => {
+						handleSaveSystemConfiguration();
+
+						setShowGroovyScriptUsesModal(true);
+					}}
 					type="submit"
 				>
 					{Liferay.Language.get('save')}
@@ -98,6 +113,13 @@ export default function ScriptManagementContainer({
 					{Liferay.Language.get('cancel')}
 				</ClayButton>
 			</ClayButton.Group>
+
+			{showGroovyScriptUsesModal && (
+				<GroovyScriptUsesModal
+					groovyScriptUsesItems={[]}
+					handleOnClose={setShowGroovyScriptUsesModal}
+				/>
+			)}
 		</div>
 	);
 }
