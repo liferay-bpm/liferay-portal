@@ -309,6 +309,21 @@ public class ObjectDefinitionResourceImpl
 					serviceBuilderObjectField.getObjectFieldId());
 		}
 
+		if (Validator.isNotNull(rootObjectDefinitionExternalReferenceCode)) {
+			com.liferay.object.model.ObjectDefinition rootObjectDefinition =
+				_objectDefinitionService.
+					fetchObjectDefinitionByExternalReferenceCode(
+						rootObjectDefinitionExternalReferenceCode,
+						serviceBuilderObjectDefinition.getCompanyId());
+
+			_objectDefinitionService.updateRootObjectDefinitionId(
+				serviceBuilderObjectDefinition.getObjectDefinitionId(),
+				rootObjectDefinition.getObjectDefinitionId());
+
+			_objectDefinitionLocalService.updateObjectDefinitionPortlet(
+				serviceBuilderObjectDefinition);
+		}
+
 		_addObjectDefinitionResources(
 			Collections.emptySet(), objectDefinition.getObjectActions(),
 			serviceBuilderObjectDefinition.getObjectDefinitionId(),
@@ -367,21 +382,6 @@ public class ObjectDefinitionResourceImpl
 						serviceBuilderObjectDefinition.
 							getExternalReferenceCode(),
 						serviceBuilderObjectDefinition.getCompanyId());
-		}
-
-		if (Validator.isNotNull(rootObjectDefinitionExternalReferenceCode)) {
-			com.liferay.object.model.ObjectDefinition rootObjectDefinition =
-				_objectDefinitionService.
-					fetchObjectDefinitionByExternalReferenceCode(
-						rootObjectDefinitionExternalReferenceCode,
-						serviceBuilderObjectDefinition.getCompanyId());
-
-			_objectDefinitionService.updateRootObjectDefinitionId(
-				serviceBuilderObjectDefinition.getObjectDefinitionId(),
-				rootObjectDefinition.getObjectDefinitionId());
-
-			_objectDefinitionLocalService.updateObjectDefinitionPortlet(
-				serviceBuilderObjectDefinition);
 		}
 
 		return _toObjectDefinition(serviceBuilderObjectDefinition);
@@ -816,6 +816,8 @@ public class ObjectDefinitionResourceImpl
 								objectRelationship.getName());
 				}
 
+				boolean relationshipEdge = objectRelationship.getEdge();
+
 				if (serviceBuilderObjectRelationship != null) {
 					if (updateReverseObjectRelationshipNames.contains(
 							serviceBuilderObjectRelationship.getName())) {
@@ -847,6 +849,15 @@ public class ObjectDefinitionResourceImpl
 					objectRelationshipResource.
 						postObjectDefinitionObjectRelationship(
 							objectDefinitionId, objectRelationship);
+
+				_objectRelationshipLocalService.makeEdgeRelationship(
+					relationshipEdge, objectRelationship.getId());
+
+				ObjectField relationshipField =
+					objectRelationship.getObjectField();
+
+				_objectFieldLocalService.updateRequired(
+					relationshipField.getId(), true);
 
 				if (Objects.equals(
 						objectRelationship.getTypeAsString(),

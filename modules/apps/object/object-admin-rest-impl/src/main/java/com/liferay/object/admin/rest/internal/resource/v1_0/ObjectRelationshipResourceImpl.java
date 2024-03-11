@@ -309,6 +309,20 @@ public class ObjectRelationshipResourceImpl
 			return objectDefinition;
 		}
 
+		long rootObjectDefinitionId = 0;
+
+		if (objectRelationship.getEdge()) {
+			com.liferay.object.model.ObjectDefinition objectDefinition1 =
+				_objectDefinitionLocalService.
+					fetchObjectDefinitionByExternalReferenceCode(
+						objectRelationship.
+							getObjectDefinitionExternalReferenceCode1(),
+						contextCompany.getCompanyId());
+
+			rootObjectDefinitionId =
+				objectDefinition1.getRootObjectDefinitionId();
+		}
+
 		ObjectFolder defaultObjectFolder =
 			_objectFolderLocalService.getOrAddDefaultObjectFolder(
 				contextCompany.getCompanyId());
@@ -318,6 +332,7 @@ public class ObjectRelationshipResourceImpl
 			contextUser.getUserId(), defaultObjectFolder.getObjectFolderId(),
 			GetterUtil.get(
 				objectRelationship.getObjectDefinitionModifiable2(), true),
+			false, rootObjectDefinitionId,
 			GetterUtil.get(
 				objectRelationship.getObjectDefinitionSystem2(), false));
 	}
