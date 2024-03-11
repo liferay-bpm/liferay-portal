@@ -592,6 +592,15 @@ public class ObjectRelationshipLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.object.model.ObjectRelationship makeEdgeRelationship(
+			boolean edge, long objectRelationshipId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectRelationshipLocalService.makeEdgeRelationship(
+			edge, objectRelationshipId);
+	}
+
+	@Override
 	public void registerObjectRelationshipsRelatedInfoCollectionProviders(
 		com.liferay.object.model.ObjectDefinition objectDefinition1,
 		ObjectDefinitionLocalService objectDefinitionLocalService) {

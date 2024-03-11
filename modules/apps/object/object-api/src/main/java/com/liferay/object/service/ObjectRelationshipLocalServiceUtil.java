@@ -507,6 +507,13 @@ public class ObjectRelationshipLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
+	public static ObjectRelationship makeEdgeRelationship(
+			boolean edge, long objectRelationshipId)
+		throws PortalException {
+
+		return getService().makeEdgeRelationship(edge, objectRelationshipId);
+	}
+
 	public static void
 		registerObjectRelationshipsRelatedInfoCollectionProviders(
 			com.liferay.object.model.ObjectDefinition objectDefinition1,

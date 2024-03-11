@@ -395,6 +395,10 @@ public interface ObjectRelationshipLocalService
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
+	public ObjectRelationship makeEdgeRelationship(
+			boolean edge, long objectRelationshipId)
+		throws PortalException;
+
 	public void registerObjectRelationshipsRelatedInfoCollectionProviders(
 		ObjectDefinition objectDefinition1,
 		ObjectDefinitionLocalService objectDefinitionLocalService);
