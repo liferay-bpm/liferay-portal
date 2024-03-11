@@ -73,6 +73,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
@@ -742,6 +743,66 @@ public class ObjectRelationshipLocalServiceImpl
 
 		return objectRelationshipPersistence.findByObjectDefinitionId2(
 			objectDefinitionId2);
+	}
+
+	@Override
+	public ObjectRelationship makeEdgeRelationship(
+			boolean edge, long objectRelationshipId)
+		throws PortalException {
+
+		boolean edgeValue = false;
+
+		ObjectRelationship objectRelationship = getObjectRelationship(
+			objectRelationshipId);
+
+		if (edge &&
+			Objects.equals(
+				objectRelationship.getDeletionType(),
+				ObjectRelationshipConstants.DELETION_TYPE_CASCADE)) {
+
+			ObjectDefinitionLocalService objectDefinitionLocalService =
+				_objectDefinitionLocalServiceSnapshot.get();
+
+			ObjectDefinition objectDefinition1 =
+				objectDefinitionLocalService.getObjectDefinition(
+					objectRelationship.getObjectDefinitionId1());
+			ObjectDefinition objectDefinition2 =
+				objectDefinitionLocalService.getObjectDefinition(
+					objectRelationship.getObjectDefinitionId2());
+
+			int objectDefinition1Status = objectDefinition1.getStatus();
+			int objectDefinition2Status = objectDefinition2.getStatus();
+
+			if ((objectDefinition1Status ==
+					WorkflowConstants.STATUS_APPROVED) &&
+				(objectDefinition2Status == WorkflowConstants.STATUS_DRAFT)) {
+
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"This Relationship cannot be an edge because the " +
+							"objectDefinitions have different status");
+				}
+			}
+			else if (objectDefinition1.getRootObjectDefinitionId() !=
+						objectDefinition2.getRootObjectDefinitionId()) {
+
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"A relationship can only be an Edge between Objects " +
+							"from the same Root Model");
+				}
+			}
+			else {
+				edgeValue = true;
+			}
+		}
+
+		return updateObjectRelationship(
+			objectRelationship.getExternalReferenceCode(),
+			objectRelationship.getObjectRelationshipId(),
+			objectRelationship.getParameterObjectFieldId(),
+			objectRelationship.getDeletionType(), edgeValue,
+			objectRelationship.getLabelMap(), null);
 	}
 
 	@Override
