@@ -26,6 +26,7 @@ import com.liferay.object.field.builder.BooleanObjectFieldBuilder;
 import com.liferay.object.field.builder.DateObjectFieldBuilder;
 import com.liferay.object.field.builder.DateTimeObjectFieldBuilder;
 import com.liferay.object.field.builder.IntegerObjectFieldBuilder;
+import com.liferay.object.field.builder.LongIntegerObjectFieldBuilder;
 import com.liferay.object.field.builder.MultiselectPicklistObjectFieldBuilder;
 import com.liferay.object.field.builder.PicklistObjectFieldBuilder;
 import com.liferay.object.field.builder.TextObjectFieldBuilder;
@@ -138,6 +139,8 @@ public class BaseNotificationTypeTest {
 				"@liferay.com"
 		).put(
 			"integerObjectField", RandomTestUtil.nextInt()
+		).put(
+			"longIntegerObjectField", RandomTestUtil.nextLong()
 		).put(
 			"multiselectPicklistObjectField",
 			Arrays.asList(
@@ -275,6 +278,13 @@ public class BaseNotificationTypeTest {
 							RandomTestUtil.randomString())
 					).name(
 						"integerObjectField"
+					).build(),
+					new LongIntegerObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"longIntegerObjectField"
 					).build(),
 					new MultiselectPicklistObjectFieldBuilder(
 					).labelMap(
@@ -519,6 +529,7 @@ public class BaseNotificationTypeTest {
 				getTermName("dateTimeObjectField"),
 				getTermName("emailTextObjectField"),
 				getTermName("integerObjectField"),
+				getTermName("longIntegerObjectField"),
 				getTermName("multiselectPicklistObjectField"),
 				getTermName("picklistObjectField"),
 				getTermName("textObjectField"),
