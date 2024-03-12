@@ -21,9 +21,9 @@ import React, {useState} from 'react';
 import {defaultLanguageId} from '../../utils/constants';
 
 interface ModalAddObjectValidationProps {
+	allowScriptContentBeExecutedOrIncluded: boolean;
 	apiURL: string;
 	objectValidationRuleEngines: LabelValueObject[];
-	scriptManagementEnabled: boolean;
 	setShowAddObjectRelationshipModal: (value: boolean) => void;
 }
 
@@ -35,9 +35,9 @@ const initialValues: Partial<ObjectValidation> = {
 };
 
 export function ModalAddObjectValidation({
+	allowScriptContentBeExecutedOrIncluded,
 	apiURL,
 	objectValidationRuleEngines,
-	scriptManagementEnabled,
 	setShowAddObjectRelationshipModal,
 }: ModalAddObjectValidationProps) {
 	const [error, setError] = useState<string>('');
@@ -47,7 +47,10 @@ export function ModalAddObjectValidation({
 
 	let newObjectValidationRuleEngines = [...objectValidationRuleEngines];
 
-	if (Liferay.FeatureFlags['LPD-11179'] && !scriptManagementEnabled) {
+	if (
+		Liferay.FeatureFlags['LPD-11179'] &&
+		!allowScriptContentBeExecutedOrIncluded
+	) {
 		newObjectValidationRuleEngines = objectValidationRuleEngines.filter(
 			(objectValidationRuleEngine) =>
 				objectValidationRuleEngine.value !== 'groovy'
