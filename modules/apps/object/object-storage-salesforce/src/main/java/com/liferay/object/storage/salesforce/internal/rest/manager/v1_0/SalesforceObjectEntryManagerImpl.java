@@ -51,6 +51,8 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -230,13 +232,19 @@ public class SalesforceObjectEntryManagerImpl
 		ObjectDefinition objectDefinition, Pagination pagination,
 		String predicateString, String search, Sort[] sorts) {
 
+		String objectFieldExternalReferenceCodes = StringUtil.merge(
+			_getObjectFieldExternalReferenceCodes(
+				_objectFieldLocalService.getObjectFields(
+					objectDefinition.getObjectDefinitionId())),
+			", ");
+
 		if (Validator.isNotNull(search)) {
 			return HttpComponentsUtil.addParameter(
 				"search", "q",
 				StringBundler.concat(
 					"FIND {`", search, "`} IN ALL FIELDS RETURNING ",
-					objectDefinition.getExternalReferenceCode(), "(FIELDS(ALL)",
-					predicateString,
+					objectDefinition.getExternalReferenceCode(), "(",
+					objectFieldExternalReferenceCodes, predicateString,
 					_getSorts(objectDefinition.getObjectDefinitionId(), sorts),
 					_getSalesforcePagination(pagination), ")"));
 		}
@@ -244,7 +252,7 @@ public class SalesforceObjectEntryManagerImpl
 		return HttpComponentsUtil.addParameter(
 			"query", "q",
 			StringBundler.concat(
-				"SELECT FIELDS(ALL) FROM ",
+				"SELECT ", objectFieldExternalReferenceCodes, " FROM ",
 				objectDefinition.getExternalReferenceCode(), predicateString,
 				_getSorts(objectDefinition.getObjectDefinitionId(), sorts),
 				_getSalesforcePagination(pagination)));
@@ -287,6 +295,51 @@ public class SalesforceObjectEntryManagerImpl
 					companyId, dtoConverterContext, objectDefinition,
 					filterString, scopeKey),
 				scopeKey, search));
+	}
+
+	private ObjectField _getObjectFieldByExternalReferenceCode(
+		String externalReferenceCode, List<ObjectField> objectFields) {
+
+		for (ObjectField objectField : objectFields) {
+			if (Objects.equals(
+					externalReferenceCode,
+					objectField.getExternalReferenceCode())) {
+
+				return objectField;
+			}
+		}
+
+		return null;
+	}
+
+	private ObjectField _getObjectFieldByName(
+		String name, List<ObjectField> objectFields) {
+
+		for (ObjectField objectField : objectFields) {
+			if (Objects.equals(name, objectField.getName())) {
+				return objectField;
+			}
+		}
+
+		return null;
+	}
+
+	private ArrayList<String> _getObjectFieldExternalReferenceCodes(
+		List<ObjectField> objectFields) {
+
+		ArrayList<String> objectFieldExternalReferenceCodes = new ArrayList<>(
+			Arrays.asList("OwnerId", "CreatedDate", "LastModifiedDate", "Id"));
+
+		for (ObjectField objectField : objectFields) {
+			String externalReferenceCode =
+				objectField.getExternalReferenceCode();
+
+			if (!externalReferenceCode.matches(_UUID_REGEX_PATTERN)) {
+				objectFieldExternalReferenceCodes.add(externalReferenceCode);
+			}
+		}
+
+		return objectFieldExternalReferenceCodes;
 	}
 
 	private String _getSalesforcePagination(Pagination pagination) {
@@ -395,7 +448,7 @@ public class SalesforceObjectEntryManagerImpl
 			JSONObject responseJSONObject = _objectEntryManagerHttp.get(
 				companyId, getGroupId(objectDefinition, scopeKey),
 				_getLocation(
-					objectDefinition, Pagination.of(1, 200), predicateString,
+					objectDefinition, Pagination.of(1, 2000), predicateString,
 					search, null));
 
 			JSONArray jsonArray = responseJSONObject.getJSONArray(
@@ -443,6 +496,9 @@ public class SalesforceObjectEntryManagerImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SalesforceObjectEntryManagerImpl.class);
+
+	private static final String _UUID_REGEX_PATTERN =
+		"^(?i)[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$";
 
 	@Reference
 	private AccountEntryLocalService _accountEntryLocalService;
