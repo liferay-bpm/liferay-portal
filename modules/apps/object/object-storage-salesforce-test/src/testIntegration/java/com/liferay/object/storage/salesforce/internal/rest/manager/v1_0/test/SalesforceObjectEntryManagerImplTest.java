@@ -57,6 +57,7 @@ import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
@@ -232,8 +233,6 @@ public class SalesforceObjectEntryManagerImplTest
 						LocalizedMapUtil.getLocalizedMap("Object Definition ID")
 					).name(
 						"objectDefinitionId"
-					).objectDefinitionId(
-						_objectDefinition.getObjectDefinitionId()
 					).build()));
 
 		ObjectField objectField1 = ObjectFieldUtil.addCustomObjectField(
@@ -606,35 +605,6 @@ public class SalesforceObjectEntryManagerImplTest
 					_objectDefinition2.getResourceName(), StringPool.SPACE));
 		}
 
-		// Regular roles' individual permissions should not be restricted by
-		// account entry
-
-		//		PermissionThreadLocal.setPermissionChecker(
-		//			PermissionCheckerFactoryUtil.create(adminUser));
-		//
-		//		PrincipalThreadLocal.setName(adminUser.getUserId());
-		//
-		//		objectEntry1 = _addObjectEntry(null, null, RandomTestUtil.randomString(), accountEntry1);
-		//
-		//		PermissionThreadLocal.setPermissionChecker(
-		//			PermissionCheckerFactoryUtil.create(_user));
-		//
-		//		PrincipalThreadLocal.setName(_user.getUserId());
-		//
-		//		_resourcePermissionLocalService.setResourcePermissions(
-		//			companyId, StringBundler.concat(ObjectConstants.RESOURCE_NAME, StringPool.POUND, _objectDefinition.getObjectDefinitionId()),
-		//			ResourceConstants.SCOPE_INDIVIDUAL,
-		//			String.valueOf(objectEntry1.getId()), role.getRoleId(),
-		//			new String[] {ActionKeys.DELETE});
-		//
-		//		_objectEntryManager.deleteObjectEntry(
-		//			companyId, _getDTOConverterContextByUser(_user), objectEntry1.getExternalReferenceCode(), _objectDefinition, null);
-		//
-		//		PermissionThreadLocal.setPermissionChecker(
-		//			PermissionCheckerFactoryUtil.create(adminUser));
-		//
-		//		PrincipalThreadLocal.setName(adminUser.getUserId());
-
 		objectEntry1 = _addObjectEntry2(
 			RandomTestUtil.randomString(), accountEntry1);
 
@@ -741,17 +711,17 @@ public class SalesforceObjectEntryManagerImplTest
 
 		_assignOrganizationRole(organization1, _accountManagerRole, _user);
 
-		Organization subOrganization1 = OrganizationTestUtil.addOrganization(
+		Organization suborganization1 = OrganizationTestUtil.addOrganization(
 			organization1.getOrganizationId(), RandomTestUtil.randomString(),
 			false);
 
-		_addAccountEntryOrganizationRel(accountEntry1, subOrganization1);
+		_addAccountEntryOrganizationRel(accountEntry1, suborganization1);
 
-		Organization subOrganization2 = OrganizationTestUtil.addOrganization(
+		Organization suborganization2 = OrganizationTestUtil.addOrganization(
 			organization2.getOrganizationId(), RandomTestUtil.randomString(),
 			false);
 
-		_addAccountEntryOrganizationRel(accountEntry2, subOrganization2);
+		_addAccountEntryOrganizationRel(accountEntry2, suborganization2);
 
 		_assertObjectEntriesSize(1);
 
@@ -973,21 +943,6 @@ public class SalesforceObjectEntryManagerImplTest
 
 		_assertObjectEntriesSize(0);
 
-		// Regular roles' individual permissions should not be restricted by
-		// account entry
-
-		//		_resourcePermissionLocalService.setResourcePermissions(
-		//			companyId, _objectDefinition.getResourceName(),
-		//			ResourceConstants.SCOPE_INDIVIDUAL,
-		//			String.valueOf(objectEntry1.getId()), role.getRoleId(),
-		//			new String[] {ActionKeys.VIEW});
-		//
-		//		_assertObjectEntriesSize(1);
-		//
-		//		_userLocalService.deleteRoleUser(role.getRoleId(), _user);
-		//
-		//		_assertObjectEntriesSize(0);
-
 		// User should be able to view object entries for account entry 1
 		// because he is a member of account entry 1
 
@@ -1034,19 +989,19 @@ public class SalesforceObjectEntryManagerImplTest
 
 		// Check subOrganizations
 
-		Organization subOrganization1 = OrganizationTestUtil.addOrganization(
+		Organization suborganization1 = OrganizationTestUtil.addOrganization(
 			organization1.getOrganizationId(), RandomTestUtil.randomString(),
 			false);
 
-		_addAccountEntryOrganizationRel(accountEntry1, subOrganization1);
+		_addAccountEntryOrganizationRel(accountEntry1, suborganization1);
 
 		Organization organization2 = OrganizationTestUtil.addOrganization();
 
-		Organization subOrganization2 = OrganizationTestUtil.addOrganization(
+		Organization suborganization2 = OrganizationTestUtil.addOrganization(
 			organization2.getOrganizationId(), RandomTestUtil.randomString(),
 			false);
 
-		_addAccountEntryOrganizationRel(accountEntry2, subOrganization2);
+		_addAccountEntryOrganizationRel(accountEntry2, suborganization2);
 
 		_user = _addUser();
 
@@ -1056,12 +1011,12 @@ public class SalesforceObjectEntryManagerImplTest
 		_assertObjectEntriesSize(1);
 
 		_organizationLocalService.addUserOrganization(
-			_user.getUserId(), subOrganization2.getOrganizationId());
+			_user.getUserId(), suborganization2.getOrganizationId());
 
 		_assertObjectEntriesSize(2);
 
 		_organizationLocalService.deleteUserOrganization(
-			_user.getUserId(), subOrganization2.getOrganizationId());
+			_user.getUserId(), suborganization2.getOrganizationId());
 
 		_assertObjectEntriesSize(1);
 
@@ -1156,18 +1111,6 @@ public class SalesforceObjectEntryManagerImplTest
 				companyId, _getDTOConverterContextByUser(_user),
 				objectEntry2.getExternalReferenceCode(), _objectDefinition2,
 				objectEntry2, null));
-
-		// Regular roles' individual permissions should not be restricted by
-		// account entry
-
-		//		_resourcePermissionLocalService.setResourcePermissions(
-		//			companyId, _objectDefinition2.getResourceName(),
-		//			ResourceConstants.SCOPE_INDIVIDUAL,
-		//			String.valueOf(objectEntry1.getId()), role.getRoleId(),
-		//			new String[] {ActionKeys.UPDATE});
-		//
-		//		_objectEntryManager.updateObjectEntry(
-		//			companyId, dtoConverterContext, objectEntry1.getExternalReferenceCode(), _objectDefinition2, objectEntry1, null);
 
 		// Account entry scope
 
