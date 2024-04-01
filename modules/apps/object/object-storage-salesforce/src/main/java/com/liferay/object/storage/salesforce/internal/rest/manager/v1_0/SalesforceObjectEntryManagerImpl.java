@@ -335,7 +335,7 @@ public class SalesforceObjectEntryManagerImpl
 		List<ObjectField> objectFields) {
 
 		ArrayList<String> objectFieldExternalReferenceCodes = new ArrayList<>(
-			Arrays.asList("OwnerId", "CreatedDate", "LastModifiedDate", "Id"));
+			Arrays.asList("CreatedDate", "Id", "LastModifiedDate", "OwnerId"));
 
 		for (ObjectField objectField : objectFields) {
 			String externalReferenceCode =
