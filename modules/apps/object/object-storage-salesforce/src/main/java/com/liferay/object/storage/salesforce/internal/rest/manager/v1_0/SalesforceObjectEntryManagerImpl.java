@@ -298,12 +298,19 @@ public class SalesforceObjectEntryManagerImpl
 	}
 
 	private ObjectField _getObjectFieldByExternalReferenceCode(
-		String externalReferenceCode, List<ObjectField> objectFields) {
+		String externalReferenceCode1, List<ObjectField> objectFields) {
 
 		for (ObjectField objectField : objectFields) {
+			String externalReferenceCode2 =
+				objectField.getExternalReferenceCode(
+				).trim();
+
+			if (externalReferenceCode2.contains(" ")) {
+				externalReferenceCode2 = externalReferenceCode2.split(" ")[1];
+			}
+
 			if (Objects.equals(
-					externalReferenceCode,
-					objectField.getExternalReferenceCode())) {
+					externalReferenceCode1, externalReferenceCode2)) {
 
 				return objectField;
 			}
