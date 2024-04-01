@@ -232,11 +232,23 @@ public class SalesforceObjectEntryManagerImpl
 		ObjectDefinition objectDefinition, Pagination pagination,
 		String predicateString, String search, Sort[] sorts) {
 
-		String objectFieldExternalReferenceCodesString = StringUtil.merge(
-			_getObjectFieldExternalReferenceCodes(
+		ArrayList<String> objectFieldExternalReferenceCodes = new ArrayList<>(
+			Arrays.asList("CreatedDate", "Id", "LastModifiedDate", "OwnerId"));
+
+		for (ObjectField objectField :
 				_objectFieldLocalService.getObjectFields(
-					objectDefinition.getObjectDefinitionId())),
-			", ");
+					objectDefinition.getObjectDefinitionId())) {
+
+			String externalReferenceCode =
+				objectField.getExternalReferenceCode();
+
+			if (!externalReferenceCode.matches(_UUID_REGEX_PATTERN)) {
+				objectFieldExternalReferenceCodes.add(externalReferenceCode);
+			}
+		}
+
+		String objectFieldExternalReferenceCodesString = StringUtil.merge(
+			objectFieldExternalReferenceCodes, ", ");
 
 		if (Validator.isNotNull(search)) {
 			return HttpComponentsUtil.addParameter(
@@ -329,24 +341,6 @@ public class SalesforceObjectEntryManagerImpl
 		}
 
 		return null;
-	}
-
-	private ArrayList<String> _getObjectFieldExternalReferenceCodes(
-		List<ObjectField> objectFields) {
-
-		ArrayList<String> objectFieldExternalReferenceCodes = new ArrayList<>(
-			Arrays.asList("CreatedDate", "Id", "LastModifiedDate", "OwnerId"));
-
-		for (ObjectField objectField : objectFields) {
-			String externalReferenceCode =
-				objectField.getExternalReferenceCode();
-
-			if (!externalReferenceCode.matches(_UUID_REGEX_PATTERN)) {
-				objectFieldExternalReferenceCodes.add(externalReferenceCode);
-			}
-		}
-
-		return objectFieldExternalReferenceCodes;
 	}
 
 	private String _getSalesforcePagination(Pagination pagination) {
