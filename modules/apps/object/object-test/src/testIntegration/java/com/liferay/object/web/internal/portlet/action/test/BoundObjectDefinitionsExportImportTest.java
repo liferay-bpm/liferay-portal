@@ -25,10 +25,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * @author Gabriel Albuquerque
+ * @author Guilherme Sá
  */
 @RunWith(Arquillian.class)
-public class ObjectDefinitionExportImportTest extends BaseExportImportTestCase {
+public class BoundObjectDefinitionsExportImportTest
+	extends BaseExportImportTestCase {
 
 	@ClassRule
 	@Rule
@@ -48,33 +49,16 @@ public class ObjectDefinitionExportImportTest extends BaseExportImportTestCase {
 	}
 
 	@Test
-	public void testExportImportObjectDefinition() throws Exception {
-		ObjectDefinition objectDefinition = _getObjectDefinition(
-			"AccountEntry");
-
+	public void testExportImportBoundObjectDefinitions() throws Exception {
 		testExportImport(
-			"test-account-entry-system-object-definition.json",
-			"test-account-entry-system-object-definition.json",
-			objectDefinition.getExternalReferenceCode(), "AccountEntry");
-
-		testExportImport(
-			"test-object-definition1.json", "test-object-definition1.json",
-			null, "TestObjectDefinition1");
-
-		testExportImport(
-			"test-object-definition-2.root-object-definition.json",
-			"test-object-definition-2.root-object-definition.json", null,
+			"test-bound-object-definitions.json",
+			"test-bound-object-definitions.json", null,
 			"TestObjectDefinition2");
-
-		testExportImport(
-			"test-object-definition-3.bound-object-definition.json",
-			"test-object-definition-3.bound-object-definition.json", null,
-			"TestObjectDefinition3");
 	}
 
 	@Override
 	protected ClassLoader getClassLoader() {
-		return ObjectDefinitionExportImportTest.class.getClassLoader();
+		return BoundObjectDefinitionsExportImportTest.class.getClassLoader();
 	}
 
 	@Override
@@ -127,7 +111,7 @@ public class ObjectDefinitionExportImportTest extends BaseExportImportTestCase {
 	private MVCActionCommand _mvcActionCommand;
 
 	@Inject(
-		filter = "mvc.command.name=/object_definitions/export_object_definition"
+		filter = "mvc.command.name=/object_definitions/export_bound_object_definitions"
 	)
 	private MVCResourceCommand _mvcResourceCommand;
 

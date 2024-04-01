@@ -61,40 +61,55 @@ public abstract class BaseExportImportTestCase {
 
 		Class<?> clazz = getClazz();
 
-		byte[] bytes = _file.getBytes(
-			clazz.getResourceAsStream("dependencies/" + actualFileName));
+		String importFileContent = StringUtil.read(
+			clazz.getResourceAsStream("dependencies/" + expectedFileName));
 
-		mockMultipartHttpServletRequest.addFile(
-			new MockMultipartFile(actualFileName, bytes));
+		boolean importMultipleObjectDefinitions = importFileContent.startsWith(
+			"[");
 
-		mockMultipartHttpServletRequest.setCharacterEncoding(StringPool.UTF8);
+		if (importMultipleObjectDefinitions) {
+			mockMultipartHttpServletRequest.addParameter(
+				"objectDefinitions", importFileContent);
+		}
+		else {
+			byte[] bytes = importFileContent.getBytes();
 
-		String boundary = "WebKitFormBoundary" + StringUtil.randomString();
+			mockMultipartHttpServletRequest.addFile(
+				new MockMultipartFile(actualFileName, bytes));
 
-		String start = StringBundler.concat(
-			StringPool.DOUBLE_DASH, boundary,
-			"\r\nContent-Disposition:form-data;name=\"", getJSONName(),
-			"\";filename=\"", actualFileName,
-			"\";\r\nContent-type:application/json\r\n\r\n");
-		String end = StringBundler.concat(
-			"\r\n--", boundary, StringPool.DOUBLE_DASH);
+			mockMultipartHttpServletRequest.setCharacterEncoding(
+				StringPool.UTF8);
 
-		mockMultipartHttpServletRequest.setContent(
-			ArrayUtil.append(start.getBytes(), bytes, end.getBytes()));
+			String boundary = "WebKitFormBoundary" + StringUtil.randomString();
 
-		mockMultipartHttpServletRequest.setContentType(
-			MediaType.MULTIPART_FORM_DATA_VALUE + "; boundary=" + boundary);
+			String start = StringBundler.concat(
+				StringPool.DOUBLE_DASH, boundary,
+				"\r\nContent-Disposition:form-data;name=\"", getJSONName(),
+				"\";filename=\"", actualFileName,
+				"\";\r\nContent-type:application/json\r\n\r\n");
+			String end = StringBundler.concat(
+				"\r\n--", boundary, StringPool.DOUBLE_DASH);
+
+			mockMultipartHttpServletRequest.setContent(
+				ArrayUtil.append(start.getBytes(), bytes, end.getBytes()));
+
+			mockMultipartHttpServletRequest.setContentType(
+				MediaType.MULTIPART_FORM_DATA_VALUE + "; boundary=" + boundary);
+		}
 
 		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
 			new MockLiferayPortletActionRequest(
 				mockMultipartHttpServletRequest);
 
-		if (Validator.isNotNull(externalReferenceCode)) {
-			mockLiferayPortletActionRequest.addParameter(
-				"externalReferenceCode", externalReferenceCode);
+		if (!importMultipleObjectDefinitions) {
+			if (Validator.isNotNull(externalReferenceCode)) {
+				mockLiferayPortletActionRequest.addParameter(
+					"externalReferenceCode", externalReferenceCode);
+			}
+
+			mockLiferayPortletActionRequest.addParameter("name", name);
 		}
 
-		mockLiferayPortletActionRequest.addParameter("name", name);
 		mockLiferayPortletActionRequest.addParameter(
 			"redirect", RandomTestUtil.randomString());
 		mockLiferayPortletActionRequest.setAttribute(
@@ -146,8 +161,7 @@ public abstract class BaseExportImportTestCase {
 			mockLiferayResourceRequest, mockLiferayResourceResponse);
 
 		JSONAssert.assertEquals(
-			StringUtil.read(
-				clazz.getResourceAsStream("dependencies/" + expectedFileName)),
+			importFileContent,
 			String.valueOf(
 				mockLiferayResourceResponse.getPortletOutputStream()),
 			JSONCompareMode.LENIENT);
