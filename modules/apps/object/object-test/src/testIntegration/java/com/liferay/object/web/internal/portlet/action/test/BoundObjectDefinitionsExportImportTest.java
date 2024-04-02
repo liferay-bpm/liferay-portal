@@ -54,6 +54,9 @@ public class BoundObjectDefinitionsExportImportTest
 			"test-bound-object-definitions.json",
 			"test-bound-object-definitions.json", null,
 			"TestObjectDefinition2");
+
+		testFailedImport(
+			"invalid_bound.json", "invalid_bound.message.json", null, null);
 	}
 
 	@Override

@@ -1,0 +1,17 @@
+{
+	"message": [
+		{
+			"error": {
+				"type": "ObjectDefinitionNameException.MustOnlyContainLettersAndDigits"
+			},
+			"objectDefinitionName": "Root__"
+		},
+		{
+			"error": {
+				"type": "ObjectDefinitionNameException.MustOnlyContainLettersAndDigits"
+			},
+			"objectDefinitionName": "Leaf@@@"
+		}
+	],
+	"type": "ObjectDefinitionsImportErrorsException"
+}

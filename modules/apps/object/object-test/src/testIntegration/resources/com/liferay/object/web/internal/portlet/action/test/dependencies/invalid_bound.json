@@ -1,0 +1,680 @@
+[
+	{
+		"accountEntryRestricted": false,
+		"accountEntryRestrictedObjectFieldName": "",
+		"actions": {
+			"delete": {
+			},
+			"exportBoundObjectDefinitions": {
+			},
+			"get": {
+			},
+			"permissions": {
+			},
+			"publish": {
+			},
+			"unbind": {
+			},
+			"update": {
+			}
+		},
+		"active": false,
+		"defaultLanguageId": "en_US",
+		"enableCategorization": true,
+		"enableComments": false,
+		"enableLocalization": false,
+		"enableObjectEntryDraft": false,
+		"enableObjectEntryHistory": false,
+		"externalReferenceCode": "root",
+		"label": {
+			"en_US": "Root"
+		},
+		"modifiable": true,
+		"name": "Root__",
+		"objectActions": [
+		],
+		"objectFields": [
+			{
+				"DBType": "String",
+				"businessType": "Text",
+				"externalReferenceCode": "16275bf4-cdc9-3f72-3fa5-86d1f56274d0",
+				"indexed": false,
+				"indexedAsKeyword": false,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "Author"
+				},
+				"localized": false,
+				"name": "creator",
+				"objectFieldSettings": [
+				],
+				"readOnly": "true",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "String",
+				"unique": false
+			},
+			{
+				"DBType": "Date",
+				"businessType": "Date",
+				"externalReferenceCode": "7744ac19-a5be-a5fc-a051-f41b93132254",
+				"indexed": false,
+				"indexedAsKeyword": false,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "Create Date"
+				},
+				"localized": false,
+				"name": "createDate",
+				"objectFieldSettings": [
+				],
+				"readOnly": "true",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "Date",
+				"unique": false
+			},
+			{
+				"DBType": "String",
+				"businessType": "Text",
+				"externalReferenceCode": "69efb241-63a7-f431-55f8-b3a988e829e7",
+				"indexed": false,
+				"indexedAsKeyword": false,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "External Reference Code"
+				},
+				"localized": false,
+				"name": "externalReferenceCode",
+				"objectFieldSettings": [
+				],
+				"readOnly": "false",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "String",
+				"unique": false
+			},
+			{
+				"DBType": "Long",
+				"businessType": "LongInteger",
+				"externalReferenceCode": "e3809ab2-1d1b-78fa-15e4-1e5ede9c35f8",
+				"indexed": true,
+				"indexedAsKeyword": true,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "ID"
+				},
+				"localized": false,
+				"name": "id",
+				"objectFieldSettings": [
+				],
+				"readOnly": "true",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "Long",
+				"unique": false
+			},
+			{
+				"DBType": "Date",
+				"businessType": "Date",
+				"externalReferenceCode": "b9a086f4-e3bf-1cb5-f1b7-1f70573b161d",
+				"indexed": false,
+				"indexedAsKeyword": false,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "Modified Date"
+				},
+				"localized": false,
+				"name": "modifiedDate",
+				"objectFieldSettings": [
+				],
+				"readOnly": "true",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "Date",
+				"unique": false
+			},
+			{
+				"DBType": "String",
+				"businessType": "Text",
+				"externalReferenceCode": "219a9309-e879-6dfd-426f-e622670cf091",
+				"indexed": false,
+				"indexedAsKeyword": false,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "Status"
+				},
+				"localized": false,
+				"name": "status",
+				"objectFieldSettings": [
+				],
+				"readOnly": "true",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "String",
+				"unique": false
+			}
+		],
+		"objectFolderExternalReferenceCode": "default",
+		"objectLayouts": [
+		],
+		"objectRelationships": [
+			{
+				"deletionType": "cascade",
+				"edge": true,
+				"externalReferenceCode": "fbbbac7e-677b-6308-84e1-621e50e84499",
+				"label": {
+					"en_US": "RootToBranch"
+				},
+				"name": "rootToBranch",
+				"objectDefinitionExternalReferenceCode1": "root",
+				"objectDefinitionExternalReferenceCode2": "bd9fd224-2ac4-68b7-85f9-2ce7fb1a6908",
+				"objectDefinitionModifiable2": true,
+				"objectDefinitionName2": "Branch",
+				"objectDefinitionSystem2": false,
+				"objectField": {
+					"DBType": "Long",
+					"businessType": "Relationship",
+					"externalReferenceCode": "17649c5c-7758-06e0-f4f2-b18e050349a2",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"indexedLanguageId": "",
+					"label": {
+						"en_US": "RootToBranch"
+					},
+					"localized": false,
+					"name": "r_rootToBranch_c_rootId",
+					"objectFieldSettings": [
+						{
+							"name": "objectDefinition1ShortName",
+							"value": "Root"
+						},
+						{
+							"name": "objectRelationshipERCObjectFieldName",
+							"value": "r_rootToBranch_c_rootERC"
+						}
+					],
+					"readOnly": "false",
+					"readOnlyConditionExpression": "",
+					"relationshipType": "oneToMany",
+					"required": true,
+					"state": false,
+					"system": false,
+					"type": "Long",
+					"unique": false
+				},
+				"parameterObjectFieldId": 0,
+				"parameterObjectFieldName": "",
+				"reverse": false,
+				"system": false,
+				"type": "oneToMany"
+			}
+		],
+		"objectValidationRules": [
+		],
+		"objectViews": [
+		],
+		"panelCategoryKey": "",
+		"parameterRequired": false,
+		"pluralLabel": {
+			"en_US": "roots"
+		},
+		"portlet": true,
+		"restContextPath": "/o/c/roots",
+		"rootObjectDefinitionExternalReferenceCode": "root",
+		"scope": "company",
+		"status": {
+			"code": 2,
+			"label": "draft",
+			"label_i18n": "Draft"
+		},
+		"system": false,
+		"titleObjectFieldName": "id"
+	},
+	{
+		"accountEntryRestricted": false,
+		"accountEntryRestrictedObjectFieldName": "",
+		"actions": {
+			"delete": {
+			},
+			"get": {
+			},
+			"permissions": {
+			},
+			"publish": {
+			},
+			"unbind": {
+			},
+			"update": {
+			}
+		},
+		"active": false,
+		"defaultLanguageId": "en_US",
+		"enableCategorization": true,
+		"enableComments": false,
+		"enableLocalization": false,
+		"enableObjectEntryDraft": false,
+		"enableObjectEntryHistory": false,
+		"externalReferenceCode": "bd9fd224-2ac4-68b7-85f9-2ce7fb1a6908",
+		"label": {
+			"en_US": "Branch"
+		},
+		"modifiable": true,
+		"name": "Branch",
+		"objectActions": [
+		],
+		"objectFields": [
+			{
+				"DBType": "String",
+				"businessType": "Text",
+				"externalReferenceCode": "2f39784c-0bf5-63b7-1f20-bd717044e82f",
+				"indexed": false,
+				"indexedAsKeyword": false,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "Author"
+				},
+				"localized": false,
+				"name": "creator",
+				"objectFieldSettings": [
+				],
+				"readOnly": "true",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "String",
+				"unique": false
+			},
+			{
+				"DBType": "Date",
+				"businessType": "Date",
+				"externalReferenceCode": "7e38430e-ae3a-8d56-5ca3-2ce9a9d49ddd",
+				"indexed": false,
+				"indexedAsKeyword": false,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "Create Date"
+				},
+				"localized": false,
+				"name": "createDate",
+				"objectFieldSettings": [
+				],
+				"readOnly": "true",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "Date",
+				"unique": false
+			},
+			{
+				"DBType": "String",
+				"businessType": "Text",
+				"externalReferenceCode": "c893300f-5fc9-d9e3-b057-40a6302edd05",
+				"indexed": false,
+				"indexedAsKeyword": false,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "External Reference Code"
+				},
+				"localized": false,
+				"name": "externalReferenceCode",
+				"objectFieldSettings": [
+				],
+				"readOnly": "false",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "String",
+				"unique": false
+			},
+			{
+				"DBType": "String",
+				"businessType": "LongInteger",
+				"externalReferenceCode": "d8e47355-3a1d-7295-f3b8-a2457d9c9902",
+				"indexed": true,
+				"indexedAsKeyword": true,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "ID"
+				},
+				"localized": false,
+				"name": "id",
+				"objectFieldSettings": [
+				],
+				"readOnly": "true",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "String",
+				"unique": false
+			},
+			{
+				"DBType": "Date",
+				"businessType": "Date",
+				"externalReferenceCode": "f8b5a204-79bb-eb18-29fd-0c6e0fd5b000",
+				"indexed": false,
+				"indexedAsKeyword": false,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "Modified Date"
+				},
+				"localized": false,
+				"name": "modifiedDate",
+				"objectFieldSettings": [
+				],
+				"readOnly": "true",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "Date",
+				"unique": false
+			},
+			{
+				"DBType": "String",
+				"businessType": "Text",
+				"externalReferenceCode": "bbf36342-c1c4-2614-6303-e83c7e94b0ea",
+				"indexed": false,
+				"indexedAsKeyword": false,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "Status"
+				},
+				"localized": false,
+				"name": "status",
+				"objectFieldSettings": [
+				],
+				"readOnly": "true",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "String",
+				"unique": false
+			}
+		],
+		"objectFolderExternalReferenceCode": "default",
+		"objectLayouts": [
+		],
+		"objectRelationships": [
+			{
+				"deletionType": "cascade",
+				"edge": true,
+				"externalReferenceCode": "b741a60a-982d-ede2-634f-59549459e624",
+				"label": {
+					"en_US": "BranchToLeaf"
+				},
+				"name": "branchToLeaf",
+				"objectDefinitionExternalReferenceCode1": "bd9fd224-2ac4-68b7-85f9-2ce7fb1a6908",
+				"objectDefinitionExternalReferenceCode2": "5a1e354a-afb5-5ca2-49a0-1f1f94c1c587",
+				"objectDefinitionModifiable2": true,
+				"objectDefinitionName2": "Leaf",
+				"objectDefinitionSystem2": false,
+				"objectField": {
+					"DBType": "Long",
+					"businessType": "Relationship",
+					"externalReferenceCode": "a27d6d84-7b52-3ad7-8615-80efeabb0dff",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"indexedLanguageId": "",
+					"label": {
+						"en_US": "BranchToLeaf"
+					},
+					"localized": false,
+					"name": "r_branchToLeaf_c_branchId",
+					"objectFieldSettings": [
+						{
+							"name": "objectDefinition1ShortName",
+							"value": "Branch"
+						},
+						{
+							"name": "objectRelationshipERCObjectFieldName",
+							"value": "r_branchToLeaf_c_branchERC"
+						}
+					],
+					"readOnly": "false",
+					"readOnlyConditionExpression": "",
+					"relationshipType": "oneToMany",
+					"required": true,
+					"state": false,
+					"system": false,
+					"type": "Long",
+					"unique": false
+				},
+				"parameterObjectFieldId": 0,
+				"parameterObjectFieldName": "",
+				"reverse": false,
+				"system": false,
+				"type": "oneToMany"
+			}
+		],
+		"objectValidationRules": [
+		],
+		"objectViews": [
+		],
+		"panelCategoryKey": "",
+		"parameterRequired": false,
+		"pluralLabel": {
+			"en_US": "branchs"
+		},
+		"portlet": false,
+		"restContextPath": "/o/c/roots/branches",
+		"rootObjectDefinitionExternalReferenceCode": "root",
+		"scope": "company",
+		"status": {
+			"code": 2,
+			"label": "draft",
+			"label_i18n": "Draft"
+		},
+		"system": false,
+		"titleObjectFieldName": "id"
+	},
+	{
+		"accountEntryRestricted": false,
+		"accountEntryRestrictedObjectFieldName": "",
+		"actions": {
+			"delete": {
+			},
+			"get": {
+			},
+			"permissions": {
+			},
+			"publish": {
+			},
+			"unbind": {
+			},
+			"update": {
+			}
+		},
+		"active": false,
+		"defaultLanguageId": "en_US",
+		"enableCategorization": true,
+		"enableComments": false,
+		"enableLocalization": false,
+		"enableObjectEntryDraft": false,
+		"enableObjectEntryHistory": false,
+		"externalReferenceCode": "5a1e354a-afb5-5ca2-49a0-1f1f94c1c587",
+		"label": {
+			"en_US": "Leaf"
+		},
+		"modifiable": true,
+		"name": "Leaf@@@",
+		"objectActions": [
+		],
+		"objectFields": [
+			{
+				"DBType": "String",
+				"businessType": "Text",
+				"externalReferenceCode": "6dc93b45-7680-085f-64cb-ea810671eb74",
+				"indexed": false,
+				"indexedAsKeyword": false,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "Author"
+				},
+				"localized": false,
+				"name": "creator",
+				"objectFieldSettings": [
+				],
+				"readOnly": "true",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "String",
+				"unique": false
+			},
+			{
+				"DBType": "Date",
+				"businessType": "Date",
+				"externalReferenceCode": "5f880a67-6598-a99c-f934-f6b45f238806",
+				"indexed": false,
+				"indexedAsKeyword": false,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "Create Date"
+				},
+				"localized": false,
+				"name": "createDate",
+				"objectFieldSettings": [
+				],
+				"readOnly": "true",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "Date",
+				"unique": false
+			},
+			{
+				"DBType": "String",
+				"businessType": "Text",
+				"externalReferenceCode": "3605fb74-fb20-9b6f-a38e-2239dc289c78",
+				"indexed": false,
+				"indexedAsKeyword": false,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "External Reference Code"
+				},
+				"localized": false,
+				"name": "externalReferenceCode",
+				"objectFieldSettings": [
+				],
+				"readOnly": "false",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "String",
+				"unique": false
+			},
+			{
+				"DBType": "Long",
+				"businessType": "LongInteger",
+				"externalReferenceCode": "cb5cb17c-dc87-fed4-5fca-272375a13e9e",
+				"indexed": true,
+				"indexedAsKeyword": true,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "ID"
+				},
+				"localized": false,
+				"name": "id",
+				"objectFieldSettings": [
+				],
+				"readOnly": "true",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "Long",
+				"unique": false
+			},
+			{
+				"DBType": "Date",
+				"businessType": "Date",
+				"externalReferenceCode": "44e28ae6-6416-cdb0-7b42-f66ac5d402f2",
+				"indexed": false,
+				"indexedAsKeyword": false,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "Modified Date"
+				},
+				"localized": false,
+				"name": "modifiedDate",
+				"objectFieldSettings": [
+				],
+				"readOnly": "true",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "Date",
+				"unique": false
+			},
+			{
+				"DBType": "String",
+				"businessType": "Text",
+				"externalReferenceCode": "3ce6c7e3-f0c1-cea2-37db-713ef5b4c7a5",
+				"indexed": false,
+				"indexedAsKeyword": false,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "Status"
+				},
+				"localized": false,
+				"name": "status",
+				"objectFieldSettings": [
+				],
+				"readOnly": "true",
+				"readOnlyConditionExpression": "",
+				"required": false,
+				"state": false,
+				"system": true,
+				"type": "String",
+				"unique": false
+			}
+		],
+		"objectFolderExternalReferenceCode": "default",
+		"objectLayouts": [
+		],
+		"objectRelationships": [
+		],
+		"objectValidationRules": [
+		],
+		"objectViews": [
+		],
+		"panelCategoryKey": "",
+		"parameterRequired": false,
+		"pluralLabel": {
+			"en_US": "leaves"
+		},
+		"portlet": false,
+		"restContextPath": "/o/c/roots/leafs",
+		"rootObjectDefinitionExternalReferenceCode": "root",
+		"scope": "company",
+		"status": {
+			"code": 2,
+			"label": "draft",
+			"label_i18n": "Draft"
+		},
+		"system": false,
+		"titleObjectFieldName": "id"
+	}
+]
