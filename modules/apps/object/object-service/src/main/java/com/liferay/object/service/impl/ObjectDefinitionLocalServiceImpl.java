@@ -1772,7 +1772,7 @@ public class ObjectDefinitionLocalServiceImpl
 		return false;
 	}
 
-	private ObjectDefinition _publishObjectDefinition(
+	private synchronized ObjectDefinition _publishObjectDefinition(
 			long userId, ObjectDefinition objectDefinition)
 		throws PortalException {
 
