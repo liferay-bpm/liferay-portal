@@ -4,15 +4,9 @@
 	"actions": {
 		"delete": {
 		},
-		"exportBoundObjectDefinitions": {
-		},
 		"get": {
 		},
 		"permissions": {
-		},
-		"publish": {
-		},
-		"unbind": {
 		},
 		"update": {
 		}
@@ -22,14 +16,13 @@
 	"enableCategorization": true,
 	"enableComments": false,
 	"enableLocalization": false,
-	"enableObjectEntryDraft": false,
 	"enableObjectEntryHistory": false,
-	"externalReferenceCode": "TESTOBJECTDEFINITION2",
+	"externalReferenceCode": "TESTOBJECTDEFINITION5",
 	"label": {
-		"en_US": "Test Object Definition 2"
+		"en_US": "Test Object Definition 5"
 	},
 	"modifiable": true,
-	"name": "TestObjectDefinition2",
+	"name": "TestObjectDefinition5",
 	"objectActions": [
 	],
 	"objectFields": [
@@ -158,62 +151,33 @@
 			"system": true,
 			"type": "String",
 			"unique": false
+		},
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"externalReferenceCode": "TESTOBJECTFIELD1",
+			"indexed": true,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "en_US",
+			"label": {
+				"en_US": "Test Object Field1"
+			},
+			"localized": false,
+			"name": "testObjectField1",
+			"objectFieldSettings": [
+			],
+			"readOnly": "false",
+			"readOnlyConditionExpression": "",
+			"required": false,
+			"state": false,
+			"system": false,
+			"type": "String",
+			"unique": false
 		}
 	],
-	"objectFolderExternalReferenceCode": "default",
 	"objectLayouts": [
 	],
 	"objectRelationships": [
-		{
-			"deletionType": "cascade",
-			"edge": true,
-			"externalReferenceCode": "TESTOBJECTRELATIONSHIP1",
-			"label": {
-				"en_US": "Test Object Relationship 1"
-			},
-			"name": "testObjectRelationship1",
-			"objectDefinitionExternalReferenceCode1": "TESTOBJECTDEFINITION2",
-			"objectDefinitionExternalReferenceCode2": "TESTOBJECTDEFINITION3",
-			"objectDefinitionModifiable2": true,
-			"objectDefinitionName2": "TESTOBJECTDEFINITION3",
-			"objectDefinitionSystem2": false,
-			"objectField": {
-				"DBType": "Long",
-				"businessType": "Relationship",
-				"externalReferenceCode": "TESTOBJECTRELATIONSHIP1OBJECTFIELD1",
-				"indexed": true,
-				"indexedAsKeyword": false,
-				"indexedLanguageId": "",
-				"label": {
-					"en_US": "Test Object Relationship 1 Object Field"
-				},
-				"localized": false,
-				"name": "r_testObjectRelationship1_c_testObjectDefinition2Id",
-				"objectFieldSettings": [
-					{
-						"name": "objectDefinition1ShortName",
-						"value": "TestObjectDefinition2"
-					},
-					{
-						"name": "objectRelationshipERCObjectFieldName",
-						"value": "r_testObjectRelationship1_c_testObjectDefinition2ERC"
-					}
-				],
-				"readOnly": "false",
-				"readOnlyConditionExpression": "",
-				"relationshipType": "oneToMany",
-				"required": true,
-				"state": false,
-				"system": false,
-				"type": "Long",
-				"unique": false
-			},
-			"parameterObjectFieldId": 0,
-			"parameterObjectFieldName": "",
-			"reverse": false,
-			"system": false,
-			"type": "oneToMany"
-		}
 	],
 	"objectValidationRules": [
 	],
@@ -222,11 +186,10 @@
 	"panelCategoryKey": "",
 	"parameterRequired": false,
 	"pluralLabel": {
-		"en_US": "Test Object Definitions "
+		"en_US": "Test Object Definitions 5"
 	},
 	"portlet": true,
-	"restContextPath": "/o/c/testobjectdefinition2s",
-	"rootObjectDefinitionExternalReferenceCode": "TESTOBJECTDEFINITION2",
+	"restContextPath": "/o/c/testobjectdefinition5s",
 	"scope": "company",
 	"status": {
 		"code": 2,

@@ -72,6 +72,16 @@ public class ObjectDefinitionExportImportTest extends BaseExportImportTestCase {
 			"TestObjectDefinition3");
 	}
 
+	@Test
+	public void testInvalidImportObjectDefinition() throws Exception {
+		testExportImport("test-object-definition5.json", "test-object-definition5.json",
+			null, "TestObjectDefinition5");
+
+		testFailedImport("test-object-definition5.draft.json",
+			"test-object-definition5.error-message.json"
+			,null,"TestObjectDefinition5" );
+	}
+
 	@Override
 	protected ClassLoader getClassLoader() {
 		return ObjectDefinitionExportImportTest.class.getClassLoader();

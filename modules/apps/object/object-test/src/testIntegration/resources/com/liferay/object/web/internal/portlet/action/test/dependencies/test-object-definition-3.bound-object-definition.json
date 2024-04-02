@@ -34,7 +34,6 @@
 		{
 			"DBType": "String",
 			"businessType": "Text",
-			"externalReferenceCode": "3a4895a9-0c2b-89b1-0375-3cc9531460fd",
 			"indexed": false,
 			"indexedAsKeyword": false,
 			"indexedLanguageId": "",
@@ -56,7 +55,6 @@
 		{
 			"DBType": "Date",
 			"businessType": "Date",
-			"externalReferenceCode": "c1cc4b38-6fd1-406a-4936-2c309cad1cd2",
 			"indexed": false,
 			"indexedAsKeyword": false,
 			"indexedLanguageId": "",
@@ -78,7 +76,6 @@
 		{
 			"DBType": "String",
 			"businessType": "Text",
-			"externalReferenceCode": "63dfc622-d65b-cd4e-e4d3-df022066dffa",
 			"indexed": false,
 			"indexedAsKeyword": false,
 			"indexedLanguageId": "",
@@ -100,7 +97,6 @@
 		{
 			"DBType": "Long",
 			"businessType": "LongInteger",
-			"externalReferenceCode": "fc5c100f-04f4-385b-f1e9-a795999dede9",
 			"indexed": true,
 			"indexedAsKeyword": true,
 			"indexedLanguageId": "",
@@ -122,7 +118,6 @@
 		{
 			"DBType": "Date",
 			"businessType": "Date",
-			"externalReferenceCode": "47a0b131-ebbe-b56a-cc25-ba33c60ff60d",
 			"indexed": false,
 			"indexedAsKeyword": false,
 			"indexedLanguageId": "",
@@ -144,7 +139,6 @@
 		{
 			"DBType": "String",
 			"businessType": "Text",
-			"externalReferenceCode": "42abffcb-6e93-409e-3fa3-099ba6debd89",
 			"indexed": false,
 			"indexedAsKeyword": false,
 			"indexedLanguageId": "",
@@ -179,7 +173,7 @@
 			"objectDefinitionExternalReferenceCode1": "TESTOBJECTDEFINITION3",
 			"objectDefinitionExternalReferenceCode2": "TESTOBJECTDEFINITION4",
 			"objectDefinitionModifiable2": true,
-			"objectDefinitionName2": "TestObjectDefinition4",
+			"objectDefinitionName2": "TESTOBJECTDEFINITION4",
 			"objectDefinitionSystem2": false,
 			"objectField": {
 				"DBType": "Long",

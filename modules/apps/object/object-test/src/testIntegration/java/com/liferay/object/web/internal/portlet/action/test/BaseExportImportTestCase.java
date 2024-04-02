@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.File;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ProxyUtil;
@@ -132,6 +133,7 @@ public abstract class BaseExportImportTestCase {
 
 		themeDisplay.setScopeGroupId(TestPropsValues.getGroupId());
 		themeDisplay.setSiteDefaultLocale(LocaleUtil.US);
+		themeDisplay.setLocale(LocaleUtil.US);
 		themeDisplay.setUser(user);
 
 		return themeDisplay;
@@ -199,6 +201,7 @@ public abstract class BaseExportImportTestCase {
 			"redirect", RandomTestUtil.randomString());
 		mockLiferayPortletActionRequest.setAttribute(
 			WebKeys.THEME_DISPLAY, _getThemeDisplay());
+		mockLiferayPortletActionRequest.setAttribute(  JavaConstants.JAVAX_PORTLET_CONFIG, null);
 
 		MVCActionCommand mvcActionCommand = getMVCActionCommand();
 
