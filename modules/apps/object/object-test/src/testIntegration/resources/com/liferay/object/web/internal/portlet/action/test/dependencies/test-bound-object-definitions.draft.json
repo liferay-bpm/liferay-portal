@@ -1,0 +1,160 @@
+[
+	{
+		"externalReferenceCode": "TESTOBJECTDEFINITION1",
+		"label": {
+			"en_US": "Test Object Definition 1"
+		},
+		"name": "TestObjectDefinition1",
+		"objectRelationships": [
+			{
+				"deletionType": "cascade",
+				"edge": true,
+				"externalReferenceCode": "TESTOBJECTRELATIONSHIP1",
+				"label": {
+					"en_US": "Test Object Relationship 1"
+				},
+				"name": "testObjectRelationship1",
+				"objectDefinitionExternalReferenceCode1": "TESTOBJECTDEFINITION1",
+				"objectDefinitionExternalReferenceCode2": "TESTOBJECTDEFINITION2",
+				"objectDefinitionModifiable2": true,
+				"objectDefinitionName2": "TestObjectDefinition2",
+				"objectDefinitionSystem2": false,
+				"objectField": {
+					"DBType": "Long",
+					"businessType": "Relationship",
+					"externalReferenceCode": "TESTOBJECTRELATIONSHIP1OBJECTFIELD",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"indexedLanguageId": "",
+					"label": {
+						"en_US": "Test Object Relationship 1 Object Field"
+					},
+					"localized": false,
+					"name": "r_testObjectRelationship1_c_testObjectDefinition1Id",
+					"objectFieldSettings": [
+						{
+							"name": "objectDefinition1ShortName",
+							"value": "TestObjectDefinition1"
+						},
+						{
+							"name": "objectRelationshipERCObjectFieldName",
+							"value": "r_testObjectRelationship1_c_testObjectDefinition1ERC"
+						}
+					],
+					"readOnly": "false",
+					"readOnlyConditionExpression": "",
+					"relationshipType": "oneToMany",
+					"required": true,
+					"state": false,
+					"system": false,
+					"type": "Long",
+					"unique": false
+				},
+				"parameterObjectFieldId": 0,
+				"parameterObjectFieldName": "",
+				"reverse": false,
+				"system": false,
+				"type": "oneToMany"
+			}
+		],
+		"panelCategoryKey": "",
+		"pluralLabel": {
+			"en_US": "Test Object Definitions 1"
+		},
+		"rootObjectDefinitionExternalReferenceCode": "TESTOBJECTDEFINITION1",
+		"scope": "company",
+		"status": {
+			"code": 2,
+			"label": "draft",
+			"label_i18n": "Draft"
+		}
+	},
+	{
+		"externalReferenceCode": "TESTOBJECTDEFINITION2",
+		"label": {
+			"en_US": "Test Object Definition 2"
+		},
+		"name": "TestObjectDefinition2",
+		"objectRelationships": [
+			{
+				"deletionType": "cascade",
+				"edge": true,
+				"externalReferenceCode": "TESTOBJECTRELATIONSHIP2",
+				"label": {
+					"en_US": "Test Object Relationship 2"
+				},
+				"name": "testObjectRelationship2",
+				"objectDefinitionExternalReferenceCode1": "TESTOBJECTDEFINITION2",
+				"objectDefinitionExternalReferenceCode2": "TESTOBJECTDEFINITION3",
+				"objectDefinitionModifiable2": true,
+				"objectDefinitionName2": "TestObjectDefinition3",
+				"objectDefinitionSystem2": false,
+				"objectField": {
+					"DBType": "Long",
+					"businessType": "Relationship",
+					"externalReferenceCode": "TESTOBJECTRELATIONSHIP2OBJECTFIELD",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"indexedLanguageId": "",
+					"label": {
+						"en_US": "Test Object Relationship 2 Object Field"
+					},
+					"localized": false,
+					"name": "r_testObjectRelationship2_c_testObjectDefinition2Id",
+					"objectFieldSettings": [
+						{
+							"name": "objectDefinition1ShortName",
+							"value": "TestObjectDefinition2"
+						},
+						{
+							"name": "objectRelationshipERCObjectFieldName",
+							"value": "r_testObjectRelationship2_c_testObjectDefinition2ERC"
+						}
+					],
+					"readOnly": "false",
+					"readOnlyConditionExpression": "",
+					"relationshipType": "oneToMany",
+					"required": true,
+					"state": false,
+					"system": false,
+					"type": "Long",
+					"unique": false
+				},
+				"parameterObjectFieldId": 0,
+				"parameterObjectFieldName": "",
+				"reverse": false,
+				"system": false,
+				"type": "oneToMany"
+			}
+		],
+		"panelCategoryKey": "",
+		"pluralLabel": {
+			"en_US": "Test Object Definitions 2"
+		},
+		"rootObjectDefinitionExternalReferenceCode": "TESTOBJECTDEFINITION1",
+		"scope": "company",
+		"status": {
+			"code": 2,
+			"label": "draft",
+			"label_i18n": "Draft"
+		}
+	},
+	{
+		"externalReferenceCode": "TESTOBJECTDEFINITION3",
+		"label": {
+			"en_US": "Test Object Definition 3"
+		},
+		"name": "TestObjectDefinition3",
+		"panelCategoryKey": "",
+		"pluralLabel": {
+			"en_US": "Test Object Definitions 3"
+		},
+		"rootObjectDefinitionExternalReferenceCode": "TESTOBJECTDEFINITION1",
+		"scope": "company",
+		"status": {
+			"code": 2,
+			"label": "draft",
+			"label_i18n": "Draft"
+		}
+	}
+]
