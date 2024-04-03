@@ -214,6 +214,20 @@ public class SalesforceObjectEntryManagerImplTest
 				_objectDefinition.getObjectDefinitionId()
 			).build());
 
+		ObjectFieldUtil.addCustomObjectField(
+			new TextObjectFieldBuilder(
+			).externalReferenceCode(
+				"Title__c NewTitle"
+			).userId(
+				adminUser.getUserId()
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap("New Title")
+			).name(
+				"newTitle"
+			).objectDefinitionId(
+				_objectDefinition.getObjectDefinitionId()
+			).build());
+
 		_objectDefinition.setTitleObjectFieldId(objectField.getObjectFieldId());
 
 		_objectDefinition.setExternalReferenceCode("Ticket__c");
@@ -398,7 +412,7 @@ public class SalesforceObjectEntryManagerImplTest
 			HashMapBuilder.put(
 				"filter",
 				filterString.concat(
-					_buildNotEqualsExpressionFilterString("title", title1))
+					_buildNotEqualsExpressionFilterString("newTitle", title1))
 			).build(),
 			objectEntry2, objectEntry3, objectEntry4);
 
