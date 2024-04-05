@@ -171,6 +171,20 @@ public class SalesforceObjectEntryManagerImplTest
 			).build());
 
 		ObjectFieldUtil.addCustomObjectField(
+			new DateObjectFieldBuilder(
+			).externalReferenceCode(
+				"format(Due_date__c) FormattedDueDate"
+			).userId(
+				adminUser.getUserId()
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap("Formatted Due Date")
+			).name(
+				"formattedDueDate"
+			).objectDefinitionId(
+				_objectDefinition.getObjectDefinitionId()
+			).build());
+
+		ObjectFieldUtil.addCustomObjectField(
 			new LongIntegerObjectFieldBuilder(
 			).externalReferenceCode(
 				"Object_Definition_id__c"
@@ -210,20 +224,6 @@ public class SalesforceObjectEntryManagerImplTest
 				LocalizedMapUtil.getLocalizedMap("Title")
 			).name(
 				"title"
-			).objectDefinitionId(
-				_objectDefinition.getObjectDefinitionId()
-			).build());
-
-		ObjectFieldUtil.addCustomObjectField(
-			new TextObjectFieldBuilder(
-			).externalReferenceCode(
-				"Title__c NewTitle"
-			).userId(
-				adminUser.getUserId()
-			).labelMap(
-				LocalizedMapUtil.getLocalizedMap("New Title")
-			).name(
-				"newTitle"
 			).objectDefinitionId(
 				_objectDefinition.getObjectDefinitionId()
 			).build());
@@ -412,7 +412,7 @@ public class SalesforceObjectEntryManagerImplTest
 			HashMapBuilder.put(
 				"filter",
 				filterString.concat(
-					_buildNotEqualsExpressionFilterString("newTitle", title1))
+					_buildNotEqualsExpressionFilterString("title", title1))
 			).build(),
 			objectEntry2, objectEntry3, objectEntry4);
 
