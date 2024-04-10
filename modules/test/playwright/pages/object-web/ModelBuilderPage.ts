@@ -5,6 +5,7 @@
 
 import {Locator, Page, expect} from '@playwright/test';
 
+import {PORTLET_URLS} from '../../utils/portletUrls';
 import {ObjectDefinitionsPage} from './ObjectDefinitionsPage';
 
 export class ModelBuilderPage {
@@ -210,8 +211,18 @@ export class ModelBuilderPage {
 		);
 	}
 
-	async goto() {
-		await this.objectDefinitionsPage.goto();
-		await this.objectDefinitionsPage.viewInModelBuilder();
+	async goto({
+		objectFolderName,
+		siteUrl,
+	}: {
+		objectFolderName: string;
+		siteUrl?: Site['friendlyUrlPath'];
+	}) {
+		await this.page.goto(
+			`/group${siteUrl || '/guest'}${
+				PORTLET_URLS.modelBuilder
+			}&objectFolderName=${objectFolderName}`,
+			{waitUntil: 'load'}
+		);
 	}
 }

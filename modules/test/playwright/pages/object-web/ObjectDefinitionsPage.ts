@@ -5,6 +5,7 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {PORTLET_URLS} from '../../utils/portletUrls';
 import {ApplicationsMenuPage} from '../product-navigation-applications-menu/ApplicationsMenuPage';
 
 export class ObjectDefinitionsPage {
@@ -60,8 +61,11 @@ export class ObjectDefinitionsPage {
 		return response.json();
 	}
 
-	async goto() {
-		await this.applicationsMenuPage.goToObjects();
+	async goto(siteUrl?: Site['friendlyUrlPath']) {
+		await this.page.goto(
+			`/group${siteUrl || '/guest'}${PORTLET_URLS.objects}`,
+			{waitUntil: 'load'}
+		);
 	}
 
 	async openObjectFolderActions() {
