@@ -52,3 +52,50 @@ test('default folder does not contains delete and edit options', async ({
 		objectDefinitionsPage.objectFolderEditLabelAndERCOption
 	).toBeHidden();
 });
+
+test('object definitions from a deleted folder are moved to the default folder', async ({
+	apiHelpers,
+	objectDefinitionsPage,
+}) => {
+	const defaultLanguage = 'en_US';
+
+	const objectFolder = await apiHelpers.objectAdmin.postRandomObjectFolder();
+
+	const objectDefinition1 =
+		await apiHelpers.objectAdmin.postRandomObjectDefinition(
+			objectFolder.externalReferenceCode
+		);
+	const objectDefinition2 =
+		await apiHelpers.objectAdmin.postRandomObjectDefinition(
+			objectFolder.externalReferenceCode
+		);
+
+	await objectDefinitionsPage.goto();
+
+	await objectDefinitionsPage.openObjectFolder(
+		objectFolder.externalReferenceCode
+	);
+
+	await objectDefinitionsPage.openObjectFolderActions();
+
+	await objectDefinitionsPage.deleteObjectFolder(objectFolder.name);
+
+	await objectDefinitionsPage.clickDefaultObjectFolder();
+
+	await expect(
+		objectDefinitionsPage.frontendDataSetEntries.filter({
+			hasText: objectDefinition1.label[defaultLanguage],
+		})
+	).toBeVisible();
+
+	await expect(
+		objectDefinitionsPage.frontendDataSetEntries.filter({
+			hasText: objectDefinition2.label[defaultLanguage],
+		})
+	).toBeVisible();
+
+	// Clean up
+
+	await apiHelpers.objectAdmin.deleteObjectDefinition(objectDefinition1.id);
+	await apiHelpers.objectAdmin.deleteObjectDefinition(objectDefinition2.id);
+});
