@@ -52,3 +52,34 @@ test('default folder does not contains delete and edit options', async ({
 		objectDefinitionsPage.objectFolderEditLabelAndERCOption
 	).toBeHidden();
 });
+
+test('navigate between object folders using the left sidebar', async ({
+	apiHelpers,
+	objectDefinitionsPage,
+}) => {
+	const objectFolders: ObjectFolder[] = await Promise.all(
+		Array.apply(null, Array(5)).map(async () => {
+			return await apiHelpers.objectAdmin.postRandomObjectFolder();
+		})
+	);
+
+	await objectDefinitionsPage.goto();
+
+	for (const objectFolder of objectFolders) {
+		await expect(objectDefinitionsPage.objectFolders).toBeVisible();
+
+		objectDefinitionsPage.openObjectFolder(objectFolder.label['en_US']);
+
+		expect(
+			objectDefinitionsPage.objectFolderCardHeaderLabel({
+				objectFolderLabel: objectFolder.label['en'],
+			})
+		).toBeVisible();
+	}
+
+	// Clean up
+
+	for (const objectFolder of objectFolders) {
+		await apiHelpers.objectAdmin.deleteObjectFolder(objectFolder.id);
+	}
+});

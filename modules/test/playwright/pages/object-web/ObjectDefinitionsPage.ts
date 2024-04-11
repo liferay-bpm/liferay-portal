@@ -14,8 +14,10 @@ export class ObjectDefinitionsPage {
 	readonly createObjectFolderButton: Locator;
 	readonly defaultObjectFolderLink: Locator;
 	readonly objectFolderActionsLink: Locator;
+	readonly objectFolderCardHeader: Locator;
 	readonly objectFolderDeleteFolderOption: Locator;
 	readonly objectFolderEditLabelAndERCOption: Locator;
+	readonly objectFolders: Locator;
 	readonly objectFolderLabel: Locator;
 	readonly page: Page;
 	readonly viewInModelBuilderButton: Locator;
@@ -29,9 +31,14 @@ export class ObjectDefinitionsPage {
 		this.defaultObjectFolderLink = page
 			.locator('li')
 			.filter({hasText: 'Default'});
+		this.objectFolders = page
+			.getByRole('list')
+			.filter({hasText: 'Default'})
 		this.objectFolderActionsLink = page
 			.locator('div.lfr__object-web-view-object-definitions-title-kebab')
 			.getByLabel('Object Folder Actions');
+		this.objectFolderCardHeader = page.
+			locator('div.lfr-objects__card-header');
 		this.objectFolderDeleteFolderOption = page.getByRole('menuitem', {
 			name: 'Delete Folder',
 		});
@@ -68,14 +75,24 @@ export class ObjectDefinitionsPage {
 		);
 	}
 
+	objectFolderCardHeaderLabel = ({
+		objectFolderLabel,
+	}: {
+		objectFolderLabel: string;
+	}) => {
+		return this.objectFolderCardHeader
+			.locator('span')
+			.filter({hasText: objectFolderLabel}).first();
+	};
+
 	async openObjectFolderActions() {
-		await this.objectFolderActionsLink.click();
+		await this.objectFolderActions.click();
 	}
 
-	async openObjectFolder(objectFolderExternalReferenceCode: string) {
+	async openObjectFolder(objectFolderLabel: string) {
 		await this.page
-			.locator('li')
-			.filter({hasText: objectFolderExternalReferenceCode})
+			.getByRole('listitem')
+			.filter({hasText: objectFolderLabel})
 			.click();
 	}
 

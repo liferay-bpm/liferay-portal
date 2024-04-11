@@ -205,3 +205,45 @@ test('can delete object relationship from different folders', async ({
 
 	await apiHelpers.objectAdmin.deleteObjectFolder(objectFolder.id);
 });
+
+test('navigate between object folders by left sidebar', async ({
+	apiHelpers,
+	modelBuilderPage,
+}) => {
+	const objectFolders: ObjectFolder[] = await Promise.all(
+		Array.apply(null, Array(5)).map(async () => {
+			return await apiHelpers.objectAdmin.postRandomObjectFolder();
+		})
+	);
+
+	await modelBuilderPage.goto({objectFolderName: 'Default'});
+
+	for (const objectFolder of objectFolders) {
+		await expect(modelBuilderPage.otherObjectFolders).toBeVisible();
+
+		const otherObjectFolderLocator =
+			modelBuilderPage.otherObjectFolderLocator({
+				objectFolderLabel: objectFolder.label['en_US'],
+			});
+
+		await otherObjectFolderLocator.hover();
+
+		await otherObjectFolderLocator
+			.getByRole('button', {name: 'Go to Folder'})
+			.click();
+
+		await expect(otherObjectFolderLocator).toBeHidden();
+
+		await expect(
+			modelBuilderPage.objectFolderLabelHeaderLocator({
+				objectFolderLabel: objectFolder.label['en_US'],
+			})
+		).toBeVisible();
+	}
+
+	// Clean up
+
+	for (const objectFolder of objectFolders) {
+		await apiHelpers.objectAdmin.deleteObjectFolder(objectFolder.id);
+	}
+});
