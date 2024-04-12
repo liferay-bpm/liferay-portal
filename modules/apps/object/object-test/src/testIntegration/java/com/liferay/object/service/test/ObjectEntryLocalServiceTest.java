@@ -2974,6 +2974,7 @@ public class ObjectEntryLocalServiceTest {
 			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
 			HashMapBuilder.<String, Serializable>put(
 				"state", "listTypeEntryKey3"
+
 			).put(
 				"upload", 0L
 			).put(
