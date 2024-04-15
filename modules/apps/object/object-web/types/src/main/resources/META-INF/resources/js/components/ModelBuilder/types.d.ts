@@ -168,6 +168,12 @@ export declare type TAction =
 	  }
 	| {
 			payload: {
+				newSelectedObjectFolder: ObjectFolder;
+			};
+			type: TYPES.SET_SELECTED_OBJECT_FOLDER;
+	  }
+	| {
+			payload: {
 				selectedObjectRelationshipId: number;
 			};
 			type: TYPES.SET_SELECTED_OBJECT_RELATIONSHIP_EDGE;

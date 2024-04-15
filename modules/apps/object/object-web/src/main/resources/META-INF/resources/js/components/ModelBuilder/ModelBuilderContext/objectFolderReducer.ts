@@ -843,6 +843,15 @@ export function ObjectFolderReducer(state: TState, action: TAction): TState {
 			};
 		}
 
+		case TYPES.SET_SELECTED_OBJECT_FOLDER: {
+			const {newSelectedObjectFolder} = action.payload;
+
+			return {
+				...state,
+				selectedObjectFolder: newSelectedObjectFolder,
+			};
+		}
+
 		case TYPES.SET_SELECTED_OBJECT_DEFINITION_NODE: {
 			const {
 				objectDefinitionNodes,
