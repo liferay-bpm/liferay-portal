@@ -46,15 +46,13 @@ const Actions = (props) => {
 
 	return (
 		<>
-			{Liferay.FeatureFlags['LPD-11179'] &&
-				!allowScriptContentToBeExecutedOrIncluded &&
-				hasGroovyScript && (
-					<DisabledGroovyScriptAlert
-						scriptManagementConfigurationPortletURL={
-							scriptManagementConfigurationPortletURL
-						}
-					/>
-				)}
+			{!allowScriptContentToBeExecutedOrIncluded && hasGroovyScript && (
+				<DisabledGroovyScriptAlert
+					scriptManagementConfigurationPortletURL={
+						scriptManagementConfigurationPortletURL
+					}
+				/>
+			)}
 
 			{sections.map(({identifier}, index) => {
 				return (

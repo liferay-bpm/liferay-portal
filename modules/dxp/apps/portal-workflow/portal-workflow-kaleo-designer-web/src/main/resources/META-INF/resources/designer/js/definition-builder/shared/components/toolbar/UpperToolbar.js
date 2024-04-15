@@ -191,7 +191,6 @@ export default function UpperToolbar({
 
 	const publishDefinition = () => {
 		if (
-			Liferay.FeatureFlags['LPD-11179'] &&
 			!allowScriptContentToBeExecutedOrIncluded &&
 			detectGroovyScript(elements, setHasGroovyScript)
 		) {
@@ -233,10 +232,7 @@ export default function UpperToolbar({
 				version,
 			}).then((response) => {
 				if (response.ok) {
-					if (
-						Liferay.FeatureFlags['LPD-11179'] &&
-						!allowScriptContentToBeExecutedOrIncluded
-					) {
+					if (!allowScriptContentToBeExecutedOrIncluded) {
 						setHadGroovyScriptBefore(false);
 					}
 
@@ -267,7 +263,6 @@ export default function UpperToolbar({
 
 	const saveDefinition = () => {
 		if (
-			Liferay.FeatureFlags['LPD-11179'] &&
 			!allowScriptContentToBeExecutedOrIncluded &&
 			detectGroovyScript(elements, setHasGroovyScript)
 		) {
@@ -289,10 +284,7 @@ export default function UpperToolbar({
 				version,
 			}).then((response) => {
 				if (response.ok) {
-					if (
-						Liferay.FeatureFlags['LPD-11179'] &&
-						!allowScriptContentToBeExecutedOrIncluded
-					) {
+					if (!allowScriptContentToBeExecutedOrIncluded) {
 						setHadGroovyScriptBefore(false);
 					}
 

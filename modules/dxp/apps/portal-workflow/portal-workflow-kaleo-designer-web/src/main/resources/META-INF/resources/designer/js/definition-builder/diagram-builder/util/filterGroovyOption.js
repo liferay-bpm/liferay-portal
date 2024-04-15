@@ -8,11 +8,7 @@ export function filterGroovyOption(
 	hadGroovyScriptBefore,
 	options
 ) {
-	if (
-		Liferay.FeatureFlags['LPD-11179'] &&
-		!allowScriptContentToBeExecutedOrIncluded &&
-		!hadGroovyScriptBefore
-	) {
+	if (!allowScriptContentToBeExecutedOrIncluded && !hadGroovyScriptBefore) {
 		return options.filter((option) => option.value !== 'groovy');
 	}
 
