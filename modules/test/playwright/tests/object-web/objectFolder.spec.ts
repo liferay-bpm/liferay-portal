@@ -131,4 +131,41 @@ test.describe('Manage object definitions through ViewObjectDefinitions', () => {
 			await apiHelpers.objectAdmin.deleteObjectFolder(objectFolder.id);
 		}
 	});
+
+	test('can edit object folder label and ERC in the ViewObjectDefinitions page', async ({
+		apiHelpers,
+		modalEditObjectFolderPage,
+		page,
+		viewObjectDefinitionsPage,
+	}) => {
+		const objectFolder =
+			await apiHelpers.objectAdmin.postRandomObjectFolder();
+
+		await viewObjectDefinitionsPage.goto();
+
+		await viewObjectDefinitionsPage.page
+			.locator('li')
+			.filter({hasText: objectFolder.label['en_US']})
+			.click();
+
+		await viewObjectDefinitionsPage.openObjectFolderActions();
+
+		await viewObjectDefinitionsPage.objectFolderEditLabelAndERCOption.click();
+
+		const editedObjectFolderLabel =
+			'objectFolderLabelEdited' + getRandomInt();
+		const editedObjectFolderERC = 'objectFolderERCEdited' + getRandomInt();
+
+		await modalEditObjectFolderPage.editObjectFolderDetails(
+			editedObjectFolderERC,
+			editedObjectFolderLabel
+		);
+
+		expect(page.getByText(editedObjectFolderLabel).first()).toBeVisible();
+		expect(page.getByText(editedObjectFolderERC)).toBeVisible();
+
+		// Clean up
+
+		await apiHelpers.objectAdmin.deleteObjectFolder(objectFolder.id);
+	});
 });
