@@ -12,6 +12,7 @@ export class ModelBuilderPage {
 	readonly addObjectFieldButton: Locator;
 	readonly createNewObjectDefinitionButton: Locator;
 	readonly deleteObjectRelationshipButton: Locator;
+	readonly editObjectFolderDetailsButton: Locator;
 	readonly fitViewButton: Locator;
 	readonly leftSidebarItems: Locator;
 	readonly newObjectFieldSelectBusinessType: Locator;
@@ -41,6 +42,9 @@ export class ModelBuilderPage {
 			page.getByText('Create New Object');
 		this.deleteObjectRelationshipButton = page.getByLabel(
 			'Delete Relationship'
+		);
+		this.editObjectFolderDetailsButton = page.locator(
+			'button[name=editObjectFolderButton]'
 		);
 		this.fitViewButton = page.locator(
 			'button.react-flow__controls-button.react-flow__controls-fitview'
@@ -236,6 +240,10 @@ export class ModelBuilderPage {
 	}: {
 		objectFolderLabel: string;
 	}) => this.page.getByTitle(`Object Folder Label: ${objectFolderLabel}`);
+
+	getObjectFolderERCHeaderLocator(objectFolderERC: string) {
+		return this.page.getByTitle(`ERC: ${objectFolderERC}`);
+	}
 
 	otherObjectFolderLocator = ({
 		objectFolderLabel,
