@@ -596,6 +596,9 @@ export default function ViewObjectDefinitions({
 					id={selectedObjectFolder.id as number}
 					initialLabel={selectedObjectFolder.label}
 					name={selectedObjectFolder.name}
+					onAfterSubmit={(editedObjectFolder) => {
+						setSelectedObjectFolder(editedObjectFolder);
+					}}
 				/>
 			)}
 			{showModal.moveObjectDefinition && (
