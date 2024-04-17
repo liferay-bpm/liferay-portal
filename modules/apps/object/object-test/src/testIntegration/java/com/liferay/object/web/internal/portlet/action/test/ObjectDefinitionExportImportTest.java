@@ -60,6 +60,10 @@ public class ObjectDefinitionExportImportTest extends BaseExportImportTestCase {
 		testExportImport(
 			"test-object-definition.json", "test-object-definition.json", null,
 			"TestObjectDefinition");
+
+		testImportWithError(
+			"test-object-custom-view.json", "test-object-custom-view.json",
+			null, "TestObjectCustomView");
 	}
 
 	@Override
