@@ -5,6 +5,10 @@
 
 package com.liferay.object.rest.internal.vulcan.extension.v1_0;
 
+import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.document.library.util.DLURLHelper;
+import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
@@ -17,7 +21,11 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.File;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.vulcan.extension.ExtensionProvider;
 import com.liferay.portal.vulcan.extension.PropertyDefinition;
 
@@ -25,6 +33,7 @@ import java.io.Serializable;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -51,6 +60,14 @@ public class ObjectEntryExtensionProvider extends BaseObjectExtensionProvider {
 					getExtensionDynamicObjectDefinitionTableValues(
 						objectDefinition, getPrimaryKey(entity));
 
+			Locale locale = null;
+
+			User user = _userLocalService.fetchUser(userId);
+
+			if (user != null) {
+				locale = user.getLocale();
+			}
+
 			for (ObjectField objectField :
 					_objectFieldLocalService.getObjectFields(
 						objectDefinition.getObjectDefinitionId(), false)) {
@@ -60,6 +77,17 @@ public class ObjectEntryExtensionProvider extends BaseObjectExtensionProvider {
 						ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
 
 					values.remove(objectField.getName());
+
+					continue;
+				}
+
+				Object dtoValue = ObjectEntryValuesUtil.getDTOValue(
+					false, _dlAppService, _dLFileEntryLocalService,
+					_dlURLHelper, _file, _listTypeEntryLocalService, locale,
+					objectDefinition, null, objectField, _portal, values);
+
+				if (dtoValue != null) {
+					values.put(objectField.getName(), (Serializable)dtoValue);
 				}
 			}
 
@@ -169,6 +197,21 @@ public class ObjectEntryExtensionProvider extends BaseObjectExtensionProvider {
 		ObjectEntryExtensionProvider.class);
 
 	@Reference
+	private DLAppService _dlAppService;
+
+	@Reference
+	private DLFileEntryLocalService _dLFileEntryLocalService;
+
+	@Reference
+	private DLURLHelper _dlURLHelper;
+
+	@Reference
+	private File _file;
+
+	@Reference
+	private ListTypeEntryLocalService _listTypeEntryLocalService;
+
+	@Reference
 	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Reference
@@ -176,5 +219,11 @@ public class ObjectEntryExtensionProvider extends BaseObjectExtensionProvider {
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

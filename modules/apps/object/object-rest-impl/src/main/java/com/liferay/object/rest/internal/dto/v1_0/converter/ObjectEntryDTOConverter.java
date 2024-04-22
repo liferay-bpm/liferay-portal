@@ -8,19 +8,15 @@ package com.liferay.object.rest.internal.dto.v1_0.converter;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
-import com.liferay.document.library.kernel.model.DLFileEntry;
-import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.util.DLURLHelper;
-import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.entry.util.ObjectEntryDTOConverterUtil;
-import com.liferay.object.entry.util.ObjectEntryValuesUtil;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
@@ -29,15 +25,12 @@ import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.dto.v1_0.AuditEvent;
 import com.liferay.object.rest.dto.v1_0.AuditFieldChange;
-import com.liferay.object.rest.dto.v1_0.FileEntry;
-import com.liferay.object.rest.dto.v1_0.Folder;
-import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.dto.v1_0.Status;
 import com.liferay.object.rest.dto.v1_0.TaxonomyCategoryBrief;
 import com.liferay.object.rest.dto.v1_0.util.CreatorUtil;
-import com.liferay.object.rest.dto.v1_0.util.LinkUtil;
 import com.liferay.object.rest.internal.dto.v1_0.util.TaxonomyCategoryBriefUtil;
+import com.liferay.object.rest.internal.util.ObjectEntryValuesUtil;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -63,7 +56,6 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.File;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlParserUtil;
@@ -83,13 +75,8 @@ import com.liferay.portal.vulcan.extension.ExtensionProviderRegistry;
 import com.liferay.portal.vulcan.extension.util.ExtensionUtil;
 import com.liferay.portal.vulcan.fields.NestedFieldsSupplier;
 import com.liferay.portal.vulcan.jaxrs.extension.ExtendedEntity;
-import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.io.Serializable;
-
-import java.sql.Timestamp;
-
-import java.text.SimpleDateFormat;
 
 import java.util.HashMap;
 import java.util.List;
@@ -165,9 +152,11 @@ public class ObjectEntryDTOConverter
 
 			properties.put(
 				objectField.getName(),
-				_getListEntry(
-					dtoConverterContext, map.get("key"),
-					objectField.getListTypeDefinitionId()));
+				ObjectEntryValuesUtil.getListEntry(
+					dtoConverterContext.isAcceptAllLanguages(), map.get("key"),
+					objectField.getListTypeDefinitionId(),
+					_listTypeEntryLocalService,
+					dtoConverterContext.getLocale()));
 
 			objectEntry.setProperties(() -> properties);
 		}
@@ -365,11 +354,14 @@ public class ObjectEntryDTOConverter
 
 								values.put(
 									objectField.getName(),
-									ObjectEntryValuesUtil.getTitleFieldValue(
-										objectField.getBusinessType(),
-										baseModel.getModelAttributes(),
-										objectField,
-										dtoConverterContext.getUser(), values));
+									com.liferay.object.entry.util.
+										ObjectEntryValuesUtil.
+											getTitleFieldValue(
+												objectField.getBusinessType(),
+												baseModel.getModelAttributes(),
+												objectField,
+												dtoConverterContext.getUser(),
+												values));
 							}
 
 							relatedObjectEntryAtomicReference.set(
@@ -430,32 +422,6 @@ public class ObjectEntryDTOConverter
 			dtoConverterContext.getHttpServletRequest(), objectEntryId,
 			dtoConverterContext.getLocale(), uriInfo,
 			dtoConverterContext.getUser());
-	}
-
-	private ListEntry _getListEntry(
-		DTOConverterContext dtoConverterContext, String key,
-		long listTypeDefinitionId) {
-
-		ListTypeEntry listTypeEntry =
-			_listTypeEntryLocalService.fetchListTypeEntry(
-				listTypeDefinitionId, key);
-
-		if (listTypeEntry == null) {
-			return null;
-		}
-
-		return new ListEntry() {
-			{
-				setKey(listTypeEntry::getKey);
-				setName(
-					() -> listTypeEntry.getName(
-						dtoConverterContext.getLocale()));
-				setName_i18n(
-					() -> LocalizedMapUtil.getI18nMap(
-						dtoConverterContext.isAcceptAllLanguages(),
-						listTypeEntry.getNameMap()));
-			}
-		};
 	}
 
 	private Map<String, Serializable> _getNestedFieldsRelatedProperties(
@@ -721,137 +687,7 @@ public class ObjectEntryDTOConverter
 			}
 
 			if (objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
-
-				long fileEntryId = GetterUtil.getLong(
-					values.get(objectField.getName()));
-
-				if (fileEntryId == 0) {
-					continue;
-				}
-
-				FileEntry fileEntry = new FileEntry();
-
-				DLFileEntry dlFileEntry =
-					_dLFileEntryLocalService.fetchDLFileEntry(fileEntryId);
-
-				if (dlFileEntry != null) {
-					if (FeatureFlagManagerUtil.isEnabled(
-							objectDefinition.getCompanyId(), "LPS-174455")) {
-
-						fileEntry.setFileBase64(
-							() -> (String)NestedFieldsSupplier.supply(
-								objectFieldName + ".fileBase64",
-								fieldName -> Base64.encode(
-									_file.getBytes(
-										dlFileEntry.getContentStream()))));
-						fileEntry.setFolder(
-							() -> (Folder)NestedFieldsSupplier.supply(
-								objectFieldName + ".folder",
-								fieldName -> {
-									if (!Objects.equals(
-											ObjectFieldSettingConstants.
-												VALUE_DOCS_AND_MEDIA,
-											ObjectFieldSettingUtil.getValue(
-												ObjectFieldSettingConstants.
-													NAME_FILE_SOURCE,
-												objectField))) {
-
-										return null;
-									}
-
-									Folder folder = new Folder();
-
-									folder.setExternalReferenceCode(
-										() -> {
-											if (dlFileEntry.getFolderId() ==
-													0) {
-
-												return null;
-											}
-
-											DLFolder dlFolder =
-												dlFileEntry.getFolder();
-
-											return dlFolder.
-												getExternalReferenceCode();
-										});
-									folder.setSiteId(dlFileEntry::getGroupId);
-
-									return folder;
-								}));
-					}
-
-					fileEntry.setId(dlFileEntry::getFileEntryId);
-					fileEntry.setLink(
-						() -> LinkUtil.toLink(
-							_dlAppService, dlFileEntry, _dlURLHelper,
-							objectDefinition.getExternalReferenceCode(),
-							objectEntry.getExternalReferenceCode(), _portal));
-					fileEntry.setName(dlFileEntry::getFileName);
-				}
-
-				map.put(objectFieldName, fileEntry);
-			}
-			else if (objectField.compareBusinessType(
-						ObjectFieldConstants.BUSINESS_TYPE_DATE_TIME)) {
-
-				Timestamp timestamp = (Timestamp)serializable;
-
-				if (timestamp == null) {
-					continue;
-				}
-
-				String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS";
-
-				if (StringUtil.equals(
-						ObjectFieldSettingUtil.getValue(
-							ObjectFieldSettingConstants.NAME_TIME_STORAGE,
-							objectField),
-						ObjectFieldSettingConstants.VALUE_CONVERT_TO_UTC)) {
-
-					pattern += "'Z'";
-				}
-
-				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-					pattern);
-
-				map.put(objectFieldName, simpleDateFormat.format(timestamp));
-			}
-			else if (objectField.compareBusinessType(
-						ObjectFieldConstants.
-							BUSINESS_TYPE_MULTISELECT_PICKLIST)) {
-
-				if (objectField.getListTypeDefinitionId() == 0) {
-					continue;
-				}
-
-				map.put(
-					objectFieldName,
-					TransformUtil.transformToList(
-						StringUtil.split(
-							(String)serializable, StringPool.COMMA_AND_SPACE),
-						key -> _getListEntry(
-							dtoConverterContext, key,
-							objectField.getListTypeDefinitionId())));
-			}
-			else if (objectField.compareBusinessType(
-						ObjectFieldConstants.BUSINESS_TYPE_PICKLIST)) {
-
-				if (objectField.getListTypeDefinitionId() == 0) {
-					continue;
-				}
-
-				ListEntry listEntry = _getListEntry(
-					dtoConverterContext, (String)serializable,
-					objectField.getListTypeDefinitionId());
-
-				if (listEntry != null) {
-					map.put(objectFieldName, listEntry);
-				}
-			}
-			else if (objectField.compareBusinessType(
-						ObjectFieldConstants.BUSINESS_TYPE_RICH_TEXT)) {
+					ObjectFieldConstants.BUSINESS_TYPE_RICH_TEXT)) {
 
 				map.put(objectFieldName, serializable);
 				map.put(
@@ -881,7 +717,16 @@ public class ObjectEntryDTOConverter
 					primaryKey, values);
 			}
 			else {
-				map.put(objectFieldName, serializable);
+				Object dtoValue = ObjectEntryValuesUtil.getDTOValue(
+					dtoConverterContext.isAcceptAllLanguages(), _dlAppService,
+					_dLFileEntryLocalService, _dlURLHelper, _file,
+					_listTypeEntryLocalService, dtoConverterContext.getLocale(),
+					objectDefinition, objectEntry.getExternalReferenceCode(),
+					objectField, _portal, values);
+
+				if (dtoValue != null) {
+					map.put(objectFieldName, dtoValue);
+				}
 			}
 		}
 
