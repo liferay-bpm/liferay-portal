@@ -16,11 +16,15 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -69,26 +73,54 @@ public class UserModelListenerTest {
 
 		BundleContext bundleContext = bundle.getBundleContext();
 
-		_serviceRegistration = bundleContext.registerService(
-			SystemObjectDefinitionManager.class,
-			new TestSystemObjectDefinitionManager(
-				ObjectEntry.class, _OBJECT_DEFINITION_NAME,
-				StringBundler.concat(
-					"/o/", RandomTestUtil.randomString(), StringPool.SLASH,
-					RandomTestUtil.randomString())),
-			new HashMapDictionary<>());
+		_systemObjectDefinitionManagerServiceRegistration =
+			bundleContext.registerService(
+				SystemObjectDefinitionManager.class,
+				new TestSystemObjectDefinitionManager(
+					ObjectEntry.class, _OBJECT_DEFINITION_NAME,
+					StringBundler.concat(
+						"/o/", RandomTestUtil.randomString(), StringPool.SLASH,
+						RandomTestUtil.randomString())),
+				new HashMapDictionary<>());
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		if (_serviceRegistration != null) {
-			_serviceRegistration.unregister();
+		if (_systemObjectDefinitionManagerServiceRegistration != null) {
+			_systemObjectDefinitionManagerServiceRegistration.unregister();
 		}
 
 		_objectDefinitionLocalService.deleteCompanyObjectDefinitions(
 			_company.getCompanyId());
 
 		_companyLocalService.deleteCompany(_company.getCompanyId());
+	}
+
+	@Test
+	public void testOnAfterRemove() throws Exception {
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.createObjectDefinition(RandomTestUtil.randomLong());
+
+		User user = UserTestUtil.addUser();
+
+		objectDefinition.setCompanyId(user.getCompanyId());
+		objectDefinition.setUserId(user.getUserId());
+
+		objectDefinition = _objectDefinitionLocalService.updateObjectDefinition(
+			objectDefinition);
+
+		_userLocalService.deleteUser(user);
+
+		objectDefinition = _objectDefinitionLocalService.getObjectDefinition(
+			objectDefinition.getObjectDefinitionId());
+
+		User defaultServiceAccountUser =
+			_userLocalService.fetchUserByScreenName(
+				TestPropsValues.getCompanyId(), "default-service-account");
+
+		Assert.assertEquals(
+			defaultServiceAccountUser.getUserId(),
+			objectDefinition.getUserId());
 	}
 
 	@Test
@@ -154,6 +186,9 @@ public class UserModelListenerTest {
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	private ServiceRegistration<SystemObjectDefinitionManager>
-		_serviceRegistration;
+		_systemObjectDefinitionManagerServiceRegistration;
+
+	@Inject
+	private UserLocalService _userLocalService;
 
 }
