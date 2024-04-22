@@ -10,6 +10,7 @@ import com.liferay.info.item.renderer.InfoItemRenderer;
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectWebKeys;
+import com.liferay.object.info.item.util.ObjectEntryInfoItemUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
@@ -17,7 +18,6 @@ import com.liferay.object.rest.dto.v1_0.FileEntry;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectFieldLocalService;
-import com.liferay.object.web.internal.util.ObjectEntryUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -132,7 +132,7 @@ public class ObjectEntryRowInfoItemRenderer
 					false, null, null, null, null, themeDisplay.getLocale(),
 					null, themeDisplay.getUser()),
 				externalReferenceCode, _objectDefinition,
-				ObjectEntryUtil.getScopeKey(
+				ObjectEntryInfoItemUtil.getScopeKey(
 					themeDisplay.getScopeGroupId(), _objectDefinition,
 					_objectScopeProviderRegistry));
 		}
@@ -151,7 +151,7 @@ public class ObjectEntryRowInfoItemRenderer
 					_objectFieldLocalService.getObjectFields(
 						_objectDefinition.getObjectDefinitionId(), false))) {
 
-			Object value = ObjectEntryUtil.getValue(
+			Object value = ObjectEntryInfoItemUtil.getObjectFieldValue(
 				themeDisplay.getLocale(), objectField,
 				objectEntry.getProperties());
 
