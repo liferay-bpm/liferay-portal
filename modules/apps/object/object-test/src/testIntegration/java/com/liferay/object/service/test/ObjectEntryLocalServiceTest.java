@@ -2179,6 +2179,7 @@ public class ObjectEntryLocalServiceTest {
 			_objectDefinition.isAccountEntryRestricted(), false,
 			_objectDefinition.isEnableCategorization(),
 			_objectDefinition.isEnableComments(),
+			_objectDefinition.isEnableIndexedSearch(),
 			_objectDefinition.isEnableLocalization(),
 			_objectDefinition.isEnableObjectEntryDraft(),
 			_objectDefinition.isEnableObjectEntryHistory(),
