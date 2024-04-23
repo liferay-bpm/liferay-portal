@@ -99,7 +99,8 @@ public class UserModelListenerTest {
 	@Test
 	public void testOnAfterRemove() throws Exception {
 		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.createObjectDefinition(RandomTestUtil.randomLong());
+			_objectDefinitionLocalService.createObjectDefinition(
+				RandomTestUtil.randomLong());
 
 		User user = UserTestUtil.addUser();
 
