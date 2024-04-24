@@ -88,4 +88,33 @@ test.describe('Manage object definitions through Model Builder', () => {
 			objectDefinition.id
 		);
 	});
+
+	test('show object definition details in "RightSidebar" after create object definition', async ({
+		apiHelpers,
+		modalAddObjectDefinitionPage,
+		modelBuilderPage,
+	}) => {
+		await modelBuilderPage.goto({objectFolderName: 'Default'});
+
+		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
+
+		modelBuilderPage.createNewObjectDefinitionButton.click();
+
+		const objectDefinition =
+			await modalAddObjectDefinitionPage.createObjectDefinition(
+				objectDefinitionLabel
+			);
+
+		await expect(
+			modelBuilderPage.rightSidebar.getByTitle(
+				objectDefinitionLabel + ' Details'
+			)
+		).toBeVisible();
+
+		// Clean up
+
+		await apiHelpers.objectAdmin.deleteObjectDefinition(
+			objectDefinition.id
+		);
+	});
 });
