@@ -29,6 +29,7 @@ export class ModelBuilderPage {
 	readonly objectRelationshipEdges: Locator;
 	readonly otherObjectFolders: Locator;
 	readonly page: Page;
+	readonly rightSidebar: Locator;
 	readonly toggleSidebarsButton: Locator;
 	readonly viewObjectDefinitionsPage: ViewObjectDefinitionsPage;
 
@@ -92,6 +93,9 @@ export class ModelBuilderPage {
 			.getByRole('region')
 			.filter({has: page.getByTitle('Go to Folder')});
 		this.page = page;
+		this.rightSidebar = page
+			.getByRole('tabpanel')
+			.filter({hasNot: this.createNewObjectDefinitionButton});
 		this.toggleSidebarsButton = page.getByLabel('Toggle Sidebars');
 	}
 
