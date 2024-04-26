@@ -117,4 +117,62 @@ test.describe('Manage object definitions through Model Builder', () => {
 			objectDefinition.id
 		);
 	});
+
+	test('see object definition details', async ({
+		apiHelpers,
+		modelBuilderPage,
+	}) => {
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition('default');
+
+		await modelBuilderPage.goto({objectFolderName: 'Default'});
+
+		await expect(
+			modelBuilderPage.leftSidebarItems.filter({
+				hasText: objectDefinition.name,
+			})
+		).toBeVisible();
+
+		await modelBuilderPage.leftSidebarItems
+			.filter({hasText: objectDefinition.name})
+			.click();
+
+		await expect(
+			modelBuilderPage.objectDefinitionNodes.filter({
+				hasText: objectDefinition.name,
+			})
+		).toBeVisible();
+
+		await expect(
+			modelBuilderPage.rightSidebar.getByTitle(
+				objectDefinition.name + ' Details'
+			)
+		).toBeVisible();
+
+		const details = [
+			'Label',
+			'Plural Label',
+			'Table Name',
+			'Activate Object',
+			'Entry Title Field',
+			'Scope',
+			'Panel Link',
+		];
+
+		for (let i = 0; i < details.length; i++) {
+			const detail = details[i];
+
+			await expect(
+				modelBuilderPage.rightSidebar
+					.filter({hasText: detail})
+					.filter({hasText: objectDefinition.name})
+			).toBeVisible();
+		}
+
+		// Clean up
+
+		await apiHelpers.objectAdmin.deleteObjectDefinition(
+			objectDefinition.id
+		);
+	});
 });
