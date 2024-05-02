@@ -1,0 +1,18 @@
+{
+	"externalReferenceCode": "TESTOBJECTDEFINITIONBOUND",
+	"label": {
+		"en_US": "Test Object Definition Bound"
+	},
+	"name": "TestObjectDefinitionBound",
+	"panelCategoryKey": "",
+	"pluralLabel": {
+		"en_US": "Test Object Definitions Bound"
+	},
+	"rootObjectDefinitionExternalReferenceCode": "TESTOBJECTDEFINITIONROOT",
+	"scope": "company",
+	"status": {
+		"code": 2,
+		"label": "draft",
+		"label_i18n": "Draft"
+	}
+}

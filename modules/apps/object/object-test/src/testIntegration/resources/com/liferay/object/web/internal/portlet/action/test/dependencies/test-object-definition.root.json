@@ -1,0 +1,70 @@
+{
+	"externalReferenceCode": "TESTOBJECTDEFINITIONROOT",
+	"label": {
+		"en_US": "Test Object Definition Root"
+	},
+	"name": "TestObjectDefinitionRoot",
+	"objectRelationships": [
+		{
+			"deletionType": "cascade",
+			"edge": true,
+			"externalReferenceCode": "TESTOBJECTRELATIONSHIP1",
+			"label": {
+				"en_US": "Test Object Relationship 1"
+			},
+			"name": "testObjectRelationship1",
+			"objectDefinitionExternalReferenceCode1": "TESTOBJECTDEFINITIONROOT",
+			"objectDefinitionExternalReferenceCode2": "TESTOBJECTDEFINITIONBOUND",
+			"objectDefinitionModifiable2": true,
+			"objectDefinitionName2": "TESTOBJECTDEFINITIONBOUND",
+			"objectDefinitionSystem2": false,
+			"objectField": {
+				"DBType": "Long",
+				"businessType": "Relationship",
+				"externalReferenceCode": "TESTOBJECTRELATIONSHIP1OBJECTFIELD",
+				"indexed": true,
+				"indexedAsKeyword": false,
+				"indexedLanguageId": "",
+				"label": {
+					"en_US": "Test Object Relationship 1 Object Field"
+				},
+				"localized": false,
+				"name": "r_testObjectRelationship1_c_testObjectDefinitionRootId",
+				"objectFieldSettings": [
+					{
+						"name": "objectDefinition1ShortName",
+						"value": "TestObjectDefinitionRoot"
+					},
+					{
+						"name": "objectRelationshipERCObjectFieldName",
+						"value": "r_testObjectRelationship1_c_testObjectDefinitionRootERC"
+					}
+				],
+				"readOnly": "false",
+				"readOnlyConditionExpression": "",
+				"relationshipType": "oneToMany",
+				"required": true,
+				"state": false,
+				"system": false,
+				"type": "Long",
+				"unique": false
+			},
+			"parameterObjectFieldId": 0,
+			"parameterObjectFieldName": "",
+			"reverse": false,
+			"system": false,
+			"type": "oneToMany"
+		}
+	],
+	"pluralLabel": {
+		"en_US": "Test Object Definitions Root"
+	},
+	"rootObjectDefinitionExternalReferenceCode": "TESTOBJECTDEFINITIONROOT",
+	"scope": "company",
+	"status": {
+		"code": 2,
+		"label": "draft",
+		"label_i18n": "Draft"
+	},
+	"titleObjectFieldName": "id"
+}
