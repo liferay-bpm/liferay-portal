@@ -69,6 +69,16 @@ public class ObjectDefinitionExportImportTest extends BaseExportImportTestCase {
 			"TESTOBJECTDEFINITIONPORTUGUESE", "TestObjectDefinitionPortuguese");
 
 		testExportImport(
+			"test-object-definition.published.json",
+			"test-object-definition.published.json", null,
+			"TestObjectDefinitionPublished");
+
+		testFailedImport(
+			"test-object-definition.draft.json",
+			"test-object-definition.draft.error-message.json", null,
+			"TestObjectDefinitionPublished");
+
+		testExportImport(
 			"test-object-definition.root.json",
 			"test-object-definition.root.json", null,
 			"TestObjectDefinitionRoot");
