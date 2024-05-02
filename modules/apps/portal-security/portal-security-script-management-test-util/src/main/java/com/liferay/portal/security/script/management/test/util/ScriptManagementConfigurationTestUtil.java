@@ -26,12 +26,6 @@ public class ScriptManagementConfigurationTestUtil {
 		}
 	}
 
-	public static Closeable disable() throws Exception {
-		save(false);
-
-		return ScriptManagementConfigurationTestUtil::delete;
-	}
-
 	public static void save(boolean allowScriptContentToBeExecutedOrIncluded)
 		throws Exception {
 
@@ -41,6 +35,15 @@ public class ScriptManagementConfigurationTestUtil {
 				"allowScriptContentToBeExecutedOrIncluded",
 				allowScriptContentToBeExecutedOrIncluded
 			).build());
+	}
+
+	public static Closeable saveWithCloseable(
+			boolean allowScriptContentToBeExecutedOrIncluded)
+		throws Exception {
+
+		save(allowScriptContentToBeExecutedOrIncluded);
+
+		return ScriptManagementConfigurationTestUtil::delete;
 	}
 
 }
