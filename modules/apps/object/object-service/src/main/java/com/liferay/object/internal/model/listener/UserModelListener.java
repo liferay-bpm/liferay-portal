@@ -33,10 +33,6 @@ public class UserModelListener extends BaseModelListener<User> {
 
 	@Override
 	public void onAfterRemove(User user) throws ModelListenerException {
-		if (Objects.equals(user.getScreenName(), "default-service-account")) {
-			return;
-		}
-
 		User defaultServiceAccountUser =
 			_userLocalService.fetchUserByScreenName(
 				user.getCompanyId(), "default-service-account");
