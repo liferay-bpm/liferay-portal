@@ -11,6 +11,7 @@ import {ViewObjectDefinitionsPage} from './ViewObjectDefinitionsPage';
 export class ModelBuilderPage {
 	readonly addObjectFieldButton: Locator;
 	readonly createNewObjectDefinitionButton: Locator;
+	readonly deleteButton: Locator;
 	readonly deleteObjectDefinitionOption: Locator;
 	readonly deleteObjectRelationshipButton: Locator;
 	readonly deleteTrashButton: Locator;
@@ -47,6 +48,7 @@ export class ModelBuilderPage {
 		});
 		this.createNewObjectDefinitionButton =
 			page.getByText('Create New Object');
+		this.deleteButton = page.getByTitle('Delete');
 		this.deleteObjectDefinitionOption = page.getByRole('menuitem', {
 			name: 'Delete Object',
 		});
@@ -174,11 +176,9 @@ export class ModelBuilderPage {
 			.click();
 	}
 
-	async clickObjectDefinitionShowAllFieldsButton(
-		objectDefinitionLabel: string
-	) {
+	async clickShowAllFieldsButton(objectDefinitionName: string) {
 		await this.objectDefinitionNodes
-			.filter({hasText: objectDefinitionLabel})
+			.filter({hasText: objectDefinitionName})
 			.getByRole('button', {name: 'Show All Fields'})
 			.click();
 	}
