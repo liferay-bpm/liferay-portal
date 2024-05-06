@@ -59,7 +59,6 @@ export function SingleSelect<T extends SingleSelectOption>({
 			disabled={disabled}
 			errorMessage={error}
 			helpMessage={feedbackMessage}
-			id={id}
 			label={label}
 			required={required}
 			tooltip={tooltip}
@@ -71,6 +70,7 @@ export function SingleSelect<T extends SingleSelectOption>({
 				as={as}
 				defaultSelectedKey={defaultSelectedKey}
 				disabled={disabled}
+				id={id}
 				items={items}
 				onSelectionChange={onSelectionChange}
 				placeholder={placeholder}
