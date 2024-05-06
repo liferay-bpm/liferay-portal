@@ -7,6 +7,7 @@ import {Locator, Page} from '@playwright/test';
 
 export class EditObjectValidationPage {
 	readonly addObjectFieldsButton: Locator;
+	readonly addTwoObjectFieldsError: Locator;
 	readonly page: Page;
 	readonly saveFieldsButton: Locator;
 	readonly saveValidationButton: Locator;
@@ -17,6 +18,9 @@ export class EditObjectValidationPage {
 		this.addObjectFieldsButton = page
 			.frameLocator('iframe')
 			.getByRole('button', {name: 'Add Fields'});
+		this.addTwoObjectFieldsError = page.getByText(
+			'Add a minimum of two object fields to create unique composite keys.'
+		);
 		this.page = page;
 		this.saveFieldsButton = page.getByText('Save');
 		this.saveValidationButton = page
