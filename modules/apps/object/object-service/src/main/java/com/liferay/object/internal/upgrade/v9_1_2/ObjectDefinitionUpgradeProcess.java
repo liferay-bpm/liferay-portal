@@ -16,9 +16,9 @@ import java.sql.ResultSet;
 /**
  * @author Thalles Montenegro
  */
-public class ObjectRelationshipUpgradeProcess extends UpgradeProcess {
+public class ObjectDefinitionUpgradeProcess extends UpgradeProcess {
 
-	public ObjectRelationshipUpgradeProcess(
+	public ObjectDefinitionUpgradeProcess(
 		CompanyLocalService companyLocalService) {
 
 		_companyLocalService = companyLocalService;
