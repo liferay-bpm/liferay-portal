@@ -362,6 +362,40 @@ test.describe('Manage object definitions through Model Builder', () => {
 			objectDefinition2.id
 		);
 	});
+
+	test('can delete an object definition via the object definition node header', async ({
+		apiHelpers,
+		modelBuilderPage,
+	}) => {
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				status: {code: 0},
+			});
+
+		await modelBuilderPage.goto({objectFolderName: 'Default'});
+
+		await modelBuilderPage.leftSidebarItems
+			.filter({hasText: objectDefinition.name})
+			.click();
+
+		await modelBuilderPage.clickObjectDefinitionActionsButton(
+			objectDefinition.name
+		);
+
+		await modelBuilderPage.deleteObjectDefinition(objectDefinition.name);
+
+		await expect(
+			modelBuilderPage.objectDefinitionNodes.filter({
+				hasText: objectDefinition.name,
+			})
+		).not.toBeVisible();
+
+		await expect(
+			modelBuilderPage.leftSidebarItems.filter({
+				hasText: objectDefinition.name,
+			})
+		).not.toBeVisible();
+	});
 });
 
 test.describe('Manage object definitions through View Object Definitions', () => {
