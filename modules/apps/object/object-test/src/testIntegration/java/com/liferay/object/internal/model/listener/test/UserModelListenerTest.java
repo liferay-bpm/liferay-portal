@@ -33,11 +33,11 @@ import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.util.Collections;
 import java.util.Locale;
 
-import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -76,15 +76,14 @@ public class UserModelListenerTest {
 
 		BundleContext bundleContext = bundle.getBundleContext();
 
-		_serviceRegistration =
-			bundleContext.registerService(
-				SystemObjectDefinitionManager.class,
-				new TestSystemObjectDefinitionManager(
-					ObjectEntry.class, _OBJECT_DEFINITION_NAME,
-					StringBundler.concat(
-						"/o/", RandomTestUtil.randomString(), StringPool.SLASH,
-						RandomTestUtil.randomString())),
-				new HashMapDictionary<>());
+		_serviceRegistration = bundleContext.registerService(
+			SystemObjectDefinitionManager.class,
+			new TestSystemObjectDefinitionManager(
+				ObjectEntry.class, _OBJECT_DEFINITION_NAME,
+				StringBundler.concat(
+					"/o/", RandomTestUtil.randomString(), StringPool.SLASH,
+					RandomTestUtil.randomString())),
+			new HashMapDictionary<>());
 	}
 
 	@After

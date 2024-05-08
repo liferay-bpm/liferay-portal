@@ -68,7 +68,7 @@ public class ObjectDefinitionUpgradeProcessTest {
 		_userLocalService.deleteUser(user2);
 
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
-			_CLASS_NAME, LoggerTestUtil.OFF)) {
+				_CLASS_NAME, LoggerTestUtil.OFF)) {
 
 			UpgradeProcess upgradeProcess = UpgradeTestUtil.getUpgradeStep(
 				_upgradeStepRegistrator, _CLASS_NAME);
@@ -109,8 +109,7 @@ public class ObjectDefinitionUpgradeProcessTest {
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
 				userId, 0, false, false, false,
-				LocalizedMapUtil.getLocalizedMap("Test"),
-				"Test", null, null,
+				LocalizedMapUtil.getLocalizedMap("Test"), "Test", null, null,
 				LocalizedMapUtil.getLocalizedMap("Tests"), true,
 				ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,

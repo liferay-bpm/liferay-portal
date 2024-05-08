@@ -11,10 +11,8 @@ import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
 /**
  * @author Thalles Montenegro
@@ -22,7 +20,8 @@ import java.sql.ResultSet;
 public class ObjectDefinitionUpgradeProcess extends UpgradeProcess {
 
 	public ObjectDefinitionUpgradeProcess(
-		CompanyLocalService companyLocalService, UserLocalService userLocalService) {
+		CompanyLocalService companyLocalService,
+		UserLocalService userLocalService) {
 
 		_companyLocalService = companyLocalService;
 		_userLocalService = userLocalService;
@@ -32,18 +31,21 @@ public class ObjectDefinitionUpgradeProcess extends UpgradeProcess {
 	protected void doUpgrade() throws Exception {
 		_companyLocalService.forEachCompany(
 			company -> {
-				try (PreparedStatement preparedStatement1 = connection.prepareStatement(
-					StringBundler.concat(
-						"update ObjectDefinition left join User_ on ObjectDefinition.userId ",
-						"= User_.userId set ObjectDefinition.userId = ? where User_.userId is null and ",
-						"ObjectDefinition.companyId = ?"))
-				) {
+				try (PreparedStatement preparedStatement1 =
+						connection.prepareStatement(
+							StringBundler.concat(
+								"update ObjectDefinition left join User_ on ",
+								"ObjectDefinition.userId = User_.userId set ",
+								"ObjectDefinition.userId = ? where User_.",
+								"userId is null and ObjectDefinition.",
+								"companyId = ?"))) {
 
 					User user = _userLocalService.fetchUserByScreenName(
 						company.getCompanyId(), "default-service-account");
 
-					if (Validator.isNull(user)) {
-						throw new UpgradeException("Default service account is null");
+					if (user == null) {
+						throw new UpgradeException(
+							"Default service account is null");
 					}
 
 					preparedStatement1.setLong(1, user.getUserId());
@@ -54,7 +56,6 @@ public class ObjectDefinitionUpgradeProcess extends UpgradeProcess {
 	}
 
 	private final CompanyLocalService _companyLocalService;
-
 	private final UserLocalService _userLocalService;
 
 }
