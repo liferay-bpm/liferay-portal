@@ -6,6 +6,7 @@
 package com.liferay.object.internal.model.listener.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -33,8 +34,10 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
+import java.util.Collections;
 import java.util.Locale;
 
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -73,7 +76,7 @@ public class UserModelListenerTest {
 
 		BundleContext bundleContext = bundle.getBundleContext();
 
-		_systemObjectDefinitionManagerServiceRegistration =
+		_serviceRegistration =
 			bundleContext.registerService(
 				SystemObjectDefinitionManager.class,
 				new TestSystemObjectDefinitionManager(
@@ -86,8 +89,8 @@ public class UserModelListenerTest {
 
 	@After
 	public void tearDown() throws Exception {
-		if (_systemObjectDefinitionManagerServiceRegistration != null) {
-			_systemObjectDefinitionManagerServiceRegistration.unregister();
+		if (_serviceRegistration != null) {
+			_serviceRegistration.unregister();
 		}
 
 		_objectDefinitionLocalService.deleteCompanyObjectDefinitions(
@@ -98,17 +101,16 @@ public class UserModelListenerTest {
 
 	@Test
 	public void testOnAfterRemove() throws Exception {
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.createObjectDefinition(
-				RandomTestUtil.randomLong());
-
 		User user = UserTestUtil.addUser();
 
-		objectDefinition.setCompanyId(user.getCompanyId());
-		objectDefinition.setUserId(user.getUserId());
-
-		objectDefinition = _objectDefinitionLocalService.updateObjectDefinition(
-			objectDefinition);
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.addCustomObjectDefinition(
+				user.getUserId(), 0, false, false, false,
+				LocalizedMapUtil.getLocalizedMap("Able"), "Able", null, null,
+				LocalizedMapUtil.getLocalizedMap("Ables"), true,
+				ObjectDefinitionConstants.SCOPE_COMPANY,
+				ObjectDefinitionConstants.STORAGE_TYPE_SALESFORCE,
+				Collections.emptyList());
 
 		_userLocalService.deleteUser(user);
 
@@ -187,7 +189,7 @@ public class UserModelListenerTest {
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	private ServiceRegistration<SystemObjectDefinitionManager>
-		_systemObjectDefinitionManagerServiceRegistration;
+		_serviceRegistration;
 
 	@Inject
 	private UserLocalService _userLocalService;
