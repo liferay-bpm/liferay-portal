@@ -40,7 +40,7 @@ import org.junit.runner.RunWith;
  * @author Thalles Montenegro
  */
 @RunWith(Arquillian.class)
-public class ObjectRelationshipUpgradeProcessTest {
+public class ObjectDefinitionUpgradeProcessTest {
 
 	@ClassRule
 	@Rule
@@ -67,7 +67,14 @@ public class ObjectRelationshipUpgradeProcessTest {
 
 		_userLocalService.deleteUser(user2);
 
-		_runUpgrade();
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+			_CLASS_NAME, LoggerTestUtil.OFF)) {
+
+			UpgradeProcess upgradeProcess = UpgradeTestUtil.getUpgradeStep(
+				_upgradeStepRegistrator, _CLASS_NAME);
+
+			upgradeProcess.upgrade();
+		}
 
 		long defaultServiceAccountUserId =
 			_userLocalService.getUserIdByScreenName(
@@ -85,23 +92,6 @@ public class ObjectRelationshipUpgradeProcessTest {
 			objectDefinition2.getObjectDefinitionId());
 	}
 
-	private ObjectDefinition _addCustomObjectDefinition(
-			String label, String name, String pluralLabel, long userId)
-		throws Exception {
-
-		return _objectDefinitionLocalService.addCustomObjectDefinition(
-			userId, 0, false, false, false,
-			LocalizedMapUtil.getLocalizedMap(label), name, null, null,
-			LocalizedMapUtil.getLocalizedMap(pluralLabel), true,
-			ObjectDefinitionConstants.SCOPE_COMPANY,
-			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
-			Arrays.asList(
-				ObjectFieldUtil.createObjectField(
-					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-					ObjectFieldConstants.DB_TYPE_STRING,
-					RandomTestUtil.randomString(), StringUtil.randomId())));
-	}
-
 	private void _assertObjectDefinitionUserId(
 			long expectedUserId, long objectDefinitionId)
 		throws Exception {
@@ -116,29 +106,27 @@ public class ObjectRelationshipUpgradeProcessTest {
 	private ObjectDefinition _publishCustomObjectDefinition(long userId)
 		throws Exception {
 
-		ObjectDefinition objectDefinition = _addCustomObjectDefinition(
-			"A" + RandomTestUtil.randomString(),
-			"A" + RandomTestUtil.randomString(),
-			"A" + RandomTestUtil.randomString(), userId);
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.addCustomObjectDefinition(
+				userId, 0, false, false, false,
+				LocalizedMapUtil.getLocalizedMap("Test"),
+				"Test", null, null,
+				LocalizedMapUtil.getLocalizedMap("Tests"), true,
+				ObjectDefinitionConstants.SCOPE_COMPANY,
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Arrays.asList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING,
+						RandomTestUtil.randomString(), StringUtil.randomId())));
 
 		return _objectDefinitionLocalService.publishCustomObjectDefinition(
 			userId, objectDefinition.getObjectDefinitionId());
 	}
 
-	private void _runUpgrade() throws Exception {
-		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
-				_CLASS_NAME, LoggerTestUtil.OFF)) {
-
-			UpgradeProcess upgradeProcess = UpgradeTestUtil.getUpgradeStep(
-				_upgradeStepRegistrator, _CLASS_NAME);
-
-			upgradeProcess.upgrade();
-		}
-	}
-
 	private static final String _CLASS_NAME =
 		"com.liferay.object.internal.upgrade.v9_1_2." +
-			"ObjectRelationshipUpgradeProcess";
+			"ObjectDefinitionUpgradeProcess";
 
 	@Inject(
 		filter = "(&(component.name=com.liferay.object.internal.upgrade.registry.ObjectServiceUpgradeStepRegistrator))"
