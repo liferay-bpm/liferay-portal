@@ -13,6 +13,10 @@ import {getRandomInt} from '../../utils/getRandomInt';
 export const test = mergeTests(apiHelpersTest, loginTest(), objectPagesTest);
 
 test.describe('Manage object definitions through Model Builder', () => {
+	test.beforeEach(async ({page}) => {
+		page.setViewportSize({height: 1080, width: 1920});
+	});
+
 	test('can create an object definition by model builder', async ({
 		apiHelpers,
 		modalAddObjectDefinitionPage,
@@ -271,6 +275,30 @@ test.describe('Manage object definitions through Model Builder', () => {
 		);
 
 		await apiHelpers.objectAdmin.deleteObjectFolder(objectFolder.id);
+	});
+
+	test('navigate to edit object definition page', async ({
+		modelBuilderPage,
+		page,
+		context,
+	}) => {
+		const pagePromise = context.waitForEvent('page');
+
+		
+
+		await modelBuilderPage.goto({objectFolderName: 'Default'});
+
+		await modelBuilderPage.clickObjectDefinitionActionsButton(
+			'organization'
+		);
+
+		await modelBuilderPage.editInPageViewOption.click();
+
+		await modelBuilderPage.openPageViewButton.click();
+
+		const editObjectDefinitionPage = await pagePromise;
+
+		await expect(editObjectDefinitionPage.getByText('ERC:L_ORGANIZATION')).toBeVisible();
 	});
 
 	test('see object definition details', async ({
