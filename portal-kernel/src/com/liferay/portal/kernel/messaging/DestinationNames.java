@@ -78,6 +78,9 @@ public interface DestinationNames {
 	public static final String OBJECT_ENTRY_ATTACHMENT_DOWNLOAD =
 		"liferay/object_entry_attachment_download";
 
+	public static final String OBJECT_ENTRY_ON_AFTER_ADD =
+		"liferay/object_entry_on_after_add";
+
 	public static final String SCHEDULER_DISPATCH =
 		"liferay/scheduler_dispatch";
 

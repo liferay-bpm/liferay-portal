@@ -26,6 +26,7 @@ import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.action.util.ObjectActionThreadLocal;
 import com.liferay.object.configuration.ObjectConfiguration;
+import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
@@ -127,6 +128,9 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.messaging.DestinationNames;
+import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ModelWrapper;
@@ -157,6 +161,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.BigDecimalUtil;
@@ -338,6 +343,11 @@ public class ObjectEntryLocalServiceImpl
 		_startWorkflowInstance(userId, objectEntry, serviceContext);
 
 		_reindex(objectEntry);
+
+		_triggerObjectAction(
+			DestinationNames.OBJECT_ENTRY_ON_AFTER_ADD,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD, objectDefinition,
+			objectEntry, user);
 
 		return objectEntry;
 	}
@@ -4061,6 +4071,30 @@ public class ObjectEntryLocalServiceImpl
 			'.');
 	}
 
+	private void _triggerObjectAction(
+		String destinationName, String objectActionTrigger,
+		ObjectDefinition objectDefinition, ObjectEntry objectEntry, User user) {
+
+		TransactionCommitCallbackUtil.registerCallback(
+			() -> {
+				Message message = new Message();
+
+				message.put("companyId", user.getCompanyId());
+				message.put(
+					"objectDefinitionExternalReferenceCode",
+					objectDefinition.getExternalReferenceCode());
+				message.put(
+					"objectEntryExternalReferenceCode",
+					objectEntry.getExternalReferenceCode());
+				message.put("userId", user.getUserId());
+				message.put("objectActionTrigger", objectActionTrigger);
+
+				_messageBus.sendMessage(destinationName, message);
+
+				return null;
+			});
+	}
+
 	private void _updateTable(
 			DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
 			long objectEntryId, Map<String, Serializable> values,
@@ -4909,6 +4943,9 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private Localization _localization;
+
+	@Reference
+	private MessageBus _messageBus;
 
 	private volatile ObjectConfiguration _objectConfiguration;
 

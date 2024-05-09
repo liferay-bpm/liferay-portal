@@ -280,6 +280,7 @@ public class WebServerServlet extends HttpServlet {
 				ParamUtil.getString(
 					httpServletRequest, "objectEntryExternalReferenceCode"));
 			message.put("userId", user.getUserId());
+			message.put("objectActionTrigger", "onAfterAttachmentDownload");
 
 			messageBus.sendMessage(
 				DestinationNames.OBJECT_ENTRY_ATTACHMENT_DOWNLOAD, message);
