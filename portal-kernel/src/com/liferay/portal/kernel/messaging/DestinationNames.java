@@ -81,6 +81,9 @@ public interface DestinationNames {
 	public static final String OBJECT_ENTRY_ON_AFTER_ADD =
 		"liferay/object_entry_on_after_add";
 
+	public static final String OBJECT_ENTRY_ON_AFTER_UPDATE =
+		"liferay/object_entry_on_after_update";
+
 	public static final String SCHEDULER_DISPATCH =
 		"liferay/scheduler_dispatch";
 

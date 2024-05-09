@@ -1577,6 +1577,11 @@ public class ObjectEntryLocalServiceImpl
 
 		_reindex(objectEntry);
 
+		_triggerObjectAction(
+			DestinationNames.OBJECT_ENTRY_ON_AFTER_UPDATE,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE, objectDefinition,
+			objectEntry, user);
+
 		return objectEntry;
 	}
 
