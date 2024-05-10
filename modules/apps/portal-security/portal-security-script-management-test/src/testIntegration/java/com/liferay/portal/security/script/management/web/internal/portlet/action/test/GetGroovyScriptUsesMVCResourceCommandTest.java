@@ -67,7 +67,7 @@ import org.junit.runner.RunWith;
 /**
  * @author Feliphe Marinho
  */
-@FeatureFlags("LPD-11179")
+
 @RunWith(Arquillian.class)
 public class GetGroovyScriptUsesMVCResourceCommandTest {
 

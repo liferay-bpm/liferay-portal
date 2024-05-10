@@ -13,7 +13,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
  * @author Feliphe Marinho
  */
 @ExtendedObjectClassDefinition(
-	category = "script-management", featureFlagKey = "LPD-11179",
+	category = "script-management",
 	generateUI = false, scope = ExtendedObjectClassDefinition.Scope.SYSTEM
 )
 @Meta.OCD(

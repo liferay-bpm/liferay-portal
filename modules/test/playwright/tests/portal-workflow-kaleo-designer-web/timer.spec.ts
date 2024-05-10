@@ -14,9 +14,6 @@ import {getRandomInt} from '../../utils/getRandomInt';
 export const test = mergeTests(
 	apiHelpersTest,
 	loginTest(),
-	featureFlagsTest({
-		'LPD-11179': true,
-	}),
 	workflowPagesTest
 );
 

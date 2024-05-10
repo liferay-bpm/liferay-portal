@@ -48,7 +48,6 @@ export function ModalAddObjectValidation({
 	let newObjectValidationRuleEngines = [...objectValidationRuleEngines];
 
 	if (
-		Liferay.FeatureFlags['LPD-11179'] &&
 		!allowScriptContentToBeExecutedOrIncluded
 	) {
 		newObjectValidationRuleEngines = objectValidationRuleEngines.filter(

@@ -153,14 +153,12 @@ export function ObjectActionContainer({
 	} = useObjectActionForm({initialValues, onSubmit});
 
 	const disableGroovyAction =
-		Liferay.FeatureFlags['LPD-11179'] &&
 		!allowScriptContentToBeExecutedOrIncluded &&
 		values.objectActionExecutorKey === 'groovy';
 
 	let newObjectActionExecutors = [...objectActionExecutors];
 
 	if (
-		Liferay.FeatureFlags['LPD-11179'] &&
 		!allowScriptContentToBeExecutedOrIncluded
 	) {
 		const shouldFilterGroovyExecutor =

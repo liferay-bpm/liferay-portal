@@ -160,7 +160,6 @@ export default function EditObjectValidation({
 
 	const disabled = readOnly || !!values?.system;
 	const disabledGroovyValidation =
-		Liferay.FeatureFlags['LPD-11179'] &&
 		!allowScriptContentToBeExecutedOrIncluded &&
 		values.engine === 'groovy';
 

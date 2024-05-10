@@ -54,8 +54,7 @@ public class ScriptManagementConfigurationScreen
 
 	@Override
 	public boolean isVisible() {
-		if (FeatureFlagManagerUtil.isEnabled("LPD-11179") &&
-			PropsValues.SCRIPT_MANAGEMENT_CONFIGURATION_ENABLED) {
+		if (PropsValues.SCRIPT_MANAGEMENT_CONFIGURATION_ENABLED) {
 
 			return true;
 		}
