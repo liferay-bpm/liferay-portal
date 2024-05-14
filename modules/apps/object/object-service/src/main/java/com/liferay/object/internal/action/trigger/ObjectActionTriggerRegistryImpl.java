@@ -8,7 +8,7 @@ package com.liferay.object.internal.action.trigger;
 import com.liferay.object.action.engine.ObjectActionEngine;
 import com.liferay.object.action.trigger.ObjectActionTrigger;
 import com.liferay.object.action.trigger.ObjectActionTriggerRegistry;
-import com.liferay.object.internal.action.trigger.messaging.ObjectActionTriggerMessageListener;
+import com.liferay.object.internal.action.trigger.messaging.BaseObjectActionTriggerMessageListener;
 import com.liferay.object.internal.action.trigger.util.ObjectActionTriggerUtil;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
@@ -80,7 +80,7 @@ public class ObjectActionTriggerRegistryImpl
 					return Arrays.asList(
 						bundleContext.registerService(
 							MessageListener.class,
-							new ObjectActionTriggerMessageListener(
+							new BaseObjectActionTriggerMessageListener(
 								className, _objectActionEngine,
 								destination.getName()),
 							HashMapDictionaryBuilder.<String, Object>put(
