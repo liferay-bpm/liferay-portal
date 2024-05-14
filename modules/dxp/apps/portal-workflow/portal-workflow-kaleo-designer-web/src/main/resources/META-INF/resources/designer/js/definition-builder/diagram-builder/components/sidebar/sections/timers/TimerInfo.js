@@ -46,8 +46,7 @@ const TimerInfo = ({
 
 	return (
 		<>
-			{Liferay.FeatureFlags['LPD-11179'] &&
-				!allowScriptContentToBeExecutedOrIncluded &&
+			{!allowScriptContentToBeExecutedOrIncluded &&
 				hasGroovyOrJavaScript && (
 					<DisabledGroovyScriptAlert
 						scriptManagementConfigurationPortletURL={
