@@ -502,7 +502,7 @@ public class ObjectActionLocalServiceTest {
 
 			_assertWebhookObjectAction(
 				"John", "Smith", ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
-				_objectDefinition, null, null, WorkflowConstants.STATUS_DRAFT);
+				_objectDefinition, null, null, WorkflowConstants.STATUS_APPROVED);
 
 			// Execute standalone action to run a Groovy script
 
@@ -668,7 +668,7 @@ public class ObjectActionLocalServiceTest {
 			_assertWebhookObjectAction(
 				"Peter", null, ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE,
 				_objectDefinition, "John", null,
-				WorkflowConstants.STATUS_DRAFT);
+				WorkflowConstants.STATUS_APPROVED);
 
 			// Hierarchy, root object entry
 
@@ -1033,7 +1033,7 @@ public class ObjectActionLocalServiceTest {
 
 		_assertWebhookObjectAction(
 			"John", "Smith", ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
-			_objectDefinition, null, null, WorkflowConstants.STATUS_DRAFT);
+			_objectDefinition, null, null, WorkflowConstants.STATUS_APPROVED);
 
 		ObjectEntry objectEntry2 = _objectEntryLocalService.addObjectEntry(
 			TestPropsValues.getUserId(), 0,
@@ -1047,7 +1047,7 @@ public class ObjectActionLocalServiceTest {
 
 		_assertWebhookObjectAction(
 			"Peter", "White", ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
-			_objectDefinition, null, null, WorkflowConstants.STATUS_DRAFT);
+			_objectDefinition, null, null, WorkflowConstants.STATUS_APPROVED);
 
 		_objectEntryLocalService.deleteObjectEntry(objectEntry1);
 		_objectEntryLocalService.deleteObjectEntry(objectEntry2);
@@ -2280,10 +2280,7 @@ public class ObjectActionLocalServiceTest {
 
 		if (StringUtil.equals(
 				objectActionTriggerKey,
-				ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE) ||
-			StringUtil.equals(
-				objectActionTriggerKey,
-				ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE)) {
+				ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE)) {
 
 			Assert.assertEquals(
 				originalFirstName,
