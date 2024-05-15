@@ -23,6 +23,8 @@ import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryService;
 import com.liferay.document.library.kernel.service.DLFolderService;
 import com.liferay.document.library.util.DLURLHelper;
+import com.liferay.list.type.entry.util.ListTypeEntryUtil;
+import com.liferay.list.type.model.ListTypeDefinition;
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectActionKeys;
@@ -63,6 +65,7 @@ import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.test.util.BaseObjectEntryManagerImplTestCase;
 import com.liferay.object.rest.test.util.ObjectRelationshipTestUtil;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFieldService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectFilterLocalService;
@@ -1426,6 +1429,83 @@ public class DefaultObjectEntryManagerImplTest
 
 		objectDefinitionLocalService.deleteObjectDefinition(
 			objectDefinition.getObjectDefinitionId());
+	}
+
+	@Test
+	public void testAddObjectEntryWithPicklistObjectField() throws Exception {
+		ListTypeDefinition listTypeDefinition =
+			listTypeDefinitionLocalService.addListTypeDefinition(
+				null, TestPropsValues.getUserId(),
+				Collections.singletonMap(
+					LocaleUtil.getDefault(), RandomTestUtil.randomString()),
+				false,
+				ListUtil.fromArray(
+					ListTypeEntryUtil.createListTypeEntry(
+						"listTypeEntryKey1",
+						Collections.singletonMap(
+							LocaleUtil.US, RandomTestUtil.randomString())),
+					ListTypeEntryUtil.createListTypeEntry(
+						"listTypeEntryKey2",
+						Collections.singletonMap(
+							LocaleUtil.US, RandomTestUtil.randomString()))));
+
+		ObjectDefinition objectDefinition = _createObjectDefinition(
+			Collections.singletonList(
+				new PicklistObjectFieldBuilder(
+				).indexed(
+					true
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString())
+				).listTypeDefinitionId(
+					listTypeDefinition.getListTypeDefinitionId()
+				).name(
+					"picklistObjectFieldName"
+				).build()));
+
+		try {
+			_assertObjectEntryProperties(null, null, objectDefinition);
+			_assertObjectEntryProperties(
+				"listTypeEntryKey1", "listTypeEntryKey1", objectDefinition);
+			_assertObjectEntryProperties(
+				"listTypeEntryKey2", "listTypeEntryKey2", objectDefinition);
+
+			long objectEntryId = _assertObjectEntryProperties(
+				StringPool.BLANK, StringPool.BLANK, objectDefinition);
+
+			ObjectField objectField = _objectFieldLocalService.fetchObjectField(
+				objectDefinition.getObjectDefinitionId(),
+				"picklistObjectFieldName");
+
+			_objectFieldSettingLocalService.addObjectFieldSetting(
+				TestPropsValues.getUserId(), objectField.getObjectFieldId(),
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
+				"listTypeEntryKey1");
+			_objectFieldSettingLocalService.addObjectFieldSetting(
+				TestPropsValues.getUserId(), objectField.getObjectFieldId(),
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+				ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE);
+
+			Assert.assertEquals(
+				StringPool.BLANK,
+				_getListEntryKey(
+					_defaultObjectEntryManager.getObjectEntry(
+						_simpleDTOConverterContext, objectDefinition,
+						objectEntryId)));
+
+			_assertObjectEntryProperties(
+				null, "listTypeEntryKey1", objectDefinition);
+			_assertObjectEntryProperties(
+				StringPool.BLANK, StringPool.BLANK, objectDefinition);
+			_assertObjectEntryProperties(
+				"listTypeEntryKey1", "listTypeEntryKey1", objectDefinition);
+			_assertObjectEntryProperties(
+				"listTypeEntryKey2", "listTypeEntryKey2", objectDefinition);
+		}
+		finally {
+			objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinition);
+		}
 	}
 
 	@Test
@@ -4022,6 +4102,39 @@ public class DefaultObjectEntryManagerImplTest
 			objectEntries.toString(), size, objectEntries.size());
 	}
 
+	private long _assertObjectEntryProperties(
+			String actualPicklistObjectFieldValue,
+			String expectedPicklistObjectFieldValue,
+			ObjectDefinition objectDefinition)
+		throws Exception {
+
+		ObjectEntry objectEntry = _defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext, objectDefinition,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						"picklistObjectFieldName",
+						actualPicklistObjectFieldValue
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		if (expectedPicklistObjectFieldValue == null) {
+			Map<String, Object> properties = objectEntry.getProperties();
+
+			Assert.assertFalse(
+				properties.containsKey("picklistObjectFieldName"));
+		}
+		else {
+			Assert.assertEquals(
+				expectedPicklistObjectFieldValue,
+				_getListEntryKey(objectEntry));
+		}
+
+		return objectEntry.getId();
+	}
+
 	private void _assertPicklistOjectField(
 			ListEntry expectedListEntry, Object picklistObjectFieldValue)
 		throws Exception {
@@ -4210,6 +4323,15 @@ public class DefaultObjectEntryManagerImplTest
 		return dlFileEntry.getFileEntryId();
 	}
 
+	private String _getListEntryKey(ObjectEntry objectEntry) {
+		Map<String, Object> properties = objectEntry.getProperties();
+
+		ListEntry listEntry = (ListEntry)properties.get(
+			"picklistObjectFieldName");
+
+		return listEntry.getKey();
+	}
+
 	private void _removeResourcePermission(
 			String actionId, ObjectDefinition objectDefinition, Role role)
 		throws Exception {
@@ -4341,6 +4463,9 @@ public class DefaultObjectEntryManagerImplTest
 
 	@Inject
 	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Inject
+	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@Inject
 	private ObjectFieldService _objectFieldService;
