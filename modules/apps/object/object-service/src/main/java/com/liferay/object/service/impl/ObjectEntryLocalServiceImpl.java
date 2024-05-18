@@ -3883,6 +3883,16 @@ public class ObjectEntryLocalServiceImpl
 				preparedStatement.setString(index, String.valueOf(value));
 			}
 			else {
+				System.out.println("value: " + value);
+
+				StringReader reader = new StringReader(String.valueOf(value));
+				int c = reader.read();
+				while (c != -1){
+					System.out.print((char)c);
+					c = reader.read();
+				}
+				reader.close();
+
 				preparedStatement.setClob(
 					index, new StringReader(String.valueOf(value)));
 			}
