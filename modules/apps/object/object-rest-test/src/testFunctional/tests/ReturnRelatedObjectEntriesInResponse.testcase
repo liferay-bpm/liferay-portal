@@ -196,38 +196,6 @@ definition {
 		}
 	}
 
-	@description = "Ignore tests unitl LPS-184670 fixed"
-	@disable-webdriver = "true"
-	@ignore = "true"
-	@priority = 4
-	test CanReturnChildAndParentWithPostChildUserInOneToManyRelationship {
-		property portal.acceptance = "true";
-
-		task ("When with postUserAccount to create a user and a related student") {
-			var response = UserAccountAPI.createUserAccountAndRelatedObjects(
-				alternateName = "user",
-				emailAddress = "user@liferay.com",
-				familyName = "userfn",
-				givenName = "usergn",
-				nestedField = "studentUsers",
-				numberOfRelatedObjectEntries = 1,
-				oneToManyChild = "true",
-				relatedEntryFieldName = "name");
-		}
-
-		task ("Then in response I can retrieve detailed information of the newly created user and related student") {
-			CustomObjectAPI.assertCorrectObjectEntryValuesInResponse(
-				expectedValues = "user",
-				objectJsonPath = "$.alternateName",
-				response = ${response});
-
-			CustomObjectAPI.assertCorrectObjectEntryValuesInResponse(
-				expectedValues = "name0",
-				objectJsonPath = "$.studentUsers.name",
-				response = ${response});
-		}
-	}
-
 	@disable-webdriver = "true"
 	@priority = 4
 	test CanReturnChildAndSystemParentWithPostChildStudentInOneToManyRelationship {
