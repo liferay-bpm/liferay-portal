@@ -4,6 +4,23 @@
 		"en_US": "Definição de Objeto Teste",
 		"pt_BR": "Definição de Objeto Teste"
 	},
+	"objectActions": [
+		{
+			"active": true,
+			"conditionExpression": "",
+			"description": "",
+			"label": {
+				"en_US": "Action",
+				"pt_BR": "Acao"
+			},
+			"name": "Acao",
+			"objectActionExecutorKey": "notification",
+			"objectActionTriggerKey": "onAfterAdd",
+			"parameters": {
+				"notificationTemplateExternalReferenceCode": "TESTNOTIFICATIONTEMPLATE1"
+			}
+		}
+	],
 	"objectFields": [
 		{
 			"DBType": "String",
@@ -73,9 +90,32 @@
 			},
 			"name": "status",
 			"system": true
+		},
+		{
+			"DBType": "Integer",
+			"businessType": "Integer",
+			"label": {
+				"en_US": "Phone Number",
+				"pt_BR": "telefone"
+			},
+			"name": "telefone",
+			"readOnly": "false",
+			"system": false
 		}
 	],
 	"objectFolderExternalReferenceCode": "default",
+	"objectRelationships": [
+		{
+			"label": {
+				"en_US": "Test Object Relationship",
+				"pt_BR": "relacionamento"
+			},
+			"name": "relacionamento",
+			"objectDefinitionExternalReferenceCode2": "TESTOBJECTDEFINITION2",
+			"system": false,
+			"type": "oneToMany"
+		}
+	],
 	"pluralLabel": {
 		"en_US": "Definições de Objeto Teste",
 		"pt_BR": "Definições de Objeto Teste"
