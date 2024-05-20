@@ -275,6 +275,10 @@ public class ObjectFieldUtil {
 			}
 		}
 
+		if (!labelMap.containsKey(defaultLocale)) {
+			labelMap.put(defaultLocale, objectField.getName());
+		}
+
 		serviceBuilderObjectField.setLabelMap(labelMap);
 
 		serviceBuilderObjectField.setLocalized(

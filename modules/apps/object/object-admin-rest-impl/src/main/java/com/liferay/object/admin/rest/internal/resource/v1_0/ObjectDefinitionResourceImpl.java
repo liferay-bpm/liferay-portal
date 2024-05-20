@@ -341,7 +341,8 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		_addObjectDefinitionResources(
-			Collections.emptySet(), objectDefinition.getObjectActions(),
+			objectDefinition.getDefaultLanguageId(), Collections.emptySet(),
+			objectDefinition.getObjectActions(),
 			serviceBuilderObjectDefinition.getObjectDefinitionId(),
 			objectDefinition.getObjectLayouts(),
 			objectDefinition.getObjectRelationships(),
@@ -784,6 +785,7 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		_addObjectDefinitionResources(
+			objectDefinition.getDefaultLanguageId(),
 			accountEntryRestrictedObjectRelationshipsNames,
 			objectActions.toArray(new ObjectAction[0]), objectDefinitionId,
 			objectLayouts,
@@ -824,6 +826,16 @@ public class ObjectDefinitionResourceImpl
 		return postObjectDefinition(objectDefinition);
 	}
 
+	private Map<String, String> _addDefaultLocaleLabel(
+		String defaultLocale, Map<String, String> localeLabelMap, String name) {
+
+		if (!localeLabelMap.containsKey(defaultLocale)) {
+			localeLabelMap.put(defaultLocale, name);
+		}
+
+		return localeLabelMap;
+	}
+
 	private void _addListTypeDefinition(ObjectDefinition objectDefinition)
 		throws Exception {
 
@@ -842,6 +854,7 @@ public class ObjectDefinitionResourceImpl
 	}
 
 	private void _addObjectDefinitionResources(
+			String defaultLocale,
 			Set<String> accountEntryRestrictedObjectRelationshipsNames,
 			ObjectAction[] objectActions, long objectDefinitionId,
 			ObjectLayout[] objectLayouts,
@@ -864,6 +877,12 @@ public class ObjectDefinitionResourceImpl
 						_objectActionLocalService.fetchObjectAction(
 							objectAction.getExternalReferenceCode(),
 							objectDefinitionId);
+
+				Map<String, String> localeLabelMap = _addDefaultLocaleLabel(
+					defaultLocale, objectAction.getLabel(),
+					objectAction.getName());
+
+				objectAction.setLabel(() -> localeLabelMap);
 
 				if (serviceBuilderObjectAction != null) {
 					objectActionResource.putObjectAction(
@@ -907,6 +926,12 @@ public class ObjectDefinitionResourceImpl
 								objectDefinitionId,
 								objectRelationship.getName());
 				}
+
+				Map<String, String> localeLabelMap = _addDefaultLocaleLabel(
+					defaultLocale, objectRelationship.getLabel(),
+					objectRelationship.getName());
+
+				objectRelationship.setLabel(() -> localeLabelMap);
 
 				boolean edge = GetterUtil.getBoolean(
 					objectRelationship.getEdge());
