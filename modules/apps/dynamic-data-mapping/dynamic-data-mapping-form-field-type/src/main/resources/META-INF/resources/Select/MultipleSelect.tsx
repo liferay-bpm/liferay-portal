@@ -53,7 +53,7 @@ const MultipleSelection = ({
 	useEffect(() => {
 		if (
 			!readOnly &&
-			activeTabTitle !== Liferay.Language.get('advanced') &&
+			activeTabTitle === Liferay.Language.get('basic') &&
 			!viewMode
 		) {
 			setLoading(true);
