@@ -6,6 +6,11 @@
 /// <reference types="react" />
 
 import {MultiSelectProps} from './select.d';
+export declare function isFormFieldSettings(
+	activeTabTitle: unknown,
+	readOnly: boolean,
+	viewMode: boolean
+): boolean;
 declare const MultipleSelection: ({
 	errorMessage,
 	id,

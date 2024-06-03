@@ -10,6 +10,18 @@ import React, {useEffect, useState} from 'react';
 
 import {MultiSelectItem, MultiSelectProps} from './select.d';
 
+export function isFormFieldSettings(
+	activeTabTitle: unknown,
+	readOnly: boolean,
+	viewMode: boolean
+) {
+	return (
+		!readOnly &&
+		activeTabTitle === Liferay.Language.get('basic') &&
+		!viewMode
+	);
+}
+
 const MultipleSelection = ({
 	errorMessage,
 	id,
@@ -51,11 +63,7 @@ const MultipleSelection = ({
 	}, [values]);
 
 	useEffect(() => {
-		if (
-			!readOnly &&
-			activeTabTitle === Liferay.Language.get('basic') &&
-			!viewMode
-		) {
+		if (isFormFieldSettings(activeTabTitle, !!readOnly, !!viewMode)) {
 			setLoading(true);
 			setTimeout(() => setLoading(false), 200);
 		}
