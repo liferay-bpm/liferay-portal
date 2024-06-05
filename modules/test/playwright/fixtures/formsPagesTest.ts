@@ -7,11 +7,13 @@ import {test} from '@playwright/test';
 
 import {FormBuilderPage} from '../pages/dynamic-data-mapping-form-web/FormBuilderPage';
 import {FormBuilderSidePanelPage} from '../pages/dynamic-data-mapping-form-web/FormBuilderSidePanelPage';
+import {FormSettingsModalPage} from '../pages/dynamic-data-mapping-form-web/FormSettingsModalPage';
 import {FormsPage} from '../pages/dynamic-data-mapping-form-web/FormsPage';
 
 const formsPagesTest = test.extend<{
 	formBuilderPage: FormBuilderPage;
 	formBuilderSidePanelPage: FormBuilderSidePanelPage;
+	formSettingsModalPage: FormSettingsModalPage;
 	formsPage: FormsPage;
 }>({
 	formBuilderPage: async ({page}, use) => {
@@ -19,6 +21,9 @@ const formsPagesTest = test.extend<{
 	},
 	formBuilderSidePanelPage: async ({page}, use) => {
 		await use(new FormBuilderSidePanelPage(page));
+	},
+	formSettingsModalPage: async ({page}, use) => {
+		await use(new FormSettingsModalPage(page));
 	},
 	formsPage: async ({page}, use) => {
 		await use(new FormsPage(page));

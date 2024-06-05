@@ -6,20 +6,34 @@
 import {Locator, Page} from '@playwright/test';
 
 export class FormBuilderSidePanelPage {
+	readonly addSelectOptionButton: Locator;
 	readonly advancedTab: Locator;
 	readonly backButton: Locator;
+	readonly basicTab: Locator;
+	readonly createListSelect: Locator;
 	readonly htmlAutocompleteAttributeField: Locator;
+	readonly objectFieldSelect: Locator;
+	readonly predefinedValueSelect: Locator;
 	readonly page: Page;
 
 	constructor(page: Page) {
+		this.addSelectOptionButton = page.getByRole('button', {
+			name: 'Add Option',
+		});
 		this.advancedTab = page.getByRole('tab', {
 			name: 'Advanced',
 		});
 		this.backButton = page.getByRole('button', {name: 'Back'});
+		this.basicTab = page.getByRole('tab', {
+			name: 'Basic',
+		});
+		this.createListSelect = page.getByLabel('Create List');
 		this.htmlAutocompleteAttributeField = page.getByLabel(
 			'HTML Autocomplete Attribute'
 		);
+		this.objectFieldSelect = page.getByLabel('Object Field');
 		this.page = page;
+		this.predefinedValueSelect = page.getByLabel('Predefined Value');
 	}
 
 	async addFieldByDoubleClick(formFieldTypeTitle: FormFieldTypeTitle) {
@@ -32,7 +46,22 @@ export class FormBuilderSidePanelPage {
 		await this.advancedTab.click();
 	}
 
+	async clickBasicTab() {
+		await this.basicTab.click();
+	}
+
 	async clickBackButton() {
 		await this.backButton.click();
 	}
+
+	async selectObjectField(objectFieldLabel: string) {
+		await this.objectFieldSelect.click();
+
+		const option = this.getSelectOptionLocator(objectFieldLabel);
+		await option.click();
+	}
+
+	getSelectOptionLocator = (optionLabel: string) => {
+		return this.page.getByRole('option', {name: optionLabel});
+	};
 }
