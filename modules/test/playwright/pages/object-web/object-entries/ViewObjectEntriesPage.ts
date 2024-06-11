@@ -21,9 +21,9 @@ export class ViewObjectEntriesPage {
 	readonly successMessage: Locator;
 
 	constructor(page: Page) {
-		this.addObjectEntryButton = page
-			.getByTestId('fdsCreationActionButton')
-			.first();
+		this.addObjectEntryButton = page.locator(
+			'.management-bar .btn-primary'
+		);
 		this.backButton = page.getByTitle('Back');
 		this.duplicateEntryErrorMessage = page.getByText(
 			'Error:The field values are already in use. Please choose unique values.'
@@ -60,10 +60,12 @@ export class ViewObjectEntriesPage {
 		objectFieldBusinessType,
 		objectFieldLabel,
 		objectFieldValue,
+		roleLocator,
 	}: {
 		objectFieldBusinessType?: ObjectFieldBusinessTypeName;
 		objectFieldLabel?: string;
 		objectFieldValue: string;
+		roleLocator?: ariaRoles;
 	}) {
 		if (objectFieldBusinessType === 'RichText') {
 			await this.page.waitForSelector('iframe');
@@ -77,9 +79,21 @@ export class ViewObjectEntriesPage {
 			return;
 		}
 
+		if (roleLocator) {
+			await this.page
+				.getByRole(roleLocator, {exact: true, name: objectFieldLabel})
+				.fill(objectFieldValue);
+
+			return;
+		}
+
 		await this.page
 			.getByLabel(objectFieldLabel, {exact: true})
 			.fill(objectFieldValue);
+	}
+
+	async openObjectEntry(objectEntryId: string) {
+		await this.page.getByRole('link', {name: objectEntryId}).click();
 	}
 
 	async selectDropdownItem(fieldName: string, optionName: string) {

@@ -183,6 +183,16 @@ export class ObjectAdminApiHelper {
 		);
 	}
 
+	async putObjectDefinitionByExternalReferenceCode(
+		externalReferenceCode: string,
+		objectDefinition: Partial<ObjectDefinition>
+	) {
+		return this.apiHelpers.put(
+			`${this.apiHelpers.baseUrl}${this.basePath}/object-definitions/by-external-reference-code/${externalReferenceCode}`,
+			{data: objectDefinition}
+		);
+	}
+
 	async putObjectRelationship(
 		objectRelationshipId: number,
 		objectRelationship: Partial<ObjectRelationship>

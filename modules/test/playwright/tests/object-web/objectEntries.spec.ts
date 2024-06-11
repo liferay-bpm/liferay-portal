@@ -14,6 +14,8 @@ import {objectPagesTest} from '../../fixtures/objectPagesTest';
 import {pageEditorPagesTest} from '../../fixtures/pageEditorPagesTest';
 import {getRandomInt} from '../../utils/getRandomInt';
 import getRandomString from '../../utils/getRandomString';
+import performLogin from '../../utils/performLogin';
+import {waitForSuccessAlert} from '../../utils/waitForSuccessAlert';
 import {journalPagesTest} from '../journal-web/fixtures/journalPagesTest';
 import {getFDSDateFormat, getPageEditorDateFormat} from './utils/dateFormat';
 import {mockObjectFields} from './utils/mockObjectFields';
@@ -24,6 +26,7 @@ export const test = mergeTests(
 	isolatedSiteTest,
 	featureFlagsTest({
 		'LPS-178052': true,
+		'LPS-187142': true,
 	}),
 	journalPagesTest,
 	loginTest(),
@@ -522,6 +525,204 @@ test.describe('Manage object entries through View Object Entries', () => {
 
 		await apiHelpers.objectAdmin.deleteObjectDefinition(
 			objectDefinition2.id
+		);
+	});
+});
+
+test.describe('Manage bound object entries with update root permission', () => {
+	test('can add bound object entries with update root permission', async ({
+		apiHelpers,
+		page,
+		viewObjectEntriesPage,
+	}) => {
+
+		// test.setTimeout(180000);
+
+		const rootObjectDefinitionERC =
+			'rootObjectDefinitionERC' + getRandomInt();
+		const boundObjectDefinitionERC =
+			'boundObjectDefinitionERC' + getRandomInt();
+
+		const rootObjectDefinition =
+			await apiHelpers.objectAdmin.postObjectDefinition({
+				active: false,
+				externalReferenceCode: rootObjectDefinitionERC,
+				label: {
+					en_US: 'RootObject',
+				},
+				name: 'RootObject' + getRandomInt(),
+				objectFields: [
+					{
+						DBType: 'String',
+						businessType: 'Text',
+						externalReferenceCode: 'text',
+						indexed: true,
+						indexedAsKeyword: true,
+						label: {
+							en_US: 'text',
+						},
+						name: 'text',
+						required: false,
+						system: false,
+						type: 'String',
+					},
+				],
+				objectRelationships: [
+					{
+						deletionType: 'cascade',
+						edge: true,
+						label: {
+							en_US: 'RootToBound',
+						},
+						name: 'rootToBound',
+						objectDefinitionExternalReferenceCode1:
+							rootObjectDefinitionERC,
+						objectDefinitionExternalReferenceCode2:
+							boundObjectDefinitionERC,
+						type: 'oneToMany',
+					},
+				],
+				panelCategoryKey: '',
+				pluralLabel: {
+					en_US: 'RootObject',
+				},
+				portlet: true,
+				rootObjectDefinitionExternalReferenceCode:
+					rootObjectDefinitionERC,
+				scope: 'company',
+				status: {
+					code: 2,
+				},
+			});
+
+		const boundObjectDefinition =
+			await apiHelpers.objectAdmin.putObjectDefinitionByExternalReferenceCode(
+				boundObjectDefinitionERC,
+				{
+					active: false,
+					externalReferenceCode: boundObjectDefinitionERC,
+					label: {
+						en_US: 'BoundObject',
+					},
+					name: 'BoundObject' + getRandomInt(),
+					objectFields: [
+						{
+							DBType: 'String',
+							businessType: 'Text',
+							externalReferenceCode: 'text',
+							indexed: true,
+							indexedAsKeyword: true,
+							label: {
+								en_US: 'BoundText',
+							},
+							localized: false,
+							name: 'text',
+							readOnly: 'false',
+							required: false,
+							state: false,
+							system: false,
+							type: 'String',
+						},
+					],
+					panelCategoryKey: '',
+					pluralLabel: {
+						en_US: 'BoundObject',
+					},
+					rootObjectDefinitionExternalReferenceCode:
+						rootObjectDefinitionERC,
+					scope: 'company',
+					status: {
+						code: 2,
+						label: 'draft',
+						label_i18n: 'Draft',
+					},
+					titleObjectFieldName: 'text',
+				}
+			);
+
+		await apiHelpers.objectAdmin.postObjectDefinitionPublish(
+			rootObjectDefinition.id
+		);
+
+		const applicationName =
+			'c/' + rootObjectDefinition.name.toLowerCase() + 's';
+
+		const textObjectEntry = {
+			text: 'Root',
+		};
+
+		const objectEntry = await apiHelpers.objectEntry.postObjectEntry(
+			textObjectEntry,
+			applicationName
+		);
+
+		const companyId = await page.evaluate(() => {
+			return Liferay.ThemeDisplay.getCompanyId();
+		});
+
+		const role = await apiHelpers.headlessAdminUser.postRole({
+			name: 'Bound Updater ' + getRandomString(),
+			rolePermissions: [
+				{
+					actionIds: ['UPDATE', 'VIEW'],
+					primaryKey: companyId,
+					resourceName:
+						'com.liferay.object.model.ObjectDefinition#' +
+						rootObjectDefinition.id,
+					scope: 1,
+				},
+				{
+					actionIds: ['ACCESS_IN_CONTROL_PANEL'],
+					primaryKey: companyId,
+					resourceName:
+						'com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_' +
+						rootObjectDefinition.id,
+					scope: 1,
+				},
+			],
+		});
+
+		const user =
+			await apiHelpers.headlessAdminUser.getUserAccountByEmailAddress(
+				'demo.unprivileged@liferay.com'
+			);
+
+		await apiHelpers.headlessAdminUser.assignUserToRole(role.name, user.id);
+
+		await page.getByLabel('Test Test User Profile').click();
+		await page.getByRole('menuitem', {name: 'Sign Out'}).click();
+
+		await performLogin(page, user.alternateName);
+
+		await viewObjectEntriesPage.goto(rootObjectDefinition.id);
+
+		await viewObjectEntriesPage.openObjectEntry(String(objectEntry.id));
+		await page
+			.getByRole('link', {name: boundObjectDefinition.label.en_US})
+			.click();
+
+		const boundObjectEntryText = 'Bound' + getRandomString();
+
+		await viewObjectEntriesPage.clickAddObjectEntry();
+		await viewObjectEntriesPage.fillObjectEntry({
+			objectFieldLabel: 'BoundText',
+			objectFieldValue: boundObjectEntryText,
+			roleLocator: 'textbox',
+		});
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+		await waitForSuccessAlert(page);
+
+		await viewObjectEntriesPage.backButton.click();
+
+		await expect(
+			page.getByText(boundObjectEntryText, {exact: true})
+		).toBeVisible();
+
+		// Clean up
+
+		await apiHelpers.headlessAdminUser.deleteRoleUserAccountAssociation(
+			role.id,
+			user.id
 		);
 	});
 });
