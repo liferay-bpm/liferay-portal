@@ -570,7 +570,7 @@ definition {
 
 			for (var itemNumber : list "1,2,3") {
 				Picklist.assertPicklistItem(
-					picklistItemKey = "picklistItem${itemNumber}",
+					picklistItemKey = "PicklistItem${itemNumber}",
 					picklistItemName = "Picklist Item ${itemNumber}");
 			}
 		}
@@ -593,7 +593,7 @@ definition {
 
 			for (var itemNumber : list "1,2,3") {
 				Picklist.updatePicklistItemName(
-					itemkey = "picklistItem${itemNumber}",
+					itemkey = "PicklistItem${itemNumber}",
 					newItemName = "Picklist Item ${itemNumber} Edit After Upgrade");
 
 				PortletEntry.save();
@@ -618,9 +618,9 @@ definition {
 			}
 		}
 
-		task ("Delete items from both Picklists") {
+		task ("Delete items from both Picklists") {itemKey =
 			Picklist.optionsPicklistItem(
-				itemKey = "picklistAfterUpgradeItem2",
+				itemKey = "PicklistAfterUpgradeItem2",
 				menuItem = "Delete");
 
 			PortletEntry.save();
@@ -630,7 +630,7 @@ definition {
 			Picklist.gotoPicklistView(picklistName = "Custom Picklist Edit After Upgrade");
 
 			Picklist.optionsPicklistItem(
-				itemKey = "picklistItem2",
+				itemKey = "PicklistItem2",
 				menuItem = "Delete");
 
 			PortletEntry.save();
