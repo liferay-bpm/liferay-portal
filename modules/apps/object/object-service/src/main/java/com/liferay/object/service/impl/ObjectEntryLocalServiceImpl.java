@@ -336,12 +336,16 @@ public class ObjectEntryLocalServiceImpl
 		boolean clearObjectEntryIdsMap =
 			ObjectActionThreadLocal.isClearObjectEntryIdsMap();
 
+		Locale currentLocale = LocaleThreadLocal.getThemeDisplayLocale();
+
 		try {
 			if (clearObjectEntryIdsMap) {
 				ObjectActionThreadLocal.clearObjectEntryIdsMap();
 			}
 
 			ObjectActionThreadLocal.setClearObjectEntryIdsMap(false);
+
+			LocaleThreadLocal.setThemeDisplayLocale(serviceContext.getLocale());
 
 			_executeObjectActions(
 				objectEntry.getCompanyId(),
@@ -351,6 +355,8 @@ public class ObjectEntryLocalServiceImpl
 		finally {
 			ObjectActionThreadLocal.setClearObjectEntryIdsMap(
 				clearObjectEntryIdsMap);
+
+			LocaleThreadLocal.setThemeDisplayLocale(currentLocale);
 		}
 
 		return objectEntry;
@@ -1583,10 +1589,19 @@ public class ObjectEntryLocalServiceImpl
 
 		_reindex(objectEntry);
 
-		_executeObjectActions(
-			objectEntry.getCompanyId(),
-			ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE, objectDefinition,
-			objectEntry, originalObjectEntry, user);
+		Locale currentLocale = LocaleThreadLocal.getThemeDisplayLocale();
+
+		try {
+			LocaleThreadLocal.setThemeDisplayLocale(serviceContext.getLocale());
+
+			_executeObjectActions(
+				objectEntry.getCompanyId(),
+				ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE,
+				objectDefinition, objectEntry, originalObjectEntry, user);
+		}
+		finally {
+			LocaleThreadLocal.setThemeDisplayLocale(currentLocale);
+		}
 
 		return objectEntry;
 	}
