@@ -8,6 +8,7 @@ import {Locator, Page} from '@playwright/test';
 export class FormBuilderSidePanelPage {
 	readonly advancedTab: Locator;
 	readonly backButton: Locator;
+	readonly closeBuilderPanel: Locator;
 	readonly htmlAutocompleteAttributeField: Locator;
 	readonly page: Page;
 
@@ -16,6 +17,7 @@ export class FormBuilderSidePanelPage {
 			name: 'Advanced',
 		});
 		this.backButton = page.getByRole('button', {name: 'Back'});
+		this.closeBuilderPanel = page.getByLabel('Close Builder Panel');
 		this.htmlAutocompleteAttributeField = page.getByLabel(
 			'HTML Autocomplete Attribute'
 		);
@@ -34,5 +36,9 @@ export class FormBuilderSidePanelPage {
 
 	async clickBackButton() {
 		await this.backButton.click();
+	}
+
+	async clickCloseButton() {
+		await this.closeBuilderPanel.click();
 	}
 }

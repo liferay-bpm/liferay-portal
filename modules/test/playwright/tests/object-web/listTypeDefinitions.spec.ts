@@ -3,19 +3,24 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {expect, mergeTests} from '@playwright/test';
+import {Page, expect, mergeTests} from '@playwright/test';
 
 import {apiHelpersTest} from '../../fixtures/apiHelpersTest';
 import {listTypeDefinitionsPagesTest} from '../../fixtures/listTypeDefinitionsPagesTest';
 import {loginTest} from '../../fixtures/loginTest';
 import {siteSettingsPageTests} from '../../fixtures/siteSettingsPagesTest';
 import {getRandomInt} from '../../utils/getRandomInt';
+import {objectPagesTest} from '../../fixtures/objectPagesTest';
+import { formsPagesTest } from '../../fixtures/formsPagesTest';
 
 export const test = mergeTests(
 	apiHelpersTest,
 	listTypeDefinitionsPagesTest,
 	loginTest(),
-	siteSettingsPageTests
+	siteSettingsPageTests,
+	objectPagesTest,
+	formsPagesTest,
+	
 );
 
 let createdListTypeDefinitionName: string;
@@ -29,7 +34,7 @@ test.afterEach(async ({apiHelpers, page, siteSettingsLocalizationPage}) => {
 
 		await siteSettingsLocalizationPage.selectDefaultLanguageOption();
 
-		await siteSettingsLocalizationPage.saveConfiguration();
+		await siteSettingsLocalizationPage.saveConfiguration()	;
 
 		customDefaultSiteLanguage = '';
 	}
@@ -159,5 +164,110 @@ test.describe('manage picklists inside the picklists portlet', () => {
 				listTypeDefinitionContent[i]
 			);
 		}
+	});
+});
+
+test.describe('ensure picklist item translation', () => {
+	test('verify if translated picklist item will be displayed on forms', async ({
+		apiHelpers,
+		listTypeDefinitionPage, 
+		page,
+		viewObjectDefinitionsPage,
+		formBuilderPage,
+		formBuilderSidePanelPage,
+	}) => {
+		// Create a picklist
+
+		const listTypeDefinition: ListTypeDefinition = 
+			await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
+
+		const listTypeDefinitionName: string = listTypeDefinition.name;
+			
+		// Create a picklist item
+
+		const listTypeEntryName: string = 'picklistItem' + getRandomInt();
+		
+		await apiHelpers.listTypeAdmin.postListTypeEntry(
+			listTypeDefinition.externalReferenceCode, listTypeEntryName);
+		
+		// Translate picklist item
+
+		await listTypeDefinitionPage.goto();
+
+		await listTypeDefinitionPage.translatePicklistItem(listTypeDefinitionName, listTypeEntryName, 'pt_BR');
+
+		// Create custom object with the picklist
+
+		const objectDefinition: ObjectDefinition = 
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFolderExternalReferenceCode: 'default',
+				status: {code: 0},
+		});
+
+		await viewObjectDefinitionsPage.goto();
+
+		await page.getByRole('link', { name: objectDefinition.label['en_US'] }).click();
+
+		await page.getByRole('link', { name: 'Fields' }).click();
+
+		await page.getByRole('button', { name: 'Add Object Field' }).click();
+
+		const fieldLabel = 'picklistField' + getRandomInt();
+	
+		await page.locator('input[name="label"]').fill(fieldLabel);
+
+		await page.getByText('Select an Option').click();
+
+		await page.getByRole('option', { name: 'Picklist', exact: true }).click();
+
+		await page.getByLabel('Picklist').click();
+
+		await page.getByRole('option', { name: listTypeDefinitionName }).click();
+
+		await page.getByRole('button', { name: 'Save' }).click();
+
+		await page.getByRole('link', { name: 'Details' }).click();
+
+		await page.getByRole('button', { name: 'Save' }).dblclick();
+
+		// Go to forms and map it to object
+
+		await page.goto('/');
+
+		await formBuilderPage.goToNew();
+
+		await formBuilderPage.selectObjectStorage(objectDefinition);
+
+		await formBuilderSidePanelPage.addFieldByDoubleClick('Select from List');
+
+		await formBuilderSidePanelPage.clickAdvancedTab();
+
+		await page.getByText('Choose an Option').nth(4).click();
+
+		await page.getByRole('option', { name: fieldLabel }).click();
+		
+		// Preview form
+
+		await page.waitForTimeout(200);
+
+		const newTabPagePromise = new Promise<Page>((resolve) =>
+			formBuilderPage.page.once('popup', resolve)
+		);
+
+		await formBuilderPage.previewButton.click();
+
+		const newTabPage = await newTabPagePromise;
+
+		await newTabPage.waitForLoadState('domcontentloaded');
+
+		await page.goto('pt')
+
+		await newTabPage.reload();
+
+		await newTabPage.getByLabel('Select from List').click();
+
+		await expect(
+			newTabPage.getByRole('option', { name: listTypeEntryName + ' translated' }))
+			.toBeVisible();
 	});
 });

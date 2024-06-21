@@ -15,6 +15,12 @@ export class FormBuilderPage {
 	readonly publishButton: Locator;
 	readonly newFormHeading: Locator;
 	readonly newPageButton: Locator;
+	readonly settingsButton: Locator;
+	readonly selectStorageType: Locator;
+	readonly selectObjectStorageType: Locator;
+	readonly selectObject: Locator;
+	readonly settingsDoneButton: Locator;
+	readonly selectFromList: Locator;
 
 	constructor(page: Page) {
 		this.formTitle = page.getByPlaceholder('Untitled Form');
@@ -24,6 +30,15 @@ export class FormBuilderPage {
 		this.publishButton = page.getByRole('button', {name: 'Publish'});
 		this.newFormHeading = page.getByRole('heading', {name: 'New Form'});
 		this.newPageButton = page.getByRole('button', {name: 'New Page'});
+		this.settingsButton = page
+		.locator('[id="_com_liferay_dynamic_data_mapping_form_web_portlet_DDMFormAdminPortlet_managementToolbar"]')
+		.getByRole('button')
+		.first();
+		this.selectStorageType = page.getByLabel('Select a Storage Type');
+		this.selectObjectStorageType = page.getByRole('option', { name: 'Object' });
+		this.selectObject = page.getByLabel('Select Object');
+		this.settingsDoneButton = page.getByRole('button', { name: 'Done' });
+		this.selectFromList = page.getByRole('button', { name: 'Press enter to add Select from List field. Select from List Select options from a list.' });
 	}
 
 	async clickPreviewButton() {
@@ -32,6 +47,20 @@ export class FormBuilderPage {
 
 	async fillFormTitle(title: string) {
 		await this.formTitle.fill(title);
+	}
+
+	async selectObjectStorage(objectDefinition: ObjectDefinition) {
+		await this.settingsButton.click();
+
+		await this.selectStorageType.click();
+
+		await this.selectObjectStorageType.click();
+
+		await this.selectObject.click();
+
+		await this.page.getByRole('option', { name: objectDefinition.label['en_US'] }).click();
+	
+		await this.settingsDoneButton.click();
 	}
 
 	async goToNew() {
