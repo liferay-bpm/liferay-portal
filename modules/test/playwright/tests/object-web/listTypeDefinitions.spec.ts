@@ -23,8 +23,15 @@ export const test = mergeTests(
 	
 );
 
-let createdListTypeDefinitionName: string;
 let customDefaultSiteLanguage: string;
+
+const createdEntities = {
+	listTypeDefinitions: [],
+	objectDefinitions: [],
+} as {
+	listTypeDefinitions: ListTypeDefinition[];
+	objectDefinitions: ObjectDefinition[];
+};
 
 test.afterEach(async ({apiHelpers, page, siteSettingsLocalizationPage}) => {
 	if (customDefaultSiteLanguage) {
@@ -39,39 +46,37 @@ test.afterEach(async ({apiHelpers, page, siteSettingsLocalizationPage}) => {
 		customDefaultSiteLanguage = '';
 	}
 
-	if (createdListTypeDefinitionName) {
-		const listTypeDefinitions =
-			await apiHelpers.listTypeAdmin.getListTypeDefinitions();
-
-		const [createdListTypeDefinition] = listTypeDefinitions.items.filter(
-			(listTypeDefinition: ListTypeDefinition) =>
-				listTypeDefinition.name === createdListTypeDefinitionName
-		);
-
-		await apiHelpers.listTypeAdmin.deleteListTypeDefinition(
-			createdListTypeDefinition.id
-		);
-
-		createdListTypeDefinitionName = '';
+	for (const objectDefinition of createdEntities.objectDefinitions) {
+		await apiHelpers.objectAdmin.deleteObjectDefinition(objectDefinition.id);
 	}
+
+	createdEntities.objectDefinitions = [];
+
+	for (const listTypeDefinition of createdEntities.listTypeDefinitions) {
+		await apiHelpers.listTypeAdmin.deleteListTypeDefinition(
+			listTypeDefinition.id
+		);
+	}
+
+	createdEntities.listTypeDefinitions = [];
 });
 
 test.describe('manage picklists inside the picklists portlet', () => {
-	test('can create a picklist', async ({listTypeDefinitionPage, page}) => {
+	test('can create a picklist', async ({apiHelpers, listTypeDefinitionPage, page}) => {
+		const listTypeDefinition: ListTypeDefinition = 
+			await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
+		
+		createdEntities.listTypeDefinitions.push(listTypeDefinition);
+		
 		await listTypeDefinitionPage.goto();
 
-		const listTypeDefinitionName = 'picklist' + getRandomInt();
-
-		createdListTypeDefinitionName = listTypeDefinitionName;
-
-		await listTypeDefinitionPage.createPicklist(listTypeDefinitionName);
-
 		await expect(
-			page.getByRole('link', {name: listTypeDefinitionName})
+			page.getByRole('link', {name: listTypeDefinition.name})
 		).toBeVisible();
 	});
 
 	test('can create a picklist when the instance language is different from the site language', async ({
+		apiHelpers,
 		listTypeDefinitionPage,
 		page,
 		siteSettingsLocalizationPage,
@@ -86,16 +91,15 @@ test.describe('manage picklists inside the picklists portlet', () => {
 
 		customDefaultSiteLanguage = 'pt_BR';
 
+		const listTypeDefinition: ListTypeDefinition = 
+		await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
+		
+		createdEntities.listTypeDefinitions.push(listTypeDefinition);
+		
 		await listTypeDefinitionPage.goto();
 
-		const listTypeDefinitionName = 'picklist' + getRandomInt();
-
-		createdListTypeDefinitionName = listTypeDefinitionName;
-
-		await listTypeDefinitionPage.createPicklist(listTypeDefinitionName);
-
 		await expect(
-			page.getByRole('link', {name: listTypeDefinitionName})
+			page.getByRole('link', {name: listTypeDefinition.name})
 		).toBeVisible();
 	});
 
@@ -104,11 +108,14 @@ test.describe('manage picklists inside the picklists portlet', () => {
 		listTypeDefinitionPage,
 		page,
 	}) => {
+		const listTypeDefinition: ListTypeDefinition = 
+			await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
+
+		createdEntities.listTypeDefinitions.push(listTypeDefinition);
+		
 		await listTypeDefinitionPage.goto();
 
-		const listTypeDefinitionName = 'ListTypeDefinition' + getRandomInt();
-
-		await listTypeDefinitionPage.createPicklist(listTypeDefinitionName);
+		const listTypeDefinitionName: string = listTypeDefinition.name;
 
 		const listTypeDefinitionEntryName = 'ListTypeDefinitionEntryName';
 
@@ -119,8 +126,6 @@ test.describe('manage picklists inside the picklists portlet', () => {
 			listTypeDefinitionEntryName,
 			listTypeDefinitionEntryKey
 		);
-
-		createdListTypeDefinitionName = listTypeDefinitionName;
 
 		const [response] =
 			await apiHelpers.listTypeAdmin.getFilteredListTypeDefinition(
@@ -181,6 +186,8 @@ test.describe('ensure picklist item translation', () => {
 		const listTypeDefinition: ListTypeDefinition = 
 			await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
 
+		createdEntities.listTypeDefinitions.push(listTypeDefinition);
+
 		const listTypeDefinitionName: string = listTypeDefinition.name;
 			
 		// Create a picklist item
@@ -203,6 +210,8 @@ test.describe('ensure picklist item translation', () => {
 				objectFolderExternalReferenceCode: 'default',
 				status: {code: 0},
 		});
+
+		createdEntities.objectDefinitions.push(objectDefinition);
 
 		await viewObjectDefinitionsPage.goto();
 
