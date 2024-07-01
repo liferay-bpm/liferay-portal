@@ -82,6 +82,25 @@ export class ListTypeDefinitionsPage {
 		await this.savePicklistButton.click();
 	}
 
+	async translatePicklist(
+		listTypeDefinitionName: string,
+		locationCode: string
+	) {
+		await this.page.getByRole('link', {name: listTypeDefinitionName}).click();
+
+		await this.picklistSelectTranslation.click();
+
+		await this.page.frameLocator('iframe').getByRole('menuitem', { name: `${locationCode} Untranslated` });
+
+		await this.picklistNameInputsidebar.click();
+
+		const listTypeDefinitionNameTranslated = listTypeDefinitionName + ' translated';
+
+		await this.picklistNameInputsidebar.fill(listTypeDefinitionNameTranslated);
+
+		await this.savePicklistButtonSidebar.click();
+	}
+
 	async translatePicklistItem(
 		listTypeDefinitionName: string, 
 		listTypeEntryName: string, 

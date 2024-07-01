@@ -172,7 +172,7 @@ test.describe('manage picklists inside the picklists portlet', () => {
 	});
 });
 
-test.describe('ensure picklist item translation', () => {
+test.describe('ensure picklist translation', () => {
 	test('verify if translated picklist item will be displayed on forms', async ({
 		apiHelpers,
 		listTypeDefinitionPage, 
@@ -215,29 +215,17 @@ test.describe('ensure picklist item translation', () => {
 
 		await viewObjectDefinitionsPage.goto();
 
-		await page.getByRole('link', { name: objectDefinition.label['en_US'] }).click();
-
-		await page.getByRole('link', { name: 'Fields' }).click();
-
-		await page.getByRole('button', { name: 'Add Object Field' }).click();
-
 		const fieldLabel = 'picklistField' + getRandomInt();
-	
-		await page.locator('input[name="label"]').fill(fieldLabel);
 
-		await page.getByText('Select an Option').click();
-
-		await page.getByRole('option', { name: 'Picklist', exact: true }).click();
+		await viewObjectDefinitionsPage.clickAddObjectField(objectDefinition.label['en_US'], 'Picklist', fieldLabel);
 
 		await page.getByLabel('Picklist').click();
 
 		await page.getByRole('option', { name: listTypeDefinitionName }).click();
 
-		await page.getByRole('button', { name: 'Save' }).click();
+		await viewObjectDefinitionsPage.saveButton.click();
 
-		await page.getByRole('link', { name: 'Details' }).click();
-
-		await page.getByRole('button', { name: 'Save' }).dblclick();
+		await viewObjectDefinitionsPage.saveObjectDefinition();
 
 		// Go to forms and map it to object
 
@@ -278,5 +266,54 @@ test.describe('ensure picklist item translation', () => {
 		await expect(
 			newTabPage.getByRole('option', { name: listTypeEntryName + ' translated' }))
 			.toBeVisible();
+	});
+
+	test('verify if translated picklist will be displayed on object admin', async ({
+		apiHelpers,
+		listTypeDefinitionPage, 
+		page,
+		viewObjectDefinitionsPage,
+	}) => {
+		// Create a picklist
+
+		const listTypeDefinition: ListTypeDefinition = 
+			await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
+
+		createdEntities.listTypeDefinitions.push(listTypeDefinition);
+
+		const listTypeDefinitionName: string = listTypeDefinition.name;
+
+		// Translate picklist
+
+		await listTypeDefinitionPage.goto();
+		
+		await listTypeDefinitionPage.translatePicklist(listTypeDefinitionName, 'pt_BR');
+
+		// Create custom object with the picklist
+
+		const objectDefinition: ObjectDefinition = 
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFolderExternalReferenceCode: 'default',
+				status: {code: 0},
+		});
+
+		createdEntities.objectDefinitions.push(objectDefinition);
+
+		await viewObjectDefinitionsPage.goto('pt');
+
+		await viewObjectDefinitionsPage.clickEditObjectDefinitionLink(objectDefinition.label['en_US']);
+
+		await page.getByRole('link', { name: 'Campos' }).click();
+
+		await page.getByRole('button', { name: 'Adicionar campo de objeto' }).click();
+
+		await page.getByText('Selecione uma opção').click();
+
+		await page.getByRole('option', { name: 'Lista de seleção', exact: true }).click();
+		
+		await page.getByLabel('Lista de seleção').click();
+
+		await expect(page.getByRole('option', { name: listTypeDefinitionName + ' translated' }))
+		.toBeVisible();
 	});
 });
