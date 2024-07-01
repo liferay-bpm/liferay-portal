@@ -6,12 +6,12 @@
 import {Page, expect, mergeTests} from '@playwright/test';
 
 import {apiHelpersTest} from '../../fixtures/apiHelpersTest';
+import {formsPagesTest} from '../../fixtures/formsPagesTest';
 import {listTypeDefinitionsPagesTest} from '../../fixtures/listTypeDefinitionsPagesTest';
 import {loginTest} from '../../fixtures/loginTest';
+import {objectPagesTest} from '../../fixtures/objectPagesTest';
 import {siteSettingsPageTests} from '../../fixtures/siteSettingsPagesTest';
 import {getRandomInt} from '../../utils/getRandomInt';
-import {objectPagesTest} from '../../fixtures/objectPagesTest';
-import { formsPagesTest } from '../../fixtures/formsPagesTest';
 
 export const test = mergeTests(
 	apiHelpersTest,
@@ -19,8 +19,7 @@ export const test = mergeTests(
 	loginTest(),
 	siteSettingsPageTests,
 	objectPagesTest,
-	formsPagesTest,
-	
+	formsPagesTest
 );
 
 let customDefaultSiteLanguage: string;
@@ -41,13 +40,15 @@ test.afterEach(async ({apiHelpers, page, siteSettingsLocalizationPage}) => {
 
 		await siteSettingsLocalizationPage.selectDefaultLanguageOption();
 
-		await siteSettingsLocalizationPage.saveConfiguration()	;
+		await siteSettingsLocalizationPage.saveConfiguration();
 
 		customDefaultSiteLanguage = '';
 	}
 
 	for (const objectDefinition of createdEntities.objectDefinitions) {
-		await apiHelpers.objectAdmin.deleteObjectDefinition(objectDefinition.id);
+		await apiHelpers.objectAdmin.deleteObjectDefinition(
+			objectDefinition.id
+		);
 	}
 
 	createdEntities.objectDefinitions = [];
@@ -62,12 +63,16 @@ test.afterEach(async ({apiHelpers, page, siteSettingsLocalizationPage}) => {
 });
 
 test.describe('manage picklists inside the picklists portlet', () => {
-	test('can create a picklist', async ({apiHelpers, listTypeDefinitionPage, page}) => {
-		const listTypeDefinition: ListTypeDefinition = 
+	test('can create a picklist', async ({
+		apiHelpers,
+		listTypeDefinitionPage,
+		page,
+	}) => {
+		const listTypeDefinition: ListTypeDefinition =
 			await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
-		
+
 		createdEntities.listTypeDefinitions.push(listTypeDefinition);
-		
+
 		await listTypeDefinitionPage.goto();
 
 		await expect(
@@ -91,11 +96,11 @@ test.describe('manage picklists inside the picklists portlet', () => {
 
 		customDefaultSiteLanguage = 'pt_BR';
 
-		const listTypeDefinition: ListTypeDefinition = 
-		await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
-		
+		const listTypeDefinition: ListTypeDefinition =
+			await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
+
 		createdEntities.listTypeDefinitions.push(listTypeDefinition);
-		
+
 		await listTypeDefinitionPage.goto();
 
 		await expect(
@@ -108,11 +113,11 @@ test.describe('manage picklists inside the picklists portlet', () => {
 		listTypeDefinitionPage,
 		page,
 	}) => {
-		const listTypeDefinition: ListTypeDefinition = 
+		const listTypeDefinition: ListTypeDefinition =
 			await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
 
 		createdEntities.listTypeDefinitions.push(listTypeDefinition);
-		
+
 		await listTypeDefinitionPage.goto();
 
 		const listTypeDefinitionName: string = listTypeDefinition.name;
@@ -175,41 +180,48 @@ test.describe('manage picklists inside the picklists portlet', () => {
 test.describe('ensure picklist translation', () => {
 	test('verify if translated picklist item will be displayed on forms', async ({
 		apiHelpers,
-		listTypeDefinitionPage, 
-		page,
-		viewObjectDefinitionsPage,
 		formBuilderPage,
 		formBuilderSidePanelPage,
+		listTypeDefinitionPage,
+		page,
+		viewObjectDefinitionsPage,
 	}) => {
+
 		// Create a picklist
 
-		const listTypeDefinition: ListTypeDefinition = 
+		const listTypeDefinition: ListTypeDefinition =
 			await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
 
 		createdEntities.listTypeDefinitions.push(listTypeDefinition);
 
 		const listTypeDefinitionName: string = listTypeDefinition.name;
-			
+
 		// Create a picklist item
 
 		const listTypeEntryName: string = 'picklistItem' + getRandomInt();
-		
+
 		await apiHelpers.listTypeAdmin.postListTypeEntry(
-			listTypeDefinition.externalReferenceCode, listTypeEntryName);
-		
+			listTypeDefinition.externalReferenceCode,
+			listTypeEntryName
+		);
+
 		// Translate picklist item
 
 		await listTypeDefinitionPage.goto();
 
-		await listTypeDefinitionPage.translatePicklistItem(listTypeDefinitionName, listTypeEntryName, 'pt_BR');
+		await listTypeDefinitionPage.translatePicklistItem(
+			listTypeDefinitionName,
+			listTypeEntryName,
+			'pt_BR'
+		);
 
 		// Create custom object with the picklist
 
-		const objectDefinition: ObjectDefinition = 
+		const objectDefinition: ObjectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
 				objectFolderExternalReferenceCode: 'default',
 				status: {code: 0},
-		});
+			});
 
 		createdEntities.objectDefinitions.push(objectDefinition);
 
@@ -217,11 +229,15 @@ test.describe('ensure picklist translation', () => {
 
 		const fieldLabel = 'picklistField' + getRandomInt();
 
-		await viewObjectDefinitionsPage.clickAddObjectField(objectDefinition.label['en_US'], 'Picklist', fieldLabel);
+		await viewObjectDefinitionsPage.clickAddObjectField(
+			objectDefinition.label['en_US'],
+			'Picklist',
+			fieldLabel
+		);
 
 		await page.getByLabel('Picklist').click();
 
-		await page.getByRole('option', { name: listTypeDefinitionName }).click();
+		await page.getByRole('option', {name: listTypeDefinitionName}).click();
 
 		await viewObjectDefinitionsPage.saveButton.click();
 
@@ -235,14 +251,16 @@ test.describe('ensure picklist translation', () => {
 
 		await formBuilderPage.selectObjectStorage(objectDefinition);
 
-		await formBuilderSidePanelPage.addFieldByDoubleClick('Select from List');
+		await formBuilderSidePanelPage.addFieldByDoubleClick(
+			'Select from List'
+		);
 
 		await formBuilderSidePanelPage.clickAdvancedTab();
 
 		await page.getByText('Choose an Option').nth(4).click();
 
-		await page.getByRole('option', { name: fieldLabel }).click();
-		
+		await page.getByRole('option', {name: fieldLabel}).click();
+
 		// Preview form
 
 		await page.waitForTimeout(200);
@@ -257,26 +275,29 @@ test.describe('ensure picklist translation', () => {
 
 		await newTabPage.waitForLoadState('domcontentloaded');
 
-		await page.goto('pt')
+		await page.goto('pt');
 
 		await newTabPage.reload();
 
 		await newTabPage.getByLabel('Select from List').click();
 
 		await expect(
-			newTabPage.getByRole('option', { name: listTypeEntryName + ' translated' }))
-			.toBeVisible();
+			newTabPage.getByRole('option', {
+				name: listTypeEntryName + ' translated',
+			})
+		).toBeVisible();
 	});
 
 	test('verify if translated picklist will be displayed on object admin', async ({
 		apiHelpers,
-		listTypeDefinitionPage, 
+		listTypeDefinitionPage,
 		page,
 		viewObjectDefinitionsPage,
 	}) => {
+
 		// Create a picklist
 
-		const listTypeDefinition: ListTypeDefinition = 
+		const listTypeDefinition: ListTypeDefinition =
 			await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
 
 		createdEntities.listTypeDefinitions.push(listTypeDefinition);
@@ -286,34 +307,46 @@ test.describe('ensure picklist translation', () => {
 		// Translate picklist
 
 		await listTypeDefinitionPage.goto();
-		
-		await listTypeDefinitionPage.translatePicklist(listTypeDefinitionName, 'pt_BR');
+
+		await listTypeDefinitionPage.translatePicklist(
+			listTypeDefinitionName,
+			'pt_BR'
+		);
 
 		// Create custom object with the picklist
 
-		const objectDefinition: ObjectDefinition = 
+		const objectDefinition: ObjectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
 				objectFolderExternalReferenceCode: 'default',
 				status: {code: 0},
-		});
+			});
 
 		createdEntities.objectDefinitions.push(objectDefinition);
 
 		await viewObjectDefinitionsPage.goto('pt');
 
-		await viewObjectDefinitionsPage.clickEditObjectDefinitionLink(objectDefinition.label['en_US']);
+		await viewObjectDefinitionsPage.clickEditObjectDefinitionLink(
+			objectDefinition.label['en_US']
+		);
 
-		await page.getByRole('link', { name: 'Campos' }).click();
+		await page.getByRole('link', {name: 'Campos'}).click();
 
-		await page.getByRole('button', { name: 'Adicionar campo de objeto' }).click();
+		await page
+			.getByRole('button', {name: 'Adicionar campo de objeto'})
+			.click();
 
 		await page.getByText('Selecione uma opção').click();
 
-		await page.getByRole('option', { name: 'Lista de seleção', exact: true }).click();
-		
+		await page
+			.getByRole('option', {exact: true, name: 'Lista de seleção'})
+			.click();
+
 		await page.getByLabel('Lista de seleção').click();
 
-		await expect(page.getByRole('option', { name: listTypeDefinitionName + ' translated' }))
-		.toBeVisible();
+		await expect(
+			page.getByRole('option', {
+				name: listTypeDefinitionName + ' translated',
+			})
+		).toBeVisible();
 	});
 });

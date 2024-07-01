@@ -69,7 +69,7 @@ export class ViewObjectDefinitionsPage {
 		this.viewInModelBuilderButton = page.getByLabel(
 			'View in Model Builder'
 		);
-		this.saveButton = page.getByRole('button', { name: 'Save' });
+		this.saveButton = page.getByRole('button', {name: 'Save'});
 	}
 
 	async changeObjectActivateStatus(objectDefinitionName: string) {
@@ -94,77 +94,83 @@ export class ViewObjectDefinitionsPage {
 		await this.deleteObjectDefinitionOption.click();
 	}
 
-	async clickAddObjectField(objectDefinitionLabel: string, fieldType: string, fieldLabel: string) {
+	async clickAddObjectField(
+		objectDefinitionLabel: string,
+		fieldType: string,
+		fieldLabel: string
+	) {
 		this.clickEditObjectDefinitionLink(objectDefinitionLabel);
 
-		await this.page.getByRole('link', { name: 'Fields' }).click();
+		await this.page.getByRole('link', {name: 'Fields'}).click();
 
-		await this.page.getByRole('button', { name: 'Add Object Field' }).click();
+		await this.page.getByRole('button', {name: 'Add Object Field'}).click();
 
 		await this.page.locator('input[name="label"]').fill(fieldLabel);
 
 		await this.page.getByText('Select an Option').click();
 
-		await this.page.getByRole('option', { name: `${fieldType}`, exact: true }).click();
+		await this.page
+			.getByRole('option', {exact: true, name: `${fieldType}`})
+			.click();
 	}
-	
+
 	async createObjectFolder(objectFolderLabel: string) {
 		await this.addObjectFolderButton.click();
 		await this.objectFolderLabelInput.click();
 		await this.objectFolderLabelInput.fill(objectFolderLabel);
-		
+
 		const responsePromise = this.page.waitForResponse('**/object-folders');
 		await this.createObjectFolderButton.click();
 		const response = await responsePromise;
-		
+
 		return response.json();
 	}
-	
+
 	async deleteObjectFolder(objectFolderName: string) {
 		await this.objectFolderDeleteFolderOption.click();
 		await this.confirmObjectFolderNameInput.click();
 		await this.confirmObjectFolderNameInput.fill(objectFolderName);
 		await this.deleteObjectFolderButton.click();
 	}
-	
+
 	getObjectFolderCardHeaderERC = (objectFolderERC: string) => {
 		return this.objectFolderCardHeader
-		.getByRole('strong')
-		.filter({hasText: objectFolderERC});
+			.getByRole('strong')
+			.filter({hasText: objectFolderERC});
 	};
-	
+
 	getObjectFolderCardHeaderLabel = (objectFolderLabel: string) => {
 		return this.objectFolderCardHeader
-		.locator('span')
-		.filter({hasText: objectFolderLabel})
-		.first();
+			.locator('span')
+			.filter({hasText: objectFolderLabel})
+			.first();
 	};
-	
+
 	async goto(location?: string, siteUrl?: Site['friendlyUrlPath']) {
 		await this.page.goto(
 			`/${location ?? 'en'}/group${siteUrl || '/guest'}${PORTLET_URLS.objects}`,
 			{waitUntil: 'load'}
 		);
 	}
-	
+
 	async openObjectFolderActions() {
 		await this.objectFolderActions.click();
 	}
-	
+
 	async openObjectFolder(objectFolderLabel: string) {
 		await this.page
-		.getByRole('listitem')
-		.filter({hasText: objectFolderLabel})
-		.click();
+			.getByRole('listitem')
+			.filter({hasText: objectFolderLabel})
+			.click();
 	}
-	
+
 	async viewInModelBuilder() {
 		this.viewInModelBuilderButton.click();
 	}
 
 	async saveObjectDefinition() {
-		await this.page.getByRole('link', { name: 'Details' }).click();
-	
-		await this.page.getByRole('button', { name: 'Save' }).click();
+		await this.page.getByRole('link', {name: 'Details'}).click();
+
+		await this.page.getByRole('button', {name: 'Save'}).click();
 	}
 }
