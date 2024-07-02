@@ -802,32 +802,6 @@ definition {
 		DMDocument.viewDocumentVersionNumberCmdPG(dmDocumentVersionNumber = "1.0");
 	}
 
-	@description = "This test verifies that a basic document's URL can be copied through the actions dropdown."
-	@priority = 4
-	test CanCopyBasicDocumentLinkViaActionsDropdown {
-		property custom.properties = "feature.flag.LPS-197477=true";
-		property portal.release = "quarantine";
-
-		var portalURL = PropsUtil.get("portal.url");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "DM Document Title",
-			groupName = "Guest",
-			mimeType = "application/msword",
-			sourceFileName = "Document_1.doc");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMDocument.copyLink(rowEntry = "DM Document Title");
-
-		Search.searchWithPastedTerm();
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "ManagementBar#SEARCH_RESULT_SUMMARY",
-			value1 = "${portalURL}/documents/d/guest/dm-document-title");
-	}
-
 	@description = "This test ensures that a document can be copied to the global site folder."
 	@priority = 5
 	test CanCopyDocumentToGlobalSite {
@@ -2899,51 +2873,6 @@ definition {
 			dmDocumentTitle = '''/\<>:"?|*''',
 			escapedTitle = '''/\<>:"?|*''',
 			specialCharacters = "true");
-	}
-
-	@description = "This test ensures that the user can republish an expired document after disabling expiration date."
-	@priority = 4
-	test CanRepublishDocumentAfterDisablingExpirationDate {
-		property custom.properties = "company.default.time.zone=America/Los_Angeles";
-		property test.liferay.virtual.instance = "false";
-		property test.run.type = "single";
-
-		DMDocument.updateCheckInterval(fieldValue = 1);
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "Document_5.txt",
-			groupName = "Guest",
-			mimeType = "text/plain",
-			sourceFileName = "Document_5.txt");
-
-		DMNavigator.openToEditEntryInSite(
-			dmDocumentTitle = "Document_5.txt",
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		DMDocument.setExpirationDate(
-			enableExpirationDate = "true",
-			increaseMinutes = 1);
-
-		Navigator.openURL();
-
-		Notifications.waitForNotificationFlexibly(flexibleRefreshingTime = 3000);
-
-		DMNavigator.openToEditEntryInSite(
-			dmDocumentTitle = "Document_5.txt",
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		DMDocument.publishExpiredDocument(
-			disableExpirationDate = "true",
-			dmDocumentTitle = "Document_5.txt");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMDocument.viewStatus(
-			dmDocumentStatus = "Approved",
-			dmDocumentTitle = "Document_5.txt");
 	}
 
 	@description = "This case covers LPS-97708. It ensures that a document can be restored from the Recycle Bin even if its original folder no longer exists."

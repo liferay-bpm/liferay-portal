@@ -2492,6 +2492,36 @@
 		},
 		{
 			"properties": {
+				"enabled": {
+					"default": true,
+					"title": "Enabled",
+					"type": "boolean"
+				},
+				"pid": {
+					"const": "com.liferay.portal.security.iframe.sanitizer.configuration.IFrameConfiguration",
+					"title": "IFrame Sanitizer"
+				},
+				"removeIFrameTags": {
+					"default": false,
+					"title": "Remove IFrame Tags",
+					"type": "boolean"
+				},
+				"sandboxAttributeValues": {
+					"default": "",
+					"items": {
+						"type": "string"
+					},
+					"title": "Sandbox Attribute Values",
+					"type": "array"
+				}
+			},
+			"required": [
+				"pid"
+			],
+			"title": "IFrame Sanitizer"
+		},
+		{
+			"properties": {
 				"companyId": {
 					"default": 0,
 					"title": "Company ID",
@@ -3915,6 +3945,7 @@
 				"com.liferay.portal.search.rest.configuration.SearchSuggestionsCompanyConfiguration",
 				"com.liferay.portal.security.auto.login.internal.basic.auth.header.configuration.BasicAuthHeaderAutoLoginConfiguration",
 				"com.liferay.portal.security.configuration.BasicAuthHeaderSupportConfiguration",
+				"com.liferay.portal.security.iframe.sanitizer.configuration.IFrameConfiguration",
 				"com.liferay.portal.security.ldap.authenticator.configuration.LDAPAuthConfiguration",
 				"com.liferay.portal.security.ldap.configuration.LDAPServerConfiguration",
 				"com.liferay.portal.security.ldap.configuration.SystemLDAPConfiguration",

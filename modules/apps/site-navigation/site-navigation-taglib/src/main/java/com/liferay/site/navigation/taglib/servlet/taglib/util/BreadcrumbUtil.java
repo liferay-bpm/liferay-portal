@@ -101,7 +101,10 @@ public class BreadcrumbUtil {
 		Group group = GroupLocalServiceUtil.getGroup(
 			themeDisplay.getCompanyId(), GroupConstants.GUEST);
 
-		if (group.getPublicLayoutsPageCount() == 0) {
+		Layout layout = LayoutServiceUtil.fetchFirstLayout(
+			group.getGroupId(), false, true);
+
+		if (layout == null) {
 			return null;
 		}
 
@@ -270,18 +273,20 @@ public class BreadcrumbUtil {
 		breadcrumbEntry.setTitle(
 			group.getDescriptiveName(themeDisplay.getLocale()));
 
-		int layoutsPageCount = 0;
+		Layout firstLayout = null;
 
 		if (layoutSet.isPrivateLayout()) {
-			layoutsPageCount = LayoutServiceUtil.getLayoutsCount(
-				group.getGroupId(), true);
+			firstLayout = LayoutServiceUtil.fetchFirstLayout(
+				group.getGroupId(), true, true);
 		}
 		else {
-			layoutsPageCount = LayoutServiceUtil.getLayoutsCount(
-				group.getGroupId(), false);
+			firstLayout = LayoutServiceUtil.fetchFirstLayout(
+				group.getGroupId(), false, true);
 		}
 
-		if (layoutsPageCount <= 0) {
+		if (firstLayout == null) {
+			breadcrumbEntry.setBrowsable(false);
+
 			breadcrumbEntries.add(breadcrumbEntry);
 
 			return;

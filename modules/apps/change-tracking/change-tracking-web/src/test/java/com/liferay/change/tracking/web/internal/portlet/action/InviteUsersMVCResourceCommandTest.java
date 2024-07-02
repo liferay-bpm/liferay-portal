@@ -39,6 +39,9 @@ public class InviteUsersMVCResourceCommandTest {
 		Assert.assertTrue(
 			ArrayUtil.contains(modelResourceActions, ActionKeys.VIEW));
 		Assert.assertFalse(
+			ArrayUtil.contains(
+				modelResourceActions, CTActionKeys.INVITE_USERS));
+		Assert.assertFalse(
 			ArrayUtil.contains(modelResourceActions, CTActionKeys.PUBLISH));
 	}
 
@@ -54,6 +57,9 @@ public class InviteUsersMVCResourceCommandTest {
 		Assert.assertTrue(
 			ArrayUtil.contains(modelResourceActions, ActionKeys.VIEW));
 		Assert.assertTrue(
+			ArrayUtil.contains(
+				modelResourceActions, CTActionKeys.INVITE_USERS));
+		Assert.assertTrue(
 			ArrayUtil.contains(modelResourceActions, CTActionKeys.PUBLISH));
 	}
 
@@ -68,6 +74,9 @@ public class InviteUsersMVCResourceCommandTest {
 			ArrayUtil.contains(modelResourceActions, ActionKeys.UPDATE));
 		Assert.assertTrue(
 			ArrayUtil.contains(modelResourceActions, ActionKeys.VIEW));
+		Assert.assertFalse(
+			ArrayUtil.contains(
+				modelResourceActions, CTActionKeys.INVITE_USERS));
 		Assert.assertTrue(
 			ArrayUtil.contains(modelResourceActions, CTActionKeys.PUBLISH));
 	}
@@ -83,6 +92,9 @@ public class InviteUsersMVCResourceCommandTest {
 			ArrayUtil.contains(modelResourceActions, ActionKeys.UPDATE));
 		Assert.assertTrue(
 			ArrayUtil.contains(modelResourceActions, ActionKeys.VIEW));
+		Assert.assertFalse(
+			ArrayUtil.contains(
+				modelResourceActions, CTActionKeys.INVITE_USERS));
 		Assert.assertFalse(
 			ArrayUtil.contains(modelResourceActions, CTActionKeys.PUBLISH));
 	}

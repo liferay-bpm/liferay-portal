@@ -5,6 +5,9 @@
 
 package com.liferay.portal.search.internal.indexer;
 
+import com.liferay.petra.string.StringPool;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -19,20 +22,25 @@ public class IncludeExcludeUtil {
 		List<T> list, Collection<String> includeIds,
 		Collection<String> excludeIds, Function<T, String> function) {
 
-		return _exclude(
-			_include(list, includeIds, function), excludeIds, function);
+		if ((excludeIds.size() == 1) && excludeIds.contains(StringPool.STAR)) {
+			return new ArrayList<>();
+		}
+
+		if (!((includeIds.size() == 1) &&
+			  includeIds.contains(StringPool.STAR))) {
+
+			_filter(list, includeIds, t -> isPresent(t, includeIds, function));
+		}
+
+		_filter(list, excludeIds, t -> !isPresent(t, excludeIds, function));
+
+		return list;
 	}
 
 	protected static <T> boolean isPresent(
 		T t, Collection<String> ids, Function<T, String> function) {
 
 		return ids.contains(function.apply(t));
-	}
-
-	private static <T> List<T> _exclude(
-		List<T> list, Collection<String> ids, Function<T, String> function) {
-
-		return _filter(list, ids, t -> !isPresent(t, ids, function));
 	}
 
 	private static <T> List<T> _filter(
@@ -45,12 +53,6 @@ public class IncludeExcludeUtil {
 		list.removeIf(cur -> !predicate.test(cur));
 
 		return list;
-	}
-
-	private static <T> List<T> _include(
-		List<T> list, Collection<String> ids, Function<T, String> function) {
-
-		return _filter(list, ids, t -> isPresent(t, ids, function));
 	}
 
 }

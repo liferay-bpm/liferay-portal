@@ -51,7 +51,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -180,6 +182,29 @@ public class DBPartitionUtil {
 		}
 
 		return pids;
+	}
+
+	public static Map<String, String> getConfigurations(long companyId)
+		throws SQLException {
+
+		Connection connection = CurrentConnectionUtil.getConnection(
+			InfrastructureUtil.getDataSource());
+
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				StringBundler.concat(
+					"select configurationId, dictionary from ",
+					_getPartitionName(companyId), ".Configuration_"));
+			ResultSet resultSet = preparedStatement.executeQuery()) {
+
+			Map<String, String> configurations = new HashMap<>();
+
+			while (resultSet.next()) {
+				configurations.put(
+					resultSet.getString(1), resultSet.getString(2));
+			}
+
+			return configurations;
+		}
 	}
 
 	public static boolean insertDBPartition(long companyId)
@@ -438,6 +463,12 @@ public class DBPartitionUtil {
 						_dbPartitionDB.getCreateTableSQL(
 							fromPartitionName, toPartitionName, fromTableName,
 							toTableName));
+
+					if (StringUtil.equalsIgnoreCase(
+							fromTableName, "Configuration_")) {
+
+						continue;
+					}
 
 					statement.executeUpdate(
 						_getCopyDataSQL(

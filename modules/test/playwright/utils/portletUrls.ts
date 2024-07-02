@@ -15,6 +15,8 @@ export const PORTLET_URLS = {
 	fragments: '/~/control_panel/manage/-/fragments/fragment_collections',
 	journal:
 		'/~/control_panel/manage?p_p_id=com_liferay_journal_web_portlet_JournalPortlet',
+	journalStructures:
+		'/~/control_panel/manage?p_p_id=com_liferay_journal_web_portlet_JournalPortlet&_com_liferay_journal_web_portlet_JournalPortlet_mvcPath=%2Fview_ddm_structures.jsp',
 	journalTemplates:
 		'/~/control_panel/manage?p_p_id=com_liferay_journal_web_portlet_JournalPortlet&_com_liferay_journal_web_portlet_JournalPortlet_mvcPath=%2Fview_ddm_templates.jsp',
 	knowledgeBase:
@@ -33,11 +35,15 @@ export const PORTLET_URLS = {
 		'/~/control_panel/manage?p_p_id=com_liferay_site_navigation_admin_web_portlet_SiteNavigationAdminPortlet',
 	notificationTemplates:
 		'/~/control_panel/manage?p_p_id=com_liferay_notification_web_internal_portlet_NotificationTemplatesPortlet',
+	notifications:
+		'/manage?p_p_id=com_liferay_notifications_web_portlet_NotificationsPortlet',
 	objects:
 		'/~/control_panel/manage?p_p_id=com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet',
 	pages: '/~/control_panel/manage?p_p_id=com_liferay_layout_admin_web_portlet_GroupPagesPortlet',
 	picklists:
 		'/~/control_panel/manage?p_p_id=com_liferay_object_web_internal_list_type_portlet_portlet_ListTypeDefinitionsPortlet',
+	processBuilder:
+		'/~/control_panel/manage?p_p_id=com_liferay_portal_workflow_web_portlet_ControlPanelWorkflowPortlet',
 	publications:
 		'/~/control_panel/manage?p_p_id=com_liferay_change_tracking_web_portlet_PublicationsPortlet',
 	scriptManagement:

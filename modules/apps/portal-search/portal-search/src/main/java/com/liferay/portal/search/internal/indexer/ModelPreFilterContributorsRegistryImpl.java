@@ -7,6 +7,7 @@ package com.liferay.portal.search.internal.indexer;
 
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.search.spi.model.query.contributor.ModelPreFilterContributor;
 
 import java.util.ArrayList;
@@ -38,6 +39,12 @@ public class ModelPreFilterContributorsRegistryImpl
 		_addAll(
 			modelPreFilterContributors, _getClassContributors(entryClassName));
 
+		if ((excludes != null) && (excludes.size() == 1) &&
+			excludes.contains(StringPool.STAR)) {
+
+			mandatoryOnly = true;
+		}
+
 		if (mandatoryOnly) {
 			_retainAll(modelPreFilterContributors, _getMandatoryContributors());
 		}
@@ -45,7 +52,10 @@ public class ModelPreFilterContributorsRegistryImpl
 			List<String> mandatoryContributorClassNames =
 				_getMandatoryContributorNames(_getMandatoryContributors());
 
-			if ((includes != null) && !includes.isEmpty()) {
+			if ((includes != null) && !includes.isEmpty() &&
+				!((includes.size() == 1) &&
+				  includes.contains(StringPool.STAR))) {
+
 				modelPreFilterContributors.removeIf(
 					modelPreFilterContributor -> {
 						String className = _getClassName(

@@ -28,14 +28,21 @@ import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.portlet.PortletURLFactory;
 import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.template.react.renderer.ComponentDescriptor;
 import com.liferay.portal.template.react.renderer.ReactRenderer;
@@ -47,8 +54,14 @@ import com.liferay.taglib.util.BodyBottomTag;
 import java.io.IOException;
 import java.io.Writer;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import javax.portlet.PortletRequest;
 
@@ -196,15 +209,18 @@ public class AnalyticsReportsProductNavigationControlMenuEntry
 				_analyticsReportsInfoItemRegistry.getAnalyticsReportsInfoItem(
 					infoItemReference.getClassName());
 
-		if ((analyticsReportsInfoItem == null) ||
-			!analyticsReportsInfoItem.isShow(analyticsReportsInfoItemObject)) {
-
-			return false;
-		}
-
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
+
+		if ((analyticsReportsInfoItem == null) ||
+			(!analyticsReportsInfoItem.isShow(analyticsReportsInfoItemObject) &&
+			 !_hasResourcePermission(
+				 ActionKeys.UPDATE, httpServletRequest.getParameter("p_l_id"),
+				 _resourceNames, themeDisplay))) {
+
+			return false;
+		}
 
 		try {
 			if (!AnalyticsReportsUtil.isShowAnalyticsReportsPanel(
@@ -306,6 +322,57 @@ public class AnalyticsReportsProductNavigationControlMenuEntry
 		}
 
 		return infoItemReference;
+	}
+
+	private List<String> _getResourceNames(
+		String portletId, Map<String, List<String>> resourceNames) {
+
+		for (Map.Entry<String, List<String>> entry : resourceNames.entrySet()) {
+			if (portletId.contains(entry.getKey())) {
+				return entry.getValue();
+			}
+		}
+
+		return Collections.emptyList();
+	}
+
+	private boolean _hasResourcePermission(
+		String actionId, String plid, Map<String, List<String>> resourceNames,
+		ThemeDisplay themeDisplay) {
+
+		if (!themeDisplay.isSignedIn()) {
+			return false;
+		}
+
+		if (Validator.isNotNull(plid)) {
+			PermissionChecker permissionChecker =
+				PermissionThreadLocal.getPermissionChecker();
+
+			Set<String> resourceNamesSet = new HashSet<>();
+
+			List<PortletPreferences> portletPreferencesList =
+				_portletPreferencesLocalService.getPortletPreferencesByPlid(
+					GetterUtil.getLong(plid));
+
+			for (PortletPreferences portletPreferences :
+					portletPreferencesList) {
+
+				resourceNamesSet.addAll(
+					_getResourceNames(
+						portletPreferences.getPortletId(), resourceNames));
+			}
+
+			for (String resourceName : resourceNamesSet) {
+				if (permissionChecker.hasPermission(
+						themeDisplay.getScopeGroupId(), resourceName, "0",
+						actionId)) {
+
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private void _processBodyBottomTagBody(PageContext pageContext) {
@@ -423,9 +490,28 @@ public class AnalyticsReportsProductNavigationControlMenuEntry
 	private String _portletNamespace;
 
 	@Reference
+	private PortletPreferencesLocalService _portletPreferencesLocalService;
+
+	@Reference
 	private PortletURLFactory _portletURLFactory;
 
 	@Reference
 	private ReactRenderer _reactRenderer;
+
+	private final Map<String, List<String>> _resourceNames =
+		HashMapBuilder.<String, List<String>>put(
+			"com_liferay_blogs_web_portlet_BlogsPortlet",
+			Arrays.asList("com.liferay.blogs.model.BlogsEntry")
+		).put(
+			"com_liferay_document_library_web_portlet_DLPortlet",
+			Arrays.asList(
+				"com.liferay.document.library",
+				"com.liferay.document.library.kernel.model.DLFileEntry")
+		).put(
+			"com_liferay_journal_content_web_portlet_JournalContentPortlet",
+			Arrays.asList(
+				"com.liferay.journal",
+				"com.liferay.journal.model.JournalArticle")
+		).build();
 
 }
