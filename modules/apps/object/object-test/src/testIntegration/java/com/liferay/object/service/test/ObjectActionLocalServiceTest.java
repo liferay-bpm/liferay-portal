@@ -2267,10 +2267,7 @@ public class ObjectActionLocalServiceTest {
 			NotificationTemplateLocalServiceUtil.createNotificationTemplate(
 				RandomTestUtil.randomInt());
 
-		User user = TestPropsValues.getUser();
-
-		notificationTemplate.setUserId(user.getUserId());
-
+		notificationTemplate.setUserId(_user.getUserId());
 		notificationTemplate.setObjectDefinitionId(
 			objectDefinition.getObjectDefinitionId());
 		notificationTemplate.setBody(RandomTestUtil.randomString());
