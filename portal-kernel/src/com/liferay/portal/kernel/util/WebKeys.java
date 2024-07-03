@@ -729,4 +729,7 @@ public interface WebKeys {
 
 	public static final String WORKFLOW_TASK = "WORKFLOW_TASK";
 
+	public static final String WORKFLOW_TASK_READ_ONLY= "WORKFLOW_READ_ONLY";
+
+
 }
