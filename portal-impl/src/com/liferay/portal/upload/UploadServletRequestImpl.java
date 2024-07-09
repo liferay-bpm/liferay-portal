@@ -175,13 +175,10 @@ public class UploadServletRequestImpl
 			httpServletRequest.setAttribute(
 				WebKeys.UPLOAD_EXCEPTION, uploadException);
 
-			Throwable throwable = uploadException.getCause();
-
 			if (_log.isDebugEnabled()) {
-				_log.debug(throwable);
-			}
-			else if (_log.isWarnEnabled()) {
-				_log.warn(
+				Throwable throwable = uploadException.getCause();
+
+				_log.debug(
 					"Unable to parse upload request: " +
 						throwable.getMessage());
 			}
