@@ -197,6 +197,27 @@ public class KaleoDesignerDisplayContext {
 		return kaleoDefinitionVersionSearch;
 	}
 
+	public JSONArray getKaleoDefinitionVersionsJSONArray(
+			KaleoDefinitionVersion currentKaleoDefinitionVersion)
+		throws Exception {
+
+		return JSONUtil.toJSONArray(
+			getKaleoDefinitionVersions(currentKaleoDefinitionVersion),
+			kaleoDefinitionVersion -> JSONUtil.put(
+				"creatorName",
+				() -> {
+					User user = _userLocalService.getUser(
+						kaleoDefinitionVersion.getUserId());
+
+					return user.getFullName();
+				}
+			).put(
+				"dateCreated", kaleoDefinitionVersion.getCreateDate()
+			).put(
+				"version", kaleoDefinitionVersion.getVersion()
+			));
+	}
+
 	public String getManageSubmissionsLink() {
 		return _buildErrorLink(
 			"configure-submissions", _getWorkflowInstancesPortletURL());
