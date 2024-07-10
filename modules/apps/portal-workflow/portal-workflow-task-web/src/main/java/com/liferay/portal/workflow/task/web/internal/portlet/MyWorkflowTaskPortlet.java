@@ -154,19 +154,9 @@ public class MyWorkflowTaskPortlet extends MVCPortlet {
 			return;
 		}
 
-		if ((_countUserInstanceTasks(false, themeDisplay) > 0) ||
-			(_countUserInstanceTasks(true, themeDisplay) > 0)) {
-
-			renderRequest.setAttribute(WebKeys.WORKFLOW_TASK, workflowTask);
-			renderRequest.setAttribute(
-				WebKeys.WORKFLOW_TASK_READ_ONLY, Boolean.TRUE);
-
-			return;
-		}
-
-		throw new PrincipalException.MustHavePermission(
-			themeDisplay.getPermissionChecker(), WorkflowTask.class.getName(),
-			workflowTask.getWorkflowTaskId(), ActionKeys.VIEW);
+		renderRequest.setAttribute(WebKeys.WORKFLOW_TASK, workflowTask);
+		renderRequest.setAttribute(
+			WebKeys.WORKFLOW_TASK_READ_ONLY, Boolean.TRUE);
 	}
 
 	private int _countUserInstanceTasks(
