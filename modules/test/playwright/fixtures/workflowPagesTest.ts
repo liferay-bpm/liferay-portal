@@ -10,6 +10,7 @@ import {ActionPage} from '../pages/portal-workflow-kaleo-designer-web/ActionPage
 import {ActionReassignmentPage} from '../pages/portal-workflow-kaleo-designer-web/ActionReassignmentPage';
 import {ConditionNode} from '../pages/portal-workflow-kaleo-designer-web/ConditionNodePage';
 import {ConfigurationTabPage} from '../pages/portal-workflow-kaleo-designer-web/ConfigurationTabPage';
+import {DefinitionInfoPage} from '../pages/portal-workflow-kaleo-designer-web/DefinitionInfoPage';
 import {DiagramViewPage} from '../pages/portal-workflow-kaleo-designer-web/DiagramViewPage';
 import {NodePropertiesSidebarPage} from '../pages/portal-workflow-kaleo-designer-web/NodePropertiesSidebarPage';
 import {NotificationSectionPage} from '../pages/portal-workflow-kaleo-designer-web/NotificationSectionPage';
@@ -25,6 +26,7 @@ const workflowPagesTest = test.extend<{
 	actionReassignmentPage: ActionReassignmentPage;
 	conditionNode: ConditionNode;
 	configurationTabPage: ConfigurationTabPage;
+	definitionInfoPage: DefinitionInfoPage;
 	diagramViewPage: DiagramViewPage;
 	nodePropertiesSidebarPage: NodePropertiesSidebarPage;
 	notificationSectionPage: NotificationSectionPage;
@@ -47,6 +49,9 @@ const workflowPagesTest = test.extend<{
 	},
 	configurationTabPage: async ({page}, use) => {
 		await use(new ConfigurationTabPage(page));
+	},
+	definitionInfoPage: async ({page}, use) => {
+		await use(new DefinitionInfoPage(page));
 	},
 	diagramViewPage: async ({page}, use) => {
 		await use(new DiagramViewPage(page));
