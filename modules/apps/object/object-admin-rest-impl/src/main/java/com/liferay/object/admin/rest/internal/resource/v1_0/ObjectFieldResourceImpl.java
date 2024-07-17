@@ -130,7 +130,7 @@ public class ObjectFieldResourceImpl extends BaseObjectFieldResourceImpl {
 			_objectDefinitionLocalService.getObjectDefinition(
 				objectDefinitionId);
 
-		return _toObjectField(
+		ObjectField objectField2 = _toObjectField(
 			_objectFieldService.addCustomObjectField(
 				objectField.getExternalReferenceCode(),
 				ObjectFieldUtil.getListTypeDefinitionId(
@@ -159,6 +159,13 @@ public class ObjectFieldResourceImpl extends BaseObjectFieldResourceImpl {
 						contextUser.getUserId()),
 					objectField, _objectFieldSettingLocalService,
 					_objectFilterLocalService)));
+
+		if (objectDefinition.isApproved() && objectDefinition.isActive()) {
+				_objectDefinitionLocalService.deployObjectDefinition(
+					objectDefinition);
+		}
+
+		return objectField2;
 	}
 
 	@Override
