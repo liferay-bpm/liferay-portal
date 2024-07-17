@@ -217,7 +217,7 @@ export default function UpperToolbar({
 			xmlDefinition,
 		} = validXMLDefinition;
 
-		const publishedOrSavedDefinitionResponse =
+		const savedOrpublishedDefinitionResponse =
 			await saveOrPublishDefinitionRequest({
 				active,
 				content: xmlDefinition,
@@ -227,12 +227,12 @@ export default function UpperToolbar({
 				version,
 			});
 
-		const publishedOrSavedDefinitionResponseJSON =
-			await publishedOrSavedDefinitionResponse.json();
+		const savedOrpublishedDefinitionResponseJSON =
+			await savedOrpublishedDefinitionResponse.json();
 
-		if (!publishedOrSavedDefinitionResponse.ok) {
+		if (!savedOrpublishedDefinitionResponse.ok) {
 			setAlert(
-				publishedOrSavedDefinitionResponseJSON.title,
+				savedOrpublishedDefinitionResponseJSON.title,
 				'danger',
 				true
 			);
@@ -244,21 +244,21 @@ export default function UpperToolbar({
 			setHadGroovyOrJavaScriptBefore(false);
 		}
 
-		setDefinitionName(publishedOrSavedDefinitionResponseJSON.name);
+		setDefinitionName(savedOrpublishedDefinitionResponseJSON.name);
 		setVersion(
-			parseInt(publishedOrSavedDefinitionResponseJSON.version, 10)
+			parseInt(savedOrpublishedDefinitionResponseJSON.version, 10)
 		);
 
 		if (Liferay.FeatureFlags['LPD-29635']) {
 			setWorkflowDefinitionVersions((prevValues) => [
 				{
 					creatorName:
-						publishedOrSavedDefinitionResponseJSON.creator?.name,
+						savedOrpublishedDefinitionResponseJSON.creator?.name,
 					dateCreated:
-						publishedOrSavedDefinitionResponseJSON.dateCreated,
+						savedOrpublishedDefinitionResponseJSON.dateCreated,
 					version: String(
 						parseInt(
-							publishedOrSavedDefinitionResponseJSON.version,
+							savedOrpublishedDefinitionResponseJSON.version,
 							10
 						)
 					),
@@ -267,15 +267,15 @@ export default function UpperToolbar({
 			]);
 		}
 
-		if (publishedOrSavedDefinitionResponseJSON.version === '1') {
+		if (savedOrpublishedDefinitionResponseJSON.version === '1') {
 			localStorage.setItem(
 				localStorageKeyName,
 				true,
 				localStorage.TYPES.FUNCTIONAL
 			);
 			redirectToSavedDefinition(
-				publishedOrSavedDefinitionResponseJSON.name,
-				publishedOrSavedDefinitionResponseJSON.version
+				savedOrpublishedDefinitionResponseJSON.name,
+				savedOrpublishedDefinitionResponseJSON.version
 			);
 
 			return;
