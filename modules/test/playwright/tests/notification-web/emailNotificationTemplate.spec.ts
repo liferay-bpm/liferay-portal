@@ -16,7 +16,18 @@ export const test = mergeTests(
 	notificationPagesTest
 );
 
-test.afterEach(async ({notificationTemplatesPage, page}) => {
+let objectDefinition: ObjectDefinition;
+
+test.beforeEach(async ({apiHelpers}) => {
+	objectDefinition = await apiHelpers.objectAdmin.postRandomObjectDefinition({
+		objectFolderExternalReferenceCode: 'default',
+		status: {code: 0},
+	});
+});
+
+test.afterEach(async ({apiHelpers, notificationTemplatesPage, page}) => {
+	await apiHelpers.objectAdmin.deleteObjectDefinition(objectDefinition.id);
+
 	await notificationTemplatesPage.goto();
 
 	const frontEndDatasetItemActions =
@@ -41,6 +52,107 @@ test.afterEach(async ({notificationTemplatesPage, page}) => {
 			throw new Error(error);
 		}
 	}
+});
+
+test.use({
+	permissions: ['clipboard-read', 'clipboard-write'],
+});
+
+test('Can use notification terms and freeMarker variables in notification template', async ({
+	emailNotificationTemplatePage,
+	notificationTemplatesPage,
+	page,
+}) => {
+	await emailNotificationTemplatePage.goto();
+
+	const notificationTemplateName =
+		'Notification Template Name' + getRandomInt();
+
+	await emailNotificationTemplatePage.basicInfoName.fill(
+		notificationTemplateName
+	);
+
+	await emailNotificationTemplatePage.senderEmailAddress.fill(
+		'test@liferay.com'
+	);
+
+	await emailNotificationTemplatePage.senderName.fill('test user');
+
+	await emailNotificationTemplatePage.primaryRecipientUserEmailAddress.fill(
+		'[%CURRENT_USER_EMAIL_ADDRESS%]'
+	);
+
+	await emailNotificationTemplatePage.contentSubject.fill('Content subject');
+
+	await page.getByText('Select an Option').click();
+
+	await page
+		.getByRole('option', {name: objectDefinition.externalReferenceCode})
+		.click();
+
+	await emailNotificationTemplatePage.editorType.click();
+
+	await page.getByRole('option', {name: 'Rich Text'}).click();
+
+	await page.keyboard.press('Tab');
+
+	const customObjectDefinitionTerm =
+		objectDefinition.externalReferenceCode.toUpperCase();
+
+	const customObjectFieldName = objectDefinition.objectFields
+		.find((objectField) => !objectField.system)
+		.name.toUpperCase();
+
+	const terms =
+		'[%CURRENT_USER_FIRST_NAME%]' +
+		`[%${customObjectDefinitionTerm}_${customObjectFieldName}%]`;
+
+	page.keyboard.type(terms);
+
+	await emailNotificationTemplatePage.saveButton.click();
+
+	await notificationTemplatesPage
+		.getFrontEndDatasetItemLocator(notificationTemplateName)
+		.click();
+
+	await expect(
+		emailNotificationTemplatePage.primaryRecipientUserEmailAddress
+	).toHaveValue('[%CURRENT_USER_EMAIL_ADDRESS%]');
+
+	await expect(
+		emailNotificationTemplatePage.richTextField.getByText(terms)
+	).toBeVisible();
+
+	await emailNotificationTemplatePage.editorType.click();
+
+	await page.getByRole('option', {name: 'FreeMarker Template'}).click();
+
+	await expect(page.getByText('Elements')).toBeVisible();
+
+	await emailNotificationTemplatePage.freeMarkerEntity.click();
+
+	await page
+		.getByRole('option', {name: objectDefinition.label['en_US']})
+		.click();
+
+	await page.getByRole('button', {name: 'Current URL'}).click();
+
+	await page.getByRole('button', {name: customObjectFieldName}).click();
+
+	await emailNotificationTemplatePage.saveButton.click();
+
+	await notificationTemplatesPage
+		.getFrontEndDatasetItemLocator(notificationTemplateName)
+		.click();
+
+	await expect(
+		page
+			.locator('.CodeMirror-lines')
+			.getByText(
+				'currentURL$' +
+					`{ObjectField_${customObjectFieldName}.getData()}`
+			)
+	).toBeVisible();
 });
 
 test('can add rich text source code and verify that the source code is being persisted', async ({

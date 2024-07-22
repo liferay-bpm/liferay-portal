@@ -13,12 +13,16 @@ export class EmailNotificationTemplatePage {
 	readonly backURLButton: Locator;
 	readonly basicInfoName: Locator;
 	readonly contentSubject: Locator;
+	readonly copyButton: Locator;
+	readonly editorType: Locator;
+	readonly freeMarkerEntity: Locator;
 	readonly notificationTemplatesPage: NotificationTemplatesPage;
 	readonly organizationRolesGroupTitle: Locator;
 	readonly primaryRecipientRoles: Locator;
 	readonly primaryRecipientUserEmailAddress: Locator;
 	readonly primaryRecipientType: Locator;
 	readonly regularRolesGroupTitle: Locator;
+	readonly richTextField: Locator;
 	readonly richTextSourceButton: Locator;
 	readonly richTextSourceField: Locator;
 	readonly saveButton: Locator;
@@ -37,6 +41,9 @@ export class EmailNotificationTemplatePage {
 		this.backURLButton = page.getByTitle('Back', {exact: true}).first();
 		this.basicInfoName = page.getByLabel('Name' + 'Mandatory').first();
 		this.contentSubject = page.getByLabel('Subject' + 'Mandatory');
+		this.copyButton = page.getByRole('button', {name: 'Copy'});
+		this.editorType = page.getByLabel('Editor Type' + 'Mandatory');
+		this.freeMarkerEntity = page.getByLabel('Entity').first();
 		this.notificationTemplatesPage = new NotificationTemplatesPage(page);
 		this.organizationRolesGroupTitle = page
 			.getByText('Organization Roles')
@@ -49,6 +56,10 @@ export class EmailNotificationTemplatePage {
 		this.regularRolesGroupTitle = page
 			.getByText('Regular Roles')
 			.locator('visible=true');
+		this.richTextField = page
+			.getByRole('application', {name: 'Rich Text Editor,'})
+			.frameLocator('iframe')
+			.getByRole('textbox');
 		this.richTextSourceButton = page.getByTitle('Source');
 		this.richTextSourceField = page
 			.getByLabel('Rich Text Editor, richTextLocalizedEditor')

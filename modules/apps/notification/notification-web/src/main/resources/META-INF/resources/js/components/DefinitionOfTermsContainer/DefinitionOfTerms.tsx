@@ -95,6 +95,7 @@ export function DefinitionOfTerms({
 		<>
 			<>
 				<SingleSelect
+					id="entitySingleSelect"
 					items={objectDefinitionItems}
 					label={Liferay.Language.get('entity')}
 					onSelectionChange={(value) => {
