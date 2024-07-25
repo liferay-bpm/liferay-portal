@@ -169,15 +169,30 @@ public class DefaultObjectEntryManagerImpl
 			long primaryKey2)
 		throws Exception {
 
+		ServiceContext serviceContext = new ServiceContext();
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				objectRelationship.getObjectDefinitionId2());
+
+		if (!objectDefinition.isUnmodifiableSystemObject()) {
+			com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
+				_objectEntryService.getObjectEntry(primaryKey2);
+
+			if (serviceBuilderObjectEntry.getStatus() ==
+					WorkflowConstants.STATUS_DRAFT) {
+
+				serviceContext.setWorkflowAction(
+					WorkflowConstants.ACTION_SAVE_DRAFT);
+			}
+		}
+
 		_objectRelationshipService.addObjectRelationshipMappingTableValues(
 			objectRelationship.getObjectRelationshipId(), primaryKey1,
-			primaryKey2, new ServiceContext());
+			primaryKey2, serviceContext);
 
 		return getObjectEntry(
-			dtoConverterContext,
-			_objectDefinitionLocalService.getObjectDefinition(
-				objectRelationship.getObjectDefinitionId2()),
-			primaryKey2);
+			dtoConverterContext, objectDefinition, primaryKey2);
 	}
 
 	@Override
