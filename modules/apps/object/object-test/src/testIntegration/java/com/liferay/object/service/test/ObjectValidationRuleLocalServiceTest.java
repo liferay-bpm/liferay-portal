@@ -30,6 +30,7 @@ import com.liferay.object.service.ObjectValidationRuleLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.validation.rule.ObjectValidationRuleResult;
 import com.liferay.object.validation.rule.setting.builder.ObjectValidationRuleSettingBuilder;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -51,6 +52,9 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.script.management.test.rule.ScriptManagementConfigurationTestRule;
 import com.liferay.portal.security.script.management.test.util.ScriptManagementConfigurationTestUtil;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LogEntry;
+import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
@@ -620,6 +624,57 @@ public class ObjectValidationRuleLocalServiceTest {
 			Assert.assertEquals(
 				objectValidationRule.getErrorLabel(user.getLanguageId()),
 				objectValidationRuleResult.getErrorMessage());
+		}
+	}
+
+	@Test
+	public void testGroovyValidationRuleOutput() throws Exception {
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"Script1", LoggerTestUtil.INFO)) {
+
+			// 		CREATE OBJECT VALIDATION RULE WITH GROOVY ENGINE
+
+			String script = StringBundler.concat(
+				"import org.apache.logging.log4j.LogManager;\n",
+				"import org.apache.logging.log4j.Logger;\n",
+				"def logger = LogManager.getLogger(this.class);\n",
+				"logger.info(currentUserId);");
+
+			_addObjectValidationRule(
+				ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY, script);
+
+			// 		CREATE USER
+
+			User user = UserTestUtil.addUser();
+
+			PermissionThreadLocal.setPermissionChecker(
+				PermissionCheckerFactoryUtil.create(user));
+
+			PrincipalThreadLocal.setName(user.getUserId());
+
+			// 		PUBLISH OBJECT DEFINITION
+
+			_objectDefinitionLocalService.publishCustomObjectDefinition(
+				user.getUserId(), _objectDefinition.getObjectDefinitionId());
+
+			// 		ADD OBJECT ENTRY
+
+			_objectEntryLocalService.addObjectEntry(
+				user.getUserId(), 0, _objectDefinition.getObjectDefinitionId(),
+				HashMapBuilder.<String, Serializable>put(
+					"textObjectField", RandomTestUtil.randomString()
+				).build(),
+				ServiceContextTestUtil.getServiceContext());
+
+			// 		ASSERT OBJECT VALIDATION RULE WAS EXECUTED SUCCESSFULLY
+
+			List<LogEntry> logEntries = logCapture.getLogEntries();
+
+			Assert.assertEquals(
+				String.valueOf(user.getUserId()),
+				logEntries.get(
+					0
+				).getMessage());
 		}
 	}
 
