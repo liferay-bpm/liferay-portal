@@ -18,12 +18,14 @@ import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.rest.test.util.ObjectEntryTestUtil;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalServiceUtil;
 import com.liferay.object.service.ObjectRelationshipLocalServiceUtil;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -35,15 +37,19 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LoggerTestUtil;
+import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
+import com.liferay.object.admin.rest.resource.v1_0.ObjectFieldResource;
 
 import java.io.Serializable;
 
@@ -61,10 +67,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.osgi.service.component.annotations.Reference;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.springframework.beans.factory.annotation.Qualifier;
 
-/**
+/**testGetUndeployedObjectFieldValue
  * @author Javier Gamarra
  */
 @RunWith(Arquillian.class)
@@ -456,6 +464,80 @@ public class ObjectDefinitionGraphQLTest {
 	}
 
 	@Test
+	public void testGetUndeployedObjectFieldValue() throws Exception {
+		ObjectDefinition objectDefinition = _addObjectDefinition(true);
+
+		objectDefinition = _objectDefinitionLocalService.publishCustomObjectDefinition(
+			TestPropsValues.getUserId(),
+			objectDefinition.getObjectDefinitionId());
+
+		String objectFieldName = StringUtil.randomId();
+
+		ObjectDefinition finalObjectDefinition = objectDefinition;
+
+		com.liferay.object.admin.rest.dto.v1_0.ObjectField objectField2 =
+			new com.liferay.object.admin.rest.dto.v1_0.ObjectField() {
+				{
+					DBType = com.liferay.object.admin.rest.dto.v1_0.ObjectField.DBType.STRING;
+					businessType = BusinessType.TEXT;
+					id = RandomTestUtil.randomLong();
+					indexed = true;
+					indexedAsKeyword = true;
+					localized = false;
+					label = HashMapBuilder.put(
+						LocaleUtil.getDefault().toString(), RandomTestUtil.randomString()
+					).build();
+					name = objectFieldName;
+					objectDefinitionExternalReferenceCode1 = finalObjectDefinition.getExternalReferenceCode();
+					required = false;
+					system = false;
+					unique = false;
+				}
+			};
+
+		ObjectFieldResource.Builder objectFieldResourceBuilder =
+			_objectFieldResourceFactory.create();
+
+		ObjectFieldResource objectFieldResource =
+			objectFieldResourceBuilder.user(
+				TestPropsValues.getUser()
+			).build();
+
+		objectFieldResource.postObjectDefinitionObjectField(objectDefinition.getObjectDefinitionId(), objectField2);
+
+		ObjectEntry objectEntry = ObjectEntryLocalServiceUtil.addObjectEntry(
+			TestPropsValues.getUserId(), 0,
+			objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				objectFieldName, "matthew@liferay.com"
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
+		String key = StringUtil.lowerCaseFirstLetter(
+			objectDefinition.getShortName());
+
+		String primaryKeyName = _getPKObjectFieldName(finalObjectDefinition);
+
+		Assert.assertEquals(
+			"matthew@liferay.com",
+			JSONUtil.getValueAsString(
+				_invoke(
+					new GraphQLField(
+						"query",
+						new GraphQLField(
+							"c",
+							new GraphQLField(
+								key,
+								HashMapBuilder.<String, Object>put(
+									primaryKeyName,
+									objectEntry.getObjectEntryId()
+								).build(),
+								new GraphQLField(objectFieldName))))),
+				"JSONObject/data", "JSONObject/c", "JSONObject/" + key,
+				"Object/" + objectFieldName));
+	}
+
+	@Test
 	public void testGetObjectEntryRelatedParentObjectEntry() throws Exception {
 		String key = TextFormatter.formatPlural(
 			StringUtil.lowerCaseFirstLetter(_childObjectDefinitionName));
@@ -806,8 +888,6 @@ public class ObjectDefinitionGraphQLTest {
 			"JSONObject/create" + _parentObjectDefinitionName,
 			"Object/" + primaryKeyName);
 
-		value = RandomTestUtil.randomString();
-
 		JSONAssert.assertEquals(
 			JSONUtil.put(
 				_LIST_FIELD_NAME, JSONUtil.put("key", _LIST_FIELD_VALUE_KEY)
@@ -1074,7 +1154,15 @@ public class ObjectDefinitionGraphQLTest {
 	private String _draftAllowedObjectDefinitionName;
 
 	@Inject
+	@Qualifier("ObjectFieldDTOConverter")
+	private DTOConverter<com.liferay.object.model.ObjectField, com.liferay.object.admin.rest.dto.v1_0.ObjectField>
+		_objectFieldDTOConverter;
+
+	@Inject
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Inject
+	private ObjectFieldResource.Factory _objectFieldResourceFactory;
 
 	@DeleteAfterTestRun
 	private ObjectDefinition _parentObjectDefinition;
