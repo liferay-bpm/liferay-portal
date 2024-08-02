@@ -5,8 +5,18 @@
 
 package com.liferay.dynamic.data.mapping.internal.search.spi.model.query.contributor;
 
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.ParseException;
+import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.search.localization.SearchLocalizationHelper;
 import com.liferay.portal.search.query.QueryHelper;
 import com.liferay.portal.search.spi.model.query.contributor.KeywordQueryContributor;
 import com.liferay.portal.search.spi.model.query.contributor.helper.KeywordQueryContributorHelper;
@@ -29,16 +39,111 @@ public class DDMFormInstanceRecordKeywordQueryContributor
 		String keywords, BooleanQuery booleanQuery,
 		KeywordQueryContributorHelper keywordQueryContributorHelper) {
 
-		queryHelper.addSearchTerm(
-			booleanQuery, keywordQueryContributorHelper.getSearchContext(),
-			Field.USER_NAME, false);
+		SearchContext searchContext =
+			keywordQueryContributorHelper.getSearchContext();
 
-		queryHelper.addSearchLocalizedTerm(
-			booleanQuery, keywordQueryContributorHelper.getSearchContext(),
-			"ddmContent", false);
+		queryHelper.addSearchTerm(
+			booleanQuery, searchContext, Field.USER_NAME, false);
+
+		_addSearchLocalizedTerm(booleanQuery, searchContext, "ddmContent");
+
+		_addSearchLocalizedTerm(booleanQuery, searchContext, Field.TITLE);
 	}
 
 	@Reference
 	protected QueryHelper queryHelper;
+
+	private void _addLocalizedFields(
+		BooleanQuery booleanQuery, String fieldName, String value,
+		SearchContext searchContext) {
+
+		String[] localizedFieldNames =
+			_searchLocalizationHelper.getLocalizedFieldNames(
+				new String[] {fieldName}, searchContext);
+
+		for (String localizedFieldName : localizedFieldNames) {
+			_addTerm(booleanQuery, localizedFieldName, value);
+		}
+	}
+
+	private void _addLocalizedQuery(
+		BooleanQuery booleanQuery, BooleanQuery localizedQuery,
+		SearchContext searchContext) {
+
+		BooleanClauseOccur booleanClauseOccur = BooleanClauseOccur.SHOULD;
+
+		if (searchContext.isAndSearch()) {
+			booleanClauseOccur = BooleanClauseOccur.MUST;
+		}
+
+		try {
+			booleanQuery.add(localizedQuery, booleanClauseOccur);
+		}
+		catch (ParseException parseException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"Unable to add localized localized query ",
+						localizedQuery, " with boolean clause occur ",
+						booleanClauseOccur),
+					parseException);
+			}
+		}
+	}
+
+	private void _addSearchLocalizedTerm(
+		BooleanQuery booleanQuery, SearchContext searchContext,
+		String fieldName) {
+
+		if (Validator.isBlank(fieldName)) {
+			return;
+		}
+
+		String value = GetterUtil.getString(
+			searchContext.getAttribute(fieldName));
+
+		if (Validator.isBlank(value)) {
+			value = searchContext.getKeywords();
+		}
+
+		if (Validator.isBlank(value)) {
+			return;
+		}
+
+		if (Validator.isBlank(searchContext.getKeywords())) {
+			BooleanQuery localizedQuery = new BooleanQueryImpl();
+
+			_addLocalizedFields(
+				localizedQuery, fieldName, value, searchContext);
+
+			_addLocalizedQuery(booleanQuery, localizedQuery, searchContext);
+		}
+		else {
+			_addLocalizedFields(booleanQuery, fieldName, value, searchContext);
+		}
+	}
+
+	private void _addTerm(
+		BooleanQuery booleanQuery, String field, String value) {
+
+		try {
+			booleanQuery.addTerm(field, value, false);
+		}
+		catch (ParseException parseException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"Unable to add search term to query field:", field,
+						" value:", value, " like:", false),
+					parseException);
+			}
+		}
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DDMFormInstanceRecordKeywordQueryContributor.class);
+
+	@Reference
+	private SearchLocalizationHelper _searchLocalizationHelper;
 
 }
