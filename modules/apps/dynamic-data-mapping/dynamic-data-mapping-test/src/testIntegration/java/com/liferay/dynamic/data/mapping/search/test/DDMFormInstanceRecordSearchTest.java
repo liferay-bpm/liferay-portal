@@ -150,6 +150,88 @@ public class DDMFormInstanceRecordSearchTest {
 	}
 
 	@Test
+	public void testMultipleLanguageEntries() throws Exception {
+		List<KeyValuePair> keyValuePairs = new ArrayList<>();
+
+		keyValuePairs.add(new KeyValuePair("name", "keyword"));
+		keyValuePairs.add(new KeyValuePair("description", "keyword"));
+
+		DDMForm ddmForm = createDDMForm(
+			keyValuePairs, LocaleUtil.US, LocaleUtil.BRAZIL);
+
+		for (DDMFormField ddmFormField : ddmForm.getDDMFormFields()) {
+			LocalizedValue label = ddmFormField.getLabel();
+
+			label.addString(LocaleUtil.BRAZIL, label.getString(LocaleUtil.US));
+
+			ddmFormField.setLabel(label);
+		}
+
+		DDMFormInstance ddmFormInstance =
+			DDMFormInstanceTestUtil.addDDMFormInstance(
+				ddmForm, _group, _user.getUserId());
+
+		_searchContext = getSearchContext(_group, _user, ddmFormInstance);
+
+		DDMFormValues ddmFormValues1 =
+			DDMFormValuesTestUtil.createDDMFormValues(
+				ddmForm,
+				DDMFormValuesTestUtil.createAvailableLocales(LocaleUtil.US),
+				LocaleUtil.US);
+
+		DDMFormFieldValue nameDDMFormFieldValue =
+			createLocalizedDDMFormFieldValue(
+				"name",
+				HashMapBuilder.put(
+					LocaleUtil.US, "United States"
+				).build());
+
+		ddmFormValues1.addDDMFormFieldValue(nameDDMFormFieldValue);
+
+		DDMFormFieldValue descriptionDDMFormFieldValue =
+			createLocalizedDDMFormFieldValue(
+				"description",
+				HashMapBuilder.put(
+					LocaleUtil.US, "Solo"
+				).build());
+
+		ddmFormValues1.addDDMFormFieldValue(descriptionDDMFormFieldValue);
+
+		DDMFormInstanceRecordTestUtil.addDDMFormInstanceRecord(
+			ddmFormInstance, ddmFormValues1, _group, _user.getUserId());
+
+		DDMFormValues ddmFormValues2 =
+			DDMFormValuesTestUtil.createDDMFormValues(
+				ddmForm,
+				DDMFormValuesTestUtil.createAvailableLocales(LocaleUtil.BRAZIL),
+				LocaleUtil.US);
+
+		nameDDMFormFieldValue = createLocalizedDDMFormFieldValue(
+			"name",
+			HashMapBuilder.put(
+				LocaleUtil.BRAZIL, "Brasil"
+			).build());
+
+		ddmFormValues2.addDDMFormFieldValue(nameDDMFormFieldValue);
+
+		descriptionDDMFormFieldValue = createLocalizedDDMFormFieldValue(
+			"description",
+			HashMapBuilder.put(
+				LocaleUtil.BRAZIL, "Solo"
+			).build());
+
+		ddmFormValues2.addDDMFormFieldValue(descriptionDDMFormFieldValue);
+
+		DDMFormInstanceRecordTestUtil.addDDMFormInstanceRecord(
+			ddmFormInstance, ddmFormValues2, _group, _user.getUserId());
+
+		assertSearch("Brasil", 1);
+		assertSearch("Solo", 2);
+
+		DDMFormInstanceTestUtil.deleteFormInstance(ddmFormInstance);
+	}
+
+	@Test
 	public void testNonindexableField() throws Exception {
 		List<KeyValuePair> keyValuePairs = new ArrayList<>();
 
