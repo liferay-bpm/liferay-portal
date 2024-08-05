@@ -14,6 +14,9 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.ObjectEntryValuesException;
 import com.liferay.object.exception.RequiredObjectRelationshipException;
+import com.liferay.object.field.builder.LongTextObjectFieldBuilder;
+import com.liferay.object.field.builder.RichTextObjectFieldBuilder;
+import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -25,6 +28,7 @@ import com.liferay.object.related.models.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.related.models.test.util.ObjectEntryTestUtil;
 import com.liferay.object.related.models.test.util.ObjectRelationshipTestUtil;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
@@ -104,7 +108,59 @@ public class ObjectRelatedModelsProviderTest {
 	@Before
 	public void setUp() throws Exception {
 		_objectDefinition1 = ObjectDefinitionTestUtil.addObjectDefinition();
-		_objectDefinition2 = ObjectDefinitionTestUtil.addObjectDefinition();
+		_objectDefinition2 =
+			com.liferay.object.test.util.ObjectDefinitionTestUtil.
+				addCustomObjectDefinition(
+					true, _objectDefinitionLocalService,
+					Arrays.asList(
+						new LongTextObjectFieldBuilder(
+						).labelMap(
+							LocalizedMapUtil.getLocalizedMap(
+								RandomTestUtil.randomString())
+						).name(
+							"longTextLocalized"
+						).localized(
+							true
+						).build(),
+						new RichTextObjectFieldBuilder(
+						).labelMap(
+							LocalizedMapUtil.getLocalizedMap(
+								RandomTestUtil.randomString())
+						).name(
+							"richTextLocalized"
+						).localized(
+							true
+						).build(),
+						new TextObjectFieldBuilder(
+						).labelMap(
+							LocalizedMapUtil.getLocalizedMap(
+								RandomTestUtil.randomString())
+						).name(
+							"textLocalized"
+						).localized(
+							true
+						).build()));
+
+		ObjectField objectField = _addCustomObjectField(
+			new TextObjectFieldBuilder(
+			).objectDefinitionId(
+				_objectDefinition2.getObjectDefinitionId()
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"able"
+			).build());
+
+		_objectDefinition2.setTitleObjectFieldId(
+			objectField.getObjectFieldId());
+
+		_objectDefinition2 =
+			ObjectDefinitionLocalServiceUtil.updateObjectDefinition(
+				_objectDefinition2);
+
+		ObjectDefinitionLocalServiceUtil.publishCustomObjectDefinition(
+			TestPropsValues.getUserId(),
+			_objectDefinition2.getObjectDefinitionId());
 
 		_setUser(TestPropsValues.getUser());
 	}
@@ -262,6 +318,8 @@ public class ObjectRelatedModelsProviderTest {
 			3, _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
 			objectEntry1.getObjectEntryId());
+
+		_assertLocalizedValues();
 
 		// Get related models with search
 
@@ -481,6 +539,23 @@ public class ObjectRelatedModelsProviderTest {
 			ServiceContextTestUtil.getServiceContext());
 	}
 
+	private ObjectField _addCustomObjectField(ObjectField objectField)
+		throws Exception {
+
+		return _objectFieldLocalService.addCustomObjectField(
+			objectField.getExternalReferenceCode(), TestPropsValues.getUserId(),
+			objectField.getListTypeDefinitionId(),
+			objectField.getObjectDefinitionId(), objectField.getBusinessType(),
+			objectField.getDBType(), objectField.isIndexed(),
+			objectField.isIndexedAsKeyword(),
+			objectField.getIndexedLanguageId(), objectField.getLabelMap(),
+			objectField.isLocalized(), objectField.getName(),
+			objectField.getReadOnly(),
+			objectField.getReadOnlyConditionExpression(),
+			objectField.isRequired(), objectField.isState(),
+			objectField.getObjectFieldSettings());
+	}
+
 	private ObjectEntry _addObjectEntry(
 			long objectDefinitionId, Map<String, Serializable> values)
 		throws Exception {
@@ -515,6 +590,52 @@ public class ObjectRelatedModelsProviderTest {
 			_objectRelatedModelsProviderRegistry.getObjectRelatedModelsProvider(
 				objectDefinition2.getClassName(),
 				objectDefinition2.getCompanyId(), relationshipType);
+	}
+
+	private void _assertLocalizedValues() throws Exception {
+		ObjectEntry objectEntry1 = _addObjectEntry(
+			_objectDefinition1.getObjectDefinitionId(), Collections.emptyMap());
+
+		Map<String, Serializable> localizedValues =
+			HashMapBuilder.<String, Serializable>put(
+				"longTextLocalized_i18n",
+				HashMapBuilder.put(
+					"en_US", RandomTestUtil.randomString()
+				).build()
+			).put(
+				"richTextLocalized_i18n",
+				HashMapBuilder.put(
+					"en_US", RandomTestUtil.randomString()
+				).build()
+			).put(
+				"textLocalized_i18n",
+				HashMapBuilder.put(
+					"en_US", "en_US " + RandomTestUtil.randomString()
+				).build()
+			).build();
+
+		ObjectEntry objectEntry2 = _addObjectEntry(
+			_objectDefinition2.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>putAll(
+				localizedValues
+			).build());
+
+		ObjectRelationshipTestUtil.addObjectRelationshipMappingTableValues(
+			_objectRelationship.getObjectRelationshipId(),
+			objectEntry1.getObjectEntryId(), objectEntry2.getObjectEntryId());
+
+		Map<String, Serializable> values = _objectEntryLocalService.getValues(
+			objectEntry2.getObjectEntryId());
+
+		Assert.assertEquals(
+			localizedValues.get("longTextLocalized_i18n"),
+			values.get("longTextLocalized_i18n"));
+		Assert.assertEquals(
+			localizedValues.get("richTextLocalized_i18n"),
+			values.get("richTextLocalized_i18n"));
+		Assert.assertEquals(
+			localizedValues.get("textLocalized_i18n"),
+			values.get("textLocalized_i18n"));
 	}
 
 	private void _assertViewPermission(
