@@ -2095,12 +2095,12 @@ public class ObjectDefinitionLocalServiceImpl
 		}
 
 		if (objectDefinition.isApproved() &&
-			objectDefinition.isAccountEntryRestricted() &&
-			!accountEntryRestricted) {
+			(objectDefinition.isAccountEntryRestricted() !=
+				accountEntryRestricted)) {
 
 			throw new ObjectDefinitionAccountEntryRestrictedException(
-				"Account entry restriction cannot be disabled when the " +
-					"object definition is published");
+				"Account entry restriction cannot be changed when the object " +
+					"definition is published");
 		}
 	}
 

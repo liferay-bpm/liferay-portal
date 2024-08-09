@@ -78,11 +78,8 @@ export function AccountRestrictionContainer({
 				)
 			);
 
-			if (isApproved && values.accountEntryRestricted) {
+			if (isApproved) {
 				setDisableAccountToggle(true);
-			}
-
-			if (isApproved && values.accountEntryRestrictedObjectFieldName) {
 				setDisableAccountSelect(true);
 			}
 		}
