@@ -1758,9 +1758,15 @@ public class ObjectDefinitionLocalServiceTest {
 	@Test
 	public void testEnableAccountRestricted() throws Exception {
 		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.addObjectDefinition(
-				RandomTestUtil.randomString(), TestPropsValues.getUserId(), 0,
-				0, true, false);
+			ObjectDefinitionTestUtil.addCustomObjectDefinition(
+				Collections.singletonList(
+					new TextObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"a" + RandomTestUtil.randomString()
+					).build()));
 
 		objectDefinition =
 			_objectDefinitionLocalService.enableAccountEntryRestricted(
@@ -1780,6 +1786,38 @@ public class ObjectDefinitionLocalServiceTest {
 			objectDefinition.getAccountEntryRestrictedObjectFieldId() > 0);
 		Assert.assertTrue(objectDefinition.isAccountEntryRestricted());
 		Assert.assertFalse(objectDefinition.isSystem());
+
+		ObjectDefinition finalObjectDefinition =
+			_objectDefinitionLocalService.publishCustomObjectDefinition(
+				TestPropsValues.getUserId(),
+				objectDefinition.getObjectDefinitionId());
+
+		AssertUtils.assertFailure(
+			ObjectDefinitionAccountEntryRestrictedException.class,
+			"Account entry restriction cannot be changed when the object " +
+				"definition is published",
+			() -> _objectDefinitionLocalService.updateCustomObjectDefinition(
+				finalObjectDefinition.getExternalReferenceCode(),
+				finalObjectDefinition.getObjectDefinitionId(),
+				finalObjectDefinition.getAccountEntryRestrictedObjectFieldId(),
+				finalObjectDefinition.getDescriptionObjectFieldId(),
+				finalObjectDefinition.getObjectFolderId(),
+				finalObjectDefinition.getTitleObjectFieldId(), false,
+				finalObjectDefinition.isActive(),
+				finalObjectDefinition.isEnableCategorization(),
+				finalObjectDefinition.isEnableComments(),
+				finalObjectDefinition.isEnableIndexSearch(),
+				finalObjectDefinition.isEnableLocalization(),
+				finalObjectDefinition.isEnableObjectEntryDraft(),
+				finalObjectDefinition.isEnableObjectEntryHistory(),
+				finalObjectDefinition.getLabelMap(),
+				finalObjectDefinition.getName(),
+				finalObjectDefinition.getPanelAppOrder(),
+				finalObjectDefinition.getPanelCategoryKey(),
+				finalObjectDefinition.isPortlet(),
+				finalObjectDefinition.getPluralLabelMap(),
+				finalObjectDefinition.getScope(),
+				finalObjectDefinition.getStatus()));
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 
