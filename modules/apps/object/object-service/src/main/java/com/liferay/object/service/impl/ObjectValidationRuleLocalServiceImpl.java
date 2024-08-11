@@ -46,6 +46,7 @@ import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
@@ -349,7 +350,8 @@ public class ObjectValidationRuleLocalServiceImpl
 					NAME_ALLOW_ACTIVE_STATUS_UPDATE,
 				"true");
 
-		if (objectDefinition.isModifiable() && objectDefinition.isSystem() &&
+		if (FeatureFlagManagerUtil.isEnabled("LPD-29637") &&
+			objectDefinition.isModifiable() && objectDefinition.isSystem() &&
 			!ObjectDefinitionUtil.isInvokerBundleAllowed() &&
 			objectValidationRule.isSystem() &&
 			(objectValidationRuleSetting != null) &&
@@ -756,9 +758,13 @@ public class ObjectValidationRuleLocalServiceImpl
 		Set<String> allowedObjectValidationRuleSettingNames = SetUtil.fromArray(
 			ObjectValidationRuleSettingConstants.NAME_OUTPUT_OBJECT_FIELD_ID,
 			ObjectValidationRuleSettingConstants.
-				NAME_COMPOSITE_KEY_OBJECT_FIELD_ID,
-			ObjectValidationRuleSettingConstants.
-				NAME_ALLOW_ACTIVE_STATUS_UPDATE);
+				NAME_COMPOSITE_KEY_OBJECT_FIELD_ID);
+
+		if (FeatureFlagManagerUtil.isEnabled("LPD-29637")) {
+			allowedObjectValidationRuleSettingNames.add(
+				ObjectValidationRuleSettingConstants.
+					NAME_ALLOW_ACTIVE_STATUS_UPDATE);
+		}
 
 		int count = 0;
 
