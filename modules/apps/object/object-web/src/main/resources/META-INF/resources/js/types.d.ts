@@ -465,7 +465,7 @@ interface ObjectValidation {
 
 interface ObjectValidationRuleSetting {
 	name:
-		| 'allowActiveStatusUpdate'
+		| 'AllowActiveStatusUpdate'
 		| 'compositeKeyObjectFieldExternalReferenceCode'
 		| 'outputObjectFieldExternalReferenceCode';
 	value: string | boolean;

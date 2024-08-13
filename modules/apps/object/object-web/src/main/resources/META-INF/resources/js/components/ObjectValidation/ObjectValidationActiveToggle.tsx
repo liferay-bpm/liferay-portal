@@ -20,7 +20,7 @@ export function getDisabledValidationActionToggleState(
 ) {
 	if (Liferay.FeatureFlags['LPD-29637']) {
 		const allowActiveStatusUpdate = objectValidationRuleSettings.find(
-			({name}) => name === 'allowActiveStatusUpdate'
+			({name}) => name === 'AllowActiveStatusUpdate'
 		);
 
 		if (allowActiveStatusUpdate) {

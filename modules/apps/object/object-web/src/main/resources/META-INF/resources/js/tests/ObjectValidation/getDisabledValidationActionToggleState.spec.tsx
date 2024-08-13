@@ -12,7 +12,7 @@ function getObjectValidationRuleSettingsMock(
 ): ObjectValidationRuleSetting[] {
 	return [
 		{
-			name: 'allowActiveStatusUpdate',
+			name: 'AllowActiveStatusUpdate',
 			value,
 		},
 	];
