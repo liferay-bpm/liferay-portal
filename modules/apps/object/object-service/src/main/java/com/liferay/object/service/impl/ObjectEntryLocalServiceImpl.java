@@ -156,12 +156,14 @@ import com.liferay.portal.kernel.security.permission.InlineSQLHelper;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.PermissionService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
+import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Base64;
@@ -321,6 +323,21 @@ public class ObjectEntryLocalServiceImpl
 		}
 		finally {
 			ObjectEntryThreadLocal.setSkipObjectValidationRules(false);
+		}
+
+		ModelPermissions modelPermissions =
+			serviceContext.getModelPermissions();
+
+		if (modelPermissions != null) {
+			_permissionService.checkPermission(
+				objectEntry.getGroupId(), objectEntry.getModelClassName(),
+				objectEntry.getObjectEntryId());
+
+			_resourceLocalService.addModelResources(
+				objectEntry.getCompanyId(), objectEntry.getGroupId(),
+				objectEntry.getUserId(), objectEntry.getModelClassName(),
+				String.valueOf(objectEntry.getObjectEntryId()),
+				modelPermissions);
 		}
 
 		updateAsset(
@@ -5063,6 +5080,9 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private ObjectStateLocalService _objectStateLocalService;
+
+	@Reference
+	private PermissionService _permissionService;
 
 	@Reference
 	private ResourceLocalService _resourceLocalService;
