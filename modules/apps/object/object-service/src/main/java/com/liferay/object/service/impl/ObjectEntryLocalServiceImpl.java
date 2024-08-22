@@ -4162,7 +4162,11 @@ public class ObjectEntryLocalServiceImpl
 				insertedValues, columnNames.get(index - 1), integer);
 		}
 		else if (sqlType == Types.VARCHAR) {
-			String string = String.valueOf(value);
+			String string = null;
+
+			if (value != null) {
+				string = String.valueOf(value);
+			}
 
 			preparedStatement.setString(index, string);
 
