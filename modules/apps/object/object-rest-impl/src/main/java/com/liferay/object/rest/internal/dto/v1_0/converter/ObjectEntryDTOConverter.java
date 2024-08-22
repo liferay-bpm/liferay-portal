@@ -847,6 +847,7 @@ public class ObjectEntryDTOConverter
 
 		return ExtendedEntity.extend(dto, nestedFieldsRelatedProperties, null);
 	}
+
 	private Permission[] _toPermissions(
 			ObjectDefinition objectDefinition,
 			com.liferay.object.model.ObjectEntry objectEntry)
@@ -870,6 +871,7 @@ public class ObjectEntryDTOConverter
 				return permissions.toArray(new Permission[0]);
 			});
 	}
+
 	private Map<String, Object> _toProperties(
 			DTOConverterContext dtoConverterContext,
 			ObjectDefinition objectDefinition,
