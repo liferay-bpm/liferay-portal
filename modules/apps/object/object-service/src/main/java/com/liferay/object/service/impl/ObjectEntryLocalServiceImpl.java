@@ -36,6 +36,7 @@ import com.liferay.object.constants.ObjectFilterConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.entry.ObjectEntryContext;
 import com.liferay.object.entry.contributor.ObjectEntryValuesContributor;
+import com.liferay.object.entry.util.ObjectEntryModelPermissionsUtil;
 import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.exception.DuplicateObjectEntryExternalReferenceCodeException;
 import com.liferay.object.exception.NoSuchObjectDefinitionException;
@@ -138,10 +139,7 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.OrganizationTable;
-import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.model.ResourceConstants;
-import com.liferay.portal.kernel.model.ResourcePermission;
-import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.Users_OrgsTable;
@@ -161,16 +159,13 @@ import com.liferay.portal.kernel.security.permission.InlineSQLHelper;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.PermissionService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
-import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
-import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -228,7 +223,6 @@ import java.sql.Types;
 import java.time.LocalDateTime;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -375,7 +369,7 @@ public class ObjectEntryLocalServiceImpl
 
 		_startWorkflowInstance(userId, objectEntry, serviceContext, false);
 
-		_updateResourcePermissions(
+		ObjectEntryModelPermissionsUtil.updateResourcePermissions(
 			objectDefinition, objectEntry, serviceContext);
 
 		boolean clearObjectEntryIdsMap =
@@ -1597,7 +1591,7 @@ public class ObjectEntryLocalServiceImpl
 
 		_startWorkflowInstance(userId, objectEntry, serviceContext, true);
 
-		_updateResourcePermissions(
+		ObjectEntryModelPermissionsUtil.updateResourcePermissions(
 			objectDefinition, objectEntry, serviceContext);
 
 		_deleteFileEntries(
@@ -4357,57 +4351,6 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
-	private void _updateResourcePermissions(
-			ObjectDefinition objectDefinition, ObjectEntry objectEntry,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		ModelPermissions modelPermissions =
-			serviceContext.getModelPermissions();
-
-		if (modelPermissions == null) {
-			return;
-		}
-
-		_permissionService.checkPermission(
-			objectEntry.getGroupId(), objectDefinition.getClassName(),
-			String.valueOf(objectEntry.getObjectEntryId()));
-
-		Collection<String> roleNames = modelPermissions.getRoleNames();
-
-		for (ResourcePermission resourcePermission :
-				_resourcePermissionLocalService.getResourcePermissions(
-					objectDefinition.getCompanyId(),
-					objectDefinition.getClassName(),
-					ResourceConstants.SCOPE_INDIVIDUAL,
-					String.valueOf(objectEntry.getObjectEntryId()))) {
-
-			Role role = _roleLocalService.fetchRole(
-				resourcePermission.getRoleId());
-
-			if ((role == null) || roleNames.contains(role.getName())) {
-				continue;
-			}
-
-			for (ResourceAction resourceAction :
-					_resourceActionLocalService.getResourceActions(
-						objectDefinition.getClassName())) {
-
-				_resourcePermissionLocalService.removeResourcePermission(
-					objectDefinition.getCompanyId(),
-					objectDefinition.getClassName(),
-					ResourceConstants.SCOPE_INDIVIDUAL,
-					String.valueOf(objectEntry.getObjectEntryId()),
-					role.getRoleId(), resourceAction.getActionId());
-			}
-		}
-
-		_resourcePermissionLocalService.updateResourcePermissions(
-			objectEntry.getCompanyId(), objectEntry.getGroupId(),
-			objectDefinition.getClassName(),
-			String.valueOf(objectEntry.getObjectEntryId()), modelPermissions);
-	}
-
 	private void _updateTable(
 			DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
 			long objectEntryId, Map<String, Serializable> values,
@@ -5321,12 +5264,6 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private ObjectStateLocalService _objectStateLocalService;
-
-	@Reference
-	private PermissionService _permissionService;
-
-	@Reference
-	private ResourceActionLocalService _resourceActionLocalService;
 
 	@Reference
 	private ResourceLocalService _resourceLocalService;
