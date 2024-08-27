@@ -206,7 +206,8 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			_objectDefinitionLocalService, _objectEntryLocalService,
 			_objectEntryManagerRegistry, _objectFieldLocalService,
 			_objectRelationshipService, _objectScopeProviderRegistry,
-			_systemObjectDefinitionManagerRegistry);
+			_resourceActionLocalService, _resourcePermissionLocalService,
+			_roleLocalService, _systemObjectDefinitionManagerRegistry);
 	}
 
 	private void _disposeComponentInstances(String restContextPath) {

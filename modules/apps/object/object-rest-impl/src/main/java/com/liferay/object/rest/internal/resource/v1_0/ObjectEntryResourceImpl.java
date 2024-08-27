@@ -5,9 +5,11 @@
 
 package com.liferay.object.rest.internal.resource.v1_0;
 
+import com.liferay.object.entry.util.ObjectEntryModelPermissionsUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
+import com.liferay.object.rest.internal.util.ServiceContextUtil;
 import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManagerProvider;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
@@ -25,7 +27,12 @@ import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -34,6 +41,8 @@ import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.permission.Permission;
+import com.liferay.portal.vulcan.permission.PermissionUtil;
 
 import java.io.Serializable;
 
@@ -60,6 +69,9 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectRelationshipService objectRelationshipService,
 		ObjectScopeProviderRegistry objectScopeProviderRegistry,
+		ResourceActionLocalService resourceActionLocalService,
+		ResourcePermissionLocalService resourcePermissionLocalService,
+		RoleLocalService roleLocalService,
 		SystemObjectDefinitionManagerRegistry
 			systemObjectDefinitionManagerRegistry) {
 
@@ -72,6 +84,9 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		_objectFieldLocalService = objectFieldLocalService;
 		_objectRelationshipService = objectRelationshipService;
 		_objectScopeProviderRegistry = objectScopeProviderRegistry;
+		_resourceActionLocalService = resourceActionLocalService;
+		_resourcePermissionLocalService = resourcePermissionLocalService;
+		_roleLocalService = roleLocalService;
 		_systemObjectDefinitionManagerRegistry =
 			systemObjectDefinitionManagerRegistry;
 	}
@@ -449,6 +464,42 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	}
 
 	@Override
+	public Page<Permission> putObjectEntryPermissionsPage(
+			Long objectEntryId, Permission[] permissions)
+		throws Exception {
+
+		ObjectEntry objectEntry = getObjectEntry(objectEntryId);
+
+		objectEntry.setPermissions(() -> permissions);
+
+		ObjectEntryModelPermissionsUtil.updateResourcePermissions(
+			_objectDefinition,
+			_objectEntryLocalService.getObjectEntry(objectEntryId),
+			ServiceContextUtil.createServiceContext(
+				_getDTOConverterContext(objectEntryId), _objectDefinition,
+				objectEntry, _resourceActionLocalService,
+				_resourcePermissionLocalService, _roleLocalService));
+
+		return Page.of(
+			HashMapBuilder.put(
+				"get",
+				addAction(
+					ActionKeys.PERMISSIONS, "getObjectEntryPermissionsPage",
+					_objectDefinition.getClassName(), objectEntryId)
+			).put(
+				"replace",
+				addAction(
+					ActionKeys.PERMISSIONS, "putObjectEntryPermissionsPage",
+					_objectDefinition.getClassName(), objectEntryId)
+			).build(),
+			PermissionUtil.getPermissions(
+				_objectDefinition.getCompanyId(),
+				_resourceActionLocalService.getResourceActions(
+					_objectDefinition.getClassName()),
+				objectEntryId, _objectDefinition.getClassName(), null));
+	}
+
+	@Override
 	public ObjectEntry putScopeScopeKeyByExternalReferenceCode(
 			String scopeKey, String externalReferenceCode,
 			ObjectEntry objectEntry)
@@ -635,6 +686,10 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	private final ObjectFieldLocalService _objectFieldLocalService;
 	private final ObjectRelationshipService _objectRelationshipService;
 	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
+	private final ResourceActionLocalService _resourceActionLocalService;
+	private final ResourcePermissionLocalService
+		_resourcePermissionLocalService;
+	private final RoleLocalService _roleLocalService;
 	private final SystemObjectDefinitionManagerRegistry
 		_systemObjectDefinitionManagerRegistry;
 
