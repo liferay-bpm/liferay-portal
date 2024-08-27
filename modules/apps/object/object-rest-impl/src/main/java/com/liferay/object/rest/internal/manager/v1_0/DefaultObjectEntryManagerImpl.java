@@ -77,7 +77,6 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -103,7 +102,6 @@ import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedFieldsSupplier;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
-import com.liferay.portal.vulcan.permission.ModelPermissionsUtil;
 import com.liferay.portal.vulcan.util.ActionUtil;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
@@ -147,8 +145,10 @@ public class DefaultObjectEntryManagerImpl
 
 		validateReadOnlyObjectFields(null, objectDefinition, objectEntry);
 
-		ServiceContext serviceContext = _createServiceContext(
-			dtoConverterContext, objectDefinition, objectEntry);
+		ServiceContext serviceContext = ServiceContextUtil.createServiceContext(
+			dtoConverterContext, objectDefinition, objectEntry,
+			_resourceActionLocalService, _resourcePermissionLocalService,
+			_roleLocalService);
 
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
 			_objectEntryService.addObjectEntry(
@@ -774,8 +774,10 @@ public class DefaultObjectEntryManagerImpl
 			serviceBuilderObjectEntry.getExternalReferenceCode(),
 			objectDefinition, objectEntry);
 
-		ServiceContext serviceContext = _createServiceContext(
-			dtoConverterContext, objectDefinition, objectEntry);
+		ServiceContext serviceContext = ServiceContextUtil.createServiceContext(
+			dtoConverterContext, objectDefinition, objectEntry,
+			_resourceActionLocalService, _resourcePermissionLocalService,
+			_roleLocalService);
 
 		serviceBuilderObjectEntry = _objectEntryService.updateObjectEntry(
 			objectEntryId,
@@ -803,8 +805,10 @@ public class DefaultObjectEntryManagerImpl
 		validateReadOnlyObjectFields(
 			externalReferenceCode, objectDefinition, objectEntry);
 
-		ServiceContext serviceContext = _createServiceContext(
-			dtoConverterContext, objectDefinition, objectEntry);
+		ServiceContext serviceContext = ServiceContextUtil.createServiceContext(
+			dtoConverterContext, objectDefinition, objectEntry,
+			_resourceActionLocalService, _resourcePermissionLocalService,
+			_roleLocalService);
 
 		serviceContext.setCompanyId(companyId);
 
@@ -1008,26 +1012,6 @@ public class DefaultObjectEntryManagerImpl
 
 			throw new NoSuchObjectEntryException();
 		}
-	}
-
-	private ServiceContext _createServiceContext(
-			DTOConverterContext dtoConverterContext,
-			ObjectDefinition objectDefinition, ObjectEntry objectEntry)
-		throws Exception {
-
-		ModelPermissions modelPermissions = null;
-
-		if (FeatureFlagManagerUtil.isEnabled("LPD-28799")) {
-			modelPermissions = ModelPermissionsUtil.toModelPermissions(
-				objectDefinition.getCompanyId(), objectEntry.getPermissions(),
-				GetterUtil.getLong(objectEntry.getId()),
-				objectDefinition.getClassName(), _resourceActionLocalService,
-				_resourcePermissionLocalService, _roleLocalService);
-		}
-
-		return ServiceContextUtil.createServiceContext(
-			dtoConverterContext.getLocale(), modelPermissions, objectEntry,
-			dtoConverterContext.getUserId());
 	}
 
 	private byte[] _decode(String fileBase64) {

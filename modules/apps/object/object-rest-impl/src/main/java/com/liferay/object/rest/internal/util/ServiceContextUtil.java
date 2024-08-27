@@ -5,17 +5,22 @@
 
 package com.liferay.object.rest.internal.util;
 
+import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.dto.v1_0.Status;
 import com.liferay.object.service.ObjectEntryLocalServiceUtil;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-
-import java.util.Locale;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
+import com.liferay.portal.vulcan.permission.ModelPermissionsUtil;
 
 /**
  * @author Sergio Jiménez del Coso
@@ -23,14 +28,29 @@ import java.util.Locale;
 public class ServiceContextUtil {
 
 	public static ServiceContext createServiceContext(
-		Locale locale, ModelPermissions modelPermissions,
-		ObjectEntry objectEntry, long userId) {
+			DTOConverterContext dtoConverterContext,
+			ObjectDefinition objectDefinition, ObjectEntry objectEntry,
+			ResourceActionLocalService resourceActionLocalService,
+			ResourcePermissionLocalService resourcePermissionLocalService,
+			RoleLocalService roleLocalService)
+		throws Exception {
 
 		ServiceContext serviceContext = createServiceContext(
-			objectEntry, userId);
+			objectEntry, dtoConverterContext.getUserId());
 
-		serviceContext.setLanguageId(LocaleUtil.toLanguageId(locale));
-		serviceContext.setModelPermissions(modelPermissions);
+		serviceContext.setLanguageId(
+			LocaleUtil.toLanguageId(dtoConverterContext.getLocale()));
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPD-28799")) {
+			return serviceContext;
+		}
+
+		serviceContext.setModelPermissions(
+			ModelPermissionsUtil.toModelPermissions(
+				objectDefinition.getCompanyId(), objectEntry.getPermissions(),
+				GetterUtil.getLong(objectEntry.getId()),
+				objectDefinition.getClassName(), resourceActionLocalService,
+				resourcePermissionLocalService, roleLocalService));
 
 		return serviceContext;
 	}
