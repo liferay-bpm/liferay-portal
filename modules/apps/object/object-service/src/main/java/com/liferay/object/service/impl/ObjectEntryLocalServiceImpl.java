@@ -4967,7 +4967,8 @@ public class ObjectEntryLocalServiceImpl
 			if (!entryValueString.isEmpty()) {
 				int value = GetterUtil.getInteger(entryValue);
 
-				if (!StringUtil.equals(
+				if ((value == 0) &&
+					!StringUtil.equals(
 						String.valueOf(value), entryValueString)) {
 
 					throw new ObjectEntryValuesException.ExceedsIntegerSize(
