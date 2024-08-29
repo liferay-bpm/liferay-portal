@@ -20,6 +20,7 @@ export class WorkflowTaskDetailsPage {
 	readonly commentsTextbox: Locator;
 	readonly detailsMessage: Locator;
 	readonly doneButton: Locator;
+	readonly editAssetButton: Locator;
 	readonly page: Page;
 	readonly previewMessageBoards: Locator;
 	readonly rejectMenuItem: Locator;
@@ -57,6 +58,7 @@ export class WorkflowTaskDetailsPage {
 		this.reviewActionMenu = page.locator(
 			'[id="_com_liferay_portal_workflow_task_web_portlet_MyWorkflowTaskPortlet_kldx___menu"]'
 		);
+		this.editAssetButton = page.locator('[title="Edit"]');
 		this.reviewComment = page.getByRole('textbox', {name: 'Comment'});
 		this.subscribeButton = page.getByLabel('Subscribe to Comments');
 		this.commentsTextbox = page.frameLocator('iframe').getByRole('textbox');
