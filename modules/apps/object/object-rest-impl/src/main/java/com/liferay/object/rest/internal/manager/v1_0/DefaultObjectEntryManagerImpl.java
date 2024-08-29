@@ -44,6 +44,7 @@ import com.liferay.object.rest.manager.v1_0.util.ObjectEntryManagerUtil;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryService;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.object.system.SystemObjectDefinitionManager;
@@ -941,6 +942,25 @@ public class DefaultObjectEntryManagerImpl
 							serviceBuilderObjectEntry.getPrimaryKey());
 					}
 
+					if (Validator.isNull(
+							nestedObjectEntry.getExternalReferenceCode()) &&
+						Objects.equals(
+							ObjectRelationshipConstants.TYPE_ONE_TO_MANY,
+							objectRelationship.getType())) {
+
+						ObjectField objectField =
+							_objectFieldLocalService.fetchObjectField(
+								objectRelationship.getObjectFieldId2());
+
+						if (!objectField.isRequired()) {
+							continue;
+						}
+
+						throw new BadRequestException(
+							"External reference code is required in nested " +
+								"object entries!");
+					}
+
 					nestedObjectEntry = objectEntryManager.updateObjectEntry(
 						objectDefinition.getCompanyId(), dtoConverterContext,
 						nestedObjectEntry.getExternalReferenceCode(),
@@ -1811,6 +1831,9 @@ public class DefaultObjectEntryManagerImpl
 
 	@Reference
 	private ObjectFieldBusinessTypeRegistry _objectFieldBusinessTypeRegistry;
+
+	@Reference
+	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@Reference
 	private ObjectRelatedModelsProviderRegistry
