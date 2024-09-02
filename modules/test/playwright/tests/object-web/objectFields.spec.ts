@@ -35,40 +35,38 @@ test.beforeEach(async ({apiHelpers}) => {
 });
 
 test.afterEach(async ({apiHelpers}) => {
-	if (createdEntities.objectDefinitions.length) {
-		await Promise.all(
-			createdEntities.objectDefinitions.map(async (objectDefinition) => {
-				await apiHelpers.objectAdmin.deleteObjectDefinition(
-					objectDefinition.id
-				);
-			})
-		);
+	const asyncArray = new AsyncArray<ObjectDefinition | ObjectFolder | number, void>();
 
-		createdEntities.objectDefinitions = [];
-	}
-
-	if (createdEntities.objectFolders.length) {
-		await Promise.all(
-			createdEntities.objectFolders.map(async (objectFolder) => {
-				await apiHelpers.objectAdmin.deleteObjectFolder(
-					objectFolder.id
-				);
-			})
-		);
-
-		createdEntities.objectDefinitions = [];
-	}
-
-	if (createdEntities.listTypeDefinitionIds.length) {
-		await Promise.all(
-			createdEntities.listTypeDefinitionIds.map(
-				async (listTypeDefinitionId) =>
-					await apiHelpers.listTypeAdmin.deleteListTypeDefinition(
-						listTypeDefinitionId
-					)
+	asyncArray.map({
+		array: createdEntities.objectDefinitions,
+		predicate: async (objectDefinition: ObjectDefinition) => {
+			await apiHelpers.objectAdmin.deleteObjectDefinition(
+				objectDefinition.id
 			)
-		);
-	}
+		}
+	});
+
+	createdEntities.objectDefinitions = [];
+
+	asyncArray.map({
+		array: createdEntities.objectFolders,
+		predicate: async (objectFolder: ObjectFolder) => {
+			await apiHelpers.objectAdmin.deleteObjectFolder(
+				objectFolder.id
+			)
+		}
+	});
+
+	createdEntities.objectDefinitions = [];
+
+	asyncArray.map({
+		array: createdEntities.listTypeDefinitionIds,
+		predicate: async (listTypeDefinitionId: number) => {
+			await apiHelpers.listTypeAdmin.deleteListTypeDefinition(
+				listTypeDefinitionId
+			)
+		}
+	});
 
 	createdEntities.listTypeDefinitionIds = [];
 });
