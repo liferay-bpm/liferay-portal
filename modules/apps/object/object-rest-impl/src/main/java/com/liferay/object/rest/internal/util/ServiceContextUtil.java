@@ -5,6 +5,7 @@
 
 package com.liferay.object.rest.internal.util;
 
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.dto.v1_0.Status;
 import com.liferay.object.service.ObjectEntryLocalServiceUtil;
@@ -15,7 +16,10 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
+import java.io.Serializable;
+
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Sergio Jiménez del Coso
@@ -24,11 +28,14 @@ public class ServiceContextUtil {
 
 	public static ServiceContext createServiceContext(
 		Locale locale, ModelPermissions modelPermissions,
-		ObjectEntry objectEntry, long userId) {
+		ObjectEntry objectEntry,
+		Map<String, ObjectRelationship> objectRelationships, long userId) {
 
 		ServiceContext serviceContext = createServiceContext(
 			objectEntry, userId);
 
+		serviceContext.setAttribute(
+			"nestedObjectRelationships", (Serializable)objectRelationships);
 		serviceContext.setLanguageId(LocaleUtil.toLanguageId(locale));
 		serviceContext.setModelPermissions(modelPermissions);
 

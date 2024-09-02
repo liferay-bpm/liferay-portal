@@ -148,8 +148,12 @@ public class DefaultObjectEntryManagerImpl
 
 		validateReadOnlyObjectFields(null, objectDefinition, objectEntry);
 
+		Map<String, ObjectRelationship> objectRelationships =
+			_getObjectRelationships(objectDefinition, objectEntry);
+
 		ServiceContext serviceContext = _createServiceContext(
-			dtoConverterContext, objectDefinition, objectEntry);
+			dtoConverterContext, objectDefinition, objectEntry,
+			objectRelationships);
 
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
 			_objectEntryService.addObjectEntry(
@@ -157,7 +161,7 @@ public class DefaultObjectEntryManagerImpl
 				objectDefinition.getObjectDefinitionId(),
 				_toObjectValues(
 					dtoConverterContext.getLocale(), objectDefinition,
-					objectEntry, scopeKey, serviceContext),
+					objectEntry, objectRelationships, scopeKey, serviceContext),
 				serviceContext);
 
 		return _toObjectEntry(
@@ -775,13 +779,18 @@ public class DefaultObjectEntryManagerImpl
 			serviceBuilderObjectEntry.getExternalReferenceCode(),
 			objectDefinition, objectEntry);
 
+		Map<String, ObjectRelationship> objectRelationships =
+			_getObjectRelationships(objectDefinition, objectEntry);
+
 		ServiceContext serviceContext = _createServiceContext(
-			dtoConverterContext, objectDefinition, objectEntry);
+			dtoConverterContext, objectDefinition, objectEntry,
+			objectRelationships);
 
 		serviceBuilderObjectEntry = _objectEntryService.updateObjectEntry(
 			objectEntryId,
 			_toObjectValues(
 				dtoConverterContext.getLocale(), objectDefinition, objectEntry,
+				objectRelationships,
 				String.valueOf(serviceBuilderObjectEntry.getGroupId()),
 				serviceContext),
 			serviceContext);
@@ -790,8 +799,8 @@ public class DefaultObjectEntryManagerImpl
 			dtoConverterContext, objectDefinition,
 			_addOrUpdateNestedObjectEntries(
 				dtoConverterContext, objectDefinition, objectEntry,
-				_getObjectRelationships(objectDefinition, objectEntry),
-				serviceBuilderObjectEntry, objectEntry.getScopeKey()));
+				objectRelationships, serviceBuilderObjectEntry,
+				objectEntry.getScopeKey()));
 	}
 
 	@Override
@@ -804,8 +813,12 @@ public class DefaultObjectEntryManagerImpl
 		validateReadOnlyObjectFields(
 			externalReferenceCode, objectDefinition, objectEntry);
 
+		Map<String, ObjectRelationship> objectRelationships =
+			_getObjectRelationships(objectDefinition, objectEntry);
+
 		ServiceContext serviceContext = _createServiceContext(
-			dtoConverterContext, objectDefinition, objectEntry);
+			dtoConverterContext, objectDefinition, objectEntry,
+			objectRelationships);
 
 		serviceContext.setCompanyId(companyId);
 
@@ -815,15 +828,14 @@ public class DefaultObjectEntryManagerImpl
 				objectDefinition.getObjectDefinitionId(),
 				_toObjectValues(
 					dtoConverterContext.getLocale(), objectDefinition,
-					objectEntry, scopeKey, serviceContext),
+					objectEntry, objectRelationships, scopeKey, serviceContext),
 				serviceContext);
 
 		return _toObjectEntry(
 			dtoConverterContext, objectDefinition,
 			_addOrUpdateNestedObjectEntries(
 				dtoConverterContext, objectDefinition, objectEntry,
-				_getObjectRelationships(objectDefinition, objectEntry),
-				serviceBuilderObjectEntry, scopeKey));
+				objectRelationships, serviceBuilderObjectEntry, scopeKey));
 	}
 
 	private Map<String, String> _addAction(
@@ -1032,7 +1044,8 @@ public class DefaultObjectEntryManagerImpl
 
 	private ServiceContext _createServiceContext(
 			DTOConverterContext dtoConverterContext,
-			ObjectDefinition objectDefinition, ObjectEntry objectEntry)
+			ObjectDefinition objectDefinition, ObjectEntry objectEntry,
+			Map<String, ObjectRelationship> objectRelationships)
 		throws Exception {
 
 		ModelPermissions modelPermissions = null;
@@ -1047,7 +1060,7 @@ public class DefaultObjectEntryManagerImpl
 
 		return ServiceContextUtil.createServiceContext(
 			dtoConverterContext.getLocale(), modelPermissions, objectEntry,
-			dtoConverterContext.getUserId());
+			objectRelationships, dtoConverterContext.getUserId());
 	}
 
 	private byte[] _decode(String fileBase64) {
@@ -1699,8 +1712,9 @@ public class DefaultObjectEntryManagerImpl
 
 	private Map<String, Serializable> _toObjectValues(
 			Locale locale, ObjectDefinition objectDefinition,
-			ObjectEntry objectEntry, String scopeKey,
-			ServiceContext serviceContext)
+			ObjectEntry objectEntry,
+			Map<String, ObjectRelationship> objectRelationships,
+			String scopeKey, ServiceContext serviceContext)
 		throws Exception {
 
 		Map<String, Serializable> values = new HashMap<>();
@@ -1716,6 +1730,23 @@ public class DefaultObjectEntryManagerImpl
 				_processAttachment(
 					objectDefinition, objectEntry, objectField, scopeKey,
 					serviceContext);
+			}
+			else if (Objects.equals(
+						objectField.getBusinessType(),
+						ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP) &&
+					 (objectRelationships != null)) {
+
+				ObjectRelationship objectRelationship =
+					_objectRelationshipLocalService.
+						fetchObjectRelationshipByObjectFieldId2(
+							objectField.getObjectFieldId());
+
+				if ((objectRelationship != null) &&
+					objectRelationships.containsKey(
+						objectRelationship.getName())) {
+
+					continue;
+				}
 			}
 
 			Object value = ObjectEntryValuesUtil.getValue(

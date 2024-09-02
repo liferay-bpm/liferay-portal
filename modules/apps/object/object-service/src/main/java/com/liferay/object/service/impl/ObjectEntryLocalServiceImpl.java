@@ -306,12 +306,18 @@ public class ObjectEntryLocalServiceImpl
 			insertedValues, objectDefinition, objectEntryId, values,
 			workflowAction);
 
+		Map<String, ObjectRelationship> objectRelationships =
+			(Map<String, ObjectRelationship>)serviceContext.getAttribute(
+				"nestedObjectRelationships");
+
 		boolean dynamicObjectDefinitionStaticValues = _insertIntoTable(
 			_getDynamicObjectDefinitionTable(objectDefinitionId),
-			insertedValues, objectEntryId, values, workflowAction);
+			insertedValues, objectEntryId, objectRelationships, values,
+			workflowAction);
 		boolean extensionDynamicObjectDefinitionStaticValues = _insertIntoTable(
 			_getExtensionDynamicObjectDefinitionTable(objectDefinitionId),
-			insertedValues, objectEntryId, values, workflowAction);
+			insertedValues, objectEntryId, objectRelationships, values,
+			workflowAction);
 
 		ObjectEntry objectEntry = objectEntryPersistence.create(objectEntryId);
 
@@ -1441,7 +1447,7 @@ public class ObjectEntryLocalServiceImpl
 		}
 		else {
 			_insertIntoTable(
-				dynamicObjectDefinitionTable, new HashMap<>(), primaryKey,
+				dynamicObjectDefinitionTable, new HashMap<>(), primaryKey, null,
 				values, WorkflowConstants.ACTION_PUBLISH);
 		}
 	}
@@ -3619,6 +3625,7 @@ public class ObjectEntryLocalServiceImpl
 	private boolean _insertIntoTable(
 			DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
 			Map<String, Serializable> insertedValues, long objectEntryId,
+			Map<String, ObjectRelationship> objectRelationships,
 			Map<String, Serializable> values, int workflowAction)
 		throws PortalException {
 
@@ -3673,6 +3680,25 @@ public class ObjectEntryLocalServiceImpl
 				count += 2;
 
 				continue;
+			}
+			else if (objectField.compareBusinessType(
+						ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP) &&
+					 (objectRelationships != null)) {
+
+				ObjectRelationshipLocalService objectRelationshipLocalService =
+					_objectRelationshipLocalServiceSnapshot.get();
+
+				ObjectRelationship objectRelationship =
+					objectRelationshipLocalService.
+						fetchObjectRelationshipByObjectFieldId2(
+							objectField.getObjectFieldId());
+
+				if ((objectRelationship != null) &&
+					objectRelationships.containsKey(
+						objectRelationship.getName())) {
+
+					continue;
+				}
 			}
 
 			if (!values.containsKey(objectField.getName())) {
