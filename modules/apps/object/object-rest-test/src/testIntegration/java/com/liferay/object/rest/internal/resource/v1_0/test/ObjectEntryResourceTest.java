@@ -7250,7 +7250,62 @@ public class ObjectEntryResourceTest {
 			_objectDefinition1, _objectDefinition2, TestPropsValues.getUserId(),
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
+		_objectFieldLocalService.updateRequired(
+			_objectRelationship1.getObjectFieldId2(), true);
+
 		JSONObject objectEntryJSONObject = JSONUtil.put(
+			_objectRelationship1.getName(),
+			JSONFactoryUtil.createJSONObject(
+				JSONUtil.put(
+					_OBJECT_FIELD_NAME_1, _NEW_OBJECT_FIELD_VALUE_1
+				).put(
+					"externalReferenceCode", ""
+				).toString()));
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"com.liferay.portal.vulcan.internal.jaxrs.exception.mapper." +
+					"WebApplicationExceptionMapper",
+				LoggerTestUtil.ERROR)) {
+
+			Assert.assertEquals(
+				400,
+				HTTPTestUtil.invokeToHttpCode(
+					objectEntryJSONObject.toString(),
+					_objectDefinition2.getRESTContextPath(), Http.Method.POST));
+		}
+
+		_objectFieldLocalService.updateRequired(
+			_objectRelationship1.getObjectFieldId2(), false);
+
+		objectEntryJSONObject = JSONUtil.put(
+			_objectRelationship1.getName(),
+			JSONFactoryUtil.createJSONObject(
+				JSONUtil.put(
+					_OBJECT_FIELD_NAME_1, _NEW_OBJECT_FIELD_VALUE_1
+				).put(
+					"externalReferenceCode", ""
+				).toString()));
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			objectEntryJSONObject.toString(),
+			_objectDefinition2.getRESTContextPath(), Http.Method.POST);
+
+		Assert.assertEquals(
+			0,
+			jsonObject.getJSONObject(
+				"status"
+			).get(
+				"code"
+			));
+
+		Assert.assertEquals(
+			0,
+			jsonObject.getLong(
+				StringBundler.concat(
+					"r_", _objectRelationship1.getName(), "_",
+					_objectDefinition1.getPKObjectFieldName())));
+
+		objectEntryJSONObject = JSONUtil.put(
 			_objectRelationship1.getName(),
 			JSONFactoryUtil.createJSONObject(
 				JSONUtil.put(
@@ -7259,7 +7314,7 @@ public class ObjectEntryResourceTest {
 					"externalReferenceCode", _ERC_VALUE_1
 				).toString()));
 
-		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+		jsonObject = HTTPTestUtil.invokeToJSONObject(
 			objectEntryJSONObject.toString(),
 			_objectDefinition2.getRESTContextPath(), Http.Method.POST);
 
