@@ -56,6 +56,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 	test('all picklist definitions are listed during object field creation', async ({
 		apiHelpers,
+		modelBuilderObjectDefinitionNodePage,
 		modelBuilderPage,
 	}) => {
 		const {listTypeDefinitionIds, objectDefinition} = createdEntities;
@@ -81,17 +82,19 @@ test.describe('Manage object fields through Model Builder', () => {
 
 		await modelBuilderPage.goto({objectFolderName: 'Default'});
 
-		await modelBuilderPage.openAddNewObjectFieldModal(objectDefinition.name);
+		await modelBuilderObjectDefinitionNodePage.openAddNewObjectFieldModal(
+			objectDefinition.name
+		);
 
-		await modelBuilderPage.fillNewObjectFieldLabel(
+		await modelBuilderObjectDefinitionNodePage.fillObjectFieldLabelInput(
 			'objectFieldLabel' + getRandomInt()
 		);
 
-		await modelBuilderPage.selectNewObjectFieldBusinessTypeOption(
+		await modelBuilderObjectDefinitionNodePage.selectNewObjectFieldBusinessTypeOption(
 			'Picklist'
 		);
 
-		await modelBuilderPage.newObjectFieldSelectPicklist.click();
+		await modelBuilderObjectDefinitionNodePage.objectFieldPicklistSelect.click();
 
 		const listTypeDefinitionBox =
 			modelBuilderPage.page.getByRole('listbox');
@@ -105,6 +108,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 	test('can add picklist object field to object definition node', async ({
 		apiHelpers,
+		modelBuilderObjectDefinitionNodePage,
 		modelBuilderPage,
 		page,
 		viewObjectDefinitionsPage,
@@ -126,7 +130,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 		const objectFieldLabel = 'objectFieldLabel' + getRandomInt();
 
-		await modelBuilderPage.createObjectField({
+		await modelBuilderObjectDefinitionNodePage.createObjectField({
 			listTypeDefinitionName: listTypeDefinition.name,
 			mandatory: false,
 			objectDefinitionName: objectDefinition.name,
@@ -144,6 +148,7 @@ test.describe('Manage object fields through Model Builder', () => {
 	test('can delete object field', async ({
 		apiHelpers,
 		modelBuilderLeftSidebarPage,
+		modelBuilderObjectDefinitionNodePage,
 		modelBuilderPage,
 		modelBuilderRightSidebarPage,
 	}) => {
@@ -175,7 +180,9 @@ test.describe('Manage object fields through Model Builder', () => {
 			.filter({hasText: objectDefinition.name})
 			.click();
 
-		await modelBuilderPage.clickShowAllFieldsButton(objectDefinition.name);
+		await modelBuilderObjectDefinitionNodePage.clickShowAllFieldsButton(
+			objectDefinition.name
+		);
 
 		await modelBuilderPage.objectDefinitionNodes
 			.filter({hasText: objectDefinition.name})
@@ -184,7 +191,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 		await modelBuilderRightSidebarPage.deleteTrashButton.click();
 
-		await modelBuilderPage.modalDeleteObjectDefinitionConfirmationButton.click();
+		await modelBuilderObjectDefinitionNodePage.modalDeleteObjectDefinitionConfirmationButton.click();
 
 		await expect(
 			modelBuilderPage.objectDefinitionNodes
@@ -196,6 +203,7 @@ test.describe('Manage object fields through Model Builder', () => {
 	test('can edit picklist object field from draft object definition', async ({
 		apiHelpers,
 		modelBuilderLeftSidebarPage,
+		modelBuilderObjectDefinitionNodePage,
 		modelBuilderPage,
 		page,
 	}) => {
@@ -242,7 +250,7 @@ test.describe('Manage object fields through Model Builder', () => {
 			draftObjectDefinition.label['en_US']
 		);
 
-		await modelBuilderPage.clickShowAllFieldsButton(
+		await modelBuilderObjectDefinitionNodePage.clickShowAllFieldsButton(
 			draftObjectDefinition.label['en_US']
 		);
 
@@ -268,6 +276,7 @@ test.describe('Manage object fields through Model Builder', () => {
 	test('can show and hide object fields in the object definition node', async ({
 		apiHelpers,
 		modelBuilderLeftSidebarPage,
+		modelBuilderObjectDefinitionNodePage,
 		modelBuilderPage,
 		page,
 	}) => {
@@ -324,14 +333,14 @@ test.describe('Manage object fields through Model Builder', () => {
 		await expect(page.getByText(integerFieldName)).not.toBeVisible();
 		await expect(page.getByText(dateFieldName)).not.toBeVisible();
 
-		await modelBuilderPage.clickShowAllFieldsButton(
+		await modelBuilderObjectDefinitionNodePage.clickShowAllFieldsButton(
 			objectDefinition.label['en_US']
 		);
 
 		await expect(page.getByText(integerFieldName)).toBeVisible();
 		await expect(page.getByText(dateFieldName)).toBeVisible();
 
-		await modelBuilderPage.clickHideFieldsButton(
+		await modelBuilderObjectDefinitionNodePage.clickHideFieldsButton(
 			objectDefinition.label['en_US']
 		);
 
@@ -342,6 +351,7 @@ test.describe('Manage object fields through Model Builder', () => {
 	test('cannot delete an objectField that belongs to a unique composite key validation through Model Builder', async ({
 		apiHelpers,
 		modelBuilderLeftSidebarPage,
+		modelBuilderObjectDefinitionNodePage,
 		modelBuilderPage,
 		modelBuilderRightSidebarPage,
 		page,
@@ -407,7 +417,9 @@ test.describe('Manage object fields through Model Builder', () => {
 			.filter({hasText: objectDefinition.name})
 			.click();
 
-		await modelBuilderPage.clickShowAllFieldsButton(objectDefinition.name);
+		await modelBuilderObjectDefinitionNodePage.clickShowAllFieldsButton(
+			objectDefinition.name
+		);
 
 		await page.getByText(integerFieldName).click();
 
@@ -423,6 +435,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 	test('cannot delete only custom object field of an published object definition', async ({
 		modelBuilderLeftSidebarPage,
+		modelBuilderObjectDefinitionNodePage,
 		modelBuilderPage,
 		modelBuilderRightSidebarPage,
 		page,
@@ -435,7 +448,9 @@ test.describe('Manage object fields through Model Builder', () => {
 			.filter({hasText: objectDefinition.name})
 			.click();
 
-		await modelBuilderPage.clickShowAllFieldsButton(objectDefinition.name);
+		await modelBuilderObjectDefinitionNodePage.clickShowAllFieldsButton(
+			objectDefinition.name
+		);
 
 		await page.getByText('textField').click();
 
