@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {Locator, Page, expect} from '@playwright/test';
+import {Locator, Page} from '@playwright/test';
 
 import {PORTLET_URLS} from '../../../utils/portletUrls';
 import {ViewObjectDefinitionsPage} from '../ViewObjectDefinitionsPage';
@@ -17,10 +17,6 @@ export class ModelBuilderPage {
 	readonly fitViewButton: Locator;
 	readonly modelBuilderLeftSidebarPage: ModelBuilderLeftSidebarPage;
 	readonly newObjectFieldName: Locator;
-	readonly newObjectRelationshipLabel: Locator;
-	readonly newObjectRelationshipTitle: Locator;
-	readonly newObjectRelationshipType: Locator;
-	readonly newObjectRelationshipSaveButton: Locator;
 	readonly objectDefinitionNodes: Locator;
 	readonly objectRelationshipEdges: Locator;
 	readonly openPageViewButton: Locator;
@@ -46,19 +42,6 @@ export class ModelBuilderPage {
 		this.modelBuilderLeftSidebarPage = new ModelBuilderLeftSidebarPage(
 			page
 		);
-		this.newObjectRelationshipLabel = page
-			.locator('div.form-group')
-			.filter({hasText: /^LabelMandatory$/})
-			.getByRole('textbox');
-		this.newObjectRelationshipTitle = page.getByRole('heading', {
-			name: 'New Relationship',
-		});
-		this.newObjectRelationshipType = page.getByText('Many to Many');
-		this.newObjectRelationshipSaveButton = page
-			.getByLabel('New Relationship')
-			.getByRole('button', {
-				name: 'Save',
-			});
 		this.viewObjectDefinitionsPage = new ViewObjectDefinitionsPage(page);
 		this.objectDefinitionNodes = page.locator('.react-flow__node');
 		this.objectRelationshipEdges = page.locator('.react-flow__edge');
@@ -95,24 +78,6 @@ export class ModelBuilderPage {
 				'left'
 			)
 		);
-	}
-
-	async createObjectRelationship(
-		objectRelationshipLabel: string,
-		type: string
-	) {
-		await expect(this.newObjectRelationshipTitle).toBeVisible();
-
-		await this.newObjectRelationshipLabel.fill(objectRelationshipLabel);
-		await this.newObjectRelationshipType.click();
-		await this.page.getByRole('option', {name: type}).click();
-		const responsePromise = this.page.waitForResponse(
-			'**/object-relationships'
-		);
-		await this.newObjectRelationshipSaveButton.click();
-		const response = await responsePromise;
-
-		return response.json();
 	}
 
 	async dragNodeThroughDiagram(
