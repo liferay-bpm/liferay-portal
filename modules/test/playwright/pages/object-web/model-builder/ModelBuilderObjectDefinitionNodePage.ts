@@ -5,24 +5,24 @@
 
 import {Locator, Page, expect} from '@playwright/test';
 
+import {ModelBuilderDiagramPage} from './ModelBuilderDiagramPage';
 import {ModelBuilderLeftSidebarPage} from './ModelBuilderLeftSidebarPage';
-import {ModelBuilderPage} from './ModelBuilderPage';
 
 export class ModelBuilderObjectDefinitionNodePage {
 	readonly addObjectFieldButton: Locator;
 	readonly deleteObjectDefinitionOption: Locator;
-	readonly modelBuilderPage: ModelBuilderPage;
-	readonly newObjectRelationshipLabel: Locator;
-	readonly newObjectRelationshipTitle: Locator;
-	readonly newObjectRelationshipType: Locator;
 	readonly newObjectRelationshipSaveButton: Locator;
+	readonly modelBuilderDiagramPage: ModelBuilderDiagramPage;
+	readonly newObjectFieldSaveButton: Locator;
 	readonly modalDeleteObjectDefinitionTextField: Locator;
 	readonly modalDeleteObjectDefinitionConfirmationButton: Locator;
 	readonly modelBuilderLeftSidebarPage: ModelBuilderLeftSidebarPage;
-	readonly newObjectFieldSaveButton: Locator;
 	readonly objectFieldBusinessTypeSelect: Locator;
 	readonly objectFieldLabelInput: Locator;
 	readonly objectFieldPicklistSelect: Locator;
+	readonly objectRelationshipLabelInput: Locator;
+	readonly objectRelationshipTitle: Locator;
+	readonly objectRelationshipTypeButton: Locator;
 	readonly page: Page;
 
 	constructor(page: Page) {
@@ -39,7 +39,7 @@ export class ModelBuilderObjectDefinitionNodePage {
 		this.modalDeleteObjectDefinitionTextField = page.getByPlaceholder(
 			'Confirm Object Definition Name'
 		);
-		this.modelBuilderPage = new ModelBuilderPage(page);
+		this.modelBuilderDiagramPage = new ModelBuilderDiagramPage(page);
 		this.modelBuilderLeftSidebarPage = new ModelBuilderLeftSidebarPage(
 			page
 		);
@@ -60,14 +60,19 @@ export class ModelBuilderObjectDefinitionNodePage {
 			.locator('div.form-group')
 			.filter({hasText: /^PicklistSelect an Option$/})
 			.getByRole('combobox');
-		this.newObjectRelationshipLabel = page
+		this.objectRelationshipLabelInput = page
 			.locator('div.form-group')
 			.filter({hasText: /^LabelMandatory$/})
 			.getByRole('textbox');
-		this.newObjectRelationshipTitle = page.getByRole('heading', {
+		this.objectRelationshipTitle = page.getByRole('heading', {
 			name: 'New Relationship',
 		});
-		this.newObjectRelationshipType = page.getByText('Many to Many');
+		this.objectRelationshipTypeButton = page.getByText('Many to Many');
+		this.newObjectRelationshipSaveButton = page
+			.getByLabel('New Relationship')
+			.getByRole('button', {
+				name: 'Save',
+			});
 		this.newObjectRelationshipSaveButton = page
 			.getByLabel('New Relationship')
 			.getByRole('button', {
@@ -77,21 +82,21 @@ export class ModelBuilderObjectDefinitionNodePage {
 	}
 
 	async clickHideFieldsButton(objectDefinitionName: string) {
-		await this.modelBuilderPage.objectDefinitionNodes
+		await this.modelBuilderDiagramPage.objectDefinitionNodes
 			.filter({hasText: objectDefinitionName})
 			.getByRole('button', {name: 'Hide Fields'})
 			.click();
 	}
 
 	async clickObjectDefinitionActionsButton(objectDefinitionLabel: string) {
-		await this.modelBuilderPage.objectDefinitionNodes
+		await this.modelBuilderDiagramPage.objectDefinitionNodes
 			.filter({hasText: objectDefinitionLabel})
 			.getByLabel('Show Actions')
 			.click();
 	}
 
 	async clickShowAllFieldsButton(objectDefinitionName: string) {
-		await this.modelBuilderPage.objectDefinitionNodes
+		await this.modelBuilderDiagramPage.objectDefinitionNodes
 			.filter({hasText: objectDefinitionName})
 			.getByRole('button', {name: 'Show All Fields'})
 			.click();
@@ -133,10 +138,10 @@ export class ModelBuilderObjectDefinitionNodePage {
 		objectRelationshipLabel: string,
 		type: string
 	) {
-		await expect(this.newObjectRelationshipTitle).toBeVisible();
+		await expect(this.objectRelationshipTitle).toBeVisible();
 
-		await this.newObjectRelationshipLabel.fill(objectRelationshipLabel);
-		await this.newObjectRelationshipType.click();
+		await this.objectRelationshipLabelInput.fill(objectRelationshipLabel);
+		await this.objectRelationshipTypeButton.click();
 		await this.page.getByRole('option', {name: type}).click();
 		const responsePromise = this.page.waitForResponse(
 			'**/object-relationships'
@@ -161,7 +166,7 @@ export class ModelBuilderObjectDefinitionNodePage {
 	}
 
 	getLinkedObjectDefinitionIconLocator(objectDefinitionLabel: string) {
-		return this.modelBuilderPage.objectDefinitionNodes
+		return this.modelBuilderDiagramPage.objectDefinitionNodes
 			.filter({
 				hasText: objectDefinitionLabel,
 			})
@@ -173,7 +178,7 @@ export class ModelBuilderObjectDefinitionNodePage {
 			.filter({hasText: objectDefinitionName})
 			.click();
 
-		await this.modelBuilderPage.objectDefinitionNodes
+		await this.modelBuilderDiagramPage.objectDefinitionNodes
 			.filter({hasText: objectDefinitionName})
 			.getByRole('button', {name: 'Add Field or Relationship'})
 			.click();

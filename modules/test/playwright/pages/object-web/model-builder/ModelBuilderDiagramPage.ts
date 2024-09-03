@@ -9,7 +9,7 @@ import {PORTLET_URLS} from '../../../utils/portletUrls';
 import {ViewObjectDefinitionsPage} from '../ViewObjectDefinitionsPage';
 import {ModelBuilderLeftSidebarPage} from './ModelBuilderLeftSidebarPage';
 
-export class ModelBuilderPage {
+export class ModelBuilderDiagramPage {
 	readonly deletionNotAllowed: Locator;
 	readonly diagramArea: Locator;
 	readonly editInPageViewOption: Locator;
@@ -42,7 +42,6 @@ export class ModelBuilderPage {
 		this.modelBuilderLeftSidebarPage = new ModelBuilderLeftSidebarPage(
 			page
 		);
-		this.viewObjectDefinitionsPage = new ViewObjectDefinitionsPage(page);
 		this.objectDefinitionNodes = page.locator('.react-flow__node');
 		this.objectRelationshipEdges = page.locator('.react-flow__edge');
 		this.openPageViewButton = page.getByRole('button', {
@@ -53,10 +52,11 @@ export class ModelBuilderPage {
 			'.alert-warning',
 			{
 				hasText:
-					'Postal Address can only have a relationship with the Account object.',
+				'Postal Address can only have a relationship with the Account object.',
 			}
 		);
 		this.toggleSidebarsButton = page.getByLabel('Toggle Sidebars');
+		this.viewObjectDefinitionsPage = new ViewObjectDefinitionsPage(page);
 	}
 
 	async clickObjectRelationshipEdge(objectRelationshipLabel: string) {
@@ -111,11 +111,11 @@ export class ModelBuilderPage {
 		return this.page.getByTitle(`ERC: ${objectFolderERC}`);
 	}
 
-	getObjectFolderLabelHeaderLocator = (objectFolderLabel: string) => {
+	getObjectFolderLabelHeaderLocator(objectFolderLabel: string) {
 		return this.page.getByTitle(
 			`Object Folder Label: ${objectFolderLabel}`
 		);
-	};
+	}
 
 	async goto({
 		objectFolderName,
