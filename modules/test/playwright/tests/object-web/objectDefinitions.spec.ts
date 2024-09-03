@@ -182,6 +182,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 	test('can delete an object definition by model builder leftsidebar', async ({
 		apiHelpers,
 		modelBuilderLeftSidebarPage,
+		modelBuilderObjectDefinitionNodePage,
 		modelBuilderPage,
 	}) => {
 		const objectDefinition1 =
@@ -210,7 +211,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 			objectDefinition1.label['en_US']
 		);
 
-		await modelBuilderPage.deleteObjectDefinitionOption.click();
+		await modelBuilderObjectDefinitionNodePage.deleteObjectDefinitionOption.click();
 
 		await expect(
 			modelBuilderLeftSidebarPage.sidebarItems.filter({
@@ -229,6 +230,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 		apiHelpers,
 		modalAddObjectDefinitionPage,
 		modelBuilderLeftSidebarPage,
+		modelBuilderObjectDefinitionNodePage,
 		modelBuilderPage,
 	}) => {
 		const objectDefinition1 =
@@ -254,11 +256,13 @@ test.describe('Manage object definitions through Model Builder', () => {
 
 		await modelBuilderPage.fitViewButton.click();
 
-		await modelBuilderPage.clickObjectDefinitionActionsButton(
+		await modelBuilderObjectDefinitionNodePage.clickObjectDefinitionActionsButton(
 			objectDefinition1.label['en_US']
 		);
 
-		await modelBuilderPage.deleteObjectDefinition(objectDefinition1.name);
+		await modelBuilderObjectDefinitionNodePage.deleteObjectDefinition(
+			objectDefinition1.name
+		);
 
 		await expect(
 			modelBuilderPage.objectDefinitionNodes.filter({
@@ -361,13 +365,14 @@ test.describe('Manage object definitions through Model Builder', () => {
 
 	test('navigate to edit object definition page', async ({
 		context,
+		modelBuilderObjectDefinitionNodePage,
 		modelBuilderPage,
 	}) => {
 		await modelBuilderPage.goto({objectFolderName: 'Default'});
 
 		await modelBuilderPage.toggleSidebarsButton.click();
 
-		await modelBuilderPage.clickObjectDefinitionActionsButton(
+		await modelBuilderObjectDefinitionNodePage.clickObjectDefinitionActionsButton(
 			'organization'
 		);
 
