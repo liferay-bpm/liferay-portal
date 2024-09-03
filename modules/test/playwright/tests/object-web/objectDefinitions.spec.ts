@@ -360,6 +360,8 @@ test.describe('Manage object definitions through Model Builder', () => {
 	}) => {
 		await modelBuilderPage.goto({objectFolderName: 'Default'});
 
+		await modelBuilderPage.toggleSidebarsButton.click();
+
 		await modelBuilderPage.clickObjectDefinitionActionsButton(
 			'organization'
 		);
@@ -380,6 +382,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 	test('see object definition details', async ({
 		apiHelpers,
 		modelBuilderPage,
+		modelBuilderRightSidebarPage,
 		page,
 	}) => {
 		const objectFolder =
@@ -443,7 +446,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 				.click();
 
 			await expect(
-				modelBuilderPage.rightSidebar.getByTitle(
+				modelBuilderRightSidebarPage.rightSidebar.getByTitle(
 					`${objectDefinition.label['en_US']} Details`
 				)
 			).toBeVisible();
@@ -451,43 +454,43 @@ test.describe('Manage object definitions through Model Builder', () => {
 			// Object Data Container
 
 			await expect(
-				modelBuilderPage.rightSidebarObjectDefinitionLabel
+				modelBuilderRightSidebarPage.objectDefinitionLabel
 			).toHaveValue(objectDefinition.label['en_US']);
 
-			await modelBuilderPage.rightSidebarObjectDefinitionLabelLocalizationButton.click();
+			await modelBuilderRightSidebarPage.objectDefinitionLabelLocalizationButton.click();
 
 			await page
 				.getByRole('menuitem', {name: 'pt_BR Translated'})
 				.click();
 
 			await expect(
-				modelBuilderPage.rightSidebarObjectDefinitionLabel
+				modelBuilderRightSidebarPage.objectDefinitionLabel
 			).toHaveValue(objectDefinition.label['pt_BR']);
 
 			await page.keyboard.press('Escape');
 
 			await expect(
-				modelBuilderPage.rightSidebarObjectDefinitionPluralLabel
+				modelBuilderRightSidebarPage.objectDefinitionPluralLabel
 			).toHaveValue(objectDefinition.pluralLabel['pt_BR']);
 
-			await modelBuilderPage.rightSidebarObjectDefinitionPluralLabelLocalizationButton.click();
+			await modelBuilderRightSidebarPage.objectDefinitionPluralLabelLocalizationButton.click();
 
 			await page.getByRole('menuitem', {name: 'en_US Default'}).click();
 
 			await expect(
-				modelBuilderPage.rightSidebarObjectDefinitionPluralLabel
+				modelBuilderRightSidebarPage.objectDefinitionPluralLabel
 			).toHaveValue(objectDefinition.pluralLabel['en_US']);
 
 			await page.keyboard.press('Escape');
 
 			await expect(
-				modelBuilderPage.rightSidebarObjectDefinitionActivateObject
+				modelBuilderRightSidebarPage.objectDefinitionActivateObject
 			).toBeChecked({checked: objectDefinition.active});
 
 			// Entry Display Container
 
 			await expect(
-				modelBuilderPage.rightSidebarObjectDefinitionEntryTitleField
+				modelBuilderRightSidebarPage.objectDefinitionEntryTitleField
 			).toHaveText(objectDefinition.titleObjectFieldName, {
 				ignoreCase: true,
 			});
@@ -495,13 +498,13 @@ test.describe('Manage object definitions through Model Builder', () => {
 			// Scope Container
 
 			await expect(
-				modelBuilderPage.rightSidebarObjectDefinitionScope
+				modelBuilderRightSidebarPage.objectDefinitionScope
 			).toHaveText(objectDefinition.scope, {ignoreCase: true});
 
 			const [_, panelLink] = objectDefinition.panelCategoryKey.split('.');
 
 			await expect(
-				modelBuilderPage.rightSidebarObjectDefinitionPanelLink
+				modelBuilderRightSidebarPage.objectDefinitionPanelLink
 			).toHaveText(panelLink, {ignoreCase: true});
 		}
 	});
@@ -509,6 +512,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 	test('show object definition details in "RightSidebar" after create object definition', async ({
 		modalAddObjectDefinitionPage,
 		modelBuilderPage,
+		modelBuilderRightSidebarPage,
 	}) => {
 		await modelBuilderPage.goto({objectFolderName: 'Default'});
 
@@ -524,7 +528,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 		objectDefinitions.push(objectDefinition);
 
 		await expect(
-			modelBuilderPage.rightSidebar.getByTitle(
+			modelBuilderRightSidebarPage.rightSidebar.getByTitle(
 				objectDefinitionLabel + ' Details'
 			)
 		).toBeVisible();
