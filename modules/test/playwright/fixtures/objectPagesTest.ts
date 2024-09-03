@@ -10,6 +10,7 @@ import {ModalAddObjectDefinitionPage} from '../pages/object-web/ModalAddObjectDe
 import {ModalEditObjectFolderPage} from '../pages/object-web/ModalEditObjectFolderPage';
 import {ViewObjectDefinitionsPage} from '../pages/object-web/ViewObjectDefinitionsPage';
 import {ModelBuilderLeftSidebarPage} from '../pages/object-web/model-builder/ModelBuilderLeftSidebarPage';
+import {ModelBuilderObjectDefinitionNodePage} from '../pages/object-web/model-builder/ModelBuilderObjectDefinitionNodePage';
 import {ModelBuilderPage} from '../pages/object-web/model-builder/ModelBuilderPage';
 import {ModelBuilderRightSidebarPage} from '../pages/object-web/model-builder/ModelBuilderRightSidebarPage';
 import {EditObjectDetailsPage} from '../pages/object-web/object-details/EditObjectDetailsPage';
@@ -31,6 +32,7 @@ const objectPagesTest = test.extend<{
 	modalAddObjectValidationPage: ModalAddObjectValidationPage;
 	modalEditObjectFolderPage: ModalEditObjectFolderPage;
 	modelBuilderLeftSidebarPage: ModelBuilderLeftSidebarPage;
+	modelBuilderObjectDefinitionNodePage: ModelBuilderObjectDefinitionNodePage;
 	modelBuilderPage: ModelBuilderPage;
 	modelBuilderRightSidebarPage: ModelBuilderRightSidebarPage;
 	objectDetailsPage: ObjectDetailsPage;
@@ -63,6 +65,9 @@ const objectPagesTest = test.extend<{
 	},
 	modelBuilderLeftSidebarPage: async ({page}, use) => {
 		await use(new ModelBuilderLeftSidebarPage(page));
+	},
+	modelBuilderObjectDefinitionNodePage: async ({page}, use) => {
+		await use(new ModelBuilderObjectDefinitionNodePage(page));
 	},
 	modelBuilderPage: async ({page}, use) => {
 		await use(new ModelBuilderPage(page));

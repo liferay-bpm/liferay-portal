@@ -10,21 +10,13 @@ import {ViewObjectDefinitionsPage} from '../ViewObjectDefinitionsPage';
 import {ModelBuilderLeftSidebarPage} from './ModelBuilderLeftSidebarPage';
 
 export class ModelBuilderPage {
-	readonly addObjectFieldButton: Locator;
-	readonly deleteObjectDefinitionOption: Locator;
 	readonly deletionNotAllowed: Locator;
 	readonly diagramArea: Locator;
 	readonly editInPageViewOption: Locator;
 	readonly editObjectFolderDetailsButton: Locator;
 	readonly fitViewButton: Locator;
-	readonly modalDeleteObjectDefinitionConfirmationButton: Locator;
-	readonly modalDeleteObjectDefinitionTextField: Locator;
 	readonly modelBuilderLeftSidebarPage: ModelBuilderLeftSidebarPage;
-	readonly newObjectFieldSelectBusinessType: Locator;
-	readonly newObjectFieldLabel: Locator;
 	readonly newObjectFieldName: Locator;
-	readonly newObjectFieldSaveButton: Locator;
-	readonly newObjectFieldSelectPicklist: Locator;
 	readonly newObjectRelationshipLabel: Locator;
 	readonly newObjectRelationshipTitle: Locator;
 	readonly newObjectRelationshipType: Locator;
@@ -39,13 +31,6 @@ export class ModelBuilderPage {
 	readonly viewObjectDefinitionsPage: ViewObjectDefinitionsPage;
 
 	constructor(page: Page) {
-		this.addObjectFieldButton = page.getByRole('menuitem', {
-			exact: true,
-			name: 'Add Field',
-		});
-		this.deleteObjectDefinitionOption = page.getByRole('menuitem', {
-			name: 'Delete Object',
-		});
 		this.deletionNotAllowed = page.getByRole('heading', {
 			name: 'Deletion Not Allowed',
 		});
@@ -59,32 +44,9 @@ export class ModelBuilderPage {
 		this.fitViewButton = page.locator(
 			'button.react-flow__controls-button.react-flow__controls-fitview'
 		);
-		this.modalDeleteObjectDefinitionConfirmationButton = page
-			.getByRole('dialog')
-			.getByRole('button', {exact: true, name: 'Delete'});
-		this.modalDeleteObjectDefinitionTextField = page.getByPlaceholder(
-			'Confirm Object Definition Name'
-		);
 		this.modelBuilderLeftSidebarPage = new ModelBuilderLeftSidebarPage(
 			page
 		);
-		this.newObjectFieldSelectBusinessType = page
-			.locator('div.form-group')
-			.filter({hasText: /^TypeMandatorySelect an Option$/})
-			.getByRole('combobox');
-		this.newObjectFieldLabel = page
-			.locator('div.form-group')
-			.filter({hasText: /^LabelMandatory$/})
-			.getByRole('textbox');
-		this.newObjectFieldSaveButton = page
-			.getByLabel('New Field')
-			.getByRole('button', {
-				name: 'Save',
-			});
-		this.newObjectFieldSelectPicklist = page
-			.locator('div.form-group')
-			.filter({hasText: /^PicklistSelect an Option$/})
-			.getByRole('combobox');
 		this.newObjectRelationshipLabel = page
 			.locator('div.form-group')
 			.filter({hasText: /^LabelMandatory$/})
@@ -120,30 +82,9 @@ export class ModelBuilderPage {
 		this.toggleSidebarsButton = page.getByLabel('Toggle Sidebars');
 	}
 
-	async clickHideFieldsButton(objectDefinitionName: string) {
-		await this.objectDefinitionNodes
-			.filter({hasText: objectDefinitionName})
-			.getByRole('button', {name: 'Hide Fields'})
-			.click();
-	}
-
-	async clickObjectDefinitionActionsButton(objectDefinitionLabel: string) {
-		await this.objectDefinitionNodes
-			.filter({hasText: objectDefinitionLabel})
-			.getByLabel('Show Actions')
-			.click();
-	}
-
 	async clickObjectRelationshipEdge(objectRelationshipLabel: string) {
 		await this.objectRelationshipEdges
 			.filter({hasText: objectRelationshipLabel})
-			.click();
-	}
-
-	async clickShowAllFieldsButton(objectDefinitionName: string) {
-		await this.objectDefinitionNodes
-			.filter({hasText: objectDefinitionName})
-			.getByRole('button', {name: 'Show All Fields'})
 			.click();
 	}
 
@@ -160,38 +101,6 @@ export class ModelBuilderPage {
 				'left'
 			)
 		);
-	}
-
-	async createObjectField({
-		listTypeDefinitionName,
-		mandatory,
-		objectDefinitionName,
-		objectFieldBusinessType,
-		objectFieldLabel,
-	}: CreateObjectField) {
-		await this.openAddNewObjectFieldModal(objectDefinitionName);
-
-		await this.fillNewObjectFieldLabel(objectFieldLabel);
-
-		await this.selectNewObjectFieldBusinessTypeOption(
-			objectFieldBusinessType
-		);
-
-		if (objectFieldBusinessType === 'Picklist') {
-			await this.newObjectFieldSelectPicklist.click();
-			await this.page
-				.getByRole('option', {
-					exact: true,
-					name: listTypeDefinitionName,
-				})
-				.click();
-		}
-
-		if (mandatory) {
-			await this.page.getByLabel('Mandatory', {exact: true}).check();
-		}
-
-		await this.newObjectFieldSaveButton.click();
 	}
 
 	async createObjectRelationship(
@@ -212,15 +121,6 @@ export class ModelBuilderPage {
 		return response.json();
 	}
 
-	async deleteObjectDefinition(objectDefinitionName: string) {
-		await this.deleteObjectDefinitionOption.click();
-		await this.modalDeleteObjectDefinitionTextField.click();
-		await this.modalDeleteObjectDefinitionTextField.fill(
-			objectDefinitionName
-		);
-		await this.modalDeleteObjectDefinitionConfirmationButton.click();
-	}
-
 	async dragNodeThroughDiagram(
 		objectDefinitionLabel: string,
 		targetX: number,
@@ -231,32 +131,6 @@ export class ModelBuilderPage {
 			.dragTo(this.diagramArea, {
 				targetPosition: {x: targetX, y: targetY},
 			});
-	}
-
-	async fillNewObjectFieldLabel(objectFieldLabel: string) {
-		await this.newObjectFieldLabel.fill(objectFieldLabel);
-	}
-
-	async openAddNewObjectFieldModal(objectDefinitionName: string) {
-		await this.modelBuilderLeftSidebarPage.sidebarItems
-			.filter({hasText: objectDefinitionName})
-			.click();
-
-		await this.objectDefinitionNodes
-			.filter({hasText: objectDefinitionName})
-			.getByRole('button', {name: 'Add Field or Relationship'})
-			.click();
-
-		await this.addObjectFieldButton.click();
-	}
-
-	async selectNewObjectFieldBusinessTypeOption(
-		objectFieldBusinessType: string
-	) {
-		await this.newObjectFieldSelectBusinessType.click();
-		await this.page
-			.getByRole('option', {exact: true, name: objectFieldBusinessType})
-			.click();
 	}
 
 	getLinkedObjectDefinitionIconLocator = (objectDefinitionLabel: string) => {

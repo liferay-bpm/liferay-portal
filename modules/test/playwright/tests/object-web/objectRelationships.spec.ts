@@ -40,6 +40,7 @@ test.afterEach(async ({apiHelpers}) => {
 test.describe('Manage object relationships through Model Builder', () => {
 	test('can create relationship by dragging node handles', async ({
 		apiHelpers,
+		modelBuilderObjectDefinitionNodePage,
 		modelBuilderPage,
 		viewObjectDefinitionsPage,
 	}) => {
@@ -99,7 +100,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 			})
 		).toBeVisible();
 
-		await modelBuilderPage.clickShowAllFieldsButton(
+		await modelBuilderObjectDefinitionNodePage.clickShowAllFieldsButton(
 			objectDefinition2.label['en_US']
 		);
 
