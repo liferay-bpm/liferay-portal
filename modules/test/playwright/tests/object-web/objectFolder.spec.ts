@@ -21,6 +21,7 @@ export const test = mergeTests(
 test.describe('manage object definitions through model builder', () => {
 	test('navigate between object folders on model builder page', async ({
 		apiHelpers,
+		modelBuilderLeftSidebarPage,
 		modelBuilderPage,
 	}) => {
 		const objectFolders: ObjectFolder[] = await Promise.all(
@@ -32,10 +33,12 @@ test.describe('manage object definitions through model builder', () => {
 		await modelBuilderPage.goto({objectFolderName: 'Default'});
 
 		for (const objectFolder of objectFolders) {
-			await expect(modelBuilderPage.otherObjectFolders).toBeVisible();
+			await expect(
+				modelBuilderLeftSidebarPage.otherObjectFolders
+			).toBeVisible();
 
 			const otherObjectFolderLocator =
-				modelBuilderPage.getOtherObjectFolderLocator(
+				modelBuilderLeftSidebarPage.getOtherObjectFolderLocator(
 					objectFolder.label['en_US']
 				);
 

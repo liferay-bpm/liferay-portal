@@ -143,6 +143,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 	test('can delete object field', async ({
 		apiHelpers,
+		modelBuilderLeftSidebarPage,
 		modelBuilderPage,
 		modelBuilderRightSidebarPage,
 	}) => {
@@ -170,7 +171,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 		await modelBuilderPage.goto({objectFolderName: 'Default'});
 
-		await modelBuilderPage.leftSidebarItems
+		await modelBuilderLeftSidebarPage.sidebarItems
 			.filter({hasText: objectDefinition.name})
 			.click();
 
@@ -194,6 +195,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 	test('can edit picklist object field from draft object definition', async ({
 		apiHelpers,
+		modelBuilderLeftSidebarPage,
 		modelBuilderPage,
 		page,
 	}) => {
@@ -236,7 +238,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 		await modelBuilderPage.goto({objectFolderName: 'Default'});
 
-		await modelBuilderPage.clickLeftSideBarItem(
+		await modelBuilderLeftSidebarPage.clickSideBarItem(
 			draftObjectDefinition.label['en_US']
 		);
 
@@ -252,7 +254,7 @@ test.describe('Manage object fields through Model Builder', () => {
 			.getByPlaceholder('Text to translate...')
 			.fill(picklistFieldName);
 
-		await modelBuilderPage.clickLeftSideBarItem(
+		await modelBuilderLeftSidebarPage.clickSideBarItem(
 			draftObjectDefinition.label['en_US']
 		);
 
@@ -265,6 +267,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 	test('can show and hide object fields in the object definition node', async ({
 		apiHelpers,
+		modelBuilderLeftSidebarPage,
 		modelBuilderPage,
 		page,
 	}) => {
@@ -314,7 +317,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 		await modelBuilderPage.goto({objectFolderName: 'Default'});
 
-		await modelBuilderPage.clickLeftSideBarItem(
+		await modelBuilderLeftSidebarPage.clickSideBarItem(
 			objectDefinition.label['en_US']
 		);
 
@@ -338,6 +341,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 	test('cannot delete an objectField that belongs to a unique composite key validation through Model Builder', async ({
 		apiHelpers,
+		modelBuilderLeftSidebarPage,
 		modelBuilderPage,
 		modelBuilderRightSidebarPage,
 		page,
@@ -399,7 +403,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 		await modelBuilderPage.goto({objectFolderName: 'Default'});
 
-		await modelBuilderPage.leftSidebarItems
+		await modelBuilderLeftSidebarPage.sidebarItems
 			.filter({hasText: objectDefinition.name})
 			.click();
 
@@ -418,6 +422,7 @@ test.describe('Manage object fields through Model Builder', () => {
 	});
 
 	test('cannot delete only custom object field of an published object definition', async ({
+		modelBuilderLeftSidebarPage,
 		modelBuilderPage,
 		modelBuilderRightSidebarPage,
 		page,
@@ -426,7 +431,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 		await modelBuilderPage.goto({objectFolderName: 'Default'});
 
-		await modelBuilderPage.leftSidebarItems
+		await modelBuilderLeftSidebarPage.sidebarItems
 			.filter({hasText: objectDefinition.name})
 			.click();
 

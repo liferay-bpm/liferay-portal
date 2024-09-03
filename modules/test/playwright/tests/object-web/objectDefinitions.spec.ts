@@ -113,13 +113,14 @@ test.describe('Manage object definitions through Model Builder', () => {
 
 	test('can create an object definition by model builder', async ({
 		modalAddObjectDefinitionPage,
+		modelBuilderLeftSidebarPage,
 		modelBuilderPage,
 	}) => {
 		await modelBuilderPage.goto({objectFolderName: 'Default'});
 
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 
-		modelBuilderPage.createNewObjectDefinitionButton.click();
+		modelBuilderLeftSidebarPage.createNewObjectDefinitionButton.click();
 
 		const objectDefinition =
 			await modalAddObjectDefinitionPage.createObjectDefinition(
@@ -135,7 +136,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 		).toBeVisible();
 
 		await expect(
-			modelBuilderPage.leftSidebarItems.filter({
+			modelBuilderLeftSidebarPage.sidebarItems.filter({
 				hasText: objectDefinition.label['en_US'],
 			})
 		).toBeVisible();
@@ -143,6 +144,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 
 	test('can create an object definition inside a folder and see if it renders correctly in the model builder', async ({
 		modalAddObjectDefinitionPage,
+		modelBuilderLeftSidebarPage,
 		modelBuilderPage,
 		page,
 		viewObjectDefinitionsPage,
@@ -171,7 +173,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 		).toBeVisible();
 
 		await expect(
-			modelBuilderPage.leftSidebarItems.filter({
+			modelBuilderLeftSidebarPage.sidebarItems.filter({
 				hasText: objectDefinition.label['en_US'],
 			})
 		).toBeVisible();
@@ -179,6 +181,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 
 	test('can delete an object definition by model builder leftsidebar', async ({
 		apiHelpers,
+		modelBuilderLeftSidebarPage,
 		modelBuilderPage,
 	}) => {
 		const objectDefinition1 =
@@ -199,24 +202,24 @@ test.describe('Manage object definitions through Model Builder', () => {
 
 		await modelBuilderPage.goto({objectFolderName: 'Default'});
 
-		await modelBuilderPage.clickLeftSideBarItem(
+		await modelBuilderLeftSidebarPage.clickSideBarItem(
 			objectDefinition1.label['en_US']
 		);
 
-		await modelBuilderPage.clickObjectDefinitionActionsButtonInLeftSidebar(
+		await modelBuilderLeftSidebarPage.clickObjectDefinitionActionsButtonInSidebar(
 			objectDefinition1.label['en_US']
 		);
 
 		await modelBuilderPage.deleteObjectDefinitionOption.click();
 
 		await expect(
-			modelBuilderPage.leftSidebarItems.filter({
+			modelBuilderLeftSidebarPage.sidebarItems.filter({
 				hasText: objectDefinition2.label['en_US'],
 			})
 		).toBeVisible();
 
 		await expect(
-			modelBuilderPage.leftSidebarItems.filter({
+			modelBuilderLeftSidebarPage.sidebarItems.filter({
 				hasText: objectDefinition1.label['en_US'],
 			})
 		).toBeHidden();
@@ -225,6 +228,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 	test('can delete an published object definition by model builder', async ({
 		apiHelpers,
 		modalAddObjectDefinitionPage,
+		modelBuilderLeftSidebarPage,
 		modelBuilderPage,
 	}) => {
 		const objectDefinition1 =
@@ -235,7 +239,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 
 		await modelBuilderPage.goto({objectFolderName: 'Default'});
 
-		await modelBuilderPage.createNewObjectDefinitionButton.click();
+		await modelBuilderLeftSidebarPage.createNewObjectDefinitionButton.click();
 
 		const objectDefinition2 =
 			await modalAddObjectDefinitionPage.createObjectDefinition(
@@ -271,6 +275,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 
 	test('linked object definitions are created when object definitions are related and put into different folders', async ({
 		apiHelpers,
+		modelBuilderLeftSidebarPage,
 		modelBuilderPage,
 	}) => {
 		const objectFolder =
@@ -331,11 +336,11 @@ test.describe('Manage object definitions through Model Builder', () => {
 			)
 		).toBeHidden();
 
-		await modelBuilderPage.leftSidebarItems
+		await modelBuilderLeftSidebarPage.sidebarItems
 			.filter({hasText: objectFolder.name})
 			.hover();
 
-		await modelBuilderPage.goToFolderButton.click();
+		await modelBuilderLeftSidebarPage.goToFolderButton.click();
 
 		await expect(
 			modelBuilderPage.getLinkedObjectDefinitionIconLocator(
@@ -381,6 +386,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 
 	test('see object definition details', async ({
 		apiHelpers,
+		modelBuilderLeftSidebarPage,
 		modelBuilderPage,
 		modelBuilderRightSidebarPage,
 		page,
@@ -441,7 +447,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 		await modelBuilderPage.goto({objectFolderName: objectFolder.name});
 
 		for (const objectDefinition of [department, employee]) {
-			await modelBuilderPage.leftSidebarItems
+			await modelBuilderLeftSidebarPage.sidebarItems
 				.filter({hasText: objectDefinition.label['en_US']})
 				.click();
 
@@ -511,6 +517,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 
 	test('show object definition details in "RightSidebar" after create object definition', async ({
 		modalAddObjectDefinitionPage,
+		modelBuilderLeftSidebarPage,
 		modelBuilderPage,
 		modelBuilderRightSidebarPage,
 	}) => {
@@ -518,7 +525,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 
 		const objectDefinitionLabel = 'ObjectDefinitionLabel' + getRandomInt();
 
-		modelBuilderPage.createNewObjectDefinitionButton.click();
+		modelBuilderLeftSidebarPage.createNewObjectDefinitionButton.click();
 
 		const objectDefinition =
 			await modalAddObjectDefinitionPage.createObjectDefinition(

@@ -7,25 +7,24 @@ import {Locator, Page, expect} from '@playwright/test';
 
 import {PORTLET_URLS} from '../../../utils/portletUrls';
 import {ViewObjectDefinitionsPage} from '../ViewObjectDefinitionsPage';
+import {ModelBuilderLeftSidebarPage} from './ModelBuilderLeftSidebarPage';
 
 export class ModelBuilderPage {
 	readonly addObjectFieldButton: Locator;
-	readonly createNewObjectDefinitionButton: Locator;
 	readonly deleteObjectDefinitionOption: Locator;
 	readonly deletionNotAllowed: Locator;
 	readonly diagramArea: Locator;
 	readonly editInPageViewOption: Locator;
 	readonly editObjectFolderDetailsButton: Locator;
 	readonly fitViewButton: Locator;
-	readonly goToFolderButton: Locator;
-	readonly leftSidebarItems: Locator;
+	readonly modalDeleteObjectDefinitionConfirmationButton: Locator;
+	readonly modalDeleteObjectDefinitionTextField: Locator;
+	readonly modelBuilderLeftSidebarPage: ModelBuilderLeftSidebarPage;
 	readonly newObjectFieldSelectBusinessType: Locator;
 	readonly newObjectFieldLabel: Locator;
 	readonly newObjectFieldName: Locator;
 	readonly newObjectFieldSaveButton: Locator;
 	readonly newObjectFieldSelectPicklist: Locator;
-	readonly modalDeleteObjectDefinitionConfirmationButton: Locator;
-	readonly modalDeleteObjectDefinitionTextField: Locator;
 	readonly newObjectRelationshipLabel: Locator;
 	readonly newObjectRelationshipTitle: Locator;
 	readonly newObjectRelationshipType: Locator;
@@ -33,7 +32,6 @@ export class ModelBuilderPage {
 	readonly objectDefinitionNodes: Locator;
 	readonly objectRelationshipEdges: Locator;
 	readonly openPageViewButton: Locator;
-	readonly otherObjectFolders: Locator;
 	readonly page: Page;
 	readonly postalAddressObjectRelationshipWarning: Locator;
 	readonly selectedObjectFolder: Locator;
@@ -45,12 +43,9 @@ export class ModelBuilderPage {
 			exact: true,
 			name: 'Add Field',
 		});
-		this.createNewObjectDefinitionButton =
-			page.getByText('Create New Object');
 		this.deleteObjectDefinitionOption = page.getByRole('menuitem', {
 			name: 'Delete Object',
 		});
-
 		this.deletionNotAllowed = page.getByRole('heading', {
 			name: 'Deletion Not Allowed',
 		});
@@ -64,18 +59,14 @@ export class ModelBuilderPage {
 		this.fitViewButton = page.locator(
 			'button.react-flow__controls-button.react-flow__controls-fitview'
 		);
-		this.goToFolderButton = page.getByRole('button', {
-			exact: true,
-			name: 'Go to Folder',
-		});
-		this.leftSidebarItems = page.locator(
-			'li.treeview-item div.autofit-row'
-		);
 		this.modalDeleteObjectDefinitionConfirmationButton = page
 			.getByRole('dialog')
 			.getByRole('button', {exact: true, name: 'Delete'});
 		this.modalDeleteObjectDefinitionTextField = page.getByPlaceholder(
 			'Confirm Object Definition Name'
+		);
+		this.modelBuilderLeftSidebarPage = new ModelBuilderLeftSidebarPage(
+			page
 		);
 		this.newObjectFieldSelectBusinessType = page
 			.locator('div.form-group')
@@ -113,9 +104,6 @@ export class ModelBuilderPage {
 		this.openPageViewButton = page.getByRole('button', {
 			name: 'Open Page View',
 		});
-		this.otherObjectFolders = page
-			.getByRole('region')
-			.filter({has: page.getByTitle('Go to Folder')});
 		this.page = page;
 		this.postalAddressObjectRelationshipWarning = page.locator(
 			'.alert-warning',
@@ -139,25 +127,10 @@ export class ModelBuilderPage {
 			.click();
 	}
 
-	async clickLeftSideBarItem(objectDefinitionLabel: string) {
-		await this.leftSidebarItems
-			.filter({hasText: objectDefinitionLabel})
-			.click();
-	}
-
 	async clickObjectDefinitionActionsButton(objectDefinitionLabel: string) {
 		await this.objectDefinitionNodes
 			.filter({hasText: objectDefinitionLabel})
 			.getByLabel('Show Actions')
-			.click();
-	}
-
-	async clickObjectDefinitionActionsButtonInLeftSidebar(
-		objectDefinitionLabel: string
-	) {
-		await this.leftSidebarItems
-			.filter({hasText: objectDefinitionLabel})
-			.getByLabel('Actions')
 			.click();
 	}
 
@@ -265,7 +238,7 @@ export class ModelBuilderPage {
 	}
 
 	async openNewFieldModal(objectDefinitionName: string) {
-		await this.leftSidebarItems
+		await this.modelBuilderLeftSidebarPage.sidebarItems
 			.filter({hasText: objectDefinitionName})
 			.click();
 
@@ -317,12 +290,6 @@ export class ModelBuilderPage {
 		return this.page.getByTitle(
 			`Object Folder Label: ${objectFolderLabel}`
 		);
-	};
-
-	getOtherObjectFolderLocator = (objectFolderLabel: string) => {
-		return this.otherObjectFolders
-			.getByRole('treeitem')
-			.filter({hasText: objectFolderLabel});
 	};
 
 	async goto({
