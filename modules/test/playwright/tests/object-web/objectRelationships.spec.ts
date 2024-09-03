@@ -87,7 +87,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 		const objectRelationshipLabel = 'objectRelationship' + getRandomInt();
 
 		const objectRelationship =
-			await modelBuilderPage.createObjectRelationship(
+			await modelBuilderObjectDefinitionNodePage.createObjectRelationship(
 				objectRelationshipLabel,
 				'One to Many'
 			);
