@@ -115,6 +115,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 	test('can delete object relationship from different folders', async ({
 		apiHelpers,
 		modelBuilderPage,
+		modelBuilderRightSidebarPage,
 		page,
 		viewObjectDefinitionsPage,
 	}) => {
@@ -193,7 +194,9 @@ test.describe('Manage object relationships through Model Builder', () => {
 			objectRelationshipLabel
 		);
 
-		await modelBuilderPage.deleteObjectRelationship(objectRelationshipName);
+		await modelBuilderRightSidebarPage.deleteObjectRelationship(
+			objectRelationshipName
+		);
 
 		await expect(
 			modelBuilderPage.objectRelationshipEdges.filter({
@@ -263,6 +266,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 	test('cannot delete the object relationship that is the only custom object field from the published object definition', async ({
 		apiHelpers,
 		modelBuilderPage,
+		modelBuilderRightSidebarPage,
 		page,
 		viewObjectDefinitionsPage,
 	}) => {
@@ -337,7 +341,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 			objectRelationshipLabel
 		);
 
-		await modelBuilderPage.deleteObjectRelationship(
+		await modelBuilderRightSidebarPage.deleteObjectRelationship(
 			objectRelationshipData.name
 		);
 

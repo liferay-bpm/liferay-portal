@@ -141,7 +141,11 @@ test.describe('Manage object fields through Model Builder', () => {
 		).toBeVisible();
 	});
 
-	test('can delete object field', async ({apiHelpers, modelBuilderPage}) => {
+	test('can delete object field', async ({
+		apiHelpers,
+		modelBuilderPage,
+		modelBuilderRightSidebarPage,
+	}) => {
 		const {objectDefinition} = createdEntities;
 
 		await apiHelpers.objectAdmin.postObjectFieldByExternalReferenceCode(
@@ -177,7 +181,7 @@ test.describe('Manage object fields through Model Builder', () => {
 			.getByText('integer', {exact: true})
 			.click();
 
-		await modelBuilderPage.deleteTrashButton.click();
+		await modelBuilderRightSidebarPage.deleteTrashButton.click();
 
 		await modelBuilderPage.modalDeleteObjectDefinitionConfirmationButton.click();
 
@@ -335,6 +339,7 @@ test.describe('Manage object fields through Model Builder', () => {
 	test('cannot delete an objectField that belongs to a unique composite key validation through Model Builder', async ({
 		apiHelpers,
 		modelBuilderPage,
+		modelBuilderRightSidebarPage,
 		page,
 	}) => {
 		const {objectDefinition} = createdEntities;
@@ -402,7 +407,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 		await page.getByText(integerFieldName).click();
 
-		await modelBuilderPage.deleteButton.click();
+		await modelBuilderRightSidebarPage.deleteButton.click();
 
 		await expect(page.getByText('Deletion Not Allowed')).toBeVisible();
 		await expect(
@@ -414,6 +419,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 	test('cannot delete only custom object field of an published object definition', async ({
 		modelBuilderPage,
+		modelBuilderRightSidebarPage,
 		page,
 	}) => {
 		const {objectDefinition} = createdEntities;
@@ -428,7 +434,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 		await page.getByText('textField').click();
 
-		await modelBuilderPage.deleteButton.click();
+		await modelBuilderRightSidebarPage.deleteButton.click();
 
 		await expect(page.getByText('Deletion Not Allowed')).toBeVisible();
 		await expect(

@@ -8,8 +8,9 @@ import {test} from '@playwright/test';
 import {EditObjectDefinitionPage} from '../pages/object-web/EditObjectDefinitionPage';
 import {ModalAddObjectDefinitionPage} from '../pages/object-web/ModalAddObjectDefinitionPage';
 import {ModalEditObjectFolderPage} from '../pages/object-web/ModalEditObjectFolderPage';
-import {ModelBuilderPage} from '../pages/object-web/ModelBuilderPage';
 import {ViewObjectDefinitionsPage} from '../pages/object-web/ViewObjectDefinitionsPage';
+import {ModelBuilderPage} from '../pages/object-web/model-builder/ModelBuilderPage';
+import {ModelBuilderRightSidebarPage} from '../pages/object-web/model-builder/ModelBuilderRightSidebarPage';
 import {EditObjectDetailsPage} from '../pages/object-web/object-details/EditObjectDetailsPage';
 import {ViewObjectEntriesPage} from '../pages/object-web/object-entries/ViewObjectEntriesPage';
 import {ObjectFieldsPage} from '../pages/object-web/object-fields/ObjectFieldsPage';
@@ -29,6 +30,7 @@ const objectPagesTest = test.extend<{
 	modalAddObjectValidationPage: ModalAddObjectValidationPage;
 	modalEditObjectFolderPage: ModalEditObjectFolderPage;
 	modelBuilderPage: ModelBuilderPage;
+	modelBuilderRightSidebarPage: ModelBuilderRightSidebarPage;
 	objectDetailsPage: ObjectDetailsPage;
 	objectFieldsPage: ObjectFieldsPage;
 	objectValidationsPage: ObjectValidationsPage;
@@ -59,6 +61,9 @@ const objectPagesTest = test.extend<{
 	},
 	modelBuilderPage: async ({page}, use) => {
 		await use(new ModelBuilderPage(page));
+	},
+	modelBuilderRightSidebarPage: async ({page}, use) => {
+		await use(new ModelBuilderRightSidebarPage(page));
 	},
 	objectDetailsPage: async ({page}, use) => {
 		await use(new ObjectDetailsPage(page));
