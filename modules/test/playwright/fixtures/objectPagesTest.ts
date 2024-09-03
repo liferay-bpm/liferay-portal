@@ -9,9 +9,9 @@ import {EditObjectDefinitionPage} from '../pages/object-web/EditObjectDefinition
 import {ModalAddObjectDefinitionPage} from '../pages/object-web/ModalAddObjectDefinitionPage';
 import {ModalEditObjectFolderPage} from '../pages/object-web/ModalEditObjectFolderPage';
 import {ViewObjectDefinitionsPage} from '../pages/object-web/ViewObjectDefinitionsPage';
+import {ModelBuilderDiagramPage} from '../pages/object-web/model-builder/ModelBuilderDiagramPage';
 import {ModelBuilderLeftSidebarPage} from '../pages/object-web/model-builder/ModelBuilderLeftSidebarPage';
 import {ModelBuilderObjectDefinitionNodePage} from '../pages/object-web/model-builder/ModelBuilderObjectDefinitionNodePage';
-import {ModelBuilderPage} from '../pages/object-web/model-builder/ModelBuilderPage';
 import {ModelBuilderRightSidebarPage} from '../pages/object-web/model-builder/ModelBuilderRightSidebarPage';
 import {EditObjectDetailsPage} from '../pages/object-web/object-details/EditObjectDetailsPage';
 import {ViewObjectEntriesPage} from '../pages/object-web/object-entries/ViewObjectEntriesPage';
@@ -31,9 +31,9 @@ const objectPagesTest = test.extend<{
 	modalAddObjectDefinitionPage: ModalAddObjectDefinitionPage;
 	modalAddObjectValidationPage: ModalAddObjectValidationPage;
 	modalEditObjectFolderPage: ModalEditObjectFolderPage;
+	modelBuilderDiagramPage: ModelBuilderDiagramPage;
 	modelBuilderLeftSidebarPage: ModelBuilderLeftSidebarPage;
 	modelBuilderObjectDefinitionNodePage: ModelBuilderObjectDefinitionNodePage;
-	modelBuilderPage: ModelBuilderPage;
 	modelBuilderRightSidebarPage: ModelBuilderRightSidebarPage;
 	objectDetailsPage: ObjectDetailsPage;
 	objectFieldsPage: ObjectFieldsPage;
@@ -63,14 +63,14 @@ const objectPagesTest = test.extend<{
 	modalEditObjectFolderPage: async ({page}, use) => {
 		await use(new ModalEditObjectFolderPage(page));
 	},
+	modelBuilderDiagramPage: async ({page}, use) => {
+		await use(new ModelBuilderDiagramPage(page));
+	},
 	modelBuilderLeftSidebarPage: async ({page}, use) => {
 		await use(new ModelBuilderLeftSidebarPage(page));
 	},
 	modelBuilderObjectDefinitionNodePage: async ({page}, use) => {
 		await use(new ModelBuilderObjectDefinitionNodePage(page));
-	},
-	modelBuilderPage: async ({page}, use) => {
-		await use(new ModelBuilderPage(page));
 	},
 	modelBuilderRightSidebarPage: async ({page}, use) => {
 		await use(new ModelBuilderRightSidebarPage(page));

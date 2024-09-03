@@ -21,8 +21,8 @@ export const test = mergeTests(
 test.describe('manage object definitions through model builder', () => {
 	test('navigate between object folders on model builder page', async ({
 		apiHelpers,
+		modelBuilderDiagramPage,
 		modelBuilderLeftSidebarPage,
-		modelBuilderPage,
 	}) => {
 		const objectFolders: ObjectFolder[] = await Promise.all(
 			Array.apply(null, Array(5)).map(async () => {
@@ -30,7 +30,7 @@ test.describe('manage object definitions through model builder', () => {
 			})
 		);
 
-		await modelBuilderPage.goto({objectFolderName: 'Default'});
+		await modelBuilderDiagramPage.goto({objectFolderName: 'Default'});
 
 		for (const objectFolder of objectFolders) {
 			await expect(
@@ -51,7 +51,7 @@ test.describe('manage object definitions through model builder', () => {
 			await expect(otherObjectFolderLocator).toBeHidden();
 
 			await expect(
-				modelBuilderPage.getObjectFolderLabelHeaderLocator(
+				modelBuilderDiagramPage.getObjectFolderLabelHeaderLocator(
 					objectFolder.label['en_US']
 				)
 			).toBeVisible();
@@ -67,15 +67,17 @@ test.describe('manage object definitions through model builder', () => {
 	test('can edit object folder label and ERC by Model Builder', async ({
 		apiHelpers,
 		modalEditObjectFolderPage,
+		modelBuilderDiagramPage,
 		modelBuilderLeftSidebarPage,
-		modelBuilderPage,
 	}) => {
 		const objectFolder =
 			await apiHelpers.objectAdmin.postRandomObjectFolder();
 
-		await modelBuilderPage.goto({objectFolderName: objectFolder.name});
+		await modelBuilderDiagramPage.goto({
+			objectFolderName: objectFolder.name,
+		});
 
-		await modelBuilderPage.editObjectFolderDetailsButton.click();
+		await modelBuilderDiagramPage.editObjectFolderDetailsButton.click();
 
 		const newObjectFolderLabel = 'objectFolderLabel' + getRandomInt();
 		const newObjectFolderERC = 'objectFolderERC' + getRandomInt();
@@ -86,7 +88,7 @@ test.describe('manage object definitions through model builder', () => {
 		);
 
 		expect(
-			modelBuilderPage.getObjectFolderLabelHeaderLocator(
+			modelBuilderDiagramPage.getObjectFolderLabelHeaderLocator(
 				newObjectFolderLabel
 			)
 		).toBeVisible();
@@ -94,7 +96,9 @@ test.describe('manage object definitions through model builder', () => {
 		expect(modelBuilderLeftSidebarPage.selectedObjectFolder).toBeVisible();
 
 		expect(
-			modelBuilderPage.getObjectFolderERCHeaderLocator(newObjectFolderERC)
+			modelBuilderDiagramPage.getObjectFolderERCHeaderLocator(
+				newObjectFolderERC
+			)
 		).toBeVisible();
 
 		// Clean up
@@ -104,12 +108,12 @@ test.describe('manage object definitions through model builder', () => {
 
 	test('can navigate from Model Builder to Account Settings', async ({
 		accountSettingsPage,
-		modelBuilderPage,
+		modelBuilderDiagramPage,
 		page,
 	}) => {
-		await modelBuilderPage.goto({objectFolderName: 'Default'});
+		await modelBuilderDiagramPage.goto({objectFolderName: 'Default'});
 
-		await modelBuilderPage.toggleSidebarsButton.click();
+		await modelBuilderDiagramPage.toggleSidebarsButton.click();
 
 		await page.getByTitle('User Profile Menu').click();
 

@@ -40,8 +40,8 @@ test.afterEach(async ({apiHelpers}) => {
 test.describe('Manage object relationships through Model Builder', () => {
 	test('can create relationship by dragging node handles', async ({
 		apiHelpers,
+		modelBuilderDiagramPage,
 		modelBuilderObjectDefinitionNodePage,
-		modelBuilderPage,
 		viewObjectDefinitionsPage,
 	}) => {
 		const objectFolder =
@@ -75,11 +75,11 @@ test.describe('Manage object relationships through Model Builder', () => {
 
 		await viewObjectDefinitionsPage.viewInModelBuilderButton.click();
 
-		await modelBuilderPage.toggleSidebarsButton.click();
+		await modelBuilderDiagramPage.toggleSidebarsButton.click();
 
-		await modelBuilderPage.fitViewButton.click();
+		await modelBuilderDiagramPage.fitViewButton.click();
 
-		await modelBuilderPage.connectObjectDefinitionsNodeHandles(
+		await modelBuilderDiagramPage.connectObjectDefinitionsNodeHandles(
 			objectDefinition1.id,
 			objectDefinition2.id
 		);
@@ -95,7 +95,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 		createdEntities.objectRelationshipIds.push(objectRelationship.id);
 
 		await expect(
-			modelBuilderPage.objectRelationshipEdges.filter({
+			modelBuilderDiagramPage.objectRelationshipEdges.filter({
 				hasText: objectRelationshipLabel,
 			})
 		).toBeVisible();
@@ -104,10 +104,10 @@ test.describe('Manage object relationships through Model Builder', () => {
 			objectDefinition2.label['en_US']
 		);
 
-		await modelBuilderPage.fitViewButton.click();
+		await modelBuilderDiagramPage.fitViewButton.click();
 
 		await expect(
-			modelBuilderPage.objectDefinitionNodes
+			modelBuilderDiagramPage.objectDefinitionNodes
 				.filter({hasText: objectDefinition2.label['en_US']})
 				.getByText(objectRelationshipLabel)
 		).toBeVisible();
@@ -115,7 +115,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 
 	test('can delete object relationship from different folders', async ({
 		apiHelpers,
-		modelBuilderPage,
+		modelBuilderDiagramPage,
 		modelBuilderRightSidebarPage,
 		page,
 		viewObjectDefinitionsPage,
@@ -180,18 +180,18 @@ test.describe('Manage object relationships through Model Builder', () => {
 		await viewObjectDefinitionsPage.viewInModelBuilderButton.click();
 
 		await expect(
-			modelBuilderPage.objectRelationshipEdges.filter({
+			modelBuilderDiagramPage.objectRelationshipEdges.filter({
 				hasText: objectRelationshipLabel,
 			})
 		).toBeVisible();
 
 		await expect(
-			modelBuilderPage.objectDefinitionNodes.filter({
+			modelBuilderDiagramPage.objectDefinitionNodes.filter({
 				hasText: objectDefinition2.label['en_US'],
 			})
 		).toBeVisible();
 
-		await modelBuilderPage.clickObjectRelationshipEdge(
+		await modelBuilderDiagramPage.clickObjectRelationshipEdge(
 			objectRelationshipLabel
 		);
 
@@ -200,13 +200,13 @@ test.describe('Manage object relationships through Model Builder', () => {
 		);
 
 		await expect(
-			modelBuilderPage.objectRelationshipEdges.filter({
+			modelBuilderDiagramPage.objectRelationshipEdges.filter({
 				hasText: objectRelationshipLabel,
 			})
 		).not.toBeVisible();
 
 		await expect(
-			modelBuilderPage.objectDefinitionNodes.filter({
+			modelBuilderDiagramPage.objectDefinitionNodes.filter({
 				hasText: objectDefinition2.label['en_US'],
 			})
 		).not.toBeVisible();
@@ -214,7 +214,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 
 	test('cannot create relationship between the postal address object and objects without an one-to-many relationship with the account object', async ({
 		apiHelpers,
-		modelBuilderPage,
+		modelBuilderDiagramPage,
 		page,
 		viewObjectDefinitionsPage,
 	}) => {
@@ -236,17 +236,17 @@ test.describe('Manage object relationships through Model Builder', () => {
 
 		await viewObjectDefinitionsPage.viewInModelBuilderButton.click();
 
-		await modelBuilderPage.toggleSidebarsButton.click();
+		await modelBuilderDiagramPage.toggleSidebarsButton.click();
 
-		await modelBuilderPage.fitViewButton.click();
+		await modelBuilderDiagramPage.fitViewButton.click();
 
-		await modelBuilderPage.connectObjectDefinitionsNodeHandles(
+		await modelBuilderDiagramPage.connectObjectDefinitionsNodeHandles(
 			postalAddress.id,
 			objectDefinition1.id
 		);
 
 		await expect(
-			modelBuilderPage.postalAddressObjectRelationshipWarning
+			modelBuilderDiagramPage.postalAddressObjectRelationshipWarning
 		).toBeVisible();
 
 		const pagePromise = page.waitForEvent('popup');
@@ -266,7 +266,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 
 	test('cannot delete the object relationship that is the only custom object field from the published object definition', async ({
 		apiHelpers,
-		modelBuilderPage,
+		modelBuilderDiagramPage,
 		modelBuilderRightSidebarPage,
 		page,
 		viewObjectDefinitionsPage,
@@ -336,9 +336,9 @@ test.describe('Manage object relationships through Model Builder', () => {
 
 		await viewObjectDefinitionsPage.viewInModelBuilderButton.click();
 
-		await modelBuilderPage.fitViewButton.click();
+		await modelBuilderDiagramPage.fitViewButton.click();
 
-		await modelBuilderPage.clickObjectRelationshipEdge(
+		await modelBuilderDiagramPage.clickObjectRelationshipEdge(
 			objectRelationshipLabel
 		);
 
@@ -346,7 +346,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 			objectRelationshipData.name
 		);
 
-		await expect(modelBuilderPage.deletionNotAllowed).toBeVisible();
+		await expect(modelBuilderDiagramPage.deletionNotAllowed).toBeVisible();
 
 		const objectFieldObjectRelationship =
 			publishedObjectDefinition2.objectFields.find(
