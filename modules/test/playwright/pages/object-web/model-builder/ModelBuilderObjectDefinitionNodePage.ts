@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {Locator, Page} from '@playwright/test';
+import {Locator, Page, expect} from '@playwright/test';
 
 import {ModelBuilderLeftSidebarPage} from './ModelBuilderLeftSidebarPage';
 import {ModelBuilderPage} from './ModelBuilderPage';
@@ -12,6 +12,10 @@ export class ModelBuilderObjectDefinitionNodePage {
 	readonly addObjectFieldButton: Locator;
 	readonly deleteObjectDefinitionOption: Locator;
 	readonly modelBuilderPage: ModelBuilderPage;
+	readonly newObjectRelationshipLabel: Locator;
+	readonly newObjectRelationshipTitle: Locator;
+	readonly newObjectRelationshipType: Locator;
+	readonly newObjectRelationshipSaveButton: Locator;
 	readonly modalDeleteObjectDefinitionTextField: Locator;
 	readonly modalDeleteObjectDefinitionConfirmationButton: Locator;
 	readonly modelBuilderLeftSidebarPage: ModelBuilderLeftSidebarPage;
@@ -56,6 +60,19 @@ export class ModelBuilderObjectDefinitionNodePage {
 			.locator('div.form-group')
 			.filter({hasText: /^PicklistSelect an Option$/})
 			.getByRole('combobox');
+		this.newObjectRelationshipLabel = page
+			.locator('div.form-group')
+			.filter({hasText: /^LabelMandatory$/})
+			.getByRole('textbox');
+		this.newObjectRelationshipTitle = page.getByRole('heading', {
+			name: 'New Relationship',
+		});
+		this.newObjectRelationshipType = page.getByText('Many to Many');
+		this.newObjectRelationshipSaveButton = page
+			.getByLabel('New Relationship')
+			.getByRole('button', {
+				name: 'Save',
+			});
 		this.page = page;
 	}
 
@@ -110,6 +127,24 @@ export class ModelBuilderObjectDefinitionNodePage {
 		}
 
 		await this.newObjectFieldSaveButton.click();
+	}
+
+	async createObjectRelationship(
+		objectRelationshipLabel: string,
+		type: string
+	) {
+		await expect(this.newObjectRelationshipTitle).toBeVisible();
+
+		await this.newObjectRelationshipLabel.fill(objectRelationshipLabel);
+		await this.newObjectRelationshipType.click();
+		await this.page.getByRole('option', {name: type}).click();
+		const responsePromise = this.page.waitForResponse(
+			'**/object-relationships'
+		);
+		await this.newObjectRelationshipSaveButton.click();
+		const response = await responsePromise;
+
+		return response.json();
 	}
 
 	async deleteObjectDefinition(objectDefinitionName: string) {
