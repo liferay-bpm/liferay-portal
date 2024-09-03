@@ -5,16 +5,13 @@
 
 import {Locator, Page, expect} from '@playwright/test';
 
-import {PORTLET_URLS} from '../../utils/portletUrls';
-import {ViewObjectDefinitionsPage} from './ViewObjectDefinitionsPage';
+import {PORTLET_URLS} from '../../../utils/portletUrls';
+import {ViewObjectDefinitionsPage} from '../ViewObjectDefinitionsPage';
 
 export class ModelBuilderPage {
 	readonly addObjectFieldButton: Locator;
 	readonly createNewObjectDefinitionButton: Locator;
-	readonly deleteButton: Locator;
 	readonly deleteObjectDefinitionOption: Locator;
-	readonly deleteObjectRelationshipButton: Locator;
-	readonly deleteTrashButton: Locator;
 	readonly deletionNotAllowed: Locator;
 	readonly diagramArea: Locator;
 	readonly editInPageViewOption: Locator;
@@ -29,8 +26,6 @@ export class ModelBuilderPage {
 	readonly newObjectFieldSelectPicklist: Locator;
 	readonly modalDeleteObjectDefinitionConfirmationButton: Locator;
 	readonly modalDeleteObjectDefinitionTextField: Locator;
-	readonly modalDeleteObjectRelationshipConfirmationButton: Locator;
-	readonly modalDeleteObjectRelationshipTextField: Locator;
 	readonly newObjectRelationshipLabel: Locator;
 	readonly newObjectRelationshipTitle: Locator;
 	readonly newObjectRelationshipType: Locator;
@@ -41,15 +36,6 @@ export class ModelBuilderPage {
 	readonly otherObjectFolders: Locator;
 	readonly page: Page;
 	readonly postalAddressObjectRelationshipWarning: Locator;
-	readonly rightSidebar: Locator;
-	readonly rightSidebarObjectDefinitionActivateObject: Locator;
-	readonly rightSidebarObjectDefinitionEntryTitleField: Locator;
-	readonly rightSidebarObjectDefinitionLabel: Locator;
-	readonly rightSidebarObjectDefinitionLabelLocalizationButton: Locator;
-	readonly rightSidebarObjectDefinitionPanelLink: Locator;
-	readonly rightSidebarObjectDefinitionPluralLabel: Locator;
-	readonly rightSidebarObjectDefinitionPluralLabelLocalizationButton: Locator;
-	readonly rightSidebarObjectDefinitionScope: Locator;
 	readonly selectedObjectFolder: Locator;
 	readonly toggleSidebarsButton: Locator;
 	readonly viewObjectDefinitionsPage: ViewObjectDefinitionsPage;
@@ -61,19 +47,10 @@ export class ModelBuilderPage {
 		});
 		this.createNewObjectDefinitionButton =
 			page.getByText('Create New Object');
-		this.deleteButton = page.getByRole('button', {
-			exact: true,
-			name: 'Delete',
-		});
 		this.deleteObjectDefinitionOption = page.getByRole('menuitem', {
 			name: 'Delete Object',
 		});
-		this.deleteObjectRelationshipButton = page.getByLabel(
-			'Delete Relationship'
-		);
-		this.deleteTrashButton = page
-			.getByRole('tabpanel')
-			.getByTitle('Delete');
+
 		this.deletionNotAllowed = page.getByRole('heading', {
 			name: 'Deletion Not Allowed',
 		});
@@ -99,13 +76,6 @@ export class ModelBuilderPage {
 			.getByRole('button', {exact: true, name: 'Delete'});
 		this.modalDeleteObjectDefinitionTextField = page.getByPlaceholder(
 			'Confirm Object Definition Name'
-		);
-		this.modalDeleteObjectRelationshipConfirmationButton = page.getByRole(
-			'button',
-			{exact: true, name: 'Delete'}
-		);
-		this.modalDeleteObjectRelationshipTextField = page.getByPlaceholder(
-			'Confirm Relationship Name'
 		);
 		this.newObjectFieldSelectBusinessType = page
 			.locator('div.form-group')
@@ -154,28 +124,6 @@ export class ModelBuilderPage {
 					'Postal Address can only have a relationship with the Account object.',
 			}
 		);
-		this.rightSidebar = page
-			.getByRole('tabpanel')
-			.filter({hasNot: this.createNewObjectDefinitionButton});
-		this.rightSidebarObjectDefinitionActivateObject =
-			page.getByLabel('Activate Object');
-		this.rightSidebarObjectDefinitionEntryTitleField =
-			page.getByLabel('Entry Title Field');
-		this.rightSidebarObjectDefinitionLabel = page.getByLabel(
-			'LabelMandatory',
-			{exact: true}
-		);
-		this.rightSidebarObjectDefinitionLabelLocalizationButton = page
-			.getByTitle('Open Localizations')
-			.first();
-		this.rightSidebarObjectDefinitionPanelLink =
-			page.getByLabel('Panel Link');
-		this.rightSidebarObjectDefinitionPluralLabel =
-			page.getByLabel('Plural Label');
-		this.rightSidebarObjectDefinitionPluralLabelLocalizationButton = page
-			.getByTitle('Open Localizations')
-			.last();
-		this.rightSidebarObjectDefinitionScope = page.getByLabel('Scope');
 		this.selectedObjectFolder = page
 			.getByRole('tabpanel')
 			.getByRole('treeitem')
@@ -298,15 +246,6 @@ export class ModelBuilderPage {
 			objectDefinitionName
 		);
 		await this.modalDeleteObjectDefinitionConfirmationButton.click();
-	}
-
-	async deleteObjectRelationship(objectRelationshipName: string) {
-		await this.deleteObjectRelationshipButton.click();
-		await this.modalDeleteObjectRelationshipTextField.click();
-		await this.modalDeleteObjectRelationshipTextField.fill(
-			objectRelationshipName
-		);
-		await this.modalDeleteObjectRelationshipConfirmationButton.click();
 	}
 
 	async dragNodeThroughDiagram(
