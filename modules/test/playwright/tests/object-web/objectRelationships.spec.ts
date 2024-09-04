@@ -86,7 +86,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 		const objectRelationshipLabel = 'objectRelationship' + getRandomInt();
 
 		const objectRelationship =
-			await modelBuilderPage.createObjectRelationship(
+			await modelBuilderPage.createObjectRelationshipByDragging(
 				objectRelationshipLabel,
 				'One to Many'
 			);
@@ -109,6 +109,62 @@ test.describe('Manage object relationships through Model Builder', () => {
 			modelBuilderPage.objectDefinitionNodes
 				.filter({hasText: objectDefinition2.label['en_US']})
 				.getByText(objectRelationshipLabel)
+		).toBeVisible();
+	});
+
+	test('can create relationship by using add relationship button', async ({
+		apiHelpers,
+		modelBuilderPage,
+		viewObjectDefinitionsPage,
+	}) => {
+		const objectFolder =
+			await apiHelpers.objectAdmin.postRandomObjectFolder();
+
+		createdEntities.objectFolderIds.push(objectFolder.id);
+
+		const objectDefinition1 =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFolderExternalReferenceCode:
+					objectFolder.externalReferenceCode,
+				status: {code: 0},
+			});
+		const objectDefinition2 =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFolderExternalReferenceCode:
+					objectFolder.externalReferenceCode,
+				status: {code: 0},
+			});
+
+		createdEntities.objectDefinitionIds.push(
+			objectDefinition1.id,
+			objectDefinition2.id
+		);
+
+		await viewObjectDefinitionsPage.goto();
+
+		await viewObjectDefinitionsPage.openObjectFolder(
+			objectFolder.label['en_US']
+		);
+
+		await viewObjectDefinitionsPage.viewInModelBuilderButton.click();
+
+		await modelBuilderPage.openNewRelationshipModal(objectDefinition1.name);
+
+		const objectRelationshipLabel = 'objectRelationship' + getRandomInt();
+
+		const objectRelationship =
+			await modelBuilderPage.createObjectRelationship(
+				objectDefinition2.name,
+				objectRelationshipLabel,
+				'One to Many'
+			);
+
+		createdEntities.objectRelationshipIds.push(objectRelationship.id);
+
+		await expect(
+			modelBuilderPage.objectRelationshipEdges.filter({
+				hasText: objectRelationshipLabel,
+			})
 		).toBeVisible();
 	});
 

@@ -10,6 +10,7 @@ import {ViewObjectDefinitionsPage} from './ViewObjectDefinitionsPage';
 
 export class ModelBuilderPage {
 	readonly addObjectFieldButton: Locator;
+	readonly addObjectRelationshipButton: Locator;
 	readonly createNewObjectDefinitionButton: Locator;
 	readonly deleteButton: Locator;
 	readonly deleteObjectDefinitionOption: Locator;
@@ -32,8 +33,10 @@ export class ModelBuilderPage {
 	readonly modalDeleteObjectRelationshipConfirmationButton: Locator;
 	readonly modalDeleteObjectRelationshipTextField: Locator;
 	readonly newObjectRelationshipLabel: Locator;
+	readonly newObjectRelationshipManyRecords: Locator;
 	readonly newObjectRelationshipTitle: Locator;
 	readonly newObjectRelationshipType: Locator;
+	readonly newObjectRelationshipTypeManyToMany: Locator;
 	readonly newObjectRelationshipSaveButton: Locator;
 	readonly objectDefinitionNodes: Locator;
 	readonly objectRelationshipEdges: Locator;
@@ -58,6 +61,10 @@ export class ModelBuilderPage {
 		this.addObjectFieldButton = page.getByRole('menuitem', {
 			exact: true,
 			name: 'Add Field',
+		});
+		this.addObjectRelationshipButton = page.getByRole('menuitem', {
+			exact: true,
+			name: 'Add Relationship',
 		});
 		this.createNewObjectDefinitionButton =
 			page.getByText('Create New Object');
@@ -128,10 +135,16 @@ export class ModelBuilderPage {
 			.locator('div.form-group')
 			.filter({hasText: /^LabelMandatory$/})
 			.getByRole('textbox');
+		this.newObjectRelationshipManyRecords =
+			page.getByLabel('Many Records Of');
 		this.newObjectRelationshipTitle = page.getByRole('heading', {
 			name: 'New Relationship',
 		});
-		this.newObjectRelationshipType = page.getByText('Many to Many');
+		this.newObjectRelationshipType = page
+			.getByLabel('New Relationship')
+			.getByText('Select an Option');
+		this.newObjectRelationshipTypeManyToMany =
+			page.getByText('Many to Many');
 		this.newObjectRelationshipSaveButton = page
 			.getByLabel('New Relationship')
 			.getByRole('button', {
@@ -274,6 +287,7 @@ export class ModelBuilderPage {
 	}
 
 	async createObjectRelationship(
+		objectDefinitionName: string,
 		objectRelationshipLabel: string,
 		type: string
 	) {
@@ -281,6 +295,27 @@ export class ModelBuilderPage {
 
 		await this.newObjectRelationshipLabel.fill(objectRelationshipLabel);
 		await this.newObjectRelationshipType.click();
+		await this.page.getByRole('option', {name: type}).click();
+		await this.newObjectRelationshipManyRecords.click();
+		await this.page
+			.getByRole('option', {name: objectDefinitionName})
+			.click();
+		const responsePromise = this.page.waitForResponse(
+			'**/object-relationships'
+		);
+		await this.newObjectRelationshipSaveButton.click();
+		const response = await responsePromise;
+
+		return response.json();
+	}
+	async createObjectRelationshipByDragging(
+		objectRelationshipLabel: string,
+		type: string
+	) {
+		await expect(this.newObjectRelationshipTitle).toBeVisible();
+
+		await this.newObjectRelationshipLabel.fill(objectRelationshipLabel);
+		await this.newObjectRelationshipTypeManyToMany.click();
 		await this.page.getByRole('option', {name: type}).click();
 		const responsePromise = this.page.waitForResponse(
 			'**/object-relationships'
@@ -290,7 +325,6 @@ export class ModelBuilderPage {
 
 		return response.json();
 	}
-
 	async deleteObjectDefinition(objectDefinitionName: string) {
 		await this.deleteObjectDefinitionOption.click();
 		await this.modalDeleteObjectDefinitionTextField.click();
@@ -336,6 +370,19 @@ export class ModelBuilderPage {
 			.click();
 
 		await this.addObjectFieldButton.click();
+	}
+
+	async openNewRelationshipModal(objectDefinitionName: string) {
+		await this.leftSidebarItems
+			.filter({hasText: objectDefinitionName})
+			.click();
+
+		await this.objectDefinitionNodes
+			.filter({hasText: objectDefinitionName})
+			.getByRole('button', {name: 'Add Field or Relationship'})
+			.click();
+
+		await this.addObjectRelationshipButton.click();
 	}
 
 	async selectNewObjectFieldBusinessTypeOption(
