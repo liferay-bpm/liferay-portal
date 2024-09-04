@@ -3,11 +3,9 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {Locator, Page} from '@playwright/test';
-
 import {PORTLET_URLS} from '../../../utils/portletUrls';
-import {ViewObjectDefinitionsPage} from '../ViewObjectDefinitionsPage';
-import {ModelBuilderLeftSidebarPage} from './ModelBuilderLeftSidebarPage';
+
+import type {Locator, Page} from '@playwright/test';
 
 export class ModelBuilderDiagramPage {
 	readonly deletionNotAllowed: Locator;
@@ -15,7 +13,6 @@ export class ModelBuilderDiagramPage {
 	readonly editInPageViewOption: Locator;
 	readonly editObjectFolderDetailsButton: Locator;
 	readonly fitViewButton: Locator;
-	readonly modelBuilderLeftSidebarPage: ModelBuilderLeftSidebarPage;
 	readonly newObjectFieldName: Locator;
 	readonly objectDefinitionNodes: Locator;
 	readonly objectRelationshipEdges: Locator;
@@ -23,7 +20,6 @@ export class ModelBuilderDiagramPage {
 	readonly page: Page;
 	readonly postalAddressObjectRelationshipWarning: Locator;
 	readonly toggleSidebarsButton: Locator;
-	readonly viewObjectDefinitionsPage: ViewObjectDefinitionsPage;
 
 	constructor(page: Page) {
 		this.deletionNotAllowed = page.getByRole('heading', {
@@ -39,9 +35,6 @@ export class ModelBuilderDiagramPage {
 		this.fitViewButton = page.locator(
 			'button.react-flow__controls-button.react-flow__controls-fitview'
 		);
-		this.modelBuilderLeftSidebarPage = new ModelBuilderLeftSidebarPage(
-			page
-		);
 		this.objectDefinitionNodes = page.locator('.react-flow__node');
 		this.objectRelationshipEdges = page.locator('.react-flow__edge');
 		this.openPageViewButton = page.getByRole('button', {
@@ -52,11 +45,10 @@ export class ModelBuilderDiagramPage {
 			'.alert-warning',
 			{
 				hasText:
-				'Postal Address can only have a relationship with the Account object.',
+					'Postal Address can only have a relationship with the Account object.',
 			}
 		);
 		this.toggleSidebarsButton = page.getByLabel('Toggle Sidebars');
-		this.viewObjectDefinitionsPage = new ViewObjectDefinitionsPage(page);
 	}
 
 	async clickObjectRelationshipEdge(objectRelationshipLabel: string) {

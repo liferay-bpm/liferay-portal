@@ -57,6 +57,7 @@ test.describe('Manage object fields through Model Builder', () => {
 	test('all picklist definitions are listed during object field creation', async ({
 		apiHelpers,
 		modelBuilderDiagramPage,
+		modelBuilderLeftSidebarPage,
 		modelBuilderObjectDefinitionNodePage,
 	}) => {
 		const {listTypeDefinitionIds, objectDefinition} = createdEntities;
@@ -83,7 +84,9 @@ test.describe('Manage object fields through Model Builder', () => {
 		await modelBuilderDiagramPage.goto({objectFolderName: 'Default'});
 
 		await modelBuilderObjectDefinitionNodePage.openAddNewObjectFieldModal(
-			objectDefinition.name
+			modelBuilderLeftSidebarPage.sidebarItems,
+			objectDefinition.name,
+			modelBuilderDiagramPage.objectDefinitionNodes
 		);
 
 		await modelBuilderObjectDefinitionNodePage.fillObjectFieldLabelInput(
@@ -109,6 +112,7 @@ test.describe('Manage object fields through Model Builder', () => {
 	test('can add picklist object field to object definition node', async ({
 		apiHelpers,
 		modelBuilderDiagramPage,
+		modelBuilderLeftSidebarPage,
 		modelBuilderObjectDefinitionNodePage,
 		page,
 		viewObjectDefinitionsPage,
@@ -131,9 +135,12 @@ test.describe('Manage object fields through Model Builder', () => {
 		const objectFieldLabel = 'objectFieldLabel' + getRandomInt();
 
 		await modelBuilderObjectDefinitionNodePage.createObjectField({
+			leftSidebarItems: modelBuilderLeftSidebarPage.sidebarItems,
 			listTypeDefinitionName: listTypeDefinition.name,
 			mandatory: false,
 			objectDefinitionName: objectDefinition.name,
+			objectDefinitionNodes:
+				modelBuilderDiagramPage.objectDefinitionNodes,
 			objectFieldBusinessType: 'Picklist',
 			objectFieldLabel,
 		});
@@ -181,7 +188,8 @@ test.describe('Manage object fields through Model Builder', () => {
 			.click();
 
 		await modelBuilderObjectDefinitionNodePage.clickShowAllFieldsButton(
-			objectDefinition.name
+			objectDefinition.name,
+			modelBuilderDiagramPage.objectDefinitionNodes
 		);
 
 		await modelBuilderDiagramPage.objectDefinitionNodes
@@ -251,7 +259,8 @@ test.describe('Manage object fields through Model Builder', () => {
 		);
 
 		await modelBuilderObjectDefinitionNodePage.clickShowAllFieldsButton(
-			draftObjectDefinition.label['en_US']
+			draftObjectDefinition.label['en_US'],
+			modelBuilderDiagramPage.objectDefinitionNodes
 		);
 
 		await page.getByText(picklistFieldName).click();
@@ -334,14 +343,16 @@ test.describe('Manage object fields through Model Builder', () => {
 		await expect(page.getByText(dateFieldName)).not.toBeVisible();
 
 		await modelBuilderObjectDefinitionNodePage.clickShowAllFieldsButton(
-			objectDefinition.label['en_US']
+			objectDefinition.label['en_US'],
+			modelBuilderDiagramPage.objectDefinitionNodes
 		);
 
 		await expect(page.getByText(integerFieldName)).toBeVisible();
 		await expect(page.getByText(dateFieldName)).toBeVisible();
 
 		await modelBuilderObjectDefinitionNodePage.clickHideFieldsButton(
-			objectDefinition.label['en_US']
+			objectDefinition.label['en_US'],
+			modelBuilderDiagramPage.objectDefinitionNodes
 		);
 
 		await expect(page.getByText(integerFieldName)).not.toBeVisible();
@@ -418,7 +429,8 @@ test.describe('Manage object fields through Model Builder', () => {
 			.click();
 
 		await modelBuilderObjectDefinitionNodePage.clickShowAllFieldsButton(
-			objectDefinition.name
+			objectDefinition.name,
+			modelBuilderDiagramPage.objectDefinitionNodes
 		);
 
 		await page.getByText(integerFieldName).click();
@@ -449,7 +461,8 @@ test.describe('Manage object fields through Model Builder', () => {
 			.click();
 
 		await modelBuilderObjectDefinitionNodePage.clickShowAllFieldsButton(
-			objectDefinition.name
+			objectDefinition.name,
+			modelBuilderDiagramPage.objectDefinitionNodes
 		);
 
 		await page.getByText('textField').click();
@@ -468,6 +481,8 @@ test.describe('Manage object fields through Model Builder', () => {
 test.describe('Manage objectFields through Objects Admin UI', () => {
 	test('can create object fields of multiple types (except AutoIncrement, Date and Time, Encrypted and Aggregation)', async ({
 		apiHelpers,
+		modelBuilderDiagramPage,
+		modelBuilderLeftSidebarPage,
 		objectFieldsPage,
 		page,
 	}) => {
@@ -542,6 +557,9 @@ test.describe('Manage objectFields through Objects Admin UI', () => {
 			if (objectFieldBusinessType === 'Attachment') {
 				await objectFieldsPage.addObjectField({
 					attachmentSource: 'Upload Directly from the User',
+					leftSidebarItems: modelBuilderLeftSidebarPage.sidebarItems,
+					objectDefinitionNodes:
+						modelBuilderDiagramPage.objectDefinitionNodes,
 					objectFieldBusinessType,
 					objectFieldLabel,
 				});
@@ -554,7 +572,10 @@ test.describe('Manage objectFields through Objects Admin UI', () => {
 				objectFieldBusinessType === `Multiselect Picklist`
 			) {
 				await objectFieldsPage.addObjectField({
+					leftSidebarItems: modelBuilderLeftSidebarPage.sidebarItems,
 					listTypeDefinitionName: listTypeDefinition.name,
+					objectDefinitionNodes:
+						modelBuilderDiagramPage.objectDefinitionNodes,
 					objectFieldBusinessType,
 					objectFieldLabel,
 				});
@@ -563,6 +584,9 @@ test.describe('Manage objectFields through Objects Admin UI', () => {
 			}
 
 			await objectFieldsPage.addObjectField({
+				leftSidebarItems: modelBuilderLeftSidebarPage.sidebarItems,
+				objectDefinitionNodes:
+					modelBuilderDiagramPage.objectDefinitionNodes,
 				objectFieldBusinessType,
 				objectFieldLabel,
 			});
