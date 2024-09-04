@@ -101,7 +101,8 @@ test.describe('Manage object relationships through Model Builder', () => {
 		).toBeVisible();
 
 		await modelBuilderObjectDefinitionNodePage.clickShowAllFieldsButton(
-			objectDefinition2.label['en_US']
+			objectDefinition2.label['en_US'],
+			modelBuilderDiagramPage.objectDefinitionNodes
 		);
 
 		await modelBuilderDiagramPage.fitViewButton.click();

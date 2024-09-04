@@ -257,7 +257,8 @@ test.describe('Manage object definitions through Model Builder', () => {
 		await modelBuilderDiagramPage.fitViewButton.click();
 
 		await modelBuilderObjectDefinitionNodePage.clickObjectDefinitionActionsButton(
-			objectDefinition1.label['en_US']
+			objectDefinition1.label['en_US'],
+			modelBuilderDiagramPage.objectDefinitionNodes
 		);
 
 		await modelBuilderObjectDefinitionNodePage.deleteObjectDefinition(
@@ -331,13 +332,15 @@ test.describe('Manage object definitions through Model Builder', () => {
 
 		await expect(
 			modelBuilderObjectDefinitionNodePage.getLinkedObjectDefinitionIconLocator(
-				objectDefinition1.label['en_US']
+				objectDefinition1.label['en_US'],
+				modelBuilderDiagramPage.objectDefinitionNodes
 			)
 		).toBeVisible();
 
 		await expect(
 			modelBuilderObjectDefinitionNodePage.getLinkedObjectDefinitionIconLocator(
-				objectDefinition2.label['en_US']
+				objectDefinition2.label['en_US'],
+				modelBuilderDiagramPage.objectDefinitionNodes
 			)
 		).toBeHidden();
 
@@ -349,13 +352,15 @@ test.describe('Manage object definitions through Model Builder', () => {
 
 		await expect(
 			modelBuilderObjectDefinitionNodePage.getLinkedObjectDefinitionIconLocator(
-				objectDefinition1.label['en_US']
+				objectDefinition1.label['en_US'],
+				modelBuilderDiagramPage.objectDefinitionNodes
 			)
 		).toBeHidden();
 
 		await expect(
 			modelBuilderObjectDefinitionNodePage.getLinkedObjectDefinitionIconLocator(
-				objectDefinition2.label['en_US']
+				objectDefinition2.label['en_US'],
+				modelBuilderDiagramPage.objectDefinitionNodes
 			)
 		).toBeVisible();
 
@@ -374,7 +379,8 @@ test.describe('Manage object definitions through Model Builder', () => {
 		await modelBuilderDiagramPage.toggleSidebarsButton.click();
 
 		await modelBuilderObjectDefinitionNodePage.clickObjectDefinitionActionsButton(
-			'organization'
+			'organization',
+			modelBuilderDiagramPage.objectDefinitionNodes
 		);
 
 		await modelBuilderDiagramPage.editInPageViewOption.click();
@@ -459,8 +465,13 @@ test.describe('Manage object definitions through Model Builder', () => {
 				.filter({hasText: objectDefinition.label['en_US']})
 				.click();
 
+			const rightSidebar =
+				modelBuilderRightSidebarPage.getRightSidebarLocator(
+					modelBuilderLeftSidebarPage.createNewObjectDefinitionButton
+				);
+
 			await expect(
-				modelBuilderRightSidebarPage.rightSidebar.getByTitle(
+				rightSidebar.getByTitle(
 					`${objectDefinition.label['en_US']} Details`
 				)
 			).toBeVisible();
@@ -542,10 +553,13 @@ test.describe('Manage object definitions through Model Builder', () => {
 
 		objectDefinitions.push(objectDefinition);
 
+		const rightSidebar =
+			modelBuilderRightSidebarPage.getRightSidebarLocator(
+				modelBuilderLeftSidebarPage.createNewObjectDefinitionButton
+			);
+
 		await expect(
-			modelBuilderRightSidebarPage.rightSidebar.getByTitle(
-				objectDefinitionLabel + ' Details'
-			)
+			rightSidebar.getByTitle(objectDefinitionLabel + ' Details')
 		).toBeVisible();
 	});
 });

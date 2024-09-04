@@ -3,20 +3,17 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {Locator, Page, expect} from '@playwright/test';
+import {expect} from '@playwright/test';
 
-import {ModelBuilderDiagramPage} from './ModelBuilderDiagramPage';
-import {ModelBuilderLeftSidebarPage} from './ModelBuilderLeftSidebarPage';
+import type {Locator, Page} from '@playwright/test';
 
 export class ModelBuilderObjectDefinitionNodePage {
 	readonly addObjectFieldButton: Locator;
 	readonly deleteObjectDefinitionOption: Locator;
 	readonly newObjectRelationshipSaveButton: Locator;
-	readonly modelBuilderDiagramPage: ModelBuilderDiagramPage;
 	readonly newObjectFieldSaveButton: Locator;
 	readonly modalDeleteObjectDefinitionTextField: Locator;
 	readonly modalDeleteObjectDefinitionConfirmationButton: Locator;
-	readonly modelBuilderLeftSidebarPage: ModelBuilderLeftSidebarPage;
 	readonly objectFieldBusinessTypeSelect: Locator;
 	readonly objectFieldLabelInput: Locator;
 	readonly objectFieldPicklistSelect: Locator;
@@ -38,10 +35,6 @@ export class ModelBuilderObjectDefinitionNodePage {
 			.getByRole('button', {exact: true, name: 'Delete'});
 		this.modalDeleteObjectDefinitionTextField = page.getByPlaceholder(
 			'Confirm Object Definition Name'
-		);
-		this.modelBuilderDiagramPage = new ModelBuilderDiagramPage(page);
-		this.modelBuilderLeftSidebarPage = new ModelBuilderLeftSidebarPage(
-			page
 		);
 		this.newObjectFieldSaveButton = page
 			.getByLabel('New Field')
@@ -81,35 +74,50 @@ export class ModelBuilderObjectDefinitionNodePage {
 		this.page = page;
 	}
 
-	async clickHideFieldsButton(objectDefinitionName: string) {
-		await this.modelBuilderDiagramPage.objectDefinitionNodes
+	async clickHideFieldsButton(
+		objectDefinitionName: string,
+		objectDefinitionNodes: Locator
+	) {
+		await objectDefinitionNodes
 			.filter({hasText: objectDefinitionName})
 			.getByRole('button', {name: 'Hide Fields'})
 			.click();
 	}
 
-	async clickObjectDefinitionActionsButton(objectDefinitionLabel: string) {
-		await this.modelBuilderDiagramPage.objectDefinitionNodes
+	async clickObjectDefinitionActionsButton(
+		objectDefinitionLabel: string,
+		objectDefinitionNodes: Locator
+	) {
+		await objectDefinitionNodes
 			.filter({hasText: objectDefinitionLabel})
 			.getByLabel('Show Actions')
 			.click();
 	}
 
-	async clickShowAllFieldsButton(objectDefinitionName: string) {
-		await this.modelBuilderDiagramPage.objectDefinitionNodes
+	async clickShowAllFieldsButton(
+		objectDefinitionName: string,
+		objectDefinitionNodes: Locator
+	) {
+		await objectDefinitionNodes
 			.filter({hasText: objectDefinitionName})
 			.getByRole('button', {name: 'Show All Fields'})
 			.click();
 	}
 
 	async createObjectField({
+		leftSidebarItems,
 		listTypeDefinitionName,
 		mandatory,
 		objectDefinitionName,
+		objectDefinitionNodes,
 		objectFieldBusinessType,
 		objectFieldLabel,
 	}: CreateObjectField) {
-		await this.openAddNewObjectFieldModal(objectDefinitionName);
+		await this.openAddNewObjectFieldModal(
+			leftSidebarItems,
+			objectDefinitionName,
+			objectDefinitionNodes
+		);
 
 		await this.fillObjectFieldLabelInput(objectFieldLabel);
 
@@ -165,20 +173,27 @@ export class ModelBuilderObjectDefinitionNodePage {
 		await this.objectFieldLabelInput.fill(objectFieldLabel);
 	}
 
-	getLinkedObjectDefinitionIconLocator(objectDefinitionLabel: string) {
-		return this.modelBuilderDiagramPage.objectDefinitionNodes
+	getLinkedObjectDefinitionIconLocator(
+		objectDefinitionLabel: string,
+		objectDefinitionNodes: Locator
+	) {
+		return objectDefinitionNodes
 			.filter({
 				hasText: objectDefinitionLabel,
 			})
 			.locator('svg.lexicon-icon-link');
 	}
 
-	async openAddNewObjectFieldModal(objectDefinitionName: string) {
-		await this.modelBuilderLeftSidebarPage.sidebarItems
+	async openAddNewObjectFieldModal(
+		leftSidebarItems: unknown,
+		objectDefinitionName: string,
+		objectDefinitionNodes: unknown
+	) {
+		await (leftSidebarItems as Locator)
 			.filter({hasText: objectDefinitionName})
 			.click();
 
-		await this.modelBuilderDiagramPage.objectDefinitionNodes
+		await (objectDefinitionNodes as Locator)
 			.filter({hasText: objectDefinitionName})
 			.getByRole('button', {name: 'Add Field or Relationship'})
 			.click();

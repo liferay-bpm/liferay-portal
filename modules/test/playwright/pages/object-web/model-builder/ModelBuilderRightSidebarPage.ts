@@ -3,17 +3,13 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {Locator, Page} from '@playwright/test';
-
-import {ModelBuilderLeftSidebarPage} from './ModelBuilderLeftSidebarPage';
+import type {Locator, Page} from '@playwright/test';
 
 export class ModelBuilderRightSidebarPage {
 	readonly deleteButton: Locator;
 	readonly deleteObjectRelationshipButton: Locator;
 	readonly deleteTrashButton: Locator;
-	readonly modelBuilderLeftSidebarPage: ModelBuilderLeftSidebarPage;
 	readonly modalDeleteObjectRelationshipTextField: Locator;
-	readonly rightSidebar: Locator;
 	readonly objectDefinitionActivateObject: Locator;
 	readonly objectDefinitionEntryTitleField: Locator;
 	readonly objectDefinitionLabel: Locator;
@@ -22,6 +18,7 @@ export class ModelBuilderRightSidebarPage {
 	readonly objectDefinitionPluralLabel: Locator;
 	readonly objectDefinitionPluralLabelLocalizationButton: Locator;
 	readonly objectDefinitionScope: Locator;
+	readonly page: Page;
 
 	constructor(page: Page) {
 		this.deleteButton = page.getByRole('button', {
@@ -34,16 +31,9 @@ export class ModelBuilderRightSidebarPage {
 		this.deleteTrashButton = page
 			.getByRole('tabpanel')
 			.getByTitle('Delete');
-		this.modelBuilderLeftSidebarPage = new ModelBuilderLeftSidebarPage(
-			page
-		);
 		this.modalDeleteObjectRelationshipTextField = page.getByPlaceholder(
 			'Confirm Relationship Name'
 		);
-		this.rightSidebar = page.getByRole('tabpanel').filter({
-			hasNot: this.modelBuilderLeftSidebarPage
-				.createNewObjectDefinitionButton,
-		});
 		this.objectDefinitionActivateObject =
 			page.getByLabel('Activate Object');
 		this.objectDefinitionEntryTitleField =
@@ -60,6 +50,7 @@ export class ModelBuilderRightSidebarPage {
 			.getByTitle('Open Localizations')
 			.last();
 		this.objectDefinitionScope = page.getByLabel('Scope');
+		this.page = page;
 	}
 
 	async deleteObjectRelationship(objectRelationshipName: string) {
@@ -69,5 +60,11 @@ export class ModelBuilderRightSidebarPage {
 			objectRelationshipName
 		);
 		await this.deleteButton.click();
+	}
+
+	getRightSidebarLocator(createNewObjectDefinitionButton: Locator) {
+		return this.page.getByRole('tabpanel').filter({
+			hasNot: createNewObjectDefinitionButton,
+		});
 	}
 }
