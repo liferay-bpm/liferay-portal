@@ -12,12 +12,13 @@ export class ModelBuilderRightSidebarPage {
 	readonly modalDeleteObjectRelationshipTextField: Locator;
 	readonly objectDefinitionActivateObject: Locator;
 	readonly objectDefinitionEntryTitleField: Locator;
-	readonly objectDefinitionLabel: Locator;
+	readonly sidebarLabelInput: Locator;
 	readonly objectDefinitionLabelLocalizationButton: Locator;
 	readonly objectDefinitionPanelLink: Locator;
 	readonly objectDefinitionPluralLabel: Locator;
 	readonly objectDefinitionPluralLabelLocalizationButton: Locator;
 	readonly objectDefinitionScope: Locator;
+	readonly objectRelationshipDeletionTypeSelect: Locator;
 	readonly page: Page;
 
 	constructor(page: Page) {
@@ -38,7 +39,7 @@ export class ModelBuilderRightSidebarPage {
 			page.getByLabel('Activate Object');
 		this.objectDefinitionEntryTitleField =
 			page.getByLabel('Entry Title Field');
-		this.objectDefinitionLabel = page.getByLabel('LabelMandatory', {
+		this.sidebarLabelInput = page.getByLabel('LabelMandatory', {
 			exact: true,
 		});
 		this.objectDefinitionLabelLocalizationButton = page
@@ -50,6 +51,8 @@ export class ModelBuilderRightSidebarPage {
 			.getByTitle('Open Localizations')
 			.last();
 		this.objectDefinitionScope = page.getByLabel('Scope');
+		this.objectRelationshipDeletionTypeSelect =
+			page.getByLabel('Deletion Type');
 		this.page = page;
 	}
 

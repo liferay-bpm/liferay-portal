@@ -479,7 +479,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 			// Object Data Container
 
 			await expect(
-				modelBuilderRightSidebarPage.objectDefinitionLabel
+				modelBuilderRightSidebarPage.sidebarLabelInput
 			).toHaveValue(objectDefinition.label['en_US']);
 
 			await modelBuilderRightSidebarPage.objectDefinitionLabelLocalizationButton.click();
@@ -489,7 +489,7 @@ test.describe('Manage object definitions through Model Builder', () => {
 				.click();
 
 			await expect(
-				modelBuilderRightSidebarPage.objectDefinitionLabel
+				modelBuilderRightSidebarPage.sidebarLabelInput
 			).toHaveValue(objectDefinition.label['pt_BR']);
 
 			await page.keyboard.press('Escape');
