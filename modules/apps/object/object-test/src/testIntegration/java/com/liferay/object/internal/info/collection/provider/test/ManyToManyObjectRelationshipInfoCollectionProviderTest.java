@@ -42,7 +42,6 @@ import java.io.Serializable;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -163,19 +162,18 @@ public class ManyToManyObjectRelationshipInfoCollectionProviderTest {
 			_objectDefinition2, objectDefinition2ObjectEntry,
 			objectDefinition1ObjectEntry1, objectDefinition1ObjectEntry2);
 
-		Map<String, ServiceRegistration<?>> serviceRegistrations =
-			_objectRelationshipLocalService.getServiceRegistrations();
-
 		String serviceRegistrationKey = StringBundler.concat(
 			_objectRelationship.getCompanyId(), StringPool.POUND,
 			_objectRelationship.getObjectRelationshipId());
 
 		ServiceRegistration<?> objectRelationshipServiceRegistration =
-			serviceRegistrations.get(serviceRegistrationKey);
+			_objectRelationshipLocalService.getServiceRegistration(
+				serviceRegistrationKey);
 
 		objectRelationshipServiceRegistration.unregister();
 
-		serviceRegistrations.remove(serviceRegistrationKey);
+		_objectRelationshipLocalService.removeServiceRegistration(
+			serviceRegistrationKey);
 
 		_assertRelatedInfoCollectionProvider(
 			_objectDefinition1, objectDefinition1ObjectEntry1,
@@ -199,12 +197,14 @@ public class ManyToManyObjectRelationshipInfoCollectionProviderTest {
 			reverseObjectRelationship.getCompanyId(), StringPool.POUND,
 			reverseObjectRelationship.getObjectRelationshipId());
 
-		objectRelationshipServiceRegistration = serviceRegistrations.get(
-			serviceRegistrationKey);
+		objectRelationshipServiceRegistration =
+			_objectRelationshipLocalService.getServiceRegistration(
+				serviceRegistrationKey);
 
 		objectRelationshipServiceRegistration.unregister();
 
-		serviceRegistrations.remove(serviceRegistrationKey);
+		_objectRelationshipLocalService.removeServiceRegistration(
+			serviceRegistrationKey);
 
 		Assert.assertNull(
 			_infoItemServiceRegistry.getFirstInfoItemService(
