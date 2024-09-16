@@ -406,14 +406,13 @@ public class ObjectRelationshipLocalServiceImpl
 			objectRelationshipPersistence.remove(
 				reverseObjectRelationship.getObjectRelationshipId());
 
-			ServiceRegistration<?> serviceRegistration =
-				_serviceRegistrations.get(
-					_getServiceRegistrationKey(reverseObjectRelationship));
+			ServiceRegistration<?> serviceRegistration = getServiceRegistration(
+				_getServiceRegistrationKey(reverseObjectRelationship));
 
 			if (serviceRegistration != null) {
 				serviceRegistration.unregister();
 
-				_serviceRegistrations.remove(
+				removeServiceRegistration(
 					_getServiceRegistrationKey(reverseObjectRelationship));
 			}
 
@@ -424,13 +423,13 @@ public class ObjectRelationshipLocalServiceImpl
 			indexer.delete(reverseObjectRelationship);
 		}
 
-		ServiceRegistration<?> serviceRegistration = _serviceRegistrations.get(
+		ServiceRegistration<?> serviceRegistration = getServiceRegistration(
 			_getServiceRegistrationKey(objectRelationship));
 
 		if (serviceRegistration != null) {
 			serviceRegistration.unregister();
 
-			_serviceRegistrations.remove(
+			removeServiceRegistration(
 				_getServiceRegistrationKey(objectRelationship));
 		}
 
@@ -869,8 +868,10 @@ public class ObjectRelationshipLocalServiceImpl
 			objectDefinitionId2);
 	}
 
-	public Map<String, ServiceRegistration<?>> getServiceRegistrations() {
-		return _serviceRegistrations;
+	public ServiceRegistration<?> getServiceRegistration(
+		String serviceRegistrationKey) {
+
+		return _serviceRegistrations.get(serviceRegistrationKey);
 	}
 
 	@Override
@@ -912,6 +913,10 @@ public class ObjectRelationshipLocalServiceImpl
 				_log.error(portalException);
 			}
 		}
+	}
+
+	public void removeServiceRegistration(String serviceRegistrationKey) {
+		_serviceRegistrations.remove(serviceRegistrationKey);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
