@@ -3020,7 +3020,7 @@ public class ObjectEntryLocalServiceImpl
 				objectRelationship.getCompanyId()
 			).and(
 				() -> {
-					if (!related) {
+					if (!related && (groupId > 0)) {
 						return ObjectEntryTable.INSTANCE.groupId.eq(groupId);
 					}
 
