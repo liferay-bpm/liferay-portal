@@ -620,6 +620,14 @@ public class ObjectRelationshipLocalServiceWrapper
 	}
 
 	@Override
+	public org.osgi.framework.ServiceRegistration<?> getServiceRegistration(
+		String serviceRegistrationKey) {
+
+		return _objectRelationshipLocalService.getServiceRegistration(
+			serviceRegistrationKey);
+	}
+
+	@Override
 	public void registerObjectRelationshipsRelatedInfoCollectionProviders(
 		com.liferay.object.model.ObjectDefinition objectDefinition1,
 		ObjectDefinitionLocalService objectDefinitionLocalService) {
@@ -627,6 +635,12 @@ public class ObjectRelationshipLocalServiceWrapper
 		_objectRelationshipLocalService.
 			registerObjectRelationshipsRelatedInfoCollectionProviders(
 				objectDefinition1, objectDefinitionLocalService);
+	}
+
+	@Override
+	public void removeServiceRegistration(String serviceRegistrationKey) {
+		_objectRelationshipLocalService.removeServiceRegistration(
+			serviceRegistrationKey);
 	}
 
 	/**
