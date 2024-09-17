@@ -577,6 +577,114 @@ public class ObjectRelationshipLocalServiceTest {
 	}
 
 	@Test
+	public void testUnbindObjectDefinitions() throws Exception {
+		ObjectDefinition objectDefinitionA =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition("A");
+		ObjectDefinition objectDefinitionAA =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition("AA");
+		ObjectDefinition objectDefinitionAB =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition("AB");
+		ObjectDefinition objectDefinitionAAA =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition("AAA");
+		ObjectDefinition objectDefinitionABA =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition("ABA");
+
+		ObjectRelationship objectRelationshipA_AA =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinitionA,
+				objectDefinitionAA);
+		ObjectRelationship objectRelationshipA_AB =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinitionA,
+				objectDefinitionAB);
+		ObjectRelationship objectRelationshipAA_AAA =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinitionAA,
+				objectDefinitionAAA);
+		ObjectRelationship objectRelationshipAB_ABA =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinitionAB,
+				objectDefinitionABA);
+
+		TreeTestUtil.bind(
+			_objectDefinitionLocalService,
+			Arrays.asList(
+				objectRelationshipAA_AAA, objectRelationshipAB_ABA,
+				objectRelationshipA_AA, objectRelationshipA_AB));
+
+		_objectDefinitionLocalService.publishCustomObjectDefinition(
+			TestPropsValues.getUserId(),
+			objectDefinitionA.getObjectDefinitionId());
+
+		TreeTestUtil.assertObjectDefinitionTree(
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AA", "AB"}
+			).put(
+				"AA", new String[] {"AAA"}
+			).put(
+				"AB", new String[] {"ABA"}
+			).put(
+				"AAA", new String[0]
+			).put(
+				"ABA", new String[0]
+			).build(),
+			_treeFactory.createObjectDefinitionTree(
+				objectDefinitionA.getObjectDefinitionId()),
+			_objectDefinitionLocalService);
+
+		_testUnbindObjectDefinitions(
+			Arrays.asList(
+				objectDefinitionA, objectDefinitionAA, objectDefinitionAB,
+				objectDefinitionABA),
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AA", "AB"}
+			).put(
+				"AA", new String[0]
+			).put(
+				"AB", new String[] {"ABA"}
+			).put(
+				"ABA", new String[0]
+			).build(),
+			objectRelationshipAA_AAA, objectDefinitionA,
+			Collections.singletonList(objectDefinitionAAA));
+		_testUnbindObjectDefinitions(
+			Arrays.asList(
+				objectDefinitionA, objectDefinitionAB, objectDefinitionABA),
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AB"}
+			).put(
+				"AB", new String[] {"ABA"}
+			).put(
+				"ABA", new String[0]
+			).build(),
+			objectRelationshipA_AA, objectDefinitionA,
+			Collections.singletonList(objectDefinitionAA));
+		_testUnbindObjectDefinitions(
+			Arrays.asList(objectDefinitionAB, objectDefinitionABA),
+			LinkedHashMapBuilder.put(
+				"AB", new String[] {"ABA"}
+			).put(
+				"ABA", new String[0]
+			).build(),
+			objectRelationshipA_AB, objectDefinitionAB,
+			Collections.singletonList(objectDefinitionA));
+		_testUnbindObjectDefinitions(
+			Collections.emptyList(), null, objectRelationshipAB_ABA, null,
+			Arrays.asList(objectDefinitionAB, objectDefinitionABA));
+
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionA.getObjectDefinitionId());
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAA.getObjectDefinitionId());
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAB.getObjectDefinitionId());
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAAA.getObjectDefinitionId());
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionABA.getObjectDefinitionId());
+	}
+
+	@Test
 	public void testUpdateObjectRelationship() throws Exception {
 		String externalReferenceCode = RandomTestUtil.randomString();
 
@@ -891,6 +999,18 @@ public class ObjectRelationshipLocalServiceTest {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			StringUtil.randomId(), false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+	}
+
+	private void _assertRootObjectDefinitionId(
+		long objectDefinitionId, long rootObjectDefinitionId) {
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				objectDefinitionId);
+
+		Assert.assertEquals(
+			rootObjectDefinitionId,
+			objectDefinition.getRootObjectDefinitionId());
 	}
 
 	private boolean _hasColumn(String tableName, String columnName)
@@ -1286,6 +1406,42 @@ public class ObjectRelationshipLocalServiceTest {
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null));
 
 		_addObjectRelationshipSystemObjectDefinition();
+	}
+
+	private void _testUnbindObjectDefinitions(
+			List<ObjectDefinition> boundObjectDefinitions,
+			Map<String, String[]> objectDefinitionTreeMap,
+			ObjectRelationship objectRelationship,
+			ObjectDefinition rootObjectDefinition,
+			List<ObjectDefinition> unboundObjectDefinitions)
+		throws Exception {
+
+		objectRelationship =
+			_objectRelationshipLocalService.updateObjectRelationship(
+				objectRelationship.getExternalReferenceCode(),
+				objectRelationship.getObjectRelationshipId(), 0,
+				objectRelationship.getDeletionType(), false,
+				objectRelationship.getLabelMap(), null);
+
+		Assert.assertFalse(objectRelationship.isEdge());
+
+		boundObjectDefinitions.forEach(
+			objectDefinition -> _assertRootObjectDefinitionId(
+				objectDefinition.getObjectDefinitionId(),
+				rootObjectDefinition.getObjectDefinitionId()));
+		unboundObjectDefinitions.forEach(
+			objectDefinition -> _assertRootObjectDefinitionId(
+				objectDefinition.getObjectDefinitionId(), 0));
+
+		if (objectDefinitionTreeMap == null) {
+			return;
+		}
+
+		TreeTestUtil.assertObjectDefinitionTree(
+			objectDefinitionTreeMap,
+			_treeFactory.createObjectDefinitionTree(
+				rootObjectDefinition.getObjectDefinitionId()),
+			_objectDefinitionLocalService);
 	}
 
 	@Inject
