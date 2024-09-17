@@ -577,6 +577,94 @@ public class ObjectRelationshipLocalServiceTest {
 	}
 
 	@Test
+	public void testUnbindObjectDefinitions() throws Exception {
+		ObjectDefinition objectDefinitionA =
+			_addAndPublishCustomObjectDefinition("A");
+		ObjectDefinition objectDefinitionAA =
+			_addAndPublishCustomObjectDefinition("AA");
+		ObjectDefinition objectDefinitionAB =
+			_addAndPublishCustomObjectDefinition("AB");
+		ObjectDefinition objectDefinitionAAA =
+			_addAndPublishCustomObjectDefinition("AAA");
+		ObjectDefinition objectDefinitionABA =
+			_addAndPublishCustomObjectDefinition("ABA");
+
+		ObjectRelationship objectRelationshipA_AA = _bindObjectDefinitions(
+			objectDefinitionA, objectDefinitionAA);
+		ObjectRelationship objectRelationshipA_AB = _bindObjectDefinitions(
+			objectDefinitionA, objectDefinitionAB);
+		ObjectRelationship objectRelationshipAA_AAA = _bindObjectDefinitions(
+			objectDefinitionAA, objectDefinitionAAA);
+		ObjectRelationship objectRelationshipAB_ABA = _bindObjectDefinitions(
+			objectDefinitionAB, objectDefinitionABA);
+
+		TreeTestUtil.assertObjectDefinitionTree(
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AA", "AB"}
+			).put(
+				"AA", new String[] {"AAA"}
+			).put(
+				"AB", new String[] {"ABA"}
+			).put(
+				"AAA", new String[0]
+			).put(
+				"ABA", new String[0]
+			).build(),
+			_treeFactory.createObjectDefinitionTree(
+				objectDefinitionA.getObjectDefinitionId()),
+			_objectDefinitionLocalService);
+
+		_testUnbindObjectDefinitions(
+			Arrays.asList(
+				objectDefinitionA, objectDefinitionAA, objectDefinitionAB,
+				objectDefinitionABA),
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AA", "AB"}
+			).put(
+				"AA", new String[0]
+			).put(
+				"AB", new String[] {"ABA"}
+			).put(
+				"ABA", new String[0]
+			).build(),
+			objectRelationshipAA_AAA, objectDefinitionA, objectDefinitionAAA);
+		_testUnbindObjectDefinitions(
+			Arrays.asList(
+				objectDefinitionA, objectDefinitionAB, objectDefinitionABA),
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AB"}
+			).put(
+				"AB", new String[] {"ABA"}
+			).put(
+				"ABA", new String[0]
+			).build(),
+			objectRelationshipA_AA, objectDefinitionA, objectDefinitionAA);
+		_testUnbindObjectDefinitions(
+			Arrays.asList(objectDefinitionAB, objectDefinitionABA),
+			LinkedHashMapBuilder.put(
+				"AB", new String[] {"ABA"}
+			).put(
+				"ABA", new String[0]
+			).build(),
+			objectRelationshipA_AB, objectDefinitionAB, objectDefinitionA);
+
+		_updateObjectRelationship(false, objectRelationshipAB_ABA);
+
+		_assertRootObjectDefinitionId(objectDefinitionAB, 0);
+		_assertRootObjectDefinitionId(objectDefinitionABA, 0);
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinitionA);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAA);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAB);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAAA);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionABA);
+	}
+
+	@Test
 	public void testUpdateObjectRelationship() throws Exception {
 		String externalReferenceCode = RandomTestUtil.randomString();
 
@@ -862,6 +950,17 @@ public class ObjectRelationshipLocalServiceTest {
 			objectDefinition.getObjectDefinitionId());
 	}
 
+	private ObjectDefinition _addAndPublishCustomObjectDefinition(String name)
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition(name);
+
+		return _objectDefinitionLocalService.publishCustomObjectDefinition(
+			TestPropsValues.getUserId(),
+			objectDefinition.getObjectDefinitionId());
+	}
+
 	private ObjectRelationship _addObjectRelationshipSystemObjectDefinition()
 		throws Exception {
 
@@ -891,6 +990,30 @@ public class ObjectRelationshipLocalServiceTest {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			StringUtil.randomId(), false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+	}
+
+	private void _assertRootObjectDefinitionId(
+		ObjectDefinition objectDefinition, long rootObjectDefinitionId) {
+
+		objectDefinition = _objectDefinitionLocalService.fetchObjectDefinition(
+			objectDefinition.getObjectDefinitionId());
+
+		Assert.assertEquals(
+			rootObjectDefinitionId,
+			objectDefinition.getRootObjectDefinitionId());
+	}
+
+	private ObjectRelationship _bindObjectDefinitions(
+			ObjectDefinition objectDefinition1,
+			ObjectDefinition objectDefinition2)
+		throws Exception {
+
+		ObjectRelationship objectRelationship =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinition1,
+				objectDefinition2);
+
+		return _updateObjectRelationship(true, objectRelationship);
 	}
 
 	private boolean _hasColumn(String tableName, String columnName)
@@ -1286,6 +1409,44 @@ public class ObjectRelationshipLocalServiceTest {
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null));
 
 		_addObjectRelationshipSystemObjectDefinition();
+	}
+
+	private void _testUnbindObjectDefinitions(
+			List<ObjectDefinition> objectDefinitions,
+			Map<String, String[]> objectDefinitionTreeMap,
+			ObjectRelationship objectRelationship,
+			ObjectDefinition rootObjectDefinition,
+			ObjectDefinition unboundObjectDefinition)
+		throws Exception {
+
+		objectRelationship = _updateObjectRelationship(
+			false, objectRelationship);
+
+		Assert.assertFalse(objectRelationship.isEdge());
+
+		objectDefinitions.forEach(
+			objectDefinition -> _assertRootObjectDefinitionId(
+				objectDefinition,
+				rootObjectDefinition.getObjectDefinitionId()));
+
+		_assertRootObjectDefinitionId(unboundObjectDefinition, 0);
+
+		TreeTestUtil.assertObjectDefinitionTree(
+			objectDefinitionTreeMap,
+			_treeFactory.createObjectDefinitionTree(
+				rootObjectDefinition.getObjectDefinitionId()),
+			_objectDefinitionLocalService);
+	}
+
+	private ObjectRelationship _updateObjectRelationship(
+			boolean edge, ObjectRelationship objectRelationship)
+		throws Exception {
+
+		return _objectRelationshipLocalService.updateObjectRelationship(
+			objectRelationship.getExternalReferenceCode(),
+			objectRelationship.getObjectRelationshipId(), 0,
+			objectRelationship.getDeletionType(), edge,
+			objectRelationship.getLabelMap(), null);
 	}
 
 	@Inject
