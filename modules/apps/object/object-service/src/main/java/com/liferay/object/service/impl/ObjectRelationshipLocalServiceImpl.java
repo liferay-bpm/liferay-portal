@@ -1015,6 +1015,10 @@ public class ObjectRelationshipLocalServiceImpl
 				objectRelationship.getObjectFieldId2(), false);
 		}
 
+		if (!edge && objectRelationship.isEdge()) {
+			_unbindObjectDefinitions(objectRelationship);
+		}
+
 		return objectRelationship;
 	}
 
@@ -1293,6 +1297,19 @@ public class ObjectRelationshipLocalServiceImpl
 		}
 	}
 
+	private long _getRootObjectDefinitionId(ObjectDefinition objectDefinition)
+		throws PortalException {
+
+		long count = objectRelationshipPersistence.countByODI1_E(
+			objectDefinition.getObjectDefinitionId(), true);
+
+		if (count == 0) {
+			return 0;
+		}
+
+		return objectDefinition.getObjectDefinitionId();
+	}
+
 	private String _getServiceRegistrationKey(
 		ObjectRelationship objectRelationship) {
 
@@ -1370,6 +1387,45 @@ public class ObjectRelationshipLocalServiceImpl
 				).build()));
 	}
 
+	private void _unbindObjectDefinitions(ObjectRelationship objectRelationship)
+		throws PortalException {
+
+		objectRelationship.setEdge(false);
+
+		objectRelationship =
+			objectRelationshipLocalService.updateObjectRelationship(
+				objectRelationship);
+
+		ObjectDefinitionLocalService objectDefinitionLocalService =
+			_objectDefinitionLocalServiceSnapshot.get();
+
+		ObjectDefinition objectDefinition1 =
+			objectDefinitionLocalService.fetchObjectDefinition(
+				objectRelationship.getObjectDefinitionId1());
+
+		if (objectDefinition1.isRootDescendantNode()) {
+			objectDefinition1 =
+				objectDefinitionLocalService.fetchObjectDefinition(
+					objectDefinition1.getRootObjectDefinitionId());
+		}
+
+		_updateRootObjectDefinitionId(
+			objectDefinition1, objectDefinitionLocalService,
+			objectDefinition1.getRootObjectDefinitionId(),
+			_getRootObjectDefinitionId(objectDefinition1));
+
+		ObjectDefinition objectDefinition2 =
+			_objectDefinitionPersistence.findByPrimaryKey(
+				objectRelationship.getObjectDefinitionId2());
+
+		objectDefinition2.setScope(objectDefinition1.getScope());
+
+		_updateRootObjectDefinitionId(
+			objectDefinition2, objectDefinitionLocalService,
+			objectDefinition2.getRootObjectDefinitionId(),
+			_getRootObjectDefinitionId(objectDefinition2));
+	}
+
 	private ObjectRelationship _updateObjectRelationship(
 		String externalReferenceCode, long parameterObjectFieldId,
 		String deletionType, boolean edge, Map<Locale, String> labelMap,
@@ -1378,10 +1434,64 @@ public class ObjectRelationshipLocalServiceImpl
 		objectRelationship.setExternalReferenceCode(externalReferenceCode);
 		objectRelationship.setParameterObjectFieldId(parameterObjectFieldId);
 		objectRelationship.setDeletionType(deletionType);
-		objectRelationship.setEdge(edge);
+
+		if (edge) {
+			objectRelationship.setEdge(true);
+		}
+
 		objectRelationship.setLabelMap(labelMap);
 
 		return objectRelationshipPersistence.update(objectRelationship);
+	}
+
+	private void _updateRootObjectDefinitionId(
+			ObjectDefinition objectDefinition,
+			ObjectDefinitionLocalService objectDefinitionLocalService,
+			long oldRootObjectDefinitionId, long newRootObjectDefinitionId)
+		throws PortalException {
+
+		if (oldRootObjectDefinitionId == newRootObjectDefinitionId) {
+			if (objectDefinition.isApproved()) {
+				objectDefinitionLocalService.deployObjectDefinition(
+					objectDefinition);
+			}
+
+			return;
+		}
+
+		String previousRESTContextPath = objectDefinition.getRESTContextPath();
+
+		objectDefinition.setRootObjectDefinitionId(newRootObjectDefinitionId);
+
+		objectDefinition = objectDefinitionLocalService.updateObjectDefinition(
+			objectDefinition);
+
+		if (objectDefinition.isApproved()) {
+			objectDefinition.setPreviousRESTContextPath(
+				previousRESTContextPath);
+
+			objectDefinitionLocalService.deployObjectDefinition(
+				objectDefinition);
+		}
+
+		for (ObjectRelationship objectRelationship :
+				objectRelationshipLocalService.getObjectRelationships(
+					objectDefinition.getObjectDefinitionId(), true)) {
+
+			ObjectDefinition objectDefinition2 =
+				_objectDefinitionPersistence.findByPrimaryKey(
+					objectRelationship.getObjectDefinitionId2());
+
+			if (objectDefinition2.getRootObjectDefinitionId() !=
+					oldRootObjectDefinitionId) {
+
+				continue;
+			}
+
+			_updateRootObjectDefinitionId(
+				objectDefinition2, objectDefinitionLocalService,
+				oldRootObjectDefinitionId, newRootObjectDefinitionId);
+		}
 	}
 
 	private void _validateDeletionType(String deletionType, boolean edge)
