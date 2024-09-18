@@ -470,6 +470,11 @@ public class ObjectServiceUpgradeStepRegistrator
 			"9.2.1", "9.2.2",
 			new com.liferay.object.internal.upgrade.v9_2_2.
 				SchemaUpgradeProcess());
+
+		registry.register(
+			"9.2.2", "9.2.3",
+			new com.liferay.object.internal.upgrade.v9_2_3.
+				ObjectDefinitionUpgradeProcess());
 	}
 
 	@Reference
