@@ -54,6 +54,10 @@ import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.GroupConstants;
+import com.liferay.portal.kernel.model.ResourceAction;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.service.Snapshot;
@@ -62,6 +66,8 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.RandomUtil;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
@@ -79,6 +85,7 @@ import java.io.Serializable;
 
 import java.sql.Connection;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -1349,6 +1356,35 @@ public class ObjectRelationshipLocalServiceImpl
 		}
 	}
 
+	private void _copyResourcePermissions(
+			long companyId, String sourceName, String targetName)
+		throws PortalException {
+
+		List<ResourcePermission> resourcePermissions = ListUtil.concat(
+			_resourcePermissionLocalService.getResourcePermissions(
+				companyId, sourceName, ResourceConstants.SCOPE_COMPANY,
+				String.valueOf(companyId)),
+			_resourcePermissionLocalService.getResourcePermissions(
+				companyId, sourceName, ResourceConstants.SCOPE_GROUP_TEMPLATE,
+				String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID)));
+
+		if (resourcePermissions.isEmpty()) {
+			return;
+		}
+
+		List<ResourceAction> resourceActions =
+			_resourceActionLocalService.getResourceActions(sourceName);
+
+		for (ResourcePermission resourcePermission : resourcePermissions) {
+			_resourcePermissionLocalService.setResourcePermissions(
+				resourcePermission.getCompanyId(), targetName,
+				resourcePermission.getScope(), resourcePermission.getPrimKey(),
+				resourcePermission.getRoleId(),
+				_getResourceActionIds(
+					resourcePermission.getActionIds(), resourceActions));
+		}
+	}
+
 	private void _deleteObjectFields(
 			long objectDefinitionId, ObjectRelationship objectRelationship)
 		throws PortalException {
@@ -1370,6 +1406,24 @@ public class ObjectRelationshipLocalServiceImpl
 					objectField.getObjectFieldId());
 			}
 		}
+	}
+
+	private String[] _getResourceActionIds(
+		long actionIds, List<ResourceAction> resourceActions) {
+
+		List<String> resourceActionIds = new ArrayList<>();
+
+		for (ResourceAction resourceAction : resourceActions) {
+			long bitwiseValue = resourceAction.getBitwiseValue();
+
+			if ((actionIds & bitwiseValue) != bitwiseValue) {
+				continue;
+			}
+
+			resourceActionIds.add(resourceAction.getActionId());
+		}
+
+		return resourceActionIds.toArray(new String[0]);
 	}
 
 	private long _getRootObjectDefinitionId(ObjectDefinition objectDefinition)
@@ -1499,6 +1553,23 @@ public class ObjectRelationshipLocalServiceImpl
 			objectDefinition2, objectDefinitionLocalService,
 			objectDefinition2.getRootObjectDefinitionId(),
 			_getRootObjectDefinitionId(objectDefinition2));
+
+		if (!objectDefinition1.isApproved() ||
+			!objectDefinition2.isApproved()) {
+
+			return;
+		}
+
+		_copyResourcePermissions(
+			objectDefinition1.getCompanyId(), objectDefinition1.getClassName(),
+			objectDefinition2.getClassName());
+		_copyResourcePermissions(
+			objectDefinition1.getCompanyId(), objectDefinition1.getPortletId(),
+			objectDefinition2.getPortletId());
+		_copyResourcePermissions(
+			objectDefinition1.getCompanyId(),
+			objectDefinition1.getResourceName(),
+			objectDefinition2.getResourceName());
 	}
 
 	private ObjectRelationship _updateObjectRelationship(
@@ -1931,6 +2002,12 @@ public class ObjectRelationshipLocalServiceImpl
 	@Reference
 	private RelatedInfoCollectionProviderFactory
 		_relatedInfoCollectionProviderFactory;
+
+	@Reference
+	private ResourceActionLocalService _resourceActionLocalService;
+
+	@Reference
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
 
 	private final Map<String, ServiceRegistration<?>> _serviceRegistrations =
 		new ConcurrentHashMap<>();
