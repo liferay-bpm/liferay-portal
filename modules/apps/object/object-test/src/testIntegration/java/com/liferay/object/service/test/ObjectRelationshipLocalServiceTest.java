@@ -6,6 +6,7 @@
 package com.liferay.object.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
@@ -45,10 +46,17 @@ import com.liferay.portal.kernel.dao.db.IndexMetadata;
 import com.liferay.portal.kernel.dao.db.IndexMetadataFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.model.Address;
+import com.liferay.portal.kernel.model.GroupConstants;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
@@ -616,6 +624,33 @@ public class ObjectRelationshipLocalServiceTest {
 			TestPropsValues.getUserId(),
 			objectDefinitionA.getObjectDefinitionId());
 
+		Role organizationRole = RoleTestUtil.addRole(
+			RoleConstants.TYPE_ORGANIZATION);
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			TestPropsValues.getCompanyId(), objectDefinitionA.getClassName(),
+			ResourceConstants.SCOPE_GROUP_TEMPLATE,
+			String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID),
+			organizationRole.getRoleId(), new String[] {ActionKeys.UPDATE});
+
+		Role regularRole = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			TestPropsValues.getCompanyId(), objectDefinitionA.getPortletId(),
+			ResourceConstants.SCOPE_COMPANY,
+			String.valueOf(TestPropsValues.getCompanyId()),
+			regularRole.getRoleId(),
+			new String[] {ActionKeys.ACCESS_IN_CONTROL_PANEL});
+
+		Role siteRole = RoleTestUtil.addRole(RoleConstants.TYPE_SITE);
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			TestPropsValues.getCompanyId(), objectDefinitionA.getResourceName(),
+			ResourceConstants.SCOPE_GROUP_TEMPLATE,
+			String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID),
+			siteRole.getRoleId(),
+			new String[] {ObjectActionKeys.ADD_OBJECT_ENTRY});
+
 		TreeTestUtil.assertObjectDefinitionTree(
 			LinkedHashMapBuilder.put(
 				"A", new String[] {"AA", "AB"}
@@ -647,6 +682,10 @@ public class ObjectRelationshipLocalServiceTest {
 			).build(),
 			objectRelationshipAA_AAA, objectDefinitionA,
 			Collections.singletonList(objectDefinitionAAA));
+
+		_assertResourcePermissions(
+			objectDefinitionAAA, organizationRole, regularRole, siteRole);
+
 		_testUnbindObjectDefinitions(
 			Arrays.asList(
 				objectDefinitionA, objectDefinitionAB, objectDefinitionABA),
@@ -659,6 +698,10 @@ public class ObjectRelationshipLocalServiceTest {
 			).build(),
 			objectRelationshipA_AA, objectDefinitionA,
 			Collections.singletonList(objectDefinitionAA));
+
+		_assertResourcePermissions(
+			objectDefinitionAA, organizationRole, regularRole, siteRole);
+
 		_testUnbindObjectDefinitions(
 			Arrays.asList(objectDefinitionAB, objectDefinitionABA),
 			LinkedHashMapBuilder.put(
@@ -668,9 +711,16 @@ public class ObjectRelationshipLocalServiceTest {
 			).build(),
 			objectRelationshipA_AB, objectDefinitionAB,
 			Collections.singletonList(objectDefinitionA));
+
+		_assertResourcePermissions(
+			objectDefinitionAB, organizationRole, regularRole, siteRole);
+
 		_testUnbindObjectDefinitions(
 			Collections.emptyList(), null, objectRelationshipAB_ABA, null,
 			Arrays.asList(objectDefinitionAB, objectDefinitionABA));
+
+		_assertResourcePermissions(
+			objectDefinitionABA, organizationRole, regularRole, siteRole);
 
 		_objectDefinitionLocalService.deleteObjectDefinition(
 			objectDefinitionA.getObjectDefinitionId());
@@ -999,6 +1049,32 @@ public class ObjectRelationshipLocalServiceTest {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			StringUtil.randomId(), false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+	}
+
+	private void _assertResourcePermissions(
+			ObjectDefinition objectDefinition, Role organizationRole,
+			Role regularRole, Role siteRole)
+		throws Exception {
+
+		Assert.assertTrue(
+			_resourcePermissionLocalService.hasResourcePermission(
+				TestPropsValues.getCompanyId(), objectDefinition.getClassName(),
+				ResourceConstants.SCOPE_GROUP_TEMPLATE,
+				String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID),
+				organizationRole.getRoleId(), ActionKeys.UPDATE));
+		Assert.assertTrue(
+			_resourcePermissionLocalService.hasResourcePermission(
+				TestPropsValues.getCompanyId(), objectDefinition.getPortletId(),
+				ResourceConstants.SCOPE_COMPANY,
+				String.valueOf(TestPropsValues.getCompanyId()),
+				regularRole.getRoleId(), ActionKeys.ACCESS_IN_CONTROL_PANEL));
+		Assert.assertTrue(
+			_resourcePermissionLocalService.hasResourcePermission(
+				TestPropsValues.getCompanyId(),
+				objectDefinition.getResourceName(),
+				ResourceConstants.SCOPE_GROUP_TEMPLATE,
+				String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID),
+				siteRole.getRoleId(), ObjectActionKeys.ADD_OBJECT_ENTRY));
 	}
 
 	private void _assertRootObjectDefinitionId(
@@ -1468,6 +1544,9 @@ public class ObjectRelationshipLocalServiceTest {
 
 	@Inject
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
+
+	@Inject
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
 
 	@DeleteAfterTestRun
 	private ObjectDefinition _systemObjectDefinition2;
