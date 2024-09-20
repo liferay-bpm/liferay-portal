@@ -6,6 +6,7 @@
 package com.liferay.object.service.impl;
 
 import com.liferay.info.collection.provider.RelatedInfoItemCollectionProvider;
+import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
@@ -22,6 +23,7 @@ import com.liferay.object.exception.ObjectRelationshipSystemException;
 import com.liferay.object.exception.ObjectRelationshipTypeException;
 import com.liferay.object.internal.dao.db.ObjectDBManagerUtil;
 import com.liferay.object.internal.info.collection.provider.RelatedInfoCollectionProviderFactory;
+import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
@@ -31,6 +33,7 @@ import com.liferay.object.model.ObjectRelationshipTable;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTableUtil;
 import com.liferay.object.petra.sql.dsl.DynamicObjectRelationshipMappingTable;
 import com.liferay.object.relationship.util.ObjectRelationshipUtil;
+import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -1538,10 +1541,29 @@ public class ObjectRelationshipLocalServiceImpl
 					objectDefinition1.getRootObjectDefinitionId());
 		}
 
+		long rootObjectDefinitionId = _getRootObjectDefinitionId(
+			objectDefinition1);
+
 		_updateRootObjectDefinitionId(
 			objectDefinition1, objectDefinitionLocalService,
 			objectDefinition1.getRootObjectDefinitionId(),
-			_getRootObjectDefinitionId(objectDefinition1));
+			rootObjectDefinitionId);
+
+		if (rootObjectDefinitionId == 0) {
+			ObjectActionLocalService objectActionLocalService =
+				_objectActionLocalServiceSnapshot.get();
+
+			for (ObjectAction objectAction :
+					objectActionLocalService.getObjectActions(
+						objectDefinition1.getObjectDefinitionId(),
+						ObjectActionTriggerConstants.
+							KEY_ON_AFTER_ROOT_UPDATE)) {
+
+				objectAction.setActive(false);
+
+				objectActionLocalService.updateObjectAction(objectAction);
+			}
+		}
 
 		ObjectDefinition objectDefinition2 =
 			_objectDefinitionPersistence.findByPrimaryKey(
@@ -1968,6 +1990,10 @@ public class ObjectRelationshipLocalServiceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectRelationshipLocalServiceImpl.class);
 
+	private static final Snapshot<ObjectActionLocalService>
+		_objectActionLocalServiceSnapshot = new Snapshot<>(
+			ObjectRelationshipLocalServiceImpl.class,
+			ObjectActionLocalService.class, null, true);
 	private static final Snapshot<ObjectDefinitionLocalService>
 		_objectDefinitionLocalServiceSnapshot = new Snapshot<>(
 			ObjectRelationshipLocalServiceImpl.class,
