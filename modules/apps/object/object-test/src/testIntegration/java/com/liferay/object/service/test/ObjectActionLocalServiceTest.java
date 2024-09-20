@@ -44,6 +44,7 @@ import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.exception.ObjectActionActiveException;
 import com.liferay.object.exception.ObjectActionErrorMessageException;
 import com.liferay.object.exception.ObjectActionExecutorKeyException;
 import com.liferay.object.exception.ObjectActionLabelException;
@@ -873,21 +874,15 @@ public class ObjectActionLocalServiceTest {
 				Arrays.asList(
 					objectRelationshipAA_AAA, objectRelationshipA_AA));
 
-			_objectActionLocalService.addObjectAction(
-				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
-				objectDefinitionA.getObjectDefinitionId(), true,
-				StringPool.BLANK, RandomTestUtil.randomString(),
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				RandomTestUtil.randomString(),
+			ObjectAction objectAction6 = _addObjectAction(
+				objectDefinitionA.getObjectDefinitionId(),
 				ObjectActionExecutorConstants.KEY_WEBHOOK,
 				ObjectActionTriggerConstants.KEY_ON_AFTER_ROOT_UPDATE,
 				UnicodePropertiesBuilder.put(
 					"secret", "onafterrootupdate"
 				).put(
 					"url", "https://onafterrootupdate.com"
-				).build(),
-				false);
+				).build());
 
 			_objectDefinitionLocalService.publishCustomObjectDefinition(
 				TestPropsValues.getUserId(),
@@ -954,8 +949,21 @@ public class ObjectActionLocalServiceTest {
 			_objectEntryLocalService.deleteObjectEntry(
 				rootObjectEntry.getObjectEntryId());
 
-			_objectDefinitionLocalService.unbindObjectDefinition(
-				objectDefinitionA.getObjectDefinitionId());
+			_testUnbindObjectDefinitions(
+				objectAction6.getObjectActionId(), objectRelationshipA_AA);
+
+			ObjectAction objectAction7 = _addObjectAction(
+				objectDefinitionAA.getObjectDefinitionId(),
+				ObjectActionExecutorConstants.KEY_WEBHOOK,
+				ObjectActionTriggerConstants.KEY_ON_AFTER_ROOT_UPDATE,
+				UnicodePropertiesBuilder.put(
+					"secret", "onafterrootupdate"
+				).put(
+					"url", "https://onafterrootupdate.com"
+				).build());
+
+			_testUnbindObjectDefinitions(
+				objectAction7.getObjectActionId(), objectRelationshipAA_AAA);
 
 			_objectDefinitionLocalService.deleteObjectDefinition(
 				objectDefinitionA);
@@ -2714,6 +2722,33 @@ public class ObjectActionLocalServiceTest {
 			false);
 	}
 
+	private ObjectAction _addObjectAction(
+			long objectDefinitionId, String conditionExpression, String name,
+			String objectActionExecutorKey, String objectActionTriggerKey,
+			UnicodeProperties unicodeProperties, boolean system)
+		throws Exception {
+
+		return _objectActionLocalService.addObjectAction(
+			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+			objectDefinitionId, true, conditionExpression,
+			RandomTestUtil.randomString(),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			name, objectActionExecutorKey, objectActionTriggerKey,
+			unicodeProperties, system);
+	}
+
+	private ObjectAction _addObjectAction(
+			long objectDefinitionId, String objectActionExecutorKey,
+			String objectActionTriggerKey, UnicodeProperties unicodeProperties)
+		throws Exception {
+
+		return _addObjectAction(
+			objectDefinitionId, StringPool.BLANK, RandomTestUtil.randomString(),
+			objectActionExecutorKey, objectActionTriggerKey, unicodeProperties,
+			false);
+	}
+
 	private void _addObjectAction(
 			String errorMessage, String externalReferenceCode, String label,
 			String name, String objectActionTriggerKey, boolean system)
@@ -2735,12 +2770,8 @@ public class ObjectActionLocalServiceTest {
 			UnicodeProperties unicodeProperties, boolean system)
 		throws Exception {
 
-		return _objectActionLocalService.addObjectAction(
-			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
-			_objectDefinition.getObjectDefinitionId(), true,
-			conditionExpression, RandomTestUtil.randomString(),
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+		return _addObjectAction(
+			_objectDefinition.getObjectDefinitionId(), conditionExpression,
 			name, objectActionExecutorKey, objectActionTriggerKey,
 			unicodeProperties, system);
 	}
@@ -2752,8 +2783,9 @@ public class ObjectActionLocalServiceTest {
 		throws Exception {
 
 		return _addObjectAction(
-			StringPool.BLANK, name, objectActionExecutorKey,
-			objectActionTriggerKey, unicodeProperties, system);
+			_objectDefinition.getObjectDefinitionId(), StringPool.BLANK, name,
+			objectActionExecutorKey, objectActionTriggerKey, unicodeProperties,
+			system);
 	}
 
 	private void _assertGroovyObjectActionExecutorArguments(
@@ -3041,6 +3073,37 @@ public class ObjectActionLocalServiceTest {
 				originalPermissionChecker);
 			PrincipalThreadLocal.setName(originalName);
 		}
+	}
+
+	private void _testUnbindObjectDefinitions(
+			long objectActionId, ObjectRelationship objectRelationship)
+		throws Exception {
+
+		_objectRelationshipLocalService.updateObjectRelationship(
+			objectRelationship.getExternalReferenceCode(),
+			objectRelationship.getObjectRelationshipId(), 0,
+			objectRelationship.getDeletionType(), false,
+			objectRelationship.getLabelMap(), null);
+
+		ObjectAction objectAction = _objectActionLocalService.fetchObjectAction(
+			objectActionId);
+
+		Assert.assertFalse(objectAction.isActive());
+
+		AssertUtils.assertFailure(
+			ObjectActionActiveException.class,
+			"Cannot activate object action if trigger is onAfterRootUpdate " +
+				"but object definition is not a root node",
+			() -> _objectActionLocalService.updateObjectAction(
+				objectAction.getExternalReferenceCode(),
+				objectAction.getObjectActionId(), true,
+				objectAction.getConditionExpression(),
+				objectAction.getDescription(),
+				objectAction.getErrorMessageMap(), objectAction.getLabelMap(),
+				objectAction.getName(),
+				objectAction.getObjectActionExecutorKey(),
+				objectAction.getObjectActionTriggerKey(),
+				objectAction.getParametersUnicodeProperties()));
 	}
 
 	private AccountEntry _accountEntry;
