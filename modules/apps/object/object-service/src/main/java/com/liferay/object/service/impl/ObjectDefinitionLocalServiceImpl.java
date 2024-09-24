@@ -937,29 +937,7 @@ public class ObjectDefinitionLocalServiceImpl
 				"Unmodifiable system object definition cannot be published");
 		}
 
-		if (objectDefinition.getRootObjectDefinitionId() == 0) {
-			return _publishObjectDefinition(userId, objectDefinition);
-		}
-
-		if (objectDefinition.isRootDescendantNode()) {
-			throw new ObjectDefinitionStatusException(
-				"Nonroot object definitions within a hierarchical structure " +
-					"are ineligible for publication");
-		}
-
-		Tree tree = _treeFactory.createObjectDefinitionTree(
-			objectDefinitionId, objectDefinitionPersistence::findByPrimaryKey);
-
-		Iterator<Node> iterator = tree.iterator();
-
-		while (iterator.hasNext()) {
-			Node node = iterator.next();
-
-			_publishObjectDefinition(
-				userId, getObjectDefinition(node.getPrimaryKey()));
-		}
-
-		return getObjectDefinition(objectDefinitionId);
+		return _publishObjectDefinition(userId, objectDefinition);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
