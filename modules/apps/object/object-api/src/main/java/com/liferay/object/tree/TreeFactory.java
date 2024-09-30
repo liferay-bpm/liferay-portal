@@ -6,8 +6,12 @@
 package com.liferay.object.tree;
 
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectRelationship;
+import com.liferay.petra.function.UnsafeBiFunction;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.exception.PortalException;
+
+import java.util.List;
 
 /**
  * @author Feliphe Marinho
@@ -17,10 +21,17 @@ public interface TreeFactory {
 	public Tree createObjectDefinitionTree(
 			long objectDefinitionId,
 			UnsafeFunction<Long, ObjectDefinition, PortalException>
-				objectDefinitionLookupUnsafeFunction)
+				objectDefinitionLookupUnsafeFunction,
+			UnsafeBiFunction
+				<Long, Boolean, List<ObjectRelationship>, PortalException>
+					objectRelationshipLookupUnsafeBiFunction)
 		throws PortalException;
 
-	public Tree createObjectEntryTree(long objectEntryId)
+	public Tree createObjectEntryTree(
+			long objectEntryId,
+			UnsafeBiFunction
+				<Long, Boolean, List<ObjectRelationship>, PortalException>
+					objectRelationshipLookupUnsafeBiFunction)
 		throws PortalException;
 
 }

@@ -625,7 +625,8 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 		Tree tree = _treeFactory.createObjectDefinitionTree(
 			objectDefinition.getRootObjectDefinitionId(),
-			_objectDefinitionPersistence::findByPrimaryKey);
+			_objectDefinitionPersistence::findByPrimaryKey,
+			_objectRelationshipLocalService::getObjectRelationships);
 
 		Node node = tree.getNode(objectDefinition.getObjectDefinitionId());
 

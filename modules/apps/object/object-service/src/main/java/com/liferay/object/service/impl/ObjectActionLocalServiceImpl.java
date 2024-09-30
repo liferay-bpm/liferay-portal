@@ -37,6 +37,7 @@ import com.liferay.object.scope.ObjectDefinitionScoped;
 import com.liferay.object.scripting.exception.ObjectScriptingException;
 import com.liferay.object.scripting.validator.ObjectScriptingValidator;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.base.ObjectActionLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.object.tree.TreeFactory;
@@ -167,7 +168,8 @@ public class ObjectActionLocalServiceImpl
 
 				ObjectDefinitionResourcePermissionUtil.populateResourceActions(
 					objectActionLocalService, objectDefinition,
-					_objectDefinitionPersistence, _portletLocalService,
+					_objectDefinitionPersistence,
+					_objectRelationshipLocalService, _portletLocalService,
 					_resourceActions, _treeFactory);
 			}
 			catch (Exception exception) {
@@ -979,6 +981,9 @@ public class ObjectActionLocalServiceImpl
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
 	@Reference
 	private ObjectScriptingValidator _objectScriptingValidator;

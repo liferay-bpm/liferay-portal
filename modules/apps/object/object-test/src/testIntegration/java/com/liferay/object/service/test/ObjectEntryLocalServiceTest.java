@@ -1992,7 +1992,8 @@ public class ObjectEntryLocalServiceTest {
 
 		objectEntryTree1 = _treeFactory.createObjectEntryTree(
 			objectEntryTree1.getRootNode(
-			).getPrimaryKey());
+			).getPrimaryKey(),
+			_objectRelationshipLocalService::getObjectRelationships);
 
 		TreeTestUtil.assertObjectEntryTree(
 			LinkedHashMapBuilder.put(
@@ -2004,7 +2005,8 @@ public class ObjectEntryLocalServiceTest {
 
 		objectEntryTree2 = _treeFactory.createObjectEntryTree(
 			objectEntryTree2.getRootNode(
-			).getPrimaryKey());
+			).getPrimaryKey(),
+			_objectRelationshipLocalService::getObjectRelationships);
 
 		TreeTestUtil.assertObjectEntryTree(
 			LinkedHashMapBuilder.put(

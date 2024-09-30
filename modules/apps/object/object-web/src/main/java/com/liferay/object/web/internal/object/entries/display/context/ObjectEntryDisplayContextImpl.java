@@ -206,7 +206,8 @@ public class ObjectEntryDisplayContextImpl
 			_objectEntryLocalService.getObjectEntry(objectEntry.getId());
 
 		Tree tree = _treeFactory.createObjectEntryTree(
-			serviceBuilderObjectEntry.getRootObjectEntryId());
+			serviceBuilderObjectEntry.getRootObjectEntryId(),
+			_objectRelationshipLocalService::getObjectRelationships);
 
 		Node node = tree.getNode(serviceBuilderObjectEntry.getObjectEntryId());
 

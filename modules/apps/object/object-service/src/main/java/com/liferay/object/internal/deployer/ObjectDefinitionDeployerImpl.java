@@ -183,7 +183,8 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				_objectActionLocalService, objectDefinition,
 				(ObjectDefinitionPersistence)
 					_objectDefinitionLocalService.getBasePersistence(),
-				_portletLocalService, _resourceActions, _treeFactory);
+				_objectRelationshipLocalService, _portletLocalService,
+				_resourceActions, _treeFactory);
 		}
 		catch (Exception exception) {
 			return ReflectionUtil.throwException(exception);
@@ -436,7 +437,8 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 
 		Tree tree = _treeFactory.createObjectDefinitionTree(
 			rootObjectDefinitionId,
-			_objectDefinitionLocalService::getObjectDefinition);
+			_objectDefinitionLocalService::getObjectDefinition,
+			_objectRelationshipLocalService::getObjectRelationships);
 
 		Iterator<Node> iterator = tree.iterator();
 

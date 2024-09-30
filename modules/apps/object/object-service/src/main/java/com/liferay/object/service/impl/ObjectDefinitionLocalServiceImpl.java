@@ -640,7 +640,8 @@ public class ObjectDefinitionLocalServiceImpl
 
 				ObjectDefinitionResourcePermissionUtil.removeResourceActions(
 					_objectActionLocalService, objectDefinition,
-					objectDefinitionPersistence, _resourceActions,
+					objectDefinitionPersistence,
+					_objectRelationshipLocalService, _resourceActions,
 					_treeFactory);
 			}
 			catch (Exception exception) {
@@ -949,7 +950,8 @@ public class ObjectDefinitionLocalServiceImpl
 		}
 
 		Tree tree = _treeFactory.createObjectDefinitionTree(
-			objectDefinitionId, objectDefinitionPersistence::findByPrimaryKey);
+			objectDefinitionId, objectDefinitionPersistence::findByPrimaryKey,
+			_objectRelationshipPersistence::findByODI1_E);
 
 		Iterator<Node> iterator = tree.iterator();
 
@@ -1111,7 +1113,8 @@ public class ObjectDefinitionLocalServiceImpl
 
 		Tree tree = _treeFactory.createObjectDefinitionTree(
 			objectDefinition.getObjectDefinitionId(),
-			objectDefinitionPersistence::findByPrimaryKey);
+			objectDefinitionPersistence::findByPrimaryKey,
+			_objectRelationshipPersistence::findByODI1_E);
 
 		Iterator<Node> iterator = tree.iterator(
 			objectDefinition.getObjectDefinitionId());

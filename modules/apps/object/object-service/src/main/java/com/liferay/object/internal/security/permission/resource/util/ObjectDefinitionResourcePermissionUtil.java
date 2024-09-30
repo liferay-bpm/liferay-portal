@@ -11,6 +11,7 @@ import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectActionLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.object.tree.Node;
 import com.liferay.object.tree.Tree;
@@ -37,6 +38,7 @@ public class ObjectDefinitionResourcePermissionUtil {
 			ObjectActionLocalService objectActionLocalService,
 			ObjectDefinition objectDefinition,
 			ObjectDefinitionPersistence objectDefinitionPersistence,
+			ObjectRelationshipLocalService objectRelationshipLocalService,
 			PortletLocalService portletLocalService,
 			ResourceActions resourceActions, TreeFactory treeFactory)
 		throws Exception {
@@ -47,7 +49,8 @@ public class ObjectDefinitionResourcePermissionUtil {
 
 		Document document = _readDocument(
 			objectActionLocalService, objectDefinition,
-			objectDefinitionPersistence, treeFactory);
+			objectDefinitionPersistence, objectRelationshipLocalService,
+			treeFactory);
 
 		resourceActions.populateModelResources(document);
 
@@ -69,6 +72,7 @@ public class ObjectDefinitionResourcePermissionUtil {
 			ObjectActionLocalService objectActionLocalService,
 			ObjectDefinition objectDefinition,
 			ObjectDefinitionPersistence objectDefinitionPersistence,
+			ObjectRelationshipLocalService objectRelationshipLocalService,
 			ResourceActions resourceActions, TreeFactory treeFactory)
 		throws Exception {
 
@@ -78,7 +82,8 @@ public class ObjectDefinitionResourcePermissionUtil {
 		if (document == null) {
 			document = _readDocument(
 				objectActionLocalService, objectDefinition,
-				objectDefinitionPersistence, treeFactory);
+				objectDefinitionPersistence, objectRelationshipLocalService,
+				treeFactory);
 		}
 
 		resourceActions.removeModelResources(document);
@@ -140,6 +145,7 @@ public class ObjectDefinitionResourcePermissionUtil {
 	private static String _getRootDescendantNodeObjectDefinitionsModelResources(
 			ObjectActionLocalService objectActionLocalService,
 			ObjectDefinitionPersistence objectDefinitionPersistence,
+			ObjectRelationshipLocalService objectRelationshipLocalService,
 			ObjectDefinition rootNodeObjectDefinition, TreeFactory treeFactory)
 		throws Exception {
 
@@ -147,7 +153,8 @@ public class ObjectDefinitionResourcePermissionUtil {
 
 		Tree tree = treeFactory.createObjectDefinitionTree(
 			rootNodeObjectDefinition.getObjectDefinitionId(),
-			objectDefinitionPersistence::findByPrimaryKey);
+			objectDefinitionPersistence::findByPrimaryKey,
+			objectRelationshipLocalService::getObjectRelationships);
 
 		Iterator<Node> iterator = tree.iterator();
 
@@ -188,6 +195,7 @@ public class ObjectDefinitionResourcePermissionUtil {
 			ObjectActionLocalService objectActionLocalService,
 			ObjectDefinition objectDefinition,
 			ObjectDefinitionPersistence objectDefinitionPersistence,
+			ObjectRelationshipLocalService objectRelationshipLocalService,
 			TreeFactory treeFactory)
 		throws Exception {
 
@@ -229,7 +237,8 @@ public class ObjectDefinitionResourcePermissionUtil {
 					objectDefinition.getResourceName(),
 					_getRootDescendantNodeObjectDefinitionsModelResources(
 						objectActionLocalService, objectDefinitionPersistence,
-						objectDefinition, treeFactory)
+						objectRelationshipLocalService, objectDefinition,
+						treeFactory)
 				}));
 	}
 

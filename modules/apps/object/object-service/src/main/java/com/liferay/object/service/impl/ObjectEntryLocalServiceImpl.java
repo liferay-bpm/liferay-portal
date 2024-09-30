@@ -4280,7 +4280,8 @@ public class ObjectEntryLocalServiceImpl
 
 		Tree objectDefinitionTree = treeFactory.createObjectDefinitionTree(
 			objectDefinition.getRootObjectDefinitionId(),
-			_objectDefinitionPersistence::findByPrimaryKey);
+			_objectDefinitionPersistence::findByPrimaryKey,
+			_objectRelationshipPersistence::findByODI1_E);
 
 		Node objectDefinitionNode = objectDefinitionTree.getNode(
 			objectDefinition.getObjectDefinitionId());
@@ -4302,7 +4303,8 @@ public class ObjectEntryLocalServiceImpl
 			(objectEntry.getRootObjectEntryId() != 0)) {
 
 			Tree objectEntryTree = treeFactory.createObjectEntryTree(
-				objectEntry.getObjectEntryId());
+				objectEntry.getObjectEntryId(),
+				_objectRelationshipPersistence::findByODI1_E);
 
 			Iterator<Node> iterator = objectEntryTree.iterator();
 

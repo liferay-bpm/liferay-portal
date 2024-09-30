@@ -105,7 +105,8 @@ public class TreeTestUtil {
 
 		return treeFactory.createObjectDefinitionTree(
 			objectDefinitionA.getObjectDefinitionId(),
-			objectDefinitionLocalService::getObjectDefinition);
+			objectDefinitionLocalService::getObjectDefinition,
+			objectRelationshipLocalService::getObjectRelationships);
 	}
 
 	public static Tree createObjectEntryTree(
@@ -120,7 +121,8 @@ public class TreeTestUtil {
 
 		Tree objectDefinitionTree = treeFactory.createObjectDefinitionTree(
 			rootObjectDefinitionId,
-			objectDefinitionLocalService::getObjectDefinition);
+			objectDefinitionLocalService::getObjectDefinition,
+			objectRelationshipLocalService::getObjectRelationships);
 
 		Iterator<Node> iterator = objectDefinitionTree.iterator();
 
@@ -176,7 +178,8 @@ public class TreeTestUtil {
 		}
 
 		return treeFactory.createObjectEntryTree(
-			rootObjectEntry.getObjectEntryId());
+			rootObjectEntry.getObjectEntryId(),
+			objectRelationshipLocalService::getObjectRelationships);
 	}
 
 	public static void deleteObjectDefinitionHierarchy(

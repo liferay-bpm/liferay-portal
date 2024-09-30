@@ -14,6 +14,7 @@ import com.liferay.object.tree.Edge;
 import com.liferay.object.tree.Node;
 import com.liferay.object.tree.Tree;
 import com.liferay.object.tree.TreeFactory;
+import com.liferay.petra.function.UnsafeBiFunction;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -38,7 +39,10 @@ public class TreeFactoryImpl implements TreeFactory {
 	public Tree createObjectDefinitionTree(
 			long objectDefinitionId,
 			UnsafeFunction<Long, ObjectDefinition, PortalException>
-				objectDefinitionLookupUnsafeFunction)
+				objectDefinitionLookupUnsafeFunction,
+			UnsafeBiFunction
+				<Long, Boolean, List<ObjectRelationship>, PortalException>
+					objectRelationshipLookupUnsafeBiFunction)
 		throws PortalException {
 
 		ObjectDefinition rootObjectDefinition =
@@ -47,7 +51,7 @@ public class TreeFactoryImpl implements TreeFactory {
 		return _create(
 			objectDefinitionId,
 			node -> TransformUtil.transform(
-				_objectRelationshipLocalService.getObjectRelationships(
+				objectRelationshipLookupUnsafeBiFunction.apply(
 					node.getPrimaryKey(), true),
 				objectRelationship -> {
 					ObjectDefinition objectDefinition2 =
@@ -67,7 +71,11 @@ public class TreeFactoryImpl implements TreeFactory {
 	}
 
 	@Override
-	public Tree createObjectEntryTree(long objectEntryId)
+	public Tree createObjectEntryTree(
+			long objectEntryId,
+			UnsafeBiFunction
+				<Long, Boolean, List<ObjectRelationship>, PortalException>
+					objectRelationshipLookupUnsafeBiFunction)
 		throws PortalException {
 
 		UnsafeFunction<Node, List<Node>, PortalException> unsafeFunction =
@@ -79,7 +87,7 @@ public class TreeFactoryImpl implements TreeFactory {
 				List<Node> childrenNodes = new ArrayList<>();
 
 				for (ObjectRelationship objectRelationship :
-						_objectRelationshipLocalService.getObjectRelationships(
+						objectRelationshipLookupUnsafeBiFunction.apply(
 							parentObjectEntry.getObjectDefinitionId(), true)) {
 
 					childrenNodes.addAll(
