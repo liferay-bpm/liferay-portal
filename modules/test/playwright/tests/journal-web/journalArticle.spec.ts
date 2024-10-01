@@ -18,7 +18,7 @@ import fillAndClickOutside from '../../utils/fillAndClickOutside';
 import getRandomString from '../../utils/getRandomString';
 import addApprovedStructuredContent from '../../utils/structured-content/addApprovedStructuredContent';
 import getBasicWebContentStructureId from '../../utils/structured-content/getBasicWebContentStructureId';
-import {waitForSuccessAlert} from '../../utils/waitForSuccessAlert';
+import {waitForAlert} from '../../utils/waitForAlert';
 import {journalPagesTest} from './fixtures/journalPagesTest';
 import getDataStructureDefinition from './utils/getDataStructureDefinition';
 
@@ -639,10 +639,7 @@ baseTest(
 
 		await journalEditArticlePage.publishButton.click();
 
-		await waitForSuccessAlert(
-			page,
-			`Success:${title} was created successfully.`
-		);
+		await waitForAlert(page, `Success:${title} was created successfully.`);
 
 		await journalPage.goToJournalArticleAction(
 			'Delete Translations',
@@ -663,7 +660,7 @@ baseTest(
 
 		await page.getByRole('button', {name: 'Delete'}).click();
 
-		await waitForSuccessAlert(page);
+		await waitForAlert(page);
 	}
 );
 
@@ -1260,10 +1257,7 @@ baseTest(
 
 		await journalEditArticlePage.publishButton.click();
 
-		await waitForSuccessAlert(
-			page,
-			`Success:${title} was created successfully.`
-		);
+		await waitForAlert(page, `Success:${title} was created successfully.`);
 
 		await page.getByLabel('Close', {exact: true});
 
@@ -1314,10 +1308,7 @@ scheduleTest(
 
 		await page.getByRole('button', {exact: true, name: 'Publish'}).click();
 
-		await waitForSuccessAlert(
-			page,
-			`Success:${title} was created successfully.`
-		);
+		await waitForAlert(page, `Success:${title} was created successfully.`);
 
 		await page.getByLabel(`Actions for ${title}`).waitFor();
 
@@ -1527,10 +1518,7 @@ baseTest(
 
 		await journalEditArticlePage.publishButton.click();
 
-		await waitForSuccessAlert(
-			page,
-			`Success:${title} was created successfully.`
-		);
+		await waitForAlert(page, `Success:${title} was created successfully.`);
 
 		await pagesAdminPage.goto(site.friendlyUrlPath);
 
