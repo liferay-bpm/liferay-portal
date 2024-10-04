@@ -6,11 +6,15 @@
 package com.liferay.object.tree;
 
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * @author Pedro Leite
@@ -58,6 +62,40 @@ public class ObjectDefinitionTreeFactory extends BaseTreeFactory {
 						new Edge(objectRelationship.getObjectRelationshipId()),
 						node, objectRelationship.getObjectDefinitionId2());
 				}));
+	}
+
+	public int getObjectDefinitionTreeHeight(
+		long startObjectDefinitionId, long endObjectDefinitionId) {
+
+		int height = -1;
+
+		Queue<Long> objectDefinitionIds = new LinkedList<>();
+
+		objectDefinitionIds.add(startObjectDefinitionId);
+
+		while (!objectDefinitionIds.isEmpty()) {
+			int size = objectDefinitionIds.size();
+
+			for (int i = 0; i < size; i++) {
+				long objectDefinitionId = objectDefinitionIds.poll();
+
+				if (objectDefinitionId == endObjectDefinitionId) {
+					return height + 1;
+				}
+
+				for (ObjectRelationship objectRelationship :
+						objectRelationshipLocalService.getObjectRelationships(
+							objectDefinitionId, true)) {
+
+					objectDefinitionIds.add(
+						objectRelationship.getObjectDefinitionId2());
+				}
+			}
+
+			height++;
+		}
+
+		return height;
 	}
 
 	private ObjectDefinition _getObjectDefinition(long objectDefinitionId)
