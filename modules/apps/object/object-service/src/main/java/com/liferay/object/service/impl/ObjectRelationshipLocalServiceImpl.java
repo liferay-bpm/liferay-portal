@@ -46,6 +46,7 @@ import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.object.tree.Node;
 import com.liferay.object.tree.ObjectDefinitionTreeFactory;
 import com.liferay.object.tree.Tree;
+import com.liferay.object.tree.constants.TreeConstants;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.expression.Predicate;
@@ -1613,6 +1614,37 @@ public class ObjectRelationshipLocalServiceImpl
 						"object definitions are published so that the object ",
 						"relationship can be an edge to a root context"));
 			}
+		}
+
+		ObjectDefinitionTreeFactory objectDefinitionTreeFactory =
+			new ObjectDefinitionTreeFactory(
+				_objectDefinitionLocalServiceSnapshot.get(),
+				objectRelationshipLocalService);
+
+		int objectDefinition1Height = 0;
+
+		if (objectDefinition1.getRootObjectDefinitionId() != 0) {
+			objectDefinition1Height =
+				objectDefinitionTreeFactory.getObjectDefinitionTreeHeight(
+					objectDefinition1.getRootObjectDefinitionId(),
+					objectDefinition1.getObjectDefinitionId());
+		}
+
+		int objectDefinition2Height = 0;
+
+		if (objectDefinition2.getRootObjectDefinitionId() != 0) {
+			objectDefinition2Height =
+				objectDefinitionTreeFactory.getObjectDefinitionTreeHeight(
+					objectDefinition2.getObjectDefinitionId(), 0);
+		}
+
+		if ((objectDefinition1Height + objectDefinition2Height + 1) >
+				TreeConstants.MAX_HEIGHT) {
+
+			throw new ObjectRelationshipEdgeException(
+				"Unable to bind the object definitions because the maximum " +
+					"height allowed for a root context is " +
+						TreeConstants.MAX_HEIGHT);
 		}
 
 		long objectDefinition2RootObjectDefinitionId =
