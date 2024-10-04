@@ -40,6 +40,7 @@ import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.test.util.ObjectRelationshipTestUtil;
 import com.liferay.object.test.util.TreeTestUtil;
 import com.liferay.object.tree.ObjectDefinitionTreeFactory;
+import com.liferay.object.tree.constants.TreeConstants;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.function.UnsafeBiConsumer;
@@ -842,11 +843,6 @@ public class ObjectRelationshipLocalServiceTest {
 						objectDefinition1.getRootObjectDefinitionId()),
 					_objectDefinitionLocalService));
 
-		TreeTestUtil.deleteObjectDefinitionHierarchy(
-			_objectDefinitionLocalService,
-			new String[] {"C_AAAA", "C_AAA", "C_AA", "C_A"},
-			_objectEntryLocalService);
-
 		// Bind two published object definitions
 
 		ObjectDefinition objectDefinitionB =
@@ -884,6 +880,41 @@ public class ObjectRelationshipLocalServiceTest {
 			() -> _bindObjectDefinitions(
 				objectDefinitionBBB.getObjectDefinitionId(),
 				objectDefinitionB.getObjectDefinitionId()));
+
+		// Unable to bind the object definitions when the height of the
+		// root context would exceed the maximum height allowed
+
+		ObjectDefinition finalObjectDefinitionAAAA = objectDefinitionAAAA;
+
+		AssertUtils.assertFailure(
+			ObjectRelationshipEdgeException.class,
+			"Unable to bind the object definitions because the maximum " +
+				"height allowed for a root context is " +
+					TreeConstants.MAX_HEIGHT,
+			() -> _bindObjectDefinitions(
+				finalObjectDefinitionAAAA.getObjectDefinitionId(),
+				objectDefinitionB.getObjectDefinitionId()));
+
+		ObjectDefinition objectDefinitionAAAAA =
+			_addAndPublishCustomObjectDefinition("AAAAA");
+
+		_bindObjectDefinitions(
+			objectDefinitionAAAA.getObjectDefinitionId(),
+			objectDefinitionAAAAA.getObjectDefinitionId());
+
+		AssertUtils.assertFailure(
+			ObjectRelationshipEdgeException.class,
+			"Unable to bind the object definitions because the maximum " +
+				"height allowed for a root context is " +
+					TreeConstants.MAX_HEIGHT,
+			() -> _bindObjectDefinitions(
+				objectDefinitionB.getObjectDefinitionId(),
+				objectDefinitionA.getObjectDefinitionId()));
+
+		TreeTestUtil.deleteObjectDefinitionHierarchy(
+			_objectDefinitionLocalService,
+			new String[] {"C_AAAAA", "C_AAAA", "C_AAA", "C_AA", "C_A"},
+			_objectEntryLocalService);
 
 		// Unable to bind the object definitions when the child object
 		// definition is bound to another object definition
