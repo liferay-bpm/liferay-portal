@@ -763,6 +763,84 @@ public class ObjectRelationshipLocalServiceTest {
 	}
 
 	@Test
+	public void testBindObjectDefinitionsExceedingTreeMaxHeight()
+		throws Exception {
+
+		TreeTestUtil.createObjectDefinitionTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			false,
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AA"}
+			).put(
+				"AA", new String[] {"AAA"}
+			).put(
+				"AAA", new String[] {"AAAA"}
+			).put(
+				"AAAA", new String[] {"AAAAA"}
+			).put(
+				"AAAAA", new String[0]
+			).build());
+
+		ObjectRelationship objectRelationship =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService,
+				_objectDefinitionLocalService.fetchObjectDefinition(
+					TestPropsValues.getCompanyId(), "C_AAAAA"),
+				ObjectDefinitionTestUtil.addCustomObjectDefinition("AAAAAA"));
+
+		AssertUtils.assertFailure(
+			ObjectRelationshipEdgeException.class,
+			"Object relationship cannot be an edge because the tree max " +
+				"height will be exceeded",
+			() -> TreeTestUtil.bind(
+				_objectRelationshipLocalService,
+				Arrays.asList(objectRelationship)));
+	}
+
+	@Test
+	public void testBindObjectDefinitionTreesExceedingTreeMaxHeight()
+		throws Exception {
+
+		TreeTestUtil.createObjectDefinitionTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			false,
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AA"}
+			).put(
+				"AA", new String[] {"AAA"}
+			).put(
+				"AAA", new String[0]
+			).build());
+
+		TreeTestUtil.createObjectDefinitionTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			false,
+			LinkedHashMapBuilder.put(
+				"AAAA", new String[] {"AAAAA"}
+			).put(
+				"AAAAA", new String[] {"AAAAAA"}
+			).put(
+				"AAAAAA", new String[0]
+			).build());
+
+		ObjectRelationship objectRelationship =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService,
+				_objectDefinitionLocalService.fetchObjectDefinition(
+					TestPropsValues.getCompanyId(), "C_AAA"),
+				_objectDefinitionLocalService.fetchObjectDefinition(
+					TestPropsValues.getCompanyId(), "C_AAAA"));
+
+		AssertUtils.assertFailure(
+			ObjectRelationshipEdgeException.class,
+			"Object relationship cannot be an edge because the tree max " +
+				"height will be exceeded",
+			() -> TreeTestUtil.bind(
+				_objectRelationshipLocalService,
+				Arrays.asList(objectRelationship)));
+	}
+
+	@Test
 	public void testBindPublishedObjectDefinitions() throws Exception {
 
 		// Bind a published object definition as a child node in a published
