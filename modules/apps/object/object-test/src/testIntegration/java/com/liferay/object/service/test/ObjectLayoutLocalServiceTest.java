@@ -102,7 +102,8 @@ public class ObjectLayoutLocalServiceTest {
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING,
-						RandomTestUtil.randomString(), StringUtil.randomId())));
+						RandomTestUtil.randomString(),
+						_getRandomStringWithLowerCaseBegin())));
 
 		AssertUtils.assertFailure(
 			ObjectDefinitionModifiableException.class,
@@ -366,7 +367,8 @@ public class ObjectLayoutLocalServiceTest {
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING,
-						RandomTestUtil.randomString(), StringUtil.randomId())));
+						RandomTestUtil.randomString(),
+						_getRandomStringWithLowerCaseBegin())));
 
 		objectLayout = _addObjectLayout();
 
@@ -501,7 +503,7 @@ public class ObjectLayoutLocalServiceTest {
 				ObjectFieldConstants.BUSINESS_TYPE_TEXT, null, null,
 				ObjectFieldConstants.DB_TYPE_STRING, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				false, StringUtil.randomId(),
+				false, _getRandomStringWithLowerCaseBegin(),
 				ObjectFieldConstants.READ_ONLY_FALSE, null, false, false,
 				Collections.emptyList());
 		}
@@ -514,7 +516,7 @@ public class ObjectLayoutLocalServiceTest {
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString())
 				).name(
-					StringUtil.randomId()
+					_getRandomStringWithLowerCaseBegin()
 				).objectDefinitionId(
 					_objectDefinition.getObjectDefinitionId()
 				).required(
@@ -631,6 +633,10 @@ public class ObjectLayoutLocalServiceTest {
 		for (ObjectField objectField : objectFields) {
 			_objectFieldLocalService.deleteObjectField(objectField);
 		}
+	}
+
+	private String _getRandomStringWithLowerCaseBegin() {
+		return StringUtil.randomId(1) + RandomTestUtil.randomString();
 	}
 
 	@DeleteAfterTestRun
