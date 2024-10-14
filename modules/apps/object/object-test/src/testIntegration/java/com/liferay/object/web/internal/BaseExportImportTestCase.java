@@ -42,6 +42,7 @@ import com.liferay.portal.upload.test.util.UploadTestUtil;
 
 import java.util.Objects;
 
+import org.junit.After;
 import org.junit.Before;
 
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -72,6 +73,17 @@ public abstract class BaseExportImportTestCase {
 			"test-object-definition.default.json");
 		_defaultObjectRelationshipJSON = read(
 			"test-object-relationship.default.json");
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		if (_mockLiferayResourceRequest != null) {
+			_mockLiferayResourceRequest = null;
+		}
+
+		if (_mockLiferayResourceResponse != null) {
+			_mockLiferayResourceResponse = null;
+		}
 	}
 
 	protected JSONObject createOneToManyObjectRelationship(
@@ -143,25 +155,26 @@ public abstract class BaseExportImportTestCase {
 
 		MVCResourceCommand mvcResourceCommand = getMVCResourceCommand();
 
-		MockLiferayResourceRequest mockLiferayResourceRequest =
-			new MockLiferayResourceRequest();
+		_mockLiferayResourceRequest = new MockLiferayResourceRequest();
 
-		mockLiferayResourceRequest.addParameter(
+		_mockLiferayResourceRequest.addParameter(
 			getIdentifierName(), String.valueOf(getId(name)));
-		mockLiferayResourceRequest.setAttribute(
+		_mockLiferayResourceRequest.setAttribute(
 			WebKeys.THEME_DISPLAY, _getThemeDisplay());
 
-		MockLiferayResourceResponse mockLiferayResourceResponse =
-			new MockLiferayResourceResponse();
+		_mockLiferayResourceResponse = new MockLiferayResourceResponse();
 
 		mvcResourceCommand.serveResource(
-			mockLiferayResourceRequest, mockLiferayResourceResponse);
+			_mockLiferayResourceRequest, _mockLiferayResourceResponse);
 
 		JSONAssert.assertEquals(
 			expectedJSON,
 			String.valueOf(
-				mockLiferayResourceResponse.getPortletOutputStream()),
+				_mockLiferayResourceResponse.getPortletOutputStream()),
 			JSONCompareMode.LENIENT);
+
+		_mockLiferayResourceRequest = null;
+		_mockLiferayResourceResponse = null;
 	}
 
 	protected void testFailedImportJSON(
@@ -305,6 +318,8 @@ public abstract class BaseExportImportTestCase {
 	}
 
 	private String _defaultObjectRelationshipJSON;
+	private MockLiferayResourceRequest _mockLiferayResourceRequest;
+	private MockLiferayResourceResponse _mockLiferayResourceResponse;
 
 	@Inject
 	private ObjectDefinitionResource.Factory _objectDefinitionResourceFactory;
