@@ -18,13 +18,12 @@ export const test = mergeTests(
 	apiHelpersTest,
 	featureFlagsTest({
 		'LPS-178052': true,
-		'LPS-193005': true,
 	}),
 	isolatedSiteTest,
 	loginTest()
 );
 
-test('Sort columns', {tag: '@LPS-193005'}, async ({apiHelpers, page, site}) => {
+test('Sort columns', async ({apiHelpers, page, site}) => {
 	let layout: Layout;
 
 	await test.step('Create a content site and the frontend data set sample widget', async () => {
@@ -125,60 +124,54 @@ test('Sort columns', {tag: '@LPS-193005'}, async ({apiHelpers, page, site}) => {
 	});
 });
 
-test(
-	'Assert columns visibility',
-	{tag: '@LPS-193005'},
-	async ({apiHelpers, page, site}) => {
-		let layout: Layout;
+test('Assert columns visibility', async ({apiHelpers, page, site}) => {
+	let layout: Layout;
 
-		await test.step('Create a content site and the frontend data set sample widget', async () => {
-			const widgetDefinition = getWidgetDefinition({
-				id: getRandomString(),
-				widgetName:
-					'com_liferay_frontend_data_set_sample_web_internal_portlet_FDSSamplePortlet',
-			});
-
-			layout = await apiHelpers.headlessDelivery.createSitePage({
-				pageDefinition: getPageDefinition([widgetDefinition]),
-				siteId: site.id,
-				title: getRandomString(),
-			});
+	await test.step('Create a content site and the frontend data set sample widget', async () => {
+		const widgetDefinition = getWidgetDefinition({
+			id: getRandomString(),
+			widgetName:
+				'com_liferay_frontend_data_set_sample_web_internal_portlet_FDSSamplePortlet',
 		});
 
-		await test.step('Select Customized tab ', async () => {
-			await page.goto(
-				`${liferayConfig.environment.baseUrl}/web${site.friendlyUrlPath}${layout.friendlyUrlPath}`
-			);
-
-			const tabHeading = page
-				.getByRole('tablist')
-				.getByText('Customized');
-
-			await expect(tabHeading).toBeInViewport();
-
-			await tabHeading.click();
+		layout = await apiHelpers.headlessDelivery.createSitePage({
+			pageDefinition: getPageDefinition([widgetDefinition]),
+			siteId: site.id,
+			title: getRandomString(),
 		});
+	});
 
-		await test.step('Hide the Title column', async () => {
-			const titleColumnHeader = page
-				.getByRole('columnheader')
-				.getByText('Title');
+	await test.step('Select Customized tab ', async () => {
+		await page.goto(
+			`${liferayConfig.environment.baseUrl}/web${site.friendlyUrlPath}${layout.friendlyUrlPath}`
+		);
 
-			await expect(titleColumnHeader).toBeAttached();
+		const tabHeading = page.getByRole('tablist').getByText('Customized');
 
-			const button = page.getByLabel('Manage Columns Visibility');
+		await expect(tabHeading).toBeInViewport();
 
-			await expect(button).toBeAttached();
+		await tabHeading.click();
+	});
 
-			await button.click();
+	await test.step('Hide the Title column', async () => {
+		const titleColumnHeader = page
+			.getByRole('columnheader')
+			.getByText('Title');
 
-			const titleMenuItem = page.getByRole('menuitem').nth(1);
+		await expect(titleColumnHeader).toBeAttached();
 
-			await titleMenuItem.click();
+		const button = page.getByLabel('Manage Columns Visibility');
 
-			await expect(
-				page.getByRole('columnheader').getByText('Title')
-			).toBeHidden();
-		});
-	}
-);
+		await expect(button).toBeAttached();
+
+		await button.click();
+
+		const titleMenuItem = page.getByRole('menuitem').nth(1);
+
+		await titleMenuItem.click();
+
+		await expect(
+			page.getByRole('columnheader').getByText('Title')
+		).toBeHidden();
+	});
+});
