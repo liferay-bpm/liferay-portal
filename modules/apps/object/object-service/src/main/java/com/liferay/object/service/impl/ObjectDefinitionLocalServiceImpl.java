@@ -1203,9 +1203,10 @@ public class ObjectDefinitionLocalServiceImpl
 				throw new ObjectDefinitionAccountEntryRestrictedException(
 					"Account entry restriction " + errorMessage);
 			}
-			else if (!Objects.equals(
-						objectDefinition.getPanelCategoryKey(),
-						panelCategoryKey)) {
+			else if (Validator.isNotNull(panelCategoryKey) &&
+					 !Objects.equals(
+						 objectDefinition.getPanelCategoryKey(),
+						 panelCategoryKey)) {
 
 				throw new ObjectDefinitionPanelCategoryKeyException(
 					"Panel category key " + errorMessage);
