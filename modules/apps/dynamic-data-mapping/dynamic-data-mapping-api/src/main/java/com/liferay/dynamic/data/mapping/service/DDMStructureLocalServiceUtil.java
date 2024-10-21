@@ -402,6 +402,13 @@ public class DDMStructureLocalServiceUtil {
 		return getService().fetchDDMStructure(structureId);
 	}
 
+	public static DDMStructure fetchDDMStructureByExternalReferenceCode(
+		String externalReferenceCode, long groupId) {
+
+		return getService().fetchDDMStructureByExternalReferenceCode(
+			externalReferenceCode, groupId);
+	}
+
 	/**
 	 * Returns the ddm structure matching the UUID and group.
 	 *
@@ -563,6 +570,14 @@ public class DDMStructureLocalServiceUtil {
 		throws PortalException {
 
 		return getService().getDDMStructure(structureId);
+	}
+
+	public static DDMStructure getDDMStructureByExternalReferenceCode(
+			String externalReferenceCode, long groupId)
+		throws PortalException {
+
+		return getService().getDDMStructureByExternalReferenceCode(
+			externalReferenceCode, groupId);
 	}
 
 	/**

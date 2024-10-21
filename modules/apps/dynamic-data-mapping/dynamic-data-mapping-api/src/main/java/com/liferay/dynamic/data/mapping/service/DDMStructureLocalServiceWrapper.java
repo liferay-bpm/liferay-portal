@@ -439,6 +439,15 @@ public class DDMStructureLocalServiceWrapper
 		return _ddmStructureLocalService.fetchDDMStructure(structureId);
 	}
 
+	@Override
+	public DDMStructure fetchDDMStructureByExternalReferenceCode(
+		String externalReferenceCode, long groupId) {
+
+		return _ddmStructureLocalService.
+			fetchDDMStructureByExternalReferenceCode(
+				externalReferenceCode, groupId);
+	}
+
 	/**
 	 * Returns the ddm structure matching the UUID and group.
 	 *
@@ -616,6 +625,15 @@ public class DDMStructureLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ddmStructureLocalService.getDDMStructure(structureId);
+	}
+
+	@Override
+	public DDMStructure getDDMStructureByExternalReferenceCode(
+			String externalReferenceCode, long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _ddmStructureLocalService.getDDMStructureByExternalReferenceCode(
+			externalReferenceCode, groupId);
 	}
 
 	/**

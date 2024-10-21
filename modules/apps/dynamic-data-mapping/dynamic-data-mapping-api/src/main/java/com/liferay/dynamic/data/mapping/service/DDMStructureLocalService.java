@@ -347,6 +347,10 @@ public interface DDMStructureLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMStructure fetchDDMStructure(long structureId);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public DDMStructure fetchDDMStructureByExternalReferenceCode(
+		String externalReferenceCode, long groupId);
+
 	/**
 	 * Returns the ddm structure matching the UUID and group.
 	 *
@@ -481,6 +485,11 @@ public interface DDMStructureLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMStructure getDDMStructure(long structureId)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public DDMStructure getDDMStructureByExternalReferenceCode(
+			String externalReferenceCode, long groupId)
 		throws PortalException;
 
 	/**
