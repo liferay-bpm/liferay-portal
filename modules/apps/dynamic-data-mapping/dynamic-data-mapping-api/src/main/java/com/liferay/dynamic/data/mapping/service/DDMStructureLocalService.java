@@ -114,6 +114,14 @@ public interface DDMStructureLocalService
 			ServiceContext serviceContext)
 		throws PortalException;
 
+	public DDMStructure addStructure(
+			String externalReferenceCode, long userId, long groupId,
+			long parentStructureId, long classNameId, String structureKey,
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			DDMForm ddmForm, DDMFormLayout ddmFormLayout, String storageType,
+			int type, ServiceContext serviceContext)
+		throws PortalException;
+
 	/**
 	 * Adds the resources to the structure.
 	 *
@@ -254,6 +262,10 @@ public interface DDMStructureLocalService
 	 */
 	public void deleteStructure(
 			long groupId, long classNameId, String structureKey)
+		throws PortalException;
+
+	public void deleteStructureByExternalReferenceCode(
+			String externalReferenceCode, long groupId)
 		throws PortalException;
 
 	/**
@@ -413,6 +425,10 @@ public interface DDMStructureLocalService
 	public DDMStructure fetchStructure(
 		long groupId, long classNameId, String structureKey,
 		boolean includeAncestorStructures);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public DDMStructure fetchStructureByExternalReferenceCode(
+		String externalReferenceCode, long groupId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMStructure fetchStructureByUuidAndGroupId(
@@ -637,6 +653,10 @@ public interface DDMStructureLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DDMStructure> getStructure(
 		long groupId, String name, String description);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public DDMStructure getStructure(String externalReferenceCode, long groupId)
+		throws PortalException;
 
 	@Transactional(enabled = false)
 	public DDMForm getStructureDDMForm(DDMStructure structure)
@@ -1055,6 +1075,14 @@ public interface DDMStructureLocalService
 			String structureKey, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, String definition,
 			ServiceContext serviceContext)
+		throws PortalException;
+
+	@Indexable(type = IndexableType.REINDEX)
+	public DDMStructure updateStructure(
+			String externalReferenceCode, long userId, long structureId,
+			long parentStructureId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, DDMForm ddmForm,
+			DDMFormLayout ddmFormLayout, ServiceContext serviceContext)
 		throws PortalException;
 
 	@Override
