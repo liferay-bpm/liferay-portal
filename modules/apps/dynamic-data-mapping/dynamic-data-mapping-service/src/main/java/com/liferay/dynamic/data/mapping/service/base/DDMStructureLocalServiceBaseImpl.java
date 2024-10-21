@@ -259,6 +259,23 @@ public abstract class DDMStructureLocalServiceBaseImpl
 		return ddmStructurePersistence.fetchByUUID_G(uuid, groupId);
 	}
 
+	@Override
+	public DDMStructure fetchDDMStructureByExternalReferenceCode(
+		String externalReferenceCode, long groupId) {
+
+		return ddmStructurePersistence.fetchByERC_G(
+			externalReferenceCode, groupId);
+	}
+
+	@Override
+	public DDMStructure getDDMStructureByExternalReferenceCode(
+			String externalReferenceCode, long groupId)
+		throws PortalException {
+
+		return ddmStructurePersistence.findByERC_G(
+			externalReferenceCode, groupId);
+	}
+
 	/**
 	 * Returns the ddm structure with the primary key.
 	 *

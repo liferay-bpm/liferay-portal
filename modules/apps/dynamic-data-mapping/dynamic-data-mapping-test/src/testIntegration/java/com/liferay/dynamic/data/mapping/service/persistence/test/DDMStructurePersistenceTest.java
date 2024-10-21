@@ -6,6 +6,7 @@
 package com.liferay.dynamic.data.mapping.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.dynamic.data.mapping.exception.DuplicateDDMStructureExternalReferenceCodeException;
 import com.liferay.dynamic.data.mapping.exception.NoSuchStructureException;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
@@ -126,6 +127,8 @@ public class DDMStructurePersistenceTest {
 
 		newDDMStructure.setUuid(RandomTestUtil.randomString());
 
+		newDDMStructure.setExternalReferenceCode(RandomTestUtil.randomString());
+
 		newDDMStructure.setGroupId(RandomTestUtil.nextLong());
 
 		newDDMStructure.setCompanyId(RandomTestUtil.nextLong());
@@ -175,6 +178,9 @@ public class DDMStructurePersistenceTest {
 			newDDMStructure.getCtCollectionId());
 		Assert.assertEquals(
 			existingDDMStructure.getUuid(), newDDMStructure.getUuid());
+		Assert.assertEquals(
+			existingDDMStructure.getExternalReferenceCode(),
+			newDDMStructure.getExternalReferenceCode());
 		Assert.assertEquals(
 			existingDDMStructure.getStructureId(),
 			newDDMStructure.getStructureId());
@@ -226,6 +232,26 @@ public class DDMStructurePersistenceTest {
 		Assert.assertEquals(
 			Time.getShortTimestamp(existingDDMStructure.getLastPublishDate()),
 			Time.getShortTimestamp(newDDMStructure.getLastPublishDate()));
+	}
+
+	@Test(expected = DuplicateDDMStructureExternalReferenceCodeException.class)
+	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
+		DDMStructure ddmStructure = addDDMStructure();
+
+		DDMStructure newDDMStructure = addDDMStructure();
+
+		newDDMStructure.setGroupId(ddmStructure.getGroupId());
+
+		newDDMStructure = _persistence.update(newDDMStructure);
+
+		Session session = _persistence.getCurrentSession();
+
+		session.evict(newDDMStructure);
+
+		newDDMStructure.setExternalReferenceCode(
+			ddmStructure.getExternalReferenceCode());
+
+		_persistence.update(newDDMStructure);
 	}
 
 	@Test
@@ -352,6 +378,15 @@ public class DDMStructurePersistenceTest {
 	}
 
 	@Test
+	public void testCountByERC_G() throws Exception {
+		_persistence.countByERC_G("", RandomTestUtil.nextLong());
+
+		_persistence.countByERC_G("null", 0L);
+
+		_persistence.countByERC_G((String)null, 0L);
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		DDMStructure newDDMStructure = addDDMStructure();
 
@@ -401,12 +436,12 @@ public class DDMStructurePersistenceTest {
 	protected OrderByComparator<DDMStructure> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
 			"DDMStructure", "mvccVersion", true, "ctCollectionId", true, "uuid",
-			true, "structureId", true, "groupId", true, "companyId", true,
-			"userId", true, "userName", true, "versionUserId", true,
-			"versionUserName", true, "createDate", true, "modifiedDate", true,
-			"parentStructureId", true, "classNameId", true, "structureKey",
-			true, "version", true, "name", true, "storageType", true, "type",
-			true, "lastPublishDate", true);
+			true, "externalReferenceCode", true, "structureId", true, "groupId",
+			true, "companyId", true, "userId", true, "userName", true,
+			"versionUserId", true, "versionUserName", true, "createDate", true,
+			"modifiedDate", true, "parentStructureId", true, "classNameId",
+			true, "structureKey", true, "version", true, "name", true,
+			"storageType", true, "type", true, "lastPublishDate", true);
 	}
 
 	@Test
@@ -699,6 +734,17 @@ public class DDMStructurePersistenceTest {
 			ReflectionTestUtil.invoke(
 				ddmStructure, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "structureKey"));
+
+		Assert.assertEquals(
+			ddmStructure.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				ddmStructure, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
+		Assert.assertEquals(
+			Long.valueOf(ddmStructure.getGroupId()),
+			ReflectionTestUtil.<Long>invoke(
+				ddmStructure, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "groupId"));
 	}
 
 	protected DDMStructure addDDMStructure() throws Exception {
@@ -711,6 +757,8 @@ public class DDMStructurePersistenceTest {
 		ddmStructure.setCtCollectionId(RandomTestUtil.nextLong());
 
 		ddmStructure.setUuid(RandomTestUtil.randomString());
+
+		ddmStructure.setExternalReferenceCode(RandomTestUtil.randomString());
 
 		ddmStructure.setGroupId(RandomTestUtil.nextLong());
 
