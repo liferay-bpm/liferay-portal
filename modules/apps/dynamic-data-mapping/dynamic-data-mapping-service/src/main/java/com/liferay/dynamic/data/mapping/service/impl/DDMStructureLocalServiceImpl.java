@@ -614,6 +614,17 @@ public class DDMStructureLocalServiceImpl
 		ddmStructureLocalService.deleteStructure(structure);
 	}
 
+	@Override
+	public void deleteStructureByExternalReferenceCode(
+			String externalReferenceCode, long groupId)
+		throws PortalException {
+
+		DDMStructure structure = ddmStructurePersistence.findByERC_G(
+			externalReferenceCode, groupId);
+
+		ddmStructureLocalService.deleteStructure(structure);
+	}
+
 	/**
 	 * Deletes all the structures of the group.
 	 *
@@ -728,6 +739,14 @@ public class DDMStructureLocalServiceImpl
 		}
 
 		return null;
+	}
+
+	@Override
+	public DDMStructure fetchStructureByExternalReferenceCode(
+		String externalReferenceCode, long groupId) {
+
+		return ddmStructurePersistence.fetchByERC_G(
+			externalReferenceCode, groupId);
 	}
 
 	@Override
@@ -930,6 +949,14 @@ public class DDMStructureLocalServiceImpl
 		long groupId, String name, String description) {
 
 		return ddmStructurePersistence.findByG_N_D(groupId, name, description);
+	}
+
+	@Override
+	public DDMStructure getStructure(String externalReferenceCode, long groupId)
+		throws PortalException {
+
+		return ddmStructurePersistence.findByERC_G(
+			externalReferenceCode, groupId);
 	}
 
 	@Override
