@@ -1539,12 +1539,9 @@ public class DDMStructureLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMStructure structure = ddmStructurePersistence.findByPrimaryKey(
-			structureId);
-
-		return _updateStructure(
-			userId, parentStructureId, nameMap, descriptionMap, ddmForm,
-			ddmFormLayout, serviceContext, structure);
+		return updateStructure(
+			null, userId, structureId, parentStructureId, nameMap,
+			descriptionMap, ddmForm, ddmFormLayout, serviceContext);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -1594,6 +1591,27 @@ public class DDMStructureLocalServiceImpl
 		_reindexStructure(structure, serviceContext);
 
 		return structure;
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public DDMStructure updateStructure(
+			String externalReferenceCode, long userId, long structureId,
+			long parentStructureId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, DDMForm ddmForm,
+			DDMFormLayout ddmFormLayout, ServiceContext serviceContext)
+		throws PortalException {
+
+		DDMStructure structure = ddmStructurePersistence.findByPrimaryKey(
+			structureId);
+
+		if (externalReferenceCode != null) {
+			structure.setExternalReferenceCode(externalReferenceCode);
+		}
+
+		return _updateStructure(
+			userId, parentStructureId, nameMap, descriptionMap, ddmForm,
+			ddmFormLayout, serviceContext, structure);
 	}
 
 	@Activate
