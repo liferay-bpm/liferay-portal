@@ -96,6 +96,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -143,6 +144,20 @@ public class ObjectRelationshipLocalServiceTest {
 			_objectDefinitionLocalService, _objectRelationshipLocalService);
 		_systemObjectDefinition2 = _addSystemObjectDefinition(
 			"/o/test-endpoint/entries");
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			_modifiableSystemObjectDefinition);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			_objectDefinition1);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			_objectDefinition2);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			_systemObjectDefinition2);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			(ObjectDefinition)_objectDefinitionTreeFactory);
 	}
 
 	@Test
@@ -336,6 +351,7 @@ public class ObjectRelationshipLocalServiceTest {
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
 			objectRelationship);
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 
 		AssertUtils.assertFailure(
 			ObjectRelationshipParameterObjectFieldIdException.class,
@@ -581,6 +597,11 @@ public class ObjectRelationshipLocalServiceTest {
 		// Bind a draft object definition tree to a published object definition
 		// tree
 
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAA);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAAA);
+
 		ObjectDefinition objectDefinitionA =
 			ObjectDefinitionTestUtil.addCustomObjectDefinition("A");
 		objectDefinitionAA = ObjectDefinitionTestUtil.addCustomObjectDefinition(
@@ -628,6 +649,10 @@ public class ObjectRelationshipLocalServiceTest {
 
 		// Bind a published object definition to a draft object definition tree
 
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinitionA);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAA);
+
 		objectDefinitionA = ObjectDefinitionTestUtil.addCustomObjectDefinition(
 			"A");
 		objectDefinitionAA = ObjectDefinitionTestUtil.addCustomObjectDefinition(
@@ -661,6 +686,14 @@ public class ObjectRelationshipLocalServiceTest {
 		TreeTestUtil.deleteObjectDefinitionHierarchy(
 			_objectDefinitionLocalService,
 			new String[] {"C_AAA", "C_AA", "C_A"}, _objectEntryLocalService);
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinitionA);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAA);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAAA);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAAAA);
 	}
 
 	@Test
@@ -721,6 +754,11 @@ public class ObjectRelationshipLocalServiceTest {
 			_objectEntryLocalService);
 
 		// Bind two draft object definition trees
+
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAA);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAAA);
 
 		ObjectDefinition objectDefinitionA =
 			ObjectDefinitionTestUtil.addCustomObjectDefinition("A");
@@ -934,6 +972,13 @@ public class ObjectRelationshipLocalServiceTest {
 			_objectEntryLocalService);
 
 		// Bind two published object definition trees
+
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAA);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAAA);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinitionAAAA);
 
 		ObjectDefinition objectDefinitionA =
 			_addAndPublishCustomObjectDefinition("A");
@@ -1844,6 +1889,20 @@ public class ObjectRelationshipLocalServiceTest {
 			systemObjectRelationship.getLabelMap());
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
+			objectRelationship1);
+		_objectRelationshipLocalService.deleteObjectRelationship(
+			objectRelationship2);
+		_objectRelationshipLocalService.deleteObjectRelationship(
+			objectRelationship3);
+		_objectRelationshipLocalService.deleteObjectRelationship(
+			objectRelationship4);
+		_objectRelationshipLocalService.deleteObjectRelationship(
+			objectRelationship5);
+		_objectRelationshipLocalService.deleteObjectRelationship(
+			objectRelationship6);
+		_objectRelationshipLocalService.deleteObjectRelationship(
+			reverseObjectRelationship);
+		_objectRelationshipLocalService.deleteObjectRelationship(
 			systemObjectRelationship);
 	}
 
@@ -2252,6 +2311,9 @@ public class ObjectRelationshipLocalServiceTest {
 				objectDefinition1.getObjectDefinitionId()),
 			_objectDefinitionLocalService.getObjectDefinition(
 				objectDefinition2.getObjectDefinitionId()));
+
+		_objectRelationshipLocalService.deleteObjectRelationship(
+			objectRelationship);
 	}
 
 	private void _testCreateManyToManyObjectRelationshipTable(
