@@ -17,6 +17,7 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureLayoutLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.spi.converter.SPIDDMFormRuleConverter;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -79,6 +80,11 @@ public class DataDefinitionUtil {
 				setDescription(
 					() -> LocalizedValueUtil.toStringObjectMap(
 						ddmStructure.getDescriptionMap()));
+
+				if (FeatureFlagManagerUtil.isEnabled("LPD-34651")) {
+					setExternalReferenceCode(() -> ddmStructure.getExternalReferenceCode());
+				}
+
 				setId(ddmStructure::getStructureId);
 				setName(
 					() -> LocalizedValueUtil.toStringObjectMap(
