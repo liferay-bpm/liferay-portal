@@ -27,6 +27,7 @@ definition {
 	@description = "Verify that is possible to translate Web Content fields with different Instance language set"
 	@priority = 4
 	test CanBeTranslatedWithDifferentInstanceLanguages {
+		property custom.properties = "feature.flag.LPD-11228=true${line.separator}feature.flag.LPD-15596=true";
 		property test.liferay.virtual.instance = "false";
 		property test.run.type = "single";
 
@@ -49,6 +50,20 @@ definition {
 
 		PortletEntry.publish();
 
+		AssertClick(
+			buttonName = "Publish With Permissions",
+			locator1 = "WCEditWebContent#PUBLISH_WITH_PERMISSIONS_BUTTON",
+			value1 = "Publish With Permissions");
+
+		WaitForElementPresent(
+			locator1 = "Modal#SELECT_WITH_LABEL",
+			selectLabel = "Viewable by");
+
+		AssertClick(
+			buttonName = "Publish",
+			locator1 = "Modal#PRIMARY_BUTTON",
+			value1 = "Publish");
+
 		WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title");
 
 		WebContent.editCP(
@@ -58,7 +73,9 @@ definition {
 
 		WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title pt-BR");
 
-		PortletEntry.changeLocale(locale = "en-US");
+		PortletEntry.changeLocale(
+			locale = "en-US",
+			translated = "true");
 
 		WebContent.editWebContentContent(
 			webContentContentEdit = "WC WebContent Content en-US",
@@ -73,7 +90,9 @@ definition {
 			webContentContent = "WC WebContent Content pt-BR",
 			webContentTitle = "WC WebContent Title pt-BR");
 
-		PortletEntry.changeLocale(locale = "en-US");
+		PortletEntry.changeLocale(
+			locale = "en-US",
+			translated = "true");
 
 		WebContent.viewCP(
 			webContentContent = "WC WebContent Content en-US",
@@ -490,6 +509,8 @@ definition {
 	@description = "Verify that for decimal Numeric fields the decimal separator is adequate to the current locale"
 	@priority = 4
 	test CanDecimalSeparatorBeAdequateWithDifferentLanguages {
+		property custom.properties = "feature.flag.LPD-11228=true${line.separator}feature.flag.LPD-15596=true";
+
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
 
 		NavItem.gotoStructures();
@@ -520,6 +541,20 @@ definition {
 
 		PortletEntry.publish();
 
+		AssertClick(
+			buttonName = "Publish With Permissions",
+			locator1 = "WCEditWebContent#PUBLISH_WITH_PERMISSIONS_BUTTON",
+			value1 = "Publish With Permissions");
+
+		WaitForElementPresent(
+			locator1 = "Modal#SELECT_WITH_LABEL",
+			selectLabel = "Viewable by");
+
+		AssertClick(
+			buttonName = "Publish",
+			locator1 = "Modal#PRIMARY_BUTTON",
+			value1 = "Publish");
+
 		WebContentNavigator.gotoEditCP(webContentTitle = "Test");
 
 		AssertTextEquals.assertValue(
@@ -527,7 +562,9 @@ definition {
 			locator1 = "WCEditWebContent#TEXT_INPUT",
 			value1 = "10.00");
 
-		PortletEntry.changeLocale(locale = "pt-BR");
+		PortletEntry.changeLocale(
+			locale = "pt-BR",
+			translated = "true");
 
 		AssertTextEquals.assertValue(
 			key_fieldFieldLabel = "Numeric",
@@ -1650,7 +1687,9 @@ definition {
 			webContentTextFieldLabel = "Text",
 			webContentTitle = "Web Content Title");
 
-		PortletEntry.changeLocale(locale = "pt-BR");
+		PortletEntry.changeLocale(
+			locale = "pt-BR",
+			translated = "true");
 
 		WebContent.addCP(webContentTitle = "Web Content Title - pt-BR");
 
@@ -1658,7 +1697,9 @@ definition {
 			DataEngine.assertNonLocalizableField(fieldFieldName = ${fieldFieldLabel});
 		}
 
-		PortletEntry.changeLocale(locale = "zh-CN");
+		PortletEntry.changeLocale(
+			locale = "zh-CN",
+			translated = "true");
 
 		WebContent.addCP(webContentTitle = "Web Content Title - zh-CN");
 
@@ -1720,7 +1761,9 @@ definition {
 
 		FormFields.assertFieldsGroup(fieldName = "Fields Group");
 
-		PortletEntry.changeLocale(locale = "pt-BR");
+		PortletEntry.changeLocale(
+			locale = "pt-BR",
+			translated = "true");
 
 		WebContent.addCP(webContentTitle = "Web Content Title - pt-BR");
 
@@ -1730,7 +1773,9 @@ definition {
 			DataEngine.assertNonLocalizableField(fieldFieldName = ${fieldFieldLabel});
 		}
 
-		PortletEntry.changeLocale(locale = "zh-CN");
+		PortletEntry.changeLocale(
+			locale = "zh-CN",
+			translated = "true");
 
 		WebContent.addCP(webContentTitle = "Web Content Title - zh-CN");
 

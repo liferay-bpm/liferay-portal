@@ -495,6 +495,8 @@ definition {
 	@description = "This is a test for LPS-123539. As Content Creator, I want to leverage the structures’ translations with fieldset when creating a new Web Content"
 	@priority = 4
 	test DefaultTitleIsDisplayedUponLocaleChange {
+		property custom.properties = "feature.flag.LPD-11228=true${line.separator}feature.flag.LPD-15596=true";
+
 		NavItem.gotoStructures();
 
 		WebContentStructures.addCP(
@@ -516,21 +518,41 @@ definition {
 
 		PortletEntry.inputTitle(title = "WC Title");
 
-		PortletEntry.changeLocale(locale = "zh-CN");
+		PortletEntry.changeLocale(
+			locale = "zh-CN",
+			translated = "true");
 
 		PortletEntry.inputTitle(title = "测试标题");
 
 		PortletEntry.publish();
 
+		AssertClick(
+			buttonName = "Publish With Permissions",
+			locator1 = "WCEditWebContent#PUBLISH_WITH_PERMISSIONS_BUTTON",
+			value1 = "Publish With Permissions");
+
+		WaitForElementPresent(
+			locator1 = "Modal#SELECT_WITH_LABEL",
+			selectLabel = "Viewable by");
+
+		AssertClick(
+			buttonName = "Publish",
+			locator1 = "Modal#PRIMARY_BUTTON",
+			value1 = "Publish");
+
 		WebContentNavigator.gotoEditCP(webContentTitle = "WC Title");
 
-		PortletEntry.changeLocale(locale = "pt-BR");
+		PortletEntry.changeLocale(
+			locale = "pt-BR",
+			translated = "true");
 
 		AssertTextEquals(
 			locator1 = "TextInput#TITLE",
 			value1 = "WC Title");
 
-		PortletEntry.changeLocale(locale = "es-ES");
+		PortletEntry.changeLocale(
+			locale = "es-ES",
+			translated = "true");
 
 		AssertTextEquals(
 			locator1 = "TextInput#TITLE",
