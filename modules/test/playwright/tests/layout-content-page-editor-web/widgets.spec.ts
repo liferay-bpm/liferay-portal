@@ -82,7 +82,7 @@ test('It is not possible to drag a widget inside a Form Container', async ({
 		ObjectAdminRestClient
 	);
 
-	const {id: objectDefinitionId} =
+	const {className: objectDefinitionClassName} =
 		await objectAdminRestClient.objectDefinition.getObjectDefinitionByExternalReferenceCode(
 			{
 				externalReferenceCode: LEMON_OBJECT_ERC,
@@ -103,7 +103,7 @@ test('It is not possible to drag a widget inside a Form Container', async ({
 
 	const formDefinition = getFormContainerDefinition({
 		id: formId,
-		objectDefinitionId,
+		objectDefinitionClassName,
 		pageElements: [],
 	});
 
