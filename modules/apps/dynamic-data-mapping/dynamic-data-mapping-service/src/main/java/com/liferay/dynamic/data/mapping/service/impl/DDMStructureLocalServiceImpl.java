@@ -8,6 +8,7 @@ package com.liferay.dynamic.data.mapping.service.impl;
 import com.liferay.depot.group.provider.SiteConnectedGroupGroupProvider;
 import com.liferay.dynamic.data.mapping.constants.DDMStructureConstants;
 import com.liferay.dynamic.data.mapping.constants.DDMTemplateConstants;
+import com.liferay.dynamic.data.mapping.exception.DuplicateDDMStructureExternalReferenceCodeException;
 import com.liferay.dynamic.data.mapping.exception.InvalidParentStructureException;
 import com.liferay.dynamic.data.mapping.exception.InvalidStructureVersionException;
 import com.liferay.dynamic.data.mapping.exception.NoSuchStructureException;
@@ -287,8 +288,8 @@ public class DDMStructureLocalServiceImpl
 		}
 
 		_validate(
-			groupId, parentStructureId, classNameId, structureKey, nameMap,
-			ddmForm);
+			externalReferenceCode, groupId, parentStructureId, classNameId,
+			structureKey, nameMap, ddmForm);
 
 		DDMStructure structure = _addStructure(
 			externalReferenceCode, user, groupId, parentStructureId,
@@ -616,16 +617,16 @@ public class DDMStructureLocalServiceImpl
 	}
 
 	@Override
-	public void deleteStructureByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
+	public void deleteStructure(
+			String externalReferenceCode, long groupId, long classNameId)
 		throws PortalException {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-34651")) {
 			throw new UnsupportedOperationException();
 		}
 
-		DDMStructure structure = ddmStructurePersistence.findByERC_G(
-			externalReferenceCode, groupId);
+		DDMStructure structure = ddmStructurePersistence.findByERC_G_C(
+			externalReferenceCode, groupId, classNameId);
 
 		ddmStructureLocalService.deleteStructure(structure);
 	}
@@ -747,15 +748,15 @@ public class DDMStructureLocalServiceImpl
 	}
 
 	@Override
-	public DDMStructure fetchStructureByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
+	public DDMStructure fetchStructure(
+		String externalReferenceCode, long groupId, long classNameId) {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-34651")) {
 			throw new UnsupportedOperationException();
 		}
 
-		return ddmStructurePersistence.fetchByERC_G(
-			externalReferenceCode, groupId);
+		return ddmStructurePersistence.fetchByERC_G_C(
+			externalReferenceCode, groupId, classNameId);
 	}
 
 	@Override
@@ -961,15 +962,16 @@ public class DDMStructureLocalServiceImpl
 	}
 
 	@Override
-	public DDMStructure getStructure(String externalReferenceCode, long groupId)
+	public DDMStructure getStructure(
+			String externalReferenceCode, long groupId, long classNameId)
 		throws PortalException {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-34651")) {
 			throw new UnsupportedOperationException();
 		}
 
-		return ddmStructurePersistence.findByERC_G(
-			externalReferenceCode, groupId);
+		return ddmStructurePersistence.findByERC_G_C(
+			externalReferenceCode, groupId, classNameId);
 	}
 
 	@Override
@@ -1579,9 +1581,12 @@ public class DDMStructureLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		return updateStructure(
-			null, userId, structureId, parentStructureId, nameMap,
-			descriptionMap, ddmForm, ddmFormLayout, serviceContext);
+		DDMStructure structure = ddmStructurePersistence.findByPrimaryKey(
+			structureId);
+
+		return _updateStructure(
+			userId, parentStructureId, nameMap, descriptionMap, ddmForm,
+			ddmFormLayout, serviceContext, structure);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -1636,10 +1641,11 @@ public class DDMStructureLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public DDMStructure updateStructure(
-			String externalReferenceCode, long userId, long structureId,
-			long parentStructureId, Map<Locale, String> nameMap,
-			Map<Locale, String> descriptionMap, DDMForm ddmForm,
-			DDMFormLayout ddmFormLayout, ServiceContext serviceContext)
+			String externalReferenceCode, long userId, long groupId,
+			long structureId, long parentStructureId, long classNameId,
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			DDMForm ddmForm, DDMFormLayout ddmFormLayout,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		DDMStructure structure = ddmStructurePersistence.findByPrimaryKey(
@@ -1649,6 +1655,9 @@ public class DDMStructureLocalServiceImpl
 			if (!FeatureFlagManagerUtil.isEnabled("LPD-34651")) {
 				throw new UnsupportedOperationException();
 			}
+
+			_validateExternalReferenceCode(
+				externalReferenceCode, groupId, classNameId);
 
 			structure.setExternalReferenceCode(externalReferenceCode);
 		}
@@ -2356,6 +2365,31 @@ public class DDMStructureLocalServiceImpl
 				_language.getAvailableLocales());
 
 			throw localeException;
+		}
+	}
+
+	private void _validate(
+			String externalReferenceCode, long groupId, long parentStructureId,
+			long classNameId, String structureKey, Map<Locale, String> nameMap,
+			DDMForm ddmForm)
+		throws PortalException {
+
+		_validateExternalReferenceCode(
+			externalReferenceCode, groupId, classNameId);
+
+		_validate(
+			groupId, parentStructureId, classNameId, structureKey, nameMap,
+			ddmForm);
+	}
+
+	private void _validateExternalReferenceCode(
+		String externalReferenceCode, long groupId, long classNameId) {
+
+		DDMStructure structure = ddmStructurePersistence.fetchByERC_G_C(
+			externalReferenceCode, groupId, classNameId);
+
+		if (structure != null) {
+			throw new DuplicateDDMStructureExternalReferenceCodeException();
 		}
 	}
 
