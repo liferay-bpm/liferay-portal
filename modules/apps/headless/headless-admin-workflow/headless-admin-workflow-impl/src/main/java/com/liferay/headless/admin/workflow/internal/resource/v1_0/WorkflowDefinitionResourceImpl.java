@@ -346,7 +346,8 @@ public class WorkflowDefinitionResourceImpl
 				setDateCreated(workflowDefinition::getCreateDate);
 				setDateModified(workflowDefinition::getModifiedDate);
 				setDescription(workflowDefinition::getDescription);
-				setExternalReferenceCode(workflowDefinition::getExternalReferenceCode);
+				setExternalReferenceCode(
+					workflowDefinition::getExternalReferenceCode);
 				setId(workflowDefinition::getWorkflowDefinitionId);
 				setName(workflowDefinition::getName);
 				setNodes(
