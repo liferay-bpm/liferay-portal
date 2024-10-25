@@ -171,6 +171,11 @@ public class ServletDataImpl implements ServletData {
 							WorkflowDefinitionResourceImpl.class,
 							"putWorkflowDefinitionBatch"));
 					put(
+						"mutation#createWorkflowDefinitionLinkByExternalReferenceCode",
+						new ObjectValuePair<>(
+							WorkflowDefinitionLinkResourceImpl.class,
+							"postWorkflowDefinitionLinkByExternalReferenceCode"));
+					put(
 						"mutation#createWorkflowDefinitionLink",
 						new ObjectValuePair<>(
 							WorkflowDefinitionLinkResourceImpl.class,
@@ -301,6 +306,11 @@ public class ServletDataImpl implements ServletData {
 						new ObjectValuePair<>(
 							WorkflowDefinitionResourceImpl.class,
 							"getWorkflowDefinition"));
+					put(
+						"query#workflowDefinitionLinksByExternalReferenceCode",
+						new ObjectValuePair<>(
+							WorkflowDefinitionLinkResourceImpl.class,
+							"getWorkflowDefinitionLinksByExternalReferenceCode"));
 					put(
 						"query#workflowDefinitionLinks",
 						new ObjectValuePair<>(
