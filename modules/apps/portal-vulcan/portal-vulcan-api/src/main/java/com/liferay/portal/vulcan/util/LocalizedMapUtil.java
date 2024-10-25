@@ -249,6 +249,17 @@ public class LocalizedMapUtil {
 
 		i18nMap = new HashMap<>(i18nMap);
 
+		for (Map.Entry<String, String> entry : i18nMap.entrySet()) {
+			String languageId = entry.getKey();
+
+			i18nMap.remove(languageId);
+
+			i18nMap.put(
+				LocaleUtil.toLanguageId(
+					LocaleUtil.fromLanguageId(languageId, false, false)),
+				entry.getValue());
+		}
+
 		i18nMap.putIfAbsent(
 			siteDefaultLanguageId,
 			MapUtil.getString(i18nMap, defaultLanguageId, siteDefaultValue));
