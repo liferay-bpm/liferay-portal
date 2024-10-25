@@ -5,10 +5,14 @@
 
 package com.liferay.portal.vulcan.util;
 
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Collections;
@@ -248,6 +252,17 @@ public class LocalizedMapUtil {
 		}
 
 		i18nMap = new HashMap<>(i18nMap);
+
+		for (Map.Entry<String, String> entry : i18nMap.entrySet()) {
+			String languageId = entry.getKey();
+
+			i18nMap.remove(languageId);
+
+			i18nMap.put(
+				StringUtil.replace(
+					languageId, CharPool.MINUS, CharPool.UNDERLINE),
+				entry.getValue());
+		}
 
 		i18nMap.putIfAbsent(
 			siteDefaultLanguageId,
