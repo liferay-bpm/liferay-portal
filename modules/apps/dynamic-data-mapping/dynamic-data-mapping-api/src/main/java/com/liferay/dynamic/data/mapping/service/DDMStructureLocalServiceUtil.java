@@ -309,12 +309,12 @@ public class DDMStructureLocalServiceUtil {
 		getService().deleteStructure(groupId, classNameId, structureKey);
 	}
 
-	public static void deleteStructureByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
+	public static void deleteStructure(
+			String externalReferenceCode, long groupId, long classNameId)
 		throws PortalException {
 
-		getService().deleteStructureByExternalReferenceCode(
-			externalReferenceCode, groupId);
+		getService().deleteStructure(
+			externalReferenceCode, groupId, classNameId);
 	}
 
 	/**
@@ -427,13 +427,6 @@ public class DDMStructureLocalServiceUtil {
 		return getService().fetchDDMStructure(structureId);
 	}
 
-	public static DDMStructure fetchDDMStructureByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
-
-		return getService().fetchDDMStructureByExternalReferenceCode(
-			externalReferenceCode, groupId);
-	}
-
 	/**
 	 * Returns the ddm structure matching the UUID and group.
 	 *
@@ -505,11 +498,11 @@ public class DDMStructureLocalServiceUtil {
 			groupId, classNameId, structureKey, includeAncestorStructures);
 	}
 
-	public static DDMStructure fetchStructureByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
+	public static DDMStructure fetchStructure(
+		String externalReferenceCode, long groupId, long classNameId) {
 
-		return getService().fetchStructureByExternalReferenceCode(
-			externalReferenceCode, groupId);
+		return getService().fetchStructure(
+			externalReferenceCode, groupId, classNameId);
 	}
 
 	public static DDMStructure fetchStructureByUuidAndGroupId(
@@ -602,14 +595,6 @@ public class DDMStructureLocalServiceUtil {
 		throws PortalException {
 
 		return getService().getDDMStructure(structureId);
-	}
-
-	public static DDMStructure getDDMStructureByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
-		throws PortalException {
-
-		return getService().getDDMStructureByExternalReferenceCode(
-			externalReferenceCode, groupId);
 	}
 
 	/**
@@ -789,10 +774,11 @@ public class DDMStructureLocalServiceUtil {
 	}
 
 	public static DDMStructure getStructure(
-			String externalReferenceCode, long groupId)
+			String externalReferenceCode, long groupId, long classNameId)
 		throws PortalException {
 
-		return getService().getStructure(externalReferenceCode, groupId);
+		return getService().getStructure(
+			externalReferenceCode, groupId, classNameId);
 	}
 
 	public static com.liferay.dynamic.data.mapping.model.DDMForm
@@ -1313,8 +1299,9 @@ public class DDMStructureLocalServiceUtil {
 	}
 
 	public static DDMStructure updateStructure(
-			String externalReferenceCode, long userId, long structureId,
-			long parentStructureId, Map<java.util.Locale, String> nameMap,
+			String externalReferenceCode, long userId, long groupId,
+			long structureId, long parentStructureId, long classNameId,
+			Map<java.util.Locale, String> nameMap,
 			Map<java.util.Locale, String> descriptionMap,
 			com.liferay.dynamic.data.mapping.model.DDMForm ddmForm,
 			com.liferay.dynamic.data.mapping.model.DDMFormLayout ddmFormLayout,
@@ -1322,8 +1309,9 @@ public class DDMStructureLocalServiceUtil {
 		throws PortalException {
 
 		return getService().updateStructure(
-			externalReferenceCode, userId, structureId, parentStructureId,
-			nameMap, descriptionMap, ddmForm, ddmFormLayout, serviceContext);
+			externalReferenceCode, userId, groupId, structureId,
+			parentStructureId, classNameId, nameMap, descriptionMap, ddmForm,
+			ddmFormLayout, serviceContext);
 	}
 
 	public static DDMStructureLocalService getService() {

@@ -1736,6 +1736,66 @@ public interface DDMStructurePersistence
 	public int countByC_C(long companyId, long classNameId);
 
 	/**
+	 * Returns the ddm structure where externalReferenceCode = &#63; and groupId = &#63; and classNameId = &#63; or throws a <code>NoSuchStructureException</code> if it could not be found.
+	 *
+	 * @param externalReferenceCode the external reference code
+	 * @param groupId the group ID
+	 * @param classNameId the class name ID
+	 * @return the matching ddm structure
+	 * @throws NoSuchStructureException if a matching ddm structure could not be found
+	 */
+	public DDMStructure findByERC_G_C(
+			String externalReferenceCode, long groupId, long classNameId)
+		throws NoSuchStructureException;
+
+	/**
+	 * Returns the ddm structure where externalReferenceCode = &#63; and groupId = &#63; and classNameId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param externalReferenceCode the external reference code
+	 * @param groupId the group ID
+	 * @param classNameId the class name ID
+	 * @return the matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
+	 */
+	public DDMStructure fetchByERC_G_C(
+		String externalReferenceCode, long groupId, long classNameId);
+
+	/**
+	 * Returns the ddm structure where externalReferenceCode = &#63; and groupId = &#63; and classNameId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param externalReferenceCode the external reference code
+	 * @param groupId the group ID
+	 * @param classNameId the class name ID
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
+	 */
+	public DDMStructure fetchByERC_G_C(
+		String externalReferenceCode, long groupId, long classNameId,
+		boolean useFinderCache);
+
+	/**
+	 * Removes the ddm structure where externalReferenceCode = &#63; and groupId = &#63; and classNameId = &#63; from the database.
+	 *
+	 * @param externalReferenceCode the external reference code
+	 * @param groupId the group ID
+	 * @param classNameId the class name ID
+	 * @return the ddm structure that was removed
+	 */
+	public DDMStructure removeByERC_G_C(
+			String externalReferenceCode, long groupId, long classNameId)
+		throws NoSuchStructureException;
+
+	/**
+	 * Returns the number of ddm structures where externalReferenceCode = &#63; and groupId = &#63; and classNameId = &#63;.
+	 *
+	 * @param externalReferenceCode the external reference code
+	 * @param groupId the group ID
+	 * @param classNameId the class name ID
+	 * @return the number of matching ddm structures
+	 */
+	public int countByERC_G_C(
+		String externalReferenceCode, long groupId, long classNameId);
+
+	/**
 	 * Returns the ddm structure where groupId = &#63; and classNameId = &#63; and structureKey = &#63; or throws a <code>NoSuchStructureException</code> if it could not be found.
 	 *
 	 * @param groupId the group ID
@@ -2461,58 +2521,6 @@ public interface DDMStructurePersistence
 	 */
 	public int filterCountByG_C_N_D(
 		long[] groupIds, long classNameId, String name, String description);
-
-	/**
-	 * Returns the ddm structure where externalReferenceCode = &#63; and groupId = &#63; or throws a <code>NoSuchStructureException</code> if it could not be found.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the matching ddm structure
-	 * @throws NoSuchStructureException if a matching ddm structure could not be found
-	 */
-	public DDMStructure findByERC_G(String externalReferenceCode, long groupId)
-		throws NoSuchStructureException;
-
-	/**
-	 * Returns the ddm structure where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
-	 */
-	public DDMStructure fetchByERC_G(
-		String externalReferenceCode, long groupId);
-
-	/**
-	 * Returns the ddm structure where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching ddm structure, or <code>null</code> if a matching ddm structure could not be found
-	 */
-	public DDMStructure fetchByERC_G(
-		String externalReferenceCode, long groupId, boolean useFinderCache);
-
-	/**
-	 * Removes the ddm structure where externalReferenceCode = &#63; and groupId = &#63; from the database.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the ddm structure that was removed
-	 */
-	public DDMStructure removeByERC_G(
-			String externalReferenceCode, long groupId)
-		throws NoSuchStructureException;
-
-	/**
-	 * Returns the number of ddm structures where externalReferenceCode = &#63; and groupId = &#63;.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the number of matching ddm structures
-	 */
-	public int countByERC_G(String externalReferenceCode, long groupId);
 
 	/**
 	 * Caches the ddm structure in the entity cache if it is enabled.

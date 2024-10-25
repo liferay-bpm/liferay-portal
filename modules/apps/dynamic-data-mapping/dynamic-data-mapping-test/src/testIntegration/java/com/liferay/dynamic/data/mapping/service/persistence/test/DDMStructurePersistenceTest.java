@@ -6,7 +6,6 @@
 package com.liferay.dynamic.data.mapping.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.dynamic.data.mapping.exception.DuplicateDDMStructureExternalReferenceCodeException;
 import com.liferay.dynamic.data.mapping.exception.NoSuchStructureException;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
@@ -234,26 +233,6 @@ public class DDMStructurePersistenceTest {
 			Time.getShortTimestamp(newDDMStructure.getLastPublishDate()));
 	}
 
-	@Test(expected = DuplicateDDMStructureExternalReferenceCodeException.class)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		DDMStructure ddmStructure = addDDMStructure();
-
-		DDMStructure newDDMStructure = addDDMStructure();
-
-		newDDMStructure.setGroupId(ddmStructure.getGroupId());
-
-		newDDMStructure = _persistence.update(newDDMStructure);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newDDMStructure);
-
-		newDDMStructure.setExternalReferenceCode(
-			ddmStructure.getExternalReferenceCode());
-
-		_persistence.update(newDDMStructure);
-	}
-
 	@Test
 	public void testCountByUuid() throws Exception {
 		_persistence.countByUuid("");
@@ -341,6 +320,16 @@ public class DDMStructurePersistenceTest {
 	}
 
 	@Test
+	public void testCountByERC_G_C() throws Exception {
+		_persistence.countByERC_G_C(
+			"", RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
+
+		_persistence.countByERC_G_C("null", 0L, 0L);
+
+		_persistence.countByERC_G_C((String)null, 0L, 0L);
+	}
+
+	@Test
 	public void testCountByG_C_S() throws Exception {
 		_persistence.countByG_C_S(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(), "");
@@ -375,15 +364,6 @@ public class DDMStructurePersistenceTest {
 			new long[] {RandomTestUtil.nextLong(), 0L},
 			RandomTestUtil.nextLong(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString());
-	}
-
-	@Test
-	public void testCountByERC_G() throws Exception {
-		_persistence.countByERC_G("", RandomTestUtil.nextLong());
-
-		_persistence.countByERC_G("null", 0L);
-
-		_persistence.countByERC_G((String)null, 0L);
 	}
 
 	@Test
@@ -720,6 +700,22 @@ public class DDMStructurePersistenceTest {
 				new Class<?>[] {String.class}, "groupId"));
 
 		Assert.assertEquals(
+			ddmStructure.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				ddmStructure, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
+		Assert.assertEquals(
+			Long.valueOf(ddmStructure.getGroupId()),
+			ReflectionTestUtil.<Long>invoke(
+				ddmStructure, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "groupId"));
+		Assert.assertEquals(
+			Long.valueOf(ddmStructure.getClassNameId()),
+			ReflectionTestUtil.<Long>invoke(
+				ddmStructure, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "classNameId"));
+
+		Assert.assertEquals(
 			Long.valueOf(ddmStructure.getGroupId()),
 			ReflectionTestUtil.<Long>invoke(
 				ddmStructure, "getColumnOriginalValue",
@@ -734,17 +730,6 @@ public class DDMStructurePersistenceTest {
 			ReflectionTestUtil.invoke(
 				ddmStructure, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "structureKey"));
-
-		Assert.assertEquals(
-			ddmStructure.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				ddmStructure, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
-			Long.valueOf(ddmStructure.getGroupId()),
-			ReflectionTestUtil.<Long>invoke(
-				ddmStructure, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "groupId"));
 	}
 
 	protected DDMStructure addDDMStructure() throws Exception {

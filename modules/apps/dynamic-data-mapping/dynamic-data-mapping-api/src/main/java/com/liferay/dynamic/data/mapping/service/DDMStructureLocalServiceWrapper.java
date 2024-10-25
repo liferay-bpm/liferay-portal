@@ -326,12 +326,12 @@ public class DDMStructureLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteStructureByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
+	public void deleteStructure(
+			String externalReferenceCode, long groupId, long classNameId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		_ddmStructureLocalService.deleteStructureByExternalReferenceCode(
-			externalReferenceCode, groupId);
+		_ddmStructureLocalService.deleteStructure(
+			externalReferenceCode, groupId, classNameId);
 	}
 
 	/**
@@ -466,15 +466,6 @@ public class DDMStructureLocalServiceWrapper
 		return _ddmStructureLocalService.fetchDDMStructure(structureId);
 	}
 
-	@Override
-	public DDMStructure fetchDDMStructureByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
-
-		return _ddmStructureLocalService.
-			fetchDDMStructureByExternalReferenceCode(
-				externalReferenceCode, groupId);
-	}
-
 	/**
 	 * Returns the ddm structure matching the UUID and group.
 	 *
@@ -553,11 +544,11 @@ public class DDMStructureLocalServiceWrapper
 	}
 
 	@Override
-	public DDMStructure fetchStructureByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
+	public DDMStructure fetchStructure(
+		String externalReferenceCode, long groupId, long classNameId) {
 
-		return _ddmStructureLocalService.fetchStructureByExternalReferenceCode(
-			externalReferenceCode, groupId);
+		return _ddmStructureLocalService.fetchStructure(
+			externalReferenceCode, groupId, classNameId);
 	}
 
 	@Override
@@ -660,15 +651,6 @@ public class DDMStructureLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ddmStructureLocalService.getDDMStructure(structureId);
-	}
-
-	@Override
-	public DDMStructure getDDMStructureByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddmStructureLocalService.getDDMStructureByExternalReferenceCode(
-			externalReferenceCode, groupId);
 	}
 
 	/**
@@ -867,11 +849,12 @@ public class DDMStructureLocalServiceWrapper
 	}
 
 	@Override
-	public DDMStructure getStructure(String externalReferenceCode, long groupId)
+	public DDMStructure getStructure(
+			String externalReferenceCode, long groupId, long classNameId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ddmStructureLocalService.getStructure(
-			externalReferenceCode, groupId);
+			externalReferenceCode, groupId, classNameId);
 	}
 
 	@Override
@@ -1444,8 +1427,8 @@ public class DDMStructureLocalServiceWrapper
 
 	@Override
 	public DDMStructure updateStructure(
-			String externalReferenceCode, long userId, long structureId,
-			long parentStructureId,
+			String externalReferenceCode, long userId, long groupId,
+			long structureId, long parentStructureId, long classNameId,
 			java.util.Map<java.util.Locale, String> nameMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			com.liferay.dynamic.data.mapping.model.DDMForm ddmForm,
@@ -1454,8 +1437,9 @@ public class DDMStructureLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ddmStructureLocalService.updateStructure(
-			externalReferenceCode, userId, structureId, parentStructureId,
-			nameMap, descriptionMap, ddmForm, ddmFormLayout, serviceContext);
+			externalReferenceCode, userId, groupId, structureId,
+			parentStructureId, classNameId, nameMap, descriptionMap, ddmForm,
+			ddmFormLayout, serviceContext);
 	}
 
 	@Override

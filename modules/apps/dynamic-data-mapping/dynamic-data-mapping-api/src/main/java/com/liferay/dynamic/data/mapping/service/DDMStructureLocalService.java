@@ -264,8 +264,8 @@ public interface DDMStructureLocalService
 			long groupId, long classNameId, String structureKey)
 		throws PortalException;
 
-	public void deleteStructureByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
+	public void deleteStructure(
+			String externalReferenceCode, long groupId, long classNameId)
 		throws PortalException;
 
 	/**
@@ -359,10 +359,6 @@ public interface DDMStructureLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMStructure fetchDDMStructure(long structureId);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public DDMStructure fetchDDMStructureByExternalReferenceCode(
-		String externalReferenceCode, long groupId);
-
 	/**
 	 * Returns the ddm structure matching the UUID and group.
 	 *
@@ -427,8 +423,8 @@ public interface DDMStructureLocalService
 		boolean includeAncestorStructures);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public DDMStructure fetchStructureByExternalReferenceCode(
-		String externalReferenceCode, long groupId);
+	public DDMStructure fetchStructure(
+		String externalReferenceCode, long groupId, long classNameId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMStructure fetchStructureByUuidAndGroupId(
@@ -501,11 +497,6 @@ public interface DDMStructureLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMStructure getDDMStructure(long structureId)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public DDMStructure getDDMStructureByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
 		throws PortalException;
 
 	/**
@@ -655,7 +646,8 @@ public interface DDMStructureLocalService
 		long groupId, String name, String description);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public DDMStructure getStructure(String externalReferenceCode, long groupId)
+	public DDMStructure getStructure(
+			String externalReferenceCode, long groupId, long classNameId)
 		throws PortalException;
 
 	@Transactional(enabled = false)
@@ -1079,10 +1071,11 @@ public interface DDMStructureLocalService
 
 	@Indexable(type = IndexableType.REINDEX)
 	public DDMStructure updateStructure(
-			String externalReferenceCode, long userId, long structureId,
-			long parentStructureId, Map<Locale, String> nameMap,
-			Map<Locale, String> descriptionMap, DDMForm ddmForm,
-			DDMFormLayout ddmFormLayout, ServiceContext serviceContext)
+			String externalReferenceCode, long userId, long groupId,
+			long structureId, long parentStructureId, long classNameId,
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			DDMForm ddmForm, DDMFormLayout ddmFormLayout,
+			ServiceContext serviceContext)
 		throws PortalException;
 
 	@Override
