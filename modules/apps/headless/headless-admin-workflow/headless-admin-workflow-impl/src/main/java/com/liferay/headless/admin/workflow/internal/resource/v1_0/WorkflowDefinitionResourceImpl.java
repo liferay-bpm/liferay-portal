@@ -214,6 +214,7 @@ public class WorkflowDefinitionResourceImpl
 
 		return _toWorkflowDefinition(
 			_workflowDefinitionManager.deployWorkflowDefinition(
+				workflowDefinition.getExternalReferenceCode(),
 				contextCompany.getCompanyId(), contextUser.getUserId(),
 				_getTitle(workflowDefinition), workflowDefinition.getName(),
 				content.getBytes()));
@@ -228,6 +229,7 @@ public class WorkflowDefinitionResourceImpl
 
 		return _toWorkflowDefinition(
 			_workflowDefinitionManager.saveWorkflowDefinition(
+				workflowDefinition.getExternalReferenceCode(),
 				contextCompany.getCompanyId(), contextUser.getUserId(),
 				_getTitle(workflowDefinition), workflowDefinition.getName(),
 				content.getBytes()));
