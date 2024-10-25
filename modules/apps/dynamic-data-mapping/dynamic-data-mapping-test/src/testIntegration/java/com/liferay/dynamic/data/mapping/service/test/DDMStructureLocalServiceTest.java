@@ -47,7 +47,6 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -98,23 +97,12 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 	}
 
 	@Test
-	public void testAddDDMStructure() throws Exception {
+	public void testAddStructure() throws Exception {
 		DDMStructure ddmStructure = _addStructure(
 			RandomTestUtil.randomString());
 
 		Assert.assertTrue(
 			Validator.isNotNull(ddmStructure.getExternalReferenceCode()));
-	}
-
-	@Test(expected = DuplicateDDMStructureExternalReferenceCodeException.class)
-	public void testAddDDMStructureWithExistingExternalReferenceCode()
-		throws Exception {
-
-		String externalReferenceCode = RandomTestUtil.randomString();
-
-		for (int i = 0; i < 2; i++) {
-			_addStructure(externalReferenceCode, RandomTestUtil.randomString());
-		}
 	}
 
 	@Test(expected = StructureDefinitionException.class)
@@ -163,6 +151,17 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 			_classNameId, structureKey, "Test Structure 2",
 			read("test-structure.xsd"), StorageType.DEFAULT.getValue(),
 			DDMStructureConstants.TYPE_DEFAULT);
+	}
+
+	@Test(expected = DuplicateDDMStructureExternalReferenceCodeException.class)
+	public void testAddStructureWithExistingExternalReferenceCode()
+		throws Exception {
+
+		String externalReferenceCode = RandomTestUtil.randomString();
+
+		for (int i = 0; i < 2; i++) {
+			_addStructure(externalReferenceCode, RandomTestUtil.randomString());
+		}
 	}
 
 	@Test(expected = StructureDefinitionException.class)
@@ -298,6 +297,92 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 	}
 
 	@Test
+	public void testAddStructureWithSameExternalReferenceCodeAndDifferentClassNameId()
+		throws Exception {
+
+		String externalReferenceCode = RandomTestUtil.randomString();
+
+		DDMStructure structure1 = _addStructure(
+			externalReferenceCode,
+			PortalUtil.getClassNameId(_CLASS_NAME_DL_FILE_ENTRY_METADATA),
+			TestPropsValues.getGroupId(), RandomTestUtil.randomString(),
+			TestPropsValues.getUserId());
+		DDMStructure structure2 = _addStructure(
+			externalReferenceCode,
+			PortalUtil.getClassNameId(_CLASS_NAME_JOURNAL_ARTICLE),
+			TestPropsValues.getGroupId(), RandomTestUtil.randomString(),
+			TestPropsValues.getUserId());
+
+		Assert.assertNotEquals(structure1, structure2);
+
+		Assert.assertEquals(
+			2,
+			_ddmStructureLocalService.getStructures(
+				TestPropsValues.getGroupId()
+			).size());
+	}
+
+	@Test(expected = DuplicateDDMStructureExternalReferenceCodeException.class)
+	public void testAddStructureWithSameExternalReferenceCodeAndSameClassNameId()
+		throws Exception {
+
+		String externalReferenceCode = RandomTestUtil.randomString();
+		long classNameId = PortalUtil.getClassNameId(
+			_CLASS_NAME_DL_FILE_ENTRY_METADATA);
+
+		_addStructure(
+			externalReferenceCode, classNameId, TestPropsValues.getGroupId(),
+			RandomTestUtil.randomString(), TestPropsValues.getUserId());
+		_addStructure(
+			externalReferenceCode, classNameId, TestPropsValues.getGroupId(),
+			RandomTestUtil.randomString(), TestPropsValues.getUserId());
+	}
+
+	@Test
+	public void testAddStructureWithSameExternalReferenceCodeBetweenDifferentSites()
+		throws Exception {
+
+		DDMStructure structure1 = _addStructure(RandomTestUtil.randomString());
+
+		User user = UserTestUtil.addGroupAdminUser(GroupTestUtil.addGroup());
+
+		DDMStructure structure2 = _addStructure(
+			structure1.getExternalReferenceCode(), structure1.getClassNameId(),
+			user.getGroupId(), RandomTestUtil.randomString(), user.getUserId());
+
+		Assert.assertNotNull(
+			_ddmStructureLocalService.fetchStructure(
+				structure2.getExternalReferenceCode(), structure2.getGroupId(),
+				structure2.getClassNameId()));
+
+		Assert.assertNotEquals(structure1, structure2);
+
+		Assert.assertEquals(
+			1,
+			_ddmStructureLocalService.getStructuresCount(
+				structure1.getGroupId()));
+
+		Assert.assertEquals(
+			1,
+			_ddmStructureLocalService.getStructuresCount(
+				structure2.getGroupId()));
+
+		_ddmStructureLocalService.deleteStructure(
+			structure1.getExternalReferenceCode(), structure1.getGroupId(),
+			structure1.getClassNameId());
+
+		Assert.assertEquals(
+			0,
+			_ddmStructureLocalService.getStructuresCount(
+				structure1.getGroupId()));
+
+		Assert.assertEquals(
+			1,
+			_ddmStructureLocalService.getStructuresCount(
+				structure2.getGroupId()));
+	}
+
+	@Test
 	public void testCopyStructure() throws Exception {
 		DDMStructure structure = addStructure(_classNameId, "Test Structure");
 
@@ -312,70 +397,27 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 	}
 
 	@Test
-	public void testDDMStructureWithSameExternalReferenceCodeBetweenDifferentSites()
-		throws Exception {
-
-		DDMStructure structure1 = _addStructure(RandomTestUtil.randomString());
-
-		User user = UserTestUtil.addGroupAdminUser(GroupTestUtil.addGroup());
-
-		DDMStructure structure2 = _addStructure(
-			structure1.getExternalReferenceCode(), user.getGroupId(),
-			RandomTestUtil.randomString(), user.getUserId());
-
-		Assert.assertNotNull(
-			_ddmStructureLocalService.fetchDDMStructureByExternalReferenceCode(
-				structure2.getExternalReferenceCode(),
-				structure2.getGroupId()));
-
-		Assert.assertNotEquals(structure1, structure2);
-
-		Assert.assertEquals(
-			1,
-			_ddmStructureLocalService.getStructuresCount(
-				structure1.getGroupId()));
-
-		Assert.assertEquals(
-			1,
-			_ddmStructureLocalService.getStructuresCount(
-				structure2.getGroupId()));
-
-		_ddmStructureLocalService.deleteStructureByExternalReferenceCode(
-			structure1.getExternalReferenceCode(), structure1.getGroupId());
-
-		Assert.assertEquals(
-			0,
-			_ddmStructureLocalService.getStructuresCount(
-				structure1.getGroupId()));
-
-		Assert.assertEquals(
-			1,
-			_ddmStructureLocalService.getStructuresCount(
-				structure2.getGroupId()));
-	}
-
-	@Test
-	public void testDeleteDDMStructureByExternalReferenceCode()
-		throws Exception {
-
+	public void testDeleteDDMStructure() throws Exception {
 		DDMStructure ddmStructure = _addStructure(
 			RandomTestUtil.randomString());
 
-		_ddmStructureLocalService.deleteStructureByExternalReferenceCode(
-			ddmStructure.getExternalReferenceCode(), ddmStructure.getGroupId());
+		_ddmStructureLocalService.deleteStructure(
+			ddmStructure.getExternalReferenceCode(), ddmStructure.getGroupId(),
+			ddmStructure.getClassNameId());
 
 		Assert.assertNull(
-			_ddmStructureLocalService.fetchDDMStructureByExternalReferenceCode(
+			_ddmStructureLocalService.fetchStructure(
 				ddmStructure.getExternalReferenceCode(),
-				ddmStructure.getGroupId()));
+				ddmStructure.getGroupId(), ddmStructure.getClassNameId()));
 	}
 
 	@Test(expected = NoSuchStructureException.class)
 	public void testDeleteNonexistingDDMStructureByExternalReferenceCode()
 		throws Exception {
 
-		_ddmStructureLocalService.deleteStructureByExternalReferenceCode(
-			RandomTestUtil.randomString(), RandomTestUtil.randomLong());
+		_ddmStructureLocalService.deleteStructure(
+			RandomTestUtil.randomString(), RandomTestUtil.randomLong(),
+			RandomTestUtil.randomLong());
 	}
 
 	@Test
@@ -455,9 +497,9 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 		Assert.assertEquals(
 			externalReferenceCode, ddmStructure1.getExternalReferenceCode());
 
-		DDMStructure ddmStructure2 =
-			_ddmStructureLocalService.getDDMStructureByExternalReferenceCode(
-				externalReferenceCode, ddmStructure1.getGroupId());
+		DDMStructure ddmStructure2 = _ddmStructureLocalService.getStructure(
+			externalReferenceCode, ddmStructure1.getGroupId(),
+			ddmStructure1.getClassNameId());
 
 		Assert.assertEquals(
 			ddmStructure1.getStructureId(), ddmStructure2.getStructureId());
@@ -1005,12 +1047,11 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 	@Test
 	public void testUpdateDDMStructure() throws Exception {
 		DDMStructure structure = _addStructure(RandomTestUtil.randomString());
-
 		String externalReferenceCode = RandomTestUtil.randomString();
 
-		structure.setExternalReferenceCode(externalReferenceCode);
-
-		structure = updateStructure(structure);
+		structure = _updateStructure(
+			externalReferenceCode, structure.getClassNameId(),
+			structure.getGroupId(), RandomTestUtil.randomString(), structure);
 
 		Assert.assertEquals(
 			externalReferenceCode, structure.getExternalReferenceCode());
@@ -1020,13 +1061,24 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 	public void testUpdateDDMStructureWithExistingExternalReferenceCode()
 		throws Exception {
 
-		DDMStructure structure1 = _addStructure(RandomTestUtil.randomString());
-		DDMStructure structure2 = _addStructure(RandomTestUtil.randomString());
+		String externalReferenceCode = RandomTestUtil.randomString();
 
-		structure2.setExternalReferenceCode(
-			structure1.getExternalReferenceCode());
+		DDMStructure structure1 = _addStructure(
+			externalReferenceCode,
+			PortalUtil.getClassNameId(_CLASS_NAME_JOURNAL_ARTICLE),
+			group.getGroupId(), RandomTestUtil.randomString(),
+			TestPropsValues.getUserId());
 
-		updateStructure(structure2);
+		DDMStructure structure2 = _addStructure(
+			externalReferenceCode,
+			PortalUtil.getClassNameId(_CLASS_NAME_DL_FILE_ENTRY_METADATA),
+			group.getGroupId(), RandomTestUtil.randomString(),
+			TestPropsValues.getUserId());
+
+		_updateStructure(
+			externalReferenceCode,
+			PortalUtil.getClassNameId(_CLASS_NAME_JOURNAL_ARTICLE),
+			structure1.getGroupId(), structure1.getName(), structure2);
 	}
 
 	@Test
@@ -1310,8 +1362,8 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 	}
 
 	private DDMStructure _addStructure(
-			String externalReferenceCode, long groupId, String name,
-			long userId)
+			String externalReferenceCode, long classNameId, long groupId,
+			String name, long userId)
 		throws Exception {
 
 		DDMForm ddmForm = DDMStructureTestUtil.getSampleDDMForm();
@@ -1319,7 +1371,7 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 		DDMFormLayout ddmFormLayout = DDMUtil.getDefaultDDMFormLayout(ddmForm);
 
 		return _ddmStructureLocalService.addStructure(
-			externalReferenceCode, userId, groupId, 0, _classNameId, null,
+			externalReferenceCode, userId, groupId, 0, classNameId, null,
 			Collections.singletonMap(LocaleUtil.getSiteDefault(), name), null,
 			ddmForm, ddmFormLayout, StorageType.DEFAULT.toString(),
 			DDMStructureConstants.TYPE_DEFAULT,
@@ -1331,7 +1383,7 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 		throws Exception {
 
 		return _addStructure(
-			externalReferenceCode, group.getGroupId(), name,
+			externalReferenceCode, _classNameId, group.getGroupId(), name,
 			TestPropsValues.getUserId());
 	}
 
@@ -1339,13 +1391,34 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 		throws Exception {
 
 		return _ddmStructureLocalService.updateStructure(
-			structure.getExternalReferenceCode(), structure.getUserId(),
-			structure.getStructureId(), structure.getParentStructureId(),
+			structure.getUserId(), structure.getStructureId(),
+			structure.getParentStructureId(),
 			Collections.singletonMap(LocaleUtil.getSiteDefault(), name),
 			structure.getDescriptionMap(), structure.getDDMForm(),
 			structure.getDDMFormLayout(),
 			ServiceContextTestUtil.getServiceContext(structure.getGroupId()));
 	}
+
+	private DDMStructure _updateStructure(
+			String externalReferenceCode, long classNameId, long groupId,
+			String name, DDMStructure structure)
+		throws Exception {
+
+		return _ddmStructureLocalService.updateStructure(
+			externalReferenceCode, structure.getUserId(), groupId,
+			structure.getStructureId(), structure.getParentStructureId(),
+			classNameId,
+			Collections.singletonMap(LocaleUtil.getSiteDefault(), name),
+			structure.getDescriptionMap(), structure.getDDMForm(),
+			structure.getDDMFormLayout(),
+			ServiceContextTestUtil.getServiceContext(groupId));
+	}
+
+	private static final String _CLASS_NAME_DL_FILE_ENTRY_METADATA =
+		"com.liferay.document.library.kernel.model.DLFileEntryMetadata";
+
+	private static final String _CLASS_NAME_JOURNAL_ARTICLE =
+		"com.liferay.journal.model.JournalArticle";
 
 	private static long _classNameId;
 
@@ -1368,9 +1441,6 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 
 	@Inject
 	private DDMStructureVersionLocalService _ddmStructureVersionLocalService;
-
-	@Inject
-	private GroupLocalService _groupLocalService;
 
 	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
 
