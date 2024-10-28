@@ -149,6 +149,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 
 import org.hamcrest.CoreMatchers;
 
@@ -2066,9 +2067,12 @@ public class ObjectActionLocalServiceTest {
 				PermissionCheckerFactoryUtil.create(_user));
 			PrincipalThreadLocal.setName(_user.getUserId());
 
+			Semaphore semaphore = new Semaphore(1);
+
 			Thread thread1 = new Thread(
 				() -> {
 					try {
+						semaphore.acquire();
 						_objectEntryLocalService.addObjectEntry(
 							TestPropsValues.getUserId(), 0,
 							_objectDefinition.getObjectDefinitionId(),
@@ -2077,13 +2081,17 @@ public class ObjectActionLocalServiceTest {
 							).build(),
 							ServiceContextTestUtil.getServiceContext());
 					}
-					catch (PortalException portalException) {
+					catch (InterruptedException | PortalException exception) {
+					}
+					finally {
+						semaphore.release();
 					}
 				});
 
 			Thread thread2 = new Thread(
 				() -> {
 					try {
+						semaphore.acquire();
 						_objectEntryLocalService.addObjectEntry(
 							TestPropsValues.getUserId(), 0,
 							_objectDefinition.getObjectDefinitionId(),
@@ -2092,7 +2100,10 @@ public class ObjectActionLocalServiceTest {
 							).build(),
 							ServiceContextTestUtil.getServiceContext());
 					}
-					catch (PortalException portalException) {
+					catch (InterruptedException | PortalException exception) {
+					}
+					finally {
+						semaphore.release();
 					}
 				});
 
