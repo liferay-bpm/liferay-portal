@@ -461,7 +461,8 @@ public class ObjectDefinitionResourceImpl
 		int serviceBuilderObjectDefinitionStatus =
 			serviceBuilderObjectDefinition.getStatus();
 
-		if ((objectDefinitionStatus.getCode() !=
+		if ((objectDefinitionStatus != null) &&
+			(objectDefinitionStatus.getCode() !=
 				WorkflowConstants.STATUS_APPROVED) &&
 			(serviceBuilderObjectDefinitionStatus ==
 				WorkflowConstants.STATUS_APPROVED)) {
@@ -488,12 +489,10 @@ public class ObjectDefinitionResourceImpl
 					getObjectFieldId();
 		}
 
-		int statusInt = serviceBuilderObjectDefinition.getStatus();
+		int statusInt = serviceBuilderObjectDefinitionStatus;
 
-		if (objectDefinition.getStatus() != null) {
-			Status status = objectDefinition.getStatus();
-
-			statusInt = status.getCode();
+		if (objectDefinitionStatus != null) {
+			statusInt = objectDefinitionStatus.getCode();
 		}
 
 		if (serviceBuilderObjectDefinition.isUnmodifiableSystemObject()) {
@@ -646,7 +645,8 @@ public class ObjectDefinitionResourceImpl
 				GetterUtil.getLong(objectField.getId()),
 				contextUser.getUserId(), listTypeDefinitionId,
 				objectDefinitionId, objectField.getBusinessTypeAsString(), null,
-				null, objectField.getDBTypeAsString(), objectField.getIndexed(),
+				null, objectField.getDBTypeAsString(),
+				GetterUtil.getBoolean(objectField.getIndexed()),
 				GetterUtil.getBoolean(objectField.getIndexedAsKeyword()),
 				objectField.getIndexedLanguageId(),
 				LocalizedMapUtil.getLocalizedMap(objectField.getLabel()),
