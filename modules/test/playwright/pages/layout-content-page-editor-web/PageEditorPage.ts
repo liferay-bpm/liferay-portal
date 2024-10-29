@@ -861,7 +861,7 @@ export class PageEditorPage {
 	}
 
 	async goToWidgetConfiguration(widgetId: string) {
-		if (await this.page.evaluate(() => Liferay.FeatureFlags['32075'])) {
+		if (await this.page.evaluate(() => Liferay.FeatureFlags['LPD-32075'])) {
 			await this.clickFragmentOption(widgetId, 'Configuration');
 		}
 		else {
