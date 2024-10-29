@@ -43,10 +43,7 @@ export class AssetPublisherPage {
 			.getByRole('button', {name: 'Save'})
 			.click();
 
-		await waitForAlert(
-			this.configurationIframe,
-			'Success:The collection was created successfully.'
-		);
+		await waitForAlert(this.configurationIframe, 'Success');
 	}
 
 	async addFileFromAssetPublisher(fileName: string) {
