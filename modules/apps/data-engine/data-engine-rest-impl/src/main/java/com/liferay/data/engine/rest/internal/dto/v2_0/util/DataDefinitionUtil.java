@@ -82,7 +82,8 @@ public class DataDefinitionUtil {
 						ddmStructure.getDescriptionMap()));
 
 				if (FeatureFlagManagerUtil.isEnabled("LPD-34651")) {
-					setExternalReferenceCode(() -> ddmStructure.getExternalReferenceCode());
+					setExternalReferenceCode(
+						ddmStructure::getExternalReferenceCode);
 				}
 
 				setId(ddmStructure::getStructureId);
