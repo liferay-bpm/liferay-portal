@@ -228,6 +228,10 @@ public class DataDefinitionDDMFormUtil {
 			GetterUtil.getBoolean(dataDefinitionField.getRequired()));
 		ddmFormField.setShowLabel(
 			GetterUtil.getBoolean(dataDefinitionField.getShowLabel(), true));
+		ddmFormField.setStyle(
+			LocalizedValueUtil.toLocalizedValue(
+				dataDefinitionField.getDefaultValue(),
+				LocaleUtil.fromLanguageId(languageId)));
 		ddmFormField.setTip(
 			LocalizedValueUtil.toLocalizedValue(
 				dataDefinitionField.getTip(),
