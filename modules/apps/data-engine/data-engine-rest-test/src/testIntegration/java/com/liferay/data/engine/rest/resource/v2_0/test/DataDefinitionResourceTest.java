@@ -127,6 +127,43 @@ public class DataDefinitionResourceTest
 
 	@Override
 	@Test
+	public DataDefinition
+			testDeleteSiteDataDefinitionByContentTypeByExternalReferenceCode_addDataDefinition()
+		throws Exception {
+
+		DataDefinition dataDefinition = _addDataDefinition(
+			"data-definition-1.json");
+
+		assertHttpResponseStatusCode(
+			200,
+			dataDefinitionResource.
+				getSiteDataDefinitionByContentTypeByExternalReferenceCodeHttpResponse(
+					testGroup.getGroupId(), _CONTENT_TYPE,
+					dataDefinition.getExternalReferenceCode()));
+
+		String externalReferenceCode =
+			dataDefinition.getExternalReferenceCode();
+
+		dataDefinition.setExternalReferenceCode(RandomTestUtil.randomString());
+
+		dataDefinition =
+			dataDefinitionResource.
+				putSiteDataDefinitionByContentTypeByExternalReferenceCode(
+					testGroup.getGroupId(), _CONTENT_TYPE,
+					externalReferenceCode, dataDefinition);
+
+		assertHttpResponseStatusCode(
+			200,
+			dataDefinitionResource.
+				getSiteDataDefinitionByContentTypeByExternalReferenceCodeHttpResponse(
+					testGroup.getGroupId(), _CONTENT_TYPE,
+					dataDefinition.getExternalReferenceCode()));
+
+		return dataDefinition;
+	}
+
+	@Override
+	@Test
 	public void testGetDataDefinitionDataDefinitionFieldFieldTypes()
 		throws Exception {
 
@@ -148,6 +185,15 @@ public class DataDefinitionResourceTest
 				postDataDefinition.getId(), RoleConstants.GUEST);
 
 		Assert.assertNotNull(page);
+	}
+
+	@Override
+	@Test
+	public DataDefinition
+			testGetSiteDataDefinitionByContentTypeByExternalReferenceCode_addDataDefinition()
+		throws Exception {
+
+		return _addDataDefinition("data-definition-1.json");
 	}
 
 	@Override
@@ -288,6 +334,31 @@ public class DataDefinitionResourceTest
 							"contentType", "\"" + _CONTENT_TYPE + "\""
 						).put(
 							"dataDefinitionKey",
+							"\"" + RandomTestUtil.randomString() + "\""
+						).put(
+							"siteKey",
+							"\"" + irrelevantGroup.getGroupId() + "\""
+						).build(),
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	@Override
+	@Test
+	public void testGraphQLGetSiteDataDefinitionByContentTypeByExternalReferenceCodeNotFound()
+		throws Exception {
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"dataDefinitionByContentTypeByExternalReferenceCode",
+						HashMapBuilder.<String, Object>put(
+							"contentType", "\"" + _CONTENT_TYPE + "\""
+						).put(
+							"externalReferenceCode",
 							"\"" + RandomTestUtil.randomString() + "\""
 						).put(
 							"siteKey",
@@ -705,6 +776,24 @@ public class DataDefinitionResourceTest
 		assertValid(getDataDefinition);
 	}
 
+	@Override
+	@Test
+	public DataDefinition
+			testPutSiteDataDefinitionByContentTypeByExternalReferenceCode_addDataDefinition()
+		throws Exception {
+
+		return _addDataDefinition("data-definition-1.json");
+	}
+
+	@Override
+	@Test
+	public DataDefinition
+			testPutSiteDataDefinitionByContentTypeByExternalReferenceCode_createDataDefinition()
+		throws Exception {
+
+		return testGetDataDefinition_addDataDefinition();
+	}
+
 	@Rule
 	public SearchTestRule searchTestRule = new SearchTestRule();
 
@@ -884,6 +973,12 @@ public class DataDefinitionResourceTest
 
 		return dataDefinitionResource.postSiteDataDefinitionByContentType(
 			testGroup.getGroupId(), _CONTENT_TYPE, randomDataDefinition());
+	}
+
+	private DataDefinition _addDataDefinition(String file) throws Exception {
+		return dataDefinitionResource.postSiteDataDefinitionByContentType(
+			testGroup.getGroupId(), _CONTENT_TYPE,
+			DataDefinition.toDTO(DataDefinitionTestUtil.read(file)));
 	}
 
 	private DataDefinition _createDataDefinition(
