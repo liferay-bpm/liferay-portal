@@ -127,6 +127,61 @@ public class DataDefinitionResourceTest
 
 	@Override
 	@Test
+	public DataDefinition
+			testDeleteSiteDataDefinitionByContentTypeByExternalReferenceCode_addDataDefinition()
+		throws Exception {
+
+		DataDefinition dataDefinition =
+			dataDefinitionResource.postSiteDataDefinitionByContentType(
+				testGroup.getGroupId(), _CONTENT_TYPE,
+				DataDefinition.toDTO(
+					DataDefinitionTestUtil.read(
+						"data-definition-parent.json")));
+
+		assertHttpResponseStatusCode(
+			200,
+			dataDefinitionResource.
+				getSiteDataDefinitionByContentTypeByExternalReferenceCodeHttpResponse(
+					testGroup.getGroupId(), _CONTENT_TYPE,
+					dataDefinition.getExternalReferenceCode()));
+
+		String externalReferenceCode =
+			dataDefinition.getExternalReferenceCode();
+
+		dataDefinition.setExternalReferenceCode(RandomTestUtil.randomString());
+
+		dataDefinition =
+			dataDefinitionResource.
+				putSiteDataDefinitionByContentTypeByExternalReferenceCode(
+					testGroup.getGroupId(), _CONTENT_TYPE,
+					externalReferenceCode, dataDefinition);
+
+		assertHttpResponseStatusCode(
+			200,
+			dataDefinitionResource.
+				getSiteDataDefinitionByContentTypeByExternalReferenceCodeHttpResponse(
+					testGroup.getGroupId(), _CONTENT_TYPE,
+					dataDefinition.getExternalReferenceCode()));
+
+		assertHttpResponseStatusCode(
+			204,
+			dataDefinitionResource.
+				deleteSiteDataDefinitionByContentTypeByExternalReferenceCodeHttpResponse(
+					testGroup.getGroupId(), _CONTENT_TYPE,
+					dataDefinition.getExternalReferenceCode()));
+
+		assertHttpResponseStatusCode(
+			404,
+			dataDefinitionResource.
+				getSiteDataDefinitionByContentTypeByExternalReferenceCodeHttpResponse(
+					testGroup.getGroupId(), _CONTENT_TYPE,
+					dataDefinition.getExternalReferenceCode()));
+
+		return new DataDefinition();
+	}
+
+	@Override
+	@Test
 	public void testGetDataDefinitionDataDefinitionFieldFieldTypes()
 		throws Exception {
 
