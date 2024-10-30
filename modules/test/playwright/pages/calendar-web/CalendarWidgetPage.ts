@@ -15,6 +15,8 @@ export class CalendarWidgetPage {
 	readonly closeConfigurationButton: Locator;
 	readonly configurationMenuItem: Locator;
 	readonly endTime: Locator;
+	readonly invitations: Locator;
+	readonly inviteResource: Locator;
 	readonly modalRecurrencePage: ModalRecurrencePage;
 	readonly miniCalendarBase: Locator;
 	readonly miniCalendarGrid: Locator;
@@ -51,6 +53,12 @@ export class CalendarWidgetPage {
 		this.endTime = page
 			.frameLocator('iframe')
 			.getByLabel('Ends', {exact: true});
+		this.invitations = page
+			.frameLocator('iframe')
+			.getByText('Invitations', {exact: true});
+		this.inviteResource = page
+			.frameLocator('iframe')
+			.getByTitle('Invite Resource', {exact: true});
 		this.modalRecurrencePage = new ModalRecurrencePage(page);
 		this.miniCalendarBase = page.locator('.yui3-calendarbase');
 		this.miniCalendarGrid = page.locator('.yui3-calendar-grid');
@@ -90,7 +98,12 @@ export class CalendarWidgetPage {
 			});
 	}
 
-	async addEvent(allDay: boolean, dateEnd: string, title: string) {
+	async addEvent(
+		allDay: boolean,
+		dateEnd: string,
+		publishEvent: boolean,
+		title: string
+	) {
 		await this.addEventButton.click();
 
 		await this.allDayCheckbox.hover();
@@ -104,7 +117,24 @@ export class CalendarWidgetPage {
 			await this.title.fill(title);
 		}
 
-		await this.publishEvent();
+		if (publishEvent) {
+			await this.publishEvent();
+		}
+	}
+
+	async addInvitation(userName: string) {
+		await this.openInvitations();
+
+		await this.inviteResource.fill(userName);
+
+		await this.page
+			.frameLocator('iframe')
+			.getByRole('option', {name: userName})
+			.click();
+	}
+
+	async openInvitations() {
+		await this.invitations.click();
 	}
 
 	async publishEvent() {
