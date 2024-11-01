@@ -205,8 +205,7 @@ public class ObjectDefinitionLocalServiceImpl
 			boolean modifiable, boolean system)
 		throws PortalException {
 
-		_validateExternalReferenceCode(
-			true, externalReferenceCode, modifiable, StringPool.BLANK, system);
+		_validateExternalReferenceCode(externalReferenceCode, system);
 
 		ObjectDefinition objectDefinition = objectDefinitionPersistence.create(
 			counterLocalService.increment());
@@ -1241,8 +1240,7 @@ public class ObjectDefinitionLocalServiceImpl
 			objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
 		_validateExternalReferenceCode(
-			false, externalReferenceCode, objectDefinition.isModifiable(),
-			objectDefinition.getName(), objectDefinition.isSystem());
+			externalReferenceCode, objectDefinition.isSystem());
 
 		objectDefinition.setExternalReferenceCode(externalReferenceCode);
 
@@ -1335,8 +1333,7 @@ public class ObjectDefinitionLocalServiceImpl
 			objectDefinitionPersistence.fetchByPrimaryKey(objectDefinitionId);
 
 		_validateExternalReferenceCode(
-			false, externalReferenceCode, objectDefinition.isModifiable(),
-			objectDefinition.getName(), objectDefinition.isSystem());
+			externalReferenceCode, objectDefinition.isSystem());
 		_validateObjectFieldId(objectDefinition, titleObjectFieldId);
 
 		long oldObjectFolderId = objectDefinition.getObjectFolderId();
@@ -1464,8 +1461,7 @@ public class ObjectDefinitionLocalServiceImpl
 		storageType = Validator.isNotNull(storageType) ? storageType :
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT;
 
-		_validateExternalReferenceCode(
-			true, externalReferenceCode, modifiable, name, system);
+		_validateExternalReferenceCode(externalReferenceCode, system);
 		_validateEnableComments(
 			enableComments, modifiable, storageType, system);
 		_validateLabel(labelMap);
@@ -2152,8 +2148,7 @@ public class ObjectDefinitionLocalServiceImpl
 		boolean oldActive = objectDefinition.isActive();
 
 		_validateExternalReferenceCode(
-			false, externalReferenceCode, objectDefinition.isModifiable(), name,
-			objectDefinition.isSystem());
+			externalReferenceCode, objectDefinition.isSystem());
 		_validateAccountEntryRestrictedObjectFieldId(
 			accountEntryRestrictedObjectFieldId, accountEntryRestricted,
 			objectDefinition);
@@ -2453,19 +2448,8 @@ public class ObjectDefinitionLocalServiceImpl
 	}
 
 	private void _validateExternalReferenceCode(
-			boolean addObjectDefinition, String externalReferenceCode,
-			boolean modifiable, String name, boolean system)
+			String externalReferenceCode, boolean system)
 		throws PortalException {
-
-		if (addObjectDefinition && !modifiable && system &&
-			!ObjectDefinitionUtil.
-				isAllowedUnmodifiableSystemObjectDefinitionExternalReferenceCode(
-					externalReferenceCode, name)) {
-
-			throw new ObjectDefinitionExternalReferenceCodeException.
-				ForbiddenUnmodifiableSystemObjectDefinitionExternalReferenceCode(
-					externalReferenceCode);
-		}
 
 		if (Validator.isNull(externalReferenceCode)) {
 			return;
