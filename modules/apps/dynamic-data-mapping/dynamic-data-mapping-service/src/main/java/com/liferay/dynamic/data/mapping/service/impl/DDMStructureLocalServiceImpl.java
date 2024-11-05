@@ -1559,7 +1559,8 @@ public class DDMStructureLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public DDMStructure updateStructure(
-			long userId, long structureId, long parentStructureId,
+			String externalReferenceCode, long userId, long structureId,
+			long groupId, long parentStructureId, long classNameId,
 			String structureKey, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, String definition,
 			ServiceContext serviceContext)
@@ -1572,6 +1573,11 @@ public class DDMStructureLocalServiceImpl
 
 		structure.setUserId(userId);
 		structure.setParentStructureId(parentStructureId);
+
+		_validateExternalReferenceCode(
+			externalReferenceCode, groupId, classNameId);
+
+		structure.setExternalReferenceCode(externalReferenceCode);
 
 		if (Validator.isNotNull(structureKey)) {
 			structureKey = StringUtil.toUpperCase(structureKey.trim());
