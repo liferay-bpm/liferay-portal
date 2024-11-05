@@ -623,6 +623,20 @@ public class DDMStructureLocalServiceImpl
 		ddmStructureLocalService.deleteStructure(structure);
 	}
 
+	@Override
+	public void deleteStructureByExternalReferenceCode(
+			String externalReferenceCode, long groupId, long classNameId)
+		throws PortalException {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPD-34651")) {
+			throw new UnsupportedOperationException();
+		}
+
+		ddmStructureLocalService.deleteStructure(
+			ddmStructurePersistence.findByERC_G_C(
+				externalReferenceCode, groupId, classNameId));
+	}
+
 	/**
 	 * Deletes all the structures of the group.
 	 *
@@ -737,6 +751,18 @@ public class DDMStructureLocalServiceImpl
 		}
 
 		return null;
+	}
+
+	@Override
+	public DDMStructure fetchStructureByExternalReferenceCode(
+		String externalReferenceCode, long groupId, long classNameId) {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPD-34651")) {
+			throw new UnsupportedOperationException();
+		}
+
+		return ddmStructurePersistence.fetchByERC_G_C(
+			externalReferenceCode, groupId, classNameId);
 	}
 
 	@Override
@@ -939,6 +965,19 @@ public class DDMStructureLocalServiceImpl
 		long groupId, String name, String description) {
 
 		return ddmStructurePersistence.findByG_N_D(groupId, name, description);
+	}
+
+	@Override
+	public DDMStructure getStructureByExternalReferenceCode(
+			String externalReferenceCode, long groupId, long classNameId)
+		throws PortalException {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPD-34651")) {
+			throw new UnsupportedOperationException();
+		}
+
+		return ddmStructurePersistence.findByERC_G_C(
+			externalReferenceCode, groupId, classNameId);
 	}
 
 	@Override
