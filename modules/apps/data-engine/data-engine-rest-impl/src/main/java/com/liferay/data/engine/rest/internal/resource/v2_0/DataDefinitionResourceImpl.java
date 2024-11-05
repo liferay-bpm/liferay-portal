@@ -1129,7 +1129,7 @@ public class DataDefinitionResourceImpl extends BaseDataDefinitionResourceImpl {
 			_ddmFormSerializer.serialize(builder.build());
 
 		DDMStructure ddmStructure = _ddmStructureLocalService.addStructure(
-			PrincipalThreadLocal.getUserId(), siteId,
+			null, PrincipalThreadLocal.getUserId(), siteId,
 			DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID,
 			DataDefinitionContentTypeRegistryUtil.getClassNameId(contentType),
 			dataDefinition.getDataDefinitionKey(),
@@ -1844,10 +1844,13 @@ public class DataDefinitionResourceImpl extends BaseDataDefinitionResourceImpl {
 		return DataDefinitionUtil.toDataDefinition(
 			_ddmFormFieldTypeServicesRegistry,
 			_ddmStructureLocalService.updateStructure(
+				ddmStructure.getExternalReferenceCode(),
 				PrincipalThreadLocal.getUserId(), dataDefinitionId,
+				ddmStructure.getGroupId(),
 				GetterUtil.getLong(
 					ddmStructure.getParentStructureId(),
 					DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID),
+				ddmStructure.getClassNameId(),
 				dataDefinition.getDataDefinitionKey(),
 				LocalizedValueUtil.toLocaleStringMap(dataDefinition.getName()),
 				LocalizedValueUtil.toLocaleStringMap(
