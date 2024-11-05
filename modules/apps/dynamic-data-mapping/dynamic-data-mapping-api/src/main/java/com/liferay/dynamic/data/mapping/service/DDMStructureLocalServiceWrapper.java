@@ -49,39 +49,6 @@ public class DDMStructureLocalServiceWrapper
 
 	@Override
 	public DDMStructure addStructure(
-			long userId, long groupId, long parentStructureId, long classNameId,
-			String structureKey,
-			java.util.Map<java.util.Locale, String> nameMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
-			com.liferay.dynamic.data.mapping.model.DDMForm ddmForm,
-			com.liferay.dynamic.data.mapping.model.DDMFormLayout ddmFormLayout,
-			String storageType, int type,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddmStructureLocalService.addStructure(
-			userId, groupId, parentStructureId, classNameId, structureKey,
-			nameMap, descriptionMap, ddmForm, ddmFormLayout, storageType, type,
-			serviceContext);
-	}
-
-	@Override
-	public DDMStructure addStructure(
-			long userId, long groupId, long parentStructureId, long classNameId,
-			String structureKey,
-			java.util.Map<java.util.Locale, String> nameMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
-			String definition, String storageType,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddmStructureLocalService.addStructure(
-			userId, groupId, parentStructureId, classNameId, structureKey,
-			nameMap, descriptionMap, definition, storageType, serviceContext);
-	}
-
-	@Override
-	public DDMStructure addStructure(
 			long userId, long groupId, long classNameId,
 			java.util.Map<java.util.Locale, String> nameMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
@@ -130,6 +97,22 @@ public class DDMStructureLocalServiceWrapper
 			externalReferenceCode, userId, groupId, parentStructureId,
 			classNameId, structureKey, nameMap, descriptionMap, ddmForm,
 			ddmFormLayout, storageType, type, serviceContext);
+	}
+
+	@Override
+	public DDMStructure addStructure(
+			String externalReferenceCode, long userId, long groupId,
+			long parentStructureId, long classNameId, String structureKey,
+			java.util.Map<java.util.Locale, String> nameMap,
+			java.util.Map<java.util.Locale, String> descriptionMap,
+			String definition, String storageType,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _ddmStructureLocalService.addStructure(
+			externalReferenceCode, userId, groupId, parentStructureId,
+			classNameId, structureKey, nameMap, descriptionMap, definition,
+			storageType, serviceContext);
 	}
 
 	/**
@@ -326,11 +309,11 @@ public class DDMStructureLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteStructure(
+	public void deleteStructureByExternalReferenceCode(
 			String externalReferenceCode, long groupId, long classNameId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		_ddmStructureLocalService.deleteStructure(
+		_ddmStructureLocalService.deleteStructureByExternalReferenceCode(
 			externalReferenceCode, groupId, classNameId);
 	}
 
@@ -544,10 +527,10 @@ public class DDMStructureLocalServiceWrapper
 	}
 
 	@Override
-	public DDMStructure fetchStructure(
+	public DDMStructure fetchStructureByExternalReferenceCode(
 		String externalReferenceCode, long groupId, long classNameId) {
 
-		return _ddmStructureLocalService.fetchStructure(
+		return _ddmStructureLocalService.fetchStructureByExternalReferenceCode(
 			externalReferenceCode, groupId, classNameId);
 	}
 
@@ -849,11 +832,11 @@ public class DDMStructureLocalServiceWrapper
 	}
 
 	@Override
-	public DDMStructure getStructure(
+	public DDMStructure getStructureByExternalReferenceCode(
 			String externalReferenceCode, long groupId, long classNameId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _ddmStructureLocalService.getStructure(
+		return _ddmStructureLocalService.getStructureByExternalReferenceCode(
 			externalReferenceCode, groupId, classNameId);
 	}
 
@@ -1412,7 +1395,8 @@ public class DDMStructureLocalServiceWrapper
 
 	@Override
 	public DDMStructure updateStructure(
-			long userId, long structureId, long parentStructureId,
+			String externalReferenceCode, long userId, long structureId,
+			long groupId, long parentStructureId, long classNameId,
 			String structureKey,
 			java.util.Map<java.util.Locale, String> nameMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
@@ -1421,40 +1405,7 @@ public class DDMStructureLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ddmStructureLocalService.updateStructure(
-			userId, structureId, parentStructureId, structureKey, nameMap,
-			descriptionMap, definition, serviceContext);
-	}
-
-	@Override
-	public DDMStructure updateStructure(
-			String externalReferenceCode, long userId, long groupId,
-			long structureId, long parentStructureId, long classNameId,
-			java.util.Map<java.util.Locale, String> nameMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
-			com.liferay.dynamic.data.mapping.model.DDMForm ddmForm,
-			com.liferay.dynamic.data.mapping.model.DDMFormLayout ddmFormLayout,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddmStructureLocalService.updateStructure(
-			externalReferenceCode, userId, groupId, structureId,
-			parentStructureId, classNameId, nameMap, descriptionMap, ddmForm,
-			ddmFormLayout, serviceContext);
-	}
-
-	@Override
-	public DDMStructure updateStructure(
-			String externalReferenceCode, long userId, long groupId,
-			long structureId, long parentStructureId, long classNameId,
-			String structureKey,
-			java.util.Map<java.util.Locale, String> nameMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
-			String definition,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddmStructureLocalService.updateStructure(
-			externalReferenceCode, userId, groupId, structureId,
+			externalReferenceCode, userId, structureId, groupId,
 			parentStructureId, classNameId, structureKey, nameMap,
 			descriptionMap, definition, serviceContext);
 	}
