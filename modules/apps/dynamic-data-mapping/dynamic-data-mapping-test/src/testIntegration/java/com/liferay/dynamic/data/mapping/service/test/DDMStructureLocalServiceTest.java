@@ -15,6 +15,9 @@ import com.liferay.dynamic.data.mapping.exception.StructureDefinitionException;
 import com.liferay.dynamic.data.mapping.exception.StructureDuplicateElementException;
 import com.liferay.dynamic.data.mapping.exception.StructureDuplicateStructureKeyException;
 import com.liferay.dynamic.data.mapping.exception.StructureNameException;
+import com.liferay.dynamic.data.mapping.io.DDMFormSerializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormSerializerSerializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormSerializerSerializeResponse;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstanceLink;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
@@ -358,12 +361,12 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 		DDMStructure ddmStructure = _addStructure(
 			RandomTestUtil.randomString());
 
-		_ddmStructureLocalService.deleteStructure(
+		_ddmStructureLocalService.deleteStructureByExternalReferenceCode(
 			ddmStructure.getExternalReferenceCode(), ddmStructure.getGroupId(),
 			ddmStructure.getClassNameId());
 
 		Assert.assertNull(
-			_ddmStructureLocalService.fetchStructure(
+			_ddmStructureLocalService.fetchStructureByExternalReferenceCode(
 				ddmStructure.getExternalReferenceCode(),
 				ddmStructure.getGroupId(), ddmStructure.getClassNameId()));
 	}
@@ -494,12 +497,12 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 
 		Assert.assertEquals(
 			ddmStructure,
-			_ddmStructureLocalService.getStructure(
+			_ddmStructureLocalService.getStructureByExternalReferenceCode(
 				ddmStructure.getExternalReferenceCode(),
 				ddmStructure.getGroupId(), ddmStructure.getClassNameId()));
 
 		try {
-			_ddmStructureLocalService.getStructure(
+			_ddmStructureLocalService.getStructureByExternalReferenceCode(
 				RandomTestUtil.randomString(), ddmStructure.getGroupId(),
 				ddmStructure.getClassNameId());
 
@@ -1337,13 +1340,21 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 			String name, DDMStructure structure)
 		throws Exception {
 
+		DDMFormSerializerSerializeRequest.Builder builder =
+			DDMFormSerializerSerializeRequest.Builder.newBuilder(
+				structure.getDDMForm());
+
+		DDMFormSerializerSerializeResponse ddmFormSerializerSerializeResponse =
+			_ddmFormSerializer.serialize(builder.build());
+
 		return _ddmStructureLocalService.updateStructure(
-			externalReferenceCode, structure.getUserId(), groupId,
-			structure.getStructureId(), structure.getParentStructureId(),
-			classNameId,
+			externalReferenceCode, structure.getUserId(),
+			structure.getStructureId(), groupId,
+			structure.getParentStructureId(), classNameId,
+			structure.getStructureKey(),
 			Collections.singletonMap(LocaleUtil.getSiteDefault(), name),
-			structure.getDescriptionMap(), structure.getDDMForm(),
-			structure.getDDMFormLayout(),
+			structure.getDescriptionMap(),
+			ddmFormSerializerSerializeResponse.getContent(),
 			ServiceContextTestUtil.getServiceContext(groupId));
 	}
 
@@ -1362,6 +1373,9 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 	@Inject
 	private DDMDataProviderInstanceLocalService
 		_ddmDataProviderInstanceLocalService;
+
+	@Inject
+	private DDMFormSerializer _ddmFormSerializer;
 
 	@Inject
 	private DDMStructureLayoutLocalService _ddmStructureLayoutLocalService;
