@@ -387,14 +387,24 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					).build()));
 		}
 
-		ObjectLayout objectLayout =
-			_objectLayoutLocalService.fetchDefaultObjectLayout(
-				objectDefinition.getObjectDefinitionId());
+		ObjectLayout defaultObjectLayout = null;
+		List<ObjectLayout> defaultObjectLayouts =
+			objectDefinition.getDefaultObjectLayouts();
 
-		if (objectLayout != null) {
+		if (defaultObjectLayouts == null) {
+			defaultObjectLayout =
+				_objectLayoutLocalService.fetchDefaultObjectLayout(
+					objectDefinition.getObjectDefinitionId());
+		}
+		else if (!defaultObjectLayouts.isEmpty()) {
+			defaultObjectLayout = defaultObjectLayouts.get(0);
+		}
+
+		if (defaultObjectLayout != null) {
 			_objectLayoutTabLocalService.
 				registerObjectLayoutTabScreenNavigationCategories(
-					objectDefinition, objectLayout.getObjectLayoutTabs());
+					objectDefinition,
+					defaultObjectLayout.getObjectLayoutTabs());
 		}
 
 		_objectRelationshipLocalService.

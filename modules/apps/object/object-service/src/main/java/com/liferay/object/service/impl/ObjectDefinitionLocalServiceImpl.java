@@ -55,6 +55,7 @@ import com.liferay.object.model.ObjectEntryTable;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldModel;
 import com.liferay.object.model.ObjectFolder;
+import com.liferay.object.model.ObjectLayout;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.model.impl.ObjectDefinitionImpl;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionLocalizationTable;
@@ -990,6 +991,8 @@ public class ObjectDefinitionLocalServiceImpl
 				_workflowStatusModelPreFilterContributor,
 				_userGroupRoleLocalService);
 
+		List<ObjectLayout> defaultObjectLayouts =
+			_objectLayoutLocalService.getDefaultObjectLayouts();
 		List<ObjectAction> standaloneObjectActions =
 			_objectActionLocalService.getObjectActions(
 				true, ObjectActionTriggerConstants.KEY_STANDALONE);
@@ -1001,6 +1004,13 @@ public class ObjectDefinitionLocalServiceImpl
 							companyId, WorkflowConstants.STATUS_APPROVED)) {
 
 					if (objectDefinition.isActive()) {
+						objectDefinition.setDefaultObjectLayouts(
+							ListUtil.filter(
+								defaultObjectLayouts,
+								objectLayout ->
+									objectLayout.getObjectDefinitionId() ==
+										objectDefinition.
+											getObjectDefinitionId()));
 						objectDefinition.setStandaloneObjectActions(
 							ListUtil.filter(
 								standaloneObjectActions,
