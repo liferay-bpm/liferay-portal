@@ -7,6 +7,7 @@ package com.liferay.object.model.impl;
 
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.definition.util.ObjectDefinitionUtil;
+import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectFolder;
 import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
@@ -18,6 +19,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -187,6 +189,11 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 	}
 
 	@Override
+	public List<ObjectAction> getStandaloneObjectActions() {
+		return _standaloneObjectActions;
+	}
+
+	@Override
 	public boolean isApproved() {
 		if (getStatus() == WorkflowConstants.STATUS_APPROVED) {
 			return true;
@@ -274,6 +281,12 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 		_previousRESTContextPath = previousRESTContextPath;
 	}
 
+	@Override
+	public void setStandaloneObjectActions(List<ObjectAction> objectActions) {
+		_standaloneObjectActions = objectActions;
+	}
+
 	private String _previousRESTContextPath;
+	private List<ObjectAction> _standaloneObjectActions;
 
 }
