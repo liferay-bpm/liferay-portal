@@ -10,6 +10,7 @@ import com.liferay.object.definition.util.ObjectDefinitionUtil;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectFolder;
+import com.liferay.object.model.ObjectLayout;
 import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
 import com.liferay.object.service.ObjectFolderLocalServiceUtil;
 import com.liferay.petra.string.StringBundler;
@@ -36,6 +37,11 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 		}
 
 		return shortName;
+	}
+
+	@Override
+	public List<ObjectLayout> getDefaultObjectLayouts() {
+		return _defaultObjectLayouts;
 	}
 
 	@Override
@@ -277,6 +283,13 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 	}
 
 	@Override
+	public void setDefaultObjectLayouts(
+		List<ObjectLayout> defaultObjectLayouts) {
+
+		_defaultObjectLayouts = defaultObjectLayouts;
+	}
+
+	@Override
 	public void setPreviousRESTContextPath(String previousRESTContextPath) {
 		_previousRESTContextPath = previousRESTContextPath;
 	}
@@ -286,6 +299,7 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 		_standaloneObjectActions = objectActions;
 	}
 
+	private List<ObjectLayout> _defaultObjectLayouts;
 	private String _previousRESTContextPath;
 	private List<ObjectAction> _standaloneObjectActions;
 
