@@ -162,6 +162,19 @@ public class ObjectLayoutLocalServiceImpl
 	}
 
 	@Override
+	public List<ObjectLayout> getDefaultObjectLayouts() {
+		List<ObjectLayout> objectLayouts =
+			objectLayoutPersistence.findByDefaultObjectLayout(true);
+
+		for (ObjectLayout objectLayout : objectLayouts) {
+			objectLayout.setObjectLayoutTabs(
+				_getObjectLayoutTabs(objectLayout));
+		}
+
+		return objectLayouts;
+	}
+
+	@Override
 	public ObjectLayout getObjectLayout(long objectLayoutId)
 		throws PortalException {
 
