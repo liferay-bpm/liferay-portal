@@ -12,6 +12,7 @@ import com.liferay.fragment.cache.FragmentEntryLinkCache;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.layout.model.LayoutClassedModelUsage;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
+import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
@@ -989,6 +990,10 @@ public class ObjectDefinitionLocalServiceImpl
 				_workflowStatusModelPreFilterContributor,
 				_userGroupRoleLocalService);
 
+		List<ObjectAction> standaloneObjectActions =
+			_objectActionLocalService.getObjectActions(
+				true, ObjectActionTriggerConstants.KEY_STANDALONE);
+
 		_companyLocalService.forEachCompanyId(
 			companyId -> {
 				for (ObjectDefinition objectDefinition :
@@ -996,6 +1001,14 @@ public class ObjectDefinitionLocalServiceImpl
 							companyId, WorkflowConstants.STATUS_APPROVED)) {
 
 					if (objectDefinition.isActive()) {
+						objectDefinition.setStandaloneObjectActions(
+							ListUtil.filter(
+								standaloneObjectActions,
+								objectAction ->
+									objectAction.getObjectDefinitionId() ==
+										objectDefinition.
+											getObjectDefinitionId()));
+
 						activeServiceRegistrationsMap.put(
 							objectDefinition.getObjectDefinitionId(),
 							objectDefinitionDeployer.deploy(objectDefinition));

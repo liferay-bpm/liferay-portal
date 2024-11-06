@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -90,15 +91,20 @@ public class ObjectDefinitionResourcePermissionUtil {
 
 	private static String _getObjectActionPermissionKeys(
 		ObjectActionLocalService objectActionLocalService,
-		long objectDefinitionId) {
+		ObjectDefinition objectDefinition) {
 
 		String objectActionPermissionKeys = StringPool.BLANK;
 
-		for (ObjectAction objectAction :
-				objectActionLocalService.getObjectActions(
-					objectDefinitionId,
-					ObjectActionTriggerConstants.KEY_STANDALONE)) {
+		List<ObjectAction> standaloneObjectActions =
+			objectDefinition.getStandaloneObjectActions();
 
+		if (standaloneObjectActions == null) {
+			standaloneObjectActions = objectActionLocalService.getObjectActions(
+				objectDefinition.getObjectDefinitionId(),
+				ObjectActionTriggerConstants.KEY_STANDALONE);
+		}
+
+		for (ObjectAction objectAction : standaloneObjectActions) {
 			objectActionPermissionKeys = StringBundler.concat(
 				objectActionPermissionKeys, "<action-key>",
 				objectAction.getName(), "</action-key>");
@@ -162,12 +168,12 @@ public class ObjectDefinitionResourcePermissionUtil {
 				continue;
 			}
 
-			String objectActionPermissionKeys = _getObjectActionPermissionKeys(
-				objectActionLocalService, node.getPrimaryKey());
-
 			ObjectDefinition rootDescendantNodeObjectDefinition =
 				objectDefinitionPersistence.findByPrimaryKey(
 					node.getPrimaryKey());
+
+			String objectActionPermissionKeys = _getObjectActionPermissionKeys(
+				objectActionLocalService, rootDescendantNodeObjectDefinition);
 
 			modelResources = StringBundler.concat(
 				modelResources, "<model-resource><model-name>",
@@ -194,7 +200,7 @@ public class ObjectDefinitionResourcePermissionUtil {
 		throws Exception {
 
 		String objectActionPermissionKeys = _getObjectActionPermissionKeys(
-			objectActionLocalService, objectDefinition.getObjectDefinitionId());
+			objectActionLocalService, objectDefinition);
 
 		String resourceActionsFileName =
 			"resource-actions/resource-actions.xml.tpl";
