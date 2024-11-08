@@ -48,6 +48,8 @@ public interface ObjectDefinition
 
 		};
 
+	public java.util.List<ObjectLayout> getDefaultObjectLayouts();
+
 	public String getDestinationName();
 
 	public String getExtensionDBTableName();
@@ -72,6 +74,8 @@ public interface ObjectDefinition
 
 	public String getShortName();
 
+	public java.util.List<ObjectAction> getStandaloneObjectActions();
+
 	public boolean isApproved();
 
 	public boolean isDefaultStorageType();
@@ -88,6 +92,12 @@ public interface ObjectDefinition
 
 	public boolean isUnmodifiableSystemObject();
 
+	public void setDefaultObjectLayouts(
+		java.util.List<ObjectLayout> defaultObjectLayouts);
+
 	public void setPreviousRESTContextPath(String previousRESTContextPath);
+
+	public void setStandaloneObjectActions(
+		java.util.List<ObjectAction> objectActions);
 
 }

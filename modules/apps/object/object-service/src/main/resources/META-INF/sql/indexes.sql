@@ -51,6 +51,7 @@ create unique index IX_61EBCE03 on ObjectFolderItem (objectDefinitionId, objectF
 create index IX_F9E61F22 on ObjectFolderItem (objectFolderId);
 create index IX_880861CE on ObjectFolderItem (uuid_[$COLUMN_LENGTH:75$]);
 
+create index IX_730EAA4B on ObjectLayout (defaultObjectLayout);
 create index IX_FD0CCE8A on ObjectLayout (objectDefinitionId, defaultObjectLayout);
 create index IX_7D8E0DE5 on ObjectLayout (uuid_[$COLUMN_LENGTH:75$]);
 

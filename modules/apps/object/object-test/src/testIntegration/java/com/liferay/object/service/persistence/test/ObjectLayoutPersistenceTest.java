@@ -195,6 +195,13 @@ public class ObjectLayoutPersistenceTest {
 	}
 
 	@Test
+	public void testCountByDefaultObjectLayout() throws Exception {
+		_persistence.countByDefaultObjectLayout(RandomTestUtil.randomBoolean());
+
+		_persistence.countByDefaultObjectLayout(RandomTestUtil.randomBoolean());
+	}
+
+	@Test
 	public void testCountByODI_DOL() throws Exception {
 		_persistence.countByODI_DOL(
 			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());

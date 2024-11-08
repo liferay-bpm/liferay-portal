@@ -409,6 +409,11 @@ public class ObjectDefinitionWrapper
 		return model.getDefaultLanguageId();
 	}
 
+	@Override
+	public java.util.List<ObjectLayout> getDefaultObjectLayouts() {
+		return model.getDefaultObjectLayouts();
+	}
+
 	/**
 	 * Returns the description object field ID of this object definition.
 	 *
@@ -841,6 +846,11 @@ public class ObjectDefinitionWrapper
 		return model.getShortName();
 	}
 
+	@Override
+	public java.util.List<ObjectAction> getStandaloneObjectActions() {
+		return model.getStandaloneObjectActions();
+	}
+
 	/**
 	 * Returns the status of this object definition.
 	 *
@@ -1172,6 +1182,13 @@ public class ObjectDefinitionWrapper
 	@Override
 	public void setDBTableName(String dbTableName) {
 		model.setDBTableName(dbTableName);
+	}
+
+	@Override
+	public void setDefaultObjectLayouts(
+		java.util.List<ObjectLayout> defaultObjectLayouts) {
+
+		model.setDefaultObjectLayouts(defaultObjectLayouts);
 	}
 
 	/**
@@ -1528,6 +1545,13 @@ public class ObjectDefinitionWrapper
 	@Override
 	public void setScope(String scope) {
 		model.setScope(scope);
+	}
+
+	@Override
+	public void setStandaloneObjectActions(
+		java.util.List<ObjectAction> objectActions) {
+
+		model.setStandaloneObjectActions(objectActions);
 	}
 
 	/**
