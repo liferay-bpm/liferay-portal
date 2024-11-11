@@ -786,63 +786,7 @@ public class ObjectEntryLocalServiceTest {
 					"listTypeEntryKeyRequired", "listTypeEntryKey1"
 				).build()));
 
-		ObjectDefinition objectDefinition = _publishCustomObjectDefinition(
-			true,
-			Arrays.asList(
-				ObjectFieldUtil.createObjectField(
-					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-					ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
-					RandomTestUtil.randomString(), "name",
-					Arrays.asList(
-						new ObjectFieldSettingBuilder(
-						).name(
-							ObjectFieldSettingConstants.NAME_UNIQUE_VALUES
-						).value(
-							Boolean.TRUE.toString()
-						).build()),
-					false)));
-
-		objectDefinition.setScope(ObjectDefinitionConstants.SCOPE_SITE);
-
-		objectDefinition = _objectDefinitionLocalService.updateObjectDefinition(
-			objectDefinition);
-
-		_addObjectEntry(
-			TestPropsValues.getGroupId(),
-			objectDefinition.getObjectDefinitionId(),
-			HashMapBuilder.<String, Serializable>put(
-				"name", "Peter"
-			).build());
-
-		long finalObjectDefinitionId = objectDefinition.getObjectDefinitionId();
-
-		AssertUtils.assertFailure(
-			ObjectEntryValuesException.UniqueValueConstraintViolation.class,
-			"Unique value constraint violation for " +
-				objectDefinition.getDBTableName() + ".name_ with value Peter",
-			() -> _addObjectEntry(
-				TestPropsValues.getGroupId(), finalObjectDefinitionId,
-				HashMapBuilder.<String, Serializable>put(
-					"name", "Peter"
-				).build()));
-
-		Group group = GroupTestUtil.addGroup();
-
-		_addObjectEntry(
-			group.getGroupId(), objectDefinition.getObjectDefinitionId(),
-			HashMapBuilder.<String, Serializable>put(
-				"name", "Peter"
-			).build());
-
-		AssertUtils.assertFailure(
-			ObjectEntryValuesException.UniqueValueConstraintViolation.class,
-			"Unique value constraint violation for " +
-				objectDefinition.getDBTableName() + ".name_ with value Peter",
-			() -> _addObjectEntry(
-				group.getGroupId(), finalObjectDefinitionId,
-				HashMapBuilder.<String, Serializable>put(
-					"name", "Peter"
-				).build()));
+		// object entry with localized values
 
 		_testAddObjectEntryWithLocalizedValues(objectDefinition, group);
 
@@ -870,6 +814,68 @@ public class ObjectEntryLocalServiceTest {
 
 		_objectDefinitionLocalService.deleteObjectDefinition(
 			modifiableSystemObjectDefinition.getObjectDefinitionId());
+
+		// object entry with unique values in different sites
+
+		objectDefinition = _publishCustomObjectDefinition(
+			false,
+			Arrays.asList(
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+					ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
+					RandomTestUtil.randomString(), "name",
+					Arrays.asList(
+						new ObjectFieldSettingBuilder(
+						).name(
+							ObjectFieldSettingConstants.NAME_UNIQUE_VALUES
+						).value(
+							Boolean.TRUE.toString()
+						).build()),
+					false)));
+
+		objectDefinition.setScope(ObjectDefinitionConstants.SCOPE_SITE);
+
+		objectDefinition = _objectDefinitionLocalService.updateObjectDefinition(
+			objectDefinition);
+
+		_addObjectEntry(
+			TestPropsValues.getGroupId(),
+			objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"name", "Peter"
+			).build());
+
+		_addObjectEntry(
+			group.getGroupId(), objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"name", "Peter"
+			).build());
+
+		// object entry with unique values in the same site
+
+		long finalObjectDefinitionId = objectDefinition.getObjectDefinitionId();
+
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.UniqueValueConstraintViolation.class,
+			"Unique value constraint violation for " +
+				objectDefinition.getDBTableName() + ".name_ with value Peter",
+			() -> _addObjectEntry(
+				TestPropsValues.getGroupId(), finalObjectDefinitionId,
+				HashMapBuilder.<String, Serializable>put(
+					"name", "Peter"
+				).build()));
+
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.UniqueValueConstraintViolation.class,
+			"Unique value constraint violation for " +
+				objectDefinition.getDBTableName() + ".name_ with value Peter",
+			() -> _addObjectEntry(
+				group.getGroupId(), finalObjectDefinitionId,
+				HashMapBuilder.<String, Serializable>put(
+					"name", "Peter"
+				).build()));
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
 	@Test
