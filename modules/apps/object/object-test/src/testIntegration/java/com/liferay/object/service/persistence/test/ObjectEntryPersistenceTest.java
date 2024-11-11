@@ -278,6 +278,17 @@ public class ObjectEntryPersistenceTest {
 	}
 
 	@Test
+	public void testCountByERC_G_C_ODI() throws Exception {
+		_persistence.countByERC_G_C_ODI(
+			"", RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
+			RandomTestUtil.nextLong());
+
+		_persistence.countByERC_G_C_ODI("null", 0L, 0L, 0L);
+
+		_persistence.countByERC_G_C_ODI((String)null, 0L, 0L, 0L);
+	}
+
+	@Test
 	public void testCountByG_ODI_S() throws Exception {
 		_persistence.countByG_ODI_S(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
@@ -293,17 +304,6 @@ public class ObjectEntryPersistenceTest {
 			RandomTestUtil.nextLong());
 
 		_persistence.countByU_GtCD_ODI(0L, RandomTestUtil.nextDate(), 0L);
-	}
-
-	@Test
-	public void testCountByERC_G_C_ODI() throws Exception {
-		_persistence.countByERC_G_C_ODI(
-			"", RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
-			RandomTestUtil.nextLong());
-
-		_persistence.countByERC_G_C_ODI("null", 0L, 0L, 0L);
-
-		_persistence.countByERC_G_C_ODI((String)null, 0L, 0L, 0L);
 	}
 
 	@Test
