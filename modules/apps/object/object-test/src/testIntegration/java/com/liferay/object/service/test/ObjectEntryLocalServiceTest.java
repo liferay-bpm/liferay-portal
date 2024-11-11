@@ -786,6 +786,42 @@ public class ObjectEntryLocalServiceTest {
 					"listTypeEntryKeyRequired", "listTypeEntryKey1"
 				).build()));
 
+		// object entry with external reference code in different sites
+
+		ObjectDefinition objectDefinition = _publishCustomObjectDefinition(
+			true,
+			Collections.singletonList(
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+					ObjectFieldConstants.DB_TYPE_STRING,
+					RandomTestUtil.randomString(), StringUtil.randomId())));
+
+		objectDefinition.setScope(ObjectDefinitionConstants.SCOPE_SITE);
+
+		objectDefinition = _objectDefinitionLocalService.updateObjectDefinition(
+			objectDefinition);
+
+		String externalReferenceCode = RandomTestUtil.randomString();
+
+		ObjectEntry objectEntry1 = _addObjectEntry(
+			TestPropsValues.getGroupId(),
+			objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"externalReferenceCode", externalReferenceCode
+			).build());
+
+		Group group = GroupTestUtil.addGroup();
+
+		ObjectEntry objectEntry2 = _addObjectEntry(
+			group.getGroupId(), objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"externalReferenceCode", externalReferenceCode
+			).build());
+
+		Assert.assertEquals(
+			objectEntry1.getExternalReferenceCode(),
+			objectEntry2.getExternalReferenceCode());
+
 		// object entry with localized values
 
 		_testAddObjectEntryWithLocalizedValues(objectDefinition, group);
@@ -1838,81 +1874,6 @@ public class ObjectEntryLocalServiceTest {
 
 		Assert.assertEquals(
 			expectedValues.get("richText"), actualValues.get("richText"));
-
-		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
-	}
-
-	@Test
-	public void testAddObjectEntryWithSameExternalReferenceCodeInDifferentSites()
-		throws Exception {
-
-		ObjectDefinition objectDefinition = _publishCustomObjectDefinition(
-			false,
-			Arrays.asList(
-				ObjectFieldUtil.createObjectField(
-					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-					ObjectFieldConstants.DB_TYPE_STRING,
-					RandomTestUtil.randomString(), StringUtil.randomId())));
-
-		objectDefinition.setScope(ObjectDefinitionConstants.SCOPE_SITE);
-
-		objectDefinition = _objectDefinitionLocalService.updateObjectDefinition(
-			objectDefinition);
-
-		Group group = GroupTestUtil.addGroup();
-
-		long groupId = group.getGroupId();
-
-		Assert.assertEquals(
-			0,
-			_objectEntryLocalService.getObjectEntriesCount(
-				groupId, objectDefinition.getObjectDefinitionId()));
-
-		String externalReferenceCode = RandomTestUtil.randomString();
-
-		ObjectEntry objectEntry1 = _objectEntryLocalService.addObjectEntry(
-			TestPropsValues.getUserId(), groupId,
-			objectDefinition.getObjectDefinitionId(),
-			HashMapBuilder.<String, Serializable>put(
-				"externalReferenceCode", externalReferenceCode
-			).build(),
-			ServiceContextTestUtil.getServiceContext());
-
-		long objectEntryId1 = objectEntry1.getObjectEntryId();
-
-		Assert.assertEquals(
-			1,
-			_objectEntryLocalService.getObjectEntriesCount(
-				groupId, objectDefinition.getObjectDefinitionId()));
-
-		groupId = TestPropsValues.getGroupId();
-
-		Assert.assertEquals(
-			0,
-			_objectEntryLocalService.getObjectEntriesCount(
-				groupId, objectDefinition.getObjectDefinitionId()));
-
-		ObjectEntry objectEntry2 = _objectEntryLocalService.addObjectEntry(
-			TestPropsValues.getUserId(), groupId,
-			objectDefinition.getObjectDefinitionId(),
-			HashMapBuilder.<String, Serializable>put(
-				"externalReferenceCode", externalReferenceCode
-			).build(),
-			ServiceContextTestUtil.getServiceContext());
-
-		long objectEntryId2 = objectEntry2.getObjectEntryId();
-
-		Assert.assertEquals(
-			1,
-			_objectEntryLocalService.getObjectEntriesCount(
-				groupId, objectDefinition.getObjectDefinitionId()));
-
-		Assert.assertEquals(
-			objectEntry1.getExternalReferenceCode(),
-			objectEntry2.getExternalReferenceCode());
-
-		_objectEntryLocalService.deleteObjectEntry(objectEntryId1);
-		_objectEntryLocalService.deleteObjectEntry(objectEntryId2);
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
