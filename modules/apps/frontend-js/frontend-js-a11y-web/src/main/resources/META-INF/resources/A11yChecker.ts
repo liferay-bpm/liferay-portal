@@ -451,7 +451,7 @@ export class A11yChecker {
 			this.axeOptions
 		);
 
-		this.callback(results);
+		this.callback(results as any);
 	}
 
 	private recordCallback(target: Node) {

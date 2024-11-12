@@ -58,7 +58,7 @@ export function useKeyboardMovement({
 	}, [isTarget, item.active, item.url, setRedirectURL]);
 
 	const enableMovement = useCallback(
-		(sources) => {
+		(sources: any) => {
 			const initialTarget = getInitialTarget({
 				columnSizes,
 				isPrivateLayoutsEnabled,

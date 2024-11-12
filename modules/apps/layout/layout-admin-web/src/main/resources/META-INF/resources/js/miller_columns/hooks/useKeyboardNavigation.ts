@@ -46,7 +46,7 @@ export function useKeyboardNavigation({
 		columnIndex === target.columnIndex && itemIndex === target.itemIndex;
 
 	const onKeyDown = useCallback(
-		(event) => {
+		(event: any) => {
 			const key = getKey(event, rtl);
 
 			if (!isAllowedKey(key)) {
