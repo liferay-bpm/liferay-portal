@@ -1408,7 +1408,7 @@ public class ObjectDefinitionLocalServiceTest {
 			ObjectRelationshipTestUtil.addObjectRelationship(
 				_objectRelationshipLocalService, objectDefinitionA,
 				objectDefinitionAA,
-				ObjectRelationshipConstants.DELETION_TYPE_PREVENT);
+				ObjectRelationshipConstants.DELETION_TYPE_CASCADE);
 
 		_testBindObjectDefinitions(
 			LinkedHashMapBuilder.put(
@@ -1422,7 +1422,7 @@ public class ObjectDefinitionLocalServiceTest {
 				ObjectRelationshipTestUtil.addObjectRelationship(
 					_objectRelationshipLocalService, objectDefinitionAA,
 					ObjectDefinitionTestUtil.addCustomObjectDefinition("AAA"),
-					ObjectRelationshipConstants.DELETION_TYPE_PREVENT),
+					ObjectRelationshipConstants.DELETION_TYPE_CASCADE),
 				objectRelationshipA_AA),
 			objectDefinitionA.getObjectDefinitionId());
 
@@ -1442,7 +1442,7 @@ public class ObjectDefinitionLocalServiceTest {
 				ObjectRelationshipTestUtil.addObjectRelationship(
 					_objectRelationshipLocalService, objectDefinitionAA,
 					ObjectDefinitionTestUtil.addCustomObjectDefinition("AAB"),
-					ObjectRelationshipConstants.DELETION_TYPE_PREVENT),
+					ObjectRelationshipConstants.DELETION_TYPE_CASCADE),
 				objectRelationshipA_AA),
 			objectDefinitionA.getObjectDefinitionId());
 
