@@ -113,8 +113,6 @@ export class ObjectLayoutsPage {
 		objectLayoutBlockName: string,
 		objectLayoutName: string,
 		objectLayoutTabName: string,
-		objectField?: string,
-		isDefault?: boolean
 	) {
 		await this.openObjectLayoutConfiguration(objectLayoutName);
 		await this.createObjectLayoutTab(objectLayoutTabName);
