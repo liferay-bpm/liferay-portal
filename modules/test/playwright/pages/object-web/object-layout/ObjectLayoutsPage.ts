@@ -65,12 +65,11 @@ export class ObjectLayoutsPage {
 		this.saveTabButton = this.iframeLocator
 			.getByLabel('Add Tab')
 			.getByRole('button', {name: 'Save'});
-		this.saveUpdateLayoutButton =
-			this.iframeLocator
-				.locator(
-					'.lfr-objects__side-panel-content-container.btn-group-spaced'
-				)
-				.getByRole('button', {name: 'Save'});
+		this.saveUpdateLayoutButton = this.iframeLocator
+			.locator(
+				'.lfr-objects__side-panel-content-container.btn-group-spaced'
+			)
+			.getByRole('button', {name: 'Save'});
 		this.viewObjectDefinitionsPage = new ViewObjectDefinitionsPage(page);
 	}
 
@@ -112,7 +111,7 @@ export class ObjectLayoutsPage {
 	async createObjectLayoutContent(
 		objectLayoutBlockName: string,
 		objectLayoutName: string,
-		objectLayoutTabName: string,
+		objectLayoutTabName: string
 	) {
 		await this.openObjectLayoutConfiguration(objectLayoutName);
 		await this.createObjectLayoutTab(objectLayoutTabName);

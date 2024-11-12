@@ -826,7 +826,8 @@ test.describe('Manage object entries through View Object Entries', () => {
 			}
 		);
 
-		const applicationName = 'c/' + objectDefinition1.name.toLowerCase() + 's';
+		const applicationName =
+			'c/' + objectDefinition1.name.toLowerCase() + 's';
 
 		await apiHelpers.objectEntry.postObjectEntry(
 			{textField: 'test 1'},
