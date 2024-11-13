@@ -83,6 +83,7 @@ public class ObjectDefinitionGraphQLDTOContributor
 		ObjectEntryManager objectEntryManager,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectRelationshipLocalService objectRelationshipLocalService,
+		List<ObjectRelationship> objectRelationships,
 		ObjectScopeProvider objectScopeProvider,
 		SystemObjectDefinitionManagerRegistry
 			systemObjectDefinitionManagerRegistry) {
@@ -159,9 +160,11 @@ public class ObjectDefinitionGraphQLDTOContributor
 			}
 		}
 
-		List<ObjectRelationship> objectRelationships =
-			objectRelationshipLocalService.getObjectRelationships(
-				objectDefinition.getObjectDefinitionId());
+		if (objectRelationships == null) {
+			objectRelationships =
+				objectRelationshipLocalService.getObjectRelationships(
+					objectDefinition.getObjectDefinitionId());
+		}
 
 		for (ObjectRelationship objectRelationship : objectRelationships) {
 			if (!Objects.equals(
