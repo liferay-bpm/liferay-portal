@@ -9,6 +9,7 @@ import {apiHelpersTest} from '../../fixtures/apiHelpersTest';
 import {loginTest} from '../../fixtures/loginTest';
 import {workflowPagesTest} from '../../fixtures/workflowPagesTest';
 import {getRandomInt} from '../../utils/getRandomInt';
+import getRandomString from '../../utils/getRandomString';
 
 export const test = mergeTests(apiHelpersTest, loginTest(), workflowPagesTest);
 
@@ -67,7 +68,10 @@ test.beforeEach(async ({apiHelpers}) => {
 	const workflowDefinition =
 		await apiHelpers.headlessAdminWorkflow.postWorkflowDefinitionSave(
 			workflowDefinitionName,
-			singleApproverWorkflowDefinition
+			{
+				...singleApproverWorkflowDefinition,
+				externalReferenceCode: getRandomString(),
+			}
 		);
 
 	workflowDefinitionId = workflowDefinition.id;
