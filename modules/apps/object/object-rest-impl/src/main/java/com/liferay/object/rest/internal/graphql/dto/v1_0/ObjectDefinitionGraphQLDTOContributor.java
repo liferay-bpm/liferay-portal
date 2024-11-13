@@ -82,6 +82,7 @@ public class ObjectDefinitionGraphQLDTOContributor
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectEntryManager objectEntryManager,
 		ObjectFieldLocalService objectFieldLocalService,
+		List<ObjectField> objectFields,
 		ObjectRelationshipLocalService objectRelationshipLocalService,
 		List<ObjectRelationship> objectRelationships,
 		ObjectScopeProvider objectScopeProvider,
@@ -109,9 +110,10 @@ public class ObjectDefinitionGraphQLDTOContributor
 		List<GraphQLDTOProperty> relationshipGraphQLDTOProperties =
 			new ArrayList<>();
 
-		List<ObjectField> objectFields =
-			objectFieldLocalService.getObjectFields(
+		if (objectFields == null) {
+			objectFields = objectFieldLocalService.getObjectFields(
 				objectDefinition.getObjectDefinitionId());
+		}
 
 		for (ObjectField objectField : objectFields) {
 			if (Objects.equals(

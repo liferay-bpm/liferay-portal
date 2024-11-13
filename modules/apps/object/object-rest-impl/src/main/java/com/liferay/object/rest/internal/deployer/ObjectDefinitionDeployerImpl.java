@@ -8,6 +8,7 @@ package com.liferay.object.rest.internal.deployer;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
 import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
@@ -119,7 +120,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	public synchronized List<ServiceRegistration<?>> deploy(
 		ObjectDefinition objectDefinition) {
 
-		return _deploy(objectDefinition, null);
+		return _deploy(objectDefinition, null, null);
 	}
 
 	@Override
@@ -129,6 +130,8 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		Map<Long, List<ServiceRegistration<?>>> activeServiceRegistrationsMap =
 			new ConcurrentHashMap<>();
 
+		List<ObjectField> objectFields =
+			_objectFieldLocalService.getObjectFieldsByCompanyId(companyId);
 		List<ObjectRelationship> objectRelationships =
 			_objectRelationshipLocalService.getObjectRelationshipsByCompanyId(
 				companyId);
@@ -141,6 +144,11 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				objectDefinition.getObjectDefinitionId(),
 				_deploy(
 					objectDefinition,
+					ListUtil.filter(
+						objectFields,
+						objectField ->
+							objectField.getObjectDefinitionId() ==
+								objectDefinition.getObjectDefinitionId()),
 					ListUtil.filter(
 						objectRelationships,
 						objectRelationship ->
@@ -198,7 +206,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	}
 
 	private List<ServiceRegistration<?>> _deploy(
-		ObjectDefinition objectDefinition,
+		ObjectDefinition objectDefinition, List<ObjectField> objectFields,
 		List<ObjectRelationship> objectRelationships) {
 
 		if (objectDefinition.isUnmodifiableSystemObject()) {
@@ -240,8 +248,9 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					objectDefinition, _objectDefinitionLocalService,
 					_objectEntryManagerRegistry.getObjectEntryManager(
 						objectDefinition.getStorageType()),
-					_objectFieldLocalService, _objectRelationshipLocalService,
-					objectRelationships, objectScopeProvider,
+					_objectFieldLocalService, objectFields,
+					_objectRelationshipLocalService, objectRelationships,
+					objectScopeProvider,
 					_systemObjectDefinitionManagerRegistry),
 				HashMapDictionaryBuilder.<String, Object>put(
 					"dto.name", objectDefinition.getDBTableName()
