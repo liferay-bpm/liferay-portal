@@ -17,7 +17,7 @@
 	</tr>
 	<tr>
 		<td>OBJECT_VIEW_LABEL</td>
-		<td>//div[contains(@class, 'dnd-td') and contains(., '${key_viewLabel}')]</td>
+		<td>//td[contains(., '${key_viewLabel}')]</td>
 		<td></td>
 	</tr>
 	<tr>
@@ -37,7 +37,7 @@
 	</tr>
 	<tr>
 		<td>OBJECT_VIEW_KEBAB_MENU</td>
-		<td>//a[contains(text(),'${key_objectCustomViewLabel}')]/ancestor::div[contains(@class,'dnd-tr')]//*[contains(@class,'lexicon-icon-ellipsis')]</td>
+		<td>//a[contains(text(),'${key_objectCustomViewLabel}')]/ancestor::tr//*[contains(@class,'lexicon-icon-ellipsis')]</td>
 		<td></td>
 	</tr>
 	<tr>
@@ -187,17 +187,17 @@
 	</tr>
 	<tr>
 		<td>VIEW_FIELDS_ENTRY_BY_POSITION</td>
-		<td>//div[contains(@class,'dnd-tbody')]//div[${key_position}]//span[contains(.,'${key_entryName}')]</td>
+		<td>//tbody//div[${key_position}]//span[contains(.,'${key_entryName}')]</td>
 		<td></td>
 	</tr>
 	<tr>
 		<td>CUSTOM_FIELD_VALUE_ONE</td>
-		<td>//div[contains(@class,'dnd-tbody')]/div[1]/div[1]/span</td>
+		<td>//tbody/div[1]/div[1]/span</td>
 		<td></td>
 	</tr>
 	<tr>
 		<td>CUSTOM_FIELD_VALUE_TWO</td>
-		<td>//div[contains(@class,'dnd-tbody')]/div[2]/div[1]/span</td>
+		<td>//tbody/div[2]/div[1]/span</td>
 		<td></td>
 	</tr>
 	<tr>
