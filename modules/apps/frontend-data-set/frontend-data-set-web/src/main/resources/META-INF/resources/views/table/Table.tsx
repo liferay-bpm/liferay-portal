@@ -427,7 +427,6 @@ const Table = ({
 		'item-actions'
 	);
 
-	if (Liferay.FeatureFlags['LPS-193005']) {
 		return (
 			<DndTable.TableContextProvider
 				columnNames={visibleFields.map((field) =>
@@ -449,52 +448,6 @@ const Table = ({
 				/>
 			</DndTable.TableContextProvider>
 		);
-	}
-
-	return (
-		<DndTable.TableContextProvider columnNames={columnNames}>
-			{(inlineAddingSettings ||
-				(!inlineAddingSettings && !!items.length)) && (
-				<DndTable.Table
-					borderless
-					className={classNames(`table-style-${style}`, {
-						'with-quick-actions': quickActionsEnabled,
-					})}
-					hover={false}
-					responsive
-					striped
-				>
-					<Head
-						fields={visibleFields}
-						items={items}
-						itemsActions={itemsActions}
-						schema={schema}
-						selectItems={selectItems}
-						selectable={selectable}
-						selectedItemsKey={selectedItemsKey}
-						selectedItemsValue={selectedItemsValue}
-						selectionType={selectionType}
-					/>
-
-					<Body
-						highlightedItemsValue={highlightedItemsValue}
-						inlineAddingSettings={inlineAddingSettings}
-						items={items}
-						itemsActions={itemsActions}
-						itemsChanges={itemsChanges}
-						nestedItemsKey={nestedItemsKey}
-						nestedItemsReferenceKey={nestedItemsReferenceKey}
-						selectItems={selectItems}
-						selectable={selectable}
-						selectedItemsKey={selectedItemsKey}
-						selectedItemsValue={selectedItemsValue}
-						selectionType={selectionType}
-						visibleFields={visibleFields}
-					/>
-				</DndTable.Table>
-			)}
-		</DndTable.TableContextProvider>
-	);
 };
 
 export default Table;

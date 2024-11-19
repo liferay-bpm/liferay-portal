@@ -214,11 +214,7 @@ function ActionsDropdown({
 		});
 
 	return (
-		<div
-			className={classnames('d-flex', {
-				'justify-content-end': !Liferay.FeatureFlags['LPS-193005'],
-			})}
-		>
+		<div className="d-flex">
 			{inlineEditingAlwaysOn && inlineEditingActions}
 
 			<ClayDropDown
