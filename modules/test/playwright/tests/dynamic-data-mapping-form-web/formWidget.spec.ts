@@ -23,6 +23,7 @@ import evaluateKeepCheckingAfterFound from '../object-web/utils/keepCheckingAfte
 const test = mergeTests(
 	applicationsMenuPageTest,
 	featureFlagsTest({
+		'LPD-34651': true,
 		'LPS-178052': true,
 	}),
 	dataApiHelpersTest,

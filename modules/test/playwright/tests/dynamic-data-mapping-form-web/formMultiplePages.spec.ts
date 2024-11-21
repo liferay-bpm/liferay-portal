@@ -27,6 +27,7 @@ declare global {
 export const test = mergeTests(
 	apiHelpersTest,
 	featureFlagsTest({
+		'LPD-34651': true,
 		'LPS-178052': true,
 	}),
 	formsPagesTest,
