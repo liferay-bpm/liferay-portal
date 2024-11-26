@@ -136,7 +136,8 @@ public class ObjectRelatedModelsProviderTest {
 					"text"
 				).localized(
 					true
-				).build()));
+				).build()),
+			TestPropsValues.getUserId());
 
 		_setUser(TestPropsValues.getUser());
 	}
