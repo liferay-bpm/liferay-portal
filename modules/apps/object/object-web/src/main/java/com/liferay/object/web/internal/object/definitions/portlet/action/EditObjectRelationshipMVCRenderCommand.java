@@ -17,12 +17,21 @@ import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsRelationshipsDisplayContext;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+
+import java.util.Locale;
+import java.util.Map;
 
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
@@ -69,6 +78,25 @@ public class EditObjectRelationshipMVCRenderCommand
 					_objectDefinitionService, _objectFieldService,
 					_objectFolderLocalService,
 					_systemObjectDefinitionManagerRegistry));
+
+			Map<Locale, String> titleMap = _localization.getLocalizationMap(
+				renderRequest, "title");
+
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+			String title = titleMap.get(themeDisplay.getLocale());
+
+			if (Validator.isBlank(title)) {
+				title = titleMap.get(themeDisplay.getSiteDefaultLocale());
+			}
+
+			MultiSessionMessages.add(
+				renderRequest, "relationshipUpdated",
+				_language.format(
+					_portal.getHttpServletRequest(renderRequest),
+					"the-object-relationship-was-updated-successfully",
+					new Object[] {HtmlUtil.escape(title)}));
 		}
 		catch (PortalException portalException) {
 			SessionErrors.add(renderRequest, portalException.getClass());
@@ -76,6 +104,12 @@ public class EditObjectRelationshipMVCRenderCommand
 
 		return "/object_definitions/edit_object_relationship.jsp";
 	}
+
+	@Reference
+	private Language _language;
+
+	@Reference
+	private Localization _localization;
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
