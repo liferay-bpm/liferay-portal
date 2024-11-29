@@ -101,7 +101,7 @@ test.describe('Manage object entries through Page Templates', () => {
 		const objectDefinition2 =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition(
 				{code: 0},
-				undefined,
+				null,
 				'default'
 			);
 
@@ -676,8 +676,9 @@ test.describe('Manage object entries through View Object Entries', () => {
 		const objectDefinition1 =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition(
 				{code: 0},
-				undefined,
+				null,
 				'default',
+				null,
 				'textField'
 			);
 
@@ -689,7 +690,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 		const objectDefinition2 =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition(
 				{code: 0},
-				undefined,
+				null,
 				'default'
 			);
 
@@ -795,8 +796,9 @@ test.describe('Manage object entries through Workflow', () => {
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition(
 				{code: 0},
-				undefined,
+				null,
 				'default',
+				null,
 				'textField'
 			);
 
@@ -865,8 +867,9 @@ test.describe('Manage object entries through Workflow', () => {
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition(
 				{code: 0},
-				undefined,
+				null,
 				'default',
+				null,
 				'textField'
 			);
 
