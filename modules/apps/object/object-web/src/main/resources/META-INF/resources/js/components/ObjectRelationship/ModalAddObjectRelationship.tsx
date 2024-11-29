@@ -112,12 +112,18 @@ export function ModalAddObjectRelationship({
 	return (
 		<ClayModalProvider>
 			<ClayModal center observer={observer}>
-				<ClayForm onSubmit={handleSubmit}>
-					<ClayModal.Header>
-						{Liferay.Language.get('new-relationship')}
-					</ClayModal.Header>
+				<ClayModal.Header>
+					{Liferay.Language.get('new-relationship')}
+				</ClayModal.Header>
 
-					<ClayModal.Body>
+				<ClayModal.Body
+					className="lfr-objects__modal-add-object-relationship-body"
+					scrollable
+				>
+					<ClayForm
+						id="addObjectRelationshipModalForm"
+						onSubmit={handleSubmit}
+					>
 						<Input
 							error={errors.label}
 							label={Liferay.Language.get('label')}
@@ -178,25 +184,29 @@ export function ModalAddObjectRelationship({
 								/>
 							) : undefined}
 						</ObjectRelationshipFormBase>
-					</ClayModal.Body>
+					</ClayForm>
+				</ClayModal.Body>
 
-					<ClayModal.Footer
-						last={
-							<ClayButton.Group spaced>
-								<ClayButton
-									displayType="secondary"
-									onClick={() => onClose()}
-								>
-									{Liferay.Language.get('cancel')}
-								</ClayButton>
+				<ClayModal.Footer
+					last={
+						<ClayButton.Group spaced>
+							<ClayButton
+								displayType="secondary"
+								onClick={() => onClose()}
+							>
+								{Liferay.Language.get('cancel')}
+							</ClayButton>
 
-								<ClayButton displayType="primary" type="submit">
-									{Liferay.Language.get('save')}
-								</ClayButton>
-							</ClayButton.Group>
-						}
-					/>
-				</ClayForm>
+							<ClayButton
+								displayType="primary"
+								form="addObjectRelationshipModalForm"
+								type="submit"
+							>
+								{Liferay.Language.get('save')}
+							</ClayButton>
+						</ClayButton.Group>
+					}
+				/>
 			</ClayModal>
 		</ClayModalProvider>
 	);
