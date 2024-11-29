@@ -134,6 +134,7 @@ export function ModalAddObjectRelationship({
 					>
 						<Input
 							error={errors.label}
+							id="addObjectRelationshipModalFormLabelField"
 							label={Liferay.Language.get('label')}
 							onChange={({target: {value}}) =>
 								setValues({label: {[defaultLanguageId]: value}})
