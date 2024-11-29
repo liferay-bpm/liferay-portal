@@ -7,7 +7,7 @@ import ClayButton from '@clayui/button';
 import ClayForm from '@clayui/form';
 import ClayModal, {ClayModalProvider, useModal} from '@clayui/modal';
 import {API, Input} from '@liferay/object-js-components-web';
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 
 import {defaultLanguageId} from '../../utils/constants';
 import {toCamelCase} from '../../utils/string';
@@ -99,6 +99,16 @@ export function ModalAddObjectRelationship({
 			parameterRequired: objectRelationshipParameterRequired,
 		});
 
+	const handleInheritanceCheckboxChange = useCallback(
+		({target}: React.ChangeEvent<HTMLInputElement>) => {
+			setValues({
+				...values,
+				edge: target.checked,
+			});
+		},
+		[setValues, values]
+	);
+
 	return (
 		<ClayModalProvider>
 			<ClayModal center observer={observer}>
@@ -131,6 +141,9 @@ export function ModalAddObjectRelationship({
 							}
 							objectDefinitionExternalReferenceCode2={
 								objectDefinitionExternalReferenceCode2
+							}
+							onChangeInheritanceCheckbox={
+								handleInheritanceCheckboxChange
 							}
 							setValues={setValues}
 							submitError={submitError}
