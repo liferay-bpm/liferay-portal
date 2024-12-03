@@ -9,11 +9,14 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.WorkflowInstanceLink;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
@@ -28,6 +31,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * @author Feliphe Marinho
@@ -54,9 +59,28 @@ public class WorkflowInstanceManagerImplTest
 
 			Class<?> clazz = getClass();
 
+			ServiceContext serviceContext = new ServiceContext();
+
+			ThemeDisplay themeDisplay = new ThemeDisplay();
+
+			themeDisplay.setTilesTitle("test");
+
+			themeDisplay.setCompany(
+				CompanyLocalServiceUtil.getCompany(
+					TestPropsValues.getCompanyId()));
+			themeDisplay.setUser(TestPropsValues.getUser());
+
+			MockHttpServletRequest mockHttpServletRequest =
+				new MockHttpServletRequest();
+
+			mockHttpServletRequest.setAttribute(
+				WebKeys.THEME_DISPLAY, themeDisplay);
+
+			serviceContext.setRequest(mockHttpServletRequest);
+
 			WorkflowHandlerRegistryUtil.startWorkflowInstance(
 				TestPropsValues.getCompanyId(), 0, TestPropsValues.getUserId(),
-				clazz.getName(), 1, null, new ServiceContext());
+				clazz.getName(), 1, null, serviceContext);
 
 			WorkflowInstanceLink workflowInstanceLink =
 				workflowInstanceLinkLocalService.getWorkflowInstanceLink(
@@ -296,9 +320,30 @@ public class WorkflowInstanceManagerImplTest
 
 			Class<?> clazz = getClass();
 
+			ServiceContext serviceContext = new ServiceContext();
+
+			ThemeDisplay themeDisplay = new ThemeDisplay();
+
+			themeDisplay.setCompany(
+				CompanyLocalServiceUtil.getCompany(
+					TestPropsValues.getCompanyId()));
+			themeDisplay.setUser(TestPropsValues.getUser());
+
+			MockHttpServletRequest mockHttpServletRequest =
+				new MockHttpServletRequest();
+
+			mockHttpServletRequest.setAttribute(
+				WebKeys.THEME_DISPLAY, themeDisplay);
+
+			serviceContext.setRequest(mockHttpServletRequest);
+
+			Assert.assertNull(serviceContext.getAttribute("themeDisplay"));
+
 			WorkflowHandlerRegistryUtil.startWorkflowInstance(
 				TestPropsValues.getCompanyId(), 0, TestPropsValues.getUserId(),
-				clazz.getName(), 1, null, new ServiceContext());
+				clazz.getName(), 1, null, serviceContext);
+
+			Assert.assertNotNull(serviceContext.getAttribute("themeDisplay"));
 
 			WorkflowInstanceLink workflowInstanceLink =
 				workflowInstanceLinkLocalService.getWorkflowInstanceLink(
