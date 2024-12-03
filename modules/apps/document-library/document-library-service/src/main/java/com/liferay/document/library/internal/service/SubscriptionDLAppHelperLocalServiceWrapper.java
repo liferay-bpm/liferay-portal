@@ -169,7 +169,15 @@ public class SubscriptionDLAppHelperLocalServiceWrapper
 			return;
 		}
 
-		ThemeDisplay themeDisplay = serviceContext.getThemeDisplay();
+		ThemeDisplay themeDisplay = null;
+
+		if (serviceContext.getAttribute("themeDisplay") != null) {
+			themeDisplay = (ThemeDisplay)serviceContext.getAttribute(
+				"themeDisplay");
+		}
+		else {
+			themeDisplay = serviceContext.getThemeDisplay();
+		}
 
 		boolean hasAssetDisplayPage = GetterUtil.getBoolean(
 			serviceContext.getAttribute("hasAssetDisplayPage"));

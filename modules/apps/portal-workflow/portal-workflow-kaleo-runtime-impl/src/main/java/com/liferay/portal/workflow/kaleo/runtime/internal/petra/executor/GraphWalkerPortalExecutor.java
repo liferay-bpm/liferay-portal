@@ -13,6 +13,7 @@ import com.liferay.petra.executor.PortalExecutorManager;
 import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -22,6 +23,7 @@ import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.NamedThreadFactory;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortalRunMode;
@@ -117,6 +119,31 @@ public class GraphWalkerPortalExecutor {
 		_serviceRegistration.unregister();
 	}
 
+	private ThemeDisplay _createLigthWeightThemeDisplay(
+			ThemeDisplay themeDisplay)
+		throws PortalException {
+
+		ThemeDisplay lightWeightThemeDisplay = new ThemeDisplay();
+
+		lightWeightThemeDisplay.setCompany(themeDisplay.getCompany());
+		lightWeightThemeDisplay.setI18nLanguageId(
+			themeDisplay.getI18nLanguageId());
+		lightWeightThemeDisplay.setI18nPath(themeDisplay.getI18nPath());
+		lightWeightThemeDisplay.setLocale(themeDisplay.getLocale());
+		lightWeightThemeDisplay.setPortalDomain(themeDisplay.getPortalDomain());
+		lightWeightThemeDisplay.setPortalURL(themeDisplay.getPortalURL());
+		lightWeightThemeDisplay.setRefererPlid(themeDisplay.getRefererPlid());
+		lightWeightThemeDisplay.setScopeGroupId(themeDisplay.getScopeGroupId());
+		lightWeightThemeDisplay.setSecure(themeDisplay.isSecure());
+		lightWeightThemeDisplay.setServerName(themeDisplay.getServerName());
+		lightWeightThemeDisplay.setServerPort(themeDisplay.getServerPort());
+		lightWeightThemeDisplay.setSiteGroupId(themeDisplay.getSiteGroupId());
+		lightWeightThemeDisplay.setUser(themeDisplay.getUser());
+		lightWeightThemeDisplay.setWidget(themeDisplay.isWidget());
+
+		return lightWeightThemeDisplay;
+	}
+
 	private void _registerPortalExecutorConfig(BundleContext bundleContext) {
 		PortalExecutorConfig portalExecutorConfig = new PortalExecutorConfig(
 			GraphWalkerPortalExecutor.class.getName(), 1, 1, 60,
@@ -151,6 +178,11 @@ public class GraphWalkerPortalExecutor {
 
 			ServiceContext serviceContext =
 				executionContext.getServiceContext();
+
+			serviceContext.setAttribute(
+				"themeDisplay",
+				_createLigthWeightThemeDisplay(
+					serviceContext.getThemeDisplay()));
 
 			if (PrincipalThreadLocal.getUserId() == 0) {
 				PrincipalThreadLocal.setName(serviceContext.getUserId());
