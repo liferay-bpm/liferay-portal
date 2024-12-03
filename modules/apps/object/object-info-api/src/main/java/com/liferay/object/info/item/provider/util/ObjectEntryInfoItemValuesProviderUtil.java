@@ -156,8 +156,8 @@ public class ObjectEntryInfoItemValuesProviderUtil {
 					relatedObjectField, objectFieldInfoFieldConverter,
 					StringBundler.concat(
 						ObjectRelationship.class.getSimpleName(),
-						StringPool.POUND, parentObjectDefinition.getName(),
-						StringPool.POUND, objectRelationship.getName()),
+						StringPool.UNDERLINE, parentObjectDefinition.getName(),
+						StringPool.UNDERLINE, objectRelationship.getName()),
 					objectRelationshipLocalService, themeDisplay, value);
 			}
 		}

@@ -239,9 +239,10 @@ public class ObjectEntryInfoItemFormProviderUtil {
 							objectRelationship.getName(),
 							StringBundler.concat(
 								ObjectRelationship.class.getSimpleName(),
-								StringPool.POUND,
+								StringPool.UNDERLINE,
 								parentObjectDefinition.getName(),
-								StringPool.POUND, objectRelationship.getName()),
+								StringPool.UNDERLINE,
+								objectRelationship.getName()),
 							parentObjectDefinition,
 							objectDefinitionLocalService,
 							objectFieldInfoFieldConverter,
