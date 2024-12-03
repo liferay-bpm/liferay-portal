@@ -1025,7 +1025,7 @@ definition {
 			specificOptionSetValue = "userfn userln",
 			user = "userfn userln");
 
-		var bodyContent = MockMock.getCalendarMailBody(asset = '''Calendar: Event Notification for "Calendar Event Title"''');
+		var bodyContent = MockMock.getCalendarMailBody(asset = "Calendar Event Title");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
