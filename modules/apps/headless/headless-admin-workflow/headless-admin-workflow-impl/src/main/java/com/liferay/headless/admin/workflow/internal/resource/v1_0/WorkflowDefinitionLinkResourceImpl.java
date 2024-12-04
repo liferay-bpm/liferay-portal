@@ -7,8 +7,12 @@ package com.liferay.headless.admin.workflow.internal.resource.v1_0;
 
 import com.liferay.headless.admin.workflow.dto.v1_0.WorkflowDefinitionLink;
 import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowDefinitionLinkResource;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionRegistryUtil;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -133,23 +137,96 @@ public class WorkflowDefinitionLinkResourceImpl
 				workflowDefinition.getName(), workflowDefinition.getVersion()));
 	}
 
+	@Override
+	public WorkflowDefinitionLink
+			putWorkflowDefinitionLinkByExternalReferenceCode(
+				String externalReferenceCode,
+				WorkflowDefinitionLink workflowDefinitionLink)
+		throws Exception {
+
+		long groupId = workflowDefinitionLink.getGroupId();
+
+		if (groupId == 0) {
+			groupId = 0L;
+		}
+		else {
+			Group group = _groupLocalService.getGroupByExternalReferenceCode(
+				workflowDefinitionLink.getGroupExternalReferenceCode(),
+				contextCompany.getCompanyId());
+
+			groupId = group.getGroupId();
+		}
+
+		com.liferay.portal.kernel.model.WorkflowDefinitionLink
+			serviceBuilderWorkflowDefinitionLink =
+				_workflowDefinitionLinkService.
+					fetchWorkflowDefinitionLinkByExternalReferenceCode(
+						externalReferenceCode, groupId);
+
+		if (serviceBuilderWorkflowDefinitionLink != null) {
+			return _toWorkflowDefinitionLink(
+				_workflowDefinitionLinkService.updateWorkflowDefinitionLink(
+					groupId, workflowDefinitionLink.getClassName(),
+					serviceBuilderWorkflowDefinitionLink));
+		}
+
+		return _toWorkflowDefinitionLink(
+			_workflowDefinitionLinkService.addWorkflowDefinitionLink(
+				contextUser.getUserId(), contextCompany.getCompanyId(), groupId,
+				workflowDefinitionLink.getClassName(), 0, 0,
+				workflowDefinitionLink.getWorkflowDefinitionName(),
+				workflowDefinitionLink.getWorkflowDefinitionVersion()));
+	}
+
+	private WorkflowDefinitionLink _buildWorkflowDefinitionLink(
+		com.liferay.portal.kernel.model.WorkflowDefinitionLink
+			serviceBuilderWorkflowDefinitionLink,
+		Group group) {
+
+		long groupId = (group != null) ? group.getGroupId() : 0L;
+		String groupExternalReferenceCode =
+			(group != null) ? group.getExternalReferenceCode() :
+				StringPool.BLANK;
+
+		WorkflowDefinitionLink workflowDefinitionLink =
+			new WorkflowDefinitionLink();
+
+		workflowDefinitionLink.setClassName(
+			serviceBuilderWorkflowDefinitionLink::getClassName);
+		workflowDefinitionLink.setExternalReferenceCode(
+			serviceBuilderWorkflowDefinitionLink::getExternalReferenceCode);
+		workflowDefinitionLink.setGroupId(() -> groupId);
+		workflowDefinitionLink.setGroupExternalReferenceCode(
+			() -> groupExternalReferenceCode);
+		workflowDefinitionLink.setId(
+			serviceBuilderWorkflowDefinitionLink::getWorkflowDefinitionLinkId);
+		workflowDefinitionLink.setWorkflowDefinitionName(
+			serviceBuilderWorkflowDefinitionLink::getWorkflowDefinitionName);
+		workflowDefinitionLink.setWorkflowDefinitionVersion(
+			serviceBuilderWorkflowDefinitionLink::getWorkflowDefinitionVersion);
+
+		return workflowDefinitionLink;
+	}
+
 	private WorkflowDefinitionLink _toWorkflowDefinitionLink(
 			com.liferay.portal.kernel.model.WorkflowDefinitionLink
 				workflowDefinitionLink)
 		throws Exception {
 
-		return new WorkflowDefinitionLink() {
-			{
-				setClassName(workflowDefinitionLink::getClassName);
-				setGroupId(workflowDefinitionLink::getGroupId);
-				setId(workflowDefinitionLink::getWorkflowDefinitionLinkId);
-				setWorkflowDefinitionName(
-					workflowDefinitionLink::getWorkflowDefinitionName);
-				setWorkflowDefinitionVersion(
-					workflowDefinitionLink::getWorkflowDefinitionVersion);
-			}
-		};
+		Group group = null;
+
+		if (workflowDefinitionLink.getGroupId() != 0) {
+			group = _groupService.getGroup(workflowDefinitionLink.getGroupId());
+		}
+
+		return _buildWorkflowDefinitionLink(workflowDefinitionLink, group);
 	}
+
+	@Reference
+	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private GroupService _groupService;
 
 	@Reference
 	private WorkflowDefinitionLinkService _workflowDefinitionLinkService;
