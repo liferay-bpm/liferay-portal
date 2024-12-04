@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.workflow.WorkflowException;
 import com.liferay.portal.service.base.WorkflowDefinitionLinkLocalServiceBaseImpl;
 
 import java.util.List;
@@ -43,12 +44,26 @@ public class WorkflowDefinitionLinkLocalServiceImpl
 			int workflowDefinitionVersion)
 		throws PortalException {
 
-		User user = _userPersistence.findByPrimaryKey(userId);
-
 		long workflowDefinitionLinkId = counterLocalService.increment();
 
 		WorkflowDefinitionLink workflowDefinitionLink =
-			workflowDefinitionLinkPersistence.create(workflowDefinitionLinkId);
+			workflowDefinitionLinkPersistence.fetchByG_C_C_W(
+				groupId, companyId,
+				_classNameLocalService.getClassNameId(className),
+				workflowDefinitionName);
+
+		if (workflowDefinitionLink != null) {
+			throw new WorkflowException(
+				StringBundler.concat(
+					"WorkflowDefinitionLink ",
+					workflowDefinitionLink.getWorkflowDefinitionName(), " and ",
+					workflowDefinitionLink.getClassName(), " already exists"));
+		}
+
+		User user = _userPersistence.findByPrimaryKey(userId);
+
+		workflowDefinitionLink = workflowDefinitionLinkPersistence.create(
+			workflowDefinitionLinkId);
 
 		workflowDefinitionLink.setGroupId(StagingUtil.getLiveGroupId(groupId));
 		workflowDefinitionLink.setCompanyId(companyId);
@@ -365,6 +380,16 @@ public class WorkflowDefinitionLinkLocalServiceImpl
 				className, classPK, typePK, workflowDefinitionName,
 				workflowDefinitionVersion);
 		}
+		else if (StringUtil.equals(
+					className, workflowDefinitionLink.getClassName())) {
+
+			workflowDefinitionLinkPersistence.remove(workflowDefinitionLink);
+
+			workflowDefinitionLink = addWorkflowDefinitionLink(
+				userId, companyId, StagingUtil.getLiveGroupId(groupId),
+				className, classPK, typePK, workflowDefinitionName,
+				workflowDefinitionVersion);
+		}
 
 		workflowDefinitionLink.setGroupId(StagingUtil.getLiveGroupId(groupId));
 		workflowDefinitionLink.setCompanyId(companyId);
@@ -372,6 +397,7 @@ public class WorkflowDefinitionLinkLocalServiceImpl
 		workflowDefinitionLink.setUserName(user.getFullName());
 		workflowDefinitionLink.setClassNameId(
 			_classNameLocalService.getClassNameId(className));
+		workflowDefinitionLink.setClassName(className);
 		workflowDefinitionLink.setClassPK(classPK);
 		workflowDefinitionLink.setTypePK(typePK);
 		workflowDefinitionLink.setWorkflowDefinitionName(
@@ -380,6 +406,41 @@ public class WorkflowDefinitionLinkLocalServiceImpl
 			workflowDefinitionVersion);
 
 		return workflowDefinitionLinkPersistence.update(workflowDefinitionLink);
+	}
+
+	@Override
+	public WorkflowDefinitionLink updateWorkflowDefinitionLink(
+			Long groupId, String className,
+			WorkflowDefinitionLink oldWorkflowDefinitionLink)
+		throws PortalException {
+
+		User user = _userPersistence.findByPrimaryKey(
+			oldWorkflowDefinitionLink.getUserId());
+
+		WorkflowDefinitionLink workflowDefinitionLink =
+			workflowDefinitionLinkPersistence.findByERC_G(
+				oldWorkflowDefinitionLink.getExternalReferenceCode(), groupId);
+
+		if (workflowDefinitionLink != null) {
+			workflowDefinitionLinkPersistence.remove(workflowDefinitionLink);
+		}
+
+		WorkflowDefinitionLink newWorkflowDefinitionLink =
+			addWorkflowDefinitionLink(
+				oldWorkflowDefinitionLink.getUserId(),
+				oldWorkflowDefinitionLink.getCompanyId(),
+				StagingUtil.getLiveGroupId(groupId), className,
+				oldWorkflowDefinitionLink.getClassPK(),
+				oldWorkflowDefinitionLink.getTypePK(),
+				oldWorkflowDefinitionLink.getWorkflowDefinitionName(),
+				oldWorkflowDefinitionLink.getWorkflowDefinitionVersion());
+
+		newWorkflowDefinitionLink.setUserName(user.getFullName());
+		newWorkflowDefinitionLink.setClassNameId(
+			_classNameLocalService.getClassNameId(className));
+
+		return workflowDefinitionLinkPersistence.update(
+			newWorkflowDefinitionLink);
 	}
 
 	@Override
