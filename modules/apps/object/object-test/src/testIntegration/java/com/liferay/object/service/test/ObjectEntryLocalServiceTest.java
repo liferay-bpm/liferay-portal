@@ -823,6 +823,36 @@ public class ObjectEntryLocalServiceTest {
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 
+		// Object entry with unique external reference code in same company
+
+		_addObjectEntry(
+			HashMapBuilder.<String, Serializable>put(
+				"emailAddressRequired", "ezekiel@liferay.com"
+			).put(
+				"externalReferenceCode", externalReferenceCode
+			).put(
+				"firstName", "Ezekiel"
+			).put(
+				"listTypeEntryKeyRequired", "listTypeEntryKey1"
+			).build());
+
+		AssertUtils.assertFailure(
+			DuplicateObjectEntryExternalReferenceCodeException.class,
+			StringBundler.concat(
+				"Duplicate object entry with external reference code ",
+				externalReferenceCode, " and object definition ID ",
+				_objectDefinition.getObjectDefinitionId()),
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"emailAddressRequired", "hosea@liferay.com"
+				).put(
+					"externalReferenceCode", externalReferenceCode
+				).put(
+					"firstName", "Hosea"
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey2"
+				).build()));
+
 		// Object entry with unique values in a company scoped object definition
 
 		AssertUtils.assertFailure(
