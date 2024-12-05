@@ -1,0 +1,19 @@
+{
+	"pageElements": [
+		{
+			"definition": {
+				"widgetInstance": {
+					"widgetConfig": {
+						"ddmStructureExternalReferenceCode": "[$DDM_STRUCTURE_EXTERNAL_REFERENCE_CODE$]",
+						"formInstanceId": "[$FORM_INSTANCE_ID$]",
+						"groupExternalReferenceCode": "[$GROUP_EXTERNAL_REFERENCE_CODE$]",
+						"groupId": "[$GROUP_ID$]"
+					},
+					"widgetName": "com_liferay_dynamic_data_mapping_form_web_portlet_DDMFormPortlet"
+				}
+			},
+			"type": "Widget"
+		}
+	],
+	"type": "Root"
+}

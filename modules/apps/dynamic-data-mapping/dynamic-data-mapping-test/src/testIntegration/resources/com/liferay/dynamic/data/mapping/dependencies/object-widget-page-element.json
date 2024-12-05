@@ -1,0 +1,15 @@
+{
+	"pageElements": [
+		{
+			"definition": {
+				"widgetInstance": {
+					"widgetConfig": {
+					},
+					"widgetName": "[$WIDGET_NAME$]"
+				}
+			},
+			"type": "Widget"
+		}
+	],
+	"type": "Root"
+}
