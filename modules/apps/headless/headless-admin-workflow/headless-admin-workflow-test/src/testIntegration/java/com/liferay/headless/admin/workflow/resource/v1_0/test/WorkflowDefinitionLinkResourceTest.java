@@ -8,22 +8,26 @@ package com.liferay.headless.admin.workflow.resource.v1_0.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.headless.admin.workflow.client.dto.v1_0.WorkflowDefinitionLink;
 import com.liferay.headless.admin.workflow.resource.v1_0.test.util.WorkflowDefinitionTestUtil;
-import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinition;
 import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionLocalServiceUtil;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
@@ -51,19 +55,70 @@ public class WorkflowDefinitionLinkResourceTest
 			WorkflowDefinitionTestUtil.getContent(
 				RandomTestUtil.randomString(), "workflow-definition.xml", name),
 			StringPool.BLANK, 1, ServiceContextTestUtil.getServiceContext());
+	}
 
-		_objectDefinition =
-			ObjectDefinitionTestUtil.addCustomObjectDefinition();
+	@Override
+	@Test
+	public void testPutWorkflowDefinitionLinkByExternalReferenceCode()
+		throws Exception {
+
+		WorkflowDefinitionLink postWorkflowDefinitionLink =
+			testPutWorkflowDefinitionLinkByExternalReferenceCode_addWorkflowDefinitionLink();
+
+		WorkflowDefinitionLink randomWorkflowDefinitionLink =
+			randomWorkflowDefinitionLink();
+
+		WorkflowDefinitionLink putWorkflowDefinitionLink =
+			workflowDefinitionLinkResource.
+				putWorkflowDefinitionLinkByExternalReferenceCode(
+					postWorkflowDefinitionLink.getExternalReferenceCode(),
+					randomWorkflowDefinitionLink);
+
+		assertEquals(randomWorkflowDefinitionLink, putWorkflowDefinitionLink);
+		assertValid(putWorkflowDefinitionLink);
+
+		WorkflowDefinitionLink getWorkflowDefinitionLink =
+			testPutWorkflowDefinitionLinkByExternalReferenceCode_getWorkflowDefinitionLink(
+				putWorkflowDefinitionLink.getExternalReferenceCode());
+
+		assertEquals(randomWorkflowDefinitionLink, getWorkflowDefinitionLink);
+		assertValid(getWorkflowDefinitionLink);
+
+		WorkflowDefinitionLink newWorkflowDefinitionLink =
+			testPutWorkflowDefinitionLinkByExternalReferenceCode_createWorkflowDefinitionLink();
+
+		putWorkflowDefinitionLink =
+			workflowDefinitionLinkResource.
+				putWorkflowDefinitionLinkByExternalReferenceCode(
+					newWorkflowDefinitionLink.getExternalReferenceCode(),
+					newWorkflowDefinitionLink);
+
+		assertEquals(newWorkflowDefinitionLink, putWorkflowDefinitionLink);
+		assertValid(putWorkflowDefinitionLink);
+
+		getWorkflowDefinitionLink =
+			testPutWorkflowDefinitionLinkByExternalReferenceCode_getWorkflowDefinitionLink(
+				putWorkflowDefinitionLink.getExternalReferenceCode());
+
+		assertEquals(newWorkflowDefinitionLink, getWorkflowDefinitionLink);
 	}
 
 	@Override
 	protected WorkflowDefinitionLink randomWorkflowDefinitionLink()
 		throws Exception {
 
+		Group group = _groupService.getGroup(_kaleoDefinition.getGroupId());
+
 		return new WorkflowDefinitionLink() {
 			{
-				className = _objectDefinition.getClassName();
-				groupId = testGroup.getGroupId();
+				className = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				externalReferenceCode = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				groupExternalReferenceCode = group.getExternalReferenceCode();
+				groupId = _kaleoDefinition.getGroupId();
+				workflowDefinitionName = _kaleoDefinition.getName();
+				workflowDefinitionVersion = _kaleoDefinition.getVersion();
 			}
 		};
 	}
@@ -103,15 +158,76 @@ public class WorkflowDefinitionLinkResourceTest
 		throws Exception {
 
 		return workflowDefinitionLinkResource.
-			postWorkflowDefinitionWorkflowDefinitionLink(
-				_kaleoDefinition.getKaleoDefinitionId(),
+			postWorkflowDefinitionByExternalReferenceCodeWorkflowDefinitionLink(
+				_kaleoDefinition.getExternalReferenceCode(),
 				workflowDefinitionLink);
 	}
+
+	@Override
+	protected WorkflowDefinitionLink
+			testPutWorkflowDefinitionLinkByExternalReferenceCode_addWorkflowDefinitionLink()
+		throws Exception {
+
+		return workflowDefinitionLinkResource.
+			postWorkflowDefinitionWorkflowDefinitionLink(
+				_kaleoDefinition.getKaleoDefinitionId(),
+				randomWorkflowDefinitionLink());
+	}
+
+	@Override
+	protected WorkflowDefinitionLink
+		testPutWorkflowDefinitionLinkByExternalReferenceCode_getWorkflowDefinitionLink(
+			String externalReferenceCode) {
+
+		try {
+			return _fetchWorkflowDefinitionLinkByExternalReferenceCode(
+				externalReferenceCode, _kaleoDefinition.getGroupId());
+		}
+		catch (PortalException portalException) {
+			return null;
+		}
+	}
+
+	private WorkflowDefinitionLink
+			_fetchWorkflowDefinitionLinkByExternalReferenceCode(
+				String externalReferenceCode, long groupId)
+		throws PortalException {
+
+		return _toWorkflowDefinitionLink(
+			_workflowDefinitionLinkLocalService.
+				fetchWorkflowDefinitionLinkByExternalReferenceCode(
+					externalReferenceCode, groupId));
+	}
+
+	private WorkflowDefinitionLink _toWorkflowDefinitionLink(
+			com.liferay.portal.kernel.model.WorkflowDefinitionLink
+				workflowDefinitionLink)
+		throws PortalException {
+
+		return new WorkflowDefinitionLink() {
+			{
+				setClassName(workflowDefinitionLink::getClassName);
+				setExternalReferenceCode(
+					workflowDefinitionLink::getExternalReferenceCode);
+				setGroupExternalReferenceCode(StringPool.BLANK);
+				setGroupId(0L);
+				setId(workflowDefinitionLink::getWorkflowDefinitionLinkId);
+				setWorkflowDefinitionName(
+					workflowDefinitionLink::getWorkflowDefinitionName);
+				setWorkflowDefinitionVersion(
+					workflowDefinitionLink::getWorkflowDefinitionVersion);
+			}
+		};
+	}
+
+	@Inject
+	private GroupService _groupService;
 
 	@DeleteAfterTestRun
 	private KaleoDefinition _kaleoDefinition;
 
-	@DeleteAfterTestRun
-	private ObjectDefinition _objectDefinition;
+	@Inject
+	private WorkflowDefinitionLinkLocalService
+		_workflowDefinitionLinkLocalService;
 
 }

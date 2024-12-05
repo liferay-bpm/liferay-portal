@@ -178,6 +178,51 @@ public class WorkflowDefinitionLinkServiceImplTest {
 			workflowDefinitionLink2.getWorkflowDefinitionName());
 	}
 
+	@Test
+	public void testUpdateWorkflowDefinitionLink() throws Exception {
+		_setUpPermissionThreadLocal(_companyAdminUser);
+
+		ConfigurationTestUtil.saveConfiguration(
+			_configuration,
+			HashMapDictionaryBuilder.<String, Object>put(
+				"company.administrator.can.publish", true
+			).build());
+
+		WorkflowDefinitionLink workflowDefinitionLink1 =
+			_addWorkflowDefinitionLink(
+				"Single Approver", BlogsEntry.class.getName());
+
+		User user = _addUser();
+
+		_setUpPermissionThreadLocal(user);
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustBeCompanyAdmin.class,
+			StringBundler.concat(
+				"User ", user.getUserId(), " must be the company ",
+				"administrator to perform the action"),
+			() -> _workflowDefinitionLinkService.updateWorkflowDefinitionLink(
+				workflowDefinitionLink1.getGroupId(),
+				"com.liferay.account.model.AccountEntry",
+				workflowDefinitionLink1));
+
+		_setUpPermissionThreadLocal(_companyAdminUser);
+
+		WorkflowDefinitionLink workflowDefinitionLink2 =
+			_workflowDefinitionLinkService.updateWorkflowDefinitionLink(
+				workflowDefinitionLink1.getGroupId(),
+				"com.liferay.account.model.AccountEntry",
+				workflowDefinitionLink1);
+
+		Assert.assertEquals(
+			"com.liferay.account.model.AccountEntry",
+			workflowDefinitionLink2.getClassName());
+
+		Assert.assertEquals(
+			"Single Approver",
+			workflowDefinitionLink2.getWorkflowDefinitionName());
+	}
+
 	private User _addUser() throws Exception {
 		return UserTestUtil.addUser(
 			_company.getCompanyId(), TestPropsValues.getUserId(),
