@@ -977,7 +977,7 @@ public class ObjectEntryLocalServiceTest {
 		_objectFieldLocalService.updateRequired(
 			_objectRelationship.getObjectFieldId2(), false);
 
-		// Object entry with same external reference code in different sites
+		// Object entry with the same external reference code in different sites
 
 		String externalReferenceCode = RandomTestUtil.randomString();
 
@@ -996,20 +996,35 @@ public class ObjectEntryLocalServiceTest {
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 
-		// Object entry with unique values in a company scoped object definition
+		// Object entry with the same external reference code in the same
+		// company
+
+		_addObjectEntry(
+			HashMapBuilder.<String, Serializable>put(
+				"emailAddressRequired", "ezekiel@liferay.com"
+			).put(
+				"externalReferenceCode", externalReferenceCode
+			).put(
+				"firstName", "Ezekiel"
+			).put(
+				"listTypeEntryKeyRequired", "listTypeEntryKey1"
+			).build());
 
 		AssertUtils.assertFailure(
-			ObjectEntryValuesException.UniqueValueConstraintViolation.class,
-			"Unique value constraint violation for " +
-				_objectDefinition.getDBTableName() +
-					".emailAddress_ with value james@liferay.com",
+			DuplicateObjectEntryExternalReferenceCodeException.class,
+			StringBundler.concat(
+				"Duplicate object entry with external reference code ",
+				externalReferenceCode, " and object definition ID ",
+				_objectDefinition.getObjectDefinitionId()),
 			() -> _addObjectEntry(
 				HashMapBuilder.<String, Serializable>put(
-					"emailAddress", "james@liferay.com"
+					"emailAddressRequired", "hosea@liferay.com"
 				).put(
-					"emailAddressRequired", "james@liferay.com"
+					"externalReferenceCode", externalReferenceCode
 				).put(
-					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+					"firstName", "Hosea"
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey2"
 				).build()));
 
 		// Object entry with unique values in different sites
@@ -1047,6 +1062,22 @@ public class ObjectEntryLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"name", "Peter"
 			).build());
+
+		// Object entry with unique values in the same company
+
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.UniqueValueConstraintViolation.class,
+			"Unique value constraint violation for " +
+				_objectDefinition.getDBTableName() +
+					".emailAddress_ with value james@liferay.com",
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"emailAddress", "james@liferay.com"
+				).put(
+					"emailAddressRequired", "james@liferay.com"
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).build()));
 
 		// Object entry with unique values in the same site
 
