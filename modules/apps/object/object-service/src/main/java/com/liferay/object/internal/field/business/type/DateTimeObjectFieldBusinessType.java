@@ -27,6 +27,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
@@ -154,8 +155,11 @@ public class DateTimeObjectFieldBusinessType
 		ZonedDateTime zonedDateTime = ZonedDateTime.of(
 			localDateTime, ZoneId.of(sourceTimeZoneId));
 
-		return LocalDateTime.ofInstant(
+		LocalDateTime localDateTimeOfInstant = LocalDateTime.ofInstant(
 			zonedDateTime.toInstant(), ZoneId.of(targetTimeZoneId));
+
+		return localDateTimeOfInstant.truncatedTo(
+			ChronoUnit.MINUTES);
 	}
 
 	@Reference
