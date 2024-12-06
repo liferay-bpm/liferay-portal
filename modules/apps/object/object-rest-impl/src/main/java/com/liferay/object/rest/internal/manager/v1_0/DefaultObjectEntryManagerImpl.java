@@ -224,7 +224,8 @@ public class DefaultObjectEntryManagerImpl
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
 			_objectEntryService.getObjectEntry(
 				externalReferenceCode, companyId,
-				getGroupId(objectDefinition, scopeKey));
+				getGroupId(objectDefinition, scopeKey),
+				objectDefinition.getObjectDefinitionId());
 
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
@@ -288,7 +289,8 @@ public class DefaultObjectEntryManagerImpl
 			dtoConverterContext, objectActionName, objectDefinition,
 			objectEntryLocalService.getObjectEntry(
 				externalReferenceCode, companyId,
-				getGroupId(objectDefinition, scopeKey)));
+				getGroupId(objectDefinition, scopeKey),
+				objectDefinition.getObjectDefinitionId()));
 	}
 
 	@Override
@@ -566,7 +568,8 @@ public class DefaultObjectEntryManagerImpl
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
 			_objectEntryService.getObjectEntry(
 				externalReferenceCode, companyId,
-				getGroupId(objectDefinition, scopeKey));
+				getGroupId(objectDefinition, scopeKey),
+				objectDefinition.getObjectDefinitionId());
 
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
