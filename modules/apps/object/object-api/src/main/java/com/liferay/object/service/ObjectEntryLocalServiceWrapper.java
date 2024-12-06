@@ -168,11 +168,12 @@ public class ObjectEntryLocalServiceWrapper
 
 	@Override
 	public com.liferay.object.model.ObjectEntry deleteObjectEntry(
-			String externalReferenceCode, long companyId, long groupId)
+			String externalReferenceCode, long companyId, long groupId,
+			long objectDefinitionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectEntryLocalService.deleteObjectEntry(
-			externalReferenceCode, companyId, groupId);
+			externalReferenceCode, companyId, groupId, objectDefinitionId);
 	}
 
 	/**
@@ -549,11 +550,12 @@ public class ObjectEntryLocalServiceWrapper
 
 	@Override
 	public com.liferay.object.model.ObjectEntry getObjectEntry(
-			String externalReferenceCode, long companyId, long groupId)
+			String externalReferenceCode, long companyId, long groupId,
+			long objectDefinitionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectEntryLocalService.getObjectEntry(
-			externalReferenceCode, companyId, groupId);
+			externalReferenceCode, companyId, groupId, objectDefinitionId);
 	}
 
 	/**
