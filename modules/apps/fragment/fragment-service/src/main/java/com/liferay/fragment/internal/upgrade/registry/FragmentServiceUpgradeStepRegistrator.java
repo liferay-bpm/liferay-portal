@@ -245,6 +245,11 @@ public class FragmentServiceUpgradeStepRegistrator
 			"2.13.0", "2.13.1",
 			new com.liferay.fragment.internal.upgrade.v2_13_1.
 				FragmentEntryLinkUpgradeProcess(_jsonFactory, _portal));
+
+		registry.register(
+			"2.13.1", "3.0.0",
+			new com.liferay.fragment.internal.upgrade.v3_0_0.
+				FragmentEntryLinkUpgradeProcess());
 	}
 
 	@Reference
