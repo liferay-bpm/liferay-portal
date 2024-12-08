@@ -59,6 +59,12 @@ public interface WorkflowDefinitionLinkResource {
 				WorkflowDefinitionLink workflowDefinitionLink)
 		throws Exception;
 
+	public WorkflowDefinitionLink
+			putWorkflowDefinitionLinkByExternalReferenceCode(
+				String externalReferenceCode,
+				WorkflowDefinitionLink workflowDefinitionLink)
+		throws Exception;
+
 	public Page<WorkflowDefinitionLink>
 			getWorkflowDefinitionWorkflowDefinitionLinksPage(
 				Long workflowDefinitionId, Pagination pagination)

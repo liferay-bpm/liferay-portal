@@ -176,6 +176,11 @@ public class ServletDataImpl implements ServletData {
 							WorkflowDefinitionLinkResourceImpl.class,
 							"postWorkflowDefinitionByExternalReferenceCodeWorkflowDefinitionLink"));
 					put(
+						"mutation#updateWorkflowDefinitionLinkByExternalReferenceCode",
+						new ObjectValuePair<>(
+							WorkflowDefinitionLinkResourceImpl.class,
+							"putWorkflowDefinitionLinkByExternalReferenceCode"));
+					put(
 						"mutation#createWorkflowDefinitionWorkflowDefinitionLinksPageExportBatch",
 						new ObjectValuePair<>(
 							WorkflowDefinitionLinkResourceImpl.class,
