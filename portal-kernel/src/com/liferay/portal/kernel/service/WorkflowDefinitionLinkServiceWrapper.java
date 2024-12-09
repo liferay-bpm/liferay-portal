@@ -40,6 +40,17 @@ public class WorkflowDefinitionLinkServiceWrapper
 			workflowDefinitionName, workflowDefinitionVersion);
 	}
 
+	@Override
+	public WorkflowDefinitionLink
+			fetchWorkflowDefinitionLinkByExternalReferenceCode(
+				String externalReferenceCode, long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _workflowDefinitionLinkService.
+			fetchWorkflowDefinitionLinkByExternalReferenceCode(
+				externalReferenceCode, groupId);
+	}
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *
@@ -58,6 +69,16 @@ public class WorkflowDefinitionLinkServiceWrapper
 
 		return _workflowDefinitionLinkService.getWorkflowDefinitionLinks(
 			companyId, workflowDefinitionName, workflowDefinitionVersion);
+	}
+
+	@Override
+	public WorkflowDefinitionLink updateWorkflowDefinitionLink(
+			long groupId, String className,
+			WorkflowDefinitionLink workflowDefinitionLink)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _workflowDefinitionLinkService.updateWorkflowDefinitionLink(
+			groupId, className, workflowDefinitionLink);
 	}
 
 	@Override
