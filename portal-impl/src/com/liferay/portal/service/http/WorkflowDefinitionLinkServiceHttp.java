@@ -87,6 +87,50 @@ public class WorkflowDefinitionLinkServiceHttp {
 		}
 	}
 
+	public static com.liferay.portal.kernel.model.WorkflowDefinitionLink
+			fetchWorkflowDefinitionLinkByExternalReferenceCode(
+				HttpPrincipal httpPrincipal, String externalReferenceCode,
+				long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				WorkflowDefinitionLinkServiceUtil.class,
+				"fetchWorkflowDefinitionLinkByExternalReferenceCode",
+				_fetchWorkflowDefinitionLinkByExternalReferenceCodeParameterTypes1);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, externalReferenceCode, groupId);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return (com.liferay.portal.kernel.model.WorkflowDefinitionLink)
+				returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
 	public static java.util.List
 		<com.liferay.portal.kernel.model.WorkflowDefinitionLink>
 				getWorkflowDefinitionLinks(
@@ -99,7 +143,7 @@ public class WorkflowDefinitionLinkServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				WorkflowDefinitionLinkServiceUtil.class,
 				"getWorkflowDefinitionLinks",
-				_getWorkflowDefinitionLinksParameterTypes1);
+				_getWorkflowDefinitionLinksParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, companyId, workflowDefinitionName,
@@ -135,6 +179,51 @@ public class WorkflowDefinitionLinkServiceHttp {
 		}
 	}
 
+	public static com.liferay.portal.kernel.model.WorkflowDefinitionLink
+			updateWorkflowDefinitionLink(
+				HttpPrincipal httpPrincipal, long groupId, String className,
+				com.liferay.portal.kernel.model.WorkflowDefinitionLink
+					workflowDefinitionLink)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				WorkflowDefinitionLinkServiceUtil.class,
+				"updateWorkflowDefinitionLink",
+				_updateWorkflowDefinitionLinkParameterTypes3);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, groupId, className, workflowDefinitionLink);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return (com.liferay.portal.kernel.model.WorkflowDefinitionLink)
+				returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(
 		WorkflowDefinitionLinkServiceHttp.class);
 
@@ -143,7 +232,15 @@ public class WorkflowDefinitionLinkServiceHttp {
 			long.class, long.class, long.class, String.class, long.class,
 			long.class, String.class, int.class
 		};
-	private static final Class<?>[] _getWorkflowDefinitionLinksParameterTypes1 =
+	private static final Class<?>[]
+		_fetchWorkflowDefinitionLinkByExternalReferenceCodeParameterTypes1 =
+			new Class[] {String.class, long.class};
+	private static final Class<?>[] _getWorkflowDefinitionLinksParameterTypes2 =
 		new Class[] {long.class, String.class, int.class};
+	private static final Class<?>[]
+		_updateWorkflowDefinitionLinkParameterTypes3 = new Class[] {
+			long.class, String.class,
+			com.liferay.portal.kernel.model.WorkflowDefinitionLink.class
+		};
 
 }

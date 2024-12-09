@@ -40,6 +40,15 @@ public class WorkflowDefinitionLinkServiceUtil {
 			workflowDefinitionName, workflowDefinitionVersion);
 	}
 
+	public static WorkflowDefinitionLink
+			fetchWorkflowDefinitionLinkByExternalReferenceCode(
+				String externalReferenceCode, long groupId)
+		throws PortalException {
+
+		return getService().fetchWorkflowDefinitionLinkByExternalReferenceCode(
+			externalReferenceCode, groupId);
+	}
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *
@@ -56,6 +65,15 @@ public class WorkflowDefinitionLinkServiceUtil {
 
 		return getService().getWorkflowDefinitionLinks(
 			companyId, workflowDefinitionName, workflowDefinitionVersion);
+	}
+
+	public static WorkflowDefinitionLink updateWorkflowDefinitionLink(
+			long groupId, String className,
+			WorkflowDefinitionLink workflowDefinitionLink)
+		throws PortalException {
+
+		return getService().updateWorkflowDefinitionLink(
+			groupId, className, workflowDefinitionLink);
 	}
 
 	public static WorkflowDefinitionLinkService getService() {
