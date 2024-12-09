@@ -54,6 +54,23 @@ const triggerKeys = [
 	'onAfterUpdate',
 ];
 
+const getSelectedTriggerKey = (
+	objectActionTriggerKey: string | undefined,
+	objectActionTriggers: ObjectActionTriggerExecutorItem[]
+) => {
+	if (objectActionTriggerKey === 'onAfterRootUpdate') {
+		for (let i = 0; i < objectActionTriggers.length; i++) {
+			if (objectActionTriggers[i].value === 'onAfterRootUpdate') {
+				return objectActionTriggerKey;
+			}
+		}
+
+		return undefined;
+	}
+
+	return objectActionTriggerKey;
+};
+
 export default function ActionBuilder({
 	disableGroovyAction,
 	errors,
@@ -261,7 +278,10 @@ export default function ActionBuilder({
 							})
 						}
 						placeholder={Liferay.Language.get('choose-a-trigger')}
-						selectedKey={values.objectActionTriggerKey}
+						selectedKey={getSelectedTriggerKey(
+							values.objectActionTriggerKey,
+							objectActionTriggers
+						)}
 					>
 						{(item) => (
 							<Option key={item.value} textValue={item.label}>
