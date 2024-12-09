@@ -505,7 +505,7 @@ public class ObjectDefinitionLocalServiceTest {
 				}
 				else {
 					Assert.assertEquals(
-						0,
+						1,
 						_resourceActionLocalService.getResourceActionsCount(
 							nodeObjectDefinition.getClassName()));
 					Assert.assertEquals(
@@ -1540,8 +1540,8 @@ public class ObjectDefinitionLocalServiceTest {
 
 		AssertUtils.assertFailure(
 			ObjectDefinitionRootObjectDefinitionIdException.class,
-			"Object definitions that belong to a hierarchical structure " +
-				"cannot be deleted",
+			"To delete this object, you must first disable inheritance and " +
+				"delete its relationships",
 			() -> _objectDefinitionLocalService.deleteObjectDefinition(
 				finalObjectDefinition));
 
