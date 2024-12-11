@@ -98,6 +98,8 @@ public class RelationshipObjectFieldBusinessType
 			1
 		);
 
+		long groupId = GetterUtil.getLong(values.get("groupId"));
+
 		if (Objects.equals(
 				objectField.getRelationshipType(),
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY) &&
@@ -138,7 +140,7 @@ public class RelationshipObjectFieldBusinessType
 
 				ObjectEntry objectEntry =
 					_objectEntryLocalService.getObjectEntry(
-						externalReferenceCode,
+						externalReferenceCode, groupId,
 						objectDefinition.getObjectDefinitionId());
 
 				if (!Objects.equals(
@@ -220,7 +222,7 @@ public class RelationshipObjectFieldBusinessType
 			}
 
 			ObjectEntry objectEntry = _objectEntryLocalService.getObjectEntry(
-				externalReferenceCode,
+				externalReferenceCode, groupId,
 				objectDefinition.getObjectDefinitionId());
 
 			return objectEntry.getObjectEntryId();

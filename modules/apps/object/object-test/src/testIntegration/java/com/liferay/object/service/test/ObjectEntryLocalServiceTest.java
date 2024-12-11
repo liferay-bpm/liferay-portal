@@ -1571,7 +1571,7 @@ public class ObjectEntryLocalServiceTest {
 			});
 
 		ObjectEntry objectEntry = _objectEntryLocalService.getObjectEntry(
-			"objectEntryERC", _objectDefinition.getObjectDefinitionId());
+			"objectEntryERC", 0, _objectDefinition.getObjectDefinitionId());
 
 		ObjectFieldTestUtil.withEncryptedObjectFieldProperties(
 			"", true, "",
@@ -2907,7 +2907,7 @@ public class ObjectEntryLocalServiceTest {
 				() -> {
 					ObjectEntry objectEntry =
 						_objectEntryLocalService.getObjectEntry(
-							"A2", objectDefinitionA.getObjectDefinitionId());
+							"A2", 0, objectDefinitionA.getObjectDefinitionId());
 
 					return objectEntry.getObjectEntryId();
 				}
@@ -3348,7 +3348,7 @@ public class ObjectEntryLocalServiceTest {
 			rootObjectDefinition.getObjectDefinitionId());
 
 		ObjectEntry rootObjectEntry = _objectEntryLocalService.getObjectEntry(
-			"A1", rootObjectDefinition.getObjectDefinitionId());
+			"A1", 0, rootObjectDefinition.getObjectDefinitionId());
 
 		_objectEntryLocalService.deleteObjectEntry(
 			rootObjectEntry.getObjectEntryId());

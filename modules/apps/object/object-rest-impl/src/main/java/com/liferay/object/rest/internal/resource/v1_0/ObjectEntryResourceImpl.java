@@ -587,7 +587,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 
 		com.liferay.object.model.ObjectEntry objectEntry =
 			_objectEntryLocalService.getObjectEntry(
-				externalReferenceCode,
+				externalReferenceCode, 0,
 				objectDefinition.getObjectDefinitionId());
 
 		return objectEntry.getObjectEntryId();

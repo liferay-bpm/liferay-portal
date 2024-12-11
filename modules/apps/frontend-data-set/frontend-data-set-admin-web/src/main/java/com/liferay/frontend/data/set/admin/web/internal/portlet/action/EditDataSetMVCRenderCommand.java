@@ -62,11 +62,12 @@ public class EditDataSetMVCRenderCommand implements MVCRenderCommand {
 				throw new NoSuchObjectDefinitionException();
 			}
 
-			ObjectEntry objectEntry = _objectEntryLocalService.getObjectEntry(
-				dataSetERC, objectDefinition.getObjectDefinitionId());
-
 			ThemeDisplay themeDisplay =
 				(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+			ObjectEntry objectEntry = _objectEntryLocalService.getObjectEntry(
+				dataSetERC, themeDisplay.getSiteGroupId(),
+				objectDefinition.getObjectDefinitionId());
 
 			_checkPermissions(
 				themeDisplay.getPermissionChecker(), objectDefinition,

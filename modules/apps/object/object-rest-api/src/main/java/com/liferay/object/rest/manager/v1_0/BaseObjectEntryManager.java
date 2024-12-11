@@ -180,6 +180,9 @@ public abstract class BaseObjectEntryManager {
 
 		Map<String, Object> properties = objectEntry.getProperties();
 
+		properties.put(
+			"groupId", getGroupId(objectDefinition, objectEntry.getScopeKey()));
+
 		for (String key : properties.keySet()) {
 			ObjectField objectField = fetchObjectFieldByName(key, objectFields);
 
@@ -318,6 +321,7 @@ public abstract class BaseObjectEntryManager {
 			ObjectEntry serviceBuilderObjectEntry =
 				objectEntryLocalService.fetchObjectEntry(
 					externalReferenceCode,
+					getGroupId(objectDefinition, objectEntry.getScopeKey()),
 					objectDefinition.getObjectDefinitionId());
 
 			if (serviceBuilderObjectEntry == null) {

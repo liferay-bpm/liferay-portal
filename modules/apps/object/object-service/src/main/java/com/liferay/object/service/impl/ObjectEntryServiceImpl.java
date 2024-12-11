@@ -294,12 +294,12 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 	@Override
 	public ObjectEntry getObjectEntry(
-			String externalReferenceCode, long companyId, long groupId,
+			String externalReferenceCode, long groupId, long companyId,
 			long objectDefinitionId)
 		throws PortalException {
 
 		ObjectEntry objectEntry = objectEntryLocalService.getObjectEntry(
-			externalReferenceCode, companyId, groupId, objectDefinitionId);
+			externalReferenceCode, groupId, companyId, objectDefinitionId);
 
 		if (!ObjectEntryThreadLocal.isSkipObjectEntryResourcePermission()) {
 			_checkPermission(
