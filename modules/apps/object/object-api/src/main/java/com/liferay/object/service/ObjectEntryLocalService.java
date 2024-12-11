@@ -245,7 +245,7 @@ public interface ObjectEntryLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ObjectEntry fetchObjectEntry(
-		String externalReferenceCode, long objectDefinitionId);
+		String externalReferenceCode, long groupId, long objectDefinitionId);
 
 	/**
 	 * Returns the object entry matching the UUID and group.

@@ -573,9 +573,8 @@ public class DefaultObjectEntryManagerImpl
 
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
 			_objectEntryService.getObjectEntry(
-				externalReferenceCode, companyId,
-				getGroupId(objectDefinition, scopeKey),
-				objectDefinition.getObjectDefinitionId());
+				externalReferenceCode, getGroupId(objectDefinition, scopeKey),
+				companyId, objectDefinition.getObjectDefinitionId());
 
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);

@@ -93,9 +93,11 @@ public class ExportImportTaskResourceCreatorInfoTest {
 
 		_objectEntry1 = _objectEntryLocalService.getObjectEntry(
 			_objectEntry1.getExternalReferenceCode(),
+			_objectEntry1.getGroupId(),
 			_objectDefinition1.getObjectDefinitionId());
 		_objectEntry2 = _objectEntryLocalService.getObjectEntry(
 			_objectEntry2.getExternalReferenceCode(),
+			_objectEntry2.getGroupId(),
 			_objectDefinition1.getObjectDefinitionId());
 
 		Assert.assertEquals(
@@ -113,9 +115,11 @@ public class ExportImportTaskResourceCreatorInfoTest {
 
 		_objectEntry1 = _objectEntryLocalService.getObjectEntry(
 			_objectEntry1.getExternalReferenceCode(),
+			_objectEntry1.getGroupId(),
 			_objectDefinition1.getObjectDefinitionId());
 		_objectEntry2 = _objectEntryLocalService.getObjectEntry(
 			_objectEntry2.getExternalReferenceCode(),
+			_objectEntry2.getGroupId(),
 			_objectDefinition1.getObjectDefinitionId());
 
 		Assert.assertEquals(
@@ -142,9 +146,11 @@ public class ExportImportTaskResourceCreatorInfoTest {
 
 		_objectEntry1 = _objectEntryLocalService.getObjectEntry(
 			_objectEntry1.getExternalReferenceCode(),
+			_objectEntry1.getGroupId(),
 			_objectDefinition1.getObjectDefinitionId());
 		_objectEntry2 = _objectEntryLocalService.getObjectEntry(
 			_objectEntry2.getExternalReferenceCode(),
+			_objectEntry2.getGroupId(),
 			_objectDefinition1.getObjectDefinitionId());
 
 		Assert.assertEquals(
@@ -158,9 +164,11 @@ public class ExportImportTaskResourceCreatorInfoTest {
 
 		_objectEntry1 = _objectEntryLocalService.getObjectEntry(
 			_objectEntry1.getExternalReferenceCode(),
+			_objectEntry1.getGroupId(),
 			_objectDefinition1.getObjectDefinitionId());
 		_objectEntry2 = _objectEntryLocalService.getObjectEntry(
 			_objectEntry2.getExternalReferenceCode(),
+			_objectEntry2.getGroupId(),
 			_objectDefinition1.getObjectDefinitionId());
 
 		Assert.assertEquals(
@@ -185,9 +193,11 @@ public class ExportImportTaskResourceCreatorInfoTest {
 
 		_objectEntry1 = _objectEntryLocalService.getObjectEntry(
 			_objectEntry1.getExternalReferenceCode(),
+			_objectEntry1.getGroupId(),
 			_objectDefinition1.getObjectDefinitionId());
 		_objectEntry2 = _objectEntryLocalService.getObjectEntry(
 			_objectEntry2.getExternalReferenceCode(),
+			_objectEntry2.getGroupId(),
 			_objectDefinition1.getObjectDefinitionId());
 
 		Assert.assertEquals(
@@ -204,9 +214,11 @@ public class ExportImportTaskResourceCreatorInfoTest {
 
 		_objectEntry1 = _objectEntryLocalService.getObjectEntry(
 			_objectEntry1.getExternalReferenceCode(),
+			_objectEntry1.getGroupId(),
 			_objectDefinition1.getObjectDefinitionId());
 		_objectEntry2 = _objectEntryLocalService.getObjectEntry(
 			_objectEntry2.getExternalReferenceCode(),
+			_objectEntry2.getGroupId(),
 			_objectDefinition1.getObjectDefinitionId());
 
 		Assert.assertEquals(
@@ -230,9 +242,11 @@ public class ExportImportTaskResourceCreatorInfoTest {
 
 		_objectEntry1 = _objectEntryLocalService.getObjectEntry(
 			_objectEntry1.getExternalReferenceCode(),
+			_objectEntry1.getGroupId(),
 			_objectDefinition1.getObjectDefinitionId());
 		_objectEntry2 = _objectEntryLocalService.getObjectEntry(
 			_objectEntry2.getExternalReferenceCode(),
+			_objectEntry2.getGroupId(),
 			_objectDefinition1.getObjectDefinitionId());
 
 		Assert.assertEquals(

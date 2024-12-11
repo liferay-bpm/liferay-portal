@@ -74,7 +74,7 @@ public class CommerceReturnItemCommerceOrderItemIdObjectValidationRuleEngineImpl
 				properties.get(
 					"r_commerceReturnToCommerceReturnItems_l_" +
 						"commerceReturnERC")),
-			objectDefinition.getObjectDefinitionId());
+			0, objectDefinition.getObjectDefinitionId());
 
 		if (objectEntry == null) {
 			Map<String, Object> originalEntryDTO =
@@ -88,7 +88,7 @@ public class CommerceReturnItemCommerceOrderItemIdObjectValidationRuleEngineImpl
 					originalProperties.get(
 						"r_commerceReturnToCommerceReturnItems_l_" +
 							"commerceReturnERC")),
-				objectDefinition.getObjectDefinitionId());
+				0, objectDefinition.getObjectDefinitionId());
 
 			if (objectEntry == null) {
 				return false;

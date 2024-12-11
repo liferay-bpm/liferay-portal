@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 
@@ -93,6 +94,7 @@ public class ObjectActionDownloadTriggerMessageListener
 
 		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
 			objectEntryExternalReferenceCode,
+			GetterUtil.getLong(message.get("groupId")),
 			objectDefinition.getObjectDefinitionId());
 
 		if (objectEntry == null) {

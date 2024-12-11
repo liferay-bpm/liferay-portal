@@ -1350,7 +1350,7 @@ public class ObjectEntryDisplayContextImpl
 		else {
 			com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
 				_objectEntryLocalService.getObjectEntry(
-					objectEntry.getExternalReferenceCode(),
+					objectEntry.getExternalReferenceCode(), _getGroupId(),
 					objectField.getObjectDefinitionId());
 
 			existingValues.putAll(
