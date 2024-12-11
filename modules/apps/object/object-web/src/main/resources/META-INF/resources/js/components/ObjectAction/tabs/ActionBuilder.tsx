@@ -54,10 +54,10 @@ const triggerKeys = [
 	'onAfterUpdate',
 ];
 
-const getSelectedTriggerKey = (
+export function getSelectedTriggerKey(
 	objectActionTriggerKey: string | undefined,
 	objectActionTriggers: ObjectActionTriggerExecutorItem[]
-) => {
+) {
 	if (objectActionTriggerKey === 'onAfterRootUpdate') {
 		for (let i = 0; i < objectActionTriggers.length; i++) {
 			if (objectActionTriggers[i].value === 'onAfterRootUpdate') {
@@ -69,7 +69,7 @@ const getSelectedTriggerKey = (
 	}
 
 	return objectActionTriggerKey;
-};
+}
 
 export default function ActionBuilder({
 	disableGroovyAction,
