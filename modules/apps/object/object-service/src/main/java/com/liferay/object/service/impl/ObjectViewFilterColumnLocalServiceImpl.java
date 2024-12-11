@@ -148,7 +148,7 @@ public class ObjectViewFilterColumnLocalServiceImpl
 				_objectFieldFilterContributorRegistry.
 					getObjectFieldFilterContributor(
 						new ObjectFieldFilterContext(
-							null, objectField.getObjectDefinitionId(),
+							0, null, objectField.getObjectDefinitionId(),
 							objectViewFilterColumn));
 
 			objectFieldFilterContributor.validate();
