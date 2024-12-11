@@ -44,7 +44,7 @@ public class OneToManyObjectFieldFilterStrategy
 	extends BaseObjectFieldFilterStrategy {
 
 	public OneToManyObjectFieldFilterStrategy(
-		Locale locale, ObjectDefinition objectDefinition1,
+		long groupId, Locale locale, ObjectDefinition objectDefinition1,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectEntryLocalService objectEntryLocalService,
 		ObjectField objectField,
@@ -56,6 +56,7 @@ public class OneToManyObjectFieldFilterStrategy
 
 		super(locale, objectViewFilterColumn);
 
+		_groupId = groupId;
 		_objectDefinition1 = objectDefinition1;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryLocalService = objectEntryLocalService;
@@ -135,7 +136,7 @@ public class OneToManyObjectFieldFilterStrategy
 
 		for (int i = 0; i < jsonArray.length(); i++) {
 			ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
-				(String)jsonArray.get(i),
+				(String)jsonArray.get(i), _groupId,
 				_objectDefinition1.getObjectDefinitionId());
 
 			if (objectEntry == null) {
@@ -187,7 +188,7 @@ public class OneToManyObjectFieldFilterStrategy
 			for (int i = 0; i < jsonArray.length(); i++) {
 				if (Validator.isNull(
 						_objectEntryLocalService.fetchObjectEntry(
-							(String)jsonArray.get(i),
+							(String)jsonArray.get(i), _groupId,
 							_objectDefinition1.getObjectDefinitionId()))) {
 
 					throw new ObjectViewFilterColumnException(
@@ -200,6 +201,7 @@ public class OneToManyObjectFieldFilterStrategy
 		}
 	}
 
+	private final long _groupId;
 	private final ObjectDefinition _objectDefinition1;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectEntryLocalService _objectEntryLocalService;
