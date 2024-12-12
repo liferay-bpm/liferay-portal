@@ -1645,6 +1645,9 @@ public class ObjectRelationshipLocalServiceImpl
 
 				objectAction.setActive(false);
 
+				objectAction.setObjectActionTriggerKey(
+					ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE);
+
 				_objectActionPersistence.update(objectAction);
 			}
 		}
