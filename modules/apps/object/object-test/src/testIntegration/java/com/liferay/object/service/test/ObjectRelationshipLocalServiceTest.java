@@ -6,6 +6,8 @@
 package com.liferay.object.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
+import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationRegistryUtil;
 import com.liferay.info.collection.provider.RelatedInfoItemCollectionProvider;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.constants.ObjectActionKeys;
@@ -527,6 +529,10 @@ public class ObjectRelationshipLocalServiceTest {
 					_objectDefinitionLocalService);
 			});
 
+		_asserScreenNavigationCategories(2, "C_AA");
+		_asserScreenNavigationCategories(1, "C_AAA");
+		_asserScreenNavigationCategories(0, "C_AAAA");
+
 		// Bind a draft object definition as a parent node in a published
 		// object definition tree
 
@@ -551,6 +557,10 @@ public class ObjectRelationshipLocalServiceTest {
 						objectDefinition2.getObjectDefinitionId()),
 					_objectDefinitionLocalService);
 			});
+
+		_asserScreenNavigationCategories(0, "C_A");
+		_asserScreenNavigationCategories(2, "C_AA");
+		_asserScreenNavigationCategories(1, "C_AAA");
 
 		TreeTestUtil.deleteObjectDefinitionHierarchy(
 			_objectDefinitionLocalService,
@@ -578,6 +588,9 @@ public class ObjectRelationshipLocalServiceTest {
 						objectDefinition2.getObjectDefinitionId()),
 					_objectDefinitionLocalService);
 			});
+
+		_asserScreenNavigationCategories(0, "C_A");
+		_asserScreenNavigationCategories(1, "C_AA");
 
 		TreeTestUtil.deleteObjectDefinitionHierarchy(
 			_objectDefinitionLocalService, new String[] {"C_A", "C_AA"},
@@ -611,6 +624,9 @@ public class ObjectRelationshipLocalServiceTest {
 						objectDefinition2.getObjectDefinitionId()),
 					_objectDefinitionLocalService);
 			});
+
+		_asserScreenNavigationCategories(0, "C_A");
+		_asserScreenNavigationCategories(1, "C_AA");
 
 		long objectDefinitionId = objectDefinitionA.getObjectDefinitionId();
 
@@ -670,6 +686,11 @@ public class ObjectRelationshipLocalServiceTest {
 					_objectDefinitionLocalService);
 			});
 
+		_asserScreenNavigationCategories(0, "C_A");
+		_asserScreenNavigationCategories(0, "C_AA");
+		_asserScreenNavigationCategories(2, "C_AAA");
+		_asserScreenNavigationCategories(1, "C_AAAA");
+
 		TreeTestUtil.deleteObjectDefinitionHierarchy(
 			_objectDefinitionLocalService,
 			new String[] {"C_A", "C_AA", "C_AAA", "C_AAAA"},
@@ -706,6 +727,10 @@ public class ObjectRelationshipLocalServiceTest {
 						objectDefinition2.getObjectDefinitionId()),
 					_objectDefinitionLocalService);
 			});
+
+		_asserScreenNavigationCategories(0, "C_A");
+		_asserScreenNavigationCategories(0, "C_AA");
+		_asserScreenNavigationCategories(1, "C_AAA");
 
 		TreeTestUtil.deleteObjectDefinitionHierarchy(
 			_objectDefinitionLocalService,
@@ -958,6 +983,10 @@ public class ObjectRelationshipLocalServiceTest {
 						objectDefinition1.getRootObjectDefinitionId()),
 					_objectDefinitionLocalService));
 
+		_asserScreenNavigationCategories(2, "C_AA");
+		_asserScreenNavigationCategories(2, "C_AAA");
+		_asserScreenNavigationCategories(1, "C_AAAA");
+
 		// Bind a published object definition as a parent node in a published
 		// object definition tree
 
@@ -977,6 +1006,11 @@ public class ObjectRelationshipLocalServiceTest {
 					_objectDefinitionTreeFactory.create(
 						objectDefinition1.getObjectDefinitionId()),
 					_objectDefinitionLocalService));
+
+		_asserScreenNavigationCategories(2, "C_A");
+		_asserScreenNavigationCategories(2, "C_AA");
+		_asserScreenNavigationCategories(2, "C_AAA");
+		_asserScreenNavigationCategories(1, "C_AAAA");
 
 		TreeTestUtil.deleteObjectDefinitionHierarchy(
 			_objectDefinitionLocalService,
@@ -1017,6 +1051,11 @@ public class ObjectRelationshipLocalServiceTest {
 						objectDefinition1.getRootObjectDefinitionId()),
 					_objectDefinitionLocalService));
 
+		_asserScreenNavigationCategories(2, "C_A");
+		_asserScreenNavigationCategories(2, "C_AA");
+		_asserScreenNavigationCategories(2, "C_AAA");
+		_asserScreenNavigationCategories(1, "C_AAAA");
+
 		TreeTestUtil.deleteObjectDefinitionHierarchy(
 			_objectDefinitionLocalService,
 			new String[] {"C_A", "C_AA", "C_AAA", "C_AAAA"},
@@ -1041,6 +1080,9 @@ public class ObjectRelationshipLocalServiceTest {
 					_objectDefinitionTreeFactory.create(
 						objectDefinition1.getObjectDefinitionId()),
 					_objectDefinitionLocalService));
+
+		_asserScreenNavigationCategories(2, "C_B");
+		_asserScreenNavigationCategories(1, "C_BB");
 
 		// Unable to bind the object definitions because the object relationship
 		// must not create a circular reference in a root context
@@ -2021,6 +2063,24 @@ public class ObjectRelationshipLocalServiceTest {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			StringUtil.randomId(), false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+	}
+
+	private void _asserScreenNavigationCategories(
+			int expectedSize, String objectDefinitionName)
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				TestPropsValues.getCompanyId(), objectDefinitionName);
+
+		List<ScreenNavigationCategory> screenNavigationCategories =
+			ScreenNavigationRegistryUtil.getScreenNavigationCategories(
+				objectDefinition.getClassName(), TestPropsValues.getUser(),
+				null);
+
+		Assert.assertEquals(
+			screenNavigationCategories.toString(), expectedSize,
+			screenNavigationCategories.size());
 	}
 
 	private void _assertHasResourcePermission(
