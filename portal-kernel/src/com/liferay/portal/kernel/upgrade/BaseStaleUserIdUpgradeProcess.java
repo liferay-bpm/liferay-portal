@@ -27,8 +27,10 @@ public abstract class BaseUserIdUpgradeProcess extends UpgradeProcess {
 
 		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
 				StringBundler.concat(
-					"select ", columnName, ", companyId, userId from ",
-					tableName));
+					"SELECT t.", columnName, ", t.companyId, t.userId FROM ",
+					tableName,
+					" t LEFT JOIN User_ ON t.userId = User_.userId WHERE ",
+					"User_.userId IS NULL"));
 			PreparedStatement preparedStatement2 =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
 					connection,
@@ -38,12 +40,6 @@ public abstract class BaseUserIdUpgradeProcess extends UpgradeProcess {
 			ResultSet resultSet = preparedStatement1.executeQuery()) {
 
 			while (resultSet.next()) {
-				if (_userLocalService.fetchUser(resultSet.getLong("userId")) !=
-						null) {
-
-					continue;
-				}
-
 				User defaultServiceAccountUser =
 					_userLocalService.fetchUserByScreenName(
 						resultSet.getLong("companyId"),
