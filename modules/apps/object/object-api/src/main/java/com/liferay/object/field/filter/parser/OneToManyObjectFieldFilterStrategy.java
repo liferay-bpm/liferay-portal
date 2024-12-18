@@ -107,6 +107,11 @@ public class OneToManyObjectFieldFilterStrategy
 			restContextPath = "/o" + objectDefinition1.getRESTContextPath();
 		}
 
+		if (_groupId != 0) {
+			restContextPath = StringBundler.concat(
+				restContextPath, "/scopes/", _groupId);
+		}
+
 		return new OneToManySelectionFDSFilter(
 			parse(), restContextPath, titleObjectField.getLabel(locale),
 			_objectField.getName(), titleObjectField.getName());
@@ -134,19 +139,34 @@ public class OneToManyObjectFieldFilterStrategy
 			return selectionFDSFilterItems;
 		}
 
-		for (int i = 0; i < jsonArray.length(); i++) {
-			ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
-				(String)jsonArray.get(i),
-				_objectDefinition1.getObjectDefinitionId());
+		if ((jsonArray == null) || (jsonArray.length() == 0)) {
+			for (ObjectEntry objectEntry :
+					_objectEntryLocalService.getObjectEntries(
+						_groupId, _objectDefinition1.getObjectDefinitionId(),
+						-1, -1)) {
 
-			if (objectEntry == null) {
-				continue;
+				selectionFDSFilterItems.add(
+					new SelectionFDSFilterItem(
+						objectEntry.getTitleValue(),
+						objectEntry.getObjectEntryId()));
 			}
+		}
+		else {
+			for (int i = 0; i < jsonArray.length(); i++) {
+				ObjectEntry objectEntry =
+					_objectEntryLocalService.fetchObjectEntry(
+						(String)jsonArray.get(i),
+						_objectDefinition1.getObjectDefinitionId());
 
-			selectionFDSFilterItems.add(
-				new SelectionFDSFilterItem(
-					objectEntry.getTitleValue(),
-					objectEntry.getObjectEntryId()));
+				if (objectEntry == null) {
+					continue;
+				}
+
+				selectionFDSFilterItems.add(
+					new SelectionFDSFilterItem(
+						objectEntry.getTitleValue(),
+						objectEntry.getObjectEntryId()));
+			}
 		}
 
 		return selectionFDSFilterItems;
@@ -183,6 +203,17 @@ public class OneToManyObjectFieldFilterStrategy
 						noSuchModelException.getMessage());
 				}
 			}
+		}
+		else if (((jsonArray == null) || (jsonArray.length() == 0)) &&
+				 Validator.isNull(
+					 _objectEntryLocalService.getObjectEntries(
+						 _groupId, _objectDefinition1.getObjectDefinitionId(),
+						 -1, -1))) {
+
+			throw new ObjectViewFilterColumnException(
+				StringBundler.concat(
+					"No ", _objectDefinition1.getShortName(),
+					" exists with the groupId ", _groupId));
 		}
 		else {
 			for (int i = 0; i < jsonArray.length(); i++) {
