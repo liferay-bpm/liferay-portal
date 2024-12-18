@@ -7,7 +7,9 @@ package com.liferay.object.internal.upgrade.v10_0_2.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -33,7 +35,7 @@ import org.junit.runner.RunWith;
  * @author Igor Costa
  */
 @RunWith(Arquillian.class)
-public class ObjectDefinitionUserIdUpgradeProcessTest {
+public class ObjectFieldStaleUserIdUpgradeProcessTest {
 
 	@ClassRule
 	@Rule
@@ -52,6 +54,9 @@ public class ObjectDefinitionUserIdUpgradeProcessTest {
 		_objectDefinition =
 			_objectDefinitionLocalService.publishCustomObjectDefinition(
 				_user.getUserId(), _objectDefinition.getObjectDefinitionId());
+
+		_objectField = _objectFieldLocalService.getObjectField(
+			_objectDefinition.getTitleObjectFieldId());
 	}
 
 	@After
@@ -67,30 +72,34 @@ public class ObjectDefinitionUserIdUpgradeProcessTest {
 
 		Assert.assertNull(_userLocalService.fetchUser(userId));
 
-		Assert.assertEquals(userId, _objectDefinition.getUserId());
+		Assert.assertEquals(userId, _objectField.getUserId());
 
 		UpgradeProcess upgradeProcess = UpgradeTestUtil.getUpgradeStep(
 			_upgradeStepRegistrator,
 			"com.liferay.object.internal.upgrade.v10_0_2." +
-				"ObjectDefinitionUserIdUpgradeProcess");
+				"ObjectFieldStaleUserIdUpgradeProcess");
 
 		upgradeProcess.upgrade();
 
 		User defaultServiceAccountUser =
 			_userLocalService.fetchUserByScreenName(
 				TestPropsValues.getCompanyId(), "default-service-account");
-		_objectDefinition = _objectDefinitionLocalService.getObjectDefinition(
-			_objectDefinition.getObjectDefinitionId());
+		_objectField = _objectFieldLocalService.getObjectField(
+			_objectField.getObjectFieldId());
 
 		Assert.assertEquals(
-			defaultServiceAccountUser.getUserId(),
-			_objectDefinition.getUserId());
+			defaultServiceAccountUser.getUserId(), _objectField.getUserId());
 	}
 
 	private static ObjectDefinition _objectDefinition;
 
 	@Inject
 	private static ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	private static ObjectField _objectField;
+
+	@Inject
+	private static ObjectFieldLocalService _objectFieldLocalService;
 
 	@Inject(
 		filter = "component.name=com.liferay.object.internal.upgrade.registry.ObjectServiceUpgradeStepRegistrator"

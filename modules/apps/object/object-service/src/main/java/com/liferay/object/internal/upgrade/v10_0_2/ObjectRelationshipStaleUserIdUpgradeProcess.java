@@ -6,15 +6,15 @@
 package com.liferay.object.internal.upgrade.v10_0_2;
 
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.upgrade.BaseUserIdUpgradeProcess;
+import com.liferay.portal.kernel.upgrade.BaseStaleUserIdUpgradeProcess;
 
 /**
  * @author Igor Costa
  */
-public class ObjectRelationshipUserIdUpgradeProcess
-	extends BaseUserIdUpgradeProcess {
+public class ObjectRelationshipStaleUserIdUpgradeProcess
+	extends BaseStaleUserIdUpgradeProcess {
 
-	public ObjectRelationshipUserIdUpgradeProcess(
+	public ObjectRelationshipStaleUserIdUpgradeProcess(
 		UserLocalService userLocalService) {
 
 		super(userLocalService);

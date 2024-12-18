@@ -39,7 +39,7 @@ import org.junit.runner.RunWith;
  * @author Igor Costa
  */
 @RunWith(Arquillian.class)
-public class ListTypeEntryUserIdUpgradeProcessTest {
+public class ListTypeEntryStaleUserIdUpgradeProcessTest {
 
 	@ClassRule
 	@Rule
@@ -85,7 +85,7 @@ public class ListTypeEntryUserIdUpgradeProcessTest {
 		UpgradeProcess upgradeProcess = UpgradeTestUtil.getUpgradeStep(
 			_upgradeStepRegistrator,
 			"com.liferay.list.type.internal.upgrade.v1_3_2." +
-				"ListTypeEntryUserIdUpgradeProcess");
+				"ListTypeEntryStaleUserIdUpgradeProcess");
 
 		upgradeProcess.upgrade();
 

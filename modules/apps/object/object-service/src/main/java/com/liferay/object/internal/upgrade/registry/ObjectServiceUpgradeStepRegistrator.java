@@ -10,9 +10,9 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectValidationRuleSettingConstants;
 import com.liferay.object.internal.upgrade.v10_0_1.ObjectDefinitionPortletIdUpgradeProcess;
-import com.liferay.object.internal.upgrade.v10_0_2.ObjectDefinitionUserIdUpgradeProcess;
-import com.liferay.object.internal.upgrade.v10_0_2.ObjectFieldUserIdUpgradeProcess;
-import com.liferay.object.internal.upgrade.v10_0_2.ObjectRelationshipUserIdUpgradeProcess;
+import com.liferay.object.internal.upgrade.v10_0_2.ObjectDefinitionStaleUserIdUpgradeProcess;
+import com.liferay.object.internal.upgrade.v10_0_2.ObjectFieldStaleUserIdUpgradeProcess;
+import com.liferay.object.internal.upgrade.v10_0_2.ObjectRelationshipStaleUserIdUpgradeProcess;
 import com.liferay.object.internal.upgrade.v1_2_0.util.ObjectViewColumnTable;
 import com.liferay.object.internal.upgrade.v1_2_0.util.ObjectViewTable;
 import com.liferay.object.internal.upgrade.v2_1_0.ObjectFieldBusinessTypeUpgradeProcess;
@@ -486,9 +486,9 @@ public class ObjectServiceUpgradeStepRegistrator
 
 		registry.register(
 			"10.0.1", "10.0.2",
-			new ObjectDefinitionUserIdUpgradeProcess(_userLocalService),
-			new ObjectFieldUserIdUpgradeProcess(_userLocalService),
-			new ObjectRelationshipUserIdUpgradeProcess(_userLocalService));
+			new ObjectDefinitionStaleUserIdUpgradeProcess(_userLocalService),
+			new ObjectFieldStaleUserIdUpgradeProcess(_userLocalService),
+			new ObjectRelationshipStaleUserIdUpgradeProcess(_userLocalService));
 	}
 
 	@Reference

@@ -16,9 +16,9 @@ import java.sql.ResultSet;
 /**
  * @author Igor Costa
  */
-public abstract class BaseUserIdUpgradeProcess extends UpgradeProcess {
+public abstract class BaseStaleUserIdUpgradeProcess extends UpgradeProcess {
 
-	public BaseUserIdUpgradeProcess(UserLocalService userLocalService) {
+	public BaseStaleUserIdUpgradeProcess(UserLocalService userLocalService) {
 		_userLocalService = userLocalService;
 	}
 

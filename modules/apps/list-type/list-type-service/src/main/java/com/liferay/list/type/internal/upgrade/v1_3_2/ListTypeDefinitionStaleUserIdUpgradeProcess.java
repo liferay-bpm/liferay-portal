@@ -6,15 +6,15 @@
 package com.liferay.list.type.internal.upgrade.v1_3_2;
 
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.upgrade.BaseUserIdUpgradeProcess;
+import com.liferay.portal.kernel.upgrade.BaseStaleUserIdUpgradeProcess;
 
 /**
  * @author Igor Costa
  */
-public class ListTypeDefinitionUserIdUpgradeProcess
-	extends BaseUserIdUpgradeProcess {
+public class ListTypeDefinitionStaleUserIdUpgradeProcess
+	extends BaseStaleUserIdUpgradeProcess {
 
-	public ListTypeDefinitionUserIdUpgradeProcess(
+	public ListTypeDefinitionStaleUserIdUpgradeProcess(
 		UserLocalService userLocalService) {
 
 		super(userLocalService);
