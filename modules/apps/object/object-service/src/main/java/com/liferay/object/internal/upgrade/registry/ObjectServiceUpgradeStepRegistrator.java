@@ -479,6 +479,11 @@ public class ObjectServiceUpgradeStepRegistrator
 
 		registry.register(
 			"10.0.0", "10.0.1", new ObjectDefinitionPortletIdUpgradeProcess());
+
+		registry.register(
+			"10.0.1", "10.0.2",
+			new com.liferay.object.internal.upgrade.v10_0_2.
+				SchemaUpgradeProcess());
 	}
 
 	@Reference
