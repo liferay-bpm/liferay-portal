@@ -51,19 +51,11 @@ public class ObjectRelationshipStaleUserIdUpgradeProcessTest {
 	public static void setUpClass() throws Exception {
 		_user = UserTestUtil.addUser(TestPropsValues.getCompanyId());
 
-		_objectDefinition1 = ObjectDefinitionTestUtil.addCustomObjectDefinition(
-			ObjectDefinitionTestUtil.getRandomName(), _user.getUserId());
+		_objectDefinition1 = ObjectDefinitionTestUtil.publishObjectDefinition(
+			_user.getUserId());
 
-		_objectDefinition1 =
-			_objectDefinitionLocalService.publishCustomObjectDefinition(
-				_user.getUserId(), _objectDefinition1.getObjectDefinitionId());
-
-		_objectDefinition2 = ObjectDefinitionTestUtil.addCustomObjectDefinition(
-			ObjectDefinitionTestUtil.getRandomName(), _user.getUserId());
-
-		_objectDefinition2 =
-			_objectDefinitionLocalService.publishCustomObjectDefinition(
-				_user.getUserId(), _objectDefinition2.getObjectDefinitionId());
+		_objectDefinition2 = ObjectDefinitionTestUtil.publishObjectDefinition(
+			_user.getUserId());
 
 		_objectRelationship =
 			_objectRelationshipLocalService.addObjectRelationship(

@@ -39,14 +39,24 @@ public class ObjectDefinitionTestUtil {
 		throws Exception {
 
 		return addCustomObjectDefinition(
-			0, enableLocalization, getRandomName(), objectFields);
+			enableLocalization, objectFields, TestPropsValues.getUserId());
+	}
+
+	public static ObjectDefinition addCustomObjectDefinition(
+			boolean enableLocalization, List<ObjectField> objectFields,
+			long userId)
+		throws Exception {
+
+		return addCustomObjectDefinition(
+			0, enableLocalization, getRandomName(), objectFields, userId);
 	}
 
 	public static ObjectDefinition addCustomObjectDefinition(
 			List<ObjectField> objectFields)
 		throws Exception {
 
-		return addCustomObjectDefinition(false, objectFields);
+		return addCustomObjectDefinition(
+			false, objectFields, TestPropsValues.getUserId());
 	}
 
 	public static ObjectDefinition addCustomObjectDefinition(
@@ -145,20 +155,22 @@ public class ObjectDefinitionTestUtil {
 	}
 
 	public static ObjectDefinition publishObjectDefinition() throws Exception {
-		return publishObjectDefinition(false, Collections.emptyList());
+		return publishObjectDefinition(
+			false, Collections.emptyList(), TestPropsValues.getUserId());
 	}
 
 	public static ObjectDefinition publishObjectDefinition(
-			boolean enableLocalization, List<ObjectField> objectFields)
+			boolean enableLocalization, List<ObjectField> objectFields,
+			long userId)
 		throws Exception {
 
 		ObjectDefinition objectDefinition = addCustomObjectDefinition(
-			enableLocalization, objectFields);
+			enableLocalization, objectFields, userId);
 
 		ObjectField objectField = ObjectFieldUtil.addCustomObjectField(
 			new TextObjectFieldBuilder(
 			).userId(
-				TestPropsValues.getUserId()
+				userId
 			).labelMap(
 				LocalizedMapUtil.getLocalizedMap("Able")
 			).name(
@@ -174,8 +186,7 @@ public class ObjectDefinitionTestUtil {
 			objectField.getObjectFieldId());
 
 		return ObjectDefinitionLocalServiceUtil.publishCustomObjectDefinition(
-			TestPropsValues.getUserId(),
-			objectDefinition.getObjectDefinitionId());
+			userId, objectDefinition.getObjectDefinitionId());
 	}
 
 	public static ObjectDefinition publishObjectDefinition(
@@ -219,6 +230,12 @@ public class ObjectDefinitionTestUtil {
 
 		return publishObjectDefinition(
 			getRandomName(), objectFields, scope, userId);
+	}
+
+	public static ObjectDefinition publishObjectDefinition(long userId)
+		throws Exception {
+
+		return publishObjectDefinition(false, Collections.emptyList(), userId);
 	}
 
 	public static ObjectDefinition publishObjectDefinition(

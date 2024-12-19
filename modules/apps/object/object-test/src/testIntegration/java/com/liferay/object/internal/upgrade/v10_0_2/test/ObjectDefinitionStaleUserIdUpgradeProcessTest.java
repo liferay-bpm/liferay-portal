@@ -46,12 +46,8 @@ public class ObjectDefinitionStaleUserIdUpgradeProcessTest {
 	public static void setUpClass() throws Exception {
 		_user = UserTestUtil.addUser(TestPropsValues.getCompanyId());
 
-		_objectDefinition = ObjectDefinitionTestUtil.addCustomObjectDefinition(
-			ObjectDefinitionTestUtil.getRandomName(), _user.getUserId());
-
-		_objectDefinition =
-			_objectDefinitionLocalService.publishCustomObjectDefinition(
-				_user.getUserId(), _objectDefinition.getObjectDefinitionId());
+		_objectDefinition = ObjectDefinitionTestUtil.publishObjectDefinition(
+			_user.getUserId());
 	}
 
 	@After
