@@ -8,37 +8,36 @@ package com.liferay.object.internal.upgrade.v10_0_2.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.list.type.model.ListTypeDefinition;
 import com.liferay.list.type.service.ListTypeDefinitionLocalService;
-import com.liferay.object.constants.ObjectDefinitionConstants;
-import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.field.builder.MultiselectPicklistObjectFieldBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
+import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.dao.orm.common.SQLTransformer;
-import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBInspector;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 import com.liferay.portal.upgrade.test.util.UpgradeTestUtil;
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
 import java.util.Collections;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,8 +54,14 @@ public class SchemaUpgradeProcessTest {
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
 
-	@Test
-	public void testUpgrade() throws Exception {
+	@Before
+	public void setUp() throws Exception {
+		_connection = DataAccess.getConnection();
+
+		_dbInspector = new DBInspector(_connection);
+
+		_db = DBManagerUtil.getDB();
+
 		ListTypeDefinition listTypeDefinition =
 			_listTypeDefinitionLocalService.addListTypeDefinition(
 				null, TestPropsValues.getUserId(),
@@ -64,54 +69,33 @@ public class SchemaUpgradeProcessTest {
 					LocaleUtil.US, RandomTestUtil.randomString()),
 				false, Collections.emptyList());
 
-		ObjectDefinitionTestUtil.publishObjectDefinition(
-			ObjectDefinitionTestUtil.getRandomName(),
-			Collections.singletonList(
-				ObjectFieldUtil.createObjectField(
-					listTypeDefinition.getListTypeDefinitionId(),
-					ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST,
-					null, ObjectFieldConstants.DB_TYPE_STRING, true, false,
-					null, RandomTestUtil.randomString(),
-					_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST, false, false)),
-			ObjectDefinitionConstants.SCOPE_COMPANY);
+		_objectDefinition = ObjectDefinitionTestUtil.publishObjectDefinition();
 
-		Connection connection = DataAccess.getConnection();
+		_objectField = ObjectFieldUtil.addCustomObjectField(
+			new MultiselectPicklistObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).listTypeDefinitionId(
+				listTypeDefinition.getListTypeDefinitionId()
+			).name(
+				StringUtil.randomId()
+			).objectDefinitionId(
+				_objectDefinition.getObjectDefinitionId()
+			).userId(
+				TestPropsValues.getUserId()
+			).build());
+	}
 
-		String dbColumnName = null;
-		String dbTableName = null;
-
-		try (PreparedStatement preparedStatement = connection.prepareStatement(
-				SQLTransformer.transform(
-					StringBundler.concat(
-						"select ObjectField.dbColumnName, ",
-						"ObjectField.dbTableName from ObjectField inner join ",
-						"ObjectDefinition on ",
-						"ObjectDefinition.objectDefinitionId = ",
-						"ObjectField.objectDefinitionId where ",
-						"ObjectDefinition.status = ",
-						WorkflowConstants.STATUS_APPROVED,
-						" and ObjectField.businessType = '",
-						ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST,
-						"'")));
-			ResultSet resultSet = preparedStatement.executeQuery()) {
-
-			while (resultSet.next()) {
-				DB db = DBManagerUtil.getDB();
-
-				dbColumnName = resultSet.getString("dbColumnName");
-				dbTableName = resultSet.getString("dbTableName");
-
-				db.alterColumnType(
-					connection, resultSet.getString("dbTableName"),
-					resultSet.getString("dbColumnName"), "VARCHAR(280) null");
-			}
-		}
-
-		DBInspector dbInspector = new DBInspector(connection);
+	@Test
+	public void testUpgrade() throws Exception {
+		_db.alterColumnType(
+			_connection, _objectField.getDBTableName(),
+			_objectField.getDBColumnName(), "VARCHAR(280) null");
 
 		Assert.assertTrue(
-			dbInspector.hasColumnType(
-				dbTableName, dbColumnName, "VARCHAR(280) null"));
+			_dbInspector.hasColumnType(
+				_objectField.getDBTableName(), _objectField.getDBColumnName(),
+				"VARCHAR(280) null"));
 
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
 				_CLASS_NAME, LoggerTestUtil.OFF)) {
@@ -120,30 +104,33 @@ public class SchemaUpgradeProcessTest {
 				_upgradeStepRegistrator, _CLASS_NAME);
 
 			upgradeProcess.upgrade();
-
-			_multiVMPool.clear();
 		}
 
 		Assert.assertTrue(
-			dbInspector.hasColumnType(
-				dbTableName, dbColumnName, "VARCHAR(5000) null"));
+			_dbInspector.hasColumnType(
+				_objectField.getDBTableName(), _objectField.getDBColumnName(),
+				"VARCHAR(5000) null"));
 	}
 
 	private static final String _CLASS_NAME =
 		"com.liferay.object.internal.upgrade.v10_0_2.SchemaUpgradeProcess";
 
-	private static final String _OBJECT_FIELD_NAME_MULTISELECT_PICKLIST =
-		"x" + RandomTestUtil.randomString();
+	@Inject
+	private static ListTypeDefinitionLocalService
+		_listTypeDefinitionLocalService;
 
 	@Inject(
 		filter = "component.name=com.liferay.object.internal.upgrade.registry.ObjectServiceUpgradeStepRegistrator"
 	)
 	private static UpgradeStepRegistrator _upgradeStepRegistrator;
 
-	@Inject
-	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;
+	private Connection _connection;
+	private DB _db;
+	private DBInspector _dbInspector;
 
-	@Inject
-	private MultiVMPool _multiVMPool;
+	@DeleteAfterTestRun
+	private ObjectDefinition _objectDefinition;
+
+	private ObjectField _objectField;
 
 }
