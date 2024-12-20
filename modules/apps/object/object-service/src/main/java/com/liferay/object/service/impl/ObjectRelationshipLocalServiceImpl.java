@@ -23,8 +23,8 @@ import com.liferay.object.exception.ObjectRelationshipSystemException;
 import com.liferay.object.exception.ObjectRelationshipTypeException;
 import com.liferay.object.internal.dao.db.ObjectDBManagerUtil;
 import com.liferay.object.internal.info.collection.provider.RelatedInfoCollectionProviderFactory;
+import com.liferay.object.internal.security.permission.resource.util.ObjectDefinitionResourcePermissionUtil;
 import com.liferay.object.model.ObjectAction;
-import com.liferay.object.model.ObjectActionModel;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
@@ -52,7 +52,6 @@ import com.liferay.object.tree.Node;
 import com.liferay.object.tree.ObjectDefinitionTreeFactory;
 import com.liferay.object.tree.Tree;
 import com.liferay.object.tree.constants.TreeConstants;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.expression.Predicate;
@@ -79,6 +78,7 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.RandomUtil;
+import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -92,6 +92,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.io.Serializable;
@@ -1400,38 +1401,40 @@ public class ObjectRelationshipLocalServiceImpl
 	}
 
 	private void _copyResourcePermissions(
+			List<ResourceAction> originalResourceActions,
+			List<ResourcePermission> originalResourcePermissions,
 			List<ResourceAction> sourceResourceActions,
 			List<ResourcePermission> sourceResourcePermissions,
-			String targetName, List<String> targetObjectActionNames,
-			String targetPrimKey)
+			String targetName, String targetPrimKey)
 		throws PortalException {
 
 		for (ResourcePermission sourceResourcePermission :
 				sourceResourcePermissions) {
 
-			List<String> targetResourceActionIds = new ArrayList<>();
+			List<String> targetResourceActionIds = _getResourceActionIds(
+				sourceResourceActions, sourceResourcePermission);
 
-			for (ResourceAction sourceResourceAction : sourceResourceActions) {
-				long bitwiseValue = sourceResourceAction.getBitwiseValue();
+			ListUtil.isNotEmptyForEach(
+				originalResourcePermissions,
+				originalResourcePermission -> {
+					if (Objects.equals(
+							originalResourcePermission.getName(), targetName) &&
+						Objects.equals(
+							originalResourcePermission.getPrimKey(),
+							targetPrimKey) &&
+						Objects.equals(
+							originalResourcePermission.getRoleId(),
+							sourceResourcePermission.getRoleId()) &&
+						Objects.equals(
+							originalResourcePermission.getScope(),
+							sourceResourcePermission.getScope())) {
 
-				if ((sourceResourcePermission.getActionIds() & bitwiseValue) !=
-						bitwiseValue) {
-
-					continue;
-				}
-
-				targetResourceActionIds.add(sourceResourceAction.getActionId());
-			}
-
-			if (ListUtil.isNotEmpty(targetObjectActionNames)) {
-				targetResourceActionIds.addAll(
-					_resourcePermissionLocalService.
-						getAvailableResourcePermissionActionIds(
-							sourceResourcePermission.getCompanyId(), targetName,
-							sourceResourcePermission.getScope(), targetPrimKey,
-							sourceResourcePermission.getRoleId(),
-							targetObjectActionNames));
-			}
+						targetResourceActionIds.addAll(
+							_getResourceActionIds(
+								originalResourceActions,
+								originalResourcePermission));
+					}
+				});
 
 			_resourcePermissionLocalService.setResourcePermissions(
 				sourceResourcePermission.getCompanyId(), targetName,
@@ -1442,31 +1445,35 @@ public class ObjectRelationshipLocalServiceImpl
 	}
 
 	private void _copyResourcePermissions(
-			long companyId, String sourceName, String targetName,
-			List<String> targetObjectActionNames)
+			long companyId, List<ResourceAction> originalResourceActions,
+			List<ResourcePermission> originalResourcePermissions,
+			String sourceName, String targetName)
 		throws PortalException {
 
 		List<ResourceAction> resourceActions =
 			_resourceActionLocalService.getResourceActions(sourceName);
 
 		_copyResourcePermissions(
+			originalResourceActions, originalResourcePermissions,
 			resourceActions,
 			_resourcePermissionLocalService.getResourcePermissions(
 				companyId, sourceName, ResourceConstants.SCOPE_COMPANY,
 				String.valueOf(companyId)),
-			targetName, targetObjectActionNames, String.valueOf(companyId));
+			targetName, String.valueOf(companyId));
 		_copyResourcePermissions(
+			originalResourceActions, originalResourcePermissions,
 			resourceActions,
 			_resourcePermissionLocalService.getResourcePermissions(
 				companyId, sourceName, ResourceConstants.SCOPE_GROUP_TEMPLATE,
 				String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID)),
-			targetName, targetObjectActionNames,
-			String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID));
+			targetName, String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID));
 	}
 
 	private void _copyResourcePermissions(
 			ObjectDefinition objectDefinition1,
-			ObjectDefinition objectDefinition2)
+			ObjectDefinition objectDefinition2,
+			List<ResourceAction> originalResourceActions,
+			List<ResourcePermission> originalResourcePermissions)
 		throws PortalException {
 
 		if (!objectDefinition1.isApproved() ||
@@ -1475,11 +1482,6 @@ public class ObjectRelationshipLocalServiceImpl
 			return;
 		}
 
-		List<String> objectActionNames = TransformUtil.transform(
-			_objectActionPersistence.findByO_A_OATK(
-				objectDefinition2.getObjectDefinitionId(), true,
-				ObjectActionTriggerConstants.KEY_STANDALONE),
-			ObjectActionModel::getName);
 		List<ResourceAction> resourceActions =
 			_resourceActionLocalService.getResourceActions(
 				objectDefinition1.getClassName());
@@ -1487,26 +1489,28 @@ public class ObjectRelationshipLocalServiceImpl
 		_performActions(
 			objectDefinition2.getObjectDefinitionId(), true,
 			(ObjectEntry objectEntry) -> _copyResourcePermissions(
+				originalResourceActions, originalResourcePermissions,
 				resourceActions,
 				_resourcePermissionLocalService.getResourcePermissions(
 					objectDefinition1.getCompanyId(),
 					objectDefinition1.getClassName(),
 					ResourceConstants.SCOPE_INDIVIDUAL,
 					String.valueOf(objectEntry.getRootObjectEntryId())),
-				objectDefinition2.getClassName(), objectActionNames,
+				objectDefinition2.getClassName(),
 				String.valueOf(objectEntry.getObjectEntryId())));
 
 		_copyResourcePermissions(
-			objectDefinition1.getCompanyId(), objectDefinition1.getClassName(),
-			objectDefinition2.getClassName(), objectActionNames);
+			objectDefinition1.getCompanyId(), originalResourceActions,
+			originalResourcePermissions, objectDefinition1.getClassName(),
+			objectDefinition2.getClassName());
 
 		_copyResourcePermissions(
-			objectDefinition1.getCompanyId(), objectDefinition1.getPortletId(),
-			objectDefinition2.getPortletId(), null);
+			objectDefinition1.getCompanyId(), null, null,
+			objectDefinition1.getPortletId(), objectDefinition2.getPortletId());
 		_copyResourcePermissions(
-			objectDefinition1.getCompanyId(),
+			objectDefinition1.getCompanyId(), null, null,
 			objectDefinition1.getResourceName(),
-			objectDefinition2.getResourceName(), null);
+			objectDefinition2.getResourceName());
 	}
 
 	private void _deleteObjectFields(
@@ -1543,6 +1547,27 @@ public class ObjectRelationshipLocalServiceImpl
 			_objectDefinitionLocalServiceSnapshot.get();
 
 		objectDefinitionLocalService.deployObjectDefinition(objectDefinition);
+	}
+
+	private List<String> _getResourceActionIds(
+		List<ResourceAction> resourceActions,
+		ResourcePermission resourcePermission) {
+
+		List<String> resourceActionIds = new ArrayList<>();
+
+		for (ResourceAction resourceAction : resourceActions) {
+			long bitwiseValue = resourceAction.getBitwiseValue();
+
+			if ((resourcePermission.getActionIds() & bitwiseValue) !=
+					bitwiseValue) {
+
+				continue;
+			}
+
+			resourceActionIds.add(resourceAction.getActionId());
+		}
+
+		return resourceActionIds;
 	}
 
 	private long _getRootObjectDefinitionId(ObjectDefinition objectDefinition)
@@ -1716,11 +1741,46 @@ public class ObjectRelationshipLocalServiceImpl
 		long newRootObjectDefinitionId2 = _getRootObjectDefinitionId(
 			objectDefinition2);
 
+		Map<Long, List<String>> resourcePermissionActionIds = new HashMap<>();
+
+		List<ResourceAction> resourceActions =
+			_resourceActionLocalService.getResourceActions(
+				objectDefinition2.getClassName());
+		List<ResourcePermission> resourcePermissions =
+			_resourcePermissionLocalService.getResourcePermissions(
+				objectDefinition2.getClassName());
+
+		for (ResourcePermission resourcePermission : resourcePermissions) {
+			resourcePermissionActionIds.put(resourcePermission.getResourcePermissionId(), _getResourceActionIds(resourceActions, resourcePermission));
+		}
+
+		try {
+			_resourceActions.removeModelResources(
+				SAXReaderUtil.read(
+					StringUtil.replace(
+						StringUtil.read(
+							ObjectDefinitionResourcePermissionUtil.class.
+								getClassLoader(),
+							"resource-actions/resource-actions.xml.tpl"),
+						new String[] {"[$MODEL_NAME$]", "[$PORTLET_NAME$]"},
+						new String[] {
+							objectDefinition2.getClassName(),
+							objectDefinition1.getPortletId()
+						})));
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
+		}
+
 		_updateRootObjectDefinitionId(
 			objectDefinition2, oldRootObjectDefinitionId2,
 			newRootObjectDefinitionId2);
 
-		_copyResourcePermissions(objectDefinition1, objectDefinition2);
+		_copyResourcePermissions(
+			objectDefinition1, objectDefinition2, resourceActions,
+			resourcePermissions);
 
 		_updateObjectEntries(
 			objectDefinition2, oldRootObjectDefinitionId2,
@@ -2326,6 +2386,9 @@ public class ObjectRelationshipLocalServiceImpl
 
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
+
+	@Reference
+	private ResourceActions _resourceActions;
 
 	@Reference
 	private ResourcePermissionLocalService _resourcePermissionLocalService;

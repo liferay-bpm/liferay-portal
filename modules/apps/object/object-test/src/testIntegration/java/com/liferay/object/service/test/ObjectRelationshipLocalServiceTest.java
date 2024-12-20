@@ -1706,12 +1706,12 @@ public class ObjectRelationshipLocalServiceTest {
 			).build(),
 			false);
 
-		_resourcePermissionLocalService.setResourcePermissions(
+		_resourcePermissionLocalService.addResourcePermission(
 			TestPropsValues.getCompanyId(), objectDefinitionAA.getClassName(),
 			ResourceConstants.SCOPE_GROUP_TEMPLATE,
 			String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID),
 			organizationRole.getRoleId(),
-			new String[] {objectAction.getName()});
+			objectAction.getName());
 
 		_unbindObjectDefinitionNode("AA", tree);
 
