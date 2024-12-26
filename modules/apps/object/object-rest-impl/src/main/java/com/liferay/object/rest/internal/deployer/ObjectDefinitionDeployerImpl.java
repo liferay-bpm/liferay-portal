@@ -66,6 +66,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -88,6 +89,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
@@ -150,6 +152,36 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		ObjectDefinition objectDefinition) {
 
 		return _deploy(objectDefinition, null, null);
+	}
+
+	public Configuration getConfiguration(
+		long companyId, String factoryPid, String path) {
+
+		try {
+			String filterString = String.format(
+				"(&(path=%s)(|(service.factoryPid=%s)" +
+					"(&(service.factoryPid=%s)(%s=%d))))",
+				path,
+				"com.liferay.portal.vulcan.internal.configuration." +
+					"VulcanConfiguration",
+				factoryPid,
+				ExtendedObjectClassDefinition.Scope.COMPANY.getPropertyKey(),
+				companyId);
+
+			Configuration[] configurations =
+				_configurationAdmin.listConfigurations(filterString);
+
+			if (configurations != null) {
+				return configurations[0];
+			}
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
+		}
+
+		return null;
 	}
 
 	public ObjectDefinition getObjectDefinition(
@@ -270,9 +302,9 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				"com.liferay.portal.vulcan.internal.configuration." +
 					"VulcanCompanyConfiguration";
 
-			Configuration configuration =
-				_configurationAdmin.createFactoryConfiguration(
-					factoryPid, StringPool.QUESTION);
+			Configuration configuration = getConfiguration(
+				objectDefinition.getCompanyId(), factoryPid,
+				objectDefinition.getRESTContextPath());
 
 			Method[] methods = BaseObjectEntryResourceImpl.class.getMethods();
 
@@ -299,6 +331,26 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					excludedOperationIds.add(method.getName());
 				}
 			}
+
+			Dictionary<String, Object> properties =
+				configuration.getProperties();
+
+			List<String> currentExcludedOperationIds = ListUtil.fromString(
+				GetterUtil.getString(properties.get("excludedOperationIds")),
+				StringPool.COMMA);
+
+			Collections.sort(currentExcludedOperationIds);
+
+			Collections.sort(excludedOperationIds);
+
+			if (Objects.equals(
+					currentExcludedOperationIds, excludedOperationIds)) {
+
+				return;
+			}
+
+			configuration = _configurationAdmin.createFactoryConfiguration(
+				factoryPid, StringPool.QUESTION);
 
 			configuration.update(
 				HashMapDictionaryBuilder.put(
