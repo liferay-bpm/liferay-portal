@@ -79,6 +79,7 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.RandomUtil;
+import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -1729,6 +1730,10 @@ public class ObjectRelationshipLocalServiceImpl
 		_updateObjectDefinitionTree(
 			objectDefinition2, oldRootObjectDefinitionId2,
 			newRootObjectDefinitionId2);
+
+		if (objectDefinition2.isRootNode()) {
+			_deployObjectDefinition(objectDefinition2);
+		}
 	}
 
 	private void _updateObjectDefinitionTree(
@@ -1841,6 +1846,18 @@ public class ObjectRelationshipLocalServiceImpl
 			_deployObjectDefinition(objectDefinition);
 
 			return;
+		}
+
+		if (objectDefinition.isApproved() &&
+			objectDefinition.isRootDescendantNode()) {
+
+			ObjectDefinition oldRootObjectDefinition =
+				_objectDefinitionPersistence.findByPrimaryKey(
+					oldRootObjectDefinitionId);
+
+			_resourceActions.removeModelResourceReference(
+				objectDefinition.getClassName(),
+				oldRootObjectDefinition.getPortletId());
 		}
 
 		String previousRESTContextPath = objectDefinition.getRESTContextPath();
@@ -2337,6 +2354,9 @@ public class ObjectRelationshipLocalServiceImpl
 
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
+
+	@Reference
+	private ResourceActions _resourceActions;
 
 	@Reference
 	private ResourcePermissionLocalService _resourcePermissionLocalService;
