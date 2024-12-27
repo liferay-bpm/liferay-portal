@@ -619,6 +619,17 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	@Override
+	public void removeModelResourceReference(
+		String modelName, String portletName) {
+
+		Set<String> resources = _resourceReferences.get(portletName);
+
+		if (resources != null) {
+			resources.remove(modelName);
+		}
+	}
+
+	@Override
 	public void removeModelResources(Document document) {
 		Element rootElement = document.getRootElement();
 
