@@ -123,6 +123,9 @@ public interface ResourceActions {
 
 	public void removeModelResource(String name, String action);
 
+	public void removeModelResourceReference(
+		String modelName, String portletName);
+
 	public void removeModelResources(Document document);
 
 	public void removePortletResources(Document document);
