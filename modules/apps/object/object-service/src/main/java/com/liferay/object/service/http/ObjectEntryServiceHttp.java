@@ -206,7 +206,7 @@ public class ObjectEntryServiceHttp {
 
 	public static com.liferay.object.model.ObjectEntry deleteObjectEntry(
 			HttpPrincipal httpPrincipal, String externalReferenceCode,
-			long companyId, long groupId)
+			long groupId, long companyId, long objectDefinitionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -215,7 +215,8 @@ public class ObjectEntryServiceHttp {
 				_deleteObjectEntryParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, externalReferenceCode, companyId, groupId);
+				methodKey, externalReferenceCode, groupId, companyId,
+				objectDefinitionId);
 
 			Object returnObj = null;
 
@@ -501,7 +502,7 @@ public class ObjectEntryServiceHttp {
 
 	public static com.liferay.object.model.ObjectEntry getObjectEntry(
 			HttpPrincipal httpPrincipal, String externalReferenceCode,
-			long companyId, long groupId)
+			long groupId, long companyId, long objectDefinitionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -510,7 +511,8 @@ public class ObjectEntryServiceHttp {
 				_getObjectEntryParameterTypes11);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, externalReferenceCode, companyId, groupId);
+				methodKey, externalReferenceCode, groupId, companyId,
+				objectDefinitionId);
 
 			Object returnObj = null;
 
@@ -855,7 +857,7 @@ public class ObjectEntryServiceHttp {
 	private static final Class<?>[] _deleteObjectEntryParameterTypes3 =
 		new Class[] {long.class};
 	private static final Class<?>[] _deleteObjectEntryParameterTypes4 =
-		new Class[] {String.class, long.class, long.class};
+		new Class[] {String.class, long.class, long.class, long.class};
 	private static final Class<?>[] _fetchManyToOneObjectEntryParameterTypes5 =
 		new Class[] {long.class, long.class, long.class};
 	private static final Class<?>[] _fetchObjectEntryParameterTypes6 =
@@ -875,7 +877,7 @@ public class ObjectEntryServiceHttp {
 	private static final Class<?>[] _getObjectEntryParameterTypes10 =
 		new Class[] {long.class};
 	private static final Class<?>[] _getObjectEntryParameterTypes11 =
-		new Class[] {String.class, long.class, long.class};
+		new Class[] {String.class, long.class, long.class, long.class};
 	private static final Class<?>[] _getOneToManyObjectEntriesParameterTypes12 =
 		new Class[] {
 			long.class, long.class, long.class, boolean.class, String.class,
