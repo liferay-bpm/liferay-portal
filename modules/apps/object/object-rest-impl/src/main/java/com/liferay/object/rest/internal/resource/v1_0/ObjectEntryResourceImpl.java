@@ -385,10 +385,10 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 				objectRelationshipName);
 
 		long primaryKey1 = _getPrimaryKey(
-			currentExternalReferenceCode,
+			currentExternalReferenceCode, 0,
 			objectRelationship.getObjectDefinitionId1());
 		long primaryKey2 = _getPrimaryKey(
-			relatedExternalReferenceCode,
+			relatedExternalReferenceCode, 0,
 			objectRelationship.getObjectDefinitionId2());
 
 		return _getRelatedObjectEntry(
@@ -468,6 +468,39 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		return objectEntryManager.updateObjectEntry(
 			contextCompany.getCompanyId(), _getDTOConverterContext(null),
 			externalReferenceCode, _objectDefinition, objectEntry, scopeKey);
+	}
+
+	@Override
+	public ObjectEntry
+			putScopeScopeKeyByExternalReferenceCodeCurrentExternalReferenceCodeObjectRelationshipNameRelatedExternalReferenceCode(
+				String scopeKey, String currentExternalReferenceCode,
+				String objectRelationshipName,
+				String relatedExternalReferenceCode)
+		throws Exception {
+
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			DefaultObjectEntryManagerProvider.provide(
+				_objectEntryManagerRegistry.getObjectEntryManager(
+					_objectDefinition.getStorageType()));
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipService.getObjectRelationship(
+				_objectDefinition.getObjectDefinitionId(),
+				objectRelationshipName);
+
+		long primaryKey1 = _getPrimaryKey(
+			currentExternalReferenceCode, GetterUtil.getLong(scopeKey),
+			objectRelationship.getObjectDefinitionId1());
+		long primaryKey2 = _getPrimaryKey(
+			relatedExternalReferenceCode, GetterUtil.getLong(scopeKey),
+			objectRelationship.getObjectDefinitionId2());
+
+		return _getRelatedObjectEntry(
+			_objectDefinitionLocalService.getObjectDefinition(
+				objectRelationship.getObjectDefinitionId2()),
+			defaultObjectEntryManager.addObjectRelationshipMappingTableValues(
+				_getDTOConverterContext(primaryKey1), objectRelationship,
+				primaryKey1, primaryKey2));
 	}
 
 	@Override
@@ -564,7 +597,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	}
 
 	private long _getPrimaryKey(
-			String externalReferenceCode, long objectDefinitionId)
+			String externalReferenceCode, long groupId, long objectDefinitionId)
 		throws Exception {
 
 		ObjectDefinition objectDefinition =
@@ -587,7 +620,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 
 		com.liferay.object.model.ObjectEntry objectEntry =
 			_objectEntryLocalService.getObjectEntry(
-				externalReferenceCode, 0,
+				externalReferenceCode, groupId,
 				objectDefinition.getObjectDefinitionId());
 
 		return objectEntry.getObjectEntryId();
