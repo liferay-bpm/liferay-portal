@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.openapi.OpenAPIContext;
 import com.liferay.portal.vulcan.resource.OpenAPIResource;
@@ -553,11 +554,13 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 		return new Operation() {
 			{
 				operationId(
-					StringBundler.concat(
-						"delete", _objectDefinition.getShortName(),
-						StringUtil.upperCaseFirstLetter(
-							objectRelationship.getName()),
-						schemaName));
+					_getOperationId(
+						StringBundler.concat(
+							"delete", _objectDefinition.getShortName(),
+							StringUtil.upperCaseFirstLetter(
+								objectRelationship.getName()),
+							schemaName),
+						operation));
 				parameters(_getParameters(operation, schemaName));
 				responses(_getObjectRelationshipApiResponses(operation, null));
 				tags(operation.getTags());
@@ -572,11 +575,13 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 		return new Operation() {
 			{
 				operationId(
-					StringBundler.concat(
-						"get", _objectDefinition.getShortName(),
-						StringUtil.upperCaseFirstLetter(
-							objectRelationship.getName()),
-						schemaName, "Page"));
+					_getOperationId(
+						StringBundler.concat(
+							"get", _objectDefinition.getShortName(),
+							StringUtil.upperCaseFirstLetter(
+								objectRelationship.getName()),
+							schemaName, "Page"),
+						operation));
 				parameters(_getParameters(operation, schemaName));
 				responses(
 					_getObjectRelationshipApiResponses(
@@ -594,17 +599,31 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 		return new Operation() {
 			{
 				operationId(
-					StringBundler.concat(
-						"put", _objectDefinition.getShortName(),
-						StringUtil.upperCaseFirstLetter(
-							objectRelationship.getName()),
-						schemaName));
+					_getOperationId(
+						StringBundler.concat(
+							"put", _objectDefinition.getShortName(),
+							StringUtil.upperCaseFirstLetter(
+								objectRelationship.getName()),
+							schemaName),
+						operation));
 				parameters(_getParameters(operation, schemaName));
 				responses(
 					_getObjectRelationshipApiResponses(operation, schemaName));
 				tags(operation.getTags());
 			}
 		};
+	}
+
+	private String _getOperationId(
+		String defaultOperationId, Operation operation) {
+
+		String operationId = operation.getOperationId();
+
+		if (Validator.isNull(operationId)) {
+			return defaultOperationId;
+		}
+
+		return operationId;
 	}
 
 	private List<Parameter> _getParameters(
