@@ -436,6 +436,7 @@ paths:
             tags: ["ObjectEntry"]
     "/scopes/{scopeKey}/by-external-reference-code/{currentExternalReferenceCode}/{objectRelationshipName}/{relatedExternalReferenceCode}":
         put:
+            operationId: putScopeScopeKeyByExternalReferenceCodeCurrentExternalReferenceCodeObjectRelationshipNameRelatedExternalReferenceCode
             parameters:
                 - in: path
                   name: scopeKey
