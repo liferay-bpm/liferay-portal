@@ -619,7 +619,13 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 
 		String operationId = operation.getOperationId();
 
-		if (Validator.isNull(operationId)) {
+		if (Validator.isNull(operationId) ||
+			!operationId.contains(
+				StringBundler.concat(
+					"ByExternalReferenceCode",
+					"CurrentExternalReferenceCodeObjectRelationshipName",
+					"RelatedExternalReferenceCode"))) {
+
 			return defaultOperationId;
 		}
 
