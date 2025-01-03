@@ -1041,7 +1041,7 @@
 		},
 		"/by-external-reference-code/{currentExternalReferenceCode}/relationship1/{relatedExternalReferenceCode}": {
 			"put": {
-				"operationId": "putObject1Relationship1Object2",
+				"operationId": "putByExternalReferenceCodeCurrentExternalReferenceCodeObjectRelationshipNameRelatedExternalReferenceCode",
 				"parameters": [
 					{
 						"in": "path",
@@ -1084,7 +1084,7 @@
 		},
 		"/by-external-reference-code/{currentExternalReferenceCode}/relationship2/{relatedExternalReferenceCode}": {
 			"put": {
-				"operationId": "putObject1Relationship2Object2",
+				"operationId": "putByExternalReferenceCodeCurrentExternalReferenceCodeObjectRelationshipNameRelatedExternalReferenceCode",
 				"parameters": [
 					{
 						"in": "path",

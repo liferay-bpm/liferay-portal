@@ -145,114 +145,139 @@
 				},
 				"type": "object"
 			},
-			"FileEntry": {
+			"Object3": {
 				"properties": {
-					"externalReferenceCode": {
-						"type": "string"
+					"actions": {
+						"additionalProperties": {
+							"additionalProperties": {
+								"type": "string"
+							},
+							"type": "object"
+						},
+						"readOnly": true,
+						"type": "object",
+						"x-batch-unsupported-formats": "CSV"
 					},
-					"fileBase64": {
-						"description": "optional field with the content of the document in Base64, can be embedded with nestedFields (the format of the nested field must be `<attachment field name>.fileBase64`)",
-						"type": "string"
+					"auditEvents": {
+						"description": "Optional field with the audit events associated with this object entry, can be embedded with nestedFields",
+						"items": {
+							"$ref": "#/components/schemas/AuditEvent"
+						},
+						"readOnly": true,
+						"type": "array",
+						"x-batch-unsupported-formats": "CSV"
 					},
-					"fileURL": {
+					"creator": {
+						"readOnly": true,
 						"type": "string",
-						"writeOnly": true
+						"x-batch-unsupported-formats": "CSV",
+						"x-parent-map": "properties"
 					},
-					"folder": {
-						"$ref": "#/components/schemas/Folder"
+					"dateCreated": {
+						"format": "date-time",
+						"readOnly": true,
+						"type": "string"
+					},
+					"dateModified": {
+						"format": "date-time",
+						"readOnly": true,
+						"type": "string"
+					},
+					"externalReferenceCode": {
+						"readOnly": false,
+						"type": "string",
+						"x-parent-map": "properties"
+					},
+					"field": {
+						"readOnly": false,
+						"type": "string",
+						"x-parent-map": "properties"
 					},
 					"id": {
 						"format": "int64",
-						"type": "integer"
-					},
-					"link": {
-						"$ref": "#/components/schemas/Link"
-					},
-					"name": {
-						"type": "string"
-					},
-					"scope": {
-						"$ref": "#/components/schemas/Scope"
-					},
-					"x-class-name": {
-						"default": "com.liferay.object.rest.dto.v1_0.FileEntry",
 						"readOnly": true,
-						"type": "string"
-					}
-				},
-				"type": "object",
-				"xml": {
-					"name": "FileEntry"
-				}
-			},
-			"Folder": {
-				"properties": {
-					"externalReferenceCode": {
-						"type": "string"
+						"type": "integer",
+						"x-parent-map": "properties"
 					},
-					"siteId": {
-						"format": "int64",
-						"type": "integer"
-					},
-					"x-class-name": {
-						"default": "com.liferay.object.rest.dto.v1_0.Folder",
-						"readOnly": true,
-						"type": "string"
-					}
-				},
-				"type": "object",
-				"xml": {
-					"name": "Folder"
-				}
-			},
-			"Link": {
-				"properties": {
-					"href": {
-						"type": "string"
-					},
-					"label": {
-						"type": "string"
-					},
-					"x-class-name": {
-						"default": "com.liferay.object.rest.dto.v1_0.Link",
-						"readOnly": true,
-						"type": "string"
-					}
-				},
-				"readOnly": true,
-				"type": "object",
-				"xml": {
-					"name": "Link"
-				}
-			},
-			"ListEntry": {
-				"properties": {
-					"key": {
-						"type": "string"
-					},
-					"name": {
-						"type": "string"
-					},
-					"name_i18n": {
-						"additionalProperties": {
+					"keywords": {
+						"description": "A list of keywords describing the object entry.",
+						"items": {
+							"description": "A list of keywords describing the object entry.",
 							"type": "string"
 						},
-						"readOnly": true,
+						"type": "array",
+						"x-batch-unsupported-formats": "CSV"
+					},
+					"permissions": {
+						"items": {
+							"$ref": "#/components/schemas/Permission"
+						},
+						"type": "array"
+					},
+					"r_relationship5_c_object5ERC": {
+						"type": "string",
+						"x-parent-map": "properties"
+					},
+					"r_relationship5_c_object5Id": {
+						"format": "int64",
+						"readOnly": false,
+						"type": "integer",
+						"x-parent-map": "properties"
+					},
+					"relationship5": {
+						"description": "Information about the relationship relationship5 can be embedded with \"nestedFields\".",
 						"type": "object"
 					},
+					"relationship5ERC": {
+						"readOnly": true,
+						"type": "string",
+						"x-parent-map": "properties"
+					},
+					"scopeKey": {
+						"readOnly": true,
+						"type": "string"
+					},
+					"status": {
+						"readOnly": true,
+						"type": "string",
+						"x-batch-unsupported-formats": "CSV",
+						"x-parent-map": "properties"
+					},
+					"taxonomyCategoryBriefs": {
+						"description": "The categories associated with this object entry.",
+						"items": {
+							"$ref": "#/components/schemas/TaxonomyCategoryBrief"
+						},
+						"readOnly": true,
+						"type": "array",
+						"x-batch-unsupported-formats": "CSV"
+					},
+					"taxonomyCategoryIds": {
+						"items": {
+							"format": "int64",
+							"type": "integer"
+						},
+						"type": "array",
+						"writeOnly": true,
+						"x-batch-unsupported-formats": "CSV"
+					},
 					"x-class-name": {
-						"default": "com.liferay.object.rest.dto.v1_0.ListEntry",
+						"default": "com.liferay.object.rest.dto.v1_0.ObjectEntry",
+						"readOnly": true,
+						"type": "string"
+					},
+					"x-schema-name": {
+						"default": "Object3",
 						"readOnly": true,
 						"type": "string"
 					}
 				},
 				"type": "object",
 				"xml": {
-					"name": "ListEntry"
+					"name": "ObjectEntry"
 				}
 			},
-			"Object1": {
-				"description": "Information about the relationship relationship2 can be embedded with \"nestedFields\".",
+			"Object5": {
 				"properties": {
 					"actions": {
 						"additionalProperties": {
@@ -295,10 +320,7 @@
 						"type": "string",
 						"x-parent-map": "properties"
 					},
-					"field1": {
-						"$ref": "#/components/schemas/FileEntry"
-					},
-					"field2": {
+					"field": {
 						"readOnly": false,
 						"type": "string",
 						"x-parent-map": "properties"
@@ -324,17 +346,10 @@
 						},
 						"type": "array"
 					},
-					"relationship1": {
-						"description": "Information about the relationship relationship1 can be embedded with \"nestedFields\".",
+					"relationship5": {
+						"description": "Information about the relationship relationship5 can be embedded with \"nestedFields\".",
 						"items": {
-							"type": "object"
-						},
-						"type": "array"
-					},
-					"relationship2": {
-						"description": "Information about the relationship relationship2 can be embedded with \"nestedFields\".",
-						"items": {
-							"type": "object"
+							"$ref": "#/components/schemas/Object3"
 						},
 						"type": "array"
 					},
@@ -372,7 +387,7 @@
 						"type": "string"
 					},
 					"x-schema-name": {
-						"default": "Object1",
+						"default": "Object5",
 						"readOnly": true,
 						"type": "string"
 					}
@@ -382,153 +397,7 @@
 					"name": "ObjectEntry"
 				}
 			},
-			"Object2": {
-				"properties": {
-					"actions": {
-						"additionalProperties": {
-							"additionalProperties": {
-								"type": "string"
-							},
-							"type": "object"
-						},
-						"readOnly": true,
-						"type": "object",
-						"x-batch-unsupported-formats": "CSV"
-					},
-					"auditEvents": {
-						"description": "Optional field with the audit events associated with this object entry, can be embedded with nestedFields",
-						"items": {
-							"$ref": "#/components/schemas/AuditEvent"
-						},
-						"readOnly": true,
-						"type": "array",
-						"x-batch-unsupported-formats": "CSV"
-					},
-					"creator": {
-						"readOnly": true,
-						"type": "string",
-						"x-batch-unsupported-formats": "CSV",
-						"x-parent-map": "properties"
-					},
-					"dateCreated": {
-						"format": "date-time",
-						"readOnly": true,
-						"type": "string"
-					},
-					"dateModified": {
-						"format": "date-time",
-						"readOnly": true,
-						"type": "string"
-					},
-					"externalReferenceCode": {
-						"readOnly": false,
-						"type": "string",
-						"x-parent-map": "properties"
-					},
-					"field1": {
-						"readOnly": false,
-						"type": "string",
-						"x-parent-map": "properties"
-					},
-					"id": {
-						"format": "int64",
-						"readOnly": true,
-						"type": "integer",
-						"x-parent-map": "properties"
-					},
-					"keywords": {
-						"description": "A list of keywords describing the object entry.",
-						"items": {
-							"description": "A list of keywords describing the object entry.",
-							"type": "string"
-						},
-						"type": "array",
-						"x-batch-unsupported-formats": "CSV"
-					},
-					"multiselectPicklistField": {
-						"items": {
-							"$ref": "#/components/schemas/ListEntry"
-						},
-						"readOnly": false,
-						"type": "array",
-						"x-parent-map": "properties"
-					},
-					"permissions": {
-						"items": {
-							"$ref": "#/components/schemas/Permission"
-						},
-						"type": "array"
-					},
-					"r_relationship2_c_object1ERC": {
-						"type": "string",
-						"x-parent-map": "properties"
-					},
-					"r_relationship2_c_object1Id": {
-						"format": "int64",
-						"readOnly": false,
-						"type": "integer",
-						"x-parent-map": "properties"
-					},
-					"relationship1": {
-						"description": "Information about the relationship relationship1 can be embedded with \"nestedFields\".",
-						"items": {
-							"$ref": "#/components/schemas/Object1"
-						},
-						"type": "array"
-					},
-					"relationship2": {
-						"$ref": "#/components/schemas/Object1"
-					},
-					"relationship2ERC": {
-						"readOnly": true,
-						"type": "string",
-						"x-parent-map": "properties"
-					},
-					"scopeKey": {
-						"readOnly": true,
-						"type": "string"
-					},
-					"status": {
-						"readOnly": true,
-						"type": "string",
-						"x-batch-unsupported-formats": "CSV",
-						"x-parent-map": "properties"
-					},
-					"taxonomyCategoryBriefs": {
-						"description": "The categories associated with this object entry.",
-						"items": {
-							"$ref": "#/components/schemas/TaxonomyCategoryBrief"
-						},
-						"readOnly": true,
-						"type": "array",
-						"x-batch-unsupported-formats": "CSV"
-					},
-					"taxonomyCategoryIds": {
-						"items": {
-							"format": "int64",
-							"type": "integer"
-						},
-						"type": "array",
-						"writeOnly": true,
-						"x-batch-unsupported-formats": "CSV"
-					},
-					"x-class-name": {
-						"default": "com.liferay.object.rest.dto.v1_0.ObjectEntry",
-						"readOnly": true,
-						"type": "string"
-					},
-					"x-schema-name": {
-						"default": "Object2",
-						"readOnly": true,
-						"type": "string"
-					}
-				},
-				"type": "object",
-				"xml": {
-					"name": "ObjectEntry"
-				}
-			},
-			"PageObject1": {
+			"PageObject3": {
 				"properties": {
 					"actions": {
 						"additionalProperties": {
@@ -547,7 +416,7 @@
 					},
 					"items": {
 						"items": {
-							"$ref": "#/components/schemas/Object1"
+							"$ref": "#/components/schemas/Object3"
 						},
 						"type": "array"
 					},
@@ -568,14 +437,14 @@
 						"type": "integer"
 					},
 					"x-schema-name": {
-						"default": "PageObject1",
+						"default": "PageObject3",
 						"readOnly": true,
 						"type": "string"
 					}
 				},
 				"type": "object"
 			},
-			"PageObject2": {
+			"PageObject5": {
 				"properties": {
 					"actions": {
 						"additionalProperties": {
@@ -594,7 +463,7 @@
 					},
 					"items": {
 						"items": {
-							"$ref": "#/components/schemas/Object2"
+							"$ref": "#/components/schemas/Object5"
 						},
 						"type": "array"
 					},
@@ -615,7 +484,7 @@
 						"type": "integer"
 					},
 					"x-schema-name": {
-						"default": "PageObject2",
+						"default": "PageObject5",
 						"readOnly": true,
 						"type": "string"
 					}
@@ -679,29 +548,6 @@
 				"type": "object",
 				"xml": {
 					"name": "Permission"
-				}
-			},
-			"Scope": {
-				"properties": {
-					"externalReferenceCode": {
-						"type": "string"
-					},
-					"type": {
-						"enum": [
-							"AssetLibrary",
-							"Site"
-						],
-						"type": "string"
-					},
-					"x-class-name": {
-						"default": "com.liferay.object.rest.dto.v1_0.Scope",
-						"readOnly": true,
-						"type": "string"
-					}
-				},
-				"type": "object",
-				"xml": {
-					"name": "Scope"
 				}
 			},
 			"Status": {
@@ -802,10 +648,44 @@
 	},
 	"openapi": "3.0.1",
 	"paths": {
-		"/": {
+		"/openapi.{type}": {
 			"get": {
-				"operationId": "getObject2sPage",
+				"operationId": "getOpenAPI",
 				"parameters": [
+					{
+						"in": "path",
+						"name": "type",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"default": {
+						"content": {
+							"application/json": {
+							},
+							"application/yaml": {
+							}
+						},
+						"description": "default response"
+					}
+				}
+			}
+		},
+		"/scopes/{scopeKey}": {
+			"get": {
+				"operationId": "getScopeScopeKeyPage",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "scopeKey",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
 					{
 						"in": "query",
 						"name": "aggregationTerms",
@@ -882,12 +762,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/PageObject2"
+									"$ref": "#/components/schemas/PageObject5"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"$ref": "#/components/schemas/PageObject2"
+									"$ref": "#/components/schemas/PageObject5"
 								}
 							}
 						},
@@ -895,23 +775,31 @@
 					}
 				},
 				"tags": [
-					"Object2"
+					"Object5"
 				]
 			},
 			"post": {
-				"operationId": "postObject2",
+				"operationId": "postScopeScopeKey",
 				"parameters": [
+					{
+						"in": "path",
+						"name": "scopeKey",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
 				],
 				"requestBody": {
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/Object2"
+								"$ref": "#/components/schemas/Object5"
 							}
 						},
 						"application/xml": {
 							"schema": {
-								"$ref": "#/components/schemas/Object2"
+								"$ref": "#/components/schemas/Object5"
 							}
 						}
 					}
@@ -921,12 +809,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Object2"
+									"$ref": "#/components/schemas/Object5"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"$ref": "#/components/schemas/Object2"
+									"$ref": "#/components/schemas/Object5"
 								}
 							}
 						},
@@ -934,115 +822,22 @@
 					}
 				},
 				"tags": [
-					"Object2"
+					"Object5"
 				]
 			}
 		},
-		"/batch": {
-			"delete": {
-				"operationId": "deleteObject2Batch",
-				"parameters": [
-					{
-						"in": "query",
-						"name": "callbackURL",
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"type": "object"
-							}
-						}
-					}
-				},
-				"responses": {
-					"default": {
-						"content": {
-							"application/json": {
-							}
-						},
-						"description": "default response"
-					}
-				},
-				"tags": [
-					"Object2"
-				]
-			},
-			"post": {
-				"operationId": "postObject2Batch",
-				"parameters": [
-					{
-						"in": "query",
-						"name": "callbackURL",
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"type": "object"
-							}
-						}
-					}
-				},
-				"responses": {
-					"default": {
-						"content": {
-							"application/json": {
-							}
-						},
-						"description": "default response"
-					}
-				},
-				"tags": [
-					"Object2"
-				]
-			},
+		"/scopes/{scopeKey}/by-external-reference-code/{currentExternalReferenceCode}/relationship5/{relatedExternalReferenceCode}": {
 			"put": {
-				"operationId": "putObject2Batch",
+				"operationId": "putScopeScopeKeyByExternalReferenceCodeCurrentExternalReferenceCodeObjectRelationshipNameRelatedExternalReferenceCode",
 				"parameters": [
 					{
-						"in": "query",
-						"name": "callbackURL",
+						"in": "path",
+						"name": "scopeKey",
+						"required": true,
 						"schema": {
 							"type": "string"
 						}
-					}
-				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"type": "object"
-							}
-						}
-					}
-				},
-				"responses": {
-					"default": {
-						"content": {
-							"application/json": {
-							}
-						},
-						"description": "default response"
-					}
-				},
-				"tags": [
-					"Object2"
-				]
-			}
-		},
-		"/by-external-reference-code/{currentExternalReferenceCode}/relationship1/{relatedExternalReferenceCode}": {
-			"put": {
-				"operationId": "putByExternalReferenceCodeCurrentExternalReferenceCodeObjectRelationshipNameRelatedExternalReferenceCode",
-				"parameters": [
+					},
 					{
 						"in": "path",
 						"name": "currentExternalReferenceCode",
@@ -1065,12 +860,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Object1"
+									"$ref": "#/components/schemas/Object3"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"$ref": "#/components/schemas/Object1"
+									"$ref": "#/components/schemas/Object3"
 								}
 							}
 						},
@@ -1078,14 +873,22 @@
 					}
 				},
 				"tags": [
-					"Object2"
+					"Object5"
 				]
 			}
 		},
-		"/by-external-reference-code/{externalReferenceCode}": {
+		"/scopes/{scopeKey}/by-external-reference-code/{externalReferenceCode}": {
 			"delete": {
-				"operationId": "deleteByExternalReferenceCode",
+				"operationId": "deleteScopeScopeKeyByExternalReferenceCode",
 				"parameters": [
+					{
+						"in": "path",
+						"name": "scopeKey",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
 					{
 						"in": "path",
 						"name": "externalReferenceCode",
@@ -1107,12 +910,20 @@
 					}
 				},
 				"tags": [
-					"Object2"
+					"Object5"
 				]
 			},
 			"get": {
-				"operationId": "getByExternalReferenceCode",
+				"operationId": "getScopeScopeKeyByExternalReferenceCode",
 				"parameters": [
+					{
+						"in": "path",
+						"name": "scopeKey",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
 					{
 						"in": "path",
 						"name": "externalReferenceCode",
@@ -1148,12 +959,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Object2"
+									"$ref": "#/components/schemas/Object5"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"$ref": "#/components/schemas/Object2"
+									"$ref": "#/components/schemas/Object5"
 								}
 							}
 						},
@@ -1161,12 +972,20 @@
 					}
 				},
 				"tags": [
-					"Object2"
+					"Object5"
 				]
 			},
 			"patch": {
-				"operationId": "patchByExternalReferenceCode",
+				"operationId": "patchScopeScopeKeyByExternalReferenceCode",
 				"parameters": [
+					{
+						"in": "path",
+						"name": "scopeKey",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
 					{
 						"in": "path",
 						"name": "externalReferenceCode",
@@ -1180,12 +999,12 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/Object2"
+								"$ref": "#/components/schemas/Object5"
 							}
 						},
 						"application/xml": {
 							"schema": {
-								"$ref": "#/components/schemas/Object2"
+								"$ref": "#/components/schemas/Object5"
 							}
 						}
 					}
@@ -1195,12 +1014,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Object2"
+									"$ref": "#/components/schemas/Object5"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"$ref": "#/components/schemas/Object2"
+									"$ref": "#/components/schemas/Object5"
 								}
 							}
 						},
@@ -1208,12 +1027,20 @@
 					}
 				},
 				"tags": [
-					"Object2"
+					"Object5"
 				]
 			},
 			"put": {
-				"operationId": "putByExternalReferenceCode",
+				"operationId": "putScopeScopeKeyByExternalReferenceCode",
 				"parameters": [
+					{
+						"in": "path",
+						"name": "scopeKey",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
 					{
 						"in": "path",
 						"name": "externalReferenceCode",
@@ -1227,12 +1054,12 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/Object2"
+								"$ref": "#/components/schemas/Object5"
 							}
 						},
 						"application/xml": {
 							"schema": {
-								"$ref": "#/components/schemas/Object2"
+								"$ref": "#/components/schemas/Object5"
 							}
 						}
 					}
@@ -1242,12 +1069,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Object2"
+									"$ref": "#/components/schemas/Object5"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"$ref": "#/components/schemas/Object2"
+									"$ref": "#/components/schemas/Object5"
 								}
 							}
 						},
@@ -1255,104 +1082,17 @@
 					}
 				},
 				"tags": [
-					"Object2"
+					"Object5"
 				]
 			}
 		},
-		"/export-batch": {
-			"post": {
-				"operationId": "postObject2sPageExportBatch",
-				"parameters": [
-					{
-						"in": "query",
-						"name": "filter",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "search",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "sort",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "callbackURL",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "contentType",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "fieldNames",
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"responses": {
-					"default": {
-						"content": {
-							"application/json": {
-							}
-						},
-						"description": "default response"
-					}
-				},
-				"tags": [
-					"Object2"
-				]
-			}
-		},
-		"/openapi.{type}": {
-			"get": {
-				"operationId": "getOpenAPI",
-				"parameters": [
-					{
-						"in": "path",
-						"name": "type",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"responses": {
-					"default": {
-						"content": {
-							"application/json": {
-							},
-							"application/yaml": {
-							}
-						},
-						"description": "default response"
-					}
-				}
-			}
-		},
-		"/{object2Id}": {
+		"/{object5Id}": {
 			"delete": {
-				"operationId": "deleteObject2",
+				"operationId": "deleteObject5",
 				"parameters": [
 					{
 						"in": "path",
-						"name": "object2Id",
+						"name": "object5Id",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -1371,15 +1111,15 @@
 					}
 				},
 				"tags": [
-					"Object2"
+					"Object5"
 				]
 			},
 			"get": {
-				"operationId": "getObject2",
+				"operationId": "getObject5",
 				"parameters": [
 					{
 						"in": "path",
-						"name": "object2Id",
+						"name": "object5Id",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -1412,12 +1152,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Object2"
+									"$ref": "#/components/schemas/Object5"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"$ref": "#/components/schemas/Object2"
+									"$ref": "#/components/schemas/Object5"
 								}
 							}
 						},
@@ -1425,15 +1165,15 @@
 					}
 				},
 				"tags": [
-					"Object2"
+					"Object5"
 				]
 			},
 			"patch": {
-				"operationId": "patchObject2",
+				"operationId": "patchObject5",
 				"parameters": [
 					{
 						"in": "path",
-						"name": "object2Id",
+						"name": "object5Id",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -1444,12 +1184,12 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/Object2"
+								"$ref": "#/components/schemas/Object5"
 							}
 						},
 						"application/xml": {
 							"schema": {
-								"$ref": "#/components/schemas/Object2"
+								"$ref": "#/components/schemas/Object5"
 							}
 						}
 					}
@@ -1459,12 +1199,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Object2"
+									"$ref": "#/components/schemas/Object5"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"$ref": "#/components/schemas/Object2"
+									"$ref": "#/components/schemas/Object5"
 								}
 							}
 						},
@@ -1472,15 +1212,15 @@
 					}
 				},
 				"tags": [
-					"Object2"
+					"Object5"
 				]
 			},
 			"put": {
-				"operationId": "putObject2",
+				"operationId": "putObject5",
 				"parameters": [
 					{
 						"in": "path",
-						"name": "object2Id",
+						"name": "object5Id",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -1491,12 +1231,12 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/Object2"
+								"$ref": "#/components/schemas/Object5"
 							}
 						},
 						"application/xml": {
 							"schema": {
-								"$ref": "#/components/schemas/Object2"
+								"$ref": "#/components/schemas/Object5"
 							}
 						}
 					}
@@ -1506,12 +1246,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Object2"
+									"$ref": "#/components/schemas/Object5"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"$ref": "#/components/schemas/Object2"
+									"$ref": "#/components/schemas/Object5"
 								}
 							}
 						},
@@ -1519,17 +1259,17 @@
 					}
 				},
 				"tags": [
-					"Object2"
+					"Object5"
 				]
 			}
 		},
-		"/{object2Id}/permissions": {
+		"/{object5Id}/permissions": {
 			"get": {
-				"operationId": "getObject2PermissionsPage",
+				"operationId": "getObject5PermissionsPage",
 				"parameters": [
 					{
 						"in": "path",
-						"name": "object2Id",
+						"name": "object5Id",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -1582,15 +1322,15 @@
 					}
 				},
 				"tags": [
-					"Object2"
+					"Object5"
 				]
 			},
 			"put": {
-				"operationId": "putObject2PermissionsPage",
+				"operationId": "putObject5PermissionsPage",
 				"parameters": [
 					{
 						"in": "path",
-						"name": "object2Id",
+						"name": "object5Id",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -1635,17 +1375,17 @@
 					}
 				},
 				"tags": [
-					"Object2"
+					"Object5"
 				]
 			}
 		},
-		"/{object2Id}/relationship1": {
+		"/{object5Id}/relationship5": {
 			"get": {
-				"operationId": "getObject2Relationship1Object1Page",
+				"operationId": "getObject5Relationship5Object3Page",
 				"parameters": [
 					{
 						"in": "path",
-						"name": "object2Id",
+						"name": "object5Id",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -1692,12 +1432,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/PageObject1"
+									"$ref": "#/components/schemas/PageObject3"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"$ref": "#/components/schemas/PageObject1"
+									"$ref": "#/components/schemas/PageObject3"
 								}
 							}
 						},
@@ -1705,17 +1445,17 @@
 					}
 				},
 				"tags": [
-					"Object2"
+					"Object5"
 				]
 			}
 		},
-		"/{object2Id}/relationship1/{object1Id}": {
+		"/{object5Id}/relationship5/{object3Id}": {
 			"delete": {
-				"operationId": "deleteObject2Relationship1Object1",
+				"operationId": "deleteObject5Relationship5Object3",
 				"parameters": [
 					{
 						"in": "path",
-						"name": "object2Id",
+						"name": "object5Id",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -1723,7 +1463,7 @@
 					},
 					{
 						"in": "path",
-						"name": "object1Id",
+						"name": "object3Id",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -1742,15 +1482,15 @@
 					}
 				},
 				"tags": [
-					"Object2"
+					"Object5"
 				]
 			},
 			"put": {
-				"operationId": "putObject2Relationship1Object1",
+				"operationId": "putObject5Relationship5Object3",
 				"parameters": [
 					{
 						"in": "path",
-						"name": "object2Id",
+						"name": "object5Id",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -1758,7 +1498,7 @@
 					},
 					{
 						"in": "path",
-						"name": "object1Id",
+						"name": "object3Id",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -1770,12 +1510,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Object1"
+									"$ref": "#/components/schemas/Object3"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"$ref": "#/components/schemas/Object1"
+									"$ref": "#/components/schemas/Object3"
 								}
 							}
 						},
@@ -1783,14 +1523,14 @@
 					}
 				},
 				"tags": [
-					"Object2"
+					"Object5"
 				]
 			}
 		}
 	},
 	"servers": [
 		{
-			"url": "http://localhost:8080/o/c/object2s/"
+			"url": "http://localhost:8080/o/c/object5s/"
 		}
 	]
 }

@@ -186,8 +186,8 @@ public class OpenAPIResourceTest {
 		_assertOpenAPI("expected_openapi.json", _objectDefinition);
 		_assertOpenAPI(
 			"expected_openapi_related.json", relatedObjectDefinition);
-		_assertOpenAPI(
-			"expected_openapi_site.json",
+
+		ObjectDefinition siteScopedObjectDefinition1 =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
 				"Object3",
 				Collections.singletonList(
@@ -195,7 +195,10 @@ public class OpenAPIResourceTest {
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
 						"field", "field", false)),
-				ObjectDefinitionConstants.SCOPE_SITE));
+				ObjectDefinitionConstants.SCOPE_SITE);
+
+		_assertOpenAPI(
+			"expected_openapi_site.json", siteScopedObjectDefinition1);
 
 		ObjectDefinition categorizationDisabledObjectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
@@ -216,6 +219,28 @@ public class OpenAPIResourceTest {
 		_assertOpenAPI(
 			"expected_openapi_categorization_disabled.json",
 			categorizationDisabledObjectDefinition);
+
+		ObjectDefinition siteScopedObjectDefinition2 =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				"Object5",
+				Collections.singletonList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
+						"field", "field", false)),
+				ObjectDefinitionConstants.SCOPE_SITE);
+
+		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
+			null, TestPropsValues.getUserId(),
+			siteScopedObjectDefinition2.getObjectDefinitionId(),
+			siteScopedObjectDefinition1.getObjectDefinitionId(), 0,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, false,
+			LocalizedMapUtil.getLocalizedMap("relationship5"), "relationship5",
+			false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+
+		_assertOpenAPI(
+			"expected_openapi_site_object_relationship.json",
+			siteScopedObjectDefinition2);
 	}
 
 	@Test
