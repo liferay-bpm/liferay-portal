@@ -6053,7 +6053,7 @@ public class ObjectEntryResourceTest {
 
 			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_BOOLEAN));
 			Assert.assertFalse(jsonObject.has(_OBJECT_FIELD_NAME_DATE));
-			Assert.assertFalse(jsonObject.has(_OBJECT_FIELD_NAME_TEXT));
+			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_TEXT));
 			Assert.assertFalse(jsonObject.has(_objectRelationship1.getName()));
 
 			_assertInvocations(invocations, true, _OBJECT_FIELD_NAME_BOOLEAN);
@@ -6074,7 +6074,7 @@ public class ObjectEntryResourceTest {
 
 			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_BOOLEAN));
 			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_DATE));
-			Assert.assertFalse(jsonObject.has(_OBJECT_FIELD_NAME_TEXT));
+			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_TEXT));
 			Assert.assertFalse(jsonObject.has(_objectRelationship1.getName()));
 
 			_assertInvocations(invocations, true, _OBJECT_FIELD_NAME_BOOLEAN);
@@ -6097,7 +6097,7 @@ public class ObjectEntryResourceTest {
 
 			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_BOOLEAN));
 			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_DATE));
-			Assert.assertFalse(jsonObject.has(_OBJECT_FIELD_NAME_TEXT));
+			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_TEXT));
 			Assert.assertTrue(jsonObject.has(_objectRelationship1.getName()));
 			Assert.assertFalse(
 				Validator.isNull(
@@ -6128,7 +6128,7 @@ public class ObjectEntryResourceTest {
 
 			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_BOOLEAN));
 			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_DATE));
-			Assert.assertFalse(jsonObject.has(_OBJECT_FIELD_NAME_TEXT));
+			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_TEXT));
 			Assert.assertTrue(jsonObject.has(_objectRelationship1.getName()));
 			Assert.assertTrue(
 				Validator.isNull(
