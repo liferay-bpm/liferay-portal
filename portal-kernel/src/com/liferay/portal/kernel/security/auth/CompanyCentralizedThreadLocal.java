@@ -7,10 +7,10 @@ package com.liferay.portal.kernel.security.auth;
 
 import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.petra.lang.SafeClosable;
-import com.liferay.petra.lang.SafeCloseable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -23,47 +23,45 @@ public class CompanyCentralizedThreadLocal<T>
 	public static List<CompanyCentralizedThreadLocal<?>>
 		getCompanyCentralizedThreadLocals() {
 
-		return _companyCentralizedThreadLocals;
+		List<CompanyCentralizedThreadLocal<?>> companyCentralizedThreadLocals =
+			new ArrayList<>();
+
+		Map<CentralizedThreadLocal<?>, Object>
+			shortLivedCentralizedThreadLocals =
+				getShortLivedCentralizedThreadLocals();
+
+		for (CentralizedThreadLocal<?> shortLivedCentralizedThreadLocal :
+				shortLivedCentralizedThreadLocals.keySet()) {
+
+			if (shortLivedCentralizedThreadLocal instanceof
+					CompanyCentralizedThreadLocal) {
+
+				companyCentralizedThreadLocals.add(
+					(CompanyCentralizedThreadLocal<?>)
+						shortLivedCentralizedThreadLocal);
+			}
+		}
+
+		return companyCentralizedThreadLocals;
 	}
 
 	public CompanyCentralizedThreadLocal(String name) {
-		this(name, () -> null, true);
+		super(name, () -> null, null, true);
 	}
 
 	public CompanyCentralizedThreadLocal(String name, Supplier<T> supplier) {
-		this(name, supplier, true);
+		super(name, supplier, null, true);
 	}
 
 	public CompanyCentralizedThreadLocal(
-		String name, Supplier<T> supplier, boolean shortLived) {
+		String name, Supplier<T> supplier, Function<T, T> copyFunction) {
 
-		this(name, supplier, null, shortLived);
-	}
-
-	public CompanyCentralizedThreadLocal(
-		String name, Supplier<T> supplier, Function<T, T> copyFunction,
-		boolean shortLived) {
-
-		super(name, supplier, copyFunction, shortLived);
-
-		_companyCentralizedThreadLocals.add(this);
+		super(name, supplier, copyFunction, true);
 	}
 
 	@Override
 	public SafeClosable setWithSafeClosable(T value) {
 		throw new UnsupportedOperationException();
 	}
-
-	@Override
-	public SafeCloseable setWithSafeCloseable(T value) {
-		if (value == null) {
-			value = initialValue();
-		}
-
-		return super.setWithSafeCloseable(value);
-	}
-
-	private static final List<CompanyCentralizedThreadLocal<?>>
-		_companyCentralizedThreadLocals = new ArrayList<>();
 
 }

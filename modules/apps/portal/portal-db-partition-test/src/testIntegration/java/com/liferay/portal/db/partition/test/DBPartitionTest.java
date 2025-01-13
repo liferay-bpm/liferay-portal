@@ -17,7 +17,6 @@ import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.instance.PortalInstancePool;
 import com.liferay.portal.kernel.model.ClassName;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.ResourceAction;
@@ -521,13 +520,25 @@ public class DBPartitionTest extends BaseDBPartitionTestCase {
 
 	@Test
 	public void testDeployRemotePortlet() throws Exception {
-		Company company = companyLocalService.fetchCompanyByVirtualHost(
-			TestPropsValues.COMPANY_WEB_ID);
-
 		String portletName = RandomTestUtil.randomString();
 
 		try {
-			_deployRemotePortlet(company.getCompanyId(), portletName);
+			_deployRemotePortlet(CompanyConstants.SYSTEM, portletName);
+
+			Portlet portlet = _portletLocalService.getPortletById(portletName);
+
+			DBPartitionUtil.forEachCompanyId(
+				companyId -> Assert.assertEquals(
+					portlet, _portletLocalService.getPortletById(portletName)));
+		}
+		finally {
+			Portlet portlet = _portletLocalService.getPortletById(portletName);
+
+			_portletLocalService.destroyRemotePortlet(portlet);
+		}
+
+		try {
+			_deployRemotePortlet(TestPropsValues.getCompanyId(), portletName);
 
 			long defaultCompanyId = PortalInstancePool.getDefaultCompanyId();
 
@@ -535,13 +546,13 @@ public class DBPartitionTest extends BaseDBPartitionTestCase {
 
 			try (SafeCloseable safeCloseable =
 					CompanyThreadLocal.setCompanyIdWithSafeCloseable(
-						company.getCompanyId())) {
+						TestPropsValues.getCompanyId())) {
 
 				Portlet portlet = _portletLocalService.getPortletById(
 					portletName);
 
 				Assert.assertEquals(
-					company.getCompanyId(), portlet.getCompanyId());
+					TestPropsValues.getCompanyId(), portlet.getCompanyId());
 			}
 
 			try (SafeCloseable safeCloseable =
@@ -874,9 +885,16 @@ public class DBPartitionTest extends BaseDBPartitionTestCase {
 		portlet.setCompanyId(companyId);
 		portlet.setPortletId(portletName);
 
-		_portletLocalService.deployRemotePortlet(
-			new long[] {companyId}, portlet, new String[] {"category.hidden"},
-			true, true);
+		companyId = (companyId == CompanyConstants.SYSTEM) ?
+			PortalInstancePool.getDefaultCompanyId() : companyId;
+
+		try (SafeCloseable safeCloseable =
+				CompanyThreadLocal.setCompanyIdWithSafeCloseable(companyId)) {
+
+			_portletLocalService.deployRemotePortlet(
+				new long[] {companyId}, portlet,
+				new String[] {"category.hidden"}, true, true);
+		}
 	}
 
 	private static final String _CLASS_NAME = DBPartitionTest.class.getName();

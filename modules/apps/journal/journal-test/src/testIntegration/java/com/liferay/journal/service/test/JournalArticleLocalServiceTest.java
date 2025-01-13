@@ -8,7 +8,9 @@ package com.liferay.journal.service.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.display.page.constants.AssetDisplayPageConstants;
 import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
+import com.liferay.asset.kernel.exception.AssetCategoryException;
 import com.liferay.asset.kernel.model.AssetCategory;
+import com.liferay.asset.kernel.model.AssetCategoryConstants;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.model.AssetVocabulary;
@@ -126,6 +128,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portlet.asset.util.AssetVocabularySettingsHelper;
 
 import java.io.InputStream;
 
@@ -169,6 +172,54 @@ public class JournalArticleLocalServiceTest {
 		_journalFolderFixture = new JournalFolderFixture(
 			_journalFolderLocalService);
 		_themeDisplay = _getThemeDisplay();
+	}
+
+	@Test(expected = AssetCategoryException.class)
+	public void testAddArticleWithAssetCategoriesFromNonmultiValuedAssetVocabulary()
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group, TestPropsValues.getUserId());
+
+		AssetVocabularySettingsHelper assetVocabularySettingsHelper =
+			_getAssetVocabularySettingsHelper(
+				false, new long[] {AssetCategoryConstants.ALL_CLASS_NAME_ID},
+				new long[] {AssetCategoryConstants.ALL_CLASS_TYPE_PK},
+				new boolean[] {false}, new boolean[] {false});
+
+		Assert.assertFalse(assetVocabularySettingsHelper.isMultiValued());
+
+		AssetVocabulary assetVocabulary =
+			_assetVocabularyLocalService.addVocabulary(
+				TestPropsValues.getUserId(), _group.getGroupId(),
+				RandomTestUtil.randomString(),
+				HashMapBuilder.put(
+					LocaleUtil.US, RandomTestUtil.randomString()
+				).build(),
+				null, assetVocabularySettingsHelper.toString(), serviceContext);
+
+		AssetCategory assetCategory1 = _assetCategoryLocalService.addCategory(
+			TestPropsValues.getUserId(), _group.getGroupId(),
+			RandomTestUtil.randomString(), assetVocabulary.getVocabularyId(),
+			serviceContext);
+		AssetCategory assetCategory2 = _assetCategoryLocalService.addCategory(
+			TestPropsValues.getUserId(), _group.getGroupId(),
+			RandomTestUtil.randomString(), assetVocabulary.getVocabularyId(),
+			serviceContext);
+
+		serviceContext.setAssetCategoryIds(
+			new long[] {
+				assetCategory1.getCategoryId(), assetCategory2.getCategoryId()
+			});
+
+		JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			JournalArticleConstants.CLASS_NAME_ID_DEFAULT,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), LocaleUtil.getSiteDefault(), false,
+			false, serviceContext);
 	}
 
 	@Test
@@ -1209,6 +1260,46 @@ public class JournalArticleLocalServiceTest {
 	}
 
 	@Test
+	public void testFetchDisplayArticle() throws Exception {
+		JournalArticle article1 = JournalTestUtil.addArticle(
+			_group.getGroupId(), 0);
+
+		article1 = _journalArticleLocalService.fetchDisplayArticle(
+			_group.getGroupId(), article1.getArticleId());
+
+		Assert.assertEquals(1, article1.getVersion(), 0);
+
+		article1 = JournalTestUtil.updateArticle(article1);
+		article1 = JournalTestUtil.updateArticle(article1);
+
+		JournalArticle article2 = JournalTestUtil.updateArticle(article1);
+
+		article1 = _journalArticleLocalService.fetchDisplayArticle(
+			_group.getGroupId(), article1.getArticleId());
+
+		Assert.assertEquals(1.3, article1.getVersion(), 0);
+
+		JournalTestUtil.expireArticle(
+			_group.getGroupId(), article2, article2.getVersion());
+
+		article1 = _journalArticleLocalService.fetchDisplayArticle(
+			_group.getGroupId(), article1.getArticleId());
+
+		Assert.assertEquals(1.2, article1.getVersion(), 0);
+
+		article2.setDisplayDate(
+			new Date(System.currentTimeMillis() + (60 * 60 * 1000)));
+		article2.setStatus(WorkflowConstants.STATUS_APPROVED);
+
+		JournalTestUtil.updateArticle(article2);
+
+		article1 = _journalArticleLocalService.fetchDisplayArticle(
+			_group.getGroupId(), article1.getArticleId());
+
+		Assert.assertEquals(1.2, article1.getVersion(), 0);
+	}
+
+	@Test
 	public void testFetchLatestArticleByExternalReferenceCodeWithStatus()
 		throws Exception {
 
@@ -2093,6 +2184,61 @@ public class JournalArticleLocalServiceTest {
 		}
 	}
 
+	@Test(expected = AssetCategoryException.class)
+	public void testUpdateArticleWithAssetCategoriesFromNonmultiValuedAssetVocabulary()
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group, TestPropsValues.getUserId());
+
+		AssetVocabularySettingsHelper assetVocabularySettingsHelper =
+			_getAssetVocabularySettingsHelper(
+				false, new long[] {AssetCategoryConstants.ALL_CLASS_NAME_ID},
+				new long[] {AssetCategoryConstants.ALL_CLASS_TYPE_PK},
+				new boolean[] {false}, new boolean[] {false});
+
+		Assert.assertFalse(assetVocabularySettingsHelper.isMultiValued());
+
+		AssetVocabulary assetVocabulary =
+			_assetVocabularyLocalService.addVocabulary(
+				TestPropsValues.getUserId(), _group.getGroupId(),
+				RandomTestUtil.randomString(),
+				HashMapBuilder.put(
+					LocaleUtil.US, RandomTestUtil.randomString()
+				).build(),
+				null, assetVocabularySettingsHelper.toString(), serviceContext);
+
+		AssetCategory assetCategory1 = _assetCategoryLocalService.addCategory(
+			TestPropsValues.getUserId(), _group.getGroupId(),
+			RandomTestUtil.randomString(), assetVocabulary.getVocabularyId(),
+			serviceContext);
+		AssetCategory assetCategory2 = _assetCategoryLocalService.addCategory(
+			TestPropsValues.getUserId(), _group.getGroupId(),
+			RandomTestUtil.randomString(), assetVocabulary.getVocabularyId(),
+			serviceContext);
+
+		serviceContext.setAssetCategoryIds(
+			new long[] {assetCategory1.getCategoryId()});
+
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			JournalArticleConstants.CLASS_NAME_ID_DEFAULT,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), LocaleUtil.getSiteDefault(), false,
+			false, serviceContext);
+
+		serviceContext.setAssetCategoryIds(
+			new long[] {
+				assetCategory1.getCategoryId(), assetCategory2.getCategoryId()
+			});
+
+		JournalTestUtil.updateArticle(
+			journalArticle, RandomTestUtil.randomString(),
+			journalArticle.getContent(), true, true, serviceContext);
+	}
+
 	@Test
 	public void testUpdateDDMStructurePredefinedValues() throws Exception {
 		Tuple tuple = _createJournalArticleWithPredefinedValues("Test Article");
@@ -2285,6 +2431,20 @@ public class JournalArticleLocalServiceTest {
 				serviceContext);
 
 		return new Tuple(journalArticle, ddmStructure);
+	}
+
+	private AssetVocabularySettingsHelper _getAssetVocabularySettingsHelper(
+		boolean multiValued, long[] classNameIds, long[] classTypePKs,
+		boolean[] depotRequireds, boolean[] requireds) {
+
+		AssetVocabularySettingsHelper assetVocabularySettingsHelper =
+			new AssetVocabularySettingsHelper();
+
+		assetVocabularySettingsHelper.setClassNameIdsAndClassTypePKs(
+			classNameIds, classTypePKs, depotRequireds, requireds);
+		assetVocabularySettingsHelper.setMultiValued(multiValued);
+
+		return assetVocabularySettingsHelper;
 	}
 
 	private String _getNewTitle(String title) {

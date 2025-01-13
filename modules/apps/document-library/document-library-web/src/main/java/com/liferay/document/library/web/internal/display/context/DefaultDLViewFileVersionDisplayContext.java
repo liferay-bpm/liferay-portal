@@ -132,6 +132,12 @@ public class DefaultDLViewFileVersionDisplayContext
 						_uiItemsBuilder::isCheckinActionAvailable,
 						_uiItemsBuilder.createCheckinDropdownItem()
 					).add(
+						_uiItemsBuilder::isSubscribeActionAvailable,
+						_uiItemsBuilder.createSubscribeDropdownItem()
+					).add(
+						_uiItemsBuilder::isUnsubscribeActionAvailable,
+						_uiItemsBuilder.createUnsubscribeDropdownItem()
+					).add(
 						_uiItemsBuilder::
 							isCollectDigitalSignatureActionAvailable,
 						_uiItemsBuilder.
@@ -140,6 +146,15 @@ public class DefaultDLViewFileVersionDisplayContext
 						_uiItemsBuilder::isHistoryActionAvailable,
 						_uiItemsBuilder.createHistoryDropdownItem()
 					).add(
+						_uiItemsBuilder::isViewUsagesActionAvailable,
+						_uiItemsBuilder.createViewUsagesDropdownItem()
+					).build());
+				dropdownGroupItem.setSeparator(true);
+			}
+		).addGroup(
+			dropdownGroupItem -> {
+				dropdownGroupItem.setDropdownItems(
+					DropdownItemListBuilder.add(
 						_uiItemsBuilder::isMoveActionAvailable,
 						_uiItemsBuilder.createMoveDropdownItem()
 					).add(

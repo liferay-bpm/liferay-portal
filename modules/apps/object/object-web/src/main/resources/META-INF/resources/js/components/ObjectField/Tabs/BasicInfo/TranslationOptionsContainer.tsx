@@ -33,7 +33,9 @@ export function TranslationOptionsContainer({
 	const translatableField =
 		(values.businessType === 'LongText' ||
 			values.businessType === 'RichText' ||
-			values.businessType === 'Text') &&
+			values.businessType === 'Text' ||
+			(Liferay.FeatureFlags['LPD-32050'] &&
+				values.businessType === 'Boolean')) &&
 		!values.system;
 
 	return (

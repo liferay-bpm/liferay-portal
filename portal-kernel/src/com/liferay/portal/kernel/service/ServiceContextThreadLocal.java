@@ -53,14 +53,17 @@ public class ServiceContextThreadLocal {
 					new LinkedList<>();
 
 				for (ServiceContext serviceContext : serviceContexts) {
-					ServiceContext cloneServiceContext =
-						(ServiceContext)serviceContext.clone();
+					ServiceContext cloneServiceContext = null;
+
+					if (serviceContext != null) {
+						cloneServiceContext =
+							(ServiceContext)serviceContext.clone();
+					}
 
 					cloneServiceContexts.add(cloneServiceContext);
 				}
 
 				return cloneServiceContexts;
-			},
-			true);
+			});
 
 }

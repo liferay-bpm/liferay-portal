@@ -207,6 +207,7 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import java.text.DateFormat;
 
@@ -227,6 +228,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.mail.internet.InternetAddress;
 
@@ -3856,7 +3858,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		Ticket ticket = _ticketLocalService.addDistinctTicket(
 			user.getCompanyId(), User.class.getName(), user.getUserId(),
-			TicketConstants.TYPE_EMAIL_ADDRESS, emailAddress, null,
+			TicketConstants.TYPE_EMAIL_ADDRESS, emailAddress,
+			new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(2)),
 			serviceContext);
 
 		String verifyEmailAddressURL = StringBundler.concat(
@@ -7499,8 +7502,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		}
 	}
 
-	private java.sql.Date _toSQLDate(Date date) {
-		return new java.sql.Date(date.getTime());
+	private Timestamp _toSQLTimestamp(Date date) {
+		return new Timestamp(date.getTime());
 	}
 
 	private User _unlockOutUser(User user, PasswordPolicy passwordPolicy) {
@@ -7556,10 +7559,11 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 				CustomSQLUtil.get(_UPDATE_LAST_LOGIN))) {
 
 			for (User user : users) {
-				preparedStatement.setDate(1, _toSQLDate(user.getLoginDate()));
+				preparedStatement.setTimestamp(
+					1, _toSQLTimestamp(user.getLoginDate()));
 				preparedStatement.setString(2, user.getLoginIP());
-				preparedStatement.setDate(
-					3, _toSQLDate(user.getLastLoginDate()));
+				preparedStatement.setTimestamp(
+					3, _toSQLTimestamp(user.getLastLoginDate()));
 				preparedStatement.setString(4, user.getLastLoginIP());
 				preparedStatement.setInt(5, user.getFailedLoginAttempts());
 				preparedStatement.setLong(6, user.getPrimaryKey());

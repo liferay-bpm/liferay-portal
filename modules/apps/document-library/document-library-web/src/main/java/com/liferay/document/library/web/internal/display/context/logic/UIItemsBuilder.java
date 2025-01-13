@@ -21,16 +21,19 @@ import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.document.library.web.internal.display.context.helper.FileEntryDisplayContextHelper;
 import com.liferay.document.library.web.internal.display.context.helper.FileShortcutDisplayContextHelper;
 import com.liferay.document.library.web.internal.helper.DLTrashHelper;
+import com.liferay.document.library.web.internal.util.DLSubscriptionUtil;
 import com.liferay.document.library.web.internal.util.FolderItemSelectorURLProvider;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerRegistryUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemBuilder;
 import com.liferay.item.selector.ItemSelector;
+import com.liferay.layout.service.LayoutClassedModelUsageLocalServiceUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -545,6 +548,62 @@ public class UIItemsBuilder {
 		).build();
 	}
 
+	public DropdownItem createSubscribeDropdownItem() {
+		return DropdownItemBuilder.putData(
+			"action", "subscribeFileEntry"
+		).putData(
+			"subscribeFileEntryURL",
+			PortletURLBuilder.createActionURL(
+				_getLiferayPortletResponse()
+			).setActionName(
+				"/document_library/subscribe_file_entry"
+			).setRedirect(
+				_getRedirect()
+			).setParameter(
+				"fileEntryId", _fileEntry.getFileEntryId()
+			).buildString()
+		).setIcon(
+			"bell-on"
+		).setLabel(
+			LanguageUtil.get(_httpServletRequest, "subscribe")
+		).build();
+	}
+
+	public DropdownItem createUnsubscribeDropdownItem() throws PortalException {
+		if (!DLSubscriptionUtil.isSubscribedToFolder(
+				_themeDisplay.getCompanyId(), _themeDisplay.getScopeGroupId(),
+				_themeDisplay.getUserId(), _fileEntry.getFolderId())) {
+
+			return DropdownItemBuilder.putData(
+				"action", "unsubscribeFileEntry"
+			).putData(
+				"unsubscribeFileEntryURL",
+				PortletURLBuilder.createActionURL(
+					_getLiferayPortletResponse()
+				).setActionName(
+					"/document_library/unsubscribe_file_entry"
+				).setRedirect(
+					_getRedirect()
+				).setParameter(
+					"fileEntryId", _fileEntry.getFileEntryId()
+				).buildString()
+			).setIcon(
+				"bell-off"
+			).setLabel(
+				LanguageUtil.get(_httpServletRequest, "unsubscribe")
+			).build();
+		}
+
+		return DropdownItemBuilder.setDisabled(
+			true
+		).setIcon(
+			"bell-off"
+		).setLabel(
+			LanguageUtil.get(
+				_httpServletRequest, "subscribed-to-a-parent-folder")
+		).build();
+	}
+
 	public DropdownItem createViewOriginalFileDropdownItem() {
 		if (_fileShortcut == null) {
 			return null;
@@ -560,6 +619,34 @@ public class UIItemsBuilder {
 			DLUIItemKeys.VIEW_ORIGINAL_FILE
 		).setLabel(
 			LanguageUtil.get(_httpServletRequest, "view-original-file")
+		).build();
+	}
+
+	public DropdownItem createViewUsagesDropdownItem() {
+		return DropdownItemBuilder.setDisabled(
+			() -> {
+				int count =
+					LayoutClassedModelUsageLocalServiceUtil.
+						getLayoutClassedModelUsagesCount(
+							PortalUtil.getClassNameId(FileEntry.class),
+							_fileEntry.getFileEntryId());
+
+				if (count == 0) {
+					return true;
+				}
+
+				return false;
+			}
+		).setHref(
+			PortletURLBuilder.create(
+				_getRenderURL("/document_library/view_file_entry_usages")
+			).setParameter(
+				"fileEntryId", _fileEntry.getFileEntryId()
+			).buildString()
+		).setIcon(
+			"list-ul"
+		).setLabel(
+			LanguageUtil.get(_httpServletRequest, "view-usages")
 		).build();
 	}
 
@@ -795,8 +882,42 @@ public class UIItemsBuilder {
 			latestFileVersion.getVersion(), _fileVersion.getVersion());
 	}
 
+	public boolean isSubscribeActionAvailable() throws PortalException {
+		if (!_fileEntryDisplayContextHelper.hasSubscribePermission()) {
+			return false;
+		}
+
+		return !isUnsubscribeActionAvailable();
+	}
+
+	public boolean isUnsubscribeActionAvailable() throws PortalException {
+		if (_subscribed != null) {
+			return _subscribed;
+		}
+
+		_subscribed = false;
+
+		if (_fileEntryDisplayContextHelper.hasSubscribePermission()) {
+			_subscribed = DLSubscriptionUtil.isSubscribedToFileEntry(
+				_fileEntry.getCompanyId(), _themeDisplay.getScopeGroupId(),
+				_themeDisplay.getUserId(), _fileEntry.getFileEntryId());
+		}
+
+		return _subscribed;
+	}
+
 	public boolean isViewOriginalFileActionAvailable() {
 		if (_fileShortcut != null) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public boolean isViewUsagesActionAvailable() {
+		if (FeatureFlagManagerUtil.isEnabled(
+				_themeDisplay.getCompanyId(), "LPD-36446")) {
+
 			return true;
 		}
 
@@ -1197,6 +1318,7 @@ public class UIItemsBuilder {
 	private final FileVersion _fileVersion;
 	private final HttpServletRequest _httpServletRequest;
 	private String _redirect;
+	private Boolean _subscribed;
 	private final ThemeDisplay _themeDisplay;
 	private Boolean _trashEnabled;
 	private final VersioningStrategy _versioningStrategy;

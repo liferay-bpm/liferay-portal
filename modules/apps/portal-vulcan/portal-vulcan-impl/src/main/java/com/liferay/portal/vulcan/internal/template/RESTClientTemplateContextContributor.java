@@ -12,6 +12,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.access.control.AccessControlUtil;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.servlet.PipingServletResponse;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.template.TemplateContextContributor;
@@ -75,16 +77,19 @@ public class RESTClientTemplateContextContributor
 		private Object _get(String path) throws Exception {
 			UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
+			AccessControlContext accessControlContext =
+				AccessControlUtil.getAccessControlContext();
+
+			HttpServletResponse httpServletResponse = new PipingServletResponse(
+				new RESTClientHttpResponse(), unsyncStringWriter);
+
 			ServletContext servletContext = _getServletContext();
 
 			RequestDispatcher requestDispatcher =
 				servletContext.getRequestDispatcher(Portal.PATH_MODULE + path);
 
-			HttpServletResponse httpServletResponse = new PipingServletResponse(
-				new RESTClientHttpResponse(), unsyncStringWriter);
-
-			AccessControlContext accessControlContext =
-				AccessControlUtil.getAccessControlContext();
+			PermissionChecker permissionChecker =
+				PermissionThreadLocal.getPermissionChecker();
 
 			try {
 				AccessControlUtil.setAccessControlContext(null);
@@ -100,6 +105,7 @@ public class RESTClientTemplateContextContributor
 			}
 			finally {
 				AccessControlUtil.setAccessControlContext(accessControlContext);
+				PermissionThreadLocal.setPermissionChecker(permissionChecker);
 			}
 
 			String responseString = unsyncStringWriter.toString();

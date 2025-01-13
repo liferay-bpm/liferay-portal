@@ -11,7 +11,11 @@ import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.audit.AuditMessage;
+import com.liferay.portal.kernel.bean.ClassLoaderBeanHandler;
+import com.liferay.portal.kernel.dao.jdbc.DataAccess;
+import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.NoSuchTicketException;
 import com.liferay.portal.kernel.exception.PasswordExpiredException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.RequiredRoleException;
@@ -45,6 +49,7 @@ import com.liferay.portal.kernel.service.PortalPreferencesLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.ServiceWrapper;
 import com.liferay.portal.kernel.service.TicketLocalService;
 import com.liferay.portal.kernel.service.UserGroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -74,18 +79,25 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.comparator.UserLastLoginDateComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.model.impl.UserImpl;
 import com.liferay.portal.security.audit.AuditMessageProcessor;
 import com.liferay.portal.security.audit.event.generators.constants.EventTypes;
+import com.liferay.portal.service.impl.UserLocalServiceImpl;
+import com.liferay.portal.spring.aop.AopInvocationHandler;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.util.DigesterImpl;
 
+import java.sql.Connection;
+
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -1036,6 +1048,43 @@ public class UserLocalServiceTest {
 	}
 
 	@Test
+	public void testUpdateLastLogin() throws Exception {
+		User user = UserTestUtil.addUser();
+
+		AopInvocationHandler aopInvocationHandler =
+			ProxyUtil.fetchInvocationHandler(
+				_userLocalService, AopInvocationHandler.class);
+
+		ServiceWrapper<UserLocalService> serviceWrapper =
+			(ServiceWrapper<UserLocalService>)aopInvocationHandler.getTarget();
+
+		ClassLoaderBeanHandler classLoaderBeanHandler =
+			(ClassLoaderBeanHandler)ProxyUtil.getInvocationHandler(
+				serviceWrapper.getWrappedService());
+
+		UserLocalServiceImpl userLocalServiceImpl =
+			(UserLocalServiceImpl)classLoaderBeanHandler.getBean();
+
+		user.setLoginDate(new Date());
+		user.setLastLoginDate(new Date());
+
+		try (Connection connection = DataAccess.getConnection()) {
+			ReflectionTestUtil.invoke(
+				userLocalServiceImpl, "_updateLastLogin",
+				new Class<?>[] {Connection.class, List.class}, connection,
+				Collections.singletonList(user));
+		}
+
+		EntityCacheUtil.clearCache(UserImpl.class);
+
+		User updatedUser = _userLocalService.getUser(user.getUserId());
+
+		Assert.assertEquals(user.getLoginDate(), updatedUser.getLoginDate());
+		Assert.assertEquals(
+			user.getLastLoginDate(), updatedUser.getLastLoginDate());
+	}
+
+	@Test
 	public void testUpdatePassword() throws Exception {
 		User user = UserTestUtil.addUser();
 		String password = RandomTestUtil.randomString(
@@ -1171,6 +1220,12 @@ public class UserLocalServiceTest {
 		}
 	}
 
+	@Test
+	public void testVerifyEmailAddress() throws Exception {
+		_testVerifyEmailAddress(false);
+		_testVerifyEmailAddress(true);
+	}
+
 	private long[] _addUsers(int numberOfUsers) throws Exception {
 		long[] userIds = new long[numberOfUsers];
 
@@ -1219,6 +1274,87 @@ public class UserLocalServiceTest {
 		Assert.assertFalse(user.isLockout());
 
 		return user;
+	}
+
+	private void _testVerifyEmailAddress(boolean expired) throws Exception {
+		try (SafeCloseable safeCloseable = _updateSecurityWithSafeCloseable(
+				TestPropsValues.getCompanyId(), true)) {
+
+			User user = _userLocalService.addUserWithWorkflow(
+				0, TestPropsValues.getCompanyId(), false, "test", "test", false,
+				RandomTestUtil.randomString(),
+				RandomTestUtil.randomString() + "@liferay.com", LocaleUtil.US,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), 0, 0, true, 1, 1, 1970,
+				StringPool.BLANK, UserConstants.TYPE_REGULAR, null, null, null,
+				null, true,
+				ServiceContextTestUtil.getServiceContext(
+					TestPropsValues.getCompanyId(),
+					TestPropsValues.getGroupId(), TestPropsValues.getUserId()));
+
+			List<Ticket> tickets = _ticketLocalService.getTickets(
+				user.getCompanyId(), User.class.getName(), user.getUserId());
+
+			Ticket ticket = tickets.get(0);
+
+			Assert.assertEquals(
+				TicketConstants.TYPE_EMAIL_ADDRESS, ticket.getType());
+			Assert.assertFalse(ticket.isExpired());
+			Assert.assertNotNull(ticket.getExpirationDate());
+
+			if (expired) {
+				try {
+					ticket.setExpirationDate(
+						new Date(System.currentTimeMillis()));
+
+					ticket = _ticketLocalService.updateTicket(ticket);
+
+					Assert.assertTrue(ticket.isExpired());
+
+					_userLocalService.verifyEmailAddress(ticket.getKey());
+
+					Assert.fail();
+				}
+				catch (NoSuchTicketException noSuchTicketException) {
+					Assert.assertNotNull(noSuchTicketException);
+				}
+			}
+			else {
+				_userLocalService.verifyEmailAddress(ticket.getKey());
+
+				tickets = _ticketLocalService.getTickets(
+					user.getCompanyId(), User.class.getName(),
+					user.getUserId());
+
+				Assert.assertEquals(tickets.toString(), 0, tickets.size());
+
+				Assert.assertEquals(
+					Authenticator.SUCCESS,
+					_userLocalService.authenticateByEmailAddress(
+						user.getCompanyId(), user.getEmailAddress(), "test",
+						null, null, null));
+			}
+		}
+	}
+
+	private SafeCloseable _updateSecurityWithSafeCloseable(
+			long companyId, boolean strangersVerify)
+		throws PortalException {
+
+		Company company = _companyLocalService.getCompany(companyId);
+
+		boolean originalStrangersVerify = company.isStrangersVerify();
+
+		_companyLocalService.updateSecurity(
+			companyId, company.getAuthType(), company.isAutoLogin(),
+			company.isSendPasswordResetLink(), company.isStrangers(),
+			company.isStrangersWithMx(), strangersVerify, company.isSiteLogo());
+
+		return () -> _companyLocalService.updateSecurity(
+			companyId, company.getAuthType(), company.isAutoLogin(),
+			company.isSendPasswordResetLink(), company.isStrangers(),
+			company.isStrangersWithMx(), originalStrangersVerify,
+			company.isSiteLogo());
 	}
 
 	private static Company _company;

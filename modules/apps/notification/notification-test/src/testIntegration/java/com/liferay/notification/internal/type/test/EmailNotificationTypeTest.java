@@ -102,6 +102,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -563,7 +564,7 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 			ServiceContextThreadLocal.getServiceContext());
 
 		_testSendNotification(
-			0, Collections.emptyList(), false, user.getEmailAddress());
+			0, Collections.emptyList(), true, user.getEmailAddress());
 
 		_userLocalService.deleteUser(user.getUserId());
 
@@ -1570,12 +1571,16 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 				_formatDate(serviceBuilderObjectEntry.getLastPublishDate()),
 				WorkflowConstants.getStatusLabel(
 					serviceBuilderObjectEntry.getStatus()),
-				"true", "9/25/24 12:00 AM", "2024-09-25T00:00",
-				"test@liferay.com", "12345", "123456789",
+				"true",
+				_formatDate(
+					DateUtil.parseDate(
+						"MM/dd/yy hh:mm a", "9/25/24 12:00 AM", LocaleUtil.US)),
+				"2024-09-25T00:00", "test@liferay.com", "12345", "123456789",
 				"listTypeEntry1Value,listTypeEntry2Value",
 				"listTypeEntry1Value", "", "textObjectFieldValue",
 				LanguageUtil.getLanguageId(LocaleUtil.US),
 				_portal.getPortalURL(serviceContext.getRequest()),
+				StringPool.NEW_LINE, StringPool.NEW_LINE,
 				serviceContext.getCompanyId()),
 			StringPool.NEW_LINE);
 	}

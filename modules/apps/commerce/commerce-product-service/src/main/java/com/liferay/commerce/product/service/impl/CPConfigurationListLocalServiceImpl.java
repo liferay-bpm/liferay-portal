@@ -8,14 +8,18 @@ package com.liferay.commerce.product.service.impl;
 import com.liferay.commerce.constants.CPDefinitionInventoryConstants;
 import com.liferay.commerce.price.list.exception.CommercePriceListDisplayDateException;
 import com.liferay.commerce.price.list.exception.CommercePriceListExpirationDateException;
+import com.liferay.commerce.product.constants.CPConfigurationEntrySettingConstants;
 import com.liferay.commerce.product.exception.CPConfigurationListParentCPConfigurationListGroupIdException;
 import com.liferay.commerce.product.exception.DuplicateCPConfigurationListException;
 import com.liferay.commerce.product.exception.NoSuchCPConfigurationListException;
 import com.liferay.commerce.product.exception.RequiredCPConfigurationListException;
 import com.liferay.commerce.product.model.CPConfigurationEntry;
+import com.liferay.commerce.product.model.CPConfigurationEntrySetting;
 import com.liferay.commerce.product.model.CPConfigurationList;
 import com.liferay.commerce.product.service.CPConfigurationEntryLocalService;
+import com.liferay.commerce.product.service.CPConfigurationEntrySettingLocalService;
 import com.liferay.commerce.product.service.base.CPConfigurationListLocalServiceBaseImpl;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -33,8 +37,10 @@ import com.liferay.portal.kernel.util.Validator;
 import java.math.BigDecimal;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -53,19 +59,17 @@ public class CPConfigurationListLocalServiceImpl
 	@Override
 	public CPConfigurationList addCPConfigurationList(
 			String externalReferenceCode, long groupId, long userId,
-			long parentCPConfigurationListId, boolean masterCPConfigurationList,
-			String name, double priority, int displayDateMonth,
-			int displayDateDay, int displayDateYear, int displayDateHour,
-			int displayDateMinute, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire)
+			long parentCPConfigurationListId, boolean master, String name,
+			double priority, int displayDateMonth, int displayDateDay,
+			int displayDateYear, int displayDateHour, int displayDateMinute,
+			int expirationDateMonth, int expirationDateDay,
+			int expirationDateYear, int expirationDateHour,
+			int expirationDateMinute, boolean neverExpire)
 		throws PortalException {
 
 		User user = _userLocalService.getUser(userId);
 
-		_validate(
-			groupId, 0, masterCPConfigurationList, parentCPConfigurationListId);
+		_validate(groupId, 0, master, parentCPConfigurationListId);
 
 		Date displayDate = _portal.getDate(
 			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
@@ -92,8 +96,7 @@ public class CPConfigurationListLocalServiceImpl
 		cpConfigurationList.setUserName(user.getFullName());
 		cpConfigurationList.setParentCPConfigurationListId(
 			parentCPConfigurationListId);
-		cpConfigurationList.setMasterCPConfigurationList(
-			masterCPConfigurationList);
+		cpConfigurationList.setMaster(master);
 		cpConfigurationList.setName(name);
 		cpConfigurationList.setPriority(priority);
 		cpConfigurationList.setDisplayDate(displayDate);
@@ -103,27 +106,59 @@ public class CPConfigurationListLocalServiceImpl
 			cpConfigurationList);
 
 		if (parentCPConfigurationListId > 0) {
+			Set<Long> classPKs = new HashSet<>();
 			Indexer<CPConfigurationEntry> indexer =
 				IndexerRegistryUtil.nullSafeGetIndexer(
 					CPConfigurationEntry.class);
 
-			for (CPConfigurationEntry cpConfigurationEntry :
-					_cpConfigurationEntryLocalService.getCPConfigurationEntries(
-						parentCPConfigurationListId)) {
+			while (parentCPConfigurationListId > 0) {
+				for (CPConfigurationEntry cpConfigurationEntry :
+						_cpConfigurationEntryLocalService.
+							getCPConfigurationEntries(
+								parentCPConfigurationListId)) {
 
-				if (Objects.equals(
-						cpConfigurationEntry.getClassName(),
-						CPConfigurationList.class.getName())) {
+					if (Objects.equals(
+							cpConfigurationEntry.getClassName(),
+							CPConfigurationList.class.getName()) ||
+						classPKs.contains(cpConfigurationEntry.getClassPK())) {
 
-					continue;
+						continue;
+					}
+
+					CPConfigurationEntrySetting cpConfigurationEntrySetting =
+						_cpConfigurationEntrySettingLocalService.
+							fetchCPConfigurationEntrySetting(
+								cpConfigurationEntry.
+									getCPConfigurationEntryId(),
+								CPConfigurationEntrySettingConstants.
+									TYPE_INDEX_IDS);
+
+					cpConfigurationEntrySetting.setValue(
+						StringBundler.concat(
+							cpConfigurationEntrySetting.getValue(),
+							StringPool.COMMA,
+							cpConfigurationList.getCPConfigurationListId()));
+
+					_cpConfigurationEntrySettingLocalService.
+						updateCPConfigurationEntrySetting(
+							cpConfigurationEntrySetting);
+
+					classPKs.add(cpConfigurationEntry.getClassPK());
+
+					indexer.reindex(
+						CPConfigurationEntry.class.getName(),
+						cpConfigurationEntry.getCPConfigurationEntryId());
 				}
 
-				indexer.reindex(
-					CPConfigurationEntry.class.getName(),
-					cpConfigurationEntry.getCPConfigurationEntryId());
+				CPConfigurationList parentCPConfigurationList =
+					cpConfigurationListLocalService.getCPConfigurationList(
+						parentCPConfigurationListId);
+
+				parentCPConfigurationListId =
+					parentCPConfigurationList.getParentCPConfigurationListId();
 			}
 		}
-		else if (masterCPConfigurationList) {
+		else if (master) {
 			_cpConfigurationEntryLocalService.addCPConfigurationEntry(
 				null, userId, groupId,
 				_portal.getClassNameId(CPConfigurationList.class),
@@ -145,10 +180,10 @@ public class CPConfigurationListLocalServiceImpl
 	@Override
 	public CPConfigurationList addOrUpdateCPConfigurationList(
 			String externalReferenceCode, long companyId, long groupId,
-			long userId, long parentCPConfigurationListId,
-			boolean masterCPConfigurationList, String name, double priority,
-			int displayDateMonth, int displayDateDay, int displayDateYear,
-			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			long userId, long parentCPConfigurationListId, boolean master,
+			String name, double priority, int displayDateMonth,
+			int displayDateDay, int displayDateYear, int displayDateHour,
+			int displayDateMinute, int expirationDateMonth,
 			int expirationDateDay, int expirationDateYear,
 			int expirationDateHour, int expirationDateMinute,
 			boolean neverExpire)
@@ -164,19 +199,19 @@ public class CPConfigurationListLocalServiceImpl
 					updateCPConfigurationList(
 						externalReferenceCode,
 						cpConfigurationList.getCPConfigurationListId(), groupId,
-						userId, parentCPConfigurationListId,
-						masterCPConfigurationList, name, priority,
-						displayDateMonth, displayDateDay, displayDateYear,
-						displayDateHour, displayDateMinute, expirationDateMonth,
-						expirationDateDay, expirationDateYear,
-						expirationDateHour, expirationDateMinute, neverExpire);
+						userId, parentCPConfigurationListId, master, name,
+						priority, displayDateMonth, displayDateDay,
+						displayDateYear, displayDateHour, displayDateMinute,
+						expirationDateMonth, expirationDateDay,
+						expirationDateYear, expirationDateHour,
+						expirationDateMinute, neverExpire);
 			}
 		}
 
 		return cpConfigurationListLocalService.addCPConfigurationList(
 			externalReferenceCode, groupId, userId, parentCPConfigurationListId,
-			masterCPConfigurationList, name, priority, displayDateMonth,
-			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
+			master, name, priority, displayDateMonth, displayDateDay,
+			displayDateYear, displayDateHour, displayDateMinute,
 			expirationDateMonth, expirationDateDay, expirationDateYear,
 			expirationDateHour, expirationDateMinute, neverExpire);
 	}
@@ -188,11 +223,11 @@ public class CPConfigurationListLocalServiceImpl
 			CPConfigurationList cpConfigurationList)
 		throws PortalException {
 
-		if (cpConfigurationList.isMasterCPConfigurationList()) {
+		if (cpConfigurationList.isMaster()) {
 			throw new RequiredCPConfigurationListException();
 		}
 
-		cpConfigurationList = cpConfigurationListPersistence.remove(
+		cpConfigurationList = super.deleteCPConfigurationList(
 			cpConfigurationList);
 
 		_cpConfigurationEntryLocalService.deleteCPConfigurationEntries(
@@ -215,7 +250,9 @@ public class CPConfigurationListLocalServiceImpl
 	}
 
 	@Override
-	public void deleteCPConfigurationLists(long companyId) {
+	public void deleteCPConfigurationLists(long companyId)
+		throws PortalException {
+
 		List<CPConfigurationList> cpConfigurationLists =
 			cpConfigurationListPersistence.findByCompanyId(companyId);
 
@@ -231,13 +268,15 @@ public class CPConfigurationListLocalServiceImpl
 	public CPConfigurationList forceDeleteCPConfigurationList(
 		CPConfigurationList cpConfigurationList) {
 
-		cpConfigurationList = cpConfigurationListPersistence.remove(
-			cpConfigurationList);
+		for (CPConfigurationEntry cpConfigurationEntry :
+				_cpConfigurationEntryLocalService.getCPConfigurationEntries(
+					cpConfigurationList.getCPConfigurationListId())) {
 
-		_cpConfigurationEntryLocalService.deleteCPConfigurationEntries(
-			cpConfigurationList.getCPConfigurationListId());
+			_cpConfigurationEntryLocalService.forceDeleteCPConfigurationEntry(
+				cpConfigurationEntry);
+		}
 
-		return cpConfigurationList;
+		return cpConfigurationListPersistence.remove(cpConfigurationList);
 	}
 
 	@Override
@@ -259,9 +298,9 @@ public class CPConfigurationListLocalServiceImpl
 	public CPConfigurationList updateCPConfigurationList(
 			String externalReferenceCode, long cpConfigurationListId,
 			long groupId, long userId, long parentCPConfigurationListId,
-			boolean masterCPConfigurationList, String name, double priority,
-			int displayDateMonth, int displayDateDay, int displayDateYear,
-			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			boolean master, String name, double priority, int displayDateMonth,
+			int displayDateDay, int displayDateYear, int displayDateHour,
+			int displayDateMinute, int expirationDateMonth,
 			int expirationDateDay, int expirationDateYear,
 			int expirationDateHour, int expirationDateMinute,
 			boolean neverExpire)
@@ -270,7 +309,7 @@ public class CPConfigurationListLocalServiceImpl
 		User user = _userLocalService.getUser(userId);
 
 		_validate(
-			groupId, cpConfigurationListId, masterCPConfigurationList,
+			groupId, cpConfigurationListId, master,
 			parentCPConfigurationListId);
 
 		Date expirationDate = null;
@@ -295,8 +334,7 @@ public class CPConfigurationListLocalServiceImpl
 		cpConfigurationList.setGroupId(groupId);
 		cpConfigurationList.setParentCPConfigurationListId(
 			parentCPConfigurationListId);
-		cpConfigurationList.setMasterCPConfigurationList(
-			masterCPConfigurationList);
+		cpConfigurationList.setMaster(master);
 		cpConfigurationList.setName(name);
 		cpConfigurationList.setPriority(priority);
 		cpConfigurationList.setDisplayDate(displayDate);
@@ -342,6 +380,10 @@ public class CPConfigurationListLocalServiceImpl
 
 	@Reference
 	private CPConfigurationEntryLocalService _cpConfigurationEntryLocalService;
+
+	@Reference
+	private CPConfigurationEntrySettingLocalService
+		_cpConfigurationEntrySettingLocalService;
 
 	@Reference
 	private Portal _portal;

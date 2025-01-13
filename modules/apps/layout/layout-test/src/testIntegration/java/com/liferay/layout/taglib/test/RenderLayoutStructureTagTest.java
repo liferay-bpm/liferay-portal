@@ -362,6 +362,57 @@ public class RenderLayoutStructureTagTest {
 	}
 
 	@Test
+	@TestInfo("LPS-163440")
+	public void testRenderCollectionStyledLayoutStructureItemForFlexRowListStyle()
+		throws Exception {
+
+		AssetListEntry assetListEntry =
+			_assetListEntryLocalService.addAssetListEntry(
+				null, TestPropsValues.getUserId(), _group.getGroupId(),
+				RandomTestUtil.randomString(),
+				AssetListEntryTypeConstants.TYPE_DYNAMIC, _serviceContext);
+
+		JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+		Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
+
+		long segmentsExperienceId =
+			_segmentsExperienceLocalService.fetchDefaultSegmentsExperienceId(
+				layout.getPlid());
+
+		_addCollectionStyledLayoutStructureItem(
+			JSONUtil.put(
+				"classNameId", _portal.getClassNameId(AssetListEntry.class)
+			).put(
+				"classPK", assetListEntry.getAssetListEntryId()
+			).put(
+				"itemType", AssetEntry.class.getName()
+			).put(
+				"type", InfoListItemSelectorReturnType.class.getName()
+			),
+			JSONUtil.put(
+				"align", "align-items-end"
+			).put(
+				"justify", "justify-content-center"
+			),
+			layout, "flex-row", segmentsExperienceId,
+			_addFragmentEntryLinks(
+				1, JSONUtil.put("collectionFieldId", "JournalArticle_title"),
+				layout.fetchDraftLayout(), segmentsExperienceId));
+
+		MockHttpServletResponse mockHttpServletResponse = _renderLayout(
+			layout, _getMockHttpServletRequest(layout));
+
+		String content = mockHttpServletResponse.getContentAsString();
+
+		Assert.assertTrue(
+			content.contains(
+				"d-flex flex-row align-items-end justify-content-center"));
+	}
+
+	@Test
 	public void testRenderCollectionStyledLayoutStructureItemForRepeatableFields()
 		throws Exception {
 

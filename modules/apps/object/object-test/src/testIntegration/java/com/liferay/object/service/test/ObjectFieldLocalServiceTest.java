@@ -14,6 +14,7 @@ import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.constants.ObjectFilterConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.ObjectFieldBusinessTypeException;
 import com.liferay.object.exception.ObjectFieldDBTypeException;
@@ -50,11 +51,13 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
+import com.liferay.object.model.ObjectFilter;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
+import com.liferay.object.service.ObjectFilterLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.test.util.ObjectFieldTestUtil;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
@@ -65,6 +68,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.db.DBInspector;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.test.AssertUtils;
@@ -78,7 +82,6 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
@@ -99,7 +102,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -112,7 +114,7 @@ import org.junit.runner.RunWith;
  * @author Marco Leo
  * @author Brian Wing Shun Chan
  */
-@FeatureFlags({"LPD-32050", "LPS-187142"})
+@FeatureFlags({"LPD-32050", "LPD-34594"})
 @RunWith(Arquillian.class)
 public class ObjectFieldLocalServiceTest {
 
@@ -342,8 +344,8 @@ public class ObjectFieldLocalServiceTest {
 		AssertUtils.assertFailure(
 			ObjectFieldLocalizedException.class,
 			"Only Boolean,Date,DateTime,Decimal,Integer,LongInteger,LongText," +
-				"PrecisionDecimal,RichText and Text business types support " +
-					"localization",
+				"MultiselectPicklist,Picklist,PrecisionDecimal,RichText and " +
+					"Text business types support localization",
 			() -> ObjectDefinitionTestUtil.addCustomObjectDefinition(
 				false,
 				Arrays.asList(
@@ -409,6 +411,55 @@ public class ObjectFieldLocalServiceTest {
 					objectRelationshipName
 				).objectDefinitionId(
 					objectDefinition2.getObjectDefinitionId()
+				).build()));
+
+		ObjectFilter objectFilter =
+			_objectFilterLocalService.createObjectFilter(0L);
+
+		objectFilter.setFilterBy(RandomTestUtil.randomString());
+		objectFilter.setFilterType(ObjectFilterConstants.TYPE_EQUALS);
+		objectFilter.setJSON(
+			JSONUtil.put(
+				ObjectFilterConstants.TYPE_EQUALS, RandomTestUtil.randomInt()
+			).toString());
+
+		Assert.assertNotNull(
+			_addCustomObjectField(
+				new AggregationObjectFieldBuilder(
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString())
+				).name(
+					"a" + RandomTestUtil.randomString()
+				).objectDefinitionId(
+					objectDefinition1.getObjectDefinitionId()
+				).objectFieldSettings(
+					Arrays.asList(
+						new ObjectFieldSettingBuilder(
+						).name(
+							ObjectFieldSettingConstants.NAME_FILTERS
+						).objectFilters(
+							Arrays.asList(objectFilter)
+						).build(),
+						new ObjectFieldSettingBuilder(
+						).name(
+							ObjectFieldSettingConstants.NAME_FUNCTION
+						).value(
+							ObjectFieldSettingConstants.VALUE_MAX
+						).build(),
+						new ObjectFieldSettingBuilder(
+						).name(
+							ObjectFieldSettingConstants.NAME_OBJECT_FIELD_NAME
+						).value(
+							"a" + RandomTestUtil.randomString()
+						).build(),
+						new ObjectFieldSettingBuilder(
+						).name(
+							ObjectFieldSettingConstants.
+								NAME_OBJECT_RELATIONSHIP_NAME
+						).value(
+							objectRelationshipName
+						).build())
 				).build()));
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
@@ -1063,8 +1114,9 @@ public class ObjectFieldLocalServiceTest {
 
 		ObjectField systemObjectField = _addOrUpdateSystemObjectField(
 			null, modifiableSystemObjectDefinition.getObjectDefinitionId(),
-			null, null, false, false, LocalizedMapUtil.getLocalizedMap("Able"),
-			false, "able", false);
+			ObjectFieldConstants.BUSINESS_TYPE_TEXT, null, null,
+			ObjectFieldConstants.DB_TYPE_STRING, false, false,
+			LocalizedMapUtil.getLocalizedMap("Able"), false, "able", false);
 
 		_assertSystemObjectField(
 			"able_", false, false, LocalizedMapUtil.getLocalizedMap("Able"),
@@ -1075,14 +1127,18 @@ public class ObjectFieldLocalServiceTest {
 			_addOrUpdateSystemObjectField(
 				systemObjectField.getExternalReferenceCode(),
 				modifiableSystemObjectDefinition.getObjectDefinitionId(),
+				ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-				true, true, LocalizedMapUtil.getLocalizedMap("Baker"), false,
-				"able", true));
+				ObjectFieldConstants.DB_TYPE_STRING, true, true,
+				LocalizedMapUtil.getLocalizedMap("Baker"), false, "able",
+				true));
 
 		ObjectField localizedSystemObjectField = _addOrUpdateSystemObjectField(
 			null, modifiableSystemObjectDefinition.getObjectDefinitionId(),
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(), false,
-			false, LocalizedMapUtil.getLocalizedMap("Charlie"), true, "charlie",
+			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			ObjectFieldConstants.DB_TYPE_STRING, false, false,
+			LocalizedMapUtil.getLocalizedMap("Charlie"), true, "charlie",
 			false);
 
 		Assert.assertTrue(localizedSystemObjectField.isLocalized());
@@ -1104,8 +1160,10 @@ public class ObjectFieldLocalServiceTest {
 				_addOrUpdateSystemObjectField(
 					systemObjectField.getExternalReferenceCode(),
 					modifiableSystemObjectDefinition.getObjectDefinitionId(),
+					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 					RandomTestUtil.randomString(),
-					RandomTestUtil.randomString(), false, false,
+					RandomTestUtil.randomString(),
+					ObjectFieldConstants.DB_TYPE_STRING, false, false,
 					LocalizedMapUtil.getLocalizedMap("Dog"), false, "able",
 					false));
 		}
@@ -2203,15 +2261,15 @@ public class ObjectFieldLocalServiceTest {
 
 	private ObjectField _addOrUpdateSystemObjectField(
 			String externalReferenceCode, long objectDefinitionId,
-			String dbColumnName, String dbTableName, boolean indexed,
-			boolean indexedAsKeyword, Map<Locale, String> labelMap,
-			boolean localized, String name, boolean required)
+			String businessType, String dbColumnName, String dbTableName,
+			String dbType, boolean indexed, boolean indexedAsKeyword,
+			Map<Locale, String> labelMap, boolean localized, String name,
+			boolean required)
 		throws Exception {
 
 		return _objectFieldLocalService.addOrUpdateSystemObjectField(
 			externalReferenceCode, TestPropsValues.getUserId(), 0L,
-			objectDefinitionId, ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-			dbColumnName, dbTableName, ObjectFieldConstants.DB_TYPE_STRING,
+			objectDefinitionId, businessType, dbColumnName, dbTableName, dbType,
 			indexed, indexedAsKeyword, "", labelMap, localized, name,
 			ObjectFieldConstants.READ_ONLY_FALSE, null, required, false,
 			Collections.emptyList());
@@ -2614,11 +2672,17 @@ public class ObjectFieldLocalServiceTest {
 			ObjectDefinitionTestUtil.addCustomObjectDefinition(
 				false, Collections.emptyList());
 
-		for (String objectFieldName : _readOnlyObjectFieldNames) {
+		for (Map.Entry<String, String> entry :
+				_readOnlyObjectFieldDBTypes.entrySet()) {
+
 			_assertReadOnlyTrue(
 				_objectFieldLocalService.getObjectField(
-					objectDefinition1.getObjectDefinitionId(),
-					objectFieldName));
+					objectDefinition1.getObjectDefinitionId(), entry.getKey()));
+
+			ObjectField objectField = _objectFieldLocalService.getObjectField(
+				objectDefinition1.getObjectDefinitionId(), entry.getKey());
+
+			Assert.assertEquals(entry.getValue(), objectField.getDBType());
 		}
 
 		_assertReadOnlyFalse(
@@ -2814,9 +2878,22 @@ public class ObjectFieldLocalServiceTest {
 	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
 
 	@Inject
+	private ObjectFilterLocalService _objectFilterLocalService;
+
+	@Inject
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
-	private final Set<String> _readOnlyObjectFieldNames = SetUtil.fromArray(
-		"createDate", "creator", "id", "modifiedDate", "status");
+	private final Map<String, String> _readOnlyObjectFieldDBTypes =
+		HashMapBuilder.put(
+			"createDate", ObjectFieldConstants.DB_TYPE_DATE
+		).put(
+			"creator", ObjectFieldConstants.DB_TYPE_STRING
+		).put(
+			"id", ObjectFieldConstants.DB_TYPE_LONG
+		).put(
+			"modifiedDate", ObjectFieldConstants.DB_TYPE_DATE
+		).put(
+			"status", ObjectFieldConstants.DB_TYPE_INTEGER
+		).build();
 
 }

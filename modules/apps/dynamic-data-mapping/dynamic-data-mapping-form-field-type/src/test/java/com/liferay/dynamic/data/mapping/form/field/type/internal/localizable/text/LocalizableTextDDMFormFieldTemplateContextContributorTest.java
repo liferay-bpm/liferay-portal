@@ -5,7 +5,6 @@
 
 package com.liferay.dynamic.data.mapping.form.field.type.internal.localizable.text;
 
-import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
@@ -13,7 +12,6 @@ import com.liferay.dynamic.data.mapping.test.util.BaseDDMFormFieldTypeSettingsTe
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -53,7 +51,6 @@ public class LocalizableTextDDMFormFieldTemplateContextContributorTest
 		super.setUp();
 
 		_setUpJSONFactory();
-		_setUpJSONFactoryUtil();
 		_setUpLanguage();
 		_setUpPortal();
 	}
@@ -115,16 +112,8 @@ public class LocalizableTextDDMFormFieldTemplateContextContributorTest
 		Assert.assertEquals(expectedString, actualPredefinedValue);
 	}
 
-	private DDMForm _getDDMForm() {
-		DDMForm ddmForm = new DDMForm();
-
-		ddmForm.setDefaultLocale(LocaleUtil.US);
-
-		return ddmForm;
-	}
-
 	private Map<String, Object> _getParameters() {
-		_ddmFormField.setDDMForm(_getDDMForm());
+		_ddmFormField.setDDMForm(getDDMForm());
 
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext =
 			new DDMFormFieldRenderingContext();
@@ -147,12 +136,6 @@ public class LocalizableTextDDMFormFieldTemplateContextContributorTest
 		ReflectionTestUtil.setFieldValue(
 			_localizableTextDDMFormFieldTemplateContextContributor,
 			"jsonFactory", _jsonFactory);
-	}
-
-	private void _setUpJSONFactoryUtil() {
-		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
-
-		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
 	}
 
 	private void _setUpLanguage() {

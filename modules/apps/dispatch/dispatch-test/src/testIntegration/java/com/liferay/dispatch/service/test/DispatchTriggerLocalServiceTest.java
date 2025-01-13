@@ -631,9 +631,7 @@ public class DispatchTriggerLocalServiceTest {
 
 		calendar.set(Calendar.MILLISECOND, 0);
 
-		if (startCalendar.get(Calendar.DAY_OF_MONTH) == futureCalendar.get(
-				Calendar.DAY_OF_MONTH)) {
-
+		if (startCalendar.compareTo(calendar) >= 0) {
 			calendar.add(Calendar.DAY_OF_MONTH, 1);
 		}
 

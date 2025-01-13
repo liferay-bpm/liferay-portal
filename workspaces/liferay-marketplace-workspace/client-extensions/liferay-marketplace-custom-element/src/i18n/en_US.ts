@@ -96,6 +96,8 @@ export default {
 	'confirm-deletion': 'Confirm Deletion',
 	'confirm-uninstall': 'Confirm & Uninstall',
 	'confirm-uninstall-terms': 'Confirm Uninstall Terms',
+	'congratulations': 'Congratulations',
+	'connect-anyway': 'Connect Anyway',
 	'contact-publisher': 'Contact Publisher',
 	'contact-sales': 'Contact Sales',
 	'contact-support': 'Contact Support',
@@ -161,6 +163,7 @@ export default {
 	'download-key': 'Download Key',
 	'draft': 'Draft',
 	'drag-and-drop-to-upload-or': 'Drag and drop to upload or',
+	'dxp-connections': 'DXP Connections',
 	'dxp-license-usage-type': 'DXP License Usage Type',
 	'dxp-module-based-apps-are-not-supported-on-liferay-experience-cloud-lxc':
 		'DXP module-based apps are not supported on Liferay SaaS.',
@@ -277,6 +280,8 @@ export default {
 	'move-to-bottom': 'Move to Bottom',
 	'move-to-top': 'Move to Top',
 	'move-up': 'Move Up',
+	'my-apps': 'My Apps',
+	'my-solutions': 'My Solutions',
 	'name': 'Name',
 	'never-expires': 'Never Expires',
 	'new-trial': 'New Trial',
@@ -312,11 +317,14 @@ export default {
 	'please-fill-in-a-valid-email': 'Please fill in a valid email',
 	'please-review-before-submitting-once-sent-you-will-not-be-able-to-edit-any-information-until-this-submission-is-completely-reviewed-by-liferay':
 		'Please, review before submitting. Once sent, you will not be able to edit any information until this submission is completely reviewed by Liferay.',
+	'please-select-the-account-you-wish-to-link-to-your-liferay-dxp-below':
+		'Please select the account you wish to link to your Liferay DXP below',
 	'privacy-policy': 'Privacy Policy',
 	'product': 'Product',
 	'product-unavailable': 'Product Unavailable',
 	'profile': 'Profile',
 	'project': 'Project',
+	'project-selected': 'Project Selected',
 	'project-selection': 'Project Selection',
 	'projects': 'Projects',
 	'provide-app-build': 'Provide app build',
@@ -376,7 +384,6 @@ export default {
 		'Select the offering of Liferay your app is compatible with. The compatibility selections will determine on what platforms your app is tested.',
 	'select-the-versions-of-liferay-that-your-app-is-compatible-with':
 		'Select the versions of Liferay that your app is compatible with.',
-	'selected-project': 'Selected Project',
 	'self-managed': 'Self-Managed',
 	'send-request': 'Send Request',
 	'sign-in-with-a-different-account': 'Sign in with a different Account',
@@ -517,6 +524,8 @@ export default {
 	'x-will-be-deleted-and-this-action-cant-be-undone-are-you-sure-you-want-to-delete-it':
 		'{0} will be deleted and this action can’t be undone. Are you sure you want to delete it?',
 	'yes': 'Yes',
+	'you-are-one-step-away-from-finalizing-your-connection-with-the-marketplace-this-window-will-close-automatically':
+		'You are one step away from finalizing your connection with the Marketplace, this window will close automatically.',
 	'you-can-paste-links-directly-from-youtube':
 		'You can paste links directly from YouTube.',
 	'you-can-put-anything-you-want-here-but-a-good-guideline-is-no-more-than-4-5-paragraphs-this-field-does-not-allow-any-markup-tags-its-just-text-please-do-not-use-misleading-names-information-or-icons-descriptions-should-be-as-concise-as-possible-ensure-your-icons-images-descriptions-and-tags-are-free-of-profanity-or-other-offensive-material':
@@ -529,6 +538,8 @@ export default {
 		'You cannot upload more than {0} files.',
 	'you-currently-do-not-have-access-to-any-cloud-projects-please-login-as-a-user-that-has-access-to-a-project-or-contact-your-project-administrator-to-add-you-to-a-project':
 		'You currently do not have access to any Cloud Projects. Please login as a user that has access to a project or contact your project administrator to add you to a project.',
+	'you-currently-do-not-have-access-to-any-cloud-projects-which-may-restrict-the-functionalities-available-to-you':
+		'You currently do not have access to any Cloud Projects, which may restrict the functionalities available to you.',
 	'your-request-completed-successfully':
 		'Your request completed successfully',
 	'zip-files-must-be-in-universal-file-format-archive-uffa-the-specially-structured-zip-encoded-archive-used-to-package-client-extension-project-outputs-this-format-must-support-the-following-use-cases-deliver-batch-engine-data-files-compatible-with-all-deployment-targets-deliver-dxp-configuration-resource-compatible-with-all-deployment-targets-deliver-static-resources-compatible-with-all-deployment-targets-deliver-the-infrastructure-metadata-necessary-to-deploy-to-lxc-sm-for-more-information-see':

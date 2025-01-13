@@ -22,9 +22,20 @@ import org.osgi.service.component.annotations.Component;
 public class MostViewedAssetsPortletManager implements PortletManager {
 
 	@Override
+	public boolean isDeprecated() {
+		return true;
+	}
+
+	@Override
 	public boolean isVisible(Layout layout) {
-		return FeatureFlagManagerUtil.isEnabled(
-			layout.getCompanyId(), "LPD-39304");
+		if (FeatureFlagManagerUtil.isEnabled(
+				layout.getCompanyId(), "LPD-39304") &&
+			FeatureFlagManagerUtil.isEnabled("LPD-40530")) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 }

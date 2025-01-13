@@ -7,6 +7,7 @@ package com.liferay.headless.commerce.admin.catalog.resource.v1_0.test;
 
 import com.liferay.account.constants.AccountConstants;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.commerce.product.model.CPConfigurationEntry;
 import com.liferay.commerce.product.model.CPConfigurationList;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CProduct;
@@ -80,8 +81,13 @@ public class ProductConfigurationResourceTest
 	public void tearDown() throws Exception {
 		super.tearDown();
 
-		_cpConfigurationEntryLocalService.deleteCPConfigurationEntries(
-			_masterCPConfigurationList.getCPConfigurationListId());
+		for (CPConfigurationEntry cpConfigurationEntry :
+				_cpConfigurationEntryLocalService.getCPConfigurationEntries(
+					_masterCPConfigurationList.getCPConfigurationListId())) {
+
+			_cpConfigurationEntryLocalService.forceDeleteCPConfigurationEntry(
+				cpConfigurationEntry);
+		}
 	}
 
 	@FeatureFlags("LPD-10889")

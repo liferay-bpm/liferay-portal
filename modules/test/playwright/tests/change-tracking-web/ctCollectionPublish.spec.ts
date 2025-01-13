@@ -57,7 +57,7 @@ test('LPD-42499 Assert correct message appears in Checking changes page', async 
 
 	await pageEditorPage.publishPage();
 
-	await changeTrackingPage.goToReviewChanges(ctCollection.name);
+	await changeTrackingPage.goToReviewChanges(ctCollection.body.name);
 
 	await page.reload();
 
@@ -179,9 +179,7 @@ test('Publish Parallel Publications', async ({
 
 	await journalEditArticlePage.fillTitle(title1);
 
-	const publishButton = page.getByRole('button', {name: 'Publish'});
-
-	await publishButton.click();
+	await journalEditArticlePage.publishArticle();
 
 	await waitForAlert(page, `Success:${title1} was created successfully.`);
 
@@ -208,7 +206,7 @@ test('Publish Parallel Publications', async ({
 
 	await journalEditArticlePage.fillTitle(title2);
 
-	await publishButton.click();
+	await journalEditArticlePage.publishArticle();
 
 	await waitForAlert(page, `Success:${title2} was created successfully.`);
 
