@@ -4616,15 +4616,23 @@ public class ObjectEntryLocalServiceImpl
 			}
 		}
 
+		String contentTypes;
+
+		if (Validator.isXml(title)) {
+			contentTypes = ContentTypes.TEXT_HTML;
+		}
+		else {
+			contentTypes = ContentTypes.TEXT_PLAIN;
+		}
+
 		AssetEntry assetEntry = _assetEntryLocalService.updateEntry(
 			userId, objectEntry.getNonzeroGroupId(),
 			objectEntry.getCreateDate(), objectEntry.getModifiedDate(),
 			objectDefinition.getClassName(), objectEntry.getObjectEntryId(),
 			objectEntry.getUuid(), 0, assetCategoryIds, assetTagNames, true,
-			objectEntry.isApproved(), null, null, null, null,
-			ContentTypes.TEXT_PLAIN, title,
-			String.valueOf(objectEntry.getObjectEntryId()), null, null, null, 0,
-			0, priority, serviceContext);
+			objectEntry.isApproved(), null, null, null, null, contentTypes,
+			title, String.valueOf(objectEntry.getObjectEntryId()), null, null,
+			null, 0, 0, priority, serviceContext);
 
 		if (assetLinkEntryIds != null) {
 			_assetLinkLocalService.updateLinks(
