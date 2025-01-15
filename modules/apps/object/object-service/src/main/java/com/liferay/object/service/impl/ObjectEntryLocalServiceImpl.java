@@ -330,7 +330,7 @@ public class ObjectEntryLocalServiceImpl
 		objectEntry.setCreateDate(new Date());
 		objectEntry.setObjectDefinitionId(objectDefinitionId);
 		objectEntry.setObjectEntryFolderId(
-			ObjectEntryFolderConstants.DEFAULT_PARENT_OBJECT_ENTRY_FOLDER);
+			ObjectEntryFolderConstants.DEFAULT_PARENT_OBJECT_ENTRY_FOLDER_ID);
 		objectEntry.setTreePath(objectEntry.buildTreePath());
 
 		_setExternalReferenceCode(objectEntry, values);
@@ -431,7 +431,7 @@ public class ObjectEntryLocalServiceImpl
 		objectEntry.setObjectDefinitionId(
 			objectDefinition.getObjectDefinitionId());
 		objectEntry.setObjectEntryFolderId(
-			ObjectEntryFolderConstants.DEFAULT_PARENT_OBJECT_ENTRY_FOLDER);
+			ObjectEntryFolderConstants.DEFAULT_PARENT_OBJECT_ENTRY_FOLDER_ID);
 		objectEntry.setTreePath(objectEntry.buildTreePath());
 		objectEntry.setStatus(WorkflowConstants.STATUS_DRAFT);
 		objectEntry.setStatusDate(new Date());
