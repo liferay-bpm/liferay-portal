@@ -38,6 +38,7 @@ import com.liferay.object.definition.util.ObjectDefinitionThreadLocal;
 import com.liferay.object.entry.ObjectEntryContext;
 import com.liferay.object.entry.contributor.ObjectEntryValuesContributor;
 import com.liferay.object.entry.util.ObjectEntryThreadLocal;
+import com.liferay.object.entry.util.ObjectEntryValuesUtil;
 import com.liferay.object.exception.DuplicateObjectEntryExternalReferenceCodeException;
 import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
@@ -81,6 +82,7 @@ import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.search.StrictObjectReindexThreadLocal;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectFieldLocalServiceUtil;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectStateFlowLocalService;
@@ -4605,24 +4607,49 @@ public class ObjectEntryLocalServiceImpl
 			assetTagNames = null;
 		}
 
+		ObjectField objectField = ObjectFieldLocalServiceUtil.fetchObjectField(
+			objectDefinition.getTitleObjectFieldId());
+
 		String title = StringPool.BLANK;
 
-		try {
-			title = objectEntry.getTitleValue();
+		if ((objectField != null) && objectField.isLocalized()) {
+			Map<String, Serializable> values = objectEntry.getValues();
+
+			Map<String, Serializable> localizedValues =
+				(Map<String, Serializable>)values.get(
+					objectField.getI18nObjectFieldName());
+
+			if (MapUtil.isNotEmpty(localizedValues)) {
+				Map<String, String> titleMap = new HashMap<>();
+
+				for (Map.Entry<String, Serializable> entry :
+						localizedValues.entrySet()) {
+
+					titleMap.put(
+						entry.getKey(),
+						ObjectEntryValuesUtil.getValueString(
+							objectField, localizedValues, entry.getValue()));
+				}
+
+				title = _localization.getXml(
+					titleMap, objectField.getDefaultLanguageId(), "title");
+			}
 		}
-		catch (PortalException portalException) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+		else {
+			try {
+				title = objectEntry.getTitleValue();
+			}
+			catch (PortalException portalException) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(portalException);
+				}
 			}
 		}
 
-		String contentTypes;
+		String contentTypes = ContentTypes.TEXT_PLAIN;
 
 		if (Validator.isXml(title)) {
 			contentTypes = ContentTypes.TEXT_HTML;
-		}
-		else {
-			contentTypes = ContentTypes.TEXT_PLAIN;
 		}
 
 		AssetEntry assetEntry = _assetEntryLocalService.updateEntry(

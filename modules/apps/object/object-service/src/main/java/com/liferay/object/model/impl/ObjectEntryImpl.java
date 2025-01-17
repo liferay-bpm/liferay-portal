@@ -87,8 +87,10 @@ public class ObjectEntryImpl extends ObjectEntryBaseImpl {
 					objectDefinition.getTitleObjectFieldId());
 
 			if (objectField != null) {
+				Map<String, Serializable> values = getValues();
+
 				String title = ObjectEntryValuesUtil.getValueString(
-					objectField, getValues());
+					objectField, values, values.get(objectField.getName()));
 
 				if (Validator.isNotNull(title)) {
 					return title;
@@ -105,9 +107,12 @@ public class ObjectEntryImpl extends ObjectEntryBaseImpl {
 					return String.valueOf(getObjectEntryId());
 				}
 
+				Map<String, Serializable> systemValues =
+					ObjectEntryLocalServiceUtil.getSystemValues(this);
+
 				return ObjectEntryValuesUtil.getValueString(
-					objectField,
-					ObjectEntryLocalServiceUtil.getSystemValues(this));
+					objectField, systemValues,
+					systemValues.get(objectField.getName()));
 			}
 		}
 
