@@ -26,9 +26,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Locale;
@@ -105,14 +103,7 @@ public class ObjectEntryAssetRenderer
 	@Override
 	public String getTitle(Locale locale) {
 		try {
-			String titleValue = _objectEntry.getTitleValue();
-
-			if (Validator.isXml(titleValue)) {
-				return LocalizationUtil.getLocalization(
-					titleValue, locale.getLanguage());
-			}
-
-			return titleValue;
+			return _objectEntry.getTitleValue();
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
