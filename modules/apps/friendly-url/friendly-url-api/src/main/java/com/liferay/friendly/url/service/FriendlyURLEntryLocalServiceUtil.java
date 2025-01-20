@@ -115,6 +115,10 @@ public class FriendlyURLEntryLocalServiceUtil {
 		return getService().createPersistedModel(primaryKeyObj);
 	}
 
+	public static void deleteFriendlyURLEntries(long classNameId) {
+		getService().deleteFriendlyURLEntries(classNameId);
+	}
+
 	/**
 	 * Deletes the friendly url entry from the database. Also notifies the appropriate model listeners.
 	 *
