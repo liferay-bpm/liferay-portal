@@ -57,24 +57,29 @@ public class ObjectEntryImpl extends ObjectEntryBaseImpl {
 				ObjectFieldLocalServiceUtil.fetchObjectField(
 					objectDefinition.getTitleObjectFieldId());
 
-			if (objectField != null) {
-				Map<String, Serializable> values = getValues();
+			if (objectField == null) {
+				return titleMap;
+			}
 
-				Map<String, Serializable> localizedValues =
-					(Map<String, Serializable>)values.get(
-						objectField.getI18nObjectFieldName());
+			Map<String, Serializable> values = getValues();
 
-				if (MapUtil.isNotEmpty(localizedValues)) {
-					for (Map.Entry<String, Serializable> entry :
-							localizedValues.entrySet()) {
+			Map<String, Serializable> localizedValues =
+				(Map<String, Serializable>)values.get(
+					objectField.getI18nObjectFieldName());
 
-						titleMap.put(
-							entry.getKey(),
-							ObjectEntryValuesUtil.getValueString(
-								objectField, localizedValues,
-								entry.getValue()));
-					}
-				}
+			if (MapUtil.isEmpty(localizedValues)) {
+				return titleMap;
+			}
+
+			for (Map.Entry<String, Serializable> entry :
+					localizedValues.entrySet()) {
+
+				titleMap.put(
+					entry.getKey(),
+					String.valueOf(
+						ObjectEntryValuesUtil.getValue(
+							entry.getKey(), objectField,
+							new HashMap<>(values))));
 			}
 		}
 
@@ -126,10 +131,8 @@ public class ObjectEntryImpl extends ObjectEntryBaseImpl {
 					objectDefinition.getTitleObjectFieldId());
 
 			if (objectField != null) {
-				Map<String, Serializable> values = getValues();
-
 				String title = ObjectEntryValuesUtil.getValueString(
-					objectField, values, values.get(objectField.getName()));
+					objectField, getValues());
 
 				if (Validator.isNotNull(title)) {
 					return title;
@@ -146,12 +149,9 @@ public class ObjectEntryImpl extends ObjectEntryBaseImpl {
 					return String.valueOf(getObjectEntryId());
 				}
 
-				Map<String, Serializable> systemValues =
-					ObjectEntryLocalServiceUtil.getSystemValues(this);
-
 				return ObjectEntryValuesUtil.getValueString(
-					objectField, systemValues,
-					systemValues.get(objectField.getName()));
+					objectField,
+					ObjectEntryLocalServiceUtil.getSystemValues(this));
 			}
 		}
 
