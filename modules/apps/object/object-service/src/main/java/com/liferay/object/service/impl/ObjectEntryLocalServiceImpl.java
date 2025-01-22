@@ -4613,8 +4613,8 @@ public class ObjectEntryLocalServiceImpl
 
 		if ((objectField != null) && objectField.isLocalized()) {
 			title = _localization.getXml(
-				getLocalizedTitleValue(), objectField.getDefaultLanguageId(),
-				"title");
+				objectEntry.getLocalizedTitleValue(),
+				objectField.getDefaultLanguageId(), "title");
 		}
 		else {
 			try {
