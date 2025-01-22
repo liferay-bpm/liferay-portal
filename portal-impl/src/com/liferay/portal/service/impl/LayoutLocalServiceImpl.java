@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.exception.SitemapChangeFrequencyException;
 import com.liferay.portal.kernel.exception.SitemapIncludeException;
 import com.liferay.portal.kernel.exception.SitemapPagePriorityException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lock.LockManagerUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -255,7 +254,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			  (classPK > 0) &&
 			  (classNameId == _classNameLocalService.getClassNameId(
 				  Layout.class.getName()))) ||
-			 Objects.equals(type, LayoutConstants.TYPE_COLLECTION) ||
 			 Objects.equals(type, LayoutConstants.TYPE_CONTENT) ||
 			 Objects.equals(type, LayoutConstants.TYPE_UTILITY))) {
 
@@ -369,8 +367,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		if (_workflowDefinitionLinkLocalService.hasWorkflowDefinitionLink(
 				layout.getCompanyId(), layout.getGroupId(),
 				Layout.class.getName()) &&
-			(Objects.equals(type, LayoutConstants.TYPE_COLLECTION) ||
-			 Objects.equals(type, LayoutConstants.TYPE_CONTENT) ||
+			(Objects.equals(type, LayoutConstants.TYPE_CONTENT) ||
 			 Objects.equals(type, LayoutConstants.TYPE_UTILITY)) &&
 			!system) {
 
@@ -425,9 +422,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			Layout.class.getName(), layout.getPlid(), false,
 			addGroupPermissions, addGuestPermissions);
 
-		if (FeatureFlagManagerUtil.isEnabled("LPD-21265") &&
-			Objects.equals(layout.getType(), LayoutConstants.TYPE_CONTENT)) {
-
+		if (Objects.equals(layout.getType(), LayoutConstants.TYPE_CONTENT)) {
 			PortalDefaultPermissionsUtil.setModelDefaultPermissions(
 				layout, layout.getCompanyId(), groupId, serviceContext);
 		}
@@ -3676,8 +3671,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		layout.setType(type);
 
-		if (Objects.equals(type, LayoutConstants.TYPE_COLLECTION) ||
-			Objects.equals(type, LayoutConstants.TYPE_CONTENT) ||
+		if (Objects.equals(type, LayoutConstants.TYPE_CONTENT) ||
 			Objects.equals(type, LayoutConstants.TYPE_UTILITY)) {
 
 			layout.setLayoutPrototypeUuid(StringPool.BLANK);
@@ -4122,10 +4116,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 				LayoutTable.INSTANCE.system.eq(false)
 			).and(
 				LayoutTable.INSTANCE.type.notIn(
-					new String[] {
-						LayoutConstants.TYPE_COLLECTION,
-						LayoutConstants.TYPE_CONTENT
-					}
+					new String[] {LayoutConstants.TYPE_CONTENT}
 				).or(
 					LayoutTable.INSTANCE.plid.in(
 						DSLQueryFactoryUtil.select(

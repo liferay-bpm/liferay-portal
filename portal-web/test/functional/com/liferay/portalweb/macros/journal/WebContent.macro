@@ -1411,7 +1411,7 @@ definition {
 			SelectFrame(value1 = "relative=top");
 		}
 
-		if (${saveAsDraft} == "true") {
+		if (isSet(saveAsDraft) && (${saveAsDraft} == "true")) {
 			WebContent.saveAsDraftWithPermissions();
 
 			AssertTextEquals.assertPartialText(
@@ -1482,7 +1482,7 @@ definition {
 			webContentUpload = ${webContentUpload},
 			webContentWebContent = ${webContentWebContent});
 
-		if (${saveAsDraft} == "true") {
+		if (isSet(saveAsDraft) && (${saveAsDraft} == "true")) {
 			WebContent.saveAsDraftWithPermissions();
 
 			AssertTextEquals.assertPartialText(
@@ -2025,6 +2025,15 @@ definition {
 			key_fieldFieldLabel = ${fieldFieldLabel},
 			locator1 = "WCEditWebContent#IMAGE_DESCRIPTION",
 			value1 = ${webContentImageDescription});
+	}
+
+	@summary = "Default summary"
+	macro submitForWorkflow() {
+		Button.clickSubmitForWorkflow();
+
+		Click(locator1 = "WCEditWebContent#SUBMIT_FOR_WORKFLOW");
+
+		WaitForElementPresent.waitForElementPresentNoException(locator1 = "Message#ALERT_DISMISSIBLE");
 	}
 
 	@summary = "Default summary"

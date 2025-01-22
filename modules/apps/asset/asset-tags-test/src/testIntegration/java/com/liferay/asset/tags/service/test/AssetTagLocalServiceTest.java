@@ -391,6 +391,33 @@ public class AssetTagLocalServiceTest {
 	}
 
 	@Test
+	public void testGetTagsWithDifferentGroups() throws Exception {
+		Group group1 = GroupTestUtil.addGroup();
+		Group group2 = GroupTestUtil.addGroup();
+
+		long classNameId = _classNameLocalService.getClassNameId(
+			JournalArticle.class.getName());
+
+		try {
+			_assetTagLocalService.addTag(
+				null, TestPropsValues.getUserId(), group1.getGroupId(), "tag1",
+				_serviceContext);
+			_assetTagLocalService.addTag(
+				null, TestPropsValues.getUserId(), group2.getGroupId(), "tag2",
+				_serviceContext);
+
+			List<AssetTag> assetTags = _assetTagLocalService.getTags(
+				group1.getGroupId(), classNameId, null);
+
+			Assert.assertEquals(assetTags.toString(), 1, assetTags.size());
+		}
+		finally {
+			GroupTestUtil.deleteGroup(group1);
+			GroupTestUtil.deleteGroup(group2);
+		}
+	}
+
+	@Test
 	public void testGetTagWithCaseSensitive() throws PortalException {
 		List<AssetTag> assetTags = _addAssetTags(new String[] {"tag", "TAG"});
 

@@ -448,7 +448,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountGroupByExternalReferenceCode(externalReferenceCode: ___){actions, customFields, description, externalReferenceCode, id, name}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountGroupByExternalReferenceCode(externalReferenceCode: ___){actions, customFields, dateCreated, dateModified, description, externalReferenceCode, id, name}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public AccountGroup accountGroupByExternalReferenceCode(
@@ -466,7 +466,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountGroup(accountGroupId: ___){actions, customFields, description, externalReferenceCode, id, name}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountGroup(accountGroupId: ___){actions, customFields, dateCreated, dateModified, description, externalReferenceCode, id, name}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public AccountGroup accountGroup(
@@ -2033,7 +2033,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {userGroupByExternalReferenceCode(externalReferenceCode: ___){actions, description, externalReferenceCode, id, name, usersCount}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {userGroupByExternalReferenceCode(externalReferenceCode: ___){actions, creator, dateCreated, dateModified, description, externalReferenceCode, id, name, permissions, roleBriefs, userAccountBriefs, usersCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public UserGroup userGroupByExternalReferenceCode(
@@ -2051,7 +2051,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {userGroup(userGroupId: ___){actions, description, externalReferenceCode, id, name, usersCount}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {userGroup(userGroupId: ___){actions, creator, dateCreated, dateModified, description, externalReferenceCode, id, name, permissions, roleBriefs, userAccountBriefs, usersCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public UserGroup userGroup(@GraphQLName("userGroupId") Long userGroupId)

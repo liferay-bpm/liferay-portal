@@ -44,6 +44,16 @@ const renderCSSSelectorField = ({
 };
 
 describe('CSSClassSelectorField', () => {
+	beforeEach(() => {
+		window.document.createRange = () => ({
+			cloneRange: (range) => range,
+			getBoundingClientRect: () => 1,
+			getClientRects: () => 1,
+			setEnd: () => {},
+			setStart: () => {},
+		});
+	});
+
 	it('renders', () => {
 		renderCSSSelectorField();
 
@@ -81,18 +91,20 @@ describe('CSSClassSelectorField', () => {
 
 		const cssClassesInput = screen.getByLabelText('css-classes');
 
-		await userEvent.type(cssClassesInput, 'customClass1');
-		fireEvent.keyDown(cssClassesInput, {key: 'Enter'});
+		fireEvent.change(cssClassesInput, {target: {value: 'customClass1'}});
+
+		await userEvent.type(cssClassesInput, '{Enter}');
 
 		expect(screen.getByText('customClass1')).toBeInTheDocument();
 
-		await userEvent.type(cssClassesInput, 'customClass2');
-		fireEvent.keyDown(cssClassesInput, {key: ','});
+		fireEvent.change(cssClassesInput, {target: {value: 'customClass2'}});
+
+		await userEvent.type(cssClassesInput, ',');
 
 		expect(screen.getByText('customClass2')).toBeInTheDocument();
 
-		await userEvent.type(cssClassesInput, 'customClass3');
-		fireEvent.keyDown(cssClassesInput, {key: ' '});
+		fireEvent.change(cssClassesInput, {target: {value: 'customClass3'}});
+		await userEvent.type(cssClassesInput, ' ');
 
 		expect(screen.getByText('customClass3')).toBeInTheDocument();
 	});

@@ -16,7 +16,6 @@
 		"@clayui/table": "3.111.0",
 		"@liferay/frontend-js-react-web": "*",
 		"classnames": "2.3.1",
-		"date-fns": "2.29.3",
 		"formik": "2.1.4",
 		"frontend-js-components-web": "*",
 		"frontend-js-web": "*",
@@ -46,5 +45,5 @@
 		"format": "node-scripts format",
 		"test": "node-scripts test"
 	},
-	"version": "1.0.76"
+	"version": "1.0.78"
 }

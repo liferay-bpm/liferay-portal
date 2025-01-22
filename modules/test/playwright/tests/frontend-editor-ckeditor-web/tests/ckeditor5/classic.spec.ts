@@ -42,3 +42,23 @@ test(
 		).toBeAttached();
 	}
 );
+
+test(
+	'Assert editor is rendered with the default plugins configuration',
+	{tag: '@LPD-11235'},
+	async ({page}) => {
+		const editorToolbar = page.getByLabel('Editor toolbar');
+		const expectedButtons = ['Undo', 'Redo', 'Bold', 'Italic', 'Underline'];
+
+		await editorToolbar.waitFor({state: 'attached'});
+
+		await expect(editorToolbar).toBeVisible();
+
+		const availableButtons = await editorToolbar
+			.getByRole('button')
+			.locator('.ck-button__label')
+			.allInnerTexts();
+
+		expect(availableButtons).toEqual(expectedButtons);
+	}
+);

@@ -45,6 +45,7 @@ const test = mergeTests(
 	documentLibraryPagesTest,
 	featureFlagsTest({
 		'LPD-37927': {enabled: true},
+		'LPD-46393': {enabled: true},
 		'LPS-178052': {enabled: true},
 	}),
 	loginTest(),
@@ -1115,7 +1116,7 @@ test.describe('Date and Time Fragment', () => {
 
 			// Check the date and time of the object entry
 
-			const row = page.locator('.dnd-tbody .dnd-tr').first();
+			const row = page.locator('.fds tbody tr').first();
 
 			await expect(row).toContainText('Oct 10, 2022, 10:10 AM');
 		}
@@ -1793,7 +1794,9 @@ test.describe('Form Localization', () => {
 					exact: true,
 					name: 'View',
 				}),
-				trigger: page.locator('.dnd-tbody .item-actions').last(),
+				trigger: page
+					.locator('.fds tbody .cell-item-actions .dropdown-toggle')
+					.last(),
 			});
 
 			await page.getByRole('textbox', {name: 'Long Text'}).waitFor();
@@ -2264,7 +2267,9 @@ test.describe('Form Localization', () => {
 					exact: true,
 					name: 'View',
 				}),
-				trigger: page.locator('.dnd-tbody .item-actions').last(),
+				trigger: page
+					.locator('.fds tbody .cell-item-actions .dropdown-toggle')
+					.last(),
 			});
 
 			await page.getByRole('textbox', {name: 'Long Text'}).waitFor();
@@ -2832,7 +2837,7 @@ test.describe('Submit button', () => {
 
 				// Check the status of the object entry
 
-				const row = page.locator('.dnd-tr', {hasText: value});
+				const row = page.locator('.fds tr', {hasText: value});
 
 				await expect(row).toContainText(status);
 			};
@@ -6269,5 +6274,64 @@ test(
 		).forEach(async (input) => {
 			await expect(input).toHaveAttribute('readonly', '');
 		});
+	}
+);
+
+test(
+	'Submitted entry status configuration is only visible if the form button is submit',
+	{tag: '@LPD-37217'},
+	async ({apiHelpers, page, pageEditorPage, pageManagementSite}) => {
+		const objectDefinitionApiClient =
+			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+
+		const {className: objectDefinitionClassName} = (
+			await objectDefinitionApiClient.getObjectDefinitionByExternalReferenceCode(
+				getObjectERC('Lemon')
+			)
+		).body;
+
+		const formId = getRandomString();
+
+		const submitFragmentId = getRandomString();
+
+		const submitFragmentDefinition = getFragmentDefinition({
+			id: submitFragmentId,
+			key: 'INPUTS-submit-button',
+		});
+
+		const formDefinition = getFormContainerDefinition({
+			id: formId,
+			objectDefinitionClassName,
+			pageElements: [submitFragmentDefinition],
+		});
+
+		const layout = await apiHelpers.headlessDelivery.createSitePage({
+			pageDefinition: getPageDefinition([formDefinition]),
+			siteId: pageManagementSite.id,
+			title: getRandomString(),
+		});
+
+		await pageEditorPage.goto(layout, pageManagementSite.friendlyUrlPath);
+
+		await pageEditorPage.selectFragment(submitFragmentId);
+
+		await expect(page.getByLabel('Type', {exact: true})).toHaveValue(
+			'submit'
+		);
+
+		await expect(
+			page.getByLabel('Submitted Entry Status', {exact: true})
+		).toBeVisible();
+
+		await pageEditorPage.changeFragmentConfiguration({
+			fieldLabel: 'Type',
+			fragmentId: submitFragmentId,
+			tab: 'General',
+			value: 'Next',
+		});
+
+		await expect(
+			page.getByLabel('Submitted Entry Status')
+		).not.toBeVisible();
 	}
 );

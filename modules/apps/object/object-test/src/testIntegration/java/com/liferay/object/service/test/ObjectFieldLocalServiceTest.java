@@ -254,7 +254,8 @@ public class ObjectFieldLocalServiceTest {
 			"Salesforce storage type does not support aggregation and " +
 				"attachment business types",
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
-				TestPropsValues.getUserId(), 0, null, false, true, false, false,
+				TestPropsValues.getUserId(), 0, null, false, false, true, false,
+				false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -295,7 +296,8 @@ public class ObjectFieldLocalServiceTest {
 			"Salesforce storage type does not support aggregation and " +
 				"attachment business types",
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
-				TestPropsValues.getUserId(), 0, null, false, true, false, false,
+				TestPropsValues.getUserId(), 0, null, false, false, true, false,
+				false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -343,9 +345,11 @@ public class ObjectFieldLocalServiceTest {
 					).build())));
 		AssertUtils.assertFailure(
 			ObjectFieldLocalizedException.class,
-			"Only Boolean,Date,DateTime,Decimal,Integer,LongInteger,LongText," +
-				"MultiselectPicklist,Picklist,PrecisionDecimal,RichText and " +
-					"Text business types support localization",
+			StringBundler.concat(
+				"Only Attachment,Boolean,Date,DateTime,Decimal,Integer,",
+				"LongInteger,LongText,MultiselectPicklist,Picklist,",
+				"PrecisionDecimal,RichText and Text business types support ",
+				"localization"),
 			() -> ObjectDefinitionTestUtil.addCustomObjectDefinition(
 				false,
 				Arrays.asList(
@@ -2127,7 +2131,8 @@ public class ObjectFieldLocalServiceTest {
 		ObjectFieldTestUtil.withEncryptedObjectFieldProperties(
 			algorithm, enabled, key,
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
-				TestPropsValues.getUserId(), 0, null, false, true, false, false,
+				TestPropsValues.getUserId(), 0, null, false, false, true, false,
+				false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -2776,7 +2781,8 @@ public class ObjectFieldLocalServiceTest {
 
 		objectDefinition1 =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-				TestPropsValues.getUserId(), 0, null, false, true, false, false,
+				TestPropsValues.getUserId(), 0, null, false, false, true, false,
+				false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"Test", null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),

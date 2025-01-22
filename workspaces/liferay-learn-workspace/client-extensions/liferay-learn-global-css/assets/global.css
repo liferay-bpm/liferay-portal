@@ -1736,3 +1736,9 @@ pre[class*='language-'] {
 	font-size: 13px;
 	font-weight: 400;
 }
+
+@media(min-width: 767px) {
+	.code-toolbar {
+		max-width: 50vw;
+	}
+}

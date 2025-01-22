@@ -160,11 +160,19 @@ public class DBPartitionUtil {
 			unsafeConsumer.accept(null);
 		}
 		else {
-			for (long companyId : companyIds) {
-				try (SafeCloseable safeCloseable = CompanyThreadLocal.lock(
-						companyId)) {
+			try (SafeCloseable safeCloseable = CompanyThreadLocal.lock(
+					_defaultCompanyId)) {
 
-					unsafeConsumer.accept(companyId);
+				unsafeConsumer.accept(_defaultCompanyId);
+			}
+
+			for (long companyId : companyIds) {
+				if (companyId != _defaultCompanyId) {
+					try (SafeCloseable safeCloseable = CompanyThreadLocal.lock(
+							companyId)) {
+
+						unsafeConsumer.accept(companyId);
+					}
 				}
 			}
 		}
@@ -846,31 +854,32 @@ public class DBPartitionUtil {
 				unsafeConsumer.accept(null);
 			}
 			else {
+				try (SafeCloseable safeCloseable = CompanyThreadLocal.lock(
+						_defaultCompanyId)) {
+
+					unsafeConsumer.accept(_defaultCompanyId);
+				}
+
 				for (long companyId : companyIds) {
 					if (companyId == _defaultCompanyId) {
-						try (SafeCloseable safeCloseable =
-								CompanyThreadLocal.lock(companyId)) {
-
-							unsafeConsumer.accept(companyId);
-						}
+						continue;
 					}
-					else {
-						Future<Void> future = executorService.submit(
-							() -> {
-								try (SafeCloseable safeCloseable =
-										CompanyThreadLocal.lock(companyId)) {
 
-									unsafeConsumer.accept(companyId);
-								}
-								catch (Exception exception) {
-									throwableCollector.collect(exception);
-								}
+					Future<Void> future = executorService.submit(
+						() -> {
+							try (SafeCloseable safeCloseable =
+									CompanyThreadLocal.lock(companyId)) {
 
-								return null;
-							});
+								unsafeConsumer.accept(companyId);
+							}
+							catch (Exception exception) {
+								throwableCollector.collect(exception);
+							}
 
-						futures.add(future);
-					}
+							return null;
+						});
+
+					futures.add(future);
 				}
 			}
 		}

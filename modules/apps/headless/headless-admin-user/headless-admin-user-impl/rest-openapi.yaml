@@ -213,6 +213,18 @@ components:
                     items:
                         $ref: "#/components/schemas/CustomField"
                     type: array
+                dateCreated:
+                    description:
+                        The account group's creation date.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                dateModified:
+                    description:
+                        The account group's most recent modification date.
+                    format: date-time
+                    readOnly: true
+                    type: string
                 description:
                     example: AccountGroup Description
                     type: string
@@ -1293,6 +1305,33 @@ components:
                     readOnly: true
                     type: array
             type: object
+        UserAccountBrief:
+            description:
+                Represents a user's basic information, to be embedded in other resources like UserGroup.
+            properties:
+                alternateName:
+                    description:
+                        The user's alias or screen name.
+                    type: string
+                emailAddress:
+                    description:
+                        The user's main email address.
+                    type: string
+                externalReferenceCode:
+                    description:
+                        The optional external key of this user account.
+                    type: string
+                id:
+                    description:
+                        The user's ID.
+                    format: int64
+                    type: integer
+                name:
+                    description:
+                        The user's full name.
+                    readOnly: true
+                    type: string
+            type: object
         UserAccountFullNameDefinition:
             description:
                 Represents the definition of the user full name.
@@ -1330,6 +1369,23 @@ components:
                         type: object
                     readOnly: true
                     type: object
+                creator:
+                    $ref: "#/components/schemas/Creator"
+                    description:
+                        The user who created the user group.
+                    readOnly: true
+                dateCreated:
+                    description:
+                        The user group's creation date.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                dateModified:
+                    description:
+                        The user group's most recent modification date.
+                    format: date-time
+                    readOnly: true
+                    type: string
                 description:
                     type: string
                 externalReferenceCode:
@@ -1340,6 +1396,24 @@ components:
                     type: integer
                 name:
                     type: string
+                permissions:
+                    items:
+                        type: permission
+                    type: array
+                roleBriefs:
+                    description:
+                        The list of roles associated with this user group.
+                    items:
+                        $ref: "#/components/schemas/RoleBrief"
+                    readOnly: true
+                    type: array
+                userAccountBriefs:
+                    description:
+                        The list of users associated with this user group.
+                    items:
+                        $ref: "#/components/schemas/UserAccountBrief"
+                    readOnly: true
+                    type: array
                 usersCount:
                     format: int32
                     readOnly: true
@@ -1394,7 +1468,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.headless.admin.user.client', and version '4.0.71'."
+        'com.liferay.headless.admin.user.client', and version '4.0.73'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"

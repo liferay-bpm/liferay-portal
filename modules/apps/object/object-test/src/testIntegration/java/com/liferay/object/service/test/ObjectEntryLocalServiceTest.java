@@ -21,6 +21,9 @@ import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.kernel.model.ExpandoTable;
 import com.liferay.expando.kernel.model.ExpandoTableConstants;
 import com.liferay.expando.test.util.ExpandoTestUtil;
+import com.liferay.friendly.url.model.FriendlyURLEntry;
+import com.liferay.friendly.url.model.FriendlyURLEntryLocalization;
+import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
 import com.liferay.list.type.entry.util.ListTypeEntryUtil;
 import com.liferay.list.type.model.ListTypeDefinition;
 import com.liferay.list.type.model.ListTypeEntry;
@@ -121,6 +124,7 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -843,7 +847,7 @@ public class ObjectEntryLocalServiceTest {
 
 		AssertUtils.assertFailure(
 			ObjectEntryValuesException.InvalidFileExtension.class,
-			"The file extension txt is invalid for object field \"upload\"",
+			"The file extension \"txt\" is invalid for object field \"upload\"",
 			() -> {
 				ObjectField objectField =
 					_objectFieldLocalService.fetchObjectField(
@@ -1038,6 +1042,129 @@ public class ObjectEntryLocalServiceTest {
 
 		_objectDefinitionLocalService.deleteObjectDefinition(
 			modifiableSystemObjectDefinition.getObjectDefinitionId());
+	}
+
+	@FeatureFlags("LPD-32050")
+	@Test
+	public void testAddObjectEntryAfterDeletingLocalizedObjectField()
+		throws Exception {
+
+		ObjectField objectField = new TextObjectFieldBuilder(
+		).labelMap(
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+		).name(
+			"name"
+		).build();
+
+		Assert.assertFalse(objectField.isLocalized());
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				Collections.singletonList(objectField));
+
+		ObjectField localizedObjectField1 =
+			ObjectFieldUtil.addCustomObjectField(
+				new IntegerObjectFieldBuilder(
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString())
+				).localized(
+					true
+				).name(
+					"a" + RandomTestUtil.randomString()
+				).objectDefinitionId(
+					objectDefinition.getObjectDefinitionId()
+				).userId(
+					TestPropsValues.getUserId()
+				).build());
+
+		Map<String, Serializable> localizedValues = Collections.singletonMap(
+			localizedObjectField1.getI18nObjectFieldName(),
+			HashMapBuilder.put(
+				"en_US", RandomTestUtil.randomInt()
+			).put(
+				"pt_BR", RandomTestUtil.randomInt()
+			).build());
+
+		_assertObjectEntryLocalizedValues(
+			localizedValues,
+			_addObjectEntry(
+				0, objectDefinition.getObjectDefinitionId(), localizedValues),
+			localizedObjectField1);
+
+		_objectFieldLocalService.deleteObjectField(localizedObjectField1);
+
+		ObjectField localizedObjectField2 =
+			ObjectFieldUtil.addCustomObjectField(
+				new IntegerObjectFieldBuilder(
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString())
+				).localized(
+					true
+				).name(
+					"a" + RandomTestUtil.randomString()
+				).objectDefinitionId(
+					objectDefinition.getObjectDefinitionId()
+				).userId(
+					TestPropsValues.getUserId()
+				).build());
+
+		localizedValues = Collections.singletonMap(
+			localizedObjectField2.getI18nObjectFieldName(),
+			HashMapBuilder.put(
+				"en_US", RandomTestUtil.randomInt()
+			).put(
+				"pt_BR", RandomTestUtil.randomInt()
+			).build());
+
+		_assertObjectEntryLocalizedValues(
+			localizedValues,
+			_addObjectEntry(
+				0, objectDefinition.getObjectDefinitionId(), localizedValues),
+			localizedObjectField2);
+
+		ObjectField localizedObjectField3 =
+			ObjectFieldUtil.addCustomObjectField(
+				new IntegerObjectFieldBuilder(
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString())
+				).localized(
+					true
+				).name(
+					"a" + RandomTestUtil.randomString()
+				).objectDefinitionId(
+					objectDefinition.getObjectDefinitionId()
+				).userId(
+					TestPropsValues.getUserId()
+				).build());
+
+		localizedValues = HashMapBuilder.<String, Serializable>put(
+			localizedObjectField2.getI18nObjectFieldName(),
+			HashMapBuilder.put(
+				"en_US", RandomTestUtil.randomInt()
+			).put(
+				"pt_BR", RandomTestUtil.randomInt()
+			).build()
+		).put(
+			localizedObjectField3.getI18nObjectFieldName(),
+			HashMapBuilder.put(
+				"en_US", RandomTestUtil.randomInt()
+			).put(
+				"pt_BR", RandomTestUtil.randomInt()
+			).build()
+		).build();
+
+		ObjectEntry objectEntry = _addObjectEntry(
+			0, objectDefinition.getObjectDefinitionId(), localizedValues);
+
+		_assertObjectEntryLocalizedValues(
+			localizedValues, objectEntry, localizedObjectField2);
+		_assertObjectEntryLocalizedValues(
+			localizedValues, objectEntry, localizedObjectField3);
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
 	@Test
@@ -2434,6 +2561,8 @@ public class ObjectEntryLocalServiceTest {
 
 		Map<String, Serializable> values =
 			HashMapBuilder.<String, Serializable>put(
+				"emailAddressDomain", "@liferay.com"
+			).put(
 				"emailAddressRequired", "peter@liferay.com"
 			).put(
 				"firstName", "Peter"
@@ -2450,6 +2579,8 @@ public class ObjectEntryLocalServiceTest {
 			_objectEntryLocalService.getValues(objectEntry.getObjectEntryId()));
 
 		values = HashMapBuilder.<String, Serializable>put(
+			"emailAddressDomain", "@liferay.com"
+		).put(
 			"emailAddressRequired", "peter@liferay.com"
 		).put(
 			"firstName", "Pedro"
@@ -2495,6 +2626,136 @@ public class ObjectEntryLocalServiceTest {
 
 		// TODO Test object entries scoped to company vs. scoped to group
 
+	}
+
+	@FeatureFlags("LPD-21926")
+	@Test
+	public void testAddOrUpdateObjectEntryWithFriendlyURL() throws Exception {
+
+		// Scope by company
+
+		ObjectDefinition companyObjectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				true, Collections.emptyList());
+
+		ObjectEntry companyObjectEntry1 = _addObjectEntry(
+			0, companyObjectDefinition.getObjectDefinitionId(),
+			Collections.emptyMap());
+
+		_assertURLTitleMap(
+			HashMapBuilder.put(
+				"en_US", companyObjectEntry1.getExternalReferenceCode()
+			).build(),
+			companyObjectDefinition, companyObjectEntry1);
+
+		companyObjectEntry1 = _objectEntryLocalService.updateObjectEntry(
+			TestPropsValues.getUserId(), companyObjectEntry1.getObjectEntryId(),
+			HashMapBuilder.<String, Serializable>put(
+				"able", "Test URL"
+			).put(
+				"externalReferenceCode", RandomTestUtil.randomString()
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
+		_assertURLTitleMap(
+			HashMapBuilder.put(
+				"en_US", "test-url"
+			).build(),
+			companyObjectDefinition, companyObjectEntry1);
+
+		ObjectField objectField = ObjectFieldUtil.addCustomObjectField(
+			new TextObjectFieldBuilder(
+			).userId(
+				TestPropsValues.getUserId()
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).localized(
+				true
+			).name(
+				"a" + RandomTestUtil.randomString()
+			).objectDefinitionId(
+				companyObjectDefinition.getObjectDefinitionId()
+			).build());
+
+		_objectDefinitionLocalService.updateTitleObjectFieldId(
+			companyObjectDefinition.getObjectDefinitionId(),
+			objectField.getObjectFieldId());
+
+		ObjectEntry companyObjectEntry2 = _addObjectEntry(
+			0, companyObjectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				objectField.getI18nObjectFieldName(),
+				HashMapBuilder.put(
+					"en_US", "Test URL"
+				).put(
+					"pt_BR", "Test URL"
+				).build()
+			).put(
+				"able", RandomTestUtil.randomString()
+			).build());
+
+		_assertURLTitleMap(
+			HashMapBuilder.put(
+				"en_US", "test-url-1"
+			).put(
+				"pt_BR", "test-url-1"
+			).build(),
+			companyObjectDefinition, companyObjectEntry2);
+
+		_assertFriendlyURLEntriesSize(
+			2, companyObjectDefinition, companyObjectEntry1);
+		_assertFriendlyURLEntriesSize(
+			1, companyObjectDefinition, companyObjectEntry2);
+
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			companyObjectDefinition);
+
+		// Scope by site
+
+		ObjectDefinition siteObjectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition();
+
+		siteObjectDefinition.setScope(ObjectDefinitionConstants.SCOPE_SITE);
+
+		siteObjectDefinition =
+			_objectDefinitionLocalService.updateObjectDefinition(
+				siteObjectDefinition);
+
+		Group group1 = GroupTestUtil.addGroup();
+
+		ObjectEntry siteObjectEntry1 = _addObjectEntry(
+			group1.getGroupId(), siteObjectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"able", "Test URL"
+			).build());
+
+		_assertURLTitleMap(
+			HashMapBuilder.put(
+				"en_US", "test-url"
+			).build(),
+			siteObjectDefinition, siteObjectEntry1);
+
+		Group group2 = GroupTestUtil.addGroup();
+
+		ObjectEntry siteObjectEntry2 = _addObjectEntry(
+			group2.getGroupId(), siteObjectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"able", "Test URL"
+			).build());
+
+		_assertURLTitleMap(
+			HashMapBuilder.put(
+				"en_US", "test-url"
+			).build(),
+			siteObjectDefinition, siteObjectEntry2);
+
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			siteObjectDefinition);
+
+		_assertFriendlyURLEntriesSize(
+			0, siteObjectDefinition, siteObjectEntry1);
+		_assertFriendlyURLEntriesSize(
+			0, siteObjectDefinition, siteObjectEntry2);
 	}
 
 	@Test
@@ -2930,6 +3191,7 @@ public class ObjectEntryLocalServiceTest {
 			_objectDefinition.getClassName(),
 			_objectDefinition.isEnableCategorization(),
 			_objectDefinition.isEnableComments(),
+			_objectDefinition.isEnableFriendlyURLCustomization(),
 			_objectDefinition.isEnableIndexSearch(),
 			_objectDefinition.isEnableLocalization(),
 			_objectDefinition.isEnableObjectEntryDraft(),
@@ -3139,7 +3401,7 @@ public class ObjectEntryLocalServiceTest {
 					objectDefinition, user.getUserId());
 
 		Assert.assertEquals(0L, extensionValues.get("longField"));
-		Assert.assertNull(extensionValues.get("textField"));
+		Assert.assertEquals(StringPool.BLANK, extensionValues.get("textField"));
 
 		_objectFieldLocalService.deleteObjectField(
 			objectField1.getObjectFieldId());
@@ -3162,6 +3424,8 @@ public class ObjectEntryLocalServiceTest {
 
 		Map<String, Serializable> values1 =
 			HashMapBuilder.<String, Serializable>put(
+				"emailAddressDomain", "@liferay.com"
+			).put(
 				"emailAddressRequired", "peter@liferay.com"
 			).put(
 				"firstName", "Peter"
@@ -3186,6 +3450,8 @@ public class ObjectEntryLocalServiceTest {
 
 		Map<String, Serializable> values2 =
 			HashMapBuilder.<String, Serializable>put(
+				"emailAddressDomain", "@liferay.com"
+			).put(
 				"emailAddressRequired", "james@liferay.com"
 			).put(
 				"firstName", "James"
@@ -3212,6 +3478,8 @@ public class ObjectEntryLocalServiceTest {
 
 		Map<String, Serializable> values3 =
 			HashMapBuilder.<String, Serializable>put(
+				"emailAddressDomain", "@liferay.com"
+			).put(
 				"emailAddressRequired", "john@liferay.com"
 			).put(
 				"firstName", "John"
@@ -3298,10 +3566,10 @@ public class ObjectEntryLocalServiceTest {
 			"john@liferay.com", values.get("emailAddressRequired"));
 		Assert.assertEquals("John", values.get("firstName"));
 		Assert.assertEquals(0D, values.get("height"));
-		Assert.assertEquals(null, values.get("lastName"));
-		Assert.assertEquals(null, values.get("middleName"));
+		Assert.assertEquals(StringPool.BLANK, values.get("lastName"));
+		Assert.assertEquals(StringPool.BLANK, values.get("middleName"));
 		Assert.assertEquals(0, values.get("numberOfBooksWritten"));
-		Assert.assertEquals(null, values.get("listTypeEntryKey"));
+		Assert.assertEquals(StringPool.BLANK, values.get("listTypeEntryKey"));
 		Assert.assertEquals(
 			"listTypeEntryKey1", values.get("listTypeEntryKeyRequired"));
 		Assert.assertEquals(StringPool.BLANK, values.get("script"));
@@ -3346,6 +3614,8 @@ public class ObjectEntryLocalServiceTest {
 
 		Map<String, Serializable> values1 =
 			HashMapBuilder.<String, Serializable>put(
+				"emailAddressDomain", "@liferay.com"
+			).put(
 				"emailAddressRequired", "peter@liferay.com"
 			).put(
 				"firstName", "Peter"
@@ -3370,6 +3640,8 @@ public class ObjectEntryLocalServiceTest {
 
 		Map<String, Serializable> values2 =
 			HashMapBuilder.<String, Serializable>put(
+				"emailAddressDomain", "@liferay.com"
+			).put(
 				"emailAddressRequired", "james@liferay.com"
 			).put(
 				"firstName", "James"
@@ -3395,6 +3667,8 @@ public class ObjectEntryLocalServiceTest {
 
 		Map<String, Serializable> values3 =
 			HashMapBuilder.<String, Serializable>put(
+				"emailAddressDomain", "@liferay.com"
+			).put(
 				"emailAddressRequired", "john@liferay.com"
 			).put(
 				"firstName", "John"
@@ -3856,10 +4130,10 @@ public class ObjectEntryLocalServiceTest {
 		Assert.assertEquals("João", values.get("firstName"));
 		Assert.assertEquals(0D, values.get("height"));
 		Assert.assertEquals("o Discípulo Amado", values.get("lastName"));
-		Assert.assertEquals(null, values.get("listTypeEntryKey"));
+		Assert.assertEquals(StringPool.BLANK, values.get("listTypeEntryKey"));
 		Assert.assertEquals(
 			"listTypeEntryKey2", values.get("listTypeEntryKeyRequired"));
-		Assert.assertEquals(null, values.get("middleName"));
+		Assert.assertEquals(StringPool.BLANK, values.get("middleName"));
 		Assert.assertEquals(
 			"multipleListTypeEntryKey3, multipleListTypeEntryKey4",
 			values.get("multipleListTypeEntriesKey"));
@@ -3941,7 +4215,7 @@ public class ObjectEntryLocalServiceTest {
 			"listTypeEntryKey1", values.get("listTypeEntryKey"));
 		Assert.assertEquals(
 			"listTypeEntryKey3", values.get("listTypeEntryKeyRequired"));
-		Assert.assertEquals(null, values.get("middleName"));
+		Assert.assertEquals(StringPool.BLANK, values.get("middleName"));
 		Assert.assertEquals(
 			"multipleListTypeEntryKey5, multipleListTypeEntryKey6",
 			values.get("multipleListTypeEntriesKey"));
@@ -3985,7 +4259,7 @@ public class ObjectEntryLocalServiceTest {
 			"listTypeEntryKey1", values.get("listTypeEntryKey"));
 		Assert.assertEquals(
 			"listTypeEntryKey3", values.get("listTypeEntryKeyRequired"));
-		Assert.assertEquals(null, values.get("middleName"));
+		Assert.assertEquals(StringPool.BLANK, values.get("middleName"));
 		Assert.assertEquals(
 			"multipleListTypeEntryKey5, multipleListTypeEntryKey6",
 			values.get("multipleListTypeEntriesKey"));
@@ -4543,6 +4817,38 @@ public class ObjectEntryLocalServiceTest {
 			objectValidationRuleResults.get(0));
 	}
 
+	private void _assertFriendlyURLEntriesSize(
+			int expectedSize, ObjectDefinition objectDefinition,
+			ObjectEntry objectEntry)
+		throws Exception {
+
+		long classNameId = _classNameLocalService.getClassNameId(
+			objectDefinition.getClassName());
+
+		List<FriendlyURLEntry> friendlyURLEntries =
+			_friendlyURLEntryLocalService.getFriendlyURLEntries(
+				objectEntry.getNonzeroGroupId(), classNameId,
+				objectEntry.getObjectEntryId());
+
+		Assert.assertEquals(
+			friendlyURLEntries.toString(), expectedSize,
+			friendlyURLEntries.size());
+
+		if (expectedSize == 0) {
+			return;
+		}
+
+		_objectEntryLocalService.deleteObjectEntry(objectEntry);
+
+		friendlyURLEntries =
+			_friendlyURLEntryLocalService.getFriendlyURLEntries(
+				objectEntry.getNonzeroGroupId(), classNameId,
+				objectEntry.getObjectEntryId());
+
+		Assert.assertEquals(
+			friendlyURLEntries.toString(), 0, friendlyURLEntries.size());
+	}
+
 	private void _assertKeywords(String keywords, int count) throws Exception {
 		BaseModelSearchResult<ObjectEntry> baseModelSearchResult =
 			_objectEntryLocalService.searchObjectEntries(
@@ -4608,6 +4914,31 @@ public class ObjectEntryLocalServiceTest {
 		Assert.assertEquals(
 			expectedObjectFieldName,
 			objectValidationRuleResult.getObjectFieldName());
+	}
+
+	private void _assertURLTitleMap(
+			Map<String, String> expectedURLTitleMap,
+			ObjectDefinition objectDefinition, ObjectEntry objectEntry)
+		throws Exception {
+
+		Map<String, String> actualURLTitleMap = new HashMap<>();
+
+		FriendlyURLEntry friendlyURLEntry =
+			_friendlyURLEntryLocalService.getMainFriendlyURLEntry(
+				_classNameLocalService.getClassNameId(
+					objectDefinition.getClassName()),
+				objectEntry.getObjectEntryId());
+
+		for (FriendlyURLEntryLocalization friendlyURLEntryLocalization :
+				_friendlyURLEntryLocalService.getFriendlyURLEntryLocalizations(
+					friendlyURLEntry.getFriendlyURLEntryId())) {
+
+			actualURLTitleMap.put(
+				friendlyURLEntryLocalization.getLanguageId(),
+				friendlyURLEntryLocalization.getUrlTitle());
+		}
+
+		AssertUtils.assertEquals(expectedURLTitleMap, actualURLTitleMap);
 	}
 
 	private void _clearValidatedObjectEntryIds() {
@@ -4882,71 +5213,103 @@ public class ObjectEntryLocalServiceTest {
 				).labelMap(
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString())
+				).localized(
+					true
 				).name(
 					"longTextLocalized1"
 				).objectDefinitionId(
 					objectDefinition.getObjectDefinitionId()
-				).localized(
-					true
 				).system(
 					true
 				).build());
 		}
 
 		_addCustomObjectField(
+			new AttachmentObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).localized(
+				true
+			).name(
+				"localizedAttachment"
+			).objectDefinitionId(
+				objectDefinition.getObjectDefinitionId()
+			).objectFieldSettings(
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.
+							NAME_ACCEPTED_FILE_EXTENSIONS
+					).value(
+						"png"
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_FILE_SOURCE
+					).value(
+						ObjectFieldSettingConstants.VALUE_USER_COMPUTER
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_MAX_FILE_SIZE
+					).value(
+						"100"
+					).build())
+			).build());
+		_addCustomObjectField(
 			new IntegerObjectFieldBuilder(
 			).labelMap(
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).localized(
+				true
 			).name(
 				"integerLocalized"
 			).objectDefinitionId(
 				objectDefinition.getObjectDefinitionId()
-			).localized(
-				true
 			).build());
 		_addCustomObjectField(
 			new LongIntegerObjectFieldBuilder(
 			).labelMap(
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).localized(
+				true
 			).name(
 				"longIntegerLocalized"
 			).objectDefinitionId(
 				objectDefinition.getObjectDefinitionId()
-			).localized(
-				true
 			).build());
 		_addCustomObjectField(
 			new LongTextObjectFieldBuilder(
 			).labelMap(
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).localized(
+				true
 			).name(
 				"longTextLocalized2"
 			).objectDefinitionId(
 				objectDefinition.getObjectDefinitionId()
-			).localized(
-				true
 			).build());
 		_addCustomObjectField(
 			new RichTextObjectFieldBuilder(
 			).labelMap(
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).localized(
+				true
 			).name(
 				"richTextLocalized"
 			).objectDefinitionId(
 				objectDefinition.getObjectDefinitionId()
-			).localized(
-				true
 			).build());
 		_addCustomObjectField(
 			new TextObjectFieldBuilder(
 			).labelMap(
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).localized(
+				true
 			).name(
 				"textLocalized"
 			).objectDefinitionId(
 				objectDefinition.getObjectDefinitionId()
-			).localized(
-				true
 			).objectFieldSettings(
 				Collections.singletonList(
 					new ObjectFieldSettingBuilder(
@@ -5036,6 +5399,24 @@ public class ObjectEntryLocalServiceTest {
 					"longIntegerLocalized_i18n",
 					HashMapBuilder.put(
 						"en_US", "9223372036854775808"
+					).build()
+				).build()));
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.InvalidFileExtension.class,
+			"The file extension \"txt\" is invalid for object field " +
+				"\"localizedAttachment\"",
+			() -> _addObjectEntry(
+				group.getGroupId(), objectDefinition.getObjectDefinitionId(),
+				HashMapBuilder.<String, Serializable>put(
+					"localizedAttachment_i18n",
+					HashMapBuilder.put(
+						"en_US",
+						() -> {
+							FileEntry fileEntry = _addTempFileEntry(
+								RandomTestUtil.randomString());
+
+							return fileEntry.getFileEntryId();
+						}
 					).build()
 				).build()));
 		AssertUtils.assertFailure(
@@ -5330,6 +5711,9 @@ public class ObjectEntryLocalServiceTest {
 	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Inject
+	private ClassNameLocalService _classNameLocalService;
+
+	@Inject
 	private CounterLocalService _counterLocalService;
 
 	@Inject
@@ -5346,6 +5730,9 @@ public class ObjectEntryLocalServiceTest {
 
 	@Inject
 	private Encryptor _encryptor;
+
+	@Inject
+	private FriendlyURLEntryLocalService _friendlyURLEntryLocalService;
 
 	@DeleteAfterTestRun
 	private ObjectDefinition _irrelevantObjectDefinition;

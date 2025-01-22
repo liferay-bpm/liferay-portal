@@ -188,10 +188,11 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	}
 
 	private ObjectEntryResourceImpl _createObjectEntryResourceImpl(
-		ObjectDefinition objectDefinition) {
+		ObjectDefinition objectDefinition, String restContextPath) {
 
 		return new ObjectEntryResourceImpl(
 			_dtoConverterRegistry, _entityModelProvider, objectDefinition,
+			_objectDefinitionsMap.get(restContextPath),
 			_objectDefinitionLocalService, _objectEntryLocalService,
 			_objectEntryManagerRegistry, _objectFieldLocalService,
 			_objectRelationshipService, _objectScopeProviderRegistry,
@@ -319,6 +320,11 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		}
 	}
 
+	private String _getEntityClassName(ObjectDefinition objectDefinition) {
+		return ObjectEntry.class.getName() + "#" +
+			StringUtil.toLowerCase(objectDefinition.getShortName());
+	}
+
 	private void _initCustomObjectDefinition(
 		ObjectDefinition objectDefinition) {
 
@@ -412,7 +418,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 										serviceRegistration) {
 
 									return _createObjectEntryResourceImpl(
-										objectDefinition);
+										objectDefinition, restContextPath);
 								}
 
 								@Override
@@ -472,9 +478,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		).put(
 			"companyId", companyIds
 		).put(
-			"entity.class.name",
-			ObjectEntry.class.getName() + "#" +
-				StringUtil.toLowerCase(objectDefinition.getName())
+			"entity.class.name", _getEntityClassName(objectDefinition)
 		).put(
 			"osgi.jaxrs.application.select",
 			"(osgi.jaxrs.name=" + osgiJaxRsName + ")"
@@ -502,7 +506,8 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 							ServiceRegistration<ObjectEntryResource>
 								serviceRegistration) {
 
-							return _createObjectEntryResourceImpl(null);
+							return _createObjectEntryResourceImpl(
+								null, restContextPath);
 						}
 
 						@Override
@@ -574,13 +579,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 							"api.version", "v1.0"
 						).put(
 							"entity.class.name",
-							() -> {
-								String lowerCaseName = StringUtil.toLowerCase(
-									objectDefinition.getName());
-
-								return ObjectEntry.class.getName() + "#" +
-									lowerCaseName;
-							}
+							_getEntityClassName(objectDefinition)
 						).put(
 							"osgi.jaxrs.application.select",
 							"(osgi.jaxrs.name=" + osgiJaxRsName + ")"
@@ -594,7 +593,8 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 							_defaultPermissionCheckerFactory,
 							_expressionConvert, _filterParserProvider,
 							_groupLocalService, objectDefinition,
-							() -> _createObjectEntryResourceImpl(null),
+							() -> _createObjectEntryResourceImpl(
+								null, restContextPath),
 							_resourceActionLocalService,
 							_resourcePermissionLocalService, _roleLocalService,
 							_sortParserProvider, _userLocalService),

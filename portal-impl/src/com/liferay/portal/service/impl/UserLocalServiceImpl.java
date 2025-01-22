@@ -1220,10 +1220,17 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			emailAddress = emailAddressGenerator.generate(companyId, userId);
 		}
 
+		long ldapServerId = -1;
+
+		if (serviceContext != null) {
+			ldapServerId = GetterUtil.getLong(
+				serviceContext.getAttribute("ldapServerId"), ldapServerId);
+		}
+
 		validate(
 			companyId, userId, autoPassword, password1, password2,
-			autoScreenName, screenName, emailAddress, null, firstName,
-			middleName, lastName, organizationIds, locale);
+			autoScreenName, screenName, emailAddress, ldapServerId, null,
+			firstName, middleName, lastName, organizationIds, locale);
 
 		if (Validator.isNull(password1)) {
 			if (!autoPassword) {
@@ -1289,23 +1296,20 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		}
 
 		user.setPasswordEncrypted(true);
-		user.setPasswordReset(_isPasswordReset(companyId));
+
+		boolean passwordReset = false;
+
+		if (!LDAPSettingsUtil.isPasswordPolicyEnabled(
+				ldapServerId, companyId)) {
+
+			passwordReset = _isPasswordReset(companyId);
+		}
+
+		user.setPasswordReset(passwordReset);
+
 		user.setScreenName(screenName);
 		user.setEmailAddress(emailAddress);
-
-		Long ldapServerId = null;
-
-		if (serviceContext != null) {
-			ldapServerId = (Long)serviceContext.getAttribute("ldapServerId");
-		}
-
-		if (ldapServerId != null) {
-			user.setLdapServerId(ldapServerId);
-		}
-		else {
-			user.setLdapServerId(-1);
-		}
-
+		user.setLdapServerId(ldapServerId);
 		user.setLanguageId(LocaleUtil.toLanguageId(locale));
 		user.setTimeZoneId(guestUser.getTimeZoneId());
 		user.setGreeting(greeting);
@@ -1807,10 +1811,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 */
 	@Override
 	public void checkLockout(User user) throws PortalException {
-		if (LDAPSettingsUtil.isPasswordPolicyEnabled(user.getCompanyId())) {
-			return;
-		}
-
 		doCheckLockout(user, user.getPasswordPolicy());
 	}
 
@@ -1891,10 +1891,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 */
 	@Override
 	public void checkPasswordExpired(User user) throws PortalException {
-		if (LDAPSettingsUtil.isPasswordPolicyEnabled(user.getCompanyId())) {
-			return;
-		}
-
 		doCheckPasswordExpired(user, user.getPasswordPolicy());
 	}
 
@@ -1918,7 +1914,9 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			serviceContext, "autoPassword");
 
 		if (autoPassword) {
-			if (LDAPSettingsUtil.isPasswordPolicyEnabled(user.getCompanyId())) {
+			if (LDAPSettingsUtil.isPasswordPolicyEnabled(
+					user.getLdapServerId(), user.getCompanyId())) {
+
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						StringBundler.concat(
@@ -4844,7 +4842,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 			validate(
 				companyId, user.getUserId(), autoPassword, password1, password2,
-				autoScreenName, screenName, emailAddress, null, firstName,
+				autoScreenName, screenName, emailAddress, -1, null, firstName,
 				middleName, lastName, null, locale);
 
 			if (!autoPassword &&
@@ -5245,7 +5243,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		user = userPersistence.findByPrimaryKey(userId);
 
 		if (!silentUpdate) {
-			validatePassword(user.getCompanyId(), userId, password1, password2);
+			validatePassword(userId, password1, password2);
 
 			trackPassword(user);
 		}
@@ -5291,7 +5289,9 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		catch (ModelListenerException modelListenerException) {
 			Throwable throwable = modelListenerException.getCause();
 
-			if (LDAPSettingsUtil.isPasswordPolicyEnabled(user.getCompanyId())) {
+			if (LDAPSettingsUtil.isPasswordPolicyEnabled(
+					user.getLdapServerId(), user.getCompanyId())) {
+
 				String msg = GetterUtil.getString(throwable.getMessage());
 
 				String[] errorPasswordHistoryKeywords =
@@ -6251,7 +6251,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	protected User doCheckLockout(User user, PasswordPolicy passwordPolicy)
 		throws PortalException {
 
-		if (!passwordPolicy.isLockout()) {
+		if ((passwordPolicy == null) || !passwordPolicy.isLockout()) {
 			return user;
 		}
 
@@ -6286,7 +6286,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		// Check if user should be forced to change password on first login
 
-		if (passwordPolicy.isChangeable() &&
+		if ((passwordPolicy != null) && passwordPolicy.isChangeable() &&
 			passwordPolicy.isChangeRequired() &&
 			(user.getLastLoginDate() == null)) {
 
@@ -6393,7 +6393,9 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 			// Let LDAP handle max failure event
 
-			if (!LDAPSettingsUtil.isPasswordPolicyEnabled(companyId)) {
+			if (!LDAPSettingsUtil.isPasswordPolicyEnabled(
+					user.getLdapServerId(), companyId)) {
+
 				PasswordPolicy passwordPolicy = user.getPasswordPolicy();
 
 				user = userPersistence.fetchByPrimaryKey(user.getUserId());
@@ -6445,6 +6447,11 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			}
 			else if (key.equals("noAccountEntriesAndNoOrganizations")) {
 				if (!Boolean.TRUE.equals(entry.getValue())) {
+					return true;
+				}
+			}
+			else if (key.equals("noLDAPUsers")) {
+				if (Boolean.TRUE.equals(entry.getValue())) {
 					return true;
 				}
 			}
@@ -7031,9 +7038,9 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	protected void validate(
 			long companyId, long userId, boolean autoPassword, String password1,
 			String password2, boolean autoScreenName, String screenName,
-			String emailAddress, String openId, String firstName,
-			String middleName, String lastName, long[] organizationIds,
-			Locale locale)
+			String emailAddress, long ldapServerId, String openId,
+			String firstName, String middleName, String lastName,
+			long[] organizationIds, Locale locale)
 		throws PortalException {
 
 		validateMaxUsers(companyId);
@@ -7043,11 +7050,17 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		}
 
 		if (!autoPassword) {
-			PasswordPolicy passwordPolicy =
-				_passwordPolicyLocalService.getDefaultPasswordPolicy(companyId);
+			PasswordPolicy passwordPolicy = null;
 
-			PwdToolkitUtil.validate(
-				companyId, 0, password1, password2, passwordPolicy);
+			if (!LDAPSettingsUtil.isPasswordPolicyEnabled(
+					ldapServerId, companyId)) {
+
+				passwordPolicy =
+					_passwordPolicyLocalService.getDefaultPasswordPolicy(
+						companyId);
+			}
+
+			PwdToolkitUtil.validate(0, password1, password2, passwordPolicy);
 		}
 
 		validateEmailAddress(companyId, emailAddress);
@@ -7257,7 +7270,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	}
 
 	protected void validatePassword(
-			long companyId, long userId, String password1, String password2)
+			long userId, String password1, String password2)
 		throws PortalException {
 
 		if (Validator.isNull(password1) || Validator.isNull(password2)) {
@@ -7271,8 +7284,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		PasswordPolicy passwordPolicy =
 			_passwordPolicyLocalService.getPasswordPolicyByUserId(userId);
 
-		PwdToolkitUtil.validate(
-			companyId, userId, password1, password2, passwordPolicy);
+		PwdToolkitUtil.validate(userId, password1, password2, passwordPolicy);
 	}
 
 	protected void validateReminderQuery(
@@ -7364,14 +7376,12 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		// Check password policy to see if the is account locked out or if the
 		// password is expired
 
-		if (!LDAPSettingsUtil.isPasswordPolicyEnabled(user.getCompanyId())) {
-			PasswordPolicy passwordPolicy = user.getPasswordPolicy();
+		PasswordPolicy passwordPolicy = user.getPasswordPolicy();
 
-			user = doCheckLockout(user, passwordPolicy);
+		user = doCheckLockout(user, passwordPolicy);
 
-			if (!PasswordModificationThreadLocal.isPasswordModified()) {
-				user = doCheckPasswordExpired(user, passwordPolicy);
-			}
+		if (!PasswordModificationThreadLocal.isPasswordModified()) {
+			user = doCheckPasswordExpired(user, passwordPolicy);
 		}
 
 		return user;
@@ -7440,7 +7450,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			PasswordPolicy passwordPolicy =
 				_passwordPolicyLocalService.getDefaultPasswordPolicy(companyId);
 
-			if ((passwordPolicy != null) && passwordPolicy.isChangeable() &&
+			if (passwordPolicy.isChangeable() &&
 				passwordPolicy.isChangeRequired()) {
 
 				return true;

@@ -85,6 +85,10 @@ public class OpenAPIResourceImpl {
 
 	private final Set<Class<?>> _resourceClasses = new HashSet<Class<?>>() {
 		{
+			add(EntityModelResourceTestEntity1ResourceImpl.class);
+
+			add(EntityModelResourceTestEntity2ResourceImpl.class);
+
 			add(TestEntityResourceImpl.class);
 
 			add(TestEntityAddressResourceImpl.class);

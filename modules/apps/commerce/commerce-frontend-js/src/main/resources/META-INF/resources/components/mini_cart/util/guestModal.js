@@ -104,7 +104,7 @@ function setupFromSignIn(signInViewHTML, signInURL) {
 	const navigationElement = signInContainer.querySelector('.navigation');
 
 	const anchorElements = Array.from(
-		navigationElement.querySelectorAll('.navigation li a')
+		navigationElement.querySelectorAll('.navigation a')
 	);
 
 	let forgotPasswordAnchor = null;
@@ -239,16 +239,21 @@ export function storeAccountInformation({accountName, accountType, userEmail}) {
 	);
 }
 
-export function storeImmediateCheckout() {
+export function storeImmediateCheckout(store = true) {
 	const {commerceChannelGroupId: groupId} = Liferay.CommerceContext;
 
 	const cookieKey = `${GUEST_COMMERCE_ORDER_COOKIE_IDENTIFIER}${groupId}`;
 
-	const cookieValue = getCookie(cookieKey, COOKIE_TYPES.NECESSARY);
+	const [cookieValue] = getCookie(cookieKey, COOKIE_TYPES.NECESSARY).split(
+		'#'
+	);
 
 	const cookie = new CommerceCookie(GUEST_COMMERCE_ORDER_COOKIE_IDENTIFIER);
 
-	cookie.setValue(groupId, `${cookieValue}${SUFFIX_IMMEDIATE_CHECKOUT}`);
+	cookie.setValue(
+		groupId,
+		`${cookieValue}${store ? SUFFIX_IMMEDIATE_CHECKOUT : ''}`
+	);
 }
 
 function toPopUp(url) {

@@ -6,19 +6,10 @@
 package com.liferay.headless.admin.site.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.asset.list.constants.AssetListEntryTypeConstants;
-import com.liferay.asset.list.model.AssetListEntry;
-import com.liferay.asset.list.service.AssetListEntryLocalService;
-import com.liferay.asset.list.service.AssetListEntryLocalServiceUtil;
-import com.liferay.headless.admin.site.client.dto.v1_0.ClassNameReference;
-import com.liferay.headless.admin.site.client.dto.v1_0.CollectionPageSettings;
-import com.liferay.headless.admin.site.client.dto.v1_0.CollectionReference;
 import com.liferay.headless.admin.site.client.dto.v1_0.ContentPageSettings;
 import com.liferay.headless.admin.site.client.dto.v1_0.ContentPageSpecification;
 import com.liferay.headless.admin.site.client.dto.v1_0.FriendlyUrlHistory;
-import com.liferay.headless.admin.site.client.dto.v1_0.ItemExternalReference;
 import com.liferay.headless.admin.site.client.dto.v1_0.PageSettings;
-import com.liferay.headless.admin.site.client.dto.v1_0.Scope;
 import com.liferay.headless.admin.site.client.dto.v1_0.SitePage;
 import com.liferay.headless.admin.site.client.dto.v1_0.WidgetPageSettings;
 import com.liferay.headless.admin.site.client.problem.Problem;
@@ -26,22 +17,18 @@ import com.liferay.headless.admin.site.client.resource.v1_0.SitePageResource;
 import com.liferay.headless.admin.site.resource.v1_0.test.util.LayoutPageTemplateEntryTestUtil;
 import com.liferay.headless.admin.site.resource.v1_0.test.util.LayoutUtilityPageEntryTestUtil;
 import com.liferay.headless.admin.site.resource.v1_0.test.util.PageSpecificationsTestUtil;
-import com.liferay.info.list.provider.item.selector.criterion.InfoListProviderItemSelectorReturnType;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -113,7 +100,6 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 				testGroup.getGroupId(), TestPropsValues.getUserId());
 
 		_testDeleteSiteSiteByExternalReferenceCodeSitePage(
-			_addLayout(LayoutConstants.TYPE_COLLECTION, null, serviceContext),
 			_addLayout(LayoutConstants.TYPE_CONTENT, null, serviceContext),
 			_addLayout(
 				LayoutConstants.TYPE_PORTLET,
@@ -162,8 +148,6 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 			ServiceContextTestUtil.getServiceContext(
 				testGroup.getGroupId(), TestPropsValues.getUserId());
 
-		_testGetSiteSiteByExternalReferenceCodeSitePage(
-			_addLayout(LayoutConstants.TYPE_COLLECTION, null, serviceContext));
 		_testGetSiteSiteByExternalReferenceCodeSitePage(
 			_addLayout(LayoutConstants.TYPE_CONTENT, null, serviceContext));
 		_testGetSiteSiteByExternalReferenceCodeSitePage(
@@ -216,8 +200,6 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		throws Exception {
 
 		_testPatchSiteSiteByExternalReferenceCodeSitePage(
-			SitePage.Type.COLLECTION_PAGE);
-		_testPatchSiteSiteByExternalReferenceCodeSitePage(
 			SitePage.Type.CONTENT_PAGE);
 		_testPatchSiteSiteByExternalReferenceCodeSitePage(
 			SitePage.Type.WIDGET_PAGE);
@@ -246,8 +228,6 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 	public void testPostByExternalReferenceCodeSitePage() throws Exception {
 		super.testPostByExternalReferenceCodeSitePage();
 
-		_testPostByExternalReferenceCodeSitePage(
-			_getRandomSitePage(SitePage.Type.COLLECTION_PAGE));
 		_testPostByExternalReferenceCodeSitePage(
 			_getRandomSitePage(SitePage.Type.CONTENT_PAGE));
 		_testPostByExternalReferenceCodeSitePage(
@@ -312,8 +292,6 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		throws Exception {
 
 		_testPutSiteSiteByExternalReferenceCodeSitePage(
-			SitePage.Type.COLLECTION_PAGE);
-		_testPutSiteSiteByExternalReferenceCodeSitePage(
 			SitePage.Type.CONTENT_PAGE);
 		_testPutSiteSiteByExternalReferenceCodeSitePage(
 			SitePage.Type.WIDGET_PAGE);
@@ -358,14 +336,6 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 	@Override
 	protected boolean equals(SitePage sitePage1, SitePage sitePage2) {
 		super.equals(sitePage1, sitePage2);
-
-		if (Objects.equals(
-				SitePage.Type.COLLECTION_PAGE, sitePage1.getType()) &&
-			Objects.equals(
-				SitePage.Type.COLLECTION_PAGE, sitePage2.getType())) {
-
-			return true;
-		}
 
 		return Objects.deepEquals(
 			sitePage1.getPageSettings(), sitePage2.getPageSettings());
@@ -428,88 +398,6 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 			Collections.emptyMap(), Collections.emptyMap(),
 			Collections.emptyMap(), type, typeSettings, false, false,
 			Collections.emptyMap(), 0L, serviceContext);
-	}
-
-	private void _assertCollectionSitePage(Layout layout, SitePage sitePage)
-		throws Exception {
-
-		Assert.assertEquals(SitePage.Type.COLLECTION_PAGE, sitePage.getType());
-
-		String collectionType = layout.getTypeSettingsProperty(
-			"collectionType");
-
-		if (Validator.isNull(collectionType)) {
-			Assert.assertTrue(
-				sitePage.getPageSettings() instanceof CollectionPageSettings);
-
-			return;
-		}
-
-		CollectionPageSettings collectionPageSettings =
-			(CollectionPageSettings)sitePage.getPageSettings();
-
-		if (collectionPageSettings.getCollectionReference() == null) {
-			return;
-		}
-
-		if (Objects.equals(
-				collectionType,
-				InfoListProviderItemSelectorReturnType.class.getName())) {
-
-			ClassNameReference classNameReference =
-				(ClassNameReference)
-					collectionPageSettings.getCollectionReference();
-
-			Assert.assertEquals(
-				layout.getTypeSettingsProperty("collectionPK"),
-				classNameReference.getClassName());
-			Assert.assertEquals(
-				CollectionReference.CollectionType.COLLECTION_PROVIDER,
-				classNameReference.getCollectionType());
-
-			return;
-		}
-
-		ItemExternalReference itemExternalReference =
-			(ItemExternalReference)
-				collectionPageSettings.getCollectionReference();
-
-		Assert.assertEquals(
-			AssetListEntry.class.getName(),
-			itemExternalReference.getClassName());
-		Assert.assertEquals(
-			CollectionReference.CollectionType.COLLECTION,
-			itemExternalReference.getCollectionType());
-
-		AssetListEntry assetListEntry =
-			_assetListEntryLocalService.getAssetListEntry(
-				GetterUtil.getLong(
-					layout.getTypeSettingsProperty("collectionPK")));
-
-		Assert.assertEquals(
-			assetListEntry.getExternalReferenceCode(),
-			itemExternalReference.getExternalReferenceCode());
-
-		Scope scope = itemExternalReference.getScope();
-
-		if (assetListEntry.getGroupId() == layout.getGroupId()) {
-			Assert.assertNull(scope);
-
-			return;
-		}
-
-		Group group = _groupLocalService.getGroup(assetListEntry.getGroupId());
-
-		Assert.assertEquals(
-			group.getExternalReferenceCode(), scope.getExternalReferenceCode());
-
-		Scope.Type scopeType = Scope.Type.SITE;
-
-		if (group.isDepot()) {
-			scopeType = Scope.Type.ASSET_LIBRARY;
-		}
-
-		Assert.assertEquals(scopeType, scope.getType());
 	}
 
 	private void _assertContentSitePage(SitePage sitePage) {
@@ -711,12 +599,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 
 		Assert.assertEquals(layout.getUuid(), sitePage.getUuid());
 
-		if (Objects.equals(layout.getType(), LayoutConstants.TYPE_COLLECTION)) {
-			_assertCollectionSitePage(layout, sitePage);
-		}
-		else if (Objects.equals(
-					layout.getType(), LayoutConstants.TYPE_CONTENT)) {
-
+		if (Objects.equals(layout.getType(), LayoutConstants.TYPE_CONTENT)) {
 			_assertContentSitePage(sitePage);
 		}
 		else {
@@ -736,82 +619,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 			widgetPageSettings.getLayoutTemplateId());
 	}
 
-	private ClassNameReference _getClassNameReference() {
-		return new ClassNameReference() {
-			{
-				setClassName(
-					() ->
-						"com.liferay.asset.internal.info.collection.provider." +
-							"RecentContentInfoCollectionProvider");
-				setCollectionType(() -> CollectionType.COLLECTION_PROVIDER);
-			}
-		};
-	}
-
-	private CollectionPageSettings _getCollectionPageSettings()
-		throws Exception {
-
-		if (RandomTestUtil.randomBoolean()) {
-			return new CollectionPageSettings() {
-				{
-					setCollectionReference(() -> _getClassNameReference());
-					setType(Type.COLLECTION_PAGE_SETTINGS);
-				}
-			};
-		}
-
-		ItemExternalReference itemExternalReference =
-			new ItemExternalReference() {
-				{
-					setClassName(() -> AssetListEntry.class.getName());
-					setCollectionType(() -> CollectionType.COLLECTION);
-				}
-			};
-
-		AssetListEntry assetListEntry;
-
-		if (RandomTestUtil.randomBoolean()) {
-			assetListEntry = AssetListEntryLocalServiceUtil.addAssetListEntry(
-				null, TestPropsValues.getUserId(), testGroup.getGroupId(),
-				RandomTestUtil.randomString(),
-				AssetListEntryTypeConstants.TYPE_DYNAMIC,
-				ServiceContextTestUtil.getServiceContext(
-					testGroup.getGroupId()));
-		}
-		else {
-			assetListEntry = AssetListEntryLocalServiceUtil.addAssetListEntry(
-				null, TestPropsValues.getUserId(), irrelevantGroup.getGroupId(),
-				RandomTestUtil.randomString(),
-				AssetListEntryTypeConstants.TYPE_DYNAMIC,
-				ServiceContextTestUtil.getServiceContext(
-					irrelevantGroup.getGroupId()));
-
-			itemExternalReference.setScope(
-				() -> new Scope() {
-					{
-						setExternalReferenceCode(
-							irrelevantGroup::getExternalReferenceCode);
-						setType(Type.SITE);
-					}
-				});
-		}
-
-		itemExternalReference.setExternalReferenceCode(
-			assetListEntry::getExternalReferenceCode);
-
-		return new CollectionPageSettings() {
-			{
-				setCollectionReference(() -> itemExternalReference);
-				setType(Type.COLLECTION_PAGE_SETTINGS);
-			}
-		};
-	}
-
 	private PageSettings _getPageSettings(SitePage.Type type) throws Exception {
-		if (type == SitePage.Type.COLLECTION_PAGE) {
-			return _getCollectionPageSettings();
-		}
-
 		if (type == SitePage.Type.CONTENT_PAGE) {
 			return new ContentPageSettings() {
 				{
@@ -1100,22 +908,12 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 	}
 
 	private static final List<SitePage.Type> _types = Arrays.asList(
-		SitePage.Type.COLLECTION_PAGE, SitePage.Type.CONTENT_PAGE,
-		SitePage.Type.WIDGET_PAGE);
-
-	@Inject
-	private AssetListEntryLocalService _assetListEntryLocalService;
-
-	@Inject
-	private GroupLocalService _groupLocalService;
+		SitePage.Type.CONTENT_PAGE, SitePage.Type.WIDGET_PAGE);
 
 	@Inject
 	private JSONFactory _jsonFactory;
 
 	@Inject
 	private LayoutLocalService _layoutLocalService;
-
-	@Inject
-	private UserLocalService _userLocalService;
 
 }

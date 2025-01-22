@@ -5,7 +5,8 @@
 
 import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
-import {createResourceURL, fetch, objectToFormData, sub} from 'frontend-js-web';
+import {LearnMessage, LearnResourcesContext} from 'frontend-js-components-web';
+import {createResourceURL, fetch, objectToFormData} from 'frontend-js-web';
 import pkceChallenge from 'pkce-challenge';
 import React from 'react';
 
@@ -22,7 +23,12 @@ type ConnectProps = {
 
 export default function Connect({
 	authorization,
-	marketplaceSettingsProps: {baseResourceURL, portletNamespace, ...oAuth2},
+	marketplaceSettingsProps: {
+		baseResourceURL,
+		learnResources,
+		portletNamespace,
+		...oAuth2
+	},
 	onDisconnect,
 	onNext,
 	setAuthorization,
@@ -48,7 +54,12 @@ export default function Connect({
 		) as Window;
 
 		const handleMessage = async (event: MessageEvent) => {
-			const {code, serviceURL, settings} = event.data;
+			const {data = {}, origin} = event;
+			const {code, serviceURL, settings} = data;
+
+			if (oAuth2.url !== origin || !code) {
+				return;
+			}
 
 			const body = {
 				[`${portletNamespace}code`]: code,
@@ -69,7 +80,7 @@ export default function Connect({
 
 			setAuthorization((prevAuthorization) => ({
 				...prevAuthorization,
-				data: event.data,
+				data,
 			}));
 
 			popup.close();
@@ -123,26 +134,16 @@ export default function Connect({
 					{Liferay.Language.get('connect')}
 				</ClayButton>
 			}
-			title={Liferay.Language.get('connect-marketplace')}
+			title={Liferay.Language.get('connect-to-the-marketplace')}
 		>
-			<h5>{Liferay.Language.get('do-you-need-help')}</h5>
+			<h5 className="my-2">{Liferay.Language.get('do-you-need-help')}</h5>
 
-			<div className="mb-4">
-				{sub(
-					Liferay.Language.get(
-						'click-x-to-learn-how-to-connect-to-the-liferay-marketplace'
-					),
-					(
-						<a
-							href="https://learn.liferay.com/w/dxp/liferay-development/marketplace"
-							rel="noopener noreferrer"
-							target="_blank"
-						>
-							{Liferay.Language.get('here')}
-						</a>
-					) as any
-				)}
-			</div>
+			<LearnResourcesContext.Provider value={learnResources}>
+				<LearnMessage
+					resource="marketplace-settings-web"
+					resourceKey="connect"
+				/>
+			</LearnResourcesContext.Provider>
 		</Container>
 	);
 }

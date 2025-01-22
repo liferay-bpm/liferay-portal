@@ -63,10 +63,11 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, tabs1), 
 							});
 					}
 
-					if (selPortlet.isScopeable()) {
+					if (FeatureFlagManagerUtil.isEnabled("LPD-11131") && selPortlet.isScopeable()) {
 						add(
 							navigationItem -> {
 								navigationItem.setActive(tabs1.equals("scope"));
+								navigationItem.setDeprecated(true);
 								navigationItem.setHref(renderResponse.createRenderURL(), "mvcPath", "/edit_scope.jsp", "redirect", redirect, "returnToFullPageURL", returnToFullPageURL, "portletConfiguration", Boolean.TRUE.toString(), "portletResource", portletResource);
 								navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "scope"));
 							});

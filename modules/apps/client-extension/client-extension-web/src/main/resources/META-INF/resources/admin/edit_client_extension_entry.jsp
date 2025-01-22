@@ -49,7 +49,7 @@ renderResponse.setTitle(editClientExtensionEntryDisplayContext.getTitle());
 
 		<p class="text-secondary">
 			<liferay-learn:message
-				key="learn-browser-based-client-extensions"
+				key="browser-based-client-extensions"
 				resource="client-extension-web"
 			/>
 		</p>

@@ -45,6 +45,16 @@ const renderCustomCSSField = ({
 };
 
 describe('CSSClassSelectorField', () => {
+	beforeEach(() => {
+		window.document.createRange = () => ({
+			cloneRange: (range) => range,
+			getBoundingClientRect: () => 1,
+			getClientRects: () => 1,
+			setEnd: () => {},
+			setStart: () => {},
+		});
+	});
+
 	it('renders', () => {
 		renderCustomCSSField();
 
@@ -59,17 +69,6 @@ describe('CSSClassSelectorField', () => {
 		const onValueSelect = jest.fn();
 
 		renderCustomCSSField({onValueSelect});
-
-		// CodeMirror relies on this function to be present in the body
-
-		document.body.createTextRange = () => {
-			const textRange = {
-				getBoundingClientRect: () => 1,
-				getClientRects: () => 1,
-			};
-
-			return textRange;
-		};
 
 		// Clay modal have an animation when are opened
 		// This will make sure that the body is visible before asserting

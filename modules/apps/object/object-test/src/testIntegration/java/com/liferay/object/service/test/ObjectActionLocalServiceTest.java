@@ -838,9 +838,9 @@ public class ObjectActionLocalServiceTest {
 				serviceContext);
 
 			_assertWebhookObjectAction(
-				null, "Peter", null,
+				null, "Peter", StringPool.BLANK,
 				ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE,
-				_objectDefinition, "John", null,
+				_objectDefinition, "John", StringPool.BLANK,
 				WorkflowConstants.STATUS_APPROVED);
 
 			// Hierarchy, root object entry
@@ -3082,7 +3082,8 @@ public class ObjectActionLocalServiceTest {
 						com.liferay.object.rest.dto.v1_0.ObjectEntry.class.
 							getName(),
 						StringPool.POUND,
-						StringUtil.toLowerCase(_objectDefinition.getName())));
+						StringUtil.toLowerCase(
+							_objectDefinition.getShortName())));
 
 			objectEntryResource.setContextAcceptLanguage(
 				new AcceptLanguage() {

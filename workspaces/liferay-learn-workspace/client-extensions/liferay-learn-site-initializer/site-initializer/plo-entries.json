@@ -18,6 +18,12 @@
 		}
 	},
 	{
+		"key": "learning-path",
+		"value": {
+			"en-US": "Learning Path"
+		}
+	},
+	{
 		"key": "minutes",
 		"value": {
 			"en-US": "Minutes"

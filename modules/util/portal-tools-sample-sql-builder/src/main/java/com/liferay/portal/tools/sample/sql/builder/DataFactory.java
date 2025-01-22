@@ -14,10 +14,20 @@ import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetCategoryConstants;
 import com.liferay.asset.kernel.model.AssetCategoryModel;
+import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetEntryModel;
 import com.liferay.asset.kernel.model.AssetTagModel;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.model.AssetVocabularyModel;
+import com.liferay.asset.list.constants.AssetListEntryTypeConstants;
+import com.liferay.asset.list.constants.AssetListEntryUsageConstants;
+import com.liferay.asset.list.model.AssetListEntry;
+import com.liferay.asset.list.model.AssetListEntryModel;
+import com.liferay.asset.list.model.AssetListEntrySegmentsEntryRelModel;
+import com.liferay.asset.list.model.AssetListEntryUsageModel;
+import com.liferay.asset.list.model.impl.AssetListEntryModelImpl;
+import com.liferay.asset.list.model.impl.AssetListEntrySegmentsEntryRelModelImpl;
+import com.liferay.asset.list.model.impl.AssetListEntryUsageModelImpl;
 import com.liferay.blogs.constants.BlogsPortletKeys;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.model.BlogsEntryModel;
@@ -158,6 +168,7 @@ import com.liferay.journal.constants.JournalArticleConstants;
 import com.liferay.journal.constants.JournalContentPortletKeys;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.journal.model.JournalArticleDisplay;
 import com.liferay.journal.model.JournalArticleLocalizationModel;
 import com.liferay.journal.model.JournalArticleModel;
 import com.liferay.journal.model.JournalArticleResourceModel;
@@ -295,6 +306,7 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
@@ -389,6 +401,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -396,8 +409,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
-
-import javax.portlet.PortletPreferences;
 
 /**
  * @author Brian Wing Shun Chan
@@ -432,6 +443,10 @@ public class DataFactory {
 
 		List<String> models = ModelHintsUtil.getModels();
 
+		models.add(
+			DDMTemplate.class.getName() + StringPool.DASH +
+				JournalArticle.class.getName());
+		models.add(JournalArticleDisplay.class.getName());
 		models.add(Layout.class.getName());
 		models.add(NavItem.class.getName());
 		models.add(PortletDisplayTemplate.class.getName());
@@ -675,6 +690,12 @@ public class DataFactory {
 		ObjectDefinitionModel objectDefinitionModel,
 		List<ObjectFieldModel> objectFieldModels) {
 
+		if (!_objectDefinitionDBTableNames.add(
+				objectDefinitionModel.getDBTableName())) {
+
+			return StringPool.BLANK;
+		}
+
 		List<ObjectField> objectFields = new ArrayList<>();
 
 		for (ObjectFieldModel objectFieldModel : objectFieldModels) {
@@ -698,6 +719,12 @@ public class DataFactory {
 
 		ObjectDefinition objectDefinition =
 			(ObjectDefinition)objectDefinitionModel;
+
+		if (!_objectDefinitionDBTableNames.add(
+				objectDefinition.getExtensionDBTableName())) {
+
+			return StringPool.BLANK;
+		}
 
 		DynamicObjectDefinitionTable dynamicObjectDefinitionTable =
 			new DynamicObjectDefinitionTable(
@@ -791,6 +818,10 @@ public class DataFactory {
 
 	public int getMaxJournalArticleVersionCount() {
 		return BenchmarksPropsValues.MAX_JOURNAL_ARTICLE_VERSION_COUNT;
+	}
+
+	public int getMaxObjectEntryPageCount() {
+		return BenchmarksPropsValues.MAX_OBJECT_ENTRY_PAGE_COUNT;
 	}
 
 	public int getMaxSegmentsEntrySegmentsExperienceCount() {
@@ -1180,7 +1211,7 @@ public class DataFactory {
 
 		String resourceUUID = _journalArticleResourceUUIDs.get(resourcePrimKey);
 
-		return newAssetEntryModel(
+		_journalArticleAssetEntryModel = newAssetEntryModel(
 			journalArticleModel.getGroupId(),
 			journalArticleModel.getCreateDate(),
 			journalArticleModel.getModifiedDate(),
@@ -1188,6 +1219,236 @@ public class DataFactory {
 			_defaultJournalDDMStructureId, journalArticleModel.isIndexable(),
 			true, ContentTypes.TEXT_HTML,
 			journalArticleLocalizationModel.getTitle());
+
+		return _journalArticleAssetEntryModel;
+	}
+
+	public AssetListEntryModel newAssetListEntryModel(long groupId, int index) {
+		AssetListEntryModel assetListEntryModel = new AssetListEntryModelImpl();
+
+		// PK fields
+
+		assetListEntryModel.setAssetListEntryId(_counter.get());
+
+		// Group instance
+
+		assetListEntryModel.setGroupId(groupId);
+
+		// Audit fields
+
+		assetListEntryModel.setCompanyId(_companyId);
+		assetListEntryModel.setUserId(_sampleUserId);
+		assetListEntryModel.setUserName(_SAMPLE_USER_NAME);
+		assetListEntryModel.setCreateDate(new Date());
+		assetListEntryModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		String title = StringBundler.concat(
+			"dynamic-collection-", groupId, "-", index);
+
+		assetListEntryModel.setAssetListEntryKey(title);
+		assetListEntryModel.setTitle(title);
+
+		assetListEntryModel.setType(AssetListEntryTypeConstants.TYPE_DYNAMIC);
+		assetListEntryModel.setAssetEntrySubtype(null);
+		assetListEntryModel.setAssetEntryType(AssetEntry.class.getName());
+		assetListEntryModel.setLastPublishDate(null);
+
+		// Autogenerated fields
+
+		String uuid = SequentialUUID.generate();
+
+		assetListEntryModel.setUuid(uuid);
+		assetListEntryModel.setExternalReferenceCode(uuid);
+
+		return assetListEntryModel;
+	}
+
+	public AssetListEntrySegmentsEntryRelModel
+		newAssetListEntrySegmentsEntryRelModel(
+			AssetListEntryModel assetListEntryModel,
+			DDMStructureModel ddmStructureModel, int index) {
+
+		AssetListEntrySegmentsEntryRelModel
+			assetListEntrySegmentsEntryRelModel =
+				new AssetListEntrySegmentsEntryRelModelImpl();
+
+		// PK fields
+
+		assetListEntrySegmentsEntryRelModel.setAssetListEntrySegmentsEntryRelId(
+			_counter.get());
+
+		// Group instance
+
+		long groupId = assetListEntryModel.getGroupId();
+
+		assetListEntrySegmentsEntryRelModel.setGroupId(groupId);
+
+		// Audit fields
+
+		assetListEntrySegmentsEntryRelModel.setCompanyId(_companyId);
+		assetListEntrySegmentsEntryRelModel.setUserId(_sampleUserId);
+		assetListEntrySegmentsEntryRelModel.setUserName(_SAMPLE_USER_NAME);
+		assetListEntrySegmentsEntryRelModel.setCreateDate(new Date());
+		assetListEntrySegmentsEntryRelModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		assetListEntrySegmentsEntryRelModel.setAssetListEntryId(
+			assetListEntryModel.getAssetListEntryId());
+		assetListEntrySegmentsEntryRelModel.setPriority(0);
+		assetListEntrySegmentsEntryRelModel.setSegmentsEntryId(
+			SegmentsEntryConstants.ID_DEFAULT);
+
+		Map<String, String> map = HashMapBuilder.<String, String>create(
+			11
+		).put(
+			"anyAssetType", Boolean.FALSE.toString()
+		).put(
+			"classNameIds",
+			_assetClassNameIds[0] + StringPool.COMMA + _assetClassNameIds[1]
+		).put(
+			"classTypeIdsDLFileEntryAssetRendererFactory",
+			String.valueOf(_DEFAULT_DL_FILE_ENTRY_TYPE_ID)
+		).put(
+			"classTypeIdsJournalArticleAssetRendererFactory",
+			String.valueOf(ddmStructureModel.getStructureId())
+		).put(
+			"groupIds", String.valueOf(groupId)
+		).put(
+			"orderByColumn1", "modifiedDate"
+		).put(
+			"orderByColumn2", "title"
+		).put(
+			"orderByType1", "DESC"
+		).put(
+			"orderByType2", "ASC"
+		).put(
+			"subtypeFieldsFilterEnabledDLFileEntryAssetRendererFactory",
+			Boolean.FALSE.toString()
+		).put(
+			"subtypeFieldsFilterEnabledJournalArticleAssetRendererFactory",
+			Boolean.FALSE.toString()
+		).build();
+
+		if (index == 1) {
+			map.put("queryAndOperator0", Boolean.TRUE.toString());
+			map.put("queryContains0", Boolean.TRUE.toString());
+			map.put("queryName0", "assetTags");
+		}
+		else {
+			String assetPublisherQueryName = "assetCategories";
+
+			if ((index % 2) == 0) {
+				assetPublisherQueryName = "assetTags";
+			}
+
+			ObjectValuePair<String[], Integer> objectValuePair = null;
+
+			Integer startIndex = _assetPublisherQueryStartIndexes.get(groupId);
+
+			if (startIndex == null) {
+				startIndex = 0;
+			}
+
+			if (assetPublisherQueryName.equals("assetCategories")) {
+				Map<Long, List<AssetCategoryModel>> assetCategoryModelsMap =
+					_assetCategoryModelsMaps[(int)groupId - 1];
+
+				List<AssetCategoryModel> assetCategoryModels =
+					assetCategoryModelsMap.get(
+						getNextAssetClassNameId(groupId));
+
+				objectValuePair = getAssetPublisherAssetCategoriesQueryValues(
+					assetCategoryModels, startIndex);
+			}
+			else {
+				Map<Long, List<AssetTagModel>> assetTagModelsMap =
+					_assetTagModelsMaps[(int)groupId - 1];
+
+				List<AssetTagModel> assetTagModels = assetTagModelsMap.get(
+					getNextAssetClassNameId(groupId));
+
+				objectValuePair = getAssetPublisherAssetTagsQueryValues(
+					assetTagModels, startIndex);
+			}
+
+			String[] assetPublisherQueryValues = objectValuePair.getKey();
+
+			map.put("queryAndOperator0", Boolean.FALSE.toString());
+			map.put("queryAndOperator1", Boolean.FALSE.toString());
+			map.put("queryContains0", Boolean.TRUE.toString());
+			map.put("queryContains1", Boolean.FALSE.toString());
+			map.put("queryName0", assetPublisherQueryName);
+			map.put("queryName1", assetPublisherQueryName);
+			map.put(
+				"queryValues0",
+				StringBundler.concat(
+					assetPublisherQueryValues[0], StringPool.COMMA,
+					assetPublisherQueryValues[1], StringPool.COMMA,
+					assetPublisherQueryValues[2]));
+			map.put("queryValues1", assetPublisherQueryValues[3]);
+		}
+
+		UnicodeProperties unicodeProperties = UnicodePropertiesBuilder.create(
+			map, true
+		).build();
+
+		assetListEntrySegmentsEntryRelModel.setTypeSettings(
+			unicodeProperties.toString());
+
+		assetListEntrySegmentsEntryRelModel.setLastPublishDate(null);
+
+		// Autogenerated fields
+
+		assetListEntrySegmentsEntryRelModel.setUuid(SequentialUUID.generate());
+
+		return assetListEntrySegmentsEntryRelModel;
+	}
+
+	public AssetListEntryUsageModel newAssetListEntryUsageModel(
+		AssetListEntryModel assetListEntryModel, String portletId,
+		LayoutModel layoutModel) {
+
+		AssetListEntryUsageModel assetListEntryUsageModel =
+			new AssetListEntryUsageModelImpl();
+
+		// PK fields
+
+		assetListEntryUsageModel.setAssetListEntryUsageId(_counter.get());
+
+		// Group instance
+
+		assetListEntryUsageModel.setGroupId(assetListEntryModel.getGroupId());
+
+		// Audit fields
+
+		assetListEntryUsageModel.setCompanyId(_companyId);
+		assetListEntryUsageModel.setUserId(_sampleUserId);
+		assetListEntryUsageModel.setUserName(_SAMPLE_USER_NAME);
+		assetListEntryUsageModel.setCreateDate(new Date());
+		assetListEntryUsageModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		assetListEntryUsageModel.setClassNameId(
+			getClassNameId(AssetListEntry.class));
+		assetListEntryUsageModel.setContainerKey(portletId);
+		assetListEntryUsageModel.setContainerType(
+			getClassNameId(Portlet.class));
+		assetListEntryUsageModel.setKey(
+			String.valueOf(assetListEntryModel.getAssetListEntryId()));
+		assetListEntryUsageModel.setPlid(layoutModel.getPlid());
+		assetListEntryUsageModel.setType(
+			AssetListEntryUsageConstants.TYPE_LAYOUT);
+		assetListEntryUsageModel.setLastPublishDate(null);
+
+		// Autogenerated fields
+
+		assetListEntryUsageModel.setUuid(SequentialUUID.generate());
+
+		return assetListEntryUsageModel;
 	}
 
 	public List<PortletPreferencesModel>
@@ -1198,100 +1459,14 @@ public class DataFactory {
 			newPortletPreferencesModel(plid, JournalPortletKeys.JOURNAL));
 	}
 
-	public List<PortletPreferenceValueModel>
-			newAssetPublisherPortletPreferenceValueModels(
-				PortletPreferencesModel portletPreferencesModel, long groupId,
-				int currentIndex)
-		throws Exception {
+	public PortletPreferenceValueModel
+		newAssetPublisherPortletPreferenceValueModels(
+			AssetListEntryModel assetListEntryModel,
+			PortletPreferencesModel portletPreferencesModel) {
 
-		if (currentIndex == 1) {
-			return Collections.emptyList();
-		}
-
-		String assetPublisherQueryName = "assetCategories";
-
-		if ((currentIndex % 2) == 0) {
-			assetPublisherQueryName = "assetTags";
-		}
-
-		ObjectValuePair<String[], Integer> objectValuePair = null;
-
-		Integer startIndex = _assetPublisherQueryStartIndexes.get(groupId);
-
-		if (startIndex == null) {
-			startIndex = 0;
-		}
-
-		if (assetPublisherQueryName.equals("assetCategories")) {
-			Map<Long, List<AssetCategoryModel>> assetCategoryModelsMap =
-				_assetCategoryModelsMaps[(int)groupId - 1];
-
-			List<AssetCategoryModel> assetCategoryModels =
-				assetCategoryModelsMap.get(getNextAssetClassNameId(groupId));
-
-			if (ListUtil.isEmpty(assetCategoryModels)) {
-				return Collections.emptyList();
-			}
-
-			objectValuePair = getAssetPublisherAssetCategoriesQueryValues(
-				assetCategoryModels, startIndex);
-		}
-		else {
-			Map<Long, List<AssetTagModel>> assetTagModelsMap =
-				_assetTagModelsMaps[(int)groupId - 1];
-
-			List<AssetTagModel> assetTagModels = assetTagModelsMap.get(
-				getNextAssetClassNameId(groupId));
-
-			if (ListUtil.isEmpty(assetTagModels)) {
-				return Collections.emptyList();
-			}
-
-			objectValuePair = getAssetPublisherAssetTagsQueryValues(
-				assetTagModels, startIndex);
-		}
-
-		String[] assetPublisherQueryValues = objectValuePair.getKey();
-
-		PortletPreferences jxPortletPreferences =
-			(PortletPreferences)
-				_defaultAssetPublisherPortletPreferencesImpl.clone();
-
-		jxPortletPreferences.setValue("queryAndOperator0", "false");
-		jxPortletPreferences.setValue("queryContains0", "true");
-		jxPortletPreferences.setValue("queryName0", assetPublisherQueryName);
-		jxPortletPreferences.setValues(
-			"queryValues0",
-			new String[] {
-				assetPublisherQueryValues[0], assetPublisherQueryValues[1],
-				assetPublisherQueryValues[2]
-			});
-		jxPortletPreferences.setValue("queryAndOperator1", "false");
-		jxPortletPreferences.setValue("queryContains1", "false");
-		jxPortletPreferences.setValue("queryName1", assetPublisherQueryName);
-		jxPortletPreferences.setValue(
-			"queryValues1", assetPublisherQueryValues[3]);
-
-		List<PortletPreferenceValueModel> portletPreferenceValueModels =
-			new ArrayList<>();
-
-		Map<String, String[]> map = jxPortletPreferences.getMap();
-
-		for (Map.Entry<String, String[]> entry : map.entrySet()) {
-			String[] values = entry.getValue();
-
-			if (values == null) {
-				continue;
-			}
-
-			for (int i = 0; i < values.length; i++) {
-				portletPreferenceValueModels.add(
-					newPortletPreferenceValueModel(
-						portletPreferencesModel, entry.getKey(), i, values[i]));
-			}
-		}
-
-		return portletPreferenceValueModels;
+		return newPortletPreferenceValueModel(
+			portletPreferencesModel, "assetListEntryExternalReferenceCode", 0,
+			assetListEntryModel.getUuid());
 	}
 
 	public List<AssetTagModel> newAssetTagModels(long groupId) {
@@ -4008,16 +4183,15 @@ public class DataFactory {
 		return dlFileVersionModel;
 	}
 
-	public DLFolderModel newDLFolderModel() {
-		return newDLFolderModel(
-			_counter.get(), _globalGroupId, 0, "", "Objects");
-	}
-
 	public DLFolderModel newDLFolderModel(
 		long groupId, long parentFolderId, String name) {
 
 		return newDLFolderModel(
 			_counter.get(), groupId, parentFolderId, "", name);
+	}
+
+	public DLFolderModel newDLFolderModel(String name) {
+		return newDLFolderModel(_counter.get(), _globalGroupId, 0, "", name);
 	}
 
 	public List<DLFolderModel> newDLFolderModels(
@@ -4523,6 +4697,35 @@ public class DataFactory {
 		return journalArticleModel;
 	}
 
+	public List<PortletPreferenceValueModel>
+		newJournalArticlePortletPreferenceValueModels(
+			PortletPreferencesModel portletPreferencesModel,
+			JournalArticleModel journalArticleModel, GroupModel groupModel) {
+
+		return Arrays.asList(
+			newPortletPreferenceValueModel(
+				portletPreferencesModel, "articleExternalReferenceCode", 0,
+				journalArticleModel.getUuid()),
+			newPortletPreferenceValueModel(
+				portletPreferencesModel, "assetEntryId", 0,
+				String.valueOf(_journalArticleAssetEntryModel.getEntryId())),
+			newPortletPreferenceValueModel(
+				portletPreferencesModel, "contentMetadataAssetAddonEntryKeys",
+				0, "false"),
+			newPortletPreferenceValueModel(
+				portletPreferencesModel, "ddmTemplateExternalReferenceCode", 0,
+				StringPool.BLANK),
+			newPortletPreferenceValueModel(
+				portletPreferencesModel, "enableViewCountIncrement", 0,
+				"false"),
+			newPortletPreferenceValueModel(
+				portletPreferencesModel, "groupExternalReferenceCode", 0,
+				groupModel.getUuid()),
+			newPortletPreferenceValueModel(
+				portletPreferencesModel, "userToolAssetAddonEntryKeys", 0,
+				"false"));
+	}
+
 	public JournalArticleResourceModel newJournalArticleResourceModel(
 		long groupId) {
 
@@ -4555,20 +4758,6 @@ public class DataFactory {
 			journalArticleResourceModel.getUuid());
 
 		return journalArticleResourceModel;
-	}
-
-	public List<PortletPreferenceValueModel>
-		newJournalArticleResourcePortletPreferenceValueModels(
-			PortletPreferencesModel portletPreferencesModel,
-			JournalArticleResourceModel journalArticleResourceModel) {
-
-		return Arrays.asList(
-			newPortletPreferenceValueModel(
-				portletPreferencesModel, "articleId", 0,
-				journalArticleResourceModel.getArticleId()),
-			newPortletPreferenceValueModel(
-				portletPreferencesModel, "groupId", 0,
-				String.valueOf(journalArticleResourceModel.getGroupId())));
 	}
 
 	public PortletPreferencesModel newJournalContentPortletPreferencesModel(
@@ -5323,7 +5512,9 @@ public class DataFactory {
 		return layoutPageTemplateStructureRelModel;
 	}
 
-	public ObjectDefinitionModel newObjectDefinitionModel(long objectFolderId) {
+	public ObjectDefinitionModel newObjectDefinitionModel(
+		long objectFolderId, String name) {
+
 		long objectDefinitionId = _counter.get();
 
 		String className =
@@ -5336,8 +5527,6 @@ public class DataFactory {
 		classNameModel.setValue(className);
 
 		_classNameModels.put(className, classNameModel);
-
-		String name = "Ticket";
 
 		String label = _getObjectLabel(name);
 
@@ -6020,6 +6209,15 @@ public class DataFactory {
 		return newResourcePermissionModels(
 			AssetCategory.class.getName(),
 			String.valueOf(assetCategoryModel.getCategoryId()), _sampleUserId);
+	}
+
+	public List<ResourcePermissionModel> newResourcePermissionModels(
+		AssetListEntryModel assetListEntryModel) {
+
+		return newResourcePermissionModels(
+			AssetListEntry.class.getName(),
+			String.valueOf(assetListEntryModel.getAssetListEntryId()),
+			_sampleUserId);
 	}
 
 	public List<ResourcePermissionModel> newResourcePermissionModels(
@@ -8268,6 +8466,9 @@ public class DataFactory {
 				else if (name.equals("AccountERObjectFieldId")) {
 					name = "AccountEntryRestrictedObjectFieldId";
 				}
+				else if (name.equals("AlEntrySegmentsEntryRelId")) {
+					name = "AssetListEntrySegmentsEntryRelId";
+				}
 				else if (name.equals("CdnEnabled")) {
 					name = "CDNEnabled";
 				}
@@ -8726,6 +8927,7 @@ public class DataFactory {
 	private long _guestGroupId;
 	private RoleModel _guestRoleModel;
 	private long _guestUserId;
+	private AssetEntryModel _journalArticleAssetEntryModel;
 	private String _journalArticleContent;
 	private final Map<Long, String> _journalArticleResourceUUIDs =
 		new HashMap<>();
@@ -8737,6 +8939,7 @@ public class DataFactory {
 	private final String _layoutPageTemplateStructureRelData;
 	private final SimpleCounter _layoutPlidCounter;
 	private final SimpleCounter _layoutSetIdCounter;
+	private final Set<String> _objectDefinitionDBTableNames = new HashSet<>();
 	private long _objectDefinitionId;
 	private long _objectFieldId;
 	private RoleModel _ownerRoleModel;

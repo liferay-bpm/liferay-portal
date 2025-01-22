@@ -28,6 +28,7 @@ import {wikiPagesTest} from '../../fixtures/wikiPagesTest';
 import {depotsPagesTest} from '../../tests/depot-web/fixtures/depotsPagesTest';
 import getRandomString from '../../utils/getRandomString';
 import {getTempDir} from '../../utils/temp';
+import {readFileFromZip} from '../../utils/zip';
 import {exportImportPagesTest} from './fixtures/exportImportPagesTest';
 import {stagingPageTest} from './fixtures/stagingPageTest';
 
@@ -354,6 +355,13 @@ test('can export and import custom object entries at instance level', async ({
 	const exportFilePath =
 		await exportImportPage.downloadExportProcess(exportName);
 
+	const content = await readFileFromZip('C_Test.json', exportFilePath);
+
+	const json = JSON.parse(content);
+
+	expect(json.length).toBe(1);
+	expect(json[0]).not.toHaveProperty('permissions');
+
 	await apiHelpers.delete(`${apiHelpers.baseUrl}c/tests/${objectEntry.id}`);
 
 	expect(
@@ -442,4 +450,76 @@ test('cannot export site scoped custom object entries at instance level', async 
 	await page.getByTestId('creationMenuNewButton').nth(1).click();
 
 	await expect(page.getByLabel('Tests 1 Items')).toBeHidden();
+});
+
+test('can export custom object entries at instance level with permissions based on selection', async ({
+	apiHelpers,
+	applicationsMenuPage,
+	exportImportPage,
+	page,
+}) => {
+	const objectActionApiClient =
+		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+
+	const {body: objectDefinition} =
+		await objectActionApiClient.postObjectDefinition({
+			active: true,
+			externalReferenceCode: 'test',
+			label: {
+				en_US: 'Test',
+			},
+			name: 'Test',
+			objectFields: [
+				{
+					DBType: ObjectField.DBTypeEnum.String,
+					businessType: ObjectField.BusinessTypeEnum.Text,
+					indexed: true,
+					indexedAsKeyword: true,
+					label: {
+						en_US: 'Name',
+					},
+					name: 'name',
+					required: true,
+				},
+			],
+			pluralLabel: {
+				en_US: 'Tests',
+			},
+			portlet: true,
+			scope: 'company',
+			status: {
+				code: 0,
+			},
+		});
+
+	apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
+
+	await apiHelpers.objectEntry.postObjectEntry(
+		{externalReferenceCode: '', name: 'test'},
+		'c/tests'
+	);
+
+	await applicationsMenuPage.goToExport();
+
+	await page.getByTestId('creationMenuNewButton').nth(1).click();
+
+	await page.getByLabel('Tests 1 Items').click();
+
+	const exportName = 'CustomObject-WithPermissions-' + getRandomString();
+
+	await exportImportPage.title.fill(exportName);
+
+	await page.getByLabel('Export Permissions').click();
+
+	await exportImportPage.exportButton.click();
+
+	const exportFilePath =
+		await exportImportPage.downloadExportProcess(exportName);
+
+	const content = await readFileFromZip('C_Test.json', exportFilePath);
+
+	const json = JSON.parse(content);
+
+	expect(json.length).toBe(1);
+	expect(json[0]).toHaveProperty('permissions');
 });

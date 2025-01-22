@@ -39,6 +39,7 @@ import com.liferay.object.constants.ObjectFieldValidationConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.constants.ObjectValidationRuleConstants;
 import com.liferay.object.constants.ObjectValidationRuleSettingConstants;
+import com.liferay.object.field.builder.AttachmentObjectFieldBuilder;
 import com.liferay.object.field.builder.LongTextObjectFieldBuilder;
 import com.liferay.object.field.builder.RichTextObjectFieldBuilder;
 import com.liferay.object.field.builder.TextObjectFieldBuilder;
@@ -215,7 +216,7 @@ import org.springframework.transaction.support.DefaultTransactionStatus;
 /**
  * @author Luis Miguel Barcos
  */
-@FeatureFlags("LPS-164801")
+@FeatureFlags({"LPD-32050", "LPS-164801"})
 @RunWith(Arquillian.class)
 public class ObjectEntryResourceTest {
 
@@ -4776,7 +4777,8 @@ public class ObjectEntryResourceTest {
 	public void testGetCreatorExternalReferenceCode() throws Exception {
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-				TestPropsValues.getUserId(), 0, null, false, true, false, false,
+				TestPropsValues.getUserId(), 0, null, false, false, true, false,
+				false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -6053,7 +6055,7 @@ public class ObjectEntryResourceTest {
 
 			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_BOOLEAN));
 			Assert.assertFalse(jsonObject.has(_OBJECT_FIELD_NAME_DATE));
-			Assert.assertFalse(jsonObject.has(_OBJECT_FIELD_NAME_TEXT));
+			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_TEXT));
 			Assert.assertFalse(jsonObject.has(_objectRelationship1.getName()));
 
 			_assertInvocations(invocations, true, _OBJECT_FIELD_NAME_BOOLEAN);
@@ -6074,7 +6076,7 @@ public class ObjectEntryResourceTest {
 
 			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_BOOLEAN));
 			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_DATE));
-			Assert.assertFalse(jsonObject.has(_OBJECT_FIELD_NAME_TEXT));
+			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_TEXT));
 			Assert.assertFalse(jsonObject.has(_objectRelationship1.getName()));
 
 			_assertInvocations(invocations, true, _OBJECT_FIELD_NAME_BOOLEAN);
@@ -6097,7 +6099,7 @@ public class ObjectEntryResourceTest {
 
 			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_BOOLEAN));
 			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_DATE));
-			Assert.assertFalse(jsonObject.has(_OBJECT_FIELD_NAME_TEXT));
+			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_TEXT));
 			Assert.assertTrue(jsonObject.has(_objectRelationship1.getName()));
 			Assert.assertFalse(
 				Validator.isNull(
@@ -6128,7 +6130,7 @@ public class ObjectEntryResourceTest {
 
 			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_BOOLEAN));
 			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_DATE));
-			Assert.assertFalse(jsonObject.has(_OBJECT_FIELD_NAME_TEXT));
+			Assert.assertTrue(jsonObject.has(_OBJECT_FIELD_NAME_TEXT));
 			Assert.assertTrue(jsonObject.has(_objectRelationship1.getName()));
 			Assert.assertTrue(
 				Validator.isNull(
@@ -6347,7 +6349,8 @@ public class ObjectEntryResourceTest {
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-				TestPropsValues.getUserId(), 0, null, false, true, false, false,
+				TestPropsValues.getUserId(), 0, null, false, false, true, false,
+				false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -9113,6 +9116,193 @@ public class ObjectEntryResourceTest {
 
 		_testPutCustomObjectEntryUnlinkNestedCustomObjectEntriesByExternalReferenceCode(
 			false);
+	}
+
+	@Test
+	public void testPutCustomObjectEntryWithLocalizedAttachmentObjectField()
+		throws Exception {
+
+		// File with a nonexistent external reference code
+
+		String objectDefinitionName = ObjectDefinitionTestUtil.getRandomName();
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				true, objectDefinitionName,
+				Collections.singletonList(
+					new AttachmentObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap("localizedAttachment")
+					).localized(
+						true
+					).name(
+						"localizedAttachment"
+					).objectFieldSettings(
+						Arrays.asList(
+							new ObjectFieldSettingBuilder(
+							).name(
+								ObjectFieldSettingConstants.
+									NAME_ACCEPTED_FILE_EXTENSIONS
+							).value(
+								"txt"
+							).build(),
+							new ObjectFieldSettingBuilder(
+							).name(
+								ObjectFieldSettingConstants.NAME_FILE_SOURCE
+							).value(
+								ObjectFieldSettingConstants.VALUE_USER_COMPUTER
+							).build(),
+							new ObjectFieldSettingBuilder(
+							).name(
+								ObjectFieldSettingConstants.NAME_MAX_FILE_SIZE
+							).value(
+								"100"
+							).build(),
+							new ObjectFieldSettingBuilder(
+							).name(
+								ObjectFieldSettingConstants.
+									NAME_SHOW_FILES_IN_DOCS_AND_MEDIA
+							).value(
+								StringPool.TRUE
+							).build(),
+							new ObjectFieldSettingBuilder(
+							).name(
+								ObjectFieldSettingConstants.
+									NAME_STORAGE_DL_FOLDER_PATH
+							).value(
+								StringPool.SLASH + objectDefinitionName
+							).build())
+					).build()),
+				ObjectDefinitionConstants.SCOPE_COMPANY,
+				TestPropsValues.getUserId());
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			String.valueOf(_jsonFactory.createJSONObject()),
+			objectDefinition.getRESTContextPath(), Http.Method.POST);
+
+		String fileContent1 = RandomTestUtil.randomString();
+
+		com.liferay.object.rest.dto.v1_0.FileEntry fileEntry1 = _toFileEntry(
+			Base64::encode, fileContent1,
+			RandomTestUtil.randomString() + ".txt", null, null);
+
+		fileEntry1.setExternalReferenceCode(RandomTestUtil.randomString());
+
+		Scope scope = new Scope();
+
+		scope.setExternalReferenceCode(_group.getExternalReferenceCode());
+		scope.setType(Scope.Type.SITE);
+
+		fileEntry1.setScope(scope);
+
+		String fileContent2 = RandomTestUtil.randomString();
+
+		com.liferay.object.rest.dto.v1_0.FileEntry fileEntry2 = _toFileEntry(
+			Base64::encode, fileContent2,
+			RandomTestUtil.randomString() + ".txt", null, null);
+
+		fileEntry2.setExternalReferenceCode(RandomTestUtil.randomString());
+		fileEntry2.setScope(scope);
+
+		String endpoint = StringBundler.concat(
+			objectDefinition.getRESTContextPath(), StringPool.SLASH,
+			jsonObject.get("id"));
+
+		jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"localizedAttachment_i18n",
+				JSONUtil.put(
+					"en_US",
+					JSONFactoryUtil.createJSONObject(fileEntry1.toString())
+				).put(
+					"pt_BR",
+					JSONFactoryUtil.createJSONObject(fileEntry2.toString())
+				)
+			).toString(),
+			endpoint + "?nestedFields=localizedAttachment.fileBase64",
+			Http.Method.PUT);
+
+		JSONObject localizedAttachmentI18nValuesJSONObject =
+			jsonObject.getJSONObject("localizedAttachment_i18n");
+
+		_assertAttachmentJSONObject(
+			null, Base64.encode(fileContent1.getBytes()),
+			localizedAttachmentI18nValuesJSONObject.getJSONObject("en_US"),
+			_jsonFactory.createJSONObject(scope.toString()));
+		_assertAttachmentJSONObject(
+			null, Base64.encode(fileContent2.getBytes()),
+			localizedAttachmentI18nValuesJSONObject.getJSONObject("pt_BR"),
+			_jsonFactory.createJSONObject(scope.toString()));
+
+		// File with an existing external reference code
+
+		com.liferay.portal.kernel.repository.model.Folder existingFolder =
+			_dlAppLocalService.addFolder(
+				null, TestPropsValues.getUserId(), _group.getGroupId(),
+				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				ServiceContextTestUtil.getServiceContext());
+
+		DLFileEntry existingDLFileEntry = _addDLFileEntry(
+			StringPool.BLANK, existingFolder.getFolderId());
+
+		com.liferay.object.rest.dto.v1_0.FileEntry fileEntry3 = _toFileEntry(
+			content -> null, StringPool.BLANK,
+			existingDLFileEntry.getFileName(), null,
+			TestPropsValues.getGroupId());
+
+		fileEntry3.setExternalReferenceCode(
+			existingDLFileEntry.getExternalReferenceCode());
+
+		jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"localizedAttachment_i18n",
+				JSONUtil.put(
+					"en_US",
+					JSONFactoryUtil.createJSONObject(fileEntry3.toString())
+				).put(
+					"pt_BR",
+					JSONFactoryUtil.createJSONObject(fileEntry3.toString())
+				)
+			).toString(),
+			endpoint, Http.Method.PUT);
+
+		localizedAttachmentI18nValuesJSONObject = jsonObject.getJSONObject(
+			"localizedAttachment_i18n");
+
+		JSONObject fileEntryJSONObject =
+			localizedAttachmentI18nValuesJSONObject.getJSONObject("en_US");
+
+		Assert.assertEquals(
+			fileEntry3.getExternalReferenceCode(),
+			fileEntryJSONObject.getString("externalReferenceCode"));
+
+		fileEntryJSONObject =
+			localizedAttachmentI18nValuesJSONObject.getJSONObject("pt_BR");
+
+		Assert.assertEquals(
+			fileEntry3.getExternalReferenceCode(),
+			fileEntryJSONObject.getString("externalReferenceCode"));
+
+		// Invalid format
+
+		JSONAssert.assertEquals(
+			JSONUtil.put(
+				"status", "BAD_REQUEST"
+			).put(
+				"title",
+				"The value is invalid for object field \"" +
+					"localizedAttachment_i18n\""
+			).toString(),
+			HTTPTestUtil.invokeToJSONObject(
+				JSONUtil.put(
+					"localizedAttachment_i18n", RandomTestUtil.randomLong()
+				).toString(),
+				endpoint, Http.Method.PUT
+			).toString(),
+			JSONCompareMode.STRICT);
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
 	@Test
@@ -12923,7 +13113,8 @@ public class ObjectEntryResourceTest {
 						com.liferay.object.rest.dto.v1_0.ObjectEntry.class.
 							getName(),
 						StringPool.POUND,
-						StringUtil.toLowerCase(objectDefinition.getName())));
+						StringUtil.toLowerCase(
+							objectDefinition.getShortName())));
 
 			objectEntryResource.setContextAcceptLanguage(
 				new AcceptLanguage() {
@@ -14426,17 +14617,18 @@ public class ObjectEntryResourceTest {
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				ServiceContextTestUtil.getServiceContext());
 
-		DLFileEntry existingFile = _addDLFileEntry(
+		DLFileEntry existingDLFileEntry = _addDLFileEntry(
 			fileContent, existingFolder.getFolderId());
 
 		testFileEntry = _toFileEntry(
-			Base64::encode, fileContent, existingFile.getFileName(), null,
-			TestPropsValues.getGroupId());
+			Base64::encode, fileContent, existingDLFileEntry.getFileName(),
+			null, TestPropsValues.getGroupId());
 
 		testFileEntry.setExternalReferenceCode(
-			existingFile.getExternalReferenceCode());
+			existingDLFileEntry.getExternalReferenceCode());
 
-		String externalReferenceCode1 = existingFile.getExternalReferenceCode();
+		String externalReferenceCode1 =
+			existingDLFileEntry.getExternalReferenceCode();
 
 		_testPostCustomObjectEntryWithAttachmentField(
 			fileEntry -> JSONUtil.put(
@@ -14455,17 +14647,18 @@ public class ObjectEntryResourceTest {
 
 		fileContent = RandomTestUtil.randomString();
 
-		existingFile = _addDLFileEntry(
+		existingDLFileEntry = _addDLFileEntry(
 			fileContent, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
 		testFileEntry = _toFileEntry(
-			Base64::encode, fileContent, existingFile.getFileName(), null,
-			TestPropsValues.getGroupId());
+			Base64::encode, fileContent, existingDLFileEntry.getFileName(),
+			null, TestPropsValues.getGroupId());
 
 		testFileEntry.setExternalReferenceCode(
-			existingFile.getExternalReferenceCode());
+			existingDLFileEntry.getExternalReferenceCode());
 
-		String externalReferenceCode2 = existingFile.getExternalReferenceCode();
+		String externalReferenceCode2 =
+			existingDLFileEntry.getExternalReferenceCode();
 
 		_testPostCustomObjectEntryWithAttachmentField(
 			fileEntry -> JSONUtil.put(
