@@ -38,7 +38,6 @@ import com.liferay.object.definition.util.ObjectDefinitionThreadLocal;
 import com.liferay.object.entry.ObjectEntryContext;
 import com.liferay.object.entry.contributor.ObjectEntryValuesContributor;
 import com.liferay.object.entry.util.ObjectEntryThreadLocal;
-import com.liferay.object.entry.util.ObjectEntryValuesUtil;
 import com.liferay.object.exception.DuplicateObjectEntryExternalReferenceCodeException;
 import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
@@ -4613,27 +4612,9 @@ public class ObjectEntryLocalServiceImpl
 		String title = StringPool.BLANK;
 
 		if ((objectField != null) && objectField.isLocalized()) {
-			Map<String, Serializable> values = objectEntry.getValues();
-
-			Map<String, Serializable> localizedValues =
-				(Map<String, Serializable>)values.get(
-					objectField.getI18nObjectFieldName());
-
-			if (MapUtil.isNotEmpty(localizedValues)) {
-				Map<String, String> titleMap = new HashMap<>();
-
-				for (Map.Entry<String, Serializable> entry :
-						localizedValues.entrySet()) {
-
-					titleMap.put(
-						entry.getKey(),
-						ObjectEntryValuesUtil.getValueString(
-							objectField, localizedValues, entry.getValue()));
-				}
-
-				title = _localization.getXml(
-					titleMap, objectField.getDefaultLanguageId(), "title");
-			}
+			title = _localization.getXml(
+				getLocalizedTitleValue(), objectField.getDefaultLanguageId(),
+				"title");
 		}
 		else {
 			try {
