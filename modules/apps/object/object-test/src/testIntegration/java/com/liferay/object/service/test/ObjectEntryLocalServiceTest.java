@@ -653,6 +653,170 @@ public class ObjectEntryLocalServiceTest {
 
 	@Test
 	public void testAddObjectEntry() throws Exception {
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.ExceedsIntegerSize.class,
+			"Object entry value exceeds integer field allowed size",
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"emailAddressRequired", "matthew@liferay.com"
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).put(
+					"numberOfBooksWritten", "2147483648"
+				).build()));
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.ExceedsIntegerSize.class,
+			"Object entry value exceeds integer field allowed size",
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"emailAddressRequired", "matthew@liferay.com"
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).put(
+					"numberOfBooksWritten", "-2147483649"
+				).build()));
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.ExceedsLongMaxSize.class,
+			"Object entry value exceeds maximum long field allowed size",
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"ageOfDeath", "9007199254740992"
+				).put(
+					"emailAddressRequired", "matthew@liferay.com"
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).build()));
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.ExceedsLongMinSize.class,
+			"Object entry value falls below minimum long field allowed size",
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"ageOfDeath", "-9007199254740992"
+				).put(
+					"emailAddressRequired", "matthew@liferay.com"
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).build()));
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.ExceedsLongSize.class,
+			"Object entry value exceeds long field allowed size",
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"ageOfDeath", "9223372036854775808"
+				).put(
+					"emailAddressRequired", "matthew@liferay.com"
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).build()));
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.ExceedsLongSize.class,
+			"Object entry value exceeds long field allowed size",
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"ageOfDeath", "-9223372036854775809"
+				).put(
+					"emailAddressRequired", "matthew@liferay.com"
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).build()));
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.ExceedsTextMaxLength.class,
+			"Object entry value exceeds the maximum length of 280 characters " +
+				"for object field \"firstName\"",
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"emailAddressRequired", "matthew@liferay.com"
+				).put(
+					"firstName", RandomTestUtil.randomString(281)
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).build()));
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.ExceedsTextMaxLength.class,
+			"Object entry value exceeds the maximum length of 65000 " +
+				"characters for object field \"script\"",
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"emailAddressRequired", "matthew@liferay.com"
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).put(
+					"script", RandomTestUtil.randomString(65001)
+				).build()));
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.InvalidFileExtension.class,
+			"The file extension \"txt\" is invalid for object field \"upload\"",
+			() -> {
+				ObjectField objectField =
+					_objectFieldLocalService.fetchObjectField(
+						_objectDefinition.getObjectDefinitionId(), "upload");
+
+				ObjectFieldSetting objectFieldSetting =
+					_objectFieldSettingLocalService.fetchObjectFieldSetting(
+						objectField.getObjectFieldId(),
+						"acceptedFileExtensions");
+
+				_objectFieldSettingLocalService.updateObjectFieldSetting(
+					objectFieldSetting.getObjectFieldSettingId(), "jpg, png");
+
+				_addObjectEntry(
+					HashMapBuilder.<String, Serializable>put(
+						"emailAddressRequired", "peter@liferay.com"
+					).put(
+						"listTypeEntryKeyRequired", "listTypeEntryKey1"
+					).put(
+						"upload",
+						_addTempFileEntry(
+							StringUtil.randomString()
+						).getFileEntryId()
+					).build());
+			});
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.ListTypeEntry.class,
+			"Object field name \"listTypeEntryKeyRequired\" is not mapped to " +
+				"a valid list type entry",
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"emailAddressRequired", "john@liferay.com"
+				).put(
+					"listTypeEntryKeyRequired", RandomTestUtil.randomString()
+				).build()));
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.ListTypeEntry.class,
+			"Object field name \"multipleListTypeEntriesKey\" is not mapped " +
+				"to a valid list type entry",
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"emailAddressRequired", "john@liferay.com"
+				).put(
+					"multipleListTypeEntriesKey",
+					(Serializable)Arrays.asList(
+						"multipleListTypeEntryKey1",
+						RandomTestUtil.randomString())
+				).build()));
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.Required.class,
+			"No value was provided for required object field " +
+				"\"emailAddressRequired\"",
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"firstName", "Judas"
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).build()));
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.Required.class,
+			"No value was provided for required object field " +
+				"\"listTypeEntryKeyRequired\"",
+			() -> _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"emailAddressRequired", "john@liferay.com"
+				).put(
+					"firstName", "Judas"
+				).build()));
+
+		// Count object entry
+
 		_assertCount(0);
 
 		_addObjectEntry(
@@ -746,157 +910,49 @@ public class ObjectEntryLocalServiceTest {
 
 		_assertCount(8);
 
-		AssertUtils.assertFailure(
-			ObjectEntryValuesException.ExceedsIntegerSize.class,
-			"Object entry value exceeds integer field allowed size",
-			() -> _addObjectEntry(
-				HashMapBuilder.<String, Serializable>put(
-					"emailAddressRequired", "matthew@liferay.com"
-				).put(
-					"listTypeEntryKeyRequired", "listTypeEntryKey1"
-				).put(
-					"numberOfBooksWritten", "2147483648"
-				).build()));
+		// Object entry with localized values
 
-		AssertUtils.assertFailure(
-			ObjectEntryValuesException.ExceedsIntegerSize.class,
-			"Object entry value exceeds integer field allowed size",
-			() -> _addObjectEntry(
-				HashMapBuilder.<String, Serializable>put(
-					"emailAddressRequired", "matthew@liferay.com"
-				).put(
-					"listTypeEntryKeyRequired", "listTypeEntryKey1"
-				).put(
-					"numberOfBooksWritten", "-2147483649"
-				).build()));
+		ObjectDefinition objectDefinition = _publishCustomObjectDefinition(
+			true,
+			Collections.singletonList(
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+					ObjectFieldConstants.DB_TYPE_STRING,
+					RandomTestUtil.randomString(), StringUtil.randomId())));
 
-		AssertUtils.assertFailure(
-			ObjectEntryValuesException.ExceedsLongMaxSize.class,
-			"Object entry value exceeds maximum long field allowed size",
-			() -> _addObjectEntry(
-				HashMapBuilder.<String, Serializable>put(
-					"ageOfDeath", "9007199254740992"
-				).put(
-					"emailAddressRequired", "matthew@liferay.com"
-				).put(
-					"listTypeEntryKeyRequired", "listTypeEntryKey1"
-				).build()));
+		objectDefinition.setScope(ObjectDefinitionConstants.SCOPE_SITE);
 
-		AssertUtils.assertFailure(
-			ObjectEntryValuesException.ExceedsLongMinSize.class,
-			"Object entry value falls below minimum long field allowed size",
-			() -> _addObjectEntry(
-				HashMapBuilder.<String, Serializable>put(
-					"ageOfDeath", "-9007199254740992"
-				).put(
-					"emailAddressRequired", "matthew@liferay.com"
-				).put(
-					"listTypeEntryKeyRequired", "listTypeEntryKey1"
-				).build()));
+		objectDefinition = _objectDefinitionLocalService.updateObjectDefinition(
+			objectDefinition);
 
-		AssertUtils.assertFailure(
-			ObjectEntryValuesException.ExceedsLongSize.class,
-			"Object entry value exceeds long field allowed size",
-			() -> _addObjectEntry(
-				HashMapBuilder.<String, Serializable>put(
-					"ageOfDeath", "9223372036854775808"
-				).put(
-					"emailAddressRequired", "matthew@liferay.com"
-				).put(
-					"listTypeEntryKeyRequired", "listTypeEntryKey1"
-				).build()));
+		Group group = GroupTestUtil.addGroup();
 
-		AssertUtils.assertFailure(
-			ObjectEntryValuesException.ExceedsLongSize.class,
-			"Object entry value exceeds long field allowed size",
-			() -> _addObjectEntry(
-				HashMapBuilder.<String, Serializable>put(
-					"ageOfDeath", "-9223372036854775809"
-				).put(
-					"emailAddressRequired", "matthew@liferay.com"
-				).put(
-					"listTypeEntryKeyRequired", "listTypeEntryKey1"
-				).build()));
+		_testAddObjectEntryWithLocalizedValues(objectDefinition, group);
 
-		AssertUtils.assertFailure(
-			ObjectEntryValuesException.ExceedsTextMaxLength.class,
-			"Object entry value exceeds the maximum length of 280 characters " +
-				"for object field \"firstName\"",
-			() -> _addObjectEntry(
-				HashMapBuilder.<String, Serializable>put(
-					"emailAddressRequired", "matthew@liferay.com"
-				).put(
-					"firstName", RandomTestUtil.randomString(281)
-				).put(
-					"listTypeEntryKeyRequired", "listTypeEntryKey1"
-				).build()));
+		ObjectDefinition modifiableSystemObjectDefinition =
+			ObjectDefinitionTestUtil.addModifiableSystemObjectDefinition(
+				TestPropsValues.getUserId(), null, true,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"Test", null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				ObjectDefinitionConstants.SCOPE_SITE, null, 1,
+				Collections.singletonList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING,
+						RandomTestUtil.randomString(), StringUtil.randomId())));
 
-		AssertUtils.assertFailure(
-			ObjectEntryValuesException.ExceedsTextMaxLength.class,
-			"Object entry value exceeds the maximum length of 65000 " +
-				"characters for object field \"script\"",
-			() -> _addObjectEntry(
-				HashMapBuilder.<String, Serializable>put(
-					"emailAddressRequired", "matthew@liferay.com"
-				).put(
-					"listTypeEntryKeyRequired", "listTypeEntryKey1"
-				).put(
-					"script", RandomTestUtil.randomString(65001)
-				).build()));
+		_objectDefinitionLocalService.publishSystemObjectDefinition(
+			TestPropsValues.getUserId(),
+			modifiableSystemObjectDefinition.getObjectDefinitionId());
 
-		AssertUtils.assertFailure(
-			ObjectEntryValuesException.InvalidFileExtension.class,
-			"The file extension \"txt\" is invalid for object field \"upload\"",
-			() -> {
-				ObjectField objectField =
-					_objectFieldLocalService.fetchObjectField(
-						_objectDefinition.getObjectDefinitionId(), "upload");
+		_testAddObjectEntryWithLocalizedValues(
+			modifiableSystemObjectDefinition, group);
 
-				ObjectFieldSetting objectFieldSetting =
-					_objectFieldSettingLocalService.fetchObjectFieldSetting(
-						objectField.getObjectFieldId(),
-						"acceptedFileExtensions");
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			modifiableSystemObjectDefinition.getObjectDefinitionId());
 
-				_objectFieldSettingLocalService.updateObjectFieldSetting(
-					objectFieldSetting.getObjectFieldSettingId(), "jpg, png");
-
-				_addObjectEntry(
-					HashMapBuilder.<String, Serializable>put(
-						"emailAddressRequired", "peter@liferay.com"
-					).put(
-						"listTypeEntryKeyRequired", "listTypeEntryKey1"
-					).put(
-						"upload",
-						_addTempFileEntry(
-							StringUtil.randomString()
-						).getFileEntryId()
-					).build());
-			});
-
-		AssertUtils.assertFailure(
-			ObjectEntryValuesException.ListTypeEntry.class,
-			"Object field name \"listTypeEntryKeyRequired\" is not mapped to " +
-				"a valid list type entry",
-			() -> _addObjectEntry(
-				HashMapBuilder.<String, Serializable>put(
-					"emailAddressRequired", "john@liferay.com"
-				).put(
-					"listTypeEntryKeyRequired", RandomTestUtil.randomString()
-				).build()));
-
-		AssertUtils.assertFailure(
-			ObjectEntryValuesException.ListTypeEntry.class,
-			"Object field name \"multipleListTypeEntriesKey\" is not mapped " +
-				"to a valid list type entry",
-			() -> _addObjectEntry(
-				HashMapBuilder.<String, Serializable>put(
-					"emailAddressRequired", "john@liferay.com"
-				).put(
-					"multipleListTypeEntriesKey",
-					(Serializable)Arrays.asList(
-						"multipleListTypeEntryKey1",
-						RandomTestUtil.randomString())
-				).build()));
+		// Object entry with required relationship value
 
 		_objectFieldLocalService.updateRequired(
 			_objectRelationship.getObjectFieldId2(), true);
@@ -921,27 +977,26 @@ public class ObjectEntryLocalServiceTest {
 		_objectFieldLocalService.updateRequired(
 			_objectRelationship.getObjectFieldId2(), false);
 
-		AssertUtils.assertFailure(
-			ObjectEntryValuesException.Required.class,
-			"No value was provided for required object field " +
-				"\"emailAddressRequired\"",
-			() -> _addObjectEntry(
-				HashMapBuilder.<String, Serializable>put(
-					"firstName", "Judas"
-				).put(
-					"listTypeEntryKeyRequired", "listTypeEntryKey1"
-				).build()));
+		// Object entry with same external reference code in different sites
 
-		AssertUtils.assertFailure(
-			ObjectEntryValuesException.Required.class,
-			"No value was provided for required object field " +
-				"\"listTypeEntryKeyRequired\"",
-			() -> _addObjectEntry(
-				HashMapBuilder.<String, Serializable>put(
-					"emailAddressRequired", "john@liferay.com"
-				).put(
-					"firstName", "Judas"
-				).build()));
+		String externalReferenceCode = RandomTestUtil.randomString();
+
+		_addObjectEntry(
+			TestPropsValues.getGroupId(),
+			objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"externalReferenceCode", externalReferenceCode
+			).build());
+
+		_addObjectEntry(
+			group.getGroupId(), objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"externalReferenceCode", externalReferenceCode
+			).build());
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+
+		// Object entry with unique values in a company scoped object definition
 
 		AssertUtils.assertFailure(
 			ObjectEntryValuesException.UniqueValueConstraintViolation.class,
@@ -957,14 +1012,16 @@ public class ObjectEntryLocalServiceTest {
 					"listTypeEntryKeyRequired", "listTypeEntryKey1"
 				).build()));
 
-		ObjectDefinition objectDefinition = _publishCustomObjectDefinition(
-			true,
-			Arrays.asList(
+		// Object entry with unique values in different sites
+
+		objectDefinition = _publishCustomObjectDefinition(
+			false,
+			Collections.singletonList(
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 					ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
 					RandomTestUtil.randomString(), "name",
-					Arrays.asList(
+					Collections.singletonList(
 						new ObjectFieldSettingBuilder(
 						).name(
 							ObjectFieldSettingConstants.NAME_UNIQUE_VALUES
@@ -985,6 +1042,14 @@ public class ObjectEntryLocalServiceTest {
 				"name", "Peter"
 			).build());
 
+		_addObjectEntry(
+			group.getGroupId(), objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"name", "Peter"
+			).build());
+
+		// Object entry with unique values in the same site
+
 		long finalObjectDefinitionId = objectDefinition.getObjectDefinitionId();
 
 		AssertUtils.assertFailure(
@@ -997,14 +1062,6 @@ public class ObjectEntryLocalServiceTest {
 					"name", "Peter"
 				).build()));
 
-		Group group = GroupTestUtil.addGroup();
-
-		_addObjectEntry(
-			group.getGroupId(), objectDefinition.getObjectDefinitionId(),
-			HashMapBuilder.<String, Serializable>put(
-				"name", "Peter"
-			).build());
-
 		AssertUtils.assertFailure(
 			ObjectEntryValuesException.UniqueValueConstraintViolation.class,
 			"Unique value constraint violation for " +
@@ -1015,32 +1072,7 @@ public class ObjectEntryLocalServiceTest {
 					"name", "Peter"
 				).build()));
 
-		_testAddObjectEntryWithLocalizedValues(objectDefinition, group);
-
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
-
-		ObjectDefinition modifiableSystemObjectDefinition =
-			ObjectDefinitionTestUtil.addModifiableSystemObjectDefinition(
-				TestPropsValues.getUserId(), null, true,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"Test", null, null,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				ObjectDefinitionConstants.SCOPE_SITE, null, 1,
-				Arrays.asList(
-					ObjectFieldUtil.createObjectField(
-						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-						ObjectFieldConstants.DB_TYPE_STRING,
-						RandomTestUtil.randomString(), StringUtil.randomId())));
-
-		_objectDefinitionLocalService.publishSystemObjectDefinition(
-			TestPropsValues.getUserId(),
-			modifiableSystemObjectDefinition.getObjectDefinitionId());
-
-		_testAddObjectEntryWithLocalizedValues(
-			modifiableSystemObjectDefinition, group);
-
-		_objectDefinitionLocalService.deleteObjectDefinition(
-			modifiableSystemObjectDefinition.getObjectDefinitionId());
 	}
 
 	@FeatureFlags("LPD-32050")
