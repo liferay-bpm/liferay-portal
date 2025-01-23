@@ -69,11 +69,12 @@ public class ObjectEntryServiceUtil {
 	}
 
 	public static ObjectEntry deleteObjectEntry(
-			String externalReferenceCode, long companyId, long groupId)
+			String externalReferenceCode, long groupId, long companyId,
+			long objectDefinitionId)
 		throws PortalException {
 
 		return getService().deleteObjectEntry(
-			externalReferenceCode, companyId, groupId);
+			externalReferenceCode, groupId, companyId, objectDefinitionId);
 	}
 
 	public static ObjectEntry fetchManyToOneObjectEntry(
@@ -125,11 +126,12 @@ public class ObjectEntryServiceUtil {
 	}
 
 	public static ObjectEntry getObjectEntry(
-			String externalReferenceCode, long companyId, long groupId)
+			String externalReferenceCode, long groupId, long companyId,
+			long objectDefinitionId)
 		throws PortalException {
 
 		return getService().getObjectEntry(
-			externalReferenceCode, companyId, groupId);
+			externalReferenceCode, groupId, companyId, objectDefinitionId);
 	}
 
 	public static List<ObjectEntry> getOneToManyObjectEntries(
