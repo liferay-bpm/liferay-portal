@@ -112,9 +112,11 @@ public class ObjectFieldImpl extends ObjectFieldBaseImpl {
 
 		ObjectDefinition objectDefinition = getObjectDefinition();
 
-		if (objectDefinition.isUnmodifiableSystemObject() &&
-			!Objects.equals(
-				objectDefinition.getExtensionDBTableName(), getDBTableName())) {
+		if ((objectDefinition.isUnmodifiableSystemObject() &&
+			 !Objects.equals(
+				 objectDefinition.getExtensionDBTableName(),
+				 getDBTableName())) ||
+			ObjectFieldUtil.isMetadata(getName())) {
 
 			return false;
 		}
