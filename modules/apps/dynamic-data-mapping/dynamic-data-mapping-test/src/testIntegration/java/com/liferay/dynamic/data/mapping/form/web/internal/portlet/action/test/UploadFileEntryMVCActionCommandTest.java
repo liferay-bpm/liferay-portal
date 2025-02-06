@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.upload.FileItem;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -134,6 +135,13 @@ public class UploadFileEntryMVCActionCommandTest {
 			fileJSONObject.getLong("fileEntryId"));
 
 		Assert.assertNotNull(dlFileEntry);
+
+		Assert.assertEquals(
+			fileJSONObject.get("title"),
+			TempFileEntryUtil.getOriginalTempFileName(dlFileEntry.getTitle()));
+
+		Assert.assertNotEquals(
+			fileJSONObject.get("title"), dlFileEntry.getTitle());
 
 		User user = _userLocalService.getUserByExternalReferenceCode(
 			DDMFormConstants.DDM_FORM_DEFAULT_USER_EXTERNAL_REFERENCE_CODE,
