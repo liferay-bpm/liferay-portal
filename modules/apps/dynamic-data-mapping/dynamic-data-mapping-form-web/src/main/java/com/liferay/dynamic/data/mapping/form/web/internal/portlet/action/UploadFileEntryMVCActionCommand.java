@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.upload.UploadFileEntryHandler;
 import com.liferay.upload.UploadHandler;
@@ -169,8 +170,7 @@ public class UploadFileEntryMVCActionCommand extends BaseMVCActionCommand {
 			User user = DDMFormUtil.getDDMFormDefaultUser(
 				themeDisplay.getCompanyId());
 
-			String uniqueFileName = PortletFileRepositoryUtil.getUniqueFileName(
-				groupId, folderId, fileName);
+			String uniqueFileName = TempFileEntryUtil.getTempFileName(fileName);
 
 			return PortletFileRepositoryUtil.addPortletFileEntry(
 				null, groupId, user.getUserId(),
@@ -270,8 +270,17 @@ public class UploadFileEntryMVCActionCommand extends BaseMVCActionCommand {
 				UploadPortletRequest uploadPortletRequest, FileEntry fileEntry)
 			throws PortalException {
 
-			return _defaultUploadResponseHandler.onSuccess(
+			JSONObject jsonObject = _defaultUploadResponseHandler.onSuccess(
 				uploadPortletRequest, fileEntry);
+
+			JSONObject fileJSONObject = (JSONObject)jsonObject.get("file");
+
+			fileJSONObject.put(
+				"title",
+				TempFileEntryUtil.getOriginalTempFileName(
+					fileEntry.getFileName()));
+
+			return jsonObject;
 		}
 
 		private final Log _log = LogFactoryUtil.getLog(

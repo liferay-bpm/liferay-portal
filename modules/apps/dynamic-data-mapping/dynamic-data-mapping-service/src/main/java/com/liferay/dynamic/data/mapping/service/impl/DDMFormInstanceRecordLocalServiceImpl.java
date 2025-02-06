@@ -72,11 +72,13 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.TimeZoneUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
@@ -202,8 +204,19 @@ public class DDMFormInstanceRecordLocalServiceImpl
 				continue;
 			}
 
+			String originalFileName = TempFileEntryUtil.getOriginalTempFileName(
+				dlFileEntry.getFileName());
+
+			String dlFileEntryUniqueFileName = DLUtil.getUniqueFileName(
+				groupId, dlFileEntry.getFolderId(), originalFileName, true);
+			String dlFileEntryUniqueTitle = DLUtil.getUniqueTitle(
+				groupId, dlFileEntry.getFolderId(),
+				FileUtil.stripExtension(originalFileName));
+
 			dlFileEntry.setClassName(DDMFormInstanceRecord.class.getName());
 			dlFileEntry.setClassPK(recordId);
+			dlFileEntry.setFileName(dlFileEntryUniqueFileName);
+			dlFileEntry.setTitle(dlFileEntryUniqueTitle);
 
 			_dlFileEntryLocalService.updateDLFileEntry(dlFileEntry);
 		}
