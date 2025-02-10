@@ -257,6 +257,7 @@ const Main = ({
 	editingLanguageId,
 	errorMessage: initialErrorMessage,
 	fieldName,
+	fileEntryDeleteURL,
 	fileEntryTitle,
 	fileEntryURL,
 	guestUploadURL,
@@ -473,9 +474,73 @@ const Main = ({
 		return true;
 	};
 
-	const handleUploadSelectButtonClicked = (event) => {
+	const deleteFileEntry = (value) => {
+		const request = new XMLHttpRequest();
+
+		let oldFileEntryId = 0;
+
+		try {
+			const fileEntry = JSON.parse(value);
+
+			oldFileEntryId = fileEntry.fileEntryId;
+		}
+		catch (error) {
+			console.error('Unable to parse JSON', value);
+		}
+
+		request.open('POST', fileEntryDeleteURL);
+		request.send(
+			convertToFormData({
+				[`${portletNamespace}oldFileEntryId`]: oldFileEntryId,
+			})
+		);
+	};
+
+	const handleOnClearButtonClicked = (event, value, isSignedIn) => {
 		onFocus(event);
 
+		deleteFileEntry(value);
+
+		setCurrentValue(null);
+
+		onChange(event, '{}');
+
+		if (!isSignedIn) {
+			const guestUploadInput = document.getElementById(
+				`${name}inputFileGuestUpload`
+			);
+
+			if (guestUploadInput) {
+				guestUploadInput.value = '';
+			}
+
+			onBlur(event);
+		}
+	};
+
+	const handleUploadSelectButtonClicked = (event, currentValue) => {
+		onFocus(event);
+
+		let oldFileEntryId = 0;
+
+		if (currentValue) {
+			try {
+				const fileEntry = JSON.parse(currentValue);
+
+				oldFileEntryId = fileEntry.fileEntryId;
+
+				uploadFileEntry(event, oldFileEntryId);
+			}
+			catch (error) {
+				console.error('Unable to parse JSON', currentValue);
+			}
+		}
+		else {
+			uploadFileEntry(event, oldFileEntryId);
+		}
+	};
+
+	const uploadFileEntry = (event, oldFileEntryId) => {
 		const file = event.target.files[0];
 
 		if (isExceededUploadRequestSizeLimit(file.size)) {
@@ -529,6 +594,7 @@ const Main = ({
 		request.send(
 			convertToFormData({
 				[`${portletNamespace}file`]: file,
+				[`${portletNamespace}oldFileEntryId`]: oldFileEntryId,
 			})
 		);
 	};
@@ -537,6 +603,24 @@ const Main = ({
 		(!isSignedIn && !allowGuestUsers) ||
 		maximumSubmissionLimitReached ||
 		showUploadPermissionMessage;
+
+	const valueRef = React.useRef(value);
+
+	useEffect(() => {
+		if (Object.keys(JSON.parse(value)).length) {
+			valueRef.current = value;
+		}
+	}, [value]);
+
+	useEffect(() => {
+		window.onbeforeunload = function () {
+			deleteFileEntry(valueRef.current);
+		};
+
+		return () => {
+			window.onbeforeunload = null;
+		};
+	}, []);
 
 	return (
 		<FieldBase
@@ -559,25 +643,11 @@ const Main = ({
 					name={name}
 					onBlur={onBlur}
 					onClearButtonClicked={(event) => {
-						onFocus(event);
-
-						setCurrentValue(null);
-
-						onChange(event, '{}');
-
-						const guestUploadInput = document.getElementById(
-							`${name}inputFileGuestUpload`
-						);
-
-						if (guestUploadInput) {
-							guestUploadInput.value = '';
-						}
-
-						onBlur(event);
+						handleOnClearButtonClicked(event, value, isSignedIn);
 					}}
 					onFocus={onFocus}
 					onUploadSelectButtonClicked={(event) =>
-						handleUploadSelectButtonClicked(event)
+						handleUploadSelectButtonClicked(event, currentValue)
 					}
 					placeholder={placeholder}
 					progress={progress}
@@ -596,9 +666,7 @@ const Main = ({
 					message={message}
 					name={name}
 					onClearButtonClicked={(event) => {
-						setCurrentValue(null);
-
-						onChange(event, '{}');
+						handleOnClearButtonClicked(event, value, isSignedIn);
 					}}
 					onSelectButtonClicked={(event) =>
 						handleSelectButtonClicked(
