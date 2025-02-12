@@ -81,6 +81,13 @@ public class StyleBookServiceUpgradeStepRegistrator
 				"StyleBookEntry", "themeId VARCHAR(255) null"),
 			UpgradeProcessFactory.addColumns(
 				"StyleBookEntryVersion", "themeId VARCHAR(255) null"));
+
+		registry.register(
+			"1.6.0", "1.7.0",
+			UpgradeProcessFactory.addColumns(
+				"StyleBookEntry", "themeType VARCHAR(75) null"),
+			UpgradeProcessFactory.addColumns(
+				"StyleBookEntryVersion", "themeType VARCHAR(75) null"));
 	}
 
 }
