@@ -7,12 +7,16 @@ package com.liferay.dynamic.data.mapping.form.web.internal.portlet.action.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.document.library.kernel.service.DLFileEntryLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.constants.DDMFormConstants;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormInstanceTestUtil;
+import com.liferay.dynamic.data.mapping.util.DDMFormUtil;
 import com.liferay.petra.memory.DeleteFileFinalizeAction;
 import com.liferay.petra.memory.FinalizeManager;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Group;
@@ -20,20 +24,25 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.constants.TestDataConstants;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionRequest;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionResponse;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.FileItem;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -41,6 +50,7 @@ import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.upload.test.util.UploadTestUtil;
 import com.liferay.upload.UploadHandler;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 
@@ -78,6 +88,20 @@ public class UploadFileEntryMVCActionCommandTest {
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
 
+		User user = DDMFormUtil.getDDMFormDefaultUser(
+			TestPropsValues.getCompanyId());
+
+		_oldFileEntry = DLFileEntryLocalServiceUtil.addFileEntry(
+			null, user.getUserId(), _group.getGroupId(),
+			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			"file.txt", ContentTypes.TEXT_PLAIN, "file.txt",
+			StringUtil.randomString(), StringPool.BLANK, StringPool.BLANK, -1,
+			new HashMap<>(), null,
+			new ByteArrayInputStream(TestDataConstants.TEST_BYTE_ARRAY), 0,
+			null, null, null,
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId()));
+
 		_ddmFormInstance = DDMFormInstanceTestUtil.addDDMFormInstance(
 			_group, TestPropsValues.getUserId());
 
@@ -96,6 +120,20 @@ public class UploadFileEntryMVCActionCommandTest {
 						return method.invoke(_portal, args);
 					}
 
+					MockLiferayPortletActionRequest
+						mockLiferayPortletActionRequest =
+							new MockLiferayPortletActionRequest();
+
+					ThemeDisplay themeDisplay = new ThemeDisplay();
+
+					themeDisplay.setCompany(CompanyLocalServiceUtil.getCompany(TestPropsValues.getCompanyId()));
+
+					mockLiferayPortletActionRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
+
+					mockLiferayPortletActionRequest.addParameter(
+						"oldFileEntryId",
+						String.valueOf(_oldFileEntry.getFileEntryId()));
+
 					return UploadTestUtil.createUploadPortletRequest(
 						UploadTestUtil.createUploadServletRequest(
 							_getMockMultipartHttpServletRequest(),
@@ -103,7 +141,8 @@ public class UploadFileEntryMVCActionCommandTest {
 								"file", new FileItem[] {_getFileItem()}
 							).build(),
 							new HashMap<>()),
-						null, RandomTestUtil.randomString());
+						mockLiferayPortletActionRequest,
+						RandomTestUtil.randomString());
 				}));
 	}
 
@@ -114,6 +153,10 @@ public class UploadFileEntryMVCActionCommandTest {
 
 	@Test
 	public void testProcessAction() throws Exception {
+		Assert.assertNotNull(
+			DLFileEntryLocalServiceUtil.fetchDLFileEntry(
+				_oldFileEntry.getFileEntryId()));
+
 		MockLiferayPortletActionResponse mockLiferayPortletActionResponse =
 			new MockLiferayPortletActionResponse();
 
@@ -140,6 +183,10 @@ public class UploadFileEntryMVCActionCommandTest {
 			TestPropsValues.getCompanyId());
 
 		Assert.assertEquals(user.getUserId(), dlFileEntry.getUserId());
+
+		Assert.assertNull(
+			DLFileEntryLocalServiceUtil.fetchDLFileEntry(
+				_oldFileEntry.getFileEntryId()));
 	}
 
 	private FileItem _getFileItem() throws Exception {
@@ -229,6 +276,8 @@ public class UploadFileEntryMVCActionCommandTest {
 		filter = "mvc.command.name=/dynamic_data_mapping_form/upload_file_entry"
 	)
 	private MVCActionCommand _mvcActionCommand;
+
+	private DLFileEntry _oldFileEntry;
 
 	@Inject
 	private Portal _portal;
