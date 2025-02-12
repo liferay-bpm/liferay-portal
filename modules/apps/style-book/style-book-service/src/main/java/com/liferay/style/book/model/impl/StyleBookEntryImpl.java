@@ -8,6 +8,7 @@ package com.liferay.style.book.model.impl;
 import com.liferay.document.library.util.DLURLHelperUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -55,9 +56,15 @@ public class StyleBookEntryImpl extends StyleBookEntryBaseImpl {
 			"frontendTokensValuesPath", "frontend-tokens-values.json"
 		).put(
 			"name", getName()
-		).put(
-			"themeId", getThemeId()
 		);
+
+		if (FeatureFlagManagerUtil.isEnabled(getCompanyId(), "LPD-30204")) {
+			jsonObject.put(
+				"themeId", getThemeId()
+			).put(
+				"themeType", getThemeType()
+			);
+		}
 
 		FileEntry previewFileEntry = _getPreviewFileEntry();
 
