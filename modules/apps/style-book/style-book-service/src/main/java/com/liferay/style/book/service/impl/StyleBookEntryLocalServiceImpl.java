@@ -12,6 +12,7 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.dao.orm.custom.sql.CustomSQL;
 import com.liferay.portal.kernel.dao.orm.WildcardMode;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.Repository;
@@ -27,6 +28,8 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.style.book.constants.StyleBookPortletKeys;
 import com.liferay.style.book.exception.DuplicateStyleBookEntryKeyException;
 import com.liferay.style.book.exception.StyleBookEntryNameException;
+import com.liferay.style.book.exception.StyleBookEntryThemeIdException;
+import com.liferay.style.book.exception.StyleBookEntryThemeTypeException;
 import com.liferay.style.book.model.StyleBookEntry;
 import com.liferay.style.book.service.base.StyleBookEntryLocalServiceBaseImpl;
 
@@ -52,7 +55,7 @@ public class StyleBookEntryLocalServiceImpl
 			String externalReferenceCode, long userId, long groupId,
 			boolean defaultStyleBookEntry, String frontendTokensValues,
 			String name, String styleBookEntryKey, String themeId,
-			ServiceContext serviceContext)
+			String themeType, ServiceContext serviceContext)
 		throws PortalException {
 
 		User user = _userLocalService.getUser(userId);
@@ -66,7 +69,7 @@ public class StyleBookEntryLocalServiceImpl
 			serviceContext = new ServiceContext();
 		}
 
-		_validate(name);
+		_validate(companyId, name, themeId, themeType);
 
 		if (Validator.isNull(styleBookEntryKey)) {
 			styleBookEntryKey = generateStyleBookEntryKey(groupId, name);
@@ -96,6 +99,7 @@ public class StyleBookEntryLocalServiceImpl
 		styleBookEntry.setName(name);
 		styleBookEntry.setStyleBookEntryKey(styleBookEntryKey);
 		styleBookEntry.setThemeId(themeId);
+		styleBookEntry.setThemeType(themeType);
 
 		return publishDraft(styleBookEntry);
 	}
@@ -115,7 +119,7 @@ public class StyleBookEntryLocalServiceImpl
 			null, userId, groupId, false,
 			sourceStyleBookEntry.getFrontendTokensValues(), name,
 			StringPool.BLANK, sourceStyleBookEntry.getThemeId(),
-			serviceContext);
+			sourceStyleBookEntry.getThemeType(), serviceContext);
 
 		long previewFileEntryId = _copyStyleBookEntryPreviewFileEntry(
 			userId, groupId, sourceStyleBookEntry, targetStyleBookEntry);
@@ -335,7 +339,9 @@ public class StyleBookEntryLocalServiceImpl
 		StyleBookEntry styleBookEntry =
 			styleBookEntryPersistence.findByPrimaryKey(styleBookEntryId);
 
-		_validate(name);
+		_validate(
+			styleBookEntry.getCompanyId(), name, styleBookEntry.getThemeId(),
+			styleBookEntry.getThemeType());
 
 		styleBookEntry.setModifiedDate(new Date());
 		styleBookEntry.setName(name);
@@ -385,7 +391,9 @@ public class StyleBookEntryLocalServiceImpl
 		StyleBookEntry styleBookEntry =
 			styleBookEntryPersistence.findByPrimaryKey(styleBookEntryId);
 
-		_validate(name);
+		_validate(
+			styleBookEntry.getCompanyId(), name, styleBookEntry.getThemeId(),
+			styleBookEntry.getThemeType());
 
 		if (Validator.isNull(styleBookEntryKey)) {
 			styleBookEntryKey = generateStyleBookEntryKey(
@@ -421,7 +429,9 @@ public class StyleBookEntryLocalServiceImpl
 		StyleBookEntry styleBookEntry =
 			styleBookEntryPersistence.findByPrimaryKey(styleBookEntryId);
 
-		_validate(name);
+		_validate(
+			styleBookEntry.getCompanyId(), name, styleBookEntry.getThemeId(),
+			styleBookEntry.getThemeType());
 
 		styleBookEntry.setModifiedDate(new Date());
 		styleBookEntry.setFrontendTokensValues(frontendTokensValues);
@@ -514,7 +524,10 @@ public class StyleBookEntryLocalServiceImpl
 		return name;
 	}
 
-	private void _validate(String name) throws PortalException {
+	private void _validate(
+			long companyId, String name, String themeId, String themeType)
+		throws PortalException {
+
 		if (Validator.isNull(name)) {
 			throw new StyleBookEntryNameException("Name must not be null");
 		}
@@ -532,6 +545,18 @@ public class StyleBookEntryLocalServiceImpl
 		if (name.length() > nameMaxLength) {
 			throw new StyleBookEntryNameException(
 				"Maximum length of name exceeded");
+		}
+
+		if (!FeatureFlagManagerUtil.isEnabled(companyId, "LPD-30204")) {
+			return;
+		}
+
+		if (Validator.isNull(themeId)) {
+			throw new StyleBookEntryThemeIdException.MustNotBeNull();
+		}
+
+		if (Validator.isNull(themeType)) {
+			throw new StyleBookEntryThemeTypeException.MustNotBeNull();
 		}
 	}
 

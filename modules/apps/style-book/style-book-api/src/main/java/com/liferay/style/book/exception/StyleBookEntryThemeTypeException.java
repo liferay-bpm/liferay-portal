@@ -7,23 +7,21 @@ package com.liferay.style.book.exception;
 import com.liferay.portal.kernel.exception.PortalException;
 
 /**
- * @author Brian Wing Shun Chan
+ * @author Thiago Buarque
  */
 public class StyleBookEntryThemeTypeException extends PortalException {
 
-	public StyleBookEntryThemeTypeException() {
+
+	public static class MustNotBeNull extends StyleBookEntryThemeTypeException {
+
+		public MustNotBeNull() {
+			super("Theme type must not be null");
+		}
+
 	}
 
-	public StyleBookEntryThemeTypeException(String msg) {
+	private StyleBookEntryThemeTypeException(String msg) {
 		super(msg);
-	}
-
-	public StyleBookEntryThemeTypeException(String msg, Throwable throwable) {
-		super(msg, throwable);
-	}
-
-	public StyleBookEntryThemeTypeException(Throwable throwable) {
-		super(throwable);
 	}
 
 }
