@@ -40,12 +40,13 @@ public class StyleBookEntryLocalServiceUtil {
 			String externalReferenceCode, long userId, long groupId,
 			boolean defaultStyleBookEntry, String frontendTokensValues,
 			String name, String styleBookEntryKey, String themeId,
+			String themeType,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addStyleBookEntry(
 			externalReferenceCode, userId, groupId, defaultStyleBookEntry,
-			frontendTokensValues, name, styleBookEntryKey, themeId,
+			frontendTokensValues, name, styleBookEntryKey, themeId, themeType,
 			serviceContext);
 	}
 

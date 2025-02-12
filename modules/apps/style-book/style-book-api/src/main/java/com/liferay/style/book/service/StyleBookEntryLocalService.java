@@ -69,7 +69,7 @@ public interface StyleBookEntryLocalService
 			String externalReferenceCode, long userId, long groupId,
 			boolean defaultStyleBookEntry, String frontendTokensValues,
 			String name, String styleBookEntryKey, String themeId,
-			ServiceContext serviceContext)
+			String themeType, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**

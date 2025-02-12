@@ -31,26 +31,26 @@ public class StyleBookEntryServiceWrapper
 	@Override
 	public StyleBookEntry addStyleBookEntry(
 			String externalReferenceCode, long groupId, String name,
-			String styleBookEntryKey, String themeId,
+			String styleBookEntryKey, String themeId, String themeType,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _styleBookEntryService.addStyleBookEntry(
 			externalReferenceCode, groupId, name, styleBookEntryKey, themeId,
-			serviceContext);
+			themeType, serviceContext);
 	}
 
 	@Override
 	public StyleBookEntry addStyleBookEntry(
 			String externalReferenceCode, long groupId,
 			String frontendTokensValues, String name, String styleBookEntryKey,
-			String themeId,
+			String themeId, String themeType,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _styleBookEntryService.addStyleBookEntry(
 			externalReferenceCode, groupId, frontendTokensValues, name,
-			styleBookEntryKey, themeId, serviceContext);
+			styleBookEntryKey, themeId, themeType, serviceContext);
 	}
 
 	@Override
