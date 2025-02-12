@@ -29,6 +29,7 @@
 		<column name="previewFileEntryId" type="long" />
 		<column name="styleBookEntryKey" type="String" />
 		<column name="themeId" type="String" />
+		<column name="themeType" type="String" />
 
 		<!-- Order -->
 
@@ -59,5 +60,6 @@
 		<exception>StyleBookEntryFile</exception>
 		<exception>StyleBookEntryName</exception>
 		<exception>StyleBookEntryThemeId</exception>
+		<exception>StyleBookEntryThemeType</exception>
 	</exceptions>
 </service-builder>
