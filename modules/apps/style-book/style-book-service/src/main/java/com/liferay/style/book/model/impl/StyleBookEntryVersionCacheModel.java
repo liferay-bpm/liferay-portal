@@ -69,7 +69,7 @@ public class StyleBookEntryVersionCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(39);
+		StringBundler sb = new StringBundler(41);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -109,6 +109,8 @@ public class StyleBookEntryVersionCacheModel
 		sb.append(styleBookEntryKey);
 		sb.append(", themeId=");
 		sb.append(themeId);
+		sb.append(", themeType=");
+		sb.append(themeType);
 		sb.append("}");
 
 		return sb.toString();
@@ -200,6 +202,13 @@ public class StyleBookEntryVersionCacheModel
 			styleBookEntryVersionImpl.setThemeId(themeId);
 		}
 
+		if (themeType == null) {
+			styleBookEntryVersionImpl.setThemeType("");
+		}
+		else {
+			styleBookEntryVersionImpl.setThemeType(themeType);
+		}
+
 		styleBookEntryVersionImpl.resetOriginalValues();
 
 		return styleBookEntryVersionImpl;
@@ -237,6 +246,7 @@ public class StyleBookEntryVersionCacheModel
 		previewFileEntryId = objectInput.readLong();
 		styleBookEntryKey = objectInput.readUTF();
 		themeId = objectInput.readUTF();
+		themeType = objectInput.readUTF();
 	}
 
 	@Override
@@ -312,6 +322,13 @@ public class StyleBookEntryVersionCacheModel
 		else {
 			objectOutput.writeUTF(themeId);
 		}
+
+		if (themeType == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(themeType);
+		}
 	}
 
 	public long mvccVersion;
@@ -333,5 +350,6 @@ public class StyleBookEntryVersionCacheModel
 	public long previewFileEntryId;
 	public String styleBookEntryKey;
 	public String themeId;
+	public String themeType;
 
 }

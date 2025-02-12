@@ -153,6 +153,8 @@ public class StyleBookEntryPersistenceTest {
 
 		newStyleBookEntry.setThemeId(RandomTestUtil.randomString());
 
+		newStyleBookEntry.setThemeType(RandomTestUtil.randomString());
+
 		_styleBookEntries.add(_persistence.update(newStyleBookEntry));
 
 		StyleBookEntry existingStyleBookEntry = _persistence.findByPrimaryKey(
@@ -208,6 +210,9 @@ public class StyleBookEntryPersistenceTest {
 		Assert.assertEquals(
 			existingStyleBookEntry.getThemeId(),
 			newStyleBookEntry.getThemeId());
+		Assert.assertEquals(
+			existingStyleBookEntry.getThemeType(),
+			newStyleBookEntry.getThemeType());
 	}
 
 	@Test
@@ -241,6 +246,7 @@ public class StyleBookEntryPersistenceTest {
 		draftStyleBookEntry.setStyleBookEntryKey(
 			styleBookEntry.getStyleBookEntryKey());
 		draftStyleBookEntry.setThemeId(styleBookEntry.getThemeId());
+		draftStyleBookEntry.setThemeType(styleBookEntry.getThemeType());
 
 		_styleBookEntries.add(_persistence.update(draftStyleBookEntry));
 
@@ -287,6 +293,8 @@ public class StyleBookEntryPersistenceTest {
 			draftStyleBookEntry.getStyleBookEntryKey());
 		Assert.assertEquals(
 			styleBookEntry.getThemeId(), draftStyleBookEntry.getThemeId());
+		Assert.assertEquals(
+			styleBookEntry.getThemeType(), draftStyleBookEntry.getThemeType());
 	}
 
 	@Test(
@@ -336,6 +344,8 @@ public class StyleBookEntryPersistenceTest {
 		styleBookEntry2.setStyleBookEntryKey(RandomTestUtil.randomString());
 
 		styleBookEntry2.setThemeId(RandomTestUtil.randomString());
+
+		styleBookEntry2.setThemeType(RandomTestUtil.randomString());
 
 		_styleBookEntries.add(_persistence.update(styleBookEntry2));
 	}
@@ -557,7 +567,7 @@ public class StyleBookEntryPersistenceTest {
 			"userId", true, "userName", true, "createDate", true,
 			"modifiedDate", true, "defaultStyleBookEntry", true, "name", true,
 			"previewFileEntryId", true, "styleBookEntryKey", true, "themeId",
-			true);
+			true, "themeType", true);
 	}
 
 	@Test
@@ -903,6 +913,8 @@ public class StyleBookEntryPersistenceTest {
 		styleBookEntry.setStyleBookEntryKey(RandomTestUtil.randomString());
 
 		styleBookEntry.setThemeId(RandomTestUtil.randomString());
+
+		styleBookEntry.setThemeType(RandomTestUtil.randomString());
 
 		_styleBookEntries.add(_persistence.update(styleBookEntry));
 

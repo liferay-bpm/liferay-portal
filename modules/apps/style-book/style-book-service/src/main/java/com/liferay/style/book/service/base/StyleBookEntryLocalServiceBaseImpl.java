@@ -898,6 +898,8 @@ public abstract class StyleBookEntryLocalServiceBaseImpl
 		draftStyleBookEntry.setStyleBookEntryKey(
 			publishedStyleBookEntry.getStyleBookEntryKey());
 		draftStyleBookEntry.setThemeId(publishedStyleBookEntry.getThemeId());
+		draftStyleBookEntry.setThemeType(
+			publishedStyleBookEntry.getThemeType());
 
 		draftStyleBookEntry.resetOriginalValues();
 

@@ -18,6 +18,7 @@ create table StyleBookEntry (
 	previewFileEntryId LONG,
 	styleBookEntryKey VARCHAR(75) null,
 	themeId VARCHAR(255) null,
+	themeType VARCHAR(75) null,
 	primary key (styleBookEntryId, ctCollectionId)
 );
 
@@ -41,5 +42,6 @@ create table StyleBookEntryVersion (
 	previewFileEntryId LONG,
 	styleBookEntryKey VARCHAR(75) null,
 	themeId VARCHAR(255) null,
+	themeType VARCHAR(75) null,
 	primary key (styleBookEntryVersionId, ctCollectionId)
 );

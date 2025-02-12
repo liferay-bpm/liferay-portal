@@ -362,6 +362,21 @@ public interface StyleBookEntryModel
 	 */
 	public void setThemeId(String themeId);
 
+	/**
+	 * Returns the theme type of this style book entry.
+	 *
+	 * @return the theme type of this style book entry
+	 */
+	@AutoEscape
+	public String getThemeType();
+
+	/**
+	 * Sets the theme type of this style book entry.
+	 *
+	 * @param themeType the theme type of this style book entry
+	 */
+	public void setThemeType(String themeType);
+
 	@Override
 	public StyleBookEntry cloneWithOriginalValues();
 
