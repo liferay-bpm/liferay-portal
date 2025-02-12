@@ -937,6 +937,7 @@ public class LayoutStagedModelDataHandlerTest
 				null, TestPropsValues.getUserId(), stagingGroup.getGroupId(),
 				false, StringPool.BLANK, RandomTestUtil.randomString(),
 				StringPool.BLANK, RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(),
 				ServiceContextTestUtil.getServiceContext(
 					stagingGroup.getGroupId()));
 

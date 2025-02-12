@@ -190,7 +190,7 @@ public class EditLayoutDesignMVCActionCommandTest {
 				null, TestPropsValues.getUserId(), _group.getGroupId(), false,
 				StringPool.BLANK, RandomTestUtil.randomString(),
 				StringPool.BLANK, RandomTestUtil.randomString(),
-				serviceContext);
+				RandomTestUtil.randomString(), serviceContext);
 
 		FileEntry fileEntry = _dlAppLocalService.addFileEntry(
 			null, TestPropsValues.getUserId(), _group.getGroupId(),

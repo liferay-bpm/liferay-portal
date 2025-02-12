@@ -1277,7 +1277,8 @@ public class LayoutsImporterTest {
 		return _styleBookEntryLocalService.addStyleBookEntry(
 			null, TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
 			false, StringPool.BLANK, RandomTestUtil.randomString(),
-			styleBookEntryKey, StringPool.BLANK, serviceContext);
+			styleBookEntryKey, StringPool.BLANK, RandomTestUtil.randomString(),
+			serviceContext);
 	}
 
 	private void _assertFragmentEntryLink(

@@ -455,7 +455,8 @@ public class PageSpecificationResourceTest
 		return _styleBookEntryLocalService.addStyleBookEntry(
 			null, TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
 			false, null, RandomTestUtil.randomString(), null,
-			RandomTestUtil.randomString(), serviceContext);
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			serviceContext);
 	}
 
 	private void _assertContentPageSpecification(

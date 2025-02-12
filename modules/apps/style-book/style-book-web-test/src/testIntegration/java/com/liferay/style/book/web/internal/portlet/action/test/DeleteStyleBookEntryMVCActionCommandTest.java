@@ -66,14 +66,14 @@ public class DeleteStyleBookEntryMVCActionCommandTest {
 				null, TestPropsValues.getUserId(), _group.getGroupId(), false,
 				StringPool.BLANK, RandomTestUtil.randomString(),
 				StringPool.BLANK, RandomTestUtil.randomString(),
-				_serviceContext);
+				RandomTestUtil.randomString(), _serviceContext);
 
 		StyleBookEntry styleBookEntry2 =
 			_styleBookEntryLocalService.addStyleBookEntry(
 				null, TestPropsValues.getUserId(), _group.getGroupId(), false,
 				StringPool.BLANK, RandomTestUtil.randomString(),
 				StringPool.BLANK, RandomTestUtil.randomString(),
-				_serviceContext);
+				RandomTestUtil.randomString(), _serviceContext);
 
 		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
 			new MockLiferayPortletActionRequest();
@@ -102,7 +102,8 @@ public class DeleteStyleBookEntryMVCActionCommandTest {
 			_styleBookEntryLocalService.addStyleBookEntry(
 				null, TestPropsValues.getUserId(), _group.getGroupId(), false,
 				StringPool.BLANK, name, StringPool.BLANK,
-				RandomTestUtil.randomString(), _serviceContext);
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				_serviceContext);
 
 		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
 			new MockLiferayPortletActionRequest();
@@ -133,7 +134,7 @@ public class DeleteStyleBookEntryMVCActionCommandTest {
 				null, TestPropsValues.getUserId(), _group.getGroupId(), false,
 				StringPool.BLANK, RandomTestUtil.randomString(),
 				StringPool.BLANK, RandomTestUtil.randomString(),
-				_serviceContext);
+				RandomTestUtil.randomString(), _serviceContext);
 
 		FileEntry fileEntry = _addFileEntry(styleBookEntry);
 

@@ -5,19 +5,25 @@
 
 package com.liferay.style.book.web.internal.portlet.action;
 
+import com.liferay.client.extension.type.ThemeCSSCET;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.service.ThemeLocalService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.style.book.constants.StyleBookPortletKeys;
 import com.liferay.style.book.model.StyleBookEntry;
 import com.liferay.style.book.service.StyleBookEntryService;
@@ -77,12 +83,30 @@ public class AddStyleBookEntryMVCActionCommand extends BaseMVCActionCommand {
 		String name = ParamUtil.getString(actionRequest, "name");
 		String themeId = ParamUtil.getString(actionRequest, "themeId");
 
+		String themeType = StringPool.BLANK;
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		if (FeatureFlagManagerUtil.isEnabled(
+				themeDisplay.getCompanyId(), "LPD-30204")) {
+
+			themeType = ThemeCSSCET.class.getName();
+
+			Theme theme = _themeLocalService.fetchTheme(
+				themeDisplay.getCompanyId(), themeId);
+
+			if (theme != null) {
+				themeType = Theme.class.getName();
+			}
+		}
+
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
 
 		return _styleBookEntryService.addStyleBookEntry(
 			null, serviceContext.getScopeGroupId(), name, StringPool.BLANK,
-			themeId, serviceContext);
+			themeId, themeType, serviceContext);
 	}
 
 	private String _getRedirectURL(
@@ -102,5 +126,8 @@ public class AddStyleBookEntryMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private StyleBookEntryService _styleBookEntryService;
+
+	@Reference
+	private ThemeLocalService _themeLocalService;
 
 }

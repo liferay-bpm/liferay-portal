@@ -373,7 +373,7 @@ public class LayoutPageTemplateEntryLocalServiceTest {
 				null, TestPropsValues.getUserId(), _group.getGroupId(), false,
 				StringPool.BLANK, RandomTestUtil.randomString(),
 				StringPool.BLANK, RandomTestUtil.randomString(),
-				_serviceContext);
+				RandomTestUtil.randomString(), _serviceContext);
 
 		Layout layout = _layoutLocalService.fetchLayout(
 			layoutPageTemplateEntry.getPlid());
