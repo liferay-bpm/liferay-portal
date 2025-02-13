@@ -6,6 +6,7 @@
 package com.liferay.style.book.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -15,10 +16,13 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.style.book.exception.DuplicateStyleBookEntryExternalReferenceCodeException;
+import com.liferay.style.book.exception.StyleBookEntryThemeIdException;
+import com.liferay.style.book.exception.StyleBookEntryThemeTypeException;
 import com.liferay.style.book.model.StyleBookEntry;
 import com.liferay.style.book.service.StyleBookEntryLocalService;
 
@@ -50,6 +54,7 @@ public class StyleBookEntryLocalServiceTest {
 			_group, TestPropsValues.getUserId());
 	}
 
+	@FeatureFlags("LPD-30204")
 	@Test
 	public void testAddStyleBookEntry() throws Exception {
 		StyleBookEntry styleBookEntry =
@@ -61,6 +66,40 @@ public class StyleBookEntryLocalServiceTest {
 
 		Assert.assertTrue(
 			Validator.isNotNull(styleBookEntry.getExternalReferenceCode()));
+
+		try {
+			_styleBookEntryLocalService.addStyleBookEntry(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				_group.getGroupId(), false, null, RandomTestUtil.randomString(),
+				null, StringPool.BLANK, RandomTestUtil.randomString(),
+				_serviceContext);
+
+			Assert.fail();
+		}
+		catch (StyleBookEntryThemeIdException.MustNotBeNull
+					styleBookEntryThemeIdException) {
+
+			Assert.assertEquals(
+				"Theme ID must not be null",
+				styleBookEntryThemeIdException.getMessage());
+		}
+
+		try {
+			_styleBookEntryLocalService.addStyleBookEntry(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				_group.getGroupId(), false, null, RandomTestUtil.randomString(),
+				null, RandomTestUtil.randomString(), StringPool.BLANK,
+				_serviceContext);
+
+			Assert.fail();
+		}
+		catch (StyleBookEntryThemeTypeException.MustNotBeNull
+					styleBookEntryThemeTypeException) {
+
+			Assert.assertEquals(
+				"Theme type must not be null",
+				styleBookEntryThemeTypeException.getMessage());
+		}
 	}
 
 	@Test(
