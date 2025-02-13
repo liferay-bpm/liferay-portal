@@ -741,6 +741,8 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest {
 			DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM
 		);
 
+		liferayPortletURL = new TestMockLiferayPortletURL();
+
 		Mockito.doReturn(
 			liferayPortletURL
 		).when(

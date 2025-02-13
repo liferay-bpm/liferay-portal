@@ -9,6 +9,7 @@ import path from 'path';
 import {formsPagesTest} from '../../fixtures/formsPagesTest';
 import {loginTest} from '../../fixtures/loginTest';
 import {getRandomInt} from '../../utils/getRandomInt';
+import performLoginViaApi, {performLogout} from '../../utils/performLogin';
 import {deleteItems} from './utils/deleteItems';
 
 export const test = mergeTests(loginTest(), formsPagesTest);
@@ -143,6 +144,70 @@ test.describe('Manage fields through Form Preview page', () => {
 		await expect(screenReaderOnlyCaptchaSpan).toContainText('captcha');
 
 		await newTabPage.close();
+	});
+
+	test('make sure upload field does not show file count on preview', async ({
+		formBuilderPage,
+		formBuilderSidePanelPage,
+		page,
+	}) => {
+		await formBuilderPage.goToNew();
+
+		await formBuilderPage.fillFormTitle('Form' + getRandomInt());
+
+		await formBuilderSidePanelPage.addFieldByDoubleClick('Upload');
+
+		await page.getByLabel('Allow Guest Users to Send').click();
+
+		await formBuilderPage.publishButton.click();
+
+		const newTabPagePromise = new Promise<Page>((resolve) =>
+			formBuilderPage.page.once('popup', resolve)
+		);
+
+		await formBuilderPage.openFormSubmission();
+
+		const newTabPage = await newTabPagePromise;
+
+		await newTabPage.waitForLoadState('domcontentloaded');
+
+		await performLogout(page);
+
+		await newTabPage.reload();
+
+		const fileChooserPromise = newTabPage.waitForEvent('filechooser');
+
+		await newTabPage.getByText('Select').click();
+
+		const fileChooser = await fileChooserPromise;
+
+		await fileChooser.setFiles(
+			path.join(__dirname, 'dependencies', 'sampleFile.txt')
+		);
+
+		await expect(newTabPage.getByLabel('Upload')).toHaveValue(
+			'sampleFile.txt'
+		);
+
+		await fileChooser.setFiles(
+			path.join(__dirname, 'dependencies', 'loremIpsum.txt')
+		);
+
+		await expect(newTabPage.getByLabel('Upload')).toHaveValue(
+			'loremIpsum.txt'
+		);
+
+		await fileChooser.setFiles(
+			path.join(__dirname, 'dependencies', 'sampleFile.txt')
+		);
+
+		await expect(newTabPage.getByLabel('Upload')).toHaveValue(
+			'sampleFile.txt'
+		);
+
+		await newTabPage.getByLabel('Unselect File').click();
+
+		await performLoginViaApi(page, 'test');
 	});
 });
 
