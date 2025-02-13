@@ -339,9 +339,7 @@ public class StyleBookEntryLocalServiceImpl
 		StyleBookEntry styleBookEntry =
 			styleBookEntryPersistence.findByPrimaryKey(styleBookEntryId);
 
-		_validate(
-			styleBookEntry.getCompanyId(), name, styleBookEntry.getThemeId(),
-			styleBookEntry.getThemeType());
+		_validateName(name);
 
 		styleBookEntry.setModifiedDate(new Date());
 		styleBookEntry.setName(name);
@@ -391,9 +389,7 @@ public class StyleBookEntryLocalServiceImpl
 		StyleBookEntry styleBookEntry =
 			styleBookEntryPersistence.findByPrimaryKey(styleBookEntryId);
 
-		_validate(
-			styleBookEntry.getCompanyId(), name, styleBookEntry.getThemeId(),
-			styleBookEntry.getThemeType());
+		_validateName(name);
 
 		if (Validator.isNull(styleBookEntryKey)) {
 			styleBookEntryKey = generateStyleBookEntryKey(
@@ -429,9 +425,7 @@ public class StyleBookEntryLocalServiceImpl
 		StyleBookEntry styleBookEntry =
 			styleBookEntryPersistence.findByPrimaryKey(styleBookEntryId);
 
-		_validate(
-			styleBookEntry.getCompanyId(), name, styleBookEntry.getThemeId(),
-			styleBookEntry.getThemeType());
+		_validateName(name);
 
 		styleBookEntry.setModifiedDate(new Date());
 		styleBookEntry.setFrontendTokensValues(frontendTokensValues);
@@ -528,6 +522,22 @@ public class StyleBookEntryLocalServiceImpl
 			long companyId, String name, String themeId, String themeType)
 		throws PortalException {
 
+		_validateName(name);
+
+		if (!FeatureFlagManagerUtil.isEnabled(companyId, "LPD-30204")) {
+			return;
+		}
+
+		if (Validator.isNull(themeId)) {
+			throw new StyleBookEntryThemeIdException.MustNotBeNull();
+		}
+
+		if (Validator.isNull(themeType)) {
+			throw new StyleBookEntryThemeTypeException.MustNotBeNull();
+		}
+	}
+
+	private void _validateName(String name) throws StyleBookEntryNameException {
 		if (Validator.isNull(name)) {
 			throw new StyleBookEntryNameException("Name must not be null");
 		}
@@ -545,18 +555,6 @@ public class StyleBookEntryLocalServiceImpl
 		if (name.length() > nameMaxLength) {
 			throw new StyleBookEntryNameException(
 				"Maximum length of name exceeded");
-		}
-
-		if (!FeatureFlagManagerUtil.isEnabled(companyId, "LPD-30204")) {
-			return;
-		}
-
-		if (Validator.isNull(themeId)) {
-			throw new StyleBookEntryThemeIdException.MustNotBeNull();
-		}
-
-		if (Validator.isNull(themeType)) {
-			throw new StyleBookEntryThemeTypeException.MustNotBeNull();
 		}
 	}
 
