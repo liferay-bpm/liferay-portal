@@ -5,7 +5,7 @@
 
 package com.liferay.style.book.web.internal.portlet.action;
 
-import com.liferay.client.extension.type.ThemeCSSCET;
+import com.liferay.frontend.token.definition.constants.FrontendTokenDefinitionConstants;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
@@ -91,13 +91,14 @@ public class AddStyleBookEntryMVCActionCommand extends BaseMVCActionCommand {
 		if (FeatureFlagManagerUtil.isEnabled(
 				themeDisplay.getCompanyId(), "LPD-30204")) {
 
-			themeType = ThemeCSSCET.class.getName();
+			themeType =
+				FrontendTokenDefinitionConstants.THEME_TYPE_THEME_CSS_CET;
 
 			Theme theme = _themeLocalService.fetchTheme(
 				themeDisplay.getCompanyId(), themeId);
 
 			if (theme != null) {
-				themeType = Theme.class.getName();
+				themeType = FrontendTokenDefinitionConstants.THEME_TYPE_BUNDLE;
 			}
 		}
 
