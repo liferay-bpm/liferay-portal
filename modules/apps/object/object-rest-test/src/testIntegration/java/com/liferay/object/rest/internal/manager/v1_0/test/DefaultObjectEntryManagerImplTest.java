@@ -4444,8 +4444,6 @@ public class DefaultObjectEntryManagerImplTest
 
 		long tempFileEntryId1 = _addTempFileEntry(
 			objectDefinition.getPortletId(), StringUtil.randomString());
-		long tempFileEntryId2 = _addTempFileEntry(
-			objectDefinition.getPortletId(), StringUtil.randomString());
 
 		ObjectEntry objectEntry = _defaultObjectEntryManager.addObjectEntry(
 			_simpleDTOConverterContext, objectDefinition,
@@ -4456,7 +4454,7 @@ public class DefaultObjectEntryManagerImplTest
 						HashMapBuilder.put(
 							"en_US", tempFileEntryId1
 						).put(
-							"pt_BR", tempFileEntryId2
+							"pt_BR", tempFileEntryId1
 						).build()
 					).build();
 				}
@@ -4469,12 +4467,45 @@ public class DefaultObjectEntryManagerImplTest
 				"No FileEntry exists with the key {fileEntryId=",
 				tempFileEntryId1, "}"),
 			() -> _dlAppLocalService.getFileEntry(tempFileEntryId1));
+
+		FileEntry fileEntry1 = (FileEntry)_getLocalizedPropertyValue(
+			"en_US", objectEntry, "localizedAttachment");
+
+		Assert.assertNotNull(
+			_dlAppLocalService.getFileEntry(fileEntry1.getId()));
+
+		long tempFileEntryId2 = _addTempFileEntry(
+			objectDefinition.getPortletId(), StringUtil.randomString());
+
+		objectEntry = _defaultObjectEntryManager.partialUpdateObjectEntry(
+			_simpleDTOConverterContext, objectDefinition, objectEntry.getId(),
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						"localizedAttachment_i18n",
+						HashMapBuilder.put(
+							"en_US", fileEntry1.getId()
+						).put(
+							"pt_BR", tempFileEntryId2
+						).build()
+					).build();
+				}
+			});
+
 		AssertUtils.assertFailure(
 			NoSuchFileEntryException.class,
 			StringBundler.concat(
 				"No FileEntry exists with the key {fileEntryId=",
 				tempFileEntryId2, "}"),
 			() -> _dlAppLocalService.getFileEntry(tempFileEntryId2));
+		Assert.assertNotNull(
+			_dlAppLocalService.getFileEntry(fileEntry1.getId()));
+
+		FileEntry fileEntry2 = (FileEntry)_getLocalizedPropertyValue(
+			"pt_BR", objectEntry, "localizedAttachment");
+
+		Assert.assertNotNull(
+			_dlAppLocalService.getFileEntry(fileEntry2.getId()));
 
 		objectEntry = _defaultObjectEntryManager.partialUpdateObjectEntry(
 			_simpleDTOConverterContext, objectDefinition, objectEntry.getId(),
@@ -4484,17 +4515,8 @@ public class DefaultObjectEntryManagerImplTest
 				}
 			});
 
-		Map<String, Serializable> localizedValues =
-			(Map<String, Serializable>)objectEntry.getPropertyValue(
-				"localizedAttachment_i18n");
-
-		FileEntry fileEntry1 = (FileEntry)localizedValues.get("en_US");
-
 		Assert.assertNotNull(
 			_dlAppLocalService.getFileEntry(fileEntry1.getId()));
-
-		FileEntry fileEntry2 = (FileEntry)localizedValues.get("pt_BR");
-
 		Assert.assertNotNull(
 			_dlAppLocalService.getFileEntry(fileEntry2.getId()));
 
@@ -6160,6 +6182,16 @@ public class DefaultObjectEntryManagerImplTest
 		return LocalDateTime.parse(
 			dateTimeString,
 			DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS"));
+	}
+
+	private Object _getLocalizedPropertyValue(
+		String languageId, ObjectEntry objectEntry, String objectFieldName) {
+
+		Map<String, Serializable> localizedValues =
+			(Map<String, Serializable>)objectEntry.getPropertyValue(
+				objectFieldName + "_i18n");
+
+		return localizedValues.get(languageId);
 	}
 
 	private Page<ObjectEntry> _getPage(
