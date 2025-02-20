@@ -69,49 +69,6 @@ public class ObjectEntryImpl extends ObjectEntryBaseImpl {
 		return objectEntry;
 	}
 
-	public Map<String, String> getLocalizedTitleValue() throws PortalException {
-		ObjectDefinition objectDefinition =
-			ObjectDefinitionLocalServiceUtil.getObjectDefinition(
-				getObjectDefinitionId());
-
-		Map<String, String> titleMap = new HashMap<>();
-
-		if ((objectDefinition != null) &&
-			(objectDefinition.getTitleObjectFieldId() > 0)) {
-
-			ObjectField objectField =
-				ObjectFieldLocalServiceUtil.fetchObjectField(
-					objectDefinition.getTitleObjectFieldId());
-
-			if (objectField == null) {
-				return titleMap;
-			}
-
-			Map<String, Serializable> values = getValues();
-
-			Map<String, Serializable> localizedValues =
-				(Map<String, Serializable>)values.get(
-					objectField.getI18nObjectFieldName());
-
-			if (MapUtil.isEmpty(localizedValues)) {
-				return titleMap;
-			}
-
-			for (Map.Entry<String, Serializable> entry :
-					localizedValues.entrySet()) {
-
-				titleMap.put(
-					entry.getKey(),
-					String.valueOf(
-						ObjectEntryValuesUtil.getValue(
-							entry.getKey(), objectField,
-							new HashMap<>(values))));
-			}
-		}
-
-		return titleMap;
-	}
-
 	@Override
 	public String getModelClassName() {
 		ObjectDefinition objectDefinition =
@@ -147,6 +104,49 @@ public class ObjectEntryImpl extends ObjectEntryBaseImpl {
 	public StagedModelType getStagedModelType() {
 		return new StagedModelType(
 			PortalUtil.getClassNameId(getModelClassName()));
+	}
+
+	public Map<Locale, String> getTitleMap() throws PortalException {
+		Map<Locale, String> titleMap = new HashMap<>();
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionLocalServiceUtil.getObjectDefinition(
+				getObjectDefinitionId());
+
+		if ((objectDefinition != null) &&
+			(objectDefinition.getTitleObjectFieldId() > 0)) {
+
+			ObjectField objectField =
+				ObjectFieldLocalServiceUtil.fetchObjectField(
+					objectDefinition.getTitleObjectFieldId());
+
+			if (objectField == null) {
+				return titleMap;
+			}
+
+			Map<String, Serializable> values = getValues();
+
+			Map<String, Serializable> localizedValues =
+				(Map<String, Serializable>)values.get(
+					objectField.getI18nObjectFieldName());
+
+			if (MapUtil.isEmpty(localizedValues)) {
+				return titleMap;
+			}
+
+			for (Map.Entry<String, Serializable> entry :
+					localizedValues.entrySet()) {
+
+				titleMap.put(
+					LocaleUtil.fromLanguageId(entry.getKey()),
+					String.valueOf(
+						ObjectEntryValuesUtil.getValue(
+							entry.getKey(), objectField,
+							new HashMap<>(values))));
+			}
+		}
+
+		return titleMap;
 	}
 
 	@Override

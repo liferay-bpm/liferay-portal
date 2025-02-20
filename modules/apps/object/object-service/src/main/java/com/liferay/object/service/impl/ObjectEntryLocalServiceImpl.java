@@ -217,6 +217,7 @@ import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistryUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -4822,7 +4823,7 @@ public class ObjectEntryLocalServiceImpl
 
 		if ((objectField != null) && objectField.isLocalized()) {
 			title = _localization.getXml(
-				objectEntry.getLocalizedTitleValue(),
+				LocalizedMapUtil.getLanguageIdMap(objectEntry.getTitleMap()),
 				objectField.getDefaultLanguageId(), "title");
 		}
 		else {
