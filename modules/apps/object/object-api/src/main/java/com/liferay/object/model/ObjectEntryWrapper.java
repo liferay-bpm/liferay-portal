@@ -257,13 +257,6 @@ public class ObjectEntryWrapper
 	}
 
 	@Override
-	public Map<String, String> getLocalizedTitleValue()
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return model.getLocalizedTitleValue();
-	}
-
-	@Override
 	public String getModelClassName() {
 		return model.getModelClassName();
 	}
@@ -393,6 +386,13 @@ public class ObjectEntryWrapper
 	@Override
 	public Date getStatusDate() {
 		return model.getStatusDate();
+	}
+
+	@Override
+	public Map<java.util.Locale, String> getTitleMap()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.getTitleMap();
 	}
 
 	@Override
