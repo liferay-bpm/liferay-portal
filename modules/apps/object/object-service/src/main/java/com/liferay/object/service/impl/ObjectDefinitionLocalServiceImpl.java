@@ -633,6 +633,11 @@ public class ObjectDefinitionLocalServiceImpl
 
 			undeployObjectDefinition(objectDefinition);
 
+			ClassName className = _classNameLocalService.getClassName(
+				objectDefinition.getClassName());
+
+			_classNameLocalService.deleteClassName(className);
+
 			_registerTransactionCallbackForCluster(
 				_undeployObjectDefinitionMethodKey, objectDefinition);
 		}
@@ -1939,12 +1944,11 @@ public class ObjectDefinitionLocalServiceImpl
 	}
 
 	private void _invalidatePortalCache(ObjectDefinition objectDefinition) {
-		ClassName className = _classNameLocalService.getClassName(
-			objectDefinition.getClassName());
-
 		List<LayoutClassedModelUsage> layoutClassedModelUsages =
 			_layoutClassedModelUsageLocalService.getLayoutClassedModelUsages(
-				objectDefinition.getCompanyId(), className.getClassNameId(),
+				objectDefinition.getCompanyId(),
+				_classNameLocalService.getClassNameId(
+					objectDefinition.getClassName()),
 				_portal.getClassNameId(FragmentEntryLink.class));
 
 		for (LayoutClassedModelUsage layoutClassedModelUsage :
@@ -1953,8 +1957,6 @@ public class ObjectDefinitionLocalServiceImpl
 			_fragmentEntryLinkCache.removeFragmentEntryLinkCache(
 				GetterUtil.getLong(layoutClassedModelUsage.getContainerKey()));
 		}
-
-		_classNameLocalService.deleteClassName(className);
 	}
 
 	private boolean _isUnmodifiableSystemObject(
