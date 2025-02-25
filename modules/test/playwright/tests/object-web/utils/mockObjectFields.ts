@@ -173,8 +173,8 @@ export function createObjectFields(
 		},
 		name,
 		type: objectFieldbusinessTypeInfo[businessType].type,
-		...additionalSettings,
 		...baseObjectField,
+		...additionalSettings,
 	}));
 }
 
