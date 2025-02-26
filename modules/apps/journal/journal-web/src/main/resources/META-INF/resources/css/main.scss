@@ -297,3 +297,11 @@ $productMenuWidth: 320px;
 		cursor: pointer;
 	}
 }
+
+#wrapper
+	.portlet-journal
+	.edit-article-form
+	.component-tbar.tbar-article
+	> .container-fluid.container-fluid-max-xl {
+	max-width: 1920px;
+}
