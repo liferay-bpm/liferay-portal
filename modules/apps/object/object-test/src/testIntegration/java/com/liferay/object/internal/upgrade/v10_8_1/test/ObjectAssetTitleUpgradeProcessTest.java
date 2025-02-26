@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-package com.liferay.object.internal.upgrade.v10_3_1.test;
+package com.liferay.object.internal.upgrade.v10_8_1.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.kernel.model.AssetEntry;
@@ -83,6 +83,7 @@ public class ObjectAssetTitleUpgradeProcessTest {
 		ObjectEntry objectEntry = ObjectEntryLocalServiceUtil.addObjectEntry(
 			TestPropsValues.getUserId(), 0,
 			objectDefinition.getObjectDefinitionId(),
+			objectDefinition.getDefaultLanguageId(),
 			HashMapBuilder.<String, Serializable>put(
 				textObjectFieldName + "_i18n",
 				HashMapBuilder.put(
@@ -126,7 +127,7 @@ public class ObjectAssetTitleUpgradeProcessTest {
 	}
 
 	private static final String _CLASS_NAME =
-		"com.liferay.object.internal.upgrade.v10_3_1." +
+		"com.liferay.object.internal.upgrade.v10_8_1." +
 			"ObjectAssetTitleUpgradeProcess";
 
 	@Inject
