@@ -552,12 +552,8 @@ public class ObjectServiceUpgradeStepRegistrator
 
 		registry.register(
 			"10.8.0", "10.9.0",
-			UpgradeProcessFactory.runSQL(
-				StringBundler.concat(
-					"update ObjectField set dbTableName = ",
-					"'CPDefinitionLocalization', localized = [$TRUE$] where ",
-					"dbTableName = 'CPDefinition' and name in ('description', ",
-					"'name', 'shortDescription')")));
+			new com.liferay.object.internal.upgrade.v10_9_0.
+				ObjectFieldUpgradeProcess());
 	}
 
 	@Reference
