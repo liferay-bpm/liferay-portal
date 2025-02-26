@@ -5697,7 +5697,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		stringUtilReplaceValues.put(
 			"OBJECT_DEFINITION_ID:" + name, String.valueOf(objectDefinitionId));
 
-		if (!name.contains(StringPool.POUND)) {
+		if (!className.contains(StringPool.POUND)) {
 			return;
 		}
 
