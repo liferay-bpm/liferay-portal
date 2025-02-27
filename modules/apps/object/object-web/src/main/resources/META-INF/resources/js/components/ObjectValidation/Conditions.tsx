@@ -113,6 +113,17 @@ export function Conditions({
 				title={values.engineLabel!}
 				tooltip={engine === 'ddm' ? ddmTooltip : null}
 			>
+				{hasLocalizedField && (
+					<ClayAlert
+						displayType="info"
+						title={`${Liferay.Language.get('info')}:`}
+					>
+						{Liferay.Language.get(
+							'this-object-includes-translatable-fields'
+						)}
+					</ClayAlert>
+				)}
+
 				<CodeEditor
 					error={errors.script}
 					mode={engine}
