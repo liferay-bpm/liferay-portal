@@ -14,6 +14,7 @@ import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.RequiredObjectRelationshipException;
 import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectDefinitionSetting;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
@@ -103,13 +104,21 @@ public class GroupModelListenerTest {
 			_objectDefinitionSettingLocalService.addObjectDefinitionSetting(
 				objectDefinition1.getUserId(),
 				objectDefinition1.getObjectDefinitionId(),
-				ObjectDefinitionSettingConstants.NAME_ACCEPT_ALL_GROUPS,
-				StringPool.TRUE);
+				ObjectDefinitionSettingConstants.NAME_ACCEPTED_GROUP_IDS,
+				String.valueOf(group.getGroupId()));
+
+			DepotEntry depotEntry = _depotEntryLocalService.addDepotEntry(
+				RandomTestUtil.randomLocaleStringMap(),
+				RandomTestUtil.randomLocaleStringMap(),
+				ServiceContextTestUtil.getServiceContext());
+
 			_objectDefinitionSettingLocalService.addObjectDefinitionSetting(
 				objectDefinition2.getUserId(),
 				objectDefinition2.getObjectDefinitionId(),
-				ObjectDefinitionSettingConstants.NAME_ACCEPT_ALL_GROUPS,
-				StringPool.TRUE);
+				ObjectDefinitionSettingConstants.NAME_ACCEPTED_GROUP_IDS,
+				StringBundler.concat(
+					group.getGroupId(), StringPool.COMMA,
+					depotEntry.getGroupId()));
 		}
 
 		ObjectRelationship objectRelationship =
@@ -157,6 +166,23 @@ public class GroupModelListenerTest {
 		Assert.assertNull(
 			_objectEntryLocalService.fetchObjectEntry(
 				objectEntry2.getObjectEntryId()));
+
+		if (scope.equals(ObjectDefinitionConstants.SCOPE_DEPOT)) {
+			Assert.assertNull(
+				_objectDefinitionSettingLocalService.getObjectDefinitionSetting(
+					objectDefinition1.getObjectDefinitionId(),
+					ObjectDefinitionSettingConstants.NAME_ACCEPTED_GROUP_IDS));
+
+			ObjectDefinitionSetting objectDefinitionSetting =
+				_objectDefinitionSettingLocalService.getObjectDefinitionSetting(
+					objectDefinition2.getObjectDefinitionId(),
+					ObjectDefinitionSettingConstants.NAME_ACCEPTED_GROUP_IDS);
+
+			String acceptedGroupIds = objectDefinitionSetting.getValue();
+
+			Assert.assertFalse(
+				acceptedGroupIds.contains(String.valueOf(group.getGroupId())));
+		}
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
 			objectRelationship);
