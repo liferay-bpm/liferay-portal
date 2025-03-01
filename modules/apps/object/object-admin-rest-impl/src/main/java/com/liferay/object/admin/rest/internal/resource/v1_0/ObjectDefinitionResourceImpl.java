@@ -90,7 +90,10 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
+import java.io.Serializable;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -113,6 +116,29 @@ import org.osgi.service.component.annotations.ServiceScope;
 )
 public class ObjectDefinitionResourceImpl
 	extends BaseObjectDefinitionResourceImpl {
+
+	@Override
+	@SuppressWarnings("PMD.UnusedLocalVariable")
+	public void create(
+			Collection<ObjectDefinition> objectDefinitions,
+			Map<String, Serializable> parameters)
+		throws Exception {
+
+		super.create(
+			_sortObjectDefinitionsByRelationShip(objectDefinitions),
+			parameters);
+	}
+
+	@Override
+	public void delete(
+			Collection<ObjectDefinition> objectDefinitions,
+			Map<String, Serializable> parameters)
+		throws Exception {
+
+		super.delete(
+			_sortObjectDefinitionsByRelationShip(objectDefinitions),
+			parameters);
+	}
 
 	@Override
 	public void deleteObjectDefinition(Long objectDefinitionId)
@@ -852,6 +878,17 @@ public class ObjectDefinitionResourceImpl
 	}
 
 	@Override
+	public void update(
+			Collection<ObjectDefinition> objectDefinitions,
+			Map<String, Serializable> parameters)
+		throws Exception {
+
+		super.update(
+			_sortObjectDefinitionsByRelationShip(objectDefinitions),
+			parameters);
+	}
+
+	@Override
 	protected void preparePatch(
 		ObjectDefinition objectDefinition,
 		ObjectDefinition existingObjectDefinition) {
@@ -1207,6 +1244,31 @@ public class ObjectDefinitionResourceImpl
 				contextCompany.getCompanyId());
 
 		return objectFolder.getObjectFolderId();
+	}
+
+	private Collection<ObjectDefinition> _sortObjectDefinitionsByRelationShip(
+		Collection<ObjectDefinition> objectDefinitions) {
+
+		if (objectDefinitions.size() <= 1) {
+			return objectDefinitions;
+		}
+
+		List<ObjectDefinition> objectDefinitionList = new ArrayList<>();
+		List<ObjectDefinition> objectDefinitionWithRelationShipList =
+			new ArrayList<>();
+
+		for (ObjectDefinition objectDefinition : objectDefinitions) {
+			if (objectDefinition.getObjectRelationships() == null) {
+				objectDefinitionList.add(objectDefinition);
+			}
+			else {
+				objectDefinitionWithRelationShipList.add(objectDefinition);
+			}
+		}
+
+		objectDefinitionList.addAll(objectDefinitionWithRelationShipList);
+
+		return objectDefinitionList;
 	}
 
 	private ObjectDefinition _toObjectDefinition(
