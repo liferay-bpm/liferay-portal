@@ -5,7 +5,7 @@
 
 import {ClayCheckbox} from '@clayui/form';
 import classNames from 'classnames';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 
 import FieldBase from '../FieldBase/ReactFieldBase.es';
 import {setJSONArrayValue} from '../util/setters.es';
@@ -70,11 +70,7 @@ const CheckboxMultiple = ({
 	predefinedValue,
 	value: initialValue,
 }) => {
-	const [value, setValue] = useState(initialValue);
-
-	useEffect(() => {
-		setValue(initialValue);
-	}, [initialValue]);
+	const [value, setValue] = useState(predefinedValue ?? initialValue);
 
 	const displayValues =
 		value?.length || (value?.length === 0 && localizedValueEdited)
