@@ -11,11 +11,10 @@ import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.field.builder.AttachmentObjectFieldBuilder;
+import com.liferay.object.field.setting.builder.ObjectFieldSettingBuilder;
+import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
-import com.liferay.object.model.ObjectFieldSetting;
-import com.liferay.object.service.ObjectFieldLocalService;
-import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.petra.memory.DeleteFileFinalizeAction;
 import com.liferay.petra.memory.FinalizeManager;
@@ -23,18 +22,15 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.ResourceConstants;
-import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
-import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
-import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionRequest;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionResponse;
@@ -44,7 +40,6 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.FileItem;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -65,7 +60,6 @@ import java.nio.file.Path;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -75,6 +69,7 @@ import javax.portlet.ActionResponse;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -101,42 +96,57 @@ public class UploadAttachmentMVCActionCommandTest {
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
 
-	@After
-	public void tearDown() throws Exception {
-		ReflectionTestUtil.setFieldValue(_uploadHandler, "_portal", _portal);
-	}
+	@Before
+	public void setUp() throws Exception {
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition();
 
-	@Test
-	public void testDoProcessAction() throws Exception {
+		ObjectField objectField = ObjectFieldUtil.addCustomObjectField(
+			new AttachmentObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"a" + RandomTestUtil.randomString()
+			).objectDefinitionId(
+				objectDefinition.getObjectDefinitionId()
+			).objectFieldSettings(
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.
+							NAME_ACCEPTED_FILE_EXTENSIONS
+					).value(
+						"txt"
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_FILE_SOURCE
+					).value(
+						ObjectFieldSettingConstants.VALUE_USER_COMPUTER
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_MAX_FILE_SIZE
+					).value(
+						"100"
+					).build())
+			).userId(
+				TestPropsValues.getUserId()
+			).build());
+
+		_resourcePermissionLocalService.addResourcePermission(
+			TestPropsValues.getCompanyId(), objectDefinition.getResourceName(),
+			ResourceConstants.SCOPE_COMPANY,
+			String.valueOf(TestPropsValues.getCompanyId()),
+			_roleLocalService.getRole(
+				TestPropsValues.getCompanyId(), RoleConstants.GUEST
+			).getRoleId(),
+			ObjectActionKeys.ADD_OBJECT_ENTRY);
+
 		Bundle bundle = FrameworkUtil.getBundle(
 			UploadAttachmentMVCActionCommandTest.class);
 
 		BundleContext bundleContext = bundle.getBundleContext();
-
-		ObjectDefinition objectDefinition =
-			ObjectDefinitionTestUtil.publishObjectDefinition(
-				false,
-				Collections.singletonList(
-					new AttachmentObjectFieldBuilder(
-					).labelMap(
-						LocalizedMapUtil.getLocalizedMap(
-							RandomTestUtil.randomString())
-					).name(
-						"attachmentObjectFieldName"
-					).objectFieldSettings(
-						Arrays.asList(
-							_createObjectFieldSetting(
-								ObjectFieldSettingConstants.
-									NAME_ACCEPTED_FILE_EXTENSIONS,
-								"txt"),
-							_createObjectFieldSetting(
-								ObjectFieldSettingConstants.NAME_FILE_SOURCE,
-								ObjectFieldSettingConstants.
-									VALUE_USER_COMPUTER),
-							_createObjectFieldSetting(
-								ObjectFieldSettingConstants.NAME_MAX_FILE_SIZE,
-								"100"))
-					).build()));
 
 		List<ServiceReference<MVCActionCommand>> serviceReferences =
 			new ArrayList<>(
@@ -148,50 +158,50 @@ public class UploadAttachmentMVCActionCommandTest {
 						")(mvc.command.name=/object_entries/upload_attachment",
 						"))")));
 
-		Assert.assertEquals(
-			serviceReferences.toString(), 1, serviceReferences.size());
+		_mvcActionCommand = bundleContext.getService(serviceReferences.get(0));
 
-		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
-			new MockLiferayPortletActionRequest();
+		_uploadHandler = ReflectionTestUtil.getFieldValue(
+			_mvcActionCommand, "_uploadHandler");
 
-		ThemeDisplay themeDisplay = new ThemeDisplay();
+		ReflectionTestUtil.setFieldValue(
+			_uploadHandler, "_portal",
+			ProxyUtil.newProxyInstance(
+				UploadAttachmentMVCActionCommandTest.class.getClassLoader(),
+				new Class<?>[] {Portal.class},
+				(proxy, method, args) -> {
+					if (!Objects.equals(
+							method.getName(), "getUploadPortletRequest")) {
 
-		themeDisplay.setCompany(
-			_companyLocalService.fetchCompany(TestPropsValues.getCompanyId()));
-		themeDisplay.setPermissionChecker(
-			PermissionThreadLocal.getPermissionChecker());
-		themeDisplay.setScopeGroupId(TestPropsValues.getGroupId());
-		themeDisplay.setUser(TestPropsValues.getUser());
+						return method.invoke(_portal, args);
+					}
 
-		mockLiferayPortletActionRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, themeDisplay);
+					return UploadTestUtil.createUploadPortletRequest(
+						UploadTestUtil.createUploadServletRequest(
+							_getMockHttpServletRequest(
+								objectField.getObjectFieldId()),
+							HashMapBuilder.put(
+								"file", new FileItem[] {_getFileItem()}
+							).build(),
+							new HashMap<>()),
+						null, RandomTestUtil.randomString());
+				}));
+	}
 
+	@After
+	public void tearDown() throws Exception {
+		ReflectionTestUtil.setFieldValue(_uploadHandler, "_portal", _portal);
+	}
+
+	@Test
+	public void testProcessAction() throws Exception {
 		MockLiferayPortletActionResponse mockLiferayPortletActionResponse =
 			new MockLiferayPortletActionResponse();
 
-		MVCActionCommand mvcActionCommand = bundleContext.getService(
-			serviceReferences.get(0));
-
-		Role role = _roleLocalService.getRole(
-			TestPropsValues.getCompanyId(), RoleConstants.GUEST);
-
-		_resourcePermissionLocalService.addResourcePermission(
-			TestPropsValues.getCompanyId(), objectDefinition.getResourceName(),
-			ResourceConstants.SCOPE_COMPANY,
-			String.valueOf(TestPropsValues.getCompanyId()), role.getRoleId(),
-			ObjectActionKeys.ADD_OBJECT_ENTRY);
-
-		ObjectField objectField = _objectFieldLocalService.getObjectField(
-			objectDefinition.getObjectDefinitionId(),
-			"attachmentObjectFieldName");
-
-		_setUpUploadPortletRequest(
-			mvcActionCommand, objectField.getObjectFieldId());
-
 		ReflectionTestUtil.invoke(
-			mvcActionCommand, "doProcessAction",
+			_mvcActionCommand, "doProcessAction",
 			new Class<?>[] {ActionRequest.class, ActionResponse.class},
-			mockLiferayPortletActionRequest, mockLiferayPortletActionResponse);
+			new MockLiferayPortletActionRequest(_getMockHttpServletRequest(0)),
+			mockLiferayPortletActionResponse);
 
 		MockHttpServletResponse mockHttpServletResponse =
 			(MockHttpServletResponse)
@@ -205,29 +215,15 @@ public class UploadAttachmentMVCActionCommandTest {
 		DLFileEntry dlFileEntry = _dlFileEntryLocalService.fetchDLFileEntry(
 			fileJSONObject.getLong("fileEntryId"));
 
-		Assert.assertNotNull(dlFileEntry);
-
 		Assert.assertFalse(
 			_resourcePermissionLocalService.hasResourcePermission(
 				TestPropsValues.getCompanyId(), DLFileEntry.class.getName(),
 				ResourceConstants.SCOPE_INDIVIDUAL,
 				String.valueOf(dlFileEntry.getFileEntryId()),
-				RoleLocalServiceUtil.getRole(
+				_roleLocalService.getRole(
 					TestPropsValues.getCompanyId(), RoleConstants.GUEST
 				).getRoleId(),
 				ActionKeys.DOWNLOAD));
-	}
-
-	private ObjectFieldSetting _createObjectFieldSetting(
-		String name, String value) {
-
-		ObjectFieldSetting objectFieldSetting =
-			_objectFieldSettingLocalService.createObjectFieldSetting(0L);
-
-		objectFieldSetting.setName(name);
-		objectFieldSetting.setValue(value);
-
-		return objectFieldSetting;
 	}
 
 	private FileItem _getFileItem() throws Exception {
@@ -270,7 +266,7 @@ public class UploadAttachmentMVCActionCommandTest {
 	}
 
 	private MockHttpServletRequest _getMockHttpServletRequest(
-			Long objectFieldId)
+			long objectFieldId)
 		throws Exception {
 
 		MockHttpServletRequest mockHttpServletRequest =
@@ -283,9 +279,8 @@ public class UploadAttachmentMVCActionCommandTest {
 
 		themeDisplay.setCompany(
 			_companyLocalService.fetchCompany(TestPropsValues.getCompanyId()));
-		themeDisplay.setLocale(LocaleUtil.US);
 
-		User user = UserLocalServiceUtil.getGuestUser(
+		User user = _userLocalService.getGuestUser(
 			TestPropsValues.getCompanyId());
 
 		themeDisplay.setPermissionChecker(
@@ -301,35 +296,6 @@ public class UploadAttachmentMVCActionCommandTest {
 		return mockHttpServletRequest;
 	}
 
-	private void _setUpUploadPortletRequest(
-		MVCActionCommand mvcActionCommand, Long objectFieldId) {
-
-		_uploadHandler = ReflectionTestUtil.getFieldValue(
-			mvcActionCommand, "_uploadHandler");
-
-		ReflectionTestUtil.setFieldValue(
-			_uploadHandler, "_portal",
-			ProxyUtil.newProxyInstance(
-				UploadAttachmentMVCActionCommandTest.class.getClassLoader(),
-				new Class<?>[] {Portal.class},
-				(proxy, method, args) -> {
-					if (!Objects.equals(
-							method.getName(), "getUploadPortletRequest")) {
-
-						return method.invoke(_portal, args);
-					}
-
-					return UploadTestUtil.createUploadPortletRequest(
-						UploadTestUtil.createUploadServletRequest(
-							_getMockHttpServletRequest(objectFieldId),
-							HashMapBuilder.put(
-								"file", new FileItem[] {_getFileItem()}
-							).build(),
-							new HashMap<>()),
-						null, RandomTestUtil.randomString());
-				}));
-	}
-
 	@Inject
 	private CompanyLocalService _companyLocalService;
 
@@ -339,11 +305,7 @@ public class UploadAttachmentMVCActionCommandTest {
 	@Inject
 	private JSONFactory _jsonFactory;
 
-	@Inject
-	private ObjectFieldLocalService _objectFieldLocalService;
-
-	@Inject
-	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
+	private MVCActionCommand _mvcActionCommand;
 
 	@Inject
 	private Portal _portal;
@@ -355,5 +317,8 @@ public class UploadAttachmentMVCActionCommandTest {
 	private RoleLocalService _roleLocalService;
 
 	private UploadHandler _uploadHandler;
+
+	@Inject
+	private UserLocalService _userLocalService;
 
 }
