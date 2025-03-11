@@ -6,11 +6,13 @@
 import {Locator, Page} from '@playwright/test';
 
 export class FormBuilderSidePanelPage {
+	readonly addOptionButton: Locator;
 	readonly addSelectFromListButton: Locator;
 	readonly addSelectOptionButton: Locator;
 	readonly addSingleSelectionButton: Locator;
 	readonly advancedTab: Locator;
 	readonly backButton: Locator;
+	readonly displayName: Locator;
 	readonly htmlAutocompleteAttributeField: Locator;
 	readonly label: Locator;
 	readonly objectFieldSelect: Locator;
@@ -21,6 +23,9 @@ export class FormBuilderSidePanelPage {
 	readonly requiredFieldToggleSwitch: Locator;
 
 	constructor(page: Page) {
+		this.addOptionButton = page.getByRole('button', {
+			name: 'Add Option',
+		});
 		this.addSelectFromListButton = page.getByRole('button', {
 			name: 'Press enter to add Select',
 		});
@@ -34,6 +39,7 @@ export class FormBuilderSidePanelPage {
 			name: 'Advanced',
 		});
 		this.backButton = page.getByRole('button', {name: 'Back'});
+		this.displayName = page.getByLabel('Display Name').last();
 		this.htmlAutocompleteAttributeField = page.getByLabel(
 			'HTML Autocomplete Attribute'
 		);
@@ -77,6 +83,15 @@ export class FormBuilderSidePanelPage {
 		await this.paragraphFieldTextarea.press('End');
 
 		await this.page.waitForLoadState('networkidle');
+	}
+
+	async fillMultiplePredefinedValues(values: string[]) {
+		for (const value of values) {
+			await this.page
+				.getByRole('combobox', {name: 'Predefined Value'})
+				.click();
+			await this.page.getByRole('option', {name: value}).click();
+		}
 	}
 
 	getSelectOptionLocator(optionLabel: string) {

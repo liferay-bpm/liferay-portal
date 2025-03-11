@@ -349,3 +349,106 @@ test('Select from list with multiple selections allowed is auto-filled by data p
 
 	await formPreviewPage.close();
 });
+
+test('Assert multiple selection change with predefined value', async ({
+	formBuilderPage,
+	formBuilderSidePanelPage,
+	page,
+	rulesBuilderPage,
+}) => {
+	await formBuilderPage.goToNew();
+
+	await expect(formBuilderPage.newFormHeading).toBeVisible();
+
+	await formBuilderPage.fillFormTitle('Form' + getRandomInt());
+
+	await formBuilderSidePanelPage.addFieldByDoubleClick('Single Selection');
+
+	await formBuilderSidePanelPage.displayName.fill('Option 1');
+
+	await formBuilderSidePanelPage.addOptionButton.click();
+
+	await formBuilderSidePanelPage.displayName.fill('Option 2');
+
+	await page.waitForTimeout(3000);
+
+	await formBuilderSidePanelPage.clickBackButton();
+
+	await formBuilderSidePanelPage.addFieldByDoubleClick('Multiple Selection');
+
+	await formBuilderSidePanelPage.displayName.fill('Option A');
+
+	await formBuilderSidePanelPage.addOptionButton.click();
+
+	await formBuilderSidePanelPage.displayName.fill('Option B');
+
+	await formBuilderSidePanelPage.addOptionButton.click();
+
+	await formBuilderSidePanelPage.displayName.fill('Option C');
+
+	await formBuilderSidePanelPage.addOptionButton.click();
+
+	await formBuilderSidePanelPage.displayName.fill('Option D');
+
+	await formBuilderSidePanelPage.advancedTab.click();
+
+	await formBuilderSidePanelPage.fillMultiplePredefinedValues([
+		'Option A',
+		'Option D',
+	]);
+
+	await page.waitForTimeout(3000);
+
+	await rulesBuilderPage.rulesTab.click();
+
+	await rulesBuilderPage.addElementsButton.click();
+
+	await rulesBuilderPage.selectConditionLeftFormField('Single Selection');
+
+	await rulesBuilderPage.selectConditionOperator('Is Equal To');
+
+	await rulesBuilderPage.selectConditionOperatorValueSource('Value');
+
+	await rulesBuilderPage.selectConditionRightFormField('Option 1');
+
+	await rulesBuilderPage.selectAction('Show');
+
+	await page.getByRole('combobox').nth(5).click();
+
+	await page.getByRole('option', {name: 'Multiple Selection'}).click();
+
+	await page.waitForTimeout(5000);
+
+	await rulesBuilderPage.saveButton.click();
+
+	await formBuilderPage.formTab.click();
+
+	const formPreviewPagePromise = page.waitForEvent('popup');
+
+	await formBuilderPage.previewButton.click();
+
+	const formPreviewPage = await formPreviewPagePromise;
+
+	await formPreviewPage
+		.locator('label')
+		.filter({hasText: 'Option 1'})
+		.click();
+
+	await expect(formPreviewPage.getByLabel('Option A')).toBeChecked();
+
+	await expect(formPreviewPage.getByLabel('Option B')).not.toBeChecked();
+
+	await expect(formPreviewPage.getByLabel('Option C')).not.toBeChecked();
+
+	await expect(formPreviewPage.getByLabel('Option D')).toBeChecked();
+
+	await formPreviewPage.getByLabel('Option B').click();
+
+	await expect(formPreviewPage.getByLabel('Option A')).toBeChecked();
+
+	await expect(formPreviewPage.getByLabel('Option B')).toBeChecked();
+
+	await expect(formPreviewPage.getByLabel('Option C')).not.toBeChecked();
+
+	await expect(formPreviewPage.getByLabel('Option D')).toBeChecked();
+});
