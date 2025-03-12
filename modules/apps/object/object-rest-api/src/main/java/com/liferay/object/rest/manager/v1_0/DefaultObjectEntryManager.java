@@ -13,6 +13,7 @@ import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.odata.filter.expression.Expression;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
+import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -85,6 +86,11 @@ public interface DefaultObjectEntryManager extends ObjectEntryManager {
 	public ObjectEntry getObjectEntry(
 			DTOConverterContext dtoConverterContext,
 			ObjectDefinition objectDefinition, long objectEntryId)
+		throws Exception;
+
+	public ObjectEntry getObjectEntryByVersion(
+			DefaultDTOConverterContext defaultDTOConverterContext,
+			Long objectEntryId, Integer version)
 		throws Exception;
 
 	public Page<ObjectEntry> getObjectEntryRelatedObjectEntries(

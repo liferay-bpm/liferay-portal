@@ -223,6 +223,18 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	}
 
 	@Override
+	public ObjectEntry getObjectEntryByVersion(Long objectEntryId, Integer version)
+		throws Exception {
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			DefaultObjectEntryManagerProvider.provide(
+				_objectEntryManagerRegistry.getObjectEntryManager(
+					_objectDefinition.getStorageType()));
+
+		return defaultObjectEntryManager.getObjectEntryByVersion(
+			_getDTOConverterContext(objectEntryId), objectEntryId, version);
+	}
+
+	@Override
 	public String getResourceName() {
 		return _objectDefinition.getShortName();
 	}

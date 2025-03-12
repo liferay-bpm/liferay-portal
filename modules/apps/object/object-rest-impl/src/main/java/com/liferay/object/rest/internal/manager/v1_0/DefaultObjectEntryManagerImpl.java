@@ -48,6 +48,8 @@ import com.liferay.object.rest.manager.v1_0.util.ObjectEntryManagerUtil;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryService;
+import com.liferay.object.service.ObjectEntryVersionLocalService;
+import com.liferay.object.service.ObjectEntryVersionService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.object.system.SystemObjectDefinitionManager;
@@ -585,6 +587,24 @@ public class DefaultObjectEntryManagerImpl
 
 		return _toObjectEntry(
 			dtoConverterContext, objectDefinition, serviceBuilderObjectEntry);
+	}
+
+	@Override
+	public ObjectEntry getObjectEntryByVersion(
+			DefaultDTOConverterContext defaultDTOConverterContext,
+			Long objectEntryId, Integer version)
+		throws Exception {
+
+		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
+			_objectEntryService.getObjectEntry(objectEntryId);
+
+		defaultDTOConverterContext.setAttribute(
+			"objectEntryVersion",
+			_objectEntryVersionService.getObjectEntryVersion(
+				objectEntryId, version));
+
+		return _objectEntryDTOConverter.toDTO(
+			defaultDTOConverterContext, serviceBuilderObjectEntry);
 	}
 
 	@Override
@@ -1923,6 +1943,9 @@ public class DefaultObjectEntryManagerImpl
 
 	@Reference
 	private ObjectEntryService _objectEntryService;
+
+	@Reference
+	private ObjectEntryVersionService _objectEntryVersionService;
 
 	@Reference
 	private ObjectFieldBusinessTypeRegistry _objectFieldBusinessTypeRegistry;
