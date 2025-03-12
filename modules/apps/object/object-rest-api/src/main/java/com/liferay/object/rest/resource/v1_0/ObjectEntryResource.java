@@ -88,6 +88,10 @@ public interface ObjectEntryResource {
 				String objectActionName)
 		throws Exception;
 
+	public ObjectEntry getByExternalReferenceCodeByVersion(
+			String externalReferenceCode, Integer version)
+		throws Exception;
+
 	public void deleteScopeScopeKeyByExternalReferenceCode(
 			String scopeKey, String externalReferenceCode)
 		throws Exception;
