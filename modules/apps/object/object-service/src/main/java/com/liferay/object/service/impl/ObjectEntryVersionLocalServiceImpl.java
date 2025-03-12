@@ -90,6 +90,13 @@ public class ObjectEntryVersionLocalServiceImpl
 		return objectEntryVersionPersistence.update(objectEntryVersion);
 	}
 
+	@Override
+	public ObjectEntryVersion getObjectEntryVersion(long objectEntryId, int version)
+		throws PortalException {
+
+		return objectEntryVersionPersistence.findByOEI_V(objectEntryId, version);
+	}
+
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
 
