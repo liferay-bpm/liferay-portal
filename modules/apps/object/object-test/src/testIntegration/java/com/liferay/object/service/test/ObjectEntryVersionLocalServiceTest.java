@@ -400,6 +400,42 @@ public class ObjectEntryVersionLocalServiceTest {
 				objectEntry.getObjectEntryId()));
 	}
 
+	@Test
+	public void testGetObjectEntryByVersion() throws Exception {
+		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
+			0, _objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"textObjectFieldName", "textObjectFieldValue1"
+			).build());
+
+		Assert.assertEquals(1, objectEntry.getVersion());
+
+		_assertEqualVersion(
+			_createObjectEntryVersion(
+				objectEntry.getExternalReferenceCode(),
+				JSONUtil.put("textObjectFieldName", "textObjectFieldValue1"),
+				WorkflowConstants.STATUS_APPROVED, 1),
+			_objectEntryVersionLocalService.getObjectEntryVersion(
+				objectEntry.getObjectEntryId(), 1));
+
+		objectEntry = _objectEntryLocalService.updateObjectEntry(
+			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
+			HashMapBuilder.<String, Serializable>put(
+				"textObjectFieldName", "textObjectFieldValue2"
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
+		Assert.assertEquals(2, objectEntry.getVersion());
+
+		_assertEqualVersion(
+			_createObjectEntryVersion(
+				objectEntry.getExternalReferenceCode(),
+				JSONUtil.put("textObjectFieldName", "textObjectFieldValue2"),
+				WorkflowConstants.STATUS_APPROVED, 2),
+			_objectEntryVersionLocalService.getObjectEntryVersion(
+				objectEntry.getObjectEntryId(), 2));
+	}
+
 	private void _assertEquals(
 		List<ObjectEntryVersion> expectedObjectEntryVersions,
 		List<ObjectEntryVersion> actualObjectEntryVersions) {
@@ -425,6 +461,21 @@ public class ObjectEntryVersionLocalServiceTest {
 				expectedObjectEntryVersion.getStatus(),
 				actualObjectEntryVersion.getStatus());
 		}
+	}
+
+	private void _assertEqualVersion(
+		ObjectEntryVersion expectedObjectEntryVersion,
+		ObjectEntryVersion actualObjectEntryVersion) {
+
+		Assert.assertEquals(
+			expectedObjectEntryVersion.getContent(),
+			actualObjectEntryVersion.getContent());
+		Assert.assertEquals(
+			expectedObjectEntryVersion.getVersion(),
+			actualObjectEntryVersion.getVersion());
+		Assert.assertEquals(
+			expectedObjectEntryVersion.getStatus(),
+			actualObjectEntryVersion.getStatus());
 	}
 
 	private ObjectEntryVersion _createObjectEntryVersion(
