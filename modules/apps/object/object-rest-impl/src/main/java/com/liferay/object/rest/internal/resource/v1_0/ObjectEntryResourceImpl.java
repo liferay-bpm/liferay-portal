@@ -184,6 +184,30 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	}
 
 	@Override
+	public ObjectEntry getByExternalReferenceCodeByVersion(
+			String externalReferenceCode, Integer version)
+		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPD-17564")) {
+			throw new UnsupportedOperationException();
+		}
+
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			DefaultObjectEntryManagerProvider.provide(
+				_objectEntryManagerRegistry.getObjectEntryManager(
+					_objectDefinition.getStorageType()));
+
+		ObjectEntry objectEntry = defaultObjectEntryManager.getObjectEntry(
+			contextCompany.getCompanyId(), _getDTOConverterContext(null),
+			externalReferenceCode, _objectDefinition, null);
+
+		Long objectEntryId = objectEntry.getId();
+
+		return defaultObjectEntryManager.getObjectEntryByVersion(
+			_getDTOConverterContext(objectEntryId), objectEntryId, version);
+	}
+
+	@Override
 	public Page<ObjectEntry> getByExternalReferenceCodeVersionsPage(
 			String externalReferenceCode, Pagination pagination)
 		throws Exception {
@@ -261,7 +285,8 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	}
 
 	@Override
-	public ObjectEntry getObjectEntryByVersion(Long objectEntryId, Integer version)
+	public ObjectEntry getObjectEntryByVersion(
+			Long objectEntryId, Integer version)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-17564")) {
@@ -272,29 +297,6 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			DefaultObjectEntryManagerProvider.provide(
 				_objectEntryManagerRegistry.getObjectEntryManager(
 					_objectDefinition.getStorageType()));
-
-		return defaultObjectEntryManager.getObjectEntryByVersion(
-			_getDTOConverterContext(objectEntryId), objectEntryId, version);
-	}
-
-	@Override
-	public ObjectEntry getByExternalReferenceCodeByVersion(
-		String externalReferenceCode, Integer version) throws Exception {
-
-		if (!FeatureFlagManagerUtil.isEnabled("LPD-17564")) {
-			throw new UnsupportedOperationException();
-		}
-		
-		DefaultObjectEntryManager defaultObjectEntryManager =
-			DefaultObjectEntryManagerProvider.provide(
-				_objectEntryManagerRegistry.getObjectEntryManager(
-					_objectDefinition.getStorageType()));
-
-		ObjectEntry objectEntry = defaultObjectEntryManager.getObjectEntry(
-			contextCompany.getCompanyId(), _getDTOConverterContext(null),
-			externalReferenceCode, _objectDefinition, null);
-
-		Long objectEntryId = objectEntry.getId();
 
 		return defaultObjectEntryManager.getObjectEntryByVersion(
 			_getDTOConverterContext(objectEntryId), objectEntryId, version);

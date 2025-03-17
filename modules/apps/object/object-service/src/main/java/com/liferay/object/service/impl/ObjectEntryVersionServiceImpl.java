@@ -9,7 +9,6 @@ import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryVersion;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryService;
-import com.liferay.object.service.ObjectEntryVersionLocalService;
 import com.liferay.object.service.base.ObjectEntryVersionServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -34,12 +33,13 @@ public class ObjectEntryVersionServiceImpl
 	extends ObjectEntryVersionServiceBaseImpl {
 
 	@Override
-	public ObjectEntryVersion getObjectEntryVersion(long objectEntryId, int version)
+	public ObjectEntryVersion getObjectEntryVersion(
+			long objectEntryId, int version)
 		throws PortalException {
 
 		_checkModelResourcePermission(objectEntryId);
 
-		return _objectEntryVersionLocalService.getObjectEntryVersion(
+		return objectEntryVersionLocalService.getObjectEntryVersion(
 			objectEntryId, version);
 	}
 
@@ -81,6 +81,4 @@ public class ObjectEntryVersionServiceImpl
 	@Reference
 	private ObjectEntryService _objectEntryService;
 
-	@Reference
-	private ObjectEntryVersionLocalService _objectEntryVersionLocalService;
 }
