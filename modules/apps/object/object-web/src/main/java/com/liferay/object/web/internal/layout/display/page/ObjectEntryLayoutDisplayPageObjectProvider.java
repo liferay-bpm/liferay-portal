@@ -16,6 +16,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
 
@@ -90,7 +91,15 @@ public class ObjectEntryLayoutDisplayPageObjectProvider
 		}
 
 		try {
-			return _objectEntry.getTitleValue(LocaleUtil.toLanguageId(locale));
+			String titleValue = _objectEntry.getTitleValue(
+				LocaleUtil.toLanguageId(locale));
+
+			if (Validator.isNull(titleValue)) {
+				titleValue = _objectEntry.getTitleValue(
+					_objectEntry.getDefaultLanguageId());
+			}
+
+			return titleValue;
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
