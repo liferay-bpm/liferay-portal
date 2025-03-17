@@ -263,6 +263,11 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	@Override
 	public ObjectEntry getObjectEntryByVersion(Long objectEntryId, Integer version)
 		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPD-17564")) {
+			throw new UnsupportedOperationException();
+		}
+
 		DefaultObjectEntryManager defaultObjectEntryManager =
 			DefaultObjectEntryManagerProvider.provide(
 				_objectEntryManagerRegistry.getObjectEntryManager(
@@ -276,6 +281,10 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	public ObjectEntry getByExternalReferenceCodeByVersion(
 		String externalReferenceCode, Integer version) throws Exception {
 
+		if (!FeatureFlagManagerUtil.isEnabled("LPD-17564")) {
+			throw new UnsupportedOperationException();
+		}
+		
 		DefaultObjectEntryManager defaultObjectEntryManager =
 			DefaultObjectEntryManagerProvider.provide(
 				_objectEntryManagerRegistry.getObjectEntryManager(
