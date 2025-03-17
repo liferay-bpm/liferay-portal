@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
@@ -37,6 +38,47 @@ public class ObjectEntryAssetRendererTest {
 	@ClassRule
 	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
+
+	@Test
+	public void testGetTitle() throws Exception {
+		Mockito.when(
+			_objectEntry.getDefaultLanguageId()
+		).thenReturn(
+			"en_US"
+		);
+
+		String enTitleValue = RandomTestUtil.randomString();
+
+		Mockito.when(
+			_objectEntry.getTitleValue("en_US")
+		).thenReturn(
+			enTitleValue
+		);
+
+		Mockito.when(
+			_objectEntry.getTitleValue("es_ES")
+		).thenReturn(
+			null
+		);
+
+		String ptTitleValue = RandomTestUtil.randomString();
+
+		Mockito.when(
+			_objectEntry.getTitleValue("pt_BR")
+		).thenReturn(
+			ptTitleValue
+		);
+
+		AssetRenderer<ObjectEntry> assetRenderer =
+			_getObjectEntryAssetRenderer();
+
+		Assert.assertEquals(
+			enTitleValue, assetRenderer.getTitle(LocaleUtil.SPAIN));
+		Assert.assertEquals(
+			enTitleValue, assetRenderer.getTitle(LocaleUtil.US));
+		Assert.assertEquals(
+			ptTitleValue, assetRenderer.getTitle(LocaleUtil.BRAZIL));
+	}
 
 	@Test
 	public void testGetURLViewInContext() throws Exception {
