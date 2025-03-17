@@ -82,10 +82,98 @@ public class ObjectEntryVersionServiceHttp {
 		}
 	}
 
+	public static java.util.List<com.liferay.object.model.ObjectEntryVersion>
+			getObjectEntryVersions(
+				HttpPrincipal httpPrincipal, long objectEntryId, int start,
+				int end)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				ObjectEntryVersionServiceUtil.class, "getObjectEntryVersions",
+				_getObjectEntryVersionsParameterTypes1);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, objectEntryId, start, end);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return (java.util.List<com.liferay.object.model.ObjectEntryVersion>)
+				returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
+	public static int getObjectEntryVersionsCount(
+			HttpPrincipal httpPrincipal, long objectEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				ObjectEntryVersionServiceUtil.class,
+				"getObjectEntryVersionsCount",
+				_getObjectEntryVersionsCountParameterTypes2);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, objectEntryId);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return ((Integer)returnObj).intValue();
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(
 		ObjectEntryVersionServiceHttp.class);
 
 	private static final Class<?>[] _getObjectEntryVersionParameterTypes0 =
 		new Class[] {long.class, int.class};
+	private static final Class<?>[] _getObjectEntryVersionsParameterTypes1 =
+		new Class[] {long.class, int.class, int.class};
+	private static final Class<?>[]
+		_getObjectEntryVersionsCountParameterTypes2 = new Class[] {long.class};
 
 }

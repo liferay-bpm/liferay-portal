@@ -9,6 +9,8 @@ import com.liferay.object.model.ObjectEntryVersion;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.module.service.Snapshot;
 
+import java.util.List;
+
 /**
  * Provides the remote service utility for ObjectEntryVersion. This utility wraps
  * <code>com.liferay.object.service.impl.ObjectEntryVersionServiceImpl</code> and is an
@@ -33,6 +35,19 @@ public class ObjectEntryVersionServiceUtil {
 		throws PortalException {
 
 		return getService().getObjectEntryVersion(objectEntryId, version);
+	}
+
+	public static List<ObjectEntryVersion> getObjectEntryVersions(
+			long objectEntryId, int start, int end)
+		throws PortalException {
+
+		return getService().getObjectEntryVersions(objectEntryId, start, end);
+	}
+
+	public static int getObjectEntryVersionsCount(long objectEntryId)
+		throws PortalException {
+
+		return getService().getObjectEntryVersionsCount(objectEntryId);
 	}
 
 	/**
