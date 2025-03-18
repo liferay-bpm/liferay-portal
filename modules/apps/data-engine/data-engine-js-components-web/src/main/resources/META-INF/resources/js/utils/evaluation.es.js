@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {debounce} from 'frontend-js-web';
-
 import {convertToFormData, makeFetch} from './fetch.es';
 import {PagesVisitor} from './visitors.es';
 
@@ -128,7 +126,7 @@ export function mergePages(
 	);
 }
 
-const doEvaluate = debounce((fieldName, evaluatorContext, callback) => {
+const doEvaluate = (fieldName, evaluatorContext, callback) => {
 	const {
 		defaultLanguageId,
 		editingLanguageId,
@@ -188,7 +186,7 @@ const doEvaluate = debounce((fieldName, evaluatorContext, callback) => {
 			callback(null, mergedPages);
 		})
 		.catch((error) => callback(error));
-}, 200);
+};
 
 export function evaluate(fieldName, evaluatorContext) {
 	return new Promise((resolve, reject) => {
