@@ -24,6 +24,7 @@ import com.liferay.object.exception.ObjectDefinitionClassNameException;
 import com.liferay.object.exception.ObjectDefinitionEnableFriendlyURLCustomizationException;
 import com.liferay.object.exception.ObjectDefinitionEnableLocalizationException;
 import com.liferay.object.exception.ObjectDefinitionEnableObjectEntryHistoryException;
+import com.liferay.object.exception.ObjectDefinitionEnableObjectEntryVersioningException;
 import com.liferay.object.exception.ObjectDefinitionExternalReferenceCodeException;
 import com.liferay.object.exception.ObjectDefinitionLabelException;
 import com.liferay.object.exception.ObjectDefinitionModifiableException;
@@ -159,7 +160,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
  * @author Marco Leo
  * @author Brian Wing Shun Chan
  */
-@FeatureFlags({"LPD-21926", "LPD-34594"})
+@FeatureFlags({"LPD-17564", "LPD-21926", "LPD-34594"})
 @RunWith(Arquillian.class)
 public class ObjectDefinitionLocalServiceTest {
 
@@ -1379,6 +1380,23 @@ public class ObjectDefinitionLocalServiceTest {
 					).name(
 						StringUtil.randomId()
 					).build())));
+
+		// Enable object entry versioning
+
+		AssertUtils.assertFailure(
+			ObjectDefinitionEnableObjectEntryVersioningException.class,
+			"Enable object entry versioning is not allowed for unmodifiable " +
+				"system object definitions",
+			() -> _objectDefinitionLocalService.addSystemObjectDefinition(
+				null, TestPropsValues.getUserId(), 0,
+				ObjectDefinitionTestUtil.getRandomName(), null, false, false,
+				true, false, false, true,
+				RandomTestUtil.randomLocaleStringMap(), false,
+				ObjectDefinitionTestUtil.getRandomName(), null, null, null,
+				null, RandomTestUtil.randomLocaleStringMap(), false,
+				ObjectDefinitionConstants.SCOPE_COMPANY, null, 1,
+				WorkflowConstants.STATUS_APPROVED, Collections.emptyList(),
+				Collections.emptyList()));
 
 		// Label is null
 
@@ -2667,7 +2685,7 @@ public class ObjectDefinitionLocalServiceTest {
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, false, true, false,
-				false, false, LocalizedMapUtil.getLocalizedMap("Able"), "Able",
+				false, true, LocalizedMapUtil.getLocalizedMap("Able"), "Able",
 				null, null, LocalizedMapUtil.getLocalizedMap("Ables"), true,
 				ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_SALESFORCE,
@@ -2677,6 +2695,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 		Assert.assertFalse(objectDefinition.isActive());
 		Assert.assertFalse(objectDefinition.isEnableFriendlyURLCustomization());
+		Assert.assertTrue(objectDefinition.isEnableObjectEntryVersioning());
 		Assert.assertEquals("C_Able", objectDefinition.getName());
 		Assert.assertEquals(
 			ObjectDefinitionConstants.STORAGE_TYPE_SALESFORCE,
@@ -2691,7 +2710,7 @@ public class ObjectDefinitionLocalServiceTest {
 			"Enable friendly URL customization is only allowed for object " +
 				"definitions with the default storage type",
 			() -> _updateObjectDefinition(
-				null, objectDefinitionId, 0, 0, true, true,
+				null, objectDefinitionId, 0, 0, true, true, false,
 				LocalizedMapUtil.getLocalizedMap("Able"), "Able",
 				LocalizedMapUtil.getLocalizedMap("Ables"), scope, status));
 		AssertUtils.assertFailure(
@@ -2699,7 +2718,7 @@ public class ObjectDefinitionLocalServiceTest {
 			"Enable object entry history is only allowed for object " +
 				"definitions with the default storage type",
 			() -> _updateObjectDefinition(
-				null, objectDefinitionId, 0, 0, false, true,
+				null, objectDefinitionId, 0, 0, false, true, false,
 				LocalizedMapUtil.getLocalizedMap("Able"), "Able",
 				LocalizedMapUtil.getLocalizedMap("Ables"), scope, status));
 		AssertUtils.assertFailure(
@@ -2708,7 +2727,7 @@ public class ObjectDefinitionLocalServiceTest {
 			"The prefix L_ is reserved",
 			() -> _updateObjectDefinition(
 				"L_INVALID_ERC_TEST", objectDefinitionId, 0, 0, false, false,
-				LocalizedMapUtil.getLocalizedMap("Able"), "Able",
+				false, LocalizedMapUtil.getLocalizedMap("Able"), "Able",
 				LocalizedMapUtil.getLocalizedMap("Ables"), scope, status));
 
 		objectDefinition.setStorageType(
@@ -2725,7 +2744,7 @@ public class ObjectDefinitionLocalServiceTest {
 			NoSuchObjectFieldException.class, null,
 			() -> _updateObjectDefinition(
 				null, objectDefinitionId, RandomTestUtil.randomLong(),
-				RandomTestUtil.randomLong(), false, false,
+				RandomTestUtil.randomLong(), false, false, false,
 				LocalizedMapUtil.getLocalizedMap("Able"), "Able",
 				LocalizedMapUtil.getLocalizedMap("Ables"), scope, status));
 
@@ -2814,6 +2833,7 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertTrue(objectDefinition.isEnableFriendlyURLCustomization());
 		Assert.assertFalse(objectDefinition.isEnableIndexSearch());
 		Assert.assertFalse(objectDefinition.isEnableObjectEntryHistory());
+		Assert.assertFalse(objectDefinition.isEnableObjectEntryVersioning());
 		Assert.assertEquals(
 			LocalizedMapUtil.getLocalizedMap("Able"),
 			objectDefinition.getLabelMap());
@@ -2826,7 +2846,7 @@ public class ObjectDefinitionLocalServiceTest {
 			_objectDefinitionLocalService.updateCustomObjectDefinition(
 				null, objectDefinition.getObjectDefinitionId(), 0, 0, 0, 0,
 				false, objectDefinition.isActive(), null, true, false, false,
-				true, false, false, true, false,
+				true, false, false, true, true,
 				LocalizedMapUtil.getLocalizedMap("Baker"), "Baker", null, null,
 				false, LocalizedMapUtil.getLocalizedMap("Bakers"),
 				objectDefinition.getScope(), objectDefinition.getStatus(),
@@ -2838,6 +2858,7 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertFalse(objectDefinition.isEnableFriendlyURLCustomization());
 		Assert.assertTrue(objectDefinition.isEnableIndexSearch());
 		Assert.assertTrue(objectDefinition.isEnableObjectEntryHistory());
+		Assert.assertTrue(objectDefinition.isEnableObjectEntryVersioning());
 		Assert.assertEquals("C_Baker", objectDefinition.getName());
 
 		objectDefinition =
@@ -2845,11 +2866,20 @@ public class ObjectDefinitionLocalServiceTest {
 				TestPropsValues.getUserId(),
 				objectDefinition.getObjectDefinitionId());
 
+		AssertUtils.assertFailure(
+			ObjectDefinitionEnableObjectEntryVersioningException.class,
+			"Object entry versioning cannot be disabled when the object " +
+				"definition is published",
+			() -> _updateObjectDefinition(
+				null, objectDefinitionId, 0, 0, true, true, false,
+				LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie",
+				LocalizedMapUtil.getLocalizedMap("Charlies"), scope, status));
+
 		objectDefinition =
 			_objectDefinitionLocalService.updateCustomObjectDefinition(
 				null, objectDefinition.getObjectDefinitionId(), 0, 0, 0, 0,
 				false, true, objectDefinition.getClassName(), true, false, true,
-				false, false, false, true, false,
+				false, false, false, true, true,
 				LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie", null,
 				null, false, LocalizedMapUtil.getLocalizedMap("Charlies"),
 				objectDefinition.getScope(), objectDefinition.getStatus(),
@@ -2861,6 +2891,7 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertTrue(objectDefinition.isEnableFriendlyURLCustomization());
 		Assert.assertTrue(objectDefinition.isEnableIndexSearch());
 		Assert.assertTrue(objectDefinition.isEnableObjectEntryHistory());
+		Assert.assertTrue(objectDefinition.isEnableObjectEntryVersioning());
 		Assert.assertEquals("C_Baker", objectDefinition.getName());
 
 		_testUpdateCustomObjectDefinitionThrowsObjectFieldRelationshipTypeException(
@@ -3961,7 +3992,8 @@ public class ObjectDefinitionLocalServiceTest {
 			String externalReferenceCode, long objectDefinitionId,
 			long descriptionObjectFieldId, long titleObjectFieldId,
 			boolean enableFriendlyURLCustomization,
-			boolean enableObjectEntryHistory, Map<Locale, String> labelMap,
+			boolean enableObjectEntryHistory,
+			boolean enableObjectEntryVersioning, Map<Locale, String> labelMap,
 			String name, Map<Locale, String> pluralLabelMap, String scope,
 			int status)
 		throws PortalException {
@@ -3970,8 +4002,9 @@ public class ObjectDefinitionLocalServiceTest {
 			externalReferenceCode, objectDefinitionId, 0,
 			descriptionObjectFieldId, 0, titleObjectFieldId, false, false, null,
 			false, false, enableFriendlyURLCustomization, true, false, false,
-			enableObjectEntryHistory, false, labelMap, name, null, null, false,
-			pluralLabelMap, scope, status, Collections.emptyList());
+			enableObjectEntryHistory, enableObjectEntryVersioning, labelMap,
+			name, null, null, false, pluralLabelMap, scope, status,
+			Collections.emptyList());
 	}
 
 	private static ObjectFolder _defaultObjectFolder;
