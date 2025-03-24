@@ -98,10 +98,8 @@ public interface ObjectEntryResource {
 			String externalReferenceCode, Pagination pagination)
 		throws Exception;
 
-	public void
-			putByExternalReferenceCodeObjectEntryExternalReferenceCodeObjectActionObjectActionName(
-				String objectEntryExternalReferenceCode,
-				String objectActionName)
+	public void putByExternalReferenceCodeObjectActionObjectActionName(
+			String externalReferenceCode, String objectActionName)
 		throws Exception;
 
 	public void deleteScopeScopeKeyByExternalReferenceCode(
