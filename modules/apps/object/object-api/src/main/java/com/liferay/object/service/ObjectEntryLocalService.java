@@ -5,9 +5,12 @@
 
 package com.liferay.object.service;
 
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.object.exception.ObjectEntryValuesException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
@@ -38,6 +41,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -523,6 +527,14 @@ public interface ObjectEntryLocalService
 	public ObjectEntry updateStatus(
 			long userId, ObjectEntry objectEntry, int status,
 			ServiceContext serviceContext)
+		throws PortalException;
+
+	public List<ObjectEntryValuesException> validateValues(
+			Map<DLFileEntry, ObjectField> dlFileEntries,
+			Set<Long> tempDLFileEntryIds, ObjectEntry existingObjectEntry,
+			boolean guestUser, long groupId, ObjectDefinition objectDefinition,
+			long objectEntryId, ServiceContext serviceContext, long userId,
+			boolean validation, Map<String, Serializable> values)
 		throws PortalException;
 
 }
