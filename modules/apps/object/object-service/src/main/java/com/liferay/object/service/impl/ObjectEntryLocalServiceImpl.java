@@ -1969,31 +1969,26 @@ public class ObjectEntryLocalServiceImpl
 			Set<Long> tempDLFileEntryIds, ObjectEntry existingObjectEntry,
 			boolean guestUser, long groupId, ObjectDefinition objectDefinition,
 			long objectEntryId, ServiceContext serviceContext, long userId,
-			boolean validation, Map<String, Serializable> values)
+			boolean fictitious, Map<String, Serializable> values)
 		throws PortalException {
 
 		List<ObjectField> objectFields =
 			_objectFieldLocalService.getObjectFields(
 				objectDefinition.getObjectDefinitionId());
 
-		List<ObjectEntryValuesException> fieldExceptions = new ArrayList<>();
+		List<ObjectEntryValuesException> objectEntryValuesExceptions =
+			new ArrayList<>();
 
 		for (ObjectField objectField : objectFields) {
 			if (!objectField.isLocalized() &&
 				values.containsKey(objectField.getName())) {
 
-				fieldExceptions.addAll(
-					_validateValues(
-						dlFileEntries, tempDLFileEntryIds, existingObjectEntry,
-						guestUser, groupId, objectDefinition, objectField,
-						serviceContext, userId, validation,
-						values.get(objectField.getName()), StringPool.BLANK));
-
-				if (ListUtil.isNotEmpty(fieldExceptions) && !validation) {
-					return fieldExceptions;
-				}
-
-				continue;
+				_validateValues(
+					dlFileEntries, tempDLFileEntryIds, existingObjectEntry,
+					guestUser, groupId, objectDefinition,
+					objectEntryValuesExceptions, objectField, serviceContext,
+					userId, fictitious, values.get(objectField.getName()),
+					StringPool.BLANK);
 			}
 
 			Map<String, String> localizedValues =
@@ -2005,19 +2000,15 @@ public class ObjectEntryLocalServiceImpl
 			}
 
 			for (Map.Entry<String, String> entry : localizedValues.entrySet()) {
-				return _validateValues(
+				_validateValues(
 					dlFileEntries, tempDLFileEntryIds, existingObjectEntry,
-					guestUser, groupId, objectDefinition, objectField,
-					serviceContext, userId, validation, entry.getValue(),
-					entry.getKey());
+					guestUser, groupId, objectDefinition,
+					objectEntryValuesExceptions, objectField, serviceContext,
+					userId, fictitious, entry.getValue(), entry.getKey());
 			}
 		}
 
-		if (ListUtil.isNotEmpty(fieldExceptions) && validation) {
-			return fieldExceptions;
-		}
-
-		return Collections.emptyList();
+		return objectEntryValuesExceptions;
 	}
 
 	@Activate
@@ -2370,6 +2361,19 @@ public class ObjectEntryLocalServiceImpl
 			values.put(
 				objectRelationshipERCObjectFieldName, externalReferenceCode);
 		}
+	}
+
+	private void _checkSimulated(
+			boolean simulated,
+			Supplier<ObjectEntryValuesException> exceptionSupplier,
+			List<ObjectEntryValuesException> exceptionsList)
+		throws ObjectEntryValuesException {
+
+		if (!simulated) {
+			throw exceptionSupplier.get();
+		}
+
+		exceptionsList.add(exceptionSupplier.get());
 	}
 
 	private void _contributeValues(
@@ -5381,31 +5385,38 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	private void _validateFileExtension(
-			String fileExtension, long objectFieldId, String objectFieldName)
+			boolean simulated, String fileExtension,
+			List<ObjectEntryValuesException> objectEntryValuesExceptions,
+			long objectFieldId, String objectFieldName)
 		throws PortalException {
 
 		if (!ArrayUtil.contains(
 				_attachmentManager.getAcceptedFileExtensions(objectFieldId),
 				fileExtension, true)) {
 
-			_objectEntryValuesException.add(
-				new ObjectEntryValuesException.InvalidFileExtension(
-					fileExtension, objectFieldName));
+			_checkSimulated(
+				simulated,
+				() -> new ObjectEntryValuesException.InvalidFileExtension(
+					fileExtension, objectFieldName),
+				objectEntryValuesExceptions);
 		}
 	}
 
 	private void _validateFileSize(
-			boolean guestUser, long fileSize, long objectFieldId,
-			String objectFieldName)
+			boolean simulated, boolean guestUser, long fileSize,
+			List<ObjectEntryValuesException> objectEntryValuesExceptions,
+			long objectFieldId, String objectFieldName)
 		throws PortalException {
 
 		long maximumFileSize = _attachmentManager.getMaximumFileSize(
 			objectFieldId, !guestUser);
 
 		if ((maximumFileSize > 0) && (fileSize > maximumFileSize)) {
-			_objectEntryValuesException.add(
-				new ObjectEntryValuesException.ExceedsMaxFileSize(
-					maximumFileSize / (1024 * 1024), objectFieldName));
+			_checkSimulated(
+				simulated,
+				() -> new ObjectEntryValuesException.ExceedsMaxFileSize(
+					maximumFileSize / (1024 * 1024), objectFieldName),
+				objectEntryValuesExceptions);
 		}
 	}
 
@@ -5449,7 +5460,9 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	private void _validateListTypeEntryKey(
-			String listTypeEntryKey, ObjectField objectField)
+			boolean simulated, String listTypeEntryKey,
+			List<ObjectEntryValuesException> objectEntryValuesExceptions,
+			ObjectField objectField)
 		throws PortalException {
 
 		ListTypeEntry listTypeEntry =
@@ -5460,9 +5473,11 @@ public class ObjectEntryLocalServiceImpl
 			(Validator.isNotNull(listTypeEntryKey) ||
 			 objectField.isRequired())) {
 
-			_objectEntryValuesException.add(
-				new ObjectEntryValuesException.ListTypeEntry(
-					objectField.getName()));
+			_checkSimulated(
+				simulated,
+				() -> new ObjectEntryValuesException.ListTypeEntry(
+					objectField.getName()),
+				objectEntryValuesExceptions);
 		}
 	}
 
@@ -5490,7 +5505,9 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	private void _validateObjectStateTransition(
-			ObjectEntry existingObjectEntry, long listTypeDefinitionId,
+			ObjectEntry existingObjectEntry, boolean simulated,
+			long listTypeDefinitionId,
+			List<ObjectEntryValuesException> objectEntryValuesExceptions,
 			ObjectField objectField, long userId, Serializable value)
 		throws PortalException {
 
@@ -5547,11 +5564,15 @@ public class ObjectEntryLocalServiceImpl
 		if (invalidObjectStateTransition) {
 			User user = _userLocalService.getUser(userId);
 
-			_objectEntryValuesException.add(
-				new ObjectEntryValuesException.InvalidObjectStateTransition(
-					originalListTypeEntry.getName(user.getLocale()),
-					sourceObjectState, listTypeEntry.getName(user.getLocale()),
-					targetObjectState));
+			_checkSimulated(
+				simulated,
+				() ->
+					new ObjectEntryValuesException.InvalidObjectStateTransition(
+						originalListTypeEntry.getName(user.getLocale()),
+						sourceObjectState,
+						listTypeEntry.getName(user.getLocale()),
+						targetObjectState),
+				objectEntryValuesExceptions);
 		}
 	}
 
@@ -5631,11 +5652,12 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	private void _validateTextMaxLength(
-			int defaultMaxLength, String objectEntryValue, long objectFieldId,
-			String objectFieldName)
+			int defaultMaxLength, boolean simulated, String objectEntryValue,
+			List<ObjectEntryValuesException> objectEntryValuesExceptions,
+			long objectFieldId, String objectFieldName)
 		throws PortalException {
 
-		int maxLength = defaultMaxLength;
+		int maxLength;
 
 		ObjectFieldSetting objectFieldSetting =
 			_objectFieldSettingPersistence.fetchByOFI_N(
@@ -5644,26 +5666,36 @@ public class ObjectEntryLocalServiceImpl
 		if (objectFieldSetting != null) {
 			maxLength = GetterUtil.getInteger(objectFieldSetting.getValue());
 		}
+		else {
+			maxLength = defaultMaxLength;
+		}
 
 		if (objectEntryValue.length() > maxLength) {
-			_objectEntryValuesException.add(
-				new ObjectEntryValuesException.ExceedsTextMaxLength(
-					maxLength, objectFieldName));
+			_checkSimulated(
+				simulated,
+				() -> new ObjectEntryValuesException.ExceedsTextMaxLength(
+					maxLength, objectFieldName),
+				objectEntryValuesExceptions);
 		}
 	}
 
 	private void _validateTextMaxLength280(
+			boolean simulated,
+			List<ObjectEntryValuesException> objectEntryValuesExceptions,
 			ObjectField objectField, String value)
 		throws PortalException {
 
 		_validateTextMaxLength(
-			280, value, objectField.getObjectFieldId(), objectField.getName());
+			280, simulated, value, objectEntryValuesExceptions,
+			objectField.getObjectFieldId(), objectField.getName());
 	}
 
 	private void _validateUniqueValues(
-			ObjectEntry existingObjectEntry, long groupId,
-			ObjectDefinition objectDefinition, ObjectField objectField,
-			long userId, Object value, String valueLanguageId)
+			ObjectEntry existingObjectEntry, boolean simulated, long groupId,
+			ObjectDefinition objectDefinition,
+			List<ObjectEntryValuesException> objectEntryValuesExceptions,
+			ObjectField objectField, long userId, Object value,
+			String valueLanguageId)
 		throws PortalException {
 
 		long objectEntriesCount = 0;
@@ -5726,30 +5758,36 @@ public class ObjectEntryLocalServiceImpl
 
 		User user = _userLocalService.getUser(userId);
 
-		_objectEntryValuesException.add(
-			new ObjectEntryValuesException.UniqueValueConstraintViolation(
+		Table<?> finalTable = table;
+
+		_checkSimulated(
+			simulated,
+			() -> new ObjectEntryValuesException.UniqueValueConstraintViolation(
 				objectField.getDBColumnName(), (Serializable)value,
-				objectField.getLabel(user.getLocale()), table.getTableName(),
-				null));
+				objectField.getLabel(user.getLocale()),
+				finalTable.getTableName(), null),
+			objectEntryValuesExceptions);
 	}
 
-	private List<ObjectEntryValuesException> _validateValues(
+	private void _validateValues(
 			Map<DLFileEntry, ObjectField> dlFileEntries,
 			Set<Long> tempDLFileEntryIds, ObjectEntry existingObjectEntry,
 			boolean guestUser, long groupId, ObjectDefinition objectDefinition,
+			List<ObjectEntryValuesException> objectEntryValuesExceptions,
 			ObjectField objectField, ServiceContext serviceContext, long userId,
-			boolean check, Serializable value, String valueLanguageId)
+			boolean simulated, Serializable value, String valueLanguageId)
 		throws PortalException {
-
-		_objectEntryValuesException.clear();
 
 		if (Validator.isNull(value) && !objectField.isLocalized() &&
 			objectField.isRequired() &&
 			(serviceContext.getWorkflowAction() !=
 				WorkflowConstants.ACTION_SAVE_DRAFT)) {
 
-			_objectEntryValuesException.add(
-				new ObjectEntryValuesException.Required(objectField.getName()));
+			_checkSimulated(
+				simulated,
+				() -> new ObjectEntryValuesException.Required(
+					objectField.getName()),
+				objectEntryValuesExceptions);
 		}
 		else if (StringUtil.equals(
 					objectField.getBusinessType(),
@@ -5760,11 +5798,13 @@ public class ObjectEntryLocalServiceImpl
 
 			if (dlFileEntry != null) {
 				_validateFileExtension(
-					dlFileEntry.getExtension(), objectField.getObjectFieldId(),
+					simulated, dlFileEntry.getExtension(),
+					objectEntryValuesExceptions, objectField.getObjectFieldId(),
 					objectField.getName());
 				_validateFileSize(
-					guestUser, dlFileEntry.getSize(),
-					objectField.getObjectFieldId(), objectField.getName());
+					simulated, guestUser, dlFileEntry.getSize(),
+					objectEntryValuesExceptions, objectField.getObjectFieldId(),
+					objectField.getName());
 
 				if (existingObjectEntry != null) {
 					Map<String, Serializable> existingValues =
@@ -5773,7 +5813,7 @@ public class ObjectEntryLocalServiceImpl
 					if (dlFileEntry.getFileEntryId() == GetterUtil.getLong(
 							existingValues.get(objectField.getName()))) {
 
-						return Collections.emptyList();
+						return;
 					}
 
 					tempDLFileEntryIds.add(dlFileEntry.getFileEntryId());
@@ -5784,44 +5824,53 @@ public class ObjectEntryLocalServiceImpl
 
 				dlFileEntries.put(dlFileEntry, objectField);
 
-				return Collections.emptyList();
+				return;
 			}
 
 			if (Validator.isNotNull(value)) {
-				_objectEntryValuesException.add(
-					new ObjectEntryValuesException.InvalidValue(
-						objectField.getName()));
+				_checkSimulated(
+					simulated,
+					() -> new ObjectEntryValuesException.InvalidValue(
+						objectField.getName()),
+					objectEntryValuesExceptions);
 			}
 			else if (objectField.isRequired() &&
 					 (serviceContext.getWorkflowAction() !=
 						 WorkflowConstants.ACTION_SAVE_DRAFT)) {
 
-				_objectEntryValuesException.add(
-					new ObjectEntryValuesException.Required(
-						objectField.getName()));
+				_checkSimulated(
+					simulated,
+					() -> new ObjectEntryValuesException.Required(
+						objectField.getName()),
+					objectEntryValuesExceptions);
 			}
 		}
 		else if (objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_BOOLEAN)) {
 
 			if (!GetterUtil.getBoolean(value) && objectField.isRequired()) {
-				_objectEntryValuesException.add(
-					new ObjectEntryValuesException.Required(
-						objectField.getName()));
+				_checkSimulated(
+					simulated,
+					() -> new ObjectEntryValuesException.Required(
+						objectField.getName()),
+					objectEntryValuesExceptions);
 			}
 		}
 		else if (objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_ENCRYPTED)) {
 
-			_validateTextMaxLength280(objectField, GetterUtil.getString(value));
+			_validateTextMaxLength280(
+				simulated, objectEntryValuesExceptions, objectField,
+				GetterUtil.getString(value));
 		}
 		else if (StringUtil.equals(
 					objectField.getBusinessType(),
 					ObjectFieldConstants.BUSINESS_TYPE_LONG_TEXT)) {
 
 			_validateTextMaxLength(
-				65000, GetterUtil.getString(value),
-				objectField.getObjectFieldId(), objectField.getName());
+				65000, simulated, GetterUtil.getString(value),
+				objectEntryValuesExceptions, objectField.getObjectFieldId(),
+				objectField.getName());
 		}
 		else if (StringUtil.equals(
 					objectField.getBusinessType(),
@@ -5837,9 +5886,11 @@ public class ObjectEntryLocalServiceImpl
 				if ((relatedObjectEntry != null) &&
 					(groupId != relatedObjectEntry.getGroupId())) {
 
-					_objectEntryValuesException.add(
-						new ObjectEntryValuesException.InvalidValue(
-							objectField.getName()));
+					_checkSimulated(
+						simulated,
+						() -> new ObjectEntryValuesException.InvalidValue(
+							objectField.getName()),
+						objectEntryValuesExceptions);
 				}
 			}
 
@@ -5850,7 +5901,7 @@ public class ObjectEntryLocalServiceImpl
 						getAccountEntryRestrictedObjectFieldId()) ||
 				(existingObjectEntry == null)) {
 
-				return Collections.emptyList();
+				return;
 			}
 		}
 		else if (StringUtil.equals(
@@ -5866,9 +5917,11 @@ public class ObjectEntryLocalServiceImpl
 					!StringUtil.equals(
 						String.valueOf(entryValueInteger), entryValueString)) {
 
-					_objectEntryValuesException.add(
-						new ObjectEntryValuesException.ExceedsIntegerSize(
-							9, objectField.getName()));
+					_checkSimulated(
+						simulated,
+						() -> new ObjectEntryValuesException.ExceedsIntegerSize(
+							9, objectField.getName()),
+						objectEntryValuesExceptions);
 				}
 			}
 		}
@@ -5885,27 +5938,33 @@ public class ObjectEntryLocalServiceImpl
 					!StringUtil.equals(
 						String.valueOf(entryValueLong), entryValueString)) {
 
-					_objectEntryValuesException.add(
-						new ObjectEntryValuesException.ExceedsLongSize(
-							16, objectField.getName()));
+					_checkSimulated(
+						simulated,
+						() -> new ObjectEntryValuesException.ExceedsLongSize(
+							16, objectField.getName()),
+						objectEntryValuesExceptions);
 				}
 				else if (entryValueLong > ObjectFieldValidationConstants.
 							BUSINESS_TYPE_LONG_VALUE_MAX) {
 
-					_objectEntryValuesException.add(
-						new ObjectEntryValuesException.ExceedsLongMaxSize(
+					_checkSimulated(
+						simulated,
+						() -> new ObjectEntryValuesException.ExceedsLongMaxSize(
 							ObjectFieldValidationConstants.
 								BUSINESS_TYPE_LONG_VALUE_MAX,
-							objectField.getName()));
+							objectField.getName()),
+						objectEntryValuesExceptions);
 				}
 				else if (entryValueLong < ObjectFieldValidationConstants.
 							BUSINESS_TYPE_LONG_VALUE_MIN) {
 
-					_objectEntryValuesException.add(
-						new ObjectEntryValuesException.ExceedsLongMinSize(
+					_checkSimulated(
+						simulated,
+						() -> new ObjectEntryValuesException.ExceedsLongMinSize(
 							ObjectFieldValidationConstants.
 								BUSINESS_TYPE_LONG_VALUE_MIN,
-							objectField.getName()));
+							objectField.getName()),
+						objectEntryValuesExceptions);
 				}
 			}
 		}
@@ -5916,7 +5975,8 @@ public class ObjectEntryLocalServiceImpl
 			_validateTextMaxLength(
 				DynamicObjectDefinitionTableUtil.getMaxLength(
 					objectField.getBusinessType()),
-				GetterUtil.getString(value), objectField.getObjectFieldId(),
+				simulated, GetterUtil.getString(value),
+				objectEntryValuesExceptions, objectField.getObjectFieldId(),
 				objectField.getName());
 		}
 
@@ -5939,42 +5999,40 @@ public class ObjectEntryLocalServiceImpl
 					(serviceContext.getWorkflowAction() !=
 						WorkflowConstants.ACTION_SAVE_DRAFT)) {
 
-					_objectEntryValuesException.add(
-						new ObjectEntryValuesException.Required(
-							objectField.getName()));
+					_checkSimulated(
+						simulated,
+						() -> new ObjectEntryValuesException.Required(
+							objectField.getName()),
+						objectEntryValuesExceptions);
 				}
 
 				for (String listTypeEntryKey : listTypeEntryKeys) {
-					_validateListTypeEntryKey(listTypeEntryKey, objectField);
+					_validateListTypeEntryKey(
+						simulated, listTypeEntryKey,
+						objectEntryValuesExceptions, objectField);
 				}
 			}
 			else {
-				_validateListTypeEntryKey(String.valueOf(value), objectField);
+				_validateListTypeEntryKey(
+					simulated, String.valueOf(value),
+					objectEntryValuesExceptions, objectField);
 
 				if ((existingObjectEntry != null) && objectField.isState()) {
 					_validateObjectStateTransition(
-						existingObjectEntry,
-						objectField.getListTypeDefinitionId(), objectField,
-						userId, value);
+						existingObjectEntry, simulated,
+						objectField.getListTypeDefinitionId(),
+						objectEntryValuesExceptions, objectField, userId,
+						value);
 				}
 			}
 		}
 
 		if (objectField.hasUniqueValues()) {
 			_validateUniqueValues(
-				existingObjectEntry, groupId, objectDefinition, objectField,
-				userId, value, valueLanguageId);
+				existingObjectEntry, simulated, groupId, objectDefinition,
+				objectEntryValuesExceptions, objectField, userId, value,
+				valueLanguageId);
 		}
-
-		if (check) {
-			return _objectEntryValuesException;
-		}
-
-		if (!_objectEntryValuesException.isEmpty()) {
-			throw _objectEntryValuesException.get(0);
-		}
-
-		return Collections.emptyList();
 	}
 
 	private void _validateWorkflowAction(
@@ -6084,9 +6142,6 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private ObjectEntryFolderPersistence _objectEntryFolderPersistence;
-
-	private final List<ObjectEntryValuesException> _objectEntryValuesException =
-		new ArrayList<>();
 
 	@Reference
 	private ObjectEntryVersionLocalService _objectEntryVersionLocalService;
