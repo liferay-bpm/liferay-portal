@@ -826,14 +826,14 @@ public class ObjectEntryLocalServiceWrapper
 					long objectEntryId,
 					com.liferay.portal.kernel.service.ServiceContext
 						serviceContext,
-					long userId, boolean validation,
+					boolean throwError, long userId,
 					java.util.Map<String, java.io.Serializable> values)
 			throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectEntryLocalService.validateValues(
 			dlFileEntries, tempDLFileEntryIds, existingObjectEntry, guestUser,
-			groupId, objectDefinition, objectEntryId, serviceContext, userId,
-			validation, values);
+			groupId, objectDefinition, objectEntryId, serviceContext,
+			throwError, userId, values);
 	}
 
 	@Override

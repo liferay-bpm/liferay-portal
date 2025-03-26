@@ -533,8 +533,8 @@ public interface ObjectEntryLocalService
 			Map<DLFileEntry, ObjectField> dlFileEntries,
 			Set<Long> tempDLFileEntryIds, ObjectEntry existingObjectEntry,
 			boolean guestUser, long groupId, ObjectDefinition objectDefinition,
-			long objectEntryId, ServiceContext serviceContext, long userId,
-			boolean validation, Map<String, Serializable> values)
+			long objectEntryId, ServiceContext serviceContext,
+			boolean throwError, long userId, Map<String, Serializable> values)
 		throws PortalException;
 
 }
