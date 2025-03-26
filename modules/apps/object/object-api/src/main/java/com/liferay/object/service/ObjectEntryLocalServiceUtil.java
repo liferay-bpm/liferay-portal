@@ -718,14 +718,14 @@ public class ObjectEntryLocalServiceUtil {
 				com.liferay.object.model.ObjectDefinition objectDefinition,
 				long objectEntryId,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext,
-				long userId, boolean validation,
+				boolean throwError, long userId,
 				Map<String, Serializable> values)
 		throws PortalException {
 
 		return getService().validateValues(
 			dlFileEntries, tempDLFileEntryIds, existingObjectEntry, guestUser,
-			groupId, objectDefinition, objectEntryId, serviceContext, userId,
-			validation, values);
+			groupId, objectDefinition, objectEntryId, serviceContext,
+			throwError, userId, values);
 	}
 
 	public static ObjectEntryLocalService getService() {
