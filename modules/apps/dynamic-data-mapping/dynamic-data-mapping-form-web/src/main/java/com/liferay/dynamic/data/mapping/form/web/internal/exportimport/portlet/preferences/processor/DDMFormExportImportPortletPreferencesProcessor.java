@@ -8,7 +8,9 @@ package com.liferay.dynamic.data.mapping.form.web.internal.exportimport.portlet.
 import com.liferay.dynamic.data.mapping.constants.DDMConstants;
 import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
@@ -30,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.portlet.PortletPreferences;
-import javax.portlet.ReadOnlyException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -186,14 +187,31 @@ public class DDMFormExportImportPortletPreferencesProcessor
 			groupIds, importedGroupId, importedGroupId);
 
 		try {
+			DDMFormInstance ddmFormInstance =
+				_ddmFormInstanceLocalService.getDDMFormInstance(formInstanceId);
+
+			DDMStructure ddmStructure =
+				_ddmStructureLocalService.getDDMStructure(
+					ddmFormInstance.getStructureId());
+
+			portletPreferences.setValue(
+				"ddmStructureExternalReferenceCode",
+				ddmStructure.getExternalReferenceCode());
+
 			portletPreferences.setValue(
 				"formInstanceId", String.valueOf(formInstanceId));
+
+			Group group = _groupLocalService.getGroup(groupId);
+
+			portletPreferences.setValue(
+				"groupExternalReferenceCode", group.getExternalReferenceCode());
+
 			portletPreferences.setValue("groupId", String.valueOf(groupId));
 		}
-		catch (ReadOnlyException readOnlyException) {
+		catch (Exception exception) {
 			throw new PortletDataException(
 				"Unable to update portlet preferences during import",
-				readOnlyException);
+				exception);
 		}
 
 		return portletPreferences;
@@ -207,6 +225,9 @@ public class DDMFormExportImportPortletPreferencesProcessor
 
 	@Reference
 	private DDMFormInstanceLocalService _ddmFormInstanceLocalService;
+
+	@Reference
+	private DDMStructureLocalService _ddmStructureLocalService;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
