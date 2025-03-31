@@ -558,8 +558,14 @@ public class SelectDDMFormFieldTemplateContextContributorTest
 		DDMFormField ddmFormField, DDMFormFieldOptions ddmFormFieldOptions,
 		Locale locale) {
 
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext =
+			new DDMFormFieldRenderingContext();
+
+		ddmFormFieldRenderingContext.setLocale(locale);
+
 		return _selectDDMFormFieldTemplateContextContributor.getOptions(
-			ddmFormField, ddmFormFieldOptions, locale, null);
+			ddmFormField, ddmFormFieldOptions, ddmFormFieldRenderingContext,
+			false, null);
 	}
 
 	private ListTypeEntry _getListTypeEntry(String name) {
