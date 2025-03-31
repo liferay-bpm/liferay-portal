@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -811,7 +812,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 				objectEntryManager.validateObjectEntry(
 					_getDTOConverterContext(null), _objectDefinition,
 					validationRequest.getValues(),
-					Arrays.asList(
+					ListUtil.fromArray(
 						validationRequest.
 							getObjectValidationRuleExternalReferenceCodes()),
 					scopeKey);
