@@ -112,7 +112,8 @@ public class SelectDDMFormFieldTemplateContextContributor
 
 				return getOptions(
 					ddmFormField, ddmFormFieldOptions,
-					ddmFormFieldRenderingContext.getLocale(), objectField);
+					ddmFormFieldRenderingContext.getLocale(),
+					localizedObjectField, objectField);
 			}
 		).put(
 			"predefinedValue",
@@ -247,7 +248,7 @@ public class SelectDDMFormFieldTemplateContextContributor
 
 	protected List<Map<String, Object>> getOptions(
 		DDMFormField ddmFormField, DDMFormFieldOptions ddmFormFieldOptions,
-		Locale locale, ObjectField objectField) {
+		Locale locale, boolean localizedObjectField, ObjectField objectField) {
 
 		boolean alphabeticalOrder = GetterUtil.getBoolean(
 			ddmFormField.getProperty("alphabeticalOrder"));
@@ -280,24 +281,26 @@ public class SelectDDMFormFieldTemplateContextContributor
 			LocalizedValue localizedValue = ddmFormFieldOptions.getOptionLabels(
 				optionValue);
 
+			Map<Locale, String> labelMap = _getLabelMap(
+				ddmFormField, optionValue, _listTypeEntryLocalService,
+				localizedValue);
+
 			options.add(
 				HashMapBuilder.<String, Object>put(
-					"label", localizedValue.getString(locale)
-				).put(
-					"labelMap",
+					"label",
 					() -> {
-						Map<Locale, String> labeMap =
-							DDMFormFieldTemplateContextContributorUtil.
-								getListTypeEntryNameMap(
-									ddmFormField, optionValue,
-									_listTypeEntryLocalService);
-
-						if (labeMap != null) {
-							return labeMap;
+						if (localizedObjectField) {
+							return GetterUtil.getString(
+								labelMap.get(
+									localizedValue.getDefaultLocale()));
 						}
 
-						return localizedValue.getValues();
+						return GetterUtil.getString(
+							labelMap.get(
+								LocaleThreadLocal.getThemeDisplayLocale()));
 					}
+				).put(
+					"labelMap", labelMap
 				).put(
 					"reference",
 					ddmFormFieldOptions.getOptionReference(optionValue)
@@ -356,6 +359,22 @@ public class SelectDDMFormFieldTemplateContextContributor
 
 	@Reference
 	protected Portal portal;
+
+	private Map<Locale, String> _getLabelMap(
+		DDMFormField ddmFormField, String key,
+		ListTypeEntryLocalService listTypeEntryLocalService,
+		LocalizedValue localizedValue) {
+
+		Map<Locale, String> labelMap =
+			DDMFormFieldTemplateContextContributorUtil.getListTypeEntryNameMap(
+				ddmFormField, key, listTypeEntryLocalService);
+
+		if (labelMap != null) {
+			return labelMap;
+		}
+
+		return localizedValue.getValues();
+	}
 
 	private ObjectField _getObjectField(
 		DDMFormField ddmFormField,
