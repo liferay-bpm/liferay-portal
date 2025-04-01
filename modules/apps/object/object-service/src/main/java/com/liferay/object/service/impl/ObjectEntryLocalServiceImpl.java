@@ -5938,16 +5938,11 @@ public class ObjectEntryLocalServiceImpl
 				continue;
 			}
 
+			_validateRequiredValues(
+				objectField, serviceContext,
+				localizedValues.get(objectDefinition.getDefaultLanguageId()));
+
 			for (Map.Entry<String, String> entry : localizedValues.entrySet()) {
-				if (Objects.equals(
-						objectDefinition.getDefaultLanguageId(),
-						entry.getKey())) {
-
-					_validateRequiredValues(
-						objectField, serviceContext,
-						values.get(objectField.getName()));
-				}
-
 				_validateValues(
 					dlFileEntryIds, existingObjectEntry, guestUser, groupId,
 					objectDefinition, objectEntryId, objectField,
