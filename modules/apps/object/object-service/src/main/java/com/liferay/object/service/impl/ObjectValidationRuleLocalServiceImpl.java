@@ -31,6 +31,7 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.model.ObjectValidationRule;
 import com.liferay.object.model.ObjectValidationRuleSetting;
+import com.liferay.object.model.ObjectValidationRuleTable;
 import com.liferay.object.scripting.exception.ObjectScriptingException;
 import com.liferay.object.scripting.validator.ObjectScriptingValidator;
 import com.liferay.object.service.ObjectEntryLocalService;
@@ -47,6 +48,8 @@ import com.liferay.object.validation.rule.ObjectValidationRuleEngineRegistry;
 import com.liferay.object.validation.rule.ObjectValidationRuleResult;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.sql.dsl.Column;
+import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
@@ -436,20 +439,9 @@ public class ObjectValidationRuleLocalServiceImpl
 				objectEntry.getObjectDefinitionId(), true);
 		}
 		else {
-			objectValidationRules = TransformUtil.transform(
-				externalReferenceCodes,
-				externalReferenceCode -> {
-					ObjectValidationRule objectValidationRule =
-						fetchObjectValidationRule(
-							externalReferenceCode,
-							objectEntry.getObjectDefinitionId());
-
-					if (objectValidationRule.isActive()) {
-						return objectValidationRule;
-					}
-
-					return null;
-				});
+			objectValidationRules = _getObjectValidationRulesDSLQuery(
+				true, objectEntry.getCompanyId(), externalReferenceCodes,
+				objectEntry.getObjectDefinitionId());
 		}
 
 		_validate(
@@ -546,6 +538,29 @@ public class ObjectValidationRuleLocalServiceImpl
 		}
 
 		return objectValidationRules;
+	}
+
+	private List<ObjectValidationRule> _getObjectValidationRulesDSLQuery(
+		boolean active, long companyId, List<String> externalReferenceCodes,
+		long objectDefinitionId) {
+
+		DSLQuery dslQuery = DSLQueryFactoryUtil.select(
+		).from(
+			ObjectValidationRuleTable.INSTANCE
+		).where(
+			ObjectValidationRuleTable.INSTANCE.objectDefinitionId.eq(
+				objectDefinitionId
+			).and(
+				ObjectValidationRuleTable.INSTANCE.active.eq(active)
+			).and(
+				ObjectValidationRuleTable.INSTANCE.companyId.eq(companyId)
+			).and(
+				ObjectValidationRuleTable.INSTANCE.externalReferenceCode.in(
+					externalReferenceCodes.toArray(new String[0]))
+			)
+		);
+
+		return objectValidationRulePersistence.dslQuery(dslQuery);
 	}
 
 	private List<ObjectValidationRuleSetting>
