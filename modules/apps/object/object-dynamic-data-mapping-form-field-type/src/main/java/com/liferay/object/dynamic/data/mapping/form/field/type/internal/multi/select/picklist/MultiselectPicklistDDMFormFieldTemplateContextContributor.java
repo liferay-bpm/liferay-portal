@@ -44,9 +44,9 @@ public class MultiselectPicklistDDMFormFieldTemplateContextContributor
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
+		DDMForm ddmForm = ddmFormField.getDDMForm();
 		boolean localizedObjectField = GetterUtil.getBoolean(
 			ddmFormField.getProperty("localizedObjectField"));
-		DDMForm ddmForm = ddmFormField.getDDMForm();
 
 		return HashMapBuilder.<String, Object>put(
 			"editOnlyInDefaultLanguage",
@@ -72,19 +72,12 @@ public class MultiselectPicklistDDMFormFieldTemplateContextContributor
 						continue;
 					}
 
-					HttpServletRequest httpServletRequest =
-						ddmFormFieldRenderingContext.getHttpServletRequest();
-
 					LocalizedValue localizedValue =
 						ddmFormFieldOptions.getOptionLabels(optionValue);
 
 					Map<Locale, String> labelMap = _getLabelMap(
 						ddmFormField, optionValue, _listTypeEntryLocalService,
 						localizedValue);
-
-					ThemeDisplay themeDisplay =
-						(ThemeDisplay)httpServletRequest.getAttribute(
-							WebKeys.THEME_DISPLAY);
 
 					options.add(
 						HashMapBuilder.<String, Object>put(
@@ -95,6 +88,15 @@ public class MultiselectPicklistDDMFormFieldTemplateContextContributor
 										labelMap.get(
 											localizedValue.getDefaultLocale()));
 								}
+
+								HttpServletRequest httpServletRequest =
+									ddmFormFieldRenderingContext.
+										getHttpServletRequest();
+
+								ThemeDisplay themeDisplay =
+									(ThemeDisplay)
+										httpServletRequest.getAttribute(
+											WebKeys.THEME_DISPLAY);
 
 								return GetterUtil.getString(
 									labelMap.get(themeDisplay.getLocale()));

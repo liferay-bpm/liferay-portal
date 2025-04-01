@@ -286,19 +286,12 @@ public class SelectDDMFormFieldTemplateContextContributor
 				continue;
 			}
 
-			HttpServletRequest httpServletRequest =
-				ddmFormFieldRenderingContext.getHttpServletRequest();
-
 			LocalizedValue localizedValue = ddmFormFieldOptions.getOptionLabels(
 				optionValue);
 
 			Map<Locale, String> labelMap = _getLabelMap(
 				ddmFormField, optionValue, _listTypeEntryLocalService,
 				localizedValue);
-
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)httpServletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
 
 			options.add(
 				HashMapBuilder.<String, Object>put(
@@ -309,6 +302,14 @@ public class SelectDDMFormFieldTemplateContextContributor
 								labelMap.get(
 									localizedValue.getDefaultLocale()));
 						}
+
+						HttpServletRequest httpServletRequest =
+							ddmFormFieldRenderingContext.
+								getHttpServletRequest();
+
+						ThemeDisplay themeDisplay =
+							(ThemeDisplay)httpServletRequest.getAttribute(
+								WebKeys.THEME_DISPLAY);
 
 						return GetterUtil.getString(
 							labelMap.get(themeDisplay.getLocale()));
