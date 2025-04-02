@@ -5093,6 +5093,8 @@ public class ObjectEntryLocalServiceTest {
 						"pt_BR", false
 					).build()
 				).build()));
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
 	@Rule
