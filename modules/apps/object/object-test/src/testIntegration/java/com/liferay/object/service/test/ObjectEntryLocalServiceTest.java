@@ -5067,7 +5067,7 @@ public class ObjectEntryLocalServiceTest {
 				Collections.singletonList(objectField));
 
 		AssertUtils.assertFailure(
-			ObjectEntryValuesException.Required.class,
+			ObjectEntryValuesException.RequiredLanguageId.class,
 			StringBundler.concat(
 				"No value was provided for the language ID \"en_US\" in the ",
 				"required object field \"", objectField.getName(), "\""),
