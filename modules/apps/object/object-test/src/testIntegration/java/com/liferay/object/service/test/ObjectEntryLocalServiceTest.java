@@ -903,6 +903,8 @@ public class ObjectEntryLocalServiceTest {
 				HashMapBuilder.<String, Serializable>put(
 					"emailAddressRequired", "john@liferay.com"
 				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).put(
 					"multipleListTypeEntriesKey",
 					(Serializable)Arrays.asList(
 						"multipleListTypeEntryKey1",
@@ -5070,7 +5072,7 @@ public class ObjectEntryLocalServiceTest {
 			ObjectEntryValuesException.RequiredLanguageId.class,
 			StringBundler.concat(
 				"No value was provided for the language ID \"en_US\" in the ",
-				"required object field \"", objectField.getName(), "\""),
+				"required object field \"", objectField.getName(), "\"."),
 			() -> ObjectEntryTestUtil.addObjectEntry(
 				0, objectDefinition.getObjectDefinitionId(),
 				HashMapBuilder.<String, Serializable>put(
