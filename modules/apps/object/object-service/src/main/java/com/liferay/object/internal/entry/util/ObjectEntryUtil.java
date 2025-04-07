@@ -6,6 +6,7 @@
 package com.liferay.object.internal.entry.util;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectEntryLocalServiceUtil;
@@ -107,9 +108,17 @@ public class ObjectEntryUtil {
 					return null;
 				}
 
+				Map<String, Serializable> attributes =
+					ObjectEntryThreadLocal.getExpandoValues();
+
+				ObjectEntryThreadLocal.clear();
+
 				return _toDTO(
 					originalBaseModel, dtoConverter, dtoConverterRegistry,
-					Collections.emptyMap(), jsonFactory, modelClass, userId);
+					Collections.emptyMap(), jsonFactory, modelClass, userId
+				).put(
+					"customFields", attributes
+				);
 			}
 		).put(
 			"originalExtendedProperties", originalExtendedProperties

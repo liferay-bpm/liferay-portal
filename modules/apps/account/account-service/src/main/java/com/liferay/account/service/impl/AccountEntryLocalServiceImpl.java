@@ -20,7 +20,10 @@ import com.liferay.account.service.base.AccountEntryLocalServiceBaseImpl;
 import com.liferay.account.validator.AccountEntryEmailAddressValidator;
 import com.liferay.account.validator.AccountEntryEmailAddressValidatorFactory;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.service.ExpandoRowLocalService;
+import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
+import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.sql.dsl.DSLFunctionFactoryUtil;
@@ -685,6 +688,14 @@ public class AccountEntryLocalServiceImpl
 
 		accountEntry.setTaxIdNumber(taxIdNumber);
 		accountEntry.setStatus(WorkflowConstants.STATUS_DRAFT);
+
+		ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(
+			accountEntry.getCompanyId(), accountEntry.getModelClassName(),
+			accountEntryId);
+
+		ObjectEntryThreadLocal.setExpandoValues(
+			expandoBridge.getAttributes());
+
 		accountEntry.setExpandoBridgeAttributes(serviceContext);
 
 		accountEntry = accountEntryPersistence.update(accountEntry);
