@@ -32,14 +32,6 @@ jest.mock('react-flow-renderer', () => {
 });
 
 describe('Object Definition Node Header', () => {
-	afterAll(() => {
-		window.Liferay.FeatureFlags['LPD-34594'] = false;
-	});
-
-	beforeAll(() => {
-		window.Liferay.FeatureFlags['LPD-34594'] = true;
-	});
-
 	it('has root object label when it is a parent', () => {
 		render(
 			<ObjectDefinitionNodeHeader

@@ -96,14 +96,11 @@ export function ManagementToolbar({
 					<div className="border-right ml-sm-2 mr-3 pr-3">
 						<h3 className="mb-0 text-truncate">{label}</h3>
 
-						{Liferay.FeatureFlags['LPD-34594'] &&
-							inheritanceLabel && (
-								<strong
-									className={`${inheritanceClassName} label`}
-								>
-									{inheritanceLabel}
-								</strong>
-							)}
+						{inheritanceLabel && (
+							<strong className={`${inheritanceClassName} label`}>
+								{inheritanceLabel}
+							</strong>
+						)}
 
 						{badgeLabel && (
 							<strong className={`${badgeClassName} label`}>

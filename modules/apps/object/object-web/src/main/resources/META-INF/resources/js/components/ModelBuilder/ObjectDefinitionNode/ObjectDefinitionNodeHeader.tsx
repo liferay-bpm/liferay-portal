@@ -92,20 +92,18 @@ export default function ObjectDefinitionNodeHeader({
 				</div>
 
 				<div>
-					{Liferay.FeatureFlags['LPD-34594'] && (
-						<ClayLabel
-							className={classNames('label-inverse-secondary', {
-								'label-inverse-info':
-									isRootDescendantNode || isRootNode,
-							})}
-						>
-							{isRootNode
-								? Liferay.Language.get('root-object')
-								: isRootDescendantNode
-									? Liferay.Language.get('inherited')
-									: Liferay.Language.get('standard')}
-						</ClayLabel>
-					)}
+					<ClayLabel
+						className={classNames('label-inverse-secondary', {
+							'label-inverse-info':
+								isRootDescendantNode || isRootNode,
+						})}
+					>
+						{isRootNode
+							? Liferay.Language.get('root-object')
+							: isRootDescendantNode
+								? Liferay.Language.get('inherited')
+								: Liferay.Language.get('standard')}
+					</ClayLabel>
 
 					<ClayLabel displayType={system ? 'info' : 'warning'}>
 						{system

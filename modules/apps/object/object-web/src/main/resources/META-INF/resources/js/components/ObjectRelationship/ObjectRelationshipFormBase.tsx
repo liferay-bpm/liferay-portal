@@ -434,15 +434,13 @@ export function ObjectRelationshipFormBase({
 
 			{children}
 
-			{onChangeInheritanceCheckbox &&
-				values.type === 'oneToMany' &&
-				Liferay.FeatureFlags['LPD-34594'] && (
-					<ObjectRelationshipInheritanceCheckbox
-						learnResources={learnResources}
-						onChange={onChangeInheritanceCheckbox}
-						values={values}
-					/>
-				)}
+			{onChangeInheritanceCheckbox && values.type === 'oneToMany' && (
+				<ObjectRelationshipInheritanceCheckbox
+					learnResources={learnResources}
+					onChange={onChangeInheritanceCheckbox}
+					values={values}
+				/>
+			)}
 
 			{submitError && (
 				<ClayAlert

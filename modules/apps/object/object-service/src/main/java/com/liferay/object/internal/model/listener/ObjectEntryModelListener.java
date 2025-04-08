@@ -38,7 +38,6 @@ import com.liferay.portal.kernel.audit.AuditMessage;
 import com.liferay.portal.kernel.audit.AuditRouter;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -113,12 +112,6 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 			_executeObjectActions(
 				ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE, objectEntry,
 				objectEntry, user);
-
-			if (!FeatureFlagManagerUtil.isEnabled(
-					objectEntry.getCompanyId(), "LPD-34594")) {
-
-				return;
-			}
 
 			ObjectDefinition objectDefinition =
 				_objectDefinitionLocalService.getObjectDefinition(

@@ -1241,10 +1241,7 @@ public class ObjectDefinitionResourceImpl
 				).put(
 					"exportBoundObjectDefinitions",
 					() -> {
-						if (!FeatureFlagManagerUtil.isEnabled(
-								contextCompany.getCompanyId(), "LPD-34594") ||
-							!serviceBuilderObjectDefinition.isRootNode()) {
-
+						if (!serviceBuilderObjectDefinition.isRootNode()) {
 							return null;
 						}
 

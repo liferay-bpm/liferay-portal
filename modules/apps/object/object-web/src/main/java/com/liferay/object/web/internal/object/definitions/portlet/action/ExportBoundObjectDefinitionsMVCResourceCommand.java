@@ -52,10 +52,6 @@ public class ExportBoundObjectDefinitionsMVCResourceCommand
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		if (!FeatureFlagManagerUtil.isEnabled("LPD-34594")) {
-			throw new UnsupportedOperationException();
-		}
-
 		ObjectDefinitionResource.Builder builder =
 			_objectDefinitionResourceFactory.create();
 

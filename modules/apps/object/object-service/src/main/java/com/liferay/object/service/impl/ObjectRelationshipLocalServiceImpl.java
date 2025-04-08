@@ -68,7 +68,6 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.GroupConstants;
@@ -1008,16 +1007,10 @@ public class ObjectRelationshipLocalServiceImpl
 				objectRelationship.getObjectFieldId2(), false);
 		}
 
-		if (edge && !objectRelationship.isEdge() &&
-			FeatureFlagManagerUtil.isEnabled(
-				objectRelationship.getCompanyId(), "LPD-34594")) {
-
+		if (edge && !objectRelationship.isEdge()) {
 			_bindObjectDefinitions(objectRelationship);
 		}
-		else if (!edge && objectRelationship.isEdge() &&
-				 FeatureFlagManagerUtil.isEnabled(
-					 objectRelationship.getCompanyId(), "LPD-34594")) {
-
+		else if (!edge && objectRelationship.isEdge()) {
 			_unbindObjectDefinitions(objectRelationship);
 		}
 
@@ -1292,10 +1285,7 @@ public class ObjectRelationshipLocalServiceImpl
 		_registerRelatedInfoItemCollectionProvider(
 			objectDefinition1, objectDefinition2, objectRelationship);
 
-		if (edge &&
-			FeatureFlagManagerUtil.isEnabled(
-				objectRelationship.getCompanyId(), "LPD-34594")) {
-
+		if (edge) {
 			_bindObjectDefinitions(objectRelationship);
 		}
 
@@ -1919,9 +1909,7 @@ public class ObjectRelationshipLocalServiceImpl
 		throws PortalException {
 
 		if (!edge ||
-			((objectRelationship != null) && objectRelationship.isEdge()) ||
-			!FeatureFlagManagerUtil.isEnabled(
-				objectDefinition1.getCompanyId(), "LPD-34594")) {
+			((objectRelationship != null) && objectRelationship.isEdge())) {
 
 			return;
 		}

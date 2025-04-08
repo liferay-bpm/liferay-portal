@@ -16,7 +16,6 @@ import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
-import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
@@ -80,7 +79,6 @@ public class ObjectDefinitionImplTest {
 		}
 	}
 
-	@FeatureFlags("LPD-34594")
 	@Test
 	public void testGetRESTContextPathRootDescendantNode() {
 

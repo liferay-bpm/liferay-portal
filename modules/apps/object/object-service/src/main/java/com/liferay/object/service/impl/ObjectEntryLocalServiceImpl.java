@@ -2598,13 +2598,11 @@ public class ObjectEntryLocalServiceImpl
 			},
 			user.getUserId());
 
-		if (!FeatureFlagManagerUtil.isEnabled(
-				objectDefinition.getCompanyId(), "LPD-34594") ||
-			(!objectDefinition.isRootDescendantNode() &&
-			 (!objectDefinition.isRootNode() ||
-			  StringUtil.equals(
-				  objectActionTrigger,
-				  ObjectActionTriggerConstants.KEY_ON_AFTER_ADD)))) {
+		if (!objectDefinition.isRootDescendantNode() &&
+			(!objectDefinition.isRootNode() ||
+			 StringUtil.equals(
+				 objectActionTrigger,
+				 ObjectActionTriggerConstants.KEY_ON_AFTER_ADD))) {
 
 			return;
 		}
