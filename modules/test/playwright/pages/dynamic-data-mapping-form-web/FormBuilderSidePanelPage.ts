@@ -5,6 +5,8 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {ApiHelpers} from '../../helpers/ApiHelpers';
+
 export class FormBuilderSidePanelPage {
 	readonly addSelectFromListButton: Locator;
 	readonly addSelectOptionButton: Locator;
@@ -19,6 +21,7 @@ export class FormBuilderSidePanelPage {
 	readonly paragraphFieldTextarea: Locator;
 	readonly paragraphFieldTitle: Locator;
 	readonly predefinedValueField: Locator;
+	readonly requireConfirmationToggleSwitch: Locator;
 	readonly requiredFieldToggleSwitch: Locator;
 
 	constructor(page: Page) {
@@ -48,6 +51,9 @@ export class FormBuilderSidePanelPage {
 		this.paragraphFieldTitle = page.getByPlaceholder('Enter a title.');
 		this.predefinedValueField = page.getByLabel('Predefined Value');
 		this.requiredFieldToggleSwitch = page.getByText('Required Field');
+		this.requireConfirmationToggleSwitch = page.getByLabel(
+			'Require Confirmation'
+		);
 	}
 
 	async addFieldByDoubleClick(formFieldTypeTitle: FormFieldTypeTitle) {
@@ -74,14 +80,14 @@ export class FormBuilderSidePanelPage {
 		await this.backButton.click();
 	}
 
-	async fillParagraphField({text}: {text: string}) {
+	async fillParagraphField(apiHelpers: ApiHelpers, text: string) {
 		await this.paragraphFieldTextarea.fill(text);
 
 		// filling is not enough, we need need a key event to make it work
 
 		await this.paragraphFieldTextarea.press('End');
 
-		await this.page.waitForLoadState('networkidle');
+		await apiHelpers.dynamicDataMapping.waitForDDMEvaluate(this.page);
 	}
 
 	async selectObjectField(objectFieldLabel: string) {
