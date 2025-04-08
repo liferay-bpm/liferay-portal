@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * @author Marcela Cunha
@@ -27,6 +28,15 @@ public class ObjectEntryThreadLocal {
 
 	public static void clear() {
 		_expandoValues.remove();
+	}
+
+	public static <T> T clearAfter(Supplier<T> supplier) {
+		try {
+			return supplier.get();
+		}
+		finally {
+			clear();
+		}
 	}
 
 	public static Map<String, Serializable> getExpandoValues() {

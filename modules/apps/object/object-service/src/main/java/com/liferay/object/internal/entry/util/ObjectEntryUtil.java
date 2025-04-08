@@ -108,17 +108,19 @@ public class ObjectEntryUtil {
 					return null;
 				}
 
-				Map<String, Serializable> attributes =
-					ObjectEntryThreadLocal.getExpandoValues();
+				return ObjectEntryThreadLocal.clearAfter(
+					() -> {
+						Map<String, Object> map = _toDTO(
+							originalBaseModel, dtoConverter,
+							dtoConverterRegistry, Collections.emptyMap(),
+							jsonFactory, modelClass, userId);
 
-				ObjectEntryThreadLocal.clear();
+						map.put(
+							"customFields",
+							ObjectEntryThreadLocal.getExpandoValues());
 
-				return _toDTO(
-					originalBaseModel, dtoConverter, dtoConverterRegistry,
-					Collections.emptyMap(), jsonFactory, modelClass, userId
-				).put(
-					"customFields", attributes
-				);
+						return map;
+					});
 			}
 		).put(
 			"originalExtendedProperties", originalExtendedProperties
