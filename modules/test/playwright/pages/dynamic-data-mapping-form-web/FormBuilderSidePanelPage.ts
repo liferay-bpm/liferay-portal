@@ -19,6 +19,7 @@ export class FormBuilderSidePanelPage {
 	readonly paragraphFieldTextarea: Locator;
 	readonly paragraphFieldTitle: Locator;
 	readonly predefinedValueField: Locator;
+	readonly requireConfirmationToggleSwitch: Locator;
 	readonly requiredFieldToggleSwitch: Locator;
 
 	constructor(page: Page) {
@@ -48,6 +49,9 @@ export class FormBuilderSidePanelPage {
 		this.paragraphFieldTitle = page.getByPlaceholder('Enter a title.');
 		this.predefinedValueField = page.getByLabel('Predefined Value');
 		this.requiredFieldToggleSwitch = page.getByText('Required Field');
+		this.requireConfirmationToggleSwitch = page.getByLabel(
+			'Require Confirmation'
+		);
 	}
 
 	async addFieldByDoubleClick(formFieldTypeTitle: FormFieldTypeTitle) {
