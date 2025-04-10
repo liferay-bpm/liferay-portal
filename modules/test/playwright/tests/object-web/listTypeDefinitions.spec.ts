@@ -429,7 +429,9 @@ test.describe('ensure picklist translation', () => {
 
 		// Preview form
 
-		await page.waitForTimeout(200);
+		await page.waitForResponse(
+			'http://localhost:8080/o/dynamic-data-mapping-form-context-provider/'
+		);
 
 		const newTabPagePromise = new Promise<Page>((resolve) =>
 			formBuilderPage.page.once('popup', resolve)

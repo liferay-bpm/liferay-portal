@@ -51,8 +51,7 @@ test.describe('Data engine debounce', () => {
 		await confirmationField.click();
 
 		for (let index = 0; index < 15; index++) {
-			await newTabPage.keyboard.press('2');
-			await newTabPage.waitForTimeout(300);
+			await newTabPage.keyboard.press('2', {delay: 300});
 		}
 
 		await expect(confirmationField).toHaveValue('222222222222222');

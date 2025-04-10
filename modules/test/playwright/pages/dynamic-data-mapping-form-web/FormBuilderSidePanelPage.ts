@@ -75,7 +75,9 @@ export class FormBuilderSidePanelPage {
 
 		await this.paragraphFieldTextarea.press('End');
 
-		await this.page.waitForLoadState('networkidle');
+		await this.page.waitForResponse(
+			'http://localhost:8080/o/dynamic-data-mapping-form-context-provider/'
+		);
 	}
 
 	async selectObjectField(objectFieldLabel: string) {
