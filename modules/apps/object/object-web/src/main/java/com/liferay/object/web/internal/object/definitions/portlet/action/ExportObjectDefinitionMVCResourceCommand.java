@@ -12,7 +12,6 @@ import com.liferay.object.web.internal.object.definitions.portlet.action.util.Ex
 import com.liferay.object.web.internal.util.JSONObjectSanitizerUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.PortletResponseUtil;
@@ -70,10 +69,6 @@ public class ExportObjectDefinitionMVCResourceCommand
 
 		JSONObject objectDefinitionJSONObject = _jsonFactory.createJSONObject(
 			objectDefinition.toString());
-
-		if (!FeatureFlagManagerUtil.isEnabled("LPS-135430")) {
-			objectDefinitionJSONObject.remove("storageType");
-		}
 
 		JSONObjectSanitizerUtil.sanitize(
 			objectDefinitionJSONObject,

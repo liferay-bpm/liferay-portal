@@ -268,44 +268,42 @@ export default function EditObjectDetails({
 						</ClayPanel.Body>
 					</ClayPanel>
 
-					{Liferay.FeatureFlags['LPS-135430'] && (
-						<ClayPanel
-							collapsable
-							defaultExpanded
-							displayTitle={
-								<div className="lfr__object-web-edit-object-details-external-data-source-panel">
-									<span className="panel-title">
-										{Liferay.Language.get(
-											'external-data-source'
-										)}
-									</span>
-
-									{values.storageType === 'salesforce' && (
-										<div className="lfr__object-web-edit-object-details-external-data-source-panel-container-beta">
-											<FeatureIndicator
-												interactive
-												learnResourceContext={
-													learnResourceContext
-												}
-												type="beta"
-											/>
-										</div>
+					<ClayPanel
+						collapsable
+						defaultExpanded
+						displayTitle={
+							<div className="lfr__object-web-edit-object-details-external-data-source-panel">
+								<span className="panel-title">
+									{Liferay.Language.get(
+										'external-data-source'
 									)}
-								</div>
-							}
-							displayType="unstyled"
-						>
-							<ClayPanel.Body>
-								<div className="lfr__object-web-edit-object-details-external-data-source-container">
-									<ExternalDataSourceContainer
-										errors={errors}
-										storageTypes={storageTypes}
-										values={values}
-									/>
-								</div>
-							</ClayPanel.Body>
-						</ClayPanel>
-					)}
+								</span>
+
+								{values.storageType === 'salesforce' && (
+									<div className="lfr__object-web-edit-object-details-external-data-source-panel-container-beta">
+										<FeatureIndicator
+											interactive
+											learnResourceContext={
+												learnResourceContext
+											}
+											type="beta"
+										/>
+									</div>
+								)}
+							</div>
+						}
+						displayType="unstyled"
+					>
+						<ClayPanel.Body>
+							<div className="lfr__object-web-edit-object-details-external-data-source-container">
+								<ExternalDataSourceContainer
+									errors={errors}
+									storageTypes={storageTypes}
+									values={values}
+								/>
+							</div>
+						</ClayPanel.Body>
+					</ClayPanel>
 
 					<ClayPanel
 						collapsable

@@ -92,10 +92,6 @@ public class ExportBoundObjectDefinitionsMVCResourceCommand
 			JSONObject jsonObject = _jsonFactory.createJSONObject(
 				objectDefinition.toString());
 
-			if (!FeatureFlagManagerUtil.isEnabled("LPS-135430")) {
-				jsonObject.remove("storageType");
-			}
-
 			JSONObjectSanitizerUtil.sanitize(
 				jsonObject,
 				new String[] {

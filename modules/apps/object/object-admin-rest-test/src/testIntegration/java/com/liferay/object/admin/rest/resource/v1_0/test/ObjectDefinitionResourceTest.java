@@ -46,7 +46,6 @@ import com.liferay.object.service.ObjectFolderLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -1378,10 +1377,6 @@ public class ObjectDefinitionResourceTest
 				}
 			});
 		objectDefinition.setSystem(false);
-
-		if (!FeatureFlagManagerUtil.isEnabled("LPS-135430")) {
-			objectDefinition.setStorageType(StringPool.BLANK);
-		}
 
 		return objectDefinition;
 	}

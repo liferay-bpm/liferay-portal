@@ -11,8 +11,6 @@ import com.liferay.object.constants.ObjectPortletKeys;
 import com.liferay.object.exception.ObjectDefinitionNameException;
 import com.liferay.object.exception.ObjectDefinitionStatusException;
 import com.liferay.object.exception.ObjectViewColumnFieldNameException;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -176,10 +174,6 @@ public class ImportObjectDefinitionMVCActionCommand
 							objectDefinition);
 
 				putObjectDefinition.setPortlet(objectDefinition::getPortlet);
-
-				if (!FeatureFlagManagerUtil.isEnabled("LPS-135430")) {
-					putObjectDefinition.setStorageType(() -> StringPool.BLANK);
-				}
 
 				objectDefinitionResource.putObjectDefinition(
 					putObjectDefinition.getId(), putObjectDefinition);

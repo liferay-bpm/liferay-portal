@@ -241,8 +241,7 @@ export function ObjectRelationshipFormBase({
 				({modifiable, parameterRequired, storageType}) => {
 					return (
 						(objectDefinition.modifiable || modifiable) &&
-						(!Liferay.FeatureFlags['LPS-135430'] ||
-							storageType === 'default') &&
+						storageType === 'default' &&
 						!parameterRequired
 					);
 				}

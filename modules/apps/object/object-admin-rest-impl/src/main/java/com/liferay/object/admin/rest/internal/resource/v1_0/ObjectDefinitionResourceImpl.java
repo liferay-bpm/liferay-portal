@@ -35,7 +35,6 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.definition.util.ObjectDefinitionUtil;
 import com.liferay.object.exception.ObjectDefinitionStatusException;
-import com.liferay.object.exception.ObjectDefinitionStorageTypeException;
 import com.liferay.object.model.ObjectActionModel;
 import com.liferay.object.model.ObjectFieldModel;
 import com.liferay.object.model.ObjectFolder;
@@ -231,12 +230,6 @@ public class ObjectDefinitionResourceImpl
 	public ObjectDefinition postObjectDefinition(
 			ObjectDefinition objectDefinition)
 		throws Exception {
-
-		if (!Validator.isBlank(objectDefinition.getStorageType()) &&
-			!FeatureFlagManagerUtil.isEnabled("LPS-135430")) {
-
-			throw new ObjectDefinitionStorageTypeException();
-		}
 
 		_addListTypeDefinition(objectDefinition);
 
@@ -479,12 +472,6 @@ public class ObjectDefinitionResourceImpl
 		throws Exception {
 
 		// TODO Move logic to service
-
-		if (!Validator.isBlank(objectDefinition.getStorageType()) &&
-			!FeatureFlagManagerUtil.isEnabled("LPS-135430")) {
-
-			throw new ObjectDefinitionStorageTypeException();
-		}
 
 		com.liferay.object.model.ObjectDefinition
 			serviceBuilderObjectDefinition =

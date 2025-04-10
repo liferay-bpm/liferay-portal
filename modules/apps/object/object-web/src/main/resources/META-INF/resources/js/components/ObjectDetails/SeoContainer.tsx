@@ -15,8 +15,7 @@ interface SeoContainerProps {
 
 export function SeoContainer({onSubmit, setValues, values}: SeoContainerProps) {
 	const disabled =
-		(Liferay.FeatureFlags['LPS-135430'] &&
-			values.storageType !== 'default') ||
+		values.storageType !== 'default' ||
 		(!values.modifiable && values.system);
 
 	return (

@@ -292,14 +292,7 @@ public class ObjectDefinitionUtil {
 											getStatus())));
 						}
 					});
-				setStorageType(
-					() -> {
-						if (!FeatureFlagManagerUtil.isEnabled("LPS-135430")) {
-							return null;
-						}
-
-						return serviceBuilderObjectDefinition.getStorageType();
-					});
+				setStorageType(serviceBuilderObjectDefinition::getStorageType);
 				setSystem(serviceBuilderObjectDefinition::isSystem);
 				setTitleObjectFieldName(
 					() -> {

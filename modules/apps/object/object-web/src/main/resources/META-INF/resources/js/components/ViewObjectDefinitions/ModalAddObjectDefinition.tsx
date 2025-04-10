@@ -101,9 +101,8 @@ export function ModalAddObjectDefinition({
 				objectFolderExternalReferenceCode;
 		}
 
-		if (Liferay.FeatureFlags['LPS-135430']) {
-			objectDefinition.storageType = storageType;
-		}
+		objectDefinition.storageType = storageType;
+
 		try {
 			const newObjectDefinition = (await API.postObjectDefinition(
 				objectDefinition
@@ -198,36 +197,32 @@ export function ModalAddObjectDefinition({
 							}
 						/>
 
-						{Liferay.FeatureFlags['LPS-135430'] && (
-							<div className="lfr__object-web-modal-add-object-definition-storage-type">
-								<SingleSelect<LabelValueObject>
-									items={
-										objectDefinitionStorageTypesSortedByLabel
-									}
-									label={Liferay.Language.get('storage-type')}
-									onSelectionChange={(value) => {
-										setValues({
-											...values,
-											storageType: value as string,
-										});
-									}}
-									selectedKey={values.storageType}
-									tooltip={Liferay.Language.get(
-										'object-definition-storage-type-tooltip'
-									)}
-								/>
+						<div className="lfr__object-web-modal-add-object-definition-storage-type">
+							<SingleSelect<LabelValueObject>
+								items={
+									objectDefinitionStorageTypesSortedByLabel
+								}
+								label={Liferay.Language.get('storage-type')}
+								onSelectionChange={(value) => {
+									setValues({
+										...values,
+										storageType: value as string,
+									});
+								}}
+								selectedKey={values.storageType}
+								tooltip={Liferay.Language.get(
+									'object-definition-storage-type-tooltip'
+								)}
+							/>
 
-								<div className="lfr__object-web-modal-add-object-definition-storage-type-beta">
-									<FeatureIndicator
-										interactive
-										learnResourceContext={
-											learnResourceContext
-										}
-										type="beta"
-									/>
-								</div>
+							<div className="lfr__object-web-modal-add-object-definition-storage-type-beta">
+								<FeatureIndicator
+									interactive
+									learnResourceContext={learnResourceContext}
+									type="beta"
+								/>
 							</div>
-						)}
+						</div>
 					</ClayModal.Body>
 
 					<ClayModal.Footer

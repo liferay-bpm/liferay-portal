@@ -216,7 +216,7 @@ export function BasicInfoTab({
 				/>
 			</ContainerWrapper>
 
-			{Liferay.FeatureFlags['LPS-135430'] && !isDefaultStorageType && (
+			{!isDefaultStorageType && (
 				<ContainerWrapper
 					collapsable
 					defaultExpanded
