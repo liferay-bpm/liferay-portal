@@ -27,7 +27,6 @@ import com.liferay.object.admin.rest.client.dto.v1_0.ObjectValidationRuleSetting
 import com.liferay.object.admin.rest.client.dto.v1_0.Status;
 import com.liferay.object.admin.rest.client.pagination.Page;
 import com.liferay.object.admin.rest.client.pagination.Pagination;
-import com.liferay.object.admin.rest.client.problem.Problem;
 import com.liferay.object.admin.rest.client.resource.v1_0.ObjectDefinitionResource;
 import com.liferay.object.admin.rest.client.serdes.v1_0.ObjectDefinitionSerDes;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
@@ -1114,19 +1113,15 @@ public class ObjectDefinitionResourceTest
 		randomObjectDefinition = randomObjectDefinition();
 
 		randomObjectDefinition.setStorageType(
-			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT);
+			ObjectDefinitionConstants.STORAGE_TYPE_SALESFORCE);
 
-		try {
+		ObjectDefinition putObjectDefinition =
 			objectDefinitionResource.putObjectDefinition(
 				postObjectDefinition.getId(), randomObjectDefinition);
 
-			Assert.fail();
-		}
-		catch (Problem.ProblemException problemException) {
-			Problem problem = problemException.getProblem();
-
-			Assert.assertEquals("BAD_REQUEST", problem.getStatus());
-		}
+		Assert.assertEquals(
+			postObjectDefinition.getStorageType(),
+			putObjectDefinition.getStorageType());
 
 		_objectDefinitionLocalService.deleteObjectDefinition(
 			postObjectDefinition.getId());
@@ -1376,6 +1371,8 @@ public class ObjectDefinitionResourceTest
 							WorkflowConstants.STATUS_DRAFT));
 				}
 			});
+		objectDefinition.setStorageType(
+			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT);
 		objectDefinition.setSystem(false);
 
 		return objectDefinition;
