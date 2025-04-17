@@ -269,7 +269,11 @@ export default function FieldBase({
 					);
 
 	const renderLabel =
-		(label && showLabel) || hideField || repeatable || required || tooltip;
+		((label || type === 'checkbox') && showLabel) ||
+		hideField ||
+		repeatable ||
+		required ||
+		tooltip;
 	const showDisabledFieldIcon =
 		editOnlyInDefaultLanguage && showLabel && readOnly;
 	const showGroup =

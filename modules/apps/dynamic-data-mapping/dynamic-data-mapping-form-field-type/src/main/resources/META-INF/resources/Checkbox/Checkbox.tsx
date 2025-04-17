@@ -35,6 +35,7 @@ export default function Main({
 	label,
 	localizedObjectField,
 	required,
+	showLabel,
 	...otherProps
 }: IProps) {
 	const Component =
@@ -43,7 +44,7 @@ export default function Main({
 			: Checkbox;
 
 	return (
-		<FieldBase showLabel={false} {...otherProps}>
+		<FieldBase showLabel={showLabel} {...otherProps}>
 			<Component label={label} required={required} {...otherProps} />
 		</FieldBase>
 	);

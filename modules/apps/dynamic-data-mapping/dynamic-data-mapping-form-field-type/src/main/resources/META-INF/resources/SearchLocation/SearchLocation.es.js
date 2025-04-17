@@ -205,63 +205,70 @@ const Main = ({
 			required={false}
 			tip=""
 		>
-			<Field
-				{...otherProps}
-				className="col-md-12"
-				disabled={readOnly}
-				editingLanguageId={editingLanguageId}
-				id={`${name}#place`}
-				label={label}
-				name={`${name}#place`}
-				onBlur={onBlur}
-				onChange={onChange}
-				onFocus={onFocus}
-				parsedValue={parsedValue}
-				placeholder={placeholder}
-				readOnly={readOnly}
-				repeatable={false}
-				showLabel={showLabel}
-				visibleField="place"
-			/>
+			<label id={`${name}_fieldDetails`}>
+				<Field
+					{...otherProps}
+					className="col-md-12"
+					disabled={readOnly}
+					editingLanguageId={editingLanguageId}
+					id={`${name}#place`}
+					label={label}
+					name={`${name}#place`}
+					onBlur={onBlur}
+					onChange={onChange}
+					onFocus={onFocus}
+					parsedValue={parsedValue}
+					placeholder={placeholder}
+					readOnly={readOnly}
+					repeatable={false}
+					showLabel={showLabel}
+					visibleField="place"
+				/>
 
-			<div className="row">
-				{!!availableVisibleFields.length &&
-					availableVisibleFields.map((visibleField, index) => {
-						if (currentVisibleFields.includes(visibleField)) {
-							const visibleFieldName = name + '#' + visibleField;
-							const className = getClassNameBasedOnLayout(
-								currentLayout,
-								visibleField
-							);
+				<div className="row">
+					{!!availableVisibleFields.length &&
+						availableVisibleFields.map((visibleField, index) => {
+							if (currentVisibleFields.includes(visibleField)) {
+								const visibleFieldName =
+									name + '#' + visibleField;
+								const className = getClassNameBasedOnLayout(
+									currentLayout,
+									visibleField
+								);
 
-							return (
-								<div className={className} key={index}>
-									<Field
-										{...otherProps}
-										disabled={readOnly}
-										editingLanguageId={editingLanguageId}
-										id={visibleFieldName}
-										key={visibleFieldName}
-										label={availableLabels[visibleField]}
-										name={visibleFieldName}
-										onBlur={onBlur}
-										onChange={onChange}
-										onFocus={onFocus}
-										parsedValue={parsedValue}
-										placeholder=""
-										readOnly={readOnly}
-										repeatable={false}
-										showLabel
-										tip=""
-										visibleField={visibleField}
-									/>
-								</div>
-							);
-						}
-					})}
-			</div>
+								return (
+									<div className={className} key={index}>
+										<Field
+											{...otherProps}
+											disabled={readOnly}
+											editingLanguageId={
+												editingLanguageId
+											}
+											id={visibleFieldName}
+											key={visibleFieldName}
+											label={
+												availableLabels[visibleField]
+											}
+											name={visibleFieldName}
+											onBlur={onBlur}
+											onChange={onChange}
+											onFocus={onFocus}
+											parsedValue={parsedValue}
+											placeholder=""
+											readOnly={readOnly}
+											repeatable={false}
+											showLabel
+											tip=""
+											visibleField={visibleField}
+										/>
+									</div>
+								);
+							}
+						})}
+				</div>
 
-			<ClayInput name={name} type="hidden" value={value} />
+				<ClayInput name={name} type="hidden" value={value} />
+			</label>
 		</FieldBase>
 	);
 };
