@@ -7053,9 +7053,9 @@ public class ObjectEntryResourceTest {
 				StringBundler.concat(
 					"http://localhost:8080/o",
 					_objectDefinition1.getRESTContextPath(),
-					"/by-external-reference-code/",
-					jsonObject.getString("externalReferenceCode"),
-					"/object-actions/", objectAction.getName()),
+					"/by-external-reference-code/externalReferenceCode",
+					"externalReferenceCode/object-actions/",
+					objectAction.getName()),
 				actionJSONObject.getString("href")));
 
 		_testGetObjectEntryWithObjectActions(
