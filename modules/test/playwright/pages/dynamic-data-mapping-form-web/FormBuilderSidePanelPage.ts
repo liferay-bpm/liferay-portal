@@ -60,6 +60,39 @@ export class FormBuilderSidePanelPage {
 		);
 	}
 
+	async addAllFields() {
+		const formFieldTypes: FormFieldTypeTitle[] = [
+			'Boolean',
+			'Color',
+			'Date',
+			'Date and Time',
+			'Grid',
+			'Image',
+			'Multiple Selection',
+			'Numeric',
+			'Paragraph',
+			'Rich Text',
+			'Search Location',
+			'Select from List',
+			'Separator',
+			'Single Selection',
+			'Text',
+			'Upload',
+		];
+
+		for (let i = 0; i < formFieldTypes.length; i++) {
+			await this.addFieldByDoubleClick(formFieldTypes[i]);
+
+			if (formFieldTypes[i] === 'Paragraph') {
+				await this.fillParagraphField(
+					new ApiHelpers(this.page),
+					'Sample text'
+				);
+			}
+			this.clickBackButton();
+		}
+	}
+
 	async addFieldByDoubleClick(formFieldTypeTitle: FormFieldTypeTitle) {
 		await this.page
 			.getByTitle(formFieldTypeTitle, {exact: true})

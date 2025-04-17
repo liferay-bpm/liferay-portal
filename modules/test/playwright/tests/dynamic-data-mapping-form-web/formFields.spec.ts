@@ -9,6 +9,7 @@ import path from 'path';
 import {dataApiHelpersTest} from '../../fixtures/dataApiHelpersTest';
 import {formsPagesTest} from '../../fixtures/formsPagesTest';
 import {loginTest} from '../../fixtures/loginTest';
+import {checkAccessibility} from '../../utils/checkAccessibility';
 import {getRandomInt} from '../../utils/getRandomInt';
 import performLoginViaApi, {performLogout} from '../../utils/performLogin';
 import {deleteItems} from './utils/deleteItems';
@@ -183,6 +184,59 @@ test.describe('Manage fields through Form Preview page', () => {
 		await expect(screenReaderOnlyCaptchaSpan).toHaveClass('sr-only');
 
 		await expect(screenReaderOnlyCaptchaSpan).toContainText('captcha');
+
+		await newTabPage.close();
+	});
+
+	test('verify all default form fields aria-labelledby have corresponding element', async ({
+		formBuilderPage,
+		formBuilderSidePanelPage,
+	}) => {
+		await formBuilderPage.goToNew();
+
+		await formBuilderPage.fillFormTitle('Form' + getRandomInt());
+
+		await formBuilderSidePanelPage.addAllFields();
+
+		const newTabPagePromise = new Promise<Page>((resolve) =>
+			formBuilderPage.page.once('popup', resolve)
+		);
+
+		await formBuilderPage.previewButton.click();
+
+		const newTabPage = await newTabPagePromise;
+
+		await newTabPage.waitForLoadState('domcontentloaded');
+
+		await newTabPage.waitForTimeout(3000);
+
+		await checkAccessibility({
+			bestPractices: false,
+			page: newTabPage,
+			selectorsToExclude: [
+				'[data-field-name^="Grid"]',
+				'[data-field-name^="RichText"]',
+			],
+			soft: true,
+		});
+
+		// We need to wait a little so all accessibility features (like aria labels and scrollable content) are rendered
+		// Otherwise test will fail
+
+		const ariaLabelledByElements = await newTabPage.$$(
+			':not(label)[aria-labelledby]'
+		);
+
+		for (const ariaLabelledByElement of ariaLabelledByElements) {
+			const ariaLabelledByValue =
+				await ariaLabelledByElement.getAttribute('aria-labelledby');
+
+			// Ckeditor label elements are not always visible, so we have to expect toHaveCount === 1 instead of toBeVisible
+
+			await expect(
+				newTabPage.locator(`[id="${ariaLabelledByValue}"]`)
+			).toHaveCount(1);
+		}
 
 		await newTabPage.close();
 	});
