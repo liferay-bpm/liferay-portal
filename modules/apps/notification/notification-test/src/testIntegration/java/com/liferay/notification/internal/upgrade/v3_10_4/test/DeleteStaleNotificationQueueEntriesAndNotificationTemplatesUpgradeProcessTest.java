@@ -257,7 +257,7 @@ public class
 			preparedStatement.setString(14, RandomTestUtil.randomString());
 			preparedStatement.setString(15, RandomTestUtil.randomString());
 			preparedStatement.setString(16, RandomTestUtil.randomString());
-			preparedStatement.setLong(17, 0);
+			preparedStatement.setBoolean(17, false);
 			preparedStatement.setString(18, RandomTestUtil.randomString());
 
 			preparedStatement.executeUpdate();
