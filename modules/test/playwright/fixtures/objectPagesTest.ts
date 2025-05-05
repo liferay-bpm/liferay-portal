@@ -13,6 +13,7 @@ import {ModelBuilderDiagramPage} from '../pages/object-web/model-builder/ModelBu
 import {ModelBuilderLeftSidebarPage} from '../pages/object-web/model-builder/ModelBuilderLeftSidebarPage';
 import {ModelBuilderObjectDefinitionNodePage} from '../pages/object-web/model-builder/ModelBuilderObjectDefinitionNodePage';
 import {ModelBuilderRightSidebarPage} from '../pages/object-web/model-builder/ModelBuilderRightSidebarPage';
+import {ObjectConfigurationPage} from '../pages/object-web/object-configuration/ObjectConfigurationPage';
 import {EditObjectDetailsPage} from '../pages/object-web/object-details/EditObjectDetailsPage';
 import {ViewObjectEntriesPage} from '../pages/object-web/object-entries/ViewObjectEntriesPage';
 import {ObjectFieldsPage} from '../pages/object-web/object-fields/ObjectFieldsPage';
@@ -39,6 +40,7 @@ const objectPagesTest = test.extend<{
 	modelBuilderLeftSidebarPage: ModelBuilderLeftSidebarPage;
 	modelBuilderObjectDefinitionNodePage: ModelBuilderObjectDefinitionNodePage;
 	modelBuilderRightSidebarPage: ModelBuilderRightSidebarPage;
+	objectConfigurationPage: ObjectConfigurationPage;
 	objectDetailsPage: ObjectDetailsPage;
 	objectFieldsPage: ObjectFieldsPage;
 	objectRelationshipFormPage: ObjectRelationshipFormPage;
@@ -83,6 +85,9 @@ const objectPagesTest = test.extend<{
 	},
 	modelBuilderRightSidebarPage: async ({page}, use) => {
 		await use(new ModelBuilderRightSidebarPage(page));
+	},
+	objectConfigurationPage: async ({page}, use) => {
+		await use(new ObjectConfigurationPage(page));
 	},
 	objectDetailsPage: async ({page}, use) => {
 		await use(new ObjectDetailsPage(page));
