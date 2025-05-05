@@ -375,6 +375,9 @@ export default function EditObjectDetails({
 									<WorkflowContainer
 										baseResourceURL={baseResourceURL}
 										className="lfr-objects__object-definition-details-section"
+										isRootDescendantNode={
+											isRootDescendantNode
+										}
 										objectDefinitionId={objectDefinitionId}
 										workflowLabel={workflowLabel}
 									/>
