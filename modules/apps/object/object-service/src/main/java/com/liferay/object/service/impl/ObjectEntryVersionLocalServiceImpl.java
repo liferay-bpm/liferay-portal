@@ -44,6 +44,18 @@ public class ObjectEntryVersionLocalServiceImpl
 	}
 
 	@Override
+	public ObjectEntryVersion deleteObjectEntryVersion(
+			long objectEntryId, int version)
+		throws PortalException {
+
+		ObjectEntryVersion objectEntryVersion =
+			objectEntryVersionPersistence.findByOEI_V(objectEntryId, version);
+
+		return objectEntryVersionLocalService.deleteObjectEntryVersion(
+			objectEntryVersion);
+	}
+
+	@Override
 	public void deleteObjectEntryVersionByObjectDefinitionId(
 		Long objectDefinitionId) {
 
