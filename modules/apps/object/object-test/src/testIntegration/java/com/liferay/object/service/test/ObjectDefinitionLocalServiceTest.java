@@ -95,6 +95,7 @@ import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
 import com.liferay.portal.kernel.model.UserNotificationEvent;
 import com.liferay.portal.kernel.model.UserNotificationEventTable;
+import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
@@ -107,6 +108,7 @@ import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -2534,6 +2536,8 @@ public class ObjectDefinitionLocalServiceTest {
 				"AAAAA", new String[0]
 			).build());
 
+		_updateWorkflowDefinitionLink("C_AAAA");
+
 		_addObjectAction("C_AAAAA");
 
 		_assertModelResourceNames(ListUtil.fromArray("C_AAAA", "C_AAAAA"));
@@ -2583,12 +2587,15 @@ public class ObjectDefinitionLocalServiceTest {
 				objectDefinitionA.getObjectDefinitionId()),
 			_objectDefinitionLocalService);
 
+		_updateWorkflowDefinitionLink("C_A");
+
 		TreeTestUtil.unbind(
 			objectDefinitionA.getObjectDefinitionId(),
 			_objectRelationshipLocalService);
 
 		_assertModelResourceNames(ListUtil.fromArray("C_A"));
 		_assertModelResourceNames(ListUtil.fromArray("C_AA", "C_AAAAA"));
+		_assertWorkflowDefinitionLink("C_AA");
 
 		TreeTestUtil.deleteObjectDefinitionHierarchy(
 			_objectDefinitionLocalService,
@@ -3576,6 +3583,12 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertNull(
 			_resourceActionLocalService.fetchResourceAction(
 				objectDefinition.getClassName(), ActionKeys.VIEW));
+
+		Assert.assertTrue(
+			ListUtil.isEmpty(
+				_workflowDefinitionLinkLocalService.getWorkflowDefinitionLinks(
+					objectDefinition.getCompanyId(),
+					objectDefinition.getClassName())));
 	}
 
 	private void _assertSystemObjectFields(
@@ -3604,6 +3617,30 @@ public class ObjectDefinitionLocalServiceTest {
 			expectedObjectField.isRequired(), objectField.isRequired());
 		Assert.assertEquals(
 			expectedObjectField.isState(), objectField.isState());
+	}
+
+	private void _assertWorkflowDefinitionLink(String objectDefinitionName)
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				TestPropsValues.getCompanyId(), objectDefinitionName);
+
+		List<WorkflowDefinitionLink> workflowDefinitionLinks =
+			_workflowDefinitionLinkLocalService.getWorkflowDefinitionLinks(
+				objectDefinition.getCompanyId(),
+				objectDefinition.getClassName());
+
+		Assert.assertEquals(
+			workflowDefinitionLinks.toString(), 1,
+			workflowDefinitionLinks.size());
+
+		WorkflowDefinitionLink workflowDefinitionLink =
+			workflowDefinitionLinks.get(0);
+
+		Assert.assertEquals(
+			"Single Approver",
+			workflowDefinitionLink.getWorkflowDefinitionName());
 	}
 
 	private ObjectAction _createObjectAction(String objectActionName) {
@@ -4121,6 +4158,20 @@ public class ObjectDefinitionLocalServiceTest {
 			Collections.emptyList());
 	}
 
+	private void _updateWorkflowDefinitionLink(String objectDefinitionName)
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				TestPropsValues.getCompanyId(), objectDefinitionName);
+
+		_workflowDefinitionLinkLocalService.updateWorkflowDefinitionLink(
+			TestPropsValues.getUserId(), TestPropsValues.getCompanyId(), 0,
+			objectDefinition.getClassName(), 0, 0, "Single Approver", 1);
+
+		_assertWorkflowDefinitionLink(objectDefinitionName);
+	}
+
 	private static ObjectFolder _defaultObjectFolder;
 
 	@Inject
@@ -4177,5 +4228,9 @@ public class ObjectDefinitionLocalServiceTest {
 
 	@Inject
 	private SharingEntryLocalService _sharingEntryLocalService;
+
+	@Inject
+	private WorkflowDefinitionLinkLocalService
+		_workflowDefinitionLinkLocalService;
 
 }
