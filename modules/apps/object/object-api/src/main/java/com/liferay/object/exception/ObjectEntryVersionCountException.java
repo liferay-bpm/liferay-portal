@@ -13,6 +13,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 public class ObjectEntryVersionCountException extends PortalException {
 
 	public ObjectEntryVersionCountException() {
+		_messageKey = "at-least-one-version-must-remain";
 	}
 
 	public ObjectEntryVersionCountException(String msg) {
@@ -26,5 +27,11 @@ public class ObjectEntryVersionCountException extends PortalException {
 	public ObjectEntryVersionCountException(Throwable throwable) {
 		super(throwable);
 	}
+
+	public String getMessageKey() {
+		return _messageKey;
+	}
+
+	private String _messageKey;
 
 }

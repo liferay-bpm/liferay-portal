@@ -13,6 +13,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 public class ObjectEntryVersionLatestException extends PortalException {
 
 	public ObjectEntryVersionLatestException() {
+		_messageKey = "the-last-version-cannot-be-deleted";
 	}
 
 	public ObjectEntryVersionLatestException(String msg) {
@@ -26,5 +27,11 @@ public class ObjectEntryVersionLatestException extends PortalException {
 	public ObjectEntryVersionLatestException(Throwable throwable) {
 		super(throwable);
 	}
+
+	public String getMessageKey() {
+		return _messageKey;
+	}
+
+	private String _messageKey;
 
 }
