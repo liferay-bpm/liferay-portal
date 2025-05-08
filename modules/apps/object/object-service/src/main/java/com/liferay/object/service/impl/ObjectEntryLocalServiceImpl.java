@@ -300,7 +300,8 @@ public class ObjectEntryLocalServiceImpl
 	public ObjectEntry addObjectEntry(
 			long userId, long groupId, long objectDefinitionId,
 			long objectEntryFolderId, String defaultLanguageId,
-			Map<String, Serializable> values, ServiceContext serviceContext)
+			Map<String, Serializable> values, Date reviewDate,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		serviceContext.setStrictAdd(true);
@@ -373,6 +374,7 @@ public class ObjectEntryLocalServiceImpl
 		_setExternalReferenceCode(objectEntry, values);
 		_setRootObjectEntryId(objectDefinition, objectEntry, values);
 
+		objectEntry.setReviewDate(reviewDate);
 		objectEntry.setStatus(WorkflowConstants.STATUS_DRAFT);
 		objectEntry.setStatusByUserId(user.getUserId());
 		objectEntry.setStatusDate(serviceContext.getModifiedDate(null));
@@ -543,11 +545,11 @@ public class ObjectEntryLocalServiceImpl
 		_deleteTempFileEntries(dlFileEntriesMap);
 	}
 
-	@Override
 	public ObjectEntry addOrUpdateObjectEntry(
 			String externalReferenceCode, long userId, long groupId,
 			long objectDefinitionId, long objectEntryFolderId,
-			Map<String, Serializable> values, ServiceContext serviceContext)
+			Map<String, Serializable> values, Date reviewDate,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		User user = _userLocalService.getUser(userId);
@@ -568,14 +570,14 @@ public class ObjectEntryLocalServiceImpl
 
 			if (objectEntry != null) {
 				return objectEntryLocalService.updateObjectEntry(
-					userId, objectEntry.getObjectEntryId(), values,
+					userId, objectEntry.getObjectEntryId(), values, reviewDate,
 					serviceContext);
 			}
 		}
 
 		objectEntry = objectEntryLocalService.addObjectEntry(
 			userId, groupId, objectDefinitionId, objectEntryFolderId, null,
-			values, serviceContext);
+			values, reviewDate, serviceContext);
 
 		if (Validator.isNotNull(externalReferenceCode)) {
 			objectEntry.setExternalReferenceCode(externalReferenceCode);
@@ -1711,10 +1713,9 @@ public class ObjectEntryLocalServiceImpl
 			assetLinkEntryIds, priority, null);
 	}
 
-	@Override
 	public ObjectEntry updateObjectEntry(
 			long userId, long objectEntryId, Map<String, Serializable> values,
-			ServiceContext serviceContext)
+			Date reviewDate, ServiceContext serviceContext)
 		throws PortalException {
 
 		User user = _userLocalService.getUser(userId);
@@ -1777,6 +1778,7 @@ public class ObjectEntryLocalServiceImpl
 		if ((workflowAction == WorkflowConstants.ACTION_SAVE_DRAFT) &&
 			!objectEntry.isPending()) {
 
+			objectEntry.setReviewDate(reviewDate);
 			objectEntry.setStatus(WorkflowConstants.STATUS_DRAFT);
 			objectEntry.setStatusByUserId(user.getUserId());
 			objectEntry.setStatusDate(serviceContext.getModifiedDate(null));

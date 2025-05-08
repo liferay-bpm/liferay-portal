@@ -98,11 +98,10 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
-	@Override
 	public ObjectEntry addObjectEntry(
 			long groupId, long objectDefinitionId, long objectEntryFolderId,
 			String defaultLanguageId, Map<String, Serializable> values,
-			ServiceContext serviceContext)
+			Date reviewDate, ServiceContext serviceContext)
 		throws PortalException {
 
 		if (!ObjectEntryThreadLocal.isSkipObjectEntryResourcePermission()) {
@@ -114,14 +113,13 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 		return objectEntryLocalService.addObjectEntry(
 			getUserId(), groupId, objectDefinitionId, objectEntryFolderId,
-			defaultLanguageId, values, serviceContext);
+			defaultLanguageId, values, reviewDate, serviceContext);
 	}
 
-	@Override
 	public ObjectEntry addOrUpdateObjectEntry(
 			String externalReferenceCode, long groupId, long objectDefinitionId,
 			long objectEntryFolderId, Map<String, Serializable> values,
-			ServiceContext serviceContext)
+			Date reviewDate, ServiceContext serviceContext)
 		throws PortalException {
 
 		ObjectEntry objectEntry = objectEntryPersistence.fetchByERC_C_ODI(
@@ -140,7 +138,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 		return objectEntryLocalService.addOrUpdateObjectEntry(
 			externalReferenceCode, getUserId(), groupId, objectDefinitionId,
-			objectEntryFolderId, values, serviceContext);
+			objectEntryFolderId, values, reviewDate, serviceContext);
 	}
 
 	@Override
@@ -419,10 +417,9 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 			getPermissionChecker(), groupId, actionId);
 	}
 
-	@Override
 	public ObjectEntry updateObjectEntry(
 			long objectEntryId, Map<String, Serializable> values,
-			ServiceContext serviceContext)
+			Date reviewDate, ServiceContext serviceContext)
 		throws PortalException {
 
 		ObjectEntry objectEntry = objectEntryLocalService.getObjectEntry(
@@ -435,7 +432,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 		}
 
 		return objectEntryLocalService.updateObjectEntry(
-			getUserId(), objectEntryId, values, serviceContext);
+			getUserId(), objectEntryId, values, reviewDate, serviceContext);
 	}
 
 	@Override

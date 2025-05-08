@@ -177,7 +177,7 @@ public class DefaultObjectEntryManagerImpl
 				_toObjectValues(
 					dtoConverterContext.getLocale(), objectDefinition,
 					objectEntry, scopeKey, serviceContext),
-				serviceContext);
+				objectEntry.getReviewDate(), serviceContext);
 
 		return _toObjectEntry(
 			dtoConverterContext, objectDefinition,
@@ -908,7 +908,7 @@ public class DefaultObjectEntryManagerImpl
 			_toObjectValues(
 				dtoConverterContext.getLocale(), objectDefinition, objectEntry,
 				scopeKey, serviceContext),
-			serviceContext);
+			objectEntry.getReviewDate(), serviceContext);
 
 		return _toObjectEntry(
 			dtoConverterContext, objectDefinition,
@@ -942,7 +942,7 @@ public class DefaultObjectEntryManagerImpl
 				_toObjectValues(
 					dtoConverterContext.getLocale(), objectDefinition,
 					objectEntry, scopeKey, serviceContext),
-				serviceContext);
+				objectEntry.getReviewDate(), serviceContext);
 
 		return _toObjectEntry(
 			dtoConverterContext, objectDefinition,

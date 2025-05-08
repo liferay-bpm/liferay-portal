@@ -53,7 +53,7 @@ public interface ObjectEntryService extends BaseService {
 			String defaultLanguageId, Map<String, Serializable> values,
 			ServiceContext serviceContext)
 		throws PortalException;
-
+ String                    externalReferenceCode
 	public ObjectEntry addOrUpdateObjectEntry(
 			String externalReferenceCode, long groupId, long objectDefinitionId,
 			long objectEntryFolderId, Map<String, Serializable> values,
