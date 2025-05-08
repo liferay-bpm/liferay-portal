@@ -359,6 +359,7 @@ public class ObjectEntryDTOConverter
 									getObjectDefinitionId()),
 							clonedServiceBuilderObjectEntry);
 					});
+				setReviewDate(serviceBuilderObjectEntry::getReviewDate);
 				setScopeKey(
 					() -> _getScopeKey(
 						objectDefinition, serviceBuilderObjectEntry));
