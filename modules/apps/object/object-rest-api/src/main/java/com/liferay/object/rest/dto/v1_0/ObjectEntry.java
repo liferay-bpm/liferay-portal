@@ -743,6 +743,47 @@ public class ObjectEntry implements Serializable {
 		new LinkedHashMap<>());
 
 	@io.swagger.v3.oas.annotations.media.Schema
+	public Date getReviewDate() {
+		if (_reviewDateSupplier != null) {
+			reviewDate = _reviewDateSupplier.get();
+
+			_reviewDateSupplier = null;
+		}
+
+		return reviewDate;
+	}
+
+	public void setReviewDate(Date reviewDate) {
+		this.reviewDate = reviewDate;
+
+		_reviewDateSupplier = null;
+	}
+
+	@JsonIgnore
+	public void setReviewDate(
+		UnsafeSupplier<Date, Exception> reviewDateUnsafeSupplier) {
+
+		_reviewDateSupplier = () -> {
+			try {
+				return reviewDateUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Date reviewDate;
+
+	@JsonIgnore
+	private Supplier<Date> _reviewDateSupplier;
+
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getScopeKey() {
 		if (_scopeKeySupplier != null) {
 			scopeKey = _scopeKeySupplier.get();
@@ -1021,6 +1062,9 @@ public class ObjectEntry implements Serializable {
 		}
 		else if (Objects.equals(propertyName, "permissions")) {
 			return getPermissions();
+		}
+		else if (Objects.equals(propertyName, "reviewDate")) {
+			return getReviewDate();
 		}
 		else if (Objects.equals(propertyName, "scopeKey")) {
 			return getScopeKey();
@@ -1340,6 +1384,22 @@ public class ObjectEntry implements Serializable {
 			sb.append("\"properties\": ");
 
 			sb.append(_toJSON(properties));
+		}
+
+		Date reviewDate = getReviewDate();
+
+		if (reviewDate != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"reviewDate\": ");
+
+			sb.append("\"");
+
+			sb.append(liferayToJSONDateFormat.format(reviewDate));
+
+			sb.append("\"");
 		}
 
 		String scopeKey = getScopeKey();
