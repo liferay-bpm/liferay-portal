@@ -49,6 +49,7 @@ import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectEntryDefaultLanguageIdException;
 import com.liferay.object.exception.ObjectEntryFolderScopeException;
+import com.liferay.object.exception.ObjectEntryReviewDateException;
 import com.liferay.object.exception.ObjectEntryStatusException;
 import com.liferay.object.exception.ObjectEntryValidationException;
 import com.liferay.object.exception.ObjectEntryValidationException.ValidationError;
@@ -373,8 +374,8 @@ public class ObjectEntryLocalServiceImpl
 
 		_setExternalReferenceCode(objectEntry, values);
 		_setRootObjectEntryId(objectDefinition, objectEntry, values);
+		_setReviewDate(objectEntry, false, reviewDate, serviceContext);
 
-		objectEntry.setReviewDate(reviewDate);
 		objectEntry.setStatus(WorkflowConstants.STATUS_DRAFT);
 		objectEntry.setStatusByUserId(user.getUserId());
 		objectEntry.setStatusDate(serviceContext.getModifiedDate(null));
@@ -1774,11 +1775,11 @@ public class ObjectEntryLocalServiceImpl
 		objectEntry.setModifiedDate(serviceContext.getModifiedDate(null));
 
 		_setRootObjectEntryId(objectDefinition, objectEntry, values);
+		_setReviewDate(objectEntry, true, reviewDate, serviceContext);
 
 		if ((workflowAction == WorkflowConstants.ACTION_SAVE_DRAFT) &&
 			!objectEntry.isPending()) {
 
-			objectEntry.setReviewDate(reviewDate);
 			objectEntry.setStatus(WorkflowConstants.STATUS_DRAFT);
 			objectEntry.setStatusByUserId(user.getUserId());
 			objectEntry.setStatusDate(serviceContext.getModifiedDate(null));
@@ -5048,6 +5049,29 @@ public class ObjectEntryLocalServiceImpl
 				objectEntry.setExternalReferenceCode(externalReferenceCode);
 			}
 		}
+	}
+
+	private void _setReviewDate(
+			ObjectEntry objectEntry, boolean update, Date reviewDate,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		if (reviewDate == null) {
+			objectEntry.setReviewDate(null);
+
+			return;
+		}
+
+		if (reviewDate.before(serviceContext.getModifiedDate(null))) {
+			throw new ObjectEntryReviewDateException(
+				"Invalid date input. The review date cannot be a past date.");
+		}
+
+		if (update && reviewDate.equals(objectEntry.getReviewDate())) {
+			return;
+		}
+
+		objectEntry.setReviewDate(reviewDate);
 	}
 
 	private void _setRootObjectEntryId(
