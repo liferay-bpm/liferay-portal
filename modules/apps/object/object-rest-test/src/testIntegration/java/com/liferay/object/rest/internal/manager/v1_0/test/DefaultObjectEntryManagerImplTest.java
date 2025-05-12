@@ -41,6 +41,7 @@ import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectEntryDefaultLanguageIdException;
+import com.liferay.object.exception.ObjectEntryReviewDateException;
 import com.liferay.object.exception.ObjectEntryValuesException;
 import com.liferay.object.exception.ObjectRelationshipDeletionTypeException;
 import com.liferay.object.exception.RequiredObjectRelationshipException;
@@ -180,6 +181,7 @@ import java.sql.Timestamp;
 
 import java.text.DateFormat;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -2143,6 +2145,58 @@ public class DefaultObjectEntryManagerImplTest
 					).build();
 				}
 			});
+	}
+
+	@Test
+	public void testAddObjectEntryWithReviewDate() throws Exception {
+		ObjectDefinition objectDefinition = _createObjectDefinition(
+			Collections.singletonList(
+				new TextObjectFieldBuilder(
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString())
+				).name(
+					"textObjectFieldName"
+				).build()));
+
+		AssertUtils.assertFailure(
+			ObjectEntryReviewDateException.class,
+			"Invalid date input. The review date cannot be a past date.",
+			() -> _defaultObjectEntryManager.addObjectEntry(
+				_simpleDTOConverterContext, objectDefinition,
+				new ObjectEntry() {
+					{
+						setProperties(
+							HashMapBuilder.<String, Object>put(
+								"textObjectFieldName",
+								RandomTestUtil.randomString()
+							).build());
+
+						setReviewDate(
+							Date.from(
+								Instant.parse("2000-11-29T10:00:00.150Z")));
+					}
+				},
+				null));
+
+		ObjectEntry objectEntry = _defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext, objectDefinition,
+			new ObjectEntry() {
+				{
+					setProperties(
+						HashMapBuilder.<String, Object>put(
+							"textObjectFieldName", RandomTestUtil.randomString()
+						).build());
+
+					setReviewDate(
+						Date.from(Instant.parse("2090-11-29T10:00:00.150Z")));
+				}
+			},
+			null);
+
+		Assert.assertEquals(
+			Date.from(Instant.parse("2090-11-29T10:00:00.150Z")),
+			objectEntry.getReviewDate());
 	}
 
 	@Test
@@ -5581,6 +5635,88 @@ public class DefaultObjectEntryManagerImplTest
 				_localizedObjectFieldI18nValues
 			).build(),
 			"pt_BR", objectEntry.getId());
+	}
+
+	@Test
+	public void testUpdateObjectEntryReviewDate() throws Exception {
+		ObjectDefinition objectDefinition = _createObjectDefinition(
+			Collections.singletonList(
+				new TextObjectFieldBuilder(
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString())
+				).name(
+					"textObjectFieldName"
+				).build()));
+
+		ObjectEntry objectEntry = _defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext, objectDefinition,
+			new ObjectEntry() {
+				{
+					setProperties(
+						HashMapBuilder.<String, Object>put(
+							"textObjectFieldName", RandomTestUtil.randomString()
+						).build());
+
+					setReviewDate(
+						Date.from(Instant.parse("2100-12-25T10:00:00.150Z")));
+				}
+			},
+			null);
+
+		long objectEntryId = objectEntry.getId();
+
+		AssertUtils.assertFailure(
+			ObjectEntryReviewDateException.class,
+			"Invalid date input. The review date cannot be a past date.",
+			() -> _defaultObjectEntryManager.updateObjectEntry(
+				_simpleDTOConverterContext, objectDefinition, objectEntryId,
+				new ObjectEntry() {
+					{
+						setProperties(
+							HashMapBuilder.<String, Object>put(
+								"textObjectFieldName",
+								RandomTestUtil.randomString()
+							).build());
+
+						setReviewDate(
+							Date.from(
+								Instant.parse("2000-12-25T10:00:00.150Z")));
+					}
+				}));
+
+		objectEntry = _defaultObjectEntryManager.updateObjectEntry(
+			_simpleDTOConverterContext, objectDefinition, objectEntryId,
+			new ObjectEntry() {
+				{
+					setProperties(
+						HashMapBuilder.<String, Object>put(
+							"textObjectFieldName", RandomTestUtil.randomString()
+						).build());
+
+					setReviewDate(
+						Date.from(Instant.parse("2100-11-29T10:00:00.150Z")));
+				}
+			});
+
+		Assert.assertEquals(
+			Date.from(Instant.parse("2100-11-29T10:00:00.150Z")),
+			objectEntry.getReviewDate());
+
+		objectEntry = _defaultObjectEntryManager.updateObjectEntry(
+			_simpleDTOConverterContext, objectDefinition, objectEntryId,
+			new ObjectEntry() {
+				{
+					setProperties(
+						HashMapBuilder.<String, Object>put(
+							"textObjectFieldName", RandomTestUtil.randomString()
+						).build());
+
+					setReviewDate((Date)null);
+				}
+			});
+
+		Assert.assertNull(objectEntry.getReviewDate());
 	}
 
 	@Test
