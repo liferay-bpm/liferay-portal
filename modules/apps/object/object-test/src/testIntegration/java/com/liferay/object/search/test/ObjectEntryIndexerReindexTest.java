@@ -264,7 +264,7 @@ public class ObjectEntryIndexerReindexTest {
 						"pt_BR", "pt_BR " + RandomTestUtil.randomString()
 					).build()
 				).build(),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 			String originalName = PrincipalThreadLocal.getName();
 

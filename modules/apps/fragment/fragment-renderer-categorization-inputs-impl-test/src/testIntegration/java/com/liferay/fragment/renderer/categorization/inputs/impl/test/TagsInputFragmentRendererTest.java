@@ -55,6 +55,7 @@ public class TagsInputFragmentRendererTest
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", RandomTestUtil.randomString()
 			).build(),
+			null,
 			ServiceContextTestUtil.getServiceContext(
 				group.getGroupId(), TestPropsValues.getUserId(),
 				new String[] {"tag1"}));

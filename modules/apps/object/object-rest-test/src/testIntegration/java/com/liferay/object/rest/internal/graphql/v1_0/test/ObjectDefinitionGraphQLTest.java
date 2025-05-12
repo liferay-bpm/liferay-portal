@@ -189,7 +189,7 @@ public class ObjectDefinitionGraphQLTest {
 			).put(
 				_OBJECT_FIELD_NAME, "peter@liferay.com"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		_childObjectEntry = ObjectEntryLocalServiceUtil.addObjectEntry(
 			TestPropsValues.getUserId(), 0,
@@ -204,7 +204,7 @@ public class ObjectDefinitionGraphQLTest {
 			).put(
 				_OBJECT_FIELD_NAME, "igor@liferay.com"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 	}
 
 	@After
@@ -615,7 +615,7 @@ public class ObjectDefinitionGraphQLTest {
 			).put(
 				objectField.getName(), "matthew@liferay.com"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertEquals(
 			"matthew@liferay.com",
@@ -698,7 +698,7 @@ public class ObjectDefinitionGraphQLTest {
 				TestPropsValues.getUserId());
 
 			ObjectEntryTestUtil.addObjectEntry(
-				objectDefinition,
+				objectDefinition, null,
 				HashMapBuilder.<String, Serializable>put(
 					_OBJECT_FIELD_NAME_LONG_TEXT, "name2_text_english"
 				).put(

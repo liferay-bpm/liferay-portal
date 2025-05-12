@@ -4308,7 +4308,7 @@ public class DefaultObjectEntryManagerImplTest
 			).put(
 				"textObjectFieldNameExtension", StringUtil.randomId()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		SearchResponse searchResponse = _searcher.search(
 			_searchRequestBuilderFactory.builder(
@@ -5228,7 +5228,7 @@ public class DefaultObjectEntryManagerImplTest
 			).put(
 				"textObjectFieldName2", "Baker"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		AccountEntry accountEntry2 = _addAccountEntry();
 
@@ -5245,7 +5245,7 @@ public class DefaultObjectEntryManagerImplTest
 			).put(
 				"textObjectFieldName2", "Delta"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		_assignAccountEntryRole(accountEntry1, _buyerRole, _addUser());
 
@@ -6784,7 +6784,7 @@ public class DefaultObjectEntryManagerImplTest
 				},
 				accountEntry.getAccountEntryId()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		return tree;
 	}

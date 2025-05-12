@@ -117,7 +117,7 @@ public class ManyToManyObjectRelationshipInfoCollectionProviderTest {
 					"objectDefinition1TextObjectFieldName",
 					RandomTestUtil.randomString()
 				).build(),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 		ObjectEntry objectDefinition1ObjectEntry2 =
 			_objectEntryLocalService.addObjectEntry(
@@ -130,7 +130,7 @@ public class ManyToManyObjectRelationshipInfoCollectionProviderTest {
 					"objectDefinition1TextObjectFieldName",
 					RandomTestUtil.randomString()
 				).build(),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 		ObjectEntry objectDefinition2ObjectEntry =
 			_objectEntryLocalService.addObjectEntry(
@@ -143,7 +143,7 @@ public class ManyToManyObjectRelationshipInfoCollectionProviderTest {
 					"objectDefinition2TextObjectFieldName",
 					RandomTestUtil.randomString()
 				).build(),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 		_objectRelationshipLocalService.addObjectRelationshipMappingTableValues(
 			TestPropsValues.getUserId(),

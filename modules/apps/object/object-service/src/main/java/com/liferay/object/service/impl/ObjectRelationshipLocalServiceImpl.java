@@ -249,7 +249,7 @@ public class ObjectRelationshipLocalServiceImpl
 				).put(
 					objectField2.getName(), primaryKey1
 				).build(),
-				serviceContext);
+				null, serviceContext);
 		}
 	}
 

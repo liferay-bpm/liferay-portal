@@ -482,7 +482,7 @@ public class RenderLayoutStructureTagTest {
 				HashMapBuilder.<String, Serializable>put(
 					"text", relationshipTextValue
 				).build(),
-				_serviceContext);
+				null, _serviceContext);
 
 		Assert.assertEquals(
 			relationshipFriendlyURLValue,
@@ -506,7 +506,7 @@ public class RenderLayoutStructureTagTest {
 			).put(
 				"text", textValue
 			).build(),
-			_serviceContext);
+			null, _serviceContext);
 
 		Assert.assertEquals(
 			friendlyURLValue,
@@ -1239,7 +1239,7 @@ public class RenderLayoutStructureTagTest {
 			).put(
 				"myText", myTextValue
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
 

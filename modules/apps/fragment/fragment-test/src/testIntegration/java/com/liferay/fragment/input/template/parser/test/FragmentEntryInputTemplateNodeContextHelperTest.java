@@ -164,7 +164,7 @@ public class FragmentEntryInputTemplateNodeContextHelperTest {
 			).put(
 				"myText", RandomTestUtil.randomString()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 	}
 
 	@Test
@@ -219,7 +219,7 @@ public class FragmentEntryInputTemplateNodeContextHelperTest {
 			).put(
 				"myText", RandomTestUtil.randomString()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		HttpServletRequest httpServletRequest = _getHttpServletRequest();
 

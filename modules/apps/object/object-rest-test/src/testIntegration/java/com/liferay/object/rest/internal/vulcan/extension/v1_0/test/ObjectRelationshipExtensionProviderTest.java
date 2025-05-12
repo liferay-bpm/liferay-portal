@@ -207,7 +207,7 @@ public class ObjectRelationshipExtensionProviderTest {
 			HashMapBuilder.<String, Serializable>put(
 				_OBJECT_FIELD_NAME, objectFieldValue
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 	}
 
 	private NestedFieldsContext _getNestedFieldsContext(

@@ -117,7 +117,7 @@ public class ObjectEntryDefaultLanguageIdUpgradeProcessTest {
 				null,
 				Collections.singletonMap(
 					"textObjectField", RandomTestUtil.randomString()),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 		companyObjectEntry.setDefaultLanguageId(null);
 
@@ -154,7 +154,7 @@ public class ObjectEntryDefaultLanguageIdUpgradeProcessTest {
 			null,
 			Collections.singletonMap(
 				"textObjectField", RandomTestUtil.randomString()),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		siteObjectEntry.setDefaultLanguageId(null);
 

@@ -127,7 +127,7 @@ public class ObjectEntryVersionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"textObjectFieldName", "textObjectFieldValue2"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertEquals(2, objectEntry.getVersion());
 
@@ -188,7 +188,7 @@ public class ObjectEntryVersionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"textObjectFieldName", "textObjectFieldValue2"
 			).build(),
-			serviceContext);
+			null, serviceContext);
 
 		Assert.assertTrue(objectEntry.isDraft());
 		Assert.assertEquals(1, objectEntry.getVersion());
@@ -212,7 +212,7 @@ public class ObjectEntryVersionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"textObjectFieldName", "textObjectFieldValue3"
 			).build(),
-			serviceContext);
+			null, serviceContext);
 
 		Assert.assertTrue(objectEntry.isApproved());
 		Assert.assertEquals(1, objectEntry.getVersion());
@@ -236,7 +236,7 @@ public class ObjectEntryVersionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"textObjectFieldName", "textObjectFieldValue4"
 			).build(),
-			serviceContext);
+			null, serviceContext);
 
 		Assert.assertTrue(objectEntry.isDraft());
 		Assert.assertEquals(2, objectEntry.getVersion());
@@ -299,7 +299,7 @@ public class ObjectEntryVersionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"textObjectFieldName", "textObjectFieldValue2"
 			).build(),
-			serviceContext);
+			null, serviceContext);
 
 		Assert.assertTrue(objectEntry.isPending());
 		Assert.assertEquals(1, objectEntry.getVersion());
@@ -356,7 +356,7 @@ public class ObjectEntryVersionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"textObjectFieldName", "textObjectFieldValue3"
 			).build(),
-			serviceContext);
+			null, serviceContext);
 
 		Assert.assertTrue(objectEntry.isPending());
 		Assert.assertEquals(2, objectEntry.getVersion());
@@ -385,7 +385,7 @@ public class ObjectEntryVersionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"textObjectFieldName", "textObjectFieldValue4"
 			).build(),
-			serviceContext);
+			null, serviceContext);
 
 		_workflowDefinitionLinkLocalService.deleteWorkflowDefinitionLink(
 			workflowDefinitionLink);
@@ -427,7 +427,7 @@ public class ObjectEntryVersionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"textObjectFieldName", RandomTestUtil.randomString()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertEquals(
 			2,

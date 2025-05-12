@@ -709,7 +709,7 @@ public class ObjectViewLocalServiceTest {
 			TestPropsValues.getUserId(), 0,
 			objectDefinition.getObjectDefinitionId(),
 			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-			null, Collections.emptyMap(),
+			null, Collections.emptyMap(), null,
 			ServiceContextTestUtil.getServiceContext());
 
 		_objectViewLocalService.addObjectView(

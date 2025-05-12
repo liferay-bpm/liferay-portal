@@ -114,13 +114,13 @@ public class EditObjectEntryMVCActionCommand extends BaseMVCActionCommand {
 					objectDefinition.getObjectDefinitionId(),
 					ObjectEntryFolderConstants.
 						PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-					null, _getValues(actionRequest),
+					null, _getValues(actionRequest), null,
 					ServiceContextFactory.getInstance(
 						objectDefinition.getClassName(), actionRequest));
 			}
 			else {
 				_objectEntryService.updateObjectEntry(
-					objectEntryId, _getValues(actionRequest),
+					objectEntryId, _getValues(actionRequest), null,
 					ServiceContextFactory.getInstance(
 						objectDefinition.getClassName(), actionRequest));
 			}

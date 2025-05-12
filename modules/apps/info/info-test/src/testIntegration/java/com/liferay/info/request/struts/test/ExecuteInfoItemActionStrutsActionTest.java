@@ -106,7 +106,7 @@ public class ExecuteInfoItemActionStrutsActionTest {
 			HashMapBuilder.<String, Serializable>put(
 				"text", RandomTestUtil.randomString()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		_classPK = String.valueOf(objectEntry.getPrimaryKey());
 

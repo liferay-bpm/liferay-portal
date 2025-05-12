@@ -683,7 +683,7 @@ public class ObjectActionLocalServiceTest {
 				).put(
 					"lastName", "Smith"
 				).build(),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 			// On after create
 
@@ -733,7 +733,7 @@ public class ObjectActionLocalServiceTest {
 				).put(
 					"lastName", "o Discípulo Amado"
 				).build(),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 			// On after update
 
@@ -789,7 +789,7 @@ public class ObjectActionLocalServiceTest {
 				HashMapBuilder.<String, Serializable>put(
 					"firstName", RandomTestUtil.randomString()
 				).build(),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 			_addModelResourcePermissions(
 				systemObjectAction.getName(), objectEntry.getObjectEntryId(),
@@ -842,7 +842,7 @@ public class ObjectActionLocalServiceTest {
 				HashMapBuilder.<String, Serializable>put(
 					"firstName", "John"
 				).build(),
-				serviceContext);
+				null, serviceContext);
 
 			_assertWebhookObjectAction(
 				null, "John", null,
@@ -856,7 +856,7 @@ public class ObjectActionLocalServiceTest {
 				HashMapBuilder.<String, Serializable>put(
 					"firstName", "Peter"
 				).build(),
-				serviceContext);
+				null, serviceContext);
 
 			_assertWebhookObjectAction(
 				null, "Peter", StringPool.BLANK,
@@ -930,7 +930,7 @@ public class ObjectActionLocalServiceTest {
 					HashMapBuilder.<String, Serializable>put(
 						"firstName", "John"
 					).build(),
-					ServiceContextTestUtil.getServiceContext());
+					null, ServiceContextTestUtil.getServiceContext());
 
 			// Hierarchy, add object entry in a child node
 
@@ -950,7 +950,7 @@ public class ObjectActionLocalServiceTest {
 					relationshipObjectField.getName(),
 					rootObjectEntry.getObjectEntryId()
 				).build(),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 			// Hierarchy, on after root update
 
@@ -977,7 +977,7 @@ public class ObjectActionLocalServiceTest {
 					relationshipObjectField.getName(),
 					objectEntry.getObjectEntryId()
 				).build(),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 			// Hierarchy, on after root update
 
@@ -1392,7 +1392,7 @@ public class ObjectActionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", "John"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		_assertOrganization(
 			comment1, organizationName1, organizationObjectDefinition,
@@ -1526,7 +1526,7 @@ public class ObjectActionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", "John"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		User user = _userLocalService.getUserByScreenName(
 			TestPropsValues.getCompanyId(), "ScreenName");
@@ -1837,7 +1837,7 @@ public class ObjectActionLocalServiceTest {
 			).put(
 				"lastName", "Smith"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertEquals(
 			WorkflowConstants.STATUS_PENDING, objectEntry.getStatus());
@@ -1906,7 +1906,7 @@ public class ObjectActionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", "John"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		_objectEntryLocalService.deleteObjectEntry(objectEntry);
 
@@ -1922,7 +1922,7 @@ public class ObjectActionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", "João"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		objectEntry = _objectEntryLocalService.deleteObjectEntry(objectEntry);
 
@@ -1981,14 +1981,14 @@ public class ObjectActionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", RandomTestUtil.randomString()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		_objectEntryLocalService.updateObjectEntry(
 			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", RandomTestUtil.randomString()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertEquals(
 			"John",
@@ -2030,7 +2030,7 @@ public class ObjectActionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", RandomTestUtil.randomString()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		int objectEntriesCount = _objectEntryLocalService.getObjectEntriesCount(
 			0, _objectDefinition.getObjectDefinitionId());
@@ -2040,7 +2040,7 @@ public class ObjectActionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", "Paulo"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertEquals(
 			objectEntriesCount,
@@ -2052,7 +2052,7 @@ public class ObjectActionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", RandomTestUtil.randomString()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertEquals(
 			objectEntriesCount + 1,
@@ -2297,7 +2297,7 @@ public class ObjectActionLocalServiceTest {
 		_objectEntryLocalService.addObjectEntry(
 			guestUser.getUserId(), 0, objectDefinition.getObjectDefinitionId(),
 			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-			null, Collections.emptyMap(), serviceContext);
+			null, Collections.emptyMap(), null, serviceContext);
 
 		_assertNotificationQueueEntrySubject("Subject");
 
@@ -2309,7 +2309,7 @@ public class ObjectActionLocalServiceTest {
 		_objectEntryLocalService.addObjectEntry(
 			user.getUserId(), 0, objectDefinition.getObjectDefinitionId(),
 			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-			null, Collections.emptyMap(), serviceContext);
+			null, Collections.emptyMap(), null, serviceContext);
 
 		_assertNotificationQueueEntrySubject("Assunto");
 
@@ -2328,7 +2328,7 @@ public class ObjectActionLocalServiceTest {
 		_objectEntryLocalService.addObjectEntry(
 			guestUser.getUserId(), 0, objectDefinition.getObjectDefinitionId(),
 			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-			null, Collections.emptyMap(), serviceContext);
+			null, Collections.emptyMap(), null, serviceContext);
 
 		_assertNotificationQueueEntrySubject("Assunto");
 
@@ -2338,7 +2338,7 @@ public class ObjectActionLocalServiceTest {
 		_objectEntryLocalService.addObjectEntry(
 			user.getUserId(), 0, objectDefinition.getObjectDefinitionId(),
 			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-			null, Collections.emptyMap(), serviceContext);
+			null, Collections.emptyMap(), null, serviceContext);
 
 		_assertNotificationQueueEntrySubject("Subject");
 
@@ -2347,14 +2347,14 @@ public class ObjectActionLocalServiceTest {
 		_objectEntryLocalService.addObjectEntry(
 			guestUser.getUserId(), 0, objectDefinition.getObjectDefinitionId(),
 			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-			null, Collections.emptyMap(), serviceContext);
+			null, Collections.emptyMap(), null, serviceContext);
 
 		_assertNotificationQueueEntrySubject("Subject");
 
 		_objectEntryLocalService.addObjectEntry(
 			user.getUserId(), 0, objectDefinition.getObjectDefinitionId(),
 			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-			null, Collections.emptyMap(), serviceContext);
+			null, Collections.emptyMap(), null, serviceContext);
 
 		_assertNotificationQueueEntrySubject("Subject");
 
@@ -2499,7 +2499,7 @@ public class ObjectActionLocalServiceTest {
 			).put(
 				"integer", String.valueOf(RandomTestUtil.randomInt())
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		_objectEntryLocalService.addOrUpdateObjectEntry(
 			objectEntry.getExternalReferenceCode(), TestPropsValues.getUserId(),
@@ -2510,7 +2510,7 @@ public class ObjectActionLocalServiceTest {
 			).put(
 				"integer", String.valueOf(RandomTestUtil.randomInt())
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		objectEntry = _objectEntryLocalService.getObjectEntry(
 			objectEntry.getObjectEntryId());
@@ -2640,14 +2640,14 @@ public class ObjectActionLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", RandomTestUtil.randomString()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		objectEntry = _objectEntryLocalService.updateObjectEntry(
 			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", RandomTestUtil.randomString()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		Map<String, Serializable> values = _objectEntryLocalService.getValues(
 			objectEntry.getObjectEntryId());
@@ -3040,7 +3040,7 @@ public class ObjectActionLocalServiceTest {
 			TestPropsValues.getUserId(), 0,
 			objectDefinition.getObjectDefinitionId(),
 			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-			null, values, ServiceContextTestUtil.getServiceContext());
+			null, values, null, ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertEquals(
 			values.get("firstName"),
@@ -3269,7 +3269,7 @@ public class ObjectActionLocalServiceTest {
 							HashMapBuilder.<String, Serializable>put(
 								"firstName", firstName
 							).build(),
-							ServiceContextTestUtil.getServiceContext());
+							null, ServiceContextTestUtil.getServiceContext());
 					}
 					catch (PortalException portalException) {
 					}
@@ -3407,7 +3407,7 @@ public class ObjectActionLocalServiceTest {
 				null,
 				Collections.singletonMap(
 					"firstName", RandomTestUtil.randomString()),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 			Assert.assertEquals(
 				expectedObjectEntriesCount,
@@ -3450,7 +3450,7 @@ public class ObjectActionLocalServiceTest {
 			).put(
 				"lastName", "Smith"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		_assertWebhookObjectAction(
 			null, "John", "Smith",
@@ -3467,7 +3467,7 @@ public class ObjectActionLocalServiceTest {
 			).put(
 				"lastName", "White"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		_assertWebhookObjectAction(
 			null, "Peter", "White",
@@ -3503,7 +3503,7 @@ public class ObjectActionLocalServiceTest {
 			).put(
 				"lastName", "Smith"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 		ObjectEntry objectEntry4 = _objectEntryLocalService.addObjectEntry(
 			TestPropsValues.getUserId(), 0,
 			_objectDefinition.getObjectDefinitionId(),
@@ -3514,7 +3514,7 @@ public class ObjectActionLocalServiceTest {
 			).put(
 				"lastName", "White"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		_objectEntryLocalService.deleteObjectEntry(objectEntry3);
 
@@ -3554,7 +3554,7 @@ public class ObjectActionLocalServiceTest {
 			).put(
 				"lastName", "White"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 		ObjectEntry objectEntry6 = _objectEntryLocalService.addObjectEntry(
 			TestPropsValues.getUserId(), 0,
 			_objectDefinition.getObjectDefinitionId(),
@@ -3565,7 +3565,7 @@ public class ObjectActionLocalServiceTest {
 			).put(
 				"lastName", "White"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		objectEntry5 = _objectEntryLocalService.updateObjectEntry(
 			TestPropsValues.getUserId(), objectEntry5.getObjectEntryId(),
@@ -3574,7 +3574,7 @@ public class ObjectActionLocalServiceTest {
 			).put(
 				"lastName", "Smith"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		_assertWebhookObjectAction(
 			null, "John", "Smith",
@@ -3588,7 +3588,7 @@ public class ObjectActionLocalServiceTest {
 			).put(
 				"lastName", "o Discípulo Amado"
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		_assertWebhookObjectAction(
 			null, "João", "o Discípulo Amado",

@@ -160,7 +160,7 @@ public class CommerceReturnObjectEntryValuesContributorTest {
 				"r_commerceOrderToCommerceReturns_commerceOrderId",
 				_commerceOrder.getCommerceOrderId()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		_objectEntries.add(objectEntry);
 

@@ -84,7 +84,7 @@ public class EditCommerceReturnExternalReferenceCodeMVCActionCommand
 				objectEntry.getObjectDefinitionId());
 
 		_objectEntryService.updateObjectEntry(
-			objectEntry.getObjectEntryId(), values,
+			objectEntry.getObjectEntryId(), values, null,
 			ServiceContextFactory.getInstance(
 				objectDefinition.getClassName(), actionRequest));
 	}

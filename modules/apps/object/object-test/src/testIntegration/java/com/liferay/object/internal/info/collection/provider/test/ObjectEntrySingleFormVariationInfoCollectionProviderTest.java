@@ -234,7 +234,7 @@ public class ObjectEntrySingleFormVariationInfoCollectionProviderTest {
 					HashMapBuilder.<String, Serializable>put(
 						"textObjectFieldName", RandomTestUtil.randomString()
 					).build(),
-					ServiceContextTestUtil.getServiceContext());
+					null, ServiceContextTestUtil.getServiceContext());
 			}
 
 			InfoCollectionProvider<ObjectEntry> infoCollectionProvider =

@@ -134,7 +134,7 @@ public class CommerceReturnItemPermissionObjectValidationRuleEngineImplTest
 				"r_commerceOrderToCommerceReturns_commerceOrderId",
 				commerceOrder.getCommerceOrderId()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 	}
 
 	@Test
@@ -187,7 +187,7 @@ public class CommerceReturnItemPermissionObjectValidationRuleEngineImplTest
 			).put(
 				"returnStatus", CommerceReturnConstants.RETURN_STATUS_PENDING
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 	}
 
 	@Test
@@ -316,7 +316,7 @@ public class CommerceReturnItemPermissionObjectValidationRuleEngineImplTest
 			).put(
 				"returnStatus", CommerceReturnConstants.RETURN_STATUS_PENDING
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		results = _objectValidationRuleEngine.execute(
 			HashMapBuilder.<String, Object>put(
@@ -444,7 +444,7 @@ public class CommerceReturnItemPermissionObjectValidationRuleEngineImplTest
 			).put(
 				"returnStatus", CommerceReturnConstants.RETURN_STATUS_PENDING
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		results = _objectValidationRuleEngine.execute(
 			HashMapBuilder.<String, Object>put(

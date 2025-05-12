@@ -1314,7 +1314,7 @@ public class ObjectRelationshipLocalServiceTest {
 				Collections.singletonMap(
 					objectField1.getName(),
 					objectDefinitionAAObjectEntry1.getObjectEntryId()),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertEquals(
 			0, objectDefinitionAAObjectEntry1.getRootObjectEntryId());
@@ -1367,7 +1367,7 @@ public class ObjectRelationshipLocalServiceTest {
 			Collections.singletonMap(
 				objectField2.getName(),
 				objectDefinitionAObjectEntry1.getObjectEntryId()),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertEquals(
 			0, objectDefinitionAObjectEntry1.getRootObjectEntryId());
@@ -2376,7 +2376,7 @@ public class ObjectRelationshipLocalServiceTest {
 			TestPropsValues.getUserId(), 0,
 			objectDefinition.getObjectDefinitionId(),
 			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-			null, values, ServiceContextTestUtil.getServiceContext());
+			null, values, null, ServiceContextTestUtil.getServiceContext());
 	}
 
 	private ObjectLayoutBox _addObjectLayoutBox() throws Exception {

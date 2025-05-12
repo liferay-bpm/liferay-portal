@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -26,7 +27,7 @@ import java.util.Map;
 public class ObjectEntryTestUtil {
 
 	public static ObjectEntry addObjectEntry(
-			long groupId, ObjectDefinition objectDefinition,
+			long groupId, ObjectDefinition objectDefinition, Date reviewDate,
 			Map<String, Serializable> values, String... keywords)
 		throws Exception {
 
@@ -41,12 +42,12 @@ public class ObjectEntryTestUtil {
 			TestPropsValues.getUserId(), groupId,
 			objectDefinition.getObjectDefinitionId(),
 			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-			null, values, serviceContext);
+			null, values, reviewDate, serviceContext);
 	}
 
 	public static ObjectEntry addObjectEntry(
-			ObjectDefinition objectDefinition, Map<String, Serializable> values,
-			String... keywords)
+			ObjectDefinition objectDefinition, Date reviewDate,
+			Map<String, Serializable> values, String... keywords)
 		throws Exception {
 
 		long groupId = 0;
@@ -58,7 +59,8 @@ public class ObjectEntryTestUtil {
 			groupId = TestPropsValues.getGroupId();
 		}
 
-		return addObjectEntry(groupId, objectDefinition, values, keywords);
+		return addObjectEntry(
+			groupId, objectDefinition, reviewDate, values, keywords);
 	}
 
 	public static ObjectEntry addObjectEntry(
@@ -67,7 +69,7 @@ public class ObjectEntryTestUtil {
 		throws Exception {
 
 		return addObjectEntry(
-			objectDefinition,
+			objectDefinition, null,
 			HashMapBuilder.<String, Serializable>put(
 				objectFieldName, objectFieldValue
 			).build());

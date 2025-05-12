@@ -89,7 +89,7 @@ public class AssetRendererSharingEntryInterpreterTest {
 				HashMapBuilder.<String, Serializable>put(
 					"title", title
 				).build(),
-				serviceContext);
+				null, serviceContext);
 
 			SharingEntry sharingEntry =
 				_sharingEntryLocalService.addSharingEntry(

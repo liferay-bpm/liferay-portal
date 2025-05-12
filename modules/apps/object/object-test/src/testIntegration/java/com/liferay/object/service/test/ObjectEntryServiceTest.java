@@ -872,7 +872,7 @@ public class ObjectEntryServiceTest {
 					0, _objectDefinition.getObjectDefinitionId(),
 					ObjectEntryFolderConstants.
 						PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-					null, Collections.emptyMap(),
+					null, Collections.emptyMap(), null,
 					ServiceContextTestUtil.getServiceContext(
 						TestPropsValues.getGroupId(), _guestUser.getUserId())));
 
@@ -945,7 +945,7 @@ public class ObjectEntryServiceTest {
 					0, _objectDefinition.getObjectDefinitionId(),
 					ObjectEntryFolderConstants.
 						PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-					null, Collections.emptyMap(),
+					null, Collections.emptyMap(), null,
 					ServiceContextTestUtil.getServiceContext(
 						TestPropsValues.getGroupId(), _guestUser.getUserId())));
 
@@ -982,6 +982,7 @@ public class ObjectEntryServiceTest {
 			).put(
 				"LastName", RandomStringUtils.randomAlphabetic(5)
 			).build(),
+			null,
 			ServiceContextTestUtil.getServiceContext(
 				TestPropsValues.getGroupId(), user.getUserId()));
 	}

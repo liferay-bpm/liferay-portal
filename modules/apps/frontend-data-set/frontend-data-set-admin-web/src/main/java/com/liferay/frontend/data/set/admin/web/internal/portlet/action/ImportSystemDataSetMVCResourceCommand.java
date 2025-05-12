@@ -130,7 +130,7 @@ public class ImportSystemDataSetMVCResourceCommand
 			).put(
 				"restSchema", systemFDSEntry.getRESTSchema()
 			).build(),
-			new ServiceContext());
+			null, new ServiceContext());
 
 		ObjectDefinition dataSetActionObjectDefinition =
 			_objectDefinitionLocalService.fetchObjectDefinition(
@@ -236,7 +236,7 @@ public class ImportSystemDataSetMVCResourceCommand
 					"r_dataSetToDataSetCardsSections_l_dataSetId",
 					objectEntry.getObjectEntryId()
 				).build(),
-				new ServiceContext());
+				null, new ServiceContext());
 		}
 
 		if (baseCardsFDSView.isDefault()) {
@@ -245,7 +245,8 @@ public class ImportSystemDataSetMVCResourceCommand
 			values.put("defaultVisualizationMode", "cards");
 
 			_objectEntryService.updateObjectEntry(
-				objectEntry.getObjectEntryId(), values, new ServiceContext());
+				objectEntry.getObjectEntryId(), values, null,
+				new ServiceContext());
 		}
 	}
 
@@ -288,7 +289,7 @@ public class ImportSystemDataSetMVCResourceCommand
 					"r_dataSetToDataSetListSections_l_dataSetId",
 					objectEntry.getObjectEntryId()
 				).build(),
-				new ServiceContext());
+				null, new ServiceContext());
 		}
 
 		if (baseListFDSView.isDefault()) {
@@ -297,7 +298,8 @@ public class ImportSystemDataSetMVCResourceCommand
 			values.put("defaultVisualizationMode", "list");
 
 			_objectEntryService.updateObjectEntry(
-				objectEntry.getObjectEntryId(), values, new ServiceContext());
+				objectEntry.getObjectEntryId(), values, null,
+				new ServiceContext());
 		}
 	}
 
@@ -387,7 +389,7 @@ public class ImportSystemDataSetMVCResourceCommand
 				).put(
 					"type", "string"
 				).build(),
-				new ServiceContext());
+				null, new ServiceContext());
 		}
 
 		if (baseTableFDSView.isDefault()) {
@@ -396,7 +398,8 @@ public class ImportSystemDataSetMVCResourceCommand
 			values.put("defaultVisualizationMode", "table");
 
 			_objectEntryService.updateObjectEntry(
-				objectEntry.getObjectEntryId(), values, new ServiceContext());
+				objectEntry.getObjectEntryId(), values, null,
+				new ServiceContext());
 		}
 	}
 
@@ -471,7 +474,7 @@ public class ImportSystemDataSetMVCResourceCommand
 					0, objectDefinitionId,
 					ObjectEntryFolderConstants.
 						PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-					null, objectEntryValues, new ServiceContext());
+					null, objectEntryValues, null, new ServiceContext());
 			}
 		}
 		else if (fdsEntryItemImportPolicy ==
@@ -515,7 +518,7 @@ public class ImportSystemDataSetMVCResourceCommand
 					).put(
 						"type", "creation"
 					).build(),
-					new ServiceContext());
+					null, new ServiceContext());
 			}
 		}
 		else {
@@ -532,7 +535,7 @@ public class ImportSystemDataSetMVCResourceCommand
 				).put(
 					"type", "creation"
 				).build(),
-				new ServiceContext());
+				null, new ServiceContext());
 		}
 	}
 
@@ -609,7 +612,7 @@ public class ImportSystemDataSetMVCResourceCommand
 				0, objectDefinition.getObjectDefinitionId(),
 				ObjectEntryFolderConstants.
 					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-				null, values, new ServiceContext());
+				null, values, null, new ServiceContext());
 		}
 	}
 
@@ -703,7 +706,7 @@ public class ImportSystemDataSetMVCResourceCommand
 						() -> _getOptionalValue(
 							fdsActionDropdownItem.get("href"))
 					).build(),
-					new ServiceContext());
+					null, new ServiceContext());
 			}
 		}
 		else if (fdsEntryItemImportPolicy ==
@@ -746,7 +749,7 @@ public class ImportSystemDataSetMVCResourceCommand
 					).put(
 						"type", "item"
 					).build(),
-					new ServiceContext());
+					null, new ServiceContext());
 			}
 		}
 		else {
@@ -763,7 +766,7 @@ public class ImportSystemDataSetMVCResourceCommand
 				).put(
 					"type", "item"
 				).build(),
-				new ServiceContext());
+				null, new ServiceContext());
 		}
 	}
 
@@ -807,7 +810,7 @@ public class ImportSystemDataSetMVCResourceCommand
 					"r_dataSetToDataSetSorts_l_dataSetId",
 					objectEntry.getObjectEntryId()
 				).build(),
-				new ServiceContext());
+				null, new ServiceContext());
 
 			return;
 		}
@@ -844,7 +847,7 @@ public class ImportSystemDataSetMVCResourceCommand
 					"r_dataSetToDataSetSorts_l_dataSetId",
 					objectEntry.getObjectEntryId()
 				).build(),
-				new ServiceContext());
+				null, new ServiceContext());
 		}
 	}
 

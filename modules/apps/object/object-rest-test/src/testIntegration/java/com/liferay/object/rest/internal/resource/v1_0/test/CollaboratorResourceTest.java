@@ -206,6 +206,7 @@ public class CollaboratorResourceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"title", RandomTestUtil.randomString()
 			).build(),
+			null,
 			ServiceContextTestUtil.getServiceContext(
 				_group.getGroupId(), TestPropsValues.getUserId()));
 	}

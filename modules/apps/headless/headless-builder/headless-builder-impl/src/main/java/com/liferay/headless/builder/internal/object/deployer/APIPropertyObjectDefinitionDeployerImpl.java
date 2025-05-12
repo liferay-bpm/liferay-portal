@@ -150,7 +150,7 @@ public class APIPropertyObjectDefinitionDeployerImpl
 				objectDefinition.getObjectDefinitionId(),
 				ObjectEntryFolderConstants.
 					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-				values, new ServiceContext());
+				values, null, new ServiceContext());
 		}
 	}
 

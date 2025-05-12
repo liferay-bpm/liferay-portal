@@ -104,7 +104,7 @@ public class SaveDataSetSortMVCResourceCommand
 					values.put("default", false);
 
 					_objectEntryService.updateObjectEntry(
-						dataSetSortObjectEntry.getId(), values,
+						dataSetSortObjectEntry.getId(), values, null,
 						new ServiceContext());
 				}
 			}
@@ -131,7 +131,7 @@ public class SaveDataSetSortMVCResourceCommand
 			).put(
 				"r_dataSetToDataSetSorts_l_dataSetId", dataSetId
 			).build(),
-			new ServiceContext());
+			null, new ServiceContext());
 
 		Collection<ObjectEntry> updatedDataSetSortObjectEntries =
 			_getDataSetSortObjectEntries(dataSetObjectDefinition, dataSetId);

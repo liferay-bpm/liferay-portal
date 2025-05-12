@@ -384,7 +384,7 @@ public class ObjectValidationRuleLocalServiceTest {
 			HashMapBuilder.<String, Serializable>put(
 				"textObjectField", RandomTestUtil.randomString()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		AssertUtils.assertFailure(
 			ObjectValidationRuleSettingValueException.InvalidValue.class,
@@ -492,7 +492,7 @@ public class ObjectValidationRuleLocalServiceTest {
 				HashMapBuilder.<String, Serializable>put(
 					"textObjectField", RandomTestUtil.randomString()
 				).build(),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 			Assert.assertEquals(1, _argumentsList.size());
 
@@ -750,7 +750,7 @@ public class ObjectValidationRuleLocalServiceTest {
 				HashMapBuilder.<String, Serializable>put(
 					"textObjectField", RandomTestUtil.randomString()
 				).build(),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 			Assert.fail();
 		}

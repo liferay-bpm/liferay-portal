@@ -1483,7 +1483,7 @@ public class ExportImportLayoutPageTemplateEntriesTest {
 			HashMapBuilder.<String, Serializable>put(
 				"text", RandomTestUtil.randomString()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 	}
 
 	private void _addTextFragmentEntry() throws Exception {

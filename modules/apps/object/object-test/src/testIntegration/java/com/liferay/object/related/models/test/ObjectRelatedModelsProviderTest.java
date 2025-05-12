@@ -783,7 +783,7 @@ public class ObjectRelatedModelsProviderTest {
 				user.getUserId(), 0, objectDefinition.getObjectDefinitionId(),
 				ObjectEntryFolderConstants.
 					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-				null, Collections.emptyMap(),
+				null, Collections.emptyMap(), null,
 				ServiceContextTestUtil.getServiceContext());
 
 			_objectEntryLocalService.
@@ -1057,7 +1057,7 @@ public class ObjectRelatedModelsProviderTest {
 		throws Exception {
 
 		return _objectEntryLocalService.updateObjectEntry(
-			TestPropsValues.getUserId(), objectEntryId, values,
+			TestPropsValues.getUserId(), objectEntryId, values, null,
 			ServiceContextTestUtil.getServiceContext());
 	}
 

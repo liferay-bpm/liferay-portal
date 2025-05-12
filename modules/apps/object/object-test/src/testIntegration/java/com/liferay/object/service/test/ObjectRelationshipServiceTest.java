@@ -295,13 +295,13 @@ public class ObjectRelationshipServiceTest {
 			TestPropsValues.getUserId(), 0,
 			objectDefinition1.getObjectDefinitionId(),
 			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-			null, Collections.emptyMap(),
+			null, Collections.emptyMap(), null,
 			ServiceContextTestUtil.getServiceContext());
 		ObjectEntry objectEntry2 = _objectEntryLocalService.addObjectEntry(
 			TestPropsValues.getUserId(), 0,
 			objectDefinition2.getObjectDefinitionId(),
 			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-			null, Collections.emptyMap(),
+			null, Collections.emptyMap(), null,
 			ServiceContextTestUtil.getServiceContext());
 
 		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);

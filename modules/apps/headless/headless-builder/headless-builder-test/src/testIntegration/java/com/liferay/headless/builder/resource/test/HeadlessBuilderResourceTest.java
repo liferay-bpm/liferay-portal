@@ -3443,7 +3443,7 @@ public class HeadlessBuilderResourceTest extends BaseTestCase {
 		Document document = _addRandomDocument();
 
 		return ObjectEntryTestUtil.addObjectEntry(
-			groupId, objectDefinition,
+			groupId, objectDefinition, null,
 			HashMapBuilder.<String, Serializable>put(
 				"attachmentField", document.getId()
 			).put(

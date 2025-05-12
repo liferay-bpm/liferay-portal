@@ -93,7 +93,7 @@ public class SaveDataSetTableSectionsMVCResourceCommand
 				).put(
 					"type", String.valueOf(creationDataJSONObject.get("type"))
 				).build(),
-				new ServiceContext());
+				null, new ServiceContext());
 
 			JSONObject jsonObject = _jsonFactory.createJSONObject(
 				objectEntry.getValues());

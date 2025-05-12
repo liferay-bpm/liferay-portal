@@ -134,7 +134,7 @@ public class CommerceReturnPermissionObjectValidationRuleEngineImplTest
 				"r_commerceOrderToCommerceReturns_commerceOrderId",
 				commerceOrder.getCommerceOrderId()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 	}
 
 	@Test

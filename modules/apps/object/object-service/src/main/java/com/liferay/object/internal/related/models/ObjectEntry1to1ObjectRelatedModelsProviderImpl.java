@@ -87,7 +87,7 @@ public class ObjectEntry1to1ObjectRelatedModelsProviderImpl
 					},
 					0
 				).build(),
-				new ServiceContext());
+				null, new ServiceContext());
 		}
 		else if (Objects.equals(
 					deletionType,
@@ -119,7 +119,7 @@ public class ObjectEntry1to1ObjectRelatedModelsProviderImpl
 				},
 				0
 			).build(),
-			new ServiceContext());
+			null, new ServiceContext());
 	}
 
 	@Override

@@ -159,6 +159,7 @@ public class CategoriesInputFragmentRendererTest
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", RandomTestUtil.randomString()
 			).build(),
+			null,
 			ServiceContextTestUtil.getServiceContext(
 				group.getGroupId(), TestPropsValues.getUserId(),
 				new long[] {_assetCategory.getCategoryId()}));

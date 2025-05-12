@@ -21,6 +21,7 @@ import com.liferay.sharing.service.SharingEntryLocalService;
 
 import java.io.Serializable;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -37,12 +38,12 @@ public class SharingEntryObjectEntryLocalServiceWrapper
 	@Override
 	public ObjectEntry updateObjectEntry(
 			long userId, long objectEntryId, Map<String, Serializable> values,
-			ServiceContext serviceContext)
+			Date reviewDate, ServiceContext serviceContext)
 		throws PortalException {
 
 		return _reindexSharingEntries(
 			super.updateObjectEntry(
-				userId, objectEntryId, values, serviceContext));
+				userId, objectEntryId, values, reviewDate, serviceContext));
 	}
 
 	@Override

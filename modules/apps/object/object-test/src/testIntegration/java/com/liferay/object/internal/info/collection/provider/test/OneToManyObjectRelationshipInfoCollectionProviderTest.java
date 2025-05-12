@@ -110,7 +110,7 @@ public class OneToManyObjectRelationshipInfoCollectionProviderTest {
 			HashMapBuilder.<String, Serializable>put(
 				"parentTextObjectFieldName", RandomTestUtil.randomString()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		ObjectEntry childObjectEntry1 = _addChildObjectEntry(
 			_group, _childObjectDefinition, _parentObjectDefinition,
@@ -164,7 +164,7 @@ public class OneToManyObjectRelationshipInfoCollectionProviderTest {
 					parentObjectDefinition.getPKObjectFieldName(),
 				parentObjectEntry.getObjectEntryId()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 	}
 
 	private ObjectDefinition _addObjectDefinition(ObjectField objectField)

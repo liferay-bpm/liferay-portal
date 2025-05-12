@@ -719,7 +719,7 @@ public class ObjectEntryResourceTest {
 			TestPropsValues.getUserId());
 
 		_objectEntry5 = ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition5,
+			_objectDefinition5, null,
 			HashMapBuilder.<String, Serializable>put(
 				_OBJECT_FIELD_NAME_LONG_TEXT, "name2_text_english"
 			).put(
@@ -2443,7 +2443,7 @@ public class ObjectEntryResourceTest {
 		throws Exception {
 
 		_objectEntry1 = ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition1,
+			_objectDefinition1, null,
 			HashMapBuilder.<String, Serializable>put(
 				_OBJECT_FIELD_NAME_1, _OBJECT_FIELD_VALUE_1
 			).put(
@@ -2453,7 +2453,7 @@ public class ObjectEntryResourceTest {
 			).build(),
 			_TAG_1);
 		_objectEntry2 = ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition2,
+			_objectDefinition2, null,
 			HashMapBuilder.<String, Serializable>put(
 				_OBJECT_FIELD_NAME_2, _OBJECT_FIELD_VALUE_2
 			).put(
@@ -3026,7 +3026,7 @@ public class ObjectEntryResourceTest {
 		throws Exception {
 
 		_objectEntry1 = ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition1,
+			_objectDefinition1, null,
 			HashMapBuilder.<String, Serializable>put(
 				_OBJECT_FIELD_NAME_1, _OBJECT_FIELD_VALUE_1
 			).put(
@@ -3034,7 +3034,7 @@ public class ObjectEntryResourceTest {
 			).build(),
 			_TAG_1);
 		_objectEntry2 = ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition2,
+			_objectDefinition2, null,
 			HashMapBuilder.<String, Serializable>put(
 				_OBJECT_FIELD_NAME_2, _OBJECT_FIELD_VALUE_2
 			).put(
@@ -3042,7 +3042,7 @@ public class ObjectEntryResourceTest {
 			).build(),
 			_TAG_2);
 		_objectEntry3 = ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition3,
+			_objectDefinition3, null,
 			HashMapBuilder.<String, Serializable>put(
 				_OBJECT_FIELD_NAME_3, _OBJECT_FIELD_VALUE_3
 			).put(
@@ -4306,7 +4306,7 @@ public class ObjectEntryResourceTest {
 		throws Exception {
 
 		_objectEntry1 = ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition1,
+			_objectDefinition1, null,
 			HashMapBuilder.<String, Serializable>put(
 				_OBJECT_FIELD_NAME_1, _OBJECT_FIELD_VALUE_1
 			).put(
@@ -5084,7 +5084,7 @@ public class ObjectEntryResourceTest {
 				HashMapBuilder.<String, Serializable>put(
 					"testField", true
 				).build(),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 		long objectEntryId = serviceBuilderObjectEntry.getObjectEntryId();
 
@@ -5904,13 +5904,13 @@ public class ObjectEntryResourceTest {
 		throws Exception {
 
 		ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition1,
+			_objectDefinition1, null,
 			HashMapBuilder.<String, Serializable>put(
 				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
 			).build(),
 			_TAG_1);
 		ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition1,
+			_objectDefinition1, null,
 			HashMapBuilder.<String, Serializable>put(
 				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
 			).put(
@@ -5918,7 +5918,7 @@ public class ObjectEntryResourceTest {
 			).build(),
 			_TAG_1);
 		ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition1,
+			_objectDefinition1, null,
 			HashMapBuilder.<String, Serializable>put(
 				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
 			).put(
@@ -5928,7 +5928,7 @@ public class ObjectEntryResourceTest {
 			).build(),
 			_TAG_1);
 		ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition1,
+			_objectDefinition1, null,
 			HashMapBuilder.<String, Serializable>put(
 				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
 			).put(
@@ -6299,7 +6299,7 @@ public class ObjectEntryResourceTest {
 	@Test
 	public void testGetObjectEntryUnsafeSuppliers() throws Exception {
 		_objectEntry1 = ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition1,
+			_objectDefinition1, null,
 			HashMapBuilder.<String, Serializable>put(
 				_OBJECT_FIELD_NAME_BOOLEAN, RandomTestUtil.randomBoolean()
 			).put(
@@ -6759,7 +6759,7 @@ public class ObjectEntryResourceTest {
 							return fileEntry.getFileEntryId();
 						}
 					).build(),
-					ServiceContextTestUtil.getServiceContext());
+					null, ServiceContextTestUtil.getServiceContext());
 
 			long objectEntryId = serviceBuilderObjectEntry.getObjectEntryId();
 
@@ -6783,7 +6783,7 @@ public class ObjectEntryResourceTest {
 						return fileEntry.getFileEntryId();
 					}
 				).build(),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 			User user = UserTestUtil.addUser();
 
@@ -7501,7 +7501,7 @@ public class ObjectEntryResourceTest {
 			ServiceContextTestUtil.getServiceContext());
 
 		ObjectEntry depotScopedObjectEntry = ObjectEntryTestUtil.addObjectEntry(
-			depotEntry.getGroupId(), depotScopedObjectDefinition,
+			depotEntry.getGroupId(), depotScopedObjectDefinition, null,
 			Collections.emptyMap());
 
 		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
@@ -10574,7 +10574,7 @@ public class ObjectEntryResourceTest {
 				() -> {
 					ObjectEntry relatedObjectEntry =
 						ObjectEntryTestUtil.addObjectEntry(
-							_objectDefinition2,
+							_objectDefinition2, null,
 							HashMapBuilder.<String, Serializable>put(
 								_OBJECT_FIELD_NAME_2, _OBJECT_FIELD_VALUE_2
 							).put(
@@ -10624,7 +10624,7 @@ public class ObjectEntryResourceTest {
 				() -> {
 					ObjectEntry relatedObjectEntry =
 						ObjectEntryTestUtil.addObjectEntry(
-							_objectDefinition2,
+							_objectDefinition2, null,
 							HashMapBuilder.<String, Serializable>put(
 								_OBJECT_FIELD_NAME_2, _OBJECT_FIELD_VALUE_2
 							).put(
@@ -13339,7 +13339,7 @@ public class ObjectEntryResourceTest {
 		throws Exception {
 
 		return ObjectEntryTestUtil.addObjectEntry(
-			objectDefinition,
+			objectDefinition, null,
 			HashMapBuilder.<String, Serializable>put(
 				objectFieldName + "_i18n",
 				HashMapBuilder.<String, Serializable>put(

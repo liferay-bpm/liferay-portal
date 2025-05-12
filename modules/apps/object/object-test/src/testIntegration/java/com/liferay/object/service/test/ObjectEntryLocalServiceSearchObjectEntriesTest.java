@@ -582,7 +582,7 @@ public class ObjectEntryLocalServiceSearchObjectEntriesTest {
 			TestPropsValues.getUserId(), 0,
 			_objectDefinition.getObjectDefinitionId(),
 			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-			null, values, ServiceContextTestUtil.getServiceContext());
+			null, values, null, ServiceContextTestUtil.getServiceContext());
 	}
 
 	private void _assertKeywords(String keywords, int count) throws Exception {

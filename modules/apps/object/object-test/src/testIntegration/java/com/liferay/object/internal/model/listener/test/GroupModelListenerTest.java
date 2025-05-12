@@ -138,7 +138,7 @@ public class GroupModelListenerTest {
 			HashMapBuilder.<String, Serializable>put(
 				objectField.getName(), RandomTestUtil.randomString()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		ObjectField relationshipObjectField =
 			_objectFieldLocalService.getObjectField(
@@ -155,7 +155,7 @@ public class GroupModelListenerTest {
 				relationshipObjectField.getName(),
 				objectEntry1.getObjectEntryId()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		AssertUtils.assertFailure(
 			RequiredObjectRelationshipException.class,

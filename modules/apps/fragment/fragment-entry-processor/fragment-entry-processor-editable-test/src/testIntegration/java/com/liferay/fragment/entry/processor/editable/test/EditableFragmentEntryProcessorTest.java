@@ -760,7 +760,7 @@ public class EditableFragmentEntryProcessorTest {
 			HashMapBuilder.<String, Serializable>put(
 				"text", RandomTestUtil.randomString()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		String fieldId =
 			ObjectAction.class.getSimpleName() + StringPool.UNDERLINE +

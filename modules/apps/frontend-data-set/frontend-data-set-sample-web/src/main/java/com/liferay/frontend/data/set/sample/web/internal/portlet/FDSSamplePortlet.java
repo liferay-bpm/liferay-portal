@@ -175,7 +175,7 @@ public class FDSSamplePortlet extends MVCPortlet {
 				).put(
 					"title", "Sample" + i
 				).build(),
-				new ServiceContext());
+				null, new ServiceContext());
 
 			calendar.add(Calendar.MONTH, 1);
 			calendar.add(Calendar.DATE, 1);

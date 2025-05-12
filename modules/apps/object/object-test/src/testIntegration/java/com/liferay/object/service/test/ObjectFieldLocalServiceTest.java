@@ -1514,7 +1514,7 @@ public class ObjectFieldLocalServiceTest {
 					return fileEntry.getFileEntryId();
 				}
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		long persistedFileEntryId = MapUtil.getLong(
 			objectEntry.getValues(), "upload");
@@ -2487,7 +2487,7 @@ public class ObjectFieldLocalServiceTest {
 		ObjectEntry objectEntry = _objectEntryLocalService.addObjectEntry(
 			TestPropsValues.getUserId(), 0, objectField.getObjectDefinitionId(),
 			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-			null, values, ServiceContextTestUtil.getServiceContext());
+			null, values, null, ServiceContextTestUtil.getServiceContext());
 
 		values = objectEntry.getValues();
 

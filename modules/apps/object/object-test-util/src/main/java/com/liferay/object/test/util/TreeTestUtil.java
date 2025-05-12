@@ -173,7 +173,7 @@ public class TreeTestUtil {
 				"externalReferenceCode",
 				externalReferenceCodes.poll() + externalReferenceCodeSuffix
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		Map<Long, Long> objectEntryIds = HashMapBuilder.put(
 			rootNode.getPrimaryKey(), rootObjectEntry.getObjectEntryId()
@@ -210,7 +210,7 @@ public class TreeTestUtil {
 						return objectEntryIds.get(parentNode.getPrimaryKey());
 					}
 				).build(),
-				ServiceContextTestUtil.getServiceContext());
+				null, ServiceContextTestUtil.getServiceContext());
 
 			objectEntryIds.put(
 				node.getPrimaryKey(), objectEntry.getObjectEntryId());

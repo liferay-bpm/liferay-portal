@@ -73,7 +73,7 @@ public class ObjectEntryLayoutDisplayPageProviderTest {
 			HashMapBuilder.<String, Serializable>put(
 				objectFieldName, StringUtil.randomId()
 			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			null, ServiceContextTestUtil.getServiceContext());
 
 		ObjectDefinition objectDefinition2 = _publishCustomObjectDefinition(
 			Collections.singletonList(
