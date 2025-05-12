@@ -2146,6 +2146,40 @@ public class DefaultObjectEntryManagerImplTest
 			});
 	}
 
+	@FeatureFlag("LPD-17564")
+	@Test
+	public void testAddObjectEntryWithReviewDate() throws Exception {
+		ObjectDefinition objectDefinition = _createObjectDefinition(
+			Collections.singletonList(
+				new TextObjectFieldBuilder(
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString())
+				).name(
+					"textObjectFieldName"
+				).build()));
+
+		ObjectEntry objectEntry = _defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext, objectDefinition,
+			new ObjectEntry() {
+				{
+					setProperties(
+						HashMapBuilder.<String, Object>put(
+							"reviewDate", "2090-11-29 10:00:00.0"
+						).put(
+							"textObjectFieldName", RandomTestUtil.randomString()
+						).build());
+				}
+			},
+			null);
+
+		Assert.assertEquals(
+			"2090-11-29 10:00:00.0",
+			objectEntry.getPropertyValue(
+				"reviewDate"
+			).toString());
+	}
+
 	@Test
 	public void testAddObjectEntryWithRichTextObjectField() throws Exception {
 		ObjectDefinition objectDefinition = _createObjectDefinition(
@@ -5695,6 +5729,70 @@ public class DefaultObjectEntryManagerImplTest
 				_localizedObjectFieldI18nValues
 			).build(),
 			"pt_BR", objectEntry.getId());
+	}
+
+	@FeatureFlag("LPD-17564")
+	@Test
+	public void testUpdateObjectEntryReviewDate() throws Exception {
+		ObjectDefinition objectDefinition = _createObjectDefinition(
+			Collections.singletonList(
+				new TextObjectFieldBuilder(
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString())
+				).name(
+					"textObjectFieldName"
+				).build()));
+
+		ObjectEntry objectEntry = _defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext, objectDefinition,
+			new ObjectEntry() {
+				{
+					setProperties(
+						HashMapBuilder.<String, Object>put(
+							"reviewDate", "2100-12-25 10:00:00.0"
+						).put(
+							"textObjectFieldName", RandomTestUtil.randomString()
+						).build());
+				}
+			},
+			null);
+
+		long objectEntryId = objectEntry.getId();
+
+		objectEntry = _defaultObjectEntryManager.updateObjectEntry(
+			_simpleDTOConverterContext, objectDefinition, objectEntryId,
+			new ObjectEntry() {
+				{
+					setProperties(
+						HashMapBuilder.<String, Object>put(
+							"reviewDate", "2100-11-29 10:00:00.0"
+						).put(
+							"textObjectFieldName", RandomTestUtil.randomString()
+						).build());
+				}
+			});
+
+		Assert.assertEquals(
+			"2100-11-29 10:00:00.0",
+			objectEntry.getPropertyValue(
+				"reviewDate"
+			).toString());
+
+		objectEntry = _defaultObjectEntryManager.updateObjectEntry(
+			_simpleDTOConverterContext, objectDefinition, objectEntryId,
+			new ObjectEntry() {
+				{
+					setProperties(
+						HashMapBuilder.<String, Object>put(
+							"reviewDate", ""
+						).put(
+							"textObjectFieldName", RandomTestUtil.randomString()
+						).build());
+				}
+			});
+
+		Assert.assertNull(objectEntry.getPropertyValue("reviewDate"));
 	}
 
 	@Test
