@@ -6,8 +6,11 @@
 package com.liferay.object.web.internal.object.definitions.portlet.action.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectPortletKeys;
 import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
@@ -32,6 +35,7 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.FeatureFlag;
@@ -69,10 +73,22 @@ public class GetObjectDefinitionInfoMVCResourceCommandTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_objectDefinitionA = ObjectDefinitionTestUtil.addCustomObjectDefinition(
-			"A");
-		_objectDefinitionAA =
-			ObjectDefinitionTestUtil.addCustomObjectDefinition("AA");
+		_objectDefinitionA = ObjectDefinitionTestUtil.publishObjectDefinition(
+			"A",
+			Collections.singletonList(
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+					ObjectFieldConstants.DB_TYPE_STRING,
+					"x" + RandomTestUtil.randomString())),
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+		_objectDefinitionAA = ObjectDefinitionTestUtil.publishObjectDefinition(
+			"AA",
+			Collections.singletonList(
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+					ObjectFieldConstants.DB_TYPE_STRING,
+					"x" + RandomTestUtil.randomString())),
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 	}
 
 	@Test
@@ -80,10 +96,11 @@ public class GetObjectDefinitionInfoMVCResourceCommandTest {
 		KaleoDefinition kaleoDefinition = _addKaleoDefinition(
 			_objectDefinitionA);
 
-		_assertJSONObject(kaleoDefinition, _objectDefinitionA);
+		_assertJSONObject(kaleoDefinition, _objectDefinitionA, true);
 
 		_assertJSONObject(
-			_addKaleoDefinition(_objectDefinitionAA), _objectDefinitionAA);
+			_addKaleoDefinition(_objectDefinitionAA), _objectDefinitionAA,
+			true);
 
 		TreeTestUtil.bind(
 			_objectRelationshipLocalService,
@@ -94,8 +111,8 @@ public class GetObjectDefinitionInfoMVCResourceCommandTest {
 					ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 					StringUtil.randomId())));
 
-		_assertJSONObject(kaleoDefinition, _objectDefinitionA);
-		_assertJSONObject(kaleoDefinition, _objectDefinitionAA);
+		_assertJSONObject(kaleoDefinition, _objectDefinitionA, true);
+		_assertJSONObject(kaleoDefinition, _objectDefinitionAA, true);
 
 		TreeTestUtil.deleteObjectDefinitionHierarchy(
 			_objectDefinitionLocalService,
@@ -103,6 +120,12 @@ public class GetObjectDefinitionInfoMVCResourceCommandTest {
 				_objectDefinitionA.getName(), _objectDefinitionAA.getName()
 			},
 			_objectEntryLocalService, _objectRelationshipLocalService);
+
+		ObjectDefinition systemObjectDefinition =
+			_objectDefinitionLocalService.fetchSystemObjectDefinition(
+				TestPropsValues.getCompanyId(), "Organization");
+
+		_assertJSONObject(null, systemObjectDefinition, false);
 	}
 
 	private KaleoDefinition _addKaleoDefinition(
@@ -125,14 +148,24 @@ public class GetObjectDefinitionInfoMVCResourceCommandTest {
 	}
 
 	private void _assertJSONObject(
-			KaleoDefinition kaleoDefinition, ObjectDefinition objectDefinition)
+			KaleoDefinition kaleoDefinition, ObjectDefinition objectDefinition,
+			boolean workflowSupported)
 		throws Exception {
 
 		Assert.assertEquals(
 			JSONUtil.put(
+				"isWorkflowSupported", workflowSupported
+			).put(
 				"tableName", objectDefinition.getDBTableName()
 			).put(
-				"workflowDefinitionTitle", kaleoDefinition.getTitle()
+				"workflowDefinitionTitle",
+				() -> {
+					if (kaleoDefinition != null) {
+						return kaleoDefinition.getTitle();
+					}
+
+					return "No Workflow";
+				}
 			).toString(),
 			String.valueOf(
 				_getJSONObject(objectDefinition.getObjectDefinitionId())));
@@ -157,6 +190,7 @@ public class GetObjectDefinitionInfoMVCResourceCommandTest {
 
 		themeDisplay.setCompany(
 			_companyLocalService.fetchCompany(TestPropsValues.getCompanyId()));
+		themeDisplay.setLocale(LocaleUtil.getDefault());
 		themeDisplay.setSiteGroupId(TestPropsValues.getGroupId());
 		themeDisplay.setUser(TestPropsValues.getUser());
 
