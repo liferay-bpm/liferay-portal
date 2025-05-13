@@ -19,6 +19,7 @@ export class ViewObjectEntriesPage {
 	readonly frameSelect: FrameLocator;
 	readonly frontendDatasetActions: Locator;
 	readonly frontendDatasetDeleteAction: Locator;
+	readonly neverReview: Locator;
 	readonly page: Page;
 	readonly saveObjectEntryButton: Locator;
 	readonly saveObjectEntryButtonArabic: Locator;
@@ -56,6 +57,7 @@ export class ViewObjectEntriesPage {
 		this.frontendDatasetDeleteAction = page.getByRole('menuitem', {
 			name: 'Delete',
 		});
+		this.neverReview = page.getByLabel('Never Review', {exact: true});
 		this.page = page;
 		this.searchBar = this.frameSelect.getByPlaceholder('Search for');
 		this.searchButton = this.frameSelect.getByRole('button', {
