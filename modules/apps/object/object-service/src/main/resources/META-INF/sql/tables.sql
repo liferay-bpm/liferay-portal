@@ -97,6 +97,7 @@ create table ObjectEntry (
 	expirationDate DATE null,
 	treePath STRING null,
 	version INTEGER,
+	reviewDate DATE null,
 	lastPublishDate DATE null,
 	status INTEGER,
 	statusByUserId LONG,

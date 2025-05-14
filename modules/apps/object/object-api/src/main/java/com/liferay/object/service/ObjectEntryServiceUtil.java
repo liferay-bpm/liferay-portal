@@ -36,23 +36,25 @@ public class ObjectEntryServiceUtil {
 	public static ObjectEntry addObjectEntry(
 			long groupId, long objectDefinitionId, long objectEntryFolderId,
 			String defaultLanguageId, Map<String, Serializable> values,
+			java.util.Date reviewDate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addObjectEntry(
 			groupId, objectDefinitionId, objectEntryFolderId, defaultLanguageId,
-			values, serviceContext);
+			values, reviewDate, serviceContext);
 	}
 
 	public static ObjectEntry addOrUpdateObjectEntry(
 			String externalReferenceCode, long groupId, long objectDefinitionId,
 			long objectEntryFolderId, Map<String, Serializable> values,
+			java.util.Date reviewDate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addOrUpdateObjectEntry(
 			externalReferenceCode, groupId, objectDefinitionId,
-			objectEntryFolderId, values, serviceContext);
+			objectEntryFolderId, values, reviewDate, serviceContext);
 	}
 
 	public static void checkModelResourcePermission(
@@ -212,11 +214,12 @@ public class ObjectEntryServiceUtil {
 
 	public static ObjectEntry updateObjectEntry(
 			long objectEntryId, Map<String, Serializable> values,
+			java.util.Date reviewDate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().updateObjectEntry(
-			objectEntryId, values, serviceContext);
+			objectEntryId, values, reviewDate, serviceContext);
 	}
 
 	public static void validate(

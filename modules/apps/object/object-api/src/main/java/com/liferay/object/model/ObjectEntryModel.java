@@ -331,6 +331,20 @@ public interface ObjectEntryModel
 	public void setVersion(int version);
 
 	/**
+	 * Returns the review date of this object entry.
+	 *
+	 * @return the review date of this object entry
+	 */
+	public Date getReviewDate();
+
+	/**
+	 * Sets the review date of this object entry.
+	 *
+	 * @param reviewDate the review date of this object entry
+	 */
+	public void setReviewDate(Date reviewDate);
+
+	/**
 	 * Returns the last publish date of this object entry.
 	 *
 	 * @return the last publish date of this object entry

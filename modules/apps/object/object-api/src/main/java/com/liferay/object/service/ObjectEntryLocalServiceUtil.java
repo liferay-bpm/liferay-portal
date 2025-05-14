@@ -40,13 +40,13 @@ public class ObjectEntryLocalServiceUtil {
 	public static ObjectEntry addObjectEntry(
 			long userId, long groupId, long objectDefinitionId,
 			long objectEntryFolderId, String defaultLanguageId,
-			Map<String, Serializable> values,
+			Map<String, Serializable> values, java.util.Date reviewDate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addObjectEntry(
 			userId, groupId, objectDefinitionId, objectEntryFolderId,
-			defaultLanguageId, values, serviceContext);
+			defaultLanguageId, values, reviewDate, serviceContext);
 	}
 
 	/**
@@ -88,13 +88,13 @@ public class ObjectEntryLocalServiceUtil {
 	public static ObjectEntry addOrUpdateObjectEntry(
 			String externalReferenceCode, long userId, long groupId,
 			long objectDefinitionId, long objectEntryFolderId,
-			Map<String, Serializable> values,
+			Map<String, Serializable> values, java.util.Date reviewDate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addOrUpdateObjectEntry(
 			externalReferenceCode, userId, groupId, objectDefinitionId,
-			objectEntryFolderId, values, serviceContext);
+			objectEntryFolderId, values, reviewDate, serviceContext);
 	}
 
 	/**
@@ -667,11 +667,12 @@ public class ObjectEntryLocalServiceUtil {
 
 	public static ObjectEntry updateObjectEntry(
 			long userId, long objectEntryId, Map<String, Serializable> values,
+			java.util.Date reviewDate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().updateObjectEntry(
-			userId, objectEntryId, values, serviceContext);
+			userId, objectEntryId, values, reviewDate, serviceContext);
 	}
 
 	/**

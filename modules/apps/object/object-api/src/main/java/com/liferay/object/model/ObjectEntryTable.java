@@ -66,6 +66,8 @@ public class ObjectEntryTable extends BaseTable<ObjectEntryTable> {
 		"treePath", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<ObjectEntryTable, Integer> version = createColumn(
 		"version", Integer.class, Types.INTEGER, Column.FLAG_DEFAULT);
+	public final Column<ObjectEntryTable, Date> reviewDate = createColumn(
+		"reviewDate", Date.class, Types.TIMESTAMP, Column.FLAG_DEFAULT);
 	public final Column<ObjectEntryTable, Date> lastPublishDate = createColumn(
 		"lastPublishDate", Date.class, Types.TIMESTAMP, Column.FLAG_DEFAULT);
 	public final Column<ObjectEntryTable, Integer> status = createColumn(

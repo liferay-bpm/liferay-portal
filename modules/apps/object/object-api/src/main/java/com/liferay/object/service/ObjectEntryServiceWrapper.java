@@ -30,12 +30,13 @@ public class ObjectEntryServiceWrapper
 			long groupId, long objectDefinitionId, long objectEntryFolderId,
 			String defaultLanguageId,
 			java.util.Map<String, java.io.Serializable> values,
+			java.util.Date reviewDate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectEntryService.addObjectEntry(
 			groupId, objectDefinitionId, objectEntryFolderId, defaultLanguageId,
-			values, serviceContext);
+			values, reviewDate, serviceContext);
 	}
 
 	@Override
@@ -43,12 +44,13 @@ public class ObjectEntryServiceWrapper
 			String externalReferenceCode, long groupId, long objectDefinitionId,
 			long objectEntryFolderId,
 			java.util.Map<String, java.io.Serializable> values,
+			java.util.Date reviewDate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectEntryService.addOrUpdateObjectEntry(
 			externalReferenceCode, groupId, objectDefinitionId,
-			objectEntryFolderId, values, serviceContext);
+			objectEntryFolderId, values, reviewDate, serviceContext);
 	}
 
 	@Override
@@ -237,11 +239,12 @@ public class ObjectEntryServiceWrapper
 	public com.liferay.object.model.ObjectEntry updateObjectEntry(
 			long objectEntryId,
 			java.util.Map<String, java.io.Serializable> values,
+			java.util.Date reviewDate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectEntryService.updateObjectEntry(
-			objectEntryId, values, serviceContext);
+			objectEntryId, values, reviewDate, serviceContext);
 	}
 
 	@Override

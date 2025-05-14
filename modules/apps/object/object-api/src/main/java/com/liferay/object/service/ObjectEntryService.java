@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.transaction.Transactional;
 
 import java.io.Serializable;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -51,13 +52,13 @@ public interface ObjectEntryService extends BaseService {
 	public ObjectEntry addObjectEntry(
 			long groupId, long objectDefinitionId, long objectEntryFolderId,
 			String defaultLanguageId, Map<String, Serializable> values,
-			ServiceContext serviceContext)
+			Date reviewDate, ServiceContext serviceContext)
 		throws PortalException;
- String                    externalReferenceCode
+
 	public ObjectEntry addOrUpdateObjectEntry(
 			String externalReferenceCode, long groupId, long objectDefinitionId,
 			long objectEntryFolderId, Map<String, Serializable> values,
-			ServiceContext serviceContext)
+			Date reviewDate, ServiceContext serviceContext)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -158,7 +159,7 @@ public interface ObjectEntryService extends BaseService {
 
 	public ObjectEntry updateObjectEntry(
 			long objectEntryId, Map<String, Serializable> values,
-			ServiceContext serviceContext)
+			Date reviewDate, ServiceContext serviceContext)
 		throws PortalException;
 
 	public void validate(

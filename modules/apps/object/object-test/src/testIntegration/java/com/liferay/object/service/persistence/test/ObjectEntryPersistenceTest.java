@@ -147,6 +147,8 @@ public class ObjectEntryPersistenceTest {
 
 		newObjectEntry.setVersion(RandomTestUtil.nextInt());
 
+		newObjectEntry.setReviewDate(RandomTestUtil.nextDate());
+
 		newObjectEntry.setLastPublishDate(RandomTestUtil.nextDate());
 
 		newObjectEntry.setStatus(RandomTestUtil.nextInt());
@@ -206,6 +208,9 @@ public class ObjectEntryPersistenceTest {
 			existingObjectEntry.getTreePath(), newObjectEntry.getTreePath());
 		Assert.assertEquals(
 			existingObjectEntry.getVersion(), newObjectEntry.getVersion());
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingObjectEntry.getReviewDate()),
+			Time.getShortTimestamp(newObjectEntry.getReviewDate()));
 		Assert.assertEquals(
 			Time.getShortTimestamp(existingObjectEntry.getLastPublishDate()),
 			Time.getShortTimestamp(newObjectEntry.getLastPublishDate()));
@@ -365,9 +370,9 @@ public class ObjectEntryPersistenceTest {
 			"createDate", true, "modifiedDate", true, "objectDefinitionId",
 			true, "objectEntryFolderId", true, "rootObjectEntryId", true,
 			"defaultLanguageId", true, "expirationDate", true, "treePath", true,
-			"version", true, "lastPublishDate", true, "status", true,
-			"statusByUserId", true, "statusByUserName", true, "statusDate",
-			true);
+			"version", true, "reviewDate", true, "lastPublishDate", true,
+			"status", true, "statusByUserId", true, "statusByUserName", true,
+			"statusDate", true);
 	}
 
 	@Test
@@ -712,6 +717,8 @@ public class ObjectEntryPersistenceTest {
 		objectEntry.setTreePath(RandomTestUtil.randomString());
 
 		objectEntry.setVersion(RandomTestUtil.nextInt());
+
+		objectEntry.setReviewDate(RandomTestUtil.nextDate());
 
 		objectEntry.setLastPublishDate(RandomTestUtil.nextDate());
 

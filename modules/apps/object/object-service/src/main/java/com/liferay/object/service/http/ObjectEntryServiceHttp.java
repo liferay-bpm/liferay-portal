@@ -45,6 +45,7 @@ public class ObjectEntryServiceHttp {
 			HttpPrincipal httpPrincipal, long groupId, long objectDefinitionId,
 			long objectEntryFolderId, String defaultLanguageId,
 			java.util.Map<String, java.io.Serializable> values,
+			java.util.Date reviewDate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -55,7 +56,7 @@ public class ObjectEntryServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, objectDefinitionId, objectEntryFolderId,
-				defaultLanguageId, values, serviceContext);
+				defaultLanguageId, values, reviewDate, serviceContext);
 
 			Object returnObj = null;
 
@@ -89,6 +90,7 @@ public class ObjectEntryServiceHttp {
 			HttpPrincipal httpPrincipal, String externalReferenceCode,
 			long groupId, long objectDefinitionId, long objectEntryFolderId,
 			java.util.Map<String, java.io.Serializable> values,
+			java.util.Date reviewDate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -99,7 +101,7 @@ public class ObjectEntryServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, externalReferenceCode, groupId, objectDefinitionId,
-				objectEntryFolderId, values, serviceContext);
+				objectEntryFolderId, values, reviewDate, serviceContext);
 
 			Object returnObj = null;
 
@@ -881,6 +883,7 @@ public class ObjectEntryServiceHttp {
 	public static com.liferay.object.model.ObjectEntry updateObjectEntry(
 			HttpPrincipal httpPrincipal, long objectEntryId,
 			java.util.Map<String, java.io.Serializable> values,
+			java.util.Date reviewDate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -890,7 +893,7 @@ public class ObjectEntryServiceHttp {
 				_updateObjectEntryParameterTypes20);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, objectEntryId, values, serviceContext);
+				methodKey, objectEntryId, values, reviewDate, serviceContext);
 
 			Object returnObj = null;
 
@@ -966,13 +969,13 @@ public class ObjectEntryServiceHttp {
 	private static final Class<?>[] _addObjectEntryParameterTypes0 =
 		new Class[] {
 			long.class, long.class, long.class, String.class,
-			java.util.Map.class,
+			java.util.Map.class, java.util.Date.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 	private static final Class<?>[] _addOrUpdateObjectEntryParameterTypes1 =
 		new Class[] {
 			String.class, long.class, long.class, long.class,
-			java.util.Map.class,
+			java.util.Map.class, java.util.Date.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 	private static final Class<?>[]
@@ -1037,7 +1040,7 @@ public class ObjectEntryServiceHttp {
 		};
 	private static final Class<?>[] _updateObjectEntryParameterTypes20 =
 		new Class[] {
-			long.class, java.util.Map.class,
+			long.class, java.util.Map.class, java.util.Date.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 	private static final Class<?>[] _validateParameterTypes21 = new Class[] {

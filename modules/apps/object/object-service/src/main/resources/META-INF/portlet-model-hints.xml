@@ -117,6 +117,7 @@
 			<hint name="max-length">4000</hint>
 		</field>
 		<field name="version" type="int" />
+		<field name="reviewDate" type="Date" />
 		<field name="lastPublishDate" type="Date" />
 		<field name="status" type="int" />
 		<field name="statusByUserId" type="long" />

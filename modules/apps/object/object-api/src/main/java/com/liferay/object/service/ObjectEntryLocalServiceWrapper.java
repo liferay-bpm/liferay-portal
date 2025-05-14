@@ -34,12 +34,13 @@ public class ObjectEntryLocalServiceWrapper
 			long userId, long groupId, long objectDefinitionId,
 			long objectEntryFolderId, String defaultLanguageId,
 			java.util.Map<String, java.io.Serializable> values,
+			java.util.Date reviewDate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectEntryLocalService.addObjectEntry(
 			userId, groupId, objectDefinitionId, objectEntryFolderId,
-			defaultLanguageId, values, serviceContext);
+			defaultLanguageId, values, reviewDate, serviceContext);
 	}
 
 	/**
@@ -89,12 +90,13 @@ public class ObjectEntryLocalServiceWrapper
 			String externalReferenceCode, long userId, long groupId,
 			long objectDefinitionId, long objectEntryFolderId,
 			java.util.Map<String, java.io.Serializable> values,
+			java.util.Date reviewDate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectEntryLocalService.addOrUpdateObjectEntry(
 			externalReferenceCode, userId, groupId, objectDefinitionId,
-			objectEntryFolderId, values, serviceContext);
+			objectEntryFolderId, values, reviewDate, serviceContext);
 	}
 
 	/**
@@ -766,11 +768,12 @@ public class ObjectEntryLocalServiceWrapper
 	public com.liferay.object.model.ObjectEntry updateObjectEntry(
 			long userId, long objectEntryId,
 			java.util.Map<String, java.io.Serializable> values,
+			java.util.Date reviewDate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectEntryLocalService.updateObjectEntry(
-			userId, objectEntryId, values, serviceContext);
+			userId, objectEntryId, values, reviewDate, serviceContext);
 	}
 
 	/**

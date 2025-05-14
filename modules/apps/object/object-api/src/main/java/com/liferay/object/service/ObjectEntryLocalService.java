@@ -67,7 +67,8 @@ public interface ObjectEntryLocalService
 	public ObjectEntry addObjectEntry(
 			long userId, long groupId, long objectDefinitionId,
 			long objectEntryFolderId, String defaultLanguageId,
-			Map<String, Serializable> values, ServiceContext serviceContext)
+			Map<String, Serializable> values, Date reviewDate,
+			ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -96,7 +97,8 @@ public interface ObjectEntryLocalService
 	public ObjectEntry addOrUpdateObjectEntry(
 			String externalReferenceCode, long userId, long groupId,
 			long objectDefinitionId, long objectEntryFolderId,
-			Map<String, Serializable> values, ServiceContext serviceContext)
+			Map<String, Serializable> values, Date reviewDate,
+			ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -498,7 +500,7 @@ public interface ObjectEntryLocalService
 
 	public ObjectEntry updateObjectEntry(
 			long userId, long objectEntryId, Map<String, Serializable> values,
-			ServiceContext serviceContext)
+			Date reviewDate, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
