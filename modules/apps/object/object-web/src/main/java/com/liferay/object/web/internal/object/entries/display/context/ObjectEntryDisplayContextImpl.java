@@ -674,6 +674,11 @@ public class ObjectEntryDisplayContextImpl
 		DDMFormRenderingContext ddmFormRenderingContext =
 			new DDMFormRenderingContext();
 
+		ddmFormRenderingContext.setAvailableLocalesJSONArray(
+			JSONUtil.toJSONArray(
+				LanguageUtil.getAvailableLocales(),
+				locale -> _getLocaleJSONObject(locale), _log));
+
 		ddmFormRenderingContext.setContainerId("editObjectEntry");
 
 		Locale locale = _themeDisplay.getSiteDefaultLocale();
@@ -1233,6 +1238,19 @@ public class ObjectEntryDisplayContextImpl
 
 			return 0L;
 		}
+	}
+
+	private JSONObject _getLocaleJSONObject(Locale locale) {
+		String languageId = LocaleUtil.toLanguageId(locale);
+
+		return JSONUtil.put(
+			"displayName", locale.getDisplayName(locale)
+		).put(
+			"icon",
+			StringUtil.toLowerCase(StringUtil.replace(languageId, '_', "-"))
+		).put(
+			"localeId", languageId
+		);
 	}
 
 	private List<DDMFormFieldValue> _getNestedDDMFormFieldValues(

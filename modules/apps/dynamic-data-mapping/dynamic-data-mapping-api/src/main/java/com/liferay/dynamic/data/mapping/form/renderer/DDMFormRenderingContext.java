@@ -6,6 +6,7 @@
 package com.liferay.dynamic.data.mapping.form.renderer;
 
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -29,6 +30,10 @@ public class DDMFormRenderingContext {
 
 	public void addProperty(String key, Object value) {
 		_properties.put(key, value);
+	}
+
+	public JSONArray getAvailableLocalesJSONArray() {
+		return _availableLocalesJSONArray;
 	}
 
 	public String getCancelLabel() {
@@ -121,6 +126,12 @@ public class DDMFormRenderingContext {
 
 	public boolean isViewMode() {
 		return MapUtil.getBoolean(_properties, "viewMode");
+	}
+
+	public void setAvailableLocalesJSONArray(
+		JSONArray availableLocalesJSONArray) {
+
+		_availableLocalesJSONArray = availableLocalesJSONArray;
 	}
 
 	public void setCancelLabel(String cancelLabel) {
@@ -221,6 +232,7 @@ public class DDMFormRenderingContext {
 		return "ddmForm".concat(StringUtil.randomString());
 	}
 
+	private JSONArray _availableLocalesJSONArray;
 	private String _cancelLabel;
 	private String _containerId;
 	private long _ddmFormInstanceId;

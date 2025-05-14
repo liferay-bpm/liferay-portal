@@ -220,6 +220,10 @@ public class DDMFormTemplateContextFactoryImpl
 			ParamUtil.getInteger(
 				ddmFormRenderingContext.getHttpServletRequest(), "activePage"));
 
+		templateContext.put(
+			"availableLocales",
+			ddmFormRenderingContext.getAvailableLocalesJSONArray());
+
 		_setDDMFormFieldsEvaluableProperty(ddmForm, ddmFormLayout);
 
 		Locale locale = ddmFormRenderingContext.getLocale();
