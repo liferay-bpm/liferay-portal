@@ -89,7 +89,7 @@ test.describe('manage Object Layouts through the Object Layout tab', () => {
 		const {objectEntry, objectFields} = await mockObjectFields({
 			apiHelpers,
 			objectEntryReturn: {format: 'API'},
-			objectFieldBusinessTypes: ['text'],
+			objectFieldBusinessTypes: ['Text'],
 		});
 
 		const objectDefinitionAPIClient =
@@ -131,7 +131,7 @@ test.describe('manage Object Layouts through the Object Layout tab', () => {
 			await mockObjectFields({
 				apiHelpers,
 				objectEntryReturn: {format: 'API'},
-				objectFieldBusinessTypes: ['text'],
+				objectFieldBusinessTypes: ['Text'],
 			});
 
 		const {body: objectDefinition2} =
