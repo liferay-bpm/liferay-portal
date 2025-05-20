@@ -1156,6 +1156,15 @@ public class ObjectEntryDTOConverter
 
 		Map<String, Serializable> values = objectEntry.getValues();
 
+		if (FeatureFlagManagerUtil.isEnabled(
+				objectDefinition.getCompanyId(), "LPD-17564")) {
+
+			unsafeSuppliers.put(
+				"expirationDate", objectEntry::getExpirationDate);
+			unsafeSuppliers.put("publishDate", objectEntry::getPublishDate);
+			unsafeSuppliers.put("reviewDate", objectEntry::getReviewDate);
+		}
+
 		List<ObjectField> objectFields =
 			_objectFieldLocalService.getObjectFields(
 				objectDefinition.getObjectDefinitionId());
