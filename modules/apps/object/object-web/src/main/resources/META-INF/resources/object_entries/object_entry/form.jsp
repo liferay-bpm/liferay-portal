@@ -209,7 +209,7 @@ portletDisplay.setURLBack(backURL);
 					);
 
 					const scheduleContainerInputValue = JSON.parse(
-						scheduleContainerInput
+						scheduleContainerInput.value
 					);
 
 					if (
