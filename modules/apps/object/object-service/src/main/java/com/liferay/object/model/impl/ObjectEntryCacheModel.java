@@ -68,7 +68,7 @@ public class ObjectEntryCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(45);
+		StringBundler sb = new StringBundler(49);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -104,6 +104,10 @@ public class ObjectEntryCacheModel
 		sb.append(treePath);
 		sb.append(", version=");
 		sb.append(version);
+		sb.append(", reviewDate=");
+		sb.append(reviewDate);
+		sb.append(", publishDate=");
+		sb.append(publishDate);
 		sb.append(", lastPublishDate=");
 		sb.append(lastPublishDate);
 		sb.append(", status=");
@@ -192,6 +196,20 @@ public class ObjectEntryCacheModel
 
 		objectEntryImpl.setVersion(version);
 
+		if (reviewDate == Long.MIN_VALUE) {
+			objectEntryImpl.setReviewDate(null);
+		}
+		else {
+			objectEntryImpl.setReviewDate(new Date(reviewDate));
+		}
+
+		if (publishDate == Long.MIN_VALUE) {
+			objectEntryImpl.setPublishDate(null);
+		}
+		else {
+			objectEntryImpl.setPublishDate(new Date(publishDate));
+		}
+
 		if (lastPublishDate == Long.MIN_VALUE) {
 			objectEntryImpl.setLastPublishDate(null);
 		}
@@ -248,6 +266,8 @@ public class ObjectEntryCacheModel
 		treePath = objectInput.readUTF();
 
 		version = objectInput.readInt();
+		reviewDate = objectInput.readLong();
+		publishDate = objectInput.readLong();
 		lastPublishDate = objectInput.readLong();
 
 		status = objectInput.readInt();
@@ -316,6 +336,8 @@ public class ObjectEntryCacheModel
 		}
 
 		objectOutput.writeInt(version);
+		objectOutput.writeLong(reviewDate);
+		objectOutput.writeLong(publishDate);
 		objectOutput.writeLong(lastPublishDate);
 
 		objectOutput.writeInt(status);
@@ -349,6 +371,8 @@ public class ObjectEntryCacheModel
 	public long expirationDate;
 	public String treePath;
 	public int version;
+	public long reviewDate;
+	public long publishDate;
 	public long lastPublishDate;
 	public int status;
 	public long statusByUserId;

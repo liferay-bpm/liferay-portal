@@ -53,6 +53,8 @@ public class ObjectEntryWrapper
 		attributes.put("expirationDate", getExpirationDate());
 		attributes.put("treePath", getTreePath());
 		attributes.put("version", getVersion());
+		attributes.put("reviewDate", getReviewDate());
+		attributes.put("publishDate", getPublishDate());
 		attributes.put("lastPublishDate", getLastPublishDate());
 		attributes.put("status", getStatus());
 		attributes.put("statusByUserId", getStatusByUserId());
@@ -165,6 +167,18 @@ public class ObjectEntryWrapper
 
 		if (version != null) {
 			setVersion(version);
+		}
+
+		Date reviewDate = (Date)attributes.get("reviewDate");
+
+		if (reviewDate != null) {
+			setReviewDate(reviewDate);
+		}
+
+		Date publishDate = (Date)attributes.get("publishDate");
+
+		if (publishDate != null) {
+			setPublishDate(publishDate);
 		}
 
 		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
@@ -350,6 +364,26 @@ public class ObjectEntryWrapper
 	@Override
 	public long getPrimaryKey() {
 		return model.getPrimaryKey();
+	}
+
+	/**
+	 * Returns the publish date of this object entry.
+	 *
+	 * @return the publish date of this object entry
+	 */
+	@Override
+	public Date getPublishDate() {
+		return model.getPublishDate();
+	}
+
+	/**
+	 * Returns the review date of this object entry.
+	 *
+	 * @return the review date of this object entry
+	 */
+	@Override
+	public Date getReviewDate() {
+		return model.getReviewDate();
 	}
 
 	/**
@@ -728,6 +762,26 @@ public class ObjectEntryWrapper
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		model.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	 * Sets the publish date of this object entry.
+	 *
+	 * @param publishDate the publish date of this object entry
+	 */
+	@Override
+	public void setPublishDate(Date publishDate) {
+		model.setPublishDate(publishDate);
+	}
+
+	/**
+	 * Sets the review date of this object entry.
+	 *
+	 * @param reviewDate the review date of this object entry
+	 */
+	@Override
+	public void setReviewDate(Date reviewDate) {
+		model.setReviewDate(reviewDate);
 	}
 
 	/**

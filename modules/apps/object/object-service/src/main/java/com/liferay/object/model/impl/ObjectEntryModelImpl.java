@@ -75,7 +75,8 @@ public class ObjectEntryModelImpl
 		{"rootObjectEntryId", Types.BIGINT},
 		{"defaultLanguageId", Types.VARCHAR},
 		{"expirationDate", Types.TIMESTAMP}, {"treePath", Types.VARCHAR},
-		{"version", Types.INTEGER}, {"lastPublishDate", Types.TIMESTAMP},
+		{"version", Types.INTEGER}, {"reviewDate", Types.TIMESTAMP},
+		{"publishDate", Types.TIMESTAMP}, {"lastPublishDate", Types.TIMESTAMP},
 		{"status", Types.INTEGER}, {"statusByUserId", Types.BIGINT},
 		{"statusByUserName", Types.VARCHAR}, {"statusDate", Types.TIMESTAMP}
 	};
@@ -101,6 +102,8 @@ public class ObjectEntryModelImpl
 		TABLE_COLUMNS_MAP.put("expirationDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("treePath", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("version", Types.INTEGER);
+		TABLE_COLUMNS_MAP.put("reviewDate", Types.TIMESTAMP);
+		TABLE_COLUMNS_MAP.put("publishDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("lastPublishDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("status", Types.INTEGER);
 		TABLE_COLUMNS_MAP.put("statusByUserId", Types.BIGINT);
@@ -109,7 +112,7 @@ public class ObjectEntryModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table ObjectEntry (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(1000) null,objectEntryId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,objectDefinitionId LONG,objectEntryFolderId LONG,rootObjectEntryId LONG,defaultLanguageId VARCHAR(75) null,expirationDate DATE null,treePath STRING null,version INTEGER,lastPublishDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
+		"create table ObjectEntry (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(1000) null,objectEntryId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,objectDefinitionId LONG,objectEntryFolderId LONG,rootObjectEntryId LONG,defaultLanguageId VARCHAR(75) null,expirationDate DATE null,treePath STRING null,version INTEGER,reviewDate DATE null,publishDate DATE null,lastPublishDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
 
 	public static final String TABLE_SQL_DROP = "drop table ObjectEntry";
 
@@ -330,6 +333,10 @@ public class ObjectEntryModelImpl
 			attributeGetterFunctions.put("treePath", ObjectEntry::getTreePath);
 			attributeGetterFunctions.put("version", ObjectEntry::getVersion);
 			attributeGetterFunctions.put(
+				"reviewDate", ObjectEntry::getReviewDate);
+			attributeGetterFunctions.put(
+				"publishDate", ObjectEntry::getPublishDate);
+			attributeGetterFunctions.put(
 				"lastPublishDate", ObjectEntry::getLastPublishDate);
 			attributeGetterFunctions.put("status", ObjectEntry::getStatus);
 			attributeGetterFunctions.put(
@@ -409,6 +416,12 @@ public class ObjectEntryModelImpl
 			attributeSetterBiConsumers.put(
 				"version",
 				(BiConsumer<ObjectEntry, Integer>)ObjectEntry::setVersion);
+			attributeSetterBiConsumers.put(
+				"reviewDate",
+				(BiConsumer<ObjectEntry, Date>)ObjectEntry::setReviewDate);
+			attributeSetterBiConsumers.put(
+				"publishDate",
+				(BiConsumer<ObjectEntry, Date>)ObjectEntry::setPublishDate);
 			attributeSetterBiConsumers.put(
 				"lastPublishDate",
 				(BiConsumer<ObjectEntry, Date>)ObjectEntry::setLastPublishDate);
@@ -821,6 +834,36 @@ public class ObjectEntryModelImpl
 
 	@JSON
 	@Override
+	public Date getReviewDate() {
+		return _reviewDate;
+	}
+
+	@Override
+	public void setReviewDate(Date reviewDate) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_reviewDate = reviewDate;
+	}
+
+	@JSON
+	@Override
+	public Date getPublishDate() {
+		return _publishDate;
+	}
+
+	@Override
+	public void setPublishDate(Date publishDate) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_publishDate = publishDate;
+	}
+
+	@JSON
+	@Override
 	public Date getLastPublishDate() {
 		return _lastPublishDate;
 	}
@@ -1084,6 +1127,8 @@ public class ObjectEntryModelImpl
 		objectEntryImpl.setExpirationDate(getExpirationDate());
 		objectEntryImpl.setTreePath(getTreePath());
 		objectEntryImpl.setVersion(getVersion());
+		objectEntryImpl.setReviewDate(getReviewDate());
+		objectEntryImpl.setPublishDate(getPublishDate());
 		objectEntryImpl.setLastPublishDate(getLastPublishDate());
 		objectEntryImpl.setStatus(getStatus());
 		objectEntryImpl.setStatusByUserId(getStatusByUserId());
@@ -1131,6 +1176,10 @@ public class ObjectEntryModelImpl
 			this.<String>getColumnOriginalValue("treePath"));
 		objectEntryImpl.setVersion(
 			this.<Integer>getColumnOriginalValue("version"));
+		objectEntryImpl.setReviewDate(
+			this.<Date>getColumnOriginalValue("reviewDate"));
+		objectEntryImpl.setPublishDate(
+			this.<Date>getColumnOriginalValue("publishDate"));
 		objectEntryImpl.setLastPublishDate(
 			this.<Date>getColumnOriginalValue("lastPublishDate"));
 		objectEntryImpl.setStatus(
@@ -1314,6 +1363,24 @@ public class ObjectEntryModelImpl
 
 		objectEntryCacheModel.version = getVersion();
 
+		Date reviewDate = getReviewDate();
+
+		if (reviewDate != null) {
+			objectEntryCacheModel.reviewDate = reviewDate.getTime();
+		}
+		else {
+			objectEntryCacheModel.reviewDate = Long.MIN_VALUE;
+		}
+
+		Date publishDate = getPublishDate();
+
+		if (publishDate != null) {
+			objectEntryCacheModel.publishDate = publishDate.getTime();
+		}
+		else {
+			objectEntryCacheModel.publishDate = Long.MIN_VALUE;
+		}
+
 		Date lastPublishDate = getLastPublishDate();
 
 		if (lastPublishDate != null) {
@@ -1423,6 +1490,8 @@ public class ObjectEntryModelImpl
 	private Date _expirationDate;
 	private String _treePath;
 	private int _version;
+	private Date _reviewDate;
+	private Date _publishDate;
 	private Date _lastPublishDate;
 	private int _status;
 	private long _statusByUserId;
@@ -1477,6 +1546,8 @@ public class ObjectEntryModelImpl
 		_columnOriginalValues.put("expirationDate", _expirationDate);
 		_columnOriginalValues.put("treePath", _treePath);
 		_columnOriginalValues.put("version", _version);
+		_columnOriginalValues.put("reviewDate", _reviewDate);
+		_columnOriginalValues.put("publishDate", _publishDate);
 		_columnOriginalValues.put("lastPublishDate", _lastPublishDate);
 		_columnOriginalValues.put("status", _status);
 		_columnOriginalValues.put("statusByUserId", _statusByUserId);
@@ -1539,15 +1610,19 @@ public class ObjectEntryModelImpl
 
 		columnBitmasks.put("version", 65536L);
 
-		columnBitmasks.put("lastPublishDate", 131072L);
+		columnBitmasks.put("reviewDate", 131072L);
 
-		columnBitmasks.put("status", 262144L);
+		columnBitmasks.put("publishDate", 262144L);
 
-		columnBitmasks.put("statusByUserId", 524288L);
+		columnBitmasks.put("lastPublishDate", 524288L);
 
-		columnBitmasks.put("statusByUserName", 1048576L);
+		columnBitmasks.put("status", 1048576L);
 
-		columnBitmasks.put("statusDate", 2097152L);
+		columnBitmasks.put("statusByUserId", 2097152L);
+
+		columnBitmasks.put("statusByUserName", 4194304L);
+
+		columnBitmasks.put("statusDate", 8388608L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}
