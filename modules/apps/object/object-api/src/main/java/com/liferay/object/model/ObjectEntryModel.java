@@ -288,6 +288,20 @@ public interface ObjectEntryModel
 	public void setDefaultLanguageId(String defaultLanguageId);
 
 	/**
+	 * Returns the publish date of this object entry.
+	 *
+	 * @return the publish date of this object entry
+	 */
+	public Date getPublishDate();
+
+	/**
+	 * Sets the publish date of this object entry.
+	 *
+	 * @param publishDate the publish date of this object entry
+	 */
+	public void setPublishDate(Date publishDate);
+
+	/**
 	 * Returns the expiration date of this object entry.
 	 *
 	 * @return the expiration date of this object entry
@@ -300,6 +314,20 @@ public interface ObjectEntryModel
 	 * @param expirationDate the expiration date of this object entry
 	 */
 	public void setExpirationDate(Date expirationDate);
+
+	/**
+	 * Returns the review date of this object entry.
+	 *
+	 * @return the review date of this object entry
+	 */
+	public Date getReviewDate();
+
+	/**
+	 * Sets the review date of this object entry.
+	 *
+	 * @param reviewDate the review date of this object entry
+	 */
+	public void setReviewDate(Date reviewDate);
 
 	/**
 	 * Returns the tree path of this object entry.

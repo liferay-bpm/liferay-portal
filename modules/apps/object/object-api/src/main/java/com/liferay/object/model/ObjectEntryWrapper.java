@@ -50,7 +50,9 @@ public class ObjectEntryWrapper
 		attributes.put("objectEntryFolderId", getObjectEntryFolderId());
 		attributes.put("rootObjectEntryId", getRootObjectEntryId());
 		attributes.put("defaultLanguageId", getDefaultLanguageId());
+		attributes.put("publishDate", getPublishDate());
 		attributes.put("expirationDate", getExpirationDate());
+		attributes.put("reviewDate", getReviewDate());
 		attributes.put("treePath", getTreePath());
 		attributes.put("version", getVersion());
 		attributes.put("lastPublishDate", getLastPublishDate());
@@ -149,10 +151,22 @@ public class ObjectEntryWrapper
 			setDefaultLanguageId(defaultLanguageId);
 		}
 
+		Date publishDate = (Date)attributes.get("publishDate");
+
+		if (publishDate != null) {
+			setPublishDate(publishDate);
+		}
+
 		Date expirationDate = (Date)attributes.get("expirationDate");
 
 		if (expirationDate != null) {
 			setExpirationDate(expirationDate);
+		}
+
+		Date reviewDate = (Date)attributes.get("reviewDate");
+
+		if (reviewDate != null) {
+			setReviewDate(reviewDate);
 		}
 
 		String treePath = (String)attributes.get("treePath");
@@ -350,6 +364,26 @@ public class ObjectEntryWrapper
 	@Override
 	public long getPrimaryKey() {
 		return model.getPrimaryKey();
+	}
+
+	/**
+	 * Returns the publish date of this object entry.
+	 *
+	 * @return the publish date of this object entry
+	 */
+	@Override
+	public Date getPublishDate() {
+		return model.getPublishDate();
+	}
+
+	/**
+	 * Returns the review date of this object entry.
+	 *
+	 * @return the review date of this object entry
+	 */
+	@Override
+	public Date getReviewDate() {
+		return model.getReviewDate();
 	}
 
 	/**
@@ -728,6 +762,26 @@ public class ObjectEntryWrapper
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		model.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	 * Sets the publish date of this object entry.
+	 *
+	 * @param publishDate the publish date of this object entry
+	 */
+	@Override
+	public void setPublishDate(Date publishDate) {
+		model.setPublishDate(publishDate);
+	}
+
+	/**
+	 * Sets the review date of this object entry.
+	 *
+	 * @param reviewDate the review date of this object entry
+	 */
+	@Override
+	public void setReviewDate(Date reviewDate) {
+		model.setReviewDate(reviewDate);
 	}
 
 	/**
