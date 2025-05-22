@@ -10,6 +10,7 @@ import com.liferay.object.system.JaxRsApplicationDescriptor;
 import com.liferay.object.system.SystemObjectDefinitionManager;
 import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -94,7 +95,9 @@ public class ObjectEntryDTOConverterUtil {
 		Object dto = dtoConverter.toDTO(
 			defaultDTOConverterContext, objectEntry);
 
-		JSONObject dtoJSONObject = jsonFactory.createJSONObject(dto.toString());
+		String dtoJSON = JSONFactoryUtil.serialize(dto);
+
+		JSONObject dtoJSONObject = jsonFactory.createJSONObject(dtoJSON);
 
 		dtoJSONObject.remove("actions");
 		dtoJSONObject.remove("creator");
