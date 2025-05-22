@@ -18,6 +18,8 @@ import com.liferay.portal.kernel.workflow.WorkflowException;
 import com.liferay.portal.security.script.management.test.util.ScriptManagementConfigurationTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+import com.liferay.portal.workflow.constants.WorkflowDefinitionConstants;
 import com.liferay.portal.workflow.kaleo.definition.exception.KaleoDefinitionValidationException;
 import com.liferay.portal.workflow.kaleo.definition.util.WorkflowDefinitionContentUtil;
 import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
@@ -41,7 +43,9 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new LiferayIntegrationTestRule();
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			PermissionCheckerMethodTestRule.INSTANCE);
 
 	@Test(expected = WorkflowException.class)
 	public void testDeleteSaveWorkflowDefinition() throws Exception {
@@ -73,7 +77,8 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 				() -> _workflowDefinitionManager.deployWorkflowDefinition(
 					null, TestPropsValues.getCompanyId(),
 					TestPropsValues.getUserId(), StringPool.BLANK,
-					"Single Approver", content.getBytes()));
+					WorkflowDefinitionConstants.NAME_SINGLE_APPROVER,
+					content.getBytes()));
 		}
 	}
 
@@ -90,7 +95,8 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 			_workflowDefinitionManager.deployWorkflowDefinition(
 				null, TestPropsValues.getCompanyId(),
 				TestPropsValues.getUserId(), StringPool.BLANK,
-				"Single Approver", content.getBytes());
+				WorkflowDefinitionConstants.NAME_SINGLE_APPROVER,
+				content.getBytes());
 
 		Assert.assertEquals(
 			workflowDefinition.getName(), workflowDefinition.getName());
@@ -106,16 +112,19 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 
 		WorkflowDefinition workflowDefinition =
 			_workflowDefinitionManager.deployWorkflowDefinition(
-				null, TestPropsValues.getCompanyId(),
-				TestPropsValues.getUserId(), StringPool.BLANK,
-				"Single Approver", content.getBytes());
+				WorkflowDefinitionConstants.
+					EXTERNAL_REFERENCE_CODE_SINGLE_APPROVER,
+				TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+				StringPool.BLANK,
+				WorkflowDefinitionConstants.NAME_SINGLE_APPROVER,
+				content.getBytes());
 
 		Assert.assertEquals(
 			workflowDefinition.getName(), workflowDefinition.getName());
 		Assert.assertTrue(workflowDefinition.isActive());
 	}
 
-	@Test
+	@Test(expected = WorkflowException.class)
 	public void testDeployWorkflowDraftDefinition() throws Exception {
 		WorkflowDefinition workflowDefinition = _saveWorkflowDefinition();
 
@@ -134,20 +143,26 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	}
 
 	@Test
+	public void testGetWorkflowDefinition() throws Exception {
+		_testGetWorkflowDefinition("L_MESSAGE_BOARDS_USER_STATS_MODERATION");
+		_testGetWorkflowDefinition("L_SINGLE_APPROVER");
+	}
+
+	@Test(expected = WorkflowException.class)
 	public void testSaveWorkflowDefinition() throws Exception {
 		WorkflowDefinition workflowDefinition = _saveWorkflowDefinition();
 
 		Assert.assertNotNull(workflowDefinition);
 	}
 
-	@Test
+	@Test(expected = WorkflowException.class)
 	public void testSaveWorkflowDefinitionIsNotActive() throws Exception {
 		WorkflowDefinition workflowDefinition = _saveWorkflowDefinition();
 
 		Assert.assertFalse(workflowDefinition.isActive());
 	}
 
-	@Test
+	@Test(expected = WorkflowException.class)
 	public void testSaveWorkflowDefinitionWithoutTitleAndContent()
 		throws Exception {
 
@@ -544,8 +559,22 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 		throws Exception {
 
 		return _workflowDefinitionManager.saveWorkflowDefinition(
-			null, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
-			title, StringUtil.randomId(), bytes);
+			WorkflowDefinitionConstants.EXTERNAL_REFERENCE_CODE_SINGLE_APPROVER,
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId(), title,
+			StringUtil.randomId(), bytes);
+	}
+
+	private void _testGetWorkflowDefinition(String externalReferenceCode)
+		throws Exception {
+
+		WorkflowDefinition workflowDefinition =
+			_workflowDefinitionManager.getWorkflowDefinition(
+				externalReferenceCode, TestPropsValues.getCompanyId());
+
+		Assert.assertEquals(
+			externalReferenceCode,
+			workflowDefinition.getExternalReferenceCode());
+		Assert.assertTrue(workflowDefinition.isActive());
 	}
 
 	@Inject
