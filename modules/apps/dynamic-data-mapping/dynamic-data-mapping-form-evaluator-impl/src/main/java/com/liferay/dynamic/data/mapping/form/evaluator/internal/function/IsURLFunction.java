@@ -23,7 +23,14 @@ public class IsURLFunction
 	@Override
 	public Boolean apply(Object parameter) {
 		if ((parameter == null) ||
-			Objects.equals(parameter.toString(), Http.HTTP_WITH_SLASH) ||
+			parameter.toString(
+			).trim(
+			).isEmpty()) {
+
+			return true;
+		}
+
+		if (Objects.equals(parameter.toString(), Http.HTTP_WITH_SLASH) ||
 			Objects.equals(parameter.toString(), Http.HTTPS_WITH_SLASH)) {
 
 			return false;
