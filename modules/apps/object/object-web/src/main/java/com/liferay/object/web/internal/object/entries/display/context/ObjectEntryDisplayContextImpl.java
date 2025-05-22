@@ -580,6 +580,20 @@ public class ObjectEntryDisplayContextImpl
 	@Override
 	public Map<String, Object> getScheduleProperties() {
 		return HashMapBuilder.<String, Object>put(
+			"expirationDate",
+			JSONUtil.put(
+				"checked", true
+			).put(
+				"value", () -> null
+			)
+		).put(
+			"expirationDate",
+			JSONUtil.put(
+				"checked", true
+			).put(
+				"value", () -> null
+			)
+		).put(
 			"reviewDate",
 			() -> {
 				ObjectEntry objectEntry = _getObjectEntry();
