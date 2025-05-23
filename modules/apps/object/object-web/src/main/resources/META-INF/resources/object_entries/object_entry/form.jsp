@@ -158,6 +158,13 @@ portletDisplay.setURLBack(backURL);
 			return Object.values(object).some((value) => value === '');
 		}
 
+		function isPastDate(date) {
+			const currentDate = new Date().setSeconds(0, 0);
+			const dateTime = new Date(date).setSeconds(0, 0);
+
+			return currentDate > dateTime;
+		}
+
 		Liferay.provide(window, '<portlet:namespace />submitObjectEntry', () => {
 			const form = document.getElementById('<portlet:namespace />fm');
 
@@ -213,6 +220,16 @@ portletDisplay.setURLBack(backURL);
 					if (
 						scheduleContainerInput &&
 						hasEmptyString(scheduleContainerInputValue)
+					) {
+						shouldSubmitForm = false;
+
+						loadingElement.remove();
+
+						return false;
+					}
+
+					if (scheduleContainerInputValue.expirationDate &&
+						isPastDate(scheduleContainerInputValue.expirationDate)
 					) {
 						shouldSubmitForm = false;
 
