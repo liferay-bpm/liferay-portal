@@ -10,7 +10,7 @@ import ScheduleField from './ScheduleField';
 
 import './ScheduleContainer.scss';
 
-type SchedulePropertyKey = 'reviewDate';
+type SchedulePropertyKey = 'expirationDate' | 'reviewDate';
 
 interface SchedulePropertyValues {
 	checked: boolean;
@@ -31,6 +31,10 @@ export default function ScheduleContainer({
 	const [displayedScheduleValues, setDisplayedScheduleValues] = useState<{
 		[key in SchedulePropertyKey]: SchedulePropertyValues;
 	}>({
+		expirationDate: {
+			checked: scheduleProperties.expirationDate.checked,
+			value: scheduleProperties.expirationDate.value ?? '',
+		},
 		reviewDate: {
 			checked: scheduleProperties.reviewDate.checked,
 			value: scheduleProperties.reviewDate.value ?? '',
@@ -39,6 +43,7 @@ export default function ScheduleContainer({
 
 	const [hiddenScheduleValues, setHiddenScheduleValues] =
 		useState<HiddenValue>({
+			expirationDate: scheduleProperties.expirationDate.value ?? null,
 			reviewDate: scheduleProperties.reviewDate.value ?? null,
 		});
 
@@ -69,6 +74,48 @@ export default function ScheduleContainer({
 			<ClayPanel.Body className="lfr-object__entries-schedule-panel">
 				<div className="row">
 					<ScheduleField
+						checkboxLabel={Liferay.Language.get('never-expire')}
+						customValidation={(value) => {
+							const currentDate = new Date().setSeconds(0, 0);
+							const dateTime = new Date(value).setSeconds(0, 0);
+
+							if (currentDate > dateTime) {
+								return Liferay.Language.get(
+									'the-date-entered-is-in-the-past'
+								);
+							}
+
+							return '';
+						}}
+						dateLabel={Liferay.Language.get('expiration-date')}
+						id={portletNamespace + 'expirationDate'}
+						isChecked={
+							displayedScheduleValues.expirationDate.checked
+						}
+						onCheckboxChange={(event) => {
+							handleCheckboxChange({
+								event,
+								property: 'expirationDate',
+							});
+						}}
+						onDateChange={(value: string) => {
+							setDisplayedScheduleValues({
+								...displayedScheduleValues,
+								expirationDate: {
+									...scheduleProperties.expirationDate,
+									value,
+								},
+							});
+							setHiddenScheduleValues((prev) => ({
+								...prev,
+								expirationDate: value,
+							}));
+						}}
+						portletNamespace={portletNamespace}
+						value={displayedScheduleValues.expirationDate.value}
+					/>
+
+					<ScheduleField
 						checkboxLabel={Liferay.Language.get('never-review')}
 						dateLabel={Liferay.Language.get('review-date')}
 						id={portletNamespace + 'reviewDate'}
@@ -87,7 +134,10 @@ export default function ScheduleContainer({
 									value,
 								},
 							});
-							setHiddenScheduleValues({reviewDate: value});
+							setHiddenScheduleValues((prev) => ({
+								...prev,
+								reviewDate: value,
+							}));
 						}}
 						portletNamespace={portletNamespace}
 						value={displayedScheduleValues.reviewDate.value}
