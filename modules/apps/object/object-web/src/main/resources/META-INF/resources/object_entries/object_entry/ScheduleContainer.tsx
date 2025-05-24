@@ -17,9 +17,13 @@ interface SchedulePropertyValues {
 	value: string;
 }
 
+export type ScheduleProperties = {
+	[key in SchedulePropertyKey]: SchedulePropertyValues;
+};
+
 interface ScheduleContainerProps {
 	portletNamespace: string;
-	scheduleProperties: {[key in SchedulePropertyKey]: SchedulePropertyValues};
+	scheduleProperties: ScheduleProperties;
 }
 
 type HiddenValue = {[key in SchedulePropertyKey]: string | null};
