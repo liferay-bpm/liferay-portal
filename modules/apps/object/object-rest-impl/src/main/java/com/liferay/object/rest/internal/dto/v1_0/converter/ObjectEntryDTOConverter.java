@@ -24,6 +24,7 @@ import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.entry.util.ObjectEntryDTOConverterUtil;
 import com.liferay.object.entry.util.ObjectEntryValuesUtil;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
+import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntryFolder;
 import com.liferay.object.model.ObjectEntryModel;
@@ -586,9 +587,7 @@ public class ObjectEntryDTOConverter
 			serviceBuilderObjectEntry);
 	}
 
-	private String _getDateString(
-		ObjectField objectField, Timestamp timestamp) {
-
+	private String _getDateString(Object date, ObjectField objectField) {
 		String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 
 		if (objectField.compareBusinessType(
@@ -601,9 +600,13 @@ public class ObjectEntryDTOConverter
 			pattern += "'Z'";
 		}
 
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+		if (Validator.isNotNull(date)) {
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
-		return simpleDateFormat.format(timestamp);
+			return simpleDateFormat.format(date);
+		}
+
+		return null;
 	}
 
 	private DTOConverterContext _getDTOConverterContext(
@@ -981,7 +984,7 @@ public class ObjectEntryDTOConverter
 				return null;
 			}
 
-			return _getDateString(objectField, timestamp);
+			return _getDateString(timestamp, objectField);
 		}
 		else if (objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST)) {
@@ -1156,21 +1159,31 @@ public class ObjectEntryDTOConverter
 
 		Map<String, Serializable> values = objectEntry.getValues();
 
-		if (FeatureFlagManagerUtil.isEnabled(
-				objectDefinition.getCompanyId(), "LPD-17564")) {
-
-			unsafeSuppliers.put(
-				"expirationDate", objectEntry::getExpirationDate);
-			unsafeSuppliers.put("publishDate", objectEntry::getPublishDate);
-			unsafeSuppliers.put("reviewDate", objectEntry::getReviewDate);
-		}
-
 		List<ObjectField> objectFields =
 			_objectFieldLocalService.getObjectFields(
 				objectDefinition.getObjectDefinitionId());
 
 		for (ObjectField objectField : objectFields) {
-			if (objectField.isMetadata()) {
+			if (objectField.isMetadata() &&
+				ObjectFieldUtil.isScheduleField(objectField.getName()) &&
+				FeatureFlagManagerUtil.isEnabled(
+					objectDefinition.getCompanyId(), "LPD-17564")) {
+
+				unsafeSuppliers.put(
+					"expirationDate",
+					() -> _getDateString(
+						objectEntry.getExpirationDate(), objectField));
+
+				unsafeSuppliers.put(
+					"publishDate",
+					() -> _getDateString(
+						objectEntry.getPublishDate(), objectField));
+
+				unsafeSuppliers.put(
+					"reviewDate",
+					() -> _getDateString(
+						objectEntry.getReviewDate(), objectField));
+
 				continue;
 			}
 

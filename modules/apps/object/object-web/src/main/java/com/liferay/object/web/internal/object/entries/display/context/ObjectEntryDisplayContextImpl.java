@@ -123,10 +123,6 @@ import java.sql.Timestamp;
 
 import java.text.DecimalFormat;
 
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -588,31 +584,25 @@ public class ObjectEntryDisplayContextImpl
 					return JSONUtil.put(
 						"checked", true
 					).put(
-						"value", (Date)null
+						"value", (String)null
 					);
 				}
 
-				Date rawDate = (Date)objectEntry.getPropertyValue("reviewDate");
+				String rawDate = (String)objectEntry.getPropertyValue(
+					"reviewDate");
 
 				if (rawDate == null) {
 					return JSONUtil.put(
 						"checked", true
 					).put(
-						"value", (Date)null
+						"value", (String)null
 					);
 				}
 
-				User user = _objectRequestHelper.getUser();
-
-				String formattedDate = DateTimeFormatter.ofPattern(
-					"yyyy-MM-dd HH:mm"
-				).withZone(
-					ZoneId.of(user.getTimeZoneId())
-				).format(
-					rawDate.toInstant(
-					).truncatedTo(
-						ChronoUnit.MINUTES
-					)
+				String formattedDate = StringUtil.replace(
+					rawDate, 'T', ' '
+				).substring(
+					0, 16
 				);
 
 				return JSONUtil.put(
