@@ -7,6 +7,7 @@ import ClayPanel from '@clayui/panel';
 import {API, openToast, stringUtils} from '@liferay/object-js-components-web';
 import React, {useEffect, useState} from 'react';
 
+import {Error, handleErrors} from '../../utils/errors';
 import ObjectManagementToolbar from '../ObjectManagementToolbar';
 import {AccountRestrictionContainer} from './AccountRestrictionContainer';
 import {ConfigurationContainer} from './ConfigurationContainer';
@@ -14,17 +15,18 @@ import {EntryDisplayContainer} from './EntryDisplayContainer';
 import {ExternalDataSourceContainer} from './ExternalDataSourceContainer';
 import {ObjectDataContainer} from './ObjectDataContainer';
 import {ScopeContainer} from './ScopeContainer';
+import {SeoContainer} from './SeoContainer';
 import Sheet from './Sheet';
 import {TranslationsContainer} from './TranslationsContainer';
 import {useObjectDetailsForm} from './useObjectDetailsForm';
 
 import './ObjectDetails.scss';
-import {SeoContainer} from './SeoContainer';
 
 export type Scope = {
 	items: LabelValueObject[];
 	label: string;
 };
+
 interface EditObjectDetailsProps {
 	backURL: string;
 	companies: Scope[];
@@ -89,6 +91,7 @@ export default function EditObjectDetails({
 	sites,
 	storageTypes,
 }: EditObjectDetailsProps) {
+	const [backEndErrors, setBackEndErrors] = useState<Error>({});
 	const [objectFields, setObjectFields] = useState<ObjectField[]>([]);
 
 	const {errors, handleChange, handleValidate, setValues, values} =
@@ -120,15 +123,9 @@ export default function EditObjectDetails({
 				);
 
 			if (!saveResponse.ok) {
-				const {title} = (await saveResponse.json()) as {
-					status: string;
-					title: string;
-				};
+				const {detail, title} = (await saveResponse.json()) as Error;
 
-				openToast({
-					message: title,
-					type: 'danger',
-				});
+				handleErrors({detail, title}, setBackEndErrors);
 
 				return;
 			}
@@ -138,15 +135,10 @@ export default function EditObjectDetails({
 					await API.postObjectDefinitionPublish(values.id as number);
 
 				if (!publishResponse.ok) {
-					const {title} = (await publishResponse.json()) as {
-						status: string;
-						title: string;
-					};
+					const {detail, title} =
+						(await publishResponse.json()) as Error;
 
-					openToast({
-						message: title,
-						type: 'danger',
-					});
+					handleErrors({detail, title}, setBackEndErrors);
 
 					return;
 				}
@@ -193,6 +185,15 @@ export default function EditObjectDetails({
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [objectDefinitionId]);
+
+	const showSeoSection =
+		Liferay.FeatureFlags['LPD-21926'] &&
+		values.friendlyURLSeparator !== undefined &&
+		!(
+			(Liferay.FeatureFlags['LPS-135430'] &&
+				values.storageType !== 'default') ||
+			(!values.modifiable && values.system)
+		);
 
 	return (
 		<>
@@ -368,7 +369,7 @@ export default function EditObjectDetails({
 						</ClayPanel.Body>
 					</ClayPanel>
 
-					{Liferay.FeatureFlags['LPD-21926'] && (
+					{showSeoSection && (
 						<ClayPanel
 							collapsable
 							defaultExpanded
@@ -377,6 +378,7 @@ export default function EditObjectDetails({
 						>
 							<ClayPanel.Body>
 								<SeoContainer
+									errors={backEndErrors}
 									setValues={setValues}
 									values={values}
 								/>
