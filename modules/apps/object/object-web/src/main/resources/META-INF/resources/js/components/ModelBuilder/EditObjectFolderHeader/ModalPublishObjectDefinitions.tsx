@@ -121,7 +121,15 @@ export function ModalPublishObjectDefinitions({
 					await objectDefinitionResponse.json();
 
 				if (!objectDefinitionResponse.ok) {
-					throw new Error(objectDefinitionResponseJSON.title);
+					const {detail, title} = objectDefinitionResponseJSON;
+
+					if (title) {
+						throw new Error(title);
+					}
+					else if (detail) {
+						const [details] = JSON.parse(detail);
+						throw new Error(details.message);
+					}
 				}
 
 				setSelectedDraftObjectDefinitions((prevState) =>
