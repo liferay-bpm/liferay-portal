@@ -135,15 +135,9 @@ public class ObjectEntryItemSelectorViewDescriptor
 
 				long finalGroupId = groupId;
 
+
 				searchContainer.setResultsAndTotal(
 					() -> {
-						if ((finalGroupId == 0) &&
-							ObjectDefinitionConstants.SCOPE_SITE.equals(
-								objectScopeProvider.getKey())) {
-
-							return new ArrayList<>();
-						}
-
 						return objectRelatedModelsProvider.getUnrelatedModels(
 							_objectDefinition.getCompanyId(), finalGroupId,
 							_objectDefinition,
