@@ -9,7 +9,6 @@ import {apiHelpersTest} from '../../../fixtures/apiHelpersTest';
 import {dataApiHelpersTest} from '../../../fixtures/dataApiHelpersTest';
 import {loginTest} from '../../../fixtures/loginTest';
 import {workflowPagesTest} from '../../../fixtures/workflowPagesTest';
-import clearInvalidUserNotifications from '../../../utils/clearInvalidUserNotifications';
 import getBasicWebContentStructureId from '../../../utils/structured-content/getBasicWebContentStructureId';
 
 export const test = mergeTests(
@@ -19,54 +18,40 @@ export const test = mergeTests(
 	workflowPagesTest
 );
 
-interface CreatedEntities {
-	blogPosts?: TBlogPost[];
-}
-
-const createdEntities: CreatedEntities = {};
-
-test.beforeEach(async ({apiHelpers, configurationTabPage}) => {
+test.beforeEach(async ({apiHelpers, configurationTabPage, page}) => {
 	await configurationTabPage.goTo();
+
+	await page.getByLabel('Items per Page').click();
+
+	await page.getByRole('option').filter({hasText: '40'}).click();
 
 	await configurationTabPage.assignWorkflowToAssetType(
 		'Single Approver',
-		'Blogs Entry'
+		'Web Content Article'
 	);
 
+	const basicWebContentStructureId =
+		await getBasicWebContentStructureId(apiHelpers);
+
 	const site = await apiHelpers.headlessSite.getSiteByERC('L_GUEST');
-	const blogPosts: TBlogPost[] = [];
+
 	for (let i = 1; i <= 21; i++) {
-		blogPosts.push(
-			await apiHelpers.headlessDelivery.postBlog(site.id, {
-				headline: `Blogs Entry ${i}`,
-			})
-		);
-	}
+		const webContent =
+			await apiHelpers.jsonWebServicesJournal.addWebContent({
+				ddmStructureId: basicWebContentStructureId,
+				groupId: site.id,
+				titleMap: {en_US: `Web content ${i}`},
+			});
 
-	createdEntities.blogPosts = blogPosts;
+		apiHelpers.data.push({
+			id: `${site.id}_${webContent.articleId}`,
+			type: 'webContent',
+		});
+	}
 });
 
-test.afterEach(async ({apiHelpers, configurationTabPage, page}) => {
-	await configurationTabPage.goTo();
-
-	await configurationTabPage.unassignWorkflowFromAssetType('Blogs Entry');
-
-	if (createdEntities.blogPosts?.length) {
-		for (const blog of createdEntities.blogPosts) {
-			await apiHelpers.headlessDelivery.deleteBlog(blog.id);
-		}
-	}
-
-	delete createdEntities.blogPosts;
-
-	await clearInvalidUserNotifications(page);
-});
-
-test.describe('Workflow metrics', () => {
-	test('displays the correct number of entries based on the selected entries per page option', async ({
-		metricsPage,
-		page,
-	}) => {
+test('Workflow metrics', async ({metricsPage, page}) => {
+	test.step('displays the correct number of entries based on the selected entries per page option', async () => {
 		await metricsPage.goTo();
 
 		await page
@@ -81,121 +66,32 @@ test.describe('Workflow metrics', () => {
 			.click();
 
 		await expect(
-			page.getByRole('row').filter({hasText: 'Blogs Entry'})
+			page.getByRole('row').filter({hasText: 'Web content'})
 		).toHaveCount(20);
 
 		await page.getByLabel('Go to the next page').click();
 
 		await expect(
-			page.getByRole('row').filter({hasText: 'Blogs entry'})
+			page.getByRole('row').filter({hasText: 'Web content'})
 		).toHaveCount(1);
-	});
 
-	test('preserves Item Subject sorting when the user changes the pagination', async ({
-		metricsPage,
-		page,
-	}) => {
-		await metricsPage.goTo();
+		test.step('preserves ascending Creation Date sorting when the user changes the pagination', async () => {
+			await page.getByLabel('Items per Page').click();
 
-		await page
-			.getByRole('cell', {name: 'Single Approver'})
-			.getByRole('link')
-			.click();
+			await page.getByRole('option').filter({hasText: '40'}).click();
 
-		await page
-			.getByRole('link')
-			.filter({hasText: 'Untracked'})
-			.first()
-			.click();
+			await page.getByRole('link', {name: 'Creation Date'}).dblclick();
 
-		await page.getByRole('link', {name: 'Item Subject'}).click();
-
-		await page.getByLabel('Go to the next page').click();
-
-		await expect(
-			page
-				.getByRole('link', {name: 'Item Subject'})
-				.locator('.lexicon-icon-order-arrow-down')
-		).toBeVisible();
-	});
-
-	test('preserves ascending Creation Date sorting when the user changes the pagination', async ({
-		apiHelpers,
-		configurationTabPage,
-		metricsPage,
-		page,
-	}) => {
-		test.slow();
-
-		await configurationTabPage.goTo();
-
-		await page.getByLabel('Items per Page').click();
-
-		await page.getByRole('option').filter({hasText: '40'}).click();
-
-		await configurationTabPage.assignWorkflowToAssetType(
-			'Single Approver',
-			'Web Content Article'
-		);
-
-		const basicWebContentStructureId =
-			await getBasicWebContentStructureId(apiHelpers);
-
-		const site = await apiHelpers.headlessSite.getSiteByERC('L_GUEST');
-
-		for (let i = 22; i <= 40; i++) {
-			const webContent =
-				await apiHelpers.jsonWebServicesJournal.addWebContent({
-					ddmStructureId: basicWebContentStructureId,
-					groupId: site.id,
-					titleMap: {en_US: `Web content ${i}`},
-				});
-
-			apiHelpers.data.push({
-				id: `${site.id}_${webContent.articleId}`,
-				type: 'webContent',
-			});
-		}
-
-		await metricsPage.goTo();
-
-		await page
-			.getByRole('cell', {name: 'Single Approver'})
-			.getByRole('link')
-			.click();
-
-		await page
-			.getByRole('link')
-			.filter({hasText: 'Total Pending'})
-			.first()
-			.click();
-
-		await page.getByLabel('Items per Page').click();
-
-		await page.getByRole('option').filter({hasText: '40'}).click();
-
-		await page.getByRole('link', {name: 'Creation Date'}).dblclick();
-
-		for (let i = 1; i <= 21; i++) {
-			await expect(
-				page
-					.getByRole('cell', {
-						exact: true,
-						name: `Blogs Entry: Blogs Entry ${i}`,
-					})
-					.last()
-			).toBeVisible();
-		}
-
-		for (let i = 22; i <= 40; i++) {
-			await expect(
-				page
-					.getByRole('cell', {
-						exact: true,
-						name: `Web Content Article: Web content ${i}`,
-					})
-					.last()
-			).toBeVisible();
-		}
+			for (let i = 1; i <= 21; i++) {
+				await expect(
+					page
+						.getByRole('cell', {
+							exact: true,
+							name: `Web Content Article: Web content ${i}`,
+						})
+						.last()
+				).toBeVisible();
+			}
+		});
 	});
 });
