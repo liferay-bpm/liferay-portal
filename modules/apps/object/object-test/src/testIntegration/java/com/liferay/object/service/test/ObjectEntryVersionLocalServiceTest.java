@@ -574,12 +574,12 @@ public class ObjectEntryVersionLocalServiceTest {
 	}
 
 	@Test
-	public void testMaximumObjectEntryVersions() throws Exception {
+	public void testObjectEntryVersionRetention() throws Exception {
 		_configurationProvider.saveCompanyConfiguration(
 			ObjectEntryVersionRetentionConfiguration.class,
 			TestPropsValues.getCompanyId(),
 			HashMapDictionaryBuilder.<String, Object>put(
-				"maximumEntryVersionsNumber", 4
+				"maximumEntryVersionsNumber", 3
 			).put(
 				"maximumRetentionPeriod", 1
 			).build());
@@ -590,11 +590,13 @@ public class ObjectEntryVersionLocalServiceTest {
 					ObjectEntryVersionRetentionConfiguration.class,
 					CompanyThreadLocal.getCompanyId());
 
-		int maximumVersionsNumber =
+		Assert.assertEquals(
+			3,
 			objectEntryVersionRetentionConfiguration.
-				maximumEntryVersionsNumber();
-
-		Assert.assertEquals(4, maximumVersionsNumber);
+				maximumEntryVersionsNumber());
+		Assert.assertEquals(
+			1,
+			objectEntryVersionRetentionConfiguration.maximumRetentionPeriod());
 
 		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
 			0, _objectDefinition.getObjectDefinitionId(),
@@ -604,19 +606,46 @@ public class ObjectEntryVersionLocalServiceTest {
 
 		_updateObjectEntryVersionDate(objectEntry, 3);
 
+		objectEntry = _objectEntryLocalService.updateObjectEntry(
+			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
+			HashMapBuilder.<String, Serializable>put(
+				"textObjectFieldName", RandomTestUtil.randomString()
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
 		_updateObjectEntryVersionDate(objectEntry, 2);
 
-		_updateObjectEntryVersionDate(objectEntry, 1);
+		objectEntry = _objectEntryLocalService.updateObjectEntry(
+			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
+			HashMapBuilder.<String, Serializable>put(
+				"textObjectFieldName", RandomTestUtil.randomString()
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
+		_updateObjectEntryVersionDate(objectEntry, 2);
 
 		Assert.assertEquals(
-			4,
+			3,
 			_objectEntryVersionLocalService.getObjectEntryVersionsCount(
 				objectEntry.getObjectEntryId()));
 
-		_updateObjectEntryVersionDate(objectEntry, 0);
+		objectEntry = _objectEntryLocalService.updateObjectEntry(
+			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
+			HashMapBuilder.<String, Serializable>put(
+				"textObjectFieldName", RandomTestUtil.randomString()
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertEquals(
-			4,
+			3,
+			_objectEntryVersionLocalService.getObjectEntryVersionsCount(
+				objectEntry.getObjectEntryId()));
+
+		_objectEntryVersionLocalService.checkObjectEntryRetention(
+			objectEntry.getCompanyId());
+
+		Assert.assertEquals(
+			1,
 			_objectEntryVersionLocalService.getObjectEntryVersionsCount(
 				objectEntry.getObjectEntryId()));
 	}
@@ -724,18 +753,8 @@ public class ObjectEntryVersionLocalServiceTest {
 			objectEntryVersion.setCreateDate(Date.valueOf(LocalDate.now()));
 		}
 
-		objectEntryVersion =
-			_objectEntryVersionLocalService.updateObjectEntryVersion(
-				objectEntryVersion);
-
-		objectEntry = _objectEntryLocalService.updateObjectEntry(
-			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
-			HashMapBuilder.<String, Serializable>put(
-				"textObjectFieldName", RandomTestUtil.randomString()
-			).build(),
-			ServiceContextTestUtil.getServiceContext());
-
-		return objectEntryVersion;
+		return _objectEntryVersionLocalService.updateObjectEntryVersion(
+			objectEntryVersion);
 	}
 
 	private static ObjectDefinition _objectDefinition;
