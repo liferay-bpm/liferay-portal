@@ -23,6 +23,9 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -71,6 +74,38 @@ public class ObjectEntryVersionLocalServiceImpl
 		}
 
 		return objectEntryVersion;
+	}
+
+	public void checkObjectEntryRetention(long companyId)
+		throws PortalException {
+
+		ObjectEntryVersionRetentionConfiguration
+			objectEntryVersionRetentionConfiguration =
+				_configurationProvider.getCompanyConfiguration(
+					ObjectEntryVersionRetentionConfiguration.class,
+					CompanyThreadLocal.getCompanyId());
+
+		int retentionPeriod =
+			objectEntryVersionRetentionConfiguration.maximumRetentionPeriod();
+
+		LocalDate localDate = LocalDate.now(
+		).minusMonths(
+			retentionPeriod
+		);
+
+		Date retentionDate = Date.from(
+			localDate.atStartOfDay(
+				ZoneId.systemDefault()
+			).toInstant());
+
+		List<ObjectEntryVersion> versions =
+			objectEntryVersionPersistence.findByC_LtCD(
+				companyId, retentionDate);
+
+		for (ObjectEntryVersion version : versions) {
+			deleteObjectEntryVersion(
+				version.getObjectEntryId(), version.getVersion());
+		}
 	}
 
 	@Override
