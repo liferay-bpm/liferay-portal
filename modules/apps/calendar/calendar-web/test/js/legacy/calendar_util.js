@@ -38,4 +38,32 @@ describe('liferay-calendar-util', () => {
 
 		expect(url).toContain('doAsUserId=userIdEncoded');
 	});
+
+	it('applies a custom width for events that end at midnight in the month view', () => {
+		const mockNode = {
+			addClass: jest.fn(),
+		};
+
+		calendarUtil.setEventCustomClass(
+			'month',
+			'01:00 AM',
+			mockNode,
+			new Date('2025-05-30'),
+			new Date('2025-05-29')
+		);
+
+		expect(mockNode.addClass).not.toHaveBeenCalled();
+
+		calendarUtil.setEventCustomClass(
+			'month',
+			'12:00 AM',
+			mockNode,
+			new Date('2025-05-30'),
+			new Date('2025-05-30')
+		);
+
+		expect(mockNode.addClass).toHaveBeenCalledWith(
+			'calendar-event-custom-width'
+		);
+	});
 });
