@@ -17,6 +17,8 @@ AUI.add(
 			return Lang.toInt(value, 10, 0);
 		};
 
+		const REGEX_MIDNIGHT_FORMAT = /^12:00\s*[Aa]\.?M\.?$/i;
+
 		const REGEX_UNFILLED_PARAMETER =
 			/\{\s*([^|}]+?)\s*(?:\|([^}]*))?\s*\}/g;
 
@@ -222,6 +224,24 @@ AUI.add(
 					);
 
 					scheduler.syncEventsUI();
+				}
+			},
+
+			setEventCustomClass(
+				activeViewName,
+				endTime,
+				node,
+				oneDayBeforeEndDate,
+				startDate
+			) {
+				const isMidnight = REGEX_MIDNIGHT_FORMAT.test(endTime);
+
+				if (
+					activeViewName === 'month' &&
+					isMidnight &&
+					oneDayBeforeEndDate.getDate() === startDate.getDate()
+				) {
+					node.addClass('calendar-event-custom-width');
 				}
 			},
 

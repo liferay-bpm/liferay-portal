@@ -303,6 +303,30 @@ AUI.add(
 
 					const node = instance.get('node');
 
+					const oneDayBeforeEndDate = new Date(val - 86400000);
+
+					const endTime = instance._formatDate(val, '%I:%M %p');
+
+					const startDate = new Date(
+						node.getAttribute('data-startdate')
+					);
+
+					const scheduler = instance.get('scheduler');
+
+					if (scheduler && !instance.get('editingEvent')) {
+						const activeViewName = scheduler
+							.get('activeView')
+							.get('name');
+
+						CalendarUtil.setEventCustomClass(
+							activeViewName,
+							endTime,
+							node,
+							oneDayBeforeEndDate,
+							startDate
+						);
+					}
+
 					node.attr(
 						'data-endDate',
 						instance._formatDate(val, '%m/%d/%Y')
