@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.kernel.workflow.BaseWorkflowHandler;
 import com.liferay.portal.kernel.workflow.DefaultWorkflowTask;
+import com.liferay.portal.kernel.workflow.WorkflowException;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowTask;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManager;
@@ -38,6 +39,9 @@ import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.workflow.security.permission.WorkflowTaskPermission;
 
 import java.io.Serializable;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,6 +86,48 @@ public class WorkflowTaskUserNotificationHandlerTest {
 	public void setUp() {
 		_allowedUsers.clear();
 		_setUpWorkflowHandlerRegistryUtil();
+	}
+
+	@Test
+	public void testHasPermission()
+		throws IllegalAccessException, InvocationTargetException,
+			   NoSuchMethodException, WorkflowException {
+
+		ServiceContext serviceContext = Mockito.mock(ServiceContext.class);
+
+		ThemeDisplay themeDisplay = Mockito.mock(ThemeDisplay.class);
+
+		Mockito.when(
+			serviceContext.getThemeDisplay()
+		).thenReturn(
+			themeDisplay
+		);
+
+		WorkflowTask workflowTask = Mockito.mock(WorkflowTask.class);
+
+		Mockito.when(
+			_workflowTaskManager.fetchWorkflowTask(Mockito.anyLong())
+		).thenReturn(
+			workflowTask
+		);
+
+		Class<?> clazz = _workflowTaskUserNotificationHandler.getClass();
+
+		Method method = clazz.getDeclaredMethod(
+			"_hasPermission", long.class, long.class, ServiceContext.class);
+
+		method.setAccessible(true);
+
+		method.invoke(
+			_workflowTaskUserNotificationHandler, 1L, 1L, serviceContext);
+
+		Mockito.verify(
+			themeDisplay
+		).getSiteGroupId();
+
+		Mockito.verify(
+			workflowTask, Mockito.never()
+		).getOptionalAttributes();
 	}
 
 	@Test
