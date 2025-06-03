@@ -296,6 +296,9 @@ public interface UserGroupRoleLocalService
 		long groupId, long roleId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<UserGroupRole> getUserGroupRolesByRole(long roleId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<UserGroupRole> getUserGroupRolesByUserUserGroupAndGroup(
 		long userId, long groupId);
 

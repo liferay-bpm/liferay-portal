@@ -352,6 +352,10 @@ public class UserGroupRoleLocalServiceUtil {
 		return getService().getUserGroupRolesByGroupAndRole(groupId, roleId);
 	}
 
+	public static List<UserGroupRole> getUserGroupRolesByRole(long roleId) {
+		return getService().getUserGroupRolesByRole(roleId);
+	}
+
 	public static List<UserGroupRole> getUserGroupRolesByUserUserGroupAndGroup(
 		long userId, long groupId) {
 

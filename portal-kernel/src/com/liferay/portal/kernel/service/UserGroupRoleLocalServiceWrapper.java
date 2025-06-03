@@ -407,6 +407,11 @@ public class UserGroupRoleLocalServiceWrapper
 	}
 
 	@Override
+	public java.util.List<UserGroupRole> getUserGroupRolesByRole(long roleId) {
+		return _userGroupRoleLocalService.getUserGroupRolesByRole(roleId);
+	}
+
+	@Override
 	public java.util.List<UserGroupRole>
 		getUserGroupRolesByUserUserGroupAndGroup(long userId, long groupId) {
 

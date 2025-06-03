@@ -344,6 +344,7 @@ public interface UserLocalService
 	 bridge attributes for the user.
 	 * @return the new user
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public User addUserWithWorkflow(
 			long creatorUserId, long companyId, boolean autoPassword,
 			String password1, String password2, boolean autoScreenName,
