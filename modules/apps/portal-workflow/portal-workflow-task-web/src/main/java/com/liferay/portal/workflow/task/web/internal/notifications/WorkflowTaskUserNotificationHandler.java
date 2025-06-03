@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -296,9 +295,7 @@ public class WorkflowTaskUserNotificationHandler
 
 		ThemeDisplay themeDisplay = serviceContext.getThemeDisplay();
 
-		long groupId = MapUtil.getLong(
-			workflowTask.getOptionalAttributes(), "groupId",
-			themeDisplay.getSiteGroupId());
+		long groupId = themeDisplay.getSiteGroupId();
 
 		return _workflowTaskPermission.contains(
 			themeDisplay.getPermissionChecker(), workflowTask, groupId);

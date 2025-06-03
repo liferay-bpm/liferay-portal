@@ -6,6 +6,8 @@
 package com.liferay.portal.workflow.kaleo.runtime.internal.notification.recipient;
 
 import com.liferay.depot.constants.DepotRolesConstants;
+import com.liferay.object.scope.ObjectScopeProvider;
+import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -20,6 +22,7 @@ import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserGroupGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -125,6 +128,9 @@ public class RoleNotificationRecipientBuilder
 	protected GroupLocalService groupLocalService;
 
 	@Reference
+	protected ObjectScopeProviderRegistry objectScopeProviderRegistry;
+
+	@Reference
 	protected OrganizationLocalService organizationLocalService;
 
 	@Reference
@@ -203,13 +209,31 @@ public class RoleNotificationRecipientBuilder
 				roleId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 		}
 
+		List<User> users = new ArrayList<>();
+
+		ServiceContext serviceContext = executionContext.getServiceContext();
+
+		ObjectScopeProvider objectScopeProvider =
+			objectScopeProviderRegistry.getObjectScopeProvider(
+				String.valueOf(serviceContext.getAttribute("scope")));
+
+		if ((role.getType() == RoleConstants.TYPE_SITE) &&
+			!objectScopeProvider.isGroupAware()) {
+
+			List<UserGroupRole> userGroupRoles =
+				userGroupRoleLocalService.getUserGroupRolesByRole(
+					role.getRoleId());
+
+			for (UserGroupRole userGroupRole : userGroupRoles) {
+				users.add(userGroupRole.getUser());
+			}
+		}
+
 		KaleoInstanceToken kaleoInstanceToken =
 			executionContext.getKaleoInstanceToken();
 
 		List<Long> groupIds = _getGroupIds(
 			kaleoInstanceToken.getGroupId(), role);
-
-		List<User> users = new ArrayList<>();
 
 		for (Long groupId : groupIds) {
 			List<UserGroupRole> userGroupRoles =

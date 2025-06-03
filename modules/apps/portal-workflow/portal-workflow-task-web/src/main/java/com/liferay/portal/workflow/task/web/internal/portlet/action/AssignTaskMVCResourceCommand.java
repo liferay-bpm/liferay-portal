@@ -11,7 +11,6 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -55,9 +54,7 @@ public class AssignTaskMVCResourceCommand extends BaseMVCResourceCommand {
 		WorkflowTask workflowTask = workflowTaskManager.getWorkflowTask(
 			workflowTaskId);
 
-		long groupId = MapUtil.getLong(
-			workflowTask.getOptionalAttributes(), "groupId",
-			themeDisplay.getSiteGroupId());
+		long groupId = themeDisplay.getSiteGroupId();
 
 		_workflowTaskPermission.check(
 			themeDisplay.getPermissionChecker(), workflowTask, groupId);

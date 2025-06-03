@@ -434,6 +434,8 @@ public class ObjectEntryLocalServiceImpl
 				ObjectEntryThreadLocal.setObjectEntryFolderIdWithSafeCloseable(
 					objectEntryFolderId)) {
 
+			serviceContext.setAttribute("scope", objectDefinition.getScope());
+
 			_startWorkflowInstance(userId, objectEntry, serviceContext, false);
 		}
 

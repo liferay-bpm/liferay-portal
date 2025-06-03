@@ -10,7 +10,6 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
@@ -136,9 +135,7 @@ public class MyWorkflowTaskPortlet extends MVCPortlet {
 	private boolean _hasWorkflowTaskViewPermission(
 		ThemeDisplay themeDisplay, WorkflowTask workflowTask) {
 
-		long groupId = MapUtil.getLong(
-			workflowTask.getOptionalAttributes(), "groupId",
-			themeDisplay.getSiteGroupId());
+		long groupId = themeDisplay.getSiteGroupId();
 
 		return _workflowTaskPermission.contains(
 			themeDisplay.getPermissionChecker(), workflowTask, groupId);
