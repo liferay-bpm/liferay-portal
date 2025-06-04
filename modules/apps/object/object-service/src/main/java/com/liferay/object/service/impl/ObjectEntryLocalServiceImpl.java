@@ -1342,25 +1342,8 @@ public class ObjectEntryLocalServiceImpl
 				Predicate.withParentheses(
 					_fillPredicate(objectDefinitionId, predicate, search))
 			).and(
-				() -> {
-					Predicate permissionWherePredicate = null;
-
-					for (Long groupId : groupIds) {
-						if (permissionWherePredicate == null) {
-							permissionWherePredicate =
-								_getPermissionWherePredicate(
-									dynamicObjectDefinitionTable, groupId);
-						}
-						else {
-							permissionWherePredicate =
-								permissionWherePredicate.or(
-									_getPermissionWherePredicate(
-										dynamicObjectDefinitionTable, groupId));
-						}
-					}
-
-					return permissionWherePredicate;
-				}
+				() -> _getPermissionWherePredicate(
+					dynamicObjectDefinitionTable, groupIds)
 			)
 		).limit(
 			start, end
@@ -1673,25 +1656,8 @@ public class ObjectEntryLocalServiceImpl
 				Predicate.withParentheses(
 					_fillPredicate(objectDefinitionId, predicate, search))
 			).and(
-				() -> {
-					Predicate permissionWherePredicate = null;
-
-					for (Long groupId : groupIds) {
-						if (permissionWherePredicate == null) {
-							permissionWherePredicate =
-								_getPermissionWherePredicate(
-									dynamicObjectDefinitionTable, groupId);
-						}
-						else {
-							permissionWherePredicate =
-								permissionWherePredicate.or(
-									_getPermissionWherePredicate(
-										dynamicObjectDefinitionTable, groupId));
-						}
-					}
-
-					return permissionWherePredicate;
-				}
+				() -> _getPermissionWherePredicate(
+					dynamicObjectDefinitionTable, groupIds)
 			)
 		);
 
@@ -3901,6 +3867,28 @@ public class ObjectEntryLocalServiceImpl
 					permissionChecker.getUserId())
 			).withParentheses()
 		).withParentheses();
+	}
+
+	private Predicate _getPermissionWherePredicate(
+			DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
+			Long[] groupIds)
+		throws PortalException {
+
+		Predicate permissionWherePredicate = null;
+
+		for (Long groupId : groupIds) {
+			if (permissionWherePredicate == null) {
+				permissionWherePredicate = _getPermissionWherePredicate(
+					dynamicObjectDefinitionTable, groupId);
+			}
+			else {
+				permissionWherePredicate = permissionWherePredicate.or(
+					_getPermissionWherePredicate(
+						dynamicObjectDefinitionTable, groupId));
+			}
+		}
+
+		return permissionWherePredicate;
 	}
 
 	private Column<?, Long> _getPrimaryKeyColumn(
