@@ -813,7 +813,7 @@ paths:
             tags: ["ObjectEntry"]
     "/scopes/{scopeKey}/by-external-reference-code/{externalReferenceCode}/by-version/{version}/delete":
         delete:
-            operationId: deleteScopeScopeKeyByExternalReferenceCodeByVersion
+            operationId: deleteScopeScopeKeyByExternalReferenceCodeByVersionDelete
             parameters:
                 -   in: path
                     name: scopeKey
