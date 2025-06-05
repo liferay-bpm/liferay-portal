@@ -155,7 +155,7 @@ public class ObjectEntryResourceImpl
 					_objectDefinition.getStorageType()));
 
 		defaultObjectEntryManager.deleteObjectEntryByVersion(
-			externalReferenceCode, _objectDefinition, version);
+			externalReferenceCode, _objectDefinition, null, version);
 	}
 
 	@Override
@@ -204,6 +204,20 @@ public class ObjectEntryResourceImpl
 		objectEntryManager.deleteObjectEntry(
 			contextCompany.getCompanyId(), _getDTOConverterContext(null),
 			externalReferenceCode, _objectDefinition, scopeKey);
+	}
+
+	@Override
+	public void deleteScopeScopeKeyByExternalReferenceCodeByVersionDelete(
+			String scopeKey, String externalReferenceCode, Integer version)
+		throws Exception {
+
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			DefaultObjectEntryManagerProvider.provide(
+				_objectEntryManagerRegistry.getObjectEntryManager(
+					_objectDefinition.getStorageType()));
+
+		defaultObjectEntryManager.deleteObjectEntryByVersion(
+			externalReferenceCode, _objectDefinition, scopeKey, version);
 	}
 
 	@Override
