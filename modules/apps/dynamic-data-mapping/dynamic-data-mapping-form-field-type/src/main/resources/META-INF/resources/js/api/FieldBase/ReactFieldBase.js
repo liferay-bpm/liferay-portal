@@ -636,16 +636,32 @@ export default function FieldBase({
 						)}
 						disabled={readOnly || disabledRepeatableButton}
 						onClick={() => {
-							dispatch({
-								payload: name,
-								type: CORE_EVENT_TYPES.FIELD.REPEATED,
-							});
+							if (type === 'text') {
+								setTimeout(() => {
+									dispatch({
+										payload: name,
+										type: CORE_EVENT_TYPES.FIELD.REPEATED,
+									});
 
-							Liferay.fire('journal:storeState', {
-								fieldName: Liferay.Language.get(
-									'add-repeatable-field'
-								),
-							});
+									Liferay.fire('journal:storeState', {
+										fieldName: Liferay.Language.get(
+											'add-repeatable-field'
+										),
+									});
+								}, 1000);
+							}
+							else {
+								dispatch({
+									payload: name,
+									type: CORE_EVENT_TYPES.FIELD.REPEATED,
+								});
+
+								Liferay.fire('journal:storeState', {
+									fieldName: Liferay.Language.get(
+										'add-repeatable-field'
+									),
+								});
+							}
 						}}
 						small
 						title={Liferay.Language.get('duplicate')}

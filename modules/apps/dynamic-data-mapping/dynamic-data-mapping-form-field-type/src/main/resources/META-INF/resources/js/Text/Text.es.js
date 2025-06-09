@@ -176,10 +176,6 @@ const Text = ({
 						maxLength={showCounter ? '' : maxLength}
 						name={name}
 						onBlur={(event) => {
-							if (repeatable) {
-								Liferay.fire('disableRepeatableButton');
-							}
-
 							onBlur(event);
 
 							if (!preventChangeHandlerOnBlur) {
