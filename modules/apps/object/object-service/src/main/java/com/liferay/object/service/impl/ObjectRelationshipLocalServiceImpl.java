@@ -1389,15 +1389,12 @@ public class ObjectRelationshipLocalServiceImpl
 			objectDefinition1.getRESTContextPath();
 
 		if (objectDefinition1.getRootObjectDefinitionId() == 0) {
-			objectDefinition1.setRootObjectDefinitionId(
-				objectDefinition1.getObjectDefinitionId());
+			objectDefinition1.setRootObjectDefinitionIds(
+				new long[] {objectDefinition1.getObjectDefinitionId()});
 		}
 
 		ObjectDefinitionLocalService objectDefinitionLocalService =
 			_objectDefinitionLocalServiceSnapshot.get();
-
-		objectDefinition1 = objectDefinitionLocalService.updateObjectDefinition(
-			objectDefinition1);
 
 		ObjectDefinition objectDefinition2 =
 			_objectDefinitionPersistence.findByPrimaryKey(
@@ -1426,7 +1423,7 @@ public class ObjectRelationshipLocalServiceImpl
 					objectRelationshipLocalService);
 
 			Tree tree = objectDefinitionTreeFactory.create(
-				objectDefinition2.getObjectDefinitionId());
+				true, false, objectDefinition2.getObjectDefinitionId());
 
 			Iterator<Node> iterator = tree.iterator();
 
@@ -1440,11 +1437,8 @@ public class ObjectRelationshipLocalServiceImpl
 				String nodeObjectDefinitionPreviousRESTContextPath =
 					nodeObjectDefinition.getRESTContextPath();
 
-				nodeObjectDefinition =
-					objectDefinitionLocalService.
-						updateRootDescendantNodeObjectDefinition(
-							nodeObjectDefinition,
-							objectDefinition1.getRootObjectDefinitionId());
+				nodeObjectDefinition.setRootObjectDefinitionIds(
+					objectDefinition1.getRootObjectDefinitionIds());
 
 				if (nodeObjectDefinition.isApproved() &&
 					objectDefinition1.isApproved()) {
@@ -1462,12 +1456,8 @@ public class ObjectRelationshipLocalServiceImpl
 				return;
 			}
 
-			objectDefinition2.setRootObjectDefinitionId(
-				objectDefinition2.getObjectDefinitionId());
-
-			objectDefinition2 =
-				objectDefinitionLocalService.updateObjectDefinition(
-					objectDefinition2);
+			objectDefinition2.setRootObjectDefinitionIds(
+				new long[] {objectDefinition2.getObjectDefinitionId()});
 
 			if (objectDefinition2.isApproved()) {
 				objectDefinitionLocalService.deployObjectDefinition(
@@ -2005,10 +1995,8 @@ public class ObjectRelationshipLocalServiceImpl
 
 		String previousRESTContextPath = objectDefinition.getRESTContextPath();
 
-		objectDefinition.setRootObjectDefinitionId(newRootObjectDefinitionId);
-
-		objectDefinition = _objectDefinitionPersistence.update(
-			objectDefinition);
+		objectDefinition.setRootObjectDefinitionIds(
+			new long[] {newRootObjectDefinitionId});
 
 		objectDefinition.setPreviousRESTContextPath(previousRESTContextPath);
 
@@ -2208,20 +2196,6 @@ public class ObjectRelationshipLocalServiceImpl
 						"enable-inheritance-x-(x-object-entries)-and-x-(x-" +
 							"object-entries)");
 			}
-		}
-
-		long objectDefinition2RootObjectDefinitionId =
-			objectDefinition2.getRootObjectDefinitionId();
-
-		if ((objectDefinition2RootObjectDefinitionId != 0) &&
-			(objectDefinition2RootObjectDefinitionId !=
-				objectDefinition2.getObjectDefinitionId())) {
-
-			throw new ObjectRelationshipEdgeException(
-				"Unable to bind the object definitions when the child object " +
-					"definition is bound to another object definition",
-				"unable-to-bind-the-object-definitions-when-the-child-object-" +
-					"definition-is-bound-to-another-object-definition");
 		}
 
 		if (!StringUtil.equals(
