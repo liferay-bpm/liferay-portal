@@ -842,6 +842,105 @@ public class ObjectRelationshipLocalServiceTest {
 	}
 
 	@Test
+	public void testBindDraftObjectDefinitionNodesToManyRootObjectDefinitions()
+		throws Exception {
+
+		Tree treeA = TreeTestUtil.createObjectDefinitionTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			false,
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AA"}
+			).put(
+				"AA", new String[0]
+			).build());
+		Tree treeB = TreeTestUtil.createObjectDefinitionTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			false,
+			LinkedHashMapBuilder.put(
+				"B", new String[] {"BB"}
+			).put(
+				"BB", new String[] {"BBB"}
+			).put(
+				"BBB", new String[0]
+			).build());
+		Tree treeC = TreeTestUtil.createObjectDefinitionTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			false,
+			LinkedHashMapBuilder.put(
+				"C", new String[] {"CC"}
+			).put(
+				"CC", new String[] {"CCC"}
+			).put(
+				"CCC", new String[0]
+			).build());
+
+		TreeTestUtil.bind(
+			_objectRelationshipLocalService,
+			Arrays.asList(
+				ObjectRelationshipTestUtil.addObjectRelationship(
+					_objectRelationshipLocalService,
+					_objectDefinitionLocalService.getObjectDefinition(
+						TestPropsValues.getCompanyId(), "C_AA"),
+					_objectDefinitionLocalService.getObjectDefinition(
+						TestPropsValues.getCompanyId(), "C_BB")),
+				ObjectRelationshipTestUtil.addObjectRelationship(
+					_objectRelationshipLocalService,
+					_objectDefinitionLocalService.getObjectDefinition(
+						TestPropsValues.getCompanyId(), "C_BB"),
+					_objectDefinitionLocalService.getObjectDefinition(
+						TestPropsValues.getCompanyId(), "C_CC"))));
+
+		Node rootNodeA = treeA.getRootNode();
+
+		TreeTestUtil.assertObjectDefinitionTree(
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AA"}
+			).put(
+				"AA", new String[] {"BB"}
+			).put(
+				"BB", new String[] {"BBB", "CC"}
+			).put(
+				"BBB", new String[0]
+			).put(
+				"CC", new String[] {"CCC"}
+			).put(
+				"CCC", new String[0]
+			).build(),
+			_objectDefinitionTreeFactory.create(rootNodeA.getPrimaryKey()),
+			_objectDefinitionLocalService);
+
+		Node rootNodeB = treeB.getRootNode();
+
+		TreeTestUtil.assertObjectDefinitionTree(
+			LinkedHashMapBuilder.put(
+				"B", new String[] {"BB"}
+			).put(
+				"BB", new String[] {"BBB", "CC"}
+			).put(
+				"BBB", new String[0]
+			).put(
+				"CC", new String[] {"CCC"}
+			).put(
+				"CCC", new String[0]
+			).build(),
+			_objectDefinitionTreeFactory.create(rootNodeB.getPrimaryKey()),
+			_objectDefinitionLocalService);
+
+		Node rootNodeC = treeC.getRootNode();
+
+		TreeTestUtil.assertObjectDefinitionTree(
+			LinkedHashMapBuilder.put(
+				"C", new String[] {"CC"}
+			).put(
+				"CC", new String[] {"CCC"}
+			).put(
+				"CCC", new String[0]
+			).build(),
+			_objectDefinitionTreeFactory.create(rootNodeC.getPrimaryKey()),
+			_objectDefinitionLocalService);
+	}
+
+	@Test
 	public void testBindDraftObjectDefinitions() throws Exception {
 
 		// Bind a draft object definition as a child node in a draft object
