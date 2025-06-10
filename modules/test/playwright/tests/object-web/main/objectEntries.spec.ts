@@ -2014,23 +2014,51 @@ test.describe('Manage object entries through Workflow', () => {
 });
 
 scheduleTest.describe('Manage object entries schedule properties', () => {
-	scheduleTest(
-		'can create, read, update, and delete a reviewDate of an object entry',
-		async ({apiHelpers, page, viewObjectEntriesPage}) => {
-			const objectDefinition =
-				await apiHelpers.objectAdmin.postRandomObjectDefinition({
-					status: {code: 0},
-				});
+	let _objectDefinition: ObjectDefinition;
 
-			apiHelpers.data.push({
-				id: objectDefinition.id,
-				type: 'objectDefinition',
+	scheduleTest.afterEach(async ({apiHelpers}) => {
+		const objectDefinitionAPIClient =
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+		await objectDefinitionAPIClient.patchObjectDefinition(
+			_objectDefinition.id,
+			{
+				enableObjectEntrySchedule: false,
+			}
+		);
+	});
+
+	scheduleTest.beforeEach(async ({apiHelpers}) => {
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				status: {code: 0},
 			});
 
-			await viewObjectEntriesPage.goto(objectDefinition.className);
+		_objectDefinition = objectDefinition;
+
+		const objectDefinitionAPIClient =
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+		await objectDefinitionAPIClient.patchObjectDefinition(
+			_objectDefinition.id,
+			{
+				enableObjectEntrySchedule: true,
+			}
+		);
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+	});
+
+	scheduleTest(
+		'can create, read, update, and delete a reviewDate of an object entry',
+		async ({page, viewObjectEntriesPage}) => {
+			await viewObjectEntriesPage.goto(_objectDefinition.className);
 
 			await viewObjectEntriesPage.clickAddObjectEntry(
-				objectDefinition.label['en_US']
+				_objectDefinition.label['en_US']
 			);
 
 			await viewObjectEntriesPage.neverReview.uncheck();
@@ -2077,21 +2105,11 @@ scheduleTest.describe('Manage object entries schedule properties', () => {
 
 	scheduleTest(
 		'cannot submit an empty displayDate',
-		async ({apiHelpers, page, viewObjectEntriesPage}) => {
-			const objectDefinition =
-				await apiHelpers.objectAdmin.postRandomObjectDefinition({
-					status: {code: 0},
-				});
-
-			apiHelpers.data.push({
-				id: objectDefinition.id,
-				type: 'objectDefinition',
-			});
-
-			await viewObjectEntriesPage.goto(objectDefinition.className);
+		async ({page, viewObjectEntriesPage}) => {
+			await viewObjectEntriesPage.goto(_objectDefinition.className);
 
 			await viewObjectEntriesPage.clickAddObjectEntry(
-				objectDefinition.label['en_US']
+				_objectDefinition.label['en_US']
 			);
 
 			await viewObjectEntriesPage.choosePublicationOption('schedule');
@@ -2106,21 +2124,11 @@ scheduleTest.describe('Manage object entries schedule properties', () => {
 
 	scheduleTest(
 		'cannot submit an empty reviewDate when neverReview is not checked',
-		async ({apiHelpers, page, viewObjectEntriesPage}) => {
-			const objectDefinition =
-				await apiHelpers.objectAdmin.postRandomObjectDefinition({
-					status: {code: 0},
-				});
-
-			apiHelpers.data.push({
-				id: objectDefinition.id,
-				type: 'objectDefinition',
-			});
-
-			await viewObjectEntriesPage.goto(objectDefinition.className);
+		async ({page, viewObjectEntriesPage}) => {
+			await viewObjectEntriesPage.goto(_objectDefinition.className);
 
 			await viewObjectEntriesPage.clickAddObjectEntry(
-				objectDefinition.label['en_US']
+				_objectDefinition.label['en_US']
 			);
 
 			await viewObjectEntriesPage.neverReview.uncheck();
@@ -2132,4 +2140,5 @@ scheduleTest.describe('Manage object entries schedule properties', () => {
 			).toBeVisible();
 		}
 	);
+
 });

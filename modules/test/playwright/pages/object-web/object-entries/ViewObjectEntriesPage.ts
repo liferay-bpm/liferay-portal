@@ -16,6 +16,7 @@ export class ViewObjectEntriesPage {
 	readonly deleteFileButton: Locator;
 	readonly duplicateEntryErrorMessage: Locator;
 	readonly editObjectEntryForm: Locator;
+	readonly expirationDateInput: Locator;
 	readonly frameSelect: FrameLocator;
 	readonly frontendDatasetActions: Locator;
 	readonly frontendDatasetDeleteAction: Locator;
@@ -27,6 +28,7 @@ export class ViewObjectEntriesPage {
 	readonly reviewDateInput: Locator;
 	readonly saveObjectEntryButton: Locator;
 	readonly saveObjectEntryButtonArabic: Locator;
+	readonly schedulePanelButton: Locator;
 	readonly schedulePublicationOption: Locator;
 	readonly schedulePublicationButton: Locator;
 	readonly searchBar: Locator;
@@ -54,6 +56,12 @@ export class ViewObjectEntriesPage {
 			'Error:The field values are already in use. Please choose unique values.'
 		);
 		this.editObjectEntryForm = page.locator('[id="editObjectEntry"]');
+		this.expirationDateInput = page.getByLabel(
+			'Expiration Date' + 'Mandatory',
+			{
+				exact: true,
+			}
+		);
 		this.frameSelect = page
 			.locator('iframe[title="Select"]')
 			.contentFrame();
@@ -75,6 +83,7 @@ export class ViewObjectEntriesPage {
 		this.reviewDateInput = page.getByLabel('Review Date' + 'Mandatory', {
 			exact: true,
 		});
+		this.schedulePanelButton = page.getByRole('button', {name: 'Schedule'});
 		this.schedulePublicationButton = page
 			.getByLabel('Schedule Publication')
 			.getByRole('button', {name: 'Schedule'});
