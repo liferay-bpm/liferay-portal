@@ -2141,4 +2141,48 @@ scheduleTest.describe('Manage object entries schedule properties', () => {
 		}
 	);
 
+	scheduleTest(
+		'schedule container is only visible when enableObjectEntrySchedule is enabled',
+		async ({apiHelpers, page, viewObjectEntriesPage}) => {
+			await viewObjectEntriesPage.goto(_objectDefinition.className);
+
+			await viewObjectEntriesPage.clickAddObjectEntry(
+				_objectDefinition.label['en_US']
+			);
+
+			await expect(
+				viewObjectEntriesPage.schedulePanelButton
+			).toBeVisible();
+
+			await expect(
+				viewObjectEntriesPage.expirationDateInput
+			).toBeVisible();
+
+			await expect(viewObjectEntriesPage.reviewDateInput).toBeVisible();
+
+			const objectDefinitionAPIClient =
+				await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+			await objectDefinitionAPIClient.patchObjectDefinition(
+				_objectDefinition.id,
+				{
+					enableObjectEntrySchedule: false,
+				}
+			);
+
+			await page.reload();
+
+			await expect(
+				viewObjectEntriesPage.schedulePanelButton
+			).not.toBeVisible();
+
+			await expect(
+				viewObjectEntriesPage.expirationDateInput
+			).not.toBeVisible();
+
+			await expect(
+				viewObjectEntriesPage.reviewDateInput
+			).not.toBeVisible();
+		}
+	);
 });
