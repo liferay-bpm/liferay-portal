@@ -3091,6 +3091,76 @@ public class DefaultObjectEntryManagerImplTest
 			ActionKeys.VIEW, tree);
 	}
 
+	@Test
+	public void testDeleteSiteScopedObjectEntryVersion() throws Exception {
+		_enableObjectEntryVersioning();
+
+		ObjectEntry objectEntry = new ObjectEntry() {
+			{
+				externalReferenceCode = RandomTestUtil.randomString();
+				keywords = new String[] {RandomTestUtil.randomString()};
+				properties = HashMapBuilder.<String, Object>put(
+					"textObjectFieldName", RandomTestUtil.randomString()
+				).build();
+				systemProperties = new SystemProperties() {
+					{
+						version = new Version() {
+							{
+								number = 1;
+							}
+						};
+					}
+				};
+			}
+		};
+
+		objectEntry = _defaultObjectEntryManager.addObjectEntry(
+			dtoConverterContext, _objectDefinition1, objectEntry,
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		assertEquals(
+			_defaultObjectEntryManager.getObjectEntryByVersion(
+				dtoConverterContext, objectEntry.getExternalReferenceCode(),
+				_objectDefinition1, 1),
+			objectEntry);
+
+		Assert.assertEquals(
+			1,
+			_defaultObjectEntryManager.getVersionedObjectEntries(
+				dtoConverterContext, objectEntry.getExternalReferenceCode(),
+				_objectDefinition1, null
+			).getItems(
+			).size());
+
+		objectEntry = _updateObjectEntryVersion(objectEntry, 2);
+
+		Assert.assertEquals(
+			2,
+			_defaultObjectEntryManager.getVersionedObjectEntries(
+				dtoConverterContext, objectEntry.getExternalReferenceCode(),
+				_objectDefinition1, null
+			).getItems(
+			).size());
+
+		_defaultObjectEntryManager.deleteObjectEntryByVersion(
+			objectEntry.getExternalReferenceCode(), _objectDefinition1,
+			objectEntry.getScopeKey(), 1);
+
+		Assert.assertEquals(
+			1,
+			_defaultObjectEntryManager.getVersionedObjectEntries(
+				dtoConverterContext, objectEntry.getExternalReferenceCode(),
+				_objectDefinition1, null
+			).getItems(
+			).size());
+
+		assertEquals(
+			_defaultObjectEntryManager.getObjectEntryByVersion(
+				dtoConverterContext, objectEntry.getExternalReferenceCode(),
+				_objectDefinition1, 2),
+			objectEntry);
+	}
+
 	@FeatureFlag("LPD-17564")
 	@Test
 	public void testExpireObjectEntryByVersion() throws Exception {
