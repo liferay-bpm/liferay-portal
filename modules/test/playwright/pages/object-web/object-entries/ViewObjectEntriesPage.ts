@@ -7,7 +7,11 @@ import {ObjectField} from '@liferay/object-admin-rest-client-js';
 import {FrameLocator, Locator, Page, expect} from '@playwright/test';
 import path from 'path';
 
+import {getObjectEntryUIDateTimeFormat} from '../../../tests/object-web/main/utils/dateFormat';
 import {PORTLET_URLS} from '../../../utils/portletUrls';
+import {waitForAlert} from '../../../utils/waitForAlert';
+
+type ScheduleProperty = 'Expiration' | 'Review';
 
 export class ViewObjectEntriesPage {
 	readonly addObjectEntryButton: Locator;
@@ -20,6 +24,7 @@ export class ViewObjectEntriesPage {
 	readonly frameSelect: FrameLocator;
 	readonly frontendDatasetActions: Locator;
 	readonly frontendDatasetDeleteAction: Locator;
+	readonly neverExpire: Locator;
 	readonly neverReview: Locator;
 	readonly page: Page;
 	readonly publishDateInput: Locator;
@@ -71,6 +76,7 @@ export class ViewObjectEntriesPage {
 		this.frontendDatasetDeleteAction = page.getByRole('menuitem', {
 			name: 'Delete',
 		});
+		this.neverExpire = page.getByLabel('Never Expire', {exact: true});
 		this.neverReview = page.getByLabel('Never Review', {exact: true});
 		this.page = page;
 		this.publishDateInput = page.getByLabel('Publish Date' + 'Mandatory', {
@@ -283,5 +289,63 @@ export class ViewObjectEntriesPage {
 	async goToObjectDefinitionEntry(objectDefinition: string) {
 		await this.goto(objectDefinition);
 		await this.objectEntryButton.click();
+	}
+
+	async schedulePropertiesCrud(scheduleProperties: ScheduleProperty[]) {
+		for (const scheduleProperty of scheduleProperties) {
+			await this.page
+				.getByLabel(
+					`Never ${scheduleProperty === 'Expiration' ? 'Expire' : 'Review'}`,
+					{exact: true}
+				)
+				.uncheck();
+
+			const date = new Date();
+
+			// Since expiration does not accept current time, we add 200 minutes to the current time
+
+			date.setMinutes(date.getMinutes() + 200);
+
+			await this[`${scheduleProperty.toLowerCase()}DateInput`].fill(
+				getObjectEntryUIDateTimeFormat(date)
+			);
+
+			await this.choosePublicationOption('publish');
+
+			await waitForAlert(this.page);
+
+			await expect(
+				this[`${scheduleProperty.toLowerCase()}DateInput`]
+			).toHaveValue(getObjectEntryUIDateTimeFormat(date));
+
+			date.setDate(date.getDate() + 1);
+
+			const tomorrow = getObjectEntryUIDateTimeFormat(date);
+
+			await this[`${scheduleProperty.toLowerCase()}DateInput`].fill(
+				tomorrow
+			);
+
+			await this.choosePublicationOption('publish');
+
+			await waitForAlert(this.page);
+
+			await expect(
+				this[`${scheduleProperty.toLowerCase()}DateInput`]
+			).toHaveValue(tomorrow);
+
+			await this.page
+				.getByLabel(
+					`Never ${scheduleProperty === 'Expiration' ? 'Expire' : 'Review'}`,
+					{exact: true}
+				)
+				.check();
+
+			await this.choosePublicationOption('publish');
+
+			await expect(
+				this[`${scheduleProperty.toLowerCase()}DateInput`]
+			).toHaveValue('');
+		}
 	}
 }

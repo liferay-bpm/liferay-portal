@@ -2053,53 +2053,18 @@ scheduleTest.describe('Manage object entries schedule properties', () => {
 	});
 
 	scheduleTest(
-		'can create, read, update, and delete a reviewDate of an object entry',
-		async ({page, viewObjectEntriesPage}) => {
+		'can create, read, update, and delete an expirationDate and reviewDate of an object entry',
+		async ({viewObjectEntriesPage}) => {
 			await viewObjectEntriesPage.goto(_objectDefinition.className);
 
 			await viewObjectEntriesPage.clickAddObjectEntry(
 				_objectDefinition.label['en_US']
 			);
 
-			await viewObjectEntriesPage.neverReview.uncheck();
-
-			await viewObjectEntriesPage.scheduleForCurrentDate('Review');
-
-			await page.keyboard.press('Escape');
-
-			await viewObjectEntriesPage.choosePublicationOption('publish');
-
-			await waitForAlert(page);
-
-			const date = new Date();
-
-			const today = getObjectEntryUIDateTimeFormat(date);
-
-			await expect(viewObjectEntriesPage.reviewDateInput).toHaveValue(
-				today
-			);
-
-			date.setDate(date.getDate() + 1);
-
-			const tomorrow = getObjectEntryUIDateTimeFormat(date);
-
-			await viewObjectEntriesPage.reviewDateInput.fill(tomorrow);
-
-			await viewObjectEntriesPage.choosePublicationOption('publish');
-
-			await waitForAlert(page);
-
-			await expect(viewObjectEntriesPage.reviewDateInput).toHaveValue(
-				tomorrow
-			);
-
-			await viewObjectEntriesPage.neverReview.check();
-
-			await viewObjectEntriesPage.choosePublicationOption('publish');
-
-			await waitForAlert(page);
-
-			await expect(viewObjectEntriesPage.reviewDateInput).toHaveValue('');
+			await viewObjectEntriesPage.schedulePropertiesCrud([
+				'Expiration',
+				'Review',
+			]);
 		}
 	);
 
@@ -2123,7 +2088,7 @@ scheduleTest.describe('Manage object entries schedule properties', () => {
 	);
 
 	scheduleTest(
-		'cannot submit an empty reviewDate when neverReview is not checked',
+		'cannot submit an empty expirationDate and reviewDate when it is enabled',
 		async ({page, viewObjectEntriesPage}) => {
 			await viewObjectEntriesPage.goto(_objectDefinition.className);
 
@@ -2131,12 +2096,65 @@ scheduleTest.describe('Manage object entries schedule properties', () => {
 				_objectDefinition.label['en_US']
 			);
 
-			await viewObjectEntriesPage.neverReview.uncheck();
+			for (const scheduleProperty of ['Expiration', 'Review']) {
+				await viewObjectEntriesPage.page
+					.getByLabel(
+						`Never ${scheduleProperty === 'Expiration' ? 'Expire' : 'Review'}`,
+						{exact: true}
+					)
+					.uncheck();
+
+				await viewObjectEntriesPage.choosePublicationOption('publish');
+
+				await expect(
+					page.getByText('This field is required')
+				).toBeVisible();
+
+				await viewObjectEntriesPage.page
+					.getByLabel(
+						`Never ${scheduleProperty === 'Expiration' ? 'Expire' : 'Review'}`,
+						{exact: true}
+					)
+					.check();
+			}
+		}
+	);
+
+	scheduleTest(
+		'cannot submit current or past date in expirationDate',
+		async ({page, viewObjectEntriesPage}) => {
+			await viewObjectEntriesPage.goto(_objectDefinition.className);
+
+			await viewObjectEntriesPage.clickAddObjectEntry(
+				_objectDefinition.label['en_US']
+			);
+
+			await viewObjectEntriesPage.page
+				.getByLabel('Never Expire', {exact: true})
+				.uncheck();
+
+			await viewObjectEntriesPage.scheduleForCurrentDate('Expiration');
+
+			await viewObjectEntriesPage.page.keyboard.press('Escape');
 
 			await viewObjectEntriesPage.choosePublicationOption('publish');
 
 			await expect(
-				page.getByText('This field is required')
+				page.getByText('The date entered is in the past')
+			).toBeVisible();
+
+			const date = new Date();
+
+			date.setDate(date.getDate() - 1);
+
+			const yesterday = getObjectEntryUIDateTimeFormat(date);
+
+			await viewObjectEntriesPage.expirationDateInput.fill(yesterday);
+
+			await viewObjectEntriesPage.choosePublicationOption('publish');
+
+			await expect(
+				page.getByText('The date entered is in the past')
 			).toBeVisible();
 		}
 	);
