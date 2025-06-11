@@ -4517,6 +4517,55 @@ public class DefaultObjectEntryManagerImplTest
 			1, String.valueOf(parentObjectEntry2.getId()), page);
 	}
 
+	@Test
+	public void testGetObjectEntrybyExternalReferenceCodebyVersion()
+		throws Exception {
+
+		_enableObjectEntryVersioning();
+
+		ObjectEntry objectEntry = new ObjectEntry() {
+			{
+				externalReferenceCode = RandomTestUtil.randomString();
+				keywords = new String[] {RandomTestUtil.randomString()};
+				properties = HashMapBuilder.<String, Object>put(
+					"textObjectFieldName", RandomTestUtil.randomString()
+				).build();
+				systemProperties = new SystemProperties() {
+					{
+						version = new Version() {
+							{
+								number = 1;
+							}
+						};
+					}
+				};
+			}
+		};
+
+		objectEntry = _defaultObjectEntryManager.addObjectEntry(
+			dtoConverterContext, _objectDefinition1, objectEntry,
+			ObjectDefinitionConstants.SCOPE_SITE);
+
+		objectEntry = _updateObjectEntryVersion(objectEntry, 2);
+
+		assertEquals(
+			_defaultObjectEntryManager.
+				getObjectEntrybyExternalReferenceCodebyVersion(
+					dtoConverterContext, _objectDefinition1.getCompanyId(),
+					_objectDefinition1, objectEntry.getScopeKey(),
+					objectEntry.getExternalReferenceCode(), 2),
+			objectEntry);
+
+		assertEquals(
+			_defaultObjectEntryManager.
+				getObjectEntrybyExternalReferenceCodebyVersion(
+					dtoConverterContext, _objectDefinition1.getCompanyId(),
+					_objectDefinition1, objectEntry.getScopeKey(),
+					objectEntry.getExternalReferenceCode(), 1),
+			_defaultObjectEntryManager.getObjectEntryByVersion(
+				dtoConverterContext, objectEntry.getId(), 1));
+	}
+
 	@FeatureFlag("LPD-17564")
 	@Test
 	public void testGetObjectEntryByVersion() throws Exception {
