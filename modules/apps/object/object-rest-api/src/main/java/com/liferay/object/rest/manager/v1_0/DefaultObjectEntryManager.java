@@ -120,6 +120,12 @@ public interface DefaultObjectEntryManager extends ObjectEntryManager {
 			ObjectDefinition objectDefinition, long objectEntryId)
 		throws Exception;
 
+	public ObjectEntry getObjectEntrybyExternalReferenceCodebyVersion(
+			DTOConverterContext dtoConverterContext, long companyId,
+			ObjectDefinition objectDefinition, String scopeKey,
+			String externalReferenceCode, Integer version)
+		throws Exception;
+
 	public ObjectEntry getObjectEntryByVersion(
 			DTOConverterContext dtoConverterContext, Long objectEntryId,
 			int version)

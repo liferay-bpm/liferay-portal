@@ -389,6 +389,22 @@ public class ObjectEntryResourceImpl
 	}
 
 	@Override
+	public ObjectEntry getScopeScopeKeyByExternalReferenceCodeByVersion(
+			String scopeKey, String externalReferenceCode, Integer version)
+		throws Exception {
+
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			DefaultObjectEntryManagerProvider.provide(
+				_objectEntryManagerRegistry.getObjectEntryManager(
+					_objectDefinition.getStorageType()));
+
+		return defaultObjectEntryManager.
+			getObjectEntrybyExternalReferenceCodebyVersion(
+				_getDTOConverterContext(null), contextCompany.getCompanyId(),
+				_objectDefinition, scopeKey, externalReferenceCode, version);
+	}
+
+	@Override
 	public Page<ObjectEntry> getScopeScopeKeyPage(
 			String scopeKey, Boolean flatten, String search,
 			Aggregation aggregation, Filter filter, Pagination pagination,
