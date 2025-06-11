@@ -115,6 +115,12 @@ public interface DefaultObjectEntryManager extends ObjectEntryManager {
 			Filter filter, Pagination pagination, String search, Sort[] sorts)
 		throws Exception;
 
+	public Page<ObjectEntry> getObjectEntriesbyExternalReferenceCodebyVersion(
+			DTOConverterContext dtoConverterContext, long companyId,
+			ObjectDefinition objectDefinition, Pagination pagination,
+			String scopeKey, String externalReferenceCode)
+		throws Exception;
+
 	public ObjectEntry getObjectEntry(
 			DTOConverterContext dtoConverterContext,
 			ObjectDefinition objectDefinition, long objectEntryId)
