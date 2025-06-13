@@ -4138,6 +4138,78 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
+	public void testGetObjectEntriesbyExternalReferenceCodebyVersion()
+		throws Exception {
+
+		_enableObjectEntryVersioning();
+
+		ObjectEntry objectEntry = new ObjectEntry() {
+			{
+				externalReferenceCode = RandomTestUtil.randomString();
+				keywords = new String[] {RandomTestUtil.randomString()};
+				properties = HashMapBuilder.<String, Object>put(
+					"textObjectFieldName", RandomTestUtil.randomString()
+				).build();
+				systemProperties = new SystemProperties() {
+					{
+						version = new Version() {
+							{
+								number = 1;
+							}
+						};
+					}
+				};
+			}
+		};
+
+		objectEntry = _defaultObjectEntryManager.addObjectEntry(
+			dtoConverterContext, _objectDefinition1, objectEntry,
+			ObjectDefinitionConstants.SCOPE_SITE);
+
+		assertEquals(
+			_defaultObjectEntryManager.getObjectEntryByVersion(
+				dtoConverterContext, objectEntry.getExternalReferenceCode(),
+				_objectDefinition1, 1),
+			objectEntry);
+
+		objectEntry = _updateObjectEntryVersion(objectEntry, 2);
+
+		Assert.assertEquals(
+			2,
+			_defaultObjectEntryManager.getVersionedObjectEntries(
+				dtoConverterContext, objectEntry.getExternalReferenceCode(),
+				_objectDefinition1, null
+			).getItems(
+			).size());
+
+		objectEntry = _updateObjectEntryVersion(objectEntry, 3);
+
+		Assert.assertEquals(
+			3,
+			_defaultObjectEntryManager.getVersionedObjectEntries(
+				dtoConverterContext, objectEntry.getExternalReferenceCode(),
+				_objectDefinition1, null
+			).getItems(
+			).size());
+
+		Page<ObjectEntry> page =
+			_defaultObjectEntryManager.
+				getObjectEntriesbyExternalReferenceCodebyVersion(
+					dtoConverterContext, _objectDefinition1.getCompanyId(),
+					_objectDefinition1, null, objectEntry.getScopeKey(),
+					objectEntry.getExternalReferenceCode());
+
+		Assert.assertEquals(
+			page.getItems(
+			).size(),
+			_defaultObjectEntryManager.getVersionedObjectEntries(
+				dtoConverterContext, objectEntry.getExternalReferenceCode(),
+				_objectDefinition1, null
+			).getItems(
+			).size());
+	}
+
+	@Test
 	public void testGetObjectEntriesWithAccountEntryRestricted1()
 		throws Exception {
 
