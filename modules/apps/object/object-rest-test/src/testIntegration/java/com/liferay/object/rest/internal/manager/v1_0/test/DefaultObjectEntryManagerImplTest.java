@@ -2549,6 +2549,49 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
+	public void testCopyObjectEntryByExternalReferenceCodeByVersion()
+		throws Exception {
+
+		_enableObjectEntryVersioning();
+
+		ObjectEntry objectEntry1 = new ObjectEntry() {
+			{
+				externalReferenceCode = RandomTestUtil.randomString();
+				keywords = new String[] {RandomTestUtil.randomString()};
+				properties = HashMapBuilder.<String, Object>put(
+					"textObjectFieldName", RandomTestUtil.randomString()
+				).build();
+				systemProperties = new SystemProperties() {
+					{
+						version = new Version() {
+							{
+								number = 1;
+							}
+						};
+					}
+				};
+			}
+		};
+
+		objectEntry1 = _defaultObjectEntryManager.addObjectEntry(
+			dtoConverterContext, _objectDefinition1, objectEntry1,
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		objectEntry1 = _updateObjectEntryVersion(objectEntry1, 2);
+
+		ObjectEntry objectEntry2 =
+			_defaultObjectEntryManager.copyObjectEntryByVersion(
+				dtoConverterContext, objectEntry1.getExternalReferenceCode(),
+				_objectDefinition1, objectEntry1.getScopeKey(), 2);
+
+		assertEquals(
+			_defaultObjectEntryManager.getObjectEntryByVersion(
+				dtoConverterContext, objectEntry1.getExternalReferenceCode(),
+				_objectDefinition1, 2),
+			objectEntry2);
+	}
+
+	@Test
 	public void testCopyObjectEntryByVersion() throws Exception {
 		_enableObjectEntryVersioning();
 
