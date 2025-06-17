@@ -92,6 +92,8 @@ public class CheckObjectEntrySchedulerJobConfigurationTest {
 				"displayDate", date
 			).build());
 
+		Assert.assertTrue(objectEntry1.isApproved());
+
 		ObjectEntry objectEntry2 = ObjectEntryTestUtil.addObjectEntry(
 			0, _objectDefinition.getObjectDefinitionId(),
 			HashMapBuilder.<String, Serializable>put(
@@ -100,6 +102,8 @@ public class CheckObjectEntrySchedulerJobConfigurationTest {
 				"displayDate",
 				new Date(date.getTime() + TimeUnit.MINUTE.toMillis(5))
 			).build());
+
+		Assert.assertTrue(objectEntry2.isApproved());
 
 		_jobExecutorUnsafeRunnable.run();
 
@@ -110,7 +114,7 @@ public class CheckObjectEntrySchedulerJobConfigurationTest {
 
 		Assert.assertTrue(objectEntry1.isScheduled());
 
-		Assert.assertFalse(objectEntry2.isScheduled());
+		Assert.assertTrue(objectEntry2.isApproved());
 	}
 
 	@Test
