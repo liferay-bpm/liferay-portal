@@ -7,6 +7,7 @@ package com.liferay.object.rest.internal.manager.v1_0;
 
 import com.liferay.account.exception.NoSuchGroupException;
 import com.liferay.batch.engine.attachment.BatchEngineAttachmentManager;
+import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.object.action.engine.ObjectActionEngine;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
@@ -525,6 +526,21 @@ public class DefaultObjectEntryManagerImpl
 			}
 		}
 
+		Long[] groupIds;
+
+		if (StringUtil.equals(
+				objectDefinition.getScope(),
+				ObjectDefinitionConstants.SCOPE_DEPOT)) {
+
+			groupIds = TransformUtil.transformToArray(
+				_depotEntryLocalService.getGroupConnectedDepotEntries(
+					groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS),
+				depotEntry -> depotEntry.getGroupId(), Long.class);
+		}
+		else {
+			groupIds = new Long[] {groupId};
+		}
+
 		return Page.of(
 			HashMapBuilder.put(
 				"create",
@@ -566,14 +582,14 @@ public class DefaultObjectEntryManagerImpl
 			facets,
 			TransformUtil.transform(
 				objectEntryLocalService.getPrimaryKeys(
-					groupId, companyId, dtoConverterContext.getUserId(),
+					groupIds, companyId, dtoConverterContext.getUserId(),
 					objectDefinition.getObjectDefinitionId(), predicate, search,
 					start, end, sorts),
 				primaryKey -> _getObjectEntry(
 					dtoConverterContext, objectDefinition, primaryKey)),
 			pagination,
 			objectEntryLocalService.getValuesListCount(
-				groupId, companyId, dtoConverterContext.getUserId(),
+				groupIds, companyId, dtoConverterContext.getUserId(),
 				objectDefinition.getObjectDefinitionId(), predicate, search));
 	}
 
@@ -2271,6 +2287,9 @@ public class DefaultObjectEntryManagerImpl
 
 	@Reference
 	private BatchEngineAttachmentManager _batchEngineAttachmentManager;
+
+	@Reference
+	private DepotEntryLocalService _depotEntryLocalService;
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
