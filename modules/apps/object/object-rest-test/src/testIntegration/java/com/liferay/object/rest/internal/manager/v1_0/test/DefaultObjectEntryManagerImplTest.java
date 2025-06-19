@@ -2208,7 +2208,7 @@ public class DefaultObjectEntryManagerImplTest
 
 	@Test
 	@TestInfo("LPD-58490")
-	public void testAddObjectEntryWithMissingRoles() throws Exception {
+	public void testAddObjectEntryWithMissingRoleReference() throws Exception {
 		Permission permission = new Permission() {
 			{
 				actionIds = new String[] {ActionKeys.UPDATE};
