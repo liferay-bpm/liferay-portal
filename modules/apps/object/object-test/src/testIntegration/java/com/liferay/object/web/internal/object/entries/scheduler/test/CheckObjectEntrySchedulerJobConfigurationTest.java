@@ -79,6 +79,7 @@ public class CheckObjectEntrySchedulerJobConfigurationTest {
 					_OBJECT_FIELD_NAME
 				).build()));
 	}
+
 	@Test
 	public void testCheckObjectEntryExpirationDate() throws Exception {
 		Date date = new Date();
