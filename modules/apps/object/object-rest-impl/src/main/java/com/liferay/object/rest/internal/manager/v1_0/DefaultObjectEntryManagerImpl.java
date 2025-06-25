@@ -2255,6 +2255,18 @@ public class DefaultObjectEntryManagerImpl
 				_processAttachment(
 					objectDefinition, objectEntry, objectField, scopeKey,
 					serviceContext);
+
+				if (objectField.isLocalized()) {
+					properties.put(
+						objectField.getI18nObjectFieldName(),
+						objectEntry.getPropertyValue(
+							objectField.getI18nObjectFieldName()));
+				}
+				else {
+					properties.put(
+						objectField.getName(),
+						objectEntry.getPropertyValue(objectField.getName()));
+				}
 			}
 
 			Object value = ObjectEntryValuesUtil.getValue(
