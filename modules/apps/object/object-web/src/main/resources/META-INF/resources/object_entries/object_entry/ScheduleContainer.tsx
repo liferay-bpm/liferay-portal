@@ -66,7 +66,7 @@ export default function ScheduleContainer({
 
 	const [hiddenScheduleValues, setHiddenScheduleValues] =
 		useState<HiddenValue>({
-			displayDate: convertToUTC(scheduleProperties.displayDate?.value),
+			displayDate: convertToUTC(scheduleProperties.displayDate.value),
 			expirationDate: convertToUTC(
 				scheduleProperties.expirationDate.value
 			),
@@ -197,7 +197,7 @@ export default function ScheduleContainer({
 				hiddenScheduleValues={hiddenScheduleValues}
 				portletNamespace={portletNamespace}
 				submitRef={submitRef}
-				value={scheduleProperties.displayDate?.value}
+				value={scheduleProperties.displayDate.value}
 			/>
 		</>
 	);
