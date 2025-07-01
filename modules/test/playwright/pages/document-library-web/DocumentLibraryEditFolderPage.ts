@@ -7,9 +7,11 @@ import {Locator, Page} from '@playwright/test';
 
 export class DocumentLibraryEditFolderPage {
 	readonly page: Page;
+	readonly saveButton: Locator;
 	readonly title: Locator;
 	constructor(page: Page) {
 		this.page = page;
+		this.saveButton = page.getByRole('button', {name: 'Save'});
 		this.title = page.getByLabel('Name Required');
 	}
 
