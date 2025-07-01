@@ -4,6 +4,7 @@
  */
 
 import {FrameLocator, Locator, Page, expect} from '@playwright/test';
+import path from 'path';
 
 import {clickAndExpectToBeVisible} from '../../utils/clickAndExpectToBeVisible';
 import {PORTLET_URLS} from '../../utils/portletUrls';
@@ -14,6 +15,11 @@ export type TVocabularyCategory = {
 };
 
 export class DocumentLibraryPage {
+	readonly checkoutButton: Locator;
+	readonly defaultWorkflowForAllDocumentTypes: Locator;
+	readonly documentTypeRestrictions: Locator;
+	readonly draftStatus: Locator;
+	readonly editButton: Locator;
 	readonly exportImportOptionsMenuItem: Locator;
 	readonly infoPanel: Locator;
 	readonly infoPanelButton: Locator;
@@ -21,11 +27,22 @@ export class DocumentLibraryPage {
 	readonly optionsMenu: Locator;
 	readonly orderMenu: Locator;
 	readonly page: Page;
+	readonly pendingStatus: Locator;
 	readonly permissionsFrameLocator: FrameLocator;
 	readonly searchButton: Locator;
 	readonly searchInput: Locator;
+	readonly setTheDefaultWorkflowInput: Locator;
 
 	constructor(page: Page) {
+		this.checkoutButton = page.getByRole('menuitem', {name: 'Checkout'});
+		this.defaultWorkflowForAllDocumentTypes = page.getByLabel(
+			'Default Workflow for all'
+		);
+		this.documentTypeRestrictions = page.getByRole('button', {
+			name: 'Document Type Restrictions',
+		});
+		this.draftStatus = page.getByText('Draft');
+		this.editButton = page.getByRole('menuitem', {name: 'Edit'});
 		this.exportImportOptionsMenuItem = page.getByRole('menuitem', {
 			name: 'Export / Import',
 		});
@@ -41,6 +58,7 @@ export class DocumentLibraryPage {
 			.getByLabel('Options');
 		this.orderMenu = page.getByLabel('Order');
 		this.page = page;
+		this.pendingStatus = page.getByText('Pending');
 		this.permissionsFrameLocator = page.frameLocator(
 			'iframe[title="Permissions"]'
 		);
@@ -50,6 +68,9 @@ export class DocumentLibraryPage {
 		this.searchInput = page.getByRole('searchbox', {
 			name: 'Search for:',
 		});
+		this.setTheDefaultWorkflowInput = page.getByText(
+			'Set the default workflow for'
+		);
 	}
 
 	async goto(siteUrl?: Site['friendlyUrlPath']) {
@@ -64,6 +85,14 @@ export class DocumentLibraryPage {
 				await parent.getByLabel('Not Visible to Guest Users').last()
 			).toBeVisible();
 		}).toPass();
+	}
+
+	async openMoreFilesActions(fileName: string) {
+		const documentLocation = this.page.locator(
+			`dd[data-title='${fileName}']`
+		);
+
+		await documentLocation.locator('button.dropdown-toggle').click();
 	}
 
 	async openInfoPanel(entryTitle: string, tabName: 'Details' | 'Versions') {
@@ -193,6 +222,33 @@ export class DocumentLibraryPage {
 		});
 	}
 
+	async updateDocumentTypeRestrictionsAndWorkflow() {
+		const isDropdownOpen =
+			(await this.documentTypeRestrictions.getAttribute(
+				'aria-expanded'
+			)) === 'true';
+
+		if (!isDropdownOpen) {
+			await this.documentTypeRestrictions.click();
+		}
+
+		await this.setTheDefaultWorkflowInput.click();
+
+		await this.defaultWorkflowForAllDocumentTypes.selectOption(
+			'Single Approver@1'
+		);
+
+		await this.page.getByRole('button', {name: 'Save'}).click();
+	}
+
+	async deleteFolder(entryTitle: string) {
+		await this.page
+			.locator(`.card-body:has-text('${entryTitle}')`)
+			.getByLabel('More actions')
+			.click();
+		await this.page.getByRole('menuitem', {name: 'Delete'}).click();
+	}
+
 	async goToEditFolder(entryTitle: string) {
 		await this.page
 			.locator(`.card-body:has-text('${entryTitle}')`)
@@ -279,6 +335,37 @@ export class DocumentLibraryPage {
 				name: 'Create AI Image',
 			})
 			.click();
+	}
+
+	async openFolder(folderName: string, goTo?: boolean) {
+		if (goTo) {
+			await this.goto();
+		}
+
+		await this.page.getByRole('link', {name: `${folderName}`}).click();
+	}
+
+	async openFolderAction({
+		fileName,
+		folderName,
+		goTo = false,
+		typeAction,
+	}: {
+		fileName: string;
+		folderName: string;
+		goTo?: boolean;
+		typeAction: string;
+	}) {
+		await this.openFolder(folderName, goTo);
+
+		await this.openMoreFilesActions(fileName);
+
+		if (typeAction === 'edit') {
+			await this.editButton.click();
+		}
+		else if (typeAction === 'checkout') {
+			await this.checkoutButton.click();
+		}
 	}
 
 	async openNewButton() {
@@ -396,5 +483,14 @@ export class DocumentLibraryPage {
 		await this.permissionsFrameLocator
 			.getByRole('button', {name: 'Cancel'})
 			.click();
+	}
+
+	async uploadFile(page: Page, dirName: string, fileName: string) {
+		const fullPath = path.join(dirName, 'dependencies', fileName);
+
+		await page.setInputFiles(
+			'#_com_liferay_document_library_web_portlet_DLAdminPortlet_file',
+			fullPath
+		);
 	}
 }
