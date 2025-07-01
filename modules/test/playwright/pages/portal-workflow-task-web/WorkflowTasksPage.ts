@@ -52,6 +52,14 @@ export class WorkflowTasksPage {
 		await waitForAlert(this.page);
 	}
 
+	async assignAndAprove(taskName: string) {
+		await this.goToAssignedToMyRoles();
+
+		await this.assignToMe(taskName);
+
+		await this.approve(taskName);
+	}
+
 	async assignToMe(articleTitle: string) {
 		const row = await this.page
 			.getByRole('row')
