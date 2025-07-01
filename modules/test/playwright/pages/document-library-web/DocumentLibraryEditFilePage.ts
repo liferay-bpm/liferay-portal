@@ -14,23 +14,42 @@ import {DocumentLibraryPage} from './DocumentLibraryPage';
 export class DocumentLibraryEditFilePage {
 	readonly page: Page;
 
+	readonly categorizationDropdownButton: Locator;
+	readonly categorizationFields: Locator;
 	readonly descriptionInput: Locator;
 	readonly documentLibraryPage: DocumentLibraryPage;
+	readonly fileTitleInput: Locator;
+	readonly legalVocabularyOption: Locator;
+	readonly otherVocabularyOption: Locator;
 	readonly permissionViewSelector: Locator;
 	readonly publishButton: Locator;
 	readonly publishDateSelector: Locator;
+	readonly saveAndCheckInButton: Locator;
 	readonly saveButton: Locator;
 	readonly scheduleButton: Locator;
+	readonly selectFileButton: Locator;
 	readonly selectForUpdateButton: Locator;
+	readonly submitForWorkflowButton: Locator;
 	readonly titleSelector: Locator;
+	readonly vocabularySelect: Locator;
 
 	constructor(page: Page) {
 		this.page = page;
 
+		this.categorizationDropdownButton = page.getByRole('button', {
+			name: 'Categorization',
+		});
+		this.categorizationFields = page
+			.locator('div')
+			.filter({hasText: /^legalother$/})
+			.nth(1);
 		this.descriptionInput = page.locator(
 			'#_com_liferay_document_library_web_portlet_DLAdminPortlet_description'
 		);
 		this.documentLibraryPage = new DocumentLibraryPage(page);
+		this.fileTitleInput = page.getByLabel('Title Required');
+		this.legalVocabularyOption = page.getByRole('option', {name: 'legal'});
+		this.otherVocabularyOption = page.getByRole('option', {name: 'other'});
 		this.permissionViewSelector = page.getByLabel(
 			'Viewable and Downloadable By'
 		);
@@ -39,10 +58,20 @@ export class DocumentLibraryEditFilePage {
 			name: 'Publish',
 		});
 		this.publishDateSelector = page.getByLabel('Publish Date');
+		this.saveAndCheckInButton = page.getByRole('button', {
+			name: 'Save and Check In',
+		});
 		this.saveButton = page.getByRole('button', {exact: true, name: 'Save'});
 		this.scheduleButton = page.getByRole('button', {name: 'Schedule'});
+		this.selectFileButton = page.getByRole('button', {name: 'Select File'});
 		this.selectForUpdateButton = page.getByLabel('Upload', {exact: true});
+		this.submitForWorkflowButton = page.getByRole('button', {
+			name: 'Submit for Workflow',
+		});
 		this.titleSelector = page.getByLabel('Title');
+		this.vocabularySelect = page.getByLabel('Vocabulary Name', {
+			exact: true,
+		});
 	}
 
 	async goto(siteUrl?: Site['friendlyUrlPath']) {
