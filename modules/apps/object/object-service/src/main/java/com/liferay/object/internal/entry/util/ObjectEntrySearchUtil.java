@@ -67,11 +67,6 @@ public class ObjectEntrySearchUtil {
 		return dynamicObjectDefinitionLocalizationTable.getForeignKeyColumn(
 		).eq(
 			dynamicObjectDefinitionTable.getPrimaryKeyColumn()
-		).and(
-			dynamicObjectDefinitionLocalizationTable.getLanguageIdColumn(
-			).eq(
-				getLanguageId()
-			)
 		);
 	}
 
