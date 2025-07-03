@@ -2969,6 +2969,34 @@ public class ObjectEntryLocalServiceImpl
 				continue;
 			}
 
+			if (objectField.isLocalized()) {
+				DynamicObjectDefinitionLocalizationTable
+					dynamicObjectDefinitionLocalizationTable =
+						DynamicObjectDefinitionLocalizationTableFactory.create(
+							_objectDefinitionPersistence.findByPrimaryKey(
+								objectDefinitionId),
+							_objectFieldLocalService);
+
+				if (dynamicObjectDefinitionLocalizationTable != null) {
+					objectFieldPredicate =
+						ObjectEntryTable.INSTANCE.objectEntryId.in(
+							DSLQueryFactoryUtil.select(
+								dynamicObjectDefinitionLocalizationTable.
+									getForeignKeyColumn()
+							).from(
+								dynamicObjectDefinitionLocalizationTable
+							).where(
+								objectFieldPredicate.and(
+									dynamicObjectDefinitionLocalizationTable.
+										getForeignKeyColumn(
+										).eq(
+											ObjectEntryTable.INSTANCE.
+												objectEntryId
+										))
+							));
+				}
+			}
+
 			if (searchPredicate == null) {
 				searchPredicate = objectFieldPredicate;
 			}
