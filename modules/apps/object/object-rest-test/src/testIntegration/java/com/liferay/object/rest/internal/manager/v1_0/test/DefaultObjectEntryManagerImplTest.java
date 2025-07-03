@@ -4064,7 +4064,8 @@ public class DefaultObjectEntryManagerImplTest
 		testGetObjectEntries(
 			HashMapBuilder.put(
 				"search", "pt_BR"
-			).build());
+			).build(),
+			childObjectEntry1, childObjectEntry2);
 		testGetObjectEntries(
 			HashMapBuilder.put(
 				"search", String.valueOf(childObjectEntry1.getId())
@@ -4079,12 +4080,12 @@ public class DefaultObjectEntryManagerImplTest
 			HashMapBuilder.put(
 				"search", _listTypeEntryKey1
 			).build(),
-			childObjectEntry1);
+			childObjectEntry1, childObjectEntry2);
 		testGetObjectEntries(
 			HashMapBuilder.put(
 				"search", _listTypeEntryKey2
 			).build(),
-			childObjectEntry2);
+			childObjectEntry1, childObjectEntry2);
 		testGetObjectEntries(
 			HashMapBuilder.put(
 				"search", picklistObjectFieldValue1
