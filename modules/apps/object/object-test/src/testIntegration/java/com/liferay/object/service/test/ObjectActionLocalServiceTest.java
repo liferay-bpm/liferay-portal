@@ -49,6 +49,7 @@ import com.liferay.object.constants.ObjectActionConstants;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
+import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
@@ -68,6 +69,7 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.related.models.test.util.ObjectEntryTestUtil;
 import com.liferay.object.rest.resource.v1_0.ObjectEntryResource;
 import com.liferay.object.scripting.executor.ObjectScriptingExecutor;
 import com.liferay.object.service.ObjectActionLocalService;
@@ -100,13 +102,18 @@ import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.auth.CompanyInheritableThreadLocalCallable;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
+import com.liferay.portal.kernel.service.ResourceActionLocalServiceUtil;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
@@ -142,6 +149,8 @@ import com.liferay.portal.kernel.workflow.WorkflowTask;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManager;
 import com.liferay.portal.security.script.management.test.rule.ScriptManagementConfigurationTestRule;
 import com.liferay.portal.security.script.management.test.util.ScriptManagementConfigurationTestUtil;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.mail.MailMessage;
 import com.liferay.portal.test.mail.MailServiceTestUtil;
 import com.liferay.portal.test.rule.FeatureFlag;
@@ -179,6 +188,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 
 import org.osgi.framework.Bundle;
@@ -2423,6 +2433,91 @@ public class ObjectActionLocalServiceTest {
 
 		_userLocalService.deleteUser(user);
 	}
+	@Test
+	public void testOnAfterAddGroovyObjectActionExecutesCallback() throws Exception {
+
+		ReflectionTestUtil.setFieldValue(
+			_objectActionExecutorRegistry.getObjectActionExecutor(
+				0, ObjectActionExecutorConstants.KEY_GROOVY),
+			"_objectScriptingExecutor", _originalObjectScriptingExecutor);
+
+		try (Closeable closeable =
+				 ScriptManagementConfigurationTestUtil.saveWithCloseable(true)) {
+
+			ObjectDefinition objectDefinition = null;
+
+			try {
+				objectDefinition = ObjectDefinitionTestUtil.publishObjectDefinition(
+					Collections.singletonList(
+						new TextObjectFieldBuilder()
+							.labelMap(LocalizedMapUtil.getLocalizedMap("First Name"))
+							.name("firstName")
+							.required(true)
+							.build()),
+					ObjectDefinitionConstants.SCOPE_SITE);
+
+				String resourceName = objectDefinition.getResourceName();
+				List<String> modelResourceActions =
+					ResourceActionsUtil.getModelResourceActions(resourceName);
+
+				if (!modelResourceActions.contains(ActionKeys.VIEW)) {
+					ResourceActionLocalServiceUtil.addResourceAction(
+						resourceName, ActionKeys.VIEW, 1);
+				}
+				Role guestRole = RoleLocalServiceUtil.getRole(
+					TestPropsValues.getCompanyId(), RoleConstants.GUEST);
+
+				ResourcePermissionLocalServiceUtil.addResourcePermission(
+					objectDefinition.getCompanyId(),
+					resourceName,
+					ResourceConstants.SCOPE_COMPANY,
+					String.valueOf(objectDefinition.getObjectDefinitionId()),
+					guestRole.getRoleId(),
+					ActionKeys.VIEW);
+
+				Class<?> clazz = ObjectActionLocalServiceTest.class;
+
+				_addObjectAction(
+					objectDefinition.getObjectDefinitionId(),
+					ObjectActionExecutorConstants.KEY_GROOVY,
+					ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+					UnicodePropertiesBuilder.create(true)
+						.put(
+							"parameters",
+							JSONUtil.put(
+								"objectName", objectDefinition.getShortName()
+							).toString()
+						)
+						.put(
+							"script",
+							StringUtil.read(
+								clazz,
+								"/com/liferay/object/service/test/dependencies/" +
+								clazz.getSimpleName() + "." +
+								testName.getMethodName() + ".groovy")
+						)
+						.build());
+
+				try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+					"GROOVY_CALLBACK_LOG", LoggerTestUtil.INFO)) {
+
+					ObjectEntryTestUtil.addObjectEntry(
+						TestPropsValues.getGroupId(),
+						objectDefinition.getObjectDefinitionId(),
+						Collections.singletonMap("firstName", "Peter"));
+				}
+			}
+			finally {
+				if (objectDefinition != null) {
+					_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+				}
+			}
+		}
+	}
+
+
+	@Rule
+	public TestName testName = new TestName();
 
 	@Test
 	public void testOnAfterAddObjectActionWithHierarchy() throws Exception {
