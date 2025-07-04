@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
 
 import java.util.Collections;
@@ -40,6 +41,7 @@ import org.junit.runner.RunWith;
 /**
  * @author Carolina Barbosa
  */
+@FeatureFlag("LPD-32050")
 @RunWith(Arquillian.class)
 public class CPDefinitionSystemObjectRelatedModelsProviderTest
 	extends BaseSystemObjectRelatedModelsProviderTestCase {

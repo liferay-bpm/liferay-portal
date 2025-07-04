@@ -314,6 +314,7 @@ definition {
 	@description = "LPS-173537 - Verify deleting a Commerce Product entry triggers an action to add a Commerce Product Group entry"
 	@priority = 5
 	test CanAddCommerceProductGroupEntryAfterDeletingCommerceProductEntry {
+		property custom.properties = "feature.flag.LPD-32050=true";
 		property portal.acceptance = "true";
 
 		task ("Given a Minium site and a Commerce Product") {
@@ -363,6 +364,7 @@ definition {
 	@description = "LPS-180070 - Verify creating a Commerce Product entry triggers an action to add a user"
 	@priority = 5
 	test CanAddUserAfterCreatingCommerceProductEntry {
+		property custom.properties = "feature.flag.LPD-32050=true";
 		property portal.acceptance = "true";
 
 		task ("Given a Commerce Product object") {
