@@ -984,56 +984,56 @@ public class ObjectEntryResourceTest {
 	public void tearDown() throws Exception {
 		if (_objectRelationship1 != null) {
 			_objectRelationshipLocalService.deleteObjectRelationship(
-				_objectRelationship1);
+				_objectRelationship1.getObjectRelationshipId());
 		}
 
 		if (_objectRelationship2 != null) {
 			_objectRelationshipLocalService.deleteObjectRelationship(
-				_objectRelationship2);
+				_objectRelationship2.getObjectRelationshipId());
 		}
 
 		if (_objectRelationship3 != null) {
 			_objectRelationshipLocalService.deleteObjectRelationship(
-				_objectRelationship3);
+				_objectRelationship3.getObjectRelationshipId());
 		}
 
 		if (_objectRelationship4 != null) {
 			_objectRelationshipLocalService.deleteObjectRelationship(
-				_objectRelationship4);
+				_objectRelationship4.getObjectRelationshipId());
 		}
 
 		if (_objectRelationship5 != null) {
 			_objectRelationshipLocalService.deleteObjectRelationship(
-				_objectRelationship5);
+				_objectRelationship5.getObjectRelationshipId());
 		}
 
 		if (_objectRelationship6 != null) {
 			_objectRelationshipLocalService.deleteObjectRelationship(
-				_objectRelationship6);
+				_objectRelationship6.getObjectRelationshipId());
 		}
 
 		if (_objectRelationship7 != null) {
 			_objectRelationshipLocalService.deleteObjectRelationship(
-				_objectRelationship7);
+				_objectRelationship7.getObjectRelationshipId());
 		}
 
 		_objectDefinitionLocalService.deleteObjectDefinition(
-			_objectDefinition1);
+			_objectDefinition1.getObjectDefinitionId());
 		_objectDefinitionLocalService.deleteObjectDefinition(
-			_objectDefinition2);
+			_objectDefinition2.getObjectDefinitionId());
 		_objectDefinitionLocalService.deleteObjectDefinition(
-			_objectDefinition3);
+			_objectDefinition3.getObjectDefinitionId());
 		_objectDefinitionLocalService.deleteObjectDefinition(
-			_objectDefinition4);
+			_objectDefinition4.getObjectDefinitionId());
 		_objectDefinitionLocalService.deleteObjectDefinition(
-			_siteScopedObjectDefinition1);
+			_siteScopedObjectDefinition1.getObjectDefinitionId());
 		_objectDefinitionLocalService.deleteObjectDefinition(
-			_siteScopedObjectDefinition2);
+			_siteScopedObjectDefinition2.getObjectDefinitionId());
 
 		_listTypeDefinitionLocalService.deleteListTypeDefinition(
-			_listTypeDefinition);
+			_listTypeDefinition.getListTypeDefinitionId());
 
-		_groupLocalService.deleteGroup(_group);
+		_groupLocalService.deleteGroup(_group.getGroupId());
 	}
 
 	@Test
@@ -14518,6 +14518,8 @@ public class ObjectEntryResourceTest {
 						URLCodec.encodeURL(fileEntry.getName()), "/",
 						serviceBuilderFileEntry.getUuid(), "?version=",
 						fileVersion.getVersion(), "&t=", modifiedDate.getTime(),
+						"&previewCTCollectionId=",
+						fileVersion.getCtCollectionId(),
 						"&download=true&objectDefinitionExternalReferenceCode=",
 						objectDefinition.getExternalReferenceCode(),
 						"&objectEntryExternalReferenceCode=",
