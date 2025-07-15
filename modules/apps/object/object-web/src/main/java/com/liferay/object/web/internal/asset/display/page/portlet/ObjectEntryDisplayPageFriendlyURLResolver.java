@@ -9,7 +9,6 @@ import com.liferay.asset.display.page.portlet.BaseAssetDisplayPageFriendlyURLRes
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.petra.string.CharPool;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolver;
 import com.liferay.portal.kernel.portlet.constants.FriendlyURLResolverConstants;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -42,11 +41,6 @@ public class ObjectEntryDisplayPageFriendlyURLResolver
 
 		return StringUtil.replace(
 			_objectDefinition.getClassName(), CharPool.POUND, CharPool.PERIOD);
-	}
-
-	@Override
-	public boolean isURLSeparatorConfigurable() {
-		return !FeatureFlagManagerUtil.isEnabled("LPD-21926");
 	}
 
 	public void setObjectDefinition(ObjectDefinition objectDefinition) {

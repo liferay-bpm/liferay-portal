@@ -41,7 +41,7 @@ portletDisplay.setURLBack(backURL);
 				</clay:col>
 			</clay:row>
 
-			<c:if test='<%= FeatureFlagManagerUtil.isEnabled("LPD-21926") && objectDefinition.isEnableFriendlyURLCustomization() && defaultObjectLayout %>'>
+			<c:if test="<%= objectDefinition.isEnableFriendlyURLCustomization() && defaultObjectLayout %>">
 				<clay:panel-group>
 					<clay:panel
 						collapsable="<%= true %>"

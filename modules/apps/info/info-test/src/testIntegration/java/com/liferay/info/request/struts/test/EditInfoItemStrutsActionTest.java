@@ -49,7 +49,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.events.EventsProcessorUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.InfoFormException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
@@ -160,7 +159,6 @@ public class EditInfoItemStrutsActionTest {
 		_layout = _addLayout();
 	}
 
-	@FeatureFlag("LPD-21926")
 	@Test
 	@TestInfo("LPD-50584")
 	public void testAddAndUpdateInfoItemFriendlyURL() throws Exception {
@@ -896,10 +894,8 @@ public class EditInfoItemStrutsActionTest {
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
 				_user.getUserId(), 0, null, false,
-				enableFriendlyURLCustomization, true,
-				FeatureFlagManagerUtil.isEnabled(
-					TestPropsValues.getCompanyId(), "LPD-21926"),
-				true, false, false, null,
+				enableFriendlyURLCustomization, true, true, true, false, false,
+				null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null,
 				"control_panel.sites",

@@ -19,7 +19,6 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.web.internal.util.ObjectEntryUtil;
 import com.liferay.petra.string.CharPool;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
@@ -144,15 +143,12 @@ public class ObjectEntryLayoutDisplayPageProvider
 	public LayoutDisplayPageObjectProvider<ObjectEntry>
 		getLayoutDisplayPageObjectProvider(long groupId, String urlTitle) {
 
-		if (FeatureFlagManagerUtil.isEnabled("LPD-21926")) {
-			ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
-				groupId, _objectDefinition, urlTitle);
+		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
+			groupId, _objectDefinition, urlTitle);
 
-			if (objectEntry != null) {
-				return new ObjectEntryLayoutDisplayPageObjectProvider(
-					_infoItemFriendlyURLProvider, _objectDefinition,
-					objectEntry);
-			}
+		if (objectEntry != null) {
+			return new ObjectEntryLayoutDisplayPageObjectProvider(
+				_infoItemFriendlyURLProvider, _objectDefinition, objectEntry);
 		}
 
 		if (!_objectDefinition.isDefaultStorageType()) {

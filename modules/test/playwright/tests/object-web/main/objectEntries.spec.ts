@@ -53,7 +53,6 @@ const test = mergeTests(
 	isolatedSiteTest,
 	editObjectDefinitionPagesTest,
 	featureFlagsTest({
-		'LPD-21926': {enabled: true},
 		'LPS-178052': {enabled: true},
 	}),
 	formsPagesTest,

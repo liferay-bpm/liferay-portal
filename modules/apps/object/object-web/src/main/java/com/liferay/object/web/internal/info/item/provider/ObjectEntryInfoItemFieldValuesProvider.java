@@ -34,7 +34,6 @@ import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.web.internal.model.ProxyObjectEntry;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -199,21 +198,17 @@ public class ObjectEntryInfoItemFieldValuesProvider
 				_objectRelationshipLocalService, _objectScopeProviderRegistry,
 				_portal, themeDisplay, properties));
 
-		if (FeatureFlagManagerUtil.isEnabled(
-				_objectDefinition.getCompanyId(), "LPD-21926")) {
-
-			objectEntryFieldValues.add(
-				new InfoFieldValue<>(
-					ObjectEntryInfoItemFields.getFriendlyURLInfoField(
-						_objectDefinition),
-					() ->
-						ObjectEntryInfoItemValuesProviderUtil.
-							getFriendlyURLInfoFieldValue(
-								_portal.getClassNameId(
-									_objectDefinition.getClassName()),
-								_friendlyURLEntryLocalService,
-								objectEntry.getObjectEntryId())));
-		}
+		objectEntryFieldValues.add(
+			new InfoFieldValue<>(
+				ObjectEntryInfoItemFields.getFriendlyURLInfoField(
+					_objectDefinition),
+				() ->
+					ObjectEntryInfoItemValuesProviderUtil.
+						getFriendlyURLInfoFieldValue(
+							_portal.getClassNameId(
+								_objectDefinition.getClassName()),
+							_friendlyURLEntryLocalService,
+							objectEntry.getObjectEntryId())));
 
 		return objectEntryFieldValues;
 	}

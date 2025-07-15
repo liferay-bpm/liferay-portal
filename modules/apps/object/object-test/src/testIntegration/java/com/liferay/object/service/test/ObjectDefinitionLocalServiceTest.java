@@ -179,8 +179,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
  */
 @FeatureFlags(
 	featureFlags = {
-		@FeatureFlag(value = "LPD-17564"), @FeatureFlag(value = "LPD-21926"),
-		@FeatureFlag("LPD-34594")
+		@FeatureFlag(value = "LPD-17564"), @FeatureFlag("LPD-34594")
 	}
 )
 @RunWith(Arquillian.class)
