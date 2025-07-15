@@ -26,6 +26,7 @@ import com.liferay.object.exception.ObjectDefinitionEnableFriendlyURLCustomizati
 import com.liferay.object.exception.ObjectDefinitionEnableLocalizationException;
 import com.liferay.object.exception.ObjectDefinitionEnableObjectEntryHistoryException;
 import com.liferay.object.exception.ObjectDefinitionEnableObjectEntryScheduleException;
+import com.liferay.object.exception.ObjectDefinitionEnableObjectEntrySubscriptionException;
 import com.liferay.object.exception.ObjectDefinitionEnableObjectEntryVersioningException;
 import com.liferay.object.exception.ObjectDefinitionExternalReferenceCodeException;
 import com.liferay.object.exception.ObjectDefinitionFriendlyURLSeparatorException;
@@ -1352,7 +1353,8 @@ public class ObjectDefinitionLocalServiceTest {
 
 	@FeatureFlags(
 		featureFlags = {
-			@FeatureFlag(value = "LPD-17564"), @FeatureFlag(value = "LPD-32050")
+			@FeatureFlag(value = "LPD-17564"),
+			@FeatureFlag(value = "LPD-32050"), @FeatureFlag(value = "LPD-42577")
 		}
 	)
 	@Test
@@ -1385,6 +1387,23 @@ public class ObjectDefinitionLocalServiceTest {
 				null, TestPropsValues.getUserId(), 0,
 				ObjectDefinitionTestUtil.getRandomName(), null, false, false,
 				true, false, false, true, false, false, null,
+				RandomTestUtil.randomLocaleStringMap(), false,
+				ObjectDefinitionTestUtil.getRandomName(), null, null, null,
+				null, RandomTestUtil.randomLocaleStringMap(), false,
+				ObjectDefinitionConstants.SCOPE_COMPANY, null, 1,
+				WorkflowConstants.STATUS_APPROVED, Collections.emptyList(),
+				Collections.emptyList()));
+
+		// Enable object entry subscription
+
+		AssertUtils.assertFailure(
+			ObjectDefinitionEnableObjectEntrySubscriptionException.class,
+			"Enable object entry subscription is not allowed for " +
+				"unmodifiable system object definitions",
+			() -> _objectDefinitionLocalService.addSystemObjectDefinition(
+				null, TestPropsValues.getUserId(), 0,
+				ObjectDefinitionTestUtil.getRandomName(), null, false, false,
+				true, false, false, false, true, false, null,
 				RandomTestUtil.randomLocaleStringMap(), false,
 				ObjectDefinitionTestUtil.getRandomName(), null, null, null,
 				null, RandomTestUtil.randomLocaleStringMap(), false,
@@ -2512,13 +2531,17 @@ public class ObjectDefinitionLocalServiceTest {
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
-	@FeatureFlag("LPD-17564")
+	@FeatureFlags(
+		featureFlags = {
+			@FeatureFlag(value = "LPD-17564"), @FeatureFlag(value = "LPD-42577")
+		}
+	)
 	@Test
 	public void testUpdateCustomObjectDefinition() throws Exception {
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, false, true, false,
-				false, true, false, true, null,
+				false, true, true, true, null,
 				LocalizedMapUtil.getLocalizedMap("Able"), "Able", null, null,
 				LocalizedMapUtil.getLocalizedMap("Ables"), true,
 				ObjectDefinitionConstants.SCOPE_COMPANY,
@@ -2530,6 +2553,7 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertFalse(objectDefinition.isActive());
 		Assert.assertFalse(objectDefinition.isEnableFriendlyURLCustomization());
 		Assert.assertTrue(objectDefinition.isEnableObjectEntrySchedule());
+		Assert.assertTrue(objectDefinition.isEnableObjectEntrySubscription());
 		Assert.assertTrue(objectDefinition.isEnableObjectEntryVersioning());
 		Assert.assertTrue(
 			Validator.isBlank(objectDefinition.getFriendlyURLSeparator()));
@@ -2672,6 +2696,7 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertFalse(objectDefinition.isEnableIndexSearch());
 		Assert.assertFalse(objectDefinition.isEnableObjectEntryHistory());
 		Assert.assertFalse(objectDefinition.isEnableObjectEntrySchedule());
+		Assert.assertFalse(objectDefinition.isEnableObjectEntrySubscription());
 		Assert.assertFalse(objectDefinition.isEnableObjectEntryVersioning());
 		Assert.assertEquals("test", objectDefinition.getFriendlyURLSeparator());
 		Assert.assertEquals(
@@ -2686,7 +2711,7 @@ public class ObjectDefinitionLocalServiceTest {
 			_objectDefinitionLocalService.updateCustomObjectDefinition(
 				null, objectDefinition.getObjectDefinitionId(), 0, 0, 0, 0,
 				false, objectDefinition.isActive(), null, true, false, false,
-				true, false, false, true, true, false, true,
+				true, false, false, true, true, true, true,
 				FriendlyURLResolverConstants.URL_SEPARATOR_Y_OBJECT_ENTRY,
 				LocalizedMapUtil.getLocalizedMap("Baker"), "Baker", null, null,
 				false, LocalizedMapUtil.getLocalizedMap("Bakers"),
@@ -2700,6 +2725,7 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertTrue(objectDefinition.isEnableIndexSearch());
 		Assert.assertTrue(objectDefinition.isEnableObjectEntryHistory());
 		Assert.assertTrue(objectDefinition.isEnableObjectEntrySchedule());
+		Assert.assertTrue(objectDefinition.isEnableObjectEntrySubscription());
 		Assert.assertTrue(objectDefinition.isEnableObjectEntryVersioning());
 		Assert.assertEquals(
 			FriendlyURLResolverConstants.URL_SEPARATOR_Y_OBJECT_ENTRY,
@@ -2741,7 +2767,7 @@ public class ObjectDefinitionLocalServiceTest {
 			_objectDefinitionLocalService.updateCustomObjectDefinition(
 				null, objectDefinition.getObjectDefinitionId(), 0, 0, 0, 0,
 				false, true, objectDefinition.getClassName(), true, false, true,
-				false, false, false, true, true, false, true, null,
+				false, false, false, true, true, true, true, null,
 				LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie", null,
 				null, false, LocalizedMapUtil.getLocalizedMap("Charlies"),
 				objectDefinition.getScope(), objectDefinition.getStatus(),
@@ -2754,6 +2780,7 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertTrue(objectDefinition.isEnableIndexSearch());
 		Assert.assertTrue(objectDefinition.isEnableObjectEntryHistory());
 		Assert.assertTrue(objectDefinition.isEnableObjectEntrySchedule());
+		Assert.assertTrue(objectDefinition.isEnableObjectEntrySubscription());
 		Assert.assertTrue(objectDefinition.isEnableObjectEntryVersioning());
 		Assert.assertEquals(
 			"c_baker", objectDefinition.getFriendlyURLSeparator());
