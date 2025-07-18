@@ -21,6 +21,7 @@ import {TranslationsContainer} from './TranslationsContainer';
 import {useObjectDetailsForm} from './useObjectDetailsForm';
 
 import './ObjectDetails.scss';
+import {SubscriptionsContainer} from './SubscriptionsContainer';
 
 export type Scope = {
 	items: LabelValueObject[];
@@ -205,6 +206,10 @@ export default function EditObjectDetails({
 				values.storageType !== 'default') ||
 			(!values.modifiable && values.system)
 		);
+
+	const showSubscriptionSection =
+		Liferay.FeatureFlags['LPD-42577'] &&
+		!(!values.modifiable && values.system);
 
 	return (
 		<>
@@ -393,6 +398,22 @@ export default function EditObjectDetails({
 									hasUpdateObjectDefinitionPermission={
 										hasUpdateObjectDefinitionPermission
 									}
+									setValues={setValues}
+									values={values}
+								/>
+							</ClayPanel.Body>
+						</ClayPanel>
+					)}
+
+					{showSubscriptionSection && (
+						<ClayPanel
+							collapsable
+							defaultExpanded
+							displayTitle={Liferay.Language.get('subscriptions')}
+							displayType="unstyled"
+						>
+							<ClayPanel.Body>
+								<SubscriptionsContainer
 									setValues={setValues}
 									values={values}
 								/>
