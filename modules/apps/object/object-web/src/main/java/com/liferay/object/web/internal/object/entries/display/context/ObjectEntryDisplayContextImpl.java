@@ -1084,13 +1084,11 @@ public class ObjectEntryDisplayContextImpl
 		// TODO Store the type and the object field type in the database
 
 		ObjectFieldBusinessType objectFieldBusinessType =
-			_objectFieldBusinessTypeRegistry.getObjectFieldBusinessType(
-				objectField.getBusinessType());
+			_getEffectiveObjectFieldBusinessType(objectField);
 
 		DDMFormField ddmFormField = new DDMFormField(
 			objectField.getName(),
-			objectFieldBusinessType.getDDMFormFieldTypeName(
-				objectField.isLocalized()));
+			objectFieldBusinessType.getDDMFormFieldTypeName(objectField));
 
 		if (!readOnly) {
 			readOnly = ObjectFieldUtil.isReadOnly(
@@ -1285,8 +1283,7 @@ public class ObjectEntryDisplayContextImpl
 		throws PortalException {
 
 		ObjectFieldBusinessType objectFieldBusinessType =
-			_objectFieldBusinessTypeRegistry.getObjectFieldBusinessType(
-				objectField.getBusinessType());
+			_getEffectiveObjectFieldBusinessType(objectField);
 
 		return objectFieldBusinessType.getDisplayContextValue(
 			objectField, _objectRequestHelper.getUserId(), values);
@@ -1297,6 +1294,22 @@ public class ObjectEntryDisplayContextImpl
 			false, null, null, _objectRequestHelper.getRequest(), null,
 			_themeDisplay.getSiteDefaultLocale(), null,
 			_themeDisplay.getUser());
+	}
+
+	private ObjectFieldBusinessType _getEffectiveObjectFieldBusinessType(
+		ObjectField objectField) {
+
+		if (Objects.equals(
+				objectField.getBusinessType(),
+				ObjectFieldConstants.BUSINESS_TYPE_DATE) &&
+			objectField.isMetadata()) {
+
+			return _objectFieldBusinessTypeRegistry.getObjectFieldBusinessType(
+				ObjectFieldConstants.BUSINESS_TYPE_DATE_TIME);
+		}
+
+		return _objectFieldBusinessTypeRegistry.getObjectFieldBusinessType(
+			objectField.getBusinessType());
 	}
 
 	private long _getGroupId() {
