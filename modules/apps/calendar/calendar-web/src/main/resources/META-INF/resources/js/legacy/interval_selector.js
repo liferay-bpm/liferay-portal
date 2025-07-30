@@ -267,9 +267,7 @@ AUI.add(
 					instance._startDate = new Date();
 					instance._validDate = true;
 
-					instance._initPicker(instance.get('endDatePicker'));
 					instance._initPicker(instance.get('endTimePicker'));
-					instance._initPicker(instance.get('startDatePicker'));
 					instance._initPicker(instance.get('startTimePicker'));
 
 					instance._setEndDate();
