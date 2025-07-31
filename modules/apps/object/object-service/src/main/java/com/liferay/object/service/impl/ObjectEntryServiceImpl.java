@@ -243,13 +243,13 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 	@Override
 	public List<ObjectEntry> getManyToManyObjectEntries(
-			long groupId, long objectRelationshipId, long primaryKey,
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
 			boolean related, boolean reverse, String search, int start, int end)
 		throws PortalException {
 
 		List<ObjectEntry> objectEntries =
 			objectEntryLocalService.getManyToManyObjectEntries(
-				groupId, objectRelationshipId, primaryKey, related, reverse,
+				groupId, objectRelationshipId, primaryKeys, related, reverse,
 				search, start, end);
 
 		if (!ObjectEntryThreadLocal.isSkipObjectEntryResourcePermission()) {
@@ -265,12 +265,12 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 	@Override
 	public int getManyToManyObjectEntriesCount(
-			long groupId, long objectRelationshipId, long primaryKey,
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
 			boolean related, boolean reverse, String search)
 		throws PortalException {
 
 		return objectEntryLocalService.getManyToManyObjectEntriesCount(
-			groupId, objectRelationshipId, primaryKey, related, reverse,
+			groupId, objectRelationshipId, primaryKeys, related, reverse,
 			search);
 	}
 
@@ -326,13 +326,13 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 	@Override
 	public List<ObjectEntry> getOneToManyObjectEntries(
-			long groupId, long objectRelationshipId, long primaryKey,
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
 			boolean related, String search, int start, int end)
 		throws PortalException {
 
 		List<ObjectEntry> objectEntries =
 			objectEntryLocalService.getOneToManyObjectEntries(
-				groupId, objectRelationshipId, primaryKey, related, search,
+				groupId, objectRelationshipId, primaryKeys, related, search,
 				start, end);
 
 		if (!ObjectEntryThreadLocal.isSkipObjectEntryResourcePermission()) {
@@ -348,12 +348,12 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 	@Override
 	public int getOneToManyObjectEntriesCount(
-			long groupId, long objectRelationshipId, long primaryKey,
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
 			boolean related, String search)
 		throws PortalException {
 
 		return objectEntryLocalService.getOneToManyObjectEntriesCount(
-			groupId, objectRelationshipId, primaryKey, related, search);
+			groupId, objectRelationshipId, primaryKeys, related, search);
 	}
 
 	@Override

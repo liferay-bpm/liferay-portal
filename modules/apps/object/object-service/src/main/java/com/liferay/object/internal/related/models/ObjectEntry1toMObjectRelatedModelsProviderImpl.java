@@ -152,8 +152,19 @@ public class ObjectEntry1toMObjectRelatedModelsProviderImpl
 			String search, int start, int end)
 		throws PortalException {
 
+		return getRelatedModels(
+			groupId, objectRelationshipId, new Long[] {primaryKey}, search,
+			start, end);
+	}
+
+	@Override
+	public List<ObjectEntry> getRelatedModels(
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
+			String search, int start, int end)
+		throws PortalException {
+
 		return _objectEntryService.getOneToManyObjectEntries(
-			groupId, objectRelationshipId, primaryKey, true, search, start,
+			groupId, objectRelationshipId, primaryKeys, true, search, start,
 			end);
 	}
 
@@ -163,8 +174,18 @@ public class ObjectEntry1toMObjectRelatedModelsProviderImpl
 			String search)
 		throws PortalException {
 
+		return getRelatedModelsCount(
+			groupId, objectRelationshipId, new Long[] {primaryKey}, search);
+	}
+
+	@Override
+	public int getRelatedModelsCount(
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
+			String search)
+		throws PortalException {
+
 		return _objectEntryService.getOneToManyObjectEntriesCount(
-			groupId, objectRelationshipId, primaryKey, true, search);
+			groupId, objectRelationshipId, primaryKeys, true, search);
 	}
 
 	@Override
@@ -175,8 +196,8 @@ public class ObjectEntry1toMObjectRelatedModelsProviderImpl
 		throws PortalException {
 
 		return _objectEntryService.getOneToManyObjectEntries(
-			groupId, objectRelationshipId, objectEntryId, false, search, start,
-			end);
+			groupId, objectRelationshipId, new Long[] {objectEntryId}, false,
+			search, start, end);
 	}
 
 	@Override
@@ -186,7 +207,8 @@ public class ObjectEntry1toMObjectRelatedModelsProviderImpl
 		throws PortalException {
 
 		return _objectEntryService.getOneToManyObjectEntriesCount(
-			groupId, objectRelationshipId, objectEntryId, false, search);
+			groupId, objectRelationshipId, new Long[] {objectEntryId}, false,
+			search);
 	}
 
 	@Override
