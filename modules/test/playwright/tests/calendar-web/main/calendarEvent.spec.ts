@@ -76,6 +76,31 @@ test.beforeEach(
 	}
 );
 
+test('add event modal follows accessibility guidelines related to focus when navigating with tab', async ({
+	calendarWidgetPage,
+	page,
+}) => {
+	await calendarWidgetPage.clickAddEventButton();
+
+	await expect(page.locator('h1.modal-title')).toBeFocused();
+
+	await page.keyboard.down('Tab');
+
+	await expect(calendarWidgetPage.closeEventModalButton).toBeFocused();
+
+	await page.keyboard.down('Tab');
+
+	await expect(calendarWidgetPage.title).toBeFocused();
+
+	await page.keyboard.down('Tab');
+
+	await expect(calendarWidgetPage.titleLocalesDropdown).toBeFocused();
+
+	await page.keyboard.down('Tab');
+
+	await expect(calendarWidgetPage.startDate).toBeFocused();
+});
+
 test('assert that past events have respective class within the click more dropdown', async ({
 	calendarWidgetPage,
 	page,
