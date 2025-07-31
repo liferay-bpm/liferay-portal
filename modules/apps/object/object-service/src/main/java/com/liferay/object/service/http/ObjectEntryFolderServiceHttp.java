@@ -426,22 +426,27 @@ public class ObjectEntryFolderServiceHttp {
 		}
 	}
 
-	public static void subscribeObjectEntryFolder(
-			HttpPrincipal httpPrincipal, long userId, long groupId,
-			long objectEntryFolderId)
+	public static com.liferay.object.model.ObjectEntryFolder
+			getOrAddEmptyObjectEntryFolder(
+				HttpPrincipal httpPrincipal, String externalReferenceCode,
+				long groupId, long companyId, long userId,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryFolderServiceUtil.class,
-				"subscribeObjectEntryFolder",
-				_subscribeObjectEntryFolderParameterTypes9);
+				"getOrAddEmptyObjectEntryFolder",
+				_getOrAddEmptyObjectEntryFolderParameterTypes9);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, userId, groupId, objectEntryFolderId);
+				methodKey, externalReferenceCode, groupId, companyId, userId,
+				serviceContext);
+
+			Object returnObj = null;
 
 			try {
-				TunnelUtil.invoke(httpPrincipal, methodHandler);
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception exception) {
 				if (exception instanceof
@@ -454,44 +459,8 @@ public class ObjectEntryFolderServiceHttp {
 				throw new com.liferay.portal.kernel.exception.SystemException(
 					exception);
 			}
-		}
-		catch (com.liferay.portal.kernel.exception.SystemException
-					systemException) {
 
-			_log.error(systemException, systemException);
-
-			throw systemException;
-		}
-	}
-
-	public static void unsubscribeObjectEntryFolder(
-			HttpPrincipal httpPrincipal, long userId, long groupId,
-			long objectEntryFolderId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		try {
-			MethodKey methodKey = new MethodKey(
-				ObjectEntryFolderServiceUtil.class,
-				"unsubscribeObjectEntryFolder",
-				_unsubscribeObjectEntryFolderParameterTypes10);
-
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, userId, groupId, objectEntryFolderId);
-
-			try {
-				TunnelUtil.invoke(httpPrincipal, methodHandler);
-			}
-			catch (Exception exception) {
-				if (exception instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						exception;
-				}
-
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					exception);
-			}
+			return (com.liferay.object.model.ObjectEntryFolder)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException
 					systemException) {
@@ -575,16 +544,26 @@ public class ObjectEntryFolderServiceHttp {
 		new Class[] {long.class, long.class, long.class, int.class, int.class};
 	private static final Class<?>[] _getObjectEntryFoldersCountParameterTypes8 =
 		new Class[] {long.class, long.class, long.class};
-	private static final Class<?>[] _subscribeObjectEntryFolderParameterTypes9 =
-		new Class[] {long.class, long.class, long.class};
 	private static final Class<?>[]
-		_unsubscribeObjectEntryFolderParameterTypes10 = new Class[] {
-			long.class, long.class, long.class
+		_getOrAddEmptyObjectEntryFolderParameterTypes9 = new Class[] {
+			String.class, long.class, long.class, long.class,
+			com.liferay.portal.kernel.service.ServiceContext.class
+		};
+	private static final Class<?>[] _updateObjectEntryFolderParameterTypes10 =
+		new Class[] {
+			long.class, long.class, String.class, java.util.Map.class,
+			String.class, com.liferay.portal.kernel.service.ServiceContext.class
 		};
 	private static final Class<?>[] _updateObjectEntryFolderParameterTypes11 =
 		new Class[] {
 			long.class, long.class, String.class, java.util.Map.class,
 			String.class, com.liferay.portal.kernel.service.ServiceContext.class
+		};
+	private static final Class<?>[] _subscribeObjectEntryFolderParameterTypes9 =
+		new Class[] {long.class, long.class, long.class};
+	private static final Class<?>[]
+		_unsubscribeObjectEntryFolderParameterTypes10 = new Class[] {
+			long.class, long.class, long.class
 		};
 
 }
