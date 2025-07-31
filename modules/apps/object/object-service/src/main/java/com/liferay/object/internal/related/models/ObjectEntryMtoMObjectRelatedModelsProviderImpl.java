@@ -46,8 +46,8 @@ public class ObjectEntryMtoMObjectRelatedModelsProviderImpl
 		throws PortalException {
 
 		List<ObjectEntry> relatedModels = getRelatedModels(
-			groupId, objectRelationshipId, primaryKey, null, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS);
+			groupId, objectRelationshipId, new Long[] {primaryKey}, null,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		if (relatedModels.isEmpty()) {
 			return;
@@ -107,8 +107,19 @@ public class ObjectEntryMtoMObjectRelatedModelsProviderImpl
 		return ObjectRelationshipConstants.TYPE_MANY_TO_MANY;
 	}
 
+	@Override
 	public List<ObjectEntry> getRelatedModels(
 			long groupId, long objectRelationshipId, long primaryKey,
+			String search, int start, int end)
+		throws PortalException {
+
+		return getRelatedModels(
+			groupId, objectRelationshipId, new Long[] {primaryKey}, search,
+			start, end);
+	}
+
+	public List<ObjectEntry> getRelatedModels(
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
 			String search, int start, int end)
 		throws PortalException {
 
@@ -117,7 +128,7 @@ public class ObjectEntryMtoMObjectRelatedModelsProviderImpl
 				objectRelationshipId);
 
 		return _objectEntryService.getManyToManyObjectEntries(
-			groupId, objectRelationship.getObjectRelationshipId(), primaryKey,
+			groupId, objectRelationship.getObjectRelationshipId(), primaryKeys,
 			true, objectRelationship.isReverse(), search, start, end);
 	}
 
@@ -127,12 +138,22 @@ public class ObjectEntryMtoMObjectRelatedModelsProviderImpl
 			String search)
 		throws PortalException {
 
+		return getRelatedModelsCount(
+			groupId, objectRelationshipId, new Long[] {primaryKey}, search);
+	}
+
+	@Override
+	public int getRelatedModelsCount(
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
+			String search)
+		throws PortalException {
+
 		ObjectRelationship objectRelationship =
 			_objectRelationshipLocalService.getObjectRelationship(
 				objectRelationshipId);
 
 		return _objectEntryService.getManyToManyObjectEntriesCount(
-			groupId, objectRelationship.getObjectRelationshipId(), primaryKey,
+			groupId, objectRelationship.getObjectRelationshipId(), primaryKeys,
 			true, objectRelationship.isReverse(), search);
 	}
 
@@ -149,8 +170,8 @@ public class ObjectEntryMtoMObjectRelatedModelsProviderImpl
 
 		return _objectEntryService.getManyToManyObjectEntries(
 			groupId, objectRelationship.getObjectRelationshipId(),
-			objectEntryId, false, objectRelationship.isReverse(), search, start,
-			end);
+			new Long[] {objectEntryId}, false, objectRelationship.isReverse(),
+			search, start, end);
 	}
 
 	@Override
@@ -165,7 +186,8 @@ public class ObjectEntryMtoMObjectRelatedModelsProviderImpl
 
 		return _objectEntryService.getManyToManyObjectEntriesCount(
 			groupId, objectRelationship.getObjectRelationshipId(),
-			objectEntryId, false, objectRelationship.isReverse(), search);
+			new Long[] {objectEntryId}, false, objectRelationship.isReverse(),
+			search);
 	}
 
 	@Override

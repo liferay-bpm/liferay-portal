@@ -1021,9 +1021,20 @@ public class ObjectEntryLocalServiceImpl
 			boolean related, boolean reverse, String search, int start, int end)
 		throws PortalException {
 
+		return getManyToManyObjectEntries(
+			groupId, objectRelationshipId, new Long[] {primaryKey}, related,
+			reverse, search, start, end);
+	}
+
+	@Override
+	public List<ObjectEntry> getManyToManyObjectEntries(
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
+			boolean related, boolean reverse, String search, int start, int end)
+		throws PortalException {
+
 		DSLQuery dslQuery = _getManyToManyObjectEntriesGroupByStep(
 			DSLQueryFactoryUtil.selectDistinct(ObjectEntryTable.INSTANCE),
-			groupId, objectRelationshipId, primaryKey, related, reverse, search
+			groupId, objectRelationshipId, primaryKeys, related, reverse, search
 		).orderBy(
 			ObjectEntryTable.INSTANCE.objectEntryId.ascending()
 		).limit(
@@ -1043,10 +1054,21 @@ public class ObjectEntryLocalServiceImpl
 			boolean related, boolean reverse, String search)
 		throws PortalException {
 
+		return getManyToManyObjectEntriesCount(
+			groupId, objectRelationshipId, new Long[] {primaryKey}, related,
+			reverse, search);
+	}
+
+	@Override
+	public int getManyToManyObjectEntriesCount(
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
+			boolean related, boolean reverse, String search)
+		throws PortalException {
+
 		DSLQuery dslQuery = _getManyToManyObjectEntriesGroupByStep(
 			DSLQueryFactoryUtil.countDistinct(
 				ObjectEntryTable.INSTANCE.objectEntryId),
-			groupId, objectRelationshipId, primaryKey, related, reverse,
+			groupId, objectRelationshipId, primaryKeys, related, reverse,
 			search);
 
 		if (_log.isDebugEnabled()) {
@@ -1170,9 +1192,20 @@ public class ObjectEntryLocalServiceImpl
 			boolean related, String search, int start, int end)
 		throws PortalException {
 
+		return getOneToManyObjectEntries(
+			groupId, objectRelationshipId, new Long[] {primaryKey}, related,
+			search, start, end);
+	}
+
+	@Override
+	public List<ObjectEntry> getOneToManyObjectEntries(
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
+			boolean related, String search, int start, int end)
+		throws PortalException {
+
 		DSLQuery dslQuery = _getOneToManyObjectEntriesGroupByStep(
 			DSLQueryFactoryUtil.selectDistinct(ObjectEntryTable.INSTANCE),
-			groupId, objectRelationshipId, primaryKey, related, search
+			groupId, objectRelationshipId, primaryKeys, related, search
 		).orderBy(
 			ObjectEntryTable.INSTANCE.objectEntryId.ascending()
 		).limit(
@@ -1192,10 +1225,21 @@ public class ObjectEntryLocalServiceImpl
 			boolean related, String search)
 		throws PortalException {
 
+		return getOneToManyObjectEntriesCount(
+			groupId, objectRelationshipId, new Long[] {primaryKey}, related,
+			search);
+	}
+
+	@Override
+	public int getOneToManyObjectEntriesCount(
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
+			boolean related, String search)
+		throws PortalException {
+
 		DSLQuery dslQuery = _getOneToManyObjectEntriesGroupByStep(
 			DSLQueryFactoryUtil.countDistinct(
 				ObjectEntryTable.INSTANCE.objectEntryId),
-			groupId, objectRelationshipId, primaryKey, related, search);
+			groupId, objectRelationshipId, primaryKeys, related, search);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
@@ -3808,7 +3852,7 @@ public class ObjectEntryLocalServiceImpl
 
 	private GroupByStep _getManyToManyObjectEntriesGroupByStep(
 			FromStep fromStep, long groupId, long objectRelationshipId,
-			long primaryKey, boolean related, boolean reverse, String search)
+			Long[] primaryKeys, boolean related, boolean reverse, String search)
 		throws PortalException {
 
 		ObjectRelationship objectRelationship =
@@ -3911,7 +3955,7 @@ public class ObjectEntryLocalServiceImpl
 			).and(
 				() -> {
 					if (related) {
-						return primaryKeyColumn1.eq(primaryKey);
+						return primaryKeyColumn1.in(primaryKeys);
 					}
 
 					return dynamicObjectDefinitionTablePrimaryKeyColumn.notIn(
@@ -3920,19 +3964,17 @@ public class ObjectEntryLocalServiceImpl
 						).from(
 							dynamicObjectRelationshipMappingTable
 						).where(
-							primaryKeyColumn1.eq(primaryKey)
+							primaryKeyColumn1.in(primaryKeys)
 						));
 				}
 			).and(
 				() -> {
-					if (objectDefinition1.getObjectDefinitionId() !=
-							objectDefinition2.getObjectDefinitionId()) {
-
-						return null;
+					if (objectRelationship.isSelf()) {
+						return dynamicObjectDefinitionTablePrimaryKeyColumn.
+							notIn(primaryKeys);
 					}
 
-					return dynamicObjectDefinitionTablePrimaryKeyColumn.neq(
-						primaryKey);
+					return null;
 				}
 			).and(
 				ObjectEntrySearchUtil.getRelatedModelsPredicate(
@@ -3958,7 +4000,7 @@ public class ObjectEntryLocalServiceImpl
 
 	private GroupByStep _getOneToManyObjectEntriesGroupByStep(
 			FromStep fromStep, long groupId, long objectRelationshipId,
-			long primaryKey, boolean related, String search)
+			Long[] primaryKeys, boolean related, String search)
 		throws PortalException {
 
 		ObjectRelationship objectRelationship =
@@ -4042,12 +4084,11 @@ public class ObjectEntryLocalServiceImpl
 									objectField.getDBColumnName());
 					}
 
-					return column.eq(related ? primaryKey : 0L);
+					return column.in(primaryKeys);
 				}
 			).and(
-				() ->
-					objectRelationship.isSelf() ?
-						primaryKeyColumn.neq(primaryKey) : null
+				() -> objectRelationship.isSelf() ?
+					primaryKeyColumn.notIn(primaryKeys) : null
 			).and(
 				() -> {
 					if (ObjectEntryThreadLocal.
