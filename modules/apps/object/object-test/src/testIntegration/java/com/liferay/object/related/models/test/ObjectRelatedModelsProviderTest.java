@@ -260,6 +260,8 @@ public class ObjectRelatedModelsProviderTest {
 		ObjectEntry objectEntry1 = _addObjectEntry(
 			_objectDefinition1, Collections.emptyMap());
 		ObjectEntry objectEntry2 = _addObjectEntry(
+			_objectDefinition1, Collections.emptyMap());
+		ObjectEntry objectEntry3 = _addObjectEntry(
 			_objectDefinition2, Collections.emptyMap());
 
 		ObjectRelationshipTestUtil.assertGetRelatedModels(
@@ -267,7 +269,7 @@ public class ObjectRelatedModelsProviderTest {
 			_objectRelationship.getObjectRelationshipId(),
 			objectEntry1.getObjectEntryId());
 
-		ObjectEntry objectEntry3 = _addObjectEntry(
+		ObjectEntry objectEntry4 = _addObjectEntry(
 			_objectDefinition2,
 			HashMapBuilder.<String, Serializable>put(
 				"able", "First Entry"
@@ -280,6 +282,27 @@ public class ObjectRelatedModelsProviderTest {
 			1, _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
 			objectEntry1.getObjectEntryId());
+
+		ObjectRelationshipTestUtil.assertGetRelatedModels(
+			1, _objectRelatedModelsProvider,
+			_objectRelationship.getObjectRelationshipId(),
+			new Long[] {
+				objectEntry1.getObjectEntryId(), objectEntry2.getObjectEntryId()
+			});
+
+		_addObjectEntry(
+			_objectDefinition2,
+			HashMapBuilder.<String, Serializable>put(
+				_relationshipObjectField.getName(),
+				objectEntry2.getObjectEntryId()
+			).build());
+
+		ObjectRelationshipTestUtil.assertGetRelatedModels(
+			2, _objectRelatedModelsProvider,
+			_objectRelationship.getObjectRelationshipId(),
+			new Long[] {
+				objectEntry1.getObjectEntryId(), objectEntry2.getObjectEntryId()
+			});
 
 		_addObjectEntry(
 			_objectDefinition2,
@@ -296,7 +319,7 @@ public class ObjectRelatedModelsProviderTest {
 			objectEntry1.getObjectEntryId());
 
 		_updateObjectEntry(
-			objectEntry2.getObjectEntryId(),
+			objectEntry3.getObjectEntryId(),
 			HashMapBuilder.<String, Serializable>put(
 				"able", "Third Entry"
 			).put(
@@ -382,7 +405,7 @@ public class ObjectRelatedModelsProviderTest {
 			1, _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
 			objectEntry1.getObjectEntryId(),
-			String.valueOf(objectEntry2.getObjectEntryId()));
+			String.valueOf(objectEntry3.getObjectEntryId()));
 		ObjectRelationshipTestUtil.assertSearchRelatedModels(
 			1, _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
@@ -397,7 +420,7 @@ public class ObjectRelatedModelsProviderTest {
 			objectEntry1.getObjectEntryId(), "Entry");
 
 		_updateObjectEntry(
-			objectEntry3.getObjectEntryId(),
+			objectEntry4.getObjectEntryId(),
 			HashMapBuilder.<String, Serializable>put(
 				_relationshipObjectField.getName(), 0
 			).build());
@@ -412,7 +435,7 @@ public class ObjectRelatedModelsProviderTest {
 		_setUser(_user);
 
 		_assertViewPermission(
-			_objectDefinition2, objectEntry1, objectEntry2.getObjectEntryId());
+			_objectDefinition2, objectEntry1, objectEntry3.getObjectEntryId());
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
 			_objectRelationship);
@@ -448,34 +471,34 @@ public class ObjectRelatedModelsProviderTest {
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
-		ObjectEntry objectEntry4 = _addObjectEntry(
+		ObjectEntry objectEntry6 = _addObjectEntry(
 			_objectDefinition1, Collections.emptyMap());
 
 		ObjectRelationshipTestUtil.assertGetRelatedModels(
 			0, _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry4.getObjectEntryId());
+			objectEntry6.getObjectEntryId());
 
 		Group group = GroupTestUtil.addGroup();
 
-		ObjectEntry objectEntry6 = ObjectEntryTestUtil.addObjectEntry(
+		ObjectEntry objectEntry7 = ObjectEntryTestUtil.addObjectEntry(
 			group.getGroupId(),
 			scopeSiteObjectDefinition.getObjectDefinitionId(),
 			HashMapBuilder.<String, Serializable>put(
 				_relationshipObjectField.getName(),
-				objectEntry4.getObjectEntryId()
+				objectEntry6.getObjectEntryId()
 			).build());
 
 		ObjectRelationshipTestUtil.assertGetRelatedModels(
 			1, _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry4.getObjectEntryId());
+			objectEntry6.getObjectEntryId());
 
-		_objectEntryLocalService.deleteObjectEntry(objectEntry4);
+		_objectEntryLocalService.deleteObjectEntry(objectEntry6);
 
 		Assert.assertNull(
 			_objectEntryLocalService.fetchObjectEntry(
-				objectEntry6.getObjectEntryId()));
+				objectEntry7.getObjectEntryId()));
 
 		// Object relationship deletion type disassociate
 
@@ -485,32 +508,32 @@ public class ObjectRelatedModelsProviderTest {
 			ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE,
 			_objectRelationship.getLabelMap());
 
-		ObjectEntry objectEntry7 = _addObjectEntry(
+		ObjectEntry objectEntry8 = _addObjectEntry(
 			_objectDefinition1, Collections.emptyMap());
 
-		ObjectEntry objectEntry8 = ObjectEntryTestUtil.addObjectEntry(
+		ObjectEntry objectEntry9 = ObjectEntryTestUtil.addObjectEntry(
 			group.getGroupId(),
 			scopeSiteObjectDefinition.getObjectDefinitionId(),
 			HashMapBuilder.<String, Serializable>put(
 				_relationshipObjectField.getName(),
-				objectEntry7.getObjectEntryId()
+				objectEntry8.getObjectEntryId()
 			).build());
 
 		ObjectRelationshipTestUtil.assertGetRelatedModels(
 			1, _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry7.getObjectEntryId());
+			objectEntry8.getObjectEntryId());
 
-		_objectEntryLocalService.deleteObjectEntry(objectEntry7);
+		_objectEntryLocalService.deleteObjectEntry(objectEntry8);
 
 		Assert.assertNotNull(
 			_objectEntryLocalService.fetchObjectEntry(
-				objectEntry8.getObjectEntryId()));
+				objectEntry9.getObjectEntryId()));
 
 		ObjectRelationshipTestUtil.assertGetRelatedModels(
 			0, _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry7.getObjectEntryId());
+			objectEntry8.getObjectEntryId());
 
 		// Object relationship deletion type prevent
 
@@ -520,20 +543,20 @@ public class ObjectRelatedModelsProviderTest {
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
 			_objectRelationship.getLabelMap());
 
-		ObjectEntry objectEntry9 = _addObjectEntry(
+		ObjectEntry objectEntry10 = _addObjectEntry(
 			_objectDefinition1, Collections.emptyMap());
 
 		_updateObjectEntry(
-			objectEntry8.getObjectEntryId(),
+			objectEntry9.getObjectEntryId(),
 			HashMapBuilder.<String, Serializable>put(
 				_relationshipObjectField.getName(),
-				objectEntry9.getObjectEntryId()
+				objectEntry10.getObjectEntryId()
 			).build());
 
 		ObjectRelationshipTestUtil.assertGetRelatedModels(
 			1, _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry9.getObjectEntryId());
+			objectEntry10.getObjectEntryId());
 
 		AssertUtils.assertFailure(
 			RequiredObjectRelationshipException.class,
@@ -541,12 +564,12 @@ public class ObjectRelatedModelsProviderTest {
 				"Object relationship ",
 				_objectRelationship.getObjectRelationshipId(),
 				" does not allow deletes"),
-			() -> _objectEntryLocalService.deleteObjectEntry(objectEntry9));
+			() -> _objectEntryLocalService.deleteObjectEntry(objectEntry10));
 
 		ObjectRelationshipTestUtil.assertGetRelatedModels(
 			1, _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry9.getObjectEntryId());
+			objectEntry10.getObjectEntryId());
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
 			_objectRelationship);
@@ -1032,6 +1055,8 @@ public class ObjectRelatedModelsProviderTest {
 		ObjectEntry objectEntry1 = _addObjectEntry(
 			objectDefinition1, Collections.emptyMap());
 		ObjectEntry objectEntry2 = _addObjectEntry(
+			objectDefinition1, Collections.emptyMap());
+		ObjectEntry objectEntry3 = _addObjectEntry(
 			objectDefinition2,
 			HashMapBuilder.<String, Serializable>put(
 				"able", "First Entry"
@@ -1044,14 +1069,32 @@ public class ObjectRelatedModelsProviderTest {
 
 		ObjectRelationshipTestUtil.addObjectRelationshipMappingTableValues(
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry1.getObjectEntryId(), objectEntry2.getObjectEntryId());
+			objectEntry1.getObjectEntryId(), objectEntry3.getObjectEntryId());
 
 		ObjectRelationshipTestUtil.assertGetRelatedModels(
 			1, _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
 			objectEntry1.getObjectEntryId());
 
-		ObjectEntry objectEntry3 = _addObjectEntry(
+		ObjectRelationshipTestUtil.assertGetRelatedModels(
+			1, _objectRelatedModelsProvider,
+			_objectRelationship.getObjectRelationshipId(),
+			new Long[] {
+				objectEntry1.getObjectEntryId(), objectEntry2.getObjectEntryId()
+			});
+
+		ObjectRelationshipTestUtil.addObjectRelationshipMappingTableValues(
+			_objectRelationship.getObjectRelationshipId(),
+			objectEntry2.getObjectEntryId(), objectEntry3.getObjectEntryId());
+
+		ObjectRelationshipTestUtil.assertGetRelatedModels(
+			1, _objectRelatedModelsProvider,
+			_objectRelationship.getObjectRelationshipId(),
+			new Long[] {
+				objectEntry1.getObjectEntryId(), objectEntry2.getObjectEntryId()
+			});
+
+		ObjectEntry objectEntry4 = _addObjectEntry(
 			objectDefinition2,
 			HashMapBuilder.<String, Serializable>put(
 				"able", "Second Entry"
@@ -1059,7 +1102,7 @@ public class ObjectRelatedModelsProviderTest {
 
 		ObjectRelationshipTestUtil.addObjectRelationshipMappingTableValues(
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry1.getObjectEntryId(), objectEntry3.getObjectEntryId());
+			objectEntry1.getObjectEntryId(), objectEntry4.getObjectEntryId());
 
 		ObjectRelationshipTestUtil.assertGetRelatedModels(
 			2, _objectRelatedModelsProvider,
@@ -1069,20 +1112,20 @@ public class ObjectRelatedModelsProviderTest {
 		// Get related models with search
 
 		ObjectRelationshipTestUtil.assertSearchRelatedModels(
-			0, objectEntry2.getGroupId(), _objectRelatedModelsProvider,
+			0, objectEntry3.getGroupId(), _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
 			objectEntry1.getObjectEntryId(), StringUtil.randomString());
 		ObjectRelationshipTestUtil.assertSearchRelatedModels(
-			1, objectEntry2.getGroupId(), _objectRelatedModelsProvider,
+			1, objectEntry3.getGroupId(), _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
 			objectEntry1.getObjectEntryId(),
-			String.valueOf(objectEntry2.getObjectEntryId()));
+			String.valueOf(objectEntry3.getObjectEntryId()));
 		ObjectRelationshipTestUtil.assertSearchRelatedModels(
-			1, objectEntry2.getGroupId(), _objectRelatedModelsProvider,
+			1, objectEntry3.getGroupId(), _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
 			objectEntry1.getObjectEntryId(), "First ");
 		ObjectRelationshipTestUtil.assertSearchRelatedModels(
-			2, objectEntry2.getGroupId(), _objectRelatedModelsProvider,
+			2, objectEntry3.getGroupId(), _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
 			objectEntry1.getObjectEntryId(), " Entry");
 
@@ -1091,7 +1134,7 @@ public class ObjectRelatedModelsProviderTest {
 		_setUser(_user);
 
 		_assertViewPermission(
-			objectDefinition2, objectEntry1, objectEntry2.getObjectEntryId());
+			objectDefinition2, objectEntry1, objectEntry3.getObjectEntryId());
 
 		_setUser(TestPropsValues.getUser());
 
@@ -1103,14 +1146,14 @@ public class ObjectRelatedModelsProviderTest {
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 			_objectRelationship.getLabelMap());
 
-		_objectEntryLocalService.deleteObjectEntry(objectEntry3);
+		_objectEntryLocalService.deleteObjectEntry(objectEntry4);
 
 		Assert.assertNotNull(
 			_objectEntryLocalService.fetchObjectEntry(
 				objectEntry1.getObjectEntryId()));
 		Assert.assertNull(
 			_objectEntryLocalService.fetchObjectEntry(
-				objectEntry3.getObjectEntryId()));
+				objectEntry4.getObjectEntryId()));
 
 		ObjectRelationshipTestUtil.assertGetRelatedModels(
 			1, _objectRelatedModelsProvider,
@@ -1124,7 +1167,7 @@ public class ObjectRelatedModelsProviderTest {
 				objectEntry1.getObjectEntryId()));
 		Assert.assertNull(
 			_objectEntryLocalService.fetchObjectEntry(
-				objectEntry2.getObjectEntryId()));
+				objectEntry3.getObjectEntryId()));
 
 		// Object relationship deletion type disassociate
 
@@ -1134,31 +1177,31 @@ public class ObjectRelatedModelsProviderTest {
 			ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE,
 			_objectRelationship.getLabelMap());
 
-		ObjectEntry objectEntry4 = _addObjectEntry(
-			objectDefinition1, Collections.emptyMap());
 		ObjectEntry objectEntry5 = _addObjectEntry(
-			objectDefinition2, Collections.emptyMap());
+			objectDefinition1, Collections.emptyMap());
 		ObjectEntry objectEntry6 = _addObjectEntry(
+			objectDefinition2, Collections.emptyMap());
+		ObjectEntry objectEntry7 = _addObjectEntry(
 			objectDefinition2, Collections.emptyMap());
 
 		ObjectRelationshipTestUtil.addObjectRelationshipMappingTableValues(
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry4.getObjectEntryId(), objectEntry5.getObjectEntryId());
+			objectEntry5.getObjectEntryId(), objectEntry6.getObjectEntryId());
 		ObjectRelationshipTestUtil.addObjectRelationshipMappingTableValues(
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry4.getObjectEntryId(), objectEntry6.getObjectEntryId());
+			objectEntry5.getObjectEntryId(), objectEntry7.getObjectEntryId());
 
 		ObjectRelationshipTestUtil.assertGetRelatedModels(
 			2, _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry4.getObjectEntryId());
+			objectEntry5.getObjectEntryId());
 
-		_objectEntryLocalService.deleteObjectEntry(objectEntry4);
+		_objectEntryLocalService.deleteObjectEntry(objectEntry5);
 
 		ObjectRelationshipTestUtil.assertGetRelatedModels(
 			0, _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry4.getObjectEntryId());
+			objectEntry5.getObjectEntryId());
 
 		// Object relationship deletion type prevent
 
@@ -1168,20 +1211,20 @@ public class ObjectRelatedModelsProviderTest {
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
 			_objectRelationship.getLabelMap());
 
-		ObjectEntry objectEntry7 = _addObjectEntry(
+		ObjectEntry objectEntry8 = _addObjectEntry(
 			objectDefinition1, Collections.emptyMap());
 
 		ObjectRelationshipTestUtil.addObjectRelationshipMappingTableValues(
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry7.getObjectEntryId(), objectEntry5.getObjectEntryId());
+			objectEntry8.getObjectEntryId(), objectEntry6.getObjectEntryId());
 		ObjectRelationshipTestUtil.addObjectRelationshipMappingTableValues(
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry7.getObjectEntryId(), objectEntry6.getObjectEntryId());
+			objectEntry8.getObjectEntryId(), objectEntry7.getObjectEntryId());
 
 		ObjectRelationshipTestUtil.assertGetRelatedModels(
 			2, _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry7.getObjectEntryId());
+			objectEntry8.getObjectEntryId());
 
 		AssertUtils.assertFailure(
 			RequiredObjectRelationshipException.class,
@@ -1189,23 +1232,23 @@ public class ObjectRelatedModelsProviderTest {
 				"Object relationship ",
 				_objectRelationship.getObjectRelationshipId(),
 				" does not allow deletes"),
-			() -> _objectEntryLocalService.deleteObjectEntry(objectEntry7));
+			() -> _objectEntryLocalService.deleteObjectEntry(objectEntry8));
 
 		Assert.assertNotNull(
 			_objectEntryLocalService.fetchObjectEntry(
-				objectEntry7.getObjectEntryId()));
+				objectEntry8.getObjectEntryId()));
 
 		ObjectRelationshipTestUtil.assertGetRelatedModels(
 			2, _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry7.getObjectEntryId());
+			objectEntry8.getObjectEntryId());
 
-		_objectEntryLocalService.deleteObjectEntry(objectEntry6);
+		_objectEntryLocalService.deleteObjectEntry(objectEntry7);
 
 		ObjectRelationshipTestUtil.assertGetRelatedModels(
 			1, _objectRelatedModelsProvider,
 			_objectRelationship.getObjectRelationshipId(),
-			objectEntry7.getObjectEntryId());
+			objectEntry8.getObjectEntryId());
 
 		// Reverse object relationship
 

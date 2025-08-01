@@ -49,6 +49,21 @@ public class ObjectRelationshipTestUtil {
 			objectEntries.toString(), expectedSize, objectEntries.size());
 	}
 
+	public static void assertGetRelatedModels(
+			int expectedSize,
+			ObjectRelatedModelsProvider objectRelatedModelsProvider,
+			long objectRelationshipId, Long[] primaryKeys)
+		throws Exception {
+
+		List<ObjectEntry> objectEntries =
+			objectRelatedModelsProvider.getRelatedModels(
+				0, objectRelationshipId, primaryKeys, null, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS);
+
+		Assert.assertEquals(
+			objectEntries.toString(), expectedSize, objectEntries.size());
+	}
+
 	public static void assertSearchRelatedModels(
 			int expectedSize, long groupId,
 			ObjectRelatedModelsProvider objectRelatedModelsProvider,
