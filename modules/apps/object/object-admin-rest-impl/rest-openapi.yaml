@@ -102,6 +102,8 @@ components:
                     type: boolean
                 enableObjectEntryVersioning:
                     type: boolean
+                enableRecycleBin:
+                    type: boolean
                 externalReferenceCode:
                     type: string
                 friendlyURLSeparator:

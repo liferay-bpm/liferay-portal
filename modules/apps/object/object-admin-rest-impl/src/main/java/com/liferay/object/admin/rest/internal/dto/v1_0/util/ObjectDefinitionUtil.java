@@ -190,6 +190,15 @@ public class ObjectDefinitionUtil {
 						return serviceBuilderObjectDefinition.
 							isEnableObjectEntryVersioning();
 					});
+				setEnableRecycleBin(
+					() -> {
+						if (!FeatureFlagManagerUtil.isEnabled("LPD-53981")) {
+							return null;
+						}
+
+						return serviceBuilderObjectDefinition.
+							isEnableRecycleBin();
+					});
 				setExternalReferenceCode(
 					serviceBuilderObjectDefinition::getExternalReferenceCode);
 				setFriendlyURLSeparator(
