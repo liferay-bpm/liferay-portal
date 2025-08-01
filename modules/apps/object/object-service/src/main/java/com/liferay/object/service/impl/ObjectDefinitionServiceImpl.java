@@ -52,10 +52,11 @@ public class ObjectDefinitionServiceImpl
 			boolean enableLocalization, boolean enableObjectEntryDraft,
 			boolean enableObjectEntrySchedule,
 			boolean enableObjectEntrySubscription,
-			boolean enableObjectEntryVersioning, String friendlyURLSeparator,
-			Map<Locale, String> labelMap, String name, String panelAppOrder,
-			String panelCategoryKey, Map<Locale, String> pluralLabelMap,
-			boolean portlet, String scope, String storageType,
+			boolean enableObjectEntryVersioning, boolean enableRecycleBin,
+			String friendlyURLSeparator, Map<Locale, String> labelMap,
+			String name, String panelAppOrder, String panelCategoryKey,
+			Map<Locale, String> pluralLabelMap, boolean portlet, String scope,
+			String storageType,
 			List<ObjectDefinitionSetting> objectDefinitionSettings,
 			List<ObjectField> objectFields)
 		throws PortalException {
@@ -73,9 +74,10 @@ public class ObjectDefinitionServiceImpl
 			enableFriendlyURLCustomization, enableIndexSearch,
 			enableLocalization, enableObjectEntryDraft,
 			enableObjectEntrySchedule, enableObjectEntrySubscription,
-			enableObjectEntryVersioning, friendlyURLSeparator, labelMap, name,
-			panelAppOrder, panelCategoryKey, pluralLabelMap, portlet, scope,
-			storageType, objectDefinitionSettings, objectFields);
+			enableObjectEntryVersioning, enableRecycleBin, friendlyURLSeparator,
+			labelMap, name, panelAppOrder, panelCategoryKey, pluralLabelMap,
+			portlet, scope, storageType, objectDefinitionSettings,
+			objectFields);
 	}
 
 	@Override
@@ -105,10 +107,10 @@ public class ObjectDefinitionServiceImpl
 			boolean enableLocalization, boolean enableObjectEntryDraft,
 			boolean enableObjectEntrySchedule,
 			boolean enableObjectEntrySubscription,
-			boolean enableObjectEntryVersioning, String friendlyURLSeparator,
-			Map<Locale, String> labelMap, String name, String panelAppOrder,
-			String panelCategoryKey, Map<Locale, String> pluralLabelMap,
-			boolean portlet, String scope,
+			boolean enableObjectEntryVersioning, boolean enableRecycleBin,
+			String friendlyURLSeparator, Map<Locale, String> labelMap,
+			String name, String panelAppOrder, String panelCategoryKey,
+			Map<Locale, String> pluralLabelMap, boolean portlet, String scope,
 			List<ObjectDefinitionSetting> objectDefinitionSettings,
 			List<ObjectField> objectFields)
 		throws PortalException {
@@ -126,10 +128,11 @@ public class ObjectDefinitionServiceImpl
 			enableComments, enableFriendlyURLCustomization, enableIndexSearch,
 			enableLocalization, enableObjectEntryDraft,
 			enableObjectEntrySchedule, enableObjectEntrySubscription,
-			enableObjectEntryVersioning, friendlyURLSeparator, labelMap, true,
-			name, panelAppOrder, panelCategoryKey, null, null, pluralLabelMap,
-			portlet, scope, null, 1, WorkflowConstants.STATUS_DRAFT,
-			objectDefinitionSettings, objectFields);
+			enableObjectEntryVersioning, enableRecycleBin, friendlyURLSeparator,
+			labelMap, true, name, panelAppOrder, panelCategoryKey, null, null,
+			pluralLabelMap, portlet, scope, null, 1,
+			WorkflowConstants.STATUS_DRAFT, objectDefinitionSettings,
+			objectFields);
 	}
 
 	@Override
@@ -278,11 +281,11 @@ public class ObjectDefinitionServiceImpl
 			boolean enableObjectEntryDraft, boolean enableObjectEntryHistory,
 			boolean enableObjectEntrySchedule,
 			boolean enableObjectEntrySubscription,
-			boolean enableObjectEntryVersioning, String friendlyURLSeparator,
-			Map<Locale, String> labelMap, String name, String panelAppOrder,
-			String panelCategoryKey, boolean portlet,
-			Map<Locale, String> pluralLabelMap, String scope, int status,
-			List<ObjectDefinitionSetting> objectDefinitionSettings)
+			boolean enableObjectEntryVersioning, boolean enableRecycleBin,
+			String friendlyURLSeparator, Map<Locale, String> labelMap,
+			String name, String panelAppOrder, String panelCategoryKey,
+			boolean portlet, Map<Locale, String> pluralLabelMap, String scope,
+			int status, List<ObjectDefinitionSetting> objectDefinitionSettings)
 		throws PortalException {
 
 		_objectDefinitionModelResourcePermission.check(
@@ -301,9 +304,9 @@ public class ObjectDefinitionServiceImpl
 			enableLocalization, enableObjectEntryDraft,
 			enableObjectEntryHistory, enableObjectEntrySchedule,
 			enableObjectEntrySubscription, enableObjectEntryVersioning,
-			friendlyURLSeparator, labelMap, name, panelAppOrder,
-			panelCategoryKey, portlet, pluralLabelMap, scope, status,
-			objectDefinitionSettings);
+			enableRecycleBin, friendlyURLSeparator, labelMap, name,
+			panelAppOrder, panelCategoryKey, portlet, pluralLabelMap, scope,
+			status, objectDefinitionSettings);
 	}
 
 	@Override

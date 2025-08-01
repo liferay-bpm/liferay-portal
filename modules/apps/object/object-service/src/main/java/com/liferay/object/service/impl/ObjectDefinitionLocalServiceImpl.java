@@ -230,10 +230,11 @@ public class ObjectDefinitionLocalServiceImpl
 			boolean enableIndexSearch, boolean enableLocalization,
 			boolean enableObjectEntryDraft, boolean enableObjectEntrySchedule,
 			boolean enableObjectEntrySubscription,
-			boolean enableObjectEntryVersioning, String friendlyURLSeparator,
-			Map<Locale, String> labelMap, String name, String panelAppOrder,
-			String panelCategoryKey, Map<Locale, String> pluralLabelMap,
-			boolean portlet, String scope, String storageType,
+			boolean enableObjectEntryVersioning, boolean enableRecycleBin,
+			String friendlyURLSeparator, Map<Locale, String> labelMap,
+			String name, String panelAppOrder, String panelCategoryKey,
+			Map<Locale, String> pluralLabelMap, boolean portlet, String scope,
+			String storageType,
 			List<ObjectDefinitionSetting> objectDefinitionSettings,
 			List<ObjectField> objectFields)
 		throws PortalException {
@@ -243,9 +244,9 @@ public class ObjectDefinitionLocalServiceImpl
 			enableFriendlyURLCustomization, enableIndexSearch,
 			enableLocalization, enableObjectEntryDraft,
 			enableObjectEntrySchedule, enableObjectEntrySubscription,
-			enableObjectEntryVersioning, friendlyURLSeparator, labelMap, true,
-			name, panelAppOrder, panelCategoryKey, null, null, pluralLabelMap,
-			portlet, scope, storageType, false, null, 0,
+			enableObjectEntryVersioning, enableRecycleBin, friendlyURLSeparator,
+			labelMap, true, name, panelAppOrder, panelCategoryKey, null, null,
+			pluralLabelMap, portlet, scope, storageType, false, null, 0,
 			WorkflowConstants.STATUS_DRAFT, objectDefinitionSettings,
 			objectFields);
 	}
@@ -331,7 +332,7 @@ public class ObjectDefinitionLocalServiceImpl
 				systemObjectDefinitionManager.getModelClassName(),
 				table.getTableName(), false, false, true,
 				systemObjectDefinitionManager.isEnableLocalization(), false,
-				false, false, false, null,
+				false, false, false, false, null,
 				systemObjectDefinitionManager.getLabelMap(), false,
 				systemObjectDefinitionManager.getName(), null, null,
 				primaryKeyColumn.getName(), primaryKeyColumn.getName(),
@@ -429,12 +430,13 @@ public class ObjectDefinitionLocalServiceImpl
 			boolean enableLocalization, boolean enableObjectEntryDraft,
 			boolean enableObjectEntrySchedule,
 			boolean enableObjectEntrySubscription,
-			boolean enableObjectEntryVersioning, String friendlyURLSeparator,
-			Map<Locale, String> labelMap, boolean modifiable, String name,
-			String panelAppOrder, String panelCategoryKey,
-			String pkObjectFieldDBColumnName, String pkObjectFieldName,
-			Map<Locale, String> pluralLabelMap, boolean portlet, String scope,
-			String titleObjectFieldName, int version, int status,
+			boolean enableObjectEntryVersioning, boolean enableRecycleBin,
+			String friendlyURLSeparator, Map<Locale, String> labelMap,
+			boolean modifiable, String name, String panelAppOrder,
+			String panelCategoryKey, String pkObjectFieldDBColumnName,
+			String pkObjectFieldName, Map<Locale, String> pluralLabelMap,
+			boolean portlet, String scope, String titleObjectFieldName,
+			int version, int status,
 			List<ObjectDefinitionSetting> objectDefinitionSettings,
 			List<ObjectField> objectFields)
 		throws PortalException {
@@ -444,8 +446,8 @@ public class ObjectDefinitionLocalServiceImpl
 			dbTableName, enableComments, enableFriendlyURLCustomization,
 			enableIndexSearch, enableLocalization, enableObjectEntryDraft,
 			enableObjectEntrySchedule, enableObjectEntrySubscription,
-			enableObjectEntryVersioning, friendlyURLSeparator, labelMap,
-			modifiable, name, panelAppOrder, panelCategoryKey,
+			enableObjectEntryVersioning, enableRecycleBin, friendlyURLSeparator,
+			labelMap, modifiable, name, panelAppOrder, panelCategoryKey,
 			pkObjectFieldDBColumnName, pkObjectFieldName, pluralLabelMap,
 			portlet, scope, ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 			true, titleObjectFieldName, version, status,
@@ -1186,11 +1188,11 @@ public class ObjectDefinitionLocalServiceImpl
 			boolean enableObjectEntryDraft, boolean enableObjectEntryHistory,
 			boolean enableObjectEntrySchedule,
 			boolean enableObjectEntrySubscription,
-			boolean enableObjectEntryVersioning, String friendlyURLSeparator,
-			Map<Locale, String> labelMap, String name, String panelAppOrder,
-			String panelCategoryKey, boolean portlet,
-			Map<Locale, String> pluralLabelMap, String scope, int status,
-			List<ObjectDefinitionSetting> objectDefinitionSettings)
+			boolean enableObjectEntryVersioning, boolean enableRecycleBin,
+			String friendlyURLSeparator, Map<Locale, String> labelMap,
+			String name, String panelAppOrder, String panelCategoryKey,
+			boolean portlet, Map<Locale, String> pluralLabelMap, String scope,
+			int status, List<ObjectDefinitionSetting> objectDefinitionSettings)
 		throws PortalException {
 
 		ObjectDefinition objectDefinition =
@@ -1247,9 +1249,9 @@ public class ObjectDefinitionLocalServiceImpl
 			enableLocalization, enableObjectEntryDraft,
 			enableObjectEntryHistory, enableObjectEntrySchedule,
 			enableObjectEntrySubscription, enableObjectEntryVersioning,
-			friendlyURLSeparator, labelMap, name, panelAppOrder,
-			panelCategoryKey, portlet, null, null, pluralLabelMap, scope,
-			status, objectDefinitionSettings);
+			enableRecycleBin, friendlyURLSeparator, labelMap, name,
+			panelAppOrder, panelCategoryKey, portlet, null, null,
+			pluralLabelMap, scope, status, objectDefinitionSettings);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -1433,13 +1435,13 @@ public class ObjectDefinitionLocalServiceImpl
 			boolean enableLocalization, boolean enableObjectEntryDraft,
 			boolean enableObjectEntrySchedule,
 			boolean enableObjectEntrySubscription,
-			boolean enableObjectEntryVersioning, String friendlyURLSeparator,
-			Map<Locale, String> labelMap, boolean modifiable, String name,
-			String panelAppOrder, String panelCategoryKey,
-			String pkObjectFieldDBColumnName, String pkObjectFieldName,
-			Map<Locale, String> pluralLabelMap, boolean portlet, String scope,
-			String storageType, boolean system, String titleObjectFieldName,
-			int version, int status,
+			boolean enableObjectEntryVersioning, boolean enableRecycleBin,
+			String friendlyURLSeparator, Map<Locale, String> labelMap,
+			boolean modifiable, String name, String panelAppOrder,
+			String panelCategoryKey, String pkObjectFieldDBColumnName,
+			String pkObjectFieldName, Map<Locale, String> pluralLabelMap,
+			boolean portlet, String scope, String storageType, boolean system,
+			String titleObjectFieldName, int version, int status,
 			List<ObjectDefinitionSetting> objectDefinitionSettings,
 			List<ObjectField> objectFields)
 		throws PortalException {
@@ -1532,6 +1534,10 @@ public class ObjectDefinitionLocalServiceImpl
 
 			objectDefinition.setEnableObjectEntrySubscription(
 				enableObjectEntrySubscription);
+		}
+
+		if (FeatureFlagManagerUtil.isEnabled("LPD-53981")) {
+			objectDefinition.setEnableRecycleBin(enableRecycleBin);
 		}
 
 		objectDefinition.setFriendlyURLSeparator(friendlyURLSeparator);
@@ -2417,11 +2423,12 @@ public class ObjectDefinitionLocalServiceImpl
 			boolean enableLocalization, boolean enableObjectEntryDraft,
 			boolean enableObjectEntryHistory, boolean enableObjectEntrySchedule,
 			boolean enableObjectEntrySubscription,
-			boolean enableObjectEntryVersioning, String friendlyURLSeparator,
-			Map<Locale, String> labelMap, String name, String panelAppOrder,
-			String panelCategoryKey, boolean portlet,
-			String pkObjectFieldDBColumnName, String pkObjectFieldName,
-			Map<Locale, String> pluralLabelMap, String scope, int status,
+			boolean enableObjectEntryVersioning, boolean enableRecycleBin,
+			String friendlyURLSeparator, Map<Locale, String> labelMap,
+			String name, String panelAppOrder, String panelCategoryKey,
+			boolean portlet, String pkObjectFieldDBColumnName,
+			String pkObjectFieldName, Map<Locale, String> pluralLabelMap,
+			String scope, int status,
 			List<ObjectDefinitionSetting> objectDefinitionSettings)
 		throws PortalException {
 
@@ -2537,6 +2544,10 @@ public class ObjectDefinitionLocalServiceImpl
 				enableObjectEntrySchedule);
 			objectDefinition.setEnableObjectEntryVersioning(
 				enableObjectEntryVersioning);
+		}
+
+		if (FeatureFlagManagerUtil.isEnabled("LPD-53981")) {
+			objectDefinition.setEnableRecycleBin(enableRecycleBin);
 		}
 
 		if (FeatureFlagManagerUtil.isEnabled(
