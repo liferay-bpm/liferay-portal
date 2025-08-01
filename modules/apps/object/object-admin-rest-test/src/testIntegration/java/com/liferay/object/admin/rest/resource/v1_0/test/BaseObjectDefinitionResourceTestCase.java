@@ -1807,6 +1807,14 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("enableRecycleBin", additionalAssertFieldName)) {
+				if (objectDefinition.getEnableRecycleBin() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals(
 					"externalReferenceCode", additionalAssertFieldName)) {
 
@@ -2385,6 +2393,17 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				if (!Objects.deepEquals(
 						objectDefinition1.getEnableObjectEntryVersioning(),
 						objectDefinition2.getEnableObjectEntryVersioning())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("enableRecycleBin", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						objectDefinition1.getEnableRecycleBin(),
+						objectDefinition2.getEnableRecycleBin())) {
 
 					return false;
 				}
@@ -3076,6 +3095,11 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("enableRecycleBin")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("externalReferenceCode")) {
 			Object object = objectDefinition.getExternalReferenceCode();
 
@@ -3726,6 +3750,7 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				enableObjectEntrySchedule = RandomTestUtil.randomBoolean();
 				enableObjectEntrySubscription = RandomTestUtil.randomBoolean();
 				enableObjectEntryVersioning = RandomTestUtil.randomBoolean();
+				enableRecycleBin = RandomTestUtil.randomBoolean();
 				externalReferenceCode = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				friendlyURLSeparator = StringUtil.toLowerCase(

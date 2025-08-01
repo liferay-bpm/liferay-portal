@@ -861,6 +861,47 @@ public class ObjectDefinition implements Serializable {
 	private Supplier<Boolean> _enableObjectEntryVersioningSupplier;
 
 	@io.swagger.v3.oas.annotations.media.Schema
+	public Boolean getEnableRecycleBin() {
+		if (_enableRecycleBinSupplier != null) {
+			enableRecycleBin = _enableRecycleBinSupplier.get();
+
+			_enableRecycleBinSupplier = null;
+		}
+
+		return enableRecycleBin;
+	}
+
+	public void setEnableRecycleBin(Boolean enableRecycleBin) {
+		this.enableRecycleBin = enableRecycleBin;
+
+		_enableRecycleBinSupplier = null;
+	}
+
+	@JsonIgnore
+	public void setEnableRecycleBin(
+		UnsafeSupplier<Boolean, Exception> enableRecycleBinUnsafeSupplier) {
+
+		_enableRecycleBinSupplier = () -> {
+			try {
+				return enableRecycleBinUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Boolean enableRecycleBin;
+
+	@JsonIgnore
+	private Supplier<Boolean> _enableRecycleBinSupplier;
+
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getExternalReferenceCode() {
 		if (_externalReferenceCodeSupplier != null) {
 			externalReferenceCode = _externalReferenceCodeSupplier.get();
@@ -2233,6 +2274,18 @@ public class ObjectDefinition implements Serializable {
 			sb.append("\"enableObjectEntryVersioning\": ");
 
 			sb.append(enableObjectEntryVersioning);
+		}
+
+		Boolean enableRecycleBin = getEnableRecycleBin();
+
+		if (enableRecycleBin != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"enableRecycleBin\": ");
+
+			sb.append(enableRecycleBin);
 		}
 
 		String externalReferenceCode = getExternalReferenceCode();

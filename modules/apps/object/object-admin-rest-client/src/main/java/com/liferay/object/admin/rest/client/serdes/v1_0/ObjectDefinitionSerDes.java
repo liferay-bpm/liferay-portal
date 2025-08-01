@@ -278,6 +278,16 @@ public class ObjectDefinitionSerDes {
 			sb.append(objectDefinition.getEnableObjectEntryVersioning());
 		}
 
+		if (objectDefinition.getEnableRecycleBin() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"enableRecycleBin\": ");
+
+			sb.append(objectDefinition.getEnableRecycleBin());
+		}
+
 		if (objectDefinition.getExternalReferenceCode() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -883,6 +893,15 @@ public class ObjectDefinitionSerDes {
 					objectDefinition.getEnableObjectEntryVersioning()));
 		}
 
+		if (objectDefinition.getEnableRecycleBin() == null) {
+			map.put("enableRecycleBin", null);
+		}
+		else {
+			map.put(
+				"enableRecycleBin",
+				String.valueOf(objectDefinition.getEnableRecycleBin()));
+		}
+
 		if (objectDefinition.getExternalReferenceCode() == null) {
 			map.put("externalReferenceCode", null);
 		}
@@ -1202,6 +1221,9 @@ public class ObjectDefinitionSerDes {
 
 				return false;
 			}
+			else if (Objects.equals(jsonParserFieldName, "enableRecycleBin")) {
+				return false;
+			}
 			else if (Objects.equals(
 						jsonParserFieldName, "externalReferenceCode")) {
 
@@ -1436,6 +1458,12 @@ public class ObjectDefinitionSerDes {
 
 				if (jsonParserFieldValue != null) {
 					objectDefinition.setEnableObjectEntryVersioning(
+						(Boolean)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "enableRecycleBin")) {
+				if (jsonParserFieldValue != null) {
+					objectDefinition.setEnableRecycleBin(
 						(Boolean)jsonParserFieldValue);
 				}
 			}

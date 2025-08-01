@@ -452,6 +452,27 @@ public class ObjectDefinition implements Cloneable, Serializable {
 
 	protected Boolean enableObjectEntryVersioning;
 
+	public Boolean getEnableRecycleBin() {
+		return enableRecycleBin;
+	}
+
+	public void setEnableRecycleBin(Boolean enableRecycleBin) {
+		this.enableRecycleBin = enableRecycleBin;
+	}
+
+	public void setEnableRecycleBin(
+		UnsafeSupplier<Boolean, Exception> enableRecycleBinUnsafeSupplier) {
+
+		try {
+			enableRecycleBin = enableRecycleBinUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Boolean enableRecycleBin;
+
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}

@@ -38,6 +38,7 @@
 			"enableObjectEntrySchedule"?: boolean;
 			"enableObjectEntrySubscription"?: boolean;
 			"enableObjectEntryVersioning"?: boolean;
+			"enableRecycleBin"?: boolean;
 			"externalReferenceCode"?: string;
 			"friendlyURLSeparator"?: string;
 			"id"?: number;
@@ -165,6 +166,11 @@
 		{
 			baseName: "enableObjectEntryVersioning",
 			name: "enableObjectEntryVersioning",
+			type: "boolean",
+		},
+		{
+			baseName: "enableRecycleBin",
+			name: "enableRecycleBin",
 			type: "boolean",
 		},
 		{
