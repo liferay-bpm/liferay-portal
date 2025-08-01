@@ -106,6 +106,7 @@
 		<column name="enableObjectEntrySchedule" type="boolean" />
 		<column name="enableObjectEntrySubscription" type="boolean" />
 		<column name="enableObjectEntryVersioning" type="boolean" />
+		<column name="enableRecycleBin" type="boolean" />
 		<column name="friendlyURLSeparator" type="String" />
 		<column localized="true" name="label" type="String" />
 		<column name="modifiable" type="boolean" />
