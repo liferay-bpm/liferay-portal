@@ -3907,6 +3907,7 @@ public class ObjectEntryLocalServiceTest {
 			_objectDefinition.isEnableObjectEntrySchedule(),
 			_objectDefinition.isEnableObjectEntrySubscription(),
 			_objectDefinition.isEnableObjectEntryVersioning(),
+			_objectDefinition.isEnableRecycleBin(),
 			_objectDefinition.getFriendlyURLSeparator(),
 			_objectDefinition.getLabelMap(), _objectDefinition.getName(),
 			_objectDefinition.getPanelAppOrder(),

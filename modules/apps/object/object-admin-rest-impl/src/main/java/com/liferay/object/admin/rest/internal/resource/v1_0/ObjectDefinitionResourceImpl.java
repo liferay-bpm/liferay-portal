@@ -287,6 +287,8 @@ public class ObjectDefinitionResourceImpl
 						objectDefinition.getEnableObjectEntrySubscription()),
 					GetterUtil.getBoolean(
 						objectDefinition.getEnableObjectEntryVersioning()),
+					GetterUtil.getBoolean(
+						objectDefinition.getEnableRecycleBin()),
 					objectDefinition.getFriendlyURLSeparator(),
 					LocalizedMapUtil.populateLocalizedMap(
 						objectDefinition.getDefaultLanguageId(),
@@ -329,6 +331,8 @@ public class ObjectDefinitionResourceImpl
 						objectDefinition.getEnableObjectEntrySubscription()),
 					GetterUtil.getBoolean(
 						objectDefinition.getEnableObjectEntryVersioning()),
+					GetterUtil.getBoolean(
+						objectDefinition.getEnableRecycleBin()),
 					objectDefinition.getFriendlyURLSeparator(),
 					LocalizedMapUtil.populateLocalizedMap(
 						objectDefinition.getDefaultLanguageId(),
@@ -614,6 +618,8 @@ public class ObjectDefinitionResourceImpl
 						objectDefinition.getEnableObjectEntrySubscription()),
 					GetterUtil.getBoolean(
 						objectDefinition.getEnableObjectEntryVersioning()),
+					GetterUtil.getBoolean(
+						objectDefinition.getEnableRecycleBin()),
 					GetterUtil.getString(
 						objectDefinition.getFriendlyURLSeparator(),
 						serviceBuilderObjectDefinition.
