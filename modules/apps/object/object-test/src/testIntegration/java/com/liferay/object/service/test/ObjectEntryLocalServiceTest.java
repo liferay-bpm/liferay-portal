@@ -4785,9 +4785,10 @@ public class ObjectEntryLocalServiceTest {
 			24, values3, valuesList.get(2), selectedObjectFieldNames);
 	}
 
-	@FeatureFlag("LPD-53981")
 	@Test
 	public void testMoveObjectEntryToTrashWithComments() throws Exception {
+		_siteObjectDefinition = _enableRecycleBin(_siteObjectDefinition);
+
 		Group group = GroupTestUtil.addGroup();
 
 		ObjectEntry objectEntry = _addObjectEntry(
@@ -4826,9 +4827,10 @@ public class ObjectEntryLocalServiceTest {
 				objectEntry.getObjectEntryId()));
 	}
 
-	@FeatureFlag("LPD-53981")
 	@Test
 	public void testMoveObjectEntryToTrashWithObjectAction() throws Exception {
+		_siteObjectDefinition = _enableRecycleBin(_siteObjectDefinition);
+
 		_addObjectAction(
 			_siteObjectDefinition.getObjectDefinitionId(),
 			ObjectActionExecutorConstants.KEY_ADD_OBJECT_ENTRY,
@@ -4877,10 +4879,11 @@ public class ObjectEntryLocalServiceTest {
 		_assertCount(1);
 	}
 
-	@FeatureFlag("LPD-53981")
 	@Test
 	public void testMoveObjectEntryToTrashWithOngoingWorkflowInstances()
 		throws Exception {
+
+		_siteObjectDefinition = _enableRecycleBin(_siteObjectDefinition);
 
 		_workflowDefinitionLinkLocalService.updateWorkflowDefinitionLink(
 			TestPropsValues.getUserId(), TestPropsValues.getCompanyId(), 0,
@@ -7097,6 +7100,15 @@ public class ObjectEntryLocalServiceTest {
 		}
 
 		return listTypeEntries;
+	}
+
+	private ObjectDefinition _enableRecycleBin(
+		ObjectDefinition objectDefinition) {
+
+		objectDefinition.setEnableRecycleBin(true);
+
+		return _objectDefinitionLocalService.updateObjectDefinition(
+			objectDefinition);
 	}
 
 	private BigDecimal _getBigDecimal(long value) {

@@ -6211,10 +6211,10 @@ public class DefaultObjectEntryManagerImplTest
 			ListUtil.fromArray(objectEntry1, objectEntry2));
 	}
 
-	@FeatureFlag("LPD-53981")
 	@Test
 	public void testMoveObjectEntryToTrash() throws Exception {
-		_enableObjectEntryVersioning();
+		_objectDefinition1 = _enableObjectEntryVersioning();
+		_objectDefinition1 = _enableRecycleBin(_objectDefinition1);
 
 		ObjectEntry objectEntry = _addObjectEntry(_objectDefinition1, null, 1);
 
@@ -8998,6 +8998,15 @@ public class DefaultObjectEntryManagerImplTest
 
 		return objectDefinitionLocalService.updateObjectDefinition(
 			_objectDefinition1);
+	}
+
+	private ObjectDefinition _enableRecycleBin(
+		ObjectDefinition objectDefinition) {
+
+		objectDefinition.setEnableRecycleBin(true);
+
+		return objectDefinitionLocalService.updateObjectDefinition(
+			objectDefinition);
 	}
 
 	private Long _getAttachmentObjectFieldValue() throws Exception {
