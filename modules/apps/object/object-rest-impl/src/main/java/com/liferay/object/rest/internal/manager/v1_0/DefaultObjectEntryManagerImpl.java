@@ -1660,7 +1660,7 @@ public class DefaultObjectEntryManagerImpl
 			objectDefinition, serviceBuilderObjectEntry);
 		_checkRootDescendantNode(serviceBuilderObjectEntry);
 
-		if (!FeatureFlagManagerUtil.isEnabled("LPD-53981") ||
+		if (!objectDefinition.isEnableRecycleBin() ||
 			(serviceBuilderObjectEntry.getStatus() ==
 				WorkflowConstants.STATUS_IN_TRASH)) {
 

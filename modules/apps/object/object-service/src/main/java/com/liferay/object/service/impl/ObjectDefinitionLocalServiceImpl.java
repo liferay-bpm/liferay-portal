@@ -1536,7 +1536,7 @@ public class ObjectDefinitionLocalServiceImpl
 				enableObjectEntrySubscription);
 		}
 
-		if (FeatureFlagManagerUtil.isEnabled("LPD-53981")) {
+		if (objectDefinition.isEnableRecycleBin()) {
 			objectDefinition.setEnableRecycleBin(enableRecycleBin);
 		}
 
@@ -2544,9 +2544,6 @@ public class ObjectDefinitionLocalServiceImpl
 				enableObjectEntrySchedule);
 			objectDefinition.setEnableObjectEntryVersioning(
 				enableObjectEntryVersioning);
-		}
-
-		if (FeatureFlagManagerUtil.isEnabled("LPD-53981")) {
 			objectDefinition.setEnableRecycleBin(enableRecycleBin);
 		}
 

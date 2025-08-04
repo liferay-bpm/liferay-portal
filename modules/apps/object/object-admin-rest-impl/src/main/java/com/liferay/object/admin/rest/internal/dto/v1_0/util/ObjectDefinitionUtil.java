@@ -192,7 +192,7 @@ public class ObjectDefinitionUtil {
 					});
 				setEnableRecycleBin(
 					() -> {
-						if (!FeatureFlagManagerUtil.isEnabled("LPD-53981")) {
+						if (!FeatureFlagManagerUtil.isEnabled("LPD-17564")) {
 							return null;
 						}
 
