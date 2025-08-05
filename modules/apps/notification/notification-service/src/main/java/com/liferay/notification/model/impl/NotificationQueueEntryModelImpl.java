@@ -585,7 +585,7 @@ public class NotificationQueueEntryModelImpl
 			return "";
 		}
 
-		return PortalUtil.getClassName(getClassNameId());
+		return PortalUtil.fetchClassName(getClassNameId());
 	}
 
 	@Override
