@@ -20,6 +20,7 @@ import com.liferay.object.entry.folder.subscription.util.ObjectEntryFolderSubscr
 import com.liferay.object.entry.util.ObjectEntryDTOConverterUtil;
 import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.exception.ObjectEntryValuesException;
+import com.liferay.object.exception.ObjectEntryVersionStatusException;
 import com.liferay.object.field.attachment.AttachmentManager;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
@@ -137,7 +138,6 @@ import com.liferay.portal.vulcan.util.SearchUtil;
 import com.liferay.roles.admin.role.type.contributor.RoleTypeContributor;
 import com.liferay.roles.admin.role.type.contributor.provider.RoleTypeContributorProvider;
 import com.liferay.subscription.service.SubscriptionLocalService;
-import com.liferay.trash.exception.TrashEntryException;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -302,7 +302,9 @@ public class DefaultObjectEntryManagerImpl
 		Status status = objectEntry.getStatus();
 
 		if (status.getCode() == WorkflowConstants.STATUS_IN_TRASH) {
-			throw new TrashEntryException();
+			throw new ObjectEntryVersionStatusException.
+				CannotDeleteEntryInTrash(
+					"Cannot copy a version of an entry that is in recycle bin");
 		}
 
 		return _copyVersionedObjectEntry(
@@ -327,7 +329,9 @@ public class DefaultObjectEntryManagerImpl
 		Status status = objectEntry.getStatus();
 
 		if (status.getCode() == WorkflowConstants.STATUS_IN_TRASH) {
-			throw new TrashEntryException();
+			throw new ObjectEntryVersionStatusException.
+				CannotDeleteEntryInTrash(
+					"Cannot copy a version of an entry that is in recycle bin");
 		}
 
 		return _copyVersionedObjectEntry(
@@ -381,7 +385,10 @@ public class DefaultObjectEntryManagerImpl
 		if (serviceBuilderObjectEntry.getStatus() ==
 				WorkflowConstants.STATUS_IN_TRASH) {
 
-			throw new TrashEntryException();
+			throw new ObjectEntryVersionStatusException.
+				CannotDeleteEntryInTrash(
+					"Cannot delete a version of an entry that is in recycle " +
+						"bin");
 		}
 
 		_objectEntryVersionService.deleteObjectEntryVersion(
@@ -409,7 +416,10 @@ public class DefaultObjectEntryManagerImpl
 		if (serviceBuilderObjectEntry.getStatus() ==
 				WorkflowConstants.STATUS_IN_TRASH) {
 
-			throw new TrashEntryException();
+			throw new ObjectEntryVersionStatusException.
+				CannotDeleteEntryInTrash(
+					"Cannot delete a version of an entry that is in recycle " +
+						"bin");
 		}
 
 		_objectEntryVersionService.deleteObjectEntryVersion(
@@ -523,7 +533,10 @@ public class DefaultObjectEntryManagerImpl
 		if (serviceBuilderObjectEntry.getStatus() ==
 				WorkflowConstants.STATUS_IN_TRASH) {
 
-			throw new TrashEntryException();
+			throw new ObjectEntryVersionStatusException.
+				CannotExpireEntryInTrash(
+					"Cannot expire a version of an entry that is in recycle " +
+						"bin");
 		}
 
 		return _expireObjectEntryVersion(
@@ -546,7 +559,10 @@ public class DefaultObjectEntryManagerImpl
 		if (serviceBuilderObjectEntry.getStatus() ==
 				WorkflowConstants.STATUS_IN_TRASH) {
 
-			throw new TrashEntryException();
+			throw new ObjectEntryVersionStatusException.
+				CannotExpireEntryInTrash(
+					"Cannot expire a version of an entry that is in recycle " +
+						"bin");
 		}
 
 		return _expireObjectEntryVersion(
@@ -1119,7 +1135,10 @@ public class DefaultObjectEntryManagerImpl
 		Status status = objectEntry.getStatus();
 
 		if (status.getCode() == WorkflowConstants.STATUS_IN_TRASH) {
-			throw new TrashEntryException();
+			throw new ObjectEntryVersionStatusException.
+				CannotRestoreEntryInTrash(
+					"Cannot restore a version of an entry that is in recycle " +
+						"bin");
 		}
 
 		return _restoreVersionedObjectEntry(
@@ -1140,7 +1159,10 @@ public class DefaultObjectEntryManagerImpl
 		Status status = objectEntry.getStatus();
 
 		if (status.getCode() == WorkflowConstants.STATUS_IN_TRASH) {
-			throw new TrashEntryException();
+			throw new ObjectEntryVersionStatusException.
+				CannotRestoreEntryInTrash(
+					"Cannot restore a version of an entry that is in recycle " +
+						"bin");
 		}
 
 		return _restoreVersionedObjectEntry(
