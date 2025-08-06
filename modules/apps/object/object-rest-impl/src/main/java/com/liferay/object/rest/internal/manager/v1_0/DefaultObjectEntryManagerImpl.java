@@ -22,6 +22,8 @@ import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.entry.folder.subscription.util.ObjectEntryFolderSubscriptionUtil;
 import com.liferay.object.entry.util.ObjectEntryDTOConverterUtil;
 import com.liferay.object.exception.NoSuchObjectEntryException;
+import com.liferay.object.exception.ObjectEntryValuesException;
+import com.liferay.object.exception.ObjectEntryVersionStatusException;
 import com.liferay.object.field.attachment.AttachmentManager;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
@@ -297,6 +299,13 @@ public class DefaultObjectEntryManagerImpl
 		ObjectEntry objectEntry = _getObjectEntryByVersion(
 			dtoConverterContext, objectEntryId, version);
 
+		Status status = objectEntry.getStatus();
+
+		if (status.getCode() == WorkflowConstants.STATUS_IN_TRASH) {
+			throw new ObjectEntryVersionStatusException.
+				MustNotCopyObjectEntryVersionInTrash();
+		}
+
 		return _copyVersionedObjectEntry(
 			dtoConverterContext, objectDefinition, objectEntry);
 	}
@@ -315,6 +324,13 @@ public class DefaultObjectEntryManagerImpl
 		ObjectEntry objectEntry = _getObjectEntryByVersion(
 			dtoConverterContext, externalReferenceCode, objectDefinition,
 			scopeKey, version);
+
+		Status status = objectEntry.getStatus();
+
+		if (status.getCode() == WorkflowConstants.STATUS_IN_TRASH) {
+			throw new ObjectEntryVersionStatusException.
+				MustNotCopyObjectEntryVersionInTrash();
+		}
 
 		return _copyVersionedObjectEntry(
 			dtoConverterContext, objectDefinition, objectEntry);
@@ -355,9 +371,18 @@ public class DefaultObjectEntryManagerImpl
 			throw new UnsupportedOperationException();
 		}
 
+		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
+			_objectEntryService.getObjectEntry(objectEntryId);
+
 		_checkObjectEntryObjectDefinitionId(
-			objectDefinition,
-			_objectEntryService.getObjectEntry(objectEntryId));
+			objectDefinition, serviceBuilderObjectEntry);
+
+		if (serviceBuilderObjectEntry.getStatus() ==
+				WorkflowConstants.STATUS_IN_TRASH) {
+
+			throw new ObjectEntryVersionStatusException.
+				MustNotDeleteObjectEntryVersionInTrash();
+		}
 
 		_objectEntryVersionService.deleteObjectEntryVersion(
 			objectEntryId, version);
@@ -380,6 +405,13 @@ public class DefaultObjectEntryManagerImpl
 
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
+
+		if (serviceBuilderObjectEntry.getStatus() ==
+				WorkflowConstants.STATUS_IN_TRASH) {
+
+			throw new ObjectEntryVersionStatusException.
+				MustNotDeleteObjectEntryVersionInTrash();
+		}
 
 		_objectEntryVersionService.deleteObjectEntryVersion(
 			serviceBuilderObjectEntry.getObjectEntryId(), version);
@@ -513,9 +545,19 @@ public class DefaultObjectEntryManagerImpl
 			ObjectDefinition objectDefinition, long objectEntryId, int version)
 		throws Exception {
 
+		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
+			_objectEntryService.getObjectEntry(objectEntryId);
+
+		if (serviceBuilderObjectEntry.getStatus() ==
+				WorkflowConstants.STATUS_IN_TRASH) {
+
+			throw new ObjectEntryVersionStatusException.
+				MustNotExpireObjectEntryVersionInTrash();
+		}
+
 		return _expireObjectEntryVersion(
-			dtoConverterContext, objectDefinition,
-			_objectEntryService.getObjectEntry(objectEntryId), version);
+			dtoConverterContext, objectDefinition, serviceBuilderObjectEntry,
+			version);
 	}
 
 	@Override
@@ -525,11 +567,20 @@ public class DefaultObjectEntryManagerImpl
 			String scopeKey, int version)
 		throws Exception {
 
-		return _expireObjectEntryVersion(
-			dtoConverterContext, objectDefinition,
+		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
 			_objectEntryService.getObjectEntry(
 				externalReferenceCode, getGroupId(objectDefinition, scopeKey),
-				objectDefinition.getObjectDefinitionId()),
+				objectDefinition.getObjectDefinitionId());
+
+		if (serviceBuilderObjectEntry.getStatus() ==
+				WorkflowConstants.STATUS_IN_TRASH) {
+
+			throw new ObjectEntryVersionStatusException.
+				MustNotExpireObjectEntryVersionInTrash();
+		}
+
+		return _expireObjectEntryVersion(
+			dtoConverterContext, objectDefinition, serviceBuilderObjectEntry,
 			version);
 	}
 
@@ -1138,6 +1189,16 @@ public class DefaultObjectEntryManagerImpl
 			ObjectDefinition objectDefinition, long objectEntryId, int version)
 		throws Exception {
 
+		ObjectEntry objectEntry = getObjectEntryByVersion(
+			dtoConverterContext, objectEntryId, version);
+
+		Status status = objectEntry.getStatus();
+
+		if (status.getCode() == WorkflowConstants.STATUS_IN_TRASH) {
+			throw new ObjectEntryVersionStatusException.
+				MustNotRestoreObjectEntryVersionInTrash();
+		}
+
 		return _restoreVersionedObjectEntry(
 			dtoConverterContext, objectDefinition,
 			_getObjectEntryByVersion(
@@ -1151,6 +1212,17 @@ public class DefaultObjectEntryManagerImpl
 			String externalReferenceCode, ObjectDefinition objectDefinition,
 			String scopeKey, int version)
 		throws Exception {
+
+		ObjectEntry objectEntry = getObjectEntryByVersion(
+			dtoConverterContext, externalReferenceCode, objectDefinition,
+			scopeKey, version);
+
+		Status status = objectEntry.getStatus();
+
+		if (status.getCode() == WorkflowConstants.STATUS_IN_TRASH) {
+			throw new ObjectEntryVersionStatusException.
+				MustNotRestoreObjectEntryVersionInTrash();
+		}
 
 		return _restoreVersionedObjectEntry(
 			dtoConverterContext, objectDefinition,
