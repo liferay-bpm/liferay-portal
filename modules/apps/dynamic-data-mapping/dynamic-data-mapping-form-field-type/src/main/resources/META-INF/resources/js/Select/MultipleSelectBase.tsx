@@ -5,7 +5,7 @@
 
 import {ClayCheckbox} from '@clayui/form';
 import ClayMultiSelect from '@clayui/multi-select';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {MultiSelectItem, MultipleSelectBaseProps} from './select.d';
 
@@ -61,12 +61,19 @@ const MultipleSelectBase = ({
 		});
 	}, [options]);
 
+	const isAsync = useMemo(() => {
+		return !options.length;
+
+		// eslint-disable-next-line
+	}, []);
+
 	return (
 		<ClayMultiSelect
 			{...accessibleProps}
 			clearAllTitle={Liferay.Language.get('clear-all')}
 			disabled={readOnly}
-			items={items}
+			defaultItems={isAsync ? undefined : items}
+			items={isAsync ? items : undefined}
 			messages={messages}
 			onItemsChange={(itemsChanged: MultiSelectItem[]) => {
 				const uniqueItems = [
@@ -84,7 +91,7 @@ const MultipleSelectBase = ({
 					event.preventDefault();
 				}
 			}}
-			onLoadMore={handleAsyncOptions}
+			onLoadMore={isAsync ? handleAsyncOptions : undefined}
 			placeholder={
 				!items.length ? Liferay.Language.get('choose-options') : ''
 			}
