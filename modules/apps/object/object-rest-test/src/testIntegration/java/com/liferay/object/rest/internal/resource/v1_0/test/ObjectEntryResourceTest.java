@@ -697,6 +697,8 @@ public class ObjectEntryResourceTest {
 				).labelMap(
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString())
+				).indexed(
+					true
 				).localized(
 					true
 				).name(
@@ -706,6 +708,8 @@ public class ObjectEntryResourceTest {
 				).labelMap(
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString())
+				).indexed(
+					true
 				).localized(
 					true
 				).name(
@@ -715,6 +719,8 @@ public class ObjectEntryResourceTest {
 				).labelMap(
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString())
+				).indexed(
+					true
 				).localized(
 					true
 				).name(
@@ -5776,6 +5782,41 @@ public class ObjectEntryResourceTest {
 			LocaleUtil.setDefault(
 				locale.getLanguage(), locale.getCountry(), locale.getVariant());
 		}
+	}
+
+	@Test
+	public void testGetObjectEntriesPageWithLocalizedObjectField()
+		throws Exception {
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null, _objectDefinition4.getRESTContextPath() + "/?search=textEng",
+			Http.Method.GET);
+
+		JSONArray itemsJSONArray = jsonObject.getJSONArray("items");
+
+		Assert.assertEquals(1, itemsJSONArray.length());
+
+		jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null, _objectDefinition4.getRESTContextPath() + "/?search=textEng",
+			HashMapBuilder.put(
+				"Accept-Language", "es-ES"
+			).build(),
+			Http.Method.GET);
+
+		itemsJSONArray = jsonObject.getJSONArray("items");
+
+		Assert.assertEquals(0, itemsJSONArray.length());
+
+		jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null, _objectDefinition4.getRESTContextPath() + "/?search=textEsp",
+			HashMapBuilder.put(
+				"Accept-Language", "es-ES"
+			).build(),
+			Http.Method.GET);
+
+		itemsJSONArray = jsonObject.getJSONArray("items");
+
+		Assert.assertEquals(1, itemsJSONArray.length());
 	}
 
 	@Test
