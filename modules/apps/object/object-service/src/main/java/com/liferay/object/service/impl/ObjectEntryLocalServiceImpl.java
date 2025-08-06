@@ -4541,7 +4541,7 @@ public class ObjectEntryLocalServiceImpl
 		return TransformUtil.transform(
 			objectEntryVersions,
 			objectEntryVersion -> new ObjectValuePair<>(
-				objectEntryVersion.getObjectEntryId(),
+				objectEntryVersion.getObjectEntryVersionId(),
 				_getStatus(objectEntryVersion.getStatus())));
 	}
 
