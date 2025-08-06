@@ -1256,6 +1256,7 @@
 		<exception>ObjectEntryFolderScope</exception>
 		<exception>ObjectEntryGroupId</exception>
 		<exception>ObjectEntryValues</exception>
+		<exception>ObjectEntryVersionStatus</exception>
 		<exception>ObjectFieldBusinessType</exception>
 		<exception>ObjectFieldDBType</exception>
 		<exception>ObjectFieldLabel</exception>
