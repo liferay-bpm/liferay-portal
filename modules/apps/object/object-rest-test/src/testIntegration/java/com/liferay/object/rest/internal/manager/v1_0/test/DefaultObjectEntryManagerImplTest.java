@@ -6158,24 +6158,24 @@ public class DefaultObjectEntryManagerImplTest
 	public void testMoveObjectEntryToTrash() throws Exception {
 		_enableObjectEntryVersioning();
 
-		ObjectEntry objectEntry = _addObjectEntry(_objectDefinition1, null, 1);
+		ObjectEntry objectEntry1 = _addObjectEntry(_objectDefinition1, null, 1);
 
 		_defaultObjectEntryManager.deleteObjectEntry(
-			dtoConverterContext, _objectDefinition1, objectEntry.getId());
+			dtoConverterContext, _objectDefinition1, objectEntry1.getId());
 
-		objectEntry = _defaultObjectEntryManager.getObjectEntry(
-			dtoConverterContext, _objectDefinition1, objectEntry.getId());
+		objectEntry1 = _defaultObjectEntryManager.getObjectEntry(
+			dtoConverterContext, _objectDefinition1, objectEntry1.getId());
 
-		Status status = objectEntry.getStatus();
+		Status status1 = objectEntry1.getStatus();
 
 		AssertUtils.assertEquals(
-			WorkflowConstants.STATUS_IN_TRASH, status.getCode());
+			WorkflowConstants.STATUS_IN_TRASH, status1.getCode());
 
-		Assert.assertNotNull(objectEntry.getRemovedBy());
+		Assert.assertNotNull(objectEntry1.getRemovedBy());
 
-		Assert.assertNotNull(objectEntry.getRemovedDate());
+		Assert.assertNotNull(objectEntry1.getRemovedDate());
 
-		Long objectEntryId = objectEntry.getId();
+		Long objectEntryId = objectEntry1.getId();
 
 		ObjectEntryVersion objectEntryVersion =
 			_objectEntryVersionLocalService.getObjectEntryVersion(
@@ -6184,8 +6184,32 @@ public class DefaultObjectEntryManagerImplTest
 		AssertUtils.assertEquals(
 			WorkflowConstants.STATUS_IN_TRASH, objectEntryVersion.getStatus());
 
+		_updateObjectEntryVersion(_objectDefinition1, objectEntry1, 2);
+
 		_defaultObjectEntryManager.deleteObjectEntry(
-			dtoConverterContext, _objectDefinition1, objectEntry.getId());
+			dtoConverterContext, _objectDefinition1, objectEntry1.getId());
+
+		Page<ObjectEntry> objectEntriesPage =
+			_defaultObjectEntryManager.getObjectEntries(
+				_objectDefinition1.getCompanyId(), _objectDefinition1,
+				objectEntry1.getScopeKey(), null, dtoConverterContext, "", null,
+				null, null);
+
+		Collection<ObjectEntry> entries = objectEntriesPage.getItems();
+
+		boolean hasObjectEntryInTrash = entries.stream(
+		).anyMatch(
+			objectEntry2 -> {
+				Status status2 = objectEntry2.getStatus();
+
+				return status2.getCode() == WorkflowConstants.STATUS_IN_TRASH;
+			}
+		);
+
+		Assert.assertFalse(hasObjectEntryInTrash);
+
+		_defaultObjectEntryManager.deleteObjectEntry(
+			dtoConverterContext, _objectDefinition1, objectEntry1.getId());
 
 		AssertUtils.assertFailure(
 			NoSuchObjectEntryException.class,
