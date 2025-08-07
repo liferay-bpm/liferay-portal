@@ -260,6 +260,37 @@ public class ObjectDefinitionLocalServiceImpl
 
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
+	public ObjectDefinition addCustomObjectDefinition(
+			ObjectDefinition objectDefinition, List<ObjectField> objectFields,
+			List<WorkflowDefinitionLink> workflowDefinitionLink)
+		throws PortalException {
+
+		return _addObjectDefinition(
+			null, objectDefinition.getUserId(),
+			objectDefinition.getObjectFolderId(),
+			objectDefinition.getClassName(), null,
+			objectDefinition.isEnableComments(),
+			objectDefinition.isEnableFormContainer(),
+			objectDefinition.isEnableFriendlyURLCustomization(),
+			objectDefinition.isEnableIndexSearch(),
+			objectDefinition.isEnableLocalization(),
+			objectDefinition.isEnableObjectEntryDraft(),
+			objectDefinition.isEnableObjectEntrySchedule(),
+			objectDefinition.isEnableObjectEntrySubscription(),
+			objectDefinition.isEnableObjectEntryVersioning(),
+			objectDefinition.getFriendlyURLSeparator(),
+			objectDefinition.getLabelMap(), true, objectDefinition.getName(),
+			objectDefinition.getPanelAppOrder(),
+			objectDefinition.getPanelCategoryKey(), null, null,
+			objectDefinition.getPluralLabelMap(), objectDefinition.isPortlet(),
+			objectDefinition.getScope(), objectDefinition.getStorageType(),
+			false, null, 0, WorkflowConstants.STATUS_DRAFT,
+			objectDefinition.getObjectDefinitionSettings(), objectFields,
+			workflowDefinitionLink);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
 	public ObjectDefinition addObjectDefinition(
 			String externalReferenceCode, long userId, long objectFolderId,
 			boolean modifiable, String scope, boolean system)
