@@ -178,6 +178,8 @@ public class ObjectEntryManager1RestController extends BaseRestController {
 
 		JSONObject objectEntryJSONObject = _getObjectEntryJSONObject(json);
 
+		objectEntryJSONObject.put("externalReferenceCode", externalReferenceCode);
+
 		objectEntryJSONObjects.put(
 			externalReferenceCode, objectEntryJSONObject);
 
