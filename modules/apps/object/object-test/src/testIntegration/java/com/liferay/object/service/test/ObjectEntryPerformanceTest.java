@@ -9,16 +9,23 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.admin.rest.client.http.HttpInvoker;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectFolder;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectFolderResource;
+import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
+import com.liferay.object.test.util.ObjectRelationshipTestUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.configuration.test.util.CompanyConfigurationTemporarySwapper;
@@ -29,12 +36,23 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.test.performance.PerformanceTimer;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.AssumeTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -54,12 +72,16 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
+import com.liferay.portal.vulcan.fields.NestedFieldsContext;
+import com.liferay.portal.vulcan.fields.NestedFieldsContextThreadLocal;
 
 import java.io.Closeable;
 
 import java.net.ConnectException;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Predicate;
@@ -103,23 +125,22 @@ public class ObjectEntryPerformanceTest {
 
 	@Test
 	public void testGetObjectEntries() throws Exception {
-		_customObjectDefinition =
-			ObjectDefinitionTestUtil.addCustomObjectDefinition(
-				false,
-				Collections.singletonList(
-					ObjectFieldUtil.createObjectField(
-						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-						ObjectFieldConstants.DB_TYPE_STRING, "Performance",
-						"performance")));
+		_objectDefinition1 = ObjectDefinitionTestUtil.addCustomObjectDefinition(
+			false,
+			Collections.singletonList(
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+					ObjectFieldConstants.DB_TYPE_STRING, "Performance",
+					"performance")));
 
-		_customObjectDefinition =
+		_objectDefinition1 =
 			_objectDefinitionLocalService.publishCustomObjectDefinition(
 				TestPropsValues.getUserId(),
-				_customObjectDefinition.getObjectDefinitionId());
+				_objectDefinition1.getObjectDefinitionId());
 
 		ObjectEntryManager objectEntryManager =
 			_objectEntryManagerRegistry.getObjectEntryManager(
-				_customObjectDefinition.getStorageType());
+				_objectDefinition1.getStorageType());
 
 		DTOConverterContext dtoConverterContext =
 			new DefaultDTOConverterContext(
@@ -128,7 +149,7 @@ public class ObjectEntryPerformanceTest {
 
 		for (int i = 0; i < _objectEntriesCount; i++) {
 			objectEntryManager.addObjectEntry(
-				dtoConverterContext, _customObjectDefinition,
+				dtoConverterContext, _objectDefinition1,
 				new ObjectEntry() {
 					{
 						properties = HashMapBuilder.<String, Object>put(
@@ -143,12 +164,159 @@ public class ObjectEntryPerformanceTest {
 				GetterUtil.getInteger(
 					_properties.getProperty("object.entries.get.max.time")),
 				"Get object entries by object definition " +
-					_customObjectDefinition.getObjectDefinitionId())) {
+					_objectDefinition1.getObjectDefinitionId())) {
 
 			_objectEntryLocalService.getObjectEntries(
-				0, _customObjectDefinition.getObjectDefinitionId(),
+				0, _objectDefinition1.getObjectDefinitionId(),
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 		}
+	}
+
+	@Test
+	public void testGetObjectEntriesWithNestedFields() throws Exception {
+		String textObjectFieldName = "a" + RandomTestUtil.randomString();
+
+		_objectDefinition2 = ObjectDefinitionTestUtil.publishObjectDefinition(
+			Collections.singletonList(
+				new TextObjectFieldBuilder(
+				).labelMap(
+					RandomTestUtil.randomLocaleStringMap()
+				).name(
+					textObjectFieldName
+				).build()),
+			ObjectDefinitionConstants.SCOPE_COMPANY,
+			TestPropsValues.getUserId());
+
+		_objectDefinition3 = ObjectDefinitionTestUtil.publishObjectDefinition(
+			Collections.singletonList(
+				new TextObjectFieldBuilder(
+				).labelMap(
+					RandomTestUtil.randomLocaleStringMap()
+				).name(
+					"a" + RandomTestUtil.randomString()
+				).build()),
+			ObjectDefinitionConstants.SCOPE_COMPANY,
+			TestPropsValues.getUserId());
+
+		int objectRelationshipsCount = GetterUtil.getInteger(
+			_properties.getProperty("object.relationships.count"));
+
+		List<String> objectRelationshipNames = new ArrayList<>();
+
+		List<String> relationshipObjectFieldNames = new ArrayList<>();
+
+		for (int i = 0; i < objectRelationshipsCount; i++) {
+			ObjectRelationship objectRelationship =
+				ObjectRelationshipTestUtil.addObjectRelationship(
+					_objectRelationshipLocalService, _objectDefinition2,
+					_objectDefinition3);
+
+			objectRelationshipNames.add(objectRelationship.getName());
+
+			ObjectField relationshipObjectField =
+				_objectFieldLocalService.getObjectField(
+					objectRelationship.getObjectFieldId2());
+
+			relationshipObjectFieldNames.add(relationshipObjectField.getName());
+		}
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		_resourcePermissionLocalService.addResourcePermission(
+			TestPropsValues.getCompanyId(),
+			_objectDefinition2.getResourceName(),
+			ResourceConstants.SCOPE_COMPANY,
+			String.valueOf(TestPropsValues.getCompanyId()), role.getRoleId(),
+			ObjectActionKeys.ADD_OBJECT_ENTRY);
+
+		_resourcePermissionLocalService.addResourcePermission(
+			TestPropsValues.getCompanyId(),
+			_objectDefinition3.getResourceName(),
+			ResourceConstants.SCOPE_COMPANY,
+			String.valueOf(TestPropsValues.getCompanyId()), role.getRoleId(),
+			ObjectActionKeys.ADD_OBJECT_ENTRY);
+
+		User user = UserTestUtil.addUser();
+
+		UserLocalServiceUtil.addRoleUser(role.getRoleId(), user.getUserId());
+
+		String originalName = PrincipalThreadLocal.getName();
+		PermissionChecker originalPermissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		PermissionThreadLocal.setPermissionChecker(
+			PermissionCheckerFactoryUtil.create(user));
+
+		PrincipalThreadLocal.setName(user.getUserId());
+
+		ObjectEntryManager objectEntryManager =
+			_objectEntryManagerRegistry.getObjectEntryManager(
+				_objectDefinition2.getStorageType());
+
+		DTOConverterContext dtoConverterContext =
+			new DefaultDTOConverterContext(
+				false, Collections.emptyMap(), _dtoConverterRegistry, null,
+				LocaleUtil.getDefault(), null, user);
+
+		for (int i = 0; i < _objectEntriesCount; i++) {
+			ObjectEntry objectEntry = objectEntryManager.addObjectEntry(
+				dtoConverterContext, _objectDefinition2,
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							textObjectFieldName, RandomTestUtil.randomString()
+						).build();
+					}
+				},
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+			HashMap<String, Object> relatedObjectEntryProperties =
+				new HashMap<>();
+
+			for (String relationshipObjectFieldName :
+					relationshipObjectFieldNames) {
+
+				relatedObjectEntryProperties.put(
+					relationshipObjectFieldName, objectEntry.getId());
+			}
+
+			objectEntryManager.addObjectEntry(
+				dtoConverterContext, _objectDefinition3,
+				new ObjectEntry() {
+					{
+						properties = relatedObjectEntryProperties;
+					}
+				},
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+		}
+
+		// Nested fields: object relationship name
+
+		NestedFieldsContext originalNestedFieldsContext =
+			NestedFieldsContextThreadLocal.getNestedFieldsContext();
+
+		NestedFieldsContextThreadLocal.setNestedFieldsContext(
+			new NestedFieldsContext(
+				1, null, objectRelationshipNames, null, null, null));
+
+		try (Closeable closeable = new PerformanceTimer(
+				GetterUtil.getInteger(
+					_properties.getProperty("object.entries.get.max.time")),
+				"Get object entries with nested fields object relationship " +
+					"name by object definition " +
+						_objectDefinition2.getObjectDefinitionId())) {
+
+			objectEntryManager.getObjectEntries(
+				TestPropsValues.getCompanyId(), _objectDefinition2, null, null,
+				dtoConverterContext, (String)null, null, null, null);
+		}
+
+		NestedFieldsContextThreadLocal.setNestedFieldsContext(
+			originalNestedFieldsContext);
+
+		PermissionThreadLocal.setPermissionChecker(originalPermissionChecker);
+
+		PrincipalThreadLocal.setName(originalName);
 	}
 
 	@Test
@@ -227,7 +395,7 @@ public class ObjectEntryPerformanceTest {
 			List<ObjectDefinition> objectDefinitions =
 				_objectDefinitionLocalService.getCustomObjectDefinitions(0);
 
-			_customObjectDefinition = objectDefinitions.get(0);
+			_objectDefinition1 = objectDefinitions.get(0);
 
 			_waitFor(
 				0,
@@ -300,7 +468,7 @@ public class ObjectEntryPerformanceTest {
 		while (predicate.test(currentObjectEntriesCount)) {
 			currentObjectEntriesCount =
 				_objectEntryLocalService.getObjectEntriesCount(
-					_customObjectDefinition.getObjectDefinitionId());
+					_objectDefinition1.getObjectDefinitionId());
 		}
 	}
 
@@ -312,14 +480,20 @@ public class ObjectEntryPerformanceTest {
 	@DeleteAfterTestRun
 	private Company _company;
 
-	@DeleteAfterTestRun
-	private ObjectDefinition _customObjectDefinition;
-
 	@Inject
 	private DTOConverterRegistry _dtoConverterRegistry;
 
 	@Inject
 	private JSONFactory _jsonFactory;
+
+	@DeleteAfterTestRun
+	private ObjectDefinition _objectDefinition1;
+
+	@DeleteAfterTestRun
+	private ObjectDefinition _objectDefinition2;
+
+	@DeleteAfterTestRun
+	private ObjectDefinition _objectDefinition3;
 
 	@Inject
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
@@ -331,6 +505,15 @@ public class ObjectEntryPerformanceTest {
 	private ObjectEntryManagerRegistry _objectEntryManagerRegistry;
 
 	@Inject
+	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Inject
 	private ObjectFolderResource.Factory _objectFolderResourceFactory;
+
+	@Inject
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
+
+	@Inject
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
 
 }
