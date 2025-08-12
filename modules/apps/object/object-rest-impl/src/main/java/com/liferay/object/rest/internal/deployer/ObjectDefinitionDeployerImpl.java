@@ -823,7 +823,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				() -> new ObjectEntryCountExceptionMapper(_language),
 				() -> new ObjectEntryExpirationDateExceptionMapper(_language),
 				() -> new ObjectEntryGroupIdExceptionMapper(_language),
-				() -> new ObjectEntryStatusExceptionMapper(_language),
+				ObjectEntryStatusExceptionMapper::new,
 				() -> new ObjectEntryValuesExceptionMapper(_language),
 				ObjectEntryVersionStatusExceptionMapper::new,
 				() -> new ObjectRelationshipDeletionTypeExceptionMapper(

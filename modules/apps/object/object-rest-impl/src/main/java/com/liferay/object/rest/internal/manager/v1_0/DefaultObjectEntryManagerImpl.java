@@ -20,7 +20,7 @@ import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.entry.folder.subscription.util.ObjectEntryFolderSubscriptionUtil;
 import com.liferay.object.entry.util.ObjectEntryDTOConverterUtil;
 import com.liferay.object.exception.NoSuchObjectEntryException;
-import com.liferay.object.exception.ObjectEntryValuesException;
+import com.liferay.object.exception.ObjectEntryStatusException;
 import com.liferay.object.exception.ObjectEntryVersionStatusException;
 import com.liferay.object.field.attachment.AttachmentManager;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
@@ -527,6 +527,13 @@ public class DefaultObjectEntryManagerImpl
 			_objectEntryService.getObjectEntry(
 				externalReferenceCode, getGroupId(objectDefinition, scopeKey),
 				objectDefinition.getObjectDefinitionId());
+
+		if (serviceBuilderObjectEntry.getStatus() ==
+				WorkflowConstants.STATUS_IN_TRASH) {
+
+			throw new ObjectEntryStatusException.
+				MustNotExpireObjectEntryInTrash();
+		}
 
 		return expireObjectEntry(
 			dtoConverterContext, serviceBuilderObjectEntry.getObjectEntryId());

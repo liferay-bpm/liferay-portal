@@ -12,18 +12,60 @@ import com.liferay.portal.kernel.exception.PortalException;
  */
 public class ObjectEntryStatusException extends PortalException {
 
-	public ObjectEntryStatusException() {
+	public static class DraftStatusIsNotAllowed
+		extends ObjectEntryStatusException {
+
+		public DraftStatusIsNotAllowed() {
+		}
+
+		public DraftStatusIsNotAllowed(String msg) {
+			super(msg);
+		}
+
+		public DraftStatusIsNotAllowed(String msg, Throwable throwable) {
+			super(msg, throwable);
+		}
+
+		public DraftStatusIsNotAllowed(Throwable throwable) {
+			super(throwable);
+		}
+
 	}
 
-	public ObjectEntryStatusException(String msg) {
+	public static class MustNotExpireObjectEntryInTrash
+		extends ObjectEntryStatusException {
+
+		public MustNotExpireObjectEntryInTrash() {
+		}
+
+		public MustNotExpireObjectEntryInTrash(String msg) {
+			super(msg);
+		}
+
+		public MustNotExpireObjectEntryInTrash(
+			String msg, Throwable throwable) {
+
+			super(msg, throwable);
+		}
+
+		public MustNotExpireObjectEntryInTrash(Throwable throwable) {
+			super(throwable);
+		}
+
+	}
+
+	protected ObjectEntryStatusException() {
+	}
+
+	protected ObjectEntryStatusException(String msg) {
 		super(msg);
 	}
 
-	public ObjectEntryStatusException(String msg, Throwable throwable) {
+	protected ObjectEntryStatusException(String msg, Throwable throwable) {
 		super(msg, throwable);
 	}
 
-	public ObjectEntryStatusException(Throwable throwable) {
+	protected ObjectEntryStatusException(Throwable throwable) {
 		super(throwable);
 	}
 
