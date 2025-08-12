@@ -17,6 +17,7 @@ import com.liferay.object.definition.security.permission.resource.ObjectDefiniti
 import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectEntryCountException;
+import com.liferay.object.exception.ObjectEntryStatusException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryFolder;
@@ -179,6 +180,11 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 		ObjectEntry objectEntry = objectEntryLocalService.getObjectEntry(
 			objectEntryId);
+
+		if (objectEntry.getStatus() == WorkflowConstants.STATUS_IN_TRASH) {
+			throw new ObjectEntryStatusException.
+				MustNotExpireObjectEntryInTrash();
+		}
 
 		checkModelResourcePermission(
 			objectEntry.getObjectDefinitionId(), objectEntry.getObjectEntryId(),

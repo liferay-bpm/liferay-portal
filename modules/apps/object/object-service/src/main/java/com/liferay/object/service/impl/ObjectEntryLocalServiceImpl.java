@@ -789,9 +789,17 @@ public class ObjectEntryLocalServiceImpl
 			long userId, long objectEntryId, ServiceContext serviceContext)
 		throws PortalException {
 
+		ObjectEntry objectEntry = objectEntryPersistence.findByPrimaryKey(
+			objectEntryId);
+
+		if (objectEntry.getStatus() == WorkflowConstants.STATUS_IN_TRASH) {
+			throw new ObjectEntryStatusException.
+				MustNotExpireObjectEntryInTrash();
+		}
+
 		return updateStatus(
-			userId, objectEntryPersistence.findByPrimaryKey(objectEntryId),
-			WorkflowConstants.STATUS_EXPIRED, serviceContext);
+			userId, objectEntry, WorkflowConstants.STATUS_EXPIRED,
+			serviceContext);
 	}
 
 	@Override
@@ -5808,10 +5816,11 @@ public class ObjectEntryLocalServiceImpl
 								workflowInstanceLink.getWorkflowInstanceId());
 
 						if (!workflowInstance.isComplete()) {
-							throw new ObjectEntryStatusException(
-								"Draft root descendant nodes cannot be added " +
-									"when the root node has incomplete " +
-										"workflow instance");
+							throw new ObjectEntryStatusException.
+								DraftStatusIsNotAllowed(
+									"Draft root descendant nodes cannot be " +
+										"added when the root node has " +
+											"incomplete workflow instance");
 						}
 					}
 
@@ -7199,7 +7208,8 @@ public class ObjectEntryLocalServiceImpl
 			((status != null) && (status != WorkflowConstants.STATUS_DRAFT) &&
 			 !objectDefinition.isEnableObjectEntryVersioning())) {
 
-			throw new ObjectEntryStatusException("Draft status is not allowed");
+			throw new ObjectEntryStatusException.DraftStatusIsNotAllowed(
+				"Draft status is not allowed");
 		}
 	}
 
