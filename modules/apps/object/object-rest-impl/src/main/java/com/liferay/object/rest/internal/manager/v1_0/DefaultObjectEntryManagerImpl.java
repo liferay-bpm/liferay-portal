@@ -139,6 +139,7 @@ import com.liferay.portal.vulcan.util.SearchUtil;
 import com.liferay.roles.admin.role.type.contributor.RoleTypeContributor;
 import com.liferay.roles.admin.role.type.contributor.provider.RoleTypeContributorProvider;
 import com.liferay.subscription.service.SubscriptionLocalService;
+import com.liferay.trash.TrashHelper;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -1670,10 +1671,26 @@ public class DefaultObjectEntryManagerImpl
 			return;
 		}
 
-		_objectEntryService.moveObjectEntryToTrash(
-			dtoConverterContext.getUserId(), serviceBuilderObjectEntry,
-			ServiceContextUtil.createServiceContext(
-				serviceBuilderObjectEntry.getObjectEntryId()));
+		long groupId = serviceBuilderObjectEntry.getGroupId();
+
+		Group group = groupLocalService.getGroup(groupId);
+
+		if ((group.isCMS() ||
+			 (group.isSite() && objectDefinition.isEnableRecycleBin())) &&
+			_trashHelper.isTrashEnabled(groupId) &&
+			(serviceBuilderObjectEntry.getStatus() !=
+				WorkflowConstants.STATUS_IN_TRASH)) {
+
+			_objectEntryService.moveObjectEntryToTrash(
+				dtoConverterContext.getUserId(), serviceBuilderObjectEntry,
+				ServiceContextUtil.createServiceContext(
+					serviceBuilderObjectEntry.getObjectEntryId()));
+
+			return;
+		}
+
+		_objectEntryService.deleteObjectEntry(
+			serviceBuilderObjectEntry.getObjectEntryId());
 	}
 
 	private void _disassociateRelatedModels(
@@ -3095,6 +3112,9 @@ public class DefaultObjectEntryManagerImpl
 	@Reference
 	private SystemObjectDefinitionManagerRegistry
 		_systemObjectDefinitionManagerRegistry;
+
+	@Reference
+	private TrashHelper _trashHelper;
 
 	@Reference
 	private UserLocalService _userLocalService;
