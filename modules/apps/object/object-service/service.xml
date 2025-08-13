@@ -1235,6 +1235,7 @@
 		<exception>ObjectDefinitionEnableObjectEntrySchedule</exception>
 		<exception>ObjectDefinitionEnableObjectEntrySubscription</exception>
 		<exception>ObjectDefinitionEnableObjectEntryVersioning</exception>
+		<exception>ObjectDefinitionEnableRecycleBin</exception>
 		<exception>ObjectDefinitionExternalReferenceCode</exception>
 		<exception>ObjectDefinitionFriendlyURLSeparator</exception>
 		<exception>ObjectDefinitionLabel</exception>
