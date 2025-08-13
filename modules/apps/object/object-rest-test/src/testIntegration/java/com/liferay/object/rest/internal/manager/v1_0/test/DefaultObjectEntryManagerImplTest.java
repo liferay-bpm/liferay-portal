@@ -6213,18 +6213,34 @@ public class DefaultObjectEntryManagerImplTest
 
 	@Test
 	public void testMoveObjectEntryToTrash() throws Exception {
-		_objectDefinition1 = _enableObjectEntryVersioning();
-		_objectDefinition1 = _enableRecycleBin(_objectDefinition1);
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				Collections.singletonList(
+					new TextObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"textObjectFieldName"
+					).build()),
+				ObjectDefinitionConstants.SCOPE_SITE);
 
-		ObjectEntry objectEntry = _addObjectEntry(_objectDefinition1, null, 1);
+		objectDefinition.setEnableObjectEntryVersioning(true);
+		objectDefinition.setEnableRecycleBin(true);
+
+		objectDefinition = objectDefinitionLocalService.updateObjectDefinition(
+			objectDefinition);
+
+		ObjectEntry objectEntry = _addObjectEntry(
+			objectDefinition, _group.getGroupKey(), 1);
 
 		_updateObjectEntryVersion(_objectDefinition1, objectEntry, 2);
 
 		_defaultObjectEntryManager.deleteObjectEntry(
-			dtoConverterContext, _objectDefinition1, objectEntry.getId());
+			dtoConverterContext, objectDefinition, objectEntry.getId());
 
 		objectEntry = _defaultObjectEntryManager.getObjectEntry(
-			dtoConverterContext, _objectDefinition1, objectEntry.getId());
+			dtoConverterContext, objectDefinition, objectEntry.getId());
 
 		Status status = objectEntry.getStatus();
 
@@ -6247,13 +6263,15 @@ public class DefaultObjectEntryManagerImplTest
 		_assertObjectEntriesSize1(_objectDefinition1, 0);
 
 		_defaultObjectEntryManager.deleteObjectEntry(
-			dtoConverterContext, _objectDefinition1, objectEntry.getId());
+			dtoConverterContext, objectDefinition, objectEntry.getId());
+
+		ObjectDefinition finalObjectDefinition = objectDefinition;
 
 		AssertUtils.assertFailure(
 			NoSuchObjectEntryException.class,
 			"No ObjectEntry exists with the primary key " + objectEntryId,
 			() -> _defaultObjectEntryManager.getObjectEntry(
-				dtoConverterContext, _objectDefinition1, objectEntryId));
+				dtoConverterContext, finalObjectDefinition, objectEntryId));
 	}
 
 	@Test
@@ -8998,15 +9016,6 @@ public class DefaultObjectEntryManagerImplTest
 
 		return objectDefinitionLocalService.updateObjectDefinition(
 			_objectDefinition1);
-	}
-
-	private ObjectDefinition _enableRecycleBin(
-		ObjectDefinition objectDefinition) {
-
-		objectDefinition.setEnableRecycleBin(true);
-
-		return objectDefinitionLocalService.updateObjectDefinition(
-			objectDefinition);
 	}
 
 	private Long _getAttachmentObjectFieldValue() throws Exception {

@@ -3766,7 +3766,7 @@ public class ObjectDefinitionLocalServiceTest {
 			long descriptionObjectFieldId, long titleObjectFieldId,
 			boolean enableFriendlyURLCustomization,
 			boolean enableObjectEntryHistory, boolean enableObjectEntrySchedule,
-			boolean enableObjectEntryVersioning, boolean enableRecicleBin,
+			boolean enableObjectEntryVersioning, boolean enableRecycleBin,
 			String friendlyURLSeparator, Map<Locale, String> labelMap,
 			String name, Map<Locale, String> pluralLabelMap, String scope,
 			int status)
@@ -3777,7 +3777,7 @@ public class ObjectDefinitionLocalServiceTest {
 			descriptionObjectFieldId, 0, titleObjectFieldId, false, false, null,
 			false, false, enableFriendlyURLCustomization, true, false, false,
 			enableObjectEntryHistory, enableObjectEntrySchedule, false,
-			enableObjectEntryVersioning, enableRecicleBin, friendlyURLSeparator,
+			enableObjectEntryVersioning, enableRecycleBin, friendlyURLSeparator,
 			labelMap, name, null, null, false, pluralLabelMap, scope, status,
 			Collections.emptyList());
 	}

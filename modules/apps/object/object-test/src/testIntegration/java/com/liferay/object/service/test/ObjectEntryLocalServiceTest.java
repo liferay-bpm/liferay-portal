@@ -568,6 +568,12 @@ public class ObjectEntryLocalServiceTest {
 						ObjectFieldConstants.DB_TYPE_STRING,
 						RandomTestUtil.randomString(), "textObjectFieldName")),
 				ObjectDefinitionConstants.SCOPE_SITE);
+
+		_siteObjectDefinition.setEnableRecycleBin(true);
+
+		_siteObjectDefinition =
+			_objectDefinitionLocalService.updateObjectDefinition(
+				_siteObjectDefinition);
 	}
 
 	@After
@@ -4787,8 +4793,6 @@ public class ObjectEntryLocalServiceTest {
 
 	@Test
 	public void testMoveObjectEntryToTrashWithComments() throws Exception {
-		_siteObjectDefinition = _enableRecycleBin(_siteObjectDefinition);
-
 		Group group = GroupTestUtil.addGroup();
 
 		ObjectEntry objectEntry = _addObjectEntry(
@@ -4829,8 +4833,6 @@ public class ObjectEntryLocalServiceTest {
 
 	@Test
 	public void testMoveObjectEntryToTrashWithObjectAction() throws Exception {
-		_siteObjectDefinition = _enableRecycleBin(_siteObjectDefinition);
-
 		_addObjectAction(
 			_siteObjectDefinition.getObjectDefinitionId(),
 			ObjectActionExecutorConstants.KEY_ADD_OBJECT_ENTRY,
@@ -4882,8 +4884,6 @@ public class ObjectEntryLocalServiceTest {
 	@Test
 	public void testMoveObjectEntryToTrashWithOngoingWorkflowInstances()
 		throws Exception {
-
-		_siteObjectDefinition = _enableRecycleBin(_siteObjectDefinition);
 
 		_workflowDefinitionLinkLocalService.updateWorkflowDefinitionLink(
 			TestPropsValues.getUserId(), TestPropsValues.getCompanyId(), 0,
@@ -7100,15 +7100,6 @@ public class ObjectEntryLocalServiceTest {
 		}
 
 		return listTypeEntries;
-	}
-
-	private ObjectDefinition _enableRecycleBin(
-		ObjectDefinition objectDefinition) {
-
-		objectDefinition.setEnableRecycleBin(true);
-
-		return _objectDefinitionLocalService.updateObjectDefinition(
-			objectDefinition);
 	}
 
 	private BigDecimal _getBigDecimal(long value) {
