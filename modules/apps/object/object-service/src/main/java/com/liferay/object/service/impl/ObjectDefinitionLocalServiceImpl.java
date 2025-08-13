@@ -38,6 +38,7 @@ import com.liferay.object.exception.ObjectDefinitionEnableObjectEntryHistoryExce
 import com.liferay.object.exception.ObjectDefinitionEnableObjectEntryScheduleException;
 import com.liferay.object.exception.ObjectDefinitionEnableObjectEntrySubscriptionException;
 import com.liferay.object.exception.ObjectDefinitionEnableObjectEntryVersioningException;
+import com.liferay.object.exception.ObjectDefinitionEnableRecycleBinException;
 import com.liferay.object.exception.ObjectDefinitionExternalReferenceCodeException;
 import com.liferay.object.exception.ObjectDefinitionFriendlyURLSeparatorException;
 import com.liferay.object.exception.ObjectDefinitionLabelException;
@@ -1485,6 +1486,7 @@ public class ObjectDefinitionLocalServiceImpl
 			enableObjectEntrySubscription, modifiable, system);
 		_validateEnableObjectEntryVersioning(
 			enableObjectEntryVersioning, modifiable, null, system);
+		_validateEnableRecycleBin(enableRecycleBin, scope);
 		_validateLabel(labelMap);
 		_validateName(0, user.getCompanyId(), modifiable, name, system);
 		_validatePluralLabel(pluralLabelMap);
@@ -1527,6 +1529,7 @@ public class ObjectDefinitionLocalServiceImpl
 				enableObjectEntrySchedule);
 			objectDefinition.setEnableObjectEntryVersioning(
 				enableObjectEntryVersioning);
+			objectDefinition.setEnableRecycleBin(enableRecycleBin);
 		}
 
 		if (FeatureFlagManagerUtil.isEnabled(
@@ -1534,10 +1537,6 @@ public class ObjectDefinitionLocalServiceImpl
 
 			objectDefinition.setEnableObjectEntrySubscription(
 				enableObjectEntrySubscription);
-		}
-
-		if (objectDefinition.isEnableRecycleBin()) {
-			objectDefinition.setEnableRecycleBin(enableRecycleBin);
 		}
 
 		objectDefinition.setFriendlyURLSeparator(friendlyURLSeparator);
@@ -2492,6 +2491,8 @@ public class ObjectDefinitionLocalServiceImpl
 		_validateEnableObjectEntryVersioning(
 			enableObjectEntryVersioning, objectDefinition.isModifiable(),
 			objectDefinition, objectDefinition.isSystem());
+		_validateEnableRecycleBin(
+			enableRecycleBin, objectDefinition.getScope());
 		_validateLabel(labelMap);
 		_validatePluralLabel(pluralLabelMap);
 
@@ -2969,6 +2970,22 @@ public class ObjectDefinitionLocalServiceImpl
 			throw new ObjectDefinitionEnableObjectEntryVersioningException(
 				"Object entry versioning cannot be disabled when the object " +
 					"definition is published");
+		}
+	}
+
+	private void _validateEnableRecycleBin(
+			boolean enableRecyclebin, String scope)
+		throws PortalException {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPD-17564")) {
+			return;
+		}
+
+		if (enableRecyclebin &&
+			scope.equals(ObjectDefinitionConstants.SCOPE_COMPANY)) {
+
+			throw new ObjectDefinitionEnableRecycleBinException(
+				"Recycle bin cannot be enabled for Company Scoped objects");
 		}
 	}
 
