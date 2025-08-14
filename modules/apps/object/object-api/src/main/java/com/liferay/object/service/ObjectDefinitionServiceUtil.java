@@ -37,9 +37,9 @@ public class ObjectDefinitionServiceUtil {
 			boolean enableLocalization, boolean enableObjectEntryDraft,
 			boolean enableObjectEntrySchedule,
 			boolean enableObjectEntrySubscription,
-			boolean enableObjectEntryVersioning, String friendlyURLSeparator,
-			Map<java.util.Locale, String> labelMap, String name,
-			String panelAppOrder, String panelCategoryKey,
+			boolean enableObjectEntryVersioning, boolean enableRecycleBin,
+			String friendlyURLSeparator, Map<java.util.Locale, String> labelMap,
+			String name, String panelAppOrder, String panelCategoryKey,
 			Map<java.util.Locale, String> pluralLabelMap, boolean portlet,
 			String scope, String storageType,
 			List<com.liferay.object.model.ObjectDefinitionSetting>
@@ -52,9 +52,10 @@ public class ObjectDefinitionServiceUtil {
 			enableFriendlyURLCustomization, enableIndexSearch,
 			enableLocalization, enableObjectEntryDraft,
 			enableObjectEntrySchedule, enableObjectEntrySubscription,
-			enableObjectEntryVersioning, friendlyURLSeparator, labelMap, name,
-			panelAppOrder, panelCategoryKey, pluralLabelMap, portlet, scope,
-			storageType, objectDefinitionSettings, objectFields);
+			enableObjectEntryVersioning, enableRecycleBin, friendlyURLSeparator,
+			labelMap, name, panelAppOrder, panelCategoryKey, pluralLabelMap,
+			portlet, scope, storageType, objectDefinitionSettings,
+			objectFields);
 	}
 
 	public static ObjectDefinition addObjectDefinition(
@@ -73,9 +74,9 @@ public class ObjectDefinitionServiceUtil {
 			boolean enableLocalization, boolean enableObjectEntryDraft,
 			boolean enableObjectEntrySchedule,
 			boolean enableObjectEntrySubscription,
-			boolean enableObjectEntryVersioning, String friendlyURLSeparator,
-			Map<java.util.Locale, String> labelMap, String name,
-			String panelAppOrder, String panelCategoryKey,
+			boolean enableObjectEntryVersioning, boolean enableRecycleBin,
+			String friendlyURLSeparator, Map<java.util.Locale, String> labelMap,
+			String name, String panelAppOrder, String panelCategoryKey,
 			Map<java.util.Locale, String> pluralLabelMap, boolean portlet,
 			String scope,
 			List<com.liferay.object.model.ObjectDefinitionSetting>
@@ -88,9 +89,9 @@ public class ObjectDefinitionServiceUtil {
 			enableComments, enableFriendlyURLCustomization, enableIndexSearch,
 			enableLocalization, enableObjectEntryDraft,
 			enableObjectEntrySchedule, enableObjectEntrySubscription,
-			enableObjectEntryVersioning, friendlyURLSeparator, labelMap, name,
-			panelAppOrder, panelCategoryKey, pluralLabelMap, portlet, scope,
-			objectDefinitionSettings, objectFields);
+			enableObjectEntryVersioning, enableRecycleBin, friendlyURLSeparator,
+			labelMap, name, panelAppOrder, panelCategoryKey, pluralLabelMap,
+			portlet, scope, objectDefinitionSettings, objectFields);
 	}
 
 	public static ObjectDefinition deleteObjectDefinition(
@@ -185,11 +186,11 @@ public class ObjectDefinitionServiceUtil {
 			boolean enableObjectEntryDraft, boolean enableObjectEntryHistory,
 			boolean enableObjectEntrySchedule,
 			boolean enableObjectEntrySubscription,
-			boolean enableObjectEntryVersioning, String friendlyURLSeparator,
-			Map<java.util.Locale, String> labelMap, String name,
-			String panelAppOrder, String panelCategoryKey, boolean portlet,
-			Map<java.util.Locale, String> pluralLabelMap, String scope,
-			int status,
+			boolean enableObjectEntryVersioning, boolean enableRecycleBin,
+			String friendlyURLSeparator, Map<java.util.Locale, String> labelMap,
+			String name, String panelAppOrder, String panelCategoryKey,
+			boolean portlet, Map<java.util.Locale, String> pluralLabelMap,
+			String scope, int status,
 			List<com.liferay.object.model.ObjectDefinitionSetting>
 				objectDefinitionSettings)
 		throws PortalException {
@@ -203,9 +204,9 @@ public class ObjectDefinitionServiceUtil {
 			enableLocalization, enableObjectEntryDraft,
 			enableObjectEntryHistory, enableObjectEntrySchedule,
 			enableObjectEntrySubscription, enableObjectEntryVersioning,
-			friendlyURLSeparator, labelMap, name, panelAppOrder,
-			panelCategoryKey, portlet, pluralLabelMap, scope, status,
-			objectDefinitionSettings);
+			enableRecycleBin, friendlyURLSeparator, labelMap, name,
+			panelAppOrder, panelCategoryKey, portlet, pluralLabelMap, scope,
+			status, objectDefinitionSettings);
 	}
 
 	public static ObjectDefinition updateExternalReferenceCode(

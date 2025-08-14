@@ -113,6 +113,10 @@ public class ObjectDefinitionTable extends BaseTable<ObjectDefinitionTable> {
 		enableObjectEntryVersioning = createColumn(
 			"enableObjectEntryVersioning", Boolean.class, Types.BOOLEAN,
 			Column.FLAG_DEFAULT);
+	public final Column<ObjectDefinitionTable, Boolean> enableRecycleBin =
+		createColumn(
+			"enableRecycleBin", Boolean.class, Types.BOOLEAN,
+			Column.FLAG_DEFAULT);
 	public final Column<ObjectDefinitionTable, String> friendlyURLSeparator =
 		createColumn(
 			"friendlyURLSeparator", String.class, Types.VARCHAR,

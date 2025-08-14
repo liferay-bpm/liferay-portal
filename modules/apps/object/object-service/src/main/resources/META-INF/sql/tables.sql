@@ -50,6 +50,7 @@ create table ObjectDefinition (
 	enableObjectEntrySchedule BOOLEAN,
 	enableObjectEntrySubscription BOOLEAN,
 	enableObjectEntryVersioning BOOLEAN,
+	enableRecycleBin BOOLEAN,
 	friendlyURLSeparator VARCHAR(75) null,
 	label STRING null,
 	modifiable BOOLEAN,

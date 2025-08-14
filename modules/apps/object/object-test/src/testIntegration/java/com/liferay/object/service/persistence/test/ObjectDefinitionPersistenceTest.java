@@ -181,6 +181,8 @@ public class ObjectDefinitionPersistenceTest {
 		newObjectDefinition.setEnableObjectEntryVersioning(
 			RandomTestUtil.randomBoolean());
 
+		newObjectDefinition.setEnableRecycleBin(RandomTestUtil.randomBoolean());
+
 		newObjectDefinition.setFriendlyURLSeparator(
 			RandomTestUtil.randomString());
 
@@ -298,6 +300,9 @@ public class ObjectDefinitionPersistenceTest {
 		Assert.assertEquals(
 			existingObjectDefinition.isEnableObjectEntryVersioning(),
 			newObjectDefinition.isEnableObjectEntryVersioning());
+		Assert.assertEquals(
+			existingObjectDefinition.isEnableRecycleBin(),
+			newObjectDefinition.isEnableRecycleBin());
 		Assert.assertEquals(
 			existingObjectDefinition.getFriendlyURLSeparator(),
 			newObjectDefinition.getFriendlyURLSeparator());
@@ -566,12 +571,12 @@ public class ObjectDefinitionPersistenceTest {
 			"enableLocalization", true, "enableObjectEntryDraft", true,
 			"enableObjectEntryHistory", true, "enableObjectEntrySchedule", true,
 			"enableObjectEntrySubscription", true,
-			"enableObjectEntryVersioning", true, "friendlyURLSeparator", true,
-			"label", true, "modifiable", true, "name", true, "panelAppOrder",
-			true, "panelCategoryKey", true, "pkObjectFieldDBColumnName", true,
-			"pkObjectFieldName", true, "pluralLabel", true, "portlet", true,
-			"scope", true, "storageType", true, "system", true, "version", true,
-			"status", true);
+			"enableObjectEntryVersioning", true, "enableRecycleBin", true,
+			"friendlyURLSeparator", true, "label", true, "modifiable", true,
+			"name", true, "panelAppOrder", true, "panelCategoryKey", true,
+			"pkObjectFieldDBColumnName", true, "pkObjectFieldName", true,
+			"pluralLabel", true, "portlet", true, "scope", true, "storageType",
+			true, "system", true, "version", true, "status", true);
 	}
 
 	@Test
@@ -949,6 +954,8 @@ public class ObjectDefinitionPersistenceTest {
 
 		objectDefinition.setEnableObjectEntryVersioning(
 			RandomTestUtil.randomBoolean());
+
+		objectDefinition.setEnableRecycleBin(RandomTestUtil.randomBoolean());
 
 		objectDefinition.setFriendlyURLSeparator(RandomTestUtil.randomString());
 
