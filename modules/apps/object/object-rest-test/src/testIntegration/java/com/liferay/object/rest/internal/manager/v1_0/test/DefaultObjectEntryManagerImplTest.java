@@ -6234,7 +6234,7 @@ public class DefaultObjectEntryManagerImplTest
 		ObjectEntry objectEntry = _addObjectEntry(
 			objectDefinition, _group.getGroupKey(), 1);
 
-		_updateObjectEntryVersion(_objectDefinition1, objectEntry, 2);
+		_updateObjectEntryVersion(objectDefinition, objectEntry, 2);
 
 		_defaultObjectEntryManager.deleteObjectEntry(
 			dtoConverterContext, objectDefinition, objectEntry.getId());
@@ -6260,7 +6260,7 @@ public class DefaultObjectEntryManagerImplTest
 				WorkflowConstants.STATUS_IN_TRASH,
 				objectEntryVersion.getStatus()));
 
-		_assertObjectEntriesSize1(_objectDefinition1, 0);
+		_assertObjectEntriesSize1(objectDefinition, 0);
 
 		_defaultObjectEntryManager.deleteObjectEntry(
 			dtoConverterContext, objectDefinition, objectEntry.getId());
@@ -8795,7 +8795,7 @@ public class DefaultObjectEntryManagerImplTest
 		throws Exception {
 
 		Page<ObjectEntry> page = _defaultObjectEntryManager.getObjectEntries(
-			companyId, objectDefinition, null, null,
+			companyId, objectDefinition, _group.getGroupKey(), null,
 			new DefaultDTOConverterContext(
 				false, Collections.emptyMap(), dtoConverterRegistry, null,
 				LocaleUtil.getDefault(), null, _user),
