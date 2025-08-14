@@ -8,6 +8,7 @@ package com.liferay.object.service.impl;
 import com.liferay.object.configuration.ObjectEntryVersionConfiguration;
 import com.liferay.object.entry.util.ObjectEntryDTOConverterUtil;
 import com.liferay.object.exception.RequiredObjectEntryVersionException;
+import com.liferay.object.field.attachment.AttachmentManager;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryVersion;
 import com.liferay.object.service.base.ObjectEntryVersionLocalServiceBaseImpl;
@@ -32,11 +33,15 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 
+import java.io.Serializable;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -164,6 +169,18 @@ public class ObjectEntryVersionLocalServiceImpl
 
 		objectEntryVersion = objectEntryVersionPersistence.findByOEI_V(
 			objectEntryId, version);
+
+		com.liferay.object.rest.dto.v1_0.ObjectEntry objectEntry =
+			com.liferay.object.rest.dto.v1_0.ObjectEntry.unsafeToDTO(
+				objectEntryVersion.getContent());
+
+		_attachmentManager.deleteFileEntries(
+			Collections.emptyMap(), objectEntryVersion.getObjectDefinitionId(),
+			() -> {
+				Map<String, Object> properties = objectEntry.getProperties();
+
+				return (Map<String, Serializable>)properties.get("properties");
+			});
 
 		return deleteObjectEntryVersion(objectEntryVersion);
 	}
@@ -405,6 +422,9 @@ public class ObjectEntryVersionLocalServiceImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectEntryVersionLocalServiceImpl.class);
+
+	@Reference
+	private AttachmentManager _attachmentManager;
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;

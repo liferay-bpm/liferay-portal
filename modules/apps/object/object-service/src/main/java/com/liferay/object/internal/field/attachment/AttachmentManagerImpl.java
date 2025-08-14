@@ -13,11 +13,13 @@ import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFolderLocalService;
 import com.liferay.document.library.kernel.service.DLFolderService;
 import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.document.library.kernel.util.DLValidator;
 import com.liferay.object.configuration.ObjectConfiguration;
+import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.field.attachment.AttachmentManager;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
@@ -32,6 +34,8 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
@@ -49,8 +53,15 @@ import com.liferay.portlet.documentlibrary.util.DLAppUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -66,6 +77,117 @@ import org.osgi.service.component.annotations.Reference;
 	service = AttachmentManager.class
 )
 public class AttachmentManagerImpl implements AttachmentManager {
+
+	@Override
+	public void deleteFileEntries(
+		Map<String, Serializable> newValues, long objectDefinitionId,
+		Supplier<Map<String, Serializable>> oldValuesSupplier) {
+
+		List<ObjectField> objectFields =
+			_objectFieldLocalService.getObjectFields(objectDefinitionId);
+
+		Map<String, Serializable> oldValues = null;
+
+		for (ObjectField objectField : objectFields) {
+			if (objectField.isSystem() ||
+				!Objects.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
+
+				continue;
+			}
+
+			if (oldValues == null) {
+				oldValues = oldValuesSupplier.get();
+			}
+
+			ObjectFieldSetting objectFieldSetting =
+				_objectFieldSettingLocalService.fetchObjectFieldSetting(
+					objectField.getObjectFieldId(),
+					ObjectFieldSettingConstants.NAME_FILE_SOURCE);
+
+			if (!Objects.equals(
+					objectFieldSetting.getValue(),
+					ObjectFieldSettingConstants.VALUE_USER_COMPUTER)) {
+
+				continue;
+			}
+
+			objectFieldSetting =
+				_objectFieldSettingLocalService.fetchObjectFieldSetting(
+					objectField.getObjectFieldId(),
+					ObjectFieldSettingConstants.
+						NAME_SHOW_FILES_IN_DOCS_AND_MEDIA);
+
+			if ((objectFieldSetting != null) &&
+				GetterUtil.getBoolean(objectFieldSetting.getValue())) {
+
+				continue;
+			}
+
+			List<Long> orphanedFileEntryIds = new ArrayList<>();
+
+			if (objectField.isLocalized()) {
+				Map<String, Serializable> oldLocalizedValues =
+					(Map<String, Serializable>)oldValues.get(
+						objectField.getI18nObjectFieldName());
+
+				if (oldLocalizedValues == null) {
+					continue;
+				}
+
+				Map<String, Serializable> newLocalizedValues =
+					(Map<String, Serializable>)newValues.getOrDefault(
+						objectField.getI18nObjectFieldName(),
+						(Serializable)Collections.emptyMap());
+
+				Collection<Serializable> values = newLocalizedValues.values();
+
+				for (Map.Entry<String, Serializable> entry :
+						oldLocalizedValues.entrySet()) {
+
+					long fileEntryId = _getFileEntryId(entry.getValue());
+
+					if (values.contains(fileEntryId)) {
+						continue;
+					}
+
+					orphanedFileEntryIds.add(fileEntryId);
+				}
+			}
+			else {
+				String objectFieldName = objectField.getName();
+
+				long fileEntryId = _getFileEntryId(
+					oldValues.get(objectFieldName));
+
+				if (Objects.equals(
+						GetterUtil.getLong(newValues.get(objectFieldName)),
+						fileEntryId)) {
+
+					continue;
+				}
+
+				orphanedFileEntryIds.add(fileEntryId);
+			}
+
+			try {
+				for (Long orphanedFileEntryId : orphanedFileEntryIds) {
+					if (orphanedFileEntryId == 0) {
+						continue;
+					}
+
+					_dlFileEntryLocalService.deleteFileEntry(
+						orphanedFileEntryId);
+				}
+			}
+			catch (PortalException portalException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(portalException);
+				}
+			}
+		}
+	}
 
 	@Override
 	public String[] getAcceptedFileExtensions(long objectFieldId) {
@@ -280,6 +402,20 @@ public class AttachmentManagerImpl implements AttachmentManager {
 			ObjectConfiguration.class, properties);
 	}
 
+	private long _getFileEntryId(Object value) {
+		if (value instanceof Number) {
+			return GetterUtil.getLong(value);
+		}
+
+		if (value instanceof Map) {
+			Map<String, Object> valueMap = (Map<String, Object>)value;
+
+			return GetterUtil.getLong(valueMap.get("id"));
+		}
+
+		return 0;
+	}
+
 	private long _getObjectFieldSettingMaximumFileSize(long objectFieldId) {
 		ObjectFieldSetting objectFieldSetting =
 			_objectFieldSettingLocalService.fetchObjectFieldSetting(
@@ -416,11 +552,17 @@ public class AttachmentManagerImpl implements AttachmentManager {
 
 	private static final long _FILE_LENGTH_MB = 1024 * 1024;
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		AttachmentManagerImpl.class);
+
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
 
 	@Reference
 	private DLAppService _dlAppService;
+
+	@Reference
+	private DLFileEntryLocalService _dlFileEntryLocalService;
 
 	@Reference
 	private DLFolderLocalService _dlFolderLocalService;

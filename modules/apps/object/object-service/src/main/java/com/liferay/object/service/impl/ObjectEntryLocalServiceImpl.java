@@ -294,7 +294,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import javax.crypto.spec.SecretKeySpec;
 
@@ -694,7 +693,7 @@ public class ObjectEntryLocalServiceImpl
 				objectEntry.getObjectEntryId());
 		}
 
-		_deleteFileEntries(
+		_attachmentManager.deleteFileEntries(
 			Collections.emptyMap(), objectDefinition.getObjectDefinitionId(),
 			objectEntry::getValues);
 
@@ -2778,110 +2777,8 @@ public class ObjectEntryLocalServiceImpl
 		Map<String, Serializable> newValues, long objectDefinitionId,
 		Map<String, Serializable> oldValues) {
 
-		_deleteFileEntries(newValues, objectDefinitionId, () -> oldValues);
-	}
-
-	private void _deleteFileEntries(
-		Map<String, Serializable> newValues, long objectDefinitionId,
-		Supplier<Map<String, Serializable>> oldValuesSupplier) {
-
-		List<ObjectField> objectFields =
-			_objectFieldPersistence.findByObjectDefinitionId(
-				objectDefinitionId);
-
-		Map<String, Serializable> oldValues = null;
-
-		for (ObjectField objectField : objectFields) {
-			if (objectField.isSystem() ||
-				!Objects.equals(
-					objectField.getBusinessType(),
-					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
-
-				continue;
-			}
-
-			if (oldValues == null) {
-				oldValues = oldValuesSupplier.get();
-			}
-
-			ObjectFieldSetting objectFieldSetting =
-				_objectFieldSettingPersistence.fetchByOFI_N(
-					objectField.getObjectFieldId(), "fileSource");
-
-			if (!Objects.equals(
-					objectFieldSetting.getValue(), "userComputer")) {
-
-				continue;
-			}
-
-			objectFieldSetting = _objectFieldSettingPersistence.fetchByOFI_N(
-				objectField.getObjectFieldId(), "showFilesInDocumentsAndMedia");
-
-			if ((objectFieldSetting != null) &&
-				GetterUtil.getBoolean(objectFieldSetting.getValue())) {
-
-				continue;
-			}
-
-			List<Long> orphanedFileEntryIds = new ArrayList<>();
-
-			if (objectField.isLocalized()) {
-				Map<String, Serializable> oldLocalizedValues =
-					(Map<String, Serializable>)oldValues.get(
-						objectField.getI18nObjectFieldName());
-
-				if (oldLocalizedValues == null) {
-					continue;
-				}
-
-				Map<String, Serializable> newLocalizedValues =
-					(Map<String, Serializable>)newValues.getOrDefault(
-						objectField.getI18nObjectFieldName(),
-						(Serializable)Collections.emptyMap());
-
-				Collection<Serializable> values = newLocalizedValues.values();
-
-				for (Map.Entry<String, Serializable> entry :
-						oldLocalizedValues.entrySet()) {
-
-					if (values.contains(entry.getValue())) {
-						continue;
-					}
-
-					orphanedFileEntryIds.add(
-						GetterUtil.getLong(entry.getValue()));
-				}
-			}
-			else {
-				String objectFieldName = objectField.getName();
-
-				if (Objects.equals(
-						GetterUtil.getLong(newValues.get(objectFieldName)),
-						GetterUtil.getLong(oldValues.get(objectFieldName)))) {
-
-					continue;
-				}
-
-				orphanedFileEntryIds.add(
-					GetterUtil.getLong(oldValues.get(objectFieldName)));
-			}
-
-			try {
-				for (Long orphanedFileEntryId : orphanedFileEntryIds) {
-					if (orphanedFileEntryId == 0) {
-						continue;
-					}
-
-					_dlFileEntryLocalService.deleteFileEntry(
-						orphanedFileEntryId);
-				}
-			}
-			catch (PortalException portalException) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
-				}
-			}
-		}
+		_attachmentManager.deleteFileEntries(
+			newValues, objectDefinitionId, () -> oldValues);
 	}
 
 	private void _deleteFromLocalizationTable(

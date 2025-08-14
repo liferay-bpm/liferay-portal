@@ -13,10 +13,19 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
 
+import java.io.Serializable;
+
+import java.util.Map;
+import java.util.function.Supplier;
+
 /**
  * @author Carlos Correa
  */
 public interface AttachmentManager {
+
+	public void deleteFileEntries(
+		Map<String, Serializable> newValues, long objectDefinitionId,
+		Supplier<Map<String, Serializable>> oldValuesSupplier);
 
 	public String[] getAcceptedFileExtensions(long objectFieldId);
 
