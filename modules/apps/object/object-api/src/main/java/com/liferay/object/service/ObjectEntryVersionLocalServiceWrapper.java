@@ -138,7 +138,8 @@ public class ObjectEntryVersionLocalServiceWrapper
 
 	@Override
 	public void deleteObjectEntryVersionByObjectDefinitionId(
-		Long objectDefinitionId) {
+			Long objectDefinitionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_objectEntryVersionLocalService.
 			deleteObjectEntryVersionByObjectDefinitionId(objectDefinitionId);

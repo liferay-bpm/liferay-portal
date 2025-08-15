@@ -27,6 +27,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -170,32 +172,67 @@ public class ObjectEntryVersionLocalServiceImpl
 		objectEntryVersion = objectEntryVersionPersistence.findByOEI_V(
 			objectEntryId, version);
 
-		com.liferay.object.rest.dto.v1_0.ObjectEntry objectEntry =
-			com.liferay.object.rest.dto.v1_0.ObjectEntry.unsafeToDTO(
-				objectEntryVersion.getContent());
+		return deleteObjectEntryVersion(objectEntryVersion);
+	}
+
+	@Indexable(type = IndexableType.DELETE)
+	@Override
+	public ObjectEntryVersion deleteObjectEntryVersion(
+		ObjectEntryVersion objectEntryVersion) {
 
 		_attachmentManager.deleteFileEntries(
 			Collections.emptyMap(), objectEntryVersion.getObjectDefinitionId(),
 			() -> {
+				com.liferay.object.rest.dto.v1_0.ObjectEntry objectEntry =
+					com.liferay.object.rest.dto.v1_0.ObjectEntry.unsafeToDTO(
+						objectEntryVersion.getContent());
+
 				Map<String, Object> properties = objectEntry.getProperties();
 
 				return (Map<String, Serializable>)properties.get("properties");
 			});
 
-		return deleteObjectEntryVersion(objectEntryVersion);
+		return objectEntryVersionPersistence.remove(objectEntryVersion);
 	}
 
 	@Override
 	public void deleteObjectEntryVersionByObjectDefinitionId(
-		Long objectDefinitionId) {
+			Long objectDefinitionId)
+		throws PortalException {
 
-		objectEntryVersionPersistence.removeByObjectDefinitionId(
-			objectDefinitionId);
+		ActionableDynamicQuery actionableDynamicQuery =
+			getActionableDynamicQuery();
+
+		actionableDynamicQuery.setAddCriteriaMethod(
+			dynamicQuery -> {
+				Property objectDefinitionIdProperty =
+					PropertyFactoryUtil.forName("objectDefinitionId");
+
+				dynamicQuery.add(
+					objectDefinitionIdProperty.eq(objectDefinitionId));
+			});
+		actionableDynamicQuery.setPerformActionMethod(
+			(ObjectEntryVersion objectEntryVersion) -> {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Deleting object entry version " +
+							objectEntryVersion.getObjectEntryVersionId());
+				}
+
+				deleteObjectEntryVersion(objectEntryVersion);
+			});
+
+		actionableDynamicQuery.performActions();
 	}
 
 	@Override
 	public void deleteObjectEntryVersions(long objectEntryId) {
-		objectEntryVersionPersistence.removeByObjectEntryId(objectEntryId);
+		for (ObjectEntryVersion objectEntryVersion :
+				objectEntryVersionPersistence.findByObjectEntryId(
+					objectEntryId)) {
+
+			deleteObjectEntryVersion(objectEntryVersion);
+		}
 	}
 
 	@Override

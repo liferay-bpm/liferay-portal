@@ -129,7 +129,8 @@ public class ObjectEntryVersionLocalServiceUtil {
 	}
 
 	public static void deleteObjectEntryVersionByObjectDefinitionId(
-		Long objectDefinitionId) {
+			Long objectDefinitionId)
+		throws PortalException {
 
 		getService().deleteObjectEntryVersionByObjectDefinitionId(
 			objectDefinitionId);

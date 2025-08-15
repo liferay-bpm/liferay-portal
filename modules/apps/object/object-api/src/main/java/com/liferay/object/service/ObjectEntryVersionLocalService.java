@@ -126,7 +126,8 @@ public interface ObjectEntryVersionLocalService
 		ObjectEntryVersion objectEntryVersion);
 
 	public void deleteObjectEntryVersionByObjectDefinitionId(
-		Long objectDefinitionId);
+			Long objectDefinitionId)
+		throws PortalException;
 
 	public void deleteObjectEntryVersions(long objectEntryId);
 
