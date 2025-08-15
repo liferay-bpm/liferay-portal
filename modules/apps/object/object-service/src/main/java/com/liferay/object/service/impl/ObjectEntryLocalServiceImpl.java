@@ -654,7 +654,7 @@ public class ObjectEntryLocalServiceImpl
 			0, objectDefinition.getObjectDefinitionId(), primaryKey);
 
 		_deleteFileEntries(
-			Collections.emptyMap(), objectDefinition.getObjectDefinitionId(),
+			Collections.emptyMap(), _objectFieldLocalService.getObjectFieldsByBusinessType(objectDefinition.getObjectDefinitionId(),ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT),
 			extensionDynamicObjectDefinitionTableValues);
 	}
 
@@ -694,7 +694,8 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		_attachmentManager.deleteFileEntries(
-			Collections.emptyMap(), objectDefinition.getObjectDefinitionId(),
+			Collections.emptyMap(), _objectFieldLocalService.getObjectFieldsByBusinessType(objectDefinition.getObjectDefinitionId(),
+				ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT),
 			objectEntry::getValues);
 
 		if (FeatureFlagManagerUtil.isEnabled("LPD-53981")) {
@@ -2774,11 +2775,11 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	private void _deleteFileEntries(
-		Map<String, Serializable> newValues, long objectDefinitionId,
+		Map<String, Serializable> newValues, List<ObjectField> objectFields,
 		Map<String, Serializable> oldValues) {
 
 		_attachmentManager.deleteFileEntries(
-			newValues, objectDefinitionId, () -> oldValues);
+			newValues, objectFields, () -> oldValues);
 	}
 
 	private void _deleteFromLocalizationTable(
@@ -5745,13 +5746,15 @@ public class ObjectEntryLocalServiceImpl
 
 		Map<ObjectField, Set<DLFileEntry>> dlFileEntriesMap = new HashMap<>();
 
+		List<ObjectField> objectFields = _objectFieldLocalService.getObjectFields(
+			objectDefinition.getObjectDefinitionId());
+
 		_validateValues(
 			objectEntry.getDefaultLanguageId(), dlFileEntriesMap,
 			objectEntry.getValues(), objectEntry.getGroupId(),
 			user.isGuestUser(), objectDefinition,
 			objectEntry.getObjectEntryId(),
-			_objectFieldLocalService.getObjectFields(
-				objectDefinition.getObjectDefinitionId()),
+			objectFields,
 			partialUpdate, serviceContext, objectEntry.getStatus(), userId,
 			null, values);
 
@@ -5835,7 +5838,10 @@ public class ObjectEntryLocalServiceImpl
 
 		if (!objectDefinition.isEnableObjectEntryVersioning()) {
 			_deleteFileEntries(
-				objectEntry.getValues(), objectEntry.getObjectDefinitionId(),
+				objectEntry.getValues(),ListUtil.filter(
+					objectFields,
+					objectField ->
+						objectField.compareBusinessType(ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)),
 				transientValues);
 		}
 

@@ -9,12 +9,14 @@ import com.liferay.document.library.kernel.exception.FileExtensionException;
 import com.liferay.document.library.kernel.exception.FileNameException;
 import com.liferay.document.library.kernel.exception.FileSizeException;
 import com.liferay.document.library.kernel.model.DLFolder;
+import com.liferay.object.model.ObjectField;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -24,7 +26,7 @@ import java.util.function.Supplier;
 public interface AttachmentManager {
 
 	public void deleteFileEntries(
-		Map<String, Serializable> newValues, long objectDefinitionId,
+		Map<String, Serializable> newValues, List<ObjectField> objectFields,
 		Supplier<Map<String, Serializable>> oldValuesSupplier);
 
 	public String[] getAcceptedFileExtensions(long objectFieldId);

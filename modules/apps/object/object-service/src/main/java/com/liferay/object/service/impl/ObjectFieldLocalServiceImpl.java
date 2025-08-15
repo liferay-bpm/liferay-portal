@@ -5,7 +5,6 @@
 
 package com.liferay.object.service.impl;
 
-import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
 import com.liferay.object.constants.ObjectDefinitionConstants;
@@ -30,6 +29,7 @@ import com.liferay.object.exception.ObjectFieldSettingValueException;
 import com.liferay.object.exception.ObjectFieldStateException;
 import com.liferay.object.exception.ObjectFieldSystemException;
 import com.liferay.object.exception.RequiredObjectFieldException;
+import com.liferay.object.field.attachment.AttachmentManager;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.field.util.ObjectFieldUtil;
@@ -40,6 +40,7 @@ import com.liferay.object.internal.field.setting.contributor.StateFlowObjectFiel
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryTable;
+import com.liferay.object.model.ObjectEntryVersion;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.model.ObjectRelationship;
@@ -47,6 +48,7 @@ import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionLocalizationTable
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionLocalizationTableFactory;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTableUtil;
+import com.liferay.object.service.ObjectEntryVersionLocalService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectFilterLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
@@ -101,6 +103,7 @@ import java.io.Serializable;
 import java.sql.Connection;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -1138,27 +1141,60 @@ public class ObjectFieldLocalServiceImpl
 
 			ObjectFieldSetting objectFieldSetting =
 				_objectFieldSettingPersistence.fetchByOFI_N(
-					objectField.getObjectFieldId(), "fileSource");
+					objectField.getObjectFieldId(),
+					ObjectFieldSettingConstants.NAME_FILE_SOURCE);
 
-			if (Objects.equals(objectFieldSetting.getValue(), "userComputer")) {
-				List<ObjectEntry> objectEntries =
-					_objectEntryPersistence.findByObjectDefinitionId(
-						objectField.getObjectDefinitionId());
+			if (Objects.equals(
+					objectFieldSetting.getValue(),
+					ObjectFieldSettingConstants.VALUE_USER_COMPUTER)) {
 
-				for (ObjectEntry objectEntry : objectEntries) {
+				objectFieldSetting =
+					_objectFieldSettingPersistence.fetchByOFI_N(
+						objectField.getObjectFieldId(),
+						ObjectFieldSettingConstants.
+							NAME_SHOW_FILES_IN_DOCS_AND_MEDIA);
 
-					// getValues must be called before deleting the object field
+				if ((objectFieldSetting == null) ||
+					!GetterUtil.getBoolean(objectFieldSetting.getValue())) {
 
-					Map<String, Serializable> values = objectEntry.getValues();
+					for (ObjectEntry objectEntry :
+							_objectEntryPersistence.findByObjectDefinitionId(
+								objectField.getObjectDefinitionId())) {
 
-					try {
-						_dlFileEntryLocalService.deleteFileEntry(
-							GetterUtil.getLong(
-								values.get(objectField.getName())));
-					}
-					catch (PortalException portalException) {
-						if (_log.isDebugEnabled()) {
-							_log.debug(portalException);
+						// getValues must be called before deleting the object
+						// field
+
+						_attachmentManager.deleteFileEntries(
+							Collections.emptyMap(), ,
+							objectDefinition.getObjectDefinitionId(),
+							objectEntry::getValues);
+
+						if (!objectDefinition.isEnableObjectEntryVersioning()) {
+							continue;
+						}
+
+						for (ObjectEntryVersion objectEntryVersion :
+								_objectEntryVersionLocalService.
+									getObjectEntryVersions(
+										objectEntry.getObjectEntryId())) {
+
+							_attachmentManager.deleteFileEntries(
+								Collections.emptyMap(), ,
+								objectEntryVersion.getObjectDefinitionId(),
+								() -> {
+									com.liferay.object.rest.dto.v1_0.ObjectEntry
+										objectEntryDTO =
+											com.liferay.object.rest.dto.v1_0.
+												ObjectEntry.unsafeToDTO(
+													objectEntryVersion.
+														getContent());
+
+									Map<String, Object> properties =
+										objectEntryDTO.getProperties();
+
+									return (Map<String, Serializable>)
+										properties.get("properties");
+								});
 						}
 					}
 				}
@@ -1844,6 +1880,9 @@ public class ObjectFieldLocalServiceImpl
 			ObjectFieldLocalServiceImpl.class,
 			ObjectRelationshipLocalService.class, null, true);
 
+	@Reference
+	private AttachmentManager _attachmentManager;
+
 	private final Map<String, String> _businessTypes = HashMapBuilder.put(
 		"BigDecimal", "PrecisionDecimal"
 	).put(
@@ -1875,9 +1914,6 @@ public class ObjectFieldLocalServiceImpl
 	private ObjectFieldSettingContributor _defaultObjectFieldSettingContributor;
 
 	@Reference
-	private DLFileEntryLocalService _dlFileEntryLocalService;
-
-	@Reference
 	private Language _language;
 
 	@Reference
@@ -1885,6 +1921,9 @@ public class ObjectFieldLocalServiceImpl
 
 	@Reference
 	private ObjectEntryPersistence _objectEntryPersistence;
+
+	@Reference
+	private ObjectEntryVersionLocalService _objectEntryVersionLocalService;
 
 	@Reference
 	private ObjectFieldBusinessTypeRegistry _objectFieldBusinessTypeRegistry;

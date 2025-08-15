@@ -80,11 +80,8 @@ public class AttachmentManagerImpl implements AttachmentManager {
 
 	@Override
 	public void deleteFileEntries(
-		Map<String, Serializable> newValues, long objectDefinitionId,
-		Supplier<Map<String, Serializable>> oldValuesSupplier) {
-
-		List<ObjectField> objectFields =
-			_objectFieldLocalService.getObjectFields(objectDefinitionId);
+		Map<String, Serializable> newValues,
+		List<ObjectField> objectFields, Supplier<Map<String, Serializable>> oldValuesSupplier) {
 
 		Map<String, Serializable> oldValues = null;
 

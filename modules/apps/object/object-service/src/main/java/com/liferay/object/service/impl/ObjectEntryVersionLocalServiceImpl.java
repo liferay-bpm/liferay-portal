@@ -181,7 +181,7 @@ public class ObjectEntryVersionLocalServiceImpl
 		ObjectEntryVersion objectEntryVersion) {
 
 		_attachmentManager.deleteFileEntries(
-			Collections.emptyMap(), objectEntryVersion.getObjectDefinitionId(),
+			Collections.emptyMap(), , objectEntryVersion.getObjectDefinitionId(),
 			() -> {
 				com.liferay.object.rest.dto.v1_0.ObjectEntry objectEntry =
 					com.liferay.object.rest.dto.v1_0.ObjectEntry.unsafeToDTO(
