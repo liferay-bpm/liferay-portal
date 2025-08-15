@@ -10,6 +10,7 @@ import {sub} from 'frontend-js-web';
 import {openGenericFDSDeleteConfirmationModal} from '../../common/utils/genericOpenModalUtil';
 import AuthorRenderer from './cell_renderers/AuthorRenderer';
 import SpaceRenderer from './cell_renderers/SpaceRenderer';
+import {executeRestoreItemAction} from './utils/executeRestoreItemAction';
 
 type Action = {
 	href: string;
@@ -21,9 +22,10 @@ interface ItemData {
 		expire: Action;
 		get: Action;
 		replace: Action;
+		restore: Action;
 		update: Action;
 	};
-	embedded: {content: string; title: string};
+	embedded: {content: string; objectEntryFolderId: number; title: string};
 }
 
 export default function RecycleBinFDSPropsTransformer({
@@ -83,6 +85,17 @@ export default function RecycleBinFDSPropsTransformer({
 					itemData.embedded.title,
 					loadData,
 					displayDeleteItemSuccessToast
+				);
+			}
+
+			if (action.data.id === 'restore') {
+				const formattedItemLabel = `<strong>${Liferay.Util.escapeHTML(itemData.embedded.title)}</strong>`;
+
+				executeRestoreItemAction(
+					formattedItemLabel,
+					loadData,
+					itemData.actions?.restore.method,
+					itemData.actions?.restore.href
 				);
 			}
 		},
