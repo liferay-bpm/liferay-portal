@@ -64,7 +64,11 @@ public class ViewRecycleBinSectionDisplayContext
 			new FDSActionDropdownItem(
 				null, "trash", "delete",
 				language.get(httpServletRequest, "delete"), null, "delete",
-				null));
+				null),
+			new FDSActionDropdownItem(
+				null, "restore", "restore",
+				language.get(httpServletRequest, "restore"), "restore",
+				"restore", null));
 	}
 
 	@Override
