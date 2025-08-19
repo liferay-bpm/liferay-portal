@@ -294,8 +294,20 @@ public interface ObjectEntryLocalService
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<ObjectEntry> getManyToManyObjectEntries(
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
+			boolean related, boolean reverse, String search, int start, int end)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getManyToManyObjectEntriesCount(
 			long groupId, long objectRelationshipId, long primaryKey,
+			boolean related, boolean reverse, String search)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getManyToManyObjectEntriesCount(
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
 			boolean related, boolean reverse, String search)
 		throws PortalException;
 
@@ -415,8 +427,20 @@ public interface ObjectEntryLocalService
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<ObjectEntry> getOneToManyObjectEntries(
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
+			boolean related, String search, int start, int end)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getOneToManyObjectEntriesCount(
 			long groupId, long objectRelationshipId, long primaryKey,
+			boolean related, String search)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getOneToManyObjectEntriesCount(
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
 			boolean related, String search)
 		throws PortalException;
 
