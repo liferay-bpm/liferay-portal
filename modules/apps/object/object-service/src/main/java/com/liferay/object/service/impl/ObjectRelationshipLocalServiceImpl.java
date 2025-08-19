@@ -1701,7 +1701,7 @@ public class ObjectRelationshipLocalServiceImpl
 				int relatedObjectEntriesCount =
 					_objectEntryLocalService.getOneToManyObjectEntriesCount(
 						0, objectRelationship.getObjectRelationshipId(), 0L,
-						false, null);
+						true, null);
 
 				if (relatedObjectEntriesCount > 0) {
 					throw new ObjectRelationshipEdgeException(
