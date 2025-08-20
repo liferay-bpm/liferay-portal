@@ -461,7 +461,8 @@ public class ObjectEntryServiceHttp {
 	public static com.liferay.portal.kernel.security.permission.resource.
 		ModelResourcePermission<com.liferay.object.model.ObjectEntry>
 				getModelResourcePermission(
-					HttpPrincipal httpPrincipal, long objectDefinitionId)
+					HttpPrincipal httpPrincipal, long objectDefinitionId,
+					long objectEntryId)
 			throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -470,7 +471,7 @@ public class ObjectEntryServiceHttp {
 				_getModelResourcePermissionParameterTypes10);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, objectDefinitionId);
+				methodKey, objectDefinitionId, objectEntryId);
 
 			Object returnObj = null;
 
@@ -1203,7 +1204,9 @@ public class ObjectEntryServiceHttp {
 			String.class
 		};
 	private static final Class<?>[]
-		_getModelResourcePermissionParameterTypes10 = new Class[] {long.class};
+		_getModelResourcePermissionParameterTypes10 = new Class[] {
+			long.class, long.class
+		};
 	private static final Class<?>[] _getObjectEntryParameterTypes11 =
 		new Class[] {long.class};
 	private static final Class<?>[] _getObjectEntryParameterTypes12 =

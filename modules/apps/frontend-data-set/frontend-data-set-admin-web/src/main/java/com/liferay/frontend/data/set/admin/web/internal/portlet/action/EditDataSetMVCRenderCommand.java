@@ -97,7 +97,8 @@ public class EditDataSetMVCRenderCommand implements MVCRenderCommand {
 
 		ModelResourcePermission<ObjectEntry> modelResourcePermission =
 			_objectEntryService.getModelResourcePermission(
-				objectDefinition.getObjectDefinitionId());
+				objectDefinition.getObjectDefinitionId(),
+				objectEntry.getObjectEntryId());
 
 		modelResourcePermission.check(
 			permissionChecker, objectEntry, ActionKeys.UPDATE);

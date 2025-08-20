@@ -276,15 +276,21 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 	@Override
 	public ModelResourcePermission<ObjectEntry> getModelResourcePermission(
-			long objectDefinitionId)
+			long objectDefinitionId, long objectEntryId)
 		throws PortalException {
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
-		if (objectDefinition.isRootDescendantNode()) {
+		ObjectEntry objectEntry = objectEntryLocalService.getObjectEntry(
+			objectEntryId);
+
+		ObjectEntry rootObjectEntry = _getRootObjectEntry(
+			objectDefinition, objectEntry.getValues());
+
+		if (rootObjectEntry != null) {
 			objectDefinition = _objectDefinitionPersistence.findByPrimaryKey(
-				objectDefinition.getRootObjectDefinitionId());
+				rootObjectEntry.getObjectDefinitionId());
 		}
 
 		return ModelResourcePermissionRegistryUtil.getModelResourcePermission(
@@ -386,7 +392,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 		throws PortalException {
 
 		ModelResourcePermission<ObjectEntry> modelResourcePermission =
-			getModelResourcePermission(objectDefinitionId);
+			getModelResourcePermission(objectDefinitionId, objectEntryId);
 
 		return modelResourcePermission.contains(
 			getPermissionChecker(), objectEntryId, actionId);
@@ -398,7 +404,9 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 		throws PortalException {
 
 		ModelResourcePermission<ObjectEntry> modelResourcePermission =
-			getModelResourcePermission(objectEntry.getObjectDefinitionId());
+			getModelResourcePermission(
+				objectEntry.getObjectDefinitionId(),
+				objectEntry.getObjectEntryId());
 
 		return modelResourcePermission.contains(
 			getPermissionChecker(), objectEntry, actionId);
@@ -413,7 +421,8 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 			objectEntryId);
 
 		ModelResourcePermission<ObjectEntry> modelResourcePermission =
-			getModelResourcePermission(objectEntry.getObjectDefinitionId());
+			getModelResourcePermission(
+				objectEntry.getObjectDefinitionId(), objectEntryId);
 
 		return modelResourcePermission.contains(
 			_permissionCheckerFactory.create(user), objectEntryId, actionId);
@@ -683,7 +692,8 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 		throws PortalException {
 
 		ModelResourcePermission<ObjectEntry> modelResourcePermission =
-			getModelResourcePermission(objectDefinitionId);
+			getModelResourcePermission(
+				objectDefinitionId, objectEntry.getObjectEntryId());
 
 		try {
 			modelResourcePermission.check(
@@ -791,7 +801,9 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 		}
 
 		ModelResourcePermission<ObjectEntry> modelResourcePermission =
-			getModelResourcePermission(rootObjectEntry.getObjectDefinitionId());
+			getModelResourcePermission(
+				rootObjectEntry.getObjectDefinitionId(),
+				rootObjectEntry.getObjectEntryId());
 
 		return modelResourcePermission.contains(
 			permissionChecker, rootObjectEntry, ActionKeys.UPDATE);

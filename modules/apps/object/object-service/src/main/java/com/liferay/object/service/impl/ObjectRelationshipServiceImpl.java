@@ -74,7 +74,7 @@ public class ObjectRelationshipServiceImpl
 
 		ModelResourcePermission<ObjectEntry> modelResourcePermission =
 			_objectEntryService.getModelResourcePermission(
-				objectRelationship.getObjectDefinitionId2());
+				objectRelationship.getObjectDefinitionId2(), primaryKey2);
 
 		modelResourcePermission.check(
 			getPermissionChecker(), primaryKey2, ActionKeys.UPDATE);
@@ -85,7 +85,7 @@ public class ObjectRelationshipServiceImpl
 
 			modelResourcePermission =
 				_objectEntryService.getModelResourcePermission(
-					objectRelationship.getObjectDefinitionId1());
+					objectRelationship.getObjectDefinitionId1(), primaryKey1);
 
 			modelResourcePermission.check(
 				getPermissionChecker(), primaryKey1, ActionKeys.UPDATE);

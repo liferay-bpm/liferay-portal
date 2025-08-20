@@ -1337,7 +1337,8 @@ public class DefaultObjectEntryManagerImpl
 			actionName, ObjectEntryResourceImpl.class,
 			serviceBuilderObjectEntry.getObjectEntryId(), methodName, null,
 			_objectEntryService.getModelResourcePermission(
-				serviceBuilderObjectEntry.getObjectDefinitionId()),
+				serviceBuilderObjectEntry.getObjectDefinitionId(),
+				serviceBuilderObjectEntry.getObjectEntryId()),
 			templateParameterMap, uriInfo);
 	}
 

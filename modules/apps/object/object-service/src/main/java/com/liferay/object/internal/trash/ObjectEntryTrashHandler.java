@@ -80,7 +80,7 @@ public class ObjectEntryTrashHandler extends BaseTrashHandler {
 
 		ModelResourcePermission<ObjectEntry> modelResourcePermission =
 			_objectEntryService.getModelResourcePermission(
-				_objectDefinition.getObjectDefinitionId());
+				_objectDefinition.getObjectDefinitionId(), 0L);
 
 		return modelResourcePermission.contains(
 			permissionChecker, classPK, actionId);

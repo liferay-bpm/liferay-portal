@@ -49,7 +49,7 @@ public class SubscribeContentItemStrutsAction implements StrutsAction {
 
 		ModelResourcePermission<ObjectEntry> modelResourcePermission =
 			_objectEntryService.getModelResourcePermission(
-				objectDefinition.getObjectDefinitionId());
+				objectDefinition.getObjectDefinitionId(), 0L);
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(

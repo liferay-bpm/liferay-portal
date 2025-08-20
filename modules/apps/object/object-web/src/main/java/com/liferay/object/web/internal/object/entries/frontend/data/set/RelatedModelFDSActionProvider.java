@@ -72,7 +72,8 @@ public class RelatedModelFDSActionProvider implements FDSActionProvider {
 
 				ModelResourcePermission<ObjectEntry> modelResourcePermission =
 					_objectEntryService.getModelResourcePermission(
-						objectEntry.getObjectDefinitionId());
+						objectEntry.getObjectDefinitionId(),
+						objectEntry.getObjectEntryId());
 
 				ThemeDisplay themeDisplay =
 					(ThemeDisplay)httpServletRequest.getAttribute(
