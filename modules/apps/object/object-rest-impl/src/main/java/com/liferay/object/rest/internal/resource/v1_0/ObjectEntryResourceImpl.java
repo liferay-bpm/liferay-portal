@@ -295,6 +295,23 @@ public class ObjectEntryResourceImpl
 	}
 
 	@Override
+	public Page<ObjectEntry> getApprovedPage(
+			String search, Aggregation aggregation, Filter filter,
+			Pagination pagination, Sort[] sorts)
+		throws Exception {
+
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			DefaultObjectEntryManagerProvider.provide(
+				_objectEntryManagerRegistry.getObjectEntryManager(
+					_objectDefinition.getStorageType()));
+
+		return defaultObjectEntryManager.getApprovedObjectEntries(
+			contextCompany.getCompanyId(), _objectDefinition, null, aggregation,
+			_getDTOConverterContext(null), _getFilterString(), pagination,
+			search, sorts);
+	}
+
+	@Override
 	public ObjectEntry getByExternalReferenceCode(String externalReferenceCode)
 		throws Exception {
 
@@ -456,6 +473,23 @@ public class ObjectEntryResourceImpl
 		}
 
 		return Scope.SITE;
+	}
+
+	@Override
+	public Page<ObjectEntry> getScopeScopeKeyApprovedPage(
+			String scopeKey, String search, Aggregation aggregation,
+			Filter filter, Pagination pagination, Sort[] sorts)
+		throws Exception {
+
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			DefaultObjectEntryManagerProvider.provide(
+				_objectEntryManagerRegistry.getObjectEntryManager(
+					_objectDefinition.getStorageType()));
+
+		return defaultObjectEntryManager.getApprovedObjectEntries(
+			contextCompany.getCompanyId(), _objectDefinition, scopeKey,
+			aggregation, _getDTOConverterContext(null), _getFilterString(),
+			pagination, search, sorts);
 	}
 
 	@Override
