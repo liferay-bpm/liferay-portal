@@ -709,7 +709,8 @@ public class DefaultObjectEntryManagerImpl
 	public Page<ObjectEntry> getObjectEntries(
 			long companyId, ObjectDefinition objectDefinition, String scopeKey,
 			Aggregation aggregation, DTOConverterContext dtoConverterContext,
-			Filter filter, Pagination pagination, String search, Sort[] sorts)
+			Filter filter, Pagination pagination, String search, Sort[] sorts,
+			int status)
 		throws Exception {
 
 		long groupId = getGroupId(objectDefinition, scopeKey);
@@ -746,8 +747,7 @@ public class DefaultObjectEntryManagerImpl
 				Field.ENTRY_CLASS_PK),
 			searchContext -> {
 				searchContext.addVulcanAggregation(aggregation);
-				searchContext.setAttribute(
-					Field.STATUS, WorkflowConstants.STATUS_ANY);
+				searchContext.setAttribute(Field.STATUS, status);
 				searchContext.setAttribute(
 					"objectDefinitionId",
 					objectDefinition.getObjectDefinitionId());
