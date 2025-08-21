@@ -6,9 +6,12 @@
 package com.liferay.object.rest.filter.parser;
 
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.InvalidFilterException;
 import com.liferay.portal.odata.filter.expression.Expression;
+
+import java.util.Locale;
 
 /**
  * @author Carlos Correa
@@ -17,6 +20,11 @@ public interface ObjectDefinitionFilterParser {
 
 	public Expression parse(
 			EntityModel entityModel, String filterString,
+			ObjectDefinition objectDefinition)
+		throws InvalidFilterException;
+
+	public Filter parse(
+			String filterString, Locale locale,
 			ObjectDefinition objectDefinition)
 		throws InvalidFilterException;
 
