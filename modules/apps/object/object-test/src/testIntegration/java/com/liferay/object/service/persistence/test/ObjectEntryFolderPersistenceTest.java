@@ -231,13 +231,12 @@ public class ObjectEntryFolderPersistenceTest {
 	}
 
 	@Test
-	public void testCountByERC_G_C() throws Exception {
-		_persistence.countByERC_G_C(
-			"", RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
+	public void testCountByERC_G() throws Exception {
+		_persistence.countByERC_G("", RandomTestUtil.nextLong());
 
-		_persistence.countByERC_G_C("null", 0L, 0L);
+		_persistence.countByERC_G("null", 0L);
 
-		_persistence.countByERC_G_C((String)null, 0L, 0L);
+		_persistence.countByERC_G((String)null, 0L);
 	}
 
 	@Test
@@ -597,11 +596,6 @@ public class ObjectEntryFolderPersistenceTest {
 			ReflectionTestUtil.<Long>invoke(
 				objectEntryFolder, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "groupId"));
-		Assert.assertEquals(
-			Long.valueOf(objectEntryFolder.getCompanyId()),
-			ReflectionTestUtil.<Long>invoke(
-				objectEntryFolder, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "companyId"));
 
 		Assert.assertEquals(
 			Long.valueOf(objectEntryFolder.getGroupId()),

@@ -132,7 +132,7 @@ public class ObjectEntryFolderServiceHttp {
 	public static com.liferay.object.model.ObjectEntryFolder
 			deleteObjectEntryFolderByExternalReferenceCode(
 				HttpPrincipal httpPrincipal, String externalReferenceCode,
-				long groupId, long companyId)
+				long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -142,7 +142,7 @@ public class ObjectEntryFolderServiceHttp {
 				_deleteObjectEntryFolderByExternalReferenceCodeParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, externalReferenceCode, groupId, companyId);
+				methodKey, externalReferenceCode, groupId);
 
 			Object returnObj = null;
 
@@ -216,7 +216,7 @@ public class ObjectEntryFolderServiceHttp {
 	public static com.liferay.object.model.ObjectEntryFolder
 			fetchObjectEntryFolderByExternalReferenceCode(
 				HttpPrincipal httpPrincipal, String externalReferenceCode,
-				long groupId, long companyId)
+				long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -226,7 +226,7 @@ public class ObjectEntryFolderServiceHttp {
 				_fetchObjectEntryFolderByExternalReferenceCodeParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, externalReferenceCode, groupId, companyId);
+				methodKey, externalReferenceCode, groupId);
 
 			Object returnObj = null;
 
@@ -300,7 +300,7 @@ public class ObjectEntryFolderServiceHttp {
 	public static com.liferay.object.model.ObjectEntryFolder
 			getObjectEntryFolderByExternalReferenceCode(
 				HttpPrincipal httpPrincipal, String externalReferenceCode,
-				long groupId, long companyId)
+				long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -310,7 +310,7 @@ public class ObjectEntryFolderServiceHttp {
 				_getObjectEntryFolderByExternalReferenceCodeParameterTypes6);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, externalReferenceCode, groupId, companyId);
+				methodKey, externalReferenceCode, groupId);
 
 			Object returnObj = null;
 
@@ -560,17 +560,17 @@ public class ObjectEntryFolderServiceHttp {
 		new Class[] {long.class};
 	private static final Class<?>[]
 		_deleteObjectEntryFolderByExternalReferenceCodeParameterTypes2 =
-			new Class[] {String.class, long.class, long.class};
+			new Class[] {String.class, long.class};
 	private static final Class<?>[] _fetchObjectEntryFolderParameterTypes3 =
 		new Class[] {long.class};
 	private static final Class<?>[]
 		_fetchObjectEntryFolderByExternalReferenceCodeParameterTypes4 =
-			new Class[] {String.class, long.class, long.class};
+			new Class[] {String.class, long.class};
 	private static final Class<?>[] _getObjectEntryFolderParameterTypes5 =
 		new Class[] {long.class};
 	private static final Class<?>[]
 		_getObjectEntryFolderByExternalReferenceCodeParameterTypes6 =
-			new Class[] {String.class, long.class, long.class};
+			new Class[] {String.class, long.class};
 	private static final Class<?>[] _getObjectEntryFoldersParameterTypes7 =
 		new Class[] {long.class, long.class, long.class, int.class, int.class};
 	private static final Class<?>[] _getObjectEntryFoldersCountParameterTypes8 =

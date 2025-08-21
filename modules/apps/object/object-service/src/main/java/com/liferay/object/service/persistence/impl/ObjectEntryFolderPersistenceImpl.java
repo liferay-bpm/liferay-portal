@@ -1413,27 +1413,26 @@ public class ObjectEntryFolderPersistenceImpl
 	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 =
 		"objectEntryFolder.companyId = ?";
 
-	private FinderPath _finderPathFetchByERC_G_C;
+	private FinderPath _finderPathFetchByERC_G;
 
 	/**
-	 * Returns the object entry folder where externalReferenceCode = &#63; and groupId = &#63; and companyId = &#63; or throws a <code>NoSuchObjectEntryFolderException</code> if it could not be found.
+	 * Returns the object entry folder where externalReferenceCode = &#63; and groupId = &#63; or throws a <code>NoSuchObjectEntryFolderException</code> if it could not be found.
 	 *
 	 * @param externalReferenceCode the external reference code
 	 * @param groupId the group ID
-	 * @param companyId the company ID
 	 * @return the matching object entry folder
 	 * @throws NoSuchObjectEntryFolderException if a matching object entry folder could not be found
 	 */
 	@Override
-	public ObjectEntryFolder findByERC_G_C(
-			String externalReferenceCode, long groupId, long companyId)
+	public ObjectEntryFolder findByERC_G(
+			String externalReferenceCode, long groupId)
 		throws NoSuchObjectEntryFolderException {
 
-		ObjectEntryFolder objectEntryFolder = fetchByERC_G_C(
-			externalReferenceCode, groupId, companyId);
+		ObjectEntryFolder objectEntryFolder = fetchByERC_G(
+			externalReferenceCode, groupId);
 
 		if (objectEntryFolder == null) {
-			StringBundler sb = new StringBundler(8);
+			StringBundler sb = new StringBundler(6);
 
 			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
@@ -1442,9 +1441,6 @@ public class ObjectEntryFolderPersistenceImpl
 
 			sb.append(", groupId=");
 			sb.append(groupId);
-
-			sb.append(", companyId=");
-			sb.append(companyId);
 
 			sb.append("}");
 
@@ -1459,49 +1455,44 @@ public class ObjectEntryFolderPersistenceImpl
 	}
 
 	/**
-	 * Returns the object entry folder where externalReferenceCode = &#63; and groupId = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the object entry folder where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
 	 * @param externalReferenceCode the external reference code
 	 * @param groupId the group ID
-	 * @param companyId the company ID
 	 * @return the matching object entry folder, or <code>null</code> if a matching object entry folder could not be found
 	 */
 	@Override
-	public ObjectEntryFolder fetchByERC_G_C(
-		String externalReferenceCode, long groupId, long companyId) {
+	public ObjectEntryFolder fetchByERC_G(
+		String externalReferenceCode, long groupId) {
 
-		return fetchByERC_G_C(externalReferenceCode, groupId, companyId, true);
+		return fetchByERC_G(externalReferenceCode, groupId, true);
 	}
 
 	/**
-	 * Returns the object entry folder where externalReferenceCode = &#63; and groupId = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the object entry folder where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param externalReferenceCode the external reference code
 	 * @param groupId the group ID
-	 * @param companyId the company ID
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching object entry folder, or <code>null</code> if a matching object entry folder could not be found
 	 */
 	@Override
-	public ObjectEntryFolder fetchByERC_G_C(
-		String externalReferenceCode, long groupId, long companyId,
-		boolean useFinderCache) {
+	public ObjectEntryFolder fetchByERC_G(
+		String externalReferenceCode, long groupId, boolean useFinderCache) {
 
 		externalReferenceCode = Objects.toString(externalReferenceCode, "");
 
 		Object[] finderArgs = null;
 
 		if (useFinderCache) {
-			finderArgs = new Object[] {
-				externalReferenceCode, groupId, companyId
-			};
+			finderArgs = new Object[] {externalReferenceCode, groupId};
 		}
 
 		Object result = null;
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByERC_G_C, finderArgs, this);
+				_finderPathFetchByERC_G, finderArgs, this);
 		}
 
 		if (result instanceof ObjectEntryFolder) {
@@ -1510,32 +1501,29 @@ public class ObjectEntryFolderPersistenceImpl
 			if (!Objects.equals(
 					externalReferenceCode,
 					objectEntryFolder.getExternalReferenceCode()) ||
-				(groupId != objectEntryFolder.getGroupId()) ||
-				(companyId != objectEntryFolder.getCompanyId())) {
+				(groupId != objectEntryFolder.getGroupId())) {
 
 				result = null;
 			}
 		}
 
 		if (result == null) {
-			StringBundler sb = new StringBundler(5);
+			StringBundler sb = new StringBundler(4);
 
 			sb.append(_SQL_SELECT_OBJECTENTRYFOLDER_WHERE);
 
 			boolean bindExternalReferenceCode = false;
 
 			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_ERC_G_C_EXTERNALREFERENCECODE_3);
+				sb.append(_FINDER_COLUMN_ERC_G_EXTERNALREFERENCECODE_3);
 			}
 			else {
 				bindExternalReferenceCode = true;
 
-				sb.append(_FINDER_COLUMN_ERC_G_C_EXTERNALREFERENCECODE_2);
+				sb.append(_FINDER_COLUMN_ERC_G_EXTERNALREFERENCECODE_2);
 			}
 
-			sb.append(_FINDER_COLUMN_ERC_G_C_GROUPID_2);
-
-			sb.append(_FINDER_COLUMN_ERC_G_C_COMPANYID_2);
+			sb.append(_FINDER_COLUMN_ERC_G_GROUPID_2);
 
 			String sql = sb.toString();
 
@@ -1554,14 +1542,12 @@ public class ObjectEntryFolderPersistenceImpl
 
 				queryPos.add(groupId);
 
-				queryPos.add(companyId);
-
 				List<ObjectEntryFolder> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache) {
 						finderCache.putResult(
-							_finderPathFetchByERC_G_C, finderArgs, list);
+							_finderPathFetchByERC_G, finderArgs, list);
 					}
 				}
 				else {
@@ -1589,38 +1575,34 @@ public class ObjectEntryFolderPersistenceImpl
 	}
 
 	/**
-	 * Removes the object entry folder where externalReferenceCode = &#63; and groupId = &#63; and companyId = &#63; from the database.
+	 * Removes the object entry folder where externalReferenceCode = &#63; and groupId = &#63; from the database.
 	 *
 	 * @param externalReferenceCode the external reference code
 	 * @param groupId the group ID
-	 * @param companyId the company ID
 	 * @return the object entry folder that was removed
 	 */
 	@Override
-	public ObjectEntryFolder removeByERC_G_C(
-			String externalReferenceCode, long groupId, long companyId)
+	public ObjectEntryFolder removeByERC_G(
+			String externalReferenceCode, long groupId)
 		throws NoSuchObjectEntryFolderException {
 
-		ObjectEntryFolder objectEntryFolder = findByERC_G_C(
-			externalReferenceCode, groupId, companyId);
+		ObjectEntryFolder objectEntryFolder = findByERC_G(
+			externalReferenceCode, groupId);
 
 		return remove(objectEntryFolder);
 	}
 
 	/**
-	 * Returns the number of object entry folders where externalReferenceCode = &#63; and groupId = &#63; and companyId = &#63;.
+	 * Returns the number of object entry folders where externalReferenceCode = &#63; and groupId = &#63;.
 	 *
 	 * @param externalReferenceCode the external reference code
 	 * @param groupId the group ID
-	 * @param companyId the company ID
 	 * @return the number of matching object entry folders
 	 */
 	@Override
-	public int countByERC_G_C(
-		String externalReferenceCode, long groupId, long companyId) {
-
-		ObjectEntryFolder objectEntryFolder = fetchByERC_G_C(
-			externalReferenceCode, groupId, companyId);
+	public int countByERC_G(String externalReferenceCode, long groupId) {
+		ObjectEntryFolder objectEntryFolder = fetchByERC_G(
+			externalReferenceCode, groupId);
 
 		if (objectEntryFolder == null) {
 			return 0;
@@ -1629,17 +1611,14 @@ public class ObjectEntryFolderPersistenceImpl
 		return 1;
 	}
 
-	private static final String _FINDER_COLUMN_ERC_G_C_EXTERNALREFERENCECODE_2 =
+	private static final String _FINDER_COLUMN_ERC_G_EXTERNALREFERENCECODE_2 =
 		"objectEntryFolder.externalReferenceCode = ? AND ";
 
-	private static final String _FINDER_COLUMN_ERC_G_C_EXTERNALREFERENCECODE_3 =
+	private static final String _FINDER_COLUMN_ERC_G_EXTERNALREFERENCECODE_3 =
 		"(objectEntryFolder.externalReferenceCode IS NULL OR objectEntryFolder.externalReferenceCode = '') AND ";
 
-	private static final String _FINDER_COLUMN_ERC_G_C_GROUPID_2 =
-		"objectEntryFolder.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_ERC_G_C_COMPANYID_2 =
-		"objectEntryFolder.companyId = ?";
+	private static final String _FINDER_COLUMN_ERC_G_GROUPID_2 =
+		"objectEntryFolder.groupId = ?";
 
 	private FinderPath _finderPathWithPaginationFindByG_C_P;
 	private FinderPath _finderPathWithoutPaginationFindByG_C_P;
@@ -4036,10 +4015,10 @@ public class ObjectEntryFolderPersistenceImpl
 			objectEntryFolder);
 
 		finderCache.putResult(
-			_finderPathFetchByERC_G_C,
+			_finderPathFetchByERC_G,
 			new Object[] {
 				objectEntryFolder.getExternalReferenceCode(),
-				objectEntryFolder.getGroupId(), objectEntryFolder.getCompanyId()
+				objectEntryFolder.getGroupId()
 			},
 			objectEntryFolder);
 
@@ -4138,12 +4117,11 @@ public class ObjectEntryFolderPersistenceImpl
 
 		args = new Object[] {
 			objectEntryFolderModelImpl.getExternalReferenceCode(),
-			objectEntryFolderModelImpl.getGroupId(),
-			objectEntryFolderModelImpl.getCompanyId()
+			objectEntryFolderModelImpl.getGroupId()
 		};
 
 		finderCache.putResult(
-			_finderPathFetchByERC_G_C, args, objectEntryFolderModelImpl);
+			_finderPathFetchByERC_G, args, objectEntryFolderModelImpl);
 
 		args = new Object[] {
 			objectEntryFolderModelImpl.getGroupId(),
@@ -4715,14 +4693,10 @@ public class ObjectEntryFolderPersistenceImpl
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
 
-		_finderPathFetchByERC_G_C = new FinderPath(
-			FINDER_CLASS_NAME_ENTITY, "fetchByERC_G_C",
-			new String[] {
-				String.class.getName(), Long.class.getName(),
-				Long.class.getName()
-			},
-			new String[] {"externalReferenceCode", "groupId", "companyId"},
-			true);
+		_finderPathFetchByERC_G = new FinderPath(
+			FINDER_CLASS_NAME_ENTITY, "fetchByERC_G",
+			new String[] {String.class.getName(), Long.class.getName()},
+			new String[] {"externalReferenceCode", "groupId"}, true);
 
 		_finderPathWithPaginationFindByG_C_P = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_P",

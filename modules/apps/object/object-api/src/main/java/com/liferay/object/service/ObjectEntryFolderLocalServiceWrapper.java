@@ -129,12 +129,12 @@ public class ObjectEntryFolderLocalServiceWrapper
 	@Override
 	public com.liferay.object.model.ObjectEntryFolder
 			deleteObjectEntryFolderByExternalReferenceCode(
-				String externalReferenceCode, long groupId, long companyId)
+				String externalReferenceCode, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectEntryFolderLocalService.
 			deleteObjectEntryFolderByExternalReferenceCode(
-				externalReferenceCode, groupId, companyId);
+				externalReferenceCode, groupId);
 	}
 
 	/**
@@ -263,11 +263,11 @@ public class ObjectEntryFolderLocalServiceWrapper
 	@Override
 	public com.liferay.object.model.ObjectEntryFolder
 		fetchObjectEntryFolderByExternalReferenceCode(
-			String externalReferenceCode, long groupId, long companyId) {
+			String externalReferenceCode, long groupId) {
 
 		return _objectEntryFolderLocalService.
 			fetchObjectEntryFolderByExternalReferenceCode(
-				externalReferenceCode, groupId, companyId);
+				externalReferenceCode, groupId);
 	}
 
 	/**
@@ -329,12 +329,12 @@ public class ObjectEntryFolderLocalServiceWrapper
 	@Override
 	public com.liferay.object.model.ObjectEntryFolder
 			getObjectEntryFolderByExternalReferenceCode(
-				String externalReferenceCode, long groupId, long companyId)
+				String externalReferenceCode, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectEntryFolderLocalService.
 			getObjectEntryFolderByExternalReferenceCode(
-				externalReferenceCode, groupId, companyId);
+				externalReferenceCode, groupId);
 	}
 
 	/**

@@ -56,7 +56,7 @@ public interface ObjectEntryFolderService extends BaseService {
 		throws PortalException;
 
 	public ObjectEntryFolder deleteObjectEntryFolderByExternalReferenceCode(
-			String externalReferenceCode, long groupId, long companyId)
+			String externalReferenceCode, long groupId)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -65,7 +65,7 @@ public interface ObjectEntryFolderService extends BaseService {
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ObjectEntryFolder fetchObjectEntryFolderByExternalReferenceCode(
-			String externalReferenceCode, long groupId, long companyId)
+			String externalReferenceCode, long groupId)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -74,7 +74,7 @@ public interface ObjectEntryFolderService extends BaseService {
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ObjectEntryFolder getObjectEntryFolderByExternalReferenceCode(
-			String externalReferenceCode, long groupId, long companyId)
+			String externalReferenceCode, long groupId)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)

@@ -32,9 +32,9 @@ create index IX_68B7FB2 on ObjectEntry (objectDefinitionId, userId, createDate);
 create index IX_F4C7E3D on ObjectEntry (status, rootObjectEntryId);
 create index IX_BD205C3B on ObjectEntry (uuid_[$COLUMN_LENGTH:75$]);
 
-create unique index IX_9D7AE9B8 on ObjectEntryFolder (groupId, companyId, externalReferenceCode[$COLUMN_LENGTH:75$]);
 create unique index IX_F55286DC on ObjectEntryFolder (groupId, companyId, parentObjectEntryFolderId, name[$COLUMN_LENGTH:75$]);
 create index IX_772D12BC on ObjectEntryFolder (groupId, companyId, treePath[$COLUMN_LENGTH:4000$]);
+create unique index IX_2CD0E77A on ObjectEntryFolder (groupId, externalReferenceCode[$COLUMN_LENGTH:75$]);
 create unique index IX_8EC73DF1 on ObjectEntryFolder (groupId, uuid_[$COLUMN_LENGTH:75$]);
 create index IX_56A855AD on ObjectEntryFolder (uuid_[$COLUMN_LENGTH:75$]);
 
