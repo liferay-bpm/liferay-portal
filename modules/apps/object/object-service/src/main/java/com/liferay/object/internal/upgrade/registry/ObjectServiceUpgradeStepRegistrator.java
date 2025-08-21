@@ -645,6 +645,11 @@ public class ObjectServiceUpgradeStepRegistrator
 			"10.21.0", "10.22.0",
 			UpgradeProcessFactory.addColumns(
 				"ObjectDefinition", "enableObjectEntrySubscription BOOLEAN"));
+
+		registry.register(
+			"10.22.0", "10.22.1",
+			new com.liferay.object.internal.upgrade.v10_22_1.
+				ResourceActionUpgradeProcess());
 	}
 
 	@Reference
