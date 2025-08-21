@@ -8,13 +8,17 @@ package com.liferay.object.rest.internal.filter.parser;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.rest.filter.parser.ObjectDefinitionFilterParser;
 import com.liferay.object.rest.odata.entity.v1_0.provider.EntityModelProvider;
+import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParser;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.odata.filter.InvalidFilterException;
 import com.liferay.portal.odata.filter.expression.Expression;
 import com.liferay.portal.odata.filter.expression.ExpressionVisitException;
+
+import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -40,6 +44,32 @@ public class ObjectDefinitionFilterParserImpl
 
 		try {
 			return filterParser.parse(filterString);
+		}
+		catch (ExpressionVisitException expressionVisitException) {
+			throw new InvalidFilterException(
+				expressionVisitException.getMessage(),
+				expressionVisitException);
+		}
+	}
+
+	@Override
+	public Filter parse(
+			String filterString, Locale locale,
+			ObjectDefinition objectDefinition)
+		throws InvalidFilterException {
+
+		if (Validator.isNull(filterString)) {
+			return null;
+		}
+
+		EntityModel entityModel = _entityModelProvider.getEntityModel(
+			objectDefinition);
+
+		FilterParser filterParser = _filterParserProvider.provide(entityModel);
+
+		try {
+			return _expressionConvert.convert(
+				filterParser.parse(filterString), locale, entityModel);
 		}
 		catch (ExpressionVisitException expressionVisitException) {
 			throw new InvalidFilterException(
@@ -76,6 +106,11 @@ public class ObjectDefinitionFilterParserImpl
 
 	@Reference
 	private EntityModelProvider _entityModelProvider;
+
+	@Reference(
+		target = "(result.class.name=com.liferay.portal.kernel.search.filter.Filter)"
+	)
+	private ExpressionConvert<Filter> _expressionConvert;
 
 	@Reference
 	private FilterParserProvider _filterParserProvider;
