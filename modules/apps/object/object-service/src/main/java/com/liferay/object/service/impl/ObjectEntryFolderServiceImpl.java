@@ -67,13 +67,13 @@ public class ObjectEntryFolderServiceImpl
 
 	@Override
 	public ObjectEntryFolder deleteObjectEntryFolderByExternalReferenceCode(
-			String externalReferenceCode, long groupId, long companyId)
+			String externalReferenceCode, long groupId)
 		throws PortalException {
 
 		ObjectEntryFolder objectEntryFolder =
 			objectEntryFolderLocalService.
 				getObjectEntryFolderByExternalReferenceCode(
-					externalReferenceCode, groupId, companyId);
+					externalReferenceCode, groupId);
 
 		ModelResourcePermissionUtil.check(
 			_modelResourcePermission, getPermissionChecker(), groupId,
@@ -101,13 +101,13 @@ public class ObjectEntryFolderServiceImpl
 
 	@Override
 	public ObjectEntryFolder fetchObjectEntryFolderByExternalReferenceCode(
-			String externalReferenceCode, long groupId, long companyId)
+			String externalReferenceCode, long groupId)
 		throws PortalException {
 
 		ObjectEntryFolder objectEntryFolder =
 			objectEntryFolderLocalService.
 				fetchObjectEntryFolderByExternalReferenceCode(
-					externalReferenceCode, groupId, companyId);
+					externalReferenceCode, groupId);
 
 		if (objectEntryFolder == null) {
 			return null;
@@ -136,13 +136,13 @@ public class ObjectEntryFolderServiceImpl
 
 	@Override
 	public ObjectEntryFolder getObjectEntryFolderByExternalReferenceCode(
-			String externalReferenceCode, long groupId, long companyId)
+			String externalReferenceCode, long groupId)
 		throws PortalException {
 
 		ObjectEntryFolder objectEntryFolder =
 			objectEntryFolderLocalService.
 				getObjectEntryFolderByExternalReferenceCode(
-					externalReferenceCode, groupId, companyId);
+					externalReferenceCode, groupId);
 
 		ModelResourcePermissionUtil.check(
 			_modelResourcePermission, getPermissionChecker(), groupId,

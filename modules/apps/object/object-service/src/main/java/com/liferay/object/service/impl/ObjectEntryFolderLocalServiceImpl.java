@@ -79,8 +79,7 @@ public class ObjectEntryFolderLocalServiceImpl
 
 		User user = _userLocalService.getUser(userId);
 
-		_validateExternalReferenceCode(
-			externalReferenceCode, groupId, user.getCompanyId());
+		_validateExternalReferenceCode(externalReferenceCode, groupId);
 
 		_validateParentObjectEntryFolderId(
 			groupId, null, parentObjectEntryFolderId);
@@ -231,12 +230,12 @@ public class ObjectEntryFolderLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectEntryFolder deleteObjectEntryFolderByExternalReferenceCode(
-			String externalReferenceCode, long groupId, long companyId)
+			String externalReferenceCode, long groupId)
 		throws PortalException {
 
 		ObjectEntryFolder objectEntryFolder =
-			objectEntryFolderPersistence.findByERC_G_C(
-				externalReferenceCode, groupId, companyId);
+			objectEntryFolderPersistence.findByERC_G(
+				externalReferenceCode, groupId);
 
 		return objectEntryFolderLocalService.deleteObjectEntryFolder(
 			objectEntryFolder);
@@ -244,19 +243,19 @@ public class ObjectEntryFolderLocalServiceImpl
 
 	@Override
 	public ObjectEntryFolder fetchObjectEntryFolderByExternalReferenceCode(
-		String externalReferenceCode, long groupId, long companyId) {
+		String externalReferenceCode, long groupId) {
 
-		return objectEntryFolderPersistence.fetchByERC_G_C(
-			externalReferenceCode, groupId, companyId);
+		return objectEntryFolderPersistence.fetchByERC_G(
+			externalReferenceCode, groupId);
 	}
 
 	@Override
 	public ObjectEntryFolder getObjectEntryFolderByExternalReferenceCode(
-			String externalReferenceCode, long groupId, long companyId)
+			String externalReferenceCode, long groupId)
 		throws PortalException {
 
-		return objectEntryFolderPersistence.findByERC_G_C(
-			externalReferenceCode, groupId, companyId);
+		return objectEntryFolderPersistence.findByERC_G(
+			externalReferenceCode, groupId);
 	}
 
 	@Override
@@ -284,7 +283,7 @@ public class ObjectEntryFolderLocalServiceImpl
 
 		ObjectEntryFolder objectEntryFolder =
 			fetchObjectEntryFolderByExternalReferenceCode(
-				externalReferenceCode, groupId, companyId);
+				externalReferenceCode, groupId);
 
 		if (objectEntryFolder != null) {
 			return objectEntryFolder;
@@ -496,11 +495,11 @@ public class ObjectEntryFolderLocalServiceImpl
 	}
 
 	private void _validateExternalReferenceCode(
-		String externalReferenceCode, long groupId, long companyId) {
+		String externalReferenceCode, long groupId) {
 
 		ObjectEntryFolder objectEntryFolder =
-			objectEntryFolderPersistence.fetchByERC_G_C(
-				externalReferenceCode, groupId, companyId);
+			objectEntryFolderPersistence.fetchByERC_G(
+				externalReferenceCode, groupId);
 
 		if (objectEntryFolder != null) {
 			throw new DuplicateObjectEntryFolderExternalReferenceCodeException(
