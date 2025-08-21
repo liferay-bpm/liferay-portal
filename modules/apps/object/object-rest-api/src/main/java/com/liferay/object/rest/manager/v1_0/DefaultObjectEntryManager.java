@@ -144,7 +144,8 @@ public interface DefaultObjectEntryManager extends ObjectEntryManager {
 	public Page<ObjectEntry> getObjectEntries(
 			long companyId, ObjectDefinition objectDefinition, String scopeKey,
 			Aggregation aggregation, DTOConverterContext dtoConverterContext,
-			Filter filter, Pagination pagination, String search, Sort[] sorts)
+			Filter filter, Pagination pagination, String search, Sort[] sorts,
+			int status)
 		throws Exception;
 
 	public ObjectEntry getObjectEntry(

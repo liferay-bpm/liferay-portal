@@ -8670,7 +8670,8 @@ public class DefaultObjectEntryManagerImplTest
 			new DefaultDTOConverterContext(
 				false, Collections.emptyMap(), dtoConverterRegistry, null,
 				LocaleUtil.getDefault(), null, _user),
-			(Filter)null, null, StringPool.BLANK, null);
+			(Filter)null, null, StringPool.BLANK, null,
+			WorkflowConstants.STATUS_ANY);
 
 		Collection<ObjectEntry> objectEntries = page.getItems();
 
