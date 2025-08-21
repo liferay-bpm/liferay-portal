@@ -590,6 +590,23 @@ public class DefaultObjectEntryManagerImpl
 	}
 
 	@Override
+	public Page<ObjectEntry> getApprovedObjectEntries(
+			long companyId, ObjectDefinition objectDefinition, String scopeKey,
+			Aggregation aggregation, DTOConverterContext dtoConverterContext,
+			String filterString, Pagination pagination, String search,
+			Sort[] sorts)
+		throws Exception {
+
+		return getObjectEntries(
+			companyId, objectDefinition, scopeKey, aggregation,
+			dtoConverterContext,
+			_objectDefinitionFilterParser.parse(
+				filterString, dtoConverterContext.getLocale(),
+				objectDefinition),
+			pagination, search, sorts, WorkflowConstants.STATUS_APPROVED);
+	}
+
+	@Override
 	public Page<ObjectEntry> getObjectEntries(
 			long companyId, ObjectDefinition objectDefinition, String scopeKey,
 			Aggregation aggregation, DTOConverterContext dtoConverterContext,
