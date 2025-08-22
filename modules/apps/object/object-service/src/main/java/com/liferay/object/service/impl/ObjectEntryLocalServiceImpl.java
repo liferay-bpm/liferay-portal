@@ -1688,6 +1688,28 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
+	@Override
+	public void moveObjectEntriesToTrash(
+			long userId, ObjectEntryFolder objectEntryFolder,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		for (ObjectEntry objectEntry :
+				objectEntryPersistence.findByG_OEFI(
+					objectEntryFolder.getGroupId(),
+					objectEntryFolder.getObjectEntryFolderId())) {
+
+			if (objectEntry.isInTrash()) {
+				continue;
+			}
+
+			objectEntry = _moveObjectEntryToTrash(
+				objectEntry, serviceContext, userId);
+
+			_reindex(objectEntry);
+		}
+	}
+
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectEntry moveObjectEntryToTrash(
@@ -1698,63 +1720,7 @@ public class ObjectEntryLocalServiceImpl
 			throw new TrashEntryException();
 		}
 
-		List<ObjectEntryVersion> objectEntryVersions =
-			_objectEntryVersionLocalService.getObjectEntryVersions(
-				objectEntry.getObjectEntryId());
-
-		objectEntryVersions = ListUtil.sort(
-			objectEntryVersions,
-			ObjectEntryVersionVersionComparator.getInstance(false));
-
-		List<ObjectValuePair<Long, Integer>> statusOVPs = new ArrayList<>();
-
-		if ((objectEntryVersions != null) && !objectEntryVersions.isEmpty()) {
-			statusOVPs = _getStatusOVPs(objectEntryVersions);
-		}
-
-		int oldStatus = objectEntry.getStatus();
-
-		objectEntry = updateStatus(
-			userId, objectEntry, WorkflowConstants.STATUS_IN_TRASH,
-			serviceContext);
-
-		ObjectDefinition objectDefinition =
-			_objectDefinitionPersistence.findByPrimaryKey(
-				objectEntry.getObjectDefinitionId());
-
-		_trashEntryLocalService.addTrashEntry(
-			userId, objectEntry.getGroupId(), objectDefinition.getClassName(),
-			objectEntry.getObjectEntryId(), objectEntry.getUuid(), null,
-			_getStatus(oldStatus), statusOVPs,
-			UnicodePropertiesBuilder.put(
-				"title", objectEntry.getObjectEntryId()
-			).build());
-
-		for (ObjectEntryVersion objectEntryVersion : objectEntryVersions) {
-			objectEntryVersion.setStatus(WorkflowConstants.STATUS_IN_TRASH);
-
-			_objectEntryVersionLocalService.updateObjectEntryVersion(
-				objectEntryVersion);
-		}
-
-		if (objectDefinition.isEnableComments()) {
-			_commentManager.moveDiscussionToTrash(
-				objectDefinition.getClassName(),
-				objectEntry.getObjectEntryId());
-		}
-
-		if (oldStatus == WorkflowConstants.STATUS_PENDING) {
-			_workflowInstanceLinkLocalService.deleteWorkflowInstanceLinks(
-				objectEntry.getCompanyId(), objectEntry.getNonzeroGroupId(),
-				objectDefinition.getClassName(),
-				objectEntry.getObjectEntryId());
-		}
-
-		moveRelatedObjectEntriesToTrash(
-			objectEntry.getGroupId(), objectEntry.getObjectDefinitionId(),
-			objectEntry.getObjectEntryId());
-
-		return objectEntry;
+		return _moveObjectEntryToTrash(objectEntry, serviceContext, userId);
 	}
 
 	@Override
@@ -5159,6 +5125,68 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		return results;
+	}
+
+	private ObjectEntry _moveObjectEntryToTrash(
+			ObjectEntry objectEntry, ServiceContext serviceContext, long userId)
+		throws PortalException {
+
+		List<ObjectEntryVersion> objectEntryVersions =
+			_objectEntryVersionLocalService.getObjectEntryVersions(
+				objectEntry.getObjectEntryId());
+
+		List<ObjectValuePair<Long, Integer>> statusOVPs = new ArrayList<>();
+
+		if (ListUtil.isNotEmpty(objectEntryVersions)) {
+			statusOVPs = _getStatusOVPs(
+				ListUtil.sort(
+					objectEntryVersions,
+					ObjectEntryVersionVersionComparator.getInstance(false)));
+		}
+
+		int oldStatus = objectEntry.getStatus();
+
+		objectEntry = updateStatus(
+			userId, objectEntry, WorkflowConstants.STATUS_IN_TRASH,
+			serviceContext);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.findByPrimaryKey(
+				objectEntry.getObjectDefinitionId());
+
+		_trashEntryLocalService.addTrashEntry(
+			userId, objectEntry.getGroupId(), objectDefinition.getClassName(),
+			objectEntry.getObjectEntryId(), objectEntry.getUuid(), null,
+			_getStatus(oldStatus), statusOVPs,
+			UnicodePropertiesBuilder.put(
+				"title", objectEntry.getObjectEntryId()
+			).build());
+
+		for (ObjectEntryVersion objectEntryVersion : objectEntryVersions) {
+			objectEntryVersion.setStatus(WorkflowConstants.STATUS_IN_TRASH);
+
+			_objectEntryVersionLocalService.updateObjectEntryVersion(
+				objectEntryVersion);
+		}
+
+		if (objectDefinition.isEnableComments()) {
+			_commentManager.moveDiscussionToTrash(
+				objectDefinition.getClassName(),
+				objectEntry.getObjectEntryId());
+		}
+
+		if (oldStatus == WorkflowConstants.STATUS_PENDING) {
+			_workflowInstanceLinkLocalService.deleteWorkflowInstanceLinks(
+				objectEntry.getCompanyId(), objectEntry.getNonzeroGroupId(),
+				objectDefinition.getClassName(),
+				objectEntry.getObjectEntryId());
+		}
+
+		moveRelatedObjectEntriesToTrash(
+			objectEntry.getGroupId(), objectEntry.getObjectDefinitionId(),
+			objectEntry.getObjectEntryId());
+
+		return objectEntry;
 	}
 
 	private void _performActions(
