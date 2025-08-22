@@ -671,44 +671,7 @@ public class DefaultObjectEntryManagerImpl
 		}
 
 		return Page.of(
-			HashMapBuilder.put(
-				"create",
-				ActionUtil.addAction(
-					"ADD_OBJECT_ENTRY", ObjectEntryResourceImpl.class, 0L,
-					"postObjectEntry", null, objectDefinition.getUserId(),
-					objectDefinition.getResourceName(), groupId,
-					dtoConverterContext.getUriInfo())
-			).put(
-				"createBatch",
-				ActionUtil.addAction(
-					"ADD_OBJECT_ENTRY", ObjectEntryResourceImpl.class, 0L,
-					"postObjectEntryBatch", null, objectDefinition.getUserId(),
-					objectDefinition.getResourceName(), groupId,
-					dtoConverterContext.getUriInfo())
-			).put(
-				"deleteBatch",
-				ActionUtil.addAction(
-					ActionKeys.DELETE, ObjectEntryResourceImpl.class, null,
-					"deleteObjectEntryBatch", null,
-					objectDefinition.getUserId(),
-					objectDefinition.getResourceName(), groupId,
-					dtoConverterContext.getUriInfo())
-			).put(
-				"get",
-				ActionUtil.addAction(
-					ActionKeys.VIEW, ObjectEntryResourceImpl.class, 0L,
-					"getObjectEntriesPage", null, objectDefinition.getUserId(),
-					objectDefinition.getResourceName(), groupId,
-					dtoConverterContext.getUriInfo())
-			).put(
-				"updateBatch",
-				ActionUtil.addAction(
-					ActionKeys.UPDATE, ObjectEntryResourceImpl.class, null,
-					"putObjectEntryBatch", null, objectDefinition.getUserId(),
-					objectDefinition.getResourceName(), groupId,
-					dtoConverterContext.getUriInfo())
-			).build(),
-			facets,
+			_getActions(dtoConverterContext, groupId, objectDefinition), facets,
 			TransformUtil.transform(
 				objectEntryLocalService.getPrimaryKeys(
 					groupIds, companyId, dtoConverterContext.getUserId(),
@@ -733,21 +696,7 @@ public class DefaultObjectEntryManagerImpl
 		long groupId = getGroupId(objectDefinition, scopeKey);
 
 		return SearchUtil.search(
-			HashMapBuilder.put(
-				"create",
-				ActionUtil.addAction(
-					"ADD_OBJECT_ENTRY", ObjectEntryResourceImpl.class, 0L,
-					"postObjectEntry", null, objectDefinition.getUserId(),
-					objectDefinition.getResourceName(), groupId,
-					dtoConverterContext.getUriInfo())
-			).put(
-				"get",
-				ActionUtil.addAction(
-					ActionKeys.VIEW, ObjectEntryResourceImpl.class, 0L,
-					"getObjectEntriesPage", null, objectDefinition.getUserId(),
-					objectDefinition.getResourceName(), groupId,
-					dtoConverterContext.getUriInfo())
-			).build(),
+			_getActions(dtoConverterContext, groupId, objectDefinition),
 			booleanQuery -> {
 				BooleanFilter booleanFilter =
 					booleanQuery.getPreBooleanFilter();
@@ -1971,6 +1920,48 @@ public class DefaultObjectEntryManagerImpl
 
 		return _objectEntryDTOConverter.toDTO(
 			dtoConverterContext, serviceBuilderObjectEntry);
+	}
+
+	private HashMap<String, Map<String, String>> _getActions(
+		DTOConverterContext dtoConverterContext, long groupId,
+		ObjectDefinition objectDefinition) {
+
+		return HashMapBuilder.<String, Map<String, String>>put(
+			"create",
+			ActionUtil.addAction(
+				"ADD_OBJECT_ENTRY", ObjectEntryResourceImpl.class, 0L,
+				"postObjectEntry", null, objectDefinition.getUserId(),
+				objectDefinition.getResourceName(), groupId,
+				dtoConverterContext.getUriInfo())
+		).put(
+			"createBatch",
+			ActionUtil.addAction(
+				"ADD_OBJECT_ENTRY", ObjectEntryResourceImpl.class, 0L,
+				"postObjectEntryBatch", null, objectDefinition.getUserId(),
+				objectDefinition.getResourceName(), groupId,
+				dtoConverterContext.getUriInfo())
+		).put(
+			"deleteBatch",
+			ActionUtil.addAction(
+				ActionKeys.DELETE, ObjectEntryResourceImpl.class, null,
+				"deleteObjectEntryBatch", null, objectDefinition.getUserId(),
+				objectDefinition.getResourceName(), groupId,
+				dtoConverterContext.getUriInfo())
+		).put(
+			"get",
+			ActionUtil.addAction(
+				ActionKeys.VIEW, ObjectEntryResourceImpl.class, 0L,
+				"getObjectEntriesPage", null, objectDefinition.getUserId(),
+				objectDefinition.getResourceName(), groupId,
+				dtoConverterContext.getUriInfo())
+		).put(
+			"updateBatch",
+			ActionUtil.addAction(
+				ActionKeys.UPDATE, ObjectEntryResourceImpl.class, null,
+				"putObjectEntryBatch", null, objectDefinition.getUserId(),
+				objectDefinition.getResourceName(), groupId,
+				dtoConverterContext.getUriInfo())
+		).build();
 	}
 
 	private String _getDateString(Date date) {
