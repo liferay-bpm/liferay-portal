@@ -62,7 +62,7 @@ public class ObjectDefinitionFilterParserImpl
 			return null;
 		}
 
-		EntityModel entityModel = _entityModelProvider.getEntityModel(
+		EntityModel entityModel = _entityModelProvider.getSearchableEntityModel(
 			objectDefinition);
 
 		FilterParser filterParser = _filterParserProvider.provide(entityModel);

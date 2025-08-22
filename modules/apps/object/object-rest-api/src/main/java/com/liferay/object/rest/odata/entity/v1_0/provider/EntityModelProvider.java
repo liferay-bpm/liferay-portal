@@ -30,4 +30,10 @@ public interface EntityModelProvider {
 		return null;
 	}
 
+	public default EntityModel getSearchableEntityModel(
+		ObjectDefinition objectDefinition) {
+
+		return null;
+	}
+
 }

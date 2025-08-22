@@ -31,7 +31,7 @@ public class EntityModelProviderImpl implements EntityModelProvider {
 				objectDefinition,
 				_objectFieldLocalService.getObjectFields(
 					objectDefinition.getObjectDefinitionId()),
-				false);
+				false, false);
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
@@ -44,7 +44,7 @@ public class EntityModelProviderImpl implements EntityModelProvider {
 
 		try {
 			return new ObjectEntryEntityModel(
-				objectDefinition, objectFields, false);
+				objectDefinition, objectFields, false, false);
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
@@ -58,7 +58,23 @@ public class EntityModelProviderImpl implements EntityModelProvider {
 				objectDefinition,
 				_objectFieldLocalService.getObjectFields(
 					objectDefinition.getObjectDefinitionId()),
-				true);
+				false, true);
+		}
+		catch (Exception exception) {
+			throw new SystemException(exception);
+		}
+	}
+
+	@Override
+	public EntityModel getSearchableEntityModel(
+		ObjectDefinition objectDefinition) {
+
+		try {
+			return new ObjectEntryEntityModel(
+				objectDefinition,
+				_objectFieldLocalService.getObjectFields(
+					objectDefinition.getObjectDefinitionId()),
+				true, false);
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
