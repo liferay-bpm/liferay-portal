@@ -587,6 +587,16 @@ public class ObjectEntryLocalServiceUtil {
 			start, end, sorts);
 	}
 
+	public static Long getRootOneToManyObjectEntriesCount(
+			long companyId,
+			List<com.liferay.object.model.ObjectField> objectFields,
+			long objectDefinitionId2, String search)
+		throws PortalException {
+
+		return getService().getRootOneToManyObjectEntriesCount(
+			companyId, objectFields, objectDefinitionId2, search);
+	}
+
 	public static Map<String, Object> getSystemModelAttributes(
 			com.liferay.object.model.ObjectDefinition objectDefinition,
 			long primaryKey)

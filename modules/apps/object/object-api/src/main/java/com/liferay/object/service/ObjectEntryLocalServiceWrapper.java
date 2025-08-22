@@ -671,6 +671,17 @@ public class ObjectEntryLocalServiceWrapper
 	}
 
 	@Override
+	public Long getRootOneToManyObjectEntriesCount(
+			long companyId,
+			java.util.List<com.liferay.object.model.ObjectField> objectFields,
+			long objectDefinitionId2, String search)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectEntryLocalService.getRootOneToManyObjectEntriesCount(
+			companyId, objectFields, objectDefinitionId2, search);
+	}
+
+	@Override
 	public java.util.Map<String, Object> getSystemModelAttributes(
 			com.liferay.object.model.ObjectDefinition objectDefinition,
 			long primaryKey)

@@ -8,6 +8,7 @@ package com.liferay.object.service;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
@@ -447,6 +448,12 @@ public interface ObjectEntryLocalService
 			Long[] groupIds, long companyId, long userId,
 			long objectDefinitionId, Predicate predicate, String search,
 			int start, int end, Sort[] sorts)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Long getRootOneToManyObjectEntriesCount(
+			long companyId, List<ObjectField> objectFields,
+			long objectDefinitionId2, String search)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
