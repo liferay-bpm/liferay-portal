@@ -16,6 +16,7 @@ import com.liferay.object.relationship.util.ObjectRelationshipUtil;
 import com.liferay.object.rest.internal.odata.entity.ReferenceStringEntityField;
 import com.liferay.object.service.ObjectFieldLocalServiceUtil;
 import com.liferay.object.service.ObjectRelationshipLocalServiceUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -49,8 +50,9 @@ public class ObjectEntryEntityModel implements EntityModel {
 
 	public ObjectEntryEntityModel(
 		ObjectDefinition objectDefinition, List<ObjectField> objectFields,
-		boolean useLegacyStatus) {
+		boolean searchable, boolean useLegacyStatus) {
 
+		_searchable = searchable;
 		_useLegacyStatus = useLegacyStatus;
 
 		_entityFieldsMap = _getStringEntityFieldsMap(
@@ -89,6 +91,16 @@ public class ObjectEntryEntityModel implements EntityModel {
 			relatedObjectDefinition.getName());
 	}
 
+	private Function<Locale, String> _getDateModifiedFunction() {
+		return locale -> {
+			if (_searchable) {
+				return Field.MODIFIED_DATE;
+			}
+
+			return "modifiedDate";
+		};
+	}
+
 	private EntityField _getEntityField(ObjectField objectField) {
 		if (_unsupportedBusinessTypes.contains(objectField.getBusinessType())) {
 			return null;
@@ -99,8 +111,9 @@ public class ObjectEntryEntityModel implements EntityModel {
 				ObjectFieldConstants.BUSINESS_TYPE_DATE_TIME)) {
 
 			return new DateTimeEntityField(
-				objectField.getName(), locale -> objectField.getName(),
-				locale -> objectField.getName());
+				objectField.getName(),
+				_getFieldNameFunction(objectField.getName(), "date"),
+				_getFieldNameFunction(objectField.getName(), "date"));
 		}
 		else if (Objects.equals(
 					objectField.getBusinessType(),
@@ -108,7 +121,9 @@ public class ObjectEntryEntityModel implements EntityModel {
 
 			return new CollectionEntityField(
 				new StringEntityField(
-					objectField.getName(), locale -> objectField.getName()));
+					objectField.getName(),
+					_getFieldNameFunction(
+						objectField.getName(), "keyword_lowercase")));
 		}
 
 		if (Objects.equals(
@@ -118,14 +133,16 @@ public class ObjectEntryEntityModel implements EntityModel {
 				objectField.getDBType(), ObjectFieldConstants.DB_TYPE_DOUBLE)) {
 
 			return new DoubleEntityField(
-				objectField.getName(), locale -> objectField.getName());
+				objectField.getName(),
+				_getFieldNameFunction(objectField.getName(), "double"));
 		}
 		else if (Objects.equals(
 					objectField.getDBType(),
 					ObjectFieldConstants.DB_TYPE_BOOLEAN)) {
 
 			return new BooleanEntityField(
-				objectField.getName(), locale -> objectField.getName());
+				objectField.getName(),
+				_getFieldNameFunction(objectField.getName(), "boolean"));
 		}
 		else if (Objects.equals(
 					objectField.getDBType(),
@@ -135,25 +152,34 @@ public class ObjectEntryEntityModel implements EntityModel {
 					 ObjectFieldConstants.DB_TYPE_STRING)) {
 
 			return new StringEntityField(
-				objectField.getName(), locale -> objectField.getName());
+				objectField.getName(),
+				_getFieldNameFunction(
+					objectField.getName(), "keyword_lowercase"));
 		}
 		else if (Objects.equals(
 					objectField.getDBType(),
 					ObjectFieldConstants.DB_TYPE_DATE)) {
 
 			return new DateEntityField(
-				objectField.getName(), locale -> objectField.getName(),
-				locale -> objectField.getName());
+				objectField.getName(),
+				_getFieldNameFunction(objectField.getName(), "date"),
+				_getFieldNameFunction(objectField.getName(), "date"));
 		}
 		else if (Objects.equals(
 					objectField.getDBType(),
-					ObjectFieldConstants.DB_TYPE_INTEGER) ||
-				 Objects.equals(
-					 objectField.getDBType(),
-					 ObjectFieldConstants.DB_TYPE_LONG)) {
+					ObjectFieldConstants.DB_TYPE_INTEGER)) {
 
 			return new IntegerEntityField(
-				objectField.getName(), locale -> objectField.getName());
+				objectField.getName(),
+				_getFieldNameFunction(objectField.getName(), "integer"));
+		}
+		else if (Objects.equals(
+					objectField.getDBType(),
+					ObjectFieldConstants.DB_TYPE_LONG)) {
+
+			return new IntegerEntityField(
+				objectField.getName(),
+				_getFieldNameFunction(objectField.getName(), "long"));
 		}
 
 		throw new BadRequestException(
@@ -162,6 +188,17 @@ public class ObjectEntryEntityModel implements EntityModel {
 
 	private Function<Locale, String> _getExternalReferenceCodeFunction() {
 		return locale -> "externalReferenceCode";
+	}
+
+	private Function<Locale, String> _getFieldNameFunction(
+		String name, String prefix) {
+
+		if (!_searchable) {
+			return locale -> name;
+		}
+
+		return locale -> StringBundler.concat(
+			"nestedFieldArray.value_", prefix, "#", name);
 	}
 
 	private Map<String, EntityField> _getObjectDefinitionEntityFieldsMap(
@@ -213,15 +250,25 @@ public class ObjectEntryEntityModel implements EntityModel {
 			).put(
 				"dateModified",
 				new DateTimeEntityField(
-					"dateModified", locale -> "modifiedDate",
-					locale -> "modifiedDate")
+					"dateModified", _getDateModifiedFunction(),
+					_getDateModifiedFunction())
 			).put(
 				"externalReferenceCode",
 				() -> new StringEntityField(
 					"externalReferenceCode",
 					_getExternalReferenceCodeFunction())
 			).put(
-				"id", new IdEntityField("id", locale -> "id", String::valueOf)
+				"id",
+				new IdEntityField(
+					"id",
+					locale -> {
+						if (_searchable) {
+							return Field.ENTRY_CLASS_PK;
+						}
+
+						return "id";
+					},
+					String::valueOf)
 			).put(
 				"keywords",
 				new CollectionEntityField(
@@ -328,6 +375,7 @@ public class ObjectEntryEntityModel implements EntityModel {
 	private final Map<String, EntityField> _entityFieldsMap;
 	private final Map<Long, Map<String, EntityField>> _entityFieldsMaps =
 		new HashMap<>();
+	private final boolean _searchable;
 	private final Set<String> _unsupportedBusinessTypes = SetUtil.fromArray(
 		ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION,
 		ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT,
