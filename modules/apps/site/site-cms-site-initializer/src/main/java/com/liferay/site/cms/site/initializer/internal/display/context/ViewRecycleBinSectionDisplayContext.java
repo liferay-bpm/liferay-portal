@@ -5,13 +5,20 @@
 
 package com.liferay.site.cms.site.initializer.internal.display.context;
 
+import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
 import com.liferay.object.model.ObjectEntryFolder;
 import com.liferay.object.service.ObjectDefinitionService;
 import com.liferay.object.service.ObjectDefinitionSettingLocalService;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -21,6 +28,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -73,9 +81,105 @@ public class ViewRecycleBinSectionDisplayContext
 
 	@Override
 	protected String getCMSSectionFilterString() {
-		return "cmsKind eq 'object' and (cmsSection eq 'contents' or " +
-			"cmsSection eq 'files') and status eq " +
-				WorkflowConstants.STATUS_IN_TRASH;
+		String filter =
+			"cmsKind eq 'object' and (cmsSection eq 'contents' or cmsSection " +
+				"eq 'files') and status eq " +
+					WorkflowConstants.STATUS_IN_TRASH;
+
+		List<Long> eligible = new ArrayList<>();
+
+		try {
+			eligible = _getEligibleGroupIds(httpServletRequest);
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Unable to resolve eligible group ids", portalException);
+			}
+
+			return filter;
+		}
+
+		if (eligible.isEmpty()) {
+			return "cmsKind eq 'object' and (cmsSection eq 'contents' or " +
+				"cmsSection eq 'files') and status eq -1";
+		}
+
+		return filter + _buildGroupIdsAnyClause(eligible);
 	}
+
+	private String _buildGroupIdsAnyClause(List<Long> groupIds) {
+		if (groupIds.isEmpty()) {
+			return "";
+		}
+
+		StringBundler sb = new StringBundler();
+
+		if (groupIds.size() == 1) {
+			sb.append(" and groupIds/any(g:g eq ");
+			sb.append(groupIds.get(0));
+			sb.append(")");
+
+			return sb.toString();
+		}
+
+		sb.append(" and (");
+
+		boolean first = true;
+
+		for (Long id : groupIds) {
+			if (!first) {
+				sb.append(" or ");
+			}
+
+			sb.append("groupIds/any(g:g eq ");
+			sb.append(id);
+			sb.append(")");
+
+			first = false;
+		}
+
+		sb.append(")");
+
+		return sb.toString();
+	}
+
+	private List<Long> _getEligibleGroupIds(
+			HttpServletRequest httpServletRequest)
+		throws PortalException {
+
+		long scopeGroupId = portal.getScopeGroupId(httpServletRequest);
+		List<Long> ids = new ArrayList<>();
+
+		List<DepotEntry> depots =
+			depotEntryLocalService.getGroupConnectedDepotEntries(
+				scopeGroupId, -1, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		for (DepotEntry depot : depots) {
+			Group depotGroup = groupLocalService.fetchGroup(depot.getGroupId());
+
+			if ((depotGroup != null) && _isTrashEnabled(depotGroup)) {
+				ids.add(depotGroup.getGroupId());
+			}
+		}
+
+		Group scopeGroup = groupLocalService.fetchGroup(scopeGroupId);
+
+		if ((scopeGroup != null) && scopeGroup.isDepot() &&
+			_isTrashEnabled(scopeGroup)) {
+
+			ids.add(scopeGroupId);
+		}
+
+		return ids;
+	}
+
+	private boolean _isTrashEnabled(Group group) {
+		return Boolean.parseBoolean(
+			group.getTypeSettingsProperty("trashEnabled"));
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ViewRecycleBinSectionDisplayContext.class);
 
 }
