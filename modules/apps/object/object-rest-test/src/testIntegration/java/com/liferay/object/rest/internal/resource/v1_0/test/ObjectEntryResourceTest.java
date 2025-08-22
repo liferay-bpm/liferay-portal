@@ -15625,6 +15625,15 @@ public class ObjectEntryResourceTest {
 		String randomString2 = RandomTestUtil.randomString();
 		String randomString3 = RandomTestUtil.randomString();
 
+		objectDefinition1 = _objectDefinitionLocalService.getObjectDefinition(
+			objectDefinition1.getObjectDefinitionId());
+
+		objectDefinition1.setEnableObjectEntryDraft(true);
+
+		objectDefinition1 =
+			_objectDefinitionLocalService.updateObjectDefinition(
+				objectDefinition1);
+
 		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
 			JSONUtil.put(
 				_OBJECT_FIELD_NAME_BOOLEAN, randomBoolean
@@ -15663,6 +15672,8 @@ public class ObjectEntryResourceTest {
 				_objectEntry2.getObjectEntryId()
 			).put(
 				"externalReferenceCode", randomExternalReferenceCode
+			).put(
+				"status", JSONUtil.put("code", WorkflowConstants.STATUS_DRAFT)
 			).toString(),
 			_getEndpoint(objectDefinition1, scopeKey), Http.Method.POST);
 
@@ -15721,6 +15732,8 @@ public class ObjectEntryResourceTest {
 			"externalReferenceCode", randomExternalReferenceCode
 		).put(
 			"id", (Object)jsonObject.getLong("id")
+		).put(
+			"status", JSONUtil.put("code", WorkflowConstants.STATUS_DRAFT)
 		);
 
 		String endpoint = endpointFunction.apply(jsonObject);
