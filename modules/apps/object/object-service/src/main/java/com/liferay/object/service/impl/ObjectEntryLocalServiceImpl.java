@@ -1624,6 +1624,15 @@ public class ObjectEntryLocalServiceImpl
 			ObjectEntryTable.INSTANCE.objectDefinitionId.eq(
 				objectDefinitionId
 			).and(
+				ObjectEntryTable.INSTANCE.rootObjectEntryId.eq(
+					ObjectEntryTable.INSTANCE.objectEntryId
+				).or(
+					ObjectEntryTable.INSTANCE.rootObjectEntryId.eq(0L)
+				).withParentheses()
+			).and(
+				ObjectEntryTable.INSTANCE.status.neq(
+					WorkflowConstants.STATUS_IN_TRASH)
+			).and(
 				() -> {
 					if (ArrayUtil.isEmpty(groupIds)) {
 						return null;
