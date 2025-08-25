@@ -5802,6 +5802,46 @@ public class ObjectEntryResourceTest {
 	}
 
 	@Test
+	public void testGetObjectEntriesTotalCountMatchesItemCount()
+		throws Exception {
+
+		Group group = _groupLocalService.fetchGroup(_testGroupId);
+
+		// Company scope
+
+		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
+			_objectDefinition1, _OBJECT_FIELD_NAME_1, _OBJECT_FIELD_VALUE_1);
+
+		HTTPTestUtil.invokeToJSONObject(
+			null,
+			StringBundler.concat(
+				_getEndpoint(_objectDefinition1, group.getGroupId()),
+				"/by-external-reference-code/",
+				objectEntry.getExternalReferenceCode()),
+			Http.Method.DELETE);
+
+		_testGetObjectEntriesTotalCountMatchesItemCount(
+			_objectDefinition1, group);
+
+		// Site scope
+
+		objectEntry = ObjectEntryTestUtil.addObjectEntry(
+			_siteScopedObjectDefinition1, _OBJECT_FIELD_NAME_1,
+			_OBJECT_FIELD_VALUE_1);
+
+		HTTPTestUtil.invokeToJSONObject(
+			null,
+			StringBundler.concat(
+				_getEndpoint(_siteScopedObjectDefinition1, group.getGroupId()),
+				"/by-external-reference-code/",
+				objectEntry.getExternalReferenceCode()),
+			Http.Method.DELETE);
+
+		_testGetObjectEntriesTotalCountMatchesItemCount(
+			_siteScopedObjectDefinition1, group);
+	}
+
+	@Test
 	public void testGetObjectEntriesVersionsPage() throws Exception {
 		_objectDefinition1.setEnableObjectEntryVersioning(true);
 
@@ -15438,6 +15478,21 @@ public class ObjectEntryResourceTest {
 			URLCodec.encodeURL(fieldName + " ne 2023-09-20T10:00:00Z"),
 			_objectDefinition1);
 		_assertFilteredObjectEntries(2, fieldName + " ne null");
+	}
+
+	private void _testGetObjectEntriesTotalCountMatchesItemCount(
+			ObjectDefinition objectDefinition, Group group)
+		throws Exception {
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null, _getEndpoint(objectDefinition, group.getGroupId()),
+			Http.Method.GET);
+
+		JSONArray itemsJSONArray = jsonObject.getJSONArray("items");
+
+		Assert.assertEquals(0, itemsJSONArray.length());
+
+		Assert.assertEquals(0, jsonObject.getInt("totalCount"));
 	}
 
 	private void _testGetObjectEntryWithObjectActions(
