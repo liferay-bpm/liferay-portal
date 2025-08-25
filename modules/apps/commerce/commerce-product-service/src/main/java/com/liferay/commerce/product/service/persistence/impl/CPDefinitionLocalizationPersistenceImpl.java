@@ -1725,6 +1725,7 @@ public class CPDefinitionLocalizationPersistenceImpl
 		ctStrictColumnNames.add("companyId");
 		ctMergeColumnNames.add("CPDefinitionId");
 		ctMergeColumnNames.add("languageId");
+		ctMergeColumnNames.add("CProductId");
 		ctMergeColumnNames.add("name");
 		ctMergeColumnNames.add("shortDescription");
 		ctMergeColumnNames.add("description");

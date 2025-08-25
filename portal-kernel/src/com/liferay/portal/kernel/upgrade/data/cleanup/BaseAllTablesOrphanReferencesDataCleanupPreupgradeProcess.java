@@ -5,10 +5,11 @@
 
 package com.liferay.portal.kernel.upgrade.data.cleanup;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.db.DBInspector;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.upgrade.data.cleanup.util.OrphanReferencesDataCleanupUtil;
 
 import java.util.List;
 
@@ -57,12 +58,38 @@ public abstract class BaseAllTablesOrphanReferencesDataCleanupPreupgradeProcess
 			return;
 		}
 
+		List<String> excludedTableNames =
+			OrphanReferencesDataCleanupUtil.getNormalizedExcludedTableNames(
+				connection);
+
 		List<String> tableNames = dbInspector.getTableNames(null);
 
 		tableNames.remove(targetTableName);
 
 		for (String sourceTableName : tableNames) {
-			if (!dbInspector.hasColumn(sourceTableName, targetColumnName)) {
+			if (excludedTableNames.contains(sourceTableName) ||
+				!dbInspector.hasColumn(sourceTableName, targetColumnName)) {
+
+				continue;
+			}
+
+			boolean numericSourceColumn = dbInspector.isNumeric(
+				sourceTableName, targetColumnName);
+			boolean numericTargetColumn = dbInspector.isNumeric(
+				targetTableName, targetColumnName);
+
+			if ((numericSourceColumn && !numericTargetColumn) ||
+				(!numericSourceColumn && numericTargetColumn)) {
+
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						StringBundler.concat(
+							"Table ", sourceTableName, " and column ",
+							targetColumnName,
+							" has an incompatible type with table ",
+							targetTableName, " and column ", targetColumnName));
+				}
+
 				continue;
 			}
 

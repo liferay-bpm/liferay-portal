@@ -6,7 +6,7 @@
 package com.liferay.portal.upgrade.data.cleanup.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -17,6 +17,7 @@ import com.liferay.portal.test.log.LogCapture;
 
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -34,9 +35,24 @@ public class DefaultAllTablesOrphanReferencesDataCleanupPreupgradeProcessTest
 		_companyId2 = RandomTestUtil.nextLong();
 	}
 
+	@After
+	public void tearDown() throws Exception {
+		db.runSQL("drop table " + _TABLE_NAME);
+	}
+
 	@Override
 	protected UnsafeRunnable<Exception> getInsertDataUnsafeRunnable() {
 		return () -> {
+			db.runSQL(
+				StringBundler.concat(
+					"create table ", _TABLE_NAME,
+					" (mvccVersion LONG default 0 not null, testId LONG not ",
+					"null primary key, companyId VARCHAR(50))"));
+
+			db.runSQL(
+				StringBundler.concat(
+					"insert into ", _TABLE_NAME, " (mvccVersion, testId, ",
+					"companyId ) values (0, 0, '", _companyId1, "')"));
 			_insert(_companyId1);
 			_insert(_companyId1);
 			_insert(_companyId2);
@@ -44,11 +60,11 @@ public class DefaultAllTablesOrphanReferencesDataCleanupPreupgradeProcessTest
 	}
 
 	@Override
-	protected UnsafeConsumer<LogCapture, Exception>
-		getLogAssertionUnsafeConsumer() {
+	protected UnsafeBiConsumer<LogCapture, LogCapture, Exception>
+		getLogAssertionUnsafeBiConsumer() {
 
-		return logCapture -> {
-			List<String> messages = logCapture.getMessages();
+		return (logCapture1, logCapture2) -> {
+			List<String> messages = logCapture1.getMessages();
 
 			Assert.assertTrue(
 				messages.contains(
@@ -66,6 +82,17 @@ public class DefaultAllTablesOrphanReferencesDataCleanupPreupgradeProcessTest
 				messages.contains(
 					getExpectedMessage(
 						1, "Portlet", "companyId", "Company", _companyId2)));
+
+			messages = logCapture2.getMessages();
+
+			Assert.assertTrue(
+				messages.contains(
+					StringBundler.concat(
+						"Table ", dbInspector.normalizeName(_TABLE_NAME),
+						" and column ", dbInspector.normalizeName("companyId"),
+						" has an incompatible type with table ",
+						dbInspector.normalizeName("Company"), " and column ",
+						dbInspector.normalizeName("companyId"))));
 		};
 	}
 
@@ -96,6 +123,8 @@ public class DefaultAllTablesOrphanReferencesDataCleanupPreupgradeProcessTest
 				companyId, ", '", RandomTestUtil.randomString(),
 				"', [$FALSE$])"));
 	}
+
+	private static final String _TABLE_NAME = "TestTable";
 
 	private long _companyId1;
 	private long _companyId2;

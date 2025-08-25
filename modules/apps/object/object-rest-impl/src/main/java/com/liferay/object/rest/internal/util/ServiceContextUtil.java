@@ -91,10 +91,12 @@ public class ServiceContextUtil {
 		serviceContext.setAddGroupPermissions(true);
 		serviceContext.setAddGuestPermissions(true);
 
-		_setObjectEntryTaxonomyCategoryIds(
-			companyId, groupId, userId, objectEntry);
+		if (objectEntry.getTaxonomyCategoryIds() != null) {
+			_setObjectEntryTaxonomyCategoryIds(
+				companyId, groupId, userId, objectEntry);
+		}
 
-		if (Validator.isNotNull(objectEntry.getTaxonomyCategoryIds())) {
+		if (objectEntry.getTaxonomyCategoryIds() != null) {
 			serviceContext.setAssetCategoryIds(
 				ArrayUtil.toArray(objectEntry.getTaxonomyCategoryIds()));
 		}

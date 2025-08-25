@@ -1543,6 +1543,9 @@ public abstract class BaseTopLevelBuild
 				"p", null, "Total number of Jenkins slaves used: ",
 				String.valueOf(getTotalSlavesUsedCount())),
 			Dom4JUtil.getNewElement(
+				"p", null, "Total number of reinvocations: ",
+				String.valueOf(_getTotalReinvocationCount())),
+			Dom4JUtil.getNewElement(
 				"p", null, "Average delay time for invoked build to start: ",
 				JenkinsResultsParserUtil.toDurationString(
 					getAverageDelayTime())));
@@ -2440,6 +2443,27 @@ public abstract class BaseTopLevelBuild
 			String.valueOf(getDownstreamBuildCount("completed")),
 			" Completed / ", String.valueOf(getDownstreamBuildCount(null)),
 			" Total ");
+	}
+
+	private int _getTotalReinvocationCount() {
+		BuildDatabase buildDatabase = getBuildDatabase();
+
+		Properties properties = buildDatabase.getProperties(
+			BAD_BUILD_URLS_PROPERTIES_KEY);
+
+		int totalReinvocationCount = 0;
+
+		for (String propertyName : properties.stringPropertyNames()) {
+			String badBuildURLsString = properties.getProperty(propertyName);
+
+			if (!badBuildURLsString.isEmpty()) {
+				String[] badBuildURLs = badBuildURLsString.split(",");
+
+				totalReinvocationCount += badBuildURLs.length;
+			}
+		}
+
+		return totalReinvocationCount;
 	}
 
 	private static final FailureMessageGenerator[] _FAILURE_MESSAGE_GENERATORS =

@@ -14,21 +14,27 @@ import com.liferay.document.library.kernel.service.DLFileEntryServiceUtil;
 import com.liferay.headless.admin.site.dto.v1_0.ClientExtension;
 import com.liferay.headless.admin.site.dto.v1_0.ContentPageSpecification;
 import com.liferay.headless.admin.site.dto.v1_0.FavIcon;
+import com.liferay.headless.admin.site.dto.v1_0.GeneralConfig;
 import com.liferay.headless.admin.site.dto.v1_0.ItemExternalReference;
 import com.liferay.headless.admin.site.dto.v1_0.PageExperience;
 import com.liferay.headless.admin.site.dto.v1_0.PageSpecification;
 import com.liferay.headless.admin.site.dto.v1_0.Scope;
 import com.liferay.headless.admin.site.dto.v1_0.Settings;
+import com.liferay.headless.admin.site.dto.v1_0.WidgetLookAndFeelConfig;
 import com.liferay.headless.admin.site.dto.v1_0.WidgetPageSection;
 import com.liferay.headless.admin.site.dto.v1_0.WidgetPageSpecification;
 import com.liferay.headless.admin.site.dto.v1_0.WidgetPageWidgetInstance;
 import com.liferay.layout.constants.LayoutTypeSettingsConstants;
+import com.liferay.layout.importer.util.PortletPermissionsImporterUtil;
+import com.liferay.layout.importer.util.PortletPreferencesPortletConfigurationImporterUtil;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryServiceUtil;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CustomizedPages;
@@ -47,21 +53,27 @@ import com.liferay.portal.kernel.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.vulcan.custom.field.CustomFieldsUtil;
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.service.SegmentsExperienceServiceUtil;
 import com.liferay.style.book.model.StyleBookEntry;
 import com.liferay.style.book.service.StyleBookEntryServiceUtil;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -638,6 +650,51 @@ public class LayoutUtil {
 			layout, serviceContext, unicodeProperties, widgetPageSpecification);
 	}
 
+	private static void _addPortletLookAndFeelToConfigurationMap(
+		long groupId, Map<String, Object> map,
+		WidgetLookAndFeelConfig widgetLookAndFeelConfig) {
+
+		if ((widgetLookAndFeelConfig == null) ||
+			(widgetLookAndFeelConfig.getGeneralConfig() == null)) {
+
+			return;
+		}
+
+		GeneralConfig generalConfig =
+			widgetLookAndFeelConfig.getGeneralConfig();
+
+		if (generalConfig.getApplicationDecorator() != null) {
+			map.put(
+				"portletSetupPortletDecoratorId",
+				StringUtil.lowerCase(
+					generalConfig.getApplicationDecoratorAsString()));
+		}
+
+		Map<String, String> customTitleI18n =
+			generalConfig.getCustomTitle_i18n();
+
+		if (customTitleI18n != null) {
+			Map<Locale, String> localizedMap = LocalizedMapUtil.getLocalizedMap(
+				customTitleI18n);
+
+			for (Locale locale : LanguageUtil.getAvailableLocales(groupId)) {
+				if (!localizedMap.containsKey(locale)) {
+					continue;
+				}
+
+				map.put(
+					"portletSetupTitle_" + LocaleUtil.toLanguageId(locale),
+					localizedMap.get(locale));
+			}
+		}
+
+		if (generalConfig.getUseCustomTitle() != null) {
+			map.put(
+				"portletSetupUseCustomTitle",
+				Boolean.toString(generalConfig.getUseCustomTitle()));
+		}
+	}
+
 	private static long _getFaviconFileEntryId(
 			Settings settings, ServiceContext serviceContext)
 		throws Exception {
@@ -748,6 +805,44 @@ public class LayoutUtil {
 				itemExternalReference.getExternalReferenceCode(), groupId);
 
 		return styleBookEntry.getStyleBookEntryId();
+	}
+
+	private static void _importPortletConfiguration(
+			Layout layout, String portletId,
+			WidgetPageWidgetInstance widgetPageWidgetInstance)
+		throws Exception {
+
+		Map<String, Object> configurationMap =
+			widgetPageWidgetInstance.getWidgetConfig();
+
+		if ((configurationMap != null) &&
+			ListUtil.isNotEmpty(
+				TransformUtil.transform(
+					configurationMap.keySet(),
+					key -> {
+						if (_excludePreferencesNames.contains(key) ||
+							key.startsWith("portletSetupTitle_")) {
+
+							return key;
+						}
+
+						return null;
+					}))) {
+
+			throw new UnsupportedOperationException();
+		}
+
+		if (configurationMap == null) {
+			configurationMap = new HashMap<>();
+		}
+
+		_addPortletLookAndFeelToConfigurationMap(
+			layout.getGroupId(), configurationMap,
+			widgetPageWidgetInstance.getWidgetLookAndFeelConfig());
+
+		PortletPreferencesPortletConfigurationImporterUtil.
+			importPortletConfiguration(
+				layout.getPlid(), portletId, configurationMap);
 	}
 
 	private static void _setExpandoBridgeAttributes(
@@ -1064,6 +1159,21 @@ public class LayoutUtil {
 						widgetPageWidgetInstance.getPosition());
 				}
 
+				_importPortletConfiguration(
+					layout, portletId, widgetPageWidgetInstance);
+
+				PortletPermissionsImporterUtil.importPortletPermissions(
+					layout.getPlid(), portletId, new HashSet<>(),
+					TransformUtil.transform(
+						ListUtil.fromArray(
+							widgetPageWidgetInstance.getWidgetPermissions()),
+						widgetPermission -> HashMapBuilder.<String, Object>put(
+							"actionKeys",
+							ListUtil.fromArray(widgetPermission.getActionIds())
+						).put(
+							"roleKey", widgetPermission.getRoleName()
+						).build()));
+
 				portletIds.remove(portletId);
 			}
 		}
@@ -1079,5 +1189,10 @@ public class LayoutUtil {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(LayoutUtil.class);
+
+	private static final Collection<String> _excludePreferencesNames =
+		ListUtil.fromArray(
+			"portletSetupUseCustomTitle", "portletSetupPortletDecoratorId",
+			"portletSetupCss");
 
 }

@@ -6,10 +6,10 @@
 package com.liferay.object.rest.internal.manager.v1_0;
 
 import com.liferay.account.exception.NoSuchGroupException;
-import com.liferay.batch.engine.attachment.BatchEngineAttachmentManager;
 import com.liferay.depot.constants.DepotConstants;
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.exportimport.attachment.ExportImportAttachmentManager;
 import com.liferay.object.action.engine.ObjectActionEngine;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
@@ -113,6 +113,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.odata.filter.expression.Expression;
@@ -1086,20 +1087,45 @@ public class DefaultObjectEntryManagerImpl
 
 	@Override
 	public ObjectEntry partialUpdateRelatedObjectEntry(
-			DTOConverterContext dtoConverterContext,
-			ObjectDefinition objectDefinition, ObjectEntry objectEntry,
+			DTOConverterContext dtoConverterContext, ObjectEntry objectEntry,
 			long objectEntryId, ObjectRelationship objectRelationship,
 			long parentObjectEntryId)
 		throws Exception {
 
+		ObjectDefinition objectDefinition2 =
+			_objectDefinitionLocalService.getObjectDefinition(
+				objectRelationship.getObjectDefinitionId2());
+
 		return updateRelatedObjectEntry(
-			dtoConverterContext, objectDefinition, objectEntryId,
+			dtoConverterContext,
 			ObjectEntryManagerUtil.partialUpdateObjectEntry(
 				getRelatedObjectEntry(
 					dtoConverterContext, objectEntryId, objectRelationship,
 					parentObjectEntryId),
-				objectDefinition.getObjectDefinitionId(), objectEntry),
-			objectRelationship, parentObjectEntryId);
+				objectDefinition2.getObjectDefinitionId(), objectEntry),
+			objectEntryId, objectRelationship, parentObjectEntryId);
+	}
+
+	@Override
+	public ObjectEntry partialUpdateRelatedObjectEntry(
+			DTOConverterContext dtoConverterContext,
+			String externalReferenceCode, ObjectEntry objectEntry,
+			ObjectRelationship objectRelationship,
+			String parentExternalReferenceCode, String scopeKey)
+		throws Exception {
+
+		ObjectDefinition objectDefinition2 =
+			_objectDefinitionLocalService.getObjectDefinition(
+				objectRelationship.getObjectDefinitionId2());
+
+		return updateRelatedObjectEntry(
+			dtoConverterContext, externalReferenceCode,
+			ObjectEntryManagerUtil.partialUpdateObjectEntry(
+				getRelatedObjectEntry(
+					dtoConverterContext, externalReferenceCode,
+					objectRelationship, parentExternalReferenceCode, scopeKey),
+				objectDefinition2.getObjectDefinitionId(), objectEntry),
+			objectRelationship, parentExternalReferenceCode, scopeKey);
 	}
 
 	@Override
@@ -1228,26 +1254,45 @@ public class DefaultObjectEntryManagerImpl
 	}
 
 	public ObjectEntry updateRelatedObjectEntry(
-			DTOConverterContext dtoConverterContext,
-			ObjectDefinition objectDefinition, long objectEntryId,
-			ObjectEntry objectEntry, ObjectRelationship objectRelationship,
+			DTOConverterContext dtoConverterContext, ObjectEntry objectEntry,
+			long objectEntryId, ObjectRelationship objectRelationship,
 			long parentObjectEntryId)
 		throws Exception {
 
-		Map<String, Object> properties = objectEntry.getProperties();
-
-		ObjectField objectField = _objectFieldLocalService.getObjectField(
-			objectRelationship.getObjectFieldId2());
-
-		properties.put(objectField.getName(), parentObjectEntryId);
-
-		_checkParentObjectEntry(
-			_objectEntryService.getObjectEntry(objectEntryId), objectField,
+		return _updateRelatedObjectEntry(
+			dtoConverterContext, objectEntry, objectEntryId, objectRelationship,
 			parentObjectEntryId);
+	}
 
-		return _updateObjectEntry(
-			objectRelationship.getObjectFieldId2(), dtoConverterContext,
-			objectDefinition, objectEntry, objectEntryId, false, true);
+	@Override
+	public ObjectEntry updateRelatedObjectEntry(
+			DTOConverterContext dtoConverterContext,
+			String externalReferenceCode, ObjectEntry objectEntry,
+			ObjectRelationship objectRelationship,
+			String parentExternalReferenceCode, String scopeKey)
+		throws Exception {
+
+		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
+			_objectEntryService.getObjectEntry(
+				externalReferenceCode,
+				getGroupId(
+					_objectDefinitionLocalService.getObjectDefinition(
+						objectRelationship.getObjectDefinitionId2()),
+					scopeKey),
+				objectRelationship.getObjectDefinitionId2());
+		com.liferay.object.model.ObjectEntry parentServiceBuilderObjectEntry =
+			_objectEntryService.getObjectEntry(
+				parentExternalReferenceCode,
+				getGroupId(
+					_objectDefinitionLocalService.getObjectDefinition(
+						objectRelationship.getObjectDefinitionId1()),
+					scopeKey),
+				objectRelationship.getObjectDefinitionId1());
+
+		return _updateRelatedObjectEntry(
+			dtoConverterContext, objectEntry,
+			serviceBuilderObjectEntry.getObjectEntryId(), objectRelationship,
+			parentServiceBuilderObjectEntry.getObjectEntryId());
 	}
 
 	@Override
@@ -1640,6 +1685,7 @@ public class DefaultObjectEntryManagerImpl
 			ObjectDefinition objectDefinition, ObjectEntry objectEntry)
 		throws Exception {
 
+		objectEntry.setExpirationDate(() -> null);
 		objectEntry.setExternalReferenceCode(() -> null);
 		objectEntry.setId(() -> null);
 
@@ -2510,7 +2556,7 @@ public class DefaultObjectEntryManagerImpl
 				 FeatureFlagManagerUtil.isEnabled("LPD-39967")) {
 
 			try {
-				URL url = _batchEngineAttachmentManager.getURL(
+				URL url = _exportImportAttachmentManager.getURL(
 					fileEntry.getFileURL());
 
 				if (Objects.equals(url.getProtocol(), "file")) {
@@ -2892,6 +2938,36 @@ public class DefaultObjectEntryManagerImpl
 						dtoConverterContext.getUriInfo());
 				}
 			).put(
+				"share",
+				() -> {
+					if (!FeatureFlagManagerUtil.isEnabled(
+							objectDefinition.getCompanyId(), "LPD-17564")) {
+
+						return null;
+					}
+
+					Group group = groupLocalService.fetchGroup(
+						serviceBuilderObjectEntry.getGroupId());
+
+					if (group == null) {
+						return null;
+					}
+
+					UnicodeProperties unicodeProperties =
+						group.getTypeSettingsProperties();
+
+					if (!GetterUtil.getBoolean(
+							unicodeProperties.get("sharingEnabled"))) {
+
+						return null;
+					}
+
+					return _addAction(
+						ActionKeys.VIEW, "getObjectEntry",
+						serviceBuilderObjectEntry,
+						dtoConverterContext.getUriInfo());
+				}
+			).put(
 				"update",
 				_addAction(
 					ActionKeys.UPDATE, "patchObjectEntry",
@@ -3110,6 +3186,42 @@ public class DefaultObjectEntryManagerImpl
 				serviceBuilderObjectEntry, scopeKey));
 	}
 
+	private ObjectEntry _updateRelatedObjectEntry(
+			DTOConverterContext dtoConverterContext, ObjectEntry objectEntry,
+			long objectEntryId, ObjectRelationship objectRelationship,
+			long parentObjectEntryId)
+		throws Exception {
+
+		Map<String, Object> properties = objectEntry.getProperties();
+
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			objectRelationship.getObjectFieldId2());
+
+		properties.put(objectField.getName(), parentObjectEntryId);
+
+		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
+			_objectEntryService.getObjectEntry(objectEntryId);
+
+		if (!Objects.equals(
+				MapUtil.getLong(
+					serviceBuilderObjectEntry.getValues(),
+					objectField.getName()),
+				parentObjectEntryId)) {
+
+			throw new NoSuchObjectEntryException(
+				String.format(
+					"No ObjectEntry exists with the key {%s=%s, " +
+						"objectEntryId=%s}",
+					objectField.getName(), parentObjectEntryId, objectEntryId));
+		}
+
+		return _updateObjectEntry(
+			objectRelationship.getObjectFieldId2(), dtoConverterContext,
+			_objectDefinitionLocalService.getObjectDefinition(
+				objectRelationship.getObjectDefinitionId2()),
+			objectEntry, objectEntryId, false, true);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		DefaultObjectEntryManagerImpl.class);
 
@@ -3120,9 +3232,6 @@ public class DefaultObjectEntryManagerImpl
 	private AttachmentManager _attachmentManager;
 
 	@Reference
-	private BatchEngineAttachmentManager _batchEngineAttachmentManager;
-
-	@Reference
 	private DepotEntryLocalService _depotEntryLocalService;
 
 	@Reference
@@ -3130,6 +3239,9 @@ public class DefaultObjectEntryManagerImpl
 
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
+
+	@Reference
+	private ExportImportAttachmentManager _exportImportAttachmentManager;
 
 	@Reference(
 		target = "(filter.factory.key=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT + ")"

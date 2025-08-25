@@ -254,6 +254,7 @@ create table CPDefinitionLocalization (
 	companyId LONG,
 	CPDefinitionId LONG,
 	languageId VARCHAR(75) null,
+	CProductId LONG,
 	name STRING null,
 	shortDescription STRING null,
 	description TEXT null,

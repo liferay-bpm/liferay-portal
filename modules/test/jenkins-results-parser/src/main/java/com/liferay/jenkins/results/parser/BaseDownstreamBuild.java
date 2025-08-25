@@ -648,6 +648,8 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 
 		buildDatabase.putProperty(
 			BUILD_URLS_PROPERTIES_KEY, getAxisName(), getBuildURL(), false);
+
+		_saveBadBuildURLsInBuildDatabase(getBadBuildURLs());
 	}
 
 	protected BaseDownstreamBuild(String url, TopLevelBuild topLevelBuild) {
@@ -1131,6 +1133,18 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 		sb.append(getAxisName());
 
 		return sb.toString();
+	}
+
+	private void _saveBadBuildURLsInBuildDatabase(List<String> badBuildURLs) {
+		if (badBuildURLs.isEmpty()) {
+			return;
+		}
+
+		BuildDatabase buildDatabase = getBuildDatabase();
+
+		buildDatabase.putProperty(
+			BAD_BUILD_URLS_PROPERTIES_KEY, getAxisName(),
+			JenkinsResultsParserUtil.join(",", badBuildURLs), false);
 	}
 
 	private void _uploadJenkinsConsoleTestrayAttachment() {
