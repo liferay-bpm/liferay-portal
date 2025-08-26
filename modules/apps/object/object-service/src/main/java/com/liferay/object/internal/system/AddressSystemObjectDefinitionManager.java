@@ -21,8 +21,10 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Address;
 import com.liferay.portal.kernel.model.AddressTable;
 import com.liferay.portal.kernel.model.BaseModel;
+import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.AddressLocalService;
+import com.liferay.portal.kernel.service.AddressService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.SetUtil;
 
@@ -141,6 +143,21 @@ public class AddressSystemObjectDefinitionManager
 	}
 
 	@Override
+	public BaseModel<?> getOrAddEmptyBaseModel(
+			String externalReferenceCode, long companyId, User user)
+		throws PortalException {
+
+		try {
+			return _addressService.getOrAddEmptyAddress(
+				externalReferenceCode, Contact.class.getName(),
+				user.getContactId());
+		}
+		catch (Exception exception) {
+			throw new PortalException(exception);
+		}
+	}
+
+	@Override
 	public Column<?, Long> getPrimaryKeyColumn() {
 		return AddressTable.INSTANCE.addressId;
 	}
@@ -190,5 +207,8 @@ public class AddressSystemObjectDefinitionManager
 
 	@Reference
 	private AddressLocalService _addressLocalService;
+
+	@Reference
+	private AddressService _addressService;
 
 }
