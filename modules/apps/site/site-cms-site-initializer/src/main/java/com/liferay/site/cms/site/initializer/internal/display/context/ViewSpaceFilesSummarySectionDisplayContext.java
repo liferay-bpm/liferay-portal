@@ -63,8 +63,7 @@ public class ViewSpaceFilesSummarySectionDisplayContext
 		ObjectEntryFolder objectEntryFolder =
 			_objectEntryFolderLocalService.
 				getObjectEntryFolderByExternalReferenceCode(
-					getRootObjectEntryFolderExternalReferenceCode(), _groupId,
-					themeDisplay.getCompanyId());
+					getRootObjectEntryFolderExternalReferenceCode(), _groupId);
 
 		return SpaceSummaryHeaderUtil.getSpaceSummaryHeaderProps(
 			httpServletRequest, "view-all-files", Collections.emptyMap(),

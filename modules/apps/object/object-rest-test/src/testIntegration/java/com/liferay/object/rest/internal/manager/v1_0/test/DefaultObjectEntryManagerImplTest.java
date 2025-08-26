@@ -2289,8 +2289,7 @@ public class DefaultObjectEntryManagerImplTest
 			() ->
 				_objectEntryFolderLocalService.
 					getObjectEntryFolderByExternalReferenceCode(
-						externalReferenceCode, 0,
-						TestPropsValues.getCompanyId()));
+						externalReferenceCode, 0));
 
 		try (SafeCloseable safeCloseable =
 				LazyReferencingThreadLocal.setEnabledWithSafeCloseable(true)) {
@@ -2308,7 +2307,7 @@ public class DefaultObjectEntryManagerImplTest
 		ObjectEntryFolder objectEntryFolder =
 			_objectEntryFolderLocalService.
 				getObjectEntryFolderByExternalReferenceCode(
-					externalReferenceCode, 0, TestPropsValues.getCompanyId());
+					externalReferenceCode, 0);
 
 		AssertUtils.assertEquals(
 			WorkflowConstants.STATUS_EMPTY, objectEntryFolder.getStatus());

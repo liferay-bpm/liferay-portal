@@ -711,8 +711,7 @@ public class ObjectEntryFolderResourceTest
 				fetchObjectEntryFolderByExternalReferenceCode(
 					objectEntryFolder.
 						getParentObjectEntryFolderExternalReferenceCode(),
-					_testDepotEntry.getGroupId(),
-					_testDepotEntry.getCompanyId()));
+					_testDepotEntry.getGroupId()));
 
 		try (SafeCloseable safeCloseable =
 				LazyReferencingThreadLocal.setEnabledWithSafeCloseable(true)) {
@@ -729,8 +728,7 @@ public class ObjectEntryFolderResourceTest
 					getObjectEntryFolderByExternalReferenceCode(
 						objectEntryFolder.
 							getParentObjectEntryFolderExternalReferenceCode(),
-						_testDepotEntry.getGroupId(),
-						_testDepotEntry.getCompanyId());
+						_testDepotEntry.getGroupId());
 
 		Assert.assertEquals(
 			WorkflowConstants.STATUS_EMPTY,
@@ -917,8 +915,7 @@ public class ObjectEntryFolderResourceTest
 						getObjectEntryFolderByExternalReferenceCode(
 							objectEntryFolder.
 								getParentObjectEntryFolderExternalReferenceCode(),
-							_testDepotEntry.getGroupId(),
-							_testDepotEntry.getCompanyId());
+							_testDepotEntry.getGroupId());
 
 			Assert.assertEquals(
 				WorkflowConstants.STATUS_EMPTY,
@@ -955,8 +952,7 @@ public class ObjectEntryFolderResourceTest
 					getObjectEntryFolderByExternalReferenceCode(
 						objectEntryFolder.
 							getParentObjectEntryFolderExternalReferenceCode(),
-						_testDepotEntry.getGroupId(),
-						_testDepotEntry.getCompanyId());
+						_testDepotEntry.getGroupId());
 
 			Assert.assertEquals(
 				WorkflowConstants.STATUS_APPROVED,

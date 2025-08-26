@@ -401,7 +401,7 @@ public abstract class BaseSectionDisplayContextTestCase
 			_objectEntryFolderLocalService.
 				getObjectEntryFolderByExternalReferenceCode(
 					getRootObjectEntryFolderExternalReferenceCode(),
-					group.getGroupId(), group.getCompanyId());
+					group.getGroupId());
 
 		return _objectEntryFolderLocalService.addObjectEntryFolder(
 			StringUtil.randomString(), group.getGroupId(),

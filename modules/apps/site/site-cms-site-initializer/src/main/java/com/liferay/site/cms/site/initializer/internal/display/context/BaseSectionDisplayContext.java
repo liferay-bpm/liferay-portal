@@ -91,11 +91,7 @@ public abstract class BaseSectionDisplayContext {
 
 		this.portal = portal;
 
-		themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		objectEntryFolder = _getObjectEntryFolder(
-			themeDisplay.getCompanyId(),
 			httpServletRequest.getAttribute(InfoDisplayWebKeys.INFO_ITEM));
 	}
 
@@ -483,16 +479,14 @@ public abstract class BaseSectionDisplayContext {
 		);
 	}
 
-	private ObjectEntryFolder _getObjectEntryFolder(
-		long companyId, Object object) {
-
+	private ObjectEntryFolder _getObjectEntryFolder(Object object) {
 		if (object instanceof DepotEntry) {
 			DepotEntry depotEntry = (DepotEntry)object;
 
 			return ObjectEntryFolderLocalServiceUtil.
 				fetchObjectEntryFolderByExternalReferenceCode(
 					getRootObjectEntryFolderExternalReferenceCode(),
-					depotEntry.getGroupId(), companyId);
+					depotEntry.getGroupId());
 		}
 		else if (object instanceof ObjectEntryFolder) {
 			return (ObjectEntryFolder)object;

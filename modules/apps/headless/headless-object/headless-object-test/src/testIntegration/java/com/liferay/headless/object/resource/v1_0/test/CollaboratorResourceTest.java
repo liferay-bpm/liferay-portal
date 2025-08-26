@@ -282,8 +282,7 @@ public class CollaboratorResourceTest extends BaseCollaboratorResourceTestCase {
 		return _addUserCollaborator(
 			_objectEntryFolderLocalService.
 				getObjectEntryFolderByExternalReferenceCode(
-					externalReferenceCode, testGroup.getGroupId(),
-					testCompany.getCompanyId()));
+					externalReferenceCode, testGroup.getGroupId()));
 	}
 
 	@Override

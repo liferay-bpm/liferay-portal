@@ -51,11 +51,11 @@ public class GroupModelListener extends BaseModelListener<Group> {
 			_objectEntryFolderLocalService.
 				deleteObjectEntryFolderByExternalReferenceCode(
 					ObjectEntryFolderConstants.EXTERNAL_REFERENCE_CODE_CONTENTS,
-					group.getGroupId(), group.getCompanyId());
+					group.getGroupId());
 			_objectEntryFolderLocalService.
 				deleteObjectEntryFolderByExternalReferenceCode(
 					ObjectEntryFolderConstants.EXTERNAL_REFERENCE_CODE_FILES,
-					group.getGroupId(), group.getCompanyId());
+					group.getGroupId());
 		}
 	}
 

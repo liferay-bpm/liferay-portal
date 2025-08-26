@@ -86,8 +86,7 @@ public class ObjectEntryFolderResourceImpl
 
 		_objectEntryFolderService.
 			deleteObjectEntryFolderByExternalReferenceCode(
-				externalReferenceCode, _getGroupId(scopeKey),
-				contextCompany.getCompanyId());
+				externalReferenceCode, _getGroupId(scopeKey));
 	}
 
 	@Override
@@ -113,8 +112,7 @@ public class ObjectEntryFolderResourceImpl
 		return _toObjectEntryFolder(
 			_objectEntryFolderService.
 				getObjectEntryFolderByExternalReferenceCode(
-					externalReferenceCode, _getGroupId(scopeKey),
-					contextCompany.getCompanyId()));
+					externalReferenceCode, _getGroupId(scopeKey)));
 	}
 
 	@Override
@@ -194,8 +192,7 @@ public class ObjectEntryFolderResourceImpl
 			objectEntryFolder,
 			_objectEntryFolderService.
 				getObjectEntryFolderByExternalReferenceCode(
-					externalReferenceCode, _getGroupId(scopeKey),
-					contextCompany.getCompanyId()));
+					externalReferenceCode, _getGroupId(scopeKey)));
 	}
 
 	@Override
@@ -233,8 +230,7 @@ public class ObjectEntryFolderResourceImpl
 			serviceBuilderObjectEntryFolder =
 				_objectEntryFolderService.
 					getObjectEntryFolderByExternalReferenceCode(
-						externalReferenceCode, groupId,
-						contextUser.getCompanyId());
+						externalReferenceCode, groupId);
 
 		_objectEntryFolderService.subscribeObjectEntryFolder(
 			contextUser.getUserId(), groupId,
@@ -257,8 +253,7 @@ public class ObjectEntryFolderResourceImpl
 			serviceBuilderObjectEntryFolder =
 				_objectEntryFolderService.
 					getObjectEntryFolderByExternalReferenceCode(
-						externalReferenceCode, groupId,
-						contextUser.getCompanyId());
+						externalReferenceCode, groupId);
 
 		_objectEntryFolderService.unsubscribeObjectEntryFolder(
 			contextUser.getUserId(), groupId,
@@ -282,8 +277,7 @@ public class ObjectEntryFolderResourceImpl
 			serviceBuilderObjectEntryFolder =
 				_objectEntryFolderService.
 					fetchObjectEntryFolderByExternalReferenceCode(
-						externalReferenceCode, groupId,
-						contextUser.getCompanyId());
+						externalReferenceCode, groupId);
 
 		if (serviceBuilderObjectEntryFolder == null) {
 			return _addObjectEntryFolder(
@@ -440,8 +434,7 @@ public class ObjectEntryFolderResourceImpl
 			serviceBuilderObjectEntryFolder =
 				_objectEntryFolderService.
 					fetchObjectEntryFolderByExternalReferenceCode(
-						parentObjectEntryFolderExternalReferenceCode, groupId,
-						contextUser.getCompanyId());
+						parentObjectEntryFolderExternalReferenceCode, groupId);
 
 		if ((parentObjectEntryFolderId != null) &&
 			(serviceBuilderObjectEntryFolder != null) &&

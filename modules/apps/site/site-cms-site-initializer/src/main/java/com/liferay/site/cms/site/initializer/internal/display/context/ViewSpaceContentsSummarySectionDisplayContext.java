@@ -63,8 +63,7 @@ public class ViewSpaceContentsSummarySectionDisplayContext
 		ObjectEntryFolder objectEntryFolder =
 			_objectEntryFolderLocalService.
 				getObjectEntryFolderByExternalReferenceCode(
-					getRootObjectEntryFolderExternalReferenceCode(), _groupId,
-					themeDisplay.getCompanyId());
+					getRootObjectEntryFolderExternalReferenceCode(), _groupId);
 
 		return SpaceSummaryHeaderUtil.getSpaceSummaryHeaderProps(
 			httpServletRequest, "view-all-content", Collections.emptyMap(),
