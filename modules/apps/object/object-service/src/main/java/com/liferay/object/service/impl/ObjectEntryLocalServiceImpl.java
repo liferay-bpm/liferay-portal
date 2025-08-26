@@ -22,6 +22,7 @@ import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
 import com.liferay.dynamic.data.mapping.expression.DDMExpression;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
 import com.liferay.dynamic.data.mapping.util.NumberUtil;
+import com.liferay.exportimport.kernel.empty.model.EmptyModelManager;
 import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
 import com.liferay.list.type.exception.NoSuchListTypeEntryException;
@@ -51,7 +52,6 @@ import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.entry.util.ObjectEntryValuesUtil;
 import com.liferay.object.exception.DuplicateObjectEntryExternalReferenceCodeException;
 import com.liferay.object.exception.NoSuchObjectDefinitionException;
-import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.exception.ObjectEntryDefaultLanguageIdException;
 import com.liferay.object.exception.ObjectEntryExpirationDateException;
 import com.liferay.object.exception.ObjectEntryFolderScopeException;
@@ -164,7 +164,6 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.lazy.referencing.LazyReferencingThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
@@ -1217,30 +1216,22 @@ public class ObjectEntryLocalServiceImpl
 			long objectDefinitionId)
 		throws PortalException {
 
-		ObjectEntry objectEntry = fetchObjectEntry(
-			externalReferenceCode, groupId, objectDefinitionId);
-
-		if (objectEntry != null) {
-			return objectEntry;
-		}
-
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
-		if (!LazyReferencingThreadLocal.isEnabled()) {
-			throw new NoSuchObjectEntryException(
-				String.format(
-					"No ObjectEntry exists with the key {externalReference" +
-						"Code=%s, groupId=%s, companyId=%s, " +
-							"objectDefinitionId=%s}",
-					externalReferenceCode, groupId,
-					objectDefinition.getCompanyId(), objectDefinitionId));
-		}
-
-		objectEntry = _addObjectEntry(
-			externalReferenceCode, groupId, userId, objectDefinitionId,
-			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-			WorkflowConstants.STATUS_EMPTY);
+		ObjectEntry objectEntry = _emptyModelManager.getOrAddEmptyModel(
+			objectDefinition.getClassName(), objectDefinition.getName(),
+			() -> _addObjectEntry(
+				externalReferenceCode, groupId, userId, objectDefinitionId,
+				ObjectEntryFolderConstants.
+					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+				WorkflowConstants.STATUS_EMPTY),
+			externalReferenceCode,
+			(_externalReferenceCode, _groupId) -> fetchObjectEntry(
+				_externalReferenceCode, _groupId, objectDefinitionId),
+			(_externalReferenceCode, _groupId) -> getObjectEntry(
+				_externalReferenceCode, _groupId, objectDefinitionId),
+			groupId);
 
 		_addResourcePermissions(objectDefinition, objectEntry);
 
@@ -7237,6 +7228,9 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
+
+	@Reference
+	private EmptyModelManager _emptyModelManager;
 
 	@Reference
 	private Encryptor _encryptor;
