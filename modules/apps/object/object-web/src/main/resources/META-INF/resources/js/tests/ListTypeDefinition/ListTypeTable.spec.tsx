@@ -11,10 +11,6 @@ describe('getDataSetProps', () => {
 	beforeAll(() => {
 		global.Liferay = {
 			...global.Liferay,
-			FeatureFlags: {
-				...global.Liferay?.FeatureFlags,
-				'LPD-24055': true,
-			},
 		};
 	});
 

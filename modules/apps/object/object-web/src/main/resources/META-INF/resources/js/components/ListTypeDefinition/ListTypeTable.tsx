@@ -97,9 +97,7 @@ export function getDataSetProps(
 				modalType: 'edit',
 				name_i18n: itemData.name_i18n,
 				readOnly,
-				system: Liferay.FeatureFlags['LPD-24055']
-					? itemData.system
-					: values.system,
+				system: itemData.system
 			});
 		}
 
