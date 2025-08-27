@@ -300,6 +300,10 @@ public class ObjectEntryResourceImpl
 			Pagination pagination, Sort[] sorts)
 		throws Exception {
 
+		if (!FeatureFlagManagerUtil.isEnabled("LPD-17564")) {
+			throw new UnsupportedOperationException();
+		}
+
 		DefaultObjectEntryManager defaultObjectEntryManager =
 			DefaultObjectEntryManagerProvider.provide(
 				_objectEntryManagerRegistry.getObjectEntryManager(
@@ -480,6 +484,10 @@ public class ObjectEntryResourceImpl
 			String scopeKey, String search, Aggregation aggregation,
 			Filter filter, Pagination pagination, Sort[] sorts)
 		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPD-17564")) {
+			throw new UnsupportedOperationException();
+		}
 
 		DefaultObjectEntryManager defaultObjectEntryManager =
 			DefaultObjectEntryManagerProvider.provide(

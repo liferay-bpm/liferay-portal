@@ -4016,6 +4016,7 @@ public class DefaultObjectEntryManagerImplTest
 			WorkflowConstants.STATUS_EXPIRED, status.getCode());
 	}
 
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testGetApprovedObjectEntries() throws Exception {
 		ObjectDefinition objectDefinition = _addObjectDefinition(
