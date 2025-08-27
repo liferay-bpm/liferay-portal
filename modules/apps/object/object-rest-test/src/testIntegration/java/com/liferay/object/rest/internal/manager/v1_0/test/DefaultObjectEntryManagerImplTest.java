@@ -3092,11 +3092,7 @@ public class DefaultObjectEntryManagerImplTest
 
 		// Status draft
 
-		_objectDefinition4.setEnableObjectEntryDraft(true);
-
-		_objectDefinition4 =
-			objectDefinitionLocalService.updateObjectDefinition(
-				_objectDefinition4);
+		_objectDefinition4 = _enableObjectEntryDraft(_objectDefinition4);
 
 		ObjectEntry copyObjectEntry =
 			_defaultObjectEntryManager.copyObjectEntryByVersion(
@@ -3110,11 +3106,7 @@ public class DefaultObjectEntryManagerImplTest
 
 		// Status expired
 
-		_objectDefinition4.setEnableObjectEntryDraft(false);
-
-		_objectDefinition4 =
-			objectDefinitionLocalService.updateObjectDefinition(
-				_objectDefinition4);
+		_objectDefinition4 = _enableObjectEntryDraft(_objectDefinition4);
 
 		_assertObjectEntryStatus(
 			WorkflowConstants.STATUS_EXPIRED,
@@ -4022,6 +4014,76 @@ public class DefaultObjectEntryManagerImplTest
 
 		AssertUtils.assertEquals(
 			WorkflowConstants.STATUS_EXPIRED, status.getCode());
+	}
+
+	@Test
+	public void testGetApprovedObjectEntries() throws Exception {
+		ObjectDefinition objectDefinition = _addObjectDefinition(
+			Collections.singletonList(
+				new TextObjectFieldBuilder(
+				).labelMap(
+					RandomTestUtil.randomLocaleStringMap()
+				).name(
+					"textObjectFieldName"
+				).build()),
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		objectDefinition = _enableObjectEntryDraft(objectDefinition);
+
+		_testGetApprovedObjectEntries(objectDefinition);
+
+		ObjectEntry objectEntry = _defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext, objectDefinition,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						"textObjectFieldName", RandomTestUtil.randomString()
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		_testGetApprovedObjectEntries(objectDefinition, objectEntry);
+
+		_defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext, objectDefinition,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						"textObjectFieldName", RandomTestUtil.randomString()
+					).build();
+					status = new Status() {
+						{
+							code = WorkflowConstants.STATUS_DRAFT;
+						}
+					};
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		_testGetApprovedObjectEntries(objectDefinition, objectEntry);
+
+		_defaultObjectEntryManager.expireObjectEntry(
+			_simpleDTOConverterContext, objectEntry.getId());
+
+		_testGetApprovedObjectEntries(objectDefinition);
+
+		_workflowDefinitionLinkLocalService.updateWorkflowDefinitionLink(
+			TestPropsValues.getUserId(), TestPropsValues.getCompanyId(), 0,
+			objectDefinition.getClassName(), 0, 0, "Single Approver", 1);
+
+		_defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext, objectDefinition,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						"textObjectFieldName", RandomTestUtil.randomString()
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		_testGetApprovedObjectEntries(objectDefinition);
 	}
 
 	@Test
@@ -6877,10 +6939,7 @@ public class DefaultObjectEntryManagerImplTest
 				).build()),
 			ObjectDefinitionConstants.SCOPE_COMPANY);
 
-		objectDefinition.setEnableObjectEntryDraft(true);
-
-		objectDefinition = objectDefinitionLocalService.updateObjectDefinition(
-			objectDefinition);
+		objectDefinition = _enableObjectEntryDraft(objectDefinition);
 
 		Map<String, Map<String, String>> objectEntryActions =
 			HashMapBuilder.<String, Map<String, String>>put(
@@ -8886,6 +8945,15 @@ public class DefaultObjectEntryManagerImplTest
 				organization.getOrganizationId());
 	}
 
+	private ObjectDefinition _enableObjectEntryDraft(
+		ObjectDefinition objectDefinition) {
+
+		objectDefinition.setEnableObjectEntryDraft(true);
+
+		return objectDefinitionLocalService.updateObjectDefinition(
+			objectDefinition);
+	}
+
 	private ObjectDefinition _enableObjectEntryVersioning() {
 		_objectDefinition1.setEnableObjectEntryVersioning(true);
 
@@ -9133,10 +9201,7 @@ public class DefaultObjectEntryManagerImplTest
 			// No value provided for the default language ID in the required
 			// object field of a draft object entry
 
-			objectDefinition.setEnableObjectEntryDraft(true);
-
-			objectDefinitionLocalService.updateObjectDefinition(
-				objectDefinition);
+			_enableObjectEntryDraft(objectDefinition);
 
 			assertEquals(
 				_defaultObjectEntryManager.addObjectEntry(
@@ -9518,6 +9583,21 @@ public class DefaultObjectEntryManagerImplTest
 
 		Assert.assertNull(
 			_objectEntryLocalService.fetchObjectEntry(objectEntryAA2.getId()));
+	}
+
+	private void _testGetApprovedObjectEntries(
+			ObjectDefinition objectDefinition,
+			ObjectEntry... expectedObjectEntries)
+		throws Exception {
+
+		Page<ObjectEntry> page =
+			_defaultObjectEntryManager.getApprovedObjectEntries(
+				companyId, objectDefinition, null, null, dtoConverterContext,
+				null, null, null, null);
+
+		assertEquals(
+			(List<ObjectEntry>)page.getItems(),
+			ListUtil.fromArray(expectedObjectEntries));
 	}
 
 	private void _testGetObjectEntriesWithAccountEntryRestricted2(
