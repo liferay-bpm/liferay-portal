@@ -12,6 +12,7 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.search.batch.BatchIndexingActionable;
 import com.liferay.portal.search.batch.DynamicQueryBatchIndexingActionableFactory;
 import com.liferay.portal.search.spi.model.index.contributor.ModelIndexerWriterContributor;
+import com.liferay.portal.search.spi.model.index.contributor.helper.IndexerWriterMode;
 import com.liferay.portal.search.spi.model.index.contributor.helper.ModelIndexerWriterDocumentHelper;
 
 /**
@@ -61,6 +62,17 @@ public class ObjectEntryModelIndexerWriterContributor
 	@Override
 	public long getCompanyId(ObjectEntry objectEntry) {
 		return objectEntry.getCompanyId();
+	}
+
+	@Override
+	public IndexerWriterMode getIndexerWriterMode(ObjectEntry objectEntry) {
+		if (!objectEntry.isApproved() && !objectEntry.isExpired() &&
+			!objectEntry.isScheduled() && !objectEntry.isInTrash()) {
+
+			return IndexerWriterMode.SKIP;
+		}
+
+		return IndexerWriterMode.UPDATE;
 	}
 
 	private final DynamicQueryBatchIndexingActionableFactory
