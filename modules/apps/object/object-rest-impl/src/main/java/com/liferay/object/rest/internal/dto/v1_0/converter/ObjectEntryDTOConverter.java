@@ -492,6 +492,20 @@ public class ObjectEntryDTOConverter
 			Map<String, UnsafeSupplier<Object, Exception>> unsafeSuppliers)
 		throws Exception {
 
+		if ((primaryKey == 0) ||
+			(_hasRootModelHierarchyNestedField() &&
+			 objectRelationship.isEdge())) {
+
+			return;
+		}
+
+		if (GetterUtil.getBoolean(
+				dtoConverterContext.getAttribute("rootModelOnly")) &&
+			!objectRelationship.isEdge()) {
+
+			return;
+		}
+
 		String relatedObjectDefinitionName = StringUtil.replaceLast(
 			objectFieldName.substring(
 				objectFieldName.lastIndexOf(StringPool.UNDERLINE) + 1),
@@ -892,7 +906,10 @@ public class ObjectEntryDTOConverter
 
 				if ((objectRelationship == null) ||
 					!objectRelationship.isAllowedObjectRelationshipType(
-						objectRelationship.getType())) {
+						objectRelationship.getType()) ||
+					(GetterUtil.getBoolean(
+						dtoConverterContext.getAttribute("rootModelOnly")) &&
+					 !objectRelationship.isEdge())) {
 
 					return null;
 				}
@@ -1340,14 +1357,9 @@ public class ObjectEntryDTOConverter
 						fetchObjectRelationshipByObjectFieldId2(
 							objectField.getObjectFieldId());
 
-				if ((primaryKey > 0) &&
-					(!_hasRootModelHierarchyNestedField() ||
-					 !objectRelationship.isEdge())) {
-
-					_addManyToOneRelatedObjectEntries(
-						dtoConverterContext, objectFieldName,
-						objectRelationship, primaryKey, unsafeSuppliers);
-				}
+				_addManyToOneRelatedObjectEntries(
+					dtoConverterContext, objectFieldName, objectRelationship,
+					primaryKey, unsafeSuppliers);
 
 				_addManyToOneObjectRelationshipNames(
 					objectField, objectFieldName, objectRelationship,
