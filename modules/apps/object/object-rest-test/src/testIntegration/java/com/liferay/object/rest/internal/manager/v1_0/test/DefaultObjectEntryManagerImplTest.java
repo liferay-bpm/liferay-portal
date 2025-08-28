@@ -793,7 +793,7 @@ public class DefaultObjectEntryManagerImplTest
 					"localizedTextObjectFieldName"
 				).build()));
 
-		ObjectRelationship objectRelationship1 =
+		_objectRelationship1 =
 			_objectRelationshipLocalService.addObjectRelationship(
 				null, adminUser.getUserId(),
 				_objectDefinition1.getObjectDefinitionId(),
@@ -803,7 +803,7 @@ public class DefaultObjectEntryManagerImplTest
 				"oneToManyRelationshipName", false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
-		_objectRelationshipName = objectRelationship1.getName();
+		_objectRelationshipName = _objectRelationship1.getName();
 
 		_addAggregationObjectField(
 			"precisionDecimalObjectFieldName", "AVERAGE",
@@ -826,7 +826,7 @@ public class DefaultObjectEntryManagerImplTest
 			"sumAggregationObjectFieldName", _objectRelationshipName);
 
 		ObjectField objectField = objectFieldLocalService.getObjectField(
-			objectRelationship1.getObjectFieldId2());
+			_objectRelationship1.getObjectFieldId2());
 
 		_objectRelationshipERCObjectFieldName =
 			_getObjectRelationshipERCObjectFieldName(objectField);
@@ -4087,6 +4087,59 @@ public class DefaultObjectEntryManagerImplTest
 			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		_testGetApprovedObjectEntries(objectDefinition);
+	}
+
+	@FeatureFlag("LPD-17564")
+	@Test
+	public void testGetApprovedObjectEntriesWithNestedFields()
+		throws Exception {
+
+		NestedFieldsContext originalNestedFieldsContext =
+			NestedFieldsContextThreadLocal.getNestedFieldsContext();
+
+		try {
+			ObjectEntry objectEntry = _addObjectEntry(
+				_objectDefinition2,
+				HashMapBuilder.<String, Object>put(
+					_objectRelationshipFieldName,
+					() -> {
+						ObjectEntry relatedObjectEntry = _addObjectEntry(
+							_objectDefinition1, Collections.emptyMap());
+
+						return relatedObjectEntry.getId();
+					}
+				).build());
+
+			NestedFieldsContextThreadLocal.setNestedFieldsContext(
+				new NestedFieldsContext(
+					1, null, Collections.singletonList(_objectRelationshipName),
+					null, null, null));
+
+			Assert.assertNull(_getNestedObjectEntries(_objectDefinition1));
+			Assert.assertNull(_getNestedObjectEntries(_objectDefinition2));
+
+			_objectRelationshipLocalService.updateObjectRelationship(
+				_objectRelationship1.getExternalReferenceCode(),
+				_objectRelationship1.getObjectRelationshipId(), 0,
+				_objectRelationship1.getDeletionType(), true,
+				_objectRelationship1.getLabelMap(), null);
+
+			ObjectEntry[] nestedObjectEntries = _getNestedObjectEntries(
+				_objectDefinition1);
+
+			Assert.assertEquals(
+				objectEntry.getId(), nestedObjectEntries[0].getId());
+		}
+		finally {
+			NestedFieldsContextThreadLocal.setNestedFieldsContext(
+				originalNestedFieldsContext);
+
+			_objectRelationshipLocalService.updateObjectRelationship(
+				_objectRelationship1.getExternalReferenceCode(),
+				_objectRelationship1.getObjectRelationshipId(), 0,
+				_objectRelationship1.getDeletionType(), false,
+				_objectRelationship1.getLabelMap(), null);
+		}
 	}
 
 	@Test
@@ -9017,6 +9070,25 @@ public class DefaultObjectEntryManagerImplTest
 		return localizedValues.get(languageId);
 	}
 
+	private ObjectEntry[] _getNestedObjectEntries(
+			ObjectDefinition objectDefinition)
+		throws Exception {
+
+		Page<ObjectEntry> page =
+			_defaultObjectEntryManager.getApprovedObjectEntries(
+				companyId, objectDefinition, null, null, dtoConverterContext,
+				null, null, null, null);
+
+		List<ObjectEntry> objectEntries = (List<ObjectEntry>)page.getItems();
+
+		Assert.assertEquals(objectEntries.toString(), 1, objectEntries.size());
+
+		ObjectEntry objectEntry = objectEntries.get(0);
+
+		return (ObjectEntry[])objectEntry.getPropertyValue(
+			_objectRelationshipName);
+	}
+
 	private String _getObjectRelationshipERCObjectFieldName(
 		ObjectField objectField) {
 
@@ -10235,6 +10307,7 @@ public class DefaultObjectEntryManagerImplTest
 	@Inject
 	private ObjectFilterLocalService _objectFilterLocalService;
 
+	private ObjectRelationship _objectRelationship1;
 	private String _objectRelationshipERCObjectFieldName;
 	private String _objectRelationshipFieldName;
 	private String _objectRelationshipName;
