@@ -21,6 +21,7 @@ import {
 	normalizeLocaleId,
 	transformAvailableLocalesAndValue,
 } from '../util/localizable/transform.es';
+import {validateFileSize} from '../util/validateFileSize.ts';
 
 const INITIAL_DEFAULT_LOCALE = {
 	icon: themeDisplay.getDefaultLanguageId(),
@@ -76,6 +77,7 @@ const RichText = ({
 	editorConfig,
 	evaluable,
 	fieldName,
+	fileItemThresholdSize,
 	id,
 	label = '',
 	locale,
@@ -84,6 +86,7 @@ const RichText = ({
 	onBlur,
 	onChange,
 	onFocus,
+	overallMaximumUploadRequestSize,
 	predefinedValue = '',
 	readOnly,
 	tip = '',
@@ -123,6 +126,7 @@ const RichText = ({
 			content: getISO639LanguageCode(editingLocale?.localeId),
 		},
 	});
+	const [error, setError] = useState({});
 
 	const {portletNamespace} = useConfig();
 
@@ -203,6 +207,22 @@ const RichText = ({
 	};
 
 	const handleContentChange = (content) => {
+		const base64String = getImageSrcFromHtml(content);
+
+		if (base64String) {
+			const error = validateFileSize(
+				fileItemThresholdSize,
+				getFileSizeInBytes(base64String),
+				overallMaximumUploadRequestSize
+			);
+
+			if (error) {
+				setError(error);
+
+				return;
+			}
+		}
+
 		if (currentValue[currentEditingLocale?.localeId] !== content) {
 			const newValue = {
 				...currentValue,
@@ -247,6 +267,42 @@ const RichText = ({
 							: newValue[currentEditingLocale?.localeId],
 					},
 				});
+			}
+		}
+	};
+
+	const handleFileDrop = (event) => {
+		const file = event.data.dataTransfer.$.files[0];
+
+		if (file) {
+			const error = validateFileSize(
+				fileItemThresholdSize,
+				file.size,
+				overallMaximumUploadRequestSize
+			);
+
+			if (error) {
+				event.stop();
+
+				setError(error);
+			}
+		}
+	};
+
+	const handleFilePaste = (event) => {
+		const base64String = getImageSrcFromHtml(event.data.dataValue);
+
+		if (base64String) {
+			const error = validateFileSize(
+				fileItemThresholdSize,
+				getFileSizeInBytes(base64String),
+				overallMaximumUploadRequestSize
+			);
+
+			if (error) {
+				event.stop();
+
+				setError(error);
 			}
 		}
 	};
@@ -350,6 +406,7 @@ const RichText = ({
 	return (
 		<FieldBase
 			{...otherProps}
+			{...error}
 			fieldName={fieldName}
 			id={id}
 			label={label}
@@ -405,7 +462,9 @@ const RichText = ({
 							name={name}
 							onBlur={onBlur}
 							onChange={(content) => handleContentChange(content)}
+							onDrop={(event) => handleFileDrop(event)}
 							onFocus={onFocus}
+							onPaste={(event) => handleFilePaste(event)}
 							onSetData={(event) => {
 								const editor = event.editor;
 
@@ -415,6 +474,12 @@ const RichText = ({
 									const sanitizedValue = sanitezeHTML(value);
 
 									handleContentChange(sanitizedValue);
+
+									if (error) {
+										event.data.dataValue = '';
+
+										return;
+									}
 
 									event.data.dataValue = sanitizedValue;
 								}
