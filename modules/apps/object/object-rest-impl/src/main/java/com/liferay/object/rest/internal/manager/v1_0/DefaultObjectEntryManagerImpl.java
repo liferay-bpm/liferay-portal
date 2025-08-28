@@ -597,6 +597,8 @@ public class DefaultObjectEntryManagerImpl
 			Sort[] sorts)
 		throws Exception {
 
+		dtoConverterContext.setAttribute("rootModelOnly", Boolean.TRUE);
+
 		return getObjectEntries(
 			companyId, objectDefinition, scopeKey, aggregation,
 			dtoConverterContext,
@@ -3013,30 +3015,21 @@ public class DefaultObjectEntryManagerImpl
 			}
 		}
 
-		DefaultDTOConverterContext defaultDTOConverterContext =
+		return _objectEntryDTOConverter.toDTO(
 			new DefaultDTOConverterContext(
 				dtoConverterContext.isAcceptAllLanguages(), actions,
+				HashMapBuilder.<String, Object>put(
+					"objectDefinition", objectDefinition
+				).putAll(
+					dtoConverterContext.getAttributes()
+				).build(),
 				dtoConverterContext.getDTOConverterRegistry(),
 				dtoConverterContext.getHttpServletRequest(),
 				serviceBuilderObjectEntry.getObjectEntryId(),
 				dtoConverterContext.getLocale(),
 				dtoConverterContext.getUriInfo(),
-				dtoConverterContext.getUser());
-
-		defaultDTOConverterContext.setAttribute(
-			"objectDefinition", objectDefinition);
-
-		ObjectEntryVersion objectEntryVersion =
-			(ObjectEntryVersion)dtoConverterContext.getAttribute(
-				"objectEntryVersion");
-
-		if (objectEntryVersion != null) {
-			defaultDTOConverterContext.setAttribute(
-				"objectEntryVersion", objectEntryVersion);
-		}
-
-		return _objectEntryDTOConverter.toDTO(
-			defaultDTOConverterContext, serviceBuilderObjectEntry);
+				dtoConverterContext.getUser()),
+			serviceBuilderObjectEntry);
 	}
 
 	private Map<String, Serializable> _toObjectValues(
