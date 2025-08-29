@@ -178,6 +178,17 @@ public class ObjectEntryServiceWrapper
 	}
 
 	@Override
+	public java.util.List<com.liferay.object.model.ObjectEntry>
+			getOneToManyRelatedObjectEntries(
+				long groupId, long objectRelationshipId, Long[] primaryKeys,
+				String search)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectEntryService.getOneToManyRelatedObjectEntries(
+			groupId, objectRelationshipId, primaryKeys, search);
+	}
+
+	@Override
 	public com.liferay.object.model.ObjectEntry getOrAddEmptyObjectEntry(
 			String externalReferenceCode, long groupId, long userId,
 			long objectDefinitionId)

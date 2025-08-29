@@ -125,6 +125,12 @@ public interface ObjectEntryService extends BaseService {
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<ObjectEntry> getOneToManyRelatedObjectEntries(
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
+			String search)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ObjectEntry getOrAddEmptyObjectEntry(
 			String externalReferenceCode, long groupId, long userId,
 			long objectDefinitionId)

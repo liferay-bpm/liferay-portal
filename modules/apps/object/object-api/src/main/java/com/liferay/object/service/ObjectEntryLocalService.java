@@ -420,6 +420,12 @@ public interface ObjectEntryLocalService
 			boolean related, String search)
 		throws PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<ObjectEntry> getOneToManyRelatedObjectEntries(
+			long groupId, long objectRelationshipId, Long[] primaryKeys,
+			String search)
+		throws PortalException;
+
 	@Indexable(type = IndexableType.REINDEX)
 	@Transactional(propagation = Propagation.REQUIRED)
 	public ObjectEntry getOrAddEmptyObjectEntry(
