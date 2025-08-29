@@ -815,6 +815,18 @@ public class ObjectEntryDTOConverter
 		return fileEntry;
 	}
 
+	private long _getGroupId(long groupId, ObjectDefinition objectDefinition) {
+		ObjectScopeProvider objectScopeProvider =
+			_objectScopeProviderRegistry.getObjectScopeProvider(
+				objectDefinition.getScope());
+
+		if (!objectScopeProvider.isGroupAware()) {
+			return 0;
+		}
+
+		return groupId;
+	}
+
 	private ListEntry _getListEntry(
 		DTOConverterContext dtoConverterContext, String key,
 		long listTypeDefinitionId) {
@@ -882,6 +894,14 @@ public class ObjectEntryDTOConverter
 				ObjectDefinition objectDefinition, long primaryKey)
 		throws Exception {
 
+		Map<String, Map<Long, List<com.liferay.object.model.ObjectEntry>>>
+			objectRelationshipRelatedObjectEntriesMap =
+				(Map
+					<String,
+					 Map<Long, List<com.liferay.object.model.ObjectEntry>>>)
+						 dtoConverterContext.getAttribute(
+							 "objectRelationshipRelatedObjectEntriesMap");
+
 		return NestedFieldsSupplier.supplyUnsafeSupplier(
 			nestedFieldName -> {
 				ObjectRelationship objectRelationship =
@@ -895,6 +915,21 @@ public class ObjectEntryDTOConverter
 						objectRelationship.getType())) {
 
 					return null;
+				}
+
+				if (objectRelationshipRelatedObjectEntriesMap != null) {
+					Map<Long, List<com.liferay.object.model.ObjectEntry>>
+						relatedObjectEntriesMap =
+							objectRelationshipRelatedObjectEntriesMap.get(
+								objectRelationship.getName());
+
+					if (relatedObjectEntriesMap != null) {
+						return () -> _getRelatedProperties(
+							dtoConverterContext,
+							relatedObjectEntriesMap.get(primaryKey),
+							_objectDefinitionLocalService.getObjectDefinition(
+								objectRelationship.getObjectDefinitionId2()));
+					}
 				}
 
 				ObjectDefinition relatedObjectDefinition =
@@ -912,50 +947,13 @@ public class ObjectEntryDTOConverter
 							relatedObjectDefinition.getCompanyId(),
 							objectRelationship.getType());
 
-				long relatedObjectDefinitionGroupId = groupId;
-
-				if (Objects.equals(
-						relatedObjectDefinition.getScope(),
-						ObjectDefinitionConstants.SCOPE_COMPANY)) {
-
-					relatedObjectDefinitionGroupId = 0;
-				}
-
-				List<?> relatedModels =
+				return () -> _getRelatedProperties(
+					dtoConverterContext,
 					objectRelatedModelsProvider.getRelatedModels(
-						relatedObjectDefinitionGroupId,
+						_getGroupId(groupId, relatedObjectDefinition),
 						objectRelationship.getObjectRelationshipId(),
-						primaryKey, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-
-				if (relatedObjectDefinition.isUnmodifiableSystemObject()) {
-					SystemObjectDefinitionManager
-						systemObjectDefinitionManager =
-							_systemObjectDefinitionManagerRegistry.
-								getSystemObjectDefinitionManager(
-									relatedObjectDefinition.getName());
-
-					return () -> TransformUtil.transformToArray(
-						relatedModels,
-						relatedModel -> _toExtendedEntity(
-							(BaseModel<?>)relatedModel, dtoConverterContext,
-							relatedObjectDefinition,
-							systemObjectDefinitionManager),
-						Object.class);
-				}
-
-				return () -> TransformUtil.transformToArray(
-					relatedModels,
-					relatedModel -> {
-						com.liferay.object.model.ObjectEntry objectEntry =
-							(com.liferay.object.model.ObjectEntry)relatedModel;
-
-						return toDTO(
-							_getDTOConverterContext(
-								dtoConverterContext,
-								objectEntry.getObjectEntryId()),
-							objectEntry);
-					},
-					ObjectEntry.class);
+						primaryKey, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS),
+					relatedObjectDefinition);
 			});
 	}
 
@@ -990,6 +988,40 @@ public class ObjectEntryDTOConverter
 		}
 
 		return objectDefinition;
+	}
+
+	private Object[] _getRelatedProperties(
+		DTOConverterContext dtoConverterContext, List<?> relatedModels,
+		ObjectDefinition relatedObjectDefinition) {
+
+		if (ListUtil.isEmpty(relatedModels)) {
+			return null;
+		}
+
+		if (relatedObjectDefinition.isUnmodifiableSystemObject()) {
+			return TransformUtil.transformToArray(
+				relatedModels,
+				relatedModel -> _toExtendedEntity(
+					(BaseModel<?>)relatedModel, dtoConverterContext,
+					relatedObjectDefinition,
+					_systemObjectDefinitionManagerRegistry.
+						getSystemObjectDefinitionManager(
+							relatedObjectDefinition.getName())),
+				Object.class);
+		}
+
+		return TransformUtil.transformToArray(
+			relatedModels,
+			relatedModel -> {
+				com.liferay.object.model.ObjectEntry objectEntry =
+					(com.liferay.object.model.ObjectEntry)relatedModel;
+
+				return toDTO(
+					_getDTOConverterContext(
+						dtoConverterContext, objectEntry.getObjectEntryId()),
+					objectEntry);
+			},
+			ObjectEntry.class);
 	}
 
 	private String _getScopeKey(

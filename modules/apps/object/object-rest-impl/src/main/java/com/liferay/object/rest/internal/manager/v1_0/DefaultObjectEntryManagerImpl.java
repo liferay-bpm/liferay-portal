@@ -109,6 +109,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.GroupThreadLocal;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -653,6 +654,16 @@ public class DefaultObjectEntryManagerImpl
 			groupIds = new Long[] {groupId};
 		}
 
+		List<Long> primaryKeys = objectEntryLocalService.getPrimaryKeys(
+			groupIds, companyId, dtoConverterContext.getUserId(),
+			objectDefinition.getObjectDefinitionId(), predicate, search, start,
+			end, sorts);
+
+		dtoConverterContext.setAttribute(
+			"objectRelationshipRelatedObjectEntriesMap",
+			_getObjectRelationshipRelatedObjectEntriesMap(
+				objectDefinition, primaryKeys, scopeKey));
+
 		return Page.of(
 			HashMapBuilder.put(
 				"create",
@@ -693,10 +704,7 @@ public class DefaultObjectEntryManagerImpl
 			).build(),
 			facets,
 			TransformUtil.transform(
-				objectEntryLocalService.getPrimaryKeys(
-					groupIds, companyId, dtoConverterContext.getUserId(),
-					objectDefinition.getObjectDefinitionId(), predicate, search,
-					start, end, sorts),
+				primaryKeys,
 				primaryKey -> _getObjectEntry(
 					dtoConverterContext, objectDefinition, primaryKey)),
 			pagination,
@@ -2265,6 +2273,78 @@ public class DefaultObjectEntryManagerImpl
 		return defaultDTOConverterContext;
 	}
 
+	private Map<String, Map<Long, List<com.liferay.object.model.ObjectEntry>>>
+			_getObjectRelationshipRelatedObjectEntriesMap(
+				ObjectDefinition objectDefinition, List<Long> primaryKeys,
+				String scopeKey)
+		throws Exception {
+
+		if (ListUtil.isEmpty(primaryKeys)) {
+			return Collections.emptyMap();
+		}
+
+		Map<String, Map<Long, List<com.liferay.object.model.ObjectEntry>>>
+			objectRelationshipRelatedObjectEntriesMap = new HashMap<>();
+
+		NestedFieldsSupplier.supplyUnsafeSupplier(
+			nestedFieldName -> {
+				ObjectRelationship objectRelationship =
+					_objectRelationshipLocalService.
+						fetchObjectRelationshipByObjectDefinitionId1(
+							objectDefinition.getObjectDefinitionId(),
+							nestedFieldName);
+
+				if ((objectRelationship == null) ||
+					!objectRelationship.compareType(
+						ObjectRelationshipConstants.TYPE_ONE_TO_MANY) ||
+					objectRelationship.isSelf()) {
+
+					return null;
+				}
+
+				ObjectDefinition relatedObjectDefinition =
+					_objectDefinitionLocalService.getObjectDefinition(
+						objectRelationship.getObjectDefinitionId2());
+
+				if (!relatedObjectDefinition.isActive() ||
+					relatedObjectDefinition.isUnmodifiableSystemObject()) {
+
+					return null;
+				}
+
+				Map<Long, List<com.liferay.object.model.ObjectEntry>>
+					relatedObjectEntriesMap = new HashMap<>();
+
+				ObjectField relationshipObjectField =
+					_objectFieldLocalService.fetchObjectField(
+						objectRelationship.getObjectFieldId2());
+
+				for (com.liferay.object.model.ObjectEntry relatedObjectEntry :
+						_objectEntryService.getOneToManyRelatedObjectEntries(
+							getGroupId(relatedObjectDefinition, scopeKey),
+							objectRelationship.getObjectRelationshipId(),
+							primaryKeys.toArray(new Long[0]), null)) {
+
+					List<com.liferay.object.model.ObjectEntry>
+						relatedObjectEntries =
+							relatedObjectEntriesMap.computeIfAbsent(
+								MapUtil.getLong(
+									relatedObjectEntry.getValues(),
+									relationshipObjectField.getName()),
+								key -> new ArrayList<>());
+
+					relatedObjectEntries.add(relatedObjectEntry);
+				}
+
+				objectRelationshipRelatedObjectEntriesMap.put(
+					objectRelationship.getName(), relatedObjectEntriesMap);
+
+				return null;
+			});
+
+		return objectRelationshipRelatedObjectEntriesMap;
+	}
+
 	private Map<String, ObjectRelationship> _getObjectRelationships(
 			ObjectDefinition objectDefinition, ObjectEntry objectEntry)
 		throws Exception {
@@ -3017,6 +3097,10 @@ public class DefaultObjectEntryManagerImpl
 
 		defaultDTOConverterContext.setAttribute(
 			"objectDefinition", objectDefinition);
+		defaultDTOConverterContext.setAttribute(
+			"objectRelationshipRelatedObjectEntriesMap",
+			dtoConverterContext.getAttribute(
+				"objectRelationshipRelatedObjectEntriesMap"));
 
 		ObjectEntryVersion objectEntryVersion =
 			(ObjectEntryVersion)dtoConverterContext.getAttribute(
