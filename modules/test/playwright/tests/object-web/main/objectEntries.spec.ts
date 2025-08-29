@@ -2192,7 +2192,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 				objectDefinition.label['en_US']
 			);
 
-			const filePath = path.join(__dirname, 'dependencies', 'planet.jpg');
+			const filePath = path.join(__dirname, 'dependencies', 'tree.png');
 
 			const fileBase64 = fs.readFileSync(filePath).toString('base64');
 
@@ -2204,27 +2204,55 @@ test.describe('Manage object entries through View Object Entries', () => {
 
 			await page.getByRole('textbox').last().fill(imageHtml);
 
-			await sourceButton.click();
-			await viewObjectEntriesPage.saveObjectEntryButton.click();
-
-			await waitForAlert(page, 'Error:The input was too large.', {
-				type: 'danger',
-			});
-
-			await page.reload();
-
-			const imagesHtml = `<p><img alt="" src="data:image/jpeg;base64,${fileBase64}" /><img alt="" src="data:image/jpeg;base64,${fileBase64}" /><img alt="" src="data:image/jpeg;base64,${fileBase64}" /><img alt="" src="data:image/jpeg;base64,${fileBase64}" /><img alt="" src="data:image/jpeg;base64,${fileBase64}" /></p>`;
+			await expect(
+				page.getByText(
+					'Please enter a file with a valid file size no larger than 1 MB'
+				)
+			).toBeVisible();
 
 			await sourceButton.click();
 
-			await page.getByRole('textbox').last().fill(imagesHtml);
+			const editorFrame = page.frameLocator('iframe[title="editor"]');
 
-			await sourceButton.click();
-			await viewObjectEntriesPage.saveObjectEntryButton.click();
+			await editorFrame.getByRole('textbox').fill('');
 
-			await waitForAlert(page, 'Error:Upload size is too large.', {
-				type: 'danger',
-			});
+			const editorBody = editorFrame.locator('body');
+
+			await editorBody.evaluate(
+				async (element, {fileBase64, fileName, fileType}) => {
+					const response = await fetch(
+						`data:${fileType};base64,${fileBase64}`
+					);
+					const blob = await response.blob();
+
+					const dataTransfer = new DataTransfer();
+
+					const file = new File([blob], fileName, {
+						type: fileType,
+					});
+
+					dataTransfer.items.add(file);
+
+					const pasteEvent = new ClipboardEvent('paste', {
+						bubbles: true,
+						cancelable: true,
+						clipboardData: dataTransfer,
+					});
+
+					element.dispatchEvent(pasteEvent);
+				},
+				{
+					fileBase64,
+					fileName: 'tree.png',
+					fileType: 'image/png',
+				}
+			);
+
+			await expect(
+				page.getByText(
+					'Please enter a file with a valid file size no larger than 1 MB'
+				)
+			).toBeVisible();
 		});
 	});
 
