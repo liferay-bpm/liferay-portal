@@ -10,15 +10,20 @@ import com.liferay.document.library.kernel.exception.DuplicateFileEntryException
 import com.liferay.document.library.kernel.exception.NoSuchFolderException;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.capabilities.WorkflowCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.service.RepositoryLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.constants.TestDataConstants;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -27,10 +32,17 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.io.InputStream;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -61,6 +73,52 @@ public class PortletFileRepositoryTest {
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(),
 			ServiceContextTestUtil.getServiceContext());
+	}
+
+	@Test
+	public void testAddPortletRepositoryConcurrently() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
+
+		List<Throwable> exceptions = Collections.synchronizedList(
+			new ArrayList<>());
+
+		CountDownLatch startLatch = new CountDownLatch(1);
+
+		int threadCount = 3;
+
+		CountDownLatch doneLatch = new CountDownLatch(threadCount);
+
+		String portletId = StringUtil.randomString();
+
+		for (int i = 0; i < threadCount; i++) {
+			Thread thread = new Thread(
+				() -> {
+					try {
+						startLatch.await();
+
+						_portletFileRepository.addPortletRepository(
+							_group.getGroupId(), portletId, serviceContext);
+					}
+					catch (Throwable throwable) {
+						exceptions.add(throwable);
+					}
+					finally {
+						doneLatch.countDown();
+					}
+				});
+
+			thread.start();
+		}
+
+		startLatch.countDown();
+
+		doneLatch.await();
+
+		List<Repository> repositories = _repositoryLocalService.getRepositories(
+			portletId);
+
+		Assert.assertEquals(repositories.toString(), 1, repositories.size());
 	}
 
 	@Test
@@ -279,6 +337,12 @@ public class PortletFileRepositoryTest {
 	@DeleteAfterTestRun
 	private Group _group;
 
+	@Inject
+	private PortletFileRepository _portletFileRepository;
+
 	private String _portletId;
+
+	@Inject
+	private RepositoryLocalService _repositoryLocalService;
 
 }
