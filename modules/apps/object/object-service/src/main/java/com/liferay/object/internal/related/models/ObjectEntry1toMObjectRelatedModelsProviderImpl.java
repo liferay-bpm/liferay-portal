@@ -213,7 +213,7 @@ public class ObjectEntry1toMObjectRelatedModelsProviderImpl
 
 			for (ObjectEntry objectEntry : relatedModels) {
 				_objectEntryService.moveObjectEntryToTrash(
-					userId, objectEntry, new ServiceContext());
+					objectEntry, new ServiceContext());
 			}
 		}
 		else if (Objects.equals(
@@ -247,7 +247,7 @@ public class ObjectEntry1toMObjectRelatedModelsProviderImpl
 			}
 
 			_objectEntryService.restoreObjectEntryFromTrash(
-				userId, objectEntry, new ServiceContext());
+				objectEntry, new ServiceContext());
 		}
 	}
 
