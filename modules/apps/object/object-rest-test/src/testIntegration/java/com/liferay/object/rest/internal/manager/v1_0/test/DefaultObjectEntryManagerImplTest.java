@@ -6833,10 +6833,10 @@ public class DefaultObjectEntryManagerImplTest
 
 		_defaultObjectEntryManager.subscribeObjectEntry(
 			objectEntry1.getExternalReferenceCode(), objectDefinition,
-			objectEntry1.getScopeKey(), adminUser.getUserId());
+			objectEntry1.getScopeKey());
 		_defaultObjectEntryManager.subscribeObjectEntry(
 			objectEntry2.getExternalReferenceCode(), objectDefinition,
-			objectEntry2.getScopeKey(), adminUser.getUserId());
+			objectEntry2.getScopeKey());
 
 		_assertActions(
 			ListUtil.fromArray("unsubscribe"), ListUtil.fromArray("subscribe"),
@@ -6868,7 +6868,7 @@ public class DefaultObjectEntryManagerImplTest
 				objectEntry1.getId()),
 			() -> _defaultObjectEntryManager.subscribeObjectEntry(
 				objectEntry1.getExternalReferenceCode(), objectDefinition,
-				objectEntry1.getScopeKey(), _user.getUserId()));
+				objectEntry1.getScopeKey()));
 
 		_resourcePermissionLocalService.addResourcePermission(
 			companyId, objectDefinition.getClassName(),
@@ -6877,10 +6877,10 @@ public class DefaultObjectEntryManagerImplTest
 
 		_defaultObjectEntryManager.subscribeObjectEntry(
 			objectEntry1.getExternalReferenceCode(), objectDefinition,
-			objectEntry1.getScopeKey(), _user.getUserId());
+			objectEntry1.getScopeKey());
 		_defaultObjectEntryManager.subscribeObjectEntry(
 			objectEntry2.getExternalReferenceCode(), objectDefinition,
-			objectEntry2.getScopeKey(), _user.getUserId());
+			objectEntry2.getScopeKey());
 
 		Assert.assertTrue(
 			_subscriptionLocalService.isSubscribed(
@@ -6961,7 +6961,7 @@ public class DefaultObjectEntryManagerImplTest
 
 		_defaultObjectEntryManager.subscribeObjectEntry(
 			rootObjectEntry.getExternalReferenceCode(), objectDefinitionA,
-			rootObjectEntry.getScopeKey(), adminUser.getUserId());
+			rootObjectEntry.getScopeKey());
 
 		Assert.assertTrue(
 			_subscriptionLocalService.isSubscribed(
@@ -6970,7 +6970,7 @@ public class DefaultObjectEntryManagerImplTest
 
 		_defaultObjectEntryManager.unsubscribeObjectEntry(
 			rootObjectEntry.getExternalReferenceCode(), objectDefinitionA,
-			rootObjectEntry.getScopeKey(), adminUser.getUserId());
+			rootObjectEntry.getScopeKey());
 
 		Assert.assertFalse(
 			_subscriptionLocalService.isSubscribed(
@@ -6989,7 +6989,7 @@ public class DefaultObjectEntryManagerImplTest
 			UnsupportedOperationException.class, null,
 			() -> _defaultObjectEntryManager.subscribeObjectEntry(
 				childObjectEntry.getExternalReferenceCode(), objectDefinitionAA,
-				childObjectEntry.getScopeKey(), adminUser.getUserId()));
+				childObjectEntry.getScopeKey()));
 
 		TreeTestUtil.deleteObjectDefinitionHierarchy(
 			objectDefinitionLocalService,
