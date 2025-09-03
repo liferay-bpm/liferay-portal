@@ -247,37 +247,6 @@ public class AssetLibraryResourceImpl extends BaseAssetLibraryResourceImpl {
 				contextCompany.getCompanyId(),
 				group.getExternalReferenceCode()));
 
-		List<DepotEntryGroupRel> depotEntryGroupRels =
-			_depotEntryGroupRelService.getDepotEntryGroupRels(
-				depotEntry, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-
-		List<Long> groupIds;
-
-		if (!depotEntryGroupRels.isEmpty()) {
-			groupIds = _getEligibleGroupIds(
-				_groupLocalService.getGroup(
-					depotEntryGroupRels.get(
-						0
-					).getToGroupId()));
-		}
-		else {
-			groupIds = _getEligibleGroupIds(depotEntry.getGroup());
-		}
-
-		if (!groupIds.isEmpty() ||
-			Objects.equals(
-				unicodeProperties.getProperty("trashEnabled"), "true")) {
-
-			for (DepotEntryGroupRel depotEntryGroupRel : depotEntryGroupRels) {
-				Layout layout = _layoutLocalService.getLayoutByFriendlyURL(
-					depotEntryGroupRel.getToGroupId(), false, "/recycle-bin");
-
-				layout.setHidden(false);
-
-				_layoutLocalService.updateLayout(layout);
-			}
-		}
-
 		return _toAssetLibrary(
 			_addOrUpdateDepotEntry(
 				assetLibrary,
@@ -415,40 +384,6 @@ public class AssetLibraryResourceImpl extends BaseAssetLibraryResourceImpl {
 
 			_updateDLSizeLimitConfiguration(
 				assetLibrary, group.getGroupId(), mimeTypeSizeLimits);
-
-			List<DepotEntryGroupRel> depotEntryGroupRels =
-				_depotEntryGroupRelService.getDepotEntryGroupRels(
-					depotEntry, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-
-			List<Long> groupIds;
-
-			if (!depotEntryGroupRels.isEmpty()) {
-				groupIds = _getEligibleGroupIds(
-					_groupLocalService.getGroup(
-						depotEntryGroupRels.get(
-							0
-						).getToGroupId()));
-			}
-			else {
-				groupIds = _getEligibleGroupIds(depotEntry.getGroup());
-			}
-
-			if ((groupIds.isEmpty() || (groupIds.size() == 1)) &&
-				Objects.equals(
-					unicodeProperties.getProperty("trashEnabled"), "false")) {
-
-				for (DepotEntryGroupRel depotEntryGroupRel :
-						depotEntryGroupRels) {
-
-					Layout layout = _layoutLocalService.getLayoutByFriendlyURL(
-						depotEntryGroupRel.getToGroupId(), false,
-						"/recycle-bin");
-
-					layout.setHidden(true);
-
-					_layoutLocalService.updateLayout(layout);
-				}
-			}
 
 			return _depotEntryService.updateDepotEntry(
 				depotEntry.getDepotEntryId(), nameMap, descriptionMap,
