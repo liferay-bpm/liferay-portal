@@ -172,7 +172,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 	@Override
 	public ObjectEntry expireObjectEntry(
-			long userId, long objectEntryId, ServiceContext serviceContext)
+			long objectEntryId, ServiceContext serviceContext)
 		throws PortalException {
 
 		ObjectEntry objectEntry = objectEntryLocalService.getObjectEntry(
@@ -183,7 +183,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 			ActionKeys.UPDATE);
 
 		return objectEntryLocalService.expireObjectEntry(
-			userId, objectEntryId, serviceContext);
+			getUserId(), objectEntryId, serviceContext);
 	}
 
 	@Override
@@ -358,8 +358,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 	@Override
 	public ObjectEntry getOrAddEmptyObjectEntry(
-			String externalReferenceCode, long groupId, long userId,
-			long objectDefinitionId)
+			String externalReferenceCode, long groupId, long objectDefinitionId)
 		throws PortalException {
 
 		ObjectEntry objectEntry = objectEntryService.fetchObjectEntry(
@@ -377,7 +376,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 		_validateSubmissionLimit(objectDefinitionId, getUser());
 
 		return objectEntryLocalService.getOrAddEmptyObjectEntry(
-			externalReferenceCode, groupId, userId, objectDefinitionId);
+			externalReferenceCode, groupId, getUserId(), objectDefinitionId);
 	}
 
 	@Override
@@ -433,7 +432,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 	@Override
 	public ObjectEntry moveObjectEntryToTrash(
-			long userId, ObjectEntry objectEntry, ServiceContext serviceContext)
+			ObjectEntry objectEntry, ServiceContext serviceContext)
 		throws PortalException {
 
 		_checkPermission(
@@ -441,7 +440,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 			objectEntry);
 
 		return objectEntryLocalService.moveObjectEntryToTrash(
-			userId, objectEntry, serviceContext);
+			getUserId(), objectEntry, serviceContext);
 	}
 
 	@Override
@@ -465,7 +464,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 
 	@Override
 	public ObjectEntry restoreObjectEntryFromTrash(
-			long userId, ObjectEntry objectEntry, ServiceContext serviceContext)
+			ObjectEntry objectEntry, ServiceContext serviceContext)
 		throws PortalException {
 
 		_checkPermission(
@@ -473,12 +472,11 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 			objectEntry);
 
 		return objectEntryLocalService.restoreObjectEntryFromTrash(
-			userId, objectEntry, serviceContext);
+			getUserId(), objectEntry, serviceContext);
 	}
 
 	@Override
-	public void subscribeObjectEntry(
-			long userId, long groupId, long objectEntryId)
+	public void subscribeObjectEntry(long groupId, long objectEntryId)
 		throws PortalException {
 
 		ObjectEntry objectEntry = objectEntryLocalService.getObjectEntry(
@@ -489,11 +487,11 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 			ActionKeys.SUBSCRIBE);
 
 		objectEntryLocalService.subscribeObjectEntry(
-			userId, groupId, objectEntryId);
+			getUserId(), groupId, objectEntryId);
 	}
 
 	@Override
-	public void unsubscribeObjectEntry(long userId, long objectEntryId)
+	public void unsubscribeObjectEntry(long objectEntryId)
 		throws PortalException {
 
 		ObjectEntry objectEntry = objectEntryLocalService.getObjectEntry(
@@ -503,7 +501,8 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 			objectEntry.getObjectDefinitionId(), objectEntry.getObjectEntryId(),
 			ActionKeys.SUBSCRIBE);
 
-		objectEntryLocalService.unsubscribeObjectEntry(userId, objectEntryId);
+		objectEntryLocalService.unsubscribeObjectEntry(
+			getUserId(), objectEntryId);
 	}
 
 	@Override
