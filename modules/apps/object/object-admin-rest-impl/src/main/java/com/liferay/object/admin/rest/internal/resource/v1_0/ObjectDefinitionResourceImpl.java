@@ -274,6 +274,10 @@ public class ObjectDefinitionResourceImpl
 					objectDefinition.getClassName(),
 					GetterUtil.getBoolean(objectDefinition.getEnableComments()),
 					GetterUtil.getBoolean(
+						objectDefinition.getEnableFormContainer(),
+						FeatureFlagManagerUtil.isEnabled(
+							contextUser.getCompanyId(), "LPD-17564")),
+					GetterUtil.getBoolean(
 						objectDefinition.getEnableFriendlyURLCustomization()),
 					GetterUtil.getBoolean(
 						objectDefinition.getEnableIndexSearch()),
@@ -321,13 +325,16 @@ public class ObjectDefinitionResourceImpl
 					objectDefinition.getClassName(),
 					GetterUtil.getBoolean(objectDefinition.getEnableComments()),
 					GetterUtil.getBoolean(
+						objectDefinition.getEnableFormContainer(),
+						FeatureFlagManagerUtil.isEnabled(
+							contextUser.getCompanyId(), "LPD-17564")),
+					GetterUtil.getBoolean(
 						objectDefinition.getEnableFriendlyURLCustomization()),
 					GetterUtil.getBoolean(
 						objectDefinition.getEnableIndexSearch(), true),
 					GetterUtil.getBoolean(
 						objectDefinition.getEnableLocalization(),
-						FeatureFlagManagerUtil.isEnabled(
-							contextUser.getCompanyId(), "LPD-32050")),
+						FeatureFlagManagerUtil.isEnabled("LPD-32050")),
 					GetterUtil.getBoolean(
 						objectDefinition.getEnableObjectEntryDraft()),
 					GetterUtil.getBoolean(
@@ -582,7 +589,7 @@ public class ObjectDefinitionResourceImpl
 					_getObjectFolderId(
 						objectDefinition.
 							getObjectFolderExternalReferenceCode()),
-					0,
+					0, objectDefinition.getEnableFormContainer(),
 					ObjectDefinitionSettingUtil.toObjectDefinitionSettings(
 						contextUser.getCompanyId(), _groupLocalService,
 						objectDefinition.getObjectDefinitionSettings(),
@@ -612,6 +619,11 @@ public class ObjectDefinitionResourceImpl
 					GetterUtil.getBoolean(
 						objectDefinition.getEnableCategorization(), true),
 					GetterUtil.getBoolean(objectDefinition.getEnableComments()),
+					GetterUtil.getBoolean(
+						objectDefinition.getEnableFormContainer(),
+						FeatureFlagManagerUtil.isEnabled(
+							serviceBuilderObjectDefinition.getCompanyId(),
+							"LPD-17564")),
 					GetterUtil.getBoolean(
 						objectDefinition.getEnableFriendlyURLCustomization()),
 					GetterUtil.getBoolean(
