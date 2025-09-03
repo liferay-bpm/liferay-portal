@@ -651,6 +651,11 @@ public class ObjectServiceUpgradeStepRegistrator
 			UpgradeProcessFactory.runSQL(
 				"update ObjectEntry set rootObjectEntryId = 0 where " +
 					"rootObjectEntryId is null"));
+
+		registry.register(
+			"10.22.1", "10.23.0",
+			new com.liferay.object.internal.upgrade.v10_23_0.
+				ObjectDefinitionUpgradeProcess());
 	}
 
 	@Reference
