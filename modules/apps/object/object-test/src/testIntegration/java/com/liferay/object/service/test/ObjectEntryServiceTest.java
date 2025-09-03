@@ -796,7 +796,7 @@ public class ObjectEntryServiceTest {
 				", companyId=", _group.getCompanyId(), ", objectDefinitionId=",
 				_objectDefinition.getObjectDefinitionId(), "}"),
 			() -> _objectEntryService.getOrAddEmptyObjectEntry(
-				externalReferenceCode, _group.getGroupId(), userId1,
+				externalReferenceCode, _group.getGroupId(),
 				_objectDefinition.getObjectDefinitionId()));
 
 		// Lazy referencing enabled
@@ -809,7 +809,6 @@ public class ObjectEntryServiceTest {
 			ObjectEntry objectEntry =
 				_objectEntryService.getOrAddEmptyObjectEntry(
 					RandomTestUtil.randomString(), _group.getGroupId(),
-					user.getUserId(),
 					_objectDefinition.getObjectDefinitionId());
 
 			// Without permissions
@@ -828,7 +827,7 @@ public class ObjectEntryServiceTest {
 					_objectDefinition.getResourceName(), " ",
 					_group.getGroupId()),
 				() -> _objectEntryService.getOrAddEmptyObjectEntry(
-					RandomTestUtil.randomString(), _group.getGroupId(), userId2,
+					RandomTestUtil.randomString(), _group.getGroupId(),
 					_objectDefinition.getObjectDefinitionId()));
 
 			// Without permissions, existing object entry
@@ -841,7 +840,7 @@ public class ObjectEntryServiceTest {
 					objectEntry.getObjectEntryId()),
 				() -> _objectEntryService.getOrAddEmptyObjectEntry(
 					objectEntry.getExternalReferenceCode(),
-					objectEntry.getGroupId(), userId2,
+					objectEntry.getGroupId(),
 					objectEntry.getObjectDefinitionId()));
 		}
 	}
@@ -1254,7 +1253,7 @@ public class ObjectEntryServiceTest {
 		_setUser(user);
 
 		_objectEntryService.restoreObjectEntryFromTrash(
-			user.getUserId(), objectEntry,
+			objectEntry,
 			ServiceContextTestUtil.getServiceContext());
 	}
 

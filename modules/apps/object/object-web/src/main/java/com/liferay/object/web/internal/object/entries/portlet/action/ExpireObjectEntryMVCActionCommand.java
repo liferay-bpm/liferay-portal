@@ -54,11 +54,8 @@ public class ExpireObjectEntryMVCActionCommand extends BaseMVCActionCommand {
 			return;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		_objectEntryService.expireObjectEntry(
-			themeDisplay.getUserId(), objectEntryId,
+			objectEntryId,
 			ServiceContextFactory.getInstance(
 				ObjectEntry.class.getName(), actionRequest));
 	}

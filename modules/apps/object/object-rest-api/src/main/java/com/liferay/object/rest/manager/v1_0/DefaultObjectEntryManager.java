@@ -245,12 +245,12 @@ public interface DefaultObjectEntryManager extends ObjectEntryManager {
 
 	public void subscribeObjectEntry(
 			String externalReferenceCode, ObjectDefinition objectDefinition,
-			String scopeKey, long userId)
+			String scopeKey)
 		throws Exception;
 
 	public void unsubscribeObjectEntry(
 			String externalReferenceCode, ObjectDefinition objectDefinition,
-			String scopeKey, long userId)
+			String scopeKey)
 		throws Exception;
 
 	public ObjectEntry updateObjectEntry(
