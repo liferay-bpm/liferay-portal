@@ -317,19 +317,6 @@ public class DefaultObjectEntryManagerImpl
 
 	@Override
 	public void deleteObjectEntry(
-			DTOConverterContext dtoConverterContext,
-			ObjectDefinition objectDefinition, long objectEntryId)
-		throws Exception {
-
-		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
-			_objectEntryService.getObjectEntry(objectEntryId);
-
-		_deleteObjectEntry(
-			dtoConverterContext, objectDefinition, serviceBuilderObjectEntry);
-	}
-
-	@Override
-	public void deleteObjectEntry(
 			long companyId, DTOConverterContext dtoConverterContext,
 			String externalReferenceCode, ObjectDefinition objectDefinition,
 			String scopeKey)
@@ -340,8 +327,18 @@ public class DefaultObjectEntryManagerImpl
 				externalReferenceCode, getGroupId(objectDefinition, scopeKey),
 				objectDefinition.getObjectDefinitionId());
 
-		_deleteObjectEntry(
-			dtoConverterContext, objectDefinition, serviceBuilderObjectEntry);
+		_deleteObjectEntry(objectDefinition, serviceBuilderObjectEntry);
+	}
+
+	@Override
+	public void deleteObjectEntry(
+			ObjectDefinition objectDefinition, long objectEntryId)
+		throws Exception {
+
+		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
+			_objectEntryService.getObjectEntry(objectEntryId);
+
+		_deleteObjectEntry(objectDefinition, serviceBuilderObjectEntry);
 	}
 
 	@Override
@@ -482,7 +479,7 @@ public class DefaultObjectEntryManagerImpl
 				ServiceContextUtil.createServiceContext(objectEntryId));
 
 		_objectEntryVersionService.expireObjectEntryVersions(
-			dtoConverterContext.getUserId(), serviceBuilderObjectEntry,
+			serviceBuilderObjectEntry,
 			ServiceContextUtil.createServiceContext(objectEntryId));
 
 		return _objectEntryDTOConverter.toDTO(
@@ -1748,7 +1745,6 @@ public class DefaultObjectEntryManagerImpl
 	}
 
 	private void _deleteObjectEntry(
-			DTOConverterContext dtoConverterContext,
 			ObjectDefinition objectDefinition,
 			com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry)
 		throws Exception {
@@ -1917,7 +1913,7 @@ public class DefaultObjectEntryManagerImpl
 			serviceBuilderObjectEntry,
 			ServiceContextUtil.createServiceContext(
 				serviceBuilderObjectEntry.getObjectEntryId()),
-			dtoConverterContext.getUserId(), version);
+			version);
 
 		ObjectEntryVersion objectEntryVersion =
 			_objectEntryVersionService.getObjectEntryVersion(
