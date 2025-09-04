@@ -100,7 +100,7 @@ public class ObjectEntryVersionLocalServiceTest {
 		_objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, false, true, false,
-				true, false, false, true, null,
+				false, true, false, false, true, null,
 				RandomTestUtil.randomLocaleStringMap(),
 				"A" + StringUtil.randomString(), null, null,
 				RandomTestUtil.randomLocaleStringMap(), true,

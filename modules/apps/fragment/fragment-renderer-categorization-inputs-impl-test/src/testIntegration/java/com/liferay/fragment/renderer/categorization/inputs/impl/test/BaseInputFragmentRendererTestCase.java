@@ -219,6 +219,7 @@ public abstract class BaseInputFragmentRendererTestCase {
 			objectDefinition.isEnableFriendlyURLCustomization(),
 			objectDefinition.isEnableIndexSearch(),
 			objectDefinition.isEnableLocalization(),
+			objectDefinition.isEnableObjectDefinitionMapping(),
 			objectDefinition.isEnableObjectEntryDraft(),
 			objectDefinition.isEnableObjectEntryHistory(),
 			objectDefinition.isEnableObjectEntrySchedule(),
