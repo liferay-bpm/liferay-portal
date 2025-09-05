@@ -172,23 +172,26 @@ public class ObjectEntryManager1RestController extends BaseRestController {
 		Map<String, JSONObject> objectEntryJSONObjects =
 			_getObjectEntryJSONObjects(objectDefinitionExternalReferenceCode);
 
-		JSONObject existingObjectEntry = objectEntryJSONObjects.get(
+		JSONObject existingObjectEntryjsonObject = objectEntryJSONObjects.get(
 			externalReferenceCode);
 
-		if (existingObjectEntry == null) {
+		if (existingObjectEntryjsonObject == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
-		JSONObject newObjectEntry = _getObjectEntryJSONObject(json);
+		JSONObject newObjectEntryjsonObject = _getObjectEntryJSONObject(json);
 
-		_mergeJSONObjects(existingObjectEntry, newObjectEntry);
+		_mergeJSONObjects(
+			existingObjectEntryjsonObject, newObjectEntryjsonObject);
 
-		existingObjectEntry.put("externalReferenceCode", externalReferenceCode);
+		existingObjectEntryjsonObject.put(
+			"externalReferenceCode", externalReferenceCode);
 
-		objectEntryJSONObjects.put(externalReferenceCode, existingObjectEntry);
+		objectEntryJSONObjects.put(
+			externalReferenceCode, existingObjectEntryjsonObject);
 
 		return new ResponseEntity<>(
-			existingObjectEntry.toString(), HttpStatus.OK);
+			existingObjectEntryjsonObject.toString(), HttpStatus.OK);
 	}
 
 	private JSONObject _getObjectEntryJSONObject(String json) {
@@ -212,10 +215,12 @@ public class ObjectEntryManager1RestController extends BaseRestController {
 			objectDefinitionExternalReferenceCode, key -> new HashMap<>());
 	}
 
-	private void _mergeJSONObjects(JSONObject existing, JSONObject newValues) {
-		for (String key : newValues.keySet()) {
-			Object newValue = newValues.get(key);
-			Object existingValue = existing.opt(key);
+	private void _mergeJSONObjects(
+		JSONObject existingjsonObject, JSONObject newValuesjsonObject) {
+
+		for (String key : newValuesjsonObject.keySet()) {
+			Object newValue = newValuesjsonObject.get(key);
+			Object existingValue = existingjsonObject.opt(key);
 
 			if ((newValue instanceof JSONObject) &&
 				(existingValue instanceof JSONObject)) {
@@ -224,7 +229,7 @@ public class ObjectEntryManager1RestController extends BaseRestController {
 					(JSONObject)existingValue, (JSONObject)newValue);
 			}
 			else if (!JSONObject.NULL.equals(newValue)) {
-				existing.put(key, newValue);
+				existingjsonObject.put(key, newValue);
 			}
 		}
 	}
