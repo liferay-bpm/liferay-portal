@@ -172,30 +172,37 @@ public class ObjectEntryManager1RestController extends BaseRestController {
 		Map<String, JSONObject> objectEntryJSONObjects =
 			_getObjectEntryJSONObjects(objectDefinitionExternalReferenceCode);
 
-		if (!objectEntryJSONObjects.containsKey(externalReferenceCode)) {
-			return new ResponseEntity<>(json, HttpStatus.NOT_FOUND);
+		JSONObject existingObjectEntry = objectEntryJSONObjects.get(
+			externalReferenceCode);
+
+		if (existingObjectEntry == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
-		JSONObject objectEntryJSONObject = _getObjectEntryJSONObject(json);
+		JSONObject newObjectEntry = _getObjectEntryJSONObject(json);
 
-		objectEntryJSONObjects.put(
-			externalReferenceCode, objectEntryJSONObject);
+		_mergeJSONObjects(existingObjectEntry, newObjectEntry);
+
+		existingObjectEntry.put("externalReferenceCode", externalReferenceCode);
+
+		objectEntryJSONObjects.put(externalReferenceCode, existingObjectEntry);
 
 		return new ResponseEntity<>(
-			objectEntryJSONObject.toString(), HttpStatus.OK);
+			existingObjectEntry.toString(), HttpStatus.OK);
 	}
 
 	private JSONObject _getObjectEntryJSONObject(String json) {
-		JSONObject jsonObject = new JSONObject(json);
-
-		JSONObject objectEntryJSONObject = jsonObject.getJSONObject(
-			"objectEntry");
-
-		if (objectEntryJSONObject == null) {
-			throw new IllegalArgumentException("Object entry is null");
+		if ((json == null) || json.isEmpty()) {
+			return new JSONObject();
 		}
 
-		return objectEntryJSONObject;
+		JSONObject jsonObject = new JSONObject(json);
+
+		if (jsonObject.has("objectEntry")) {
+			return jsonObject.getJSONObject("objectEntry");
+		}
+
+		return jsonObject;
 	}
 
 	private Map<String, JSONObject> _getObjectEntryJSONObjects(
@@ -203,6 +210,23 @@ public class ObjectEntryManager1RestController extends BaseRestController {
 
 		return _objectEntryJSONObjectsMap.computeIfAbsent(
 			objectDefinitionExternalReferenceCode, key -> new HashMap<>());
+	}
+
+	private void _mergeJSONObjects(JSONObject existing, JSONObject newValues) {
+		for (String key : newValues.keySet()) {
+			Object newValue = newValues.get(key);
+			Object existingValue = existing.opt(key);
+
+			if ((newValue instanceof JSONObject) &&
+				(existingValue instanceof JSONObject)) {
+
+				_mergeJSONObjects(
+					(JSONObject)existingValue, (JSONObject)newValue);
+			}
+			else if (!JSONObject.NULL.equals(newValue)) {
+				existing.put(key, newValue);
+			}
+		}
 	}
 
 	private static final Log _log = LogFactory.getLog(
