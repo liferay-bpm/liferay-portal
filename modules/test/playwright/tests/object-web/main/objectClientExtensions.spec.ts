@@ -167,7 +167,7 @@ test('Can create, read, update, and delete object entries that use the client ex
 
 	await expect(
 		page
-			.locator(`.cell-${label['en_US']}`)
+			.locator(`.cell-${label['en_US'].toLowerCase()}`)
 			.nth(1)
 			.getByText(objectEntry[name].toString())
 	).toBeVisible();
@@ -194,9 +194,9 @@ test('Can create, read, update, and delete object entries that use the client ex
 
 	await expect(
 		page
-			.locator(`.cell-${label['en_US']}`)
+			.locator(`.cell-${label['en_US'].toLowerCase()}`)
 			.nth(1)
-			.getByText(objectEntryUpdatedValue)
+			.getByText(objectEntryUpdatedValue.toString())
 	).toBeVisible();
 
 	// Delete
