@@ -5,9 +5,11 @@
 
 package com.liferay.headless.cms.internal.odata.entity.v1_0;
 
+import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.odata.entity.BooleanEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.odata.entity.IntegerEntityField;
 import com.liferay.portal.odata.entity.StringEntityField;
 
 import java.util.Map;
@@ -20,6 +22,7 @@ public class BulkActionEntityModel implements EntityModel {
 	public BulkActionEntityModel() {
 		_entityFieldsMap = EntityModel.toEntityFieldsMap(
 			new BooleanEntityField("cmsRoot", locale -> "cms_root"),
+			new IntegerEntityField("status", locale -> Field.STATUS),
 			new StringEntityField("cmsSection", locale -> "cms_section"));
 	}
 
