@@ -4,9 +4,7 @@
  */
 
 import {openModal} from 'frontend-js-components-web';
-import {sub} from 'frontend-js-web';
-
-import {START_TASK} from '../../../common/utils/events';
+import {fetch, sub} from 'frontend-js-web';
 
 function getBulkDeleteMessage(selectedData: any) {
 	if (selectedData.selectAll) {
@@ -34,10 +32,11 @@ function getBulkDeleteMessage(selectedData: any) {
 }
 
 export default function deleteAssetEntriesBulkAction({
-	actionId,
+	loadData,
 	selectedData,
 }: {
 	actionId: string;
+	loadData?: () => {};
 	selectedData: any;
 }) {
 	const {confirmationMessage, title} = getBulkDeleteMessage(selectedData);
@@ -62,10 +61,35 @@ export default function deleteAssetEntriesBulkAction({
 			{
 				displayType: 'danger',
 				label: Liferay.Language.get('delete'),
-				onClick: ({processClose}) => {
-					Liferay.fire(START_TASK, {actionId, selectedData});
-
+				onClick: async ({processClose}: any) => {
 					processClose();
+
+					const bulkActionItems = selectedData.items.map(
+						(item: any) => ({
+							classExternalReferenceCode:
+								item.embedded.externalReferenceCode,
+							className: item.entryClassName,
+							classPK: item.embedded.id,
+							name: item.embedded.title,
+						})
+					);
+
+					await fetch('/o/headless-cms/v1.0/bulk-action', {
+						body: JSON.stringify({
+							bulkActionItems,
+							selectAll: false,
+							type: 'DeleteBulkAction',
+						}),
+						headers: {
+							'Accept': 'application/json',
+							'Content-Type': 'application/json',
+							'x-csrf-token': Liferay.authToken,
+						},
+
+						method: 'POST',
+					});
+
+					loadData?.();
 				},
 			},
 		],
