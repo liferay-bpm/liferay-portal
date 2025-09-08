@@ -11,25 +11,33 @@
 ViewRecycleBinSectionDisplayContext viewRecycleBinSectionDisplayContext = (ViewRecycleBinSectionDisplayContext)request.getAttribute(ViewRecycleBinSectionDisplayContext.class.getName());
 %>
 
-<div class="cms-section custom-empty-state">
-	<div>
-		<react:component
-			module="{Breadcrumb} from site-cms-site-initializer"
-			props="<%= viewRecycleBinSectionDisplayContext.getBreadcrumbProps() %>"
+<div class="cms-section">
+	<div class="recycle-bin-section">
+		<div>
+			<react:component
+				module="{RecycleBinToolbar} from site-cms-site-initializer"
+			/>
+		</div>
+
+		<div>
+			<react:component
+				module="{Breadcrumb} from site-cms-site-initializer"
+				props="<%= viewRecycleBinSectionDisplayContext.getBreadcrumbProps() %>"
+			/>
+		</div>
+
+		<frontend-data-set:headless-display
+			apiURL="<%= viewRecycleBinSectionDisplayContext.getAPIURL() %>"
+			bulkActionDropdownItems="<%= viewRecycleBinSectionDisplayContext.getBulkActionDropdownItems() %>"
+			emptyState="<%= viewRecycleBinSectionDisplayContext.getEmptyState() %>"
+			fdsActionDropdownItems="<%= viewRecycleBinSectionDisplayContext.getFDSActionDropdownItems() %>"
+			formName="fm"
+			id="<%= CMSSiteInitializerFDSNames.RECYCLE_BIN_SECTION %>"
+			itemsPerPage="<%= 20 %>"
+			propsTransformer="{RecycleBinFDSPropsTransformer} from site-cms-site-initializer"
+			selectedItemsKey="id"
+			selectionType="multiple"
+			style="fluid"
 		/>
 	</div>
-
-	<frontend-data-set:headless-display
-		apiURL="<%= viewRecycleBinSectionDisplayContext.getAPIURL() %>"
-		bulkActionDropdownItems="<%= viewRecycleBinSectionDisplayContext.getBulkActionDropdownItems() %>"
-		emptyState="<%= viewRecycleBinSectionDisplayContext.getEmptyState() %>"
-		fdsActionDropdownItems="<%= viewRecycleBinSectionDisplayContext.getFDSActionDropdownItems() %>"
-		formName="fm"
-		id="<%= CMSSiteInitializerFDSNames.RECYCLE_BIN_SECTION %>"
-		itemsPerPage="<%= 20 %>"
-		propsTransformer="{RecycleBinFDSPropsTransformer} from site-cms-site-initializer"
-		selectedItemsKey="id"
-		selectionType="multiple"
-		style="fluid"
-	/>
-</div> </div>
+</div>

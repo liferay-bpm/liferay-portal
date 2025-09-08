@@ -1,0 +1,30 @@
+.recycle-bin-section {
+	.recycle-bin-title {
+		color: #272833;
+		font-size: 25px;
+		font-weight: 500;
+	}
+
+	.recycle-bin-toolbar {
+		border-style: none;
+
+		.breadcrumb-item {
+			font-size: 18px;
+			font-weight: 400;
+			line-height: 150%;
+			vertical-align: middle;
+
+			&:last-child {
+				font-weight: 600;
+			}
+		}
+	}
+
+	.cms-parent-container {
+		height: calc(100vh - 6rem - var(--control-menu-container-height, 0));
+
+		.cms-container-child {
+			height: 100%;
+		}
+	}
+}
