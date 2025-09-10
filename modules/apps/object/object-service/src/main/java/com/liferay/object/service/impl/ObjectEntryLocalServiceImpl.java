@@ -183,6 +183,7 @@ import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
 import com.liferay.portal.kernel.model.Users_OrgsTable;
+import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.model.WorkflowInstanceLink;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.module.service.Snapshot;
@@ -212,6 +213,7 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
+import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
@@ -255,6 +257,8 @@ import com.liferay.portal.service.PersistedModelLocalServiceRegistryUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
+import com.liferay.portal.workflow.kaleo.model.KaleoDefinition;
+import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionLocalService;
 import com.liferay.sharing.service.SharingEntryLocalService;
 import com.liferay.subscription.service.SubscriptionLocalService;
 import com.liferay.trash.exception.RestoreEntryException;
@@ -5768,12 +5772,29 @@ public class ObjectEntryLocalServiceImpl
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(
 				objectEntry.getObjectDefinitionId());
+
+		WorkflowDefinitionLink workflowDefinitionLink =
+			_workflowDefinitionLinkLocalService.fetchWorkflowDefinitionLink(
+				objectDefinition.getCompanyId(), objectEntry.getGroupId(),
+				objectDefinition.getClassName(), 0, 0, true);
+
+		boolean activeWorkflow = false;
+
+		if (workflowDefinitionLink != null) {
+			KaleoDefinition kaleoDefinition =
+				_kaleoDefinitionLocalService.getKaleoDefinition(
+					workflowDefinitionLink.getWorkflowDefinitionName(),
+					serviceContext);
+
+			activeWorkflow = kaleoDefinition.isActive();
+		}
+
 		boolean skipObjectActionExecution =
 			ObjectActionThreadLocal.isSkipObjectActionExecution();
 		boolean workflowEnabled = WorkflowThreadLocal.isEnabled();
 
 		try {
-			WorkflowThreadLocal.setEnabled(true);
+			WorkflowThreadLocal.setEnabled(activeWorkflow);
 
 			if (objectEntry.isRootDescendantNode()) {
 				ObjectEntry rootObjectEntry =
@@ -7278,6 +7299,9 @@ public class ObjectEntryLocalServiceImpl
 	private JSONFactory _jsonFactory;
 
 	@Reference
+	private KaleoDefinitionLocalService _kaleoDefinitionLocalService;
+
+	@Reference
 	private Language _language;
 
 	@Reference
@@ -7395,6 +7419,10 @@ public class ObjectEntryLocalServiceImpl
 	@Reference
 	private UserNotificationEventLocalService
 		_userNotificationEventLocalService;
+
+	@Reference
+	private WorkflowDefinitionLinkLocalService
+		_workflowDefinitionLinkLocalService;
 
 	@Reference
 	private WorkflowInstanceLinkLocalService _workflowInstanceLinkLocalService;
