@@ -12,8 +12,12 @@ import java.util.Map;
  */
 public class SystemObjectEntry {
 
-	public SystemObjectEntry(long classPK, Map<String, Object> values) {
+	public SystemObjectEntry(
+		long classPK, String externalReferenceCode,
+		Map<String, Object> values) {
+
 		_classPK = classPK;
+		_externalReferenceCode = externalReferenceCode;
 		_values = values;
 	}
 
@@ -26,6 +30,7 @@ public class SystemObjectEntry {
 	}
 
 	private final long _classPK;
+	private final String _externalReferenceCode;
 	private final Map<String, Object> _values;
 
 }
