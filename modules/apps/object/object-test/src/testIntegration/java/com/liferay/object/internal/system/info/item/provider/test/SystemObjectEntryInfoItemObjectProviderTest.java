@@ -7,6 +7,7 @@ package com.liferay.object.internal.system.info.item.provider.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.info.item.ClassPKInfoItemIdentifier;
+import com.liferay.info.item.ERCInfoItemIdentifier;
 import com.liferay.info.item.InfoItemServiceRegistry;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
 import com.liferay.object.model.ObjectDefinition;
@@ -15,10 +16,13 @@ import com.liferay.object.system.SystemObjectDefinitionManager;
 import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.object.system.SystemObjectEntry;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -29,6 +33,7 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.junit.After;
@@ -56,6 +61,8 @@ public class SystemObjectEntryInfoItemObjectProviderTest {
 
 	@Before
 	public void setUp() throws Exception {
+		_group = _groupLocalService.fetchGroup(TestPropsValues.getGroupId());
+
 		ServiceContextThreadLocal.pushServiceContext(_getServiceContext());
 	}
 
@@ -98,6 +105,30 @@ public class SystemObjectEntryInfoItemObjectProviderTest {
 
 		Map<String, Object> values = systemObjectEntry.getValues();
 
+		_assertValues(values);
+
+		long groupId = RandomTestUtil.randomLong();
+
+		String externalReferenceCode = String.valueOf(
+			values.get("externalReferenceCode"));
+
+		systemObjectEntry = infoItemObjectProvider.getInfoItem(
+			groupId, new ERCInfoItemIdentifier(externalReferenceCode));
+
+		values = systemObjectEntry.getValues();
+
+		Assert.assertEquals(Collections.emptyMap(), values);
+
+		systemObjectEntry = infoItemObjectProvider.getInfoItem(
+			_group.getGroupId(),
+			new ERCInfoItemIdentifier(externalReferenceCode));
+
+		values = systemObjectEntry.getValues();
+
+		_assertValues(values);
+	}
+
+	private void _assertValues(Map<String, Object> values) {
 		Assert.assertEquals("john", values.get("alternateName"));
 		Assert.assertEquals("john@liferay.com", values.get("emailAddress"));
 		Assert.assertEquals("Smith", values.get("familyName"));
@@ -124,6 +155,11 @@ public class SystemObjectEntryInfoItemObjectProviderTest {
 
 		return serviceContext;
 	}
+
+	private Group _group;
+
+	@Inject
+	private GroupLocalService _groupLocalService;
 
 	@Inject
 	private InfoItemServiceRegistry _infoItemServiceRegistry;
