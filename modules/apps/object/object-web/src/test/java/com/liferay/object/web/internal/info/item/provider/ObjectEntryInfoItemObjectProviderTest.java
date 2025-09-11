@@ -17,6 +17,7 @@ import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.web.internal.util.ObjectEntryUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -58,6 +59,8 @@ public class ObjectEntryInfoItemObjectProviderTest {
 
 	@Before
 	public void setUp() {
+		_groupLocalService = Mockito.mock(GroupLocalService.class);
+
 		_objectDefinition = Mockito.mock(ObjectDefinition.class);
 		_objectEntryLocalService = Mockito.mock(ObjectEntryLocalService.class);
 
@@ -256,7 +259,7 @@ public class ObjectEntryInfoItemObjectProviderTest {
 
 		ObjectEntryInfoItemObjectProvider objectEntryInfoItemObjectProvider =
 			new ObjectEntryInfoItemObjectProvider(
-				_objectDefinition, _objectEntryLocalService,
+				_groupLocalService, _objectDefinition, _objectEntryLocalService,
 				_objectEntryManagerRegistry);
 
 		try {
@@ -455,6 +458,7 @@ public class ObjectEntryInfoItemObjectProviderTest {
 		_objectEntryUtilMockedStatic = Mockito.mockStatic(
 			ObjectEntryUtil.class);
 
+	private GroupLocalService _groupLocalService;
 	private ObjectDefinition _objectDefinition;
 	private ObjectEntryLocalService _objectEntryLocalService;
 	private ObjectEntryManager _objectEntryManager;
