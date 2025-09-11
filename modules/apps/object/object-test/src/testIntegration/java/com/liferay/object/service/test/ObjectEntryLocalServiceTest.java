@@ -2532,6 +2532,40 @@ public class ObjectEntryLocalServiceTest {
 		}
 	}
 
+	@FeatureFlag("LPD-17564")
+	@Test
+	public void testAddObjectEntryWithMissingWorkflow() throws Exception {
+		WorkflowDefinitionLink workflowDefinitionLink =
+			_workflowDefinitionLinkLocalService.createWorkflowDefinitionLink(
+				0L);
+
+		workflowDefinitionLink.setUserId(TestPropsValues.getUserId());
+		workflowDefinitionLink.setWorkflowDefinitionName(
+			RandomTestUtil.randomString());
+
+		ObjectDefinition objectDefinition;
+
+		try (SafeCloseable safeCloseable =
+				LazyReferencingThreadLocal.setEnabledWithSafeCloseable(true)) {
+
+			objectDefinition =
+				ObjectDefinitionTestUtil.addCustomObjectDefinition(
+					ObjectDefinitionTestUtil.getRandomName(),
+					Collections.singletonList(workflowDefinitionLink));
+		}
+
+		_objectDefinitionLocalService.publishCustomObjectDefinition(
+			TestPropsValues.getUserId(),
+			objectDefinition.getObjectDefinitionId());
+
+		ObjectEntry objectEntry = _addObjectEntry(
+			0, objectDefinition.getObjectDefinitionId(),
+			Collections.emptyMap());
+
+		_assertGetWorkflowInstancesSize(
+			objectDefinition.getClassName(), objectEntry.getObjectEntryId(), 0);
+	}
+
 	@Test
 	public void testAddObjectEntryWithMultiselectPicklistObjectField()
 		throws Exception {
