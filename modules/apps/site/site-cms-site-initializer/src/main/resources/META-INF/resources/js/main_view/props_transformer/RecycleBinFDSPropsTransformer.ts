@@ -8,8 +8,8 @@ import {sub} from 'frontend-js-web';
 
 import {openGenericFDSDeleteConfirmationModal} from '../../common/utils/genericOpenModalUtil';
 import {getFormattedLabel} from '../../common/utils/getFormattedText';
-import deleteAssetEntriesBulkAction from './actions/deleteAssetEntriesBulkAction';
 import {displayDeleteSuccessToast} from '../../common/utils/toastUtil';
+import deleteAssetEntriesBulkAction from './actions/deleteAssetEntriesBulkAction';
 import restoreItemAction from './actions/restoreItemAction';
 import AuthorRenderer from './cell_renderers/AuthorRenderer';
 import SimpleActionLinkRenderer from './cell_renderers/SimpleActionLinkRenderer';
