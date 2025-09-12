@@ -7,6 +7,7 @@ import {OpenToastProps, openToast} from 'frontend-js-components-web';
 import {sub} from 'frontend-js-web';
 
 export default function displayBulkDeletionSuccessToast(
+	isEntriesInTrash: boolean,
 	trashStatus: {
 		allTrashEnabled: boolean;
 		noneTrashEnabled: boolean;
@@ -31,6 +32,12 @@ export default function displayBulkDeletionSuccessToast(
 		);
 	}
 	else if (trashStatus.allTrashEnabled) {
+		if (isEntriesInTrash === false) {
+			message = sub(
+				Liferay.Language.get('x-were-deleted-successfully'),
+				entriesWithTrashEnabled
+			);
+		}
 		message = sub(
 			Liferay.Language.get('x-items-were-moved-to-the-recycle-bin'),
 			entriesWithTrashEnabled

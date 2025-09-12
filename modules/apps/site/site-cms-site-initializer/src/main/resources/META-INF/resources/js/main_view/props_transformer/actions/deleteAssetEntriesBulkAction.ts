@@ -49,11 +49,14 @@ async function executeBulkDeleteAction(
 		});
 
 		processClose?.();
+
 		displayBulkDeletionSuccessToast(
+			selectedData.items[0].embedded.status.label !== 'in-trash',
 			trashStatus,
 			trashDisableCount,
 			trashEnabledCount
 		);
+
 		loadData();
 	}
 	catch {
