@@ -46,7 +46,7 @@ public class ObjectDefinitionUpgradeProcessTest {
 	public void testUpgrade() throws Exception {
 		ObjectDefinition customObjectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-				TestPropsValues.getUserId(), 0, null, false, false, true, true,
+				TestPropsValues.getUserId(), 0, null, false, true, true, true,
 				false, false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,

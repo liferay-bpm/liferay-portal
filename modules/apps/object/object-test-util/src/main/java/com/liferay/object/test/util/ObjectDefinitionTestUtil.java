@@ -123,7 +123,7 @@ public class ObjectDefinitionTestUtil {
 		throws Exception {
 
 		return ObjectDefinitionLocalServiceUtil.addSystemObjectDefinition(
-			null, userId, 0, null, dbTableName, false, false, false, true,
+			null, userId, 0, null, dbTableName, false, true, false, true,
 			enableLocalization, false, false, false, false, null, labelMap,
 			true, name, null, null, pkObjectFieldDBColumnName,
 			pkObjectFieldName, pluralLabelMap, false, scope,
