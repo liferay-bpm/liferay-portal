@@ -245,7 +245,7 @@ public class SystemObjectDefinitionManagerPortalInstanceLifecycleListener
 			_bundleContext.registerService(
 				InfoItemDetailsProvider.class,
 				new SystemObjectEntryInfoItemDetailsProvider(
-					itemClassName, objectDefinition),
+					_groupLocalService, itemClassName, objectDefinition),
 				HashMapDictionaryBuilder.<String, Object>put(
 					Constants.SERVICE_RANKING, 10
 				).put(
