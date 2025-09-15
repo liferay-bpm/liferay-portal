@@ -10,6 +10,7 @@ import restoreItemAction from '../actions/restoreItemAction';
 
 const recycleBinToastInfo = {
 	className: 'recycle-bin-link',
+	componentId: 'recycleBinSuccessToastWithLink',
 	url: '/cms/recycle-bin',
 };
 
@@ -19,7 +20,7 @@ export default function displayUndoDeleteSuccessToast(
 	method: string,
 	restoreURL: string
 ) {
-	const {className, url} = recycleBinToastInfo;
+	const {className, componentId, url} = recycleBinToastInfo;
 
 	const openToastSuccessProps: OpenToastProps = {
 		message: sub(
@@ -28,6 +29,13 @@ export default function displayUndoDeleteSuccessToast(
 			`<strong><a href="${Liferay.ThemeDisplay.getPathFriendlyURLPublic() + url}" class=${className}><u>`,
 			'</u></a></strong>'
 		),
+		renderData: {
+			__reactDOMFlushSync: true,
+			componentId,
+		},
+		toastProps: {
+			id: componentId,
+		},
 		type: 'success',
 	};
 
@@ -62,4 +70,18 @@ export default function displayUndoDeleteSuccessToast(
 	};
 
 	openToast(openToastSuccessProps);
+
+	Liferay.componentReady(componentId).then(() => {
+		const toastLink = document.getElementById(componentId);
+
+		if (toastLink) {
+			toastLink.focus();
+		}
+	});
+
+	return {
+		dispose() {
+			Liferay.destroyComponent(componentId);
+		},
+	};
 }

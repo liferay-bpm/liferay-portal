@@ -93,12 +93,17 @@ export interface OpenToastProps {
 		onClose: (event: CloseEvent) => void;
 	}) => void;
 	onClose?: ({event}: {event: CloseEvent}) => void;
-	renderData?: {portletId: string};
+	renderData?: {
+		__reactDOMFlushSync?: boolean;
+		componentId?: string;
+		portletId?: string;
+	};
 	title?: string;
 	toastProps?: {
 		actions?: ReactNode; // Element | React.JSX.Element;
 		autoClose?: number | boolean;
 		className?: string;
+		id?: string;
 	};
 	type?: DisplayType;
 	variant?: 'feedback' | 'stripe' | 'inline';
