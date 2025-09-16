@@ -793,7 +793,7 @@ public class ObjectEntryLocalServiceImpl
 		ObjectEntry objectEntry = objectEntryPersistence.findByPrimaryKey(
 			objectEntryId);
 
-		if (objectEntry.getStatus() == WorkflowConstants.STATUS_IN_TRASH) {
+		if (objectEntry.isInTrash()) {
 			throw new ObjectEntryStatusException.
 				MustNotExpireObjectEntryInTrash();
 		}
@@ -5992,7 +5992,7 @@ public class ObjectEntryLocalServiceImpl
 		ObjectEntry objectEntry = objectEntryPersistence.findByPrimaryKey(
 			objectEntryId);
 
-		if (objectEntry.getStatus() == WorkflowConstants.STATUS_IN_TRASH) {
+		if (objectEntry.isInTrash()) {
 			throw new ObjectEntryVersionStatusException.
 				MustNotRestoreObjectEntryVersionInTrash();
 		}
