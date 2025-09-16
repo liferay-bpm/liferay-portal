@@ -22,7 +22,6 @@ import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.entry.folder.subscription.util.ObjectEntryFolderSubscriptionUtil;
 import com.liferay.object.entry.util.ObjectEntryDTOConverterUtil;
 import com.liferay.object.exception.NoSuchObjectEntryException;
-import com.liferay.object.exception.ObjectEntryStatusException;
 import com.liferay.object.exception.ObjectEntryVersionStatusException;
 import com.liferay.object.field.attachment.AttachmentManager;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
@@ -507,13 +506,6 @@ public class DefaultObjectEntryManagerImpl
 				externalReferenceCode, getGroupId(objectDefinition, scopeKey),
 				objectDefinition.getObjectDefinitionId());
 
-		if (serviceBuilderObjectEntry.getStatus() ==
-				WorkflowConstants.STATUS_IN_TRASH) {
-
-			throw new ObjectEntryStatusException.
-				MustNotExpireObjectEntryInTrash();
-		}
-
 		return expireObjectEntry(
 			dtoConverterContext, serviceBuilderObjectEntry.getObjectEntryId());
 	}
@@ -524,19 +516,9 @@ public class DefaultObjectEntryManagerImpl
 			ObjectDefinition objectDefinition, long objectEntryId, int version)
 		throws Exception {
 
-		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
-			_objectEntryService.getObjectEntry(objectEntryId);
-
-		if (serviceBuilderObjectEntry.getStatus() ==
-				WorkflowConstants.STATUS_IN_TRASH) {
-
-			throw new ObjectEntryVersionStatusException.
-				MustNotExpireObjectEntryVersionInTrash();
-		}
-
 		return _expireObjectEntryVersion(
-			dtoConverterContext, objectDefinition, serviceBuilderObjectEntry,
-			version);
+			dtoConverterContext, objectDefinition,
+			_objectEntryService.getObjectEntry(objectEntryId), version);
 	}
 
 	@Override
@@ -546,20 +528,11 @@ public class DefaultObjectEntryManagerImpl
 			String scopeKey, int version)
 		throws Exception {
 
-		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
+		return _expireObjectEntryVersion(
+			dtoConverterContext, objectDefinition,
 			_objectEntryService.getObjectEntry(
 				externalReferenceCode, getGroupId(objectDefinition, scopeKey),
-				objectDefinition.getObjectDefinitionId());
-
-		if (serviceBuilderObjectEntry.getStatus() ==
-				WorkflowConstants.STATUS_IN_TRASH) {
-
-			throw new ObjectEntryVersionStatusException.
-				MustNotExpireObjectEntryVersionInTrash();
-		}
-
-		return _expireObjectEntryVersion(
-			dtoConverterContext, objectDefinition, serviceBuilderObjectEntry,
+				objectDefinition.getObjectDefinitionId()),
 			version);
 	}
 

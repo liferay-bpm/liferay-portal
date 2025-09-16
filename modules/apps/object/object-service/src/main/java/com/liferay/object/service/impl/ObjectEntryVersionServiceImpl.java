@@ -5,6 +5,7 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.object.exception.ObjectEntryVersionStatusException;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryVersion;
 import com.liferay.object.service.ObjectEntryLocalService;
@@ -14,6 +15,7 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.List;
 
@@ -52,6 +54,11 @@ public class ObjectEntryVersionServiceImpl
 		_objectEntryService.checkModelResourcePermission(
 			objectEntry.getObjectDefinitionId(), objectEntry.getObjectEntryId(),
 			ActionKeys.UPDATE);
+
+		if (objectEntry.getStatus() == WorkflowConstants.STATUS_IN_TRASH) {
+			throw new ObjectEntryVersionStatusException.
+				MustNotExpireObjectEntryVersionInTrash();
+		}
 
 		return objectEntryVersionLocalService.expireObjectEntryVersion(
 			getUserId(), objectEntry, version, serviceContext);
