@@ -299,13 +299,6 @@ public class DefaultObjectEntryManagerImpl
 		ObjectEntry objectEntry = _getObjectEntryByVersion(
 			dtoConverterContext, objectEntryId, version);
 
-		Status status = objectEntry.getStatus();
-
-		if (status.getCode() == WorkflowConstants.STATUS_IN_TRASH) {
-			throw new ObjectEntryVersionStatusException.
-				MustNotCopyObjectEntryVersionInTrash();
-		}
-
 		return _copyVersionedObjectEntry(
 			dtoConverterContext, objectDefinition, objectEntry);
 	}
@@ -324,13 +317,6 @@ public class DefaultObjectEntryManagerImpl
 		ObjectEntry objectEntry = _getObjectEntryByVersion(
 			dtoConverterContext, externalReferenceCode, objectDefinition,
 			scopeKey, version);
-
-		Status status = objectEntry.getStatus();
-
-		if (status.getCode() == WorkflowConstants.STATUS_IN_TRASH) {
-			throw new ObjectEntryVersionStatusException.
-				MustNotCopyObjectEntryVersionInTrash();
-		}
 
 		return _copyVersionedObjectEntry(
 			dtoConverterContext, objectDefinition, objectEntry);
@@ -1756,6 +1742,13 @@ public class DefaultObjectEntryManagerImpl
 			DTOConverterContext dtoConverterContext,
 			ObjectDefinition objectDefinition, ObjectEntry objectEntry)
 		throws Exception {
+
+		Status status = objectEntry.getStatus();
+
+		if (status.getCode() == WorkflowConstants.STATUS_IN_TRASH) {
+			throw new ObjectEntryVersionStatusException.
+				MustNotCopyObjectEntryVersionInTrash();
+		}
 
 		objectEntry.setExpirationDate(() -> null);
 		objectEntry.setExternalReferenceCode(() -> null);
