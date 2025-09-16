@@ -7,6 +7,7 @@ package com.liferay.object.service.impl;
 
 import com.liferay.object.configuration.ObjectEntryVersionConfiguration;
 import com.liferay.object.entry.util.ObjectEntryDTOConverterUtil;
+import com.liferay.object.exception.ObjectEntryVersionStatusException;
 import com.liferay.object.exception.RequiredObjectEntryVersionException;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryVersion;
@@ -154,6 +155,13 @@ public class ObjectEntryVersionLocalServiceImpl
 			objectEntryVersionPersistence.fetchByObjectEntryId_First(
 				objectEntryId,
 				ObjectEntryVersionVersionComparator.getInstance(false));
+
+		if (objectEntryVersion.getStatus() ==
+				WorkflowConstants.STATUS_IN_TRASH) {
+
+			throw new ObjectEntryVersionStatusException.
+				MustNotDeleteObjectEntryVersionInTrash();
+		}
 
 		if (version == objectEntryVersion.getVersion()) {
 			throw new RequiredObjectEntryVersionException.

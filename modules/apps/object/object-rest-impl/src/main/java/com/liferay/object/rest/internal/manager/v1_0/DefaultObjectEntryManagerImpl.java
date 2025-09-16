@@ -363,13 +363,6 @@ public class DefaultObjectEntryManagerImpl
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
 
-		if (serviceBuilderObjectEntry.getStatus() ==
-				WorkflowConstants.STATUS_IN_TRASH) {
-
-			throw new ObjectEntryVersionStatusException.
-				MustNotDeleteObjectEntryVersionInTrash();
-		}
-
 		_objectEntryVersionService.deleteObjectEntryVersion(
 			objectEntryId, version);
 	}
@@ -391,13 +384,6 @@ public class DefaultObjectEntryManagerImpl
 
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
-
-		if (serviceBuilderObjectEntry.getStatus() ==
-				WorkflowConstants.STATUS_IN_TRASH) {
-
-			throw new ObjectEntryVersionStatusException.
-				MustNotDeleteObjectEntryVersionInTrash();
-		}
 
 		_objectEntryVersionService.deleteObjectEntryVersion(
 			serviceBuilderObjectEntry.getObjectEntryId(), version);
