@@ -55,6 +55,7 @@ import com.liferay.object.exception.NoSuchObjectEntryFolderException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectEntryDefaultLanguageIdException;
 import com.liferay.object.exception.ObjectEntryValuesException;
+import com.liferay.object.exception.ObjectEntryVersionStatusException;
 import com.liferay.object.exception.ObjectRelationshipDeletionTypeException;
 import com.liferay.object.exception.RequiredObjectEntryVersionException;
 import com.liferay.object.exception.RequiredObjectRelationshipException;
@@ -3187,6 +3188,7 @@ public class DefaultObjectEntryManagerImplTest
 					objectRelationship, _group.getGroupKey()));
 	}
 
+	@FeatureFlag("LPD-53981")
 	@Test
 	public void testCopyObjectEntryByVersion() throws Exception {
 
@@ -3288,6 +3290,26 @@ public class DefaultObjectEntryManagerImplTest
 
 		AssertUtils.assertEquals(
 			WorkflowConstants.STATUS_APPROVED, status.getCode());
+
+		// Status in trash
+
+		_defaultObjectEntryManager.deleteObjectEntry(
+			_createDTOConverterContext(adminUser), _objectDefinition4,
+			objectEntry.getId());
+
+		try {
+			_defaultObjectEntryManager.copyObjectEntryByVersion(
+				dtoConverterContext, _objectDefinition4, objectEntry.getId(),
+				1);
+
+			Assert.fail();
+		}
+		catch (ObjectEntryVersionStatusException.
+					MustNotCopyObjectEntryVersionInTrash
+						objectEntryVersionStatusException) {
+
+			Assert.assertNotNull(objectEntryVersionStatusException);
+		}
 	}
 
 	@Test
@@ -3515,6 +3537,7 @@ public class DefaultObjectEntryManagerImplTest
 			objectDefinition2.getObjectDefinitionId());
 	}
 
+	@FeatureFlag("LPD-53981")
 	@Test
 	public void testDeleteObjectEntryByVersion() throws Exception {
 
@@ -3604,6 +3627,28 @@ public class DefaultObjectEntryManagerImplTest
 				_objectDefinition4, _group.getGroupKey(), null
 			).getItems(
 			).size());
+
+		// Status in trash
+
+		_updateObjectEntryVersion(_objectDefinition4, objectEntry2, 3);
+
+		_defaultObjectEntryManager.deleteObjectEntry(
+			_createDTOConverterContext(adminUser), _objectDefinition4,
+			objectEntry2.getId());
+
+		try {
+			_defaultObjectEntryManager.deleteObjectEntryByVersion(
+				objectEntry2.getExternalReferenceCode(), _objectDefinition4,
+				_group.getGroupKey(), 2);
+
+			Assert.fail();
+		}
+		catch (ObjectEntryVersionStatusException.
+					MustNotDeleteObjectEntryVersionInTrash
+						objectEntryVersionStatusException) {
+
+			Assert.assertNotNull(objectEntryVersionStatusException);
+		}
 	}
 
 	@Test
@@ -4209,6 +4254,26 @@ public class DefaultObjectEntryManagerImplTest
 
 		AssertUtils.assertEquals(
 			WorkflowConstants.STATUS_EXPIRED, status.getCode());
+
+		// Status in trash
+
+		_defaultObjectEntryManager.deleteObjectEntry(
+			_createDTOConverterContext(adminUser), _objectDefinition4,
+			objectEntry.getId());
+
+		try {
+			_defaultObjectEntryManager.expireObjectEntryByVersion(
+				dtoConverterContext, _objectDefinition4, objectEntry.getId(),
+				1);
+
+			Assert.fail();
+		}
+		catch (ObjectEntryVersionStatusException.
+					MustNotExpireObjectEntryVersionInTrash
+						objectEntryVersionStatusException) {
+
+			Assert.assertNotNull(objectEntryVersionStatusException);
+		}
 	}
 
 	@Test
@@ -6888,6 +6953,26 @@ public class DefaultObjectEntryManagerImplTest
 						});
 				}
 			});
+
+		// Status in trash
+
+		_defaultObjectEntryManager.deleteObjectEntry(
+			_createDTOConverterContext(adminUser), _objectDefinition4,
+			objectEntry2.getId());
+
+		try {
+			_defaultObjectEntryManager.restoreObjectEntryByVersion(
+				dtoConverterContext, _objectDefinition4, objectEntry2.getId(),
+				1);
+
+			Assert.fail();
+		}
+		catch (ObjectEntryVersionStatusException.
+					MustNotRestoreObjectEntryVersionInTrash
+						objectEntryVersionStatusException) {
+
+			Assert.assertNotNull(objectEntryVersionStatusException);
+		}
 	}
 
 	@FeatureFlag("LPD-53981")
