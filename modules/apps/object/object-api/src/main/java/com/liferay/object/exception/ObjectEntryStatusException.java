@@ -15,19 +15,8 @@ public class ObjectEntryStatusException extends PortalException {
 	public static class DraftStatusIsNotAllowed
 		extends ObjectEntryStatusException {
 
-		public DraftStatusIsNotAllowed() {
-		}
-
 		public DraftStatusIsNotAllowed(String msg) {
 			super(msg);
-		}
-
-		public DraftStatusIsNotAllowed(String msg, Throwable throwable) {
-			super(msg, throwable);
-		}
-
-		public DraftStatusIsNotAllowed(Throwable throwable) {
-			super(throwable);
 		}
 
 	}
@@ -36,37 +25,17 @@ public class ObjectEntryStatusException extends PortalException {
 		extends ObjectEntryStatusException {
 
 		public MustNotExpireObjectEntryInTrash() {
-		}
-
-		public MustNotExpireObjectEntryInTrash(String msg) {
-			super(msg);
-		}
-
-		public MustNotExpireObjectEntryInTrash(
-			String msg, Throwable throwable) {
-
-			super(msg, throwable);
-		}
-
-		public MustNotExpireObjectEntryInTrash(Throwable throwable) {
-			super(throwable);
+			super("Object entries in trash must not be expired.");
 		}
 
 	}
 
-	protected ObjectEntryStatusException() {
-	}
-
-	protected ObjectEntryStatusException(String msg) {
+	private ObjectEntryStatusException(String msg) {
 		super(msg);
 	}
 
-	protected ObjectEntryStatusException(String msg, Throwable throwable) {
+	private ObjectEntryStatusException(String msg, Throwable throwable) {
 		super(msg, throwable);
-	}
-
-	protected ObjectEntryStatusException(Throwable throwable) {
-		super(throwable);
 	}
 
 }
