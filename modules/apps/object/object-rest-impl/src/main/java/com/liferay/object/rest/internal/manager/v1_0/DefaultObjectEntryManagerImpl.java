@@ -1141,16 +1141,6 @@ public class DefaultObjectEntryManagerImpl
 			ObjectDefinition objectDefinition, long objectEntryId, int version)
 		throws Exception {
 
-		ObjectEntry objectEntry = getObjectEntryByVersion(
-			dtoConverterContext, objectEntryId, version);
-
-		Status status = objectEntry.getStatus();
-
-		if (status.getCode() == WorkflowConstants.STATUS_IN_TRASH) {
-			throw new ObjectEntryVersionStatusException.
-				MustNotRestoreObjectEntryVersionInTrash();
-		}
-
 		return _restoreVersionedObjectEntry(
 			dtoConverterContext, objectDefinition,
 			_getObjectEntryByVersion(
@@ -1164,17 +1154,6 @@ public class DefaultObjectEntryManagerImpl
 			String externalReferenceCode, ObjectDefinition objectDefinition,
 			String scopeKey, int version)
 		throws Exception {
-
-		ObjectEntry objectEntry = getObjectEntryByVersion(
-			dtoConverterContext, externalReferenceCode, objectDefinition,
-			scopeKey, version);
-
-		Status status = objectEntry.getStatus();
-
-		if (status.getCode() == WorkflowConstants.STATUS_IN_TRASH) {
-			throw new ObjectEntryVersionStatusException.
-				MustNotRestoreObjectEntryVersionInTrash();
-		}
 
 		return _restoreVersionedObjectEntry(
 			dtoConverterContext, objectDefinition,

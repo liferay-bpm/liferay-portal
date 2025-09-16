@@ -61,6 +61,7 @@ import com.liferay.object.exception.ObjectEntryStatusException;
 import com.liferay.object.exception.ObjectEntryValidationException;
 import com.liferay.object.exception.ObjectEntryValidationException.ValidationError;
 import com.liferay.object.exception.ObjectEntryValuesException;
+import com.liferay.object.exception.ObjectEntryVersionStatusException;
 import com.liferay.object.exception.ObjectRelationshipDeletionTypeException;
 import com.liferay.object.exception.ObjectValidationRuleEngineException;
 import com.liferay.object.field.attachment.AttachmentManager;
@@ -5988,10 +5989,13 @@ public class ObjectEntryLocalServiceImpl
 			Map<String, Serializable> values)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(userId);
-
 		ObjectEntry objectEntry = objectEntryPersistence.findByPrimaryKey(
 			objectEntryId);
+
+		if (objectEntry.getStatus() == WorkflowConstants.STATUS_IN_TRASH) {
+			throw new ObjectEntryVersionStatusException.
+				MustNotRestoreObjectEntryVersionInTrash();
+		}
 
 		_validateObjectEntryFolderId(
 			objectEntry.getGroupId(), objectEntryFolderId);
@@ -6005,6 +6009,8 @@ public class ObjectEntryLocalServiceImpl
 				objectEntry.getDefaultLanguageId(),
 				objectDefinition.getObjectDefinitionId(), values);
 		}
+
+		User user = _userLocalService.getUser(userId);
 
 		_contributeValues(
 			objectEntry.getGroupId(), objectDefinition, userId, values);
