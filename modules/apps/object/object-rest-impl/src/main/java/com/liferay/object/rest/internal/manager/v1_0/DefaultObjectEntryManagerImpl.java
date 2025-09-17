@@ -1791,24 +1791,30 @@ public class DefaultObjectEntryManagerImpl
 			objectDefinition, serviceBuilderObjectEntry);
 		_checkRootDescendantNode(serviceBuilderObjectEntry, false);
 
-		DepotEntry depotEntry = _depotEntryLocalService.fetchGroupDepotEntry(
-			serviceBuilderObjectEntry.getGroupId());
+		if (!FeatureFlagManagerUtil.isEnabled("LPD-17564") ||
+			(serviceBuilderObjectEntry.getStatus() ==
+				WorkflowConstants.STATUS_IN_TRASH)) {
 
-		if ((depotEntry != null) &&
-			_trashHelper.isTrashEnabled(
-				serviceBuilderObjectEntry.getGroupId()) &&
-			(serviceBuilderObjectEntry.getStatus() !=
-				WorkflowConstants.STATUS_IN_TRASH) &&
-			FeatureFlagManagerUtil.isEnabled("LPD-53981")) {
+			DepotEntry depotEntry =
+				_depotEntryLocalService.fetchGroupDepotEntry(
+					serviceBuilderObjectEntry.getGroupId());
 
-			_objectEntryService.moveObjectEntryToTrash(
-				serviceBuilderObjectEntry,
-				ServiceContextUtil.createServiceContext(
-					serviceBuilderObjectEntry.getObjectEntryId()));
-		}
-		else {
-			_objectEntryService.deleteObjectEntry(
-				serviceBuilderObjectEntry.getObjectEntryId());
+			if ((depotEntry != null) &&
+				_trashHelper.isTrashEnabled(
+					serviceBuilderObjectEntry.getGroupId()) &&
+				(serviceBuilderObjectEntry.getStatus() !=
+					WorkflowConstants.STATUS_IN_TRASH) &&
+				FeatureFlagManagerUtil.isEnabled("LPD-17564")) {
+
+				_objectEntryService.moveObjectEntryToTrash(
+					serviceBuilderObjectEntry,
+					ServiceContextUtil.createServiceContext(
+						serviceBuilderObjectEntry.getObjectEntryId()));
+			}
+			else {
+				_objectEntryService.deleteObjectEntry(
+					serviceBuilderObjectEntry.getObjectEntryId());
+			}
 		}
 	}
 
@@ -3036,7 +3042,7 @@ public class DefaultObjectEntryManagerImpl
 			).put(
 				"restore",
 				() -> {
-					if (!FeatureFlagManagerUtil.isEnabled("LPD-53981") ||
+					if (!FeatureFlagManagerUtil.isEnabled("LPD-17564") ||
 						!serviceBuilderObjectEntry.isInTrash()) {
 
 						return null;

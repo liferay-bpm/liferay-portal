@@ -737,9 +737,7 @@ public class ObjectEntryLocalServiceImpl
 				_subscriptionLocalService.deleteSubscriptions(
 					objectEntry.getCompanyId(), objectEntry.getModelClassName(),
 					objectEntry.getObjectEntryId());
-			}
 
-			if (FeatureFlagManagerUtil.isEnabled("LPD-53981")) {
 				_trashEntryLocalService.deleteEntry(
 					objectDefinition.getClassName(),
 					objectEntry.getObjectEntryId());
