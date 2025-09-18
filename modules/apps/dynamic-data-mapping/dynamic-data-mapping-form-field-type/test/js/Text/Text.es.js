@@ -121,6 +121,29 @@ describe('Field Text', () => {
 		expect(queryByText('4/10 characters')).not.toBeInTheDocument();
 	});
 
+	it('does not render aria-invalid if required and has value', () => {
+		const {container} = render(
+			<TextWithProvider
+				{...defaultTextConfig}
+				required={true}
+				value="test"
+			/>
+		);
+		act(() => {
+			jest.runAllTimers();
+		});
+		const textInputTag = container.querySelector('.ddm-field-text');
+		expect(textInputTag.hasAttribute('aria-invalid')).toBe(false);
+	});
+
+	it('does not render aria-invalid on first render even if required', () => {
+		const {container} = render(
+			<TextWithProvider {...defaultTextConfig} required={true} />
+		);
+		const textInputTag = container.querySelector('.ddm-field-text');
+		expect(textInputTag.hasAttribute('aria-invalid')).toBe(false);
+	});
+
 	it('does not render html autocomplete attribute', () => {
 		const {container} = render(<TextWithProvider {...defaultTextConfig} />);
 
