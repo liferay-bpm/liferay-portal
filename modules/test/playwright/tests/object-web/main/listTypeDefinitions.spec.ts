@@ -295,7 +295,9 @@ test.describe('ensure picklist translation', () => {
 
 		await viewObjectEntriesPage.goto(objectDefinition.className, 'pt');
 
-		await viewObjectEntriesPage.addObjectEntryButton.click();
+		await viewObjectEntriesPage.clickAddObjectEntry(
+			objectDefinition.label['en_us']
+		);
 
 		const [{name_i18n: listTypeEntry_i18n}] = listTypeEntries;
 

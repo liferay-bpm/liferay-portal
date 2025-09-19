@@ -277,7 +277,9 @@ test.describe('Manage object entries through Friendly URL', () => {
 			site.friendlyUrlPath
 		);
 
-		await viewObjectEntriesPage.clickAddObjectEntry();
+		await viewObjectEntriesPage.clickAddObjectEntry(
+			objectDefinition.label['en_US']
+		);
 	});
 
 	test('can access object entry via friendly URL', async ({
@@ -298,7 +300,7 @@ test.describe('Manage object entries through Friendly URL', () => {
 
 			await friendlyUrl.fill('Test URL');
 
-			await page.getByTestId('visibleChangeInput').fill(objectFieldValue);
+			await page.getByRole('textbox').fill(objectFieldValue);
 
 			await viewObjectEntriesPage.saveObjectEntryButton.click();
 
@@ -479,7 +481,9 @@ test.describe('Manage object entries through Friendly URL', () => {
 				site.friendlyUrlPath
 			);
 
-			await viewObjectEntriesPage.clickAddObjectEntry();
+			await viewObjectEntriesPage.clickAddObjectEntry(
+				_objectDefinition.label['en_US']
+			);
 
 			friendlyUrlInput = page.getByLabel('Friendly URL', {exact: true});
 
@@ -489,7 +493,7 @@ test.describe('Manage object entries through Friendly URL', () => {
 		await test.step('Add an object entry', async () => {
 			await friendlyUrlInput.fill('test-url');
 
-			await page.getByTestId('visibleChangeInput').fill('test entry');
+			await page.getByRole('textbox').fill('test entry');
 
 			await viewObjectEntriesPage.saveObjectEntryButton.click();
 
@@ -640,8 +644,9 @@ test.describe('Manage object entries through Object Definition widget', () => {
 
 		await page.goto(`/web${site.friendlyUrlPath}${layout.friendlyUrlPath}`);
 
-		await viewObjectEntriesPage.clickAddObjectEntry();
-
+		await viewObjectEntriesPage.clickAddObjectEntry(
+			objectDefinition.label['en_US']
+		);
 		await viewObjectEntriesPage.saveObjectEntryButton.click();
 
 		await expect(page.getByText('The field is empty')).toBeVisible();
@@ -1145,7 +1150,9 @@ test.describe('Manage object entries through View Object Entries', () => {
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await viewObjectEntriesPage.addObjectEntryButton.click();
+		await viewObjectEntriesPage.clickAddObjectEntry(
+			objectDefinition.label['en_us']
+		);
 
 		const listTypeEntry = listTypeEntries[0];
 
@@ -1650,7 +1657,9 @@ test.describe('Manage object entries through View Object Entries', () => {
 
 		await page.getByRole('link', {name: objectRelationshipTabName}).click();
 
-		await viewObjectEntriesPage.addObjectEntryButton.click();
+		await viewObjectEntriesPage.clickAddObjectEntry(
+			objectDefinition2.label['en_us']
+		);
 
 		await expect(viewObjectEntriesPage.searchButton).toBeEnabled();
 		await viewObjectEntriesPage.searchBar.click();
@@ -1707,7 +1716,9 @@ test.describe('Manage object entries through View Object Entries', () => {
 
 		await viewObjectEntriesPage.goto(objectDefinition.className, 'ar');
 
-		await viewObjectEntriesPage.addObjectEntryButton.click();
+		await viewObjectEntriesPage.clickAddObjectEntry(
+			objectDefinition.label['en_us']
+		);
 
 		await viewObjectEntriesPage.selectFileFromDocumentsAndMediaArabic();
 
@@ -1843,10 +1854,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 
 		await page.getByRole('link', {name: 'Relationship Tab'}).click();
 
-		await page
-			.getByTestId('visualization-mode-table')
-			.getByText('New')
-			.click();
+		await page.getByLabel('Add Object Relationship').click();
 
 		await page.getByRole('menuitem', {name: 'Select Existing One'}).click();
 
@@ -2349,7 +2357,7 @@ test.describe('Manage object entries through View Object Entries', () => {
 			await test.step('Create object entry and get its URL', async () => {
 				await viewObjectEntriesPage.goto(customObject.className);
 
-				await viewObjectEntriesPage.addObjectEntryButton.click();
+				await viewObjectEntriesPage.clickAddObjectEntry(objectName);
 
 				const objectFieldName = objectFields[0].name;
 
@@ -2411,7 +2419,9 @@ test.describe('Manage object entries through View Object Entries', () => {
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await viewObjectEntriesPage.addObjectEntryButton.click();
+		await viewObjectEntriesPage.clickAddObjectEntry(
+			objectDefinition.label['en_us']
+		);
 
 		for (let i = 0; i <= 10; i++) {
 			await viewObjectEntriesPage.saveObjectEntryButton.click();
@@ -2504,7 +2514,9 @@ test.describe('Manage object entries through View Object Entries', () => {
 
 				const firstOptionName = listTypeEntries[0].name;
 
-				await page.getByTestId(`labelItem-${firstOptionName}`).click();
+				await page
+					.getByRole('checkbox', {name: firstOptionName})
+					.click();
 
 				await expect
 					.soft(page.getByText(firstOptionName, {exact: true}))
@@ -2927,7 +2939,9 @@ test.describe('Manage object entries through Workflow', () => {
 
 			// Create object entry date time
 
-			await viewObjectEntriesPage.addObjectEntryButton.click();
+			await viewObjectEntriesPage.clickAddObjectEntry(
+				objectDefinition.label['en_us']
+			);
 
 			await viewObjectEntriesPage.dateTimeInput.fill(
 				'10/05/2025 12:00 PM'

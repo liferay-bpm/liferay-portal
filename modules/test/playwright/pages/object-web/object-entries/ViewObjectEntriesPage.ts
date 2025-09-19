@@ -13,7 +13,6 @@ import {PORTLET_URLS} from '../../../utils/portletUrls';
 import type {SupportedBusinessType} from '../../../tests/object-web/main/utils/generateObjectEntry';
 
 export class ViewObjectEntriesPage {
-	readonly addObjectEntryButton: Locator;
 	readonly backButton: Locator;
 	readonly cancelObjectEntryButton: Locator;
 	readonly dateTimeInput: Locator;
@@ -52,9 +51,6 @@ export class ViewObjectEntriesPage {
 	readonly successMessageArabic: Locator;
 
 	constructor(page: Page) {
-		this.addObjectEntryButton = page
-			.getByTestId('fdsCreationActionButton')
-			.first();
 		this.backButton = page.getByTitle('Back');
 		this.cancelObjectEntryButton = page.getByRole('button', {
 			name: 'Cancel',
@@ -152,10 +148,8 @@ export class ViewObjectEntriesPage {
 		}
 	}
 
-	async clickAddObjectEntry(objectName?: string) {
-		objectName
-			? await this.page.getByLabel('Add ' + objectName).click()
-			: await this.addObjectEntryButton.click();
+	async clickAddObjectEntry(objectName: string) {
+		await this.page.getByLabel('Add ' + objectName).click();
 
 		await this.editObjectEntryForm.waitFor({state: 'visible'});
 	}
