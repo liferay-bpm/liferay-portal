@@ -11,6 +11,7 @@ import com.liferay.account.model.AccountEntryOrganizationRel;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
+import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -22,10 +23,12 @@ import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.ResourcePermission;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroupRole;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -36,14 +39,21 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+
+import java.io.Serializable;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -68,6 +78,7 @@ public class ObjectEntryModelResourcePermission
 		ObjectFieldLocalService objectFieldLocalService,
 		PortletResourcePermission portletResourcePermission,
 		ResourcePermissionLocalService resourcePermissionLocalService,
+		RoleLocalService roleLocalService,
 		UserGroupRoleLocalService userGroupRoleLocalService) {
 
 		_accountEntryLocalService = accountEntryLocalService;
@@ -83,6 +94,7 @@ public class ObjectEntryModelResourcePermission
 		_objectFieldLocalService = objectFieldLocalService;
 		_portletResourcePermission = portletResourcePermission;
 		_resourcePermissionLocalService = resourcePermissionLocalService;
+		_roleLocalService = roleLocalService;
 		_userGroupRoleLocalService = userGroupRoleLocalService;
 	}
 
@@ -148,6 +160,47 @@ public class ObjectEntryModelResourcePermission
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.getObjectDefinition(
 				objectEntry.getObjectDefinitionId());
+
+		if (FeatureFlagManagerUtil.isEnabled(
+				objectDefinition.getCompanyId(), "LPD-6233") &&
+			actionId.equals(ActionKeys.UPDATE)) {
+
+			ObjectField objectField =
+				_objectFieldLocalService.fetchObjectFieldByBusinessType(
+					objectDefinition.getObjectDefinitionId(),
+					ObjectFieldConstants.BUSINESS_TYPE_ASSIGNEE, null);
+
+			if (objectField != null) {
+				Map<String, Serializable> values = objectEntry.getValues();
+
+				Map<String, Long> assigneeMap = (Map<String, Long>)values.get(
+					objectField.getName());
+
+				if (MapUtil.isNotEmpty(assigneeMap)) {
+					String className = PortalUtil.fetchClassName(
+						GetterUtil.getLong(assigneeMap.get("classNameId")));
+					long classPK = GetterUtil.getLong(
+						assigneeMap.get("classPK"));
+
+					if (StringUtil.equals(className, Role.class.getName())) {
+						for (Role role :
+								_roleLocalService.getUserRoles(
+									user.getUserId())) {
+
+							if (role.getRoleId() == classPK) {
+								return true;
+							}
+						}
+					}
+					else if (StringUtil.equals(
+								className, User.class.getName()) &&
+							 (user.getUserId() == classPK)) {
+
+						return true;
+					}
+				}
+			}
+		}
 
 		if (user.isGuestUser()) {
 			return permissionChecker.hasPermission(
@@ -338,6 +391,7 @@ public class ObjectEntryModelResourcePermission
 	private final PortletResourcePermission _portletResourcePermission;
 	private final ResourcePermissionLocalService
 		_resourcePermissionLocalService;
+	private final RoleLocalService _roleLocalService;
 	private final UserGroupRoleLocalService _userGroupRoleLocalService;
 
 }

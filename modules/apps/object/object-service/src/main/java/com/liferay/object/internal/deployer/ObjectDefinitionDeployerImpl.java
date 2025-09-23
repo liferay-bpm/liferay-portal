@@ -81,6 +81,7 @@ import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.SystemEventLocalService;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -152,6 +153,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		PortletLocalService portletLocalService,
 		ResourceActions resourceActions, UserLocalService userLocalService,
 		ResourcePermissionLocalService resourcePermissionLocalService,
+		RoleLocalService roleLocalService,
 		SearchLocalizationHelper searchLocalizationHelper,
 		SharingModelResourcePermissionConfigurator
 			sharingModelResourcePermissionConfigurator,
@@ -190,6 +192,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		_resourceActions = resourceActions;
 		_userLocalService = userLocalService;
 		_resourcePermissionLocalService = resourcePermissionLocalService;
+		_roleLocalService = roleLocalService;
 		_searchLocalizationHelper = searchLocalizationHelper;
 		_sharingModelResourcePermissionConfigurator =
 			sharingModelResourcePermissionConfigurator;
@@ -460,7 +463,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				_objectDefinitionLocalService, _objectEntryLocalService,
 				consumerSupplier, _objectFieldLocalService,
 				portletResourcePermission, _resourcePermissionLocalService,
-				_userGroupRoleLocalService);
+				_roleLocalService, _userGroupRoleLocalService);
 
 		serviceRegistrations.add(
 			_bundleContext.registerService(
@@ -674,6 +677,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	private final ResourceActions _resourceActions;
 	private final ResourcePermissionLocalService
 		_resourcePermissionLocalService;
+	private final RoleLocalService _roleLocalService;
 	private final SearchLocalizationHelper _searchLocalizationHelper;
 	private final Map<String, ServiceRegistration<?>> _serviceRegistrations =
 		new ConcurrentHashMap<>();
