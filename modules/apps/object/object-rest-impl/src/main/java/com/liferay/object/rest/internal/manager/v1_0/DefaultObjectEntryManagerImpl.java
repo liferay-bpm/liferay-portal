@@ -626,6 +626,20 @@ public class DefaultObjectEntryManagerImpl
 	}
 
 	@Override
+	public ObjectEntry getApprovedObjectEntry(
+			long companyId, DTOConverterContext dtoConverterContext,
+			String externalReferenceCode, ObjectDefinition objectDefinition,
+			String scopeKey)
+		throws Exception {
+
+		dtoConverterContext.setAttribute("preferApproved", Boolean.TRUE);
+
+		return getObjectEntry(
+			companyId, dtoConverterContext, externalReferenceCode,
+			objectDefinition, scopeKey);
+	}
+
+	@Override
 	public Page<ObjectEntry> getObjectEntries(
 			long companyId, ObjectDefinition objectDefinition, String scopeKey,
 			Aggregation aggregation, DTOConverterContext dtoConverterContext,
@@ -1706,12 +1720,16 @@ public class DefaultObjectEntryManagerImpl
 
 	private void _checkHeadObjectEntry(
 			com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry,
-			boolean skipCheckHeadObjectEntry)
+			boolean preferApproved)
 		throws Exception {
 
-		if ((serviceBuilderObjectEntry.getObjectEntryId() ==
-				serviceBuilderObjectEntry.getHeadObjectEntryId()) ||
-			skipCheckHeadObjectEntry) {
+		if (preferApproved && serviceBuilderObjectEntry.isApproved()) {
+			return;
+		}
+
+		if (!preferApproved &&
+			(serviceBuilderObjectEntry.getObjectEntryId() ==
+				serviceBuilderObjectEntry.getHeadObjectEntryId())) {
 
 			return;
 		}

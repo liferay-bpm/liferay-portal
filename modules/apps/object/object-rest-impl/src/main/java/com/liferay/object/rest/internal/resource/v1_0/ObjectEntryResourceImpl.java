@@ -294,6 +294,25 @@ public class ObjectEntryResourceImpl
 	}
 
 	@Override
+	public ObjectEntry getApprovedByExternalReferenceCode(
+			String externalReferenceCode)
+		throws Exception {
+
+		if (!_objectDefinition.isEnableObjectEntryVersioning()) {
+			throw new UnsupportedOperationException();
+		}
+
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			DefaultObjectEntryManagerProvider.provide(
+				_objectEntryManagerRegistry.getObjectEntryManager(
+					_objectDefinition.getStorageType()));
+
+		return defaultObjectEntryManager.getApprovedObjectEntry(
+			contextCompany.getCompanyId(), _getDTOConverterContext(null),
+			externalReferenceCode, _objectDefinition, null);
+	}
+
+	@Override
 	public Page<ObjectEntry> getApprovedPage(
 			String search, Aggregation aggregation, Filter filter,
 			Pagination pagination, Sort[] sorts)
@@ -484,6 +503,25 @@ public class ObjectEntryResourceImpl
 	@Override
 	public String getResourceName() {
 		return _objectDefinition.getShortName();
+	}
+
+	@Override
+	public ObjectEntry getScopeScopeKeyApprovedByExternalReferenceCode(
+			String scopeKey, String externalReferenceCode)
+		throws Exception {
+
+		if (!_objectDefinition.isEnableObjectEntryVersioning()) {
+			throw new UnsupportedOperationException();
+		}
+
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			DefaultObjectEntryManagerProvider.provide(
+				_objectEntryManagerRegistry.getObjectEntryManager(
+					_objectDefinition.getStorageType()));
+
+		return defaultObjectEntryManager.getApprovedObjectEntry(
+			contextCompany.getCompanyId(), _getDTOConverterContext(null),
+			externalReferenceCode, _objectDefinition, scopeKey);
 	}
 
 	@Override
