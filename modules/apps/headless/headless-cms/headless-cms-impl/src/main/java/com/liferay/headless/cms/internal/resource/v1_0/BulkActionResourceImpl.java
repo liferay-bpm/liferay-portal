@@ -826,8 +826,8 @@ public class BulkActionResourceImpl extends BaseBulkActionResourceImpl {
 			List<Long> primaryKeys = _objectEntryLocalService.getPrimaryKeys(
 				new Long[0], contextCompany.getCompanyId(),
 				contextUser.getUserId(),
-				objectDefinition.getObjectDefinitionId(), predicate, null,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+				objectDefinition.getObjectDefinitionId(), predicate, false,
+				null, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 			if (ListUtil.isEmpty(primaryKeys)) {
 				return bulkActionItemsMap;
