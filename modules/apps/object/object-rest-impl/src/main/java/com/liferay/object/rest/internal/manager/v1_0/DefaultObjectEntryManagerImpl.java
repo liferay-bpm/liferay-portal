@@ -362,7 +362,7 @@ public class DefaultObjectEntryManagerImpl
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
 			_objectEntryService.getObjectEntry(objectEntryId);
 
-		_checkHeadObjectEntry(serviceBuilderObjectEntry);
+		_checkHeadObjectEntry(serviceBuilderObjectEntry, false);
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
 		_checkObjectEntryStatus(serviceBuilderObjectEntry);
@@ -386,7 +386,7 @@ public class DefaultObjectEntryManagerImpl
 				externalReferenceCode, getGroupId(objectDefinition, scopeKey),
 				objectDefinition.getObjectDefinitionId());
 
-		_checkHeadObjectEntry(serviceBuilderObjectEntry);
+		_checkHeadObjectEntry(serviceBuilderObjectEntry, false);
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
 		_checkObjectEntryStatus(serviceBuilderObjectEntry);
@@ -1055,7 +1055,7 @@ public class DefaultObjectEntryManagerImpl
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
 			objectEntryLocalService.getObjectEntry(objectEntryId);
 
-		_checkHeadObjectEntry(serviceBuilderObjectEntry);
+		_checkHeadObjectEntry(serviceBuilderObjectEntry, false);
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
 
@@ -1705,11 +1705,13 @@ public class DefaultObjectEntryManagerImpl
 	}
 
 	private void _checkHeadObjectEntry(
-			com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry)
+			com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry,
+			boolean skipCheckHeadObjectEntry)
 		throws Exception {
 
-		if (serviceBuilderObjectEntry.getObjectEntryId() ==
-				serviceBuilderObjectEntry.getHeadObjectEntryId()) {
+		if ((serviceBuilderObjectEntry.getObjectEntryId() ==
+				serviceBuilderObjectEntry.getHeadObjectEntryId()) ||
+			skipCheckHeadObjectEntry) {
 
 			return;
 		}
@@ -1865,7 +1867,7 @@ public class DefaultObjectEntryManagerImpl
 			com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry)
 		throws Exception {
 
-		_checkHeadObjectEntry(serviceBuilderObjectEntry);
+		_checkHeadObjectEntry(serviceBuilderObjectEntry, false);
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
 		_checkRootDescendantNode(serviceBuilderObjectEntry, false);
@@ -1898,7 +1900,7 @@ public class DefaultObjectEntryManagerImpl
 			long parentObjectEntryId)
 		throws Exception {
 
-		_checkHeadObjectEntry(serviceBuilderObjectEntry);
+		_checkHeadObjectEntry(serviceBuilderObjectEntry, false);
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
 
@@ -2022,7 +2024,7 @@ public class DefaultObjectEntryManagerImpl
 			int version)
 		throws Exception {
 
-		_checkHeadObjectEntry(serviceBuilderObjectEntry);
+		_checkHeadObjectEntry(serviceBuilderObjectEntry, false);
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
 		_checkObjectEntryStatus(serviceBuilderObjectEntry);
@@ -2198,7 +2200,10 @@ public class DefaultObjectEntryManagerImpl
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
 			_objectEntryService.getObjectEntry(objectEntryId);
 
-		_checkHeadObjectEntry(serviceBuilderObjectEntry);
+		_checkHeadObjectEntry(
+			serviceBuilderObjectEntry,
+			GetterUtil.getBoolean(
+				dtoConverterContext.getAttribute("preferApproved")));
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
 
@@ -2212,7 +2217,10 @@ public class DefaultObjectEntryManagerImpl
 			com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry)
 		throws Exception {
 
-		_checkHeadObjectEntry(serviceBuilderObjectEntry);
+		_checkHeadObjectEntry(
+			serviceBuilderObjectEntry,
+			GetterUtil.getBoolean(
+				dtoConverterContext.getAttribute("preferApproved")));
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
 		_checkRootDescendantNode(serviceBuilderObjectEntry, false);
