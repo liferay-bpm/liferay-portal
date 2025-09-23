@@ -4,11 +4,11 @@
  */
 
 import {openModal} from 'frontend-js-components-web';
-import {sub} from 'frontend-js-web';
+import {fetch, sub} from 'frontend-js-web';
 
 import AssetBatchService from '../../../common/services/AssetBatchService';
-import SpaceService from '../../../common/services/SpaceService';
 import {displayErrorToast} from '../../../common/utils/toastUtil';
+import {DEFAULT_HEADERS} from '../utils/constants';
 import {isFromRecycleBin} from '../utils/isFromRecycleBin';
 
 /**
@@ -76,7 +76,20 @@ function getBulkDeleteMessage(selectedData: any): {
 async function getEntriesSpaces(items: any[]): Promise<any[]> {
 	const promises = items
 		.filter((item) => item.embedded.scopeId)
-		.map((item) => SpaceService.getSpace({spaceId: item.embedded.scopeId}));
+		.map((item) =>
+			fetch(
+				`/o/headless-asset-library/v1.0/asset-libraries/${item.embedded.scopeId}`,
+				{
+					headers: {
+						...DEFAULT_HEADERS,
+						'Content-Type': 'application/json',
+					},
+					method: 'GET',
+				}
+			)
+				.then((res) => res.json())
+				.catch(() => null)
+		);
 
 	return (await Promise.all(promises)).filter(Boolean);
 }
