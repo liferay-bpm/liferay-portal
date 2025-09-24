@@ -20,6 +20,7 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.definition.security.permission.resource.util.ObjectDefinitionResourcePermissionUtil;
+import com.liferay.object.definition.setting.util.ObjectDefinitionSettingUtil;
 import com.liferay.object.definition.tree.util.ObjectDefinitionTreeUtil;
 import com.liferay.object.definition.util.ObjectDefinitionThreadLocal;
 import com.liferay.object.definition.util.ObjectDefinitionUtil;
@@ -129,6 +130,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mass.delete.MassDeleteCacheThreadLocal;
 import com.liferay.portal.kernel.model.ClassName;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
@@ -161,6 +163,7 @@ import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.service.persistence.ResourcePermissionPersistence;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -1301,6 +1304,9 @@ public class ObjectDefinitionLocalServiceImpl
 		_validateExternalReferenceCode(
 			externalReferenceCode, objectDefinition.isSystem());
 		_validateObjectFieldId(objectDefinition, titleObjectFieldId);
+		_validateObjectDefinitionWorkflowLinks(
+			objectDefinition.getCompanyId(), objectDefinition.getScope(),
+			objectDefinitionSettings, workflowDefinitionLinks);
 
 		long oldObjectFolderId = objectDefinition.getObjectFolderId();
 
@@ -1468,6 +1474,9 @@ public class ObjectDefinitionLocalServiceImpl
 		_validatePluralLabel(pluralLabelMap);
 		_validateScope(scope, storageType);
 		_validateVersion(system, version);
+		_validateObjectDefinitionWorkflowLinks(
+			user.getCompanyId(), scope, objectDefinitionSettings,
+			workflowDefinitionLinks);
 
 		ObjectDefinition objectDefinition = objectDefinitionPersistence.create(
 			counterLocalService.increment());
@@ -2568,6 +2577,9 @@ public class ObjectDefinitionLocalServiceImpl
 			objectDefinition, objectDefinition.isSystem());
 		_validateLabel(labelMap);
 		_validatePluralLabel(pluralLabelMap);
+		_validateObjectDefinitionWorkflowLinks(
+			objectDefinition.getCompanyId(), scope, objectDefinitionSettings,
+			workflowDefinitionLinks);
 
 		if (objectDefinition.getAccountEntryRestrictedObjectFieldId() != 0) {
 			_objectFieldLocalService.updateRequired(
@@ -3304,6 +3316,68 @@ public class ObjectDefinitionLocalServiceImpl
 								acceptedGroupId);
 					}
 				}
+			}
+		}
+	}
+
+	private void _validateObjectDefinitionWorkflowLinks(
+			long companyId, String scope,
+			List<ObjectDefinitionSetting> objectDefinitionSettings,
+			List<WorkflowDefinitionLink> workflowDefinitionLinks)
+		throws PortalException {
+
+		if (!FeatureFlagManagerUtil.isEnabled(companyId, "LPD-17564") ||
+			StringUtil.equals(scope, ObjectDefinitionConstants.SCOPE_COMPANY) ||
+			workflowDefinitionLinks.isEmpty()) {
+
+			return;
+		}
+
+		for (WorkflowDefinitionLink workflowDefinitionLink :
+				workflowDefinitionLinks) {
+
+			if (workflowDefinitionLink.getGroupId() == 0) {
+				continue;
+			}
+
+			ObjectScopeProvider objectScopeProvider =
+				_objectScopeProviderRegistry.getObjectScopeProvider(scope);
+
+			if (!objectScopeProvider.isValidGroupId(
+					workflowDefinitionLink.getGroupId())) {
+
+				throw new ObjectDefinitionScopeException(
+					"An object definition can only be link to a workflow " +
+						"definition within the same scope");
+			}
+
+			if (!StringUtil.equals(
+					scope, ObjectDefinitionConstants.SCOPE_DEPOT) ||
+				GetterUtil.getBoolean(
+					ObjectDefinitionSettingUtil.getValue(
+						ObjectDefinitionSettingConstants.NAME_ACCEPT_ALL_GROUPS,
+						objectDefinitionSettings))) {
+
+				return;
+			}
+
+			String acceptedGroupIds = ObjectDefinitionSettingUtil.getValue(
+				ObjectDefinitionSettingConstants.NAME_ACCEPTED_GROUP_IDS,
+				objectDefinitionSettings);
+
+			Group group = _groupLocalService.getGroup(
+				workflowDefinitionLink.getGroupId());
+
+			if (Validator.isNull(acceptedGroupIds) ||
+				!ArrayUtil.exists(
+					acceptedGroupIds.split("\\s*,\\s*"),
+					acceptedGroupId -> acceptedGroupId.equals(
+						String.valueOf(group.getGroupId())))) {
+
+				throw new ObjectDefinitionScopeException(
+					StringBundler.concat(
+						"The group ", group.getGroupId(), " is not included ",
+						"in the object definition scope."));
 			}
 		}
 	}

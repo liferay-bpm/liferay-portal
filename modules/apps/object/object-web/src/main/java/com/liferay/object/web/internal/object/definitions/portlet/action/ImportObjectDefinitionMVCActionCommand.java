@@ -9,6 +9,7 @@ import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectDefinitionResource;
 import com.liferay.object.constants.ObjectPortletKeys;
 import com.liferay.object.exception.ObjectDefinitionNameException;
+import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectDefinitionStatusException;
 import com.liferay.object.exception.ObjectViewColumnFieldNameException;
 import com.liferay.petra.string.StringPool;
@@ -55,7 +56,7 @@ public class ImportObjectDefinitionMVCActionCommand
 
 	@Override
 	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
+		ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
 		JSONObject errorsJSONObject = _importObjectDefinition(actionRequest);
@@ -87,6 +88,9 @@ public class ImportObjectDefinitionMVCActionCommand
 				"type",
 				"ObjectDefinitionNameException." + clazz.getSimpleName());
 		}
+		else if (exception instanceof ObjectDefinitionScopeException) {
+			return JSONUtil.put("title", exception.getMessage());
+		}
 		else if (exception instanceof ObjectDefinitionStatusException) {
 			return JSONUtil.put("title", exception.getMessage());
 		}
@@ -96,9 +100,8 @@ public class ImportObjectDefinitionMVCActionCommand
 				_language.get(
 					_portal.getHttpServletRequest(actionRequest),
 					"the-object-definition-was-imported-without-a-custom-" +
-						"view"));
+					"view"));
 		}
-
 		return JSONUtil.put(
 			"title",
 			_language.get(
