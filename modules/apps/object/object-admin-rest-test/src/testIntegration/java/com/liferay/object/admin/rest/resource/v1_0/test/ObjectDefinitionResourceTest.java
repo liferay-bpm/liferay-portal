@@ -41,6 +41,7 @@ import com.liferay.object.constants.ObjectFolderConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.constants.ObjectValidationRuleConstants;
 import com.liferay.object.constants.ObjectValidationRuleSettingConstants;
+import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.model.ObjectFolder;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -60,6 +61,7 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
+import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -1238,6 +1240,30 @@ public class ObjectDefinitionResourceTest
 				}
 			};
 
+		WorkflowDefinitionLink workflowDefinitionLink4 =
+			new WorkflowDefinitionLink() {
+				{
+					groupExternalReferenceCode = RandomTestUtil.randomString();
+					workflowDefinitionName = workflowDefinition3.getName();
+				}
+			};
+
+		workflowDefinitionLinks = new WorkflowDefinitionLink[] {
+			workflowDefinitionLink1, workflowDefinitionLink2,
+			workflowDefinitionLink3, workflowDefinitionLink4
+		};
+
+		ObjectDefinition objectDefinition = postObjectDefinition;
+
+		objectDefinition.setWorkflowDefinitionLinks(workflowDefinitionLinks);
+
+		AssertUtils.assertFailure(
+			ObjectDefinitionScopeException.class,
+			"An object definition can only be linked to a workflow " +
+				"definition with an existing group",
+			() -> objectDefinitionResource.putObjectDefinition(
+				objectDefinition.getId(), objectDefinition));
+
 		workflowDefinitionLinks = new WorkflowDefinitionLink[] {
 			workflowDefinitionLink1, workflowDefinitionLink2,
 			workflowDefinitionLink3
@@ -2295,6 +2321,32 @@ public class ObjectDefinitionResourceTest
 					workflowDefinitionName = workflowDefinition3.getName();
 				}
 			};
+
+		WorkflowDefinitionLink workflowDefinitionLink4 =
+			new WorkflowDefinitionLink() {
+				{
+					groupExternalReferenceCode = RandomTestUtil.randomString();
+					workflowDefinitionName = workflowDefinition3.getName();
+				}
+			};
+
+		workflowDefinitionLinks = new WorkflowDefinitionLink[] {
+			workflowDefinitionLink1, workflowDefinitionLink2,
+			workflowDefinitionLink3, workflowDefinitionLink4
+		};
+
+		ObjectDefinition postObjectDefinition = randomObjectDefinition();
+
+		postObjectDefinition.setWorkflowDefinitionLinks(
+			workflowDefinitionLinks);
+
+		postObjectDefinition.setScope(ObjectDefinitionConstants.SCOPE_SITE);
+
+		AssertUtils.assertFailure(
+			ObjectDefinitionScopeException.class,
+			"An object definition can only be linked to a workflow " +
+				"definition with an existing group",
+			() -> _addObjectDefinition(postObjectDefinition));
 
 		workflowDefinitionLinks = new WorkflowDefinitionLink[] {
 			workflowDefinitionLink1, workflowDefinitionLink2,

@@ -96,6 +96,7 @@ import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.User;
@@ -103,6 +104,7 @@ import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
 import com.liferay.portal.kernel.model.UserNotificationEvent;
 import com.liferay.portal.kernel.model.UserNotificationEventTable;
+import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.portlet.constants.FriendlyURLResolverConstants;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -115,10 +117,12 @@ import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalServiceUtil;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.CompanyTestUtil;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -990,6 +994,180 @@ public class ObjectDefinitionLocalServiceTest {
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition1);
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition2);
+	}
+
+	@Test
+	public void testAddObjectDefinitionWithWorkflowDefinitionLinks()
+		throws Exception {
+
+		// Different scopes
+
+		Group group1 = _addDepotGroup();
+
+		WorkflowDefinitionLink workflowDefinitionLink1 =
+			WorkflowDefinitionLinkLocalServiceUtil.addWorkflowDefinitionLink(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				TestPropsValues.getCompanyId(), group1.getGroupId(),
+				ObjectDefinition.class.getName(), RandomTestUtil.nextLong(), 0,
+				"Single Approver", 1);
+
+		List<WorkflowDefinitionLink> workflowDefinitionLinks1 =
+			Collections.singletonList(workflowDefinitionLink1);
+
+		AssertUtils.assertFailure(
+			ObjectDefinitionScopeException.class,
+			"An object definition can only be link to a workflow definition " +
+				"within the same scope",
+			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
+				TestPropsValues.getUserId(), 0, null, false, true, true, true,
+				false, false, false, false, false, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				ObjectDefinitionTestUtil.getRandomName(), null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				true, ObjectDefinitionConstants.SCOPE_SITE,
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Collections.emptyList(), Collections.emptyList(),
+				workflowDefinitionLinks1));
+
+		group1 = GroupTestUtil.addGroup();
+
+		workflowDefinitionLink1 =
+			WorkflowDefinitionLinkLocalServiceUtil.addWorkflowDefinitionLink(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				TestPropsValues.getCompanyId(), group1.getGroupId(),
+				ObjectDefinition.class.getName(), RandomTestUtil.nextLong(), 0,
+				"Single Approver", 1);
+
+		List<WorkflowDefinitionLink> workflowDefinitionLinks2 =
+			Collections.singletonList(workflowDefinitionLink1);
+
+		AssertUtils.assertFailure(
+			ObjectDefinitionScopeException.class,
+			"An object definition can only be link to a workflow definition " +
+				"within the same scope",
+			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
+				TestPropsValues.getUserId(), 0, null, false, true, true, true,
+				false, false, false, false, false, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				ObjectDefinitionTestUtil.getRandomName(), null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				true, ObjectDefinitionConstants.SCOPE_DEPOT,
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Collections.emptyList(), Collections.emptyList(),
+				workflowDefinitionLinks2));
+
+		// Object definition settings with no accepted groups
+
+		group1 = _addDepotGroup();
+		Group group2 = _addDepotGroup();
+
+		List<ObjectDefinitionSetting> objectDefinitionSettings =
+			Collections.singletonList(
+				new ObjectDefinitionSettingBuilder(
+				).name(
+					ObjectDefinitionSettingConstants.NAME_ACCEPTED_GROUP_IDS
+				).value(
+					String.valueOf(group1.getGroupId())
+				).build());
+
+		workflowDefinitionLink1 =
+			WorkflowDefinitionLinkLocalServiceUtil.addWorkflowDefinitionLink(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				TestPropsValues.getCompanyId(), group2.getGroupId(),
+				ObjectDefinition.class.getName(), RandomTestUtil.nextLong(), 0,
+				"Single Approver", 1);
+
+		List<WorkflowDefinitionLink> workflowDefinitionLinks3 =
+			Collections.singletonList(workflowDefinitionLink1);
+
+		AssertUtils.assertFailure(
+			ObjectDefinitionScopeException.class,
+			StringBundler.concat(
+				"The group ", group2.getGroupId(),
+				" is not included in the object definition scope."),
+			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
+				TestPropsValues.getUserId(), 0, null, false, true, true, true,
+				false, false, false, false, false, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				ObjectDefinitionTestUtil.getRandomName(), null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				true, ObjectDefinitionConstants.SCOPE_DEPOT,
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				objectDefinitionSettings, Collections.emptyList(),
+				workflowDefinitionLinks3));
+
+		// Company scope
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.addCustomObjectDefinition(
+				TestPropsValues.getUserId(), 0, null, false, true, true, true,
+				false, false, false, false, false, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				ObjectDefinitionTestUtil.getRandomName(), null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				true, ObjectDefinitionConstants.SCOPE_COMPANY,
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Collections.emptyList(), Collections.emptyList(),
+				workflowDefinitionLinks1);
+
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinition.getObjectDefinitionId());
+
+		// Depot scope
+
+		WorkflowDefinitionLink workflowDefinitionLink2 =
+			WorkflowDefinitionLinkLocalServiceUtil.addWorkflowDefinitionLink(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				TestPropsValues.getCompanyId(), group1.getGroupId(),
+				ObjectDefinition.class.getName(), RandomTestUtil.nextLong(), 0,
+				"Single Approver", 1);
+
+		List<WorkflowDefinitionLink> workflowDefinitionLinks4 =
+			Collections.singletonList(workflowDefinitionLink2);
+
+		objectDefinition =
+			_objectDefinitionLocalService.addCustomObjectDefinition(
+				TestPropsValues.getUserId(), 0, null, false, true, true, true,
+				false, false, false, false, false, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				ObjectDefinitionTestUtil.getRandomName(), null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				true, ObjectDefinitionConstants.SCOPE_DEPOT,
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				objectDefinitionSettings, Collections.emptyList(),
+				workflowDefinitionLinks4);
+
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinition.getObjectDefinitionId());
+
+		// Site scope
+
+		group2 = GroupTestUtil.addGroup();
+
+		WorkflowDefinitionLink workflowDefinitionLink3 =
+			WorkflowDefinitionLinkLocalServiceUtil.addWorkflowDefinitionLink(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				TestPropsValues.getCompanyId(), group2.getGroupId(),
+				ObjectDefinition.class.getName(), RandomTestUtil.nextLong(), 0,
+				"Single Approver", 1);
+
+		List<WorkflowDefinitionLink> workflowDefinitionLinks5 =
+			Collections.singletonList(workflowDefinitionLink3);
+
+		objectDefinition =
+			_objectDefinitionLocalService.addCustomObjectDefinition(
+				TestPropsValues.getUserId(), 0, null, false, true, true, true,
+				false, false, false, false, false, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				ObjectDefinitionTestUtil.getRandomName(), null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				true, ObjectDefinitionConstants.SCOPE_SITE,
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Collections.emptyList(), Collections.emptyList(),
+				workflowDefinitionLinks5);
+
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinition.getObjectDefinitionId());
 	}
 
 	@Test
@@ -2849,8 +3027,6 @@ public class ObjectDefinitionLocalServiceTest {
 		_testUpdateCustomObjectDefinitionThrowsObjectFieldRelationshipTypeException(
 			objectDefinition);
 
-		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
-
 		_objectFolderLocalService.deleteObjectFolder(objectFolder);
 	}
 
@@ -2889,6 +3065,186 @@ public class ObjectDefinitionLocalServiceTest {
 			customObjectDefinition);
 		_objectDefinitionLocalService.deleteObjectDefinition(
 			unmodifiableSystemObjectDefinition);
+	}
+
+	@Test
+	public void testUpdateObjectDefinitionWithWorkflowDefinitionLinks()
+		throws Exception {
+
+		// Different scopes
+
+		ObjectDefinition objectDefinition1 =
+			_objectDefinitionLocalService.addCustomObjectDefinition(
+				TestPropsValues.getUserId(), 0, null, false, true, false, true,
+				false, false, true, true, true, null,
+				LocalizedMapUtil.getLocalizedMap("Delta"), "Delta", null, null,
+				LocalizedMapUtil.getLocalizedMap("Deltas"), true,
+				ObjectDefinitionConstants.SCOPE_DEPOT,
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Collections.emptyList(), Collections.emptyList(),
+				Collections.emptyList());
+
+		Group group1 = GroupTestUtil.addGroup();
+
+		WorkflowDefinitionLink workflowDefinitionLink1 =
+			WorkflowDefinitionLinkLocalServiceUtil.addWorkflowDefinitionLink(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				TestPropsValues.getCompanyId(), group1.getGroupId(),
+				ObjectDefinition.class.getName(), RandomTestUtil.nextLong(), 0,
+				"Single Approver", 1);
+
+		List<WorkflowDefinitionLink> workflowDefinitionLinks1 =
+			Collections.singletonList(workflowDefinitionLink1);
+
+		AssertUtils.assertFailure(
+			ObjectDefinitionScopeException.class,
+			"An object definition can only be link to a workflow definition " +
+				"within the same scope",
+			() -> _objectDefinitionLocalService.updateCustomObjectDefinition(
+				null, objectDefinition1.getObjectDefinitionId(), 0, 0, 0, 0,
+				false, false, objectDefinition1.getClassName(), true, false,
+				true, true, false, false, false, true, true, true, true, null,
+				LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie", null,
+				null, false, LocalizedMapUtil.getLocalizedMap("Charlies"),
+				objectDefinition1.getScope(), objectDefinition1.getStatus(),
+				Collections.emptyList(), workflowDefinitionLinks1));
+
+		objectDefinition1.setScope(ObjectDefinitionConstants.SCOPE_SITE);
+
+		group1 = _addDepotGroup();
+
+		WorkflowDefinitionLink workflowDefinitionLink2 =
+			WorkflowDefinitionLinkLocalServiceUtil.addWorkflowDefinitionLink(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				TestPropsValues.getCompanyId(), group1.getGroupId(),
+				ObjectDefinition.class.getName(), RandomTestUtil.nextLong(), 0,
+				"Single Approver", 1);
+
+		List<WorkflowDefinitionLink> workflowDefinitionLinks2 =
+			Collections.singletonList(workflowDefinitionLink2);
+
+		AssertUtils.assertFailure(
+			ObjectDefinitionScopeException.class,
+			"An object definition can only be link to a workflow definition " +
+				"within the same scope",
+			() -> _objectDefinitionLocalService.updateCustomObjectDefinition(
+				null, objectDefinition1.getObjectDefinitionId(), 0, 0, 0, 0,
+				false, false, objectDefinition1.getClassName(), true, false,
+				true, true, false, false, false, true, true, true, true, null,
+				LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie", null,
+				null, false, LocalizedMapUtil.getLocalizedMap("Charlies"),
+				objectDefinition1.getScope(), objectDefinition1.getStatus(),
+				Collections.emptyList(), workflowDefinitionLinks2));
+
+		// Object definition settings with no accepted groups
+
+		ObjectDefinition objectDefinition2 = objectDefinition1;
+
+		objectDefinition2.setScope(ObjectDefinitionConstants.SCOPE_DEPOT);
+
+		group1 = _addDepotGroup();
+		Group group2 = _addDepotGroup();
+
+		List<ObjectDefinitionSetting> objectDefinitionSettings1 =
+			Collections.singletonList(
+				new ObjectDefinitionSettingBuilder(
+				).name(
+					ObjectDefinitionSettingConstants.NAME_ACCEPTED_GROUP_IDS
+				).value(
+					String.valueOf(group1.getGroupId())
+				).build());
+		List<ObjectDefinitionSetting> objectDefinitionSettings2 =
+			Collections.singletonList(
+				new ObjectDefinitionSettingBuilder(
+				).name(
+					ObjectDefinitionSettingConstants.NAME_ACCEPT_ALL_GROUPS
+				).value(
+					StringPool.TRUE
+				).build());
+
+		WorkflowDefinitionLink workflowDefinitionLink3 =
+			WorkflowDefinitionLinkLocalServiceUtil.addWorkflowDefinitionLink(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				TestPropsValues.getCompanyId(), group2.getGroupId(),
+				ObjectDefinition.class.getName(), RandomTestUtil.nextLong(), 0,
+				"Single Approver", 1);
+
+		WorkflowDefinitionLink workflowDefinitionLink4 =
+			WorkflowDefinitionLinkLocalServiceUtil.addWorkflowDefinitionLink(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				TestPropsValues.getCompanyId(), group1.getGroupId(),
+				ObjectDefinition.class.getName(), RandomTestUtil.nextLong(), 0,
+				"Single Approver", 1);
+
+		List<WorkflowDefinitionLink> workflowDefinitionLinks3 =
+			Collections.singletonList(workflowDefinitionLink3);
+
+		List<WorkflowDefinitionLink> workflowDefinitionLinks4 =
+			Collections.singletonList(workflowDefinitionLink4);
+
+		AssertUtils.assertFailure(
+			ObjectDefinitionScopeException.class,
+			StringBundler.concat(
+				"The group ", group2.getGroupId(),
+				" is not included in the object definition scope."),
+			() -> _objectDefinitionLocalService.updateCustomObjectDefinition(
+				null, objectDefinition2.getObjectDefinitionId(), 0, 0, 0, 0,
+				false, false, objectDefinition2.getClassName(), true, false,
+				true, true, false, false, false, true, true, true, true, null,
+				LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie", null,
+				null, false, LocalizedMapUtil.getLocalizedMap("Charlies"),
+				objectDefinition2.getScope(), objectDefinition2.getStatus(),
+				objectDefinitionSettings1, workflowDefinitionLinks3));
+
+		// Company scope
+
+		_objectDefinitionLocalService.updateCustomObjectDefinition(
+			null, objectDefinition2.getObjectDefinitionId(), 0, 0, 0, 0, false,
+			false, objectDefinition2.getClassName(), true, false, true, true,
+			false, false, false, true, true, true, true, null,
+			LocalizedMapUtil.getLocalizedMap("Bravo"), "Bravo", null, null,
+			false, LocalizedMapUtil.getLocalizedMap("Bravos"),
+			ObjectDefinitionConstants.SCOPE_COMPANY,
+			objectDefinition2.getStatus(), objectDefinitionSettings2,
+			workflowDefinitionLinks4);
+
+		// Depot scope
+
+		ObjectDefinition objectDefinition3 =
+			_objectDefinitionLocalService.addCustomObjectDefinition(
+				TestPropsValues.getUserId(), 0, null, false, true, false, true,
+				false, false, true, true, true, null,
+				LocalizedMapUtil.getLocalizedMap("Delta"), "Delta", null, null,
+				LocalizedMapUtil.getLocalizedMap("Deltas"), true,
+				ObjectDefinitionConstants.SCOPE_DEPOT,
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Collections.emptyList(), Collections.emptyList(),
+				Collections.emptyList());
+
+		objectDefinition3 =
+			_objectDefinitionLocalService.updateCustomObjectDefinition(
+				null, objectDefinition3.getObjectDefinitionId(), 0, 0, 0, 0,
+				false, false, objectDefinition3.getClassName(), true, false,
+				true, true, false, false, false, true, true, true, true, null,
+				LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie", null,
+				null, false, LocalizedMapUtil.getLocalizedMap("Charlies"),
+				ObjectDefinitionConstants.SCOPE_DEPOT,
+				objectDefinition3.getStatus(), objectDefinitionSettings2,
+				workflowDefinitionLinks4);
+
+		// Site scope
+
+		_objectDefinitionLocalService.updateCustomObjectDefinition(
+			null, objectDefinition3.getObjectDefinitionId(), 0, 0, 0, 0, false,
+			false, objectDefinition3.getClassName(), true, false, true, true,
+			false, false, false, true, true, true, true, null,
+			LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie", null, null,
+			false, LocalizedMapUtil.getLocalizedMap("Charlies"),
+			ObjectDefinitionConstants.SCOPE_SITE, objectDefinition3.getStatus(),
+			Collections.emptyList(), workflowDefinitionLinks1);
+
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinition3.getObjectDefinitionId());
 	}
 
 	@Test
@@ -3262,6 +3618,16 @@ public class ObjectDefinitionLocalServiceTest {
 					ObjectFieldConstants.DB_TYPE_STRING,
 					RandomTestUtil.randomString(), StringUtil.randomId())),
 			Collections.emptyList());
+	}
+
+	private Group _addDepotGroup() throws Exception {
+		DepotEntry depotEntry = _depotEntryLocalService.addDepotEntry(
+			RandomTestUtil.randomLocaleStringMap(),
+			RandomTestUtil.randomLocaleStringMap(),
+			DepotConstants.TYPE_ASSET_LIBRARY,
+			ServiceContextTestUtil.getServiceContext());
+
+		return depotEntry.getGroup();
 	}
 
 	private ObjectFolder _addObjectFolder() throws Exception {
