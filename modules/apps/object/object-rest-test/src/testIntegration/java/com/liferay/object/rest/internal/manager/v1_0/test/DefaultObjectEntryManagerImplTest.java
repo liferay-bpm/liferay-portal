@@ -4238,6 +4238,46 @@ public class DefaultObjectEntryManagerImplTest
 					dtoConverterContext, _objectDefinition4, objectEntryId, 1));
 	}
 
+	@FeatureFlag("LPD-17564")
+	@Test
+	public void testGetApprovedObjectEntries() throws Exception {
+		_testGetApprovedObjectEntries();
+
+		ObjectEntry objectEntry = _addObjectEntry(
+			_objectDefinition1, Collections.emptyMap());
+
+		_testGetApprovedObjectEntries(objectEntry);
+
+		_defaultObjectEntryManager.expireObjectEntry(
+			_simpleDTOConverterContext, objectEntry.getId());
+
+		_testGetApprovedObjectEntries();
+
+		_enableObjectEntryVersioning();
+
+		objectEntry = _updateObjectEntryVersion(
+			_objectDefinition1,
+			_addObjectEntry(
+				_objectDefinition1,
+				ObjectEntryFolderConstants.
+					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+				null, 1),
+			2);
+
+		_testGetApprovedObjectEntries(objectEntry);
+
+		_defaultObjectEntryManager.expireObjectEntryByVersion(
+			dtoConverterContext, _objectDefinition1, objectEntry.getId(), 2);
+
+		_testGetApprovedObjectEntries(
+			_getLastApprovedObjectEntry(objectEntry.getId()));
+
+		_defaultObjectEntryManager.expireObjectEntryByVersion(
+			dtoConverterContext, _objectDefinition1, objectEntry.getId(), 1);
+
+		_testGetApprovedObjectEntries();
+	}
+
 	@Test
 	public void testGetObjectEntries() throws Exception {
 		testGetObjectEntries(Collections.emptyMap());
@@ -9426,6 +9466,19 @@ public class DefaultObjectEntryManagerImplTest
 		return fileEntry.getId();
 	}
 
+	private ObjectEntry _getLastApprovedObjectEntry(long headObjectEntryId)
+		throws Exception {
+
+		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
+			_objectEntryLocalService.fetchObjectEntryByHeadObjectEntryId(
+				headObjectEntryId);
+
+		return _defaultObjectEntryManager.getApprovedObjectEntry(
+			companyId, dtoConverterContext,
+			serviceBuilderObjectEntry.getExternalReferenceCode(),
+			_objectDefinition1, null);
+	}
+
 	private String _getListEntryKey(ObjectEntry objectEntry) {
 		Map<String, Object> properties = objectEntry.getProperties();
 
@@ -10018,6 +10071,22 @@ public class DefaultObjectEntryManagerImplTest
 
 		Assert.assertNull(
 			_objectEntryLocalService.fetchObjectEntry(objectEntryAA2.getId()));
+	}
+
+	private void _testGetApprovedObjectEntries(
+			ObjectEntry... expectedObjectEntries)
+		throws Exception {
+
+		assertEquals(
+			_defaultObjectEntryManager.getApprovedObjectEntries(
+				companyId, _objectDefinition1, null, null,
+				new DefaultDTOConverterContext(
+					false, Collections.emptyMap(), dtoConverterRegistry, null,
+					LocaleUtil.getDefault(), null, _user),
+				null, null, null, null),
+			Page.of(
+				ListUtil.fromArray(expectedObjectEntries), null,
+				expectedObjectEntries.length));
 	}
 
 	private void _testGetObjectEntriesWithAccountEntryRestricted2(
