@@ -1,0 +1,139 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Review wait label rotator
+
+# Controls when the workflow will run
+on:
+  schedule:
+    - cron: "0 * * * *"      
+  issues:
+    types: [labeled]         
+  pull_request:
+    types: [labeled, reopened, ready_for_review, assigned]
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: read
+  
+env:
+  BASE_LABEL: waiting-for-review
+  LABEL_24H: waiting-for-review-24h
+  LABEL_48H: waiting-for-review-48h
+  COLOR_BASE: "0e8a16"   # green
+  COLOR_24H:  "fbca04"   # yellow
+  COLOR_48H:  "d73a4a"   # red
+  WORK_TZ: "America/Recife"     # change if needed
+  WORK_START_HOUR: "9"          # 9:00 local
+  WORK_END_HOUR: "18"           # 18:00 local
+  THRESHOLD_24H: "24"
+  THRESHOLD_48H: "48"
+
+jobs:
+  rotate:
+    if: github.event_name != 'issues' || github.event.label.name == env.BASE_LABEL
+    runs-on: ubuntu-latest
+    steps:
+      - name: Process open PRs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo  = context.repo.repo;
+
+            const BASE   = process.env.BASE_LABEL;
+            const L24    = process.env.LABEL_24H;
+            const L48    = process.env.LABEL_48H;
+            const tz     = process.env.WORK_TZ;
+            const startH = parseInt(process.env.WORK_START_HOUR, 10);
+            const endH   = parseInt(process.env.WORK_END_HOUR, 10);
+            const T24    = parseInt(process.env.THRESHOLD_24H, 10);
+            const T48    = parseInt(process.env.THRESHOLD_48H, 10);
+
+            // Count working hours between two dates, using hourly steps in the given time zone
+            function workingHoursBetween(start, end) {
+              if (end <= start) return 0;
+              let hours = 0;
+              const step = 60 * 60 * 1000;
+              // align to the next full hour for a stable count
+              let t = new Date(Math.ceil(start.getTime() / step) * step);
+              while (t <= end) {
+                const d = new Date(t);
+                const opts = { timeZone: tz, hour: 'numeric', weekday: 'short' };
+                const parts = new Intl.DateTimeFormat('en-US', opts).formatToParts(d);
+                const hour = parseInt(parts.find(p => p.type === 'hour').value, 10);
+                // weekday in English short form, Mon to Sun
+                const wk = parts.find(p => p.type === 'weekday').value; // Mon, Tue, ...
+                const isWeekend = (wk === 'Sat' || wk === 'Sun');
+                if (!isWeekend && hour >= startH && hour < endH) {
+                  hours += 1;
+                }
+                t = new Date(t.getTime() + step);
+              }
+              return hours;
+            }
+
+            // Fetch all open PRs
+            const prs = await github.paginate(github.rest.pulls.list, { owner, repo, state: 'open', per_page: 100 });
+
+            for (const pr of prs) {
+              const number = pr.number;
+
+              // Get labels on this PR
+              const labels = pr.labels.map(l => l.name);
+              const hasAny = labels.includes(BASE) || labels.includes(L24) || labels.includes(L48);
+              if (!hasAny) continue;
+
+              // Find when the waiting label was last applied, using issue events
+              const events = await github.paginate(github.rest.issues.listEvents, { owner, repo, issue_number: number, per_page: 100 });
+              // Look from latest to earliest, pick first "labeled" event for any of our three labels
+              let appliedAt = null;
+              for (let i = events.length - 1; i >= 0; i--) {
+                const e = events[i];
+                if (e.event === 'labeled' && e.label && [BASE, L24, L48].includes(e.label.name)) {
+                  appliedAt = new Date(e.created_at);
+                  break;
+                }
+              }
+              if (!appliedAt) continue;
+
+              const now = new Date();
+              const wh = workingHoursBetween(appliedAt, now);
+
+              let target = null;
+              let thresholdHit = null;
+              if (wh >= T48) {
+                target = L48;
+                thresholdHit = 48;
+              } else if (wh >= T24) {
+                target = L24;
+                thresholdHit = 24;
+              } else {
+                target = BASE;
+              }
+
+              // Swap labels if needed
+              const current = labels.find(n => [BASE, L24, L48].includes(n));
+              if (current !== target) {
+                // remove any of the three, then add target
+                const toRemove = [BASE, L24, L48].filter(n => labels.includes(n) && n !== target);
+                for (const name of toRemove) {
+                  try {
+                    await github.rest.issues.removeLabel({ owner, repo, issue_number: number, name });
+                  } catch {}
+                }
+                if (!labels.includes(target)) {
+                  await github.rest.issues.addLabels({ owner, repo, issue_number: number, labels: [target] });
+                }
+
+                if (thresholdHit) {
+                  const prData = await github.rest.pulls.get({ owner, repo, pull_number: number });
+                  const assignees = prData.data.assignees || [];
+                  const mentions = assignees.length ? assignees.map(a => `@${a.login}`).join(' ') : '@' + prData.data.user.login;
+                  const msg = thresholdHit === 24
+                    ? `${mentions} this PR has been waiting for review for 24 working hours, label moved to **${L24}**.`
+                    : `${mentions} this PR has been waiting for review for 48 working hours, label moved to **${L48}**.`;
+                  await github.rest.issues.createComment({ owner, repo, issue_number: number, body: msg });
+                }
+              }
+            }
