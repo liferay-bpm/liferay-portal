@@ -1,0 +1,146 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ */
+
+package com.liferay.object.web.internal.object.entries.portlet.action;
+
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
+import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
+import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.search.document.Document;
+import com.liferay.portal.search.query.BooleanQuery;
+import com.liferay.portal.search.query.Queries;
+import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
+import com.liferay.portal.search.searcher.SearchResponse;
+import com.liferay.portal.search.searcher.Searcher;
+
+import jakarta.portlet.ResourceRequest;
+import jakarta.portlet.ResourceResponse;
+
+/**
+ * @author Carolina Barbosa
+ */
+public class AutocompleteAssigneeMVCResourceCommand
+	extends BaseMVCResourceCommand {
+
+	public AutocompleteAssigneeMVCResourceCommand(
+		Queries queries, Searcher searcher,
+		SearchRequestBuilderFactory searchRequestBuilderFactory,
+		UserLocalService userLocalService) {
+
+		_queries = queries;
+		_searcher = searcher;
+		_searchRequestBuilderFactory = searchRequestBuilderFactory;
+		_userLocalService = userLocalService;
+	}
+
+	@Override
+	protected void doServeResource(
+			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
+		throws Exception {
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		SearchResponse searchResponse = _searcher.search(
+			_searchRequestBuilderFactory.builder(
+			).companyId(
+				themeDisplay.getCompanyId()
+			).entryClassNames(
+				Role.class.getName(), User.class.getName()
+			).emptySearchEnabled(
+				true
+			).query(
+				_getBooleanQuery(ParamUtil.getString(resourceRequest, "search"))
+			).size(
+				20
+			).build());
+
+		for (Document document : searchResponse.getDocuments()) {
+			String entryClassName = document.getString(Field.ENTRY_CLASS_NAME);
+
+			jsonArray.put(
+				JSONUtil.put(
+					"embedded",
+					JSONUtil.put(
+						"externalReferenceCode",
+						document.getString("externalReferenceCode")
+					).put(
+						"image",
+						() -> {
+							if (!entryClassName.equals(User.class.getName())) {
+								return null;
+							}
+
+							User user = _userLocalService.fetchUser(
+								document.getLong(Field.ENTRY_CLASS_PK));
+
+							if (user == null) {
+								return null;
+							}
+
+							return user.getPortraitURL(themeDisplay);
+						}
+					).put(
+						"name",
+						() -> {
+							if (!entryClassName.equals(User.class.getName())) {
+								return document.getString(Field.NAME);
+							}
+
+							return document.getString("fullName");
+						}
+					)
+				).put(
+					"entryClassName", entryClassName
+				));
+		}
+
+		JSONPortletResponseUtil.writeJSON(
+			resourceRequest, resourceResponse,
+			JSONUtil.put("items", jsonArray));
+	}
+
+	private BooleanQuery _getBooleanQuery(String search) {
+		if (Validator.isNull(search)) {
+			return null;
+		}
+
+		BooleanQuery booleanQuery = _queries.booleanQuery();
+
+		BooleanQuery roleBooleanQuery = _queries.booleanQuery();
+
+		roleBooleanQuery.addMustQueryClauses(
+			_queries.term(Field.ENTRY_CLASS_NAME, Role.class.getName()),
+			_queries.matchPhrasePrefix(Field.NAME, search));
+
+		BooleanQuery userBooleanQuery = _queries.booleanQuery();
+
+		userBooleanQuery.addMustQueryClauses(
+			_queries.term(Field.ENTRY_CLASS_NAME, User.class.getName()),
+			_queries.matchPhrasePrefix("fullName", search));
+
+		booleanQuery.addShouldQueryClauses(roleBooleanQuery, userBooleanQuery);
+
+		return booleanQuery;
+	}
+
+	private final Queries _queries;
+	private final Searcher _searcher;
+	private final SearchRequestBuilderFactory _searchRequestBuilderFactory;
+	private final UserLocalService _userLocalService;
+
+}
