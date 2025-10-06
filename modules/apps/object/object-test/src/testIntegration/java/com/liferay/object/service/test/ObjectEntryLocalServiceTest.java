@@ -1358,7 +1358,7 @@ public class ObjectEntryLocalServiceTest {
 		ObjectFolder objectFolder =
 			_objectFolderLocalService.fetchObjectFolderByExternalReferenceCode(
 				ObjectFolderConstants.
-					EXTERNAL_REFERENCE_CODE_CONTENT_STRUCTURES,
+					EXTERNAL_REFERENCE_CODE_FILE_TYPES,
 				TestPropsValues.getCompanyId());
 
 		ObjectDefinition objectDefinition =
