@@ -13,6 +13,8 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
+import com.liferay.batch.engine.unit.BatchEngineUnitProcessor;
+import com.liferay.batch.engine.unit.BatchEngineUnitReader;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.test.util.CommerceCurrencyTestUtil;
 import com.liferay.commerce.model.CommerceOrder;
@@ -85,6 +87,7 @@ import com.liferay.object.field.builder.RichTextObjectFieldBuilder;
 import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.field.setting.builder.ObjectFieldSettingBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
+import com.liferay.object.internal.model.listener.test.GroupModelListenerTest;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectDefinitionSetting;
@@ -179,6 +182,7 @@ import com.liferay.portal.kernel.service.IdentityServiceContextFunction;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.SystemEventLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
@@ -235,11 +239,14 @@ import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.vulcan.util.LocalDateTimeUtil;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
+import com.liferay.site.initializer.SiteInitializer;
+import com.liferay.site.initializer.SiteInitializerRegistry;
 import com.liferay.trash.model.TrashEntry;
 import com.liferay.trash.service.TrashEntryLocalService;
 
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
+import java.io.File;
 import java.io.Serializable;
 
 import java.math.BigDecimal;
@@ -268,8 +275,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -331,6 +340,45 @@ public class ObjectEntryLocalServiceTest {
 
 	@Before
 	public void setUp() throws Exception {
+		_cmsAdministratorRole = _getOrAddCMSAdministratorRole(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId());
+		_userRole = _roleLocalService.getRole(
+			TestPropsValues.getCompanyId(), RoleConstants.USER);
+
+		if (!_isCMSSiteInitialized()) {
+
+			// These tests require the instance to be created with the feature
+			// flag LPD-17564 enabled. On CI, feature flags are enabled on
+			// demand for each test, but not during instance initialization.
+			// Until the feature flag LPD-17564 is removed, run the batch
+			// engine unit processor manually so that the object definitions
+			// are created.
+
+			Bundle testBundle = FrameworkUtil.getBundle(
+				GroupModelListenerTest.class);
+
+			BundleContext bundleContext = testBundle.getBundleContext();
+
+			for (Bundle bundle : bundleContext.getBundles()) {
+				if (!Objects.equals(
+						bundle.getSymbolicName(),
+						"com.liferay.site.initializer.cms")) {
+
+					continue;
+				}
+
+				_deleteFile(bundle, "00.list.type.definition");
+				_deleteFile(bundle, "01.object.folder");
+				_deleteFile(bundle, "02.object.definition");
+
+				CompletableFuture<Void> completableFuture =
+					_batchEngineUnitProcessor.processBatchEngineUnits(
+						_batchEngineUnitReader.getBatchEngineUnits(bundle));
+
+				completableFuture.join();
+			}
+		}
+
 		_draftObjectDefinition =
 			ObjectDefinitionTestUtil.addCustomObjectDefinition(
 				Arrays.asList(
@@ -1357,8 +1405,7 @@ public class ObjectEntryLocalServiceTest {
 	public void testAddObjectEntryWithAssetTag() throws Exception {
 		ObjectFolder objectFolder =
 			_objectFolderLocalService.fetchObjectFolderByExternalReferenceCode(
-				ObjectFolderConstants.
-					EXTERNAL_REFERENCE_CODE_CONTENT_STRUCTURES,
+				ObjectFolderConstants.EXTERNAL_REFERENCE_CODE_FILE_TYPES,
 				TestPropsValues.getCompanyId());
 
 		ObjectDefinition objectDefinition =
@@ -1378,11 +1425,15 @@ public class ObjectEntryLocalServiceTest {
 			_assetTagLocalService.fetchTag(
 				TestPropsValues.getGroupId(), assetTagName));
 
-		Group group = _groupLocalService.fetchGroup(
-			TestPropsValues.getCompanyId(), GroupConstants.CMS);
+		Group group1 = _getGroup();
 
 		Assert.assertNull(
-			_assetTagLocalService.fetchTag(group.getGroupId(), assetTagName));
+			_assetTagLocalService.fetchTag(group1.getGroupId(), assetTagName));
+
+		Group group2 = GroupTestUtil.addGroup();
+
+		Assert.assertNull(
+			_assetTagLocalService.fetchTag(group2.getGroupId(), assetTagName));
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext();
@@ -1396,11 +1447,11 @@ public class ObjectEntryLocalServiceTest {
 			).build(),
 			serviceContext);
 
-		Assert.assertNull(
-			_assetTagLocalService.fetchTag(
-				TestPropsValues.getGroupId(), assetTagName));
 		Assert.assertNotNull(
-			_assetTagLocalService.fetchTag(group.getGroupId(), assetTagName));
+			_assetTagLocalService.fetchTag(group1.getGroupId(), assetTagName));
+
+		Assert.assertNull(
+			_assetTagLocalService.fetchTag(group2.getGroupId(), assetTagName));
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
@@ -7521,6 +7572,16 @@ public class ObjectEntryLocalServiceTest {
 		return listTypeEntries;
 	}
 
+	private void _deleteFile(Bundle bundle, String fileName) {
+		File file = bundle.getDataFile(
+			".com.liferay.site.initializer.cms.internal.batch." + fileName +
+				".batch.engine.data.json.0.processed");
+
+		if ((file != null) && file.exists()) {
+			file.delete();
+		}
+	}
+
 	private void _enableObjectEntryVersioning() {
 		_objectDefinition.setEnableObjectEntryVersioning(true);
 
@@ -7545,6 +7606,66 @@ public class ObjectEntryLocalServiceTest {
 		return content.getBytes();
 	}
 
+	private Group _getGroup() throws Exception {
+		Group group = _groupLocalService.fetchGroup(
+			TestPropsValues.getCompanyId(), GroupConstants.CMS);
+
+		if (group != null) {
+			return group;
+		}
+
+		group = GroupTestUtil.addGroup();
+
+		group.setGroupKey(GroupConstants.CMS);
+
+		group = _groupLocalService.updateGroup(group);
+
+		ServiceContextThreadLocal.pushServiceContext(
+			ServiceContextTestUtil.getServiceContext(group.getGroupId()));
+
+		try {
+
+			// These tests require the instance to be created with the feature
+			// flag LPD-17564 enabled. On CI, feature flags are enabled on
+			// demand for each test, but not during instance initialization.
+			// Until the feature flag LPD-17564 is removed, run the instance
+			// lifecycle initializer manually so that the role is created.
+
+			SiteInitializer siteInitializer =
+				_siteInitializerRegistry.getSiteInitializer(
+					"com.liferay.site.initializer.cms");
+
+			siteInitializer.initialize(group.getGroupId());
+
+			Bundle testBundle = FrameworkUtil.getBundle(
+				GroupModelListenerTest.class);
+
+			BundleContext bundleContext = testBundle.getBundleContext();
+
+			for (Bundle bundle : bundleContext.getBundles()) {
+				if (Objects.equals(
+						bundle.getSymbolicName(),
+						"com.liferay.site.initializer.cms")) {
+
+					_deleteFile(bundle, "00.list.type.definition");
+					_deleteFile(bundle, "01.object.folder");
+					_deleteFile(bundle, "02.object.definition");
+
+					CompletableFuture<Void> completableFuture =
+						_batchEngineUnitProcessor.processBatchEngineUnits(
+							_batchEngineUnitReader.getBatchEngineUnits(bundle));
+
+					completableFuture.join();
+				}
+			}
+		}
+		finally {
+			ServiceContextThreadLocal.popServiceContext();
+		}
+
+		return group;
+	}
+
 	private String _getMultiselectPicklistObjectFieldValue(
 		String prefixKey, int size) {
 
@@ -7567,6 +7688,21 @@ public class ObjectEntryLocalServiceTest {
 		}
 
 		return ": Invalid transformation format:";
+	}
+
+	private Role _getOrAddCMSAdministratorRole(long companyId, long userId)
+		throws Exception {
+
+		Role role = _roleLocalService.fetchRole(
+			companyId, RoleConstants.CMS_ADMINISTRATOR);
+
+		if (role != null) {
+			return role;
+		}
+
+		return _roleLocalService.addRole(
+			null, userId, null, 0, RoleConstants.CMS_ADMINISTRATOR, null, null,
+			RoleConstants.TYPE_REGULAR, null, null);
 	}
 
 	private Map<String, Serializable> _getValuesFromCacheField(
@@ -7636,6 +7772,19 @@ public class ObjectEntryLocalServiceTest {
 			ResourceConstants.SCOPE_INDIVIDUAL,
 			String.valueOf(objectEntry.getPrimaryKey()), role.getRoleId(),
 			objectAction.getName());
+	}
+
+	private boolean _isCMSSiteInitialized() throws Exception {
+		ObjectFolder objectFolder =
+			_objectFolderLocalService.fetchObjectFolderByExternalReferenceCode(
+				ObjectFolderConstants.EXTERNAL_REFERENCE_CODE_FILE_TYPES,
+				TestPropsValues.getCompanyId());
+
+		if (objectFolder != null) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private ObjectDefinition _publishCustomObjectDefinition(
@@ -9181,7 +9330,15 @@ public class ObjectEntryLocalServiceTest {
 	private AssetTagLocalService _assetTagLocalService;
 
 	@Inject
+	private BatchEngineUnitProcessor _batchEngineUnitProcessor;
+
+	@Inject
+	private BatchEngineUnitReader _batchEngineUnitReader;
+
+	@Inject
 	private ClassNameLocalService _classNameLocalService;
+
+	private Role _cmsAdministratorRole;
 
 	@Inject
 	private CompanyLocalService _companyLocalService;
@@ -9289,6 +9446,9 @@ public class ObjectEntryLocalServiceTest {
 	@Inject
 	private RoleLocalService _roleLocalService;
 
+	@Inject
+	private SiteInitializerRegistry _siteInitializerRegistry;
+
 	@DeleteAfterTestRun
 	private ObjectDefinition _siteObjectDefinition;
 
@@ -9305,6 +9465,8 @@ public class ObjectEntryLocalServiceTest {
 
 	@Inject
 	private UserLocalService _userLocalService;
+
+	private Role _userRole;
 
 	@Inject
 	private WorkflowDefinitionLinkLocalService
