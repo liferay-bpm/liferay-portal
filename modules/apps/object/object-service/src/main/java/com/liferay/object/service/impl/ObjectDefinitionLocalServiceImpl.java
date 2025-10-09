@@ -139,7 +139,6 @@ import com.liferay.portal.kernel.model.WorkflowInstanceLink;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolver;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolverRegistryUtil;
-import com.liferay.portal.kernel.portlet.constants.FriendlyURLResolverConstants;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -1503,10 +1502,8 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setEnableComments(enableComments);
 		objectDefinition.setEnableFormContainer(enableFormContainer);
 
-		if (FeatureFlagManagerUtil.isEnabled("LPD-21926")) {
-			objectDefinition.setEnableFriendlyURLCustomization(
-				enableFriendlyURLCustomization);
-		}
+		objectDefinition.setEnableFriendlyURLCustomization(
+			enableFriendlyURLCustomization);
 
 		objectDefinition.setEnableIndexSearch(enableIndexSearch);
 		objectDefinition.setEnableLocalization(enableLocalization);
@@ -2216,22 +2213,6 @@ public class ObjectDefinitionLocalServiceImpl
 			return null;
 		}
 
-		if (!FeatureFlagManagerUtil.isEnabled("LPD-21926")) {
-			FriendlyURLResolver friendlyURLResolver =
-				FriendlyURLResolverRegistryUtil.
-					getFriendlyURLResolverByDefaultURLSeparator(
-						FriendlyURLResolverConstants.
-							URL_SEPARATOR_OBJECT_ENTRY);
-
-			if (friendlyURLResolver == null) {
-				return FriendlyURLResolverConstants.
-					URL_SEPARATOR_Y_OBJECT_ENTRY;
-			}
-
-			return StringUtil.removeSubstring(
-				friendlyURLResolver.getURLSeparator(), StringPool.SLASH);
-		}
-
 		if (Validator.isNull(friendlyURLSeparator)) {
 			return _friendlyURLNormalizer.normalizeWithPeriodsAndSlashes(name);
 		}
@@ -2602,10 +2583,8 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setEnableComments(enableComments);
 		objectDefinition.setEnableFormContainer(enableFormContainer);
 
-		if (FeatureFlagManagerUtil.isEnabled("LPD-21926")) {
-			objectDefinition.setEnableFriendlyURLCustomization(
-				enableFriendlyURLCustomization);
-		}
+		objectDefinition.setEnableFriendlyURLCustomization(
+			enableFriendlyURLCustomization);
 
 		objectDefinition.setEnableObjectEntryDraft(enableObjectEntryDraft);
 		objectDefinition.setEnableObjectEntryHistory(enableObjectEntryHistory);
@@ -2733,11 +2712,7 @@ public class ObjectDefinitionLocalServiceImpl
 		throws PortalException {
 
 		if (Validator.isNull(titleObjectFieldName)) {
-			titleObjectFieldName = "id";
-
-			if (FeatureFlagManagerUtil.isEnabled("LPD-21926")) {
-				titleObjectFieldName = "externalReferenceCode";
-			}
+			titleObjectFieldName = "externalReferenceCode";
 		}
 
 		ObjectField objectField = _objectFieldPersistence.findByODI_N(
@@ -2923,9 +2898,7 @@ public class ObjectDefinitionLocalServiceImpl
 			boolean modifiable, String storageType, boolean system)
 		throws PortalException {
 
-		if (!FeatureFlagManagerUtil.isEnabled("LPD-21926") ||
-			!enableFriendlyURLCustomization) {
-
+		if (!enableFriendlyURLCustomization) {
 			return;
 		}
 
@@ -3095,8 +3068,7 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectDefinition objectDefinition)
 		throws PortalException {
 
-		if (!FeatureFlagManagerUtil.isEnabled("LPD-21926") ||
-			Validator.isNull(objectDefinition.getFriendlyURLSeparator()) ||
+		if (Validator.isNull(objectDefinition.getFriendlyURLSeparator()) ||
 			ObjectDefinitionUtil.isDefaultFriendlyURLSeparator(
 				objectDefinition.getFriendlyURLSeparator())) {
 
