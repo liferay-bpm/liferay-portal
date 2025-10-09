@@ -20,7 +20,6 @@ import com.liferay.object.service.ObjectEntryLocalServiceUtil;
 import com.liferay.object.service.ObjectFieldLocalServiceUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
@@ -207,10 +206,6 @@ public class ObjectEntryImpl extends ObjectEntryBaseImpl {
 
 	@Override
 	public String getURLTitle(Locale locale) {
-		if (!FeatureFlagManagerUtil.isEnabled("LPD-21926")) {
-			return null;
-		}
-
 		FriendlyURLEntry friendlyURLEntry =
 			FriendlyURLEntryLocalServiceUtil.fetchMainFriendlyURLEntry(
 				ClassNameLocalServiceUtil.getClassNameId(getModelClassName()),
@@ -225,10 +220,6 @@ public class ObjectEntryImpl extends ObjectEntryBaseImpl {
 
 	@Override
 	public Map<String, String> getURLTitleMap() {
-		if (!FeatureFlagManagerUtil.isEnabled("LPD-21926")) {
-			return null;
-		}
-
 		FriendlyURLEntry friendlyURLEntry =
 			FriendlyURLEntryLocalServiceUtil.fetchMainFriendlyURLEntry(
 				ClassNameLocalServiceUtil.getClassNameId(getModelClassName()),
