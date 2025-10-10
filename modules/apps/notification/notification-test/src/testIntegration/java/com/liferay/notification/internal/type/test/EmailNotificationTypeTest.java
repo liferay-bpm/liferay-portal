@@ -603,6 +603,20 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 			StringBundler.concat(
 				user1.getEmailAddress(), StringPool.COMMA,
 				user2.getEmailAddress()));
+
+		// One email singleRecipient as null
+
+		_testSendNotification(
+			1,
+			ListUtil.sort(
+				Arrays.asList(
+					StringBundler.concat(
+						user1.getEmailAddress(), StringPool.COMMA,
+						user2.getEmailAddress()))),
+			null,
+			StringBundler.concat(
+				user1.getEmailAddress(), StringPool.COMMA,
+				user2.getEmailAddress()));
 	}
 
 	@Test
@@ -1624,38 +1638,45 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 
 	private NotificationTemplate _addNotificationTemplate(
 			String body, String editorType, Map<Locale, String> fromName,
-			boolean singleRecipient, Map<Locale, String> to)
+			Boolean singleRecipient, Map<Locale, String> to)
 		throws Exception {
 
 		ObjectField objectField = objectFieldLocalService.getObjectField(
 			childObjectDefinition.getObjectDefinitionId(),
 			"attachmentObjectField");
 
+		List<NotificationRecipientSetting> recipientSettings =
+			new ArrayList<>();
+
+		recipientSettings.add(
+			NotificationRecipientSettingUtil.createNotificationRecipientSetting(
+				"bcc", "[%CURRENT_USER_EMAIL_ADDRESS%],bcc@liferay.com"));
+		recipientSettings.add(
+			NotificationRecipientSettingUtil.createNotificationRecipientSetting(
+				"cc", "[%CURRENT_USER_EMAIL_ADDRESS%],cc@liferay.com"));
+		recipientSettings.add(
+			NotificationRecipientSettingUtil.createNotificationRecipientSetting(
+				"from", "[%CURRENT_USER_EMAIL_ADDRESS%]"));
+		recipientSettings.add(
+			NotificationRecipientSettingUtil.createNotificationRecipientSetting(
+				"fromName", fromName));
+
+		if (singleRecipient != null) {
+			recipientSettings.add(
+				NotificationRecipientSettingUtil.
+					createNotificationRecipientSetting(
+						"singleRecipient", String.valueOf(singleRecipient)));
+		}
+
+		recipientSettings.add(
+			NotificationRecipientSettingUtil.createNotificationRecipientSetting(
+				"to", to));
+
 		return notificationTemplateLocalService.addNotificationTemplate(
 			NotificationTemplateUtil.createNotificationContext(
 				TestPropsValues.getUser(),
 				childObjectDefinition.getObjectDefinitionId(), body,
-				RandomTestUtil.randomString(), editorType,
-				Arrays.asList(
-					NotificationRecipientSettingUtil.
-						createNotificationRecipientSetting(
-							"bcc",
-							"[%CURRENT_USER_EMAIL_ADDRESS%],bcc@liferay.com"),
-					NotificationRecipientSettingUtil.
-						createNotificationRecipientSetting(
-							"cc",
-							"[%CURRENT_USER_EMAIL_ADDRESS%],cc@liferay.com"),
-					NotificationRecipientSettingUtil.
-						createNotificationRecipientSetting(
-							"from", "[%CURRENT_USER_EMAIL_ADDRESS%]"),
-					NotificationRecipientSettingUtil.
-						createNotificationRecipientSetting(
-							"fromName", fromName),
-					NotificationRecipientSettingUtil.
-						createNotificationRecipientSetting(
-							"singleRecipient", String.valueOf(singleRecipient)),
-					NotificationRecipientSettingUtil.
-						createNotificationRecipientSetting("to", to)),
+				RandomTestUtil.randomString(), editorType, recipientSettings,
 				ListUtil.toString(
 					getTermNames(), StringPool.BLANK, StringPool.SEMICOLON),
 				NotificationConstants.TYPE_EMAIL,
@@ -2082,7 +2103,7 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 
 	private void _testSendNotification(
 			int expectedNotificationQueueEntriesCount,
-			List<String> expectedToEmailAddresses, boolean singleRecipient,
+			List<String> expectedToEmailAddresses, Boolean singleRecipient,
 			String to)
 		throws Exception {
 
@@ -2127,6 +2148,10 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 
 		if (expectedNotificationQueueEntriesCount == 0) {
 			return;
+		}
+
+		if (singleRecipient == null) {
+			singleRecipient = false;
 		}
 
 		_assertNotificationQueueEntry(
