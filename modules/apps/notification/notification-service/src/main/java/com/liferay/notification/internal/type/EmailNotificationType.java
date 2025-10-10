@@ -306,7 +306,7 @@ public class EmailNotificationType extends BaseNotificationType {
 							NotificationRecipientSettingConstants.
 								NAME_SINGLE_RECIPIENT)) {
 
-						return Boolean.TRUE.toString();
+						return Boolean.FALSE.toString();
 					}
 
 					return String.valueOf(
