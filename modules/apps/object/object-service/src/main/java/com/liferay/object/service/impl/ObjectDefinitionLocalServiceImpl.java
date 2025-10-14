@@ -2638,7 +2638,12 @@ public class ObjectDefinitionLocalServiceImpl
 					objectDefinition);
 			}
 			else if (active) {
-				_validateFriendlyURLSeparator(objectDefinition);
+				if (!StringUtil.equals(
+						objectDefinition.getFriendlyURLSeparator(),
+						friendlyURLSeparator)) {
+
+					_validateFriendlyURLSeparator(objectDefinition);
+				}
 
 				objectDefinitionLocalService.deployObjectDefinition(
 					objectDefinition);
