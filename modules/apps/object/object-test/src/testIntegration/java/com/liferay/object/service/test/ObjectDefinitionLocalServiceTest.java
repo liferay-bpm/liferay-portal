@@ -151,7 +151,6 @@ import com.liferay.portal.kernel.workflow.WorkflowDefinition;
 import com.liferay.portal.language.override.model.PLOEntry;
 import com.liferay.portal.language.override.service.PLOEntryLocalService;
 import com.liferay.portal.test.rule.FeatureFlag;
-import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -232,8 +231,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 			_objectDefinitionLocalService.addCustomObjectDefinition(
 				objectDefinition.getExternalReferenceCode(),
-				TestPropsValues.getUserId(), 0, null, false, true, true, true,
-				false, false, false, false, false, null, null, null, null, null,
+				TestPropsValues.getUserId(), 0, null, false, true, true, true, false, false, false, false, null, null, null, null, null,
 				null, true, RandomTestUtil.randomString(),
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(),
@@ -296,6 +294,7 @@ public class ObjectDefinitionLocalServiceTest {
 			_objectDefinitionLocalService.addCustomObjectDefinition(
 				null, TestPropsValues.getUserId(), 0, null, false, true, true,
 				true, false, false, false, false, false, null,
+				false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -315,8 +314,8 @@ public class ObjectDefinitionLocalServiceTest {
 			"Enable friendly URL customization is only allowed for object " +
 				"definitions with the default storage type",
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
-				null, TestPropsValues.getUserId(), 0, null, false, true, true,
-				true, false, false, false, false, false, null,
+				null, TestPropsValues.getUserId(), 0, null, false, true, true, true,
+				false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -387,8 +386,9 @@ public class ObjectDefinitionLocalServiceTest {
 		AssertUtils.assertFailure(
 			ObjectDefinitionScopeException.class, "Scope is null",
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
-				null, TestPropsValues.getUserId(), 0, null, false, true, false,
-				true, false, false, false, false, false, null,
+null, 
+				TestPropsValues.getUserId(), 0, null, false, true, false, true,
+				false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"Test", null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -409,8 +409,8 @@ public class ObjectDefinitionLocalServiceTest {
 			ObjectDefinitionScopeException.class,
 			"No object scope provider found with key " + scope,
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
-				null, TestPropsValues.getUserId(), 0, null, false, true, false,
-				true, false, false, false, false, false, null,
+				null, TestPropsValues.getUserId(), 0, null, false, true, false, true,
+				false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"Test", null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -430,8 +430,8 @@ public class ObjectDefinitionLocalServiceTest {
 				"\" cannot be associated with storage type \"",
 				ObjectDefinitionConstants.STORAGE_TYPE_SALESFORCE),
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
-				null, TestPropsValues.getUserId(), 0, null, false, true, false,
-				true, false, false, false, false, false, null,
+				null, TestPropsValues.getUserId(), 0, null, false, true, false, true,
+				false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"Test", null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -449,8 +449,8 @@ public class ObjectDefinitionLocalServiceTest {
 
 		objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-				null, TestPropsValues.getUserId(), 0, null, false, true, false,
-				true, false, false, false, false, false, null,
+				null, TestPropsValues.getUserId(), 0, null, false, true, false, true,
+				false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"Test", null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1090,9 +1090,8 @@ public class ObjectDefinitionLocalServiceTest {
 				objectDefinition1.getObjectFolderId(), 0, false,
 				objectDefinition1.isActive(), objectDefinition1.getClassName(),
 				true, false, true, true, false, false, false, false, false,
-				false, false, null, LocalizedMapUtil.getLocalizedMap("Able"),
-				"Able", null, null, false,
-				LocalizedMapUtil.getLocalizedMap("Ables"),
+				false, null, LocalizedMapUtil.getLocalizedMap("Able"), "Able",
+				null, null, false, LocalizedMapUtil.getLocalizedMap("Ables"),
 				objectDefinition1.getScope(), objectDefinition1.getStatus(),
 				Collections.singletonList(
 					new ObjectDefinitionSettingBuilder(
@@ -1125,9 +1124,8 @@ public class ObjectDefinitionLocalServiceTest {
 				objectDefinition1.getObjectFolderId(), 0, false,
 				objectDefinition1.isActive(), objectDefinition1.getClassName(),
 				true, false, true, true, false, false, false, false, false,
-				false, false, null, LocalizedMapUtil.getLocalizedMap("Able"),
-				"Able", null, null, false,
-				LocalizedMapUtil.getLocalizedMap("Ables"),
+				false, null, LocalizedMapUtil.getLocalizedMap("Able"), "Able",
+				null, null, false, LocalizedMapUtil.getLocalizedMap("Ables"),
 				objectDefinition1.getScope(), objectDefinition1.getStatus(),
 				Collections.singletonList(
 					new ObjectDefinitionSettingBuilder(
@@ -1174,8 +1172,17 @@ public class ObjectDefinitionLocalServiceTest {
 			"An object definition can only be linked to a workflow " +
 				"definition within the same scope",
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, true,
 				true, true, false, false, false, false, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, true, true,
+<<<<<<< HEAD
+				true, false, false, false, false, null,
+=======
+				false, false, false, false, null,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1191,8 +1198,17 @@ public class ObjectDefinitionLocalServiceTest {
 			"An object definition can only be linked to a workflow " +
 				"definition within the same scope",
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, true,
 				true, true, false, false, false, false, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, true, true,
+<<<<<<< HEAD
+				true, false, false, false, false, null,
+=======
+				false, false, false, false, null,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1206,8 +1222,17 @@ public class ObjectDefinitionLocalServiceTest {
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, true,
 				true, true, false, false, false, false, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, true, true,
+<<<<<<< HEAD
+				true, false, false, false, false, null,
+=======
+				false, false, false, false, null,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1226,8 +1251,17 @@ public class ObjectDefinitionLocalServiceTest {
 			"An object definition can only be linked to a workflow " +
 				"definition within the same scope",
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, true,
 				true, true, false, false, false, false, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, true, true,
+<<<<<<< HEAD
+				true, false, false, false, false, null,
+=======
+				false, false, false, false, null,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1255,8 +1289,17 @@ public class ObjectDefinitionLocalServiceTest {
 				"The group ", depotEntry2.getGroupId(),
 				" is not included in the object definition scope"),
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, true,
 				true, true, false, false, false, false, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, true, true,
+<<<<<<< HEAD
+				true, false, false, false, false, null,
+=======
+				false, false, false, false, null,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1277,8 +1320,17 @@ public class ObjectDefinitionLocalServiceTest {
 
 		objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, true,
 				true, true, false, false, false, false, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, true, true,
+<<<<<<< HEAD
+				true, false, false, false, false, null,
+=======
+				false, false, false, false, null,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1299,8 +1351,17 @@ public class ObjectDefinitionLocalServiceTest {
 
 		objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, true,
 				true, true, false, false, false, false, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, true, true,
+<<<<<<< HEAD
+				true, false, false, false, false, null,
+=======
+				false, false, false, false, null,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1326,8 +1387,17 @@ public class ObjectDefinitionLocalServiceTest {
 			"An object definition can only be linked to a workflow " +
 				"definition within the same scope",
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, true,
 				true, true, false, false, false, false, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, true, true,
+<<<<<<< HEAD
+				true, false, false, false, false, null,
+=======
+				false, false, false, false, null,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1341,8 +1411,17 @@ public class ObjectDefinitionLocalServiceTest {
 
 		objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, true,
 				true, true, false, false, false, false, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, true, true,
+<<<<<<< HEAD
+				true, false, false, false, false, null,
+=======
+				false, false, false, false, null,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1776,11 +1855,7 @@ public class ObjectDefinitionLocalServiceTest {
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
-	@FeatureFlags(
-		featureFlags = {
-			@FeatureFlag(value = "LPD-17564"), @FeatureFlag(value = "LPD-32050")
-		}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testAddSystemObjectDefinition() throws Exception {
 
@@ -1792,7 +1867,7 @@ public class ObjectDefinitionLocalServiceTest {
 				"object definitions",
 			() -> _objectDefinitionLocalService.addSystemObjectDefinition(
 				null, TestPropsValues.getUserId(), 0, null, null, false, true,
-				false, true, true, false, false, false, false, null,
+				false, true, false, false, false, false, null,
 				RandomTestUtil.randomLocaleStringMap(), false,
 				ObjectDefinitionTestUtil.getRandomName(), null, null, null,
 				null, RandomTestUtil.randomLocaleStringMap(), false,
@@ -1803,7 +1878,7 @@ public class ObjectDefinitionLocalServiceTest {
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addSystemObjectDefinition(
 				null, TestPropsValues.getUserId(), 0, null, null, false, false,
-				false, true, true, false, false, false, false, null,
+				false, true, false, false, false, false, null,
 				RandomTestUtil.randomLocaleStringMap(), false,
 				ObjectDefinitionTestUtil.getRandomName(), null, null, null,
 				null, RandomTestUtil.randomLocaleStringMap(), false,
@@ -1818,7 +1893,7 @@ public class ObjectDefinitionLocalServiceTest {
 		objectDefinition =
 			_objectDefinitionLocalService.addSystemObjectDefinition(
 				null, TestPropsValues.getUserId(), 0, null, null, false, true,
-				false, true, true, false, false, false, false, null,
+				false, true, false, false, false, false, null,
 				RandomTestUtil.randomLocaleStringMap(), true, "Test", null,
 				null, null, null, RandomTestUtil.randomLocaleStringMap(), false,
 				ObjectDefinitionConstants.SCOPE_COMPANY, null, 1,
@@ -1838,7 +1913,7 @@ public class ObjectDefinitionLocalServiceTest {
 			() -> _objectDefinitionLocalService.addSystemObjectDefinition(
 				null, TestPropsValues.getUserId(), 0,
 				ObjectDefinitionTestUtil.getRandomName(), null, false, false,
-				true, true, false, false, false, false, false, null,
+				true, true, false, false, false, false, null,
 				RandomTestUtil.randomLocaleStringMap(), false,
 				ObjectDefinitionTestUtil.getRandomName(), null, null, null,
 				null, RandomTestUtil.randomLocaleStringMap(), false,
@@ -1855,7 +1930,7 @@ public class ObjectDefinitionLocalServiceTest {
 			() -> _objectDefinitionLocalService.addSystemObjectDefinition(
 				null, TestPropsValues.getUserId(), 0,
 				ObjectDefinitionTestUtil.getRandomName(), null, false, false,
-				false, true, false, false, true, false, false, null,
+				false, true, false, true, false, false, null,
 				RandomTestUtil.randomLocaleStringMap(), false,
 				ObjectDefinitionTestUtil.getRandomName(), null, null, null,
 				null, RandomTestUtil.randomLocaleStringMap(), false,
@@ -1872,7 +1947,7 @@ public class ObjectDefinitionLocalServiceTest {
 			() -> _objectDefinitionLocalService.addSystemObjectDefinition(
 				null, TestPropsValues.getUserId(), 0,
 				ObjectDefinitionTestUtil.getRandomName(), null, false, false,
-				false, true, false, false, false, true, false, null,
+				false, true, false, false, true, false, null,
 				RandomTestUtil.randomLocaleStringMap(), false,
 				ObjectDefinitionTestUtil.getRandomName(), null, null, null,
 				null, RandomTestUtil.randomLocaleStringMap(), false,
@@ -1889,7 +1964,7 @@ public class ObjectDefinitionLocalServiceTest {
 			() -> _objectDefinitionLocalService.addSystemObjectDefinition(
 				null, TestPropsValues.getUserId(), 0,
 				ObjectDefinitionTestUtil.getRandomName(), null, false, false,
-				false, true, false, false, false, false, true, null,
+				false, true, false, false, false, true, null,
 				RandomTestUtil.randomLocaleStringMap(), false,
 				ObjectDefinitionTestUtil.getRandomName(), null, null, null,
 				null, RandomTestUtil.randomLocaleStringMap(), false,
@@ -1918,7 +1993,7 @@ public class ObjectDefinitionLocalServiceTest {
 				ForbiddenModifiableSystemObjectDefinitionName.class,
 			"Forbidden modifiable system object definition name Invalid Test",
 			() -> ObjectDefinitionTestUtil.addModifiableSystemObjectDefinition(
-				TestPropsValues.getUserId(), null, true,
+				TestPropsValues.getUserId(), null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"Invalid Test", null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -2127,7 +2202,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 		objectDefinition =
 			ObjectDefinitionTestUtil.addModifiableSystemObjectDefinition(
-				TestPropsValues.getUserId(), null, true,
+				TestPropsValues.getUserId(), null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"Test", null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -2296,8 +2371,13 @@ public class ObjectDefinitionLocalServiceTest {
 
 			ObjectDefinition customObjectDefinition =
 				_objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 					null, user.getUserId(), 0, null, false, true, false, true,
 					false, false, false, false, false, null,
+=======
+					user.getUserId(), 0, null, false, true, false, true, false,
+					false, false, false, null,
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 					LocalizedMapUtil.getLocalizedMap("Able"), "Able", null,
 					null, LocalizedMapUtil.getLocalizedMap("Ables"), true,
 					ObjectDefinitionConstants.SCOPE_COMPANY,
@@ -2317,7 +2397,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 			ObjectDefinition modifiableSystemObjectDefinition =
 				ObjectDefinitionTestUtil.addModifiableSystemObjectDefinition(
-					user.getUserId(), null, false,
+					user.getUserId(), null,
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
 					"Test", null, null,
@@ -2472,7 +2552,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 		ObjectDefinition modifiableSystemObjectDefinition =
 			ObjectDefinitionTestUtil.addModifiableSystemObjectDefinition(
-				TestPropsValues.getUserId(), null, false,
+				TestPropsValues.getUserId(), null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"Test", null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -2510,8 +2590,17 @@ public class ObjectDefinitionLocalServiceTest {
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, false,
 				true, true, false, false, false, true, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, false, true,
+<<<<<<< HEAD
+				true, false, false, false, true, null,
+=======
+				false, false, false, true, null,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"A" + StringUtil.randomString(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -2572,8 +2661,13 @@ public class ObjectDefinitionLocalServiceTest {
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, false,
 				true, false, false, false, false, false, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, false, true,
+				false, false, false, false, null,
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap("Able"), "Able", null, null,
 				LocalizedMapUtil.getLocalizedMap("Ables"), true,
 				ObjectDefinitionConstants.SCOPE_COMPANY,
@@ -2656,8 +2750,13 @@ public class ObjectDefinitionLocalServiceTest {
 
 		objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, false,
 				true, false, false, false, false, false, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, false, true,
+				false, false, false, false, null,
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap("Able"), "Able", null, null,
 				LocalizedMapUtil.getLocalizedMap("Ables"), true,
 				ObjectDefinitionConstants.SCOPE_COMPANY,
@@ -2790,9 +2889,14 @@ public class ObjectDefinitionLocalServiceTest {
 
 			ObjectDefinition objectDefinition2 =
 				_objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 					null, user.getUserId(), 0, objectDefinition1.getClassName(),
 					false, true, false, true, false, false, false, false, false,
 					null,
+=======
+					user.getUserId(), 0, objectDefinition1.getClassName(),
+					false, true, false, true, false, false, false, false, null,
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 					LocalizedMapUtil.getLocalizedMap(
 						objectDefinition1.getLabel()),
 					objectDefinition1.getShortName(), null, null,
@@ -2833,7 +2937,6 @@ public class ObjectDefinitionLocalServiceTest {
 	public void testPublishCustomObjectDefinition() throws Exception {
 		ObjectDefinition objectDefinition1 =
 			ObjectDefinitionTestUtil.addCustomObjectDefinition(
-				false,
 				Collections.singletonList(
 					new TextObjectFieldBuilder(
 					).labelMap(
@@ -2855,7 +2958,6 @@ public class ObjectDefinitionLocalServiceTest {
 				TestPropsValues.getUserId(),
 				finalObjectDefinition.getObjectDefinitionId()));
 
-		objectDefinition1.setEnableLocalization(true);
 		objectDefinition1.setName(ObjectDefinitionTestUtil.getRandomName());
 
 		objectDefinition1 = _updateCustomObjectDefinition(
@@ -2909,7 +3011,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 		ObjectDefinition objectDefinition3 =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				false, "Test",
+				"Test1",
 				Collections.singletonList(
 					new TextObjectFieldBuilder(
 					).labelMap(
@@ -2927,7 +3029,7 @@ public class ObjectDefinitionLocalServiceTest {
 		ObjectDefinition objectDefinition4 =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
 				null, TestPropsValues.getUserId(), 0, null, false, true, true,
-				true, true, false, false, false, false, "api",
+				true, false, false, false, false, "api",
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -2961,8 +3063,17 @@ public class ObjectDefinitionLocalServiceTest {
 	public void testSystemObjectFields() throws Exception {
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, false,
 				true, true, false, false, false, false, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, false, true,
+<<<<<<< HEAD
+				true, false, false, false, false, null,
+=======
+				false, false, false, false, null,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -2997,8 +3108,17 @@ public class ObjectDefinitionLocalServiceTest {
 	public void testUpdateCustomObjectDefinition() throws Exception {
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, false,
 				true, true, false, true, true, true, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, false, true,
+<<<<<<< HEAD
+				true, false, true, true, true, null,
+=======
+				false, true, true, true, null,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap("Able"), "Able", null, null,
 				LocalizedMapUtil.getLocalizedMap("Ables"), true,
 				ObjectDefinitionConstants.SCOPE_COMPANY,
@@ -3099,7 +3219,11 @@ public class ObjectDefinitionLocalServiceTest {
 					objectField.getObjectFieldId(), false,
 					objectDefinition.isActive(),
 					objectDefinition.getClassName(), true, false, true, false,
+<<<<<<< HEAD
 					true, true, false, false, false, false, false, null,
+=======
+					true, false, false, false, false, false, null,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 					HashMapBuilder.put(
 						locale, RandomTestUtil.randomString()
 					).put(
@@ -3138,10 +3262,16 @@ public class ObjectDefinitionLocalServiceTest {
 				externalReferenceCode, objectDefinition.getObjectDefinitionId(),
 				0, 0, objectFolder.getObjectFolderId(), 0, false,
 				objectDefinition.isActive(), objectDefinition.getClassName(),
+<<<<<<< HEAD
 				true, false, false, true, false, true, false, false, false,
 				false, false, "test", LocalizedMapUtil.getLocalizedMap("Able"),
 				"Able", null, null, false,
 				LocalizedMapUtil.getLocalizedMap("Ables"),
+=======
+				true, false, false, true, false, false, false, false, false,
+				false, "test", LocalizedMapUtil.getLocalizedMap("Able"), "Able",
+				null, null, false, LocalizedMapUtil.getLocalizedMap("Ables"),
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 				objectDefinition.getScope(), objectDefinition.getStatus(),
 				Collections.emptyList(), Collections.emptyList(),
 				Collections.emptyList());
@@ -3174,7 +3304,11 @@ public class ObjectDefinitionLocalServiceTest {
 			_objectDefinitionLocalService.updateCustomObjectDefinition(
 				null, objectDefinition.getObjectDefinitionId(), 0, 0, 0, 0,
 				false, objectDefinition.isActive(), null, true, false, true,
+<<<<<<< HEAD
 				false, true, true, false, true, true, true, true,
+=======
+				false, true, false, true, true, true, true,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 				FriendlyURLResolverConstants.URL_SEPARATOR_Y_OBJECT_ENTRY,
 				LocalizedMapUtil.getLocalizedMap("Baker"), "Baker", null, null,
 				false, LocalizedMapUtil.getLocalizedMap("Bakers"),
@@ -3232,7 +3366,7 @@ public class ObjectDefinitionLocalServiceTest {
 			_objectDefinitionLocalService.updateCustomObjectDefinition(
 				null, objectDefinition.getObjectDefinitionId(), 0, 0, 0, 0,
 				false, true, objectDefinition.getClassName(), true, false, true,
-				true, false, true, false, true, true, true, true, null,
+				true, false, false, true, true, true, true, null,
 				LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie", null,
 				null, false, LocalizedMapUtil.getLocalizedMap("Charlies"),
 				objectDefinition.getScope(), objectDefinition.getStatus(),
@@ -3265,8 +3399,13 @@ public class ObjectDefinitionLocalServiceTest {
 	public void testUpdateExternalReferenceCode() throws Exception {
 		ObjectDefinition customObjectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, false,
 				true, false, false, false, false, false, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, false, true,
+				false, false, false, false, null,
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap("Able"), "Able", null, null,
 				LocalizedMapUtil.getLocalizedMap("Ables"), false,
 				ObjectDefinitionConstants.SCOPE_COMPANY,
@@ -3352,7 +3491,6 @@ public class ObjectDefinitionLocalServiceTest {
 				objectDefinitionAA.isEnableFormContainer(),
 				objectDefinitionAA.isEnableFriendlyURLCustomization(),
 				objectDefinitionAA.isEnableIndexSearch(),
-				objectDefinitionAA.isEnableLocalization(),
 				objectDefinitionAA.isEnableObjectEntryDraft(),
 				objectDefinitionAA.isEnableObjectEntryHistory(),
 				objectDefinitionAA.isEnableObjectEntrySchedule(),
@@ -3371,7 +3509,6 @@ public class ObjectDefinitionLocalServiceTest {
 			panelCategoryKey, objectDefinitionAA.getPanelCategoryKey());
 	}
 
-	@FeatureFlag("LPD-32050")
 	@Test
 	public void testUpdateSystemObjectDefinition() throws Exception {
 
@@ -3379,7 +3516,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 		ObjectDefinition objectDefinition1 =
 			ObjectDefinitionTestUtil.addModifiableSystemObjectDefinition(
-				TestPropsValues.getUserId(), null, true,
+				TestPropsValues.getUserId(), null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"Test", null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -3399,8 +3536,7 @@ public class ObjectDefinitionLocalServiceTest {
 			() -> _objectDefinitionLocalService.updateCustomObjectDefinition(
 				null, objectDefinition1.getObjectDefinitionId(), 0, 0, 0, 0,
 				false, false, objectDefinition1.getClassName(), false, true,
-				true, false, true, false, false, false, false, false, false,
-				null,
+				true, false, true, false, false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				RandomTestUtil.randomString(), null, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -3419,7 +3555,7 @@ public class ObjectDefinitionLocalServiceTest {
 				null, objectDefinition1.getObjectDefinitionId(), 0, 0,
 				objectFolderId, 0, false, false,
 				objectDefinition1.getClassName(), false, true, true, false,
-				true, true, false, false, false, false, false, null,
+				true, false, false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie", null,
 				null, false, LocalizedMapUtil.getLocalizedMap("Charlie"),
 				ObjectDefinitionConstants.SCOPE_SITE,
@@ -3434,9 +3570,9 @@ public class ObjectDefinitionLocalServiceTest {
 			() -> _objectDefinitionLocalService.updateCustomObjectDefinition(
 				null, objectDefinition1.getObjectDefinitionId(), 0, 0, 0, 0,
 				false, true, objectDefinition1.getClassName(), false, true,
-				true, false, true, true, false, false, false, false, false,
-				null, LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie",
-				null, null, false, LocalizedMapUtil.getLocalizedMap("Charlies"),
+				true, false, true, false, false, false, false, false, null,
+				LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie", null,
+				null, false, LocalizedMapUtil.getLocalizedMap("Charlies"),
 				ObjectDefinitionConstants.SCOPE_SITE,
 				objectDefinition1.getStatus(), Collections.emptyList(),
 				Collections.emptyList(), Collections.emptyList()));
@@ -3449,8 +3585,8 @@ public class ObjectDefinitionLocalServiceTest {
 			() -> _objectDefinitionLocalService.updateCustomObjectDefinition(
 				null, objectDefinition1.getObjectDefinitionId(), 0, 0, 0, 0,
 				false, false, objectDefinition1.getClassName(), false, true,
-				true, false, true, true, false, false, false, false, false,
-				null, null, "Charlie", null, null, false,
+				true, false, true, false, false, false, false, false, null,
+				null, "Charlie", null, null, false,
 				LocalizedMapUtil.getLocalizedMap("Charlie"),
 				ObjectDefinitionConstants.SCOPE_SITE,
 				objectDefinition1.getStatus(), Collections.emptyList(),
@@ -3464,9 +3600,9 @@ public class ObjectDefinitionLocalServiceTest {
 			() -> _objectDefinitionLocalService.updateCustomObjectDefinition(
 				null, objectDefinition1.getObjectDefinitionId(), 0, 0, 0, 0,
 				false, false, objectDefinition1.getClassName(), false, true,
-				true, false, true, true, false, false, false, false, false,
-				null, LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie",
-				null, null, false, null, ObjectDefinitionConstants.SCOPE_SITE,
+				true, false, true, false, false, false, false, false, null,
+				LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie", null,
+				null, false, null, ObjectDefinitionConstants.SCOPE_SITE,
 				objectDefinition1.getStatus(), Collections.emptyList(),
 				Collections.emptyList(), Collections.emptyList()));
 
@@ -3477,7 +3613,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 		ObjectDefinition objectDefinition2 =
 			ObjectDefinitionTestUtil.addModifiableSystemObjectDefinition(
-				TestPropsValues.getUserId(), null, true,
+				TestPropsValues.getUserId(), null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"Test", null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -3487,8 +3623,6 @@ public class ObjectDefinitionLocalServiceTest {
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING,
 						RandomTestUtil.randomString(), StringUtil.randomId())));
-
-		Assert.assertTrue(objectDefinition2.isEnableLocalization());
 
 		objectDefinition2 =
 			_objectDefinitionLocalService.publishSystemObjectDefinition(
@@ -3502,7 +3636,7 @@ public class ObjectDefinitionLocalServiceTest {
 				null, objectDefinition2.getObjectDefinitionId(), 0, 0,
 				objectFolder.getObjectFolderId(), 0, false, true,
 				objectDefinition2.getClassName(), false, true, true, false,
-				true, true, false, false, false, false, false, null,
+				true, false, false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie", null,
 				null, false, LocalizedMapUtil.getLocalizedMap("Charlies"),
 				objectDefinition2.getScope(), objectDefinition2.getStatus(),
@@ -3517,7 +3651,6 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertFalse(objectDefinition2.isEnableCategorization());
 		Assert.assertTrue(objectDefinition2.isEnableComments());
 		Assert.assertTrue(objectDefinition2.isEnableFormContainer());
-		Assert.assertTrue(objectDefinition2.isEnableLocalization());
 		Assert.assertEquals("Test", objectDefinition2.getName());
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition2);
@@ -3658,8 +3791,17 @@ public class ObjectDefinitionLocalServiceTest {
 		throws Exception {
 
 		return _objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 			null, TestPropsValues.getUserId(), 0, className, false, true, false,
 			true, true, false, false, false, false, null,
+=======
+			TestPropsValues.getUserId(), 0, className, false, true, false, true,
+<<<<<<< HEAD
+			true, false, false, false, false, null,
+=======
+			false, false, false, false, null,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 			LocalizedMapUtil.getLocalizedMap(label), name, null, null,
 			LocalizedMapUtil.getLocalizedMap(pluralLabel), true,
 			ObjectDefinitionConstants.SCOPE_COMPANY,
@@ -3914,8 +4056,13 @@ public class ObjectDefinitionLocalServiceTest {
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, false,
 				enableIndexSearch, false, false, false, false, false, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, false,
+				enableIndexSearch, false, false, false, false, null,
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -3941,8 +4088,13 @@ public class ObjectDefinitionLocalServiceTest {
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
+<<<<<<< HEAD
 				null, TestPropsValues.getUserId(), 0, null, false, true, false,
 				true, false, false, false, false, false, null,
+=======
+				TestPropsValues.getUserId(), 0, null, false, true, false, true,
+				false, false, false, false, null,
+>>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 				LocalizedMapUtil.getLocalizedMap(name), name, null, null,
 				LocalizedMapUtil.getLocalizedMap(name), true, scope,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
@@ -3991,7 +4143,6 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertFalse(objectDefinition.isEnableCategorization());
 		Assert.assertFalse(objectDefinition.isEnableComments());
 		Assert.assertFalse(objectDefinition.isEnableIndexSearch());
-		Assert.assertFalse(objectDefinition.isEnableLocalization());
 		Assert.assertFalse(objectDefinition.isEnableObjectEntryHistory());
 		Assert.assertEquals(modifiable, objectDefinition.isModifiable());
 		Assert.assertEquals(externalReferenceCode, objectDefinition.getName());
@@ -4236,7 +4387,10 @@ public class ObjectDefinitionLocalServiceTest {
 
 		ObjectDefinition objectDefinition2 =
 			ObjectDefinitionTestUtil.addCustomObjectDefinition(
+<<<<<<< HEAD
 				true,
+=======
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 				Arrays.asList(
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -4265,7 +4419,11 @@ public class ObjectDefinitionLocalServiceTest {
 					objectRelationship.getObjectFieldId2(), 0, 0, false,
 					objectDefinition2.isActive(),
 					objectDefinition2.getClassName(), true, false, true, false,
+<<<<<<< HEAD
 					true, true, false, false, false, false, false, null,
+=======
+					true, false, false, false, false, false, null,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 					LocalizedMapUtil.getLocalizedMap("Able"), "Able", null,
 					null, false, LocalizedMapUtil.getLocalizedMap("Ables"),
 					objectDefinition2.getScope(), objectDefinition2.getStatus(),
@@ -4308,8 +4466,13 @@ public class ObjectDefinitionLocalServiceTest {
 		return _objectDefinitionLocalService.updateCustomObjectDefinition(
 			externalReferenceCode, objectDefinitionId, 0,
 			descriptionObjectFieldId, 0, titleObjectFieldId, false, false, null,
+<<<<<<< HEAD
 			false, false, true, enableFriendlyURLCustomization, true, true,
 			false, enableObjectEntryHistory, enableObjectEntrySchedule, false,
+=======
+			false, false, true, enableFriendlyURLCustomization, true, false,
+			enableObjectEntryHistory, enableObjectEntrySchedule, false,
+>>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 			enableObjectEntryVersioning, friendlyURLSeparator, labelMap, name,
 			null, null, false, pluralLabelMap, scope, status,
 			Collections.emptyList(), Collections.emptyList(),
@@ -4334,7 +4497,6 @@ public class ObjectDefinitionLocalServiceTest {
 			objectDefinition.isEnableFormContainer(),
 			objectDefinition.isEnableFriendlyURLCustomization(),
 			objectDefinition.isEnableIndexSearch(),
-			objectDefinition.isEnableLocalization(),
 			objectDefinition.isEnableObjectEntryDraft(),
 			objectDefinition.isEnableObjectEntryHistory(),
 			objectDefinition.isEnableObjectEntrySchedule(),

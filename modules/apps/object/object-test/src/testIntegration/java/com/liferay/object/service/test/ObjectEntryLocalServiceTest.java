@@ -348,7 +348,6 @@ public class ObjectEntryLocalServiceTest {
 						ObjectFieldConstants.DB_TYPE_STRING,
 						RandomTestUtil.randomString(), StringUtil.randomId())));
 		_irrelevantObjectDefinition = _publishCustomObjectDefinition(
-			true,
 			Arrays.asList(
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -369,7 +368,6 @@ public class ObjectEntryLocalServiceTest {
 						"Multiple List Type Entry Key ", 6)));
 
 		_objectDefinition = _publishCustomObjectDefinition(
-			true,
 			Arrays.asList(
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_LONG_INTEGER,
@@ -773,7 +771,6 @@ public class ObjectEntryLocalServiceTest {
 		}
 	}
 
-	@FeatureFlag("LPD-32050")
 	@Test
 	public void testAddObjectEntry() throws Exception {
 		_assertCount(0);
@@ -1101,7 +1098,6 @@ public class ObjectEntryLocalServiceTest {
 				).build()));
 
 		ObjectDefinition objectDefinition = _publishCustomObjectDefinition(
-			true,
 			Arrays.asList(
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -1164,7 +1160,7 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition modifiableSystemObjectDefinition =
 			ObjectDefinitionTestUtil.addModifiableSystemObjectDefinition(
-				TestPropsValues.getUserId(), null, true,
+				TestPropsValues.getUserId(), null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"Test", null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1186,7 +1182,6 @@ public class ObjectEntryLocalServiceTest {
 			modifiableSystemObjectDefinition.getObjectDefinitionId());
 	}
 
-	@FeatureFlag("LPD-32050")
 	@Test
 	public void testAddObjectEntryAfterDeletingLocalizedObjectField()
 		throws Exception {
@@ -1376,7 +1371,7 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				true, ObjectDefinitionTestUtil.getRandomName(),
+				ObjectDefinitionTestUtil.getRandomName(),
 				Arrays.asList(
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -2107,7 +2102,6 @@ public class ObjectEntryLocalServiceTest {
 		_objectFieldLocalService.deleteObjectField(objectField5);
 	}
 
-	@FeatureFlag("LPD-32050")
 	@Test
 	public void testAddObjectEntryWithFormulaObjectFieldAndObjectRelationship()
 		throws Exception {
@@ -2451,7 +2445,6 @@ public class ObjectEntryLocalServiceTest {
 			_objectEntryLocalService, _objectRelationshipLocalService);
 	}
 
-	@FeatureFlag("LPD-32050")
 	@Test
 	public void testAddObjectEntryWithLocalizedAttachmentObjectField()
 		throws Exception {
@@ -2538,7 +2531,6 @@ public class ObjectEntryLocalServiceTest {
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
-	@FeatureFlag("LPD-32050")
 	@Test
 	public void testAddObjectEntryWithLocalizedBooleanObjectField()
 		throws Exception {
@@ -3230,7 +3222,6 @@ public class ObjectEntryLocalServiceTest {
 	@Test
 	public void testAddObjectEntryWithRichTextObjectField() throws Exception {
 		ObjectDefinition objectDefinition = _publishCustomObjectDefinition(
-			true,
 			Arrays.asList(
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -4001,7 +3992,6 @@ public class ObjectEntryLocalServiceTest {
 			_objectDefinition.isEnableFormContainer(),
 			_objectDefinition.isEnableFriendlyURLCustomization(),
 			_objectDefinition.isEnableIndexSearch(),
-			_objectDefinition.isEnableLocalization(),
 			_objectDefinition.isEnableObjectEntryDraft(),
 			_objectDefinition.isEnableObjectEntryHistory(),
 			_objectDefinition.isEnableObjectEntrySchedule(),
@@ -4025,7 +4015,6 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition draftObjectDefinition =
 			ObjectDefinitionTestUtil.addCustomObjectDefinition(
-				false,
 				Arrays.asList(
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -4034,7 +4023,6 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition publishedObjectDefinition =
 			_publishCustomObjectDefinition(
-				false,
 				Arrays.asList(
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -4234,10 +4222,6 @@ public class ObjectEntryLocalServiceTest {
 			_objectDefinitionLocalService.fetchObjectDefinitionByClassName(
 				TestPropsValues.getCompanyId(), User.class.getName());
 
-		boolean enableLocalization = objectDefinition.isEnableLocalization();
-
-		objectDefinition.setEnableLocalization(true);
-
 		objectDefinition = _objectDefinitionLocalService.updateObjectDefinition(
 			objectDefinition);
 
@@ -4360,8 +4344,6 @@ public class ObjectEntryLocalServiceTest {
 			objectField2.getObjectFieldId());
 		_objectFieldLocalService.deleteObjectField(
 			objectField3.getObjectFieldId());
-
-		objectDefinition.setEnableLocalization(enableLocalization);
 
 		_objectDefinitionLocalService.updateObjectDefinition(objectDefinition);
 	}
@@ -7694,12 +7676,11 @@ public class ObjectEntryLocalServiceTest {
 	}
 
 	private ObjectDefinition _publishCustomObjectDefinition(
-			boolean enableLocalization, List<ObjectField> objectFields)
+			List<ObjectField> objectFields)
 		throws Exception {
 
 		ObjectDefinition objectDefinition =
-			ObjectDefinitionTestUtil.addCustomObjectDefinition(
-				enableLocalization, objectFields);
+			ObjectDefinitionTestUtil.addCustomObjectDefinition(objectFields);
 
 		return _objectDefinitionLocalService.publishCustomObjectDefinition(
 			TestPropsValues.getUserId(),
@@ -8758,7 +8739,6 @@ public class ObjectEntryLocalServiceTest {
 		throws Exception {
 
 		ObjectDefinition objectDefinition = _publishCustomObjectDefinition(
-			false,
 			Arrays.asList(
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
