@@ -8,6 +8,7 @@ dependencies {
 	compileOnly project(":apps:dynamic-data-mapping:dynamic-data-mapping-api")
 	compileOnly project(":apps:dynamic-data-mapping:dynamic-data-mapping-form-field-type-api")
 	compileOnly project(":apps:list-type:list-type-api")
+	compileOnly project(":apps:static:portal-osgi-web:portal-osgi-web-http-servlet-api")
 	compileOnly project(":core:petra:petra-function")
 	compileOnly project(":core:petra:petra-string")
 	testImplementation project(":apps:dynamic-data-mapping:dynamic-data-mapping-expression")
