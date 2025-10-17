@@ -323,10 +323,7 @@ public class ObjectEntryModelResourcePermission
 					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
 
 			if (Objects.equals(
-					ObjectFieldConstants.
-						ATTACHMENT_FIELD_DOWNLOAD_ACTION_ID_PREFIX +
-							objectField.getName(),
-					actionId)) {
+					objectField.getAttachmentDownloadActionKey(), actionId)) {
 
 				return true;
 			}

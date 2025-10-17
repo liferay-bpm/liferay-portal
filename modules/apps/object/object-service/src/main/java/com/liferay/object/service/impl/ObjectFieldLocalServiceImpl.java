@@ -344,13 +344,10 @@ public class ObjectFieldLocalServiceImpl
 				objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
 
+				String actionId = objectField.getAttachmentDownloadActionKey();
+
 				_ploEntryLocalService.deletePLOEntries(
-					objectField.getCompanyId(),
-					StringBundler.concat(
-						"action.",
-						ObjectFieldConstants.
-							ATTACHMENT_FIELD_DOWNLOAD_ACTION_ID_PREFIX,
-						objectField.getName()));
+					objectField.getCompanyId(), "action." + actionId);
 			}
 
 			_objectFieldSettingLocalService.deleteObjectFieldObjectFieldSetting(
@@ -948,7 +945,9 @@ public class ObjectFieldLocalServiceImpl
 					objectFieldLocalService, _ploEntryLocalService,
 					_portletLocalService, _resourceActions, null);
 
-				_updateResourcePermissions(objectDefinition, objectField);
+				_updateResourcePermissions(
+					objectField.getAttachmentDownloadActionKey(),
+					objectDefinition);
 			}
 			catch (Exception exception) {
 				ReflectionUtil.throwException(exception);
@@ -1024,14 +1023,11 @@ public class ObjectFieldLocalServiceImpl
 		for (Locale locale : _language.getAvailableLocales()) {
 			String languageId = LocaleUtil.toLanguageId(locale);
 
+			String actionId = objectField.getAttachmentDownloadActionKey();
+
 			_ploEntryLocalService.addOrUpdatePLOEntry(
 				objectField.getCompanyId(), objectField.getUserId(),
-				StringBundler.concat(
-					"action.",
-					ObjectFieldConstants.
-						ATTACHMENT_FIELD_DOWNLOAD_ACTION_ID_PREFIX,
-					objectField.getName()),
-				languageId,
+				"action." + actionId, languageId,
 				LanguageUtil.format(
 					locale, "download-x", objectField.getLabel(locale)));
 		}
@@ -1216,19 +1212,13 @@ public class ObjectFieldLocalServiceImpl
 					objectField.getCompanyId(), "LPD-17564") &&
 				objectDefinition.isApproved()) {
 
+				String actionId = objectField.getAttachmentDownloadActionKey();
+
 				_resourceActions.removeModelResource(
-					objectDefinition.getClassName(),
-					ObjectFieldConstants.
-						ATTACHMENT_FIELD_DOWNLOAD_ACTION_ID_PREFIX +
-							objectField.getName());
+					objectDefinition.getClassName(), actionId);
 
 				_ploEntryLocalService.deletePLOEntries(
-					objectField.getCompanyId(),
-					StringBundler.concat(
-						"action.",
-						ObjectFieldConstants.
-							ATTACHMENT_FIELD_DOWNLOAD_ACTION_ID_PREFIX,
-						objectField.getName()));
+					objectField.getCompanyId(), "action." + actionId);
 			}
 
 			ObjectFieldSetting objectFieldSetting =
@@ -1612,7 +1602,7 @@ public class ObjectFieldLocalServiceImpl
 	}
 
 	private void _updateResourcePermissions(
-			ObjectDefinition objectDefinition, ObjectField objectField)
+			String actionId, ObjectDefinition objectDefinition)
 		throws PortalException {
 
 		Role role = _roleLocalService.getRole(
@@ -1625,13 +1615,8 @@ public class ObjectFieldLocalServiceImpl
 				ResourceConstants.SCOPE_INDIVIDUAL, role.getRoleId(), true);
 
 		for (ResourcePermission resourcePermission : resourcePermissions) {
-			String objectFieldActionId =
-				ObjectFieldConstants.
-					ATTACHMENT_FIELD_DOWNLOAD_ACTION_ID_PREFIX +
-						objectField.getName();
-
-			if (!resourcePermission.hasActionId(objectFieldActionId)) {
-				resourcePermission.addResourceAction(objectFieldActionId);
+			if (!resourcePermission.hasActionId(actionId)) {
+				resourcePermission.addResourceAction(actionId);
 
 				_resourcePermissionLocalService.updateResourcePermission(
 					resourcePermission);
