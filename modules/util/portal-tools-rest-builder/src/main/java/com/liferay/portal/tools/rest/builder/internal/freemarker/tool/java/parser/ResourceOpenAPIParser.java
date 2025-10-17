@@ -97,7 +97,7 @@ public class ResourceOpenAPIParser {
 							List<JavaMethodParameter> javaMethodParameters =
 								_getJavaMethodParameters(
 									javaDataTypeMap, operation,
-									requestBodyMediaTypes);
+									requestBodyMediaTypes, schemaName);
 
 							JavaMethodSignature javaMethodSignature =
 								new JavaMethodSignature(
@@ -817,7 +817,7 @@ public class ResourceOpenAPIParser {
 
 	private static List<JavaMethodParameter> _getJavaMethodParameters(
 		Map<String, String> javaDataTypeMap, Operation operation,
-		Set<String> requestBodyMediaTypes) {
+		Set<String> requestBodyMediaTypes, String schemaName) {
 
 		if ((operation == null) || (operation.getParameters() == null)) {
 			return Collections.emptyList();
@@ -843,6 +843,13 @@ public class ResourceOpenAPIParser {
 				StringUtil.equals(parameterName, "nestedFields") ||
 				StringUtil.equals(parameterName, "restrictFields") ||
 				StringUtil.equals(parameterName, "sort")) {
+
+				continue;
+			}
+
+			if (StringUtil.equals(
+					parameterName, "assigneeUserExternalReferenceCode") &&
+				StringUtil.equals(schemaName, "ObjectEntry")) {
 
 				continue;
 			}
@@ -1595,6 +1602,12 @@ public class ResourceOpenAPIParser {
 
 	private static boolean _isValidParameter(
 		ConfigYAML configYAML, String name, String schemaName) {
+
+		if (StringUtil.equals(name, "assigneeUserExternalReferenceCode") &&
+			StringUtil.equals(schemaName, "ObjectEntry")) {
+
+			return false;
+		}
 
 		String schemaVarName = StringUtil.lowerCaseFirstLetter(schemaName);
 

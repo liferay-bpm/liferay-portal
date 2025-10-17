@@ -376,6 +376,10 @@ paths:
                             type: string
                         type: array
                 -   in: query
+                    name: assigneeUserExternalReferenceCode
+                    schema:
+                        type: string
+                -   in: query
                     name: fields
                     schema:
                         type: string
@@ -2142,6 +2146,10 @@ paths:
                         items:
                             type: string
                         type: array
+                -   in: query
+                    name: assigneeUserExternalReferenceCode
+                    schema:
+                        type: string
                 -   in: query
                     name: fields
                     schema:
