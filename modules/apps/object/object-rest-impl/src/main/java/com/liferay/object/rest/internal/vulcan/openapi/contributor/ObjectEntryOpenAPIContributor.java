@@ -178,6 +178,28 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 			paths.remove(key);
 		}
 
+		ObjectField assigneeObjectField =
+			_objectFieldLocalService.fetchObjectFieldByBusinessType(
+				_objectDefinition.getObjectDefinitionId(),
+				ObjectFieldConstants.BUSINESS_TYPE_ASSIGNEE, null);
+
+		if (assigneeObjectField == null) {
+			for (PathItem pathItem : ListUtil.fromMapValues(paths)) {
+				Operation operation = pathItem.getGet();
+
+				if (operation == null) {
+					continue;
+				}
+
+				operation.setParameters(
+					ListUtil.filter(
+						operation.getParameters(),
+						parameter -> !StringUtil.equals(
+							parameter.getName(),
+							"assigneeUserExternalReferenceCode")));
+			}
+		}
+
 		if (!_objectDefinition.isEnableCategorization()) {
 			objectDefinitionSchemaProperties.remove("keywords");
 			objectDefinitionSchemaProperties.remove("taxonomyCategoryBriefs");
