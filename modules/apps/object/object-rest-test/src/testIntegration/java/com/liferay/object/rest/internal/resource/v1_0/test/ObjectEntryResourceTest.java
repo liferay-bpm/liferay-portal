@@ -728,7 +728,7 @@ public class ObjectEntryResourceTest {
 			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		_objectDefinition4 = ObjectDefinitionTestUtil.publishObjectDefinition(
-			true, ObjectDefinitionTestUtil.getRandomName(),
+			ObjectDefinitionTestUtil.getRandomName(),
 			Arrays.asList(
 				new LongTextObjectFieldBuilder(
 				).indexed(
@@ -5182,7 +5182,7 @@ public class ObjectEntryResourceTest {
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, true, false, true,
-				false, false, false, false, false, null,
+				false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -7092,7 +7092,7 @@ public class ObjectEntryResourceTest {
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, true, false, true,
-				false, false, false, false, false, null,
+				false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -11296,7 +11296,6 @@ public class ObjectEntryResourceTest {
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 	}
 
-	@FeatureFlag("LPD-32050")
 	@Test
 	public void testPutCustomObjectEntryWithLocalizedAttachmentObjectField()
 		throws Exception {
@@ -11307,7 +11306,7 @@ public class ObjectEntryResourceTest {
 
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				true, objectDefinitionName,
+				objectDefinitionName,
 				Collections.singletonList(
 					new AttachmentObjectFieldBuilder(
 					).labelMap(
@@ -15839,7 +15838,7 @@ public class ObjectEntryResourceTest {
 		throws Exception {
 
 		return ObjectDefinitionTestUtil.publishObjectDefinition(
-			true, ObjectDefinitionTestUtil.getRandomName(),
+			ObjectDefinitionTestUtil.getRandomName(),
 			Collections.singletonList(
 				new TextObjectFieldBuilder(
 				).labelMap(

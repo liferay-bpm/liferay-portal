@@ -265,8 +265,7 @@ public class SiteNavigationMenuItemExternalReferenceCodeUpgradeProcessTest {
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, true, false, true,
-				false, false, false, false, false,
-				RandomTestUtil.randomString(),
+				false, false, false, false, RandomTestUtil.randomString(),
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"TestObject", null, "control_panel.sites",
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),

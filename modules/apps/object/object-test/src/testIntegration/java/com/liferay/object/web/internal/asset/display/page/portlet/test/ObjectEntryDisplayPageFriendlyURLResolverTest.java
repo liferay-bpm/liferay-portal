@@ -51,7 +51,7 @@ public class ObjectEntryDisplayPageFriendlyURLResolverTest {
 	@BeforeClass
 	public static void setUpClass() throws Exception {
 		_objectDefinition = ObjectDefinitionTestUtil.publishObjectDefinition(
-			false, "Test",
+			"Test",
 			Collections.singletonList(
 				new TextObjectFieldBuilder(
 				).labelMap(

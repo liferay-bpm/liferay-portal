@@ -228,8 +228,6 @@ public class ObjectActionLocalServiceTest {
 			_group.getGroupId(), _commerceCurrency.getCode());
 
 		_objectDefinition = ObjectDefinitionTestUtil.addCustomObjectDefinition(
-			FeatureFlagManagerUtil.isEnabled(
-				TestPropsValues.getCompanyId(), "LPD-32050"),
 			Arrays.asList(
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_DATE,
@@ -886,7 +884,6 @@ public class ObjectActionLocalServiceTest {
 
 			ObjectDefinition objectDefinitionA =
 				ObjectDefinitionTestUtil.addCustomObjectDefinition(
-					false,
 					Collections.singletonList(
 						ObjectFieldUtil.createObjectField(
 							ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -2765,7 +2762,6 @@ public class ObjectActionLocalServiceTest {
 
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.addCustomObjectDefinition(
-				false,
 				Arrays.asList(
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT,
