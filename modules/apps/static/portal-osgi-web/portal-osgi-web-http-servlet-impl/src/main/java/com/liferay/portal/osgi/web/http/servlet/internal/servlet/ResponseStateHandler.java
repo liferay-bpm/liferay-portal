@@ -6,6 +6,7 @@
 package com.liferay.portal.osgi.web.http.servlet.internal.servlet;
 
 import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.portal.osgi.web.http.servlet.HttpServletRequestThreadLocal;
 import com.liferay.portal.osgi.web.http.servlet.internal.Match;
 import com.liferay.portal.osgi.web.http.servlet.internal.context.LiferayContextController;
 import com.liferay.portal.osgi.web.http.servlet.internal.context.LiferayDispatchTargets;
@@ -73,6 +74,9 @@ public class ResponseStateHandler {
 		ServletRequestEvent servletRequestEvent = null;
 
 		try {
+			HttpServletRequestThreadLocal.setHttpServletRequest(
+				_httpServletRequest);
+
 			if ((_liferayDispatchTargets.getDispatcherType() ==
 					DispatcherType.REQUEST) &&
 				!servletRequestListeners.isEmpty()) {
@@ -121,6 +125,8 @@ public class ResponseStateHandler {
 			}
 		}
 		finally {
+			HttpServletRequestThreadLocal.setHttpServletRequest(null);
+
 			endpointRegistration.removeReference();
 
 			for (FilterRegistration filterRegistration :
