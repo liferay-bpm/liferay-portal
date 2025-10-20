@@ -23,4 +23,5 @@ dependencies {
 	testImplementation project(":apps:dynamic-data-mapping:dynamic-data-mapping-test-util")
 	testImplementation project(":apps:list-type:list-type-api")
 	testImplementation project(":apps:object:object-api")
+	testImplementation project(":apps:static:portal-osgi-web:portal-osgi-web-http-servlet-api")
 }
