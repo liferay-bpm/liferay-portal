@@ -2417,7 +2417,8 @@ public class ObjectActionLocalServiceTest {
 								RandomTestUtil.randomString())
 						).name(
 							"restContextPath"
-						).build()));
+						).build()),
+					false);
 
 			Class<?> clazz = getClass();
 
@@ -2558,7 +2559,8 @@ public class ObjectActionLocalServiceTest {
 							RandomTestUtil.randomString())
 					).name(
 						"a" + RandomTestUtil.randomString()
-					).build()));
+					).build()),
+				false);
 
 		NotificationTemplate notificationTemplate =
 			_notificationTemplateLocalService.addNotificationTemplate(
@@ -3729,7 +3731,6 @@ public class ObjectActionLocalServiceTest {
 
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				false,
 				Collections.singletonList(
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
