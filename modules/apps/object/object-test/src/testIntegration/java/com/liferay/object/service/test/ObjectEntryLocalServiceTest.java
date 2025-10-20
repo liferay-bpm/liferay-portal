@@ -609,7 +609,8 @@ public class ObjectEntryLocalServiceTest {
 							RandomTestUtil.randomString())
 					).name(
 						"name"
-					).build()));
+					).build()),
+				false);
 		ObjectDefinition objectDefinition2 =
 			ObjectDefinitionTestUtil.publishObjectDefinition();
 
@@ -1197,7 +1198,7 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				true, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 
 		ObjectField localizedObjectField1 =
 			ObjectFieldUtil.addCustomObjectField(
@@ -1424,7 +1425,8 @@ public class ObjectEntryLocalServiceTest {
 						RandomTestUtil.randomLocaleStringMap()
 					).name(
 						"assignee"
-					).build()));
+					).build()),
+				false);
 
 		Map<String, Long> assigneeMap = HashMapBuilder.put(
 			"classNameId", _portal.getClassNameId(User.class.getName())
@@ -2243,13 +2245,13 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition objectDefinitionA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				true, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 		ObjectDefinition objectDefinitionAA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				true, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 		ObjectDefinition objectDefinitionAAA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				true, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 
 		TreeTestUtil.bind(
 			_objectRelationshipLocalService,
@@ -2329,13 +2331,13 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition objectDefinitionA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				false, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 		ObjectDefinition objectDefinitionAA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				false, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 		ObjectDefinition objectDefinitionAAA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				false, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 
 		ObjectValidationRule objectValidationRuleA = _addObjectValidationRule(
 			objectDefinitionA,
@@ -2543,7 +2545,7 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				Collections.singletonList(objectField));
+				Collections.singletonList(objectField), false);
 
 		AssertUtils.assertFailure(
 			ObjectEntryValuesException.RequiredLanguageId.class,
@@ -2641,7 +2643,8 @@ public class ObjectEntryLocalServiceTest {
 						listTypeDefinition.getListTypeDefinitionId()
 					).name(
 						"multiselectPicklistObjectField"
-					).build()));
+					).build()),
+				false);
 
 		_objectEntryLocalService.addObjectEntry(
 			0, TestPropsValues.getUserId(),
@@ -3538,7 +3541,7 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition companyObjectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				true, Collections.emptyList());
+				Collections.emptyList());
 
 		companyObjectDefinition.setFriendlyURLSeparator("test1");
 
@@ -6563,13 +6566,13 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectDefinition objectDefinitionA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				false, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 		ObjectDefinition objectDefinitionAA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				false, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 		ObjectDefinition objectDefinitionAAA =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				false, Collections.singletonList(objectField));
+				Collections.singletonList(objectField));
 
 		Assert.assertNotNull(
 			WorkflowHandlerRegistryUtil.getWorkflowHandler(

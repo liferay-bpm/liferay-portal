@@ -726,7 +726,8 @@ public class RenderLayoutStructureTagTest {
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_BOOLEAN,
 						ObjectFieldConstants.DB_TYPE_BOOLEAN,
-						RandomTestUtil.randomString(), "boolean")));
+						RandomTestUtil.randomString(), "boolean")),
+				false);
 
 		Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
 

@@ -9062,7 +9062,8 @@ public class ObjectEntryResourceTest {
 								ObjectFieldSettingConstants.NAME_SUFFIX
 							).value(
 								"-private"
-							).build()))));
+							).build()))),
+				false);
 
 		String endpoint = _getEndpoint(objectDefinition, _testGroupId);
 

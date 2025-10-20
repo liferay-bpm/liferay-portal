@@ -3106,7 +3106,8 @@ public class DefaultObjectEntryManagerImplTest
 							RandomTestUtil.randomString())
 					).name(
 						"integerObjectField"
-					).build()));
+					).build()),
+				false);
 
 		_addObjectAction(
 			objectDefinition, ObjectActionTriggerConstants.KEY_ON_AFTER_ADD);

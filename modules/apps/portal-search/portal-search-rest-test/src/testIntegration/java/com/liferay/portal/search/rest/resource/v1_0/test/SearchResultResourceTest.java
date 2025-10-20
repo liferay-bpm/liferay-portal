@@ -1025,7 +1025,6 @@ public class SearchResultResourceTest extends BaseSearchResultResourceTestCase {
 
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				true,
 				Collections.singletonList(
 					new TextObjectFieldBuilder(
 					).labelMap(
@@ -1238,7 +1237,6 @@ public class SearchResultResourceTest extends BaseSearchResultResourceTestCase {
 
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				true,
 				Collections.singletonList(
 					new TextObjectFieldBuilder(
 					).labelMap(
