@@ -106,28 +106,28 @@ public class AutocompleteAssigneeMVCResourceCommandTest {
 			itemsJSONArray.toString(), 0, itemsJSONArray.length());
 
 		_assertJSONObject(
-			Role.class.getName(), _role.getExternalReferenceCode(),
-			_role.getName(), _getJSONObject("Custom R"));
+			_role.getExternalReferenceCode(), _role.getName(), "Role",
+			_getJSONObject("Custom R"));
 		_assertJSONObject(
-			Role.class.getName(), _role.getExternalReferenceCode(),
-			_role.getName(), _getJSONObject("custom role"));
+			_role.getExternalReferenceCode(), _role.getName(), "Role",
+			_getJSONObject("custom role"));
 		_assertJSONObject(
-			User.class.getName(), _user.getExternalReferenceCode(),
-			_user.getFullName(), _getJSONObject("Doe"));
+			_user.getExternalReferenceCode(), _user.getFullName(), "User",
+			_getJSONObject("Doe"));
 		_assertJSONObject(
-			User.class.getName(), _user.getExternalReferenceCode(),
-			_user.getFullName(), _getJSONObject("John"));
+			_user.getExternalReferenceCode(), _user.getFullName(), "User",
+			_getJSONObject("John"));
 		_assertJSONObject(
-			User.class.getName(), _user.getExternalReferenceCode(),
-			_user.getFullName(), _getJSONObject("John D"));
+			_user.getExternalReferenceCode(), _user.getFullName(), "User",
+			_getJSONObject("John D"));
 		_assertJSONObject(
-			User.class.getName(), _user.getExternalReferenceCode(),
-			_user.getFullName(), _getJSONObject("John Doe"));
+			_user.getExternalReferenceCode(), _user.getFullName(), "User",
+			_getJSONObject("John Doe"));
 	}
 
 	private void _assertJSONObject(
-		String expectedEntryClassName, String expectedExternalReferenceCode,
-		String expectedName, JSONObject jsonObject) {
+		String expectedExternalReferenceCode, String expectedName,
+		String expectedType, JSONObject jsonObject) {
 
 		JSONArray itemsJSONArray = jsonObject.getJSONArray("items");
 
@@ -137,15 +137,10 @@ public class AutocompleteAssigneeMVCResourceCommandTest {
 		JSONObject itemJSONObject = itemsJSONArray.getJSONObject(0);
 
 		Assert.assertEquals(
-			expectedEntryClassName, itemJSONObject.getString("entryClassName"));
-
-		JSONObject embeddedJSONObject = itemJSONObject.getJSONObject(
-			"embedded");
-
-		Assert.assertEquals(
 			expectedExternalReferenceCode,
-			embeddedJSONObject.getString("externalReferenceCode"));
-		Assert.assertEquals(expectedName, embeddedJSONObject.getString("name"));
+			itemJSONObject.getString("externalReferenceCode"));
+		Assert.assertEquals(expectedName, itemJSONObject.getString("name"));
+		Assert.assertEquals(expectedType, itemJSONObject.getString("type"));
 	}
 
 	private JSONObject _getJSONObject(String search) throws Exception {
