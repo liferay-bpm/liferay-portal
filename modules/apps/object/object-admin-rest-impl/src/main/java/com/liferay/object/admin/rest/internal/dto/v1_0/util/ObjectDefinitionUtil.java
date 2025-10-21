@@ -180,8 +180,7 @@ public class ObjectDefinitionUtil {
 					});
 				setEnableIndexSearch(
 					serviceBuilderObjectDefinition::isEnableIndexSearch);
-				setEnableLocalization(
-					serviceBuilderObjectDefinition::isEnableLocalization);
+				setEnableLocalization(() -> true);
 				setEnableObjectEntryDraft(
 					serviceBuilderObjectDefinition::isEnableObjectEntryDraft);
 				setEnableObjectEntryHistory(
