@@ -31,7 +31,6 @@ const test = mergeTests(
 		'LPD-11235': {enabled: true},
 		'LPD-17564': {enabled: true},
 		'LPD-21926': {enabled: true},
-		'LPD-32050': {enabled: true},
 		'LPD-60546': {enabled: true},
 		'LPS-178052': {enabled: true},
 	}),
@@ -44,7 +43,6 @@ const testWithCKEditor4 = mergeTests(
 	test,
 	featureFlagsTest({
 		'LPD-11235': {enabled: false},
-		'LPD-32050': {enabled: true},
 		'LPS-178052': {enabled: true},
 	})
 );

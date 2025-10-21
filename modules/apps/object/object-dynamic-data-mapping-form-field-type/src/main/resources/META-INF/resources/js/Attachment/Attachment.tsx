@@ -42,16 +42,10 @@ export default function Attachment({
 	value,
 	...otherProps
 }: AttachmentProps) {
-	const isLocalizedObjectField: boolean = !!localizedObjectField;
-
 	const {portletNamespace} = useConfig();
 
-	const getAttachment = () => {
-		return fileEntryProperties;
-	};
-
 	const [attachment, setAttachment] = useState<AttachmentFile | null>(
-		getAttachment() as AttachmentFile | null
+		fileEntryProperties as AttachmentFile | null
 	);
 	const [error, setError] = useState({});
 	const [submitButtonClicked, setSubmitButtonClicked] = useState(false);
@@ -129,7 +123,7 @@ export default function Attachment({
 			{...otherProps}
 			{...error}
 		>
-			{isLocalizedObjectField ? (
+			{localizedObjectField ? (
 				<AttachmentLocalizedObjectField
 					{...otherProps}
 					error={error}
