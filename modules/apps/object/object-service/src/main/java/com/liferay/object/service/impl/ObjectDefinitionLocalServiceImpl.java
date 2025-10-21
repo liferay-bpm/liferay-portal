@@ -2232,6 +2232,10 @@ public class ObjectDefinitionLocalServiceImpl
 				friendlyURLResolver.getURLSeparator(), StringPool.SLASH);
 		}
 
+		if (modifiable && system && Validator.isNull(friendlyURLSeparator)) {
+			return FriendlyURLResolverConstants.URL_SEPARATOR_Y_OBJECT_ENTRY;
+		}
+
 		if (Validator.isNull(friendlyURLSeparator)) {
 			return _friendlyURLNormalizer.normalizeWithPeriodsAndSlashes(name);
 		}
