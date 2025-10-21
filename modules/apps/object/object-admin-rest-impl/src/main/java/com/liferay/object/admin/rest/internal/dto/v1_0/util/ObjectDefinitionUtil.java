@@ -100,12 +100,12 @@ public class ObjectDefinitionUtil {
 
 		String restContextPath = StringPool.BLANK;
 
-		if (serviceBuilderObjectDefinition.isUnmodifiableSystemObject()) {
-			SystemObjectDefinitionManager systemObjectDefinitionManager =
-				systemObjectDefinitionManagerRegistry.
-					getSystemObjectDefinitionManager(
-						serviceBuilderObjectDefinition.getName());
+		SystemObjectDefinitionManager systemObjectDefinitionManager =
+			systemObjectDefinitionManagerRegistry.
+				getSystemObjectDefinitionManager(
+					serviceBuilderObjectDefinition.getName());
 
+		if (serviceBuilderObjectDefinition.isUnmodifiableSystemObject()) {
 			if (systemObjectDefinitionManager != null) {
 				JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
 					systemObjectDefinitionManager.
@@ -175,7 +175,16 @@ public class ObjectDefinitionUtil {
 				setEnableIndexSearch(
 					serviceBuilderObjectDefinition::isEnableIndexSearch);
 				setEnableLocalization(
-					serviceBuilderObjectDefinition::isEnableLocalization);
+					() -> {
+						if (serviceBuilderObjectDefinition.
+								isUnmodifiableSystemObject()) {
+
+							return systemObjectDefinitionManager.
+								isEnableLocalization();
+						}
+
+						return true;
+					});
 				setEnableObjectEntryDraft(
 					serviceBuilderObjectDefinition::isEnableObjectEntryDraft);
 				setEnableObjectEntryHistory(
