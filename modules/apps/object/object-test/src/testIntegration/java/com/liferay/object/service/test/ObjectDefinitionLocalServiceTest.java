@@ -2055,7 +2055,9 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertEquals("/test", objectDefinition.getRESTContextPath());
 		Assert.assertTrue(objectDefinition.isApproved());
 		Assert.assertTrue(objectDefinition.isEnableCategorization());
-		Assert.assertEquals("test", objectDefinition.getFriendlyURLSeparator());
+		Assert.assertEquals(
+			FriendlyURLResolverConstants.URL_SEPARATOR_Y_OBJECT_ENTRY,
+			objectDefinition.getFriendlyURLSeparator());
 		Assert.assertTrue(objectDefinition.isModifiable());
 		Assert.assertTrue(objectDefinition.isSystem());
 		Assert.assertTrue(_hasTable(objectDefinition.getDBTableName()));
