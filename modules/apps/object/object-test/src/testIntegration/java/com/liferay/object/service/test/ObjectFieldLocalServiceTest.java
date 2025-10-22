@@ -287,8 +287,8 @@ public class ObjectFieldLocalServiceTest {
 			"Salesforce storage type does not support aggregation and " +
 				"attachment business types",
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
-				null, TestPropsValues.getUserId(), 0, null, false, true, false, true,
-				false, false, false, false, null,
+				null, TestPropsValues.getUserId(), 0, null, false, true, false,
+				true, false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -331,9 +331,8 @@ public class ObjectFieldLocalServiceTest {
 			"Salesforce storage type does not support aggregation and " +
 				"attachment business types",
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
-null, 
-				TestPropsValues.getUserId(), 0, null, false, true, false, true,
-				false, false, false, false, null,
+				null, TestPropsValues.getUserId(), 0, null, false, true, false,
+				true, false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -2261,13 +2260,17 @@ null,
 		ObjectFieldTestUtil.withEncryptedObjectFieldProperties(
 			algorithm, enabled, key,
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
-null, 
-				TestPropsValues.getUserId(), 0, null, false, true, false, true,
-				false, false, false, false, null,
+				null, TestPropsValues.getUserId(), 0, null, false, true, false,
+				true, false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				true, ObjectDefinitionConstants.SCOPE_COMPANY, storageType,
+				Collections.emptyList(),
+				Arrays.asList(
 					new EncryptedObjectFieldBuilder(
 					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
 							RandomTestUtil.randomString())
 					).name(
 						"a" + RandomTestUtil.randomString()
@@ -2902,9 +2905,8 @@ null,
 
 		objectDefinition1 =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-null, 
-				TestPropsValues.getUserId(), 0, null, false, true, false, true,
-				false, false, false, false, null,
+				null, TestPropsValues.getUserId(), 0, null, false, true, false,
+				true, false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"Test", null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -2916,8 +2918,13 @@ null,
 		_assertReadOnlyFalse(
 			_addCustomObjectField(
 				_getReadOnlyTextObjectField(
+					objectDefinition1.getObjectDefinitionId(),
+					ObjectFieldConstants.READ_ONLY_CONDITIONAL,
+					validDDMScript)));
+		_assertReadOnlyFalse(
 			_addCustomObjectField(
 				_getReadOnlyTextObjectField(
+					objectDefinition1.getObjectDefinitionId(),
 					ObjectFieldConstants.READ_ONLY_TRUE, null)));
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition1);

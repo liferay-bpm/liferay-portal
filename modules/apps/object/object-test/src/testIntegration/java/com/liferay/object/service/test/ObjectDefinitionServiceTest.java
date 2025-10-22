@@ -54,7 +54,6 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.FeatureFlag;
-import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -415,8 +414,8 @@ public class ObjectDefinitionServiceTest {
 			user.getUserId(), objectDefinition.getObjectDefinitionId());*/
 
 		return _objectDefinitionLocalService.addCustomObjectDefinition(
-			null, user.getUserId(), 0, null, false, true, false, true, false, false,
-			false, false, null,
+			null, user.getUserId(), 0, null, false, true, false, true, false,
+			false, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			ObjectDefinitionTestUtil.getRandomName(), null, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -535,17 +534,8 @@ public class ObjectDefinitionServiceTest {
 
 			objectDefinition =
 				_objectDefinitionService.addCustomObjectDefinition(
-<<<<<<< HEAD
-					null, objectFolderId, null, false, true, false, true, true,
-					false, false, false, false, null,
-=======
-<<<<<<< HEAD
-					objectFolderId, null, false, true, false, true, true, false,
-=======
-					objectFolderId, null, false, true, false, true, false,
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
+					null, objectFolderId, null, false, true, false, true, false,
 					false, false, false, null,
->>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
 					ObjectDefinitionTestUtil.getRandomName(), null, null,
