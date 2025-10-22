@@ -64,9 +64,7 @@ import org.junit.runner.RunWith;
 /**
  * @author Jhosseph Gonzalez
  */
-@FeatureFlags(
-	featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-)
+@FeatureFlag("LPD-17564")
 @RunWith(Arquillian.class)
 @Sync
 public class CheckObjectEntrySchedulerJobConfigurationTest {

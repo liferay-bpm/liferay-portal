@@ -817,9 +817,7 @@ null,
 		_objectFolderLocalService.deleteObjectFolder(objectFolder);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testAddObjectDefinitionWithMissingWorkflowDefinitionReference()
 		throws Exception {
@@ -1150,11 +1148,7 @@ null,
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition2);
 	}
 
-	@FeatureFlags(
-		featureFlags = {
-			@FeatureFlag(value = "LPD-17564"), @FeatureFlag(value = "LPD-32050")
-		}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testAddObjectDefinitionWithWorkflowDefinitionLinks()
 		throws Exception {
@@ -2581,9 +2575,7 @@ null,
 			_objectEntryLocalService, _objectRelationshipLocalService);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testDeleteObjectDefinitionWithObjectEntries() throws Exception {
 		String objectFieldName = StringUtil.randomId();
@@ -2595,12 +2587,12 @@ null,
 				true, true, false, false, false, true, null,
 =======
 				TestPropsValues.getUserId(), 0, null, false, true, false, true,
-<<<<<<< HEAD
-				true, false, false, false, true, null,
-=======
 				false, false, false, true, null,
+<<<<<<< HEAD
 >>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 >>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
+=======
+>>>>>>> 595daa3 (LPD-43541 remove FF usages of CMS dependency)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"A" + StringUtil.randomString(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -3056,9 +3048,7 @@ null,
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition4);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testSystemObjectFields() throws Exception {
 		ObjectDefinition objectDefinition =
@@ -3068,12 +3058,12 @@ null,
 				true, true, false, false, false, false, null,
 =======
 				TestPropsValues.getUserId(), 0, null, false, true, false, true,
-<<<<<<< HEAD
-				true, false, false, false, false, null,
-=======
 				false, false, false, false, null,
+<<<<<<< HEAD
 >>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 >>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
+=======
+>>>>>>> 595daa3 (LPD-43541 remove FF usages of CMS dependency)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -3101,9 +3091,7 @@ null,
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testUpdateCustomObjectDefinition() throws Exception {
 		ObjectDefinition objectDefinition =
@@ -3113,12 +3101,12 @@ null,
 				true, true, false, true, true, true, null,
 =======
 				TestPropsValues.getUserId(), 0, null, false, true, false, true,
-<<<<<<< HEAD
-				true, false, true, true, true, null,
-=======
 				false, true, true, true, null,
+<<<<<<< HEAD
 >>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 >>>>>>> fcf0745 (LPD-43541 remove FF and isEnableLocalization in tests)
+=======
+>>>>>>> 595daa3 (LPD-43541 remove FF usages of CMS dependency)
 				LocalizedMapUtil.getLocalizedMap("Able"), "Able", null, null,
 				LocalizedMapUtil.getLocalizedMap("Ables"), true,
 				ObjectDefinitionConstants.SCOPE_COMPANY,

@@ -183,9 +183,7 @@ public class ObjectEntryInfoItemFieldValuesProviderTest {
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testObjectEntryInfoItemFieldValuesProvider() throws Exception {
 		FileEntry fileEntry = _dlAppLocalService.addFileEntry(

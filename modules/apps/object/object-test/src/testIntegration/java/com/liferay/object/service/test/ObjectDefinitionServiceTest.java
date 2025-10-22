@@ -155,9 +155,7 @@ public class ObjectDefinitionServiceTest {
 			_objectFolder.getObjectFolderId(), _adminUser);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	@TestInfo("LPD-66895")
 	public void testAddCustomObjectDefinitionByCMSAdministratorRole()
@@ -297,9 +295,7 @@ public class ObjectDefinitionServiceTest {
 			_addCustomObjectDefinition(_adminUser), _adminUser);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	@TestInfo("LPD-66895")
 	public void testPublishCustomObjectDefinitionByCMSAdministratorRole()

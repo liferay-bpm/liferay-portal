@@ -50,9 +50,7 @@ import org.junit.runner.RunWith;
 /**
  * @author Petteri Karttunen
  */
-@FeatureFlags(
-	featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-)
+@FeatureFlag("LPD-17564")
 @RunWith(Arquillian.class)
 public class ObjectEntryTrashHandlerTest extends BaseTrashHandlerTestCase {
 
