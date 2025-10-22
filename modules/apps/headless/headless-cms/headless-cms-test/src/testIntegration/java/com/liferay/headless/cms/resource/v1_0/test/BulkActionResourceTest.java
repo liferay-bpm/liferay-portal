@@ -110,9 +110,7 @@ import org.osgi.framework.FrameworkUtil;
  * @author Crescenzo Rega
  */
 @FeatureFlags(
-	featureFlags = {
-		@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-34594")
-	}
+	featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-34594")}
 )
 @RunWith(Arquillian.class)
 public class BulkActionResourceTest extends BaseBulkActionResourceTestCase {
