@@ -21,7 +21,6 @@ import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.IdEntityField;
 import com.liferay.portal.odata.entity.StringEntityField;
 import com.liferay.portal.test.rule.FeatureFlag;
-import com.liferay.portal.test.rule.FeatureFlags;
 
 import java.util.Collection;
 import java.util.List;

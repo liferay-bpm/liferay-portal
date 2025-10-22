@@ -1072,11 +1072,7 @@ public class ObjectDefinitionLocalServiceTest {
 				"definition within the same scope",
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, true, true, true,
-<<<<<<< HEAD
-				true, false, false, false, false, null,
-=======
 				false, false, false, false, null,
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1093,11 +1089,7 @@ public class ObjectDefinitionLocalServiceTest {
 				"definition within the same scope",
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, true, true, true,
-<<<<<<< HEAD
-				true, false, false, false, false, null,
-=======
 				false, false, false, false, null,
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1112,11 +1104,7 @@ public class ObjectDefinitionLocalServiceTest {
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, true, true, true,
-<<<<<<< HEAD
-				true, false, false, false, false, null,
-=======
 				false, false, false, false, null,
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1136,11 +1124,7 @@ public class ObjectDefinitionLocalServiceTest {
 				"definition within the same scope",
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, true, true, true,
-<<<<<<< HEAD
-				true, false, false, false, false, null,
-=======
 				false, false, false, false, null,
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1169,11 +1153,7 @@ public class ObjectDefinitionLocalServiceTest {
 				" is not included in the object definition scope"),
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, true, true, true,
-<<<<<<< HEAD
-				true, false, false, false, false, null,
-=======
 				false, false, false, false, null,
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1195,11 +1175,7 @@ public class ObjectDefinitionLocalServiceTest {
 		objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, true, true, true,
-<<<<<<< HEAD
-				true, false, false, false, false, null,
-=======
 				false, false, false, false, null,
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1221,11 +1197,7 @@ public class ObjectDefinitionLocalServiceTest {
 		objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, true, true, true,
-<<<<<<< HEAD
-				true, false, false, false, false, null,
-=======
 				false, false, false, false, null,
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1252,11 +1224,7 @@ public class ObjectDefinitionLocalServiceTest {
 				"definition within the same scope",
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, true, true, true,
-<<<<<<< HEAD
-				true, false, false, false, false, null,
-=======
 				false, false, false, false, null,
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1271,11 +1239,7 @@ public class ObjectDefinitionLocalServiceTest {
 		objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, true, true, true,
-<<<<<<< HEAD
-				true, false, false, false, false, null,
-=======
 				false, false, false, false, null,
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -3006,11 +2970,7 @@ public class ObjectDefinitionLocalServiceTest {
 					objectField.getObjectFieldId(), false,
 					objectDefinition.isActive(),
 					objectDefinition.getClassName(), true, false, true, false,
-<<<<<<< HEAD
-					true, true, false, false, false, false, false, null,
-=======
 					true, false, false, false, false, false, null,
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 					HashMapBuilder.put(
 						locale, RandomTestUtil.randomString()
 					).put(
@@ -3048,16 +3008,9 @@ public class ObjectDefinitionLocalServiceTest {
 				externalReferenceCode, objectDefinition.getObjectDefinitionId(),
 				0, 0, objectFolder.getObjectFolderId(), 0, false,
 				objectDefinition.isActive(), objectDefinition.getClassName(),
-<<<<<<< HEAD
-				true, false, false, true, false, true, false, false, false,
-				false, false, "test", LocalizedMapUtil.getLocalizedMap("Able"),
-				"Able", null, null, false,
-				LocalizedMapUtil.getLocalizedMap("Ables"),
-=======
 				true, false, false, true, false, false, false, false, false,
 				false, "test", LocalizedMapUtil.getLocalizedMap("Able"), "Able",
 				null, null, false, LocalizedMapUtil.getLocalizedMap("Ables"),
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 				objectDefinition.getScope(), objectDefinition.getStatus(),
 				Collections.emptyList(), Collections.emptyList());
 
@@ -3089,11 +3042,7 @@ public class ObjectDefinitionLocalServiceTest {
 			_objectDefinitionLocalService.updateCustomObjectDefinition(
 				null, objectDefinition.getObjectDefinitionId(), 0, 0, 0, 0,
 				false, objectDefinition.isActive(), null, true, false, true,
-<<<<<<< HEAD
-				false, true, true, false, true, true, true, true,
-=======
 				false, true, false, true, true, true, true,
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 				FriendlyURLResolverConstants.URL_SEPARATOR_Y_OBJECT_ENTRY,
 				LocalizedMapUtil.getLocalizedMap("Baker"), "Baker", null, null,
 				false, LocalizedMapUtil.getLocalizedMap("Bakers"),
@@ -3571,11 +3520,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 		return _objectDefinitionLocalService.addCustomObjectDefinition(
 			TestPropsValues.getUserId(), 0, className, false, true, false, true,
-<<<<<<< HEAD
-			true, false, false, false, false, null,
-=======
 			false, false, false, false, null,
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 			LocalizedMapUtil.getLocalizedMap(label), name, null, null,
 			LocalizedMapUtil.getLocalizedMap(pluralLabel), true,
 			ObjectDefinitionConstants.SCOPE_COMPANY,
@@ -4152,10 +4097,6 @@ public class ObjectDefinitionLocalServiceTest {
 
 		ObjectDefinition objectDefinition2 =
 			ObjectDefinitionTestUtil.addCustomObjectDefinition(
-<<<<<<< HEAD
-				true,
-=======
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 				Arrays.asList(
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -4184,11 +4125,7 @@ public class ObjectDefinitionLocalServiceTest {
 					objectRelationship.getObjectFieldId2(), 0, 0, false,
 					objectDefinition2.isActive(),
 					objectDefinition2.getClassName(), true, false, true, false,
-<<<<<<< HEAD
-					true, true, false, false, false, false, false, null,
-=======
 					true, false, false, false, false, false, null,
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 					LocalizedMapUtil.getLocalizedMap("Able"), "Able", null,
 					null, false, LocalizedMapUtil.getLocalizedMap("Ables"),
 					objectDefinition2.getScope(), objectDefinition2.getStatus(),
@@ -4230,13 +4167,8 @@ public class ObjectDefinitionLocalServiceTest {
 		return _objectDefinitionLocalService.updateCustomObjectDefinition(
 			externalReferenceCode, objectDefinitionId, 0,
 			descriptionObjectFieldId, 0, titleObjectFieldId, false, false, null,
-<<<<<<< HEAD
-			false, false, true, enableFriendlyURLCustomization, true, true,
-			false, enableObjectEntryHistory, enableObjectEntrySchedule, false,
-=======
 			false, false, true, enableFriendlyURLCustomization, true, false,
 			enableObjectEntryHistory, enableObjectEntrySchedule, false,
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 			enableObjectEntryVersioning, friendlyURLSeparator, labelMap, name,
 			null, null, false, pluralLabelMap, scope, status,
 			Collections.emptyList(), Collections.emptyList());

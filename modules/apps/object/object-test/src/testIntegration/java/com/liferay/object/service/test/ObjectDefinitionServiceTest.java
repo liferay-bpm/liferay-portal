@@ -54,7 +54,6 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.FeatureFlag;
-import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -535,11 +534,7 @@ public class ObjectDefinitionServiceTest {
 
 			objectDefinition =
 				_objectDefinitionService.addCustomObjectDefinition(
-<<<<<<< HEAD
-					objectFolderId, null, false, true, false, true, true, false,
-=======
 					objectFolderId, null, false, true, false, true, false,
->>>>>>> 951e1d0 (LPD-43541 remove localization flag from add and update methods in tests)
 					false, false, false, null,
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),

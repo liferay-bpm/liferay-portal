@@ -14,7 +14,7 @@ const test = mergeTests(
 	apiHelpersTest,
 	changeTrackingPagesTest,
 	featureFlagsTest({
-		'LPD-17564': {enabled: true}
+		'LPD-17564': {enabled: true},
 	}),
 	loginTest()
 );
