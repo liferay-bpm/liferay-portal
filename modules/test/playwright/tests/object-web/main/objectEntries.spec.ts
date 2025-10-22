@@ -80,8 +80,7 @@ const assigneeTest = test;
 const cmsTest = mergeTests(
 	test,
 	featureFlagsTest({
-		'LPD-17564': {enabled: true},
-		'LPD-32050': {enabled: true},
+		'LPD-17564': {enabled: true}
 	})
 );
 
