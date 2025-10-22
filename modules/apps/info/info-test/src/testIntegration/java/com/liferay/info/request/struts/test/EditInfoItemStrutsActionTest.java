@@ -218,9 +218,7 @@ public class EditInfoItemStrutsActionTest {
 			objectEntry.getURLTitle(_objectDefinition.getDefaultLocale()));
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testAddAndUpdateInfoItemWithEnableObjectEntrySchedule()
 		throws Exception {
@@ -531,9 +529,7 @@ public class EditInfoItemStrutsActionTest {
 			WorkflowConstants.STATUS_APPROVED);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testUpdateInfoItem() throws Exception {
 		MockHttpServletResponse mockHttpServletResponse =

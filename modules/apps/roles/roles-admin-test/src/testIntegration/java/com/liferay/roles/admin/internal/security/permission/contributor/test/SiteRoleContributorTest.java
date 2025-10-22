@@ -67,9 +67,7 @@ public class SiteRoleContributorTest {
 		UserTestUtil.setUser(_user);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testContribute() throws Exception {
 		PermissionChecker permissionChecker =

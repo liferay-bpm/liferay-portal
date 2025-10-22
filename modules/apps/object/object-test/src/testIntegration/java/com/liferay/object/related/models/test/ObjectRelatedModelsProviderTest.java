@@ -156,9 +156,7 @@ public class ObjectRelatedModelsProviderTest {
 		PermissionThreadLocal.setPermissionChecker(_originalPermissionChecker);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testMoveObjectEntryToTrash() throws Exception {
 		_testMoveObjectEntryToTrash(
@@ -664,9 +662,7 @@ public class ObjectRelatedModelsProviderTest {
 				objectRelationship.getObjectRelationshipId(), null));
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testRestoreObjectEntryFromTrash() throws Exception {
 		_testRestoreObjectEntryFromTrash(

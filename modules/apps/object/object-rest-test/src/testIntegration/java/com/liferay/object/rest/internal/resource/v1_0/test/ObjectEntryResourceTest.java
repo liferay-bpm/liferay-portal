@@ -5866,9 +5866,7 @@ public class ObjectEntryResourceTest {
 		Assert.assertEquals(1, itemsJSONArray.length());
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testGetObjectEntriesSystemProperties() throws Exception {
 		ObjectEntryTestUtil.addObjectEntry(
@@ -6017,9 +6015,7 @@ public class ObjectEntryResourceTest {
 		_testGetObjectEntryActions(false);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	@TestInfo("LPD-62553")
 	public void testGetObjectEntryActionsWithCompanySharingDisabled()
@@ -6039,9 +6035,7 @@ public class ObjectEntryResourceTest {
 		}
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	@TestInfo("LPD-62553")
 	public void testGetObjectEntryActionsWithGroupSharingDisabled()
@@ -6067,18 +6061,14 @@ public class ObjectEntryResourceTest {
 		}
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	@TestInfo("LPD-62553")
 	public void testGetObjectEntryActionsWithSharingEnabled() throws Exception {
 		_testGetObjectEntryActions(true);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	@TestInfo("LPD-62553")
 	public void testGetObjectEntryActionsWithSystemSharingDisabled()
@@ -7826,9 +7816,7 @@ public class ObjectEntryResourceTest {
 		}
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testGetObjectEntryWithTaxonomyCategories() throws Exception {
 		_addCMSGroup();
@@ -8722,9 +8710,7 @@ public class ObjectEntryResourceTest {
 			Http.Method.PUT, _objectDefinition2, _siteScopedObjectDefinition2);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-32050")}
-	)
+	@FeatureFlag("LPD-17564")
 	@Test
 	public void testPatchPutCustomObjectEntryWithScheduleDates()
 		throws Exception {
