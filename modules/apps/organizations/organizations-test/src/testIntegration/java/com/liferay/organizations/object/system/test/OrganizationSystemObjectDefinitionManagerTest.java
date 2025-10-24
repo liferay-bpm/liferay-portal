@@ -62,6 +62,10 @@ public class OrganizationSystemObjectDefinitionManagerTest
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
+
+		_adminUser = TestPropsValues.getUser();
+
+		setUser(_adminUser);
 	}
 
 	@After
@@ -75,9 +79,7 @@ public class OrganizationSystemObjectDefinitionManagerTest
 
 		// With permissions
 
-		User user1 = TestPropsValues.getUser();
-
-		setUser(user1);
+		User user = UserTestUtil.addUser();
 
 		String comment = RandomTestUtil.randomString();
 		String name = RandomTestUtil.randomString();
@@ -92,7 +94,7 @@ public class OrganizationSystemObjectDefinitionManagerTest
 			_organizationLocalService.getOrganizationsCount();
 
 		long organizationId1 = systemObjectDefinitionManager.addBaseModel(
-			true, user1, values);
+			true, user, values);
 
 		_assertCount(organizationsCount + 1);
 
@@ -106,7 +108,7 @@ public class OrganizationSystemObjectDefinitionManagerTest
 		name = RandomTestUtil.randomString();
 
 		long organizationId2 = systemObjectDefinitionManager.addBaseModel(
-			true, user1,
+			true, _adminUser,
 			HashMapBuilder.<String, Object>put(
 				"comment", comment
 			).put(
@@ -126,17 +128,15 @@ public class OrganizationSystemObjectDefinitionManagerTest
 
 		// Without permissions
 
-		User user2 = UserTestUtil.addUser();
-
-		setUser(user2);
+		setUser(user);
 
 		AssertUtils.assertFailure(
 			PortalException.class,
 			StringBundler.concat(
-				"User ", user2.getUserId(), " must have ", PortletKeys.PORTAL,
+				"User ", user.getUserId(), " must have ", PortletKeys.PORTAL,
 				", ADD_ORGANIZATION permission for null "),
 			() -> systemObjectDefinitionManager.addBaseModel(
-				true, user2, values));
+				true, user, values));
 	}
 
 	@Test
@@ -325,6 +325,8 @@ public class OrganizationSystemObjectDefinitionManagerTest
 
 		return labelMap;
 	}
+
+	private User _adminUser;
 
 	@Inject
 	private Language _language;
