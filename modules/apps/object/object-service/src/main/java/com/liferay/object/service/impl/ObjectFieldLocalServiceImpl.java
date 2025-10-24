@@ -975,8 +975,7 @@ public class ObjectFieldLocalServiceImpl
 
 			try {
 				ObjectDefinitionResourcePermissionUtil.populateResourceActions(
-					null, _language, null, objectDefinition,
-					objectFieldLocalService, _ploEntryLocalService,
+					null, null, objectDefinition, objectFieldLocalService,
 					_portletLocalService, _resourceActions, null);
 
 				_updateResourcePermissions(
