@@ -973,11 +973,16 @@ public class ObjectFieldLocalServiceImpl
 			objectField, objectDefinition, objectFieldBusinessType,
 			objectFieldSettings, null);
 
+		if (!objectDefinition.isApproved() ||
+			ObjectFieldUtil.isMetadata(name) ||
+			(system && objectDefinition.isUnmodifiableSystemObject())) {
+
+			return objectField;
+		}
+
 		if (FeatureFlagManagerUtil.isEnabled(
 				objectField.getCompanyId(), "LPD-17564") &&
-			objectDefinition.isApproved() &&
-			Objects.equals(
-				objectField.getBusinessType(),
+			objectField.compareBusinessType(
 				ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
 
 			try {
@@ -992,13 +997,6 @@ public class ObjectFieldLocalServiceImpl
 			catch (Exception exception) {
 				ReflectionUtil.throwException(exception);
 			}
-		}
-
-		if (!objectDefinition.isApproved() ||
-			ObjectFieldUtil.isMetadata(name) ||
-			(system && objectDefinition.isUnmodifiableSystemObject())) {
-
-			return objectField;
 		}
 
 		if (!objectField.compareBusinessType(
