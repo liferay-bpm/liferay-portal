@@ -363,6 +363,13 @@ public class ObjectFieldLocalServiceImpl
 
 				_ploEntryLocalService.deletePLOEntries(
 					objectField.getCompanyId(), "action." + actionId);
+
+				ObjectDefinition objectDefinition =
+					_objectDefinitionPersistence.findByPrimaryKey(
+						objectField.getObjectDefinitionId());
+
+				_resourceActions.removeModelResource(
+					objectDefinition.getClassName(), actionId);
 			}
 
 			_objectFieldSettingLocalService.deleteObjectFieldObjectFieldSetting(
@@ -1230,11 +1237,11 @@ public class ObjectFieldLocalServiceImpl
 
 				String actionId = objectField.getAttachmentDownloadActionKey();
 
-				_resourceActions.removeModelResource(
-					objectDefinition.getClassName(), actionId);
-
 				_ploEntryLocalService.deletePLOEntries(
 					objectField.getCompanyId(), "action." + actionId);
+
+				_resourceActions.removeModelResource(
+					objectDefinition.getClassName(), actionId);
 			}
 
 			ObjectFieldSetting objectFieldSetting =
