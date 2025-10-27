@@ -5,6 +5,8 @@
 
 package com.liferay.object.internal.model.listener;
 
+import com.liferay.asset.kernel.model.AssetVocabulary;
+import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
@@ -16,13 +18,16 @@ import com.liferay.portal.kernel.audit.AuditRouter;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.BaseModelListener;
+import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.security.audit.event.generators.constants.EventTypes;
 import com.liferay.portal.security.audit.event.generators.util.Attribute;
 import com.liferay.portal.security.audit.event.generators.util.AttributesBuilder;
 import com.liferay.portal.security.audit.event.generators.util.AuditMessageBuilder;
+import com.liferay.portlet.asset.util.AssetVocabularySettingsHelper;
 
 import java.util.Iterator;
 import java.util.List;
@@ -85,6 +90,25 @@ public class ObjectDefinitionModelListener
 	public void onBeforeRemove(ObjectDefinition objectDefinition)
 		throws ModelListenerException {
 
+		try {
+			ClassName className = _classNameLocalService.getClassName(
+				objectDefinition.getClassName());
+
+			long classNameId = className.getClassNameId();
+
+			List<AssetVocabulary> assetVocabularies =
+				_assetVocabularyLocalService.getAssetVocabularies(-1, -1);
+
+			for (AssetVocabulary assetVocabulary : assetVocabularies) {
+				_assetVocabularyRemoveClassNameId(assetVocabulary, classNameId);
+			}
+
+			super.onBeforeRemove(objectDefinition);
+		}
+		catch (Exception exception) {
+			throw new ModelListenerException(exception);
+		}
+
 		_route(EventTypes.DELETE, objectDefinition);
 	}
 
@@ -105,6 +129,73 @@ public class ObjectDefinitionModelListener
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
 		}
+	}
+
+	private void _assetVocabularyRemoveClassNameId(
+		AssetVocabulary assetVocabulary, long targetClassNameId) {
+
+		String settings = assetVocabulary.getSettings();
+
+		if ((settings == null) || settings.isEmpty()) {
+			return;
+		}
+
+		AssetVocabularySettingsHelper assetVocabularySettingsHelper =
+			new AssetVocabularySettingsHelper(settings);
+
+		long[] classNameIds = assetVocabularySettingsHelper.getClassNameIds();
+
+		int keepCount = 0;
+
+		for (long classNameId : classNameIds) {
+			if (classNameId != targetClassNameId) {
+				keepCount++;
+			}
+		}
+
+		if (keepCount == classNameIds.length) {
+			return;
+		}
+
+		long[] classTypePKs = assetVocabularySettingsHelper.getClassTypePKs();
+
+		if ((classTypePKs == null) ||
+			(classTypePKs.length != classNameIds.length)) {
+
+			return;
+		}
+
+		long[] newClassNameIds = new long[keepCount];
+		long[] newClassTypePKs = new long[keepCount];
+		boolean[] newRequireds = new boolean[keepCount];
+
+		int idx = 0;
+		int i = 0;
+
+		for (long classNameId : classNameIds) {
+			long classTypePK = classTypePKs[i];
+
+			if (classNameId != targetClassNameId) {
+				newClassNameIds[idx] = classNameId;
+				newClassTypePKs[idx] = classTypePK;
+
+				newRequireds[idx] =
+					assetVocabularySettingsHelper.
+						isClassNameIdAndClassTypePKRequired(
+							classNameId, classTypePK);
+
+				idx++;
+			}
+
+			i++;
+		}
+
+		assetVocabularySettingsHelper.setClassNameIdsAndClassTypePKs(
+			newClassNameIds, newClassTypePKs, newRequireds);
+
+		assetVocabulary.setSettings(assetVocabularySettingsHelper.toString());
+
+		_assetVocabularyLocalService.updateAssetVocabulary(assetVocabulary);
 	}
 
 	private List<Attribute> _getModifiedAttributes(
@@ -157,7 +248,13 @@ public class ObjectDefinitionModelListener
 	}
 
 	@Reference
+	private AssetVocabularyLocalService _assetVocabularyLocalService;
+
+	@Reference
 	private AuditRouter _auditRouter;
+
+	@Reference
+	private ClassNameLocalService _classNameLocalService;
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
