@@ -5211,7 +5211,16 @@ public class ObjectEntryLocalServiceImpl
 		_updateLatestApprovedObjectEntry(
 			objectEntry.getObjectEntryId(), WorkflowConstants.STATUS_IN_TRASH);
 
-		for (ObjectEntryVersion objectEntryVersion : objectEntryVersions) {
+		for (ObjectEntryVersion objectEntryVersion :
+				_objectEntryVersionLocalService.getObjectEntryVersions(
+					objectEntry.getObjectEntryId())) {
+
+			if (objectEntryVersion.getStatus() ==
+					WorkflowConstants.STATUS_IN_TRASH) {
+
+				continue;
+			}
+
 			objectEntryVersion.setStatus(WorkflowConstants.STATUS_IN_TRASH);
 
 			_objectEntryVersionLocalService.updateObjectEntryVersion(
