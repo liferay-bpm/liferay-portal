@@ -196,9 +196,23 @@ public class ObjectDefinitionResourceTest
 
 		Page<ObjectDefinition> page =
 			objectDefinitionResource.getObjectDefinitionsPage(
-				null, null, "status/any(k:k eq 2)", Pagination.of(1, 20), null);
+				null, null,
+				"hidden eq false and objectFolderExternalReferenceCode eq " +
+					"'default'",
+				Pagination.of(1, 20), null);
 
 		long totalCount = page.getTotalCount();
+
+		page = objectDefinitionResource.getObjectDefinitionsPage(
+			null, null, "objectFolderExternalReferenceCode eq 'default'",
+			Pagination.of(1, 20), null);
+
+		Assert.assertTrue(page.getTotalCount() > totalCount);
+
+		page = objectDefinitionResource.getObjectDefinitionsPage(
+			null, null, "status/any(k:k eq 2)", Pagination.of(1, 20), null);
+
+		totalCount = page.getTotalCount();
 
 		ObjectDefinition objectDefinition =
 			testGetObjectDefinitionsPage_addObjectDefinition(
