@@ -114,6 +114,7 @@
 			"titleObjectFieldName": "name"
 		},
 		{
+			"enableFormContainer": false,
 			"externalReferenceCode": "L_COMMERCE_ORDER",
 			"objectRelationships": [
 				{
@@ -170,6 +171,7 @@
 			"titleObjectFieldName": "id"
 		},
 		{
+			"enableFormContainer": false,
 			"externalReferenceCode": "L_COMMERCE_ORDER_ITEM",
 			"objectRelationships": [
 				{
@@ -229,6 +231,7 @@
 			"accountEntryRestrictedObjectFieldName": "r_accountToCommerceReturns_accountEntryId",
 			"className": "com.liferay.object.model.ObjectDefinition#C1R1",
 			"enableCategorization": true,
+			"enableFormContainer": false,
 			"enableLocalization": true,
 			"externalReferenceCode": "L_COMMERCE_RETURN",
 			"label": {
@@ -604,6 +607,7 @@
 			"accountEntryRestrictedObjectFieldName": "r_accountToCommerceReturnItems_accountEntryId",
 			"className": "com.liferay.object.model.ObjectDefinition#C2R2",
 			"enableCategorization": true,
+			"enableFormContainer": false,
 			"enableLocalization": true,
 			"externalReferenceCode": "L_COMMERCE_RETURN_ITEM",
 			"label": {
