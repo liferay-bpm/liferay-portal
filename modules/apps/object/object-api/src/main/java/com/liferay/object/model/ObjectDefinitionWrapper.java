@@ -1184,6 +1184,11 @@ public class ObjectDefinitionWrapper
 	}
 
 	@Override
+	public boolean isHidden() {
+		return model.isHidden();
+	}
+
+	@Override
 	public boolean isLinkedToObjectFolder(long objectFolderId) {
 		return model.isLinkedToObjectFolder(objectFolderId);
 	}

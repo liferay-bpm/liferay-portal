@@ -83,6 +83,8 @@ public interface ObjectDefinition
 
 	public boolean isDefaultStorageType();
 
+	public boolean isHidden();
+
 	public boolean isLinkedToObjectFolder(long objectFolderId);
 
 	public boolean isModifiableAndSystem();
