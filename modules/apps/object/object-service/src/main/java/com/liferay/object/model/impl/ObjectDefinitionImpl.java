@@ -20,6 +20,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -27,6 +28,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Marco Leo
@@ -215,6 +217,18 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 	}
 
 	@Override
+	public boolean isHidden() {
+		if (isModifiableAndSystem() &&
+			!_visibleModifiableAndSystemObjectDefinitions.contains(
+				getExternalReferenceCode())) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
 	public boolean isLinkedToObjectFolder(long objectFolderId) {
 		if (getObjectFolderId() == objectFolderId) {
 			return false;
@@ -284,5 +298,11 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 	}
 
 	private List<ObjectDefinitionSetting> _objectDefinitionSettings;
+	private final Set<String> _visibleModifiableAndSystemObjectDefinitions =
+		SetUtil.fromArray(
+			new String[] {
+				"L_CMS_BASIC_DOCUMENT", "L_CMS_BASIC_WEB_CONTENT", "L_CMS_BLOG",
+				"L_CMS_EXTERNAL_VIDEO"
+			});
 
 }
