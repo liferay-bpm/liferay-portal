@@ -777,6 +777,13 @@ public class DataFactory {
 		return sb.toString();
 	}
 
+	public String[] getLayoutDataItemTypes() {
+		return new String[] {
+			LayoutDataItemTypeConstants.TYPE_COLLECTION,
+			LayoutDataItemTypeConstants.TYPE_FORM
+		};
+	}
+
 	public int getMaxAccountEntryCommerceOrderCount() {
 		return BenchmarksPropsValues.MAX_ACCOUNT_ENTRY_COMMERCE_ORDER_COUNT;
 	}
