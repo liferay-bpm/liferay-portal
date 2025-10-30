@@ -4405,7 +4405,7 @@ public class DataFactory {
 					_readFile(
 						_getFragmentComponentInputStream(
 							"basic/component", "paragraph", "html")),
-					StringPool.BLANK,
+					StringPool.BLANK, StringPool.BLANK,
 					_readFile(
 						"fragment_component" +
 							"/fragment_component_paragraph_title_editValue." +
@@ -4421,7 +4421,7 @@ public class DataFactory {
 					_readFile(
 						_getFragmentComponentInputStream(
 							"basic/component", "paragraph", "html")),
-					StringPool.BLANK,
+					StringPool.BLANK, StringPool.BLANK,
 					_readFile(
 						"fragment_component" +
 							"/fragment_component_paragraph_content_editValue." +
@@ -4434,6 +4434,7 @@ public class DataFactory {
 					_readFile(
 						_getFragmentComponentInputStream(
 							"basic/component", "image", "html")),
+					StringPool.BLANK,
 					_readFile(
 						"fragment_component" +
 							"/fragment_component_image_configuration.json"),
@@ -4459,6 +4460,7 @@ public class DataFactory {
 					hiddenFragmentEntryLinkModel.getExternalReferenceCode(),
 					segmentsExperienceId, hiddenFragmentEntryLinkModel.getCss(),
 					hiddenFragmentEntryLinkModel.getHtml(),
+					hiddenFragmentEntryLinkModel.getJs(),
 					hiddenFragmentEntryLinkModel.getConfiguration(),
 					hiddenFragmentEntryLinkModel.getEditableValues(),
 					hiddenFragmentEntryLinkModel.getNamespace(),
@@ -5968,6 +5970,7 @@ public class DataFactory {
 			String css = null;
 			String editValueJSON = null;
 			String html = null;
+			String js = null;
 			String renderKey = null;
 
 			if (StringUtil.equals(
@@ -6003,7 +6006,7 @@ public class DataFactory {
 				html = _readFile(
 					_getFragmentComponentInputStream(
 						"basic/component", "heading", "html"));
-
+				js = StringPool.BLANK;
 				renderKey = _FRAGMENT_COMPONENT_RENDER_KEY_HEADING;
 			}
 			else if (StringUtil.equals(
@@ -6034,6 +6037,9 @@ public class DataFactory {
 				html = _readFile(
 					_getFragmentComponentInputStream(
 						"inputs", fragmentName, "html"));
+				js = _readFile(
+					_getFragmentComponentInputStream(
+						"inputs", fragmentName, "js"));
 			}
 
 			segmentsExperienceId = _getSegmentsExperienceId(
@@ -6042,8 +6048,8 @@ public class DataFactory {
 			nonhiddenFragmentEntryLinkModels.add(
 				newFragmentEntryLinkModel(
 					layoutModels.get(1), null, segmentsExperienceId, css, html,
-					StringPool.BLANK, editValueJSON, paragraphRenderNamespace,
-					0, renderKey));
+					js, StringPool.BLANK, editValueJSON,
+					paragraphRenderNamespace, 0, renderKey));
 		}
 
 		List<FragmentEntryLinkModel> fragmentEntryLinkModels = new ArrayList<>(
@@ -6062,6 +6068,7 @@ public class DataFactory {
 					segmentsExperienceId,
 					originalFragmentEntryLinkModel.getCss(),
 					originalFragmentEntryLinkModel.getHtml(),
+					originalFragmentEntryLinkModel.getJs(),
 					originalFragmentEntryLinkModel.getConfiguration(),
 					originalFragmentEntryLinkModel.getEditableValues(),
 					originalFragmentEntryLinkModel.getNamespace(),
@@ -7788,7 +7795,7 @@ public class DataFactory {
 
 	protected FragmentEntryLinkModel newFragmentEntryLinkModel(
 		LayoutModel layoutModel, String originalFragmentEntryLinkERC,
-		long segmentsExperienceId, String css, String html,
+		long segmentsExperienceId, String css, String html, String js,
 		String configuration, String editValue, String nameSpace, int position,
 		String renderKey) {
 
@@ -7823,6 +7830,7 @@ public class DataFactory {
 		fragmentEntryLinkModel.setPlid(layoutModel.getPlid());
 		fragmentEntryLinkModel.setCss(css);
 		fragmentEntryLinkModel.setHtml(html);
+		fragmentEntryLinkModel.setJs(js);
 		fragmentEntryLinkModel.setConfiguration(configuration);
 		fragmentEntryLinkModel.setEditableValues(editValue);
 		fragmentEntryLinkModel.setNamespace(nameSpace);
