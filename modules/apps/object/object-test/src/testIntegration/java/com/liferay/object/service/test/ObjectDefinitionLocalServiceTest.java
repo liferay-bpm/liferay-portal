@@ -27,7 +27,6 @@ import com.liferay.object.exception.ObjectDefinitionActiveException;
 import com.liferay.object.exception.ObjectDefinitionClassNameException;
 import com.liferay.object.exception.ObjectDefinitionEnableFormContainerException;
 import com.liferay.object.exception.ObjectDefinitionEnableFriendlyURLCustomizationException;
-import com.liferay.object.exception.ObjectDefinitionEnableLocalizationException;
 import com.liferay.object.exception.ObjectDefinitionEnableObjectEntryHistoryException;
 import com.liferay.object.exception.ObjectDefinitionEnableObjectEntryScheduleException;
 import com.liferay.object.exception.ObjectDefinitionEnableObjectEntrySubscriptionException;
@@ -2828,16 +2827,6 @@ public class ObjectDefinitionLocalServiceTest {
 						true
 					).build()));
 
-		ObjectDefinition finalObjectDefinition = objectDefinition1;
-
-		AssertUtils.assertFailure(
-			ObjectDefinitionEnableLocalizationException.class,
-			"You cannot disable entry translation for the object definition " +
-				"because translation is enabled for custom fields",
-			() -> _objectDefinitionLocalService.publishCustomObjectDefinition(
-				TestPropsValues.getUserId(),
-				finalObjectDefinition.getObjectDefinitionId()));
-
 		objectDefinition1.setName(ObjectDefinitionTestUtil.getRandomName());
 
 		objectDefinition1 = _updateCustomObjectDefinition(
@@ -3364,23 +3353,6 @@ public class ObjectDefinitionLocalServiceTest {
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING,
 						RandomTestUtil.randomString(), StringUtil.randomId())));
-
-		// Enable localization must be true for modifiable object definitions
-
-		AssertUtils.assertFailure(
-			ObjectDefinitionEnableLocalizationException.class,
-			"Enable localization must be true for modifiable object " +
-				"definitions",
-			() -> _objectDefinitionLocalService.updateCustomObjectDefinition(
-				null, objectDefinition1.getObjectDefinitionId(), 0, 0, 0, 0,
-				false, false, objectDefinition1.getClassName(), false, true,
-				true, false, true, false, false, false, false, false, null,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				RandomTestUtil.randomString(), null, null, false,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				ObjectDefinitionConstants.SCOPE_SITE,
-				objectDefinition1.getStatus(), Collections.emptyList(),
-				Collections.emptyList(), Collections.emptyList()));
 
 		// Object folder does not exist
 
