@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Vendel Toreki
@@ -46,6 +47,8 @@ public class BatchEnginePortletDataHandlerUtil {
 		GroupLocalService groupLocalService,
 		PortletDataContext portletDataContext,
 		StagingGroupHelper stagingGroupHelper) {
+
+		AtomicBoolean rootModelHierarchy = new AtomicBoolean(false);
 
 		HashMap<String, Serializable> exportParameters =
 			HashMapBuilder.<String, Serializable>put(
@@ -67,6 +70,10 @@ public class BatchEnginePortletDataHandlerUtil {
 
 						batchNestedFields.addAll(
 							exportImportDescriptor.getNestedFields());
+
+						if (batchNestedFields.contains("rootModelHierarchy")) {
+							rootModelHierarchy.set(true);
+						}
 					}
 
 					if (batchNestedFields.isEmpty()) {
@@ -130,6 +137,10 @@ public class BatchEnginePortletDataHandlerUtil {
 			else {
 				exportParameters.put("siteId", group.getGroupId());
 			}
+		}
+
+		if (rootModelHierarchy.get()) {
+			exportParameters.put("batchNestedFieldsDepth", 4);
 		}
 
 		return exportParameters;

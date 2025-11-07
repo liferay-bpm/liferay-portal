@@ -7,10 +7,11 @@ package com.liferay.object.rest.internal.resource.v1_0;
 
 import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.definition.tree.util.ObjectDefinitionTreeUtil;
 import com.liferay.object.exception.ObjectEntryValidationException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
-import com.liferay.object.model.ObjectRelationshipModel;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.dto.v1_0.ValidationError;
 import com.liferay.object.rest.dto.v1_0.ValidationRequest;
@@ -28,6 +29,8 @@ import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
+import com.liferay.object.tree.ObjectDefinitionTreeFactory;
+import com.liferay.object.tree.Tree;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
@@ -56,6 +59,7 @@ import jakarta.ws.rs.core.Response;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -423,11 +427,50 @@ public class ObjectEntryResourceImpl
 
 			@Override
 			public List<String> getNestedFields() {
-				return transform(
+				List<String> nestedField = new ArrayList<>();
+
+				List<ObjectRelationship> objectRelationships =
 					_objectRelationshipLocalService.
 						getObjectRelationshipsByObjectDefinitionId2(
-							_objectDefinition.getObjectDefinitionId()),
-					ObjectRelationshipModel::getName);
+							_objectDefinition.getObjectDefinitionId());
+
+				for (ObjectRelationship objectRelationship :
+						objectRelationships) {
+
+					if (!objectRelationship.isEdge() &&
+						!nestedField.contains(objectRelationship.getName())) {
+
+						nestedField.add(objectRelationship.getName());
+					}
+				}
+
+				if (_objectDefinition.isRootNode() ||
+					_objectDefinition.isRootDescendantNode()) {
+
+					try {
+						ObjectDefinitionTreeFactory
+							objectDefinitionTreeFactory =
+								new ObjectDefinitionTreeFactory(
+									_objectDefinitionLocalService,
+									_objectRelationshipLocalService);
+
+						Tree tree = objectDefinitionTreeFactory.create(
+							_objectDefinition.getObjectDefinitionId());
+
+						nestedField.addAll(
+							ObjectDefinitionTreeUtil.getObjectRelationshipNames(
+								_objectRelationshipLocalService, tree));
+
+						nestedField.add("rootModelHierarchy");
+					}
+					catch (Exception exception) {
+						_log.error(exception);
+					}
+				}
+
+				ListUtil.distinct(nestedField);
+
+				return nestedField;
 			}
 
 			@Override

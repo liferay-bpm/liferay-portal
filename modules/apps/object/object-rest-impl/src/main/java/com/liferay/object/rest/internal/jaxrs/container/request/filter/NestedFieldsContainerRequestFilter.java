@@ -5,12 +5,10 @@
 
 package com.liferay.object.rest.internal.jaxrs.container.request.filter;
 
+import com.liferay.object.definition.tree.util.ObjectDefinitionTreeUtil;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.object.tree.Edge;
-import com.liferay.object.tree.Node;
 import com.liferay.object.tree.ObjectDefinitionTreeFactory;
 import com.liferay.object.tree.Tree;
 import com.liferay.portal.kernel.log.Log;
@@ -28,7 +26,6 @@ import jakarta.ws.rs.ext.Provider;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -77,33 +74,9 @@ public class NestedFieldsContainerRequestFilter
 
 			treeHeight += tree.getHeight(tree.getRootNode());
 
-			Iterator<Node> iterator = tree.iterator();
-
-			while (iterator.hasNext()) {
-				Node node = iterator.next();
-
-				List<Node> childNodes = node.getChildNodes();
-
-				if (ListUtil.isEmpty(childNodes)) {
-					continue;
-				}
-
-				for (int i = childNodes.size() - 1; i >= 0; i--) {
-					Node childNode = childNodes.get(i);
-
-					Edge edge = childNode.getEdge();
-
-					if (edge == null) {
-						continue;
-					}
-
-					ObjectRelationship objectRelationship =
-						_objectRelationshipLocalService.getObjectRelationship(
-							edge.getObjectRelationshipId());
-
-					nestedFields.add(objectRelationship.getName());
-				}
-			}
+			nestedFields.addAll(
+				ObjectDefinitionTreeUtil.getObjectRelationshipNames(
+					_objectRelationshipLocalService, tree));
 		}
 		catch (Exception exception) {
 			_log.error(exception);
