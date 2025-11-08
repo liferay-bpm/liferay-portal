@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {act, fireEvent, render} from '@testing-library/react';
+import {act, fireEvent, render, screen} from '@testing-library/react';
 import {FormProvider, PageProvider} from 'data-engine-js-components-web';
 import React from 'react';
 
@@ -95,6 +95,46 @@ describe('ReactFieldBase', () => {
 				'class',
 				'label ml-1 label-secondary'
 			);
+		});
+	});
+
+	describe('no localization tooltip', () => {
+		it('renders no localization  tooltip when no localization is disabled', () => {
+			render(
+				<FieldBaseWithProvider
+					editOnlyInDefaultLanguage={true}
+					fieldName="field_name"
+					instanceId="instance_id"
+					label="Text"
+					name="test_name"
+					readOnly={true}
+				/>
+			);
+			const localizationTooltip = screen.getByTestId('tooltip');
+			expect(localizationTooltip).toHaveAttribute(
+				'title',
+				'this-field-cannot-be-localized'
+			);
+			expect(localizationTooltip).toContainHTML(
+				'<svg class="lexicon-icon lexicon-icon-question-circle-full"'
+			);
+		});
+
+		it('does not render no localization tooltip when localization is enabled', () => {
+			const localizedValue = {ca_ES: 'test_ca_ES', en_US: 'test_en_US'};
+			render(
+				<FieldBaseWithProvider
+					editOnlyInDefaultLanguage={true}
+					fieldName="field_name"
+					instanceId="instance_id"
+					label="Text"
+					localizedValue={localizedValue}
+					name="test_name"
+					readOnly={true}
+				/>
+			);
+			const localizationTooltip = screen.queryByTestId('tooltip');
+			expect(localizationTooltip).toBeNull();
 		});
 	});
 
