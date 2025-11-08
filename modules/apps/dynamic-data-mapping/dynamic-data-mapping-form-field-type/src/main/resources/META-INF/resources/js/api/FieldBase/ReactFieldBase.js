@@ -619,11 +619,12 @@ export default function FieldBase({
 								/>
 							)}
 
-							{showDisabledFieldIcon && (
-								<FieldInformation
-									tooltip={nonLocalizableFieldMessage}
-								/>
-							)}
+							{showDisabledFieldIcon &&
+								!hiddenTranslations.length && (
+									<FieldInformation
+										tooltip={nonLocalizableFieldMessage}
+									/>
+								)}
 
 							{children}
 						</div>
@@ -661,11 +662,12 @@ export default function FieldBase({
 								/>
 							)}
 
-							{showDisabledFieldIcon && (
-								<FieldInformation
-									tooltip={nonLocalizableFieldMessage}
-								/>
-							)}
+							{showDisabledFieldIcon &&
+								!hiddenTranslations.length && (
+									<FieldInformation
+										tooltip={nonLocalizableFieldMessage}
+									/>
+								)}
 
 							{children}
 
