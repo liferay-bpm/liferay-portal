@@ -38,15 +38,25 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectEntryException;
+import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.field.setting.builder.ObjectFieldSettingBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManager;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.test.util.ObjectRelationshipTestUtil;
+import com.liferay.object.test.util.TreeTestUtil;
+import com.liferay.object.tree.Edge;
+import com.liferay.object.tree.Node;
+import com.liferay.object.tree.Tree;
 import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.lang.SafeCloseable;
@@ -85,7 +95,9 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
+import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -105,6 +117,9 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegate;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
+import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
@@ -360,6 +375,359 @@ public class BatchEnginePortletDataHandlerTest {
 			ObjectDefinitionConstants.SCOPE_COMPANY);
 		_testExportImportObjectEntriesWithErrorReport(
 			GroupTestUtil.addGroup(), ObjectDefinitionConstants.SCOPE_SITE);
+	}
+
+	@Test
+	public void testExportImportObjectEntriesWithRootModelHierarchy()
+		throws Exception {
+
+		Group group = _stagingGroupHelper.fetchCompanyGroup(
+			TestPropsValues.getCompanyId());
+
+		DefaultObjectEntryManager defaultObjectEntryManager =
+			(DefaultObjectEntryManager)_objectEntryManager;
+
+		DTOConverterContext dtoConverterContext =
+			new DefaultDTOConverterContext(
+				false, Collections.emptyMap(), dtoConverterRegistry, null,
+				LocaleUtil.getDefault(), null, TestPropsValues.getUser());
+
+		ObjectDefinition objectDefinitionA = _addAndPublishObjectDefinition(
+			"A");
+
+		ObjectDefinition objectDefinitionAA = _addAndPublishObjectDefinition(
+			"AA");
+
+		ObjectDefinition objectDefinitionAAA = _addAndPublishObjectDefinition(
+			"AAA");
+
+		ObjectDefinition objectDefinitionAAAA = _addAndPublishObjectDefinition(
+			"AAAA");
+
+		ObjectDefinition objectDefinitionAAAAA = _addAndPublishObjectDefinition(
+			"AAAAA");
+
+		ObjectDefinition objectDefinitionB = _addAndPublishObjectDefinition(
+			"B");
+
+		ObjectEntry objectEntryB = _addObjectEntry(
+			0, objectDefinitionB,
+			Collections.singletonMap("name", RandomTestUtil.randomString()));
+
+		ObjectRelationship objectRelationshipA_B =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinitionB,
+				objectDefinitionA,
+				ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
+				"rel" + RandomTestUtil.randomString());
+
+		ObjectField relationshipObjectField =
+			_objectFieldLocalService.fetchObjectField(
+				objectRelationshipA_B.getObjectFieldId2());
+
+		ObjectEntry objectEntryA = _addObjectEntry(
+			objectEntryB.getGroupId(), objectDefinitionA,
+			Collections.singletonMap(
+				relationshipObjectField.getName(),
+				objectEntryB.getObjectEntryId()));
+
+		ObjectRelationship objectRelationshipA_AA = TreeTestUtil.bind(
+			objectDefinitionA.getObjectDefinitionId(),
+			objectDefinitionAA.getObjectDefinitionId(),
+			_objectRelationshipLocalService);
+
+		ObjectRelationship objectRelationshipAA_AAA = TreeTestUtil.bind(
+			objectDefinitionAA.getObjectDefinitionId(),
+			objectDefinitionAAA.getObjectDefinitionId(),
+			_objectRelationshipLocalService);
+
+		ObjectRelationship objectRelationshipAAA_AAAA = TreeTestUtil.bind(
+			objectDefinitionAAA.getObjectDefinitionId(),
+			objectDefinitionAAAA.getObjectDefinitionId(),
+			_objectRelationshipLocalService);
+
+		ObjectRelationship objectRelationshipAAAA_AAAAA = TreeTestUtil.bind(
+			objectDefinitionAAAA.getObjectDefinitionId(),
+			objectDefinitionAAAAA.getObjectDefinitionId(),
+			_objectRelationshipLocalService);
+
+		objectEntryA = _objectEntryLocalService.addOrUpdateObjectEntry(
+			objectEntryA.getExternalReferenceCode(), 0,
+			TestPropsValues.getUserId(),
+			objectDefinitionA.getObjectDefinitionId(),
+			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+			Collections.singletonMap("name", RandomTestUtil.randomString()),
+			ServiceContextTestUtil.getServiceContext());
+
+		com.liferay.object.rest.dto.v1_0.ObjectEntry dtoObjectEntryAA =
+			new com.liferay.object.rest.dto.v1_0.ObjectEntry();
+
+		com.liferay.object.rest.dto.v1_0.ObjectEntry dtoObjectEntryAAA =
+			new com.liferay.object.rest.dto.v1_0.ObjectEntry();
+
+		com.liferay.object.rest.dto.v1_0.ObjectEntry dtoObjectEntryAAAA =
+			new com.liferay.object.rest.dto.v1_0.ObjectEntry();
+
+		com.liferay.object.rest.dto.v1_0.ObjectEntry dtoObjectEntryAAAAA =
+			new com.liferay.object.rest.dto.v1_0.ObjectEntry();
+
+		dtoObjectEntryAA.setProperties(
+			Collections.singletonMap("name", RandomTestUtil.randomString()));
+
+		dtoObjectEntryAAA.setProperties(
+			Collections.singletonMap("name", RandomTestUtil.randomString()));
+
+		dtoObjectEntryAAAA.setProperties(
+			Collections.singletonMap("name", RandomTestUtil.randomString()));
+
+		dtoObjectEntryAAAAA.setProperties(
+			Collections.singletonMap("name", RandomTestUtil.randomString()));
+
+		com.liferay.object.rest.dto.v1_0.ObjectEntry objectEntryAA =
+			defaultObjectEntryManager.addRelatedObjectEntry(
+				dtoConverterContext, objectEntryA.getExternalReferenceCode(),
+				dtoObjectEntryAA, objectRelationshipA_AA, null);
+
+		com.liferay.object.rest.dto.v1_0.ObjectEntry objectEntryAAA =
+			defaultObjectEntryManager.addRelatedObjectEntry(
+				dtoConverterContext, objectEntryAA.getExternalReferenceCode(),
+				dtoObjectEntryAAA, objectRelationshipAA_AAA, null);
+
+		com.liferay.object.rest.dto.v1_0.ObjectEntry objectEntryAAAA =
+			defaultObjectEntryManager.addRelatedObjectEntry(
+				dtoConverterContext, objectEntryAAA.getExternalReferenceCode(),
+				dtoObjectEntryAAAA, objectRelationshipAAA_AAAA, null);
+
+		com.liferay.object.rest.dto.v1_0.ObjectEntry objectEntryAAAAA =
+			defaultObjectEntryManager.addRelatedObjectEntry(
+				dtoConverterContext, objectEntryAAAA.getExternalReferenceCode(),
+				dtoObjectEntryAAAAA, objectRelationshipAAAA_AAAAA, null);
+
+		try {
+			File larFile = _exportLayouts(
+				false, group.getGroupId(), false, new long[0],
+				objectDefinitionA);
+
+			JSONArray exportedObjectEntriesJSONArray =
+				_getExportedObjectEntriesJSONArray(
+					objectDefinitionA.getName(), larFile, group.getGroupId());
+
+			JSONObject objectDefinitionJSONObject =
+				exportedObjectEntriesJSONArray.getJSONObject(0);
+
+			Assert.assertTrue(
+				objectDefinitionJSONObject.has(
+					objectRelationshipA_B.getName()));
+
+			objectDefinitionJSONObject = _assertAndGetJSONObject(
+				objectDefinitionJSONObject, objectRelationshipA_AA,
+				(String)dtoObjectEntryAA.getPropertyValue("name"));
+
+			objectDefinitionJSONObject = _assertAndGetJSONObject(
+				objectDefinitionJSONObject, objectRelationshipAA_AAA,
+				(String)dtoObjectEntryAAA.getPropertyValue("name"));
+
+			objectDefinitionJSONObject = _assertAndGetJSONObject(
+				objectDefinitionJSONObject, objectRelationshipAAA_AAAA,
+				(String)dtoObjectEntryAAAA.getPropertyValue("name"));
+
+			_assertAndGetJSONObject(
+				objectDefinitionJSONObject, objectRelationshipAAAA_AAAAA,
+				(String)dtoObjectEntryAAAAA.getPropertyValue("name"));
+
+			_deleteObjectEntries(objectEntryA);
+			_deleteObjectEntries(objectEntryB);
+
+			_importLayouts(
+				false, false, larFile, group.getGroupId(), objectDefinitionA);
+
+			com.liferay.object.rest.dto.v1_0.ObjectEntry importedObjectEntry =
+				defaultObjectEntryManager.getObjectEntry(
+					objectDefinitionA.getCompanyId(), dtoConverterContext,
+					objectEntryA.getExternalReferenceCode(), objectDefinitionA,
+					objectDefinitionA.getScope());
+
+			Assert.assertNotNull(importedObjectEntry);
+			Assert.assertEquals(
+				objectEntryA.getValues(
+				).get(
+					"name"
+				),
+				importedObjectEntry.getPropertyValue("name"));
+
+			importedObjectEntry =
+				defaultObjectEntryManager.getRelatedObjectEntry(
+					dtoConverterContext,
+					objectEntryAA.getExternalReferenceCode(),
+					objectRelationshipA_AA,
+					objectEntryA.getExternalReferenceCode(),
+					objectDefinitionAA.getScope());
+
+			Assert.assertNotNull(importedObjectEntry);
+			Assert.assertEquals(
+				objectEntryAA.getPropertyValue("name"),
+				importedObjectEntry.getPropertyValue("name"));
+
+			importedObjectEntry =
+				defaultObjectEntryManager.getRelatedObjectEntry(
+					dtoConverterContext,
+					objectEntryAAA.getExternalReferenceCode(),
+					objectRelationshipAA_AAA,
+					objectEntryAA.getExternalReferenceCode(),
+					objectDefinitionAAA.getScope());
+
+			Assert.assertNotNull(importedObjectEntry);
+			Assert.assertEquals(
+				objectEntryAAA.getPropertyValue("name"),
+				importedObjectEntry.getPropertyValue("name"));
+
+			importedObjectEntry =
+				defaultObjectEntryManager.getRelatedObjectEntry(
+					dtoConverterContext,
+					objectEntryAAAA.getExternalReferenceCode(),
+					objectRelationshipAAA_AAAA,
+					objectEntryAAA.getExternalReferenceCode(),
+					objectDefinitionAAAA.getScope());
+
+			Assert.assertNotNull(importedObjectEntry);
+			Assert.assertEquals(
+				objectEntryAAAA.getPropertyValue("name"),
+				importedObjectEntry.getPropertyValue("name"));
+
+			importedObjectEntry =
+				defaultObjectEntryManager.getRelatedObjectEntry(
+					dtoConverterContext,
+					objectEntryAAAAA.getExternalReferenceCode(),
+					objectRelationshipAAAA_AAAAA,
+					objectEntryAAAA.getExternalReferenceCode(),
+					objectDefinitionAAAAA.getScope());
+
+			Assert.assertNotNull(importedObjectEntry);
+			Assert.assertEquals(
+				objectEntryAAAAA.getPropertyValue("name"),
+				importedObjectEntry.getPropertyValue("name"));
+
+			importedObjectEntry = defaultObjectEntryManager.getObjectEntry(
+				objectDefinitionB.getCompanyId(), dtoConverterContext,
+				objectEntryB.getExternalReferenceCode(), objectDefinitionB,
+				objectDefinitionB.getScope());
+
+			Assert.assertNotNull(importedObjectEntry);
+			Assert.assertEquals(
+				StringPool.BLANK, importedObjectEntry.getPropertyValue("name"));
+		}
+		finally {
+			TreeTestUtil.unbind(
+				objectRelationshipA_AA, _objectRelationshipLocalService);
+			TreeTestUtil.unbind(
+				objectRelationshipAA_AAA, _objectRelationshipLocalService);
+			TreeTestUtil.unbind(
+				objectRelationshipAAA_AAAA, _objectRelationshipLocalService);
+			TreeTestUtil.unbind(
+				objectRelationshipAAAA_AAAAA, _objectRelationshipLocalService);
+
+			_objectRelationshipLocalService.deleteObjectRelationship(
+				objectRelationshipA_B.getObjectRelationshipId());
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinitionA);
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinitionAA);
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinitionAAA);
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinitionAAAA);
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinitionAAAAA);
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinitionB);
+		}
+	}
+
+	@Test
+	public void testExportImportObjectEntriesWithRootModelHierarchy2()
+		throws Exception {
+
+		Group group = _stagingGroupHelper.fetchCompanyGroup(
+			TestPropsValues.getCompanyId());
+
+		Tree objectDefinitionTree = TreeTestUtil.createObjectDefinitionTree(
+			_objectDefinitionLocalService, _objectRelationshipLocalService,
+			true,
+			LinkedHashMapBuilder.put(
+				"A", new String[] {"AA", "AB"}
+			).put(
+				"AA", new String[] {"AAA", "AAB"}
+			).put(
+				"AB", new String[0]
+			).put(
+				"AAA", new String[0]
+			).put(
+				"AAB", new String[0]
+			).build());
+
+		Node objectDefinitionRootNode = objectDefinitionTree.getRootNode();
+
+		Tree objectEntryTree = TreeTestUtil.createObjectEntryTree(
+			"1", _objectDefinitionLocalService, _objectEntryLocalService,
+			_objectFieldLocalService, _objectRelationshipLocalService,
+			objectDefinitionRootNode.getPrimaryKey());
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				TestPropsValues.getCompanyId(), "C_A");
+
+		try {
+			File larFile = _exportLayouts(
+				false, group.getGroupId(), false, new long[0],
+				objectDefinition);
+
+			JSONArray objectEntriesJSONArray =
+				_getExportedObjectEntriesJSONArray(
+					objectDefinition.getName(), larFile, group.getGroupId());
+
+			JSONObject objectDefinitionJSONObject =
+				objectEntriesJSONArray.getJSONObject(0);
+
+			Node objectEntryRootNode = objectEntryTree.getRootNode();
+
+			_assertRelatedObjectEntryExternalReferenceCode(
+				_getChildNodeEdge(0, objectEntryRootNode), "AA1",
+				objectDefinitionJSONObject);
+			_assertRelatedObjectEntryExternalReferenceCode(
+				_getChildNodeEdge(1, objectEntryRootNode), "AB1",
+				objectDefinitionJSONObject);
+
+			JSONObject objectEntryJSONObject = _getRelatedJSONObject(
+				objectDefinitionJSONObject,
+				_getObjectRelationshipName(
+					_getChildNodeEdge(0, objectEntryRootNode)),
+				Type.ONE_TO_MANY);
+
+			_assertRelatedObjectEntryExternalReferenceCode(
+				_getChildNodeEdge(0, _getChildNode(0, objectEntryRootNode)),
+				"AAA1", objectEntryJSONObject);
+			_assertRelatedObjectEntryExternalReferenceCode(
+				_getChildNodeEdge(1, _getChildNode(0, objectEntryRootNode)),
+				"AAB1", objectEntryJSONObject);
+
+			_objectEntryLocalService.deleteObjectEntry(
+				objectEntryRootNode.getPrimaryKey());
+
+			_importLayouts(
+				false, false, larFile, group.getGroupId(), objectDefinition);
+
+			_assertObjectEntry("A1", "A");
+			_assertObjectEntry("AA1", "AA");
+			_assertObjectEntry("AB1", "AB");
+			_assertObjectEntry("AAA1", "AAA");
+			_assertObjectEntry("AAB1", "AAB");
+		}
+		finally {
+			TreeTestUtil.deleteObjectDefinitionHierarchy(
+				_objectDefinitionLocalService,
+				new String[] {"C_A", "C_AA", "C_AB", "C_AAAA", "C_AAB"},
+				_objectEntryLocalService, _objectRelationshipLocalService);
+		}
 	}
 
 	@Ignore("LPD-40798")
@@ -806,6 +1174,24 @@ public class BatchEnginePortletDataHandlerTest {
 
 	}
 
+	@Inject
+	protected static DTOConverterRegistry dtoConverterRegistry;
+
+	private ObjectDefinition _addAndPublishObjectDefinition(String name)
+		throws Exception {
+
+		return ObjectDefinitionTestUtil.publishObjectDefinition(
+			name,
+			Collections.singletonList(
+				new TextObjectFieldBuilder(
+				).labelMap(
+					RandomTestUtil.randomLocaleStringMap()
+				).name(
+					"name"
+				).build()),
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+	}
+
 	private DLFileEntry _addDLFileEntry(String content, long groupId)
 		throws Exception {
 
@@ -953,6 +1339,18 @@ public class BatchEnginePortletDataHandlerTest {
 
 	private ObjectEntry _addObjectEntry(
 			long groupId, ObjectDefinition objectDefinition,
+			Map<String, Serializable> values)
+		throws Exception {
+
+		return _objectEntryLocalService.addObjectEntry(
+			groupId, TestPropsValues.getUserId(),
+			objectDefinition.getObjectDefinitionId(),
+			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+			null, values, ServiceContextTestUtil.getServiceContext());
+	}
+
+	private ObjectEntry _addObjectEntry(
+			long groupId, ObjectDefinition objectDefinition,
 			Serializable objectFieldValue)
 		throws Exception {
 
@@ -999,6 +1397,24 @@ public class BatchEnginePortletDataHandlerTest {
 			TempFileEntryUtil.getTempFileName(tempFileName + ".txt"),
 			FileUtil.createTempFile(tempFileName.getBytes()),
 			ContentTypes.TEXT_PLAIN);
+	}
+
+	private JSONObject _assertAndGetJSONObject(
+		JSONObject jsonObject, ObjectRelationship objectRelationship,
+		String expectedNameValue) {
+
+		Assert.assertTrue(jsonObject.has(objectRelationship.getName()));
+
+		JSONArray jsonArray = jsonObject.getJSONArray(
+			objectRelationship.getName());
+
+		Assert.assertEquals(1, jsonArray.length());
+
+		jsonObject = jsonArray.getJSONObject(0);
+
+		Assert.assertEquals(expectedNameValue, jsonObject.getString("name"));
+
+		return jsonObject;
 	}
 
 	private void _assertNull(
@@ -1060,6 +1476,38 @@ public class BatchEnginePortletDataHandlerTest {
 		}
 	}
 
+	private void _assertObjectEntry(
+			String externalReferenceCode, String objectDefinitionShortName)
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				TestPropsValues.getCompanyId(),
+				"C_" + objectDefinitionShortName);
+
+		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
+			externalReferenceCode, 0, objectDefinition.getObjectDefinitionId());
+
+		Assert.assertNotNull(objectEntry);
+	}
+
+	private void _assertRelatedObjectEntryExternalReferenceCode(
+			Edge edge, String expectedExternalReferenceCode,
+			JSONObject jsonObject)
+		throws Exception {
+
+		String objectRelationshipName = _getObjectRelationshipName(edge);
+
+		Assert.assertTrue(jsonObject.has(objectRelationshipName));
+
+		JSONObject relatedJSONObject = _getRelatedJSONObject(
+			jsonObject, objectRelationshipName, Type.ONE_TO_MANY);
+
+		Assert.assertEquals(
+			expectedExternalReferenceCode,
+			relatedJSONObject.getString("externalReferenceCode"));
+	}
+
 	private void _deleteObjectEntries(ObjectEntry... objectEntries)
 		throws Exception {
 
@@ -1117,6 +1565,18 @@ public class BatchEnginePortletDataHandlerTest {
 	private String _getBatchFileNameWithPath(String fileName, long groupId) {
 		return StringBundler.concat(
 			"group/", groupId, StringPool.FORWARD_SLASH, fileName);
+	}
+
+	private Node _getChildNode(int index, Node node) {
+		List<Node> childNodes = node.getChildNodes();
+
+		return childNodes.get(index);
+	}
+
+	private Edge _getChildNodeEdge(int index, Node node) {
+		Node childNode = _getChildNode(index, node);
+
+		return childNode.getEdge();
 	}
 
 	private JSONArray _getClassExternalReferenceCodesJSONArray(
@@ -1288,6 +1748,35 @@ public class BatchEnginePortletDataHandlerTest {
 		}
 
 		return group.getGroupKey();
+	}
+
+	private String _getObjectRelationshipName(Edge edge) throws Exception {
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.getObjectRelationship(
+				edge.getObjectRelationshipId());
+
+		return objectRelationship.getName();
+	}
+
+	private JSONObject _getRelatedJSONObject(
+		JSONObject jsonObject, String nestedFieldName, Type type) {
+
+		if (type == Type.MANY_TO_ONE) {
+			JSONObject nestedJSONObject = jsonObject.getJSONObject(
+				nestedFieldName);
+
+			Assert.assertNotNull(nestedJSONObject);
+
+			return jsonObject.getJSONObject(nestedFieldName);
+		}
+
+		JSONArray jsonArray = jsonObject.getJSONArray(nestedFieldName);
+
+		Assert.assertNotNull(jsonArray);
+
+		Assert.assertEquals(1, jsonArray.length());
+
+		return jsonArray.getJSONObject(0);
 	}
 
 	private ExportImportConfiguration _importLayouts(
@@ -1674,6 +2163,11 @@ public class BatchEnginePortletDataHandlerTest {
 	private static final String _OBJECT_FIELD_VALUE_ATTACHMENT_USER_COMPUTER =
 		RandomTestUtil.randomString();
 
+	@Inject(
+		filter = "object.entry.manager.storage.type=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT
+	)
+	private static ObjectEntryManager _objectEntryManager;
+
 	@Inject
 	private BatchEngineImportTaskLocalService
 		_batchEngineImportTaskLocalService;
@@ -1705,7 +2199,13 @@ public class BatchEnginePortletDataHandlerTest {
 	private LayoutLocalService _layoutLocalService;
 
 	@Inject
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Inject
 	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Inject
+	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@Inject
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
@@ -1871,6 +2371,12 @@ public class BatchEnginePortletDataHandlerTest {
 
 		private final Function<Filter, Page<TestItem>> _function;
 		private final String _portletId;
+
+	}
+
+	private enum Type {
+
+		MANY_TO_MANY, MANY_TO_ONE, ONE_TO_MANY
 
 	}
 
