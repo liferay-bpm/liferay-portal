@@ -1099,6 +1099,80 @@ test.describe('Manage objectFields through Objects Admin UI', () => {
 	});
 
 	test(
+		'can create default value for boolean field',
+		{tag: ['@LPD-49587']},
+		async ({apiHelpers, objectFieldsPage, page, viewObjectEntriesPage}) => {
+			const objectName = 'ObjectDefinitionName' + getRandomInt();
+
+			let objectClassName: string;
+
+			let booleanField: Partial<ObjectField>[];
+
+			await test.step('create object with boolean field', async () => {
+				booleanField = generateObjectFields({
+					objectFieldBusinessTypes: ['Boolean'],
+				});
+
+				const objectDefinitionAPIClient =
+					await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+				const {body: objectDefinition} =
+					await objectDefinitionAPIClient.postObjectDefinition({
+						active: true,
+						externalReferenceCode: getRandomString(),
+						label: {
+							en_US: objectName,
+						},
+						name: objectName,
+						objectFields: booleanField,
+						panelCategoryKey: 'control_panel.object',
+						pluralLabel: {
+							en_US: 'NewObject',
+						},
+						portlet: true,
+						scope: 'company',
+						status: {
+							code: 0,
+						},
+					});
+
+				objectClassName = objectDefinition.className;
+
+				apiHelpers.data.push({
+					id: objectDefinition.id,
+					type: 'objectDefinition',
+				});
+			});
+
+			await test.step('set default to true for boolean field', async () => {
+				await objectFieldsPage.goto(objectName);
+
+				await objectFieldsPage.openObjectField(
+					booleanField[0].label['en_US']
+				);
+
+				await objectFieldsPage.advancedTab.click();
+
+				await objectFieldsPage.useDefaultValueToggle.check();
+
+				await objectFieldsPage.selectDefaultValue('True');
+
+				await objectFieldsPage.editFieldSaveButton.click();
+			});
+
+			await test.step('check if boolean default value in object entry is true', async () => {
+				await viewObjectEntriesPage.goto(objectClassName);
+
+				await viewObjectEntriesPage.clickAddObjectEntry(objectName);
+
+				await expect(
+					page.getByLabel(booleanField[0].label['en_US'])
+				).toBeChecked();
+			});
+		}
+	);
+
+	test(
 		'can delete created custom fields in a System Object',
 		{tag: ['@LPD-53450']},
 		async ({apiHelpers, objectFieldsPage, page}) => {
