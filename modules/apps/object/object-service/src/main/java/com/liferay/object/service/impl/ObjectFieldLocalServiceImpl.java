@@ -1814,6 +1814,7 @@ public class ObjectFieldLocalServiceImpl
 
 		if (((!Objects.equals(
 				businessType, ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT) &&
+			  !Objects.equals(dbType, ObjectFieldConstants.DB_TYPE_BOOLEAN) &&
 			  !Objects.equals(dbType, ObjectFieldConstants.DB_TYPE_CLOB) &&
 			  !Objects.equals(dbType, ObjectFieldConstants.DB_TYPE_STRING)) ||
 			 indexedAsKeyword) &&
