@@ -6,13 +6,17 @@
 package com.liferay.object.internal.field.business.type;
 
 import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
+import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.exception.ObjectFieldSettingValueException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
+import com.liferay.object.field.render.ObjectFieldRenderingContext;
+import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.model.ObjectField;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.vulcan.extension.PropertyDefinition;
 
@@ -66,8 +70,51 @@ public class BooleanObjectFieldBusinessType implements ObjectFieldBusinessType {
 	}
 
 	@Override
+	public Map<String, Object> getProperties(
+			ObjectField objectField,
+			ObjectFieldRenderingContext objectFieldRenderingContext)
+		throws PortalException {
+
+		return HashMapBuilder.<String, Object>put(
+			"predefinedValue",
+			() -> {
+				LocalizedValue localizedValue = new LocalizedValue(
+					objectFieldRenderingContext.getLocale());
+
+				Locale defaultLocale = objectFieldRenderingContext.getLocale();
+				String defaultValue = String.valueOf(
+					ObjectFieldSettingUtil.getDefaultValue(
+						null, objectField, null));
+
+				localizedValue.addString(defaultLocale, defaultValue);
+
+				return localizedValue;
+			}
+		).putAll(
+			ObjectFieldBusinessType.super.getProperties(
+				objectField, objectFieldRenderingContext)
+		).build();
+	}
+
+	@Override
 	public PropertyDefinition.PropertyType getPropertyType() {
 		return PropertyDefinition.PropertyType.BOOLEAN;
+	}
+
+	@Override
+	public Object getValue(
+			Long groupId, ObjectField objectField, long userId,
+			Map<String, Object> values)
+		throws PortalException {
+
+		Object value = ObjectFieldBusinessType.super.getValue(
+			groupId, objectField, userId, values);
+
+		if (value instanceof String) {
+			return Boolean.valueOf((String)value);
+		}
+
+		return value;
 	}
 
 	@Override
