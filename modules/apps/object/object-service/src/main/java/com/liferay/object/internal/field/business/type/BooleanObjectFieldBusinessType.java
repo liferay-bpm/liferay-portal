@@ -143,7 +143,8 @@ public class BooleanObjectFieldBusinessType implements ObjectFieldBusinessType {
 		String defaultValue = objectFieldSettingsValuesMap.get(
 			ObjectFieldSettingConstants.NAME_DEFAULT_VALUE);
 
-		if (Objects.equals(defaultValue, "false") ||
+		if ((defaultValue == null) || defaultValue.isEmpty() ||
+			Objects.equals(defaultValue, "false") ||
 			Objects.equals(defaultValue, "true")) {
 
 			return;
