@@ -208,6 +208,77 @@ test.describe('Manage object fields through Model Builder', () => {
 		).toBeVisible();
 	});
 
+	test('can create default value for boolean field', async ({
+		apiHelpers,
+		modelBuilderDiagramPage,
+		modelBuilderLeftSidebarPage,
+		modelBuilderObjectDefinitionNodePage,
+		modelBuilderRightSidebarPage,
+		page,
+		viewObjectEntriesPage,
+	}) => {
+		let booleanFieldName: string;
+
+		let objectClassName: string;
+
+		let objectName: string;
+
+		await test.step('create object with boolean field', async () => {
+			const objectFields = generateObjectFields({
+				objectFieldBusinessTypes: ['Boolean'],
+			});
+
+			booleanFieldName = objectFields[0].label['en_US'];
+
+			const objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFields,
+					status: {code: 0},
+				});
+
+			objectClassName = objectDefinition.className;
+
+			objectName = objectDefinition.name;
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+		});
+
+		await test.step('set default to false for boolean field', async () => {
+			await modelBuilderDiagramPage.goto({objectFolderName: 'Default'});
+
+			await modelBuilderLeftSidebarPage.sidebarItems
+				.filter({hasText: objectName})
+				.click();
+
+			await modelBuilderObjectDefinitionNodePage.clickShowAllFieldsButton(
+				objectName,
+				modelBuilderDiagramPage.objectDefinitionNodes
+			);
+
+			await modelBuilderDiagramPage.objectDefinitionNodes
+				.filter({hasText: objectName})
+				.getByText('Boolean', {exact: true})
+				.click();
+
+			await modelBuilderRightSidebarPage.advancedTab.click();
+
+			await modelBuilderRightSidebarPage.useDefaultValueToggle.check();
+
+			await modelBuilderRightSidebarPage.selectDefaultValue('False');
+		});
+
+		await test.step('check if boolean default value in object entry is false', async () => {
+			await viewObjectEntriesPage.goto(objectClassName);
+
+			await viewObjectEntriesPage.clickAddObjectEntry(objectName);
+
+			await expect(page.getByLabel(booleanFieldName)).not.toBeChecked();
+		});
+	});
+
 	test('can delete object field', async ({
 		apiHelpers,
 		modelBuilderDiagramPage,
