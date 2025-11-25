@@ -68,12 +68,17 @@ public class ObjectEntryPortletResourcePermissionLogic
 			return true;
 		}
 
+		String classNameSuffix = StringUtil.removeFirst(
+			name,
+			ObjectDefinitionConstants.
+				RESOURCE_NAME_PREFIX_CUSTOM_OBJECT_DEFINITION);
+
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.getObjectDefinitionByClassName(
 				permissionChecker.getCompanyId(),
 				ObjectDefinitionConstants.
 					CLASS_NAME_PREFIX_CUSTOM_OBJECT_DEFINITION +
-						StringUtil.removeFirst(name, "com.liferay.object#"));
+						classNameSuffix);
 
 		if (!objectDefinition.isAccountEntryRestricted()) {
 			return false;

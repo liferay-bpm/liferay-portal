@@ -141,7 +141,9 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 			throw new UnsupportedOperationException();
 		}
 
-		return "com.liferay.object#" + _getClassNameSuffix();
+		return ObjectDefinitionConstants.
+			RESOURCE_NAME_PREFIX_CUSTOM_OBJECT_DEFINITION +
+				_getClassNameSuffix();
 	}
 
 	@Override

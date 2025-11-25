@@ -20,6 +20,9 @@ public class ObjectDefinitionConstants {
 
 	public static final long OBJECT_DEFINITION_ID_ALL = -1;
 
+	public static final String RESOURCE_NAME_PREFIX_CUSTOM_OBJECT_DEFINITION =
+		"com.liferay.object#";
+
 	public static final String SCOPE_COMPANY = "company";
 
 	public static final String SCOPE_DEPOT = "depot";
