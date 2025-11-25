@@ -303,8 +303,6 @@ public class ObjectDefinitionLocalServiceImpl
 
 		objectDefinition = objectDefinitionPersistence.update(objectDefinition);
 
-		_addOrUpdateObjectDefinitionPLOEntries(objectDefinition);
-
 		_resourceLocalService.addResources(
 			objectDefinition.getCompanyId(), 0, objectDefinition.getUserId(),
 			ObjectDefinition.class.getName(),
