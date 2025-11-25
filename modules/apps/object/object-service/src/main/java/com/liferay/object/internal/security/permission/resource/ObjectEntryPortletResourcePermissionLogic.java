@@ -8,6 +8,7 @@ package com.liferay.object.internal.security.permission.resource;
 import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.service.AccountEntryLocalService;
+import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -20,7 +21,6 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermissionLogic;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -69,9 +69,11 @@ public class ObjectEntryPortletResourcePermissionLogic
 		}
 
 		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.getObjectDefinition(
-				GetterUtil.getLong(
-					StringUtil.removeSubstring(name, "com.liferay.object#")));
+			_objectDefinitionLocalService.getObjectDefinitionByClassName(
+				permissionChecker.getCompanyId(),
+				ObjectDefinitionConstants.
+					CLASS_NAME_PREFIX_CUSTOM_OBJECT_DEFINITION +
+						StringUtil.removeFirst(name, "com.liferay.object#"));
 
 		if (!objectDefinition.isAccountEntryRestricted()) {
 			return false;
