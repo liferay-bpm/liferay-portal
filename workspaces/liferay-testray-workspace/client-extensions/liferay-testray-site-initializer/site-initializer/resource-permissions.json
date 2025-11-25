@@ -921,7 +921,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Build$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Build$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -930,7 +930,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Build$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Build$]",
 		"roleName": "Testray Lead",
 		"scope": 1
 	},
@@ -939,7 +939,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Case$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Case$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -948,7 +948,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Case$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Case$]",
 		"roleName": "Testray Analyst",
 		"scope": 1
 	},
@@ -957,7 +957,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Case$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Case$]",
 		"roleName": "Testray Lead",
 		"scope": 1
 	},
@@ -966,7 +966,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:CaseResult$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:CaseResult$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -975,7 +975,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:CaseResult$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:CaseResult$]",
 		"roleName": "Testray Analyst",
 		"scope": 1
 	},
@@ -984,7 +984,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:CaseResult$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:CaseResult$]",
 		"roleName": "Testray Lead",
 		"scope": 1
 	},
@@ -993,7 +993,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:CaseType$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:CaseType$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1002,7 +1002,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Component$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Component$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1011,7 +1011,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Factor$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Factor$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1020,7 +1020,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Factor$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Factor$]",
 		"roleName": "Testray Lead",
 		"scope": 1
 	},
@@ -1029,7 +1029,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:FactorCategory$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:FactorCategory$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1038,7 +1038,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:FactorOption$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:FactorOption$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1047,7 +1047,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:FactorOption$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:FactorOption$]",
 		"roleName": "Testray Lead",
 		"scope": 1
 	},
@@ -1056,7 +1056,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:ProductVersion$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ProductVersion$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1065,7 +1065,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:ProductVersion$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ProductVersion$]",
 		"roleName": "Testray Lead",
 		"scope": 1
 	},
@@ -1074,7 +1074,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Project$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Project$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1083,7 +1083,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Requirement$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Requirement$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1092,7 +1092,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Requirement$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Requirement$]",
 		"roleName": "Testray Analyst",
 		"scope": 1
 	},
@@ -1101,7 +1101,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Requirement$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Requirement$]",
 		"roleName": "Testray Lead",
 		"scope": 1
 	},
@@ -1110,7 +1110,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:RequirementsCases$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:RequirementsCases$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1119,7 +1119,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:RequirementsCases$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:RequirementsCases$]",
 		"roleName": "Testray Analyst",
 		"scope": 1
 	},
@@ -1128,7 +1128,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:RequirementsCases$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:RequirementsCases$]",
 		"roleName": "Testray Lead",
 		"scope": 1
 	},
@@ -1137,7 +1137,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Routine$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Routine$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1146,7 +1146,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Run$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Run$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1155,7 +1155,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Run$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Run$]",
 		"roleName": "Testray Lead",
 		"scope": 1
 	},
@@ -1164,7 +1164,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Subtask$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Subtask$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1173,7 +1173,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Subtask$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Subtask$]",
 		"roleName": "Testray Analyst",
 		"scope": 1
 	},
@@ -1182,7 +1182,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Subtask$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Subtask$]",
 		"roleName": "Testray Lead",
 		"scope": 1
 	},
@@ -1191,7 +1191,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Suite$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Suite$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1200,7 +1200,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Suite$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Suite$]",
 		"roleName": "Testray Lead",
 		"scope": 1
 	},
@@ -1209,7 +1209,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:SuitesCases$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:SuitesCases$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1218,7 +1218,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:SuitesCases$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:SuitesCases$]",
 		"roleName": "Testray Lead",
 		"scope": 1
 	},
@@ -1227,7 +1227,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Task$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Task$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1236,7 +1236,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Task$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Task$]",
 		"roleName": "Testray Lead",
 		"scope": 1
 	},
@@ -1245,7 +1245,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:TasksCaseTypes$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TasksCaseTypes$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1254,7 +1254,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:TasksCaseTypes$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TasksCaseTypes$]",
 		"roleName": "Testray Lead",
 		"scope": 1
 	},
@@ -1263,7 +1263,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:TasksUsers$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TasksUsers$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},
@@ -1272,7 +1272,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:TasksUsers$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TasksUsers$]",
 		"roleName": "Testray Analyst",
 		"scope": 1
 	},
@@ -1281,7 +1281,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:TasksUsers$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TasksUsers$]",
 		"roleName": "Testray Lead",
 		"scope": 1
 	},
@@ -1290,7 +1290,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:Team$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Team$]",
 		"roleName": "Testray Administrator",
 		"scope": 1
 	},

@@ -5777,6 +5777,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 		stringUtilReplaceValues.put(
 			"OBJECT_DEFINITION_PORTLET_ID:" + name,
 			serviceBuilderObjectDefinition.getPortletId());
+		stringUtilReplaceValues.put(
+			"OBJECT_DEFINITION_RESOURCE_NAME:" + name,
+			serviceBuilderObjectDefinition.getResourceName());
 	}
 
 	private void _setDefaultLayoutUtilityPageEntries(

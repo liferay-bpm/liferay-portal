@@ -198,7 +198,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:LicenseTypesDescription$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LicenseTypesDescription$]",
 		"roleName": "User",
 		"scope": "1"
 	},
@@ -207,7 +207,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:PublisherAssets$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:PublisherAssets$]",
 		"roleName": "Supplier",
 		"scope": "1"
 	},
@@ -216,7 +216,7 @@
 			"VIEW"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:PublisherDetails$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:PublisherDetails$]",
 		"roleName": "Guest",
 		"scope": "1"
 	},
@@ -225,7 +225,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:RequestPublisherAccount$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:RequestPublisherAccount$]",
 		"roleName": "Guest",
 		"scope": "1"
 	},
@@ -234,7 +234,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:TrialExtensionRequest$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TrialExtensionRequest$]",
 		"roleName": "SSA",
 		"scope": "3"
 	},
@@ -243,7 +243,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:TrialExtensionRequest$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TrialExtensionRequest$]",
 		"roleName": "SSA Admin",
 		"scope": "3"
 	}

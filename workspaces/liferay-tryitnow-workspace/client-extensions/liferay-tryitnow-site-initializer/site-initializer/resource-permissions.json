@@ -157,7 +157,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:J3Y7Ticket$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:J3Y7Ticket$]",
 		"roleName": "M2H8 Petitionaries",
 		"scope": "1"
 	},
@@ -166,7 +166,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:J3Y7Ticket$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:J3Y7Ticket$]",
 		"roleName": "M2H8 Ticket Solvers",
 		"scope": "1"
 	},

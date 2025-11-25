@@ -816,7 +816,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AccountFlag$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AccountFlag$]",
 		"roleName": "Account Administrator",
 		"scope": "3"
 	},
@@ -825,7 +825,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AccountFlag$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AccountFlag$]",
 		"roleName": "Account Member",
 		"scope": "3"
 	},
@@ -834,7 +834,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AccountFlag$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AccountFlag$]",
 		"roleName": "Organization User",
 		"scope": "3"
 	},
@@ -843,7 +843,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AccountFlag$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AccountFlag$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -852,7 +852,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AccountSubscription$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AccountSubscription$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -861,7 +861,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AccountSubscriptionGroup$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AccountSubscriptionGroup$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -870,7 +870,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AccountSubscriptionTerm$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AccountSubscriptionTerm$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -879,7 +879,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AdminDXPCloud$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AdminDXPCloud$]",
 		"roleName": "Account Administrator",
 		"scope": "3"
 	},
@@ -888,7 +888,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AdminDXPCloud$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AdminDXPCloud$]",
 		"roleName": "Account Member",
 		"scope": "3"
 	},
@@ -897,7 +897,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AdminDXPCloud$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AdminDXPCloud$]",
 		"roleName": "Organization User",
 		"scope": "3"
 	},
@@ -906,7 +906,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AdminDXPCloud$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AdminDXPCloud$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -915,7 +915,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AdminLiferayExperienceCloud$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AdminLiferayExperienceCloud$]",
 		"roleName": "Account Administrator",
 		"scope": "3"
 	},
@@ -924,7 +924,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AdminLiferayExperienceCloud$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AdminLiferayExperienceCloud$]",
 		"roleName": "Account Member",
 		"scope": "3"
 	},
@@ -933,7 +933,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AdminLiferayExperienceCloud$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AdminLiferayExperienceCloud$]",
 		"roleName": "Organization User",
 		"scope": "3"
 	},
@@ -942,7 +942,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AdminLiferayExperienceCloud$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AdminLiferayExperienceCloud$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -951,7 +951,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AnalyticsCloudDataCenterLocation$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AnalyticsCloudDataCenterLocation$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -960,7 +960,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AnalyticsCloudWorkspace$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AnalyticsCloudWorkspace$]",
 		"roleName": "Account Administrator",
 		"scope": "3"
 	},
@@ -969,7 +969,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AnalyticsCloudWorkspace$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AnalyticsCloudWorkspace$]",
 		"roleName": "Account Member",
 		"scope": "3"
 	},
@@ -978,7 +978,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AnalyticsCloudWorkspace$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AnalyticsCloudWorkspace$]",
 		"roleName": "Organization User",
 		"scope": "3"
 	},
@@ -987,7 +987,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:AnalyticsCloudWorkspace$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:AnalyticsCloudWorkspace$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -996,7 +996,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:BannedEmailDomain$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:BannedEmailDomain$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -1004,7 +1004,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:BusinessEvent$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:BusinessEvent$]",
 		"roleName": "Account Administrator",
 		"scope": "3"
 	},
@@ -1012,7 +1012,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:BusinessEvent$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:BusinessEvent$]",
 		"roleName": "Liferay Staff",
 		"scope": "1"
 	},
@@ -1020,7 +1020,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:BusinessEvent$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:BusinessEvent$]",
 		"roleName": "Organization User",
 		"scope": "3"
 	},
@@ -1028,7 +1028,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:BusinessEvent$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:BusinessEvent$]",
 		"roleName": "Requester",
 		"scope": "3"
 	},
@@ -1036,7 +1036,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:BusinessEventVersion$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:BusinessEventVersion$]",
 		"roleName": "Account Administrator",
 		"scope": "3"
 	},
@@ -1044,7 +1044,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:BusinessEventVersion$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:BusinessEventVersion$]",
 		"roleName": "Liferay Staff",
 		"scope": "1"
 	},
@@ -1052,7 +1052,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:BusinessEventVersion$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:BusinessEventVersion$]",
 		"roleName": "Organization User",
 		"scope": "3"
 	},
@@ -1060,7 +1060,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:BusinessEventVersion$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:BusinessEventVersion$]",
 		"roleName": "Requester",
 		"scope": "3"
 	},
@@ -1069,7 +1069,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:CallbackRequest$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:CallbackRequest$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -1078,7 +1078,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:CallbackRequest$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:CallbackRequest$]",
 		"roleName": "User",
 		"scope": "1"
 	},
@@ -1087,7 +1087,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:DXPCDataCenterRegion$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:DXPCDataCenterRegion$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -1096,7 +1096,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:DXPCloudEnvironment$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:DXPCloudEnvironment$]",
 		"roleName": "Account Administrator",
 		"scope": "3"
 	},
@@ -1105,7 +1105,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:DXPCloudEnvironment$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:DXPCloudEnvironment$]",
 		"roleName": "Account Member",
 		"scope": "3"
 	},
@@ -1114,7 +1114,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:DXPCloudEnvironment$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:DXPCloudEnvironment$]",
 		"roleName": "Organization User",
 		"scope": "3"
 	},
@@ -1123,7 +1123,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:DXPCloudEnvironment$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:DXPCloudEnvironment$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -1132,7 +1132,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:HighPriorityContact$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:HighPriorityContact$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -1141,7 +1141,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:IncidentReportContactAnalyticsCloud$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:IncidentReportContactAnalyticsCloud$]",
 		"roleName": "Account Administrator",
 		"scope": "3"
 	},
@@ -1150,7 +1150,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:IncidentReportContactAnalyticsCloud$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:IncidentReportContactAnalyticsCloud$]",
 		"roleName": "Account Member",
 		"scope": "3"
 	},
@@ -1159,7 +1159,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:IncidentReportContactAnalyticsCloud$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:IncidentReportContactAnalyticsCloud$]",
 		"roleName": "Organization User",
 		"scope": "3"
 	},
@@ -1168,7 +1168,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:IncidentReportContactAnalyticsCloud$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:IncidentReportContactAnalyticsCloud$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -1177,7 +1177,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:KoroneikiAccount$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:KoroneikiAccount$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -1186,7 +1186,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:LiferayExperienceCloudEnvironment$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LiferayExperienceCloudEnvironment$]",
 		"roleName": "Account Administrator",
 		"scope": "3"
 	},
@@ -1195,7 +1195,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:LiferayExperienceCloudEnvironment$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LiferayExperienceCloudEnvironment$]",
 		"roleName": "Account Member",
 		"scope": "3"
 	},
@@ -1204,7 +1204,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:LiferayExperienceCloudEnvironment$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LiferayExperienceCloudEnvironment$]",
 		"roleName": "Organization User",
 		"scope": "3"
 	},
@@ -1213,7 +1213,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:LiferayExperienceCloudEnvironment$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LiferayExperienceCloudEnvironment$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -1222,7 +1222,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:ReplacementActivationKeyRequest$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ReplacementActivationKeyRequest$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -1231,7 +1231,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:SupportTicketEscalation$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:SupportTicketEscalation$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -1240,7 +1240,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:TeamMembersInvitation$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TeamMembersInvitation$]",
 		"roleName": "Account Member",
 		"scope": "3"
 	},
@@ -1248,7 +1248,7 @@
 		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:TeamMembersInvitation$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TeamMembersInvitation$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -1257,7 +1257,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:TicketAttachment$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TicketAttachment$]",
 		"roleName": "Account Administrator",
 		"scope": "3"
 	},
@@ -1266,7 +1266,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:TicketAttachment$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TicketAttachment$]",
 		"roleName": "Organization User",
 		"scope": "3"
 	},
@@ -1275,7 +1275,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:TicketAttachment$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TicketAttachment$]",
 		"roleName": "Provisioning Member",
 		"scope": "1"
 	},
@@ -1284,7 +1284,7 @@
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
-		"resourceName": "com.liferay.object#[$OBJECT_DEFINITION_ID:TicketAttachment$]",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TicketAttachment$]",
 		"roleName": "Requester",
 		"scope": "3"
 	},
