@@ -849,75 +849,6 @@
 	},
 	{
 		"actionIds": [
-			"REPLY_TO_MESSAGE"
-		],
-		"primKey": "0",
-		"resourceName": "com.liferay.message.boards.model.MBCategory",
-		"roleName": "Testray Administrator",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"REPLY_TO_MESSAGE"
-		],
-		"primKey": "0",
-		"resourceName": "com.liferay.message.boards.model.MBCategory",
-		"roleName": "Testray Analyst",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"REPLY_TO_MESSAGE"
-		],
-		"primKey": "0",
-		"resourceName": "com.liferay.message.boards.model.MBCategory",
-		"roleName": "Testray Lead",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"DELETE",
-			"UPDATE",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "com.liferay.message.boards.model.MBMessage",
-		"roleName": "Testray Administrator",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"DELETE",
-			"UPDATE",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "com.liferay.message.boards.model.MBMessage",
-		"roleName": "Testray Analyst",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"DELETE",
-			"UPDATE",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "com.liferay.message.boards.model.MBMessage",
-		"roleName": "Testray Lead",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "com.liferay.message.boards.model.MBMessage",
-		"roleName": "Testray User",
-		"scope": 1
-	},
-	{
-		"actionIds": [
 			"ADD_OBJECT_ENTRY"
 		],
 		"primKey": "0",
@@ -1292,6 +1223,75 @@
 		"primKey": "0",
 		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Team$]",
 		"roleName": "Testray Administrator",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"REPLY_TO_MESSAGE"
+		],
+		"primKey": "0",
+		"resourceName": "com.liferay.message.boards.model.MBCategory",
+		"roleName": "Testray Administrator",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"REPLY_TO_MESSAGE"
+		],
+		"primKey": "0",
+		"resourceName": "com.liferay.message.boards.model.MBCategory",
+		"roleName": "Testray Analyst",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"REPLY_TO_MESSAGE"
+		],
+		"primKey": "0",
+		"resourceName": "com.liferay.message.boards.model.MBCategory",
+		"roleName": "Testray Lead",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"DELETE",
+			"UPDATE",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "com.liferay.message.boards.model.MBMessage",
+		"roleName": "Testray Administrator",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"DELETE",
+			"UPDATE",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "com.liferay.message.boards.model.MBMessage",
+		"roleName": "Testray Analyst",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"DELETE",
+			"UPDATE",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "com.liferay.message.boards.model.MBMessage",
+		"roleName": "Testray Lead",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "com.liferay.message.boards.model.MBMessage",
+		"roleName": "Testray User",
 		"scope": 1
 	},
 	{

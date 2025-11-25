@@ -40,6 +40,60 @@
 	},
 	{
 		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LicenseTypesDescription$]",
+		"roleName": "User",
+		"scope": "1"
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:PublisherAssets$]",
+		"roleName": "Supplier",
+		"scope": "1"
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:PublisherDetails$]",
+		"roleName": "Guest",
+		"scope": "1"
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:RequestPublisherAccount$]",
+		"roleName": "Guest",
+		"scope": "1"
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TrialExtensionRequest$]",
+		"roleName": "SSA",
+		"scope": "3"
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TrialExtensionRequest$]",
+		"roleName": "SSA Admin",
+		"scope": "3"
+	},
+	{
+		"actionIds": [
 			"VIEW"
 		],
 		"primKey": "0",
@@ -192,59 +246,5 @@
 		"resourceName": "com.liferay.list.type.model.ListTypeDefinition",
 		"roleName": "User",
 		"scope": "1"
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LicenseTypesDescription$]",
-		"roleName": "User",
-		"scope": "1"
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:PublisherAssets$]",
-		"roleName": "Supplier",
-		"scope": "1"
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:PublisherDetails$]",
-		"roleName": "Guest",
-		"scope": "1"
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:RequestPublisherAccount$]",
-		"roleName": "Guest",
-		"scope": "1"
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TrialExtensionRequest$]",
-		"roleName": "SSA",
-		"scope": "3"
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:TrialExtensionRequest$]",
-		"roleName": "SSA Admin",
-		"scope": "3"
 	}
 ]

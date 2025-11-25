@@ -1662,6 +1662,601 @@
 	},
 	{
 		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Activity$]",
+		"roleName": "[Account] Partner Manager (PM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Activity$]",
+		"roleName": "[Account] Partner Marketing User (PMU)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Activity$]",
+		"roleName": "[Organization] Channel Marketing Director (CMD)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Activity$]",
+		"roleName": "[Organization] Channel Marketing Manager (CMM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY",
+			"UPDATE",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ActivitySF$]",
+		"roleName": "Channel Marketing Director (CMD)",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY",
+			"UPDATE",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ActivitySF$]",
+		"roleName": "Channel Marketing Manager (CMM)",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY",
+			"UPDATE",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ActivitySF$]",
+		"roleName": "Partner Manager (PM)",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY",
+			"UPDATE",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ActivitySF$]",
+		"roleName": "Partner Marketing User (PMU)",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Budget$]",
+		"roleName": "[Account] Partner Manager (PM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Budget$]",
+		"roleName": "[Account] Partner Marketing User (PMU)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Budget$]",
+		"roleName": "[Organization] Channel Marketing Director (CMD)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Budget$]",
+		"roleName": "[Organization] Channel Marketing Manager (CMM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadNotification$]",
+		"roleName": "Partner Manager (PM)",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadNotification$]",
+		"roleName": "Partner Sales User (PSU)",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
+		"roleName": "[Account] Partner Manager (PM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
+		"roleName": "[Account] Partner Marketing User (PMU)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
+		"roleName": "[Account] Partner Sales User (PSU)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
+		"roleName": "[Account] Partner Technical User (PTU)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
+		"roleName": "[Organization] Channel Account Manager (CAM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
+		"roleName": "[Organization] Channel Finance Manager (CFM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
+		"roleName": "[Organization] Channel Marketing Director (CMD)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
+		"roleName": "[Organization] Channel Marketing Manager (CMM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
+		"roleName": "[Organization] Channel Operations Manager (COM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaim$]",
+		"roleName": "[Account] Partner Manager (PM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaim$]",
+		"roleName": "[Account] Partner Marketing User (PMU)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivity$]",
+		"roleName": "[Account] Partner Manager (PM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivity$]",
+		"roleName": "[Account] Partner Marketing User (PMU)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivity$]",
+		"roleName": "[Organization] Channel Finance Manager (CFM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivity$]",
+		"roleName": "[Organization] Channel Marketing Director (CMD)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivity$]",
+		"roleName": "[Organization] Channel Marketing Manager (CMM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivityDocument$]",
+		"roleName": "[Account] Partner Manager (PM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivityDocument$]",
+		"roleName": "[Account] Partner Marketing User (PMU)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivityDocument$]",
+		"roleName": "[Organization] Channel Finance Manager (CFM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivityDocument$]",
+		"roleName": "[Organization] Channel Marketing Director (CMD)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivityDocument$]",
+		"roleName": "[Organization] Channel Marketing Manager (CMM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimBudget$]",
+		"roleName": "[Account] Partner Manager (PM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimBudget$]",
+		"roleName": "[Account] Partner Marketing User (PMU)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimBudget$]",
+		"roleName": "[Organization] Channel Finance Manager (CFM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimBudget$]",
+		"roleName": "[Organization] Channel Marketing Director (CMD)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimBudget$]",
+		"roleName": "[Organization] Channel Marketing Manager (CMM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY",
+			"UPDATE",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimSF$]",
+		"roleName": "Channel Finance Manager (CFM)",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY",
+			"UPDATE",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimSF$]",
+		"roleName": "Channel Marketing Director (CMD)",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY",
+			"UPDATE",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimSF$]",
+		"roleName": "Channel Marketing Manager (CMM)",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY",
+			"UPDATE",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimSF$]",
+		"roleName": "Partner Manager (PM)",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY",
+			"UPDATE",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimSF$]",
+		"roleName": "Partner Marketing User (PMU)",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFRequest$]",
+		"roleName": "[Account] Partner Manager (PM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFRequest$]",
+		"roleName": "[Account] Partner Marketing User (PMU)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY",
+			"UPDATE",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFRequestSF$]",
+		"roleName": "[Account] Partner Manager (PM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY",
+			"UPDATE",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFRequestSF$]",
+		"roleName": "[Account] Partner Marketing User (PMU)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFRequestSF$]",
+		"roleName": "[Organization] Channel Marketing Director (CMD)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY",
+			"UPDATE",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFRequestSF$]",
+		"roleName": "[Organization] Channel Marketing Manager (CMM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
+		"roleName": "[Account] Partner Manager (PM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
+		"roleName": "[Account] Partner Marketing User (PMU)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
+		"roleName": "[Account] Partner Sales User (PSU)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
+		"roleName": "[Account] Partner Technical User (PTU)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
+		"roleName": "[Organization] Channel Account Manager (CAM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
+		"roleName": "[Organization] Channel Finance Manager (CFM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
+		"roleName": "[Organization] Channel Marketing Director (CMD)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
+		"roleName": "[Organization] Channel Marketing Manager (CMM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
+		"roleName": "[Organization] Channel Operations Manager (COM)",
+		"scope": 3
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ProjectSF$]",
+		"roleName": "Partner Manager (PM)",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ProjectSF$]",
+		"roleName": "Partner Marketing User (PMU)",
+		"scope": 1
+	},
+	{
+		"actionIds": [
+			"ADD_OBJECT_ENTRY",
+			"VIEW"
+		],
+		"primKey": "0",
+		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ProjectSF$]",
+		"roleName": "Partner Sales User (PSU)",
+		"scope": 1
+	},
+	{
+		"actionIds": [
 			"VIEW"
 		],
 		"primKey": "0",
@@ -1775,601 +2370,6 @@
 		"primKey": "0",
 		"resourceName": "com.liferay.list.type.model.ListTypeDefinition",
 		"roleName": "Partner Technical User (PTU)",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Activity$]",
-		"roleName": "[Account] Partner Manager (PM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Activity$]",
-		"roleName": "[Account] Partner Marketing User (PMU)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Activity$]",
-		"roleName": "[Organization] Channel Marketing Director (CMD)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Activity$]",
-		"roleName": "[Organization] Channel Marketing Manager (CMM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY",
-			"UPDATE",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ActivitySF$]",
-		"roleName": "Channel Marketing Director (CMD)",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY",
-			"UPDATE",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ActivitySF$]",
-		"roleName": "Channel Marketing Manager (CMM)",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY",
-			"UPDATE",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ActivitySF$]",
-		"roleName": "Partner Manager (PM)",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY",
-			"UPDATE",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ActivitySF$]",
-		"roleName": "Partner Marketing User (PMU)",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Budget$]",
-		"roleName": "[Account] Partner Manager (PM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Budget$]",
-		"roleName": "[Account] Partner Marketing User (PMU)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Budget$]",
-		"roleName": "[Organization] Channel Marketing Director (CMD)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:Budget$]",
-		"roleName": "[Organization] Channel Marketing Manager (CMM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadNotification$]",
-		"roleName": "Partner Manager (PM)",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadNotification$]",
-		"roleName": "Partner Sales User (PSU)",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
-		"roleName": "[Account] Partner Manager (PM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
-		"roleName": "[Account] Partner Marketing User (PMU)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
-		"roleName": "[Account] Partner Sales User (PSU)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
-		"roleName": "[Account] Partner Technical User (PTU)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
-		"roleName": "[Organization] Channel Account Manager (CAM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
-		"roleName": "[Organization] Channel Finance Manager (CFM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
-		"roleName": "[Organization] Channel Marketing Director (CMD)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
-		"roleName": "[Organization] Channel Marketing Manager (CMM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:LeadSF$]",
-		"roleName": "[Organization] Channel Operations Manager (COM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaim$]",
-		"roleName": "[Account] Partner Manager (PM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaim$]",
-		"roleName": "[Account] Partner Marketing User (PMU)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivity$]",
-		"roleName": "[Account] Partner Manager (PM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivity$]",
-		"roleName": "[Account] Partner Marketing User (PMU)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivity$]",
-		"roleName": "[Organization] Channel Finance Manager (CFM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivity$]",
-		"roleName": "[Organization] Channel Marketing Director (CMD)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivity$]",
-		"roleName": "[Organization] Channel Marketing Manager (CMM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivityDocument$]",
-		"roleName": "[Account] Partner Manager (PM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivityDocument$]",
-		"roleName": "[Account] Partner Marketing User (PMU)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivityDocument$]",
-		"roleName": "[Organization] Channel Finance Manager (CFM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivityDocument$]",
-		"roleName": "[Organization] Channel Marketing Director (CMD)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimActivityDocument$]",
-		"roleName": "[Organization] Channel Marketing Manager (CMM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimBudget$]",
-		"roleName": "[Account] Partner Manager (PM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimBudget$]",
-		"roleName": "[Account] Partner Marketing User (PMU)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimBudget$]",
-		"roleName": "[Organization] Channel Finance Manager (CFM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimBudget$]",
-		"roleName": "[Organization] Channel Marketing Director (CMD)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimBudget$]",
-		"roleName": "[Organization] Channel Marketing Manager (CMM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY",
-			"UPDATE",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimSF$]",
-		"roleName": "Channel Finance Manager (CFM)",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY",
-			"UPDATE",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimSF$]",
-		"roleName": "Channel Marketing Director (CMD)",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY",
-			"UPDATE",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimSF$]",
-		"roleName": "Channel Marketing Manager (CMM)",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY",
-			"UPDATE",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimSF$]",
-		"roleName": "Partner Manager (PM)",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY",
-			"UPDATE",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFClaimSF$]",
-		"roleName": "Partner Marketing User (PMU)",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFRequest$]",
-		"roleName": "[Account] Partner Manager (PM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFRequest$]",
-		"roleName": "[Account] Partner Marketing User (PMU)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY",
-			"UPDATE",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFRequestSF$]",
-		"roleName": "[Account] Partner Manager (PM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY",
-			"UPDATE",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFRequestSF$]",
-		"roleName": "[Account] Partner Marketing User (PMU)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFRequestSF$]",
-		"roleName": "[Organization] Channel Marketing Director (CMD)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY",
-			"UPDATE",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:MDFRequestSF$]",
-		"roleName": "[Organization] Channel Marketing Manager (CMM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
-		"roleName": "[Account] Partner Manager (PM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
-		"roleName": "[Account] Partner Marketing User (PMU)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
-		"roleName": "[Account] Partner Sales User (PSU)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
-		"roleName": "[Account] Partner Technical User (PTU)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
-		"roleName": "[Organization] Channel Account Manager (CAM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
-		"roleName": "[Organization] Channel Finance Manager (CFM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
-		"roleName": "[Organization] Channel Marketing Director (CMD)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
-		"roleName": "[Organization] Channel Marketing Manager (CMM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:OpportunitySF$]",
-		"roleName": "[Organization] Channel Operations Manager (COM)",
-		"scope": 3
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ProjectSF$]",
-		"roleName": "Partner Manager (PM)",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ProjectSF$]",
-		"roleName": "Partner Marketing User (PMU)",
-		"scope": 1
-	},
-	{
-		"actionIds": [
-			"ADD_OBJECT_ENTRY",
-			"VIEW"
-		],
-		"primKey": "0",
-		"resourceName": "[$OBJECT_DEFINITION_RESOURCE_NAME:ProjectSF$]",
-		"roleName": "Partner Sales User (PSU)",
 		"scope": 1
 	},
 	{
