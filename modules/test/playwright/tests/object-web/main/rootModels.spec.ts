@@ -222,7 +222,7 @@ test.describe('Manage root model elements through View Object Entries', () => {
 					{
 						actionIds: ['ADD_OBJECT_ENTRY'],
 						primaryKey: companyId,
-						resourceName: `com.liferay.object#${objectDefinition1.id}`,
+						resourceName: `com.liferay.object#${objectDefinition1.className.split('#')[1]}`,
 						scope: 1,
 					},
 				],

@@ -271,6 +271,15 @@ definition {
 	}
 
 	@summary = "Default summary"
+	macro _getObjectDefinitionResourceName(objectDefinitionId = null) {
+		var objectDefinitionClassName = ObjectDefinitionAPI._getObjectDefinitionClassNameById(objectDefinitionId = ${objectDefinitionId});
+
+		var objectDefinitionClassNameSuffix = StringUtil.extractLast(${objectDefinitionClassName}, "#");
+
+		return "com.liferay.object#${objectDefinitionClassNameSuffix}";
+	}
+
+	@summary = "Default summary"
 	macro _getObjectDefinitionStatusById(objectDefinitionId = null, virtualHost = null, token = null) {
 		Variables.assertDefined(parameterList = ${objectDefinitionId});
 

@@ -448,9 +448,11 @@ definition {
 			roleTitle = "Regular Role",
 			roleType = "regular");
 
+		var objectDefinitionResourceName = ObjectDefinitionAPI._getObjectDefinitionResourceName(objectDefinitionId = ${objectId});
+
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "ADD_OBJECT_ENTRY",
-			resourceName = "com.liferay.object#${objectId}",
+			resourceName = ${objectDefinitionResourceName},
 			roleTitle = "Regular Role",
 			roleType = "regular");
 
@@ -639,9 +641,11 @@ definition {
 			roleTitle = "Regular Role",
 			roleType = "regular");
 
+		var objectDefinitionResourceName = ObjectDefinitionAPI._getObjectDefinitionResourceName(objectDefinitionId = ${objectId});
+
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "ADD_OBJECT_ENTRY",
-			resourceName = "com.liferay.object#${objectId}",
+			resourceName = ${objectDefinitionResourceName},
 			roleTitle = "Regular Role",
 			roleType = "regular");
 
@@ -904,9 +908,11 @@ definition {
 			roleTitle = "Regular Role",
 			roleType = "regular");
 
+		var objectDefinitionResourceName = ObjectDefinitionAPI._getObjectDefinitionResourceName(objectDefinitionId = ${objectId});
+
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "ADD_OBJECT_ENTRY",
-			resourceName = "com.liferay.object#${objectId}",
+			resourceName = ${objectDefinitionResourceName},
 			roleTitle = "Regular Role",
 			roleType = "regular");
 
@@ -985,9 +991,11 @@ definition {
 			roleTitle = "Regular Role",
 			roleType = "regular");
 
+		var objectDefinitionResourceName = ObjectDefinitionAPI._getObjectDefinitionResourceName(objectDefinitionId = ${objectId});
+
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "ADD_OBJECT_ENTRY",
-			resourceName = "com.liferay.object#${objectId}",
+			resourceName = ${objectDefinitionResourceName},
 			roleTitle = "Regular Role",
 			roleType = "regular");
 
@@ -1354,9 +1362,11 @@ definition {
 			roleTitle = "Regular Role",
 			roleType = "regular");
 
+		var objectDefinitionResourceName = ObjectDefinitionAPI._getObjectDefinitionResourceName(objectDefinitionId = ${objectId});
+
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "ADD_OBJECT_ENTRY",
-			resourceName = "com.liferay.object#${objectId}",
+			resourceName = ${objectDefinitionResourceName},
 			roleTitle = "Regular Role",
 			roleType = "regular");
 
@@ -2077,9 +2087,11 @@ definition {
 			roleTitle = "Regular Role",
 			roleType = "regular");
 
+		var objectDefinitionResourceName = ObjectDefinitionAPI._getObjectDefinitionResourceName(objectDefinitionId = ${objectId});
+
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "ADD_OBJECT_ENTRY",
-			resourceName = "com.liferay.object#${objectId}",
+			resourceName = ${objectDefinitionResourceName},
 			roleTitle = "Regular Role",
 			roleType = "regular");
 
@@ -2394,9 +2406,11 @@ definition {
 
 		var objectId = JSONObject.getObjectId(objectName = "CustomObject");
 
+		var objectDefinitionResourceName = ObjectDefinitionAPI._getObjectDefinitionResourceName(objectDefinitionId = ${objectId});
+
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "ADD_OBJECT_ENTRY",
-			resourceName = "com.liferay.object#${objectId}",
+			resourceName = ${objectDefinitionResourceName},
 			roleTitle = "Guest",
 			roleType = "regular");
 

@@ -77,7 +77,7 @@ async function createUserRole(
 					return {
 						actionIds: resourcePermission.actions,
 						primaryKey: companyId,
-						resourceName: `com.liferay.object#${dataSetObject.id}`,
+						resourceName: `com.liferay.object#${dataSetObject.className.split('#')[1]}`,
 						scope: 1,
 					};
 				}
