@@ -47,16 +47,21 @@ public class ObjectDefinitionImplTest {
 	public void testGetPortletId() {
 		ObjectDefinition objectDefinition = new ObjectDefinitionImpl();
 
-		String classNameSuffix = RandomTestUtil.randomString();
-
-		objectDefinition.setClassName(
-			ObjectDefinitionConstants.
-				CLASS_NAME_PREFIX_CUSTOM_OBJECT_DEFINITION + classNameSuffix);
-
 		Assert.assertEquals(
 			ObjectPortletKeys.OBJECT_DEFINITIONS + StringPool.UNDERLINE +
-				classNameSuffix,
+				_getClassNameSuffix(objectDefinition),
 			objectDefinition.getPortletId());
+	}
+
+	@Test
+	public void testGetResourceName() {
+		ObjectDefinition objectDefinition = new ObjectDefinitionImpl();
+
+		Assert.assertEquals(
+			ObjectDefinitionConstants.
+				RESOURCE_NAME_PREFIX_CUSTOM_OBJECT_DEFINITION +
+					_getClassNameSuffix(objectDefinition),
+			objectDefinition.getResourceName());
 	}
 
 	@Test
@@ -119,6 +124,16 @@ public class ObjectDefinitionImplTest {
 		objectDefinition.setSystem(system);
 
 		return objectDefinition;
+	}
+
+	private String _getClassNameSuffix(ObjectDefinition objectDefinition) {
+		String classNameSuffix = RandomTestUtil.randomString();
+
+		objectDefinition.setClassName(
+			ObjectDefinitionConstants.
+				CLASS_NAME_PREFIX_CUSTOM_OBJECT_DEFINITION + classNameSuffix);
+
+		return classNameSuffix;
 	}
 
 	private void _testGetRESTContextPath(
