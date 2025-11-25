@@ -132,7 +132,7 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 		}
 
 		return ObjectPortletKeys.OBJECT_DEFINITIONS + StringPool.UNDERLINE +
-			StringUtil.split(getClassName(), StringPool.POUND)[1];
+			_getClassNameSuffix();
 	}
 
 	@Override
@@ -141,7 +141,7 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 			throw new UnsupportedOperationException();
 		}
 
-		return "com.liferay.object#" + getObjectDefinitionId();
+		return "com.liferay.object#" + _getClassNameSuffix();
 	}
 
 	@Override
@@ -317,6 +317,13 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 		List<ObjectDefinitionSetting> objectDefinitionSettings) {
 
 		_objectDefinitionSettings = objectDefinitionSettings;
+	}
+
+	private String _getClassNameSuffix() {
+		return StringUtil.removeFirst(
+			getClassName(),
+			ObjectDefinitionConstants.
+				CLASS_NAME_PREFIX_CUSTOM_OBJECT_DEFINITION);
 	}
 
 	private List<ObjectDefinitionSetting> _objectDefinitionSettings;
