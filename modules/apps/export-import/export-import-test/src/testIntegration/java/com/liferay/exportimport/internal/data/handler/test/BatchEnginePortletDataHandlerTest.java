@@ -373,202 +373,187 @@ public class BatchEnginePortletDataHandlerTest {
 	public void testExportImportObjectEntriesWithRootModelHierarchy()
 		throws Exception {
 
-		Group group = _stagingGroupHelper.fetchCompanyGroup(
-			TestPropsValues.getCompanyId());
-
-		Tree objectDefinitionTree = TreeTestUtil.createObjectDefinitionTree(
-			_objectDefinitionLocalService, _objectRelationshipLocalService,
-			true,
-			LinkedHashMapBuilder.put(
-				"A", new String[] {"AA", "AB"}
-			).put(
-				"AA", new String[] {"AAA", "AAB"}
-			).put(
-				"AB", new String[0]
-			).put(
-				"AAA", new String[0]
-			).put(
-				"AAB", new String[0]
-			).build());
-
-		Node objectDefinitionRootNode = objectDefinitionTree.getRootNode();
-
-		Tree objectEntryTree = TreeTestUtil.createObjectEntryTree(
-			"1", _objectDefinitionLocalService, _objectEntryLocalService,
-			_objectFieldLocalService, _objectRelationshipLocalService,
-			objectDefinitionRootNode.getPrimaryKey());
-
-		ObjectDefinition objectDefinitionA =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				TestPropsValues.getCompanyId(), "C_A");
-
-		ObjectDefinition objectDefinitionAA =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				TestPropsValues.getCompanyId(), "C_AA");
-
-		ObjectDefinition objectDefinitionAB =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				TestPropsValues.getCompanyId(), "C_AB");
-
-		ObjectDefinition objectDefinitionAAA =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				TestPropsValues.getCompanyId(), "C_AAA");
-
-		ObjectDefinition objectDefinitionAAB =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				TestPropsValues.getCompanyId(), "C_AAB");
-
-		ObjectEntry objectEntryA = _objectEntryLocalService.fetchObjectEntry(
-			"A1", 0, objectDefinitionA.getObjectDefinitionId());
-
-		ObjectEntry objectEntryAA = _objectEntryLocalService.fetchObjectEntry(
-			"AA1", 0, objectDefinitionAA.getObjectDefinitionId());
-
-		ObjectEntry objectEntryAB = _objectEntryLocalService.fetchObjectEntry(
-			"AB1", 0, objectDefinitionAB.getObjectDefinitionId());
-
-		ObjectEntry objectEntryAAA = _objectEntryLocalService.fetchObjectEntry(
-			"AAA1", 0, objectDefinitionAAA.getObjectDefinitionId());
-
-		ObjectEntry objectEntryAAB = _objectEntryLocalService.fetchObjectEntry(
-			"AAB1", 0, objectDefinitionAAB.getObjectDefinitionId());
-
-		Map<String, Serializable> valuesA = Map.of(
-			"able", RandomTestUtil.randomString());
-		Map<String, Serializable> valuesAA = Map.of(
-			"able", RandomTestUtil.randomString());
-		Map<String, Serializable> valuesAB = Map.of(
-			"able", RandomTestUtil.randomString());
-		Map<String, Serializable> valuesAAA = Map.of(
-			"able", RandomTestUtil.randomString());
-		Map<String, Serializable> valuesAAB = Map.of(
-			"able", RandomTestUtil.randomString());
-
-		objectEntryA = _objectEntryLocalService.updateObjectEntry(
-			objectEntryA.getUserId(), objectEntryA.getObjectEntryId(),
-			objectEntryA.getObjectEntryFolderId(), valuesA,
-			ServiceContextTestUtil.getServiceContext());
-
-		objectEntryAA = _objectEntryLocalService.updateObjectEntry(
-			objectEntryAA.getUserId(), objectEntryAA.getObjectEntryId(),
-			objectEntryAA.getObjectEntryFolderId(), valuesAA,
-			ServiceContextTestUtil.getServiceContext());
-
-		objectEntryAB = _objectEntryLocalService.updateObjectEntry(
-			objectEntryAB.getUserId(), objectEntryAB.getObjectEntryId(),
-			objectEntryAB.getObjectEntryFolderId(), valuesAB,
-			ServiceContextTestUtil.getServiceContext());
-
-		objectEntryAAA = _objectEntryLocalService.updateObjectEntry(
-			objectEntryAAA.getUserId(), objectEntryAAA.getObjectEntryId(),
-			objectEntryAAA.getObjectEntryFolderId(), valuesAAA,
-			ServiceContextTestUtil.getServiceContext());
-
-		objectEntryAAB = _objectEntryLocalService.updateObjectEntry(
-			objectEntryAAB.getUserId(), objectEntryAAB.getObjectEntryId(),
-			objectEntryAAB.getObjectEntryFolderId(), valuesAAB,
-			ServiceContextTestUtil.getServiceContext());
-
 		try {
+
+			// Export
+
+			Group group = _stagingGroupHelper.fetchCompanyGroup(
+				TestPropsValues.getCompanyId());
+
+			Tree objectDefinitionTree = TreeTestUtil.createObjectDefinitionTree(
+				_objectDefinitionLocalService, _objectRelationshipLocalService,
+				true,
+				LinkedHashMapBuilder.put(
+					"A", new String[] {"AA", "AB"}
+				).put(
+					"AA", new String[] {"AAA", "AAB"}
+				).put(
+					"AB", new String[0]
+				).put(
+					"AAA", new String[0]
+				).put(
+					"AAB", new String[0]
+				).build());
+
+			Node objectDefinitionRootNode = objectDefinitionTree.getRootNode();
+
+			Tree objectEntryTree = TreeTestUtil.createObjectEntryTree(
+				"1", _objectDefinitionLocalService, _objectEntryLocalService,
+				_objectFieldLocalService, _objectRelationshipLocalService,
+				objectDefinitionRootNode.getPrimaryKey());
+
+			ObjectDefinition objectDefinitionA =
+				_objectDefinitionLocalService.fetchObjectDefinition(
+					TestPropsValues.getCompanyId(), "C_A");
+
+			Map<String, Serializable> valuesA = Map.of(
+				"able", RandomTestUtil.randomString());
+
+			ObjectEntry objectEntryA = _updateObjectEntry(
+				"A1", objectDefinitionA, valuesA);
+
+			ObjectDefinition objectDefinitionAA =
+				_objectDefinitionLocalService.fetchObjectDefinition(
+					TestPropsValues.getCompanyId(), "C_AA");
+
+			Map<String, Serializable> valuesAA = Map.of(
+				"able", RandomTestUtil.randomString());
+
+			ObjectEntry objectEntryAA = _updateObjectEntry(
+				"AA1", objectDefinitionAA, valuesAA);
+
+			ObjectDefinition objectDefinitionAB =
+				_objectDefinitionLocalService.fetchObjectDefinition(
+					TestPropsValues.getCompanyId(), "C_AB");
+
+			Map<String, Serializable> valuesAB = Map.of(
+				"able", RandomTestUtil.randomString());
+
+			ObjectEntry objectEntryAB = _updateObjectEntry(
+				"AB1", objectDefinitionAB, valuesAB);
+
+			ObjectDefinition objectDefinitionAAA =
+				_objectDefinitionLocalService.fetchObjectDefinition(
+					TestPropsValues.getCompanyId(), "C_AAA");
+
+			Map<String, Serializable> valuesAAA = Map.of(
+				"able", RandomTestUtil.randomString());
+
+			ObjectEntry objectEntryAAA = _updateObjectEntry(
+				"AAA1", objectDefinitionAAA, valuesAAA);
+
+			ObjectDefinition objectDefinitionAAB =
+				_objectDefinitionLocalService.fetchObjectDefinition(
+					TestPropsValues.getCompanyId(), "C_AAB");
+
+			Map<String, Serializable> valuesAAB = Map.of(
+				"able", RandomTestUtil.randomString());
+
+			ObjectEntry objectEntryAAB = _updateObjectEntry(
+				"AAB1", objectDefinitionAAB, valuesAAB);
+
 			File larFile = _exportLayouts(
 				false, group.getGroupId(), false, new long[0],
 				objectDefinitionA);
 
-			JSONArray objectEntriesJSONArray =
+			JSONArray exportedObjectEntriesJSONArray =
 				_getExportedObjectEntriesJSONArray(
 					objectDefinitionA.getName(), larFile, group.getGroupId());
 
-			JSONObject objectDefinitionJSONObject =
-				objectEntriesJSONArray.getJSONObject(0);
+			JSONObject exportedObjectEntryAJSONObject =
+				exportedObjectEntriesJSONArray.getJSONObject(0);
 
-			Node objectEntryRootNode = objectEntryTree.getRootNode();
+			Map<String, Serializable> values = objectEntryA.getValues();
 
 			Assert.assertEquals(
-				objectEntryA.getValues(
-				).get(
-					"able"
-				),
-				objectDefinitionJSONObject.getString("able"));
+				values.get("able"),
+				exportedObjectEntryAJSONObject.getString("able"));
 
-			_assertRelatedObjectEntryExternalReferenceCode(
-				_getChildNodeEdge(0, objectEntryRootNode), "AA1",
-				objectDefinitionJSONObject, objectEntryAA);
-			_assertRelatedObjectEntryExternalReferenceCode(
-				_getChildNodeEdge(1, objectEntryRootNode), "AB1",
-				objectDefinitionJSONObject, objectEntryAB);
+			Node rootNode = objectEntryTree.getRootNode();
 
-			JSONObject objectEntryJSONObject = _getRelatedJSONObject(
-				objectDefinitionJSONObject,
-				_getObjectRelationshipName(
-					_getChildNodeEdge(0, objectEntryRootNode)),
-				Type.ONE_TO_MANY);
+			_assertRelatedObjectEntry(
+				_getChildNodeEdge(0, rootNode), exportedObjectEntryAJSONObject,
+				objectEntryAA);
+			_assertRelatedObjectEntry(
+				_getChildNodeEdge(1, rootNode), exportedObjectEntryAJSONObject,
+				objectEntryAB);
 
-			_assertRelatedObjectEntryExternalReferenceCode(
-				_getChildNodeEdge(0, _getChildNode(0, objectEntryRootNode)),
-				"AAA1", objectEntryJSONObject, objectEntryAAA);
-			_assertRelatedObjectEntryExternalReferenceCode(
-				_getChildNodeEdge(1, _getChildNode(0, objectEntryRootNode)),
-				"AAB1", objectEntryJSONObject, objectEntryAAB);
+			JSONObject exportedObjectEntryAAJSONObject = _getRelatedJSONObject(
+				exportedObjectEntryAJSONObject,
+				_getObjectRelationshipName(_getChildNodeEdge(0, rootNode)));
+
+			_assertRelatedObjectEntry(
+				_getChildNodeEdge(0, _getChildNode(0, rootNode)),
+				exportedObjectEntryAAJSONObject, objectEntryAAA);
+			_assertRelatedObjectEntry(
+				_getChildNodeEdge(1, _getChildNode(0, rootNode)),
+				exportedObjectEntryAAJSONObject, objectEntryAAB);
 
 			_objectEntryLocalService.deleteObjectEntry(
-				objectEntryRootNode.getPrimaryKey());
+				rootNode.getPrimaryKey());
+
+			// Import
 
 			_importLayouts(
 				false, false, larFile, group.getGroupId(), objectDefinitionA);
 
 			_assertObjectEntry(
-				objectEntryA.getExternalReferenceCode(),
-				objectDefinitionA.getShortName(), valuesA);
+				valuesA, objectEntryA.getExternalReferenceCode(),
+				objectDefinitionA);
 			_assertObjectEntry(
-				objectEntryAA.getExternalReferenceCode(),
-				objectDefinitionAA.getShortName(), valuesAA);
+				valuesAA, objectEntryAA.getExternalReferenceCode(),
+				objectDefinitionAA);
 			_assertObjectEntry(
-				objectEntryAB.getExternalReferenceCode(),
-				objectDefinitionAB.getShortName(), valuesAB);
+				valuesAB, objectEntryAB.getExternalReferenceCode(),
+				objectDefinitionAB);
 			_assertObjectEntry(
-				objectEntryAAA.getExternalReferenceCode(),
-				objectDefinitionAAA.getShortName(), valuesAAA);
+				valuesAAA, objectEntryAAA.getExternalReferenceCode(),
+				objectDefinitionAAA);
 			_assertObjectEntry(
-				objectEntryAAB.getExternalReferenceCode(),
-				objectDefinitionAAB.getShortName(), valuesAAB);
+				valuesAAB, objectEntryAAB.getExternalReferenceCode(),
+				objectDefinitionAAB);
 
-			objectEntryA = _objectEntryLocalService.fetchObjectEntry(
-				objectEntryA.getExternalReferenceCode(), 0,
-				objectDefinitionA.getObjectDefinitionId());
+			// Import and override
 
-			objectEntryAA = _objectEntryLocalService.fetchObjectEntry(
-				objectEntryAA.getExternalReferenceCode(), 0,
-				objectDefinitionAA.getObjectDefinitionId());
+			Map<String, Serializable> randomValues = Map.of(
+				"able", RandomTestUtil.randomString());
 
-			_objectEntryLocalService.updateObjectEntry(
-				objectEntryA.getUserId(), objectEntryA.getObjectEntryId(),
-				objectEntryA.getObjectEntryFolderId(),
-				Map.of("able", "ModifiedA"),
-				ServiceContextTestUtil.getServiceContext());
+			objectEntryA = _updateObjectEntry(
+				objectEntryA.getExternalReferenceCode(), objectDefinitionA,
+				randomValues);
 
-			_objectEntryLocalService.updateObjectEntry(
-				objectEntryAA.getUserId(), objectEntryAA.getObjectEntryId(),
-				objectEntryAA.getObjectEntryFolderId(),
-				Map.of("able", "ModifiedAA"),
-				ServiceContextTestUtil.getServiceContext());
+			_assertObjectEntry(
+				randomValues, objectEntryA.getExternalReferenceCode(),
+				objectDefinitionA);
+
+			objectEntryAA = _updateObjectEntry(
+				objectEntryAA.getExternalReferenceCode(), objectDefinitionAA,
+				randomValues);
+
+			_assertObjectEntry(
+				randomValues, objectEntryAA.getExternalReferenceCode(),
+				objectDefinitionAA);
+
+			objectEntryAAA = _updateObjectEntry(
+				objectEntryAAA.getExternalReferenceCode(), objectDefinitionAAA,
+				randomValues);
+
+			_assertObjectEntry(
+				randomValues, objectEntryAAA.getExternalReferenceCode(),
+				objectDefinitionAAA);
 
 			_importLayouts(
 				false, false, larFile, group.getGroupId(), objectDefinitionA);
 
-			objectEntryA = _objectEntryLocalService.fetchObjectEntry(
-				objectEntryA.getExternalReferenceCode(), 0,
-				objectDefinitionA.getObjectDefinitionId());
-
-			objectEntryAA = _objectEntryLocalService.fetchObjectEntry(
-				objectEntryAA.getExternalReferenceCode(), 0,
-				objectDefinitionAA.getObjectDefinitionId());
-
 			_assertObjectEntry(
-				objectEntryA.getExternalReferenceCode(),
-				objectDefinitionA.getShortName(), valuesA);
+				valuesA, objectEntryA.getExternalReferenceCode(),
+				objectDefinitionA);
 			_assertObjectEntry(
-				objectEntryAA.getExternalReferenceCode(),
-				objectDefinitionAA.getShortName(), valuesAA);
+				valuesAA, objectEntryAA.getExternalReferenceCode(),
+				objectDefinitionAA);
+			_assertObjectEntry(
+				valuesAAA, objectEntryAAA.getExternalReferenceCode(),
+				objectDefinitionAAA);
 		}
 		finally {
 			TreeTestUtil.deleteObjectDefinitionHierarchy(
@@ -1277,41 +1262,20 @@ public class BatchEnginePortletDataHandlerTest {
 	}
 
 	private void _assertObjectEntry(
-			String externalReferenceCode, String objectDefinitionShortName,
-			Map<String, Serializable> expectedValues)
+			Map<String, Serializable> expectedValues,
+			String externalReferenceCode, ObjectDefinition objectDefinition)
 		throws Exception {
 
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				TestPropsValues.getCompanyId(),
-				"C_" + objectDefinitionShortName);
-
-		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
+		ObjectEntry objectEntry = _objectEntryLocalService.getObjectEntry(
 			externalReferenceCode, 0, objectDefinition.getObjectDefinitionId());
 
-		Assert.assertNotNull(objectEntry);
+		Map<String, Serializable> values = objectEntry.getValues();
 
-		if (expectedValues == null) {
-			return;
-		}
-
-		Map<String, Serializable> importedValues = objectEntry.getValues();
-
-		for (Map.Entry<String, Serializable> entry :
-				expectedValues.entrySet()) {
-
-			String fieldName = entry.getKey();
-			Serializable expectedValue = entry.getValue();
-
-			Serializable actualValue = importedValues.get(fieldName);
-
-			Assert.assertEquals(expectedValue, actualValue);
-		}
+		Assert.assertEquals(expectedValues.get("able"), values.get("able"));
 	}
 
-	private void _assertRelatedObjectEntryExternalReferenceCode(
-			Edge edge, String expectedExternalReferenceCode,
-			JSONObject jsonObject, ObjectEntry objectEntry)
+	private void _assertRelatedObjectEntry(
+			Edge edge, JSONObject jsonObject, ObjectEntry objectEntry)
 		throws Exception {
 
 		String objectRelationshipName = _getObjectRelationshipName(edge);
@@ -1319,18 +1283,16 @@ public class BatchEnginePortletDataHandlerTest {
 		Assert.assertTrue(jsonObject.has(objectRelationshipName));
 
 		JSONObject relatedJSONObject = _getRelatedJSONObject(
-			jsonObject, objectRelationshipName, Type.ONE_TO_MANY);
+			jsonObject, objectRelationshipName);
 
 		Assert.assertEquals(
-			expectedExternalReferenceCode,
+			objectEntry.getExternalReferenceCode(),
 			relatedJSONObject.getString("externalReferenceCode"));
 
+		Map<String, Serializable> values = objectEntry.getValues();
+
 		Assert.assertEquals(
-			objectEntry.getValues(
-			).get(
-				"able"
-			),
-			relatedJSONObject.getString("able"));
+			values.get("able"), relatedJSONObject.getString("able"));
 	}
 
 	private void _deleteObjectEntries(ObjectEntry... objectEntries)
@@ -1584,16 +1546,7 @@ public class BatchEnginePortletDataHandlerTest {
 	}
 
 	private JSONObject _getRelatedJSONObject(
-		JSONObject jsonObject, String nestedFieldName, Type type) {
-
-		if (type == Type.MANY_TO_ONE) {
-			JSONObject nestedJSONObject = jsonObject.getJSONObject(
-				nestedFieldName);
-
-			Assert.assertNotNull(nestedJSONObject);
-
-			return jsonObject.getJSONObject(nestedFieldName);
-		}
+		JSONObject jsonObject, String nestedFieldName) {
 
 		JSONArray jsonArray = jsonObject.getJSONArray(nestedFieldName);
 
@@ -1965,6 +1918,20 @@ public class BatchEnginePortletDataHandlerTest {
 		);
 	}
 
+	private ObjectEntry _updateObjectEntry(
+			String externalReferenceCode, ObjectDefinition objectDefinition,
+			Map<String, Serializable> values)
+		throws Exception {
+
+		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
+			externalReferenceCode, 0, objectDefinition.getObjectDefinitionId());
+
+		return _objectEntryLocalService.updateObjectEntry(
+			objectEntry.getUserId(), objectEntry.getObjectEntryId(),
+			objectEntry.getObjectEntryFolderId(), values,
+			ServiceContextTestUtil.getServiceContext());
+	}
+
 	private static final String _OBJECT_FIELD_NAME_ATTACHMENT_DOCS_AND_MEDIA =
 		"x" + RandomTestUtil.randomString();
 
@@ -2196,12 +2163,6 @@ public class BatchEnginePortletDataHandlerTest {
 
 		private final Function<Filter, Page<TestItem>> _function;
 		private final String _portletId;
-
-	}
-
-	private enum Type {
-
-		MANY_TO_MANY, MANY_TO_ONE, ONE_TO_MANY
 
 	}
 
