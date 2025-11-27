@@ -120,6 +120,8 @@ import com.liferay.portal.vulcan.util.SearchUtil;
 
 import jakarta.ws.rs.core.MultivaluedMap;
 
+import java.text.Normalizer;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -465,9 +467,9 @@ public class DataDefinitionResourceImpl extends BaseDataDefinitionResourceImpl {
 			String contentType, DataDefinition dataDefinition)
 		throws Exception {
 
-		return postSiteDataDefinitionByContentType(
+		return _postSiteDataDefinitionByContentType(
 			_portal.getSiteGroupId(contextCompany.getGroupId()), contentType,
-			dataDefinition);
+			dataDefinition, false);
 	}
 
 	@Override
@@ -495,6 +497,8 @@ public class DataDefinitionResourceImpl extends BaseDataDefinitionResourceImpl {
 	public DataDefinition postSiteDataDefinitionByContentType(
 			Long siteId, String contentType, DataDefinition dataDefinition)
 		throws Exception {
+
+		_sanitizeFieldNames(dataDefinition);
 
 		return _postSiteDataDefinitionByContentType(
 			siteId, contentType, dataDefinition, false);
@@ -643,6 +647,146 @@ public class DataDefinitionResourceImpl extends BaseDataDefinitionResourceImpl {
 			_addDataDefinitionFieldLinks(
 				contentType, dataDefinitionId,
 				ddmFormField.getNestedDDMFormFields(), groupId);
+		}
+	}
+
+	private void _applyDataLayoutMapping(
+		DataLayout dataLayout, Map<String, String> nameMapping) {
+
+		if ((dataLayout == null) || nameMapping.isEmpty()) {
+			return;
+		}
+
+		_updateDataLayoutFields(dataLayout, nameMapping);
+		_updateDataLayoutPages(dataLayout.getDataLayoutPages(), nameMapping);
+	}
+
+	private void _applyFieldNameMapping(
+			DataDefinitionField[] dataDefinitionFields,
+			Map<String, String> nameMapping)
+		throws Exception {
+
+		if (dataDefinitionFields == null) {
+			return;
+		}
+
+		for (DataDefinitionField dataDefinitionField : dataDefinitionFields) {
+			String currentName = dataDefinitionField.getName();
+
+			String mappedName = nameMapping.get(currentName);
+
+			if (mappedName != null) {
+				dataDefinitionField.setName(() -> mappedName);
+			}
+
+			Map<String, Object> customProperties =
+				dataDefinitionField.getCustomProperties();
+
+			if (customProperties != null) {
+				Map<String, Object> mutableCustomProperties = new HashMap<>(
+					customProperties);
+
+				Object fieldReference = mutableCustomProperties.get(
+					"fieldReference");
+
+				if (fieldReference instanceof String) {
+					String mappedFieldRef = nameMapping.get(
+						(String)fieldReference);
+
+					if (mappedFieldRef != null) {
+						mutableCustomProperties.put(
+							"fieldReference", mappedFieldRef);
+					}
+				}
+
+				Object rowsObject = mutableCustomProperties.get("rows");
+
+				if (rowsObject != null) {
+					String rowsString =
+						rowsObject instanceof String ? (String)rowsObject :
+							_jsonFactory.looseSerializeDeep(rowsObject);
+
+					String trimmedRowsString = StringUtil.trim(rowsString);
+
+					if (Validator.isNotNull(trimmedRowsString) &&
+						trimmedRowsString.startsWith(StringPool.OPEN_BRACKET)) {
+
+						JSONArray rowsJSONArray = _jsonFactory.createJSONArray(
+							trimmedRowsString);
+
+						for (int i = 0; i < rowsJSONArray.length(); i++) {
+							JSONObject rowJSONObject =
+								rowsJSONArray.getJSONObject(i);
+
+							JSONArray columnsJSONArray =
+								rowJSONObject.getJSONArray("columns");
+
+							for (int j = 0; j < columnsJSONArray.length();
+								 j++) {
+
+								JSONObject columnJSONObject =
+									columnsJSONArray.getJSONObject(j);
+
+								JSONArray fieldsJSONArray =
+									columnJSONObject.getJSONArray("fields");
+
+								JSONArray newFieldsJSONArray =
+									_jsonFactory.createJSONArray();
+
+								for (int k = 0; k < fieldsJSONArray.length();
+									 k++) {
+
+									String fieldName =
+										fieldsJSONArray.getString(k);
+
+									String mapped = nameMapping.getOrDefault(
+										fieldName, fieldName);
+
+									newFieldsJSONArray.put(mapped);
+								}
+
+								columnJSONObject.put(
+									"fields", newFieldsJSONArray);
+							}
+						}
+
+						mutableCustomProperties.put(
+							"rows", rowsJSONArray.toString());
+					}
+				}
+
+				dataDefinitionField.setCustomProperties(
+					() -> mutableCustomProperties);
+			}
+
+			_applyFieldNameMapping(
+				dataDefinitionField.getNestedDataDefinitionFields(),
+				nameMapping);
+		}
+	}
+
+	private void _collectFieldNameMapping(
+		DataDefinitionField[] dataDefinitionFields,
+		Map<String, String> nameMapping) {
+
+		if (dataDefinitionFields == null) {
+			return;
+		}
+
+		for (DataDefinitionField dataDefinitionField : dataDefinitionFields) {
+			String originalName = dataDefinitionField.getName();
+
+			String safeName = _normalizeFieldNameForImport(originalName);
+
+			if ((safeName != null) && !safeName.isEmpty() &&
+				!safeName.equals(originalName)) {
+
+				nameMapping.put(originalName, safeName);
+			}
+
+			_collectFieldNameMapping(
+				dataDefinitionField.getNestedDataDefinitionFields(),
+				nameMapping);
 		}
 	}
 
@@ -1120,6 +1264,52 @@ public class DataDefinitionResourceImpl extends BaseDataDefinitionResourceImpl {
 		return StringBundler.concat(fieldName, StringPool.UNDERLINE, index);
 	}
 
+	private String _normalizeFieldNameForImport(String fieldName) {
+		if (fieldName == null) {
+			return null;
+		}
+
+		String normalizedFieldName = fieldName.trim();
+
+		normalizedFieldName = Normalizer.normalize(
+			normalizedFieldName, Normalizer.Form.NFD
+		).replaceAll(
+			"\\p{M}+", ""
+		);
+
+		StringBuilder sb = new StringBuilder();
+		boolean nextUpperCase = false;
+
+		for (int i = 0; i < normalizedFieldName.length(); i++) {
+			char c = normalizedFieldName.charAt(i);
+
+			if (Character.isWhitespace(c)) {
+				nextUpperCase = true;
+
+				continue;
+			}
+
+			if (!(Character.isLetterOrDigit(c) || (c == '_'))) {
+				continue;
+			}
+
+			if (nextUpperCase) {
+				c = Character.toUpperCase(c);
+				nextUpperCase = false;
+			}
+
+			sb.append(c);
+		}
+
+		String result = sb.toString();
+
+		if (!result.isEmpty() && Character.isDigit(result.charAt(0))) {
+			result = "_" + result;
+		}
+
+		return result;
+	}
+
 	private void _normalizeNestedDataDefinitionFields(
 			int dataDefinitionFieldsCount,
 			DataDefinitionField[] nestedDataDefinitionFields)
@@ -1565,6 +1755,35 @@ public class DataDefinitionResourceImpl extends BaseDataDefinitionResourceImpl {
 		return _npmResolver.resolveModuleName(ddmFormFieldType.getModuleName());
 	}
 
+	private void _sanitizeFieldNames(DataDefinition dataDefinition)
+		throws Exception {
+
+		DataDefinitionField[] dataDefinitionFields =
+			dataDefinition.getDataDefinitionFields();
+
+		if (dataDefinitionFields == null) {
+			return;
+		}
+
+		Map<String, String> nameMapping = new HashMap<>();
+
+		_collectFieldNameMapping(dataDefinitionFields, nameMapping);
+
+		if (nameMapping.isEmpty()) {
+			return;
+		}
+
+		_applyFieldNameMapping(dataDefinitionFields, nameMapping);
+
+		DataLayout dataLayout = dataDefinition.getDefaultDataLayout();
+
+		if (dataLayout != null) {
+			_applyDataLayoutMapping(dataLayout, nameMapping);
+
+			dataDefinition.setDefaultDataLayout(() -> dataLayout);
+		}
+	}
+
 	private void _setTypeDDMFormFieldValue(
 		DDMFormValues ddmFormValues, String type) {
 
@@ -1915,6 +2134,73 @@ public class DataDefinitionResourceImpl extends BaseDataDefinitionResourceImpl {
 		}
 	}
 
+	private void _updateDataLayoutColumnsFieldNames(
+		DataLayoutColumn[] dataLayoutColumns, Map<String, String> nameMapping) {
+
+		if ((dataLayoutColumns == null) || nameMapping.isEmpty()) {
+			return;
+		}
+
+		for (DataLayoutColumn dataLayoutColumn : dataLayoutColumns) {
+			String[] fieldNames = dataLayoutColumn.getFieldNames();
+
+			if (ArrayUtil.isEmpty(fieldNames)) {
+				continue;
+			}
+
+			boolean changed = false;
+
+			for (int i = 0; i < fieldNames.length; i++) {
+				String mappedFieldName = nameMapping.get(fieldNames[i]);
+
+				if (mappedFieldName != null) {
+					fieldNames[i] = mappedFieldName;
+					changed = true;
+				}
+			}
+
+			if (changed) {
+				dataLayoutColumn.setFieldNames(() -> fieldNames);
+			}
+		}
+	}
+
+	private void _updateDataLayoutFields(
+		DataLayout dataLayout, Map<String, String> nameMapping) {
+
+		Map<String, Object> dataLayoutFieldsMap =
+			dataLayout.getDataLayoutFields();
+
+		if (MapUtil.isEmpty(dataLayoutFieldsMap)) {
+			return;
+		}
+
+		Map<String, Object> updatedDataLayoutFieldsMap = new HashMap<>();
+
+		for (Map.Entry<String, Object> entry : dataLayoutFieldsMap.entrySet()) {
+			String key = entry.getKey();
+
+			String mappedKey = nameMapping.getOrDefault(key, key);
+
+			updatedDataLayoutFieldsMap.put(mappedKey, entry.getValue());
+		}
+
+		dataLayout.setDataLayoutFields(() -> updatedDataLayoutFieldsMap);
+	}
+
+	private void _updateDataLayoutPages(
+		DataLayoutPage[] dataLayoutPages, Map<String, String> nameMapping) {
+
+		if ((dataLayoutPages == null) || nameMapping.isEmpty()) {
+			return;
+		}
+
+		for (DataLayoutPage dataLayoutPage : dataLayoutPages) {
+			_updateDataLayoutRowsFieldNames(
+				dataLayoutPage.getDataLayoutRows(), nameMapping);
+		}
+	}
+
 	private void _updateDataLayoutRows(DataLayoutRow[] dataLayoutRows) {
 		for (DataLayoutRow dataLayoutRow : dataLayoutRows) {
 			for (DataLayoutColumn dataLayoutColumn :
@@ -1928,6 +2214,19 @@ public class DataDefinitionResourceImpl extends BaseDataDefinitionResourceImpl {
 						"CopyOf" + dataLayoutColumnFieldNames[i];
 				}
 			}
+		}
+	}
+
+	private void _updateDataLayoutRowsFieldNames(
+		DataLayoutRow[] dataLayoutRows, Map<String, String> nameMapping) {
+
+		if ((dataLayoutRows == null) || nameMapping.isEmpty()) {
+			return;
+		}
+
+		for (DataLayoutRow dataLayoutRow : dataLayoutRows) {
+			_updateDataLayoutColumnsFieldNames(
+				dataLayoutRow.getDataLayoutColumns(), nameMapping);
 		}
 	}
 
