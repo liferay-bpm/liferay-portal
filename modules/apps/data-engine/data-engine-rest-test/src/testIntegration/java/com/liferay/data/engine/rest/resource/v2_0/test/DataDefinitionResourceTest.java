@@ -720,6 +720,106 @@ public class DataDefinitionResourceTest
 		}
 	}
 
+	@Test
+	public void testPostSiteDataDefinitionByContentTypeSanitizeFieldNames()
+		throws Exception {
+
+		String description = RandomTestUtil.randomString();
+		String name = RandomTestUtil.randomString();
+
+		DataDefinition dataDefinition = _createDataDefinition(
+			description, name);
+
+		DataDefinitionField[] dataDefinitionFields =
+			dataDefinition.getDataDefinitionFields();
+
+		Assert.assertTrue(
+			Arrays.toString(dataDefinitionFields),
+			dataDefinitionFields.length > 0);
+
+		DataDefinitionField dataDefinitionField = dataDefinitionFields[0];
+
+		String originalName = "Campo inválido ç 123";
+
+		dataDefinitionField.setName(originalName);
+
+		Map<String, Object> customProperties =
+			dataDefinitionField.getCustomProperties();
+
+		if (customProperties == null) {
+			customProperties = new HashMap<>();
+		}
+		else {
+			customProperties = new HashMap<>(customProperties);
+		}
+
+		customProperties.put("fieldReference", originalName);
+
+		dataDefinitionField.setCustomProperties(customProperties);
+
+		DataLayout dataLayout = dataDefinition.getDefaultDataLayout();
+
+		DataLayoutPage[] dataLayoutPages = dataLayout.getDataLayoutPages();
+
+		DataLayoutPage dataLayoutPage = dataLayoutPages[0];
+
+		DataLayoutRow dataLayoutRow = dataLayoutPage.getDataLayoutRows()[0];
+
+		DataLayoutColumn dataLayoutColumn =
+			dataLayoutRow.getDataLayoutColumns()[0];
+
+		dataLayoutColumn.setFieldNames(() -> new String[] {originalName});
+
+		dataLayoutRow.setDataLayoutColumns(
+			() -> new DataLayoutColumn[] {dataLayoutColumn});
+
+		dataLayoutPage.setDataLayoutRows(
+			() -> new DataLayoutRow[] {dataLayoutRow});
+
+		dataLayout.setDataLayoutPages(
+			() -> new DataLayoutPage[] {dataLayoutPage});
+
+		dataDefinition.setDefaultDataLayout(() -> dataLayout);
+
+		DataDefinition postDataDefinition =
+			dataDefinitionResource.postSiteDataDefinitionByContentType(
+				testGroup.getGroupId(), _CONTENT_TYPE, dataDefinition);
+
+		DataDefinitionField[] postDataDefinitionFields =
+			postDataDefinition.getDataDefinitionFields();
+
+		Assert.assertTrue(
+			Arrays.toString(postDataDefinitionFields),
+			postDataDefinitionFields.length > 0);
+
+		DataDefinitionField postDataDefinitionField =
+			postDataDefinitionFields[0];
+
+		String sanitizedName = postDataDefinitionField.getName();
+
+		Assert.assertNotEquals(originalName, sanitizedName);
+
+		Assert.assertTrue(
+			"Invalid sanitized name: " + sanitizedName,
+			sanitizedName.matches("[A-Za-z0-9_]+"));
+
+		Map<String, Object> postCustomProperties =
+			postDataDefinitionField.getCustomProperties();
+
+		Assert.assertEquals(
+			"FieldReference in custom properties was not sanitized correctly",
+			sanitizedName, postCustomProperties.get("fieldReference"));
+
+		DataLayout postDataLayout = postDataDefinition.getDefaultDataLayout();
+
+		List<String> dataLayoutColumnFieldNames =
+			_getDataLayoutColumnFieldNames(postDataLayout);
+
+		Assert.assertTrue(
+			dataLayoutColumnFieldNames.toString(),
+			dataLayoutColumnFieldNames.contains(sanitizedName));
+	}
+
 	@Override
 	@Test
 	public void testPutDataDefinition() throws Exception {
