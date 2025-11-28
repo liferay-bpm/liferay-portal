@@ -8,9 +8,27 @@ package com.liferay.headless.admin.list.type.resource.v1_0.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.headless.admin.list.type.client.dto.v1_0.ListTypeDefinition;
 import com.liferay.headless.admin.list.type.client.dto.v1_0.ListTypeEntry;
+import com.liferay.headless.admin.list.type.client.permission.Permission;
+import com.liferay.headless.admin.list.type.client.problem.Problem;
 import com.liferay.list.type.service.ListTypeDefinitionLocalService;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.RoleTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.test.rule.Inject;
@@ -25,6 +43,9 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 /**
  * @author Gabriel Albuquerque
@@ -62,6 +83,8 @@ public class ListTypeDefinitionResourceTest
 	public void testPostListTypeDefinition() throws Exception {
 		super.testPostListTypeDefinition();
 
+		// Creator
+
 		ListTypeDefinition randomListTypeDefinition =
 			randomListTypeDefinition();
 
@@ -74,6 +97,32 @@ public class ListTypeDefinitionResourceTest
 			testPostListTypeDefinition_addListTypeDefinition(
 				randomListTypeDefinition);
 
+		User user = TestPropsValues.getUser();
+
+		JSONObject expectedCreatorJSONObject = JSONUtil.put(
+			"id", user.getUserId()
+		).put(
+			"name", user.getFullName()
+		);
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null,
+			StringBundler.concat(
+				"headless-admin-list-type/v1.0/list-type-definitions",
+				"/by-external-reference-code/",
+				postListTypeDefinition.getExternalReferenceCode(),
+				"?nestedFields=permissions"),
+			Http.Method.GET);
+
+		JSONObject actualCreatorJSONObject = jsonObject.getJSONObject(
+			"creator");
+
+		JSONAssert.assertEquals(
+			expectedCreatorJSONObject.toString(),
+			actualCreatorJSONObject.toString(), JSONCompareMode.LENIENT);
+
+		// Name
+
 		assertEquals(randomListTypeDefinition, postListTypeDefinition);
 		assertValid(postListTypeDefinition);
 
@@ -85,6 +134,100 @@ public class ListTypeDefinitionResourceTest
 		_assertListTypeDefinitionNameLocalizedMap(
 			testPostListTypeDefinition_addListTypeDefinition(
 				randomListTypeDefinition));
+	}
+
+	@Test
+	public void testPostPutListTypeDefinitionWithPermissions()
+		throws Exception {
+
+		// Invalid permissions
+
+		ListTypeDefinition listTypeDefinition1 = randomListTypeDefinition();
+
+		listTypeDefinition1.setPermissions(
+			new Permission[] {
+				new Permission() {
+					{
+						actionIds = new String[] {ActionKeys.UPDATE};
+						roleExternalReferenceCode =
+							RandomTestUtil.randomString();
+						roleName = RandomTestUtil.randomString();
+					}
+				}
+			});
+
+		AssertUtils.assertFailure(
+			Problem.ProblemException.class, null,
+			() -> listTypeDefinitionResource.postListTypeDefinition(
+				listTypeDefinition1));
+
+		// Permissions with different roles
+
+		ListTypeDefinition listTypeDefinition2 = randomListTypeDefinition();
+
+		Role role1 = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		_resourcePermissionLocalService.addResourcePermission(
+			TestPropsValues.getCompanyId(),
+			"com.liferay.list.type.model.ListTypeDefinition",
+			ResourceConstants.SCOPE_COMPANY,
+			String.valueOf(TestPropsValues.getCompanyId()), role1.getRoleId(),
+			ActionKeys.DELETE);
+
+		Role role2 = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		listTypeDefinition2.setPermissions(
+			new Permission[] {
+				_getPermission(role1, ActionKeys.PERMISSIONS),
+				_getPermission(role2, ActionKeys.UPDATE, ActionKeys.VIEW)
+			});
+
+		listTypeDefinition2 = testPostListTypeDefinition_addListTypeDefinition(
+			listTypeDefinition2);
+
+		_assertListTypeDefinitionPermissions(
+			JSONUtil.putAll(
+				_getPermissionsJSONObject(
+					new String[] {ActionKeys.DELETE, ActionKeys.PERMISSIONS},
+					role1.getName()),
+				_getPermissionsJSONObject(
+					new String[] {ActionKeys.UPDATE, ActionKeys.VIEW},
+					role2.getName())),
+			listTypeDefinition2);
+
+		Role role3 = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		listTypeDefinition2.setPermissions(
+			new Permission[] {
+				_getPermission(role1, ActionKeys.UPDATE),
+				_getPermission(role3, ActionKeys.DELETE)
+			});
+
+		listTypeDefinition2 = listTypeDefinitionResource.putListTypeDefinition(
+			listTypeDefinition2.getId(), listTypeDefinition2);
+
+		_assertListTypeDefinitionPermissions(
+			JSONUtil.putAll(
+				_getPermissionsJSONObject(
+					new String[] {ActionKeys.DELETE, ActionKeys.UPDATE},
+					role1.getName()),
+				_getPermissionsJSONObject(
+					new String[] {ActionKeys.DELETE}, role3.getName())),
+			listTypeDefinition2);
+
+		// Permissions with empty list
+
+		listTypeDefinition2.setPermissions(
+			new Permission[] {_getPermission(role1, ActionKeys.DELETE)});
+
+		listTypeDefinition2 = listTypeDefinitionResource.putListTypeDefinition(
+			listTypeDefinition2.getId(), listTypeDefinition2);
+
+		_assertListTypeDefinitionPermissions(
+			JSONUtil.putAll(
+				_getPermissionsJSONObject(
+					new String[] {ActionKeys.DELETE}, role1.getName())),
+			listTypeDefinition2);
 	}
 
 	@Override
@@ -240,11 +383,58 @@ public class ListTypeDefinitionResourceTest
 			nameLocalizedMap.get(LocaleUtil.getSiteDefault()));
 	}
 
+	private void _assertListTypeDefinitionPermissions(
+			JSONArray expectedPermissionsJSONArray,
+			ListTypeDefinition listTypeDefinition)
+		throws Exception {
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null,
+			StringBundler.concat(
+				"headless-admin-list-type/v1.0/list-type-definitions",
+				"/by-external-reference-code/",
+				listTypeDefinition.getExternalReferenceCode(),
+				"?nestedFields=permissions"),
+			Http.Method.GET);
+
+		JSONArray actualPermissionsJSONArray = jsonObject.getJSONArray(
+			"permissions");
+
+		JSONAssert.assertEquals(
+			expectedPermissionsJSONArray.toString(),
+			actualPermissionsJSONArray.toString(), JSONCompareMode.LENIENT);
+	}
+
+	private Permission _getPermission(Role role, String... actionIds) {
+		Permission permission = new Permission();
+
+		permission.setActionIds(actionIds);
+		permission.setRoleName(role.getName());
+
+		return permission;
+	}
+
+	private JSONObject _getPermissionsJSONObject(
+		String[] actionIds, String roleName) {
+
+		return JSONUtil.put(
+			"actionIds", actionIds
+		).put(
+			"roleName", roleName
+		);
+	}
+
 	@Inject
 	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;
 
 	@DeleteAfterTestRun
 	private List<com.liferay.list.type.model.ListTypeDefinition>
 		_listTypeDefinitions = new ArrayList<>();
+
+	@Inject
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Inject
+	private RoleLocalService _roleLocalService;
 
 }

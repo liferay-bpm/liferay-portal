@@ -11,9 +11,17 @@ import com.liferay.headless.admin.list.type.client.pagination.Page;
 import com.liferay.headless.admin.list.type.client.pagination.Pagination;
 import com.liferay.list.type.model.ListTypeDefinition;
 import com.liferay.list.type.service.ListTypeDefinitionLocalServiceUtil;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
@@ -29,6 +37,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 /**
  * @author Gabriel Albuquerque
@@ -46,13 +57,13 @@ public class ListTypeEntryResourceTest
 			ListTypeDefinitionLocalServiceUtil.addListTypeDefinition(
 				null, TestPropsValues.getUserId(),
 				Collections.singletonMap(LocaleUtil.getDefault(), "test"),
-				false, Collections.emptyList());
+				false, Collections.emptyList(), new ServiceContext());
 		_systemListTypeDefinition =
 			ListTypeDefinitionLocalServiceUtil.addListTypeDefinition(
 				null, TestPropsValues.getUserId(),
 				Collections.singletonMap(
 					LocaleUtil.getDefault(), RandomTestUtil.randomString()),
-				true, Collections.emptyList());
+				true, Collections.emptyList(), new ServiceContext());
 	}
 
 	@Override
@@ -224,6 +235,34 @@ public class ListTypeEntryResourceTest
 		assertEquals(
 			listTypeEntry,
 			listTypeEntryResource.getListTypeEntry(listTypeEntry.getId()));
+
+		User user = TestPropsValues.getUser();
+
+		JSONObject expectedCreatorJSONObject = JSONUtil.put(
+			"id", user.getUserId()
+		).put(
+			"name", user.getFullName()
+		);
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null,
+			StringBundler.concat(
+				"headless-admin-list-type/v1.0/list-type-definitions",
+				"/by-external-reference-code/",
+				_systemListTypeDefinition.getExternalReferenceCode(),
+				"/list-type-entries"),
+			Http.Method.GET);
+
+		JSONArray jsonArray = jsonObject.getJSONArray("items");
+
+		jsonObject = jsonArray.getJSONObject(0);
+
+		JSONObject actualCreatorJSONObject = jsonObject.getJSONObject(
+			"creator");
+
+		JSONAssert.assertEquals(
+			expectedCreatorJSONObject.toString(),
+			actualCreatorJSONObject.toString(), JSONCompareMode.LENIENT);
 	}
 
 	@Override
