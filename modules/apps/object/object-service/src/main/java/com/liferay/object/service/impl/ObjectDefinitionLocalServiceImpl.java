@@ -8,6 +8,8 @@ package com.liferay.object.service.impl;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.exportimport.kernel.empty.model.EmptyModelManager;
+import com.liferay.exportimport.kernel.empty.model.EmptyModelManagerUtil;
 import com.liferay.fragment.cache.FragmentEntryLinkCache;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.friendly.url.separator.util.FriendlyURLSeparatorUtil;
@@ -986,6 +988,60 @@ public class ObjectDefinitionLocalServiceImpl
 
 		return objectDefinitionPersistence.countByObjectFolderId(
 			objectFolderId);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	public ObjectDefinition getOrAddEmptyObjectDefinition(
+			String externalReferenceCode, long companyId, long userId,
+			long objectFolderId, boolean modifiable, boolean system)
+		throws PortalException {
+
+		return _emptyModelManager.getOrAddEmptyModel(
+			ObjectDefinition.class, companyId,
+			() -> {
+				ObjectDefinition objectDefinition = null;
+
+				if (system) {
+					objectDefinition =
+						objectDefinitionLocalService.addSystemObjectDefinition(
+							externalReferenceCode, userId, objectFolderId, null,
+							null, false, false, false, true, false, false,
+							false, false, false, null,
+							LocalizedMapUtil.getLocalizedMap(
+								externalReferenceCode),
+							modifiable, externalReferenceCode, null, null,
+							externalReferenceCode, externalReferenceCode,
+							LocalizedMapUtil.getLocalizedMap(
+								externalReferenceCode),
+							false, ObjectDefinitionConstants.SCOPE_COMPANY,
+							externalReferenceCode, 1,
+							WorkflowConstants.STATUS_EMPTY,
+							Collections.emptyList(), Collections.emptyList(),
+							Collections.emptyList());
+				}
+				else {
+					objectDefinition =
+						objectDefinitionLocalService.addCustomObjectDefinition(
+							externalReferenceCode, userId, objectFolderId, null,
+							false, true, false, true, false, false, false,
+							false, false, null,
+							LocalizedMapUtil.getLocalizedMap(
+								externalReferenceCode),
+							externalReferenceCode, null, null,
+							LocalizedMapUtil.getLocalizedMap(
+								externalReferenceCode),
+							true, ObjectDefinitionConstants.SCOPE_COMPANY,
+							new ServiceContext(),
+							ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+							Collections.emptyList(), Collections.emptyList(),
+							Collections.emptyList());
+				}
+
+				return objectDefinition;
+			},
+			externalReferenceCode,
+			this::fetchObjectDefinitionByExternalReferenceCode,
+			this::getObjectDefinitionByExternalReferenceCode);
 	}
 
 	@Override
@@ -3756,6 +3812,9 @@ public class ObjectDefinitionLocalServiceImpl
 	@Reference
 	private DynamicQueryBatchIndexingActionableFactory
 		_dynamicQueryBatchIndexingActionableFactory;
+
+	@Reference
+	private EmptyModelManager _emptyModelManager;
 
 	@Reference
 	private FragmentEntryLinkCache _fragmentEntryLinkCache;
