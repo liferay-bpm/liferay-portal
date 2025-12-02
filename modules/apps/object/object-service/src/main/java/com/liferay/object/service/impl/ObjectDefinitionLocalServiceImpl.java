@@ -1603,7 +1603,13 @@ public class ObjectDefinitionLocalServiceImpl
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT);
 		objectDefinition.setSystem(system);
 		objectDefinition.setVersion(version);
-		objectDefinition.setStatus(status);
+
+		if (EmptyModelManagerUtil.isEmptyModel()) {
+			objectDefinition.setStatus(WorkflowConstants.STATUS_EMPTY);
+		}
+		else {
+			objectDefinition.setStatus(status);
+		}
 
 		objectDefinition = _update(objectDefinition);
 
@@ -1680,8 +1686,10 @@ public class ObjectDefinitionLocalServiceImpl
 			userId, objectDefinition.getObjectDefinitionId(),
 			objectDefinition.getObjectFolderId(), 0, 0);
 
-		objectDefinition = _updateTitleObjectFieldId(
-			objectDefinition, titleObjectFieldName);
+		if (!EmptyModelManagerUtil.isEmptyModel()) {
+			objectDefinition = _updateTitleObjectFieldId(
+				objectDefinition, titleObjectFieldName);
+		}
 
 		_addOrUpdateWorkflowDefinitionLinks(
 			objectDefinition, workflowDefinitionLinks);
@@ -3412,6 +3420,10 @@ public class ObjectDefinitionLocalServiceImpl
 			long objectDefinitionId, long companyId, boolean modifiable,
 			String name, boolean system)
 		throws PortalException {
+
+		if (EmptyModelManagerUtil.isEmptyModel()) {
+			return;
+		}
 
 		if (modifiable && system &&
 			!ObjectDefinitionUtil.isAllowedModifiableSystemObjectDefinitionName(
