@@ -277,63 +277,6 @@ public class ObjectDefinitionLocalServiceImpl
 
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public ObjectDefinition addObjectDefinition(
-			String externalReferenceCode, long userId, long objectFolderId,
-			boolean modifiable, String scope, boolean system)
-		throws PortalException {
-
-		_validateExternalReferenceCode(externalReferenceCode, system);
-
-		ObjectDefinition objectDefinition = objectDefinitionPersistence.create(
-			counterLocalService.increment());
-
-		objectDefinition.setExternalReferenceCode(externalReferenceCode);
-
-		User user = _userLocalService.getUser(userId);
-
-		objectDefinition.setCompanyId(user.getCompanyId());
-		objectDefinition.setUserId(user.getUserId());
-		objectDefinition.setUserName(user.getFullName());
-		objectDefinition.setObjectFolderId(
-			_getObjectFolderId(user.getCompanyId(), objectFolderId));
-
-		objectDefinition.setActive(false);
-		objectDefinition.setLabel(externalReferenceCode);
-		objectDefinition.setModifiable(modifiable);
-		objectDefinition.setName(externalReferenceCode);
-		objectDefinition.setPluralLabel(externalReferenceCode);
-		objectDefinition.setScope(scope);
-		objectDefinition.setStorageType(
-			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT);
-		objectDefinition.setSystem(system);
-		objectDefinition.setStatus(WorkflowConstants.STATUS_DRAFT);
-
-		if (objectDefinition.isUnmodifiableSystemObject() || !modifiable) {
-			throw new ObjectDefinitionModifiableException.MustBeModifiable();
-		}
-
-		objectDefinition = objectDefinitionPersistence.update(objectDefinition);
-
-		_addOrUpdateObjectDefinitionPLOEntries(objectDefinition);
-
-		_resourceLocalService.addResources(
-			objectDefinition.getCompanyId(), 0, objectDefinition.getUserId(),
-			ObjectDefinition.class.getName(),
-			objectDefinition.getObjectDefinitionId(), false, true, true);
-
-		_objectFolderItemLocalService.addObjectFolderItem(
-			userId, objectDefinition.getObjectDefinitionId(),
-			objectDefinition.getObjectFolderId(), 0, 0);
-
-		_addSystemObjectFields(
-			ObjectEntryTable.INSTANCE.getTableName(), objectDefinition,
-			ObjectEntryTable.INSTANCE.objectEntryId.getName(), userId);
-
-		return _updateTitleObjectFieldId(objectDefinition, null);
-	}
-
-	@Indexable(type = IndexableType.REINDEX)
-	@Override
 	public ObjectDefinition addOrUpdateSystemObjectDefinition(
 			long companyId, long objectFolderId,
 			SystemObjectDefinitionManager systemObjectDefinitionManager)
