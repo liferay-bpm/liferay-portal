@@ -629,6 +629,18 @@ public class ObjectDefinitionLocalServiceWrapper
 			getObjectFolderObjectDefinitionsCount(objectFolderId);
 	}
 
+	@Override
+	public com.liferay.object.model.ObjectDefinition
+			getOrAddEmptyObjectDefinition(
+				String externalReferenceCode, long companyId, long userId,
+				long objectFolderId, boolean modifiable, boolean system)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectDefinitionLocalService.getOrAddEmptyObjectDefinition(
+			externalReferenceCode, companyId, userId, objectFolderId,
+			modifiable, system);
+	}
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *

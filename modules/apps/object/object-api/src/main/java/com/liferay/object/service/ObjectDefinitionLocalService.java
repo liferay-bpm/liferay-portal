@@ -413,6 +413,13 @@ public interface ObjectDefinitionLocalService
 	public int getObjectFolderObjectDefinitionsCount(long objectFolderId)
 		throws PortalException;
 
+	@Indexable(type = IndexableType.REINDEX)
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ObjectDefinition getOrAddEmptyObjectDefinition(
+			String externalReferenceCode, long companyId, long userId,
+			long objectFolderId, boolean modifiable, boolean system)
+		throws PortalException;
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *
