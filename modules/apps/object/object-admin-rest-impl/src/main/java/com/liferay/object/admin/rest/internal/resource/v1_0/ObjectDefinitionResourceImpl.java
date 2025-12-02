@@ -1203,19 +1203,23 @@ public class ObjectDefinitionResourceImpl
 
 		com.liferay.object.model.ObjectDefinition
 			serviceBuilderObjectDefinition1 =
-				_objectDefinitionLocalService.
-					fetchObjectDefinitionByExternalReferenceCode(
-						objectDefinitionExternalReferenceCode1,
-						serviceBuilderObjectDefinition2.getCompanyId());
-
-		if (serviceBuilderObjectDefinition1 == null) {
-			serviceBuilderObjectDefinition1 =
-				_objectDefinitionLocalService.addObjectDefinition(
+				_objectDefinitionLocalService.getOrAddEmptyObjectDefinition(
+					serviceBuilderObjectDefinition2.getCompanyId(),
 					objectDefinitionExternalReferenceCode1,
 					contextUser.getUserId(),
-					serviceBuilderObjectDefinition2.getObjectFolderId(), true,
-					ObjectDefinitionConstants.SCOPE_COMPANY, false);
-		}
+					serviceBuilderObjectDefinition2.getObjectFolderId(), null,
+					false, true, false, true, false, false, false, false, false,
+					null,
+					LocalizedMapUtil.getLocalizedMap(
+						objectDefinitionExternalReferenceCode1),
+					objectDefinitionExternalReferenceCode1, null, null,
+					LocalizedMapUtil.getLocalizedMap(
+						objectDefinitionExternalReferenceCode1),
+					true, ObjectDefinitionConstants.SCOPE_COMPANY,
+					new ServiceContext(),
+					ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+					Collections.emptyList(), Collections.emptyList(),
+					Collections.emptyList());
 
 		com.liferay.object.model.ObjectRelationship objectRelationship =
 			_objectRelationshipLocalService.

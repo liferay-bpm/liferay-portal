@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -40,6 +41,8 @@ import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
 import jakarta.ws.rs.core.MultivaluedMap;
+
+import java.util.Collections;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -335,32 +338,29 @@ public class ObjectRelationshipResourceImpl
 			ObjectRelationship objectRelationship)
 		throws Exception {
 
-		com.liferay.object.model.ObjectDefinition
-			serviceBuilderObjectDefinition2 =
-				_objectDefinitionLocalService.
-					fetchObjectDefinitionByExternalReferenceCode(
-						objectRelationship.
-							getObjectDefinitionExternalReferenceCode2(),
-						contextCompany.getCompanyId());
-
-		if (serviceBuilderObjectDefinition2 != null) {
-			return serviceBuilderObjectDefinition2;
-		}
-
 		ObjectFolder defaultObjectFolder =
 			_objectFolderLocalService.getOrAddDefaultObjectFolder(
 				contextCompany.getCompanyId());
 
-		return _objectDefinitionLocalService.addObjectDefinition(
+		return _objectDefinitionLocalService.getOrAddEmptyObjectDefinition(
+			contextCompany.getCompanyId(),
 			objectRelationship.getObjectDefinitionExternalReferenceCode2(),
 			contextUser.getUserId(), defaultObjectFolder.getObjectFolderId(),
-			GetterUtil.get(
-				objectRelationship.getObjectDefinitionModifiable2(), true),
+			null, false, true, false, true, false, false, false, false, false,
+			null,
+			LocalizedMapUtil.getLocalizedMap(
+				objectRelationship.getObjectDefinitionExternalReferenceCode2()),
+			objectRelationship.getObjectDefinitionName2(), null, null,
+			LocalizedMapUtil.getLocalizedMap(
+				objectRelationship.getObjectDefinitionExternalReferenceCode2()),
+			true,
 			GetterUtil.get(
 				objectRelationship.getObjectDefinitionScope2(),
 				ObjectDefinitionConstants.SCOPE_COMPANY),
-			GetterUtil.get(
-				objectRelationship.getObjectDefinitionSystem2(), false));
+			new ServiceContext(),
+			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+			Collections.emptyList(), Collections.emptyList(),
+			Collections.emptyList());
 	}
 
 	private ObjectRelationship _toObjectRelationship(

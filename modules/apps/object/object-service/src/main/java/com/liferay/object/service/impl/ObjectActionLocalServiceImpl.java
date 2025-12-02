@@ -65,6 +65,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.service.PortletLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -81,6 +82,7 @@ import com.liferay.portal.security.script.management.configuration.helper.Script
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -896,20 +898,27 @@ public class ObjectActionLocalServiceImpl
 					"objectDefinitionExternalReferenceCode"));
 
 			if (Validator.isNotNull(objectDefinitionExternalReferenceCode)) {
-				objectDefinition = _objectDefinitionPersistence.fetchByERC_C(
-					objectDefinitionExternalReferenceCode, companyId);
+				ObjectFolder defaultObjectFolder =
+					_objectFolderLocalService.getOrAddDefaultObjectFolder(
+						companyId);
 
-				if (objectDefinition == null) {
-					ObjectFolder defaultObjectFolder =
-						_objectFolderLocalService.getOrAddDefaultObjectFolder(
-							companyId);
-
-					objectDefinition =
-						ObjectDefinitionLocalServiceUtil.addObjectDefinition(
-							objectDefinitionExternalReferenceCode, userId,
-							defaultObjectFolder.getObjectFolderId(), true,
-							ObjectDefinitionConstants.SCOPE_COMPANY, false);
-				}
+				objectDefinition =
+					ObjectDefinitionLocalServiceUtil.
+						getOrAddEmptyObjectDefinition(
+							companyId, objectDefinitionExternalReferenceCode,
+							userId, defaultObjectFolder.getObjectFolderId(),
+							null, false, true, false, true, false, false, false,
+							false, false, null,
+							LocalizedMapUtil.getLocalizedMap(
+								objectDefinitionExternalReferenceCode),
+							objectDefinitionExternalReferenceCode, null, null,
+							LocalizedMapUtil.getLocalizedMap(
+								objectDefinitionExternalReferenceCode),
+							true, ObjectDefinitionConstants.SCOPE_COMPANY,
+							new ServiceContext(),
+							ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+							Collections.emptyList(), Collections.emptyList(),
+							Collections.emptyList());
 
 				parametersUnicodeProperties.put(
 					"objectDefinitionId",
