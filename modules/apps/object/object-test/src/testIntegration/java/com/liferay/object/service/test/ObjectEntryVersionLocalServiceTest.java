@@ -106,7 +106,7 @@ public class ObjectEntryVersionLocalServiceTest {
 				RandomTestUtil.randomLocaleStringMap(),
 				"A" + StringUtil.randomString(), null, null,
 				RandomTestUtil.randomLocaleStringMap(), true,
-				ObjectDefinitionConstants.SCOPE_COMPANY,
+				ObjectDefinitionConstants.SCOPE_COMPANY, new ServiceContext(),
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(),
 				Collections.singletonList(

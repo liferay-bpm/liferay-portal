@@ -34,7 +34,6 @@ import com.liferay.object.exception.ObjectDefinitionEnableObjectEntryVersioningE
 import com.liferay.object.exception.ObjectDefinitionExternalReferenceCodeException;
 import com.liferay.object.exception.ObjectDefinitionFriendlyURLSeparatorException;
 import com.liferay.object.exception.ObjectDefinitionLabelException;
-import com.liferay.object.exception.ObjectDefinitionModifiableException;
 import com.liferay.object.exception.ObjectDefinitionNameException;
 import com.liferay.object.exception.ObjectDefinitionPluralLabelException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
@@ -73,6 +72,7 @@ import com.liferay.object.related.models.test.util.ObjectEntryTestUtil;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectActionLocalServiceUtil;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryVersionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -125,6 +125,7 @@ import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
@@ -244,7 +245,7 @@ public class ObjectDefinitionLocalServiceTest {
 					).name(
 						"Test"
 					).build()),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 			Assert.fail();
 		}
@@ -300,7 +301,7 @@ public class ObjectDefinitionLocalServiceTest {
 				true, ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		Assert.assertTrue(objectDefinition.isEnableFormContainer());
 
@@ -321,7 +322,7 @@ public class ObjectDefinitionLocalServiceTest {
 				true, ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_SALESFORCE,
 				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList()));
+				Collections.emptyList(), new ServiceContext()));
 
 		// Label is null
 
@@ -397,7 +398,7 @@ public class ObjectDefinitionLocalServiceTest {
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING,
 						RandomTestUtil.randomString(), StringUtil.randomId())),
-				Collections.emptyList()));
+				Collections.emptyList(), new ServiceContext()));
 
 		// No object scope provider found with key
 
@@ -419,7 +420,7 @@ public class ObjectDefinitionLocalServiceTest {
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING,
 						RandomTestUtil.randomString(), StringUtil.randomId())),
-				Collections.emptyList()));
+				Collections.emptyList(), new ServiceContext()));
 
 		AssertUtils.assertFailure(
 			ObjectDefinitionScopeException.class,
@@ -441,7 +442,7 @@ public class ObjectDefinitionLocalServiceTest {
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING,
 						RandomTestUtil.randomString(), StringUtil.randomId())),
-				Collections.emptyList()));
+				Collections.emptyList(), new ServiceContext()));
 
 		// Name, database table, resources, and status
 
@@ -464,7 +465,7 @@ public class ObjectDefinitionLocalServiceTest {
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING, "Baker", "baker",
 						false)),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		ObjectFieldUtil.addCustomObjectField(
 			new AssigneeObjectFieldBuilder(
@@ -758,19 +759,6 @@ public class ObjectDefinitionLocalServiceTest {
 
 	@Test
 	public void testAddObjectDefinition() throws Exception {
-		AssertUtils.assertFailure(
-			ObjectDefinitionModifiableException.MustBeModifiable.class,
-			"A modifiable object definition is required",
-			() -> _objectDefinitionLocalService.addObjectDefinition(
-				RandomTestUtil.randomString(), TestPropsValues.getUserId(), 0,
-				false, ObjectDefinitionConstants.SCOPE_COMPANY, false));
-		AssertUtils.assertFailure(
-			ObjectDefinitionModifiableException.MustBeModifiable.class,
-			"A modifiable object definition is required",
-			() -> _objectDefinitionLocalService.addObjectDefinition(
-				RandomTestUtil.randomString(), TestPropsValues.getUserId(), 0,
-				false, ObjectDefinitionConstants.SCOPE_COMPANY, true));
-
 		_testAddObjectDefinition(true, false);
 		_testAddObjectDefinition(true, true);
 	}
@@ -1096,7 +1084,8 @@ public class ObjectDefinitionLocalServiceTest {
 					).value(
 						String.valueOf(depotEntry2.getGroupId())
 					).build()),
-				Collections.emptyList(), Collections.emptyList());
+				Collections.emptyList(), Collections.emptyList(),
+				new ServiceContext());
 
 		_assertObjectDefinitionSettingsValues(
 			objectDefinition1.getObjectDefinitionSettings(),
@@ -1130,7 +1119,8 @@ public class ObjectDefinitionLocalServiceTest {
 					).value(
 						String.valueOf(depotEntry1.getGroupId())
 					).build()),
-				Collections.emptyList(), Collections.emptyList());
+				Collections.emptyList(), Collections.emptyList(),
+				new ServiceContext());
 
 		_assertObjectDefinitionSettingsValues(
 			objectDefinition1.getObjectDefinitionSettings(),
@@ -1172,7 +1162,8 @@ public class ObjectDefinitionLocalServiceTest {
 				true, ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(), Collections.emptyList(),
-				_createWorkflowDefinitionLinks(depotEntry1.getGroupId())));
+				_createWorkflowDefinitionLinks(depotEntry1.getGroupId()),
+				new ServiceContext()));
 
 		Group group = GroupTestUtil.addGroup();
 
@@ -1189,7 +1180,8 @@ public class ObjectDefinitionLocalServiceTest {
 				true, ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(), Collections.emptyList(),
-				_createWorkflowDefinitionLinks(group.getGroupId())));
+				_createWorkflowDefinitionLinks(group.getGroupId()),
+				new ServiceContext()));
 
 		List<WorkflowDefinitionLink> workflowDefinitionLinks =
 			_createWorkflowDefinitionLinks(0);
@@ -1204,7 +1196,7 @@ public class ObjectDefinitionLocalServiceTest {
 				true, ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(), Collections.emptyList(),
-				workflowDefinitionLinks);
+				workflowDefinitionLinks, new ServiceContext());
 
 		_assertWorkflowDefinitionLink(
 			workflowDefinitionLinks.get(0), 0, objectDefinition);
@@ -1231,7 +1223,8 @@ public class ObjectDefinitionLocalServiceTest {
 						StringPool.TRUE
 					).build()),
 				Collections.emptyList(),
-				_createWorkflowDefinitionLinks(group.getGroupId())));
+				_createWorkflowDefinitionLinks(group.getGroupId()),
+				new ServiceContext()));
 
 		DepotEntry depotEntry2 = _depotEntryLocalService.addDepotEntry(
 			RandomTestUtil.randomLocaleStringMap(),
@@ -1260,7 +1253,8 @@ public class ObjectDefinitionLocalServiceTest {
 						String.valueOf(depotEntry1.getGroupId())
 					).build()),
 				Collections.emptyList(),
-				_createWorkflowDefinitionLinks(depotEntry2.getGroupId())));
+				_createWorkflowDefinitionLinks(depotEntry2.getGroupId()),
+				new ServiceContext()));
 
 		workflowDefinitionLinks = _createWorkflowDefinitionLinks(
 			depotEntry1.getGroupId());
@@ -1281,7 +1275,8 @@ public class ObjectDefinitionLocalServiceTest {
 					).value(
 						StringPool.TRUE
 					).build()),
-				Collections.emptyList(), workflowDefinitionLinks);
+				Collections.emptyList(), workflowDefinitionLinks,
+				new ServiceContext());
 
 		_assertWorkflowDefinitionLink(
 			workflowDefinitionLinks.get(0), depotEntry1.getGroupId(),
@@ -1303,7 +1298,8 @@ public class ObjectDefinitionLocalServiceTest {
 					).value(
 						String.valueOf(depotEntry1.getGroupId())
 					).build()),
-				Collections.emptyList(), workflowDefinitionLinks);
+				Collections.emptyList(), workflowDefinitionLinks,
+				new ServiceContext());
 
 		_assertWorkflowDefinitionLink(
 			workflowDefinitionLinks.get(0), depotEntry1.getGroupId(),
@@ -1324,7 +1320,8 @@ public class ObjectDefinitionLocalServiceTest {
 				true, ObjectDefinitionConstants.SCOPE_SITE,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(), Collections.emptyList(),
-				_createWorkflowDefinitionLinks(depotEntry1.getGroupId())));
+				_createWorkflowDefinitionLinks(depotEntry1.getGroupId()),
+				new ServiceContext()));
 
 		workflowDefinitionLinks = _createWorkflowDefinitionLinks(
 			group.getGroupId());
@@ -1339,7 +1336,7 @@ public class ObjectDefinitionLocalServiceTest {
 				true, ObjectDefinitionConstants.SCOPE_SITE,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(), Collections.emptyList(),
-				workflowDefinitionLinks);
+				workflowDefinitionLinks, new ServiceContext());
 
 		_assertWorkflowDefinitionLink(
 			workflowDefinitionLinks.get(0), group.getGroupId(),
@@ -1379,11 +1376,8 @@ public class ObjectDefinitionLocalServiceTest {
 				RandomTestUtil.randomString(),
 				ObjectDefinitionTestUtil.getRandomName()));
 
-		ObjectDefinition objectDefinition2 =
-			_objectDefinitionLocalService.addObjectDefinition(
-				ObjectDefinitionTestUtil.getRandomName(),
-				TestPropsValues.getUserId(), 0, true,
-				ObjectDefinitionConstants.SCOPE_COMPANY, false);
+		ObjectDefinition objectDefinition2 = _addCustomObjectDefinition(
+			null, ObjectDefinitionTestUtil.getRandomName());
 
 		Assert.assertTrue(Validator.isNull(objectDefinition2.getClassName()));
 
@@ -2295,7 +2289,7 @@ public class ObjectDefinitionLocalServiceTest {
 							ObjectFieldConstants.DB_TYPE_STRING,
 							RandomTestUtil.randomString(),
 							StringUtil.randomId())),
-					Collections.emptyList());
+					Collections.emptyList(), new ServiceContext());
 
 			_objectDefinitionLocalService.publishCustomObjectDefinition(
 				user.getUserId(),
@@ -2507,7 +2501,7 @@ public class ObjectDefinitionLocalServiceTest {
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING,
 						RandomTestUtil.randomString(), objectFieldName)),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		_objectDefinitionLocalService.publishCustomObjectDefinition(
 			TestPropsValues.getUserId(),
@@ -2563,7 +2557,7 @@ public class ObjectDefinitionLocalServiceTest {
 				ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_SALESFORCE,
 				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		objectDefinition =
 			_objectDefinitionLocalService.
@@ -2647,7 +2641,7 @@ public class ObjectDefinitionLocalServiceTest {
 				ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_SALESFORCE,
 				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		objectDefinition =
 			_objectDefinitionLocalService.
@@ -2705,9 +2699,7 @@ public class ObjectDefinitionLocalServiceTest {
 	@Test
 	public void testEnableAccountRestricted() throws Exception {
 		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.addObjectDefinition(
-				RandomTestUtil.randomString(), TestPropsValues.getUserId(), 0,
-				true, ObjectDefinitionConstants.SCOPE_COMPANY, false);
+			ObjectDefinitionTestUtil.addCustomObjectDefinition();
 
 		objectDefinition =
 			_objectDefinitionLocalService.enableAccountEntryRestricted(
@@ -2792,7 +2784,7 @@ public class ObjectDefinitionLocalServiceTest {
 						).name(
 							StringUtil.randomId()
 						).build()),
-					Collections.emptyList());
+					Collections.emptyList(), new ServiceContext());
 
 			objectDefinition2 =
 				_objectDefinitionLocalService.publishCustomObjectDefinition(
@@ -2910,7 +2902,7 @@ public class ObjectDefinitionLocalServiceTest {
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING,
 						RandomTestUtil.randomString(), StringUtil.randomId())),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		AssertUtils.assertFailure(
 			ObjectDefinitionFriendlyURLSeparatorException.class,
@@ -2938,7 +2930,7 @@ public class ObjectDefinitionLocalServiceTest {
 				true, ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		_testSystemObjectFields(9, objectDefinition);
 
@@ -2971,7 +2963,7 @@ public class ObjectDefinitionLocalServiceTest {
 				ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_SALESFORCE,
 				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		_assertLabelAndPluralLabel(objectDefinition, "Able", "Ables");
 
@@ -3080,7 +3072,7 @@ public class ObjectDefinitionLocalServiceTest {
 					).build(),
 					objectDefinition.getScope(), objectDefinition.getStatus(),
 					Collections.emptyList(), Collections.emptyList(),
-					Collections.emptyList());
+					Collections.emptyList(), new ServiceContext());
 
 			Assert.assertEquals(
 				objectField.getObjectFieldId(),
@@ -3110,7 +3102,7 @@ public class ObjectDefinitionLocalServiceTest {
 				null, null, false, LocalizedMapUtil.getLocalizedMap("Ables"),
 				objectDefinition.getScope(), objectDefinition.getStatus(),
 				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		Assert.assertEquals(
 			externalReferenceCode, objectDefinition.getExternalReferenceCode());
@@ -3146,7 +3138,7 @@ public class ObjectDefinitionLocalServiceTest {
 				false, LocalizedMapUtil.getLocalizedMap("Bakers"),
 				objectDefinition.getScope(), objectDefinition.getStatus(),
 				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		_assertLabelAndPluralLabel(objectDefinition, "Baker", "Bakers");
 
@@ -3203,7 +3195,7 @@ public class ObjectDefinitionLocalServiceTest {
 				null, false, LocalizedMapUtil.getLocalizedMap("Charlies"),
 				objectDefinition.getScope(), objectDefinition.getStatus(),
 				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		_assertLabelAndPluralLabel(objectDefinition, "Charlie", "Charlies");
 
@@ -3238,7 +3230,7 @@ public class ObjectDefinitionLocalServiceTest {
 				ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		_objectDefinitionLocalService.updateExternalReferenceCode(
 			customObjectDefinition.getObjectDefinitionId(), "TEST_ERC");
@@ -3330,7 +3322,7 @@ public class ObjectDefinitionLocalServiceTest {
 				objectDefinitionAA.getPluralLabelMap(),
 				objectDefinitionAA.getScope(), objectDefinitionAA.getStatus(),
 				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		Assert.assertEquals(
 			panelCategoryKey, objectDefinitionAA.getPanelCategoryKey());
@@ -3370,7 +3362,8 @@ public class ObjectDefinitionLocalServiceTest {
 				null, false, LocalizedMapUtil.getLocalizedMap("Charlie"),
 				ObjectDefinitionConstants.SCOPE_SITE,
 				objectDefinition1.getStatus(), Collections.emptyList(),
-				Collections.emptyList(), Collections.emptyList()));
+				Collections.emptyList(), Collections.emptyList(),
+				new ServiceContext()));
 
 		// Modifiable system object definition must be published to be actived
 
@@ -3385,7 +3378,8 @@ public class ObjectDefinitionLocalServiceTest {
 				null, false, LocalizedMapUtil.getLocalizedMap("Charlies"),
 				ObjectDefinitionConstants.SCOPE_SITE,
 				objectDefinition1.getStatus(), Collections.emptyList(),
-				Collections.emptyList(), Collections.emptyList()));
+				Collections.emptyList(), Collections.emptyList(),
+				new ServiceContext()));
 
 		// Label is null
 
@@ -3400,7 +3394,8 @@ public class ObjectDefinitionLocalServiceTest {
 				LocalizedMapUtil.getLocalizedMap("Charlie"),
 				ObjectDefinitionConstants.SCOPE_SITE,
 				objectDefinition1.getStatus(), Collections.emptyList(),
-				Collections.emptyList(), Collections.emptyList()));
+				Collections.emptyList(), Collections.emptyList(),
+				new ServiceContext()));
 
 		// Plural label is null
 
@@ -3414,7 +3409,8 @@ public class ObjectDefinitionLocalServiceTest {
 				LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie", null,
 				null, false, null, ObjectDefinitionConstants.SCOPE_SITE,
 				objectDefinition1.getStatus(), Collections.emptyList(),
-				Collections.emptyList(), Collections.emptyList()));
+				Collections.emptyList(), Collections.emptyList(),
+				new ServiceContext()));
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition1);
 
@@ -3451,7 +3447,7 @@ public class ObjectDefinitionLocalServiceTest {
 				null, false, LocalizedMapUtil.getLocalizedMap("Charlies"),
 				objectDefinition2.getScope(), objectDefinition2.getStatus(),
 				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		_assertLabelAndPluralLabel(objectDefinition2, "Charlie", "Charlies");
 
@@ -3613,7 +3609,7 @@ public class ObjectDefinitionLocalServiceTest {
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 					ObjectFieldConstants.DB_TYPE_STRING,
 					RandomTestUtil.randomString(), StringUtil.randomId())),
-			Collections.emptyList());
+			Collections.emptyList(), new ServiceContext());
 	}
 
 	private ObjectFolder _addObjectFolder() throws Exception {
@@ -3870,7 +3866,7 @@ public class ObjectDefinitionLocalServiceTest {
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING,
 						RandomTestUtil.randomString(), StringUtil.randomId())),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		return _objectDefinitionLocalService.publishCustomObjectDefinition(
 			TestPropsValues.getUserId(),
@@ -3895,7 +3891,7 @@ public class ObjectDefinitionLocalServiceTest {
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING,
 						RandomTestUtil.randomString(), StringUtil.randomId())),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		return _objectDefinitionLocalService.publishCustomObjectDefinition(
 			objectDefinition.getUserId(),
@@ -3906,14 +3902,45 @@ public class ObjectDefinitionLocalServiceTest {
 		throws Exception {
 
 		String externalReferenceCode = RandomTestUtil.randomString();
+		String name = "Test";
 		User user = TestPropsValues.getUser();
 		ObjectFolder objectFolder = _addObjectFolder();
 
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.addObjectDefinition(
-				externalReferenceCode, user.getUserId(),
-				objectFolder.getObjectFolderId(), modifiable,
-				ObjectDefinitionConstants.SCOPE_COMPANY, system);
+		ObjectDefinition objectDefinition = null;
+
+		if (system) {
+			objectDefinition =
+				ObjectDefinitionLocalServiceUtil.addSystemObjectDefinition(
+					externalReferenceCode, user.getUserId(),
+					objectFolder.getObjectFolderId(), null, null, false, true,
+					false, false, false, false, false, false, false, null,
+					LocalizedMapUtil.getLocalizedMap(externalReferenceCode),
+					modifiable, name, null, null, null, null,
+					LocalizedMapUtil.getLocalizedMap(externalReferenceCode),
+					false, ObjectDefinitionConstants.SCOPE_COMPANY, null, 1,
+					WorkflowConstants.STATUS_DRAFT, Collections.emptyList(),
+					List.of(
+						ObjectFieldUtil.createObjectField(
+							ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+							ObjectFieldConstants.DB_TYPE_STRING,
+							RandomTestUtil.randomString(),
+							StringUtil.randomId())),
+					Collections.emptyList());
+		}
+		else {
+			objectDefinition =
+				ObjectDefinitionLocalServiceUtil.addCustomObjectDefinition(
+					externalReferenceCode, user.getUserId(),
+					objectFolder.getObjectFolderId(), null, false, true, false,
+					false, false, false, false, false, false, null,
+					LocalizedMapUtil.getLocalizedMap(externalReferenceCode),
+					name, null, null,
+					LocalizedMapUtil.getLocalizedMap(externalReferenceCode),
+					true, ObjectDefinitionConstants.SCOPE_COMPANY,
+					ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+					Collections.emptyList(), Collections.emptyList(),
+					Collections.emptyList(), new ServiceContext());
+		}
 
 		_assertLabelAndPluralLabel(
 			objectDefinition, externalReferenceCode, externalReferenceCode);
@@ -3929,14 +3956,12 @@ public class ObjectDefinitionLocalServiceTest {
 			objectDefinition.getObjectFolderId());
 		Assert.assertFalse(objectDefinition.isAccountEntryRestricted());
 		Assert.assertFalse(objectDefinition.isActive());
-		Assert.assertEquals(
-			StringPool.BLANK, objectDefinition.getDBTableName());
-		Assert.assertFalse(objectDefinition.isEnableCategorization());
+		Assert.assertTrue(objectDefinition.isEnableCategorization());
 		Assert.assertFalse(objectDefinition.isEnableComments());
 		Assert.assertFalse(objectDefinition.isEnableIndexSearch());
 		Assert.assertFalse(objectDefinition.isEnableObjectEntryHistory());
 		Assert.assertEquals(modifiable, objectDefinition.isModifiable());
-		Assert.assertEquals(externalReferenceCode, objectDefinition.getName());
+		Assert.assertEquals(name, objectDefinition.getShortName());
 		Assert.assertEquals(
 			ObjectDefinitionConstants.SCOPE_COMPANY,
 			objectDefinition.getScope());
@@ -4211,7 +4236,7 @@ public class ObjectDefinitionLocalServiceTest {
 					null, false, LocalizedMapUtil.getLocalizedMap("Ables"),
 					objectDefinition2.getScope(), objectDefinition2.getStatus(),
 					Collections.emptyList(), Collections.emptyList(),
-					Collections.emptyList());
+					Collections.emptyList(), new ServiceContext());
 
 			Assert.fail();
 		}
@@ -4254,7 +4279,7 @@ public class ObjectDefinitionLocalServiceTest {
 			enableObjectEntryVersioning, friendlyURLSeparator, labelMap, name,
 			null, null, false, pluralLabelMap, scope, status,
 			Collections.emptyList(), Collections.emptyList(),
-			Collections.emptyList());
+			Collections.emptyList(), new ServiceContext());
 	}
 
 	private ObjectDefinition _updateCustomObjectDefinition(
@@ -4287,7 +4312,7 @@ public class ObjectDefinitionLocalServiceTest {
 			objectDefinition.isPortlet(), objectDefinition.getPluralLabelMap(),
 			objectDefinition.getScope(), objectDefinition.getStatus(),
 			Collections.emptyList(), Collections.emptyList(),
-			Collections.emptyList());
+			Collections.emptyList(), new ServiceContext());
 	}
 
 	private static ObjectFolder _defaultObjectFolder;

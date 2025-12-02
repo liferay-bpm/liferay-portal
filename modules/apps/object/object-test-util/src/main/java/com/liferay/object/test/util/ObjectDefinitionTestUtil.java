@@ -14,6 +14,7 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.portlet.constants.FriendlyURLResolverConstants;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -72,7 +73,7 @@ public class ObjectDefinitionTestUtil {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			name, null, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			true, ObjectDefinitionConstants.SCOPE_COMPANY,
+			true, ObjectDefinitionConstants.SCOPE_COMPANY, new ServiceContext(),
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 			Collections.emptyList(), objectFields, Collections.emptyList());
 	}
@@ -92,7 +93,7 @@ public class ObjectDefinitionTestUtil {
 			false, false, false, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(name), name, null, null,
 			LocalizedMapUtil.getLocalizedMap(name), true,
-			ObjectDefinitionConstants.SCOPE_COMPANY,
+			ObjectDefinitionConstants.SCOPE_COMPANY, new ServiceContext(),
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 			Collections.emptyList(),
 			Arrays.asList(
@@ -193,7 +194,8 @@ public class ObjectDefinitionTestUtil {
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				name, null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				true, scope, ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				true, scope, new ServiceContext(),
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(), objectFields, Collections.emptyList());
 
 		return ObjectDefinitionLocalServiceUtil.publishCustomObjectDefinition(

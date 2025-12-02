@@ -22,6 +22,7 @@ import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -131,7 +132,8 @@ public abstract class BaseDisplayContextTestCase {
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				Collections.singletonMap(
 					LocaleUtil.getDefault(), RandomTestUtil.randomString()),
-				true, scope, ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				true, scope, new ServiceContext(),
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				objectDefinitionSettings,
 				Collections.singletonList(
 					ObjectFieldUtil.createObjectField(
@@ -172,7 +174,8 @@ public abstract class BaseDisplayContextTestCase {
 			objectDefinition.getPanelAppOrder(),
 			objectDefinition.getPanelCategoryKey(),
 			objectDefinition.isPortlet(), objectDefinition.getPluralLabelMap(),
-			objectDefinition.getScope(), objectDefinition.getStatus(),
+			objectDefinition.getScope(), new ServiceContext(),
+			objectDefinition.getStatus(),
 			objectDefinition.getObjectDefinitionSettings(),
 			Collections.emptyList(), Collections.emptyList());
 	}

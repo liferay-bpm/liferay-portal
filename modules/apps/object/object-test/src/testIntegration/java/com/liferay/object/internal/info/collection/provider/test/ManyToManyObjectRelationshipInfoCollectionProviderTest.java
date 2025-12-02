@@ -95,7 +95,8 @@ public class ManyToManyObjectRelationshipInfoCollectionProviderTest {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			ObjectDefinitionTestUtil.getRandomName(), null, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			true, scope, ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+			true, scope, new ServiceContext(),
+			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 			Collections.emptyList(), Arrays.asList(objectField),
 			Collections.emptyList());
 	}

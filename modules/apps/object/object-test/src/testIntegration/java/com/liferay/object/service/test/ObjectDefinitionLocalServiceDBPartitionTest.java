@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.instance.PortalInstancePool;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.AssumeTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -86,6 +87,7 @@ public class ObjectDefinitionLocalServiceDBPartitionTest {
 					objectDefinition1.getShortName(), null, null,
 					RandomTestUtil.randomLocaleStringMap(), true,
 					ObjectDefinitionConstants.SCOPE_COMPANY,
+					new ServiceContext(),
 					ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 					Collections.emptyList(),
 					Collections.singletonList(

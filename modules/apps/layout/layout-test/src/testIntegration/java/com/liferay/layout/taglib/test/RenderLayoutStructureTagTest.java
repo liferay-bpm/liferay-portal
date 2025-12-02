@@ -275,7 +275,7 @@ public class RenderLayoutStructureTagTest {
 				RandomTestUtil.randomLocaleStringMap(),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				RandomTestUtil.randomLocaleStringMap(), true,
-				ObjectDefinitionConstants.SCOPE_COMPANY,
+				ObjectDefinitionConstants.SCOPE_COMPANY, new ServiceContext(),
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(),
 				ListUtil.fromArray(
@@ -298,7 +298,7 @@ public class RenderLayoutStructureTagTest {
 				RandomTestUtil.randomLocaleStringMap(),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				RandomTestUtil.randomLocaleStringMap(), true,
-				ObjectDefinitionConstants.SCOPE_COMPANY,
+				ObjectDefinitionConstants.SCOPE_COMPANY, new ServiceContext(),
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(),
 				ListUtil.fromArray(

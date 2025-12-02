@@ -266,7 +266,7 @@ public class ObjectEntryInfoItemFieldValuesProviderTest {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			ObjectDefinitionTestUtil.getRandomName(), null, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			true, ObjectDefinitionConstants.SCOPE_SITE,
+			true, ObjectDefinitionConstants.SCOPE_SITE, new ServiceContext(),
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 			Collections.emptyList(), Arrays.asList(objectFields),
 			Collections.emptyList());
