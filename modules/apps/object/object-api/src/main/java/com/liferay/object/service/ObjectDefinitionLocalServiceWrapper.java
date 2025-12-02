@@ -41,7 +41,9 @@ public class ObjectDefinitionLocalServiceWrapper
 			java.util.Map<java.util.Locale, String> labelMap, String name,
 			String panelAppOrder, String panelCategoryKey,
 			java.util.Map<java.util.Locale, String> pluralLabelMap,
-			boolean portlet, String scope, String storageType,
+			boolean portlet, String scope,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext,
+			String storageType,
 			java.util.List<com.liferay.object.model.ObjectDefinitionSetting>
 				objectDefinitionSettings,
 			java.util.List<com.liferay.object.model.ObjectField> objectFields,
@@ -57,7 +59,7 @@ public class ObjectDefinitionLocalServiceWrapper
 			enableObjectEntrySchedule, enableObjectEntrySubscription,
 			enableObjectEntryVersioning, friendlyURLSeparator, labelMap, name,
 			panelAppOrder, panelCategoryKey, pluralLabelMap, portlet, scope,
-			storageType, objectDefinitionSettings, objectFields,
+			serviceContext, storageType, objectDefinitionSettings, objectFields,
 			workflowDefinitionLinks);
 	}
 
@@ -707,7 +709,9 @@ public class ObjectDefinitionLocalServiceWrapper
 				java.util.Map<java.util.Locale, String> labelMap, String name,
 				String panelAppOrder, String panelCategoryKey, boolean portlet,
 				java.util.Map<java.util.Locale, String> pluralLabelMap,
-				String scope, int status,
+				String scope,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext,
+				int status,
 				java.util.List<com.liferay.object.model.ObjectDefinitionSetting>
 					objectDefinitionSettings,
 				java.util.List<com.liferay.object.model.ObjectField>
@@ -727,8 +731,9 @@ public class ObjectDefinitionLocalServiceWrapper
 			enableObjectEntryHistory, enableObjectEntrySchedule,
 			enableObjectEntrySubscription, enableObjectEntryVersioning,
 			friendlyURLSeparator, labelMap, name, panelAppOrder,
-			panelCategoryKey, portlet, pluralLabelMap, scope, status,
-			objectDefinitionSettings, objectFields, workflowDefinitionLinks);
+			panelCategoryKey, portlet, pluralLabelMap, scope, serviceContext,
+			status, objectDefinitionSettings, objectFields,
+			workflowDefinitionLinks);
 	}
 
 	@Override

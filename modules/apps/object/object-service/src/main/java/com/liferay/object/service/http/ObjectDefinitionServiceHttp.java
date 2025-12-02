@@ -56,7 +56,9 @@ public class ObjectDefinitionServiceHttp {
 				java.util.Map<java.util.Locale, String> labelMap, String name,
 				String panelAppOrder, String panelCategoryKey,
 				java.util.Map<java.util.Locale, String> pluralLabelMap,
-				boolean portlet, String scope, String storageType,
+				boolean portlet, String scope,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext,
+				String storageType,
 				java.util.List<com.liferay.object.model.ObjectDefinitionSetting>
 					objectDefinitionSettings,
 				java.util.List<com.liferay.object.model.ObjectField>
@@ -79,8 +81,8 @@ public class ObjectDefinitionServiceHttp {
 				enableObjectEntrySchedule, enableObjectEntrySubscription,
 				enableObjectEntryVersioning, friendlyURLSeparator, labelMap,
 				name, panelAppOrder, panelCategoryKey, pluralLabelMap, portlet,
-				scope, storageType, objectDefinitionSettings, objectFields,
-				workflowDefinitionLinks);
+				scope, serviceContext, storageType, objectDefinitionSettings,
+				objectFields, workflowDefinitionLinks);
 
 			Object returnObj = null;
 
@@ -673,7 +675,9 @@ public class ObjectDefinitionServiceHttp {
 				java.util.Map<java.util.Locale, String> labelMap, String name,
 				String panelAppOrder, String panelCategoryKey, boolean portlet,
 				java.util.Map<java.util.Locale, String> pluralLabelMap,
-				String scope, int status,
+				String scope,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext,
+				int status,
 				java.util.List<com.liferay.object.model.ObjectDefinitionSetting>
 					objectDefinitionSettings,
 				java.util.List<com.liferay.object.model.ObjectField>
@@ -699,8 +703,8 @@ public class ObjectDefinitionServiceHttp {
 				enableObjectEntryHistory, enableObjectEntrySchedule,
 				enableObjectEntrySubscription, enableObjectEntryVersioning,
 				friendlyURLSeparator, labelMap, name, panelAppOrder,
-				panelCategoryKey, portlet, pluralLabelMap, scope, status,
-				objectDefinitionSettings, objectFields,
+				panelCategoryKey, portlet, pluralLabelMap, scope,
+				serviceContext, status, objectDefinitionSettings, objectFields,
 				workflowDefinitionLinks);
 
 			Object returnObj = null;
@@ -879,6 +883,7 @@ public class ObjectDefinitionServiceHttp {
 			boolean.class, boolean.class, boolean.class, boolean.class,
 			String.class, java.util.Map.class, String.class, String.class,
 			String.class, java.util.Map.class, boolean.class, String.class,
+			com.liferay.portal.kernel.service.ServiceContext.class,
 			String.class, java.util.List.class, java.util.List.class,
 			java.util.List.class
 		};
@@ -931,7 +936,8 @@ public class ObjectDefinitionServiceHttp {
 			boolean.class, boolean.class, boolean.class, boolean.class,
 			boolean.class, boolean.class, boolean.class, String.class,
 			java.util.Map.class, String.class, String.class, String.class,
-			boolean.class, java.util.Map.class, String.class, int.class,
+			boolean.class, java.util.Map.class, String.class,
+			com.liferay.portal.kernel.service.ServiceContext.class, int.class,
 			java.util.List.class, java.util.List.class, java.util.List.class
 		};
 	private static final Class<?>[]

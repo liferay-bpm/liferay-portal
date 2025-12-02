@@ -42,7 +42,9 @@ public class ObjectDefinitionServiceUtil {
 			Map<java.util.Locale, String> labelMap, String name,
 			String panelAppOrder, String panelCategoryKey,
 			Map<java.util.Locale, String> pluralLabelMap, boolean portlet,
-			String scope, String storageType,
+			String scope,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext,
+			String storageType,
 			List<com.liferay.object.model.ObjectDefinitionSetting>
 				objectDefinitionSettings,
 			List<com.liferay.object.model.ObjectField> objectFields,
@@ -57,7 +59,7 @@ public class ObjectDefinitionServiceUtil {
 			enableObjectEntrySchedule, enableObjectEntrySubscription,
 			enableObjectEntryVersioning, friendlyURLSeparator, labelMap, name,
 			panelAppOrder, panelCategoryKey, pluralLabelMap, portlet, scope,
-			storageType, objectDefinitionSettings, objectFields,
+			serviceContext, storageType, objectDefinitionSettings, objectFields,
 			workflowDefinitionLinks);
 	}
 
@@ -195,6 +197,7 @@ public class ObjectDefinitionServiceUtil {
 			Map<java.util.Locale, String> labelMap, String name,
 			String panelAppOrder, String panelCategoryKey, boolean portlet,
 			Map<java.util.Locale, String> pluralLabelMap, String scope,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext,
 			int status,
 			List<com.liferay.object.model.ObjectDefinitionSetting>
 				objectDefinitionSettings,
@@ -213,8 +216,9 @@ public class ObjectDefinitionServiceUtil {
 			enableObjectEntryHistory, enableObjectEntrySchedule,
 			enableObjectEntrySubscription, enableObjectEntryVersioning,
 			friendlyURLSeparator, labelMap, name, panelAppOrder,
-			panelCategoryKey, portlet, pluralLabelMap, scope, status,
-			objectDefinitionSettings, objectFields, workflowDefinitionLinks);
+			panelCategoryKey, portlet, pluralLabelMap, scope, serviceContext,
+			status, objectDefinitionSettings, objectFields,
+			workflowDefinitionLinks);
 	}
 
 	public static ObjectDefinition updateExternalReferenceCode(
