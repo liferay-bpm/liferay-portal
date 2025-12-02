@@ -16,10 +16,12 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.extension.PropertyDefinition;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
@@ -83,6 +85,38 @@ public class LongIntegerObjectFieldBusinessType
 	@Override
 	public PropertyDefinition.PropertyType getPropertyType() {
 		return PropertyDefinition.PropertyType.LONG;
+	}
+
+	@Override
+	public void validateObjectFieldSettingsDefaultValue(
+			ObjectField objectField,
+			Map<String, String> objectFieldSettingsValuesMap)
+		throws PortalException {
+
+		if (objectFieldSettingsValuesMap.isEmpty()) {
+			return;
+		}
+
+		super.validateObjectFieldSettingsDefaultValue(
+			objectField, objectFieldSettingsValuesMap);
+
+		if (Objects.equals(
+				objectFieldSettingsValuesMap.get(
+					ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE),
+				ObjectFieldSettingConstants.VALUE_EXPRESSION_BUILDER)) {
+
+			return;
+		}
+
+		String defaultValue = objectFieldSettingsValuesMap.get(
+			ObjectFieldSettingConstants.NAME_DEFAULT_VALUE);
+
+		if (Validator.isNull(defaultValue)) {
+			return;
+		}
+
+		validateMaxLength(
+			16, ObjectFieldSettingConstants.NAME_DEFAULT_VALUE, defaultValue);
 	}
 
 	@Reference
