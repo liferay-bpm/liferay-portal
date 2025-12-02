@@ -409,6 +409,25 @@ public interface ObjectDefinitionLocalService
 	public int getObjectFolderObjectDefinitionsCount(long objectFolderId)
 		throws PortalException;
 
+	@Indexable(type = IndexableType.REINDEX)
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ObjectDefinition getOrAddEmptyObjectDefinition(
+			long companyId, String externalReferenceCode, long userId,
+			long objectFolderId, String className, boolean enableComments,
+			boolean enableFormContainer, boolean enableFriendlyURLCustomization,
+			boolean enableIndexSearch, boolean enableLocalization,
+			boolean enableObjectEntryDraft, boolean enableObjectEntrySchedule,
+			boolean enableObjectEntrySubscription,
+			boolean enableObjectEntryVersioning, String friendlyURLSeparator,
+			Map<Locale, String> labelMap, String name, String panelAppOrder,
+			String panelCategoryKey, Map<Locale, String> pluralLabelMap,
+			boolean portlet, String scope, ServiceContext serviceContext,
+			String storageType,
+			List<ObjectDefinitionSetting> objectDefinitionSettings,
+			List<ObjectField> objectFields,
+			List<WorkflowDefinitionLink> workflowDefinitionLinks)
+		throws PortalException;
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *

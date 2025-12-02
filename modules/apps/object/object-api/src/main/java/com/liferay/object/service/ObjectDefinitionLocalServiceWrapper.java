@@ -621,6 +621,45 @@ public class ObjectDefinitionLocalServiceWrapper
 			getObjectFolderObjectDefinitionsCount(objectFolderId);
 	}
 
+	@Override
+	public com.liferay.object.model.ObjectDefinition
+			getOrAddEmptyObjectDefinition(
+				long companyId, String externalReferenceCode, long userId,
+				long objectFolderId, String className, boolean enableComments,
+				boolean enableFormContainer,
+				boolean enableFriendlyURLCustomization,
+				boolean enableIndexSearch, boolean enableLocalization,
+				boolean enableObjectEntryDraft,
+				boolean enableObjectEntrySchedule,
+				boolean enableObjectEntrySubscription,
+				boolean enableObjectEntryVersioning,
+				String friendlyURLSeparator,
+				java.util.Map<java.util.Locale, String> labelMap, String name,
+				String panelAppOrder, String panelCategoryKey,
+				java.util.Map<java.util.Locale, String> pluralLabelMap,
+				boolean portlet, String scope,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext,
+				String storageType,
+				java.util.List<com.liferay.object.model.ObjectDefinitionSetting>
+					objectDefinitionSettings,
+				java.util.List<com.liferay.object.model.ObjectField>
+					objectFields,
+				java.util.List
+					<com.liferay.portal.kernel.model.WorkflowDefinitionLink>
+						workflowDefinitionLinks)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectDefinitionLocalService.getOrAddEmptyObjectDefinition(
+			companyId, externalReferenceCode, userId, objectFolderId, className,
+			enableComments, enableFormContainer, enableFriendlyURLCustomization,
+			enableIndexSearch, enableLocalization, enableObjectEntryDraft,
+			enableObjectEntrySchedule, enableObjectEntrySubscription,
+			enableObjectEntryVersioning, friendlyURLSeparator, labelMap, name,
+			panelAppOrder, panelCategoryKey, pluralLabelMap, portlet, scope,
+			serviceContext, storageType, objectDefinitionSettings, objectFields,
+			workflowDefinitionLinks);
+	}
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *
