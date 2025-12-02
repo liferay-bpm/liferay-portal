@@ -8,6 +8,7 @@ package com.liferay.object.service.impl;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.exportimport.kernel.empty.model.EmptyModelManager;
 import com.liferay.fragment.cache.FragmentEntryLinkCache;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.friendly.url.separator.util.FriendlyURLSeparatorUtil;
@@ -44,6 +45,7 @@ import com.liferay.object.exception.ObjectDefinitionEnableObjectEntryVersioningE
 import com.liferay.object.exception.ObjectDefinitionExternalReferenceCodeException;
 import com.liferay.object.exception.ObjectDefinitionFriendlyURLSeparatorException;
 import com.liferay.object.exception.ObjectDefinitionLabelException;
+import com.liferay.object.exception.ObjectDefinitionModifiableException;
 import com.liferay.object.exception.ObjectDefinitionNameException;
 import com.liferay.object.exception.ObjectDefinitionPluralLabelException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
@@ -986,6 +988,59 @@ public class ObjectDefinitionLocalServiceImpl
 
 		return objectDefinitionPersistence.countByObjectFolderId(
 			objectFolderId);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	public ObjectDefinition getOrAddEmptyObjectDefinition(
+			String externalReferenceCode, long companyId, long userId,
+			long objectFolderId, boolean modifiable, boolean system)
+		throws PortalException {
+
+		return _emptyModelManager.getOrAddEmptyModel(
+			ObjectDefinition.class, companyId,
+			() -> {
+				ObjectDefinition objectDefinition = null;
+
+				if (system) {
+					objectDefinition =
+						objectDefinitionLocalService.addSystemObjectDefinition(
+							externalReferenceCode, userId, objectFolderId, null,
+							null, false, false, false, true, false, false,
+							false, false, null,
+							LocalizedMapUtil.getLocalizedMap(
+								externalReferenceCode),
+							modifiable, externalReferenceCode, null, null,
+							externalReferenceCode, externalReferenceCode,
+							LocalizedMapUtil.getLocalizedMap(
+								externalReferenceCode),
+							false, ObjectDefinitionConstants.SCOPE_COMPANY,
+							externalReferenceCode, 1,
+							WorkflowConstants.STATUS_EMPTY,
+							Collections.emptyList(), Collections.emptyList(),
+							Collections.emptyList());
+				}
+				else {
+					objectDefinition =
+						objectDefinitionLocalService.addCustomObjectDefinition(
+							externalReferenceCode, userId, objectFolderId, null,
+							false, true, false, true, false, false, false,
+							false, null,
+							LocalizedMapUtil.getLocalizedMap(
+								externalReferenceCode),
+							externalReferenceCode, null, null,
+							LocalizedMapUtil.getLocalizedMap(
+								externalReferenceCode),
+							true, ObjectDefinitionConstants.SCOPE_COMPANY,
+							ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+							Collections.emptyList(), Collections.emptyList(),
+							Collections.emptyList(), new ServiceContext());
+				}
+
+				return objectDefinition;
+			},
+			externalReferenceCode,
+			this::fetchObjectDefinitionByExternalReferenceCode,
+			this::getObjectDefinitionByExternalReferenceCode);
 	}
 
 	@Override
@@ -3756,6 +3811,9 @@ public class ObjectDefinitionLocalServiceImpl
 	@Reference
 	private DynamicQueryBatchIndexingActionableFactory
 		_dynamicQueryBatchIndexingActionableFactory;
+
+	@Reference
+	private EmptyModelManager _emptyModelManager;
 
 	@Reference
 	private FragmentEntryLinkCache _fragmentEntryLinkCache;
