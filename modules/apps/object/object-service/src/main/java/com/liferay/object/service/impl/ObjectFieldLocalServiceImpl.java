@@ -8,6 +8,7 @@ package com.liferay.object.service.impl;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
+import com.liferay.exportimport.kernel.empty.model.EmptyModelManagerUtil;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
@@ -285,7 +286,8 @@ public class ObjectFieldLocalServiceImpl
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
-		if (objectDefinition.isModifiableAndSystem() &&
+		if (!EmptyModelManagerUtil.isEmptyModel() &&
+			objectDefinition.isModifiableAndSystem() &&
 			!ObjectDefinitionUtil.isInvokerBundleAllowed()) {
 
 			throw new ObjectFieldSystemException(
