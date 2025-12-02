@@ -8,6 +8,8 @@ package com.liferay.object.service.impl;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.exportimport.kernel.empty.model.EmptyModelManager;
+import com.liferay.exportimport.kernel.empty.model.EmptyModelManagerUtil;
 import com.liferay.fragment.cache.FragmentEntryLinkCache;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.friendly.url.separator.util.FriendlyURLSeparatorUtil;
@@ -997,6 +999,41 @@ public class ObjectDefinitionLocalServiceImpl
 
 		return objectDefinitionPersistence.countByObjectFolderId(
 			objectFolderId);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	public ObjectDefinition getOrAddEmptyObjectDefinition(
+			long companyId, String externalReferenceCode, long userId,
+			long objectFolderId, String className, boolean enableComments,
+			boolean enableFormContainer, boolean enableFriendlyURLCustomization,
+			boolean enableIndexSearch, boolean enableLocalization,
+			boolean enableObjectEntryDraft, boolean enableObjectEntrySchedule,
+			boolean enableObjectEntrySubscription,
+			boolean enableObjectEntryVersioning, String friendlyURLSeparator,
+			Map<Locale, String> labelMap, String name, String panelAppOrder,
+			String panelCategoryKey, Map<Locale, String> pluralLabelMap,
+			boolean portlet, String scope, ServiceContext serviceContext,
+			String storageType,
+			List<ObjectDefinitionSetting> objectDefinitionSettings,
+			List<ObjectField> objectFields,
+			List<WorkflowDefinitionLink> workflowDefinitionLinks)
+		throws PortalException {
+
+		return _emptyModelManager.getOrAddEmptyModel(
+			ObjectDefinition.class, companyId,
+			() -> objectDefinitionLocalService.addCustomObjectDefinition(
+				externalReferenceCode, userId, objectFolderId, className,
+				enableComments, enableFormContainer,
+				enableFriendlyURLCustomization, enableIndexSearch,
+				enableLocalization, enableObjectEntryDraft,
+				enableObjectEntrySchedule, enableObjectEntrySubscription,
+				enableObjectEntryVersioning, friendlyURLSeparator, labelMap,
+				name, panelAppOrder, panelCategoryKey, pluralLabelMap, portlet,
+				scope, serviceContext, storageType, objectDefinitionSettings,
+				objectFields, workflowDefinitionLinks),
+			externalReferenceCode,
+			this::fetchObjectDefinitionByExternalReferenceCode,
+			this::getObjectDefinitionByExternalReferenceCode);
 	}
 
 	@Override
@@ -3810,6 +3847,9 @@ public class ObjectDefinitionLocalServiceImpl
 	@Reference
 	private DynamicQueryBatchIndexingActionableFactory
 		_dynamicQueryBatchIndexingActionableFactory;
+
+	@Reference
+	private EmptyModelManager _emptyModelManager;
 
 	@Reference
 	private FragmentEntryLinkCache _fragmentEntryLinkCache;
