@@ -535,6 +535,16 @@ public class ObjectDefinitionLocalServiceUtil {
 			objectFolderId);
 	}
 
+	public static ObjectDefinition getOrAddEmptyObjectDefinition(
+			String externalReferenceCode, long companyId, long userId,
+			long objectFolderId, boolean modifiable, boolean system)
+		throws PortalException {
+
+		return getService().getOrAddEmptyObjectDefinition(
+			externalReferenceCode, companyId, userId, objectFolderId,
+			modifiable, system);
+	}
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *
