@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -124,8 +125,11 @@ public class ObjectFieldSettingUtil {
 				values = ListUtil.fromArray(
 					(Object[])objectFieldSetting.getValue());
 			}
-			else {
+			else if (objectFieldSetting.getValue() instanceof List<?>) {
 				values = (List<Object>)objectFieldSetting.getValue();
+			}
+			else {
+				values = Collections.emptyList();
 			}
 
 			for (Object value : values) {
