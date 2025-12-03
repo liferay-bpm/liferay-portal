@@ -1946,6 +1946,8 @@ public class ObjectFieldLocalServiceTest {
 
 		// Business type integer
 
+		String defaultValue = String.valueOf(RandomTestUtil.randomInt(0, 10));
+
 		objectDefinition = ObjectDefinitionTestUtil.addCustomObjectDefinition(
 			false, Collections.emptyList());
 
@@ -1955,10 +1957,31 @@ public class ObjectFieldLocalServiceTest {
 				Arrays.asList(
 					new ObjectFieldSettingBuilder(
 					).name(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE
+					).value(
+						defaultValue
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE
+					).value(
+						ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
 						ObjectFieldSettingConstants.NAME_UNIQUE_VALUES
 					).value(
 						"TRUE"
 					).build())));
+
+		_assertObjectFieldSettingsValues(
+			integerObjectField.getObjectFieldId(),
+			HashMapBuilder.put(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE, defaultValue
+			).put(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+				ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
+			).build());
 
 		_assertObjectFieldSettingsValues(
 			integerObjectField.getObjectFieldId(),
@@ -2067,7 +2090,7 @@ public class ObjectFieldLocalServiceTest {
 
 		// Business type text
 
-		String defaultValue = RandomTestUtil.randomString();
+		defaultValue = RandomTestUtil.randomString();
 
 		ObjectField textObjectField = _addCustomObjectField(
 			new TextObjectFieldBuilder(
