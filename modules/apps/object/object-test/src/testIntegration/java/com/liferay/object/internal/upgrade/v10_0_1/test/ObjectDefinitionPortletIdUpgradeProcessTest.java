@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
-import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
@@ -96,9 +95,7 @@ public class ObjectDefinitionPortletIdUpgradeProcessTest {
 				"jakarta.portlet.name", _oldPortletId
 			).build());
 
-		_objectDefinitionLocalService.addObjectDefinition(
-			RandomTestUtil.randomString(), TestPropsValues.getUserId(), 0, true,
-			RandomTestUtil.randomString(), false);
+		ObjectDefinitionTestUtil.addCustomObjectDefinition();
 	}
 
 	@After

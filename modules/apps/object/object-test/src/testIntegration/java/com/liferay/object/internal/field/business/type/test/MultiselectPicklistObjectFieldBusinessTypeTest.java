@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -81,6 +82,7 @@ public class MultiselectPicklistObjectFieldBusinessTypeTest {
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				true, ObjectDefinitionConstants.SCOPE_COMPANY,
+				new ServiceContext(),
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(),
 				Arrays.asList(

@@ -53,6 +53,7 @@ import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -438,6 +439,7 @@ public class ObjectRelatedModelsProviderTest {
 				PortletCategoryKeys.SITE_ADMINISTRATION_CONTENT,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				true, ObjectDefinitionConstants.SCOPE_SITE,
+				new ServiceContext(),
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(),
 				Arrays.asList(
@@ -598,6 +600,7 @@ public class ObjectRelatedModelsProviderTest {
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				true, ObjectDefinitionConstants.SCOPE_SITE,
+				new ServiceContext(),
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(), Collections.emptyList(),
 				Collections.emptyList());

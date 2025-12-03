@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.PipingServletResponse;
 import com.liferay.portal.kernel.struts.StrutsAction;
@@ -174,6 +175,7 @@ public class ExecuteInfoItemActionStrutsActionTest {
 				"control_panel.sites",
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				false, ObjectDefinitionConstants.SCOPE_SITE,
+				new ServiceContext(),
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(), null, Collections.emptyList());
 

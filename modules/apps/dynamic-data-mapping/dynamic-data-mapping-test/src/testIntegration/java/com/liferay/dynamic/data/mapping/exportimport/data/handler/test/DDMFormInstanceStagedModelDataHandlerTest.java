@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.util.CompanyTestUtil;
@@ -293,6 +294,7 @@ public class DDMFormInstanceStagedModelDataHandlerTest
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				true, ObjectDefinitionConstants.SCOPE_COMPANY,
+				new ServiceContext(),
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(),
 				Collections.singletonList(

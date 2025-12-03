@@ -9,6 +9,7 @@ import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -54,7 +55,7 @@ public class ObjectDefinitionTestUtil {
 			true, false, true, enableLocalization, false, false, false, false,
 			null, LocalizedMapUtil.getLocalizedMap(value), value, null, null,
 			LocalizedMapUtil.getLocalizedMap(value), true,
-			ObjectDefinitionConstants.SCOPE_COMPANY,
+			ObjectDefinitionConstants.SCOPE_COMPANY, new ServiceContext(),
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 			Collections.emptyList(), Collections.emptyList(),
 			Collections.emptyList());

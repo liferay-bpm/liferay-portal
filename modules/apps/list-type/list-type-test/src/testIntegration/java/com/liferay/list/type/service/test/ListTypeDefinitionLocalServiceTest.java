@@ -20,6 +20,7 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -145,7 +146,7 @@ public class ListTypeDefinitionLocalServiceTest {
 				true, false, false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap("Test"), "Test", null, null,
 				LocalizedMapUtil.getLocalizedMap("Tests"), true,
-				ObjectDefinitionConstants.SCOPE_COMPANY,
+				ObjectDefinitionConstants.SCOPE_COMPANY, new ServiceContext(),
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(), Collections.singletonList(objectField),
 				Collections.emptyList());

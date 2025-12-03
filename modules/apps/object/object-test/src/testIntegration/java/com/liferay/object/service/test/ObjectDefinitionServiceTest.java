@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUti
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
@@ -424,7 +425,7 @@ public class ObjectDefinitionServiceTest {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			ObjectDefinitionTestUtil.getRandomName(), null, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			true, ObjectDefinitionConstants.SCOPE_COMPANY,
+			true, ObjectDefinitionConstants.SCOPE_COMPANY, new ServiceContext(),
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 			Collections.emptyList(),
 			Arrays.asList(
@@ -548,6 +549,7 @@ public class ObjectDefinitionServiceTest {
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
 					true, ObjectDefinitionConstants.SCOPE_COMPANY,
+					new ServiceContext(),
 					ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 					Collections.emptyList(),
 					Collections.singletonList(
@@ -578,9 +580,26 @@ public class ObjectDefinitionServiceTest {
 		try {
 			_setUser(user);
 
-			objectDefinition = _objectDefinitionService.addObjectDefinition(
-				RandomTestUtil.randomString(), objectFolderId, true,
-				ObjectDefinitionConstants.SCOPE_COMPANY, false);
+			objectDefinition =
+				_objectDefinitionLocalService.addCustomObjectDefinition(
+					null, user.getUserId(), objectFolderId, null, false, true,
+					false, true, true, false, false, false, false, null,
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString()),
+					ObjectDefinitionTestUtil.getRandomName(), null, null,
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString()),
+					true, ObjectDefinitionConstants.SCOPE_COMPANY,
+					new ServiceContext(),
+					ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+					Collections.emptyList(),
+					Arrays.asList(
+						ObjectFieldUtil.createObjectField(
+							ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+							ObjectFieldConstants.DB_TYPE_STRING,
+							RandomTestUtil.randomString(),
+							StringUtil.randomId())),
+					Collections.emptyList());
 		}
 		finally {
 			if (objectDefinition != null) {
@@ -681,9 +700,9 @@ public class ObjectDefinitionServiceTest {
 					false, false, null,
 					LocalizedMapUtil.getLocalizedMap("Able"), "Able", null,
 					null, false, LocalizedMapUtil.getLocalizedMap("Ables"),
-					objectDefinition.getScope(), objectDefinition.getStatus(),
-					Collections.emptyList(), Collections.emptyList(),
-					Collections.emptyList());
+					objectDefinition.getScope(), new ServiceContext(),
+					objectDefinition.getStatus(), Collections.emptyList(),
+					Collections.emptyList(), Collections.emptyList());
 		}
 		finally {
 			if (objectDefinition != null) {

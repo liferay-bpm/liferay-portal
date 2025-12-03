@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -230,9 +231,9 @@ public abstract class BaseInputFragmentRendererTestCase {
 			objectDefinition.getPanelAppOrder(),
 			objectDefinition.getPanelCategoryKey(),
 			objectDefinition.isPortlet(), objectDefinition.getPluralLabelMap(),
-			objectDefinition.getScope(), objectDefinition.getStatus(),
-			Collections.emptyList(), Collections.emptyList(),
-			Collections.emptyList());
+			objectDefinition.getScope(), new ServiceContext(),
+			objectDefinition.getStatus(), Collections.emptyList(),
+			Collections.emptyList(), Collections.emptyList());
 
 		FragmentRenderer fragmentRenderer = getFragmentRenderer();
 

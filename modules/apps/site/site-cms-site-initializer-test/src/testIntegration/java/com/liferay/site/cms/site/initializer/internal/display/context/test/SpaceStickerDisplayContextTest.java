@@ -170,7 +170,7 @@ public class SpaceStickerDisplayContextTest extends BaseDisplayContextTestCase {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			ObjectDefinitionTestUtil.getRandomName(), null, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			true, ObjectDefinitionConstants.SCOPE_DEPOT,
+			true, ObjectDefinitionConstants.SCOPE_DEPOT, new ServiceContext(),
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 			Collections.emptyList(), Arrays.asList(objectField),
 			Collections.emptyList());

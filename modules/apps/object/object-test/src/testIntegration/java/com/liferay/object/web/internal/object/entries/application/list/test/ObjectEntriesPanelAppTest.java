@@ -15,6 +15,7 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -60,6 +61,7 @@ public class ObjectEntriesPanelAppTest {
 				"site_administration.content",
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				true, ObjectDefinitionConstants.SCOPE_SITE,
+				new ServiceContext(),
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(),
 				Collections.singletonList(
