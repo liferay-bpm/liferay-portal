@@ -32,6 +32,10 @@ public class ObjectEntryValuesUtil {
 		String businessType, Map<String, Object> modelAttributes,
 		ObjectField objectField, User user, Map<String, Object> values) {
 
+		if (values == null) {
+			return null;
+		}
+
 		String objectFieldName = objectField.getName();
 
 		if (!values.containsKey(objectFieldName)) {
