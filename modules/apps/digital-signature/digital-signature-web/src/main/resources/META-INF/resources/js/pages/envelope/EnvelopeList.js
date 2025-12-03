@@ -8,7 +8,7 @@ import {ClayButtonWithIcon} from '@clayui/button';
 import ClayLabel from '@clayui/label';
 import {createResourceURL, dateUtils, fetch, sub} from 'frontend-js-web';
 import React, {useContext} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router';
 
 import {AppContext} from '../../AppContext';
 import ListView from '../../components/list-view/ListView';

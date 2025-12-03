@@ -4,7 +4,7 @@
  */
 
 import React, {useCallback, useEffect} from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router';
 
 import useQuery from '../../hooks/useQuery';
 import useResource from '../../hooks/useResource';

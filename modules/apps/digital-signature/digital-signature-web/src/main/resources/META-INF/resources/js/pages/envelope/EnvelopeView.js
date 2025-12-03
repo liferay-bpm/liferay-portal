@@ -10,7 +10,7 @@ import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {openToast} from 'frontend-js-components-web';
 import {createActionURL, createResourceURL, fetch} from 'frontend-js-web';
 import React, {useContext, useEffect, useState} from 'react';
-import {useParams} from 'react-router-dom';
+import {useParams} from 'react-router';
 
 import {AppContext} from '../../AppContext';
 import {BackButtonPortal} from '../../components/control-menu/ControlMenu';

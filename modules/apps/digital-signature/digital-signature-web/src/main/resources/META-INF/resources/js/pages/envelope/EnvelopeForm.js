@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router';
 
 import {BackButtonPortal} from '../../components/control-menu/ControlMenu';
 import DigitalSignatureForm from '../../components/digital-signature-form/DigitalSignatureForm';

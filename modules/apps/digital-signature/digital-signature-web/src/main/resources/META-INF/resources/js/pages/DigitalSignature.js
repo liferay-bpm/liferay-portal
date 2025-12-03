@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import {HashRouter, Route, Routes} from 'react-router-dom';
+import {HashRouter, Route, Routes} from 'react-router';
 
 import {AppContextProvider} from '../AppContext';
 import EnvelopeForm from './envelope/EnvelopeForm';
