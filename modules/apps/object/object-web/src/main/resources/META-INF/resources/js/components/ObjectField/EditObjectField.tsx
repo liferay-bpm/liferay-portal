@@ -22,6 +22,7 @@ export interface EditObjectFieldProps {
 	baseResourceURL: string;
 	ckEditor5Config?: object;
 	creationLanguageId: Liferay.Language.Locale;
+	decimalSymbol: string;
 	filterOperators: TFilterOperators;
 	forbiddenChars: string[];
 	forbiddenLastChars: string[];
@@ -58,6 +59,7 @@ export default function EditObjectField({
 	baseResourceURL,
 	ckEditor5Config,
 	creationLanguageId,
+	decimalSymbol,
 	filterOperators,
 	forbiddenChars,
 	forbiddenLastChars,
@@ -142,6 +144,7 @@ export default function EditObjectField({
 				ckEditor5Config={ckEditor5Config}
 				containerWrapper={Card}
 				creationLanguageId={creationLanguageId}
+				decimalSymbol={decimalSymbol}
 				errors={errors}
 				filterOperators={filterOperators}
 				handleChange={handleChange}

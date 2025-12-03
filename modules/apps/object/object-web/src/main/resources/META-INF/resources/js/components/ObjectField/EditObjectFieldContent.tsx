@@ -28,6 +28,7 @@ interface EditObjectFieldContentProps
 	> {
 	ckEditor5Config?: object;
 	containerWrapper: ElementType;
+	decimalSymbol: string;
 	errors: ObjectFieldErrors;
 	handleChange: React.ChangeEventHandler<HTMLInputElement>;
 	modelBuilder?: boolean;
@@ -45,6 +46,7 @@ export function EditObjectFieldContent({
 	ckEditor5Config,
 	containerWrapper,
 	creationLanguageId,
+	decimalSymbol,
 	errors,
 	filterOperators,
 	handleChange,
@@ -200,6 +202,7 @@ export function EditObjectFieldContent({
 								ckEditor5Config={ckEditor5Config}
 								containerWrapper={containerWrapper}
 								creationLanguageId={creationLanguageId}
+								decimalSymbol={decimalSymbol}
 								errors={errors}
 								isDefaultStorageType={isDefaultStorageType}
 								isRootDescendantNode={isRootDescendantNode}
