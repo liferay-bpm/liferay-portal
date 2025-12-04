@@ -51,6 +51,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
 import com.liferay.portal.kernel.workflow.WorkflowTask;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManager;
+import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -442,12 +443,21 @@ public class ObjectEntryVersionLocalServiceTest {
 
 		// Complete pending object entry's workflow instance
 
-		List<WorkflowTask> workflowTasks =
-			_workflowTaskManager.getWorkflowTasksByUserRoles(
-				TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
-				false, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		WorkflowTask workflowTask = IdempotentRetryAssert.retryAssert(
+			5, java.util.concurrent.TimeUnit.SECONDS, 1,
+			java.util.concurrent.TimeUnit.SECONDS,
+			() -> {
+				List<WorkflowTask> workflowTasks =
+					_workflowTaskManager.getWorkflowTasksByUserRoles(
+						TestPropsValues.getCompanyId(),
+						TestPropsValues.getUserId(), false, QueryUtil.ALL_POS,
+						QueryUtil.ALL_POS, null);
 
-		WorkflowTask workflowTask = workflowTasks.get(0);
+				Assert.assertFalse(
+					"No workflow tasks found", workflowTasks.isEmpty());
+
+				return workflowTasks.get(0);
+			});
 
 		_workflowTaskManager.assignWorkflowTaskToUser(
 			TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
