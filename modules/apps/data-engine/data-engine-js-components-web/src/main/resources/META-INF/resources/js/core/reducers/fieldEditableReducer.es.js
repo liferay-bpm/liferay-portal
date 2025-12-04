@@ -671,16 +671,18 @@ export default function fieldEditableReducer(state, action, config) {
 			);
 
 			settingsContextVisitor.mapFields(({fieldName, value}) => {
-				newFocusedField = updateFieldProperty({
-					defaultLanguageId,
-					editingLanguageId,
-					fieldNameGenerator,
-					focusedField: newFocusedField,
-					generateFieldNameUsingFieldLabel,
-					pages,
-					propertyName: fieldName,
-					propertyValue: value,
-				});
+				if (fieldName !== 'name') {
+					newFocusedField = updateFieldProperty({
+						defaultLanguageId,
+						editingLanguageId,
+						fieldNameGenerator,
+						focusedField: newFocusedField,
+						generateFieldNameUsingFieldLabel,
+						pages,
+						propertyName: fieldName,
+						propertyValue: value,
+					});
+				}
 			});
 
 			const visitor = new PagesVisitor(pages);
