@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.language.override.service.PLOEntryLocalService;
 import com.liferay.portal.util.PortalInstances;
 
 import java.sql.Connection;
@@ -55,6 +56,10 @@ public class CompanyObjectDefinitionPortalInstanceLifecycleListener
 					company.getCompanyId(),
 					WorkflowConstants.STATUS_APPROVED)) {
 
+			if (objectDefinition.isUnmodifiableSystemObject()) {
+				continue;
+			}
+
 			String className = objectDefinition.getClassName();
 
 			objectDefinition = _objectDefinitionLocalService.updateClassName(
@@ -75,6 +80,12 @@ public class CompanyObjectDefinitionPortalInstanceLifecycleListener
 
 				connection.commit();
 			}
+
+			_ploEntryLocalService.deletePLOEntries(
+				company.getCompanyId(), "model.resource." + className);
+
+			_objectDefinitionLocalService.addOrUpdateObjectDefinitionPLOEntries(
+				objectDefinition);
 		}
 	}
 
@@ -228,8 +239,6 @@ public class CompanyObjectDefinitionPortalInstanceLifecycleListener
 		).put(
 			"LayoutPageTemplateStructureRel", "data_"
 		).put(
-			"PLOEntry", "key_"
-		).put(
 			"ResourceAction", "name"
 		).put(
 			"ResourcePermission", "name,primKey"
@@ -246,6 +255,9 @@ public class CompanyObjectDefinitionPortalInstanceLifecycleListener
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
+	private PLOEntryLocalService _ploEntryLocalService;
 
 	private final Map<String, String> _portletIdColumnNamesMap =
 		HashMapBuilder.put(
