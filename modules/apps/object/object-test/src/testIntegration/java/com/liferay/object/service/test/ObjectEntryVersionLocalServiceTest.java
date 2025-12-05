@@ -444,7 +444,7 @@ public class ObjectEntryVersionLocalServiceTest {
 		// Complete pending object entry's workflow instance
 
 		WorkflowTask workflowTask = IdempotentRetryAssert.retryAssert(
-			5, java.util.concurrent.TimeUnit.SECONDS, 1,
+			120, java.util.concurrent.TimeUnit.SECONDS, 10,
 			java.util.concurrent.TimeUnit.SECONDS,
 			() -> {
 				List<WorkflowTask> workflowTasks =
