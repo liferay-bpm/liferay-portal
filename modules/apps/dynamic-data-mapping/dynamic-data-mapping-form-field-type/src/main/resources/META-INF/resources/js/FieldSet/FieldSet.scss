@@ -8,5 +8,9 @@ $c: '.ddm-field-types-fieldset';
 		.fields-group {
 			margin-left: 12px;
 		}
+
+		.panel:only-child {
+			margin-bottom: 0;
+		}
 	}
 }
