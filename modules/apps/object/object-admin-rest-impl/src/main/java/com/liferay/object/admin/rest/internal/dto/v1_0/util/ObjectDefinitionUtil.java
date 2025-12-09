@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -331,7 +332,8 @@ public class ObjectDefinitionUtil {
 							User user = userLocalService.getUser(userId);
 
 							permissionService.checkPermission(
-								user.getGroupId(), permissionName,
+								GroupConstants.DEFAULT_PARENT_GROUP_ID,
+								permissionName,
 								serviceBuilderObjectDefinition.
 									getObjectDefinitionId());
 

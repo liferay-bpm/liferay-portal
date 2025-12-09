@@ -70,6 +70,7 @@ import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.internal.dao.db.ObjectDBManagerUtil;
 import com.liferay.object.internal.deployer.InactiveObjectDefinitionDeployerUtil;
 import com.liferay.object.internal.deployer.ObjectDefinitionDeployerImpl;
+import com.liferay.object.internal.security.permission.util.ObjectPermissionUtil;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectDefinitionSetting;
@@ -134,11 +135,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mass.delete.MassDeleteCacheThreadLocal;
 import com.liferay.portal.kernel.model.ClassName;
-import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.ResourceAction;
+import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ResourceConstants;
-import com.liferay.portal.kernel.model.ResourcePermission;
-import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
@@ -156,20 +154,16 @@ import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ListTypeLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
-import com.liferay.portal.kernel.service.PermissionService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.PortletLocalService;
-import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
-import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.SystemEventLocalService;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
-import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.service.persistence.ResourcePermissionPersistence;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
@@ -207,7 +201,6 @@ import com.liferay.trash.service.TrashEntryLocalService;
 import java.sql.PreparedStatement;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1696,7 +1689,11 @@ public class ObjectDefinitionLocalServiceImpl
 		_addOrUpdateWorkflowDefinitionLinks(
 			objectDefinition, workflowDefinitionLinks);
 
-		_updateResourcePermissions(objectDefinition, serviceContext);
+		ObjectPermissionUtil.updateResourcePermissions(
+			objectDefinition.getCompanyId(),
+			GroupConstants.DEFAULT_PARENT_GROUP_ID,
+			objectDefinition.getObjectDefinitionId(),
+			ObjectDefinition.class.getName(), serviceContext);
 
 		if (objectDefinition.isUnmodifiableSystemObject()) {
 			_createTable(
@@ -2774,7 +2771,11 @@ public class ObjectDefinitionLocalServiceImpl
 		_addOrUpdateWorkflowDefinitionLinks(
 			objectDefinition, workflowDefinitionLinks);
 
-		_updateResourcePermissions(objectDefinition, serviceContext);
+		ObjectPermissionUtil.updateResourcePermissions(
+			objectDefinition.getCompanyId(),
+			GroupConstants.DEFAULT_PARENT_GROUP_ID,
+			objectDefinition.getObjectDefinitionId(),
+			ObjectDefinition.class.getName(), serviceContext);
 
 		if (objectDefinition.isApproved()) {
 			if (!active && oldActive) {
@@ -2919,60 +2920,6 @@ public class ObjectDefinitionLocalServiceImpl
 			_setValidationErrorEntryKey(
 				ObjectField.class.getName(), objectField.getName());
 		}
-	}
-
-	private void _updateResourcePermissions(
-			ObjectDefinition objectDefinition, ServiceContext serviceContext)
-		throws PortalException {
-
-		ModelPermissions modelPermissions =
-			serviceContext.getModelPermissions();
-
-		if (modelPermissions == null) {
-			return;
-		}
-
-		Company company = _companyLocalService.getCompany(
-			objectDefinition.getCompanyId());
-
-		_permissionService.checkPermission(
-			company.getGroupId(), ObjectDefinition.class.getName(),
-			objectDefinition.getObjectDefinitionId());
-
-		Collection<String> roleNames = modelPermissions.getRoleNames();
-
-		for (ResourcePermission resourcePermission :
-				_resourcePermissionLocalService.getResourcePermissions(
-					objectDefinition.getCompanyId(),
-					ObjectDefinition.class.getName(),
-					ResourceConstants.SCOPE_COMPANY,
-					String.valueOf(objectDefinition.getObjectDefinitionId()))) {
-
-			Role role = _roleLocalService.fetchRole(
-				resourcePermission.getRoleId());
-
-			if ((role == null) || roleNames.contains(role.getName())) {
-				continue;
-			}
-
-			for (ResourceAction resourceAction :
-					_resourceActionLocalService.getResourceActions(
-						ObjectDefinition.class.getName())) {
-
-				_resourcePermissionLocalService.removeResourcePermission(
-					objectDefinition.getCompanyId(),
-					ObjectDefinition.class.getName(),
-					ResourceConstants.SCOPE_COMPANY,
-					String.valueOf(objectDefinition.getObjectDefinitionId()),
-					role.getRoleId(), resourceAction.getActionId());
-			}
-		}
-
-		_resourcePermissionLocalService.updateResourcePermissions(
-			objectDefinition.getCompanyId(), company.getGroupId(),
-			ObjectDefinition.class.getName(),
-			String.valueOf(objectDefinition.getObjectDefinitionId()),
-			modelPermissions);
 	}
 
 	private ObjectDefinition _updateTitleObjectFieldId(
@@ -3925,9 +3872,6 @@ public class ObjectDefinitionLocalServiceImpl
 	private OrganizationLocalService _organizationLocalService;
 
 	@Reference
-	private PermissionService _permissionService;
-
-	@Reference
 	private PLOEntryLocalService _ploEntryLocalService;
 
 	@Reference
@@ -3935,9 +3879,6 @@ public class ObjectDefinitionLocalServiceImpl
 
 	@Reference
 	private PortletLocalService _portletLocalService;
-
-	@Reference
-	private ResourceActionLocalService _resourceActionLocalService;
 
 	@Reference
 	private ResourceActions _resourceActions;
@@ -3950,9 +3891,6 @@ public class ObjectDefinitionLocalServiceImpl
 
 	@Reference
 	private ResourcePermissionPersistence _resourcePermissionPersistence;
-
-	@Reference
-	private RoleLocalService _roleLocalService;
 
 	@Reference
 	private SearchLocalizationHelper _searchLocalizationHelper;
