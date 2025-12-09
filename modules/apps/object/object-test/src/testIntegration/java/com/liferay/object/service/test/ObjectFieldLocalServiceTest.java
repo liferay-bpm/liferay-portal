@@ -1142,11 +1142,15 @@ public class ObjectFieldLocalServiceTest {
 			LocalizedMapUtil.getLocalizedMap("Able"), false, "able", false);
 
 		_assertSystemObjectField(
-			"able_", false, false, LocalizedMapUtil.getLocalizedMap("Able"),
-			false, systemObjectField);
+			"able_", null, false, false,
+			LocalizedMapUtil.getLocalizedMap("Able"), false, systemObjectField);
+
+		String externalReferenceCode =
+			systemObjectField.getExternalReferenceCode();
+
 		_assertSystemObjectField(
-			"able_", true, true, LocalizedMapUtil.getLocalizedMap("Baker"),
-			true,
+			"able_", externalReferenceCode, true, true,
+			LocalizedMapUtil.getLocalizedMap("Baker"), true,
 			_addOrUpdateSystemObjectField(
 				systemObjectField.getExternalReferenceCode(),
 				modifiableSystemObjectDefinition.getObjectDefinitionId(),
@@ -1178,8 +1182,8 @@ public class ObjectFieldLocalServiceTest {
 
 		try {
 			_assertSystemObjectField(
-				"able_", true, true, LocalizedMapUtil.getLocalizedMap("Dog"),
-				true,
+				"able_", externalReferenceCode, true, true,
+				LocalizedMapUtil.getLocalizedMap("Dog"), true,
 				_addOrUpdateSystemObjectField(
 					systemObjectField.getExternalReferenceCode(),
 					modifiableSystemObjectDefinition.getObjectDefinitionId(),
@@ -2671,12 +2675,20 @@ public class ObjectFieldLocalServiceTest {
 	}
 
 	private void _assertSystemObjectField(
-		String expectedDBColumnName, boolean expectedIndexed,
-		boolean expectedIndexedAsKeyword, Map<Locale, String> expectedLabelMap,
-		boolean expectedRequired, ObjectField systemObjectField) {
+		String expectedDBColumnName, String expectedExternalReferenceCode,
+		boolean expectedIndexed, boolean expectedIndexedAsKeyword,
+		Map<Locale, String> expectedLabelMap, boolean expectedRequired,
+		ObjectField systemObjectField) {
 
 		Assert.assertEquals(
 			expectedDBColumnName, systemObjectField.getDBColumnName());
+
+		if (expectedExternalReferenceCode != null) {
+			Assert.assertEquals(
+				expectedExternalReferenceCode,
+				systemObjectField.getExternalReferenceCode());
+		}
+
 		Assert.assertEquals(
 			ObjectFieldConstants.DB_TYPE_STRING, systemObjectField.getDBType());
 		Assert.assertEquals(expectedIndexed, systemObjectField.isIndexed());
