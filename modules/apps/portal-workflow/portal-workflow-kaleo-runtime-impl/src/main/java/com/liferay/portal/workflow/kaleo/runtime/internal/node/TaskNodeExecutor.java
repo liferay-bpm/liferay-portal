@@ -41,6 +41,8 @@ import java.util.TreeSet;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import static java.lang.System.out;
+
 /**
  * @author Michael C. Han
  */
@@ -56,6 +58,8 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 	protected boolean doEnter(
 			KaleoNode currentKaleoNode, ExecutionContext executionContext)
 		throws PortalException {
+
+		out.println("Adicionando no BANCO!");
 
 		Map<String, Serializable> workflowContext =
 			executionContext.getWorkflowContext();
@@ -166,6 +170,8 @@ public class TaskNodeExecutor extends BaseNodeExecutor {
 			KaleoInstanceToken kaleoInstanceToken, KaleoTask kaleoTask,
 			Date dueDate)
 		throws PortalException {
+
+		out.println("Adicionou no BANCO!");
 
 		KaleoTaskInstanceToken kaleoTaskInstanceToken =
 			_kaleoTaskInstanceTokenLocalService.addKaleoTaskInstanceToken(

@@ -321,6 +321,8 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
+import static java.lang.System.out;
+
 /**
  * @author Marco Leo
  * @author Brian Wing Shun Chan
@@ -517,6 +519,8 @@ public class ObjectEntryLocalServiceImpl
 		try (SafeCloseable safeCloseable =
 				ObjectEntryThreadLocal.setObjectEntryFolderIdWithSafeCloseable(
 					objectEntryFolderId)) {
+
+			out.println("Starting workflows instance in LocalServiceImpl");
 
 			_startWorkflowInstance(userId, objectEntry, serviceContext, false);
 		}
@@ -6339,6 +6343,7 @@ public class ObjectEntryLocalServiceImpl
 
 		if (ExportImportThreadLocal.isImportInProcess() ||
 			objectEntry.isInTrash()) {
+			out.println("ExportImportThreadLocal.isImportInProcess(): " + ExportImportThreadLocal.isImportInProcess());
 
 			return;
 		}

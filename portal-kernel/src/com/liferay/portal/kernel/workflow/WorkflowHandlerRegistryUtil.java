@@ -33,6 +33,8 @@ import java.util.function.Predicate;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+import static java.lang.System.out;
+
 /**
  * @author Bruno Farache
  * @author Marcellus Tavares
@@ -62,6 +64,7 @@ public class WorkflowHandlerRegistryUtil {
 				"workflowContext");
 
 		if (workflowContext == null) {
+			out.println("workflowContext null in RegistryUtil");
 			workflowContext = Collections.emptyMap();
 		}
 
@@ -78,6 +81,7 @@ public class WorkflowHandlerRegistryUtil {
 
 		if (serviceContext.getWorkflowAction() !=
 				WorkflowConstants.ACTION_PUBLISH) {
+			out.println(WorkflowConstants.ACTION_PUBLISH + " não definida no contexto");
 
 			return model;
 		}
@@ -85,9 +89,12 @@ public class WorkflowHandlerRegistryUtil {
 		WorkflowHandler<T> workflowHandler = getWorkflowHandler(className);
 
 		if (workflowHandler == null) {
+			out.println("workflowHandler null in RegistryUtil");
 			if (WorkflowThreadLocal.isEnabled()) {
 				throw new WorkflowException(
 					"No workflow handler found for " + className);
+			}else{
+				out.println("WorkflowThreadLocal not enabled");
 			}
 
 			return model;
@@ -97,6 +104,9 @@ public class WorkflowHandlerRegistryUtil {
 			companyId, groupId, className, classPK);
 
 		if (hasWorkflowInstanceInProgress) {
+			out.println(StringBundler.concat(
+				"Workflow already started for class ", className,
+				" with primary key ", classPK, " in group ", groupId));
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					StringBundler.concat(
@@ -152,9 +162,11 @@ public class WorkflowHandlerRegistryUtil {
 
 			TransactionCommitCallbackUtil.registerCallback(
 				() -> {
+					out.println("Dentro do CallBack");
 					if (!_hasWorkflowInstanceInProgress(
 							companyId, groupId, className, classPK)) {
 
+						out.println("Sem outro workflows inProgress, inicializar instance via handler");
 						workflowHandler.startWorkflowInstance(
 							companyId, groupId, userId, classPK, model,
 							tempWorkflowContext);
