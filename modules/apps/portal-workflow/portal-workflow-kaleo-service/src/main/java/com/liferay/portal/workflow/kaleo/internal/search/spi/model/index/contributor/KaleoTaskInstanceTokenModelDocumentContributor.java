@@ -31,6 +31,8 @@ import java.util.Set;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import static java.lang.System.out;
+
 /**
  * @author Rafael Praxedes
  */
@@ -45,6 +47,8 @@ public class KaleoTaskInstanceTokenModelDocumentContributor
 	@Override
 	public void contribute(
 		Document document, KaleoTaskInstanceToken kaleoTaskInstanceToken) {
+
+		out.println("Começou a indexar os tokens!");
 
 		List<KaleoTaskAssignmentInstance> kaleoTaskAssignmentInstances =
 			kaleoTaskInstanceToken.getKaleoTaskAssignmentInstances();
@@ -114,6 +118,8 @@ public class KaleoTaskInstanceTokenModelDocumentContributor
 					kaleoTaskInstanceToken.getWorkflowContext()));
 		}
 		catch (PortalException portalException) {
+			out.println("Exception dos tokens foi abafada!");
+			out.println(portalException.getMessage());
 			if (_log.isWarnEnabled()) {
 				_log.warn(portalException);
 			}
@@ -148,6 +154,8 @@ public class KaleoTaskInstanceTokenModelDocumentContributor
 			kaleoTaskInstanceToken.getClassName(),
 			kaleoTaskInstanceToken.getClassPK(), document,
 			kaleoTaskInstanceToken.getGroupId());
+
+		out.println("Finalizou a indexação!");
 	}
 
 	protected String[] getLanguageIds(

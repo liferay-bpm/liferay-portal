@@ -123,8 +123,8 @@ public class ObjectEntryVersionLocalServiceTest {
 				_objectDefinition.getObjectDefinitionId());
 
 		_workflowDefinition =
-			_workflowDefinitionManager.liberalGetLatestWorkflowDefinition(
-				TestPropsValues.getCompanyId(), "Single Approver");
+			_workflowDefinitionManager.liberalGetWorkflowDefinition(
+				TestPropsValues.getCompanyId(), "Single Approver", 1);
 	}
 
 	@Test

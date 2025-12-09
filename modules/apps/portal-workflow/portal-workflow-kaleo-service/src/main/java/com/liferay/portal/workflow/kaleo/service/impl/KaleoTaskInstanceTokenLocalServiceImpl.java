@@ -5,6 +5,7 @@
 
 package com.liferay.portal.workflow.kaleo.service.impl;
 
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
@@ -65,6 +66,8 @@ import java.util.Objects;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import static java.lang.System.out;
+
 /**
  * @author Brian Wing Shun Chan
  * @author Marcellus Tavares
@@ -84,6 +87,8 @@ public class KaleoTaskInstanceTokenLocalServiceImpl
 			Map<String, Serializable> workflowContext,
 			ServiceContext serviceContext)
 		throws PortalException {
+
+		out.println("Adding token");
 
 		KaleoInstanceToken kaleoInstanceToken =
 			_kaleoInstanceTokenPersistence.findByPrimaryKey(
@@ -117,6 +122,10 @@ public class KaleoTaskInstanceTokenLocalServiceImpl
 		kaleoTaskInstanceToken.setDueDate(dueDate);
 
 		if (workflowContext != null) {
+			out.println("workflowContext not null in InstanceToken. Entry class name:");
+			out.println((String)workflowContext.get(
+				WorkflowConstants.CONTEXT_ENTRY_CLASS_NAME));
+
 			kaleoTaskInstanceToken.setClassName(
 				(String)workflowContext.get(
 					WorkflowConstants.CONTEXT_ENTRY_CLASS_NAME));
@@ -141,6 +150,8 @@ public class KaleoTaskInstanceTokenLocalServiceImpl
 		_kaleoTaskAssignmentInstanceLocalService.addTaskAssignmentInstances(
 			kaleoTaskInstanceToken, kaleoTaskAssignments, workflowContext,
 			serviceContext);
+
+		out.println("Token Added");
 
 		return kaleoTaskInstanceToken;
 	}
