@@ -6,6 +6,7 @@
 package com.liferay.object.admin.rest.internal.resource.v1_0;
 
 import com.liferay.account.model.AccountEntry;
+import com.liferay.exportimport.kernel.empty.model.EmptyModelManagerUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate;
 import com.liferay.list.type.service.ListTypeDefinitionLocalService;
@@ -1189,19 +1190,32 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		com.liferay.object.model.ObjectDefinition
+			serviceBuilderObjectDefinition1;
+
+		if (EmptyModelManagerUtil.isEmptyModel()) {
+			serviceBuilderObjectDefinition1 =
+				_objectDefinitionLocalService.getOrAddEmptyObjectDefinition(
+					objectDefinitionExternalReferenceCode1,
+					serviceBuilderObjectDefinition2.getCompanyId(),
+					contextUser.getUserId(),
+					serviceBuilderObjectDefinition2.getObjectFolderId(), true,
+					false);
+		}
+		else {
 			serviceBuilderObjectDefinition1 =
 				_objectDefinitionLocalService.
 					fetchObjectDefinitionByExternalReferenceCode(
-						objectDefinitionExternalReferenceCode1,
+						objectField.getObjectDefinitionExternalReferenceCode1(),
 						serviceBuilderObjectDefinition2.getCompanyId());
 
-		if (serviceBuilderObjectDefinition1 == null) {
-			serviceBuilderObjectDefinition1 =
-				_objectDefinitionLocalService.addObjectDefinition(
-					objectDefinitionExternalReferenceCode1,
-					contextUser.getUserId(),
-					serviceBuilderObjectDefinition2.getObjectFolderId(), true,
-					ObjectDefinitionConstants.SCOPE_COMPANY, false);
+			if (serviceBuilderObjectDefinition1 == null) {
+				serviceBuilderObjectDefinition1 =
+					_objectDefinitionLocalService.addObjectDefinition(
+						objectDefinitionExternalReferenceCode1,
+						contextUser.getUserId(),
+						serviceBuilderObjectDefinition2.getObjectFolderId(),
+						true, ObjectDefinitionConstants.SCOPE_COMPANY, false);
+			}
 		}
 
 		com.liferay.object.model.ObjectRelationship objectRelationship =

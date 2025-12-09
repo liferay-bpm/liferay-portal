@@ -7,6 +7,7 @@ package com.liferay.object.service.impl;
 
 import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
+import com.liferay.exportimport.kernel.empty.model.EmptyModelManagerUtil;
 import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.notification.service.NotificationTemplateLocalService;
@@ -896,19 +897,35 @@ public class ObjectActionLocalServiceImpl
 					"objectDefinitionExternalReferenceCode"));
 
 			if (Validator.isNotNull(objectDefinitionExternalReferenceCode)) {
-				objectDefinition = _objectDefinitionPersistence.fetchByERC_C(
-					objectDefinitionExternalReferenceCode, companyId);
+				ObjectFolder defaultObjectFolder =
+					_objectFolderLocalService.getOrAddDefaultObjectFolder(
+						companyId);
 
-				if (objectDefinition == null) {
-					ObjectFolder defaultObjectFolder =
-						_objectFolderLocalService.getOrAddDefaultObjectFolder(
-							companyId);
-
+				if (EmptyModelManagerUtil.isEmptyModel()) {
 					objectDefinition =
-						ObjectDefinitionLocalServiceUtil.addObjectDefinition(
-							objectDefinitionExternalReferenceCode, userId,
-							defaultObjectFolder.getObjectFolderId(), true,
-							ObjectDefinitionConstants.SCOPE_COMPANY, false);
+						ObjectDefinitionLocalServiceUtil.
+							getOrAddEmptyObjectDefinition(
+								objectDefinitionExternalReferenceCode,
+								companyId, userId,
+								defaultObjectFolder.getObjectFolderId(), true,
+								false);
+				}
+				else {
+					objectDefinition =
+						_objectDefinitionPersistence.fetchByERC_C(
+							objectDefinitionExternalReferenceCode, companyId);
+
+					if (objectDefinition == null) {
+						objectDefinition =
+							ObjectDefinitionLocalServiceUtil.
+								addObjectDefinition(
+									objectDefinitionExternalReferenceCode,
+									userId,
+									defaultObjectFolder.getObjectFolderId(),
+									true,
+									ObjectDefinitionConstants.SCOPE_COMPANY,
+									false);
+					}
 				}
 
 				parametersUnicodeProperties.put(
