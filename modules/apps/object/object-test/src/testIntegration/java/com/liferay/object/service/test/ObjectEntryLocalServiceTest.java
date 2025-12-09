@@ -3991,9 +3991,9 @@ public class ObjectEntryLocalServiceTest {
 			_objectDefinition.getPanelCategoryKey(),
 			_objectDefinition.isPortlet(),
 			_objectDefinition.getPluralLabelMap(), _objectDefinition.getScope(),
-			new ServiceContext(), _objectDefinition.getStatus(),
+			_objectDefinition.getStatus(), Collections.emptyList(),
 			Collections.emptyList(), Collections.emptyList(),
-			Collections.emptyList());
+			new ServiceContext());
 
 		_objectEntryLocalService.deleteObjectEntry(objectEntry4);
 

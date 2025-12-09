@@ -167,10 +167,10 @@ public class SpaceStickerDisplayContextTest extends BaseDisplayContextTestCase {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			ObjectDefinitionTestUtil.getRandomName(), null, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			true, ObjectDefinitionConstants.SCOPE_DEPOT, new ServiceContext(),
+			true, ObjectDefinitionConstants.SCOPE_DEPOT,
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 			Collections.emptyList(), Arrays.asList(objectField),
-			Collections.emptyList());
+			Collections.emptyList(), new ServiceContext());
 	}
 
 	private HttpServletRequest _getMockHttpServletRequest(long id)

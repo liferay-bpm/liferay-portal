@@ -41,10 +41,10 @@ public class ObjectDefinitionTestUtil {
 			true, false, true, false, false, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(value), value, null, null,
 			LocalizedMapUtil.getLocalizedMap(value), true,
-			ObjectDefinitionConstants.SCOPE_COMPANY, new ServiceContext(),
+			ObjectDefinitionConstants.SCOPE_COMPANY,
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 			Collections.emptyList(), Collections.emptyList(),
-			Collections.emptyList());
+			Collections.emptyList(), new ServiceContext());
 	}
 
 	public static ObjectDefinition addModifiableSystemObjectDefinition()

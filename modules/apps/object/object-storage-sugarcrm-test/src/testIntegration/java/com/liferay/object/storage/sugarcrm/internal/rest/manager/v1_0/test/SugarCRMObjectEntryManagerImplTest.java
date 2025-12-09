@@ -130,10 +130,10 @@ public class SugarCRMObjectEntryManagerImplTest
 				false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap("Contact"), "Contact", null,
 				null, LocalizedMapUtil.getLocalizedMap("Contacts"), true,
-				ObjectDefinitionConstants.SCOPE_COMPANY, new ServiceContext(),
+				ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_SUGARCRM,
 				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		_objectDefinition.setExternalReferenceCode("Contacts");
 

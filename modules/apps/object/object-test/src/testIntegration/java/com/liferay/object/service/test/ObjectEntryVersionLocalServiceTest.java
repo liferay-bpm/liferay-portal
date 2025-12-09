@@ -106,7 +106,7 @@ public class ObjectEntryVersionLocalServiceTest {
 				RandomTestUtil.randomLocaleStringMap(),
 				"A" + StringUtil.randomString(), null, null,
 				RandomTestUtil.randomLocaleStringMap(), true,
-				ObjectDefinitionConstants.SCOPE_COMPANY, new ServiceContext(),
+				ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(),
 				Collections.singletonList(
@@ -116,7 +116,7 @@ public class ObjectEntryVersionLocalServiceTest {
 					).name(
 						"textObjectFieldName"
 					).build()),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		_objectDefinition =
 			_objectDefinitionLocalService.publishCustomObjectDefinition(

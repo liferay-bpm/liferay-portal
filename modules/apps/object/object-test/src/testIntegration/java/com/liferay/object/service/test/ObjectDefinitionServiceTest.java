@@ -420,7 +420,7 @@ public class ObjectDefinitionServiceTest {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			ObjectDefinitionTestUtil.getRandomName(), null, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			true, ObjectDefinitionConstants.SCOPE_COMPANY, new ServiceContext(),
+			true, ObjectDefinitionConstants.SCOPE_COMPANY,
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 			Collections.emptyList(),
 			Arrays.asList(
@@ -428,7 +428,7 @@ public class ObjectDefinitionServiceTest {
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 					ObjectFieldConstants.DB_TYPE_STRING,
 					RandomTestUtil.randomString(), StringUtil.randomId())),
-			Collections.emptyList());
+			Collections.emptyList(), new ServiceContext());
 	}
 
 	private ObjectDefinition _addSystemObjectDefinition(
@@ -543,7 +543,6 @@ public class ObjectDefinitionServiceTest {
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
 					true, ObjectDefinitionConstants.SCOPE_COMPANY,
-					new ServiceContext(),
 					ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 					Collections.emptyList(),
 					Collections.singletonList(
@@ -552,7 +551,7 @@ public class ObjectDefinitionServiceTest {
 							ObjectFieldConstants.DB_TYPE_STRING,
 							RandomTestUtil.randomString(),
 							StringUtil.randomId())),
-					Collections.emptyList());
+					Collections.emptyList(), new ServiceContext());
 
 			objectDefinition =
 				_objectDefinitionLocalService.publishCustomObjectDefinition(
@@ -577,14 +576,13 @@ public class ObjectDefinitionServiceTest {
 			objectDefinition =
 				_objectDefinitionLocalService.addCustomObjectDefinition(
 					null, user.getUserId(), objectFolderId, null, false, true,
-					false, true, true, false, false, false, false, null,
+					false, true, true, false, false, false, null,
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
 					ObjectDefinitionTestUtil.getRandomName(), null, null,
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
 					true, ObjectDefinitionConstants.SCOPE_COMPANY,
-					new ServiceContext(),
 					ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 					Collections.emptyList(),
 					Arrays.asList(
@@ -593,7 +591,7 @@ public class ObjectDefinitionServiceTest {
 							ObjectFieldConstants.DB_TYPE_STRING,
 							RandomTestUtil.randomString(),
 							StringUtil.randomId())),
-					Collections.emptyList());
+					Collections.emptyList(), new ServiceContext());
 		}
 		finally {
 			if (objectDefinition != null) {
@@ -694,9 +692,9 @@ public class ObjectDefinitionServiceTest {
 					false, null, LocalizedMapUtil.getLocalizedMap("Able"),
 					"Able", null, null, false,
 					LocalizedMapUtil.getLocalizedMap("Ables"),
-					objectDefinition.getScope(), new ServiceContext(),
-					objectDefinition.getStatus(), Collections.emptyList(),
-					Collections.emptyList(), Collections.emptyList());
+					objectDefinition.getScope(), objectDefinition.getStatus(),
+					Collections.emptyList(), Collections.emptyList(),
+					Collections.emptyList(), new ServiceContext());
 		}
 		finally {
 			if (objectDefinition != null) {

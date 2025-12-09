@@ -282,10 +282,10 @@ public class ObjectEntryInfoItemFormProviderTest {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			ObjectDefinitionTestUtil.getRandomName(), null, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			true, ObjectDefinitionConstants.SCOPE_SITE, new ServiceContext(),
+			true, ObjectDefinitionConstants.SCOPE_SITE,
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 			Collections.emptyList(), Arrays.asList(objectFields),
-			Collections.emptyList());
+			Collections.emptyList(), new ServiceContext());
 	}
 
 	private void _addObjectStateTransition(

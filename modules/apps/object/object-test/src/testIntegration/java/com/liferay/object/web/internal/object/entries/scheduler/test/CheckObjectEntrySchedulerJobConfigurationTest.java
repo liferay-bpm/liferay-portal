@@ -258,7 +258,7 @@ public class CheckObjectEntrySchedulerJobConfigurationTest {
 				RandomTestUtil.randomLocaleStringMap(),
 				"A" + StringUtil.randomString(), null, null,
 				RandomTestUtil.randomLocaleStringMap(), true,
-				ObjectDefinitionConstants.SCOPE_COMPANY, new ServiceContext(),
+				ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(),
 				Collections.singletonList(
@@ -268,7 +268,7 @@ public class CheckObjectEntrySchedulerJobConfigurationTest {
 					).name(
 						"textObjectFieldName"
 					).build()),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		objectDefinition =
 			_objectDefinitionLocalService.publishCustomObjectDefinition(

@@ -73,9 +73,10 @@ public class ObjectDefinitionTestUtil {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			name, null, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			true, ObjectDefinitionConstants.SCOPE_COMPANY, new ServiceContext(),
+			true, ObjectDefinitionConstants.SCOPE_COMPANY,
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
-			Collections.emptyList(), objectFields, Collections.emptyList());
+			Collections.emptyList(), objectFields, Collections.emptyList(),
+			new ServiceContext());
 	}
 
 	public static ObjectDefinition addCustomObjectDefinition(String name)
@@ -93,7 +94,7 @@ public class ObjectDefinitionTestUtil {
 			false, false, false, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(name), name, null, null,
 			LocalizedMapUtil.getLocalizedMap(name), true,
-			ObjectDefinitionConstants.SCOPE_COMPANY, new ServiceContext(),
+			ObjectDefinitionConstants.SCOPE_COMPANY,
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 			Collections.emptyList(),
 			Arrays.asList(
@@ -101,7 +102,7 @@ public class ObjectDefinitionTestUtil {
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 					ObjectFieldConstants.DB_TYPE_STRING,
 					RandomTestUtil.randomString(), StringUtil.randomId())),
-			workflowDefinitionLinks);
+			workflowDefinitionLinks, new ServiceContext());
 	}
 
 	public static ObjectDefinition addCustomObjectDefinition(
@@ -194,9 +195,9 @@ public class ObjectDefinitionTestUtil {
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				name, null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				true, scope, new ServiceContext(),
-				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
-				Collections.emptyList(), objectFields, Collections.emptyList());
+				true, scope, ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Collections.emptyList(), objectFields, Collections.emptyList(),
+				new ServiceContext());
 
 		return ObjectDefinitionLocalServiceUtil.publishCustomObjectDefinition(
 			userId, objectDefinition.getObjectDefinitionId());

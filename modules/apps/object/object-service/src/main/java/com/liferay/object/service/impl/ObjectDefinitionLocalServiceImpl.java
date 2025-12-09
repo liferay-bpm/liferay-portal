@@ -1000,7 +1000,7 @@ public class ObjectDefinitionLocalServiceImpl
 						objectDefinitionLocalService.addSystemObjectDefinition(
 							externalReferenceCode, userId, objectFolderId, null,
 							null, false, false, false, true, false, false,
-							false, false, false, null,
+							false, false, null,
 							LocalizedMapUtil.getLocalizedMap(
 								externalReferenceCode),
 							modifiable, externalReferenceCode, null, null,
@@ -1018,17 +1018,16 @@ public class ObjectDefinitionLocalServiceImpl
 						objectDefinitionLocalService.addCustomObjectDefinition(
 							externalReferenceCode, userId, objectFolderId, null,
 							false, true, false, true, false, false, false,
-							false, false, null,
+							false, null,
 							LocalizedMapUtil.getLocalizedMap(
 								externalReferenceCode),
 							externalReferenceCode, null, null,
 							LocalizedMapUtil.getLocalizedMap(
 								externalReferenceCode),
 							true, ObjectDefinitionConstants.SCOPE_COMPANY,
-							new ServiceContext(),
 							ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 							Collections.emptyList(), Collections.emptyList(),
-							Collections.emptyList());
+							Collections.emptyList(), new ServiceContext());
 				}
 
 				return objectDefinition;

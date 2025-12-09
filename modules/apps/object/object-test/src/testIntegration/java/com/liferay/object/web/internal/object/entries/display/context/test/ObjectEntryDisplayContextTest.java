@@ -350,8 +350,7 @@ public class ObjectEntryDisplayContextTest {
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				true, scope, new ServiceContext(),
-				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				true, scope, ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(),
 				List.of(
 					new TextObjectFieldBuilder(
@@ -362,7 +361,7 @@ public class ObjectEntryDisplayContextTest {
 					).name(
 						"textObjectFieldName"
 					).build()),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		return _objectDefinitionLocalService.publishCustomObjectDefinition(
 			TestPropsValues.getUserId(),

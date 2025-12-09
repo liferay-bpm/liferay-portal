@@ -116,15 +116,14 @@ public class HeadlessDiscoveryOpenAPIResourceTest {
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				true, scope, new ServiceContext(),
-				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				true, scope, ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(),
 				Collections.singletonList(
 					ObjectFieldUtil.createObjectField(
 						"Text", "String", true, true, null,
 						RandomTestUtil.randomString(),
 						"x" + RandomTestUtil.randomString(), false)),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		return _objectDefinitionLocalService.publishCustomObjectDefinition(
 			TestPropsValues.getUserId(),

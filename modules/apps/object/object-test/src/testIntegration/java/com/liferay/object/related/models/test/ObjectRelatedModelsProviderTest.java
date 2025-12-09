@@ -435,7 +435,6 @@ public class ObjectRelatedModelsProviderTest {
 				PortletCategoryKeys.SITE_ADMINISTRATION_CONTENT,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				true, ObjectDefinitionConstants.SCOPE_SITE,
-				new ServiceContext(),
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(),
 				Arrays.asList(
@@ -443,7 +442,7 @@ public class ObjectRelatedModelsProviderTest {
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING,
 						RandomTestUtil.randomString(), StringUtil.randomId())),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		scopeSiteObjectDefinition =
 			_objectDefinitionLocalService.publishCustomObjectDefinition(
@@ -596,10 +595,9 @@ public class ObjectRelatedModelsProviderTest {
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				true, ObjectDefinitionConstants.SCOPE_SITE,
-				new ServiceContext(),
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		ObjectField objectField = _objectFieldLocalService.addCustomObjectField(
 			null, TestPropsValues.getUserId(), 0,

@@ -3913,7 +3913,7 @@ public class ObjectDefinitionLocalServiceTest {
 				ObjectDefinitionLocalServiceUtil.addSystemObjectDefinition(
 					externalReferenceCode, user.getUserId(),
 					objectFolder.getObjectFolderId(), null, null, false, true,
-					false, false, false, false, false, false, false, null,
+					false, false, false, false, false, false, null,
 					LocalizedMapUtil.getLocalizedMap(externalReferenceCode),
 					modifiable, name, null, null, null, null,
 					LocalizedMapUtil.getLocalizedMap(externalReferenceCode),
@@ -3932,7 +3932,7 @@ public class ObjectDefinitionLocalServiceTest {
 				ObjectDefinitionLocalServiceUtil.addCustomObjectDefinition(
 					externalReferenceCode, user.getUserId(),
 					objectFolder.getObjectFolderId(), null, false, true, false,
-					false, false, false, false, false, false, null,
+					false, false, false, false, false, null,
 					LocalizedMapUtil.getLocalizedMap(externalReferenceCode),
 					name, null, null,
 					LocalizedMapUtil.getLocalizedMap(externalReferenceCode),

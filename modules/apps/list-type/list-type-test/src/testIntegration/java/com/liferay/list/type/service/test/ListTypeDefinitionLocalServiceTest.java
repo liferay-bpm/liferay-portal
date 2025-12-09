@@ -146,10 +146,10 @@ public class ListTypeDefinitionLocalServiceTest {
 				true, false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap("Test"), "Test", null, null,
 				LocalizedMapUtil.getLocalizedMap("Tests"), true,
-				ObjectDefinitionConstants.SCOPE_COMPANY, new ServiceContext(),
+				ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList(), Collections.singletonList(objectField),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		AssertUtils.assertFailure(
 			RequiredListTypeDefinitionException.class, null,

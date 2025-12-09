@@ -132,14 +132,13 @@ public abstract class BaseDisplayContextTestCase {
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				Collections.singletonMap(
 					LocaleUtil.getDefault(), RandomTestUtil.randomString()),
-				true, scope, new ServiceContext(),
-				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				true, scope, ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				objectDefinitionSettings,
 				Collections.singletonList(
 					ObjectFieldUtil.createObjectField(
 						"Text", "String", true, true, null,
 						RandomTestUtil.randomString(), "text", false)),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		if (status == WorkflowConstants.STATUS_DRAFT) {
 			return objectDefinition;
@@ -174,10 +173,10 @@ public abstract class BaseDisplayContextTestCase {
 			objectDefinition.getPanelAppOrder(),
 			objectDefinition.getPanelCategoryKey(),
 			objectDefinition.isPortlet(), objectDefinition.getPluralLabelMap(),
-			objectDefinition.getScope(), new ServiceContext(),
-			objectDefinition.getStatus(),
+			objectDefinition.getScope(), objectDefinition.getStatus(),
 			objectDefinition.getObjectDefinitionSettings(),
-			Collections.emptyList(), Collections.emptyList());
+			Collections.emptyList(), Collections.emptyList(),
+			new ServiceContext());
 	}
 
 	protected ObjectDefinition addCustomObjectDefinition(

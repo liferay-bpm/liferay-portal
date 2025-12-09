@@ -294,7 +294,6 @@ public class ObjectFieldLocalServiceTest {
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				true, ObjectDefinitionConstants.SCOPE_COMPANY,
-				new ServiceContext(),
 				ObjectDefinitionConstants.STORAGE_TYPE_SALESFORCE,
 				Collections.emptyList(),
 				Arrays.asList(
@@ -327,7 +326,7 @@ public class ObjectFieldLocalServiceTest {
 								"oneToManyRelationshipName"
 							).build())
 					).build()),
-				Collections.emptyList()));
+				Collections.emptyList(), new ServiceContext()));
 		AssertUtils.assertFailure(
 			ObjectFieldBusinessTypeException.class,
 			"Salesforce storage type does not support aggregation and " +
@@ -339,7 +338,6 @@ public class ObjectFieldLocalServiceTest {
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				true, ObjectDefinitionConstants.SCOPE_COMPANY,
-				new ServiceContext(),
 				ObjectDefinitionConstants.STORAGE_TYPE_SALESFORCE,
 				Collections.emptyList(),
 				Arrays.asList(
@@ -352,7 +350,7 @@ public class ObjectFieldLocalServiceTest {
 					).name(
 						"a" + RandomTestUtil.randomString()
 					).build()),
-				Collections.emptyList()));
+				Collections.emptyList(), new ServiceContext()));
 		AssertUtils.assertFailure(
 			ObjectFieldListTypeDefinitionIdException.class,
 			"List type definition ID is 0",
@@ -2283,8 +2281,8 @@ public class ObjectFieldLocalServiceTest {
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				true, ObjectDefinitionConstants.SCOPE_COMPANY,
-				new ServiceContext(), storageType, Collections.emptyList(),
+				true, ObjectDefinitionConstants.SCOPE_COMPANY, storageType,
+				Collections.emptyList(),
 				Arrays.asList(
 					new EncryptedObjectFieldBuilder(
 					).labelMap(
@@ -2293,7 +2291,7 @@ public class ObjectFieldLocalServiceTest {
 					).name(
 						"a" + RandomTestUtil.randomString()
 					).build()),
-				Collections.emptyList()));
+				Collections.emptyList(), new ServiceContext()));
 	}
 
 	private void _addCustomObjectDefinitionWithPicklistObjectField(
@@ -2929,10 +2927,9 @@ public class ObjectFieldLocalServiceTest {
 				"Test", null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				true, ObjectDefinitionConstants.SCOPE_COMPANY,
-				new ServiceContext(),
 				ObjectDefinitionConstants.STORAGE_TYPE_SALESFORCE,
 				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		_assertReadOnlyFalse(
 			_addCustomObjectField(

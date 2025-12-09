@@ -87,7 +87,6 @@ public class ObjectDefinitionLocalServiceDBPartitionTest {
 					objectDefinition1.getShortName(), null, null,
 					RandomTestUtil.randomLocaleStringMap(), true,
 					ObjectDefinitionConstants.SCOPE_COMPANY,
-					new ServiceContext(),
 					ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 					Collections.emptyList(),
 					Collections.singletonList(
@@ -97,7 +96,7 @@ public class ObjectDefinitionLocalServiceDBPartitionTest {
 						).name(
 							StringUtil.randomId()
 						).build()),
-					Collections.emptyList());
+					Collections.emptyList(), new ServiceContext());
 		}
 
 		Assert.assertNotEquals(

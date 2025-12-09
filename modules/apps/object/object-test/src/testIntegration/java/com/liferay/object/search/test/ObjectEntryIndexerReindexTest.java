@@ -91,7 +91,6 @@ public class ObjectEntryIndexerReindexTest {
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
 					true, ObjectDefinitionConstants.SCOPE_COMPANY,
-					new ServiceContext(),
 					ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 					Collections.emptyList(),
 					Arrays.asList(
@@ -195,7 +194,7 @@ public class ObjectEntryIndexerReindexTest {
 									Boolean.TRUE.toString()
 								).build())
 						).build()),
-					Collections.emptyList());
+					Collections.emptyList(), new ServiceContext());
 
 			_objectDefinitionLocalService.publishCustomObjectDefinition(
 				TestPropsValues.getUserId(),
