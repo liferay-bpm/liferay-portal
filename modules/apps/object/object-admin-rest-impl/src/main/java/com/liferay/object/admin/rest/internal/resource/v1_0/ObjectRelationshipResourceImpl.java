@@ -5,6 +5,7 @@
 
 package com.liferay.object.admin.rest.internal.resource.v1_0;
 
+import com.liferay.exportimport.kernel.empty.model.EmptyModelManagerUtil;
 import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectRelationship;
@@ -335,32 +336,42 @@ public class ObjectRelationshipResourceImpl
 			ObjectRelationship objectRelationship)
 		throws Exception {
 
-		com.liferay.object.model.ObjectDefinition
-			serviceBuilderObjectDefinition2 =
-				_objectDefinitionLocalService.
-					fetchObjectDefinitionByExternalReferenceCode(
-						objectRelationship.
-							getObjectDefinitionExternalReferenceCode2(),
-						contextCompany.getCompanyId());
+		String externalReferenceCode2 =
+			objectRelationship.getObjectDefinitionExternalReferenceCode2();
 
-		if (serviceBuilderObjectDefinition2 != null) {
-			return serviceBuilderObjectDefinition2;
-		}
+		boolean modifiable = GetterUtil.get(
+			objectRelationship.getObjectDefinitionModifiable2(), true);
+
+		boolean system = GetterUtil.get(
+			objectRelationship.getObjectDefinitionSystem2(), false);
 
 		ObjectFolder defaultObjectFolder =
 			_objectFolderLocalService.getOrAddDefaultObjectFolder(
 				contextCompany.getCompanyId());
 
+		if (EmptyModelManagerUtil.isEmptyModel()) {
+			return _objectDefinitionLocalService.getOrAddEmptyObjectDefinition(
+				externalReferenceCode2, contextCompany.getCompanyId(),
+				contextUser.getUserId(),
+				defaultObjectFolder.getObjectFolderId(), modifiable, system);
+		}
+
+		com.liferay.object.model.ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.
+				fetchObjectDefinitionByExternalReferenceCode(
+					externalReferenceCode2, contextCompany.getCompanyId());
+
+		if (objectDefinition != null) {
+			return objectDefinition;
+		}
+
 		return _objectDefinitionLocalService.addObjectDefinition(
-			objectRelationship.getObjectDefinitionExternalReferenceCode2(),
-			contextUser.getUserId(), defaultObjectFolder.getObjectFolderId(),
-			GetterUtil.get(
-				objectRelationship.getObjectDefinitionModifiable2(), true),
+			externalReferenceCode2, contextUser.getUserId(),
+			defaultObjectFolder.getObjectFolderId(), modifiable,
 			GetterUtil.get(
 				objectRelationship.getObjectDefinitionScope2(),
 				ObjectDefinitionConstants.SCOPE_COMPANY),
-			GetterUtil.get(
-				objectRelationship.getObjectDefinitionSystem2(), false));
+			system);
 	}
 
 	private ObjectRelationship _toObjectRelationship(
