@@ -203,6 +203,20 @@ public class DateTimeObjectFieldBusinessType
 			_userLocalService.getUser(userId), String.valueOf(value));
 	}
 
+	@Override
+	public void validateObjectFieldSettingsDefaultValue(
+			ObjectField objectField,
+			Map<String, String> objectFieldSettingsValuesMap)
+		throws PortalException {
+
+		if (objectFieldSettingsValuesMap.isEmpty()) {
+			return;
+		}
+
+		super.validateObjectFieldSettingsDefaultValue(
+			objectField, objectFieldSettingsValuesMap);
+	}
+
 	private boolean _containsTimeZoneId(String pattern) {
 		if (pattern.contains("X") || pattern.contains("Z") ||
 			pattern.contains("z")) {

@@ -97,6 +97,20 @@ public class DateObjectFieldBusinessType extends BaseObjectFieldBusinessType {
 		return PropertyDefinition.PropertyType.DATE_TIME;
 	}
 
+	@Override
+	public void validateObjectFieldSettingsDefaultValue(
+			ObjectField objectField,
+			Map<String, String> objectFieldSettingsValuesMap)
+		throws PortalException {
+
+		if (objectFieldSettingsValuesMap.isEmpty()) {
+			return;
+		}
+
+		super.validateObjectFieldSettingsDefaultValue(
+			objectField, objectFieldSettingsValuesMap);
+	}
+
 	private String _getValue(String value) {
 		if (Validator.isNull(value)) {
 			return StringPool.BLANK;
