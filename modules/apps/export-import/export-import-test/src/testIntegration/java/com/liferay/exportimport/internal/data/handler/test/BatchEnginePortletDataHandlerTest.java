@@ -36,6 +36,7 @@ import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.constants.ObjectPortletKeys;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.field.setting.builder.ObjectFieldSettingBuilder;
@@ -43,6 +44,7 @@ import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
@@ -347,6 +349,44 @@ public class BatchEnginePortletDataHandlerTest {
 			layout2.getExternalReferenceCode(), group2.getGroupId());
 
 		Assert.assertNull(layout2);
+	}
+
+	@Test
+	public void testExportImportObjectDefinitions() throws Exception {
+		Group group = _stagingGroupHelper.fetchCompanyGroup(
+			TestPropsValues.getCompanyId());
+
+		ObjectDefinition objectDefinition1 = _addObjectDefinition(
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		ObjectDefinition objectDefinition2 = _addObjectDefinition(
+			ObjectDefinitionConstants.SCOPE_SITE);
+
+		File larFile = _exportLayouts(
+			false, group.getGroupId(), false, new long[0]);
+
+		Assert.assertNotNull(
+			_getExportedItemsJSONArray(
+				"com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition",
+				larFile, group.getGroupId()));
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition1);
+
+		Assert.assertNull(
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				objectDefinition1.getObjectDefinitionId()));
+		Assert.assertNotNull(
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				objectDefinition2.getObjectDefinitionId()));
+
+		_importLayouts(false, false, larFile, group.getGroupId());
+
+		Assert.assertNotNull(
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				TestPropsValues.getCompanyId(), objectDefinition1.getName()));
+		Assert.assertNotNull(
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				TestPropsValues.getCompanyId(), objectDefinition2.getName()));
 	}
 
 	@Test
@@ -1148,7 +1188,7 @@ public class BatchEnginePortletDataHandlerTest {
 		}
 	}
 
-	private JSONArray _getExportedObjectEntriesJSONArray(
+	private JSONArray _getExportedItemsJSONArray(
 			String className, File file, long groupId)
 		throws Exception {
 
@@ -1182,6 +1222,10 @@ public class BatchEnginePortletDataHandlerTest {
 			new String[] {Boolean.TRUE.toString()}
 		).put(
 			PortletDataHandlerKeys.PORTLET_DATA,
+			new String[] {Boolean.TRUE.toString()}
+		).put(
+			PortletDataHandlerKeys.PORTLET_DATA + "_" +
+				ObjectPortletKeys.OBJECT_DEFINITIONS,
 			new String[] {Boolean.TRUE.toString()}
 		).put(
 			PortletDataHandlerKeys.PORTLET_DATA_CONTROL_DEFAULT,
@@ -1455,9 +1499,8 @@ public class BatchEnginePortletDataHandlerTest {
 			false, group.getGroupId(), false, new long[0], objectDefinition1,
 			objectDefinition2);
 
-		JSONArray exportedObjectEntriesJSONArray =
-			_getExportedObjectEntriesJSONArray(
-				objectDefinition2.getName(), larFile, group.getGroupId());
+		JSONArray exportedObjectEntriesJSONArray = _getExportedItemsJSONArray(
+			objectDefinition2.getName(), larFile, group.getGroupId());
 
 		if (Objects.equals(
 				ObjectRelationshipConstants.TYPE_MANY_TO_MANY, type)) {
@@ -1478,7 +1521,7 @@ public class BatchEnginePortletDataHandlerTest {
 				).toString(),
 				JSONCompareMode.NON_EXTENSIBLE);
 
-			exportedObjectEntriesJSONArray = _getExportedObjectEntriesJSONArray(
+			exportedObjectEntriesJSONArray = _getExportedItemsJSONArray(
 				objectDefinition1.getName(), larFile, group.getGroupId());
 
 			JSONAssert.assertEquals(
@@ -1703,6 +1746,9 @@ public class BatchEnginePortletDataHandlerTest {
 
 	@Inject
 	private LayoutLocalService _layoutLocalService;
+
+	@Inject
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Inject
 	private ObjectEntryLocalService _objectEntryLocalService;
