@@ -47,7 +47,8 @@ public class ObjectDefinitionLocalServiceWrapper
 			java.util.List<com.liferay.object.model.ObjectField> objectFields,
 			java.util.List
 				<com.liferay.portal.kernel.model.WorkflowDefinitionLink>
-					workflowDefinitionLinks)
+					workflowDefinitionLinks,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectDefinitionLocalService.addCustomObjectDefinition(
@@ -58,7 +59,7 @@ public class ObjectDefinitionLocalServiceWrapper
 			enableObjectEntryVersioning, friendlyURLSeparator, labelMap, name,
 			panelAppOrder, panelCategoryKey, pluralLabelMap, portlet, scope,
 			storageType, objectDefinitionSettings, objectFields,
-			workflowDefinitionLinks);
+			workflowDefinitionLinks, serviceContext);
 	}
 
 	/**
@@ -713,7 +714,8 @@ public class ObjectDefinitionLocalServiceWrapper
 					objectFields,
 				java.util.List
 					<com.liferay.portal.kernel.model.WorkflowDefinitionLink>
-						workflowDefinitionLinks)
+						workflowDefinitionLinks,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectDefinitionLocalService.updateCustomObjectDefinition(
@@ -727,7 +729,7 @@ public class ObjectDefinitionLocalServiceWrapper
 			enableObjectEntryVersioning, friendlyURLSeparator, labelMap, name,
 			panelAppOrder, panelCategoryKey, portlet, pluralLabelMap, scope,
 			status, objectDefinitionSettings, objectFields,
-			workflowDefinitionLinks);
+			workflowDefinitionLinks, serviceContext);
 	}
 
 	@Override
