@@ -74,6 +74,10 @@ import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.auth.GuestOrUserUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
@@ -94,6 +98,7 @@ import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.permission.ModelPermissionsUtil;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
@@ -421,7 +426,8 @@ public class ObjectDefinitionResourceImpl
 							contextUser.getCompanyId(), _groupLocalService,
 							contextUser.getUserId(),
 							_workflowDefinitionLinkLocalService,
-							objectDefinition.getWorkflowDefinitionLinks()));
+							objectDefinition.getWorkflowDefinitionLinks()),
+						_createServiceContext(objectDefinition));
 			}
 		}
 
@@ -689,7 +695,8 @@ public class ObjectDefinitionResourceImpl
 							contextUser.getCompanyId(), _groupLocalService,
 							contextUser.getUserId(),
 							_workflowDefinitionLinkLocalService,
-							objectDefinition.getWorkflowDefinitionLinks()));
+							objectDefinition.getWorkflowDefinitionLinks()),
+						_createServiceContext(objectDefinition));
 			}
 		}
 
@@ -1218,6 +1225,28 @@ public class ObjectDefinitionResourceImpl
 				_objectFilterLocalService));
 	}
 
+	private ServiceContext _createServiceContext(
+			ObjectDefinition objectDefinition)
+		throws Exception {
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		if (objectDefinition.getPermissions() == null) {
+			return serviceContext;
+		}
+
+		serviceContext.setModelPermissions(
+			ModelPermissionsUtil.toModelPermissions(
+				contextCompany.getCompanyId(),
+				objectDefinition.getPermissions(),
+				GetterUtil.getLong(objectDefinition.getId()),
+				com.liferay.object.model.ObjectDefinition.class.getName(),
+				_resourceActionLocalService, _resourcePermissionLocalService,
+				_roleLocalService));
+
+		return serviceContext;
+	}
+
 	private Set<String> _getAccountEntryRestrictedObjectRelationshipsNames(
 		com.liferay.object.model.ObjectDefinition objectDefinition1,
 		List<ObjectRelationship> objectRelationships) {
@@ -1568,6 +1597,15 @@ public class ObjectDefinitionResourceImpl
 
 	@Reference
 	private ObjectViewService _objectViewService;
+
+	@Reference
+	private ResourceActionLocalService _resourceActionLocalService;
+
+	@Reference
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Reference
+	private RoleLocalService _roleLocalService;
 
 	@Reference
 	private SystemObjectDefinitionManagerRegistry
