@@ -121,10 +121,6 @@ public class ObjectEntryVersionLocalServiceTest {
 			_objectDefinitionLocalService.publishCustomObjectDefinition(
 				TestPropsValues.getUserId(),
 				_objectDefinition.getObjectDefinitionId());
-
-		_workflowDefinition =
-			_workflowDefinitionManager.liberalGetWorkflowDefinition(
-				TestPropsValues.getCompanyId(), "Single Approver", 1);
 	}
 
 	@Test
@@ -389,12 +385,9 @@ public class ObjectEntryVersionLocalServiceTest {
 		// Add pending object entry
 
 		WorkflowDefinitionLink workflowDefinitionLink =
-			_workflowDefinitionLinkService.addWorkflowDefinitionLink(
-				null, TestPropsValues.getUserId(),
-				TestPropsValues.getCompanyId(), 0,
-				_objectDefinition.getClassName(), 0, 0,
-				_workflowDefinition.getName(),
-				_workflowDefinition.getVersion());
+			_workflowDefinitionLinkLocalService.updateWorkflowDefinitionLink(
+				TestPropsValues.getUserId(), TestPropsValues.getCompanyId(), 0,
+				_objectDefinition.getClassName(), 0, 0, "Single Approver", 1);
 
 		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
 			0, _objectDefinition.getObjectDefinitionId(),

@@ -86,6 +86,8 @@ public class WorkflowHandlerRegistryUtil {
 			return model;
 		}
 
+		out.println(serviceContext.getWorkflowAction() + " é a action definida no contexto");
+
 		WorkflowHandler<T> workflowHandler = getWorkflowHandler(className);
 
 		if (workflowHandler == null) {
