@@ -5322,7 +5322,7 @@ public class ObjectEntryResourceTest {
 						ObjectFieldConstants.BUSINESS_TYPE_BOOLEAN,
 						ObjectFieldConstants.DB_TYPE_BOOLEAN, true, false, null,
 						"Test Field", "testField", true)),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		_objectDefinitionLocalService.publishCustomObjectDefinition(
 			TestPropsValues.getUserId(),
@@ -7479,7 +7479,7 @@ public class ObjectEntryResourceTest {
 								String.valueOf(_MAX_FILE_SIZE_VALUE)
 							).build()),
 						false)),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		objectDefinition.setEnableObjectEntryHistory(true);
 

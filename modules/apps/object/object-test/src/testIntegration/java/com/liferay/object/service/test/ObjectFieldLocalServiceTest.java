@@ -327,7 +327,7 @@ public class ObjectFieldLocalServiceTest {
 								"oneToManyRelationshipName"
 							).build())
 					).build()),
-				Collections.emptyList()));
+				Collections.emptyList(), new ServiceContext()));
 		AssertUtils.assertFailure(
 			ObjectFieldBusinessTypeException.class,
 			"Salesforce storage type does not support aggregation and " +
@@ -351,7 +351,7 @@ public class ObjectFieldLocalServiceTest {
 					).name(
 						"a" + RandomTestUtil.randomString()
 					).build()),
-				Collections.emptyList()));
+				Collections.emptyList(), new ServiceContext()));
 		AssertUtils.assertFailure(
 			ObjectFieldListTypeDefinitionIdException.class,
 			"List type definition ID is 0",
@@ -2292,7 +2292,7 @@ public class ObjectFieldLocalServiceTest {
 					).name(
 						"a" + RandomTestUtil.randomString()
 					).build()),
-				Collections.emptyList()));
+				Collections.emptyList(), new ServiceContext()));
 	}
 
 	private void _addCustomObjectDefinitionWithPicklistObjectField(
@@ -2930,7 +2930,7 @@ public class ObjectFieldLocalServiceTest {
 				true, ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_SALESFORCE,
 				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList());
+				Collections.emptyList(), new ServiceContext());
 
 		_assertReadOnlyFalse(
 			_addCustomObjectField(
