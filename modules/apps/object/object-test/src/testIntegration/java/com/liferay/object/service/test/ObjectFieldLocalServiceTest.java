@@ -38,6 +38,7 @@ import com.liferay.object.field.builder.AssigneeObjectFieldBuilder;
 import com.liferay.object.field.builder.AttachmentObjectFieldBuilder;
 import com.liferay.object.field.builder.AutoIncrementObjectFieldBuilder;
 import com.liferay.object.field.builder.BooleanObjectFieldBuilder;
+import com.liferay.object.field.builder.DateObjectFieldBuilder;
 import com.liferay.object.field.builder.DateTimeObjectFieldBuilder;
 import com.liferay.object.field.builder.EncryptedObjectFieldBuilder;
 import com.liferay.object.field.builder.FormulaObjectFieldBuilder;
@@ -1938,9 +1939,95 @@ public class ObjectFieldLocalServiceTest {
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 
+		// Business type date
+
+		String defaultValue = String.valueOf(RandomTestUtil.nextDate());
+
+		objectDefinition = ObjectDefinitionTestUtil.addCustomObjectDefinition(
+			Collections.emptyList());
+
+		ObjectField dateObjectField = _addCustomObjectField(
+			new DateObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"date"
+			).objectDefinitionId(
+				objectDefinition.getObjectDefinitionId()
+			).objectFieldSettings(
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE
+					).value(
+						defaultValue
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE
+					).value(
+						ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
+					).build())
+			).build());
+
+		_assertObjectFieldSettingsValues(
+			dateObjectField.getObjectFieldId(),
+			HashMapBuilder.put(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE, defaultValue
+			).put(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+				ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
+			).build());
+
+		// Business type date time
+
+		defaultValue = String.valueOf(RandomTestUtil.nextTimestamp());
+
+		objectDefinition = ObjectDefinitionTestUtil.addCustomObjectDefinition(
+			Collections.emptyList());
+
+		ObjectField dateTimeObjectField = _addCustomObjectField(
+			new DateTimeObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"dateTime"
+			).objectDefinitionId(
+				objectDefinition.getObjectDefinitionId()
+			).objectFieldSettings(
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE
+					).value(
+						defaultValue
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE
+					).value(
+						ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_TIME_STORAGE
+					).value(
+						ObjectFieldSettingConstants.VALUE_USE_INPUT_AS_ENTERED
+					).build())
+			).build());
+
+		_assertObjectFieldSettingsValues(
+			dateTimeObjectField.getObjectFieldId(),
+			HashMapBuilder.put(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE, defaultValue
+			).put(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+				ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
+			).build());
+
 		// Business type integer
 
-		String defaultValue = String.valueOf(RandomTestUtil.randomInt(0, 10));
+		defaultValue = String.valueOf(RandomTestUtil.randomInt(0, 10));
 
 		objectDefinition = ObjectDefinitionTestUtil.addCustomObjectDefinition(
 			Collections.emptyList());
