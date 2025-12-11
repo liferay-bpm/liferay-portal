@@ -43,12 +43,19 @@ import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectPortletKeys;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectEntryException;
+import com.liferay.object.field.builder.AggregationObjectFieldBuilder;
+import com.liferay.object.field.builder.PicklistObjectFieldBuilder;
 import com.liferay.object.field.setting.builder.ObjectFieldSettingBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.test.util.ObjectRelationshipTestUtil;
@@ -67,10 +74,15 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.ResourcePermission;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -85,6 +97,7 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.FeatureFlagTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -339,13 +352,13 @@ public class BatchEnginePortletDataHandlerTest {
 		Layout layout2 = LayoutTestUtil.addTypePortletLayout(group1);
 
 		File larFile = _exportLayouts(
-			false, group1.getGroupId(), true, false,
+			false, group1.getGroupId(), true, false, false,
 			new long[] {layout1.getLayoutId()});
 
 		Group group2 = GroupTestUtil.addGroup();
 
 		_importLayouts(
-			false, false, larFile, group2.getGroupId(), true, false,
+			false, false, larFile, group2.getGroupId(), true, false, false,
 			new Object[0]);
 
 		layout1 = _layoutLocalService.fetchLayoutByExternalReferenceCode(
@@ -394,6 +407,138 @@ public class BatchEnginePortletDataHandlerTest {
 
 		_listTypeDefinitionLocalService.deleteListTypeDefinition(
 			listTypeDefinition);
+	}
+
+	@Test
+	public void testExportImportObjectDefinitions() throws Exception {
+		Group group = _stagingGroupHelper.fetchCompanyGroup(
+			TestPropsValues.getCompanyId());
+
+		ListTypeDefinition listTypeDefinition = _addListTypeDefinition();
+
+		ObjectDefinition objectDefinition1 =
+			ObjectDefinitionTestUtil.publishObjectDefinition();
+
+		ObjectDefinition objectDefinition2 =
+			ObjectDefinitionTestUtil.publishObjectDefinition();
+
+		ObjectRelationship objectRelationship =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinition1,
+				objectDefinition2,
+				ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
+				StringUtil.randomId(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
+
+		ObjectField picklistObjectField = ObjectFieldUtil.addCustomObjectField(
+			new PicklistObjectFieldBuilder(
+			).userId(
+				TestPropsValues.getUserId()
+			).labelMap(
+				RandomTestUtil.randomLocaleStringMap()
+			).listTypeDefinitionId(
+				listTypeDefinition.getListTypeDefinitionId()
+			).name(
+				"a" + RandomTestUtil.randomString()
+			).objectDefinitionId(
+				objectDefinition1.getObjectDefinitionId()
+			).build());
+
+		ObjectFieldUtil.addCustomObjectField(
+			new AggregationObjectFieldBuilder(
+			).userId(
+				TestPropsValues.getUserId()
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"a" + RandomTestUtil.randomString()
+			).objectDefinitionId(
+				objectDefinition1.getObjectDefinitionId()
+			).objectFieldSettings(
+				Arrays.asList(
+					_createObjectFieldSetting(
+						ObjectFieldSettingConstants.NAME_FUNCTION,
+						ObjectFieldSettingConstants.VALUE_COUNT),
+					_createObjectFieldSetting(
+						ObjectFieldSettingConstants.
+							NAME_OBJECT_RELATIONSHIP_NAME,
+						objectRelationship.getName()))
+			).build());
+
+		File larFile1 = _exportLayouts(false, group.getGroupId(), false, null);
+
+		_objectFieldLocalService.deleteObjectField(
+			picklistObjectField.getObjectFieldId());
+
+		_listTypeDefinitionLocalService.deleteListTypeDefinition(
+			listTypeDefinition.getListTypeDefinitionId());
+
+		_objectRelationshipLocalService.deleteObjectRelationship(
+			objectRelationship.getObjectRelationshipId());
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		String permissionName = ObjectDefinition.class.getName();
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			TestPropsValues.getCompanyId(), permissionName,
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(objectDefinition1.getObjectDefinitionId()),
+			role.getRoleId(),
+			new String[] {ActionKeys.UPDATE, ActionKeys.VIEW});
+
+		File larFile2 = _exportLayouts(
+			false, group.getGroupId(), false, true, false, null);
+
+		_resourcePermissionLocalService.removeResourcePermission(
+			TestPropsValues.getCompanyId(), permissionName,
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(objectDefinition1.getObjectDefinitionId()),
+			role.getRoleId(), ActionKeys.VIEW);
+
+		_importLayouts(false, false, larFile1, group.getGroupId());
+
+		ObjectDefinition importedObjectDefinition =
+			_getImportedObjectDefinition(objectDefinition1);
+
+		ResourcePermission resourcePermission = _getResourcePermission(
+			importedObjectDefinition, role, permissionName);
+
+		Assert.assertFalse(resourcePermission.hasActionId(ActionKeys.VIEW));
+		Assert.assertTrue(resourcePermission.hasActionId(ActionKeys.UPDATE));
+
+		_assertObjectDefinition(
+			objectDefinition1, _getCustomObjectFieldsCount(objectDefinition1),
+			_objectFieldLocalService.getCustomObjectFields(
+				objectDefinition1.getObjectDefinitionId()));
+
+		_assertObjectDefinition(
+			objectDefinition2, _getCustomObjectFieldsCount(objectDefinition2),
+			_objectFieldLocalService.getCustomObjectFields(
+				objectDefinition2.getObjectDefinitionId()));
+
+		_importLayouts(
+			false, false, larFile2, group.getGroupId(), false, true, true,
+			new Object[0]);
+
+		_assertObjectDefinition(
+			objectDefinition1, _getCustomObjectFieldsCount(objectDefinition1),
+			_objectFieldLocalService.getCustomObjectFields(
+				objectDefinition1.getObjectDefinitionId()));
+
+		_assertObjectDefinition(
+			objectDefinition2, _getCustomObjectFieldsCount(objectDefinition2),
+			_objectFieldLocalService.getCustomObjectFields(
+				objectDefinition2.getObjectDefinitionId()));
+
+		importedObjectDefinition = _getImportedObjectDefinition(
+			objectDefinition1);
+
+		resourcePermission = _getResourcePermission(
+			importedObjectDefinition, role, permissionName);
+
+		Assert.assertTrue(resourcePermission.hasActionId(ActionKeys.UPDATE));
+		Assert.assertTrue(resourcePermission.hasActionId(ActionKeys.VIEW));
 	}
 
 	@Test
@@ -503,13 +648,13 @@ public class BatchEnginePortletDataHandlerTest {
 		Layout layout2 = LayoutTestUtil.addTypePortletLayout(group1, true);
 
 		File larFile = _exportLayouts(
-			false, group1.getGroupId(), false, true,
+			false, group1.getGroupId(), false, false, true,
 			new long[] {layout1.getLayoutId()});
 
 		Group group2 = GroupTestUtil.addGroup();
 
 		_importLayouts(
-			false, false, larFile, group2.getGroupId(), false, true,
+			false, false, larFile, group2.getGroupId(), false, false, true,
 			new Object[0]);
 
 		layout1 = _layoutLocalService.fetchLayoutByExternalReferenceCode(
@@ -1118,6 +1263,39 @@ public class BatchEnginePortletDataHandlerTest {
 		}
 	}
 
+	private void _assertObjectDefinition(
+			ObjectDefinition objectDefinition, int objectFieldsCount,
+			List<ObjectField> objectFields)
+		throws Exception {
+
+		ObjectDefinition importedObjectDefinition =
+			_getImportedObjectDefinition(objectDefinition);
+
+		Assert.assertEquals(
+			objectDefinition.isActive(), importedObjectDefinition.isActive());
+		Assert.assertEquals(
+			objectDefinition.getName(), importedObjectDefinition.getName());
+		Assert.assertEquals(
+			objectDefinition.getScope(), importedObjectDefinition.getScope());
+		Assert.assertEquals(
+			objectFieldsCount,
+			_getCustomObjectFieldsCount(importedObjectDefinition));
+
+		for (ObjectField objectField : objectFields) {
+			ObjectField importedObjectField =
+				_objectFieldLocalService.getObjectField(
+					objectField.getObjectDefinitionId(), objectField.getName());
+
+			Assert.assertEquals(
+				objectField.getName(), importedObjectField.getName());
+			Assert.assertEquals(
+				objectField.getBusinessType(),
+				importedObjectField.getBusinessType());
+			Assert.assertEquals(
+				objectField.isRequired(), importedObjectField.isRequired());
+		}
+	}
+
 	private void _assertObjectEntries(
 			boolean empty, long objectDefinitionId,
 			ObjectEntry... objectEntries)
@@ -1166,6 +1344,18 @@ public class BatchEnginePortletDataHandlerTest {
 		}
 	}
 
+	private ObjectFieldSetting _createObjectFieldSetting(
+		String name, String value) {
+
+		ObjectFieldSetting objectFieldSetting =
+			_objectFieldSettingLocalService.createObjectFieldSetting(0L);
+
+		objectFieldSetting.setName(name);
+		objectFieldSetting.setValue(value);
+
+		return objectFieldSetting;
+	}
+
 	private void _deleteObjectEntries(ObjectEntry... objectEntries)
 		throws Exception {
 
@@ -1192,8 +1382,8 @@ public class BatchEnginePortletDataHandlerTest {
 
 	private File _exportLayouts(
 			boolean deletions, long groupId,
-			boolean includeLayoutSetLayoutsPortlet, boolean privateLayouts,
-			long[] layoutIds, Object... objects)
+			boolean includeLayoutSetLayoutsPortlet, boolean permissions,
+			boolean privateLayouts, long[] layoutIds, Object... objects)
 		throws Exception {
 
 		return _exportImportLocalService.exportLayoutsAsFile(
@@ -1207,7 +1397,7 @@ public class BatchEnginePortletDataHandlerTest {
 							layoutIds,
 							_getExportImportParameterMap(
 								deletions, includeLayoutSetLayoutsPortlet,
-								Arrays.asList(objects)))));
+								Arrays.asList(objects), permissions))));
 	}
 
 	private File _exportLayouts(
@@ -1216,7 +1406,8 @@ public class BatchEnginePortletDataHandlerTest {
 		throws Exception {
 
 		return _exportLayouts(
-			deletions, groupId, false, privateLayouts, layoutIds, objects);
+			deletions, groupId, false, false, privateLayouts, layoutIds,
+			objects);
 	}
 
 	private String _getBatchFileNameWithPath(String fileName, long groupId) {
@@ -1253,6 +1444,11 @@ public class BatchEnginePortletDataHandlerTest {
 		}
 	}
 
+	private int _getCustomObjectFieldsCount(ObjectDefinition objectDefinition) {
+		return _objectFieldLocalService.getObjectFieldsCount(
+			objectDefinition.getObjectDefinitionId(), false);
+	}
+
 	private JSONArray _getExportedObjectEntriesJSONArray(
 			String className, File file, long groupId)
 		throws Exception {
@@ -1268,17 +1464,14 @@ public class BatchEnginePortletDataHandlerTest {
 
 	private Map<String, String[]> _getExportImportParameterMap(
 		boolean deletions, boolean includeLayoutSetLayoutsPortlet,
-		List<Object> objects) {
+		List<Object> objects, boolean permissions) {
 
 		Map<String, String[]> parameterMap = HashMapBuilder.put(
 			PortletDataHandlerKeys.DELETIONS,
 			new String[] {Boolean.toString(deletions)}
 		).put(
 			PortletDataHandlerKeys.PERMISSIONS,
-			new String[] {Boolean.FALSE.toString()}
-		).put(
-			PortletDataHandlerKeys.PERMISSIONS,
-			new String[] {Boolean.FALSE.toString()}
+			new String[] {Boolean.toString(permissions)}
 		).put(
 			PortletDataHandlerKeys.PORTLET_CONFIGURATION,
 			new String[] {Boolean.TRUE.toString()}
@@ -1287,6 +1480,10 @@ public class BatchEnginePortletDataHandlerTest {
 			new String[] {Boolean.TRUE.toString()}
 		).put(
 			PortletDataHandlerKeys.PORTLET_DATA,
+			new String[] {Boolean.TRUE.toString()}
+		).put(
+			PortletDataHandlerKeys.PORTLET_DATA + "_" +
+				ObjectPortletKeys.OBJECT_DEFINITIONS,
 			new String[] {Boolean.TRUE.toString()}
 		).put(
 			PortletDataHandlerKeys.PORTLET_DATA_CONTROL_DEFAULT,
@@ -1363,6 +1560,16 @@ public class BatchEnginePortletDataHandlerTest {
 		}
 	}
 
+	private ObjectDefinition _getImportedObjectDefinition(
+			ObjectDefinition objectDefinition)
+		throws Exception {
+
+		return _objectDefinitionLocalService.
+			getObjectDefinitionByExternalReferenceCode(
+				objectDefinition.getExternalReferenceCode(),
+				objectDefinition.getCompanyId());
+	}
+
 	private LogCapture _getLogCapture(boolean expectError) {
 		LogCapture logCapture = null;
 
@@ -1404,10 +1611,21 @@ public class BatchEnginePortletDataHandlerTest {
 		return group.getGroupKey();
 	}
 
+	private ResourcePermission _getResourcePermission(
+			ObjectDefinition objectDefinition, Role role, String permissionName)
+		throws Exception {
+
+		return _resourcePermissionLocalService.getResourcePermission(
+			objectDefinition.getCompanyId(), permissionName,
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(objectDefinition.getObjectDefinitionId()),
+			role.getRoleId());
+	}
+
 	private ExportImportConfiguration _importLayouts(
 			boolean deletions, boolean expectError, File file, long groupId,
-			boolean includeLayoutSetLayoutsPortlet, boolean privateLayout,
-			Object... objects)
+			boolean includeLayoutSetLayoutsPortlet, boolean permissions,
+			boolean privateLayout, Object... objects)
 		throws Exception {
 
 		try (LogCapture logCapture = _getLogCapture(expectError)) {
@@ -1422,7 +1640,7 @@ public class BatchEnginePortletDataHandlerTest {
 								privateLayout, null,
 								_getExportImportParameterMap(
 									deletions, includeLayoutSetLayoutsPortlet,
-									Arrays.asList(objects))));
+									Arrays.asList(objects), permissions)));
 
 			if (deletions) {
 				_exportImportLocalService.importLayoutsDataDeletions(
@@ -1442,7 +1660,8 @@ public class BatchEnginePortletDataHandlerTest {
 		throws Exception {
 
 		return _importLayouts(
-			deletions, expectError, file, groupId, false, false, objects);
+			deletions, expectError, file, groupId, false, false, false,
+			objects);
 	}
 
 	private <S> SafeCloseable _registerServiceWithSafeCloseable(
@@ -1824,7 +2043,16 @@ public class BatchEnginePortletDataHandlerTest {
 	private ListTypeEntryLocalService _listTypeEntryLocalService;
 
 	@Inject
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Inject
 	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Inject
+	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Inject
+	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
 
 	@Inject
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
@@ -1834,6 +2062,9 @@ public class BatchEnginePortletDataHandlerTest {
 
 	@Inject
 	private PortletDataHandlerProvider _portletDataHandlerProvider;
+
+	@Inject
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
 
 	@Inject
 	private SAXReader _saxReader;
