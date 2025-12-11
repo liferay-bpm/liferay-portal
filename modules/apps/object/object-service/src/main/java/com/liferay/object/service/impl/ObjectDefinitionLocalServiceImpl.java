@@ -70,7 +70,6 @@ import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.internal.dao.db.ObjectDBManagerUtil;
 import com.liferay.object.internal.deployer.InactiveObjectDefinitionDeployerUtil;
 import com.liferay.object.internal.deployer.ObjectDefinitionDeployerImpl;
-import com.liferay.object.internal.security.permission.util.ObjectPermissionUtil;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectDefinitionSetting;
@@ -298,7 +297,13 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setStorageType(
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT);
 		objectDefinition.setSystem(system);
-		objectDefinition.setStatus(WorkflowConstants.STATUS_DRAFT);
+
+		if (!EmptyModelManagerUtil.isEmptyModel()) {
+			objectDefinition.setStatus(WorkflowConstants.STATUS_DRAFT);
+		}
+		else {
+			objectDefinition.setStatus(WorkflowConstants.STATUS_EMPTY);
+		}
 
 		if (objectDefinition.isUnmodifiableSystemObject() || !modifiable) {
 			throw new ObjectDefinitionModifiableException.MustBeModifiable();
@@ -992,46 +997,9 @@ public class ObjectDefinitionLocalServiceImpl
 
 		return _emptyModelManager.getOrAddEmptyModel(
 			ObjectDefinition.class, companyId,
-			() -> {
-				ObjectDefinition objectDefinition = null;
-
-				if (system) {
-					objectDefinition =
-						objectDefinitionLocalService.addSystemObjectDefinition(
-							externalReferenceCode, userId, objectFolderId, null,
-							null, false, false, false, true, false, false,
-							false, false, null,
-							LocalizedMapUtil.getLocalizedMap(
-								externalReferenceCode),
-							modifiable, externalReferenceCode, null, null,
-							externalReferenceCode, externalReferenceCode,
-							LocalizedMapUtil.getLocalizedMap(
-								externalReferenceCode),
-							false, ObjectDefinitionConstants.SCOPE_COMPANY,
-							externalReferenceCode, 1,
-							WorkflowConstants.STATUS_EMPTY,
-							Collections.emptyList(), Collections.emptyList(),
-							Collections.emptyList());
-				}
-				else {
-					objectDefinition =
-						objectDefinitionLocalService.addCustomObjectDefinition(
-							externalReferenceCode, userId, objectFolderId, null,
-							false, true, false, true, false, false, false,
-							false, null,
-							LocalizedMapUtil.getLocalizedMap(
-								externalReferenceCode),
-							externalReferenceCode, null, null,
-							LocalizedMapUtil.getLocalizedMap(
-								externalReferenceCode),
-							true, ObjectDefinitionConstants.SCOPE_COMPANY,
-							ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
-							Collections.emptyList(), Collections.emptyList(),
-							Collections.emptyList(), new ServiceContext());
-				}
-
-				return objectDefinition;
-			},
+			() -> objectDefinitionLocalService.addObjectDefinition(
+				externalReferenceCode, userId, objectFolderId, modifiable,
+				ObjectDefinitionConstants.SCOPE_COMPANY, system),
 			externalReferenceCode,
 			this::fetchObjectDefinitionByExternalReferenceCode,
 			this::getObjectDefinitionByExternalReferenceCode);
@@ -1597,13 +1565,7 @@ public class ObjectDefinitionLocalServiceImpl
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT);
 		objectDefinition.setSystem(system);
 		objectDefinition.setVersion(version);
-
-		if (EmptyModelManagerUtil.isEmptyModel()) {
-			objectDefinition.setStatus(WorkflowConstants.STATUS_EMPTY);
-		}
-		else {
-			objectDefinition.setStatus(status);
-		}
+		objectDefinition.setStatus(status);
 
 		objectDefinition = _update(objectDefinition);
 
@@ -1680,15 +1642,13 @@ public class ObjectDefinitionLocalServiceImpl
 			userId, objectDefinition.getObjectDefinitionId(),
 			objectDefinition.getObjectFolderId(), 0, 0);
 
-		if (!EmptyModelManagerUtil.isEmptyModel()) {
-			objectDefinition = _updateTitleObjectFieldId(
-				objectDefinition, titleObjectFieldName);
-		}
+		objectDefinition = _updateTitleObjectFieldId(
+			objectDefinition, titleObjectFieldName);
 
 		_addOrUpdateWorkflowDefinitionLinks(
 			objectDefinition, workflowDefinitionLinks);
 
-		ObjectPermissionUtil.updateResourcePermissions(
+		ObjectDefinitionResourcePermissionUtil.updateResourcePermissions(
 			objectDefinition.getCompanyId(),
 			GroupConstants.DEFAULT_PARENT_GROUP_ID,
 			objectDefinition.getObjectDefinitionId(),
@@ -2770,7 +2730,7 @@ public class ObjectDefinitionLocalServiceImpl
 		_addOrUpdateWorkflowDefinitionLinks(
 			objectDefinition, workflowDefinitionLinks);
 
-		ObjectPermissionUtil.updateResourcePermissions(
+		ObjectDefinitionResourcePermissionUtil.updateResourcePermissions(
 			objectDefinition.getCompanyId(),
 			GroupConstants.DEFAULT_PARENT_GROUP_ID,
 			objectDefinition.getObjectDefinitionId(),
@@ -3368,10 +3328,6 @@ public class ObjectDefinitionLocalServiceImpl
 			long objectDefinitionId, long companyId, boolean modifiable,
 			String name, boolean system)
 		throws PortalException {
-
-		if (EmptyModelManagerUtil.isEmptyModel()) {
-			return;
-		}
 
 		if (modifiable && system &&
 			!ObjectDefinitionUtil.isAllowedModifiableSystemObjectDefinitionName(

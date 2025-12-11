@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -101,7 +100,7 @@ public class ObjectDefinitionUtil {
 			serviceBuilderObjectDefinition,
 		SystemObjectDefinitionManagerRegistry
 			systemObjectDefinitionManagerRegistry,
-		long userId, UserLocalService userLocalService,
+		User user, UserLocalService userLocalService,
 		WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService) {
 
 		if (serviceBuilderObjectDefinition == null) {
@@ -329,17 +328,15 @@ public class ObjectDefinitionUtil {
 								com.liferay.object.model.ObjectDefinition.class.
 									getName();
 
-							User user = userLocalService.getUser(userId);
-
 							permissionService.checkPermission(
-								GroupConstants.DEFAULT_PARENT_GROUP_ID,
-								permissionName,
+								user.getGroupId(), permissionName,
 								serviceBuilderObjectDefinition.
 									getObjectDefinitionId());
 
 							Collection<Permission> permissions =
 								PermissionUtil.getPermissions(
-									user.getCompanyId(),
+									serviceBuilderObjectDefinition.
+										getCompanyId(),
 									resourceActionLocalService.
 										getResourceActions(permissionName),
 									serviceBuilderObjectDefinition.

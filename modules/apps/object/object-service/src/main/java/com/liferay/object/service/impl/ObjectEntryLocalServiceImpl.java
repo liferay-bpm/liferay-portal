@@ -50,6 +50,7 @@ import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectFieldValidationConstants;
 import com.liferay.object.constants.ObjectFilterConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.definition.security.permission.resource.util.ObjectDefinitionResourcePermissionUtil;
 import com.liferay.object.definition.setting.util.ObjectDefinitionSettingUtil;
 import com.liferay.object.definition.util.ObjectDefinitionThreadLocal;
 import com.liferay.object.definition.util.ObjectDefinitionUtil;
@@ -84,7 +85,6 @@ import com.liferay.object.internal.filter.parser.DateRangeObjectFilterParser;
 import com.liferay.object.internal.filter.parser.EqualityOperatorsObjectFilterParser;
 import com.liferay.object.internal.filter.parser.InclusionOperatorsObjectFilterParser;
 import com.liferay.object.internal.filter.parser.ObjectFilterParser;
-import com.liferay.object.internal.security.permission.util.ObjectPermissionUtil;
 import com.liferay.object.internal.sort.SortDSLQueryVisitor;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectDefinitionSetting;
@@ -518,7 +518,7 @@ public class ObjectEntryLocalServiceImpl
 			_startWorkflowInstance(userId, objectEntry, serviceContext, false);
 		}
 
-		ObjectPermissionUtil.updateResourcePermissions(
+		ObjectDefinitionResourcePermissionUtil.updateResourcePermissions(
 			objectDefinition.getCompanyId(), objectEntry.getGroupId(),
 			objectEntry.getObjectEntryId(), objectDefinition.getClassName(),
 			serviceContext);
@@ -6656,7 +6656,7 @@ public class ObjectEntryLocalServiceImpl
 
 		_startWorkflowInstance(userId, objectEntry, serviceContext, true);
 
-		ObjectPermissionUtil.updateResourcePermissions(
+		ObjectDefinitionResourcePermissionUtil.updateResourcePermissions(
 			objectDefinition.getCompanyId(), objectEntry.getGroupId(),
 			objectEntry.getObjectEntryId(), objectDefinition.getClassName(),
 			serviceContext);

@@ -336,42 +336,43 @@ public class ObjectRelationshipResourceImpl
 			ObjectRelationship objectRelationship)
 		throws Exception {
 
-		String externalReferenceCode2 =
-			objectRelationship.getObjectDefinitionExternalReferenceCode2();
-
-		boolean modifiable = GetterUtil.get(
-			objectRelationship.getObjectDefinitionModifiable2(), true);
-
-		boolean system = GetterUtil.get(
-			objectRelationship.getObjectDefinitionSystem2(), false);
-
 		ObjectFolder defaultObjectFolder =
 			_objectFolderLocalService.getOrAddDefaultObjectFolder(
 				contextCompany.getCompanyId());
+		String externalReferenceCode2 =
+			objectRelationship.getObjectDefinitionExternalReferenceCode2();
 
 		if (EmptyModelManagerUtil.isEmptyModel()) {
 			return _objectDefinitionLocalService.getOrAddEmptyObjectDefinition(
 				externalReferenceCode2, contextCompany.getCompanyId(),
 				contextUser.getUserId(),
-				defaultObjectFolder.getObjectFolderId(), modifiable, system);
+				defaultObjectFolder.getObjectFolderId(),
+				GetterUtil.get(
+					objectRelationship.getObjectDefinitionModifiable2(), true),
+				GetterUtil.get(
+					objectRelationship.getObjectDefinitionSystem2(), false));
 		}
 
-		com.liferay.object.model.ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.
-				fetchObjectDefinitionByExternalReferenceCode(
-					externalReferenceCode2, contextCompany.getCompanyId());
+		com.liferay.object.model.ObjectDefinition
+			serviceBuilderObjectDefinition2 =
+				_objectDefinitionLocalService.
+					fetchObjectDefinitionByExternalReferenceCode(
+						externalReferenceCode2, contextCompany.getCompanyId());
 
-		if (objectDefinition != null) {
-			return objectDefinition;
+		if (serviceBuilderObjectDefinition2 != null) {
+			return serviceBuilderObjectDefinition2;
 		}
 
 		return _objectDefinitionLocalService.addObjectDefinition(
 			externalReferenceCode2, contextUser.getUserId(),
-			defaultObjectFolder.getObjectFolderId(), modifiable,
+			defaultObjectFolder.getObjectFolderId(),
+			GetterUtil.get(
+				objectRelationship.getObjectDefinitionModifiable2(), true),
 			GetterUtil.get(
 				objectRelationship.getObjectDefinitionScope2(),
 				ObjectDefinitionConstants.SCOPE_COMPANY),
-			system);
+			GetterUtil.get(
+				objectRelationship.getObjectDefinitionSystem2(), false));
 	}
 
 	private ObjectRelationship _toObjectRelationship(

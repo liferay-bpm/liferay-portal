@@ -1190,7 +1190,7 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		com.liferay.object.model.ObjectDefinition
-			serviceBuilderObjectDefinition1;
+			serviceBuilderObjectDefinition1 = null;
 
 		if (EmptyModelManagerUtil.isEmptyModel()) {
 			serviceBuilderObjectDefinition1 =
