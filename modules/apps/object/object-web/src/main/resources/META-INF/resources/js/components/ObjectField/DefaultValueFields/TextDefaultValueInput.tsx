@@ -4,7 +4,8 @@
  */
 
 import {TextEntryBaseField} from '@liferay/object-js-components-web';
-import React, {useState} from 'react';
+import {debounce} from 'frontend-js-web';
+import React, {useMemo, useState} from 'react';
 
 import {getUpdatedDefaultValueFieldSettings} from '../../../utils/defaultValues';
 import {InputAsValueFieldComponentProps} from '../Tabs/Advanced/DefaultValueContainer';
@@ -26,25 +27,32 @@ const TextDefaultValueInput: React.FC<
 
 	const isLongText = values.businessType === 'LongText';
 
+	const debouncedSave = useMemo(
+		() =>
+			debounce((nextValue: string) => {
+				const newSettings = getUpdatedDefaultValueFieldSettings(
+					values,
+					nextValue,
+					'inputAsValue'
+				);
+
+				setValues({objectFieldSettings: newSettings});
+
+				if (onSubmit) {
+					onSubmit({
+						...values,
+						objectFieldSettings: newSettings,
+					});
+				}
+			}, 300),
+		[onSubmit, setValues, values]
+	);
+
 	const handleChangeInput = (event: any) => {
-		const newObjectFieldSettings = getUpdatedDefaultValueFieldSettings(
-			values,
-			event.target.value,
-			'inputAsValue'
-		);
+		const newValue = event.target.value;
 
-		setValues({
-			objectFieldSettings: newObjectFieldSettings,
-		});
-
-		if (onSubmit) {
-			onSubmit({
-				...values,
-				objectFieldSettings: newObjectFieldSettings,
-			});
-		}
-
-		setValue(event.target.value);
+		setValue(newValue);
+		debouncedSave(newValue);
 	};
 
 	return (

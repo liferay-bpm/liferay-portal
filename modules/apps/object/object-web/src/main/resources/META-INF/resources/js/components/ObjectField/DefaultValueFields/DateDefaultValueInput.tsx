@@ -4,7 +4,8 @@
  */
 
 import {DateEntryBaseField} from '@liferay/object-js-components-web';
-import React, {useState} from 'react';
+import {debounce} from 'frontend-js-web';
+import React, {useMemo, useState} from 'react';
 
 import {getUpdatedDefaultValueFieldSettings} from '../../../utils/defaultValues';
 import {InputAsValueFieldComponentProps} from '../Tabs/Advanced/DefaultValueContainer';
@@ -26,25 +27,30 @@ const DateDefaultValueInput: React.FC<
 
 	const fieldType = values.businessType === 'DateTime' ? 'date_time' : 'date';
 
+	const debouncedSave = useMemo(
+		() =>
+			debounce((nextValue: string) => {
+				const newSettings = getUpdatedDefaultValueFieldSettings(
+					values,
+					nextValue,
+					'inputAsValue'
+				);
+
+				setValues({objectFieldSettings: newSettings});
+
+				if (onSubmit) {
+					onSubmit({
+						...values,
+						objectFieldSettings: newSettings,
+					});
+				}
+			}, 300),
+		[onSubmit, setValues, values]
+	);
+
 	const handleChangeInput = (value: string) => {
-		const newObjectFieldSettings = getUpdatedDefaultValueFieldSettings(
-			values,
-			value,
-			'inputAsValue'
-		);
-
-		setValues({
-			objectFieldSettings: newObjectFieldSettings,
-		});
-
-		if (onSubmit) {
-			onSubmit({
-				...values,
-				objectFieldSettings: newObjectFieldSettings,
-			});
-		}
-
 		setValue(value);
+		debouncedSave(value);
 	};
 
 	return (
