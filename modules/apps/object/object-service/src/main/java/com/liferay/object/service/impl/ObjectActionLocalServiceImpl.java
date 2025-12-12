@@ -15,7 +15,6 @@ import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
 import com.liferay.object.constants.ObjectActionConstants;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
-import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.definition.security.permission.resource.util.ObjectDefinitionResourcePermissionUtil;
 import com.liferay.object.definition.util.ObjectDefinitionThreadLocal;
@@ -896,20 +895,16 @@ public class ObjectActionLocalServiceImpl
 					"objectDefinitionExternalReferenceCode"));
 
 			if (Validator.isNotNull(objectDefinitionExternalReferenceCode)) {
-				objectDefinition = _objectDefinitionPersistence.fetchByERC_C(
-					objectDefinitionExternalReferenceCode, companyId);
+				ObjectFolder defaultObjectFolder =
+					_objectFolderLocalService.getOrAddDefaultObjectFolder(
+						companyId);
 
-				if (objectDefinition == null) {
-					ObjectFolder defaultObjectFolder =
-						_objectFolderLocalService.getOrAddDefaultObjectFolder(
-							companyId);
-
-					objectDefinition =
-						ObjectDefinitionLocalServiceUtil.addObjectDefinition(
-							objectDefinitionExternalReferenceCode, userId,
-							defaultObjectFolder.getObjectFolderId(), true,
-							ObjectDefinitionConstants.SCOPE_COMPANY, false);
-				}
+				objectDefinition =
+					ObjectDefinitionLocalServiceUtil.
+						getOrAddEmptyObjectDefinition(
+							objectDefinitionExternalReferenceCode, companyId,
+							userId, defaultObjectFolder.getObjectFolderId(),
+							true, false);
 
 				parametersUnicodeProperties.put(
 					"objectDefinitionId",

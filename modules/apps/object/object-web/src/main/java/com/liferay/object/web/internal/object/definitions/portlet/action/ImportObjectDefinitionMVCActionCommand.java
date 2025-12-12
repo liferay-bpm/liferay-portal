@@ -12,6 +12,7 @@ import com.liferay.object.exception.ObjectDefinitionNameException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectDefinitionStatusException;
 import com.liferay.object.exception.ObjectViewColumnFieldNameException;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -19,6 +20,7 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.lazy.referencing.LazyReferencingThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
@@ -176,7 +178,10 @@ public class ImportObjectDefinitionMVCActionCommand
 				() -> ParamUtil.getString(
 					uploadPortletRequest, "objectFolderExternalReferenceCode"));
 
-			try {
+			try (SafeCloseable safeCloseable =
+					LazyReferencingThreadLocal.setEnabledWithSafeCloseable(
+						true)) {
+
 				ObjectDefinition putObjectDefinition =
 					objectDefinitionResource.
 						putObjectDefinitionByExternalReferenceCode(

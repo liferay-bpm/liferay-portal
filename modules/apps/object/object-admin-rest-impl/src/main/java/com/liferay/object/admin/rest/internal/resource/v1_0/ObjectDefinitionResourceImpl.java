@@ -33,7 +33,6 @@ import com.liferay.object.admin.rest.resource.v1_0.ObjectViewResource;
 import com.liferay.object.constants.ObjectActionConstants;
 import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectConstants;
-import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectPortletKeys;
 import com.liferay.object.constants.ObjectRelationshipConstants;
@@ -1190,19 +1189,12 @@ public class ObjectDefinitionResourceImpl
 
 		com.liferay.object.model.ObjectDefinition
 			serviceBuilderObjectDefinition1 =
-				_objectDefinitionLocalService.
-					fetchObjectDefinitionByExternalReferenceCode(
-						objectDefinitionExternalReferenceCode1,
-						serviceBuilderObjectDefinition2.getCompanyId());
-
-		if (serviceBuilderObjectDefinition1 == null) {
-			serviceBuilderObjectDefinition1 =
-				_objectDefinitionLocalService.addObjectDefinition(
+				_objectDefinitionLocalService.getOrAddEmptyObjectDefinition(
 					objectDefinitionExternalReferenceCode1,
+					serviceBuilderObjectDefinition2.getCompanyId(),
 					contextUser.getUserId(),
 					serviceBuilderObjectDefinition2.getObjectFolderId(), true,
-					ObjectDefinitionConstants.SCOPE_COMPANY, false);
-		}
+					false);
 
 		com.liferay.object.model.ObjectRelationship objectRelationship =
 			_objectRelationshipLocalService.
