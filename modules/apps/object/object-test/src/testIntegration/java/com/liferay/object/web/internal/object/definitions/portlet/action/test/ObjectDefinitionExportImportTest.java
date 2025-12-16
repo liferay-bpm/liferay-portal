@@ -260,6 +260,29 @@ public class ObjectDefinitionExportImportTest extends BaseExportImportTestCase {
 		Assert.assertEquals(
 			WorkflowConstants.STATUS_APPROVED, (int)status.getCode());
 
+		ObjectDefinition testRelatedObjectDefinition =
+			objectDefinitionResource.getObjectDefinitionByExternalReferenceCode(
+				"TestRelatedObjectDefinition");
+
+		status = testRelatedObjectDefinition.getStatus();
+
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_EMPTY, (int)status.getCode());
+
+		testExportImport(
+			"test-related-object-definition.json",
+			"test-related-object-definition.json",
+			"TestRelatedObjectDefinition", "TestRelatedObjectDefinition");
+
+		testRelatedObjectDefinition =
+			objectDefinitionResource.getObjectDefinition(
+				testRelatedObjectDefinition.getId());
+
+		status = testRelatedObjectDefinition.getStatus();
+
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_APPROVED, (int)status.getCode());
+
 		// Published object definition
 
 		externalReferenceCode = RandomTestUtil.randomString();

@@ -420,6 +420,25 @@
 		}
 	],
 	"objectRelationships": [
+		{
+			"deletionType": "prevent",
+			"externalReferenceCode": "RelationshipERC",
+			"label": {
+				"en_US": "Relationship"
+			},
+			"name": "relationship",
+			"objectDefinitionExternalReferenceCode1": "TestObjectDefinition",
+			"objectDefinitionExternalReferenceCode2": "TestRelatedObjectDefinition",
+			"objectDefinitionModifiable2": true,
+			"objectDefinitionName2": "TestRelatedObjectDefinition",
+			"objectDefinitionScope2": "company",
+			"objectDefinitionSystem2": false,
+			"parameterObjectFieldId": 0,
+			"parameterObjectFieldName": "",
+			"reverse": false,
+			"system": false,
+			"type": "oneToMany"
+		}
 	],
 	"objectValidationRules": [
 		{

@@ -1,0 +1,288 @@
+{
+	"accountEntryRestricted": false,
+	"accountEntryRestrictedObjectFieldName": "",
+	"actions": {
+	},
+	"active": true,
+	"defaultLanguageId": "en_US",
+	"enableCategorization": true,
+	"enableComments": false,
+	"enableLocalization": true,
+	"enableObjectEntryDraft": false,
+	"enableObjectEntryHistory": false,
+	"label": {
+		"en_US": "Test Related Object Definition"
+	},
+	"modifiable": true,
+	"name": "TestRelatedObjectDefinition",
+	"objectActions": [
+	],
+	"objectFields": [
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"indexed": false,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "",
+			"label": {
+				"en_US": "Author"
+			},
+			"localized": false,
+			"name": "creator",
+			"objectFieldSettings": [
+			],
+			"readOnly": "true",
+			"readOnlyConditionExpression": "",
+			"required": false,
+			"state": false,
+			"system": true,
+			"type": "String",
+			"unique": false
+		},
+		{
+			"DBType": "Date",
+			"businessType": "Date",
+			"indexed": false,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "",
+			"label": {
+				"en_US": "Create Date"
+			},
+			"localized": false,
+			"name": "createDate",
+			"objectFieldSettings": [
+			],
+			"readOnly": "true",
+			"readOnlyConditionExpression": "",
+			"required": false,
+			"state": false,
+			"system": true,
+			"type": "Date",
+			"unique": false
+		},
+		{
+			"DBType": "DateTime",
+			"businessType": "DateTime",
+			"indexed": false,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "",
+			"label": {
+				"en_US": "Display Date"
+			},
+			"localized": false,
+			"name": "displayDate",
+			"objectFieldSettings": [
+				{
+					"name": "timeStorage",
+					"value": "convertToUTC"
+				}
+			],
+			"readOnly": "false",
+			"readOnlyConditionExpression": "",
+			"required": false,
+			"state": false,
+			"system": true,
+			"type": "DateTime",
+			"unique": false
+		},
+		{
+			"DBType": "DateTime",
+			"businessType": "DateTime",
+			"indexed": false,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "",
+			"label": {
+				"en_US": "Expiration Date"
+			},
+			"localized": false,
+			"name": "expirationDate",
+			"objectFieldSettings": [
+				{
+					"name": "timeStorage",
+					"value": "convertToUTC"
+				}
+			],
+			"readOnly": "false",
+			"readOnlyConditionExpression": "",
+			"required": false,
+			"state": false,
+			"system": true,
+			"type": "DateTime",
+			"unique": false
+		},
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"indexed": false,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "",
+			"label": {
+				"en_US": "External Reference Code"
+			},
+			"localized": false,
+			"name": "externalReferenceCode",
+			"objectFieldSettings": [
+			],
+			"readOnly": "false",
+			"readOnlyConditionExpression": "",
+			"required": false,
+			"state": false,
+			"system": true,
+			"type": "String",
+			"unique": false
+		},
+		{
+			"DBType": "Long",
+			"businessType": "LongInteger",
+			"indexed": true,
+			"indexedAsKeyword": true,
+			"indexedLanguageId": "",
+			"label": {
+				"en_US": "ID"
+			},
+			"localized": false,
+			"name": "id",
+			"objectFieldSettings": [
+			],
+			"readOnly": "true",
+			"readOnlyConditionExpression": "",
+			"required": false,
+			"state": false,
+			"system": true,
+			"type": "Long",
+			"unique": false
+		},
+		{
+			"DBType": "Date",
+			"businessType": "Date",
+			"indexed": false,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "",
+			"label": {
+				"en_US": "Modified Date"
+			},
+			"localized": false,
+			"name": "modifiedDate",
+			"objectFieldSettings": [
+			],
+			"readOnly": "true",
+			"readOnlyConditionExpression": "",
+			"required": false,
+			"state": false,
+			"system": true,
+			"type": "Date",
+			"unique": false
+		},
+		{
+			"DBType": "DateTime",
+			"businessType": "DateTime",
+			"indexed": false,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "",
+			"label": {
+				"en_US": "Review Date"
+			},
+			"localized": false,
+			"name": "reviewDate",
+			"objectFieldSettings": [
+				{
+					"name": "timeStorage",
+					"value": "convertToUTC"
+				}
+			],
+			"readOnly": "false",
+			"readOnlyConditionExpression": "",
+			"required": false,
+			"state": false,
+			"system": true,
+			"type": "DateTime",
+			"unique": false
+		},
+		{
+			"DBType": "Integer",
+			"businessType": "Text",
+			"indexed": false,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "",
+			"label": {
+				"en_US": "Status"
+			},
+			"localized": false,
+			"name": "status",
+			"objectFieldSettings": [
+			],
+			"readOnly": "true",
+			"readOnlyConditionExpression": "",
+			"required": false,
+			"state": false,
+			"system": true,
+			"type": "Integer",
+			"unique": false
+		},
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"externalReferenceCode": "TESTFIELD",
+			"indexed": true,
+			"indexedAsKeyword": false,
+			"indexedLanguageId": "en_US",
+			"label": {
+				"en_US": "Test Field"
+			},
+			"localized": false,
+			"name": "testField",
+			"objectFieldSettings": [
+			],
+			"readOnly": "false",
+			"readOnlyConditionExpression": "",
+			"required": false,
+			"state": false,
+			"system": false,
+			"type": "String",
+			"unique": false
+		},
+		{
+			"DBType": "Long",
+			"businessType": "Relationship",
+			"indexed": true,
+			"indexedAsKeyword": false,
+			"label": {
+				"en_US": "Relationship"
+			},
+			"localized": false,
+			"name": "r_relationship_c_testObjectDefinitionId",
+			"objectDefinitionExternalReferenceCode1": "TestObjectDefinition",
+			"objectRelationshipExternalReferenceCode": "RelationshipERC",
+			"readOnly": "false",
+			"readOnlyConditionExpression": "",
+			"required": false,
+			"state": false,
+			"system": false,
+			"type": "Long",
+			"unique": false
+		}
+	],
+	"objectFolderExternalReferenceCode": "default",
+	"objectLayouts": [
+	],
+	"objectRelationships": [
+	],
+	"objectValidationRules": [
+	],
+	"objectViews": [
+	],
+	"panelCategoryKey": "",
+	"parameterRequired": false,
+	"pluralLabel": {
+		"en_US": "Test Related Object Definitions"
+	},
+	"portlet": false,
+	"scope": "company",
+	"status": {
+		"code": 0,
+		"label": "approved",
+		"label_i18n": "Approved"
+	},
+	"system": false,
+	"titleObjectFieldName": "testField"
+}
