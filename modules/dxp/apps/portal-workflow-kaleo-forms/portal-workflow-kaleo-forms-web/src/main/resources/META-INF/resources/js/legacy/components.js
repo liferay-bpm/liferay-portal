@@ -446,22 +446,6 @@ AUI.add(
 					return definition;
 				},
 
-				initializer() {
-					const instance = this;
-
-					const dialog = instance.get('dialog');
-
-					dialog.bodyNode.prepend(
-						Lang.sub(TPL_MESSAGE, {
-							message: Liferay.Language.get(
-								'press-enter-to-choose-this-field-set-or-use-arrow-keys-to-navigate-through-the-available-field-sets.-press-escape-at-anytime-to-close-this-dialog'
-							),
-						})
-					);
-
-					dialog.on('keyup', instance._onDialogKeyUp, instance);
-				},
-
 				preview() {
 					const instance = this;
 
