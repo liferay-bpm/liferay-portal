@@ -98,29 +98,7 @@ public class ObjectEntryVersionLocalServiceTest {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		_objectDefinition =
-			_objectDefinitionLocalService.addCustomObjectDefinition(
-				null, TestPropsValues.getUserId(), 0, null, false, true, false,
-				true, true, false, false, true, null,
-				RandomTestUtil.randomLocaleStringMap(),
-				"A" + StringUtil.randomString(), null, null,
-				RandomTestUtil.randomLocaleStringMap(), true,
-				ObjectDefinitionConstants.SCOPE_COMPANY,
-				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
-				Collections.emptyList(),
-				Collections.singletonList(
-					new TextObjectFieldBuilder(
-					).labelMap(
-						RandomTestUtil.randomLocaleStringMap()
-					).name(
-						"textObjectFieldName"
-					).build()),
-				Collections.emptyList(), new ServiceContext());
-
-		_objectDefinition =
-			_objectDefinitionLocalService.publishCustomObjectDefinition(
-				TestPropsValues.getUserId(),
-				_objectDefinition.getObjectDefinitionId());
+		_objectDefinition = _addObjectDefinition();
 	}
 
 	@Test
@@ -382,15 +360,18 @@ public class ObjectEntryVersionLocalServiceTest {
 	public void testAddObjectEntryVersionWithWorkflowEnabled()
 		throws Exception {
 
+		ObjectDefinition objectDefinitionTest = _addObjectDefinition();
+
 		// Add pending object entry
 
 		WorkflowDefinitionLink workflowDefinitionLink =
 			_workflowDefinitionLinkLocalService.updateWorkflowDefinitionLink(
 				TestPropsValues.getUserId(), TestPropsValues.getCompanyId(), 0,
-				_objectDefinition.getClassName(), 0, 0, "Single Approver", 1);
+				objectDefinitionTest.getClassName(), 0, 0, "Single Approver",
+				1);
 
 		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
-			0, _objectDefinition.getObjectDefinitionId(),
+			0, objectDefinitionTest.getObjectDefinitionId(),
 			HashMapBuilder.<String, Serializable>put(
 				"textObjectFieldName", "textObjectFieldValue1"
 			).build());
@@ -506,11 +487,11 @@ public class ObjectEntryVersionLocalServiceTest {
 			_objectEntryVersionLocalService.getObjectEntryVersions(
 				objectEntry.getObjectEntryId()));
 
-		_objectDefinition.setEnableObjectEntryDraft(true);
+		objectDefinitionTest.setEnableObjectEntryDraft(true);
 
-		_objectDefinition =
+		objectDefinitionTest =
 			_objectDefinitionLocalService.updateObjectDefinition(
-				_objectDefinition);
+				objectDefinitionTest);
 
 		// Update pending object entry as draft
 
@@ -542,11 +523,11 @@ public class ObjectEntryVersionLocalServiceTest {
 			_objectEntryVersionLocalService.getObjectEntryVersions(
 				objectEntry.getObjectEntryId()));
 
-		_objectDefinition.setEnableObjectEntryDraft(false);
+		objectDefinitionTest.setEnableObjectEntryDraft(false);
 
-		_objectDefinition =
+		objectDefinitionTest =
 			_objectDefinitionLocalService.updateObjectDefinition(
-				_objectDefinition);
+				objectDefinitionTest);
 
 		_workflowDefinitionLinkLocalService.deleteWorkflowDefinitionLink(
 			workflowDefinitionLink);
@@ -878,6 +859,31 @@ public class ObjectEntryVersionLocalServiceTest {
 		Assert.assertTrue(
 			_objectEntryVersionLocalService.isLatestObjectEntryVersion(
 				objectEntry.getObjectEntryId(), 2));
+	}
+
+	private static ObjectDefinition _addObjectDefinition() throws Exception {
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.addCustomObjectDefinition(
+				null, TestPropsValues.getUserId(), 0, null, false, true, false,
+				true, true, false, false, true, null,
+				RandomTestUtil.randomLocaleStringMap(),
+				"A" + StringUtil.randomString(), null, null,
+				RandomTestUtil.randomLocaleStringMap(), true,
+				ObjectDefinitionConstants.SCOPE_COMPANY,
+				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Collections.emptyList(),
+				Collections.singletonList(
+					new TextObjectFieldBuilder(
+					).labelMap(
+						RandomTestUtil.randomLocaleStringMap()
+					).name(
+						"textObjectFieldName"
+					).build()),
+				Collections.emptyList(), new ServiceContext());
+
+		return _objectDefinitionLocalService.publishCustomObjectDefinition(
+			TestPropsValues.getUserId(),
+			objectDefinition.getObjectDefinitionId());
 	}
 
 	private void _assertEquals(
