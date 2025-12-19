@@ -425,6 +425,15 @@ public class ObjectEntryVersionLocalServiceTest {
 			java.util.concurrent.TimeUnit.SECONDS,
 			() -> {
 				List<WorkflowTask> workflowTasks =
+					_workflowTaskManager.getWorkflowTasks(
+						TestPropsValues.getCompanyId(),
+						false, QueryUtil.ALL_POS,
+						QueryUtil.ALL_POS, null);
+
+				Assert.assertFalse(
+					"No workflow tasks found, even in general", workflowTasks.isEmpty());
+
+				workflowTasks =
 					_workflowTaskManager.getWorkflowTasksByUserRoles(
 						TestPropsValues.getCompanyId(),
 						TestPropsValues.getUserId(), false, QueryUtil.ALL_POS,
