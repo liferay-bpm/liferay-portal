@@ -137,18 +137,14 @@ export function updateFieldName(
 	isInvalidValue = false
 ) {
 	const {fieldName} = focusedField;
-	const normalizedFieldName = normalizeFieldName(value);
 
-	let newFieldName;
+	let newFieldName = value;
 
-	if (normalizedFieldName === '') {
+	if (newFieldName === '') {
 		newFieldName = fieldNameGenerator(
 			getDefaultFieldName(false, {name: focusedField.type}),
 			fieldName
 		);
-	}
-	else {
-		newFieldName = normalizedFieldName;
 	}
 
 	if (newFieldName) {
@@ -372,6 +368,7 @@ export function updateField(
 	propertyName,
 	propertyValue
 ) {
+	console.log('updateField rendered2');
 	if (propertyName === 'dataType') {
 		field = {
 			...field,
