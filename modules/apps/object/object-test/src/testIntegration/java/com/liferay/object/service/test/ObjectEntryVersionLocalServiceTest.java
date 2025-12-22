@@ -31,8 +31,10 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.ModelListener;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.scheduler.TimeUnit;
+import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkService;
@@ -433,6 +435,32 @@ public class ObjectEntryVersionLocalServiceTest {
 				Assert.assertFalse(
 					"No workflow tasks found, even in general", workflowTasks.isEmpty());
 
+				List<Role> roles = RoleLocalServiceUtil.getUserRoles(TestPropsValues.getUserId());
+
+				System.out.println("=== USER ROLES ===");
+
+				for (Role role : roles) {
+					System.out.println(
+						"Role: " + role.getName() +
+						" | type=" + role.getType() +
+						" | roleId=" + role.getRoleId());
+				}
+
+				System.out.println("=== General Tasks ===");
+
+				for (WorkflowTask task : workflowTasks) {
+					System.out.println(
+						"TaskId=" + task.getWorkflowTaskId() +
+						" | name=" + task.getName() +
+						" | assigneeUserId=" + task.getAssigneeUserId() +
+						" | taskId=" + task.getWorkflowTaskId() +
+						" | userName=" + task.getUserName() +
+						" | workflowTaskAssignees=" + task.getWorkflowTaskAssignees().toString() +
+						" | workflowInstanceId=" + task.getWorkflowInstanceId());
+				}
+
+				System.out.println("=== Tasks by User Roles===");
+
 				workflowTasks =
 					_workflowTaskManager.getWorkflowTasksByUserRoles(
 						TestPropsValues.getCompanyId(),
@@ -440,7 +468,18 @@ public class ObjectEntryVersionLocalServiceTest {
 						QueryUtil.ALL_POS, null);
 
 				Assert.assertFalse(
-					"No workflow tasks found", workflowTasks.isEmpty());
+					"No workflow tasks found for the expected role", workflowTasks.isEmpty());
+
+				for (WorkflowTask task : workflowTasks) {
+					System.out.println(
+						"TaskId=" + task.getWorkflowTaskId() +
+						" | name=" + task.getName() +
+						" | assigneeUserId=" + task.getAssigneeUserId() +
+						" | taskId=" + task.getWorkflowTaskId() +
+						" | userName=" + task.getUserName() +
+						" | workflowTaskAssignees=" + task.getWorkflowTaskAssignees().toString() +
+						" | workflowInstanceId=" + task.getWorkflowInstanceId());
+				}
 
 				return workflowTasks.get(0);
 			});
