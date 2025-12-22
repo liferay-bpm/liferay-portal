@@ -1574,6 +1574,9 @@ public class LayoutStructureRenderer {
 				FragmentEntryLinkLocalServiceUtil.fetchFragmentEntryLink(
 					fragmentStyledLayoutStructureItem.getFragmentEntryLinkId());
 
+			fragmentEntryLink.setEditableValues(
+				fragmentEntryLink.getEditableValues());
+
 			if (fragmentEntryLink != null) {
 				DefaultFragmentRendererContext defaultFragmentRendererContext =
 					_renderLayoutStructureDisplayContext.
