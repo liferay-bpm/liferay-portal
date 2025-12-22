@@ -85,6 +85,8 @@ import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
+import static java.lang.System.out;
+
 /**
  * @author Feliphe Marinho
  */
@@ -419,9 +421,7 @@ public class ObjectEntryVersionLocalServiceTest {
 				objectEntry.getObjectEntryId()));
 
 		// Complete pending object entry's workflow instance
-
-		TransactionCommitCallbackUtil.registerCallback(() -> null);
-
+		
 		WorkflowTask workflowTask = IdempotentRetryAssert.retryAssert(
 			120, java.util.concurrent.TimeUnit.SECONDS, 10,
 			java.util.concurrent.TimeUnit.SECONDS,
@@ -437,19 +437,19 @@ public class ObjectEntryVersionLocalServiceTest {
 
 				List<Role> roles = RoleLocalServiceUtil.getUserRoles(TestPropsValues.getUserId());
 
-				System.out.println("=== USER ROLES ===");
+				out.println("=== USER ROLES ===");
 
 				for (Role role : roles) {
-					System.out.println(
+					out.println(
 						"Role: " + role.getName() +
 						" | type=" + role.getType() +
 						" | roleId=" + role.getRoleId());
 				}
 
-				System.out.println("=== General Tasks ===");
+				out.println("=== General Tasks ===");
 
 				for (WorkflowTask task : workflowTasks) {
-					System.out.println(
+					out.println(
 						"TaskId=" + task.getWorkflowTaskId() +
 						" | name=" + task.getName() +
 						" | assigneeUserId=" + task.getAssigneeUserId() +
@@ -459,7 +459,7 @@ public class ObjectEntryVersionLocalServiceTest {
 						" | workflowInstanceId=" + task.getWorkflowInstanceId());
 				}
 
-				System.out.println("=== Tasks by User Roles===");
+				out.println("=== Tasks by User Roles===");
 
 				workflowTasks =
 					_workflowTaskManager.getWorkflowTasksByUserRoles(
@@ -471,7 +471,7 @@ public class ObjectEntryVersionLocalServiceTest {
 					"No workflow tasks found for the expected role", workflowTasks.isEmpty());
 
 				for (WorkflowTask task : workflowTasks) {
-					System.out.println(
+					out.println(
 						"TaskId=" + task.getWorkflowTaskId() +
 						" | name=" + task.getName() +
 						" | assigneeUserId=" + task.getAssigneeUserId() +
