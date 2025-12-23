@@ -233,6 +233,8 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import java.nio.charset.StandardCharsets;
+
 import java.sql.Timestamp;
 
 import java.text.DateFormat;
@@ -255,6 +257,17 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 
 import org.hibernate.SessionFactory;
 
@@ -9466,66 +9479,40 @@ public class ObjectEntryResourceTest {
 				ObjectDefinitionConstants.SCOPE_COMPANY, adminUser.getUserId());
 
 		try {
-			HTTPTestUtil.customize(
-			).withBaseURL(
-				"http://www.able.com:8080"
-			).withCredentials(
-				"test@able.com", PropsValues.DEFAULT_ADMIN_PASSWORD
-			).apply(
-				() -> {
-					JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
-						JSONUtil.put(
-							_OBJECT_FIELD_NAME_ATTACHMENT_DOCS_AND_MEDIA_SOURCE,
-							JSONFactoryUtil.createJSONObject(
-								fileEntry.toString())
-						).toString(),
-						objectDefinition.getRESTContextPath(),
-						Http.Method.POST);
+			String baseURL = "http://localhost:8080";
+			String hostHeader = "www.able.com";
+			String login = "test@able.com";
+			String password = PropsValues.DEFAULT_ADMIN_PASSWORD;
 
-					Assert.assertEquals(
-						"NOT_FOUND", jsonObject.getString("status"));
-				}
-			);
+			JSONObject jsonObject1 = _postToJSONObject(
+				baseURL, objectDefinition.getRESTContextPath(), hostHeader,
+				login, password,
+				JSONUtil.put(
+					_OBJECT_FIELD_NAME_ATTACHMENT_DOCS_AND_MEDIA_SOURCE,
+					JSONFactoryUtil.createJSONObject(fileEntry.toString())
+				).toString());
 
-			HTTPTestUtil.customize(
-			).withBaseURL(
-				"http://www.able.com:8080"
-			).withCredentials(
-				"test@able.com", PropsValues.DEFAULT_ADMIN_PASSWORD
-			).apply(
-				() -> {
-					JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
-						JSONUtil.put(
-							_OBJECT_FIELD_NAME_ATTACHMENT_DOCS_AND_MEDIA_SOURCE,
-							JSONUtil.put("id", RandomTestUtil.randomLong())
-						).toString(),
-						objectDefinition.getRESTContextPath(),
-						Http.Method.POST);
+			Assert.assertEquals("NOT_FOUND", jsonObject1.getString("status"));
 
-					Assert.assertEquals(
-						"BAD_REQUEST", jsonObject.getString("status"));
-				}
-			);
+			JSONObject jsonObject2 = _postToJSONObject(
+				baseURL, objectDefinition.getRESTContextPath(), hostHeader,
+				login, password,
+				JSONUtil.put(
+					_OBJECT_FIELD_NAME_ATTACHMENT_DOCS_AND_MEDIA_SOURCE,
+					JSONUtil.put("id", RandomTestUtil.randomLong())
+				).toString());
 
-			HTTPTestUtil.customize(
-			).withBaseURL(
-				"http://www.able.com:8080"
-			).withCredentials(
-				"test@able.com", PropsValues.DEFAULT_ADMIN_PASSWORD
-			).apply(
-				() -> {
-					JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
-						JSONUtil.put(
-							_OBJECT_FIELD_NAME_ATTACHMENT_DOCS_AND_MEDIA_SOURCE,
-							JSONUtil.put("id", fileEntry.getId())
-						).toString(),
-						objectDefinition.getRESTContextPath(),
-						Http.Method.POST);
+			Assert.assertEquals("BAD_REQUEST", jsonObject2.getString("status"));
 
-					Assert.assertEquals(
-						"BAD_REQUEST", jsonObject.getString("status"));
-				}
-			);
+			JSONObject jsonObject3 = _postToJSONObject(
+				baseURL, objectDefinition.getRESTContextPath(), hostHeader,
+				login, password,
+				JSONUtil.put(
+					_OBJECT_FIELD_NAME_ATTACHMENT_DOCS_AND_MEDIA_SOURCE,
+					JSONUtil.put("id", fileEntry.getId())
+				).toString());
+
+			Assert.assertEquals("BAD_REQUEST", jsonObject3.getString("status"));
 		}
 		finally {
 			_objectDefinitionLocalService.deleteObjectDefinition(
@@ -10970,32 +10957,26 @@ public class ObjectEntryResourceTest {
 		ObjectRelationship objectRelationship2 = _addObjectRelationship(
 			portalInstanceJSONObject.getLong("companyId"));
 
-		HTTPTestUtil.customize(
-		).withBaseURL(
-			"http://www.able.com:8080"
-		).withCredentials(
-			"test@able.com", PropsValues.DEFAULT_ADMIN_PASSWORD
-		).apply(
-			() -> {
-				ObjectDefinition objectDefinition =
-					_objectDefinitionLocalService.getObjectDefinition(
-						objectRelationship2.getObjectDefinitionId2());
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				objectRelationship2.getObjectDefinitionId2());
 
-				ObjectField objectField =
-					_objectFieldLocalService.getObjectField(
-						objectRelationship2.getObjectFieldId2());
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			objectRelationship2.getObjectFieldId2());
 
-				Assert.assertEquals(
-					400,
-					HTTPTestUtil.invokeToHttpCode(
-						JSONUtil.put(
-							objectField.getName(),
-							objectEntry.getObjectEntryId()
-						).toString(),
-						objectDefinition.getRESTContextPath(),
-						Http.Method.POST));
-			}
-		);
+		JSONObject responseJSONObject = _postToJSONObject(
+			"http://localhost:8080", objectDefinition.getRESTContextPath(),
+			"www.able.com", "test@able.com", PropsValues.DEFAULT_ADMIN_PASSWORD,
+			JSONUtil.put(
+				objectField.getName(), objectEntry.getObjectEntryId()
+			).toString());
+
+		Assert.assertEquals(
+			"BAD_REQUEST", responseJSONObject.getString("status"));
+
+		if (responseJSONObject.has("code")) {
+			Assert.assertEquals(400, responseJSONObject.getInt("code"));
+		}
 	}
 
 	@Test
@@ -16681,6 +16662,119 @@ public class ObjectEntryResourceTest {
 			_randomTaxonomyCategory(groupId, taxonomyVocabularyId));
 	}
 
+	private JSONObject _postToJSONObject(
+			String baseURL, String path, String hostHeader, String login,
+			String password, String jsonBody)
+		throws Exception {
+
+		_validatePostArgs(baseURL, path, hostHeader, login, password, jsonBody);
+
+		if (baseURL.endsWith(StringPool.SLASH)) {
+			baseURL = baseURL.substring(0, baseURL.length() - 1);
+		}
+
+		if (!baseURL.endsWith("/o")) {
+			baseURL = baseURL + "/o";
+		}
+
+		RequestConfig requestConfig = RequestConfig.custom(
+		).setConnectTimeout(
+			120_000
+		).setConnectionRequestTimeout(
+			120_000
+		).setSocketTimeout(
+			120_000
+		).build();
+
+		try (CloseableHttpClient closeableHttpClient = HttpClientBuilder.create(
+			).disableRedirectHandling(
+			).setDefaultRequestConfig(
+				requestConfig
+			).build()) {
+
+			HttpPost httpPost = new HttpPost(baseURL + path);
+
+			httpPost.setHeader("Host", hostHeader);
+
+			httpPost.setHeader(
+				"Accept", ContentType.APPLICATION_JSON.getMimeType());
+			httpPost.setHeader(
+				"Content-Type", ContentType.APPLICATION_JSON.getMimeType());
+
+			String token = java.util.Base64.getEncoder(
+			).encodeToString(
+				StringBundler.concat(
+					login, ":", password
+				).getBytes(
+					StandardCharsets.UTF_8
+				)
+			);
+
+			httpPost.setHeader("Authorization", "Basic " + token);
+
+			httpPost.setEntity(
+				new StringEntity(jsonBody, ContentType.APPLICATION_JSON));
+
+			try (CloseableHttpResponse response = closeableHttpClient.execute(
+					httpPost)) {
+
+				int statusCode = response.getStatusLine(
+				).getStatusCode();
+
+				String location = StringPool.BLANK;
+
+				Header locationHeader = response.getFirstHeader("Location");
+
+				if (locationHeader != null) {
+					location = locationHeader.getValue();
+				}
+
+				HttpEntity httpEntity = response.getEntity();
+
+				String body = (httpEntity == null) ? StringPool.BLANK :
+					EntityUtils.toString(httpEntity);
+
+				if (statusCode == 302) {
+					throw new AssertionError(
+						StringBundler.concat(
+							"Unexpected redirect HTTP 302 to ", location,
+							". baseURL=", baseURL, ", path=", path,
+							", hostHeader=", hostHeader));
+				}
+
+				String trimmed = body.trim();
+
+				if (!StringUtil.startsWith(trimmed, "{")) {
+					String status;
+
+					if (statusCode == 400) {
+						status = "BAD_REQUEST";
+					}
+					else if (statusCode == 401) {
+						status = "UNAUTHORIZED";
+					}
+					else if (statusCode == 403) {
+						status = "FORBIDDEN";
+					}
+					else if (statusCode == 404) {
+						status = "NOT_FOUND";
+					}
+					else {
+						status = "ERROR";
+					}
+
+					return JSONUtil.put(
+						"code", statusCode
+					).put(
+						"status", status
+					);
+				}
+
+				return JSONFactoryUtil.createJSONObject(trimmed);
+			}
+		}
+	}
+
 	private ObjectDefinition _publishLocalizedObjectDefinition(
 			String objectFieldName)
 		throws Exception {
@@ -20646,6 +20740,29 @@ public class ObjectEntryResourceTest {
 		}
 
 		return objectEntryResource.postValidate(validationRequest);
+	}
+
+	private void _validatePostArgs(
+		String baseURL, String path, String hostHeader, String login,
+		String password, String jsonBody) {
+
+		if (Validator.isNull(hostHeader) || hostHeader.contains("{") ||
+			hostHeader.contains("}") || hostHeader.contains(StringPool.SLASH) ||
+			hostHeader.contains("http")) {
+
+			throw new IllegalArgumentException(
+				"Invalid hostHeader=" + hostHeader);
+		}
+
+		if (Validator.isNull(baseURL) || Validator.isNull(path) ||
+			Validator.isNull(login) || Validator.isNull(password) ||
+			Validator.isNull(jsonBody)) {
+
+			throw new IllegalArgumentException(
+				StringBundler.concat(
+					"Invalid args baseURL=", baseURL, ", path=", path,
+					", hostHeader=", hostHeader));
+		}
 	}
 
 	private JSONArray _withScopeKey(JSONArray jsonArray, String scopeKey) {
