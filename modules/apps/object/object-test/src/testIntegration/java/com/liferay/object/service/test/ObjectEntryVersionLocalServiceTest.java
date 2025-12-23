@@ -437,14 +437,21 @@ public class ObjectEntryVersionLocalServiceTest {
 
 				List<Role> roles = RoleLocalServiceUtil.getUserRoles(TestPropsValues.getUserId());
 
-				out.println("=== USER ROLES ===");
+				StringBuilder sb = new StringBuilder();
+
+				sb.append("=== USER ROLES ===\n");
 
 				for (Role role : roles) {
-					out.println(
-						"Role: " + role.getName() +
-						" | type=" + role.getType() +
-						" | roleId=" + role.getRoleId());
+					sb.append("Role: ")
+						.append(role.getName())
+						.append(" | type=")
+						.append(role.getType())
+						.append(" | roleId=")
+						.append(role.getRoleId())
+						.append("\n");
 				}
+
+				out.println(sb.toString());
 
 				out.println("=== General Tasks ===");
 
@@ -468,7 +475,7 @@ public class ObjectEntryVersionLocalServiceTest {
 						QueryUtil.ALL_POS, null);
 
 				Assert.assertFalse(
-					"No workflow tasks found for the expected role", workflowTasks.isEmpty());
+					"No workflow tasks found for the expected role. User Roles:" + sb.toString(), workflowTasks.isEmpty());
 
 				for (WorkflowTask task : workflowTasks) {
 					out.println(
