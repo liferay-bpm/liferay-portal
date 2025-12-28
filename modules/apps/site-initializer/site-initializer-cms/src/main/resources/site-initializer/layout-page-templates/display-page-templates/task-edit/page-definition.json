@@ -1,0 +1,96 @@
+{
+	"pageElement": {
+		"id": "5d572083-8c0b-7466-73ba-d23dfda2e79f",
+		"pageElements": [
+			{
+				"definition": {
+					"formConfig": {
+						"formReference": {
+							"className": "com.liferay.object.model.ObjectDefinition#C1N3",
+							"classType": 0
+						},
+						"formType": "simple",
+						"numberOfSteps": 0
+					},
+					"indexed": true,
+					"layout": {
+					}
+				},
+				"id": "3061a94d-7243-e166-fba7-5fe1ccce3e28",
+				"pageElements": [
+					{
+						"definition": {
+							"fragment": {
+								"key": "INPUTS-text-input"
+							},
+							"fragmentConfig": {
+								"inputFieldId": "ObjectField_title",
+								"inputReadOnly": false,
+								"placeholder": "",
+								"showCharactersCount": false
+							},
+							"fragmentFields": [
+							],
+							"indexed": true
+						},
+						"id": "a56ca91f-f849-7e2b-d55f-53a409b0aaee",
+						"type": "Fragment"
+					},
+					{
+						"definition": {
+							"fragment": {
+								"key": "INPUTS-text-input"
+							},
+							"fragmentConfig": {
+								"inputFieldId": "ObjectField_description",
+								"inputReadOnly": false,
+								"placeholder": "",
+								"showCharactersCount": false
+							},
+							"fragmentFields": [
+							],
+							"indexed": true
+						},
+						"id": "34f4b4c4-503a-cc0d-0c20-e052ea86a30f",
+						"type": "Fragment"
+					},
+					{
+						"definition": {
+							"fragment": {
+								"key": "INPUTS-submit-button"
+							},
+							"fragmentConfig": {
+								"buttonSize": "nm",
+								"buttonType": "primary",
+								"submittedEntryStatus": "approved",
+								"type": "submit"
+							},
+							"fragmentFields": [
+								{
+									"id": "submit-button-text",
+									"value": {
+										"fragmentLink": {
+										}
+									}
+								}
+							],
+							"indexed": true
+						},
+						"id": "1f397607-fbf0-2988-dc95-67114a54b8df",
+						"type": "Fragment"
+					}
+				],
+				"type": "Form"
+			}
+		],
+		"type": "Root"
+	},
+	"settings": {
+		"colorSchemeName": "01",
+		"masterPage": {
+			"key": "cms-master"
+		},
+		"themeName": "CMS"
+	},
+	"version": 1.1
+}
