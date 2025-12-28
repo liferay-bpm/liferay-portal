@@ -75,6 +75,22 @@
 					"en_US": "Admin"
 				},
 				"type": "node"
+			},
+			{
+				"externalReferenceCode": "CMSPRIMARYNAVIGATION11",
+				"menuItems": [
+					{
+						"displayIcon": "archive",
+						"externalReferenceCode": "CMSPRIMARYNAVIGATION12",
+						"friendlyURL": "/projects",
+						"privateLayout": false,
+						"type": "layout"
+					}
+				],
+				"name_i18n": {
+					"en_US": "Planning"
+				},
+				"type": "node"
 			}
 		],
 		"name": "CMS Primary Navigation"
