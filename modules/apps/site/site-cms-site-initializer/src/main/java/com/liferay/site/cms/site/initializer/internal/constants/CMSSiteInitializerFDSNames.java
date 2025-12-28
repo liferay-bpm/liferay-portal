@@ -43,6 +43,12 @@ public class CMSSiteInitializerFDSNames {
 	public static final String CATEGORY_USAGES =
 		CMSSiteInitializerConstants.BUNDLE_SYMBOLIC_NAME + "-categoryUsages";
 
+	public static final String CMP_PROJECT =
+		CMSSiteInitializerConstants.BUNDLE_SYMBOLIC_NAME + "-cmp-project";
+
+	public static final String CMP_TASK =
+		CMSSiteInitializerConstants.BUNDLE_SYMBOLIC_NAME + "-cmp-task";
+
 	public static final String CONTENTS_SECTION =
 		CMSSiteInitializerConstants.BUNDLE_SYMBOLIC_NAME + "-contentsSection";
 
