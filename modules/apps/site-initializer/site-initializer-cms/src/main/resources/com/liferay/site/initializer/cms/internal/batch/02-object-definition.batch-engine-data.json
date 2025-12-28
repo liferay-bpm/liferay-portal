@@ -903,6 +903,229 @@
 			},
 			"system": true,
 			"titleObjectFieldName": "title"
+		},
+		{
+			"className": "com.liferay.object.model.ObjectDefinition#I5U9",
+			"enableCategorization": true,
+			"enableComments": true,
+			"enableFriendlyURLCustomization": true,
+			"enableIndexSearch": true,
+			"enableLocalization": true,
+			"enableObjectEntryDraft": true,
+			"enableObjectEntryHistory": true,
+			"enableObjectEntrySchedule": true,
+			"enableObjectEntrySubscription": true,
+			"enableObjectEntryVersioning": true,
+			"externalReferenceCode": "L_CMP_PROJECT",
+			"label": {
+				"en_US": "CMP Project"
+			},
+			"modifiable": true,
+			"name": "CMPProject",
+			"objectActions": [
+			],
+			"objectDefinitionSettings": [
+				{
+					"name": "acceptAllGroups",
+					"value": "true"
+				},
+				{
+					"name": "visible",
+					"value": "true"
+				}
+			],
+			"objectFields": [
+				{
+					"DBType": "String",
+					"businessType": "Text",
+					"defaultValue": "null",
+					"externalReferenceCode": "0b2caf24-4277-d174-13e5-bd0568d5b2b9",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"indexedLanguageId": "en_US",
+					"label": {
+						"en_US": "Title"
+					},
+					"localized": false,
+					"name": "title",
+					"objectFieldSettings": [
+						{
+							"name": "showCounter",
+							"value": false
+						}
+					],
+					"readOnly": "false",
+					"readOnlyConditionExpression": "",
+					"required": false,
+					"state": false,
+					"system": false,
+					"type": "String",
+					"unique": false
+				},
+				{
+					"DBType": "Clob",
+					"businessType": "LongText",
+					"defaultValue": "null",
+					"externalReferenceCode": "4eb00b5a-54ab-e8c6-a99f-e1b7b16941d2",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"indexedLanguageId": "en_US",
+					"label": {
+						"en_US": "Description"
+					},
+					"localized": false,
+					"name": "description",
+					"objectFieldSettings": [
+						{
+							"name": "showCounter",
+							"value": false
+						}
+					],
+					"readOnly": "false",
+					"readOnlyConditionExpression": "",
+					"required": false,
+					"state": false,
+					"system": false,
+					"type": "Clob",
+					"unique": false
+				},
+				{
+					"DBType": "Date",
+					"businessType": "Date",
+					"defaultValue": "null",
+					"externalReferenceCode": "92e28457-7c8f-a77b-d640-da2b50832bc9",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"indexedLanguageId": "",
+					"label": {
+						"en_US": "Due Date"
+					},
+					"localized": false,
+					"name": "dueDate",
+					"objectFieldSettings": [
+					],
+					"readOnly": "false",
+					"readOnlyConditionExpression": "",
+					"required": false,
+					"state": false,
+					"system": false,
+					"type": "Date",
+					"unique": false
+				}
+			],
+			"objectFolderExternalReferenceCode": "default",
+			"panelCategoryKey": "",
+			"parameterRequired": false,
+			"pluralLabel": {
+				"en_US": "CMP Projects"
+			},
+			"portlet": false,
+			"scope": "depot",
+			"status": {
+				"code": 0
+			},
+			"system": true,
+			"titleObjectFieldName": "title"
+		},
+		{
+			"className": "com.liferay.object.model.ObjectDefinition#C1N3",
+			"enableCategorization": true,
+			"enableComments": true,
+			"enableFriendlyURLCustomization": true,
+			"enableIndexSearch": true,
+			"enableLocalization": true,
+			"enableObjectEntryDraft": true,
+			"enableObjectEntryHistory": true,
+			"enableObjectEntrySchedule": true,
+			"enableObjectEntrySubscription": true,
+			"enableObjectEntryVersioning": true,
+			"externalReferenceCode": "L_CMP_TASK",
+			"label": {
+				"en_US": "CMP Task"
+			},
+			"modifiable": true,
+			"name": "CMPTask",
+			"objectActions": [
+			],
+			"objectDefinitionSettings": [
+				{
+					"name": "acceptAllGroups",
+					"value": "true"
+				},
+				{
+					"name": "visible",
+					"value": "true"
+				}
+			],
+			"objectFields": [
+				{
+					"DBType": "String",
+					"businessType": "Text",
+					"defaultValue": "null",
+					"externalReferenceCode": "51874914-a43b-c954-85d2-64219b21422c",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"indexedLanguageId": "en_US",
+					"label": {
+						"en_US": "Title"
+					},
+					"localized": false,
+					"name": "title",
+					"objectFieldSettings": [
+						{
+							"name": "showCounter",
+							"value": false
+						}
+					],
+					"readOnly": "false",
+					"readOnlyConditionExpression": "",
+					"required": false,
+					"state": false,
+					"system": false,
+					"type": "String",
+					"unique": false
+				},
+				{
+					"DBType": "String",
+					"businessType": "Text",
+					"defaultValue": "null",
+					"externalReferenceCode": "fac61797-0663-53ba-1f48-e69bad0f7d33",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"indexedLanguageId": "en_US",
+					"label": {
+						"en_US": "Description"
+					},
+					"localized": false,
+					"name": "description",
+					"objectFieldSettings": [
+						{
+							"name": "showCounter",
+							"value": false
+						}
+					],
+					"readOnly": "false",
+					"readOnlyConditionExpression": "",
+					"required": false,
+					"state": false,
+					"system": false,
+					"type": "String",
+					"unique": false
+				}
+			],
+			"objectFolderExternalReferenceCode": "default",
+			"panelCategoryKey": "",
+			"parameterRequired": false,
+			"pluralLabel": {
+				"en_US": "CMP Tasks"
+			},
+			"portlet": false,
+			"scope": "depot",
+			"status": {
+				"code": 0
+			},
+			"system": true,
+			"titleObjectFieldName": "title"
 		}
 	]
 }
