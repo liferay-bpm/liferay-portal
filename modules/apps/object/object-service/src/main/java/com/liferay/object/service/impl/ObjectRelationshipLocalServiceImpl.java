@@ -1308,7 +1308,7 @@ public class ObjectRelationshipLocalServiceImpl
 			ObjectField objectField)
 		throws PortalException {
 
-		_validateScope(objectDefinition1, objectDefinition2);
+		//_validateScope(objectDefinition1, objectDefinition2);
 
 		ObjectRelationship objectRelationship =
 			objectRelationshipPersistence.create(
