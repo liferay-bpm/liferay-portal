@@ -87,6 +87,25 @@
 			"name": "CMSStructureRepeatableGroups",
 			"objectFolderItems": [
 			]
+		},
+		{
+			"actions": {
+				"delete": {
+				},
+				"get": {
+				},
+    			"permissions": {
+				},
+				"update": {
+				}
+			},
+			"externalReferenceCode": "L_CMP_TEAMS",
+			"label": {
+				"en_US": "CMP Teams"
+			},
+			"name": "CMPTeams",
+			"objectFolderItems": [
+			]
 		}
 	]
 }
