@@ -69,6 +69,13 @@
 						"friendlyURL": "/categorization",
 						"privateLayout": false,
 						"type": "layout"
+					},
+					{
+						"displayIcon": "user-plus",
+						"externalReferenceCode": "CMSPRIMARYNAVIGATION11",
+						"friendlyURL": "/teams",
+						"privateLayout": false,
+						"type": "layout"
 					}
 				],
 				"name_i18n": {
