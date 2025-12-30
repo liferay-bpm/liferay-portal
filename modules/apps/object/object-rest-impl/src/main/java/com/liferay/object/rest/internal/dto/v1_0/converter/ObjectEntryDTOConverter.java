@@ -954,33 +954,6 @@ public class ObjectEntryDTOConverter
 		};
 	}
 
-	private Serializable _getLocalizedValue(
-			DTOConverterContext dtoConverterContext, Long groupId,
-			Map<String, Serializable> objectField_i18n)
-		throws Exception {
-
-		Serializable serializable = objectField_i18n.get(
-			String.valueOf(dtoConverterContext.getLocale()));
-
-		if (Validator.isNotNull(serializable)) {
-			return serializable;
-		}
-
-		User user = dtoConverterContext.getUser();
-
-		if (user != null) {
-			serializable = objectField_i18n.get(
-				String.valueOf(user.getLocale()));
-
-			if (Validator.isNotNull(serializable)) {
-				return serializable;
-			}
-		}
-
-		return objectField_i18n.get(
-			String.valueOf(_portal.getSiteDefaultLocale(groupId)));
-	}
-
 	private Map<String, UnsafeSupplier<Object, Exception>>
 			_getNestedFieldsRelatedProperties(
 				DTOConverterContext dtoConverterContext, long groupId,
@@ -1467,10 +1440,6 @@ public class ObjectEntryDTOConverter
 					(Map<String, Serializable>)values.get(i18nObjectFieldName);
 
 				if (objectField_i18n != null) {
-					serializable = _getLocalizedValue(
-						dtoConverterContext, objectEntry.getGroupId(),
-						objectField_i18n);
-
 					if (Objects.equals(
 							objectField.getDBType(),
 							ObjectFieldConstants.DB_TYPE_BLOB) ||
