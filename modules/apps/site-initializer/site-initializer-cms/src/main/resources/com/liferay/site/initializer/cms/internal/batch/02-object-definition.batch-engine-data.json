@@ -934,7 +934,32 @@
 					"value": "true"
 				}
 			],
+			"accountEntryRestricted": false,
 			"objectFields": [
+				{
+					"businessType": "Relationship",
+					"externalReferenceCode": "USER_TO_PROJECT_MANAGER",
+					"indexed": true,
+					"label": {
+						"en_US": "Project To User Manager"
+					},
+					"name": "r_projectToUserManager_userId",
+					"objectDefinitionExternalReferenceCode1": "L_USER",
+					"objectRelationshipExternalReferenceCode": "L_PROJECT_TO_USER_MANAGER",
+					"relationshipType": "oneToMany"
+				},
+				{
+					"businessType": "Relationship",
+					"externalReferenceCode": "USER_TO_PROJECT_SPONSOR",
+					"indexed": true,
+					"label": {
+						"en_US": "Project To User Sponsor"
+					},
+					"name": "r_projectToUserSponsor_userId",
+					"objectDefinitionExternalReferenceCode1": "L_USER",
+					"objectRelationshipExternalReferenceCode": "L_PROJECT_TO_USER_SPONSOR",
+					"relationshipType": "oneToMany"
+				},
 				{
 					"DBType": "String",
 					"businessType": "Text",
