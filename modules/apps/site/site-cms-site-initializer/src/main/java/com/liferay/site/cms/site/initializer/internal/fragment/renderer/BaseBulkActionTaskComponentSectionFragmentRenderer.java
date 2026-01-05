@@ -17,6 +17,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.site.cms.site.initializer.fragment.renderer.BaseComponentSectionFragmentRenderer;
 
 import jakarta.servlet.http.HttpServletRequest;
 

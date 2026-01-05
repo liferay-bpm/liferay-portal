@@ -10,6 +10,7 @@ import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectDefinitionResource;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.site.cms.site.initializer.fragment.renderer.BaseComponentSectionFragmentRenderer;
 import com.liferay.site.cms.site.initializer.internal.display.context.StructureBuilderDisplayContext;
 import com.liferay.taglib.ui.SuccessTag;
 

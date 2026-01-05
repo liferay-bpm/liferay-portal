@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-package com.liferay.site.cms.site.initializer.internal.display.context;
+package com.liferay.site.cmp.site.initializer.internal.display.context;
 
-import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.document.library.configuration.DLConfiguration;
 import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
@@ -31,11 +30,11 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.site.cms.site.initializer.display.context.BaseSectionDisplayContext;
 import com.liferay.translation.exporter.TranslationInfoItemFieldValuesExporterRegistry;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -43,10 +42,10 @@ import java.util.Map;
 /**
  * @author Sam Ziemer
  */
-public class ViewTasksDisplayContext extends BaseSectionDisplayContext {
+public class ViewProjectsDisplayContext extends BaseSectionDisplayContext {
 
-	public ViewTasksDisplayContext(
-		AssetEntry assetEntry, DepotEntryLocalService depotEntryLocalService,
+	public ViewProjectsDisplayContext(
+		DepotEntryLocalService depotEntryLocalService,
 		DLConfiguration dlConfiguration, GroupLocalService groupLocalService,
 		HttpServletRequest httpServletRequest, Language language,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
@@ -65,7 +64,6 @@ public class ViewTasksDisplayContext extends BaseSectionDisplayContext {
 			objectEntryFolderModelResourcePermission, portal,
 			translationInfoItemFieldValuesExporterRegistry);
 
-		_assetEntry = assetEntry;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 	}
 
@@ -87,48 +85,49 @@ public class ViewTasksDisplayContext extends BaseSectionDisplayContext {
 
 	@Override
 	public List<DropdownItem> getCreationMenuDropdownItems() {
-		try {
-			ObjectDefinition objectDefinition =
-				_objectDefinitionLocalService.getObjectDefinition(
-					themeDisplay.getCompanyId(), "CMPTask");
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.
+				fetchObjectDefinitionByExternalReferenceCode(
+					"L_CMP_PROJECT", themeDisplay.getCompanyId());
 
-			return new ArrayList<>(
-				List.of(
-					DropdownItemBuilder.putData(
-						"objectDefinitionId",
-						String.valueOf(objectDefinition.getObjectDefinitionId())
-					).putData(
-						"action", "createAsset"
-					).setHref(
-						StringBundler.concat(
-							themeDisplay.getPortalURL(),
-							themeDisplay.getPathMain(),
-							GroupConstants.CMS_FRIENDLY_URL,
-							"/add_task?objectDefinitionId=",
-							objectDefinition.getObjectDefinitionId(),
-							"&objectEntryFolderExternalReferenceCode=",
-							"&plid=", themeDisplay.getPlid(),
-							"&projectGroupId=", _assetEntry.getGroupId(),
-							"&redirect=", themeDisplay.getURLCurrent())
-					).setIcon(
-						"forms"
-					).setLabel(
-						LanguageUtil.get(httpServletRequest, "task")
-					).build()));
+		if (objectDefinition == null) {
+			return null;
 		}
-		catch (PortalException portalException) {
-			throw new RuntimeException(portalException);
-		}
+
+		return Collections.singletonList(
+			DropdownItemBuilder.putData(
+				"action", "createAsset"
+			).putData(
+				"objectDefinitionId",
+				String.valueOf(objectDefinition.getObjectDefinitionId())
+			).putData(
+				"redirect",
+				StringBundler.concat(
+					themeDisplay.getPortalURL(), themeDisplay.getPathMain(),
+					GroupConstants.CMS_FRIENDLY_URL,
+					"/add_project?objectDefinitionId=",
+					objectDefinition.getObjectDefinitionId(), "&plid=",
+					themeDisplay.getPlid(), "&redirect=",
+					themeDisplay.getURLCurrent())
+			).putData(
+				"title", objectDefinition.getLabel(themeDisplay.getLocale())
+			).setIcon(
+				"forms"
+			).setLabel(
+				LanguageUtil.get(httpServletRequest, "new-project")
+			).build());
 	}
 
 	@Override
 	public Map<String, Object> getEmptyState() {
 		return HashMapBuilder.<String, Object>put(
-			"description", ""
+			"description",
+			LanguageUtil.get(
+				httpServletRequest, "click-new-to-create-your-first-project")
 		).put(
-			"image", "/states/cms_empty_state.svg"
+			"image", "/states/cmp_empty_state_projects.svg"
 		).put(
-			"title", LanguageUtil.get(httpServletRequest, "no-assets-yet")
+			"title", LanguageUtil.get(httpServletRequest, "no-projects-yet")
 		).build();
 	}
 
@@ -137,18 +136,19 @@ public class ViewTasksDisplayContext extends BaseSectionDisplayContext {
 		try {
 			ObjectDefinition objectDefinition =
 				_objectDefinitionLocalService.getObjectDefinition(
-					themeDisplay.getCompanyId(), "CMPTask");
+					themeDisplay.getCompanyId(), "CMPProject");
 
 			return ListUtil.fromArray(
 				new FDSActionDropdownItem(
 					StringBundler.concat(
 						themeDisplay.getPathFriendlyURLPublic(),
-						GroupConstants.CMS_FRIENDLY_URL, "/e/task/",
+						GroupConstants.CMS_FRIENDLY_URL, "/e/project/",
 						PortalUtil.getClassNameId(
 							objectDefinition.getClassName()),
 						"/{embedded.id}"),
-					"cog", "edit", LanguageUtil.get(httpServletRequest, "task"),
-					"get", "update", null));
+					"cog", "edit",
+					LanguageUtil.get(httpServletRequest, "project"), "get",
+					"update", null));
 		}
 		catch (PortalException portalException) {
 			throw new RuntimeException(portalException);
@@ -160,7 +160,7 @@ public class ViewTasksDisplayContext extends BaseSectionDisplayContext {
 		try {
 			ObjectDefinition objectDefinition =
 				_objectDefinitionLocalService.getObjectDefinition(
-					themeDisplay.getCompanyId(), "CMPTask");
+					themeDisplay.getCompanyId(), "CMPProject");
 
 			return "objectDefinitionId eq " +
 				objectDefinition.getObjectDefinitionId();
@@ -193,7 +193,6 @@ public class ViewTasksDisplayContext extends BaseSectionDisplayContext {
 		return layout.getName(themeDisplay.getLocale(), true);
 	}
 
-	private final AssetEntry _assetEntry;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 }

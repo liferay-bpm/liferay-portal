@@ -27,7 +27,7 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.site.cms.site.initializer.internal.constants.CMSSpaceConstants;
+import com.liferay.site.cms.site.initializer.constants.CMSSpaceConstants;
 import com.liferay.site.cms.site.initializer.internal.util.ActionUtil;
 import com.liferay.site.cms.site.initializer.internal.util.PermissionUtil;
 import com.liferay.taglib.security.PermissionsURLTag;

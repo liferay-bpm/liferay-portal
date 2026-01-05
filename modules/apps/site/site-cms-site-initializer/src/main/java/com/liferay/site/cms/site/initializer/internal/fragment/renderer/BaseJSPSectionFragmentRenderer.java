@@ -10,6 +10,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.site.cms.site.initializer.fragment.renderer.BaseSectionFragmentRenderer;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;

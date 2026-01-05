@@ -26,7 +26,7 @@ ViewTasksDisplayContext viewTasksDisplayContext = (ViewTasksDisplayContext)reque
 			creationMenu="<%= viewTasksDisplayContext.getCreationMenu() %>"
 			fdsActionDropdownItems="<%= viewTasksDisplayContext.getFDSActionDropdownItems() %>"
 			formName="fm"
-			id="<%= CMSSiteInitializerFDSNames.CMP_TASK %>"
+			id="<%= CMPSiteInitializerFDSNames.CMP_TASK %>"
 			itemsPerPage="<%= 20 %>"
 			propsTransformer="{StructuresFDSPropsTransformer} from site-cms-site-initializer"
 			selectedItemsKey="id"

@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.site.cms.site.initializer.fragment.renderer.BaseComponentSectionFragmentRenderer;
 import com.liferay.site.cms.site.initializer.internal.util.CommentUtil;
 import com.liferay.subscription.service.SubscriptionLocalService;
 

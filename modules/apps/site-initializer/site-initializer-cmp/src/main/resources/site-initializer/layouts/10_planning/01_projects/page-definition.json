@@ -4,7 +4,7 @@
 			{
 				"definition": {
 					"fragment": {
-						"key": "com.liferay.site.cms.site.initializer.internal.fragment.renderer.ViewProjectsJSPSectionFragmentRenderer"
+						"key": "com.liferay.site.cmp.site.initializer.internal.fragment.renderer.ViewProjectsJSPSectionFragmentRenderer"
 					},
 					"fragmentConfig": {
 					},

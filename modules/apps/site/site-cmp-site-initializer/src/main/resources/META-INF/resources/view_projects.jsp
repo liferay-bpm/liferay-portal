@@ -28,7 +28,7 @@ ViewProjectsDisplayContext viewProjectsDisplayContext = (ViewProjectsDisplayCont
 			emptyState="<%= viewProjectsDisplayContext.getEmptyState() %>"
 			fdsActionDropdownItems="<%= viewProjectsDisplayContext.getFDSActionDropdownItems() %>"
 			formName="fm"
-			id="<%= CMSSiteInitializerFDSNames.CMP_PROJECT %>"
+			id="<%= CMPSiteInitializerFDSNames.CMP_PROJECT %>"
 			itemsPerPage="<%= 20 %>"
 			propsTransformer="{AssetsFDSPropsTransformer} from site-cms-site-initializer"
 			selectedItemsKey="embedded.id"

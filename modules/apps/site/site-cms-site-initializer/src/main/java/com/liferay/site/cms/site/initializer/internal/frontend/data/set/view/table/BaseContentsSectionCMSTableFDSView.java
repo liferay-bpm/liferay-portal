@@ -8,6 +8,7 @@ package com.liferay.site.cms.site.initializer.internal.frontend.data.set.view.ta
 import com.liferay.frontend.data.set.view.table.FDSTableSchema;
 import com.liferay.frontend.data.set.view.table.FDSTableSchemaBuilder;
 import com.liferay.frontend.data.set.view.table.FDSTableSchemaBuilderFactory;
+import com.liferay.site.cms.site.initializer.frontend.data.set.view.table.BaseCMSTableFDSView;
 
 import java.util.Locale;
 

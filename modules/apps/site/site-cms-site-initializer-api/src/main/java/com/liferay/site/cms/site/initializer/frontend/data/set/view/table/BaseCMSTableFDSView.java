@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-package com.liferay.site.cms.site.initializer.internal.frontend.data.set.view.table;
+package com.liferay.site.cms.site.initializer.frontend.data.set.view.table;
 
 import com.liferay.frontend.data.set.constants.FDSTimeZoneBehaviorConstants;
 import com.liferay.frontend.data.set.view.table.BaseTableFDSView;

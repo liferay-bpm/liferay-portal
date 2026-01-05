@@ -11,6 +11,7 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.site.cms.site.initializer.fragment.renderer.BaseComponentSectionFragmentRenderer;
 
 import jakarta.servlet.http.HttpServletRequest;
 
