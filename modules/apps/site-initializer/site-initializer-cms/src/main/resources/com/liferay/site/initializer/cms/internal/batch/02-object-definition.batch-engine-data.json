@@ -905,6 +905,7 @@
 			"titleObjectFieldName": "title"
 		},
 		{
+			"accountEntryRestricted": false,
 			"className": "com.liferay.object.model.ObjectDefinition#I5U9",
 			"enableCategorization": true,
 			"enableComments": true,
@@ -934,7 +935,6 @@
 					"value": "true"
 				}
 			],
-			"accountEntryRestricted": false,
 			"objectFields": [
 				{
 					"businessType": "Relationship",
@@ -1039,6 +1039,54 @@
 				}
 			],
 			"objectFolderExternalReferenceCode": "default",
+			"objectRelationships": [
+				{
+					"deletionType": "prevent",
+					"edge": false,
+					"externalReferenceCode": "L_CMP_PROJECT_TO_L_CMP_TASK",
+					"label": {
+						"en_US": "Project to Task"
+					},
+					"name": "cmpProjectToCMPTask",
+					"objectDefinitionExternalReferenceCode1": "L_CMP_PROJECT",
+					"objectDefinitionExternalReferenceCode2": "L_CMP_TASK",
+					"objectDefinitionModifiable2": true,
+					"objectDefinitionName2": "CMPTask",
+					"objectDefinitionScope2": "depot",
+					"objectDefinitionSystem2": true,
+					"objectField": {
+						"DBType": "Long",
+						"businessType": "Relationship",
+						"externalReferenceCode": "CMP_PROJECT_TO_CMP_TASK",
+						"indexed": true,
+						"indexedAsKeyword": false,
+						"label": {
+							"en_US": "Project to Task"
+						},
+						"name": "r_cmpProjectToCMPTask_c_cmpProjectId",
+						"objectFieldSettings": [
+							{
+								"name": "objectDefinition1ShortName",
+								"value": "CMPProject"
+							},
+							{
+								"name": "objectRelationshipERCObjectFieldName",
+								"value": "r_cmpProjectToCMPTask_c_cmpProjectERC"
+							}
+						],
+						"relationshipType": "oneToMany",
+						"required": false,
+						"state": false,
+						"system": true,
+						"type": "Long"
+					},
+					"parameterObjectFieldId": 0,
+					"parameterObjectFieldName": "",
+					"reverse": false,
+					"system": true,
+					"type": "oneToMany"
+				}
+			],
 			"panelCategoryKey": "",
 			"parameterRequired": false,
 			"pluralLabel": {
@@ -1084,31 +1132,26 @@
 			],
 			"objectFields": [
 				{
-					"DBType": "String",
-					"businessType": "Text",
-					"defaultValue": "null",
-					"externalReferenceCode": "51874914-a43b-c954-85d2-64219b21422c",
 					"indexed": true,
-					"indexedAsKeyword": false,
-					"indexedLanguageId": "en_US",
-					"label": {
-						"en_US": "Title"
-					},
+					"defaultValue": "null",
 					"localized": false,
-					"name": "title",
-					"objectFieldSettings": [
-						{
-							"name": "showCounter",
-							"value": false
-						}
-					],
+					"objectFieldSettings": [],
 					"readOnly": "false",
-					"readOnlyConditionExpression": "",
+					"DBType": "Long",
+					"label": {
+						"en_US": "Assign To"
+					},
+					"type": "Long",
 					"required": false,
+					"externalReferenceCode": "f2f94a82-7a73-144c-0803-f8d322529135",
+					"indexedAsKeyword": false,
+					"system": true,
+					"indexedLanguageId": "",
+					"unique": false,
+					"name": "assignTo",
 					"state": false,
-					"system": false,
-					"type": "String",
-					"unique": false
+					"businessType": "Assignee",
+					"readOnlyConditionExpression": ""
 				},
 				{
 					"DBType": "String",
@@ -1133,7 +1176,73 @@
 					"readOnlyConditionExpression": "",
 					"required": false,
 					"state": false,
-					"system": false,
+					"system": true,
+					"type": "String",
+					"unique": false
+				},
+				{
+					"DBType": "DateTime",
+					"businessType": "DateTime",
+					"externalReferenceCode": "DUE_DATE",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"label": {
+						"en_US": "Due Date"
+					},
+					"name": "dueDate",
+					"objectFieldSettings": [
+						{
+							"name": "timeStorage",
+							"value": "convertToUTC"
+						}
+					],
+					"required": false,
+					"state": false,
+					"system": true,
+					"type": "DateTime"
+				},
+				{
+					"DBType": "String",
+					"businessType": "Picklist",
+					"defaultValue": "notStarted",
+					"externalReferenceCode": "STATE",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"indexedLanguageId": "en_US",
+					"label": {
+						"en_US": "State"
+					},
+					"listTypeDefinitionExternalReferenceCode": "L_CMP_TASK_STATES",
+					"name": "state",
+					"required": true,
+					"state": true,
+					"system": true,
+					"type": "String"
+				},
+				{
+					"DBType": "String",
+					"businessType": "Text",
+					"defaultValue": "null",
+					"externalReferenceCode": "51874914-a43b-c954-85d2-64219b21422c",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"indexedLanguageId": "en_US",
+					"label": {
+						"en_US": "Title"
+					},
+					"localized": false,
+					"name": "title",
+					"objectFieldSettings": [
+						{
+							"name": "showCounter",
+							"value": false
+						}
+					],
+					"readOnly": "false",
+					"readOnlyConditionExpression": "",
+					"required": false,
+					"state": false,
+					"system": true,
 					"type": "String",
 					"unique": false
 				}
