@@ -87,6 +87,10 @@ public class ViewTasksDisplayContext extends BaseSectionDisplayContext {
 
 	@Override
 	public List<DropdownItem> getCreationMenuDropdownItems() {
+		if (_assetEntry == null) {
+			return Collections.emptyList();
+		}
+
 		try {
 			ObjectDefinition objectDefinition =
 				_objectDefinitionLocalService.getObjectDefinition(
