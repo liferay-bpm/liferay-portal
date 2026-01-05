@@ -8,7 +8,6 @@ package com.liferay.site.cms.site.initializer.internal.fragment.renderer;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.site.cms.site.initializer.internal.constants.CMSSpaceConstants;
 import com.liferay.site.cms.site.initializer.internal.display.context.BreadcrumbDisplayContext;
 import com.liferay.site.cms.site.initializer.internal.util.InfoItemUtil;
 

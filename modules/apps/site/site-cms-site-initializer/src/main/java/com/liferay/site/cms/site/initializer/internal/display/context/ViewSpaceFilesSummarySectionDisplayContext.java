@@ -16,7 +16,7 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.site.cms.site.initializer.internal.constants.CMSSpaceConstants;
+import com.liferay.site.cms.site.initializer.constants.CMSSpaceConstants;
 import com.liferay.site.cms.site.initializer.internal.util.ActionUtil;
 import com.liferay.site.cms.site.initializer.internal.util.SpaceSummaryHeaderUtil;
 import com.liferay.translation.exporter.TranslationInfoItemFieldValuesExporterRegistry;
