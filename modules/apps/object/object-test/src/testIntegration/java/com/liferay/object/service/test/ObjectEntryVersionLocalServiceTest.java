@@ -24,17 +24,14 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.CompanyConfigurationTemporarySwapper;
 import com.liferay.portal.kernel.audit.AuditMessage;
 import com.liferay.portal.kernel.audit.AuditRouter;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.ModelListener;
-import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.scheduler.TimeUnit;
-import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkService;
@@ -44,7 +41,6 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
@@ -84,8 +80,6 @@ import org.junit.runner.RunWith;
 
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-
-import static java.lang.System.out;
 
 /**
  * @author Feliphe Marinho
@@ -422,73 +416,18 @@ public class ObjectEntryVersionLocalServiceTest {
 
 		// Complete pending object entry's workflow instance
 
-		TransactionCommitCallbackUtil.registerCallback(() -> null);
-
 		WorkflowTask workflowTask = IdempotentRetryAssert.retryAssert(
 			120, java.util.concurrent.TimeUnit.SECONDS, 10,
 			java.util.concurrent.TimeUnit.SECONDS,
 			() -> {
 				List<WorkflowTask> workflowTasks =
-					_workflowTaskManager.getWorkflowTasks(
+					_workflowTaskManager.getWorkflowTasksBySubmittingUser(
 						TestPropsValues.getCompanyId(),
-						false, QueryUtil.ALL_POS,
-						QueryUtil.ALL_POS, null);
+						TestPropsValues.getUserId(), false, 0, 1, null);
 
 				Assert.assertFalse(
-					"No workflow tasks found, even in general", workflowTasks.isEmpty());
-
-				List<Role> roles = RoleLocalServiceUtil.getUserRoles(TestPropsValues.getUserId());
-
-				StringBuilder sb = new StringBuilder();
-
-				sb.append("=== USER ROLES ===\n");
-
-				for (Role role : roles) {
-					sb.append("Role: ")
-						.append(role.getName())
-						.append(" | type=")
-						.append(role.getType())
-						.append(" | roleId=")
-						.append(role.getRoleId())
-						.append("\n");
-				}
-
-				out.println(sb.toString());
-
-				out.println("=== General Tasks ===");
-
-				for (WorkflowTask task : workflowTasks) {
-					out.println(
-						"TaskId=" + task.getWorkflowTaskId() +
-						" | name=" + task.getName() +
-						" | assigneeUserId=" + task.getAssigneeUserId() +
-						" | taskId=" + task.getWorkflowTaskId() +
-						" | userName=" + task.getUserName() +
-						" | workflowTaskAssignees=" + task.getWorkflowTaskAssignees().toString() +
-						" | workflowInstanceId=" + task.getWorkflowInstanceId());
-				}
-
-				out.println("=== Tasks by User Roles===");
-
-				workflowTasks =
-					_workflowTaskManager.getWorkflowTasksByUserRoles(
-						TestPropsValues.getCompanyId(),
-						TestPropsValues.getUserId(), false, QueryUtil.ALL_POS,
-						QueryUtil.ALL_POS, null);
-
-				Assert.assertFalse(
-					"No workflow tasks found for the expected role. User Roles:" + sb.toString(), workflowTasks.isEmpty());
-
-				for (WorkflowTask task : workflowTasks) {
-					out.println(
-						"TaskId=" + task.getWorkflowTaskId() +
-						" | name=" + task.getName() +
-						" | assigneeUserId=" + task.getAssigneeUserId() +
-						" | taskId=" + task.getWorkflowTaskId() +
-						" | userName=" + task.getUserName() +
-						" | workflowTaskAssignees=" + task.getWorkflowTaskAssignees().toString() +
-						" | workflowInstanceId=" + task.getWorkflowInstanceId());
-				}
+					"No workflow tasks found for the user",
+					workflowTasks.isEmpty());
 
 				return workflowTasks.get(0);
 			});
@@ -939,7 +878,7 @@ public class ObjectEntryVersionLocalServiceTest {
 					).name(
 						"textObjectFieldName"
 					).build()),
-				Collections.emptyList(),  new ServiceContext());
+				Collections.emptyList(), new ServiceContext());
 
 		return _objectDefinitionLocalService.publishCustomObjectDefinition(
 			TestPropsValues.getUserId(),
