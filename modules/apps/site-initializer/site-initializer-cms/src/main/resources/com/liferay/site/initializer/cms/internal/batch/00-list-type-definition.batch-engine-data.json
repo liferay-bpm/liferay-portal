@@ -42,6 +42,43 @@
 			],
 			"name": "Bulk Action Statuses",
 			"system": true
+		},
+		{
+			"externalReferenceCode": "L_CMP_TASK_STATES",
+			"listTypeEntries": [
+				{
+					"externalReferenceCode": "BLOCKED",
+					"key": "blocked",
+					"name": "Blocked",
+					"system": true
+				},
+				{
+					"externalReferenceCode": "DONE",
+					"key": "done",
+					"name": "Done",
+					"system": true
+				},
+				{
+					"externalReferenceCode": "IN_PROGRESS",
+					"key": "inProgress",
+					"name": "In Progress",
+					"system": true
+				},
+				{
+					"externalReferenceCode": "NOT_STARTED",
+					"key": "notStarted",
+					"name": "Not Started",
+					"system": true
+				},
+				{
+					"externalReferenceCode": "OVERDUE",
+					"key": "overdue",
+					"name": "Overdue",
+					"system": true
+				}
+			],
+			"name": "Task States",
+			"system": true
 		}
 	]
 }
