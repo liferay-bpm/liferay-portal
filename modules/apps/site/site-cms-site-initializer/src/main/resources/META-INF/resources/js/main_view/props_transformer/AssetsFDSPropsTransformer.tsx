@@ -10,6 +10,7 @@ import {
 } from '@liferay/frontend-data-set-web';
 import React from 'react';
 
+import StateLabel from '../../common/components/StateLabel';
 import StatusLabel from '../../common/components/StatusLabel';
 import {openAssetUsageListModal} from '../../common/components/asset_usage/utils';
 import {AssetLibrary} from '../../common/types/AssetLibrary';
@@ -149,6 +150,11 @@ export default function AssetsFDSPropsTransformer({
 				{
 					component: TypeRenderer,
 					name: 'typeTableCellRenderer',
+					type: 'internal',
+				} as IInternalRenderer,
+				{
+					component: ({value}) => StateLabel(value),
+					name: 'stateTableCellRenderer',
 					type: 'internal',
 				} as IInternalRenderer,
 				{

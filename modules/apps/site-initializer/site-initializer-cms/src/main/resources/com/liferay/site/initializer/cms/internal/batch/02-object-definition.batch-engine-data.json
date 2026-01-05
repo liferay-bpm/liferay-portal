@@ -1025,17 +1025,23 @@
 					"label": {
 						"en_US": "Due Date"
 					},
-					"localized": false,
-					"name": "dueDate",
-					"objectFieldSettings": [
-					],
-					"readOnly": "false",
-					"readOnlyConditionExpression": "",
-					"required": false,
-					"state": false,
-					"system": false,
-					"type": "Date",
-					"unique": false
+					"name": "dueDate"
+				},
+				{
+					"DBType": "String",
+					"businessType": "Picklist",
+					"defaultValue": "notStarted",
+					"externalReferenceCode": "STATE",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"indexedLanguageId": "en_US",
+					"label": {
+						"en_US": "State"
+					},
+					"listTypeDefinitionExternalReferenceCode": "L_CMP_TASK_STATES",
+					"name": "state",
+					"required": true,
+					"state": true
 				}
 			],
 			"objectFolderExternalReferenceCode": "default",
@@ -1132,26 +1138,27 @@
 			],
 			"objectFields": [
 				{
-					"indexed": true,
-					"defaultValue": "null",
-					"localized": false,
-					"objectFieldSettings": [],
-					"readOnly": "false",
 					"DBType": "Long",
+					"businessType": "Assignee",
+					"defaultValue": "null",
+					"externalReferenceCode": "f2f94a82-7a73-144c-0803-f8d322529135",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"indexedLanguageId": "",
 					"label": {
 						"en_US": "Assign To"
 					},
-					"type": "Long",
-					"required": false,
-					"externalReferenceCode": "f2f94a82-7a73-144c-0803-f8d322529135",
-					"indexedAsKeyword": false,
-					"system": true,
-					"indexedLanguageId": "",
-					"unique": false,
+					"localized": false,
 					"name": "assignTo",
+					"objectFieldSettings": [
+					],
+					"readOnly": "false",
+					"readOnlyConditionExpression": "",
+					"required": false,
 					"state": false,
-					"businessType": "Assignee",
-					"readOnlyConditionExpression": ""
+					"system": true,
+					"type": "Long",
+					"unique": false
 				},
 				{
 					"DBType": "String",

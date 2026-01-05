@@ -44,9 +44,9 @@ public class ProjectSectionCMPTableFDSView extends BaseCMSTableFDSView {
 		).add(
 			addDateFDSTableSchemaField("dateModified", "modified")
 		).add(
-			"embedded.status", "status",
+			"embedded.state", "state",
 			fdsTableSchemaField -> fdsTableSchemaField.setContentRenderer(
-				"statusTableCellRenderer")
+				"stateTableCellRenderer")
 		).build();
 	}
 
