@@ -38,15 +38,17 @@ public class TaskSectionCMPTableFDSView extends BaseCMSTableFDSView {
 				"simpleActionLinkTableCellRenderer"
 			)
 		).add(
-			"embedded.scopeKey", "space",
+			"embedded.assignTo.name", "assign-to",
 			fdsTableSchemaField -> fdsTableSchemaField.setContentRenderer(
-				"spaceTableCellRenderer")
+				"authorTableCellRenderer")
 		).add(
-			addDateFDSTableSchemaField("dateModified", "modified")
+			"embedded.r_cmpProjectToCMPTask_c_cmpProject.title", "project"
 		).add(
-			"embedded.status", "status",
+			addDateFDSTableSchemaField("embedded.dueDate", "due-date")
+		).add(
+			"embedded.state", "state",
 			fdsTableSchemaField -> fdsTableSchemaField.setContentRenderer(
-				"statusTableCellRenderer")
+				"stateTableCellRenderer")
 		).build();
 	}
 

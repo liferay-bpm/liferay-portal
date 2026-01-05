@@ -69,6 +69,11 @@ public class ViewTasksDisplayContext extends BaseSectionDisplayContext {
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 	}
 
+	@Override
+	public String getAdditionalAPIURLParameters() {
+		return super.getAdditionalAPIURLParameters() + "cmpProjectToCMPTask";
+	}
+
 	public Map<String, Object> getBreadcrumbProps() throws PortalException {
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
