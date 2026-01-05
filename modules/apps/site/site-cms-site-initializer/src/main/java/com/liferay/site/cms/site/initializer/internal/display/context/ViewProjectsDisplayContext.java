@@ -116,7 +116,7 @@ public class ViewProjectsDisplayContext extends BaseSectionDisplayContext {
 					).setIcon(
 						"forms"
 					).setLabel(
-						LanguageUtil.get(httpServletRequest, "project")
+						LanguageUtil.get(httpServletRequest, "new-project")
 					).build()));
 		}
 		catch (PortalException portalException) {
@@ -127,11 +127,13 @@ public class ViewProjectsDisplayContext extends BaseSectionDisplayContext {
 	@Override
 	public Map<String, Object> getEmptyState() {
 		return HashMapBuilder.<String, Object>put(
-			"description", ""
+			"description",
+			LanguageUtil.get(
+				httpServletRequest, "click-new-to-create-your-first-project")
 		).put(
-			"image", "/states/cms_empty_state.svg"
+			"image", "/states/cmp_empty_state_projects.svg"
 		).put(
-			"title", LanguageUtil.get(httpServletRequest, "no-assets-yet")
+			"title", LanguageUtil.get(httpServletRequest, "no-projects-yet")
 		).build();
 	}
 
