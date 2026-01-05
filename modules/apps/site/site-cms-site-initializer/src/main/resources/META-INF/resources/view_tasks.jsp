@@ -24,6 +24,7 @@ ViewTasksDisplayContext viewTasksDisplayContext = (ViewTasksDisplayContext)reque
 			apiURL="<%= viewTasksDisplayContext.getAPIURL() %>"
 			bulkActionDropdownItems="<%= viewTasksDisplayContext.getBulkActionDropdownItems() %>"
 			creationMenu="<%= viewTasksDisplayContext.getCreationMenu() %>"
+			emptyState="<%= viewTasksDisplayContext.getEmptyState() %>"
 			fdsActionDropdownItems="<%= viewTasksDisplayContext.getFDSActionDropdownItems() %>"
 			formName="fm"
 			id="<%= CMSSiteInitializerFDSNames.CMP_TASK %>"
