@@ -15,6 +15,7 @@ export {default as ContentEditorToolbar} from './content_editor/components/Conte
 export {default as Spaces} from './content_editor/components/Spaces';
 
 export {default as BulkActionTaskAssets} from './main_view/bulk_action_task/BulkActionTaskAssets';
+
 export {default as BulkActionTaskDuration} from './main_view/bulk_action_task/BulkActionTaskDuration';
 export {default as BulkActionTaskStatus} from './main_view/bulk_action_task/BulkActionTaskStatus';
 export {default as BulkActionsMonitor} from './main_view/bulk_actions_monitor/BulkActionsMonitor';
@@ -28,6 +29,7 @@ export {default as EditFolder} from './main_view/folders/EditFolder';
 // Main
 
 export {default as QuickActions} from './main_view/home/QuickActions';
+
 export {default as SearchBar} from './main_view/home/SearchBar';
 export {default as ViewWorkflowTasks} from './main_view/home/ViewWorkflowTasks';
 export {default as AssetTypeInfoPanelContent} from './main_view/info_panel/AssetTypeInfoPanelContent';
@@ -55,6 +57,7 @@ export {default as NewSpace} from './main_view/spaces/NewSpace';
 export {default as SpaceSettings} from './main_view/spaces/SpaceSettings';
 export {default as SpaceSummaryHeader} from './main_view/spaces/SpaceSummaryHeader';
 export {default as SpacesNavigation} from './main_view/spaces_navigation/SpacesNavigation';
+export {default as ProjectEditorToolbar} from './project_editor/components/ProjectEditorToolbar';
 
 // Structure Builder
 

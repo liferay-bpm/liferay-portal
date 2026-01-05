@@ -330,7 +330,7 @@
 	},
 	"settings": {
 		"masterPage": {
-			"key": "content-editor-master"
+			"key": "project-editor-master"
 		}
 	},
 	"version": 1.0
