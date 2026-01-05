@@ -12,6 +12,7 @@ import com.liferay.headless.asset.library.resource.v1_0.AssetLibraryResource;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.util.PortalRunMode;
+import com.liferay.site.cms.site.initializer.fragment.renderer.BaseComponentSectionFragmentRenderer;
 import com.liferay.site.cms.site.initializer.internal.display.context.ViewSpacesDisplayContext;
 
 import jakarta.servlet.http.HttpServletRequest;

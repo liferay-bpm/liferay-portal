@@ -9,6 +9,7 @@ import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.headless.admin.list.type.resource.v1_0.ListTypeDefinitionResource;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.site.cms.site.initializer.fragment.renderer.BaseComponentSectionFragmentRenderer;
 import com.liferay.site.cms.site.initializer.internal.display.context.PicklistBuilderDisplayContext;
 
 import jakarta.servlet.http.HttpServletRequest;

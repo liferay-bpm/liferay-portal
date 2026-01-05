@@ -8,6 +8,8 @@ package com.liferay.site.cms.site.initializer.internal.fragment.renderer;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.portal.kernel.util.PortalRunMode;
+import com.liferay.site.cms.site.initializer.constants.CMSSpaceConstants;
+import com.liferay.site.cms.site.initializer.fragment.renderer.BaseComponentSectionFragmentRenderer;
 import com.liferay.site.cms.site.initializer.internal.display.context.SpaceStickerDisplayContext;
 import com.liferay.site.cms.site.initializer.internal.util.InfoItemUtil;
 
