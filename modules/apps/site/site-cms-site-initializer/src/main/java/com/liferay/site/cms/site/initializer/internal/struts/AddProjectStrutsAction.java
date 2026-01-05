@@ -20,9 +20,11 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
@@ -112,12 +114,20 @@ public class AddProjectStrutsAction implements StrutsAction {
 			objectDefinition, objectEntry,
 			String.valueOf(postAssetLibrary.getSiteId()));
 
-		httpServletResponse.sendRedirect(
-			StringBundler.concat(
-				themeDisplay.getPathFriendlyURLPublic(),
-				GroupConstants.CMS_FRIENDLY_URL, "/e/edit-project/",
-				PortalUtil.getClassNameId(objectDefinition.getClassName()),
-				StringPool.SLASH, objectEntry.getId()));
+		String editURL = StringBundler.concat(
+			themeDisplay.getPathFriendlyURLPublic(),
+			GroupConstants.CMS_FRIENDLY_URL, "/e/edit-project/",
+			PortalUtil.getClassNameId(objectDefinition.getClassName()),
+			StringPool.SLASH, objectEntry.getId());
+
+		String backURL = ParamUtil.getString(httpServletRequest, "redirect");
+
+		if (Validator.isNotNull(backURL)) {
+			editURL = HttpComponentsUtil.addParameter(
+				editURL, "redirect", backURL);
+		}
+
+		httpServletResponse.sendRedirect(editURL);
 
 		return null;
 	}

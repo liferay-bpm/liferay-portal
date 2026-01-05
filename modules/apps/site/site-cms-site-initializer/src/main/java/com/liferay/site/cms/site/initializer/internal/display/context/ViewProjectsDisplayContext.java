@@ -34,7 +34,6 @@ import com.liferay.translation.exporter.TranslationInfoItemFieldValuesExporterRe
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -85,43 +84,37 @@ public class ViewProjectsDisplayContext extends BaseSectionDisplayContext {
 
 	@Override
 	public List<DropdownItem> getCreationMenuDropdownItems() {
-		try {
-			ObjectDefinition objectDefinition =
-				_objectDefinitionLocalService.getObjectDefinition(
-					themeDisplay.getCompanyId(), "CMPProject");
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.
+				fetchObjectDefinitionByExternalReferenceCode(
+					"L_CMP_PROJECT", themeDisplay.getCompanyId());
 
-			// TODO: It should work using this, but it doesn't
-
-			//			ActionUtil.getStructuredContentDropdownItem(
-			//				httpServletRequest, "forms", "project",
-			//				"L_CMP_PROJECT", "")
-
-			return new ArrayList<>(
-				List.of(
-					DropdownItemBuilder.putData(
-						"objectDefinitionId",
-						String.valueOf(objectDefinition.getObjectDefinitionId())
-					).putData(
-						"action", "createAsset"
-					).setHref(
-						StringBundler.concat(
-							themeDisplay.getPortalURL(),
-							themeDisplay.getPathMain(),
-							GroupConstants.CMS_FRIENDLY_URL,
-							"/add_project?objectDefinitionId=",
-							objectDefinition.getObjectDefinitionId(),
-							"&objectEntryFolderExternalReferenceCode=",
-							"&plid=", themeDisplay.getPlid(), "&redirect=",
-							themeDisplay.getURLCurrent())
-					).setIcon(
-						"forms"
-					).setLabel(
-						LanguageUtil.get(httpServletRequest, "new-project")
-					).build()));
+		if (objectDefinition == null) {
+			return null;
 		}
-		catch (PortalException portalException) {
-			throw new RuntimeException(portalException);
-		}
+
+		return Collections.singletonList(
+			DropdownItemBuilder.putData(
+				"action", "createAsset"
+			).putData(
+				"objectDefinitionId",
+				String.valueOf(objectDefinition.getObjectDefinitionId())
+			).putData(
+				"redirect",
+				StringBundler.concat(
+					themeDisplay.getPortalURL(), themeDisplay.getPathMain(),
+					GroupConstants.CMS_FRIENDLY_URL,
+					"/add_project?objectDefinitionId=",
+					objectDefinition.getObjectDefinitionId(), "&plid=",
+					themeDisplay.getPlid(), "&redirect=",
+					themeDisplay.getURLCurrent())
+			).putData(
+				"title", objectDefinition.getLabel(themeDisplay.getLocale())
+			).setIcon(
+				"forms"
+			).setLabel(
+				LanguageUtil.get(httpServletRequest, "new-project")
+			).build());
 	}
 
 	@Override

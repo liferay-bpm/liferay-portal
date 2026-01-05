@@ -11,7 +11,7 @@
 ViewProjectsDisplayContext viewProjectsDisplayContext = (ViewProjectsDisplayContext)request.getAttribute(ViewProjectsDisplayContext.class.getName());
 %>
 
-<div class="cms-section">
+<div>
 	<div>
 		<react:component
 			module="{Breadcrumb} from site-cms-site-initializer"
@@ -19,8 +19,9 @@ ViewProjectsDisplayContext viewProjectsDisplayContext = (ViewProjectsDisplayCont
 		/>
 	</div>
 
-	<div>
+	<div class="cms-section custom-empty-state">
 		<frontend-data-set:headless-display
+			additionalProps="<%= viewProjectsDisplayContext.getAdditionalProps() %>"
 			apiURL="<%= viewProjectsDisplayContext.getAPIURL() %>"
 			bulkActionDropdownItems="<%= viewProjectsDisplayContext.getBulkActionDropdownItems() %>"
 			creationMenu="<%= viewProjectsDisplayContext.getCreationMenu() %>"
@@ -29,9 +30,8 @@ ViewProjectsDisplayContext viewProjectsDisplayContext = (ViewProjectsDisplayCont
 			formName="fm"
 			id="<%= CMSSiteInitializerFDSNames.CMP_PROJECT %>"
 			itemsPerPage="<%= 20 %>"
-			propsTransformer="{StructuresFDSPropsTransformer} from site-cms-site-initializer"
-			selectedItemsKey="id"
-			style="fluid"
+			propsTransformer="{AssetsFDSPropsTransformer} from site-cms-site-initializer"
+			selectedItemsKey="embedded.id"
 		/>
 	</div>
 </div>
