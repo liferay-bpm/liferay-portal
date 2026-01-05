@@ -24,6 +24,7 @@ ViewProjectsDisplayContext viewProjectsDisplayContext = (ViewProjectsDisplayCont
 			apiURL="<%= viewProjectsDisplayContext.getAPIURL() %>"
 			bulkActionDropdownItems="<%= viewProjectsDisplayContext.getBulkActionDropdownItems() %>"
 			creationMenu="<%= viewProjectsDisplayContext.getCreationMenu() %>"
+			emptyState="<%= viewProjectsDisplayContext.getEmptyState() %>"
 			fdsActionDropdownItems="<%= viewProjectsDisplayContext.getFDSActionDropdownItems() %>"
 			formName="fm"
 			id="<%= CMSSiteInitializerFDSNames.CMP_PROJECT %>"
