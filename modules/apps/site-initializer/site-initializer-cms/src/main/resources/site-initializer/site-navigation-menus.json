@@ -85,6 +85,13 @@
 						"friendlyURL": "/projects",
 						"privateLayout": false,
 						"type": "layout"
+					},
+					{
+						"displayIcon": "paste",
+						"externalReferenceCode": "CMSPRIMARYNAVIGATION13",
+						"friendlyURL": "/tasks",
+						"privateLayout": false,
+						"type": "layout"
 					}
 				],
 				"name_i18n": {
