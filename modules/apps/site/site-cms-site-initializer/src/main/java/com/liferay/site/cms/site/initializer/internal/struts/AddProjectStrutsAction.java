@@ -72,6 +72,7 @@ public class AddProjectStrutsAction implements StrutsAction {
 						() -> new Settings() {
 							{
 								setLogoColor(() -> "outline-0");
+								setTrashEnabled(() -> false);
 							}
 						});
 					setType(() -> Type.PROJECT);

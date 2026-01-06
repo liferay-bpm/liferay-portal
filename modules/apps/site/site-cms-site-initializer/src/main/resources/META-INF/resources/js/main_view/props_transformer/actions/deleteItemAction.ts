@@ -73,6 +73,8 @@ export default async function deleteItemAction(
 			getScopeExternalReferenceCode(itemData)
 		);
 
+		const title = itemData.title || embedded.title;
+
 		if (!itemSpace.settings?.trashEnabled) {
 			confirmAndDeleteEntryAction({
 				bodyHTML:
@@ -81,23 +83,23 @@ export default async function deleteItemAction(
 								Liferay.Language.get(
 									'delete-folder-confirmation-body'
 								),
-								itemData.title
+								title
 							)
 						: sub(
 								Liferay.Language.get(
 									'delete-asset-confirmation-body'
 								),
-								itemData.title
+								title
 							),
 				deleteAction: actions.delete,
 				loadData,
 				successMessage: sub(
 					Liferay.Language.get('x-was-successfully-deleted'),
-					`<strong>${itemData.title}</strong>`
+					`<strong>${title}</strong>`
 				),
 				title: sub(
 					Liferay.Language.get('delete-asset-confirmation-title'),
-					itemData.title
+					title
 				),
 			});
 		}
