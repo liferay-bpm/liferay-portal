@@ -6,9 +6,11 @@
 package com.liferay.site.cms.site.initializer.internal.frontend.data.set.view.table;
 
 import com.liferay.frontend.data.set.view.FDSView;
+import com.liferay.frontend.data.set.view.table.DateFDSTableSchemaField;
 import com.liferay.frontend.data.set.view.table.FDSTableSchema;
 import com.liferay.frontend.data.set.view.table.FDSTableSchemaBuilder;
 import com.liferay.frontend.data.set.view.table.FDSTableSchemaBuilderFactory;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.site.cms.site.initializer.internal.constants.CMSSiteInitializerFDSNames;
 
 import java.util.Locale;
@@ -38,16 +40,48 @@ public class ProjectSectionCMPTableFDSView extends BaseCMSTableFDSView {
 				"simpleActionLinkTableCellRenderer"
 			)
 		).add(
-			"embedded.scopeKey", "space",
-			fdsTableSchemaField -> fdsTableSchemaField.setContentRenderer(
-				"spaceTableCellRenderer")
+			_getDateFDSTableSchemaField("embedded.dueDate", "due-date")
 		).add(
-			addDateFDSTableSchemaField("dateModified", "modified")
+			"embedded.completionRate", "completion-rate",
+			fdsTableSchemaField -> fdsTableSchemaField.setContentRenderer(
+				"progressBarTableCellRenderer")
+		).add(
+			"embedded.r_projectToUserManager_userERC", "manager",
+			fdsTableSchemaField -> fdsTableSchemaField.setContentRenderer(
+				"userRelationshipTableCellRenderer")
+		).add(
+			"embedded.r_projectToUserSponsor_userERC", "sponsor",
+			fdsTableSchemaField -> fdsTableSchemaField.setContentRenderer(
+				"userRelationshipTableCellRenderer")
 		).add(
 			"embedded.state", "state",
 			fdsTableSchemaField -> fdsTableSchemaField.setContentRenderer(
 				"stateTableCellRenderer")
 		).build();
+	}
+
+	private DateFDSTableSchemaField _getDateFDSTableSchemaField(
+		String fieldName, String label) {
+
+		DateFDSTableSchemaField dateFDSTableSchemaField =
+			new DateFDSTableSchemaField();
+
+		dateFDSTableSchemaField.setFieldName(fieldName);
+		dateFDSTableSchemaField.setFormat(
+			JSONUtil.put(
+				"day", "numeric"
+			).put(
+				"month", "numeric"
+			).put(
+				"year", "numeric"
+			));
+		dateFDSTableSchemaField.setLabel(
+			label
+		).setLocalizeLabel(
+			true
+		);
+
+		return dateFDSTableSchemaField;
 	}
 
 	@Reference

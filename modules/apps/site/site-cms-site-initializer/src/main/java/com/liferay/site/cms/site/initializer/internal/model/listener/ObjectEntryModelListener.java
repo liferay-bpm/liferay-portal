@@ -17,6 +17,7 @@ import com.liferay.object.model.ObjectEntryFolder;
 import com.liferay.object.rest.filter.factory.FilterFactory;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryFolderLocalService;
+import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -36,10 +37,15 @@ import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.site.cms.site.initializer.util.CMSDefaultPermissionUtil;
+
+import java.io.Serializable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -60,6 +66,19 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 
 		try {
 			_onAfterCreate(objectEntry);
+			_updateProjectCompletionRate(objectEntry);
+		}
+		catch (Exception exception) {
+			throw new ModelListenerException(exception);
+		}
+	}
+
+	@Override
+	public void onAfterRemove(ObjectEntry objectEntry)
+		throws ModelListenerException {
+
+		try {
+			_updateProjectCompletionRate(objectEntry);
 		}
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
@@ -77,6 +96,8 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 
 				_setResourcePermissions(objectEntry);
 			}
+
+			_updateProjectCompletionRate(objectEntry);
 		}
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
@@ -118,6 +139,17 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 			group.getCompanyId(), group.getCreatorUserId(),
 			group.getExternalReferenceCode(), DepotEntry.class.getName(),
 			_filterFactory);
+	}
+
+	private int _getCount(
+			String filterString, ObjectDefinition objectDefinition,
+			ObjectEntry objectEntry)
+		throws Exception {
+
+		return _objectEntryLocalService.getValuesListCount(
+			new Long[] {objectEntry.getGroupId()}, 0, 0,
+			objectEntry.getObjectDefinitionId(),
+			_filterFactory.create(filterString, objectDefinition), false, null);
 	}
 
 	private ObjectEntryFolder _getRootObjectEntryFolder(
@@ -234,6 +266,61 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		}
 	}
 
+	private void _updateProjectCompletionRate(ObjectEntry objectEntry)
+		throws Exception {
+
+		ObjectDefinition taskObjectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				objectEntry.getObjectDefinitionId());
+
+		if (!StringUtil.equals(
+				taskObjectDefinition.getExternalReferenceCode(),
+				"L_CMP_TASK")) {
+
+			return;
+		}
+
+		int totalCount = _getCount(null, taskObjectDefinition, objectEntry);
+
+		if (totalCount == 0) {
+			return;
+		}
+
+		int filteredCount = _getCount(
+			"state eq 'done'", taskObjectDefinition, objectEntry);
+
+		int completionRate = (filteredCount * 100) / totalCount;
+
+		ObjectDefinition projectObjectDefinition =
+			_objectDefinitionLocalService.
+				fetchObjectDefinitionByExternalReferenceCode(
+					"L_CMP_PROJECT", objectEntry.getCompanyId());
+
+		for (ObjectEntry projectObjectEntry :
+				_objectEntryLocalService.getObjectEntries(
+					objectEntry.getGroupId(),
+					projectObjectDefinition.getObjectDefinitionId(),
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS)) {
+
+			if (Objects.equals(
+					MapUtil.getInteger(
+						projectObjectEntry.getValues(), "completionRate"),
+					completionRate)) {
+
+				continue;
+			}
+
+			_objectEntryLocalService.partialUpdateObjectEntry(
+				projectObjectEntry.getUserId(),
+				projectObjectEntry.getObjectEntryId(),
+				projectObjectEntry.getObjectEntryFolderId(),
+				HashMapBuilder.<String, Serializable>put(
+					"completionRate", completionRate
+				).build(),
+				new ServiceContext());
+		}
+	}
+
 	@Reference
 	private DepotEntryLocalService _depotEntryLocalService;
 
@@ -253,6 +340,9 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 
 	@Reference
 	private ObjectEntryFolderLocalService _objectEntryFolderLocalService;
+
+	@Reference
+	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Reference
 	private ResourcePermissionLocalService _resourcePermissionLocalService;

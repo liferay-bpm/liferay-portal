@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import ClayProgressBar from '@clayui/progress-bar';
 import {
 	IInternalRenderer,
 	IView,
@@ -145,6 +146,11 @@ export default function AssetsFDSPropsTransformer({
 						/>
 					),
 					name: 'spaceTableCellRenderer',
+					type: 'internal',
+				} as IInternalRenderer,
+				{
+					component: ({value}) => ClayProgressBar({value}),
+					name: 'progressBarTableCellRenderer',
 					type: 'internal',
 				} as IInternalRenderer,
 				{
