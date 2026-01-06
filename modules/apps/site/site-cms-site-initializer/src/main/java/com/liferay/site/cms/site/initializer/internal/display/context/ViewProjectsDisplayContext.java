@@ -12,24 +12,20 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemBuilder;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntryFolder;
-import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectDefinitionService;
 import com.liferay.object.service.ObjectDefinitionSettingLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.site.cms.site.initializer.internal.util.ActionUtil;
 import com.liferay.translation.exporter.TranslationInfoItemFieldValuesExporterRegistry;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,7 +43,7 @@ public class ViewProjectsDisplayContext extends BaseSectionDisplayContext {
 		DepotEntryLocalService depotEntryLocalService,
 		DLConfiguration dlConfiguration, GroupLocalService groupLocalService,
 		HttpServletRequest httpServletRequest, Language language,
-		ObjectDefinitionLocalService objectDefinitionLocalService,
+		ObjectDefinition objectDefinition,
 		ObjectDefinitionService objectDefinitionService,
 		ObjectDefinitionSettingLocalService objectDefinitionSettingLocalService,
 		ModelResourcePermission<ObjectEntryFolder>
@@ -63,16 +59,27 @@ public class ViewProjectsDisplayContext extends BaseSectionDisplayContext {
 			objectEntryFolderModelResourcePermission, portal,
 			translationInfoItemFieldValuesExporterRegistry);
 
-		_objectDefinitionLocalService = objectDefinitionLocalService;
+		_objectDefinition = objectDefinition;
 	}
 
 	public Map<String, Object> getBreadcrumbProps() throws PortalException {
-		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
-
-		_addBreadcrumbItem(jsonArray, false, null, _getLayoutName());
-
 		return HashMapBuilder.<String, Object>put(
-			"breadcrumbItems", jsonArray
+			"breadcrumbItems",
+			JSONUtil.putAll(
+				JSONUtil.put(
+					"active", false
+				).put(
+					"label",
+					() -> {
+						Layout layout = themeDisplay.getLayout();
+
+						if (layout == null) {
+							return null;
+						}
+
+						return layout.getName(themeDisplay.getLocale(), true);
+					}
+				))
 		).put(
 			"hideSpace", true
 		).build();
@@ -84,32 +91,17 @@ public class ViewProjectsDisplayContext extends BaseSectionDisplayContext {
 
 	@Override
 	public List<DropdownItem> getCreationMenuDropdownItems() {
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.
-				fetchObjectDefinitionByExternalReferenceCode(
-					"L_CMP_PROJECT", themeDisplay.getCompanyId());
-
-		if (objectDefinition == null) {
-			return null;
-		}
-
 		return Collections.singletonList(
 			DropdownItemBuilder.putData(
 				"action", "createAsset"
 			).putData(
 				"objectDefinitionId",
-				String.valueOf(objectDefinition.getObjectDefinitionId())
+				String.valueOf(_objectDefinition.getObjectDefinitionId())
 			).putData(
 				"redirect",
-				StringBundler.concat(
-					themeDisplay.getPortalURL(), themeDisplay.getPathMain(),
-					GroupConstants.CMS_FRIENDLY_URL,
-					"/add_project?objectDefinitionId=",
-					objectDefinition.getObjectDefinitionId(), "&plid=",
-					themeDisplay.getPlid(), "&redirect=",
-					themeDisplay.getURLCurrent())
+				ActionUtil.getAddProjectURL(_objectDefinition, themeDisplay)
 			).putData(
-				"title", objectDefinition.getLabel(themeDisplay.getLocale())
+				"title", _objectDefinition.getLabel(themeDisplay.getLocale())
 			).setIcon(
 				"forms"
 			).setLabel(
@@ -132,66 +124,34 @@ public class ViewProjectsDisplayContext extends BaseSectionDisplayContext {
 
 	@Override
 	public List<FDSActionDropdownItem> getFDSActionDropdownItems() {
-		try {
-			ObjectDefinition objectDefinition =
-				_objectDefinitionLocalService.getObjectDefinition(
-					themeDisplay.getCompanyId(), "CMPProject");
-
-			return ListUtil.fromArray(
-				new FDSActionDropdownItem(
-					StringBundler.concat(
-						themeDisplay.getPathFriendlyURLPublic(),
-						GroupConstants.CMS_FRIENDLY_URL, "/e/project/",
-						PortalUtil.getClassNameId(
-							objectDefinition.getClassName()),
-						"/{embedded.id}"),
-					"cog", "edit",
-					LanguageUtil.get(httpServletRequest, "project"), "get",
-					"update", null));
-		}
-		catch (PortalException portalException) {
-			throw new RuntimeException(portalException);
-		}
+		return ListUtil.fromArray(
+			new FDSActionDropdownItem(
+				StringBundler.concat(
+					ActionUtil.getBaseEditProjectURL(
+						_objectDefinition, themeDisplay),
+					"{embedded.id}?redirect=", themeDisplay.getURLCurrent()),
+				"pencil", "edit", LanguageUtil.get(httpServletRequest, "edit"),
+				"get", "update", null),
+			new FDSActionDropdownItem(
+				StringBundler.concat(
+					ActionUtil.getBaseViewProjectURL(
+						_objectDefinition, themeDisplay),
+					"{embedded.id}?redirect=", themeDisplay.getURLCurrent()),
+				"view", "actionLink",
+				LanguageUtil.get(httpServletRequest, "view"), null, "get",
+				null),
+			new FDSActionDropdownItem(
+				null, "trash", "delete",
+				LanguageUtil.get(httpServletRequest, "delete"), null, "delete",
+				null));
 	}
 
 	@Override
 	protected String getCMSSectionFilterString() {
-		try {
-			ObjectDefinition objectDefinition =
-				_objectDefinitionLocalService.getObjectDefinition(
-					themeDisplay.getCompanyId(), "CMPProject");
-
-			return "objectDefinitionId eq " +
-				objectDefinition.getObjectDefinitionId();
-		}
-		catch (PortalException portalException) {
-			throw new RuntimeException(portalException);
-		}
+		return "objectDefinitionId eq " +
+			_objectDefinition.getObjectDefinitionId();
 	}
 
-	private void _addBreadcrumbItem(
-		JSONArray jsonArray, boolean active, String friendlyURL, String label) {
-
-		jsonArray.put(
-			JSONUtil.put(
-				"active", active
-			).put(
-				"href", friendlyURL
-			).put(
-				"label", label
-			));
-	}
-
-	private String _getLayoutName() {
-		Layout layout = themeDisplay.getLayout();
-
-		if (layout == null) {
-			return null;
-		}
-
-		return layout.getName(themeDisplay.getLocale(), true);
-	}
-
-	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
+	private final ObjectDefinition _objectDefinition;
 
 }

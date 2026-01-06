@@ -8,31 +8,25 @@ package com.liferay.site.cms.site.initializer.internal.struts;
 import com.liferay.headless.asset.library.dto.v1_0.AssetLibrary;
 import com.liferay.headless.asset.library.dto.v1_0.Settings;
 import com.liferay.headless.asset.library.resource.v1_0.AssetLibraryResource;
-import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.dto.v1_0.Status;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.service.ObjectDefinitionService;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
+import com.liferay.site.cms.site.initializer.internal.util.ActionUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -49,85 +43,80 @@ public class AddProjectStrutsAction implements StrutsAction {
 			HttpServletResponse httpServletResponse)
 		throws Exception {
 
-		long objectDefinitionId = ParamUtil.getLong(
-			httpServletRequest, "objectDefinitionId");
-
 		ObjectDefinition objectDefinition =
-			_objectDefinitionService.getObjectDefinition(objectDefinitionId);
+			_objectDefinitionService.getObjectDefinition(
+				ParamUtil.getLong(httpServletRequest, "objectDefinitionId"));
 
-		if (!Objects.equals(
-				objectDefinition.getScope(),
-				ObjectDefinitionConstants.SCOPE_DEPOT)) {
+		if (!StringUtil.equals(
+				objectDefinition.getExternalReferenceCode(), "L_CMP_PROJECT")) {
 
 			return null;
 		}
 
+		AssetLibraryResource.Builder builder =
+			_assetLibraryResourceFactory.create();
+
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
+
+		AssetLibraryResource assetLibraryResource = builder.user(
+			themeDisplay.getUser()
+		).build();
+
+		AssetLibrary assetLibrary = assetLibraryResource.postAssetLibrary(
+			new AssetLibrary() {
+				{
+					setName(StringUtil::randomString);
+					setSettings(
+						() -> new Settings() {
+							{
+								setLogoColor(() -> "outline-0");
+							}
+						});
+					setType(() -> Type.PROJECT);
+				}
+			});
 
 		ObjectEntryManager objectEntryManager =
 			_objectEntryManagerRegistry.getObjectEntryManager(
 				objectDefinition.getCompanyId(),
 				objectDefinition.getStorageType());
 
-		ObjectEntry objectEntry = new ObjectEntry();
-
-		objectEntry.setObjectEntryFolderExternalReferenceCode(
-			() -> ParamUtil.getString(
-				httpServletRequest, "objectEntryFolderExternalReferenceCode"));
-		objectEntry.setStatus(
-			() -> new Status() {
-				{
-					setCode(() -> WorkflowConstants.STATUS_DRAFT);
-				}
-			});
-
-		AssetLibraryResource.Builder builder =
-			_assetLibraryResourceFactory.create();
-
-		AssetLibraryResource assetLibraryResource = builder.user(
-			themeDisplay.getUser()
-		).build();
-
-		AssetLibrary assetLibrary = new AssetLibrary() {
-			{
-				setName(StringUtil::randomString);
-				setSettings(
-					() -> new Settings() {
-						{
-							setLogoColor(() -> "outline-0");
-						}
-					});
-				setType(() -> Type.PROJECT);
-			}
-		};
-
-		AssetLibrary postAssetLibrary = assetLibraryResource.postAssetLibrary(
-			assetLibrary);
-
-		objectEntry = objectEntryManager.addObjectEntry(
+		ObjectEntry objectEntry = objectEntryManager.addObjectEntry(
 			new DefaultDTOConverterContext(
 				false, null, null, null, null,
 				themeDisplay.getSiteDefaultLocale(), null,
 				themeDisplay.getUser()),
-			objectDefinition, objectEntry,
-			String.valueOf(postAssetLibrary.getSiteId()));
+			objectDefinition,
+			new ObjectEntry() {
+				{
+					setObjectEntryFolderExternalReferenceCode(
+						() -> ParamUtil.getString(
+							httpServletRequest,
+							"objectEntryFolderExternalReferenceCode"));
+					setStatus(
+						() -> new Status() {
+							{
+								setCode(() -> WorkflowConstants.STATUS_DRAFT);
+							}
+						});
+				}
+			},
+			String.valueOf(assetLibrary.getSiteId()));
 
-		String editURL = StringBundler.concat(
-			themeDisplay.getPathFriendlyURLPublic(),
-			GroupConstants.CMS_FRIENDLY_URL, "/e/edit-project/",
-			PortalUtil.getClassNameId(objectDefinition.getClassName()),
-			StringPool.SLASH, objectEntry.getId());
+		String editProjectURL =
+			ActionUtil.getBaseEditProjectURL(objectDefinition, themeDisplay) +
+				objectEntry.getId();
 
 		String backURL = ParamUtil.getString(httpServletRequest, "redirect");
 
 		if (Validator.isNotNull(backURL)) {
-			editURL = HttpComponentsUtil.addParameter(
-				editURL, "redirect", backURL);
+			editProjectURL = HttpComponentsUtil.addParameter(
+				editProjectURL, "redirect", backURL);
 		}
 
-		httpServletResponse.sendRedirect(editURL);
+		httpServletResponse.sendRedirect(editProjectURL);
 
 		return null;
 	}

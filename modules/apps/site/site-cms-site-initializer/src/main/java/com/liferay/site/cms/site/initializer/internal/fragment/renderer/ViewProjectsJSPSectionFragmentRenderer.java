@@ -8,12 +8,15 @@ package com.liferay.site.cms.site.initializer.internal.fragment.renderer;
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.document.library.configuration.DLConfiguration;
 import com.liferay.fragment.renderer.FragmentRenderer;
+import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntryFolder;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectDefinitionService;
 import com.liferay.object.service.ObjectDefinitionSettingLocalService;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.site.cms.site.initializer.internal.display.context.ViewProjectsDisplayContext;
 import com.liferay.translation.exporter.TranslationInfoItemFieldValuesExporterRegistry;
 
@@ -43,9 +46,22 @@ public class ViewProjectsJSPSectionFragmentRenderer
 	protected ViewProjectsDisplayContext getDisplayContext(
 		HttpServletRequest httpServletRequest) {
 
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.
+				fetchObjectDefinitionByExternalReferenceCode(
+					"L_CMP_PROJECT", themeDisplay.getCompanyId());
+
+		if (objectDefinition == null) {
+			return null;
+		}
+
 		return new ViewProjectsDisplayContext(
 			_depotEntryLocalService, _dlConfiguration, groupLocalService,
-			httpServletRequest, language, _objectDefinitionLocalService,
+			httpServletRequest, language, objectDefinition,
 			_objectDefinitionService, _objectDefinitionSettingLocalService,
 			_objectEntryFolderModelResourcePermission, _portal,
 			_translationInfoItemFieldValuesExporterRegistry);
