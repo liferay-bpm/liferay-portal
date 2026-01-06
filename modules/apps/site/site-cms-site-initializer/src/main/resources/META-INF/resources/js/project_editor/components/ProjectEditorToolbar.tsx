@@ -12,12 +12,18 @@ import React, {useEffect, useId, useState} from 'react';
 
 import Toolbar from '../../common/components/Toolbar';
 
-export default function ProjectEditorToolbar({backURL}: {backURL: string}) {
+export default function ProjectEditorToolbar({
+	backURL,
+	viewProjectURL,
+}: {
+	backURL: string;
+	viewProjectURL: string;
+}) {
 	const [formId, setFormId] = useState<string | undefined>();
 
 	const submitLabelId = useId();
 	const submitTitle = getSubmitTitle(
-		sub(Liferay.Language.get('publish-x'), Liferay.Language.get('project'))
+		sub(Liferay.Language.get('save-x'), Liferay.Language.get('project'))
 	);
 
 	useEffect(() => {
@@ -75,7 +81,7 @@ export default function ProjectEditorToolbar({backURL}: {backURL: string}) {
 					size="sm"
 					type="submit"
 				>
-					{Liferay.Language.get('publish')}
+					{Liferay.Language.get('save')}
 				</ClayButton>
 
 				<span
@@ -88,7 +94,7 @@ export default function ProjectEditorToolbar({backURL}: {backURL: string}) {
 					form={formId}
 					name="redirect"
 					type="hidden"
-					value={backURL}
+					value={viewProjectURL}
 				/>
 			</Toolbar.Item>
 		</Toolbar>

@@ -7,9 +7,16 @@ package com.liferay.site.cms.site.initializer.internal.fragment.renderer;
 
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
+import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
+import com.liferay.layout.display.page.constants.LayoutDisplayPageWebKeys;
+import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.site.cms.site.initializer.internal.util.ActionUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Igor Franca
@@ -66,11 +74,43 @@ public class ProjectEditorToolbarComponentSectionFragmentRenderer
 		FragmentRendererContext fragmentRendererContext,
 		HttpServletRequest httpServletRequest) {
 
-		HashMapBuilder.HashMapWrapper<String, Object> hashMapWrapper =
-			HashMapBuilder.<String, Object>put(
-				"backURL", ParamUtil.getString(httpServletRequest, "redirect"));
+		return HashMapBuilder.<String, Object>put(
+			"backURL", ParamUtil.getString(httpServletRequest, "redirect")
+		).put(
+			"viewProjectURL",
+			() -> {
+				LayoutDisplayPageObjectProvider<?>
+					layoutDisplayPageObjectProvider =
+						(LayoutDisplayPageObjectProvider<?>)
+							httpServletRequest.getAttribute(
+								LayoutDisplayPageWebKeys.
+									LAYOUT_DISPLAY_PAGE_OBJECT_PROVIDER);
 
-		return hashMapWrapper.build();
+				if (layoutDisplayPageObjectProvider == null) {
+					return null;
+				}
+
+				Object displayObject =
+					layoutDisplayPageObjectProvider.getDisplayObject();
+
+				if (!(displayObject instanceof ObjectEntry)) {
+					return null;
+				}
+
+				ObjectEntry objectEntry = (ObjectEntry)displayObject;
+
+				String viewProjectURL = ActionUtil.getBaseViewProjectURL(
+					_objectDefinitionLocalService.fetchObjectDefinition(
+						objectEntry.getObjectDefinitionId()),
+					(ThemeDisplay)httpServletRequest.getAttribute(
+						WebKeys.THEME_DISPLAY));
+
+				return viewProjectURL + objectEntry.getObjectEntryId();
+			}
+		).build();
 	}
+
+	@Reference
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 }
