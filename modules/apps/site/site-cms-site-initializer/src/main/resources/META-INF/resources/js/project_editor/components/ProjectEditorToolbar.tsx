@@ -7,6 +7,7 @@ import ClayButton from '@clayui/button';
 import {ClayInput} from '@clayui/form';
 import ClayLink from '@clayui/link';
 import {isCtrlOrMeta} from '@liferay/layout-js-components-web';
+import {openToast} from 'frontend-js-components-web';
 import {sub} from 'frontend-js-web';
 import React, {useEffect, useId, useState} from 'react';
 
@@ -26,12 +27,18 @@ export default function ProjectEditorToolbar({
 		sub(Liferay.Language.get('save-x'), Liferay.Language.get('project'))
 	);
 
-	useEffect(() => {
+	function getForm(): HTMLFormElement {
 		let form = document.querySelector('.lfr-main-form-container');
 
 		if (!form) {
 			form = document.querySelector('.lfr-layout-structure-item-form');
 		}
+
+		return form as HTMLFormElement;
+	}
+
+	useEffect(() => {
+		const form = getForm();
 
 		if (form) {
 			setFormId(form.id);
@@ -78,6 +85,25 @@ export default function ProjectEditorToolbar({
 					data-title={submitTitle}
 					data-title-set-as-html
 					form={formId}
+					onClick={() => {
+						const form = getForm();
+
+						if (form && form.checkValidity()) {
+							const {value} = form.querySelector(
+								'[name^="ObjectField_title"]'
+							) as HTMLInputElement;
+
+							openToast({
+								message: sub(
+									Liferay.Language.get(
+										'x-was-published-successfully'
+									),
+									`<strong>${value}</strong>`
+								),
+								type: 'success',
+							});
+						}
+					}}
 					size="sm"
 					type="submit"
 				>
