@@ -29,7 +29,7 @@ ViewTasksDisplayContext viewTasksDisplayContext = (ViewTasksDisplayContext)reque
 			formName="fm"
 			id="<%= CMSSiteInitializerFDSNames.CMP_TASK %>"
 			itemsPerPage="<%= 20 %>"
-			propsTransformer="{StructuresFDSPropsTransformer} from site-cms-site-initializer"
+			propsTransformer="{TasksFDSPropsTransformer} from site-cms-site-initializer"
 			selectedItemsKey="id"
 			style="fluid"
 		/>
