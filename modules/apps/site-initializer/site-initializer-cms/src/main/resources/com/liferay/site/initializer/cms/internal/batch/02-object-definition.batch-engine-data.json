@@ -981,7 +981,7 @@
 					],
 					"readOnly": "false",
 					"readOnlyConditionExpression": "",
-					"required": false,
+					"required": true,
 					"state": false,
 					"system": false,
 					"type": "String",
