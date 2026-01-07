@@ -472,6 +472,16 @@ public class ActionUtil {
 		}
 	}
 
+	public static String getAddProjectURL(
+		ObjectDefinition objectDefinition, ThemeDisplay themeDisplay) {
+
+		return StringBundler.concat(
+			themeDisplay.getPortalURL(), themeDisplay.getPathMain(),
+			GroupConstants.CMS_FRIENDLY_URL, "/add_project?objectDefinitionId=",
+			objectDefinition.getObjectDefinitionId(), "&plid=",
+			themeDisplay.getPlid(), "&redirect=", themeDisplay.getURLCurrent());
+	}
+
 	public static List<DropdownItem> getAllSectionCreationMenuDropdownItems(
 		HttpServletRequest httpServletRequest) {
 
@@ -530,6 +540,16 @@ public class ActionUtil {
 			PortalUtil.getClassNameId(className));
 	}
 
+	public static String getBaseEditProjectURL(
+		ObjectDefinition objectDefinition, ThemeDisplay themeDisplay) {
+
+		return StringBundler.concat(
+			themeDisplay.getPathFriendlyURLPublic(),
+			GroupConstants.CMS_FRIENDLY_URL, "/e/edit-project/",
+			PortalUtil.getClassNameId(objectDefinition.getClassName()),
+			StringPool.SLASH);
+	}
+
 	public static String getBaseSpaceSettingsURL(ThemeDisplay themeDisplay) {
 		return StringBundler.concat(
 			themeDisplay.getPathFriendlyURLPublic(),
@@ -572,6 +592,16 @@ public class ActionUtil {
 			themeDisplay.getPathFriendlyURLPublic(),
 			GroupConstants.CMS_FRIENDLY_URL, "/e/view-folder/",
 			PortalUtil.getClassNameId(ObjectEntryFolder.class),
+			StringPool.SLASH);
+	}
+
+	public static String getBaseViewProjectURL(
+		ObjectDefinition objectDefinition, ThemeDisplay themeDisplay) {
+
+		return StringBundler.concat(
+			themeDisplay.getPathFriendlyURLPublic(),
+			GroupConstants.CMS_FRIENDLY_URL, "/e/project/",
+			PortalUtil.getClassNameId(objectDefinition.getClassName()),
 			StringPool.SLASH);
 	}
 
