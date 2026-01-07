@@ -118,6 +118,7 @@ public class ViewTasksDisplayContext extends BaseSectionDisplayContext {
 							"&objectEntryFolderExternalReferenceCode=",
 							"&plid=", themeDisplay.getPlid(),
 							"&projectGroupId=", _assetEntry.getGroupId(),
+							"&projectId=", _assetEntry.getClassPK(),
 							"&redirect=", themeDisplay.getURLCurrent())
 					).setIcon(
 						"forms"

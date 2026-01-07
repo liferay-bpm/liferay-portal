@@ -17,6 +17,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -70,6 +71,11 @@ public class AddTaskStrutsAction implements StrutsAction {
 		objectEntry.setObjectEntryFolderExternalReferenceCode(
 			() -> ParamUtil.getString(
 				httpServletRequest, "objectEntryFolderExternalReferenceCode"));
+		objectEntry.setProperties(
+			() -> HashMapBuilder.<String, Object>put(
+				"r_cmpProjectToCMPTask_c_cmpProjectId",
+				ParamUtil.getLong(httpServletRequest, "projectId")
+			).build());
 		objectEntry.setStatus(
 			() -> new Status() {
 				{
