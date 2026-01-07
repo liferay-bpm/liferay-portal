@@ -32,6 +32,7 @@ page import="com.liferay.site.cms.site.initializer.internal.display.context.View
 page import="com.liferay.site.cms.site.initializer.internal.display.context.ViewHomeRecentAssetsSectionDisplayContext" %><%@
 page import="com.liferay.site.cms.site.initializer.internal.display.context.ViewHomeSearchBarDisplayContext" %><%@
 page import="com.liferay.site.cms.site.initializer.internal.display.context.ViewHomeWorkflowTasksDisplayContext" %><%@
+page import="com.liferay.site.cms.site.initializer.internal.display.context.ViewProjectInfoSummarySectionDisplayContext" %><%@
 page import="com.liferay.site.cms.site.initializer.internal.display.context.ViewProjectsDisplayContext" %><%@
 page import="com.liferay.site.cms.site.initializer.internal.display.context.ViewRecycleBinSectionDisplayContext" %><%@
 page import="com.liferay.site.cms.site.initializer.internal.display.context.ViewSharedWithMeSectionDisplayContext" %><%@

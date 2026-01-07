@@ -1,0 +1,55 @@
+.lfr-cmp__project-info-summary {
+	&-content {
+		&-container {
+			border-top: 0.05rem solid rgb(205, 206, 217);
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+			justify-content: space-between;
+			padding: 1.5rem;
+
+			&--hidden {
+				display: none;
+			}
+		}
+
+		&-item {
+			align-items: center;
+			display: flex;
+			font-size: 14px;
+			gap: 2rem;
+		}
+
+		&-label {
+			font-weight: 600;
+		}
+
+		&-user {
+			&-avatar {
+				border-radius: 50%;
+				height: 1.5rem;
+				width: 1.5rem;
+			}
+
+			&-container {
+				align-items: center;
+				display: flex;
+				gap: 0.5rem;
+			}
+		}
+	}
+
+	&-header {
+		&-container {
+			align-items: center;
+			display: flex;
+			justify-content: space-between;
+			padding: 1.5rem;
+		}
+
+		&-content {
+			font-size: 1rem;
+			font-weight: 700;
+		}
+	}
+}

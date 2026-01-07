@@ -31,6 +31,7 @@ export {default as QuickActions} from './main_view/home/QuickActions';
 export {default as SearchBar} from './main_view/home/SearchBar';
 export {default as ViewWorkflowTasks} from './main_view/home/ViewWorkflowTasks';
 export {default as AssetTypeInfoPanelContent} from './main_view/info_panel/AssetTypeInfoPanelContent';
+export {default as ProjectInfoSummary} from './main_view/projects/ProjectInfoSummary';
 export {default as AllSpacesFDSPropsTransformer} from './main_view/props_transformer/AllSpacesFDSPropsTransformer';
 export {default as AssetsFDSPropsTransformer} from './main_view/props_transformer/AssetsFDSPropsTransformer';
 export {default as AssetsFilesDropFDSPropsTransformer} from './main_view/props_transformer/AssetsFilesDropFDSPropsTransformer';
