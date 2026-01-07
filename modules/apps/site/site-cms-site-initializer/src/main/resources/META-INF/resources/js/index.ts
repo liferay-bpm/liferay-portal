@@ -56,6 +56,10 @@ export {default as SpaceSettings} from './main_view/spaces/SpaceSettings';
 export {default as SpaceSummaryHeader} from './main_view/spaces/SpaceSummaryHeader';
 export {default as SpacesNavigation} from './main_view/spaces_navigation/SpacesNavigation';
 
+// Project Editor
+
+export {default as ProjectEditorToolbar} from './project_editor/components/ProjectEditorToolbar';
+
 // Structure Builder
 
 export {default as StructureBuilder} from './structure_builder/components/StructureBuilder';
