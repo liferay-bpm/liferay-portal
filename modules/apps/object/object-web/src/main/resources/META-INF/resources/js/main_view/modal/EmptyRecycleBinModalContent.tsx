@@ -1,0 +1,66 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ */
+
+import ClayButton from '@clayui/button';
+import ClayModal from '@clayui/modal';
+import React from 'react';
+
+import {triggerAssetBulkAction} from '../props_transformer/actions/triggerAssetBulkAction';
+
+const CMS_EMPTY_RECYCLE_BIN_FILTER =
+	"cmsRoot eq true and (cmsSection eq 'contents' or cmsSection eq 'files') and status eq 8";
+
+export default function EmptyRecycleBinModalContent({
+	closeModal,
+}: {
+	closeModal: () => void;
+}) {
+	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+
+		triggerAssetBulkAction({
+			apiURL: `/o/bulk/v1.0/bulk-action?filter=${encodeURIComponent(CMS_EMPTY_RECYCLE_BIN_FILTER)}&nestedFields=embedded`,
+			selectedData: {selectAll: true},
+			type: 'DeleteBulkAction',
+		});
+
+		closeModal();
+	};
+
+	return (
+		<form onSubmit={handleSubmit}>
+			<ClayModal.Header
+				closeButtonAriaLabel={Liferay.Language.get('close')}
+			>
+				{Liferay.Language.get('empty-recycle-bin')}
+			</ClayModal.Header>
+
+			<ClayModal.Body>
+				<p>
+					{Liferay.Language.get(
+						'this-will-permanently-delete-all-items-in-the-recycle-bin.-this-action-cannot-be-undone.-are-you-sure-you-want-to-proceed'
+					)}
+				</p>
+			</ClayModal.Body>
+
+			<ClayModal.Footer
+				last={
+					<ClayButton.Group spaced>
+						<ClayButton
+							displayType="secondary"
+							onClick={closeModal}
+						>
+							{Liferay.Language.get('cancel')}
+						</ClayButton>
+
+						<ClayButton displayType="danger" type="submit">
+							{Liferay.Language.get('empty-bin')}
+						</ClayButton>
+					</ClayButton.Group>
+				}
+			></ClayModal.Footer>
+		</form>
+	);
+}

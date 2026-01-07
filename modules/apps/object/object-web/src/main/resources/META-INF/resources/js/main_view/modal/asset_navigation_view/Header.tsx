@@ -1,0 +1,92 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ */
+
+import {ClayButtonWithIcon} from '@clayui/button';
+import ClayIcon from '@clayui/icon';
+import ClayLink from '@clayui/link';
+import classNames from 'classnames';
+import React from 'react';
+
+import {ISearchAssetObjectEntry} from '../../../common/types/AssetType';
+import {PANELS} from './AssetNavigationModalContent';
+
+export default function Header({
+	activePanel,
+	handleClickComments,
+	handleClickInfo,
+	item,
+	showCommentsPanel,
+	showInfoPanel,
+}: {
+	activePanel?: keyof typeof PANELS | null;
+	handleClickComments: () => void;
+	handleClickInfo: () => void;
+	item: ISearchAssetObjectEntry;
+	showCommentsPanel: boolean;
+	showInfoPanel: boolean;
+}) {
+	const headerName = item.embedded?.title || item.embedded.file?.name;
+
+	const file = item.embedded.file;
+	const link = file?.link;
+
+	return (
+		<div className="autofit-row autofit-row-center">
+			<div className="autofit-col autofit-col-expand">
+				<div className="text-truncate" data-testid="modal-header-name">
+					{headerName}
+				</div>
+			</div>
+
+			<div className="align-items-center c-gap-2 d-flex">
+				{showCommentsPanel && (
+					<ClayButtonWithIcon
+						aria-label={Liferay.Language.get('show-comments')}
+						borderless
+						className={classNames({
+							active:
+								activePanel &&
+								activePanel === PANELS.commentPanel,
+						})}
+						displayType="secondary"
+						onClick={handleClickComments}
+						symbol="message"
+					/>
+				)}
+
+				{showInfoPanel && (
+					<ClayButtonWithIcon
+						aria-label={Liferay.Language.get('show-details')}
+						borderless
+						className={classNames({
+							active:
+								activePanel && activePanel === PANELS.infoPanel,
+						})}
+						displayType="secondary"
+						onClick={handleClickInfo}
+						symbol="info-circle-open"
+					/>
+				)}
+
+				{link?.href && (
+					<div className="autofit-col pr-3">
+						<ClayLink
+							button
+							displayType="primary"
+							href={link.href}
+							small
+						>
+							<span className="inline-item inline-item-before">
+								<ClayIcon symbol="download" />
+							</span>
+
+							{Liferay.Language.get('download')}
+						</ClayLink>
+					</div>
+				)}
+			</div>
+		</div>
+	);
+}

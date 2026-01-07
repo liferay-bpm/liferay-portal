@@ -1,0 +1,43 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ */
+
+import React, {useContext} from 'react';
+
+import AssetCategorization from '../components/AssetCategorization';
+import {AssetTypeInfoPanelContext} from '../context';
+
+const CategorizationTabContent = () => {
+	const {
+		assetLibrary,
+		cmsGroupId,
+		objectEntries = [],
+	} = useContext(AssetTypeInfoPanelContext);
+
+	if (!objectEntries[0].actions) {
+		return null;
+	}
+
+	const [
+		{
+			actions: {get, update},
+		},
+	] = objectEntries;
+
+	if (!cmsGroupId || !assetLibrary || !get.href) {
+		return null;
+	}
+
+	return (
+		<AssetCategorization
+			assetLibraryId={assetLibrary?.groupId}
+			cmsGroupId={cmsGroupId}
+			getObjectEntryURL={get.href}
+			hasUpdatePermission={!!update?.href}
+			updateObjectEntryURL={update?.href}
+		/>
+	);
+};
+
+export default CategorizationTabContent;
