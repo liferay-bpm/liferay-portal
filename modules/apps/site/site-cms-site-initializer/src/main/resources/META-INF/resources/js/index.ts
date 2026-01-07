@@ -40,6 +40,7 @@ export {default as CategoryFDSPropsTransformer} from './main_view/props_transfor
 export {default as CategoryUsagesFDSPropsTransformer} from './main_view/props_transformer/CategoryUsagesFDSPropsTransformer';
 export {default as HomeRecentAssetsFDSPropsTransformer} from './main_view/props_transformer/HomeRecentAssetsFDSPropsTransformer';
 export {default as MembersFDSPropsTransformer} from './main_view/props_transformer/MembersFDSPropsTransformer';
+export {default as ProjectsFDSPropsTransformer} from './main_view/props_transformer/ProjectsFDSPropsTransformer';
 export {default as RecycleBinFDSPropsTransformer} from './main_view/props_transformer/RecycleBinFDSPropsTransformer';
 export {default as SharedWithMeFDSPropsTransformer} from './main_view/props_transformer/SharedWithMeFDSPropsTransformer';
 export {default as SitesFDSPropsTransformer} from './main_view/props_transformer/SitesFDSPropsTransformer';
