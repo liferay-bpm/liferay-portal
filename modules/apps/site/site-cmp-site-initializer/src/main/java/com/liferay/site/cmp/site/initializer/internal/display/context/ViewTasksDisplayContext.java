@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Sam Ziemer
+ * @author Gabriel Albuquerque
  */
 public class ViewTasksDisplayContext extends BaseSectionDisplayContext {
 

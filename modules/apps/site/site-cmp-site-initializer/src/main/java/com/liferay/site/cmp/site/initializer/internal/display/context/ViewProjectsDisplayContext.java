@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Sam Ziemer
+ * @author Gabriel Albuquerque
  */
 public class ViewProjectsDisplayContext extends BaseSectionDisplayContext {
 

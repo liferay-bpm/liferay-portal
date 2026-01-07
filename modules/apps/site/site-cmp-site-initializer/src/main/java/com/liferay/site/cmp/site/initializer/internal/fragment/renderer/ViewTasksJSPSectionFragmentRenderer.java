@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Sam Ziemer
+ * @author Gabriel Albuquerque
  */
 @Component(service = FragmentRenderer.class)
 public class ViewTasksJSPSectionFragmentRenderer
