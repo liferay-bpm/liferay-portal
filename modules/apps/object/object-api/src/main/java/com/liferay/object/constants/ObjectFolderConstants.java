@@ -10,6 +10,9 @@ package com.liferay.object.constants;
  */
 public class ObjectFolderConstants {
 
+	public static final String EXTERNAL_REFERENCE_CODE_CMP_STRUCTURES =
+		"L_CMP_STRUCTURES";
+
 	public static final String EXTERNAL_REFERENCE_CODE_CONTENT_STRUCTURES =
 		"L_CMS_CONTENT_STRUCTURES";
 
