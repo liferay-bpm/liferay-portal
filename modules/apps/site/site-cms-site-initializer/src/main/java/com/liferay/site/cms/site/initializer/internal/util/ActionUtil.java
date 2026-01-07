@@ -918,6 +918,12 @@ public class ActionUtil {
 		return dropdownItems;
 	}
 
+	public static String getProjectsURL(ThemeDisplay themeDisplay) {
+		return StringBundler.concat(
+			themeDisplay.getPathFriendlyURLPublic(),
+			GroupConstants.CMS_FRIENDLY_URL, "/projects");
+	}
+
 	public static String getRecycleBinURL(ThemeDisplay themeDisplay) {
 		return StringBundler.concat(
 			themeDisplay.getPathFriendlyURLPublic(),
