@@ -151,16 +151,21 @@ public class ViewTasksDisplayContext extends BaseSectionDisplayContext {
 				_objectDefinitionLocalService.getObjectDefinition(
 					themeDisplay.getCompanyId(), "CMPTask");
 
+			String url = StringBundler.concat(
+				themeDisplay.getPathFriendlyURLPublic(),
+				GroupConstants.CMS_FRIENDLY_URL, "/e/edit-task/",
+				PortalUtil.getClassNameId(objectDefinition.getClassName()),
+				"/{embedded.id}");
+
 			return ListUtil.fromArray(
 				new FDSActionDropdownItem(
-					StringBundler.concat(
-						themeDisplay.getPathFriendlyURLPublic(),
-						GroupConstants.CMS_FRIENDLY_URL, "/e/task/",
-						PortalUtil.getClassNameId(
-							objectDefinition.getClassName()),
-						"/{embedded.id}"),
-					"cog", "edit", LanguageUtil.get(httpServletRequest, "task"),
-					"get", "update", null));
+					url, "pencil", "edit",
+					LanguageUtil.get(httpServletRequest, "edit"), "get",
+					"update", null),
+				new FDSActionDropdownItem(
+					url, "view", "actionLink",
+					LanguageUtil.get(httpServletRequest, "view"), null, "get",
+					null));
 		}
 		catch (PortalException portalException) {
 			throw new RuntimeException(portalException);
