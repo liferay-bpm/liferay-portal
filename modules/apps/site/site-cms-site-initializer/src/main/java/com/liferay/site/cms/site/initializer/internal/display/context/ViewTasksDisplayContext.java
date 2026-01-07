@@ -179,8 +179,16 @@ public class ViewTasksDisplayContext extends BaseSectionDisplayContext {
 				_objectDefinitionLocalService.getObjectDefinition(
 					themeDisplay.getCompanyId(), "CMPTask");
 
-			return "objectDefinitionId eq " +
-				objectDefinition.getObjectDefinitionId();
+			String filterString =
+				"objectDefinitionId eq " +
+					objectDefinition.getObjectDefinitionId();
+
+			if (_assetEntry == null) {
+				return filterString;
+			}
+
+			return filterString + " and scopeGroupId eq " +
+				_assetEntry.getGroupId();
 		}
 		catch (PortalException portalException) {
 			throw new RuntimeException(portalException);
