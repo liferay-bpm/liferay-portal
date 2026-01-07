@@ -1098,7 +1098,7 @@
 							}
 						],
 						"relationshipType": "oneToMany",
-						"required": false,
+						"required": true,
 						"state": false,
 						"system": true,
 						"type": "Long"
@@ -1264,7 +1264,7 @@
 					],
 					"readOnly": "false",
 					"readOnlyConditionExpression": "",
-					"required": false,
+					"required": true,
 					"state": false,
 					"system": true,
 					"type": "String",
