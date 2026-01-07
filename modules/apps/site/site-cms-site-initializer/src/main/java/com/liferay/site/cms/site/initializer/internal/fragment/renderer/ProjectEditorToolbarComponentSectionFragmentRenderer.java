@@ -9,8 +9,10 @@ import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.layout.display.page.constants.LayoutDisplayPageWebKeys;
+import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -74,40 +76,69 @@ public class ProjectEditorToolbarComponentSectionFragmentRenderer
 		FragmentRendererContext fragmentRendererContext,
 		HttpServletRequest httpServletRequest) {
 
+		ObjectEntry objectEntry = _getObjectEntry(httpServletRequest);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
 		return HashMapBuilder.<String, Object>put(
 			"backURL", ParamUtil.getString(httpServletRequest, "redirect")
 		).put(
+			"title",
+			() -> {
+				if (objectEntry == null) {
+					return null;
+				}
+
+				ObjectDefinition objectDefinition =
+					_objectDefinitionLocalService.fetchObjectDefinition(
+						objectEntry.getObjectDefinitionId());
+
+				if (Objects.equals(
+						objectDefinition.getExternalReferenceCode(),
+						"L_CMP_TASK")) {
+
+					return LanguageUtil.get(
+						themeDisplay.getLocale(), "new-task");
+				}
+
+				return LanguageUtil.get(
+					themeDisplay.getLocale(), "new-project");
+			}
+		).put(
 			"viewProjectURL",
 			() -> {
-				LayoutDisplayPageObjectProvider<?>
-					layoutDisplayPageObjectProvider =
-						(LayoutDisplayPageObjectProvider<?>)
-							httpServletRequest.getAttribute(
-								LayoutDisplayPageWebKeys.
-									LAYOUT_DISPLAY_PAGE_OBJECT_PROVIDER);
-
-				if (layoutDisplayPageObjectProvider == null) {
+				if (objectEntry == null) {
 					return null;
 				}
-
-				Object displayObject =
-					layoutDisplayPageObjectProvider.getDisplayObject();
-
-				if (!(displayObject instanceof ObjectEntry)) {
-					return null;
-				}
-
-				ObjectEntry objectEntry = (ObjectEntry)displayObject;
 
 				String viewProjectURL = ActionUtil.getBaseViewProjectURL(
 					_objectDefinitionLocalService.fetchObjectDefinition(
 						objectEntry.getObjectDefinitionId()),
-					(ThemeDisplay)httpServletRequest.getAttribute(
-						WebKeys.THEME_DISPLAY));
+					themeDisplay);
 
 				return viewProjectURL + objectEntry.getObjectEntryId();
 			}
 		).build();
+	}
+
+	private ObjectEntry _getObjectEntry(HttpServletRequest httpServletRequest) {
+		LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider =
+			(LayoutDisplayPageObjectProvider<?>)httpServletRequest.getAttribute(
+				LayoutDisplayPageWebKeys.LAYOUT_DISPLAY_PAGE_OBJECT_PROVIDER);
+
+		if (layoutDisplayPageObjectProvider == null) {
+			return null;
+		}
+
+		Object displayObject =
+			layoutDisplayPageObjectProvider.getDisplayObject();
+
+		if (!(displayObject instanceof ObjectEntry)) {
+			return null;
+		}
+
+		return (ObjectEntry)displayObject;
 	}
 
 	@Reference

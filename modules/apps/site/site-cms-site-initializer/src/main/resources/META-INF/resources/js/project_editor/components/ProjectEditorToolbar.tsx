@@ -15,6 +15,7 @@ import Toolbar from '../../common/components/Toolbar';
 
 export default function ProjectEditorToolbar({
 	backURL,
+	title,
 	viewProjectURL,
 }: {
 	backURL: string;
@@ -64,7 +65,7 @@ export default function ProjectEditorToolbar({
 		<Toolbar
 			backURL={backURL}
 			className="content-editor__toolbar position-fixed"
-			title={Liferay.Language.get('new-project')}
+			title={title}
 		>
 			<Toolbar.Item>
 				<ClayLink
