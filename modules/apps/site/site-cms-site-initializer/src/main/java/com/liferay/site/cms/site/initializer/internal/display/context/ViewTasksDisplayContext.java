@@ -123,7 +123,7 @@ public class ViewTasksDisplayContext extends BaseSectionDisplayContext {
 					).setIcon(
 						"forms"
 					).setLabel(
-						LanguageUtil.get(httpServletRequest, "task")
+						LanguageUtil.get(httpServletRequest, "new-task")
 					).build()));
 		}
 		catch (PortalException portalException) {
