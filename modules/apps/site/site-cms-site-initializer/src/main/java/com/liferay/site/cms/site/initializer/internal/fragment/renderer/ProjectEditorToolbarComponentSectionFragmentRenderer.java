@@ -113,11 +113,12 @@ public class ProjectEditorToolbarComponentSectionFragmentRenderer
 				}
 
 				String viewProjectURL = ActionUtil.getBaseViewProjectURL(
-					_objectDefinitionLocalService.fetchObjectDefinition(
-						objectEntry.getObjectDefinitionId()),
+					_objectDefinitionLocalService.getObjectDefinition(
+						themeDisplay.getCompanyId(), "CMPProject"),
 					themeDisplay);
 
-				return viewProjectURL + objectEntry.getObjectEntryId();
+				return viewProjectURL +
+					ParamUtil.getLong(httpServletRequest, "projectId");
 			}
 		).build();
 	}

@@ -30,7 +30,7 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.site.cms.site.initializer.internal.util.ActionUtil;
 import com.liferay.translation.exporter.TranslationInfoItemFieldValuesExporterRegistry;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -147,15 +147,12 @@ public class ViewTasksDisplayContext extends BaseSectionDisplayContext {
 	@Override
 	public List<FDSActionDropdownItem> getFDSActionDropdownItems() {
 		try {
-			ObjectDefinition objectDefinition =
-				_objectDefinitionLocalService.getObjectDefinition(
-					themeDisplay.getCompanyId(), "CMPTask");
-
 			String url = StringBundler.concat(
-				themeDisplay.getPathFriendlyURLPublic(),
-				GroupConstants.CMS_FRIENDLY_URL, "/e/edit-task/",
-				PortalUtil.getClassNameId(objectDefinition.getClassName()),
-				"/{embedded.id}");
+				ActionUtil.getBaseEditTaskURL(
+					_objectDefinitionLocalService.getObjectDefinition(
+						themeDisplay.getCompanyId(), "CMPTask"),
+					themeDisplay),
+				"{embedded.id}?redirect=", themeDisplay.getURLCurrent());
 
 			return ListUtil.fromArray(
 				new FDSActionDropdownItem(

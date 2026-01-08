@@ -12,17 +12,16 @@ import com.liferay.object.rest.dto.v1_0.Status;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.service.ObjectDefinitionService;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
+import com.liferay.site.cms.site.initializer.internal.util.ActionUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -93,12 +92,22 @@ public class AddTaskStrutsAction implements StrutsAction {
 				themeDisplay.getUser()),
 			objectDefinition, objectEntry, String.valueOf(projectGroupId));
 
-		httpServletResponse.sendRedirect(
-			StringBundler.concat(
-				themeDisplay.getPathFriendlyURLPublic(),
-				GroupConstants.CMS_FRIENDLY_URL, "/e/edit-task/",
-				PortalUtil.getClassNameId(objectDefinition.getClassName()),
-				StringPool.SLASH, objectEntry.getId()));
+		String editTaskURL =
+			ActionUtil.getBaseEditTaskURL(objectDefinition, themeDisplay) +
+				objectEntry.getId();
+
+		editTaskURL = HttpComponentsUtil.addParameter(
+			editTaskURL, "projectId",
+			ParamUtil.getLong(httpServletRequest, "projectId"));
+
+		String backURL = ParamUtil.getString(httpServletRequest, "redirect");
+
+		if (Validator.isNotNull(backURL)) {
+			editTaskURL = HttpComponentsUtil.addParameter(
+				editTaskURL, "redirect", backURL);
+		}
+
+		httpServletResponse.sendRedirect(editTaskURL);
 
 		return null;
 	}

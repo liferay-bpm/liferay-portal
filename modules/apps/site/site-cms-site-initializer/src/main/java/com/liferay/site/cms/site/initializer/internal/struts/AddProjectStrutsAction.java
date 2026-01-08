@@ -110,6 +110,9 @@ public class AddProjectStrutsAction implements StrutsAction {
 			ActionUtil.getBaseEditProjectURL(objectDefinition, themeDisplay) +
 				objectEntry.getId();
 
+		editProjectURL = HttpComponentsUtil.addParameter(
+			editProjectURL, "projectId", objectEntry.getId());
+
 		String backURL = ParamUtil.getString(httpServletRequest, "redirect");
 
 		if (Validator.isNotNull(backURL)) {
