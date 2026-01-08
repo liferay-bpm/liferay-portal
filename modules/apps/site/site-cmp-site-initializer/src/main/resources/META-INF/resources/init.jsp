@@ -11,8 +11,7 @@ taglib uri="http://liferay.com/tld/react" prefix="react" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
 
 <%@ page import="com.liferay.site.cmp.site.initializer.internal.constants.CMPSiteInitializerFDSNames" %><%@
-page import="com.liferay.site.cmp.site.initializer.internal.display.context.ViewProjectsDisplayContext" %><%@
-page import="com.liferay.site.cmp.site.initializer.internal.display.context.ViewTasksDisplayContext" %>
+page import="com.liferay.site.cmp.site.initializer.internal.display.context.ViewProjectsDisplayContext" %>
 
 <liferay-theme:defineObjects />
 
