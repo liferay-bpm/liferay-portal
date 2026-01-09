@@ -125,4 +125,11 @@ public class ObjectEntryValuesUtil {
 		return String.valueOf(getValue(null, objectField, values));
 	}
 
+	public static String getValueString(
+		String languageId, ObjectField objectField, Map<String, ?> values) {
+
+		return String.valueOf(getValue(languageId, objectField, values));
+	}
+
+
 }

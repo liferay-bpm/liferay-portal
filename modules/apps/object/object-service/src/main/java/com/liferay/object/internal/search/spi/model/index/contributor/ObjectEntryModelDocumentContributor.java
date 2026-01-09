@@ -151,7 +151,7 @@ public class ObjectEntryModelDocumentContributor
 				ObjectFieldConstants.BUSINESS_TYPE_RICH_TEXT)) {
 
 			fieldValue = ObjectEntryValuesUtil.getValueString(
-				objectField, values);
+				locale, objectField, values);
 		}
 		else if (StringUtil.equals(
 					objectField.getBusinessType(),
