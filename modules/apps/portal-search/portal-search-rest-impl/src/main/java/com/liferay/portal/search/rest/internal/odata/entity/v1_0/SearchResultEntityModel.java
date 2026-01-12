@@ -26,6 +26,9 @@ public class SearchResultEntityModel implements EntityModel {
 		_entityFieldsMap = EntityModel.toEntityFieldsMap(
 			new BooleanEntityField("cmsRoot", locale -> "cms_root"),
 			new CollectionEntityField(
+				new IntegerEntityField(
+					"cmpTaskCMPProjectId", locale -> "cmpTaskCMPProjectId")),
+			new CollectionEntityField(
 				new IntegerEntityField("groupIds", locale -> Field.GROUP_ID)),
 			new CollectionEntityField(
 				new IntegerEntityField(
@@ -37,6 +40,8 @@ public class SearchResultEntityModel implements EntityModel {
 				new StringEntityField(
 					"objectFolderExternalReferenceCode",
 					locale -> "objectFolderExternalReferenceCode")),
+			new DateTimeEntityField(
+				"cmpDueDate", locale -> "cmpDueDate", locale -> "cmpDueDate"),
 			new DateTimeEntityField(
 				"dateCreated",
 				locale -> Field.getSortableFieldName(Field.CREATE_DATE),
@@ -61,12 +66,17 @@ public class SearchResultEntityModel implements EntityModel {
 				"dateReview",
 				locale -> Field.getSortableFieldName("reviewDate"),
 				locale -> "reviewDate"),
+			new IntegerEntityField(
+				"cmpProjectManagerUserId", locale -> "cmpProjectManagerUserId"),
+			new IntegerEntityField(
+				"cmpProjectSponsorUserId", locale -> "cmpProjectSponsorUserId"),
 			new IntegerEntityField("creatorId", locale -> Field.USER_ID),
 			new IntegerEntityField("folderId", locale -> Field.FOLDER_ID),
 			new IntegerEntityField(
 				"objectDefinitionId", locale -> "objectDefinitionId"),
 			new IntegerEntityField("scopeGroupId", locale -> "scopeGroupId"),
 			new IntegerEntityField("status", locale -> Field.STATUS),
+			new StringEntityField("cmpState", locale -> "cmpState"),
 			new StringEntityField("cmsKind", locale -> "cms_kind"),
 			new StringEntityField("cmsSection", locale -> "cms_section"),
 			new StringEntityField("extension", locale -> "extension"),
