@@ -143,11 +143,11 @@
 				{
 					"deletionType": "cascade",
 					"edge": false,
-					"externalReferenceCode": "L_CMP_PROJECT_TO_L_CMP_TASK",
+					"externalReferenceCode": "L_CMP_PROJECT_TO_L_CMP_TASKS",
 					"label": {
-						"en_US": "Project to Task"
+						"en_US": "Project to Tasks"
 					},
-					"name": "cmpProjectToCMPTask",
+					"name": "cmpProjectToCMPTasks",
 					"objectDefinitionExternalReferenceCode1": "L_CMP_PROJECT",
 					"objectDefinitionExternalReferenceCode2": "L_CMP_TASK",
 					"objectDefinitionModifiable2": true,
@@ -157,13 +157,13 @@
 					"objectField": {
 						"DBType": "Long",
 						"businessType": "Relationship",
-						"externalReferenceCode": "CMP_PROJECT_TO_CMP_TASK",
+						"externalReferenceCode": "CMP_PROJECT_TO_CMP_TASKS",
 						"indexed": true,
 						"indexedAsKeyword": false,
 						"label": {
-							"en_US": "Project to Task"
+							"en_US": "Project to Tasks"
 						},
-						"name": "r_cmpProjectToCMPTask_c_cmpProjectId",
+						"name": "r_cmpProjectToCMPTasks_c_cmpProjectId",
 						"objectFieldSettings": [
 							{
 								"name": "objectDefinition1ShortName",
@@ -171,7 +171,7 @@
 							},
 							{
 								"name": "objectRelationshipERCObjectFieldName",
-								"value": "r_cmpProjectToCMPTask_c_cmpProjectERC"
+								"value": "r_cmpProjectToCMPTasks_c_cmpProjectERC"
 							}
 						],
 						"relationshipType": "oneToMany",
@@ -311,7 +311,7 @@
 			"panelCategoryKey": "",
 			"parameterRequired": false,
 			"pluralLabel": {
-				"en_US": "CMP Tasks"
+				"en_US": "Tasks"
 			},
 			"portlet": false,
 			"scope": "depot",
