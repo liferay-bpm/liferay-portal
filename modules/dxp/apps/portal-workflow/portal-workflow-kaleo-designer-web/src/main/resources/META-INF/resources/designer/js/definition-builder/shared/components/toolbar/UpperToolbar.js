@@ -11,7 +11,14 @@ import ClayToolbar from '@clayui/toolbar';
 import {TranslationAdminSelector} from 'frontend-js-components-web';
 import {localStorage} from 'frontend-js-web';
 import PropTypes from 'prop-types';
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
 import {isEdge, isNode} from 'react-flow-renderer';
 
 import {DefinitionBuilderContext} from '../../../DefinitionBuilderContext';
@@ -74,15 +81,21 @@ export default function UpperToolbar({
 	const [showGroovyScriptWarningModal, setShowGroovyScriptWarningModal] =
 		useState(false);
 
-	const [translations, setTranslations] = useState(
-		definitionTitleTranslations
+	const availableLocales = useMemo(
+		() => getAvailableLocalesObject(displayNames, languageIds),
+		[displayNames, languageIds]
 	);
+	const translations = useMemo(
+		() =>
+			Object.keys(availableLocales).reduce((acc, languageId) => {
+				acc[languageId] = Boolean(
+					definitionTitleTranslations?.[languageId]?.trim()
+				);
 
-	function findEmptyElements(element, language) {
-		if (element.data.label && !(language in element.data.label)) {
-			return true;
-		}
-	}
+				return acc;
+			}, {}),
+		[availableLocales, definitionTitleTranslations]
+	);
 
 	function setAlert(alertMessage, alertType, showAlert) {
 		setAlertMessage(alertMessage);
@@ -91,11 +104,6 @@ export default function UpperToolbar({
 	}
 
 	const inputRef = useRef(null);
-
-	const availableLocales = getAvailableLocalesObject(
-		displayNames,
-		languageIds
-	);
 
 	const errorTitle = () => {
 		if (blockingError.errorType === 'duplicated') {
@@ -163,6 +171,26 @@ export default function UpperToolbar({
 
 		return false;
 	};
+
+	const handleChange = useCallback(
+		({target: {value}}) => {
+			setDefinitionTitle(value);
+
+			const languageId = selectedLanguageId || defaultLanguageId;
+
+			setDefinitionTitleTranslations((previous) => {
+				if (previous[languageId] === value) {
+					return previous;
+				}
+
+				return {
+					...previous,
+					[languageId]: value,
+				};
+			});
+		},
+		[selectedLanguageId, setDefinitionTitle, setDefinitionTitleTranslations]
+	);
 
 	const handleInvalidXMLBlockingError = () => {
 		setBlockingError(() => ({
@@ -346,39 +374,6 @@ export default function UpperToolbar({
 	]);
 
 	useEffect(() => {
-		let languageId = defaultLanguageId;
-
-		if (selectedLanguageId) {
-			languageId = selectedLanguageId;
-		}
-
-		setDefinitionTitleTranslations((previous) => ({
-			...previous,
-			[languageId]: definitionTitle,
-		}));
-
-		languageIds.map((currentLanguage) => {
-			const emptyLabel = elements?.find((elements) =>
-				findEmptyElements(elements, currentLanguage)
-			);
-			if (!emptyLabel && definitionTitleTranslations[currentLanguage]) {
-				setTranslations((previous) => ({
-					...previous,
-					[currentLanguage]: true,
-				}));
-			}
-			else {
-				setTranslations((previous) => ({
-					...previous,
-					[currentLanguage]: false,
-				}));
-			}
-		});
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [definitionTitle, elements]);
-
-	useEffect(() => {
 		if (localStorage.getItem('firstSaved', localStorage.TYPES.FUNCTIONAL)) {
 			setAlert(Liferay.Language.get('workflow-saved'), 'success', true);
 			localStorage.removeItem('firstSaved');
@@ -445,9 +440,7 @@ export default function UpperToolbar({
 								className="form-control-inline"
 								disabled={isView}
 								id="definition-title"
-								onChange={({target: {value}}) => {
-									setDefinitionTitle(value);
-								}}
+								onChange={handleChange}
 								placeholder={Liferay.Language.get(
 									'untitled-workflow'
 								)}
