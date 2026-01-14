@@ -8,26 +8,47 @@ package com.liferay.site.cmp.site.initializer.internal.struts;
 import com.liferay.headless.asset.library.dto.v1_0.AssetLibrary;
 import com.liferay.headless.asset.library.dto.v1_0.Settings;
 import com.liferay.headless.asset.library.resource.v1_0.AssetLibraryResource;
+import com.liferay.layout.importer.LayoutsImportStrategy;
+import com.liferay.layout.importer.LayoutsImporter;
+import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.dto.v1_0.Status;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.service.ObjectDefinitionService;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.GroupConstants;
+import com.liferay.portal.kernel.module.util.BundleUtil;
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.URLUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.zip.ZipWriter;
+import com.liferay.portal.kernel.zip.ZipWriterFactory;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.site.cmp.site.initializer.internal.util.ActionUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.InputStream;
+
+import java.net.URL;
+
+import java.util.Enumeration;
+
+import org.osgi.framework.Bundle;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -106,6 +127,8 @@ public class AddProjectStrutsAction implements StrutsAction {
 			},
 			String.valueOf(assetLibrary.getSiteId()));
 
+		_addLayoutPageTemplatesIfAbsent(objectDefinition, themeDisplay);
+
 		String editProjectURL =
 			ActionUtil.getBaseEditProjectURL(objectDefinition, themeDisplay) +
 				objectEntry.getId();
@@ -122,13 +145,106 @@ public class AddProjectStrutsAction implements StrutsAction {
 		return null;
 	}
 
+	private void _addLayoutPageTemplates(long groupId, long userId)
+		throws Exception {
+
+		Bundle bundle = BundleUtil.getBundle(
+			SystemBundleUtil.getBundleContext(),
+			"com.liferay.site.initializer.cmp");
+
+		if (bundle == null) {
+			return;
+		}
+
+		Enumeration<URL> enumeration = bundle.findEntries(
+			"/site-initializer/layout-page-templates", StringPool.STAR, true);
+
+		if (enumeration == null) {
+			return;
+		}
+
+		ZipWriter zipWriter = _zipWriterFactory.getZipWriter();
+
+		while (enumeration.hasMoreElements()) {
+			URL url = enumeration.nextElement();
+
+			String fileName = url.getFile();
+
+			if (fileName.endsWith("/")) {
+				continue;
+			}
+
+			String urlPath = url.getPath();
+
+			if (StringUtil.endsWith(urlPath, "display-page-template.json") ||
+				StringUtil.endsWith(urlPath, "page-definition.json")) {
+
+				zipWriter.addEntry(
+					_removeFirst(
+						urlPath, "/site-initializer/layout-page-templates"),
+					URLUtil.toString(url));
+			}
+			else {
+				try (InputStream inputStream = url.openStream()) {
+					zipWriter.addEntry(
+						_removeFirst(
+							urlPath, "/site-initializer/layout-page-templates"),
+						inputStream);
+				}
+			}
+		}
+
+		_layoutsImporter.importFile(
+			userId, groupId, zipWriter.getFile(),
+			LayoutsImportStrategy.OVERWRITE, true);
+	}
+
+	private void _addLayoutPageTemplatesIfAbsent(
+			ObjectDefinition objectDefinition, ThemeDisplay themeDisplay)
+		throws Exception {
+
+		Group group = _groupLocalService.getGroup(
+			themeDisplay.getCompanyId(), GroupConstants.CMS);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.
+				fetchDefaultLayoutPageTemplateEntry(
+					group.getGroupId(),
+					PortalUtil.getClassNameId(objectDefinition.getClassName()),
+					0);
+
+		if (layoutPageTemplateEntry == null) {
+			_addLayoutPageTemplates(
+				group.getGroupId(), themeDisplay.getUserId());
+		}
+	}
+
+	private String _removeFirst(String s, String oldSub) {
+		int index = s.indexOf(oldSub);
+
+		return s.substring(index + oldSub.length());
+	}
+
 	@Reference
 	private AssetLibraryResource.Factory _assetLibraryResourceFactory;
+
+	@Reference
+	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private LayoutPageTemplateEntryLocalService
+		_layoutPageTemplateEntryLocalService;
+
+	@Reference
+	private LayoutsImporter _layoutsImporter;
 
 	@Reference
 	private ObjectDefinitionService _objectDefinitionService;
 
 	@Reference
 	private ObjectEntryManagerRegistry _objectEntryManagerRegistry;
+
+	@Reference
+	private ZipWriterFactory _zipWriterFactory;
 
 }
