@@ -55,6 +55,8 @@ public class ObjectActionTriggerUtil {
 					new ObjectActionTrigger(
 						ObjectActionTriggerConstants.KEY_ON_AFTER_ADD),
 					new ObjectActionTrigger(
+						ObjectActionTriggerConstants.KEY_ON_AFTER_COMMENT),
+					new ObjectActionTrigger(
 						ObjectActionTriggerConstants.
 							KEY_ON_AFTER_ATTACHMENT_DOWNLOAD),
 					new ObjectActionTrigger(
