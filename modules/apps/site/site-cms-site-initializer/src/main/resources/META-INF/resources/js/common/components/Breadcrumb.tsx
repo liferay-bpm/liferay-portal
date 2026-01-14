@@ -27,7 +27,7 @@ export interface ActionDropdownItemProps {
 	redirect?: string;
 	size?: 'full-screen' | 'lg' | 'md' | 'sm';
 	successMessage?: string;
-	target?: 'asyncDelete' | 'defaultPermissionsModal' | 'link' | 'modal';
+	target?: 'asyncDelete' | 'asyncPost' |'defaultPermissionsModal' | 'link' | 'modal';
 }
 
 interface Props extends Pick<React.ComponentProps<typeof ClaySticker>, 'size'> {
@@ -67,6 +67,27 @@ function ActionDropdownItem({
 		}
 		else if (target === 'asyncDelete') {
 			const {error} = await ApiHelper.delete(href);
+
+			if (!error) {
+				openToast({
+					message:
+						successMessage ||
+						Liferay.Language.get(
+							'your-request-completed-successfully'
+						),
+					type: 'success',
+				});
+
+				if (redirect) {
+					navigate(redirect);
+				}
+			}
+			else {
+				displayErrorToast(error);
+			}
+		}
+		else if (target === 'asyncPost') {
+			const {error} = await ApiHelper.post(href);
 
 			if (!error) {
 				openToast({
