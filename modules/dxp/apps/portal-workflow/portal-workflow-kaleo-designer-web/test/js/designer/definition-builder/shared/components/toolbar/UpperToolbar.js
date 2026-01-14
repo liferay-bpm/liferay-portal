@@ -4,11 +4,24 @@
  */
 
 import '@testing-library/jest-dom';
-import {render} from '@testing-library/react';
+import {fireEvent, render} from '@testing-library/react';
 import React from 'react';
 
+import {DefinitionBuilderContext} from '../../../../../../../src/main/resources/META-INF/resources/designer/js/definition-builder/DefinitionBuilderContext';
 import UpperToolbar from '../../../../../../../src/main/resources/META-INF/resources/designer/js/definition-builder/shared/components/toolbar/UpperToolbar';
 import MockDefinitionBuilderContext from '../../../../../../mock/MockDefinitionBuilderContext';
+
+const setDefinitionTitle = jest.fn();
+const setDefinitionTitleTranslations = jest.fn();
+
+const context = {
+	blockingError: {errorType: ''},
+	definitionTitleTranslations: {en_US: 'Old Title'},
+	selectedLanguageId: 'en_US',
+	setDefinitionTitle,
+	setDefinitionTitleTranslations,
+	workflowDefinitionVersions: [],
+};
 
 const props = {
 	displayNames: ['English (United States)'],
@@ -51,5 +64,32 @@ describe('The UpperToolbar component should', () => {
 		);
 
 		expect(sourceButton).toBeTruthy();
+	});
+});
+
+describe('UpperToolbar title translations', () => {
+	function renderWithContext(contextValue) {
+		return render(
+			<DefinitionBuilderContext.Provider value={contextValue}>
+				<UpperToolbar {...props} />
+			</DefinitionBuilderContext.Provider>
+		);
+	}
+	it('updates title translation for selected language when editing title', () => {
+		const {getByPlaceholderText} = renderWithContext(context);
+
+		const input = getByPlaceholderText('untitled-workflow');
+
+		fireEvent.change(input, {target: {value: 'New Title'}});
+
+		expect(setDefinitionTitle).toHaveBeenCalledWith('New Title');
+
+		const updater = setDefinitionTitleTranslations.mock.calls[0][0];
+
+		const result = updater({en_US: 'Old Title'});
+
+		expect(result).toEqual({
+			en_US: 'New Title',
+		});
 	});
 });
