@@ -5,6 +5,8 @@
 
 package com.liferay.site.cmp.site.initializer.internal.model.listener;
 
+import com.liferay.object.action.engine.ObjectActionEngine;
+import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -13,12 +15,14 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.portal.kernel.exception.ModelListenerException;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.subscription.service.SubscriptionLocalService;
 
 import java.io.Serializable;
 
@@ -38,7 +42,53 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		throws ModelListenerException {
 
 		try {
-			_updateProjectCompletionRate(objectEntry);
+			ObjectDefinition objectDefinition =
+				_objectDefinitionLocalService.fetchObjectDefinition(
+					objectEntry.getObjectDefinitionId());
+
+			if (!StringUtil.equals(
+					objectDefinition.getExternalReferenceCode(),
+					"L_CMP_TASK")) {
+
+				return;
+			}
+
+			_updateProjectCompletionRate(objectDefinition, objectEntry);
+
+			ObjectEntry parentObjectEntry =
+				_objectEntryLocalService.fetchObjectEntry(
+					MapUtil.getLong(
+						objectEntry.getValues(),
+						"r_cmpProjectToCMPTasks_c_cmpProjectId"));
+
+			if (!_subscriptionLocalService.isSubscribed(
+					objectEntry.getCompanyId(), objectEntry.getUserId(),
+					parentObjectEntry.getModelClassName(),
+					parentObjectEntry.getObjectEntryId())) {
+
+				return;
+			}
+
+			ObjectDefinition parentObjectDefinition =
+				_objectDefinitionLocalService.
+					fetchObjectDefinitionByExternalReferenceCode(
+						"L_CMP_PROJECT", objectEntry.getCompanyId());
+
+			_objectActionEngine.executeObjectAction(
+				"SubscriptionUpdated",
+				ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE,
+				parentObjectEntry.getObjectDefinitionId(),
+				JSONUtil.put(
+					"classPK", parentObjectEntry.getObjectEntryId()
+				).put(
+					"objectEntry",
+					HashMapBuilder.putAll(
+						parentObjectEntry.getModelAttributes()
+					).put(
+						"values", parentObjectEntry.getValues()
+					).build()
+				),
+				objectEntry.getUserId());
 		}
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
@@ -50,7 +100,18 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		throws ModelListenerException {
 
 		try {
-			_updateProjectCompletionRate(objectEntry);
+			ObjectDefinition objectDefinition =
+				_objectDefinitionLocalService.fetchObjectDefinition(
+					objectEntry.getObjectDefinitionId());
+
+			if (!StringUtil.equals(
+					objectDefinition.getExternalReferenceCode(),
+					"L_CMP_TASK")) {
+
+				return;
+			}
+
+			_updateProjectCompletionRate(objectDefinition, objectEntry);
 		}
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
@@ -63,7 +124,18 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		throws ModelListenerException {
 
 		try {
-			_updateProjectCompletionRate(objectEntry);
+			ObjectDefinition objectDefinition =
+				_objectDefinitionLocalService.fetchObjectDefinition(
+					objectEntry.getObjectDefinitionId());
+
+			if (!StringUtil.equals(
+					objectDefinition.getExternalReferenceCode(),
+					"L_CMP_TASK")) {
+
+				return;
+			}
+
+			_updateProjectCompletionRate(objectDefinition, objectEntry);
 		}
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
@@ -81,18 +153,9 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 			_filterFactory.create(filterString, objectDefinition), false, null);
 	}
 
-	private void _updateProjectCompletionRate(ObjectEntry objectEntry)
+	private void _updateProjectCompletionRate(
+			ObjectDefinition objectDefinition, ObjectEntry objectEntry)
 		throws Exception {
-
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				objectEntry.getObjectDefinitionId());
-
-		if (!StringUtil.equals(
-				objectDefinition.getExternalReferenceCode(), "L_CMP_TASK")) {
-
-			return;
-		}
 
 		ObjectEntry parentObjectEntry =
 			_objectEntryLocalService.fetchObjectEntry(
@@ -138,9 +201,15 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 	private FilterFactory<Predicate> _filterFactory;
 
 	@Reference
+	private ObjectActionEngine _objectActionEngine;
+
+	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Reference
 	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Reference
+	private SubscriptionLocalService _subscriptionLocalService;
 
 }
