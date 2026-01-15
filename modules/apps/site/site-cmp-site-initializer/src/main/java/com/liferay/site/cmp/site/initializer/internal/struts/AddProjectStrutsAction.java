@@ -81,6 +81,21 @@ public class AddProjectStrutsAction implements StrutsAction {
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
+		Group group = _groupLocalService.getGroup(
+			themeDisplay.getCompanyId(), GroupConstants.CMS);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.
+				fetchDefaultLayoutPageTemplateEntry(
+					group.getGroupId(),
+					PortalUtil.getClassNameId(objectDefinition.getClassName()),
+					0);
+
+		if (layoutPageTemplateEntry == null) {
+			_addLayoutPageTemplates(
+				group.getGroupId(), themeDisplay.getUserId());
+		}
+
 		AssetLibraryResource assetLibraryResource = builder.user(
 			themeDisplay.getUser()
 		).build();
@@ -126,8 +141,6 @@ public class AddProjectStrutsAction implements StrutsAction {
 				}
 			},
 			String.valueOf(assetLibrary.getSiteId()));
-
-		_addLayoutPageTemplatesIfAbsent(objectDefinition, themeDisplay);
 
 		String editProjectURL =
 			ActionUtil.getBaseEditProjectURL(objectDefinition, themeDisplay) +
@@ -197,26 +210,6 @@ public class AddProjectStrutsAction implements StrutsAction {
 		_layoutsImporter.importFile(
 			userId, groupId, zipWriter.getFile(),
 			LayoutsImportStrategy.OVERWRITE, true);
-	}
-
-	private void _addLayoutPageTemplatesIfAbsent(
-			ObjectDefinition objectDefinition, ThemeDisplay themeDisplay)
-		throws Exception {
-
-		Group group = _groupLocalService.getGroup(
-			themeDisplay.getCompanyId(), GroupConstants.CMS);
-
-		LayoutPageTemplateEntry layoutPageTemplateEntry =
-			_layoutPageTemplateEntryLocalService.
-				fetchDefaultLayoutPageTemplateEntry(
-					group.getGroupId(),
-					PortalUtil.getClassNameId(objectDefinition.getClassName()),
-					0);
-
-		if (layoutPageTemplateEntry == null) {
-			_addLayoutPageTemplates(
-				group.getGroupId(), themeDisplay.getUserId());
-		}
 	}
 
 	private String _removeFirst(String s, String oldSub) {
