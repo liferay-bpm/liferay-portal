@@ -5,12 +5,6 @@
 
 package com.liferay.site.cms.site.initializer.internal.struts;
 
-import com.liferay.object.action.engine.ObjectActionEngine;
-import com.liferay.object.constants.ObjectActionTriggerConstants;
-import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.model.ObjectEntry;
-import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.portal.kernel.comment.Comment;
 import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.comment.DiscussionPermission;
@@ -23,16 +17,13 @@ import com.liferay.portal.kernel.service.ServiceContextFunction;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.site.cms.site.initializer.internal.util.CommentUtil;
-import com.liferay.subscription.service.SubscriptionLocalService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.util.Objects;
 import java.util.function.Function;
 
 import org.osgi.service.component.annotations.Component;
@@ -101,43 +92,6 @@ public class AddContentItemCommentStrutsAction implements StrutsAction {
 
 		Comment comment = _commentManager.fetchComment(commentId);
 
-		if (comment != null) {
-			ObjectDefinition objectDefinition =
-				_objectDefinitionLocalService.
-					fetchObjectDefinitionByExternalReferenceCode(
-						"L_CMP_PROJECT", themeDisplay.getCompanyId());
-
-			if (Objects.equals(
-					objectDefinition.getClassName(), comment.getClassName())) {
-
-				ObjectEntry objectEntry =
-					_objectEntryLocalService.fetchObjectEntry(
-						comment.getClassPK());
-
-				if (_subscriptionLocalService.isSubscribed(
-						themeDisplay.getCompanyId(), comment.getUserId(),
-						objectEntry.getModelClassName(),
-						objectEntry.getObjectEntryId())) {
-
-					_objectActionEngine.executeObjectAction(
-						"SubscriptionUpdated",
-						ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE,
-						objectEntry.getObjectDefinitionId(),
-						JSONUtil.put(
-							"classPK", objectEntry.getObjectEntryId()
-						).put(
-							"objectEntry",
-							HashMapBuilder.putAll(
-								objectEntry.getModelAttributes()
-							).put(
-								"values", objectEntry.getValues()
-							).build()
-						),
-						objectEntry.getUserId());
-				}
-			}
-		}
-
 		ServletResponseUtil.write(
 			httpServletResponse,
 			JSONUtil.toString(
@@ -154,17 +108,5 @@ public class AddContentItemCommentStrutsAction implements StrutsAction {
 
 	@Reference
 	private DiscussionPermission _discussionPermission;
-
-	@Reference
-	private ObjectActionEngine _objectActionEngine;
-
-	@Reference
-	private ObjectDefinitionLocalService _objectDefinitionLocalService;
-
-	@Reference
-	private ObjectEntryLocalService _objectEntryLocalService;
-
-	@Reference
-	private SubscriptionLocalService _subscriptionLocalService;
 
 }
