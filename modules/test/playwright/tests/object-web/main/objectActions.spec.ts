@@ -192,6 +192,69 @@ test.describe('Manage object actions through object actions tab', () => {
 			editObjectActionPage.userPreferredLanguage
 		).not.toBeChecked();
 	});
+
+	test('can create and update condition with expression builder', async ({
+		apiHelpers,
+		editObjectActionPage,
+		page,
+		viewObjectActionsPage,
+	}) => {
+		const notificationTemplateName =
+			'notification template test ' + getRandomInt();
+
+		const notificationTemplate =
+			await apiHelpers.notification.postRandomNotificationTemplate(
+				notificationTemplateName,
+				'test' + getRandomInt() + '@liferay.com'
+			);
+
+		apiHelpers.data.push({
+			id: notificationTemplate.id,
+			type: 'notificationTemplate',
+		});
+
+		await viewObjectActionsPage.goto(
+			createdObjectDefinition.label['en_US']
+		);
+
+		await editObjectActionPage.addNewAction({
+			expressionBuilderExpression: 'Expression',
+			notificationTemplateName,
+			thenOption: 'Notification',
+			whenOption: 'On After Add',
+		});
+
+		await page.waitForLoadState('networkidle');
+
+		await page.getByRole('link', {name: 'On After Add'}).click();
+
+		await editObjectActionPage.actionBuilderTab.click();
+
+		await expect(
+			page
+				.frameLocator('iframe')
+				.getByPlaceholder('Create an expression.')
+		).toHaveValue('Expression');
+
+		await editObjectActionPage.fillExpression('newExpression');
+
+		await page
+			.frameLocator('iframe')
+			.getByRole('button', {name: 'Save'})
+			.click();
+
+		await page.waitForLoadState('networkidle');
+
+		await page.getByRole('link', {name: 'On After Add'}).click();
+
+		await editObjectActionPage.actionBuilderTab.click();
+
+		await expect(
+			page
+				.frameLocator('iframe')
+				.getByPlaceholder('Create an expression.')
+		).toHaveValue('newExpression');
+	});
 });
 
 test('can send notification email via download action', async ({
