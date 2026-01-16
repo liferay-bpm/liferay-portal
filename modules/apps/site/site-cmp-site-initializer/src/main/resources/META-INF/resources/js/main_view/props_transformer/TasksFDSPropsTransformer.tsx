@@ -13,6 +13,7 @@ import {
 } from '@liferay/site-cms-site-initializer';
 
 import StateLabel from '../../common/components/StateLabel';
+import {cmpTasksFDSAtom} from './atoms';
 
 type action = {
 	data: {
@@ -69,6 +70,7 @@ export default function TasksFDSPropsTransformer({
 }) {
 	return {
 		...otherProps,
+		atom: cmpTasksFDSAtom,
 		creationMenu: {
 			...creationMenu,
 			primaryItems: addOnClickToCreationMenuItems(
