@@ -102,15 +102,18 @@ export default function TasksOverview({
 
 	return (
 		<div className="lfr-cmp__tasks-overview-container">
-			<div className="d-flex justify-content-between mb-2">
-				<h5>{Liferay.Language.get('tasks-overview')}</h5>
+			<div className="align-items-center d-flex justify-content-between mb-2">
+				<h5 className="c-m-0">
+					{Liferay.Language.get('tasks-overview')}
+				</h5>
 
-				<ClayLink
-					className="text-3 text-decoration-underline text-weight-semi-bold"
+				<ClayButton
+					className="c-p-0 text-3 text-decoration-underline text-weight-semi-bold"
+					displayType="link"
 					onClick={() => handleClick(TASK_QUICK_FILTER_TYPES.TOTAL)}
 				>
 					{Liferay.Language.get('view-all-tasks')}
-				</ClayLink>
+				</ClayButton>
 			</div>
 
 			<ClayProgressBar
@@ -122,9 +125,9 @@ export default function TasksOverview({
 				}
 			/>
 
-			<ClayLayout.ContainerFluid className="px-0" size={false}>
+			<ClayLayout.ContainerFluid className="c-px-0" size={false}>
 				<ClayLayout.Row>
-					<ClayLayout.Col className="px-2" size={3}>
+					<ClayLayout.Col className="c-px-2" size={3}>
 						<StatisticButton
 							count={totalCount}
 							displayType="unstyled"
@@ -136,7 +139,7 @@ export default function TasksOverview({
 						/>
 					</ClayLayout.Col>
 
-					<ClayLayout.Col className="px-2" size={3}>
+					<ClayLayout.Col className="c-px-2" size={3}>
 						<StatisticButton
 							count={inProgressCount}
 							displayType="info"
@@ -148,7 +151,7 @@ export default function TasksOverview({
 						/>
 					</ClayLayout.Col>
 
-					<ClayLayout.Col className="px-2" size={3}>
+					<ClayLayout.Col className="c-px-2" size={3}>
 						<StatisticButton
 							count={blockedCount}
 							displayType="danger"
@@ -160,7 +163,7 @@ export default function TasksOverview({
 						/>
 					</ClayLayout.Col>
 
-					<ClayLayout.Col className="px-2" size={3}>
+					<ClayLayout.Col className="c-px-2" size={3}>
 						<StatisticButton
 							count={overdueCount}
 							displayType="warning"
