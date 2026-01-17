@@ -12,6 +12,11 @@ import classNames from 'classnames';
 import React from 'react';
 
 import './TasksOverview.scss';
+import {
+	TASK_QUICK_FILTER_TYPES,
+	UPDATE_TASKS_QUICK_FILTER_EVENT,
+} from './TasksQuickFilters';
+
 function StatisticButton({
 	count,
 	displayType,
@@ -68,7 +73,7 @@ export default function TasksOverview({
 	overdueCount: number;
 	totalCount: number;
 }) {
-	const handleClick = () => {
+	const handleClick = (quickFilterType: string) => {
 		const projectNavigationTabsFragment = document.querySelector(
 			'[data-layout-structure-item-id="cmp-project-navigation-tabs"]'
 		);
@@ -87,6 +92,10 @@ export default function TasksOverview({
 			if (tasksTab instanceof HTMLElement) {
 				tasksTab.click();
 			}
+
+			Liferay.fire(UPDATE_TASKS_QUICK_FILTER_EVENT, {
+				type: quickFilterType,
+			});
 		}
 	};
 
@@ -109,7 +118,9 @@ export default function TasksOverview({
 							displayType="unstyled"
 							icon="task-status"
 							label={Liferay.Language.get('total-tasks')}
-							onClick={handleClick}
+							onClick={() =>
+								handleClick(TASK_QUICK_FILTER_TYPES.TOTAL)
+							}
 						/>
 					</ClayLayout.Col>
 
@@ -119,7 +130,9 @@ export default function TasksOverview({
 							displayType="info"
 							icon="analytics"
 							label={Liferay.Language.get('in-progress')}
-							onClick={handleClick}
+							onClick={() =>
+								handleClick(TASK_QUICK_FILTER_TYPES.IN_PROGRESS)
+							}
 						/>
 					</ClayLayout.Col>
 
@@ -129,7 +142,9 @@ export default function TasksOverview({
 							displayType="danger"
 							icon="block"
 							label={Liferay.Language.get('blocked')}
-							onClick={handleClick}
+							onClick={() =>
+								handleClick(TASK_QUICK_FILTER_TYPES.BLOCKED)
+							}
 						/>
 					</ClayLayout.Col>
 
@@ -139,7 +154,9 @@ export default function TasksOverview({
 							displayType="warning"
 							icon="exclamation-full"
 							label={Liferay.Language.get('overdue')}
-							onClick={handleClick}
+							onClick={() =>
+								handleClick(TASK_QUICK_FILTER_TYPES.OVERDUE)
+							}
 						/>
 					</ClayLayout.Col>
 				</ClayLayout.Row>
