@@ -11,6 +11,7 @@ import ClayProgressBar from '@clayui/progress-bar';
 import classNames from 'classnames';
 import React from 'react';
 
+import './TasksOverview.scss';
 function StatisticButton({
 	count,
 	displayType,
@@ -32,7 +33,7 @@ function StatisticButton({
 }) {
 	return (
 		<ClayButton
-			className="border c-py-3 h-100 text-left w-100"
+			className="statistic-button"
 			displayType="secondary"
 			onClick={onClick}
 		>
