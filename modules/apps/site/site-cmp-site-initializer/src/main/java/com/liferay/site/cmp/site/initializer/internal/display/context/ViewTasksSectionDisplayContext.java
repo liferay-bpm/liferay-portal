@@ -6,6 +6,7 @@
 package com.liferay.site.cmp.site.initializer.internal.display.context;
 
 import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.fragment.constants.FragmentConfigurationFieldDataType;
 import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
@@ -120,6 +121,16 @@ public class ViewTasksSectionDisplayContext extends BaseSectionDisplayContext {
 				null, "trash", "delete",
 				LanguageUtil.get(httpServletRequest, "delete"), null, "delete",
 				null));
+	}
+
+	public Map<String, Object> getTaskQuickFiltersProps() {
+		if (_assetEntry == null) {
+			return null;
+		}
+
+		return HashMapBuilder.<String, Object>put(
+			"cmpProjectId", _assetEntry.getClassPK()
+		).build();
 	}
 
 	private final AssetEntry _assetEntry;
