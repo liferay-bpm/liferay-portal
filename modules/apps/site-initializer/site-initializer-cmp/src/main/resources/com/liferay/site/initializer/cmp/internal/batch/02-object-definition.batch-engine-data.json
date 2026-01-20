@@ -45,6 +45,19 @@
 				{
 					"DBType": "Integer",
 					"businessType": "Integer",
+					"externalReferenceCode": "BLOCKED_COUNT",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"label": {
+						"en_US": "Blocked Count"
+					},
+					"name": "blockedCount",
+					"readOnly": "true",
+					"system": true
+				},
+				{
+					"DBType": "Integer",
+					"businessType": "Integer",
 					"externalReferenceCode": "COMPLETION_RATE",
 					"indexed": true,
 					"indexedAsKeyword": false,
@@ -81,6 +94,19 @@
 					"system": true
 				},
 				{
+					"DBType": "Integer",
+					"businessType": "Integer",
+					"externalReferenceCode": "IN_PROGRESS_COUNT",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"label": {
+						"en_US": "In Progress Count"
+					},
+					"name": "inProgressCount",
+					"readOnly": "true",
+					"system": true
+				},
+				{
 					"DBType": "String",
 					"businessType": "Picklist",
 					"defaultValue": "notStarted",
@@ -98,6 +124,19 @@
 					"system": true
 				},
 				{
+					"DBType": "Integer",
+					"businessType": "Integer",
+					"externalReferenceCode": "OVERDUE_COUNT",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"label": {
+						"en_US": "Overdue Count"
+					},
+					"name": "overdueCount",
+					"readOnly": "true",
+					"system": true
+				},
+				{
 					"DBType": "String",
 					"businessType": "Text",
 					"externalReferenceCode": "TITLE",
@@ -109,6 +148,19 @@
 					},
 					"name": "title",
 					"required": true,
+					"system": true
+				},
+				{
+					"DBType": "Integer",
+					"businessType": "Integer",
+					"externalReferenceCode": "TOTAL_COUNT",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"label": {
+						"en_US": "Total Count"
+					},
+					"name": "totalCount",
+					"readOnly": "true",
 					"system": true
 				},
 				{
