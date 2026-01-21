@@ -25,6 +25,7 @@ components:
                     DefaultPermissionBulkAction: "#/components/schemas/DefaultPermissionBulkAction"
                     DeleteAssetVersionBulkAction: "#/components/schemas/DeleteAssetVersionBulkAction"
                     DeleteBulkAction: "#/components/schemas/DeleteBulkAction"
+                    DeleteObjectEntryBulkAction: "#/components/schemas/DeleteBulkAction"
                     DueDateBulkAction: "#/components/schemas/DueDateBulkAction"
                     ExpireBulkAction: "#/components/schemas/ExpireBulkAction"
                     KeywordBulkAction: "#/components/schemas/KeywordBulkAction"
@@ -47,6 +48,7 @@ components:
                         -   DefaultPermissionBulkAction
                         -   DeleteAssetVersionBulkAction
                         -   DeleteBulkAction
+                        -   DeleteObjectEntryBulkAction
                         -   DueDateBulkAction
                         -   ExpireBulkAction
                         -   KeywordBulkAction
