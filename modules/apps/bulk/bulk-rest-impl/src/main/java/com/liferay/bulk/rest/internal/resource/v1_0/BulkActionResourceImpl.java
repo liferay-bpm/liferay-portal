@@ -399,10 +399,10 @@ public class BulkActionResourceImpl extends BaseBulkActionResourceImpl {
 		BulkAction.Type type) {
 
 		if (BulkAction.Type.DEFAULT_PERMISSION_BULK_ACTION.equals(type)) {
-			return _defaultPermissionObjectBulkSelectionAction;
+			return _defaultPermissionDepotObjectEntryBulkSelectionAction;
 		}
 		else if (BulkAction.Type.DELETE_BULK_ACTION.equals(type)) {
-			return _deleteObjectBulkSelectionAction;
+			return _deleteDepotObjectEntryBulkSelectionAction;
 		}
 		else if (BulkAction.Type.DELETE_OBJECT_ENTRY_BULK_ACTION.equals(type)) {
 			return _deleteObjectEntryBulkSelectionAction;
@@ -411,7 +411,7 @@ public class BulkActionResourceImpl extends BaseBulkActionResourceImpl {
 			return _expireObjectBulkSelectionAction;
 		}
 		else if (BulkAction.Type.KEYWORD_BULK_ACTION.equals(type)) {
-			return _editObjectTagsBulkSelectionAction;
+			return _editDepotObjectEntryTagsBulkSelectionAction;
 		}
 		else if (BulkAction.Type.PERMISSION_BULK_ACTION.equals(type)) {
 			return _permissionObjectBulkSelectionAction;
@@ -420,7 +420,7 @@ public class BulkActionResourceImpl extends BaseBulkActionResourceImpl {
 			return _resetPermissionObjectBulkSelectionAction;
 		}
 		else if (BulkAction.Type.TAXONOMY_CATEGORY_BULK_ACTION.equals(type)) {
-			return _editObjectCategoriesBulkSelectionAction;
+			return _editDepotObjectEntryCategoriesBulkSelectionAction;
 		}
 
 		throw new UnsupportedOperationException();
@@ -843,12 +843,15 @@ public class BulkActionResourceImpl extends BaseBulkActionResourceImpl {
 	@Reference
 	private BulkSelectionRunner _bulkSelectionRunner;
 
-	@Reference(target = "(bulk.selection.action.key=default.permission.object)")
+	@Reference(
+		target = "(bulk.selection.action.key=default.permission.depot.object.entry)"
+	)
 	private BulkSelectionAction<Object>
-		_defaultPermissionObjectBulkSelectionAction;
+		_defaultPermissionDepotObjectEntryBulkSelectionAction;
 
-	@Reference(target = "(bulk.selection.action.key=delete.object)")
-	private BulkSelectionAction<Object> _deleteObjectBulkSelectionAction;
+	@Reference(target = "(bulk.selection.action.key=delete.depot.object.entry)")
+	private BulkSelectionAction<Object>
+		_deleteDepotObjectEntryBulkSelectionAction;
 
 	@Reference(target = "(bulk.selection.action.key=delete.object.entry)")
 	private BulkSelectionAction<Object> _deleteObjectEntryBulkSelectionAction;
@@ -856,12 +859,17 @@ public class BulkActionResourceImpl extends BaseBulkActionResourceImpl {
 	@Reference
 	private DLMimeTypeDisplayContext _dlMimeTypeDisplayContext;
 
-	@Reference(target = "(bulk.selection.action.key=edit.object.categories)")
+	@Reference(
+		target = "(bulk.selection.action.key=edit.depot.object.entry.categories)"
+	)
 	private BulkSelectionAction<Object>
-		_editObjectCategoriesBulkSelectionAction;
+		_editDepotObjectEntryCategoriesBulkSelectionAction;
 
-	@Reference(target = "(bulk.selection.action.key=edit.object.tags)")
-	private BulkSelectionAction<Object> _editObjectTagsBulkSelectionAction;
+	@Reference(
+		target = "(bulk.selection.action.key=edit.depot.object.entry.tags)"
+	)
+	private BulkSelectionAction<Object>
+		_editDepotObjectEntryTagsBulkSelectionAction;
 
 	@Reference(target = "(bulk.selection.action.key=expire.object)")
 	private BulkSelectionAction<Object> _expireObjectBulkSelectionAction;
@@ -903,7 +911,9 @@ public class BulkActionResourceImpl extends BaseBulkActionResourceImpl {
 	@Reference
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
-	@Reference(target = "(bulk.selection.action.key=permission.object)")
+	@Reference(
+		target = "(bulk.selection.action.key=permission.depot.object.entry)"
+	)
 	private BulkSelectionAction<Object> _permissionObjectBulkSelectionAction;
 
 	@Reference
