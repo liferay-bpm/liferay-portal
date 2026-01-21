@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 	service = BulkSelectionAction.class
 )
 public class ExpireObjectBulkSelectionAction
-	extends BaseObjectBulkSelectionAction {
+	extends BaseDepotObjectEntryBulkSelectionAction {
 
 	@Override
 	protected void doExecute(
