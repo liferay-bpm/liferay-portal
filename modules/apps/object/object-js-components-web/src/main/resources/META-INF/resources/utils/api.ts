@@ -336,6 +336,25 @@ export async function getObjectDefinitions(urlParameters: URLParameters = {}) {
 	);
 }
 
+export async function getObjectDefinitionsPage(urlParameters: {
+	page: number;
+	pageSize: number;
+	search?: string;
+}): Promise<{items: ObjectDefinition[]}> {
+	const searchParams = new URLSearchParams();
+
+	searchParams.set('page', String(urlParameters.page));
+	searchParams.set('pageSize', String(urlParameters.pageSize));
+
+	if (urlParameters.search) {
+		searchParams.set('search', urlParameters.search);
+	}
+
+	return await fetchJSON<{items: ObjectDefinition[]}>(
+		`/o/object-admin/v1.0/object-definitions?${searchParams.toString()}`
+	);
+}
+
 export async function getObjectField(objectFieldId: number) {
 	return await fetchJSON<ObjectField>(
 		`/o/object-admin/v1.0/object-fields/${objectFieldId}`

@@ -109,9 +109,6 @@ export function ObjectRelationshipFormBase({
 		useState<Partial<ObjectDefinition>>();
 	const [objectDefinition2, setObjectDefinition2] =
 		useState<Partial<ObjectDefinition>>();
-	const [objectDefinitions, setObjectDefinitions] = useState<
-		Partial<ObjectDefinition>[]
-	>([]);
 	const [objectRelationshipTypes, setObjectRelationshipTypes] = useState<
 		ObjectRelationshipTypeInfo[]
 	>([ONE_TO_MANY]);
@@ -227,37 +224,6 @@ export function ObjectRelationshipFormBase({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [objectDefinitionExternalReferenceCode1]);
 
-	useEffect(() => {
-		const fetchObjectDefinitions = async () => {
-			const {items} = await API.getAllObjectDefinitions();
-
-			const objectDefinition = items.find(
-				({externalReferenceCode}) =>
-					objectDefinitionExternalReferenceCode1 ===
-					externalReferenceCode
-			)!;
-
-			const objectDefinitions = items.filter(
-				({modifiable, parameterRequired, storageType}) => {
-					return (
-						(objectDefinition.modifiable || modifiable) &&
-						(!Liferay.FeatureFlags['LPS-135430'] ||
-							storageType === 'default') &&
-						!parameterRequired
-					);
-				}
-			);
-
-			setCreationLanguageId(objectDefinition.defaultLanguageId);
-
-			setObjectDefinitions(objectDefinitions);
-		};
-
-		fetchObjectDefinitions();
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [objectDefinitionExternalReferenceCode1, readonly]);
-
 	return (
 		<>
 			<Input
@@ -352,6 +318,9 @@ export function ObjectRelationshipFormBase({
 								creationLanguageId={
 									creationLanguageId as Liferay.Language.Locale
 								}
+								currentObjectDefinition={
+									currentObjectDefinition
+								}
 								disabled={readonly}
 								error={errors.objectDefinitionId2}
 								label={
@@ -363,7 +332,6 @@ export function ObjectRelationshipFormBase({
 								objectDefinitionExternalReferenceCode={
 									values.objectDefinitionExternalReferenceCode2
 								}
-								objectDefinitions={objectDefinitions}
 								readOnly={readonly}
 								reverseOrder={reverseOrder}
 								setObjectDefinition={setObjectDefinition2}
@@ -396,6 +364,9 @@ export function ObjectRelationshipFormBase({
 								creationLanguageId={
 									creationLanguageId as Liferay.Language.Locale
 								}
+								currentObjectDefinition={
+									currentObjectDefinition
+								}
 								disabled={readonly}
 								error={errors.objectDefinitionId1}
 								label={
@@ -407,7 +378,6 @@ export function ObjectRelationshipFormBase({
 								objectDefinitionExternalReferenceCode={
 									values.objectDefinitionExternalReferenceCode1
 								}
-								objectDefinitions={objectDefinitions}
 								readOnly={readonly}
 								reverseOrder={reverseOrder}
 								setObjectDefinition={setObjectDefinition1}
