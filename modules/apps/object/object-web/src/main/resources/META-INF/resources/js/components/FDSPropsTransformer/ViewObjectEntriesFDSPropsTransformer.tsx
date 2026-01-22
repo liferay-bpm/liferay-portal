@@ -5,6 +5,7 @@
 
 import React from 'react';
 
+import AssetBulkActionTaskService from '../../common/services/AssetBulkActionTaskService';
 import DecimalDataRenderer from './FDSDataRenderers/DecimalDataRenderer';
 import MultiselectPicklistDataRenderer from './FDSDataRenderers/MultiselectPicklistDataRenderer';
 import ObjectEntryStatusDataRenderer from './FDSDataRenderers/ObjectEntryStatusDataRenderer';
@@ -38,6 +39,53 @@ export default function ViewObjectEntriesFDSPropsTransformer({...otherProps}) {
 				Liferay.fire('openModalDeleteObjectEntry', {
 					objectEntry: itemData,
 				});
+			}
+		},
+		onBulkActionItemClick: async ({
+			action,
+			selectedData,
+		}: {
+			action: any;
+			selectedData: any;
+		}) => {
+			if (action?.data?.id === 'delete') {
+				console.log('action: ', action);
+				console.log('selectedData: ', selectedData);
+
+				const bulkActionItems = (selectedData?.items || []).map(
+					(item) => ({
+						classExternalReferenceCode: item.externalReferenceCode,
+						className: '',
+						classPK: item.id,
+					})
+				);
+
+				const url = new URL(
+					'http://localhost:8080/o/bulk/v1.0/bulk-action'
+				);
+
+				url.searchParams.set(
+					'scope',
+// 					String(Liferay.ThemeDisplay.getScopeGroupId())
+					'0'
+				);
+				url.searchParams.set(
+					'entryClassNames',
+					'com.liferay.object.model.ObjectDefinition#Y7C4'
+				);
+
+				const response = await AssetBulkActionTaskService.createTask(
+					{
+						bulkActionItems,
+						selectionScope: {
+							selectAll: selectedData.selectAll,
+						},
+						type: 'DeleteObjectEntryBulkAction',
+					},
+					url.toString()
+				);
+
+				console.log('response: ', response);
 			}
 		},
 	};
