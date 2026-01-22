@@ -1619,10 +1619,8 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setSystem(system);
 		objectDefinition.setVersion(version);
 		objectDefinition.setStatus(status);
-		objectDefinition.setLabelCurrentLanguageId(
-			serviceContext.getLanguageId());
-		objectDefinition.setPluralLabelCurrentLanguageId(
-			serviceContext.getLanguageId());
+
+		_setCurrentLanguageIds(objectDefinition, serviceContext);
 
 		objectDefinition = _update(objectDefinition);
 
@@ -2534,6 +2532,15 @@ public class ObjectDefinitionLocalServiceImpl
 		}
 	}
 
+	private void _setCurrentLanguageIds(
+		ObjectDefinition objectDefinition, ServiceContext serviceContext) {
+
+		objectDefinition.setLabelCurrentLanguageId(
+			serviceContext.getLanguageId());
+		objectDefinition.setPluralLabelCurrentLanguageId(
+			serviceContext.getLanguageId());
+	}
+
 	private void _setValidationErrorEntryKey(
 		String entryClassName, String entryKey) {
 
@@ -2742,10 +2749,8 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setPanelCategoryKey(panelCategoryKey);
 		objectDefinition.setPluralLabelMap(pluralLabelMap);
 		objectDefinition.setPortlet(portlet);
-		objectDefinition.setLabelCurrentLanguageId(
-			serviceContext.getLanguageId());
-		objectDefinition.setPluralLabelCurrentLanguageId(
-			serviceContext.getLanguageId());
+
+		_setCurrentLanguageIds(objectDefinition, serviceContext);
 
 		_addOrUpdateObjectDefinitionSettings(
 			objectDefinition, objectDefinitionSettings);
