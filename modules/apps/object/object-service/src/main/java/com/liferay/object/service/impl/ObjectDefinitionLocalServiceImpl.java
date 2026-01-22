@@ -1619,6 +1619,10 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setSystem(system);
 		objectDefinition.setVersion(version);
 		objectDefinition.setStatus(status);
+		objectDefinition.setLabelCurrentLanguageId(
+			serviceContext.getLanguageId());
+		objectDefinition.setPluralLabelCurrentLanguageId(
+			serviceContext.getLanguageId());
 
 		objectDefinition = _update(objectDefinition);
 
@@ -2738,6 +2742,10 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setPanelCategoryKey(panelCategoryKey);
 		objectDefinition.setPluralLabelMap(pluralLabelMap);
 		objectDefinition.setPortlet(portlet);
+		objectDefinition.setLabelCurrentLanguageId(
+			serviceContext.getLanguageId());
+		objectDefinition.setPluralLabelCurrentLanguageId(
+			serviceContext.getLanguageId());
 
 		_addOrUpdateObjectDefinitionSettings(
 			objectDefinition, objectDefinitionSettings);
