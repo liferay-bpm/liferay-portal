@@ -6,29 +6,18 @@
 import Label from '@clayui/label';
 import React from 'react';
 
-declare type NameDisplayType =
-	| 'secondary'
-	| 'info'
-	| 'warning'
-	| 'danger'
-	| 'success'
-	| 'unstyled';
-
-const mapKeyToNameDisplayType: {[key: string]: NameDisplayType} = {
-	blocked: 'danger',
-	done: 'success',
-	inProgress: 'info',
-	notStarted: 'secondary',
-	overdue: 'warning',
-};
-
+import {mapStateKeyToDisplayType} from '../utils/constants';
+import {IDisplayType} from '../utils/types';
 interface StateLabelProps {
+	displayType?: IDisplayType;
 	key: string;
 	name: string;
 }
 
-const StateLabel = ({key, name}: StateLabelProps) => (
-	<Label displayType={mapKeyToNameDisplayType[key]}>{name}</Label>
+const StateLabel = ({displayType, key, name}: StateLabelProps) => (
+	<Label displayType={displayType ?? mapStateKeyToDisplayType[key]}>
+		{name}
+	</Label>
 );
 
 export default StateLabel;
