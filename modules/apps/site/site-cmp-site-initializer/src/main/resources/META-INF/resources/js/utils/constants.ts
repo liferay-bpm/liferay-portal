@@ -11,3 +11,13 @@ export const DISPLAY_TYPES = [
 	'danger',
 	'unstyled',
 ] as const;
+
+export const mapLabelToLabelDisplayType: {
+	[key: string]: (typeof DISPLAY_TYPES)[number];
+} = {
+	'Blocked': 'danger',
+	'Done': 'success',
+	'In Progress': 'info',
+	'Not Started': 'secondary',
+	'Overdue': 'warning',
+};

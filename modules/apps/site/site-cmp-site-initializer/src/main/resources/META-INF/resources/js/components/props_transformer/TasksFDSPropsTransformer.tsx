@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {IInternalRenderer} from '@liferay/frontend-data-set-web';
+import {IInternalRenderer, IView} from '@liferay/frontend-data-set-web';
 import {AssigneeValue} from '@liferay/object-dynamic-data-mapping-form-field-type';
 import {
 	ACTIONS,
@@ -17,6 +17,7 @@ import React from 'react';
 import {openCMPModal} from '../../utils/openCMPModal';
 import StateLabel from '../StateLabel';
 import EditAssigneeModalContent from '../modal/EditAssigneeModalContent';
+import KanbanView from './views/kanban_view/KanbanView';
 
 type action = {
 	data: {
@@ -66,12 +67,41 @@ export default function TasksFDSPropsTransformer({
 	additionalProps,
 	creationMenu,
 	itemsActions = [],
+	views,
 	...otherProps
 }: {
 	additionalProps: AdditionalProps;
 	creationMenu: any;
 	itemsActions?: any[];
+	views: IView[];
 }) {
+	let mergedViews = views;
+
+	const nonDefaultViews = views.map((view) => {
+		return {
+			...view,
+			default: false,
+		};
+	});
+
+	const kanbanViewRenderer: IView = {
+		component: (props: any) => KanbanView({...props, additionalProps}),
+		default: false,
+		label: Liferay.Language.get('kanban'),
+		name: 'kanban',
+		schema: {
+			description: 'description',
+			image: 'imageURL',
+			link: '',
+			sticker: '',
+			symbol: '',
+			title: 'embedded.title',
+		},
+		thumbnail: 'columns',
+	};
+
+	mergedViews = [...nonDefaultViews, kanbanViewRenderer];
+
 	return {
 		...otherProps,
 		creationMenu: {
@@ -144,5 +174,6 @@ export default function TasksFDSPropsTransformer({
 				});
 			}
 		},
+		views: mergedViews,
 	};
 }
