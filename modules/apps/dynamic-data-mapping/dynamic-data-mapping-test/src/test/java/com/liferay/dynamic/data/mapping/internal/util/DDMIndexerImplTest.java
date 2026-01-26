@@ -312,6 +312,12 @@ public class DDMIndexerImplTest {
 	}
 
 	@Test
+	public void testFormWithRepeatableSelectField() {
+		_testFormWithRepeatableSelectField("keyword");
+		_testFormWithRepeatableSelectField("text");
+	}
+
+	@Test
 	public void testFormWithSelectField() throws JSONException {
 		Document document = _createDocument();
 
@@ -455,7 +461,7 @@ public class DDMIndexerImplTest {
 				DDMIndexerConfiguration ddmIndexerConfiguration =
 					() -> enableLegacyDDMIndexFields;
 
-				ReflectionTestUtil.setFieldValue(
+				_setFieldValueIfPresent(
 					this, "_ddmFormValuesToFieldsConverter",
 					new DDMFormValuesToFieldsConverterImpl());
 				ReflectionTestUtil.setFieldValue(
@@ -536,6 +542,16 @@ public class DDMIndexerImplTest {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 		return simpleDateFormat.format(new Date());
+	}
+
+	private void _setFieldValueIfPresent(
+		Object target, String fieldName, Object value) {
+
+		try {
+			ReflectionTestUtil.setFieldValue(target, fieldName, value);
+		}
+		catch (Exception exception) {
+		}
 	}
 
 	private void _setUpJSONFactoryUtil() {
@@ -711,6 +727,55 @@ public class DDMIndexerImplTest {
 				StringBundler.concat(
 					"ddm__text__", ddmStructure.getStructureId(), "__",
 					_FIELD_NAME, "_en_US_String_sortable")));
+	}
+
+	private void _testFormWithRepeatableSelectField(String indexType) {
+		Document document = _createDocument();
+
+		DDMForm ddmForm = DDMStructureTestUtil.getSampleDDMForm(
+			_FIELD_NAME, "string", indexType, true,
+			DDMFormFieldTypeConstants.SELECT, new Locale[] {LocaleUtil.US},
+			LocaleUtil.US);
+
+		DDMFormField ddmFormField = ddmForm.getDDMFormField(_FIELD_NAME, true);
+
+		DDMFormFieldOptions ddmFormFieldOptions = new DDMFormFieldOptions();
+
+		ddmFormFieldOptions.addOptionLabel("refNo", LocaleUtil.US, "No");
+		ddmFormFieldOptions.addOptionLabel("refYes", LocaleUtil.US, "Yes");
+
+		ddmFormField.setDDMFormFieldOptions(ddmFormFieldOptions);
+
+		_ddmIndexer.addAttributes(
+			document, _createDDMStructure(ddmForm),
+			_createDDMFormValues(
+				ddmForm,
+				DDMFormValuesTestUtil.createDDMFormFieldValue(
+					_FIELD_NAME,
+					DDMFormValuesTestUtil.createLocalizedValue(
+						"[\"refNo\"]", LocaleUtil.US)),
+				DDMFormValuesTestUtil.createDDMFormFieldValue(
+					_FIELD_NAME,
+					DDMFormValuesTestUtil.createLocalizedValue(
+						"[\"refNo\"]", LocaleUtil.US))));
+
+		String indexTypeSuffix = StringUtil.upperCaseFirstLetter(indexType);
+
+		FieldValuesAssert.assertFieldValues(
+			HashMapBuilder.put(
+				"ddmFieldArray.ddmFieldValue" + indexTypeSuffix +
+					"_en_US_String",
+				"[[\"No\"], [\"No\"]]"
+			).put(
+				"ddmFieldArray.ddmFieldValue" + indexTypeSuffix +
+					"_en_US_String_sortable",
+				"[[\"no\"], [\"no\"]]"
+			).put(
+				"ddmFieldArray.ddmFieldValue" + indexTypeSuffix + "_en_US",
+				"[[\"refNo\"], [\"refNo\"]]"
+			).build(),
+			"ddmFieldArray.ddmFieldValue" + indexTypeSuffix, document,
+			StringPool.BLANK);
 	}
 
 	private static final String _FIELD_NAME = RandomTestUtil.randomString();
