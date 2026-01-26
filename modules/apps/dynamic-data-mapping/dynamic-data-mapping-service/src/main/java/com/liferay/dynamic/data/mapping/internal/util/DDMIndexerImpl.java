@@ -432,7 +432,7 @@ public class DDMIndexerImpl implements DDMIndexer {
 		String valueFieldName = getValueFieldName(indexType, locale);
 
 		_addToDocument(
-			document, indexType, valueFieldName,
+			document, ddmFormField, locale, indexType, valueFieldName,
 			_getSortableValue(ddmFormField, locale, value),
 			ddmFormField.getType(), value);
 
@@ -692,8 +692,9 @@ public class DDMIndexerImpl implements DDMIndexer {
 	}
 
 	private void _addToDocument(
-			Document document, String indexType, String name,
-			Serializable sortableValue, String type, Serializable value)
+			Document document, DDMFormField ddmFormField, Locale locale,
+			String indexType, String name, Serializable sortableValue,
+			String type, Serializable value)
 		throws PortalException {
 
 		if (value == null) {
@@ -755,6 +756,40 @@ public class DDMIndexerImpl implements DDMIndexer {
 			String[] valuesString = ArrayUtil.toStringArray((Object[])value);
 
 			String[] truncatedValuesString = valuesString;
+
+			if (type.equals(DDMFormFieldTypeConstants.CHECKBOX_MULTIPLE) ||
+				type.equals(DDMFormFieldTypeConstants.SELECT)) {
+
+				if (indexType.equals("keyword")) {
+					document.addKeywordSortable(name, valuesString);
+				}
+				else {
+					document.addTextSortable(name, valuesString);
+				}
+
+				Locale valuesLocale;
+
+				if (locale != null) {
+					valuesLocale = locale;
+				}
+				else {
+					valuesLocale = LocaleUtil.getDefault();
+				}
+
+				document.addKeyword(
+					_getFieldName(name),
+					_toStringArray(
+						ddmFormField, valuesLocale, (Object[])value, false));
+
+				document.addKeyword(
+					_getSortableFieldName(name),
+					_toStringArray(
+						ddmFormField, valuesLocale, (Object[])value, true));
+
+				document.addKeyword(name, valuesString);
+
+				return;
+			}
 
 			if (type.equals(DDMFormFieldTypeConstants.DATE) ||
 				type.equals(DDMFormFieldTypeConstants.DATE_TIME)) {
@@ -854,6 +889,15 @@ public class DDMIndexerImpl implements DDMIndexer {
 				}
 			}
 		}
+	}
+
+	private void _addToDocument(
+			Document document, String indexType, String name,
+			Serializable sortableValue, String type, Serializable value)
+		throws PortalException {
+
+		_addToDocument(
+			document, null, null, indexType, name, sortableValue, type, value);
 	}
 
 	private void _addToDocument(
@@ -1229,6 +1273,29 @@ public class DDMIndexerImpl implements DDMIndexer {
 		}
 
 		return Collections.emptySet();
+	}
+
+	private String[] _toStringArray(
+			DDMFormField ddmFormField, Locale locale, Object[] values,
+			boolean lowercase)
+		throws PortalException {
+
+		String[] valuesString = ArrayUtil.toStringArray(values);
+
+		String[] displayValues = new String[valuesString.length];
+
+		for (int i = 0; i < valuesString.length; i++) {
+			String displayJSON = _getSortableValue(
+				ddmFormField, locale, valuesString[i]);
+
+			if (lowercase) {
+				displayJSON = StringUtil.toLowerCase(displayJSON);
+			}
+
+			displayValues[i] = displayJSON;
+		}
+
+		return displayValues;
 	}
 
 	private String[] _toStringArray(Object value) throws PortalException {
