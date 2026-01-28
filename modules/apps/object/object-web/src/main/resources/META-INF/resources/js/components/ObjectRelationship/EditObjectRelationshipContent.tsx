@@ -4,17 +4,17 @@
  */
 
 import ClayAlert from '@clayui/alert';
+import {API, type FormError} from '@liferay/object-js-components-web';
 import {
 	ILearnResourceContext,
 	InputLocalized,
 } from 'frontend-js-components-web';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {ObjectRelationshipDeletionTypeSelect} from './ObjectRelationshipDeletionTypeSelect';
 import {ObjectRelationshipFormBase} from './ObjectRelationshipFormBase';
 import {ObjectRelationshipParameterRequired} from './ObjectRelationshipParameterRequired';
 
-import type {FormError} from '@liferay/object-js-components-web';
 import type {ChangeEventHandler, ElementType} from 'react';
 
 interface EditObjectRelationshipContentProps {
@@ -56,6 +56,37 @@ export function EditObjectRelationshipContent({
 	submitError,
 	values,
 }: EditObjectRelationshipContentProps) {
+	const [objectDefinitions, setObjectDefinitions] = useState<
+		Partial<ObjectDefinition>[]
+	>([]);
+
+	useEffect(() => {
+		const fetchObjectDefinitions = async () => {
+			const {items} = await API.getAllObjectDefinitions();
+
+			const objectDefinition = items.find(
+				({externalReferenceCode}) =>
+					objectDefinitionExternalReferenceCode ===
+					externalReferenceCode
+			)!;
+
+			const objectDefinitions = items.filter(
+				({modifiable, parameterRequired, storageType}) => {
+					return (
+						(objectDefinition.modifiable || modifiable) &&
+						(!Liferay.FeatureFlags['LPS-135430'] ||
+							storageType === 'default') &&
+						!parameterRequired
+					);
+				}
+			);
+
+			setObjectDefinitions(objectDefinitions);
+		};
+
+		fetchObjectDefinitions();
+	}, [objectDefinitionExternalReferenceCode]);
+
 	return (
 		<>
 			<ContainerWrapper title={Liferay.Language.get('basic-info')}>
@@ -95,6 +126,7 @@ export function EditObjectRelationshipContent({
 					objectDefinitionExternalReferenceCode1={
 						objectDefinitionExternalReferenceCode
 					}
+					objectDefinitions={objectDefinitions}
 					onChangeInheritanceCheckbox={onChangeInheritanceCheckbox}
 					onSubmit={onSubmit}
 					readonly

@@ -29,6 +29,7 @@ interface ObjectRelationshipFormBaseProps {
 	learnResources: ILearnResourceContext;
 	objectDefinitionExternalReferenceCode1: string;
 	objectDefinitionExternalReferenceCode2?: string;
+	objectDefinitions: Partial<ObjectDefinition>[];
 	onChangeInheritanceCheckbox: (
 		event: React.ChangeEvent<HTMLInputElement>
 	) => Promise<void> | void;
@@ -95,6 +96,7 @@ export function ObjectRelationshipFormBase({
 	learnResources,
 	objectDefinitionExternalReferenceCode1,
 	objectDefinitionExternalReferenceCode2,
+	objectDefinitions,
 	onChangeInheritanceCheckbox,
 	readonly,
 	setValues,
@@ -109,9 +111,6 @@ export function ObjectRelationshipFormBase({
 		useState<Partial<ObjectDefinition>>();
 	const [objectDefinition2, setObjectDefinition2] =
 		useState<Partial<ObjectDefinition>>();
-	const [objectDefinitions, setObjectDefinitions] = useState<
-		Partial<ObjectDefinition>[]
-	>([]);
 	const [objectRelationshipTypes, setObjectRelationshipTypes] = useState<
 		ObjectRelationshipTypeInfo[]
 	>([ONE_TO_MANY]);
@@ -228,35 +227,14 @@ export function ObjectRelationshipFormBase({
 	}, [objectDefinitionExternalReferenceCode1]);
 
 	useEffect(() => {
-		const fetchObjectDefinitions = async () => {
-			const {items} = await API.getAllObjectDefinitions();
+		const objectDefinition = objectDefinitions.find(
+			({externalReferenceCode}) =>
+				objectDefinitionExternalReferenceCode1 === externalReferenceCode
+		)!;
 
-			const objectDefinition = items.find(
-				({externalReferenceCode}) =>
-					objectDefinitionExternalReferenceCode1 ===
-					externalReferenceCode
-			)!;
+		setCreationLanguageId(objectDefinition.defaultLanguageId);
 
-			const objectDefinitions = items.filter(
-				({modifiable, parameterRequired, storageType}) => {
-					return (
-						(objectDefinition.modifiable || modifiable) &&
-						(!Liferay.FeatureFlags['LPS-135430'] ||
-							storageType === 'default') &&
-						!parameterRequired
-					);
-				}
-			);
-
-			setCreationLanguageId(objectDefinition.defaultLanguageId);
-
-			setObjectDefinitions(objectDefinitions);
-		};
-
-		fetchObjectDefinitions();
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [objectDefinitionExternalReferenceCode1, readonly]);
+	}, [objectDefinitionExternalReferenceCode1, objectDefinitions]);
 
 	return (
 		<>

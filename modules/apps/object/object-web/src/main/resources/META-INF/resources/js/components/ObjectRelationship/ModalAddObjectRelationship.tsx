@@ -7,7 +7,7 @@ import ClayButton from '@clayui/button';
 import ClayForm from '@clayui/form';
 import ClayModal, {ClayModalProvider, useModal} from '@clayui/modal';
 import {API, Input} from '@liferay/object-js-components-web';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {defaultLanguageId} from '../../utils/constants';
 import {toCamelCase} from '../../utils/string';
@@ -52,6 +52,9 @@ export function ModalAddObjectRelationship({
 		},
 	});
 
+	const [objectDefinitions, setObjectDefinitions] = useState<
+	Partial<ObjectDefinition>[]
+>([]);
 	const [submitError, setSubmitError] = useState<SubmitError>(null);
 
 	const initialValues: Partial<ObjectRelationship> = {
@@ -122,6 +125,33 @@ export function ModalAddObjectRelationship({
 		});
 	};
 
+	useEffect(() => {
+		const fetchObjectDefinitions = async () => {
+			const {items} = await API.getAllObjectDefinitions();
+
+			const objectDefinition = items.find(
+				({externalReferenceCode}) =>
+					objectDefinitionExternalReferenceCode1 ===
+					externalReferenceCode
+			)!;
+
+			const objectDefinitions = items.filter(
+				({modifiable, parameterRequired, storageType}) => {
+					return (
+						(objectDefinition.modifiable || modifiable) &&
+						(!Liferay.FeatureFlags['LPS-135430'] ||
+							storageType === 'default') &&
+						!parameterRequired
+					);
+				}
+			);
+
+			setObjectDefinitions(objectDefinitions);
+		};
+
+		fetchObjectDefinitions();
+	}, [objectDefinitionExternalReferenceCode1]);
+
 	return (
 		<ClayModalProvider>
 			<ClayModal center observer={observer}>
@@ -162,6 +192,7 @@ export function ModalAddObjectRelationship({
 							objectDefinitionExternalReferenceCode2={
 								objectDefinitionExternalReferenceCode2
 							}
+							objectDefinitions={objectDefinitions}
 							onChangeInheritanceCheckbox={
 								handleInheritanceCheckboxChange
 							}
