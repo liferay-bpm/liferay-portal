@@ -120,7 +120,9 @@ public class BulkActionResourceImpl extends BaseBulkActionResourceImpl {
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled(
-				contextCompany.getCompanyId(), "LPD-17564")) {
+				contextCompany.getCompanyId(), "LPD-17564") ||
+			!FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-69713")) {
 
 			throw new UnsupportedOperationException();
 		}
