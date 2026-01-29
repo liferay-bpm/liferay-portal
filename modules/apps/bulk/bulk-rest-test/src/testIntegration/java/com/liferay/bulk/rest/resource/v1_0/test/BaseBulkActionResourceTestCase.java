@@ -1336,6 +1336,14 @@ public abstract class BaseBulkActionResourceTestCase {
 				return bulkAction;
 			},
 			() -> {
+				DeleteBulkAction bulkAction = new DeleteBulkAction();
+
+				bulkAction.setType(
+					BulkAction.Type.create("DeleteObjectEntryBulkAction"));
+
+				return bulkAction;
+			},
+			() -> {
 				ExpireBulkAction bulkAction = new ExpireBulkAction();
 
 				bulkAction.setType(BulkAction.Type.create("ExpireBulkAction"));
