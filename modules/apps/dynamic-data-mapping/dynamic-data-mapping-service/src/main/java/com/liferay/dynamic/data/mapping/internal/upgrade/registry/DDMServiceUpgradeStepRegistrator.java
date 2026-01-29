@@ -706,6 +706,26 @@ public class DDMServiceUpgradeStepRegistrator
 		registry.register(
 			"7.0.6", "7.1.0",
 			new DDMFacetTemplateVersionUpgradeProcess(_classNameLocalService));
+
+		registry.register(
+			"7.1.0", "7.1.1",
+			UpgradeProcessFactory.runSQL(
+				StringBundler.concat(
+					"update FragmentEntry set html = ( select ",
+					"FragmentEntryVersion.html from FragmentEntryVersion ",
+					"where FragmentEntry.fragmentEntryId = ",
+					"FragmentEntryVersion.fragmentEntryId and ",
+					"FragmentEntry.fragmentCollectionId = ",
+					"FragmentEntryVersion.fragmentCollectionId and ",
+					"FragmentEntry.modifiedDate = ",
+					"FragmentEntryVersion.modifiedDate ) where exists ( ",
+					"select 1 from FragmentEntryVersion where ",
+					"FragmentEntry.fragmentEntryId = ",
+					"FragmentEntryVersion.fragmentEntryId and ",
+					"FragmentEntry.fragmentCollectionId = ",
+					"FragmentEntryVersion.fragmentCollectionId and ",
+					"FragmentEntry.modifiedDate = ",
+					"FragmentEntryVersion.modifiedDate)")));
 	}
 
 	@Activate
