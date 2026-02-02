@@ -22,6 +22,7 @@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
 taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
 <%@ page import="com.liferay.asset.kernel.model.AssetVocabularyConstants" %><%@
+page import="com.liferay.bulk.selection.BulkSelectionRunner" %><%@
 page import="com.liferay.dynamic.data.mapping.util.NumericDDMFormFieldUtil" %><%@
 page import="com.liferay.learn.LearnMessageUtil" %><%@
 page import="com.liferay.list.type.model.ListTypeDefinition" %><%@
@@ -39,6 +40,7 @@ page import="com.liferay.object.model.ObjectLayoutBox" %><%@
 page import="com.liferay.object.model.ObjectRelationship" %><%@
 page import="com.liferay.object.model.ObjectValidationRule" %><%@
 page import="com.liferay.object.model.ObjectView" %><%@
+page import="com.liferay.object.web.internal.bulk.selection.BulkSelectionRunnerUtil" %><%@
 page import="com.liferay.object.web.internal.list.type.constants.ListTypeFDSNames" %><%@
 page import="com.liferay.object.web.internal.list.type.display.context.ViewListTypeDefinitionsDisplayContext" %><%@
 page import="com.liferay.object.web.internal.list.type.display.context.ViewListTypeEntriesDisplayContext" %><%@
@@ -70,6 +72,7 @@ page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.LocaleUtil" %><%@
 page import="com.liferay.portal.kernel.util.LocalizationUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
+page import="com.liferay.portal.kernel.util.PortalUtil" %><%@
 page import="com.liferay.portal.kernel.util.PropsKeys" %><%@
 page import="com.liferay.portal.kernel.util.PropsUtil" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
