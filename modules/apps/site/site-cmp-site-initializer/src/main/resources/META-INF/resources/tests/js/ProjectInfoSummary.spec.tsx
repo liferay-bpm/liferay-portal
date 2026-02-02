@@ -37,5 +37,6 @@ describe('ProjectInfoSummary', () => {
 		expect(getByText('Sponsor Name')).toBeInTheDocument();
 		expect(getByText('tag1')).toBeInTheDocument();
 		expect(getByText('tag2')).toBeInTheDocument();
+		expect(getByText('not-started')).toBeInTheDocument();
 	});
 });
