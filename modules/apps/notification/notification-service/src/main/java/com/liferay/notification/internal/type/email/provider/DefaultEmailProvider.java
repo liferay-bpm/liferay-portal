@@ -43,7 +43,8 @@ public class DefaultEmailProvider implements EmailProvider {
 
 		Map<Locale, String> valueMap = (Map<Locale, String>)value;
 
-		String valueString = valueMap.get(notificationContext.getUserLocale());
+		String valueString = valueMap.get(
+			notificationContext.getPreferredLocale());
 
 		if (Validator.isNull(valueString)) {
 			valueString = valueMap.get(

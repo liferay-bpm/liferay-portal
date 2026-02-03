@@ -336,16 +336,16 @@ public abstract class BaseNotificationType implements NotificationType {
 		throws PortalException {
 
 		String content = NotificationTypeUtil.evaluateTerms(
-			contentMap.get(userLocale), notificationContext,
-			notificationTermEvaluatorTracker);
+			contentMap.get(notificationContext.getPreferredLocale()),
+			notificationContext, notificationTermEvaluatorTracker);
 
 		if (Validator.isNotNull(content)) {
 			return content;
 		}
 
 		return NotificationTypeUtil.evaluateTerms(
-			contentMap.get(siteDefaultLocale), notificationContext,
-			notificationTermEvaluatorTracker);
+			contentMap.get(notificationContext.getSiteDefaultLocale()),
+			notificationContext, notificationTermEvaluatorTracker);
 	}
 
 	protected void prepareNotificationContext(
@@ -416,12 +416,8 @@ public abstract class BaseNotificationType implements NotificationType {
 	@Reference
 	protected RoleLocalService roleLocalService;
 
-	protected Locale siteDefaultLocale;
-
 	@Reference
 	protected UserGroupLocalService userGroupLocalService;
-
-	protected Locale userLocale;
 
 	@Reference
 	protected UserLocalService userLocalService;

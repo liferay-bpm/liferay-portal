@@ -148,7 +148,7 @@ public class NotificationQueueEntryResourceImpl
 
 			recipientMap.putAll(
 				notificationType.evaluateNotificationRecipientSettings(
-					contextCompany.getCompanyId(), notificationContext,
+					notificationContext.getCompanyId(), notificationContext,
 					recipientMap));
 		}
 

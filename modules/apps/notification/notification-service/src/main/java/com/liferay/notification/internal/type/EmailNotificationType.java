@@ -59,7 +59,6 @@ import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.EmailAddressValidator;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -82,7 +81,6 @@ import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.KeyValuePair;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -101,6 +99,7 @@ import java.io.StringWriter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -128,7 +127,7 @@ public class EmailNotificationType extends BaseNotificationType {
 		return HashMapBuilder.put(
 			NotificationRecipientSettingConstants.NAME_BCC,
 			_getValue(
-				companyId, notificationContext,
+				notificationContext,
 				NotificationRecipientSettingConstants.NAME_BCC,
 				notificationRecipientSettings)
 		).put(
@@ -137,16 +136,34 @@ public class EmailNotificationType extends BaseNotificationType {
 		).put(
 			NotificationRecipientSettingConstants.NAME_CC,
 			_getValue(
-				companyId, notificationContext,
+				notificationContext,
 				NotificationRecipientSettingConstants.NAME_CC,
 				notificationRecipientSettings)
 		).put(
 			NotificationRecipientSettingConstants.NAME_CC_TYPE,
 			NotificationRecipientConstants.TYPE_EMAIL
 		).put(
+			NotificationRecipientSettingConstants.NAME_FROM,
+			NotificationTypeUtil.evaluateTerms(
+				(String)notificationRecipientSettings.get(
+					NotificationRecipientSettingConstants.NAME_FROM),
+				notificationContext, notificationTermEvaluatorTracker)
+		).put(
+			NotificationRecipientSettingConstants.NAME_FROM_NAME,
+			formatLocalizedContent(
+				(Map<Locale, String>)notificationRecipientSettings.get(
+					NotificationRecipientSettingConstants.NAME_FROM_NAME),
+				notificationContext)
+		).put(
+			NotificationRecipientSettingConstants.NAME_SINGLE_RECIPIENT,
+			() -> String.valueOf(
+				notificationRecipientSettings.getOrDefault(
+					NotificationRecipientSettingConstants.NAME_SINGLE_RECIPIENT,
+					Boolean.TRUE))
+		).put(
 			NotificationRecipientSettingConstants.NAME_TO,
 			_getValue(
-				companyId, notificationContext,
+				notificationContext,
 				NotificationRecipientSettingConstants.NAME_TO,
 				notificationRecipientSettings)
 		).put(
@@ -239,81 +256,25 @@ public class EmailNotificationType extends BaseNotificationType {
 		NotificationTemplate notificationTemplate =
 			notificationContext.getNotificationTemplate();
 
-		long groupId = 0;
-
-		User user = userLocalService.getUser(notificationContext.getUserId());
-
-		Group userGroup = user.getGroup();
-
-		if ((userGroup == null) && user.isGuestUser()) {
-			userGroup = _groupLocalService.getGroup(
-				user.getCompanyId(), GroupConstants.GUEST);
-		}
-
-		if (userGroup != null) {
-			groupId = userGroup.getGroupId();
-		}
-
-		siteDefaultLocale = portal.getSiteDefaultLocale(groupId);
-
-		userLocale = user.getLocale();
-
-		if (user.isGuestUser() &&
-			notificationContext.isUsePreferredLanguageForGuests()) {
-
-			userLocale = LocaleUtil.fromLanguageId(
-				notificationContext.getPreferredLanguageId());
-		}
-
-		notificationContext.setUserLocale(userLocale);
-
-		String body = _formatBody(
-			notificationTemplate.getBodyMap(), userGroup, notificationContext);
 		NotificationRecipient notificationRecipient =
 			notificationTemplate.getNotificationRecipient();
-		String subject = formatLocalizedContent(
-			notificationTemplate.getSubjectMap(), notificationContext);
 
 		Map<String, Object> notificationRecipientSettings =
 			NotificationRecipientSettingUtil.toMap(
 				notificationRecipient.getNotificationRecipientSettings());
 
+		notificationContext.setCompanyId(notificationTemplate.getCompanyId());
+
+		notificationContext.setSiteDefaultLocale(
+			portal.getSiteDefaultLocale(notificationContext.getGroupId()));
+
 		Map<String, String> evaluatedNotificationRecipientSettings =
-			HashMapBuilder.put(
-				NotificationRecipientSettingConstants.NAME_FROM,
-				NotificationTypeUtil.evaluateTerms(
-					(String)notificationRecipientSettings.get(
-						NotificationRecipientSettingConstants.NAME_FROM),
-					notificationContext, notificationTermEvaluatorTracker)
-			).put(
-				NotificationRecipientSettingConstants.NAME_FROM_NAME,
-				formatLocalizedContent(
-					(Map<Locale, String>)notificationRecipientSettings.get(
-						NotificationRecipientSettingConstants.NAME_FROM_NAME),
-					notificationContext)
-			).put(
-				NotificationRecipientSettingConstants.NAME_SINGLE_RECIPIENT,
-				() -> {
-					if (!notificationRecipientSettings.containsKey(
-							NotificationRecipientSettingConstants.
-								NAME_SINGLE_RECIPIENT)) {
-
-						return Boolean.TRUE.toString();
-					}
-
-					return String.valueOf(
-						notificationRecipientSettings.get(
-							NotificationRecipientSettingConstants.
-								NAME_SINGLE_RECIPIENT));
-				}
-			).putAll(
-				evaluateNotificationRecipientSettings(
-					notificationTemplate.getCompanyId(), notificationContext,
-					notificationRecipientSettings)
-			).build();
+			evaluateNotificationRecipientSettings(
+				notificationTemplate.getCompanyId(), notificationContext,
+				notificationRecipientSettings);
 
 		String validEmailAddresses = _getValidEmailAddresses(
-			user.getCompanyId(),
+			notificationContext.getCompanyId(),
 			evaluatedNotificationRecipientSettings.get(
 				NotificationRecipientSettingConstants.NAME_TO));
 
@@ -330,13 +291,74 @@ public class EmailNotificationType extends BaseNotificationType {
 			return;
 		}
 
-		if (!GetterUtil.getBoolean(
-				evaluatedNotificationRecipientSettings.get(
-					NotificationRecipientSettingConstants.
-						NAME_SINGLE_RECIPIENT))) {
+		String[] emailAddresses = StringUtil.split(validEmailAddresses);
+
+		boolean singleRecipient = GetterUtil.getBoolean(
+			evaluatedNotificationRecipientSettings.get(
+				NotificationRecipientSettingConstants.NAME_SINGLE_RECIPIENT));
+
+		Map<String, User> recipientUserMap = new HashMap<>();
+		Set<Locale> recipientLocales = new HashSet<>();
+
+		for (String emailAddress : emailAddresses) {
+			User recipientUser = _userLocalService.fetchUserByEmailAddress(
+				notificationContext.getCompanyId(), emailAddress);
+
+			if (recipientUser == null) {
+				recipientUser = _userLocalService.getGuestUser(
+					notificationContext.getCompanyId());
+			}
+
+			recipientLocales.add(recipientUser.getLocale());
+			recipientUserMap.put(emailAddress, recipientUser);
+		}
+
+		Locale locale = notificationContext.getPreferredLocale();
+
+		boolean hasTranslation = _hasTranslation(
+			locale, recipientLocales, notificationTemplate.getBodyMap());
+
+		if ((emailAddresses.length > 1) && (recipientLocales.size() > 1) &&
+			hasTranslation) {
+
+			singleRecipient = true;
+		}
+
+		Group group = _groupLocalService.fetchGroup(
+			notificationContext.getGroupId());
+
+		if (group == null) {
+			group = _groupLocalService.getGroup(
+				notificationContext.getCompanyId(), GroupConstants.GUEST);
+
+			notificationContext.setGroupId(group.getGroupId());
+		}
+
+		if (!singleRecipient) {
+			if (recipientLocales.size() == 1) {
+				Locale recipientLocale = recipientLocales.iterator(
+				).next();
+
+				Map<Locale, String> bodyMap = notificationTemplate.getBodyMap();
+
+				if ((bodyMap != null) &&
+					Validator.isNotNull(bodyMap.get(recipientLocale)) &&
+					notificationContext.isUsePreferredLanguageForGuests()) {
+
+					notificationContext.setPreferredLocale(recipientLocale);
+				}
+			}
+
+			String body = _formatBody(
+				notificationTemplate.getBodyMap(), group, notificationContext);
+
+			String subject = formatLocalizedContent(
+				notificationTemplate.getSubjectMap(), notificationContext);
 
 			prepareNotificationContext(
-				user, body, notificationContext,
+				_userLocalService.getGuestUser(
+					notificationContext.getCompanyId()),
+				body, notificationContext,
 				HashMapBuilder.putAll(
 					evaluatedNotificationRecipientSettings
 				).put(
@@ -352,28 +374,37 @@ public class EmailNotificationType extends BaseNotificationType {
 			return;
 		}
 
-		for (String emailAddress : StringUtil.split(validEmailAddresses)) {
-			User emailAddressUser = userLocalService.fetchUserByEmailAddress(
-				user.getCompanyId(), emailAddress);
+		for (String emailAddress : emailAddresses) {
+			User recipientUser = recipientUserMap.get(emailAddress);
 
-			if (emailAddressUser == null) {
-				emailAddressUser = userLocalService.getGuestUser(
-					CompanyThreadLocal.getCompanyId());
+			Locale recipientLocale = recipientUser.getLocale();
+
+			if (recipientUser.isGuestUser() &&
+				!notificationContext.isUsePreferredLanguageForGuests()) {
+
+				recipientLocale = recipientUser.getLocale();
 			}
+
+			notificationContext.setPreferredLocale(recipientLocale);
+
+			String body = _formatBody(
+				notificationTemplate.getBodyMap(), group, notificationContext);
+			String subject = formatLocalizedContent(
+				notificationTemplate.getSubjectMap(), notificationContext);
 
 			if (FeatureFlagManagerUtil.isEnabled(
 					notificationTemplate.getCompanyId(), "LPD-17564")) {
 
 				body = StringUtil.replace(
 					body, "[%EMAIL_RECIPIENT_ADDRESS%]",
-					emailAddressUser.getDisplayEmailAddress());
+					recipientUser.getDisplayEmailAddress());
 				body = StringUtil.replace(
 					body, "[%EMAIL_RECIPIENT_NAME%]",
-					emailAddressUser.getFullName());
+					recipientUser.getFullName());
 			}
 
 			prepareNotificationContext(
-				emailAddressUser, body, notificationContext,
+				recipientUser, body, notificationContext,
 				HashMapBuilder.putAll(
 					evaluatedNotificationRecipientSettings
 				).put(
@@ -579,10 +610,12 @@ public class EmailNotificationType extends BaseNotificationType {
 
 		StringWriter stringWriter = new StringWriter();
 
-		String body = notificationTemplate.getBody(userLocale);
+		String body = notificationTemplate.getBody(
+			notificationContext.getPreferredLocale());
 
 		if (Validator.isNull(body)) {
-			body = notificationTemplate.getBody(siteDefaultLocale);
+			body = notificationTemplate.getBody(
+				notificationContext.getSiteDefaultLocale());
 		}
 
 		Template template = TemplateManagerUtil.getTemplate(
@@ -601,7 +634,7 @@ public class EmailNotificationType extends BaseNotificationType {
 
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
-		themeDisplay.setLocale(siteDefaultLocale);
+		themeDisplay.setLocale(notificationContext.getPreferredLocale());
 
 		InfoItemFieldValuesProvider<Object> infoItemFieldValuesProvider =
 			_infoItemServiceRegistry.getFirstInfoItemService(
@@ -616,8 +649,7 @@ public class EmailNotificationType extends BaseNotificationType {
 			HttpServletRequestThreadLocal.getHttpServletRequest();
 
 		ServiceContextThreadLocal.pushServiceContext(
-			_getServiceContext(
-				group, httpServletRequest, notificationContext.getUserId()));
+			_getServiceContext(group, httpServletRequest, notificationContext));
 
 		try {
 			InfoItemFieldValues infoItemFieldValues =
@@ -675,7 +707,8 @@ public class EmailNotificationType extends BaseNotificationType {
 	}
 
 	private ServiceContext _getServiceContext(
-		Group group, HttpServletRequest httpServletRequest, long userId) {
+		Group group, HttpServletRequest httpServletRequest,
+		NotificationContext notificationContext) {
 
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
@@ -688,10 +721,10 @@ public class EmailNotificationType extends BaseNotificationType {
 
 		serviceContext.setCompanyId(group.getCompanyId());
 		serviceContext.setLanguageId(
-			_language.getLanguageId(siteDefaultLocale));
+			_language.getLanguageId(notificationContext.getPreferredLocale()));
 		serviceContext.setRequest(httpServletRequest);
 		serviceContext.setScopeGroupId(group.getGroupId());
-		serviceContext.setUserId(userId);
+		serviceContext.setUserId(notificationContext.getUserId());
 
 		return serviceContext;
 	}
@@ -731,7 +764,7 @@ public class EmailNotificationType extends BaseNotificationType {
 	}
 
 	private String _getValue(
-			long companyId, NotificationContext notificationContext,
+			NotificationContext notificationContext,
 			String notificationRecipientSettingName,
 			Map<String, Object> notificationRecipientSettings)
 		throws PortalException {
@@ -743,14 +776,35 @@ public class EmailNotificationType extends BaseNotificationType {
 						notificationRecipientSettingName)),
 				NotificationRecipientConstants.TYPE_EMAIL));
 
-		notificationContext.setCompanyId(companyId);
-		notificationContext.setSiteDefaultLocale(siteDefaultLocale);
-		notificationContext.setUserLocale(userLocale);
-
 		return emailProvider.provide(
 			notificationContext,
 			notificationRecipientSettings.get(
 				notificationRecipientSettingName));
+	}
+
+	private boolean _hasTranslation(
+		Locale triggerLocale, Set<Locale> recipientLocales,
+		Map<Locale, String> bodyMap) {
+
+		if (bodyMap == null) {
+			return false;
+		}
+
+		for (Locale recipientLocale : recipientLocales) {
+			if (!Objects.equals(recipientLocale, triggerLocale)) {
+				for (Map.Entry<Locale, String> entry : bodyMap.entrySet()) {
+					Locale bodyLocale = entry.getKey();
+
+					if (Objects.equals(bodyLocale, recipientLocale) &&
+						Validator.isNotNull(entry.getValue())) {
+
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private InternetAddress[] _toInternetAddresses(String string)
