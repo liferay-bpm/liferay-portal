@@ -11,7 +11,6 @@ import com.liferay.notification.type.util.NotificationTypeUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
 import java.util.Map;
@@ -19,7 +18,7 @@ import java.util.Map;
 /**
  * @author Carolina Barbosa
  */
-public class DefaultEmailProvider implements EmailProvider {
+public class DefaultEmailProvider implements com.liferay.notification.internal.type.email.provider.EmailProvider {
 
 	public DefaultEmailProvider(
 		NotificationTermEvaluatorTracker notificationTermEvaluatorTracker) {
@@ -43,7 +42,7 @@ public class DefaultEmailProvider implements EmailProvider {
 
 		Map<Locale, String> valueMap = (Map<Locale, String>)value;
 
-		String valueString = valueMap.get(notificationContext.getUserLocale());
+		String valueString = valueMap.get(notificationContext.getLocale());
 
 		if (Validator.isNull(valueString)) {
 			valueString = valueMap.get(

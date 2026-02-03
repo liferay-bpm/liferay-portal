@@ -83,7 +83,7 @@ public class ObjectDefinitionNotificationTermEvaluator
 
 		Map<String, Object> termValues = notificationContext.getTermValues();
 
-		Locale locale = notificationContext.getUserLocale();
+		Locale locale = notificationContext.getLocale();
 
 		if (locale != null) {
 			if (_isObjectFieldTermName("createDate", termName)) {
