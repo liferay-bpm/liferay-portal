@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * @author Carolina Barbosa
  */
-public class DefaultEmailProvider implements com.liferay.notification.internal.type.email.provider.EmailProvider {
+public class DefaultEmailProvider implements EmailProvider {
 
 	public DefaultEmailProvider(
 		NotificationTermEvaluatorTracker notificationTermEvaluatorTracker) {

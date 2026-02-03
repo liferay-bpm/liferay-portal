@@ -280,15 +280,17 @@ public class EmailNotificationType extends BaseNotificationType {
 
 		long groupId = 0;
 
-		Object toObj = notificationRecipientSettings.get(
+		Object toObject = notificationRecipientSettings.get(
 			NotificationRecipientSettingConstants.NAME_TO);
 
-		Map<Locale, ?> toMap = (Map<Locale, ?>)toObj;
+		Map<Locale, ?> toMap = (Map<Locale, ?>)toObject;
 
-		Object to = toMap.get(notificationContext.getSiteDefaultLocale());
+		String to = toMap.get(
+			notificationContext.getSiteDefaultLocale()
+		).toString();
 
 		User recipient = userLocalService.getUserByEmailAddress(
-			notificationContext.getCompanyId(), to.toString());
+			notificationContext.getCompanyId(), to);
 
 		Group userGroup = recipient.getGroup();
 
