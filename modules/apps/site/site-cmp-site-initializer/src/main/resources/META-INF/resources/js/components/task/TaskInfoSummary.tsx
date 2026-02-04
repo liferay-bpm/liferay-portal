@@ -17,7 +17,7 @@ import InfoSummary from '../InfoSummary';
 import StateSelector, {State} from '../StateSelector';
 
 import '../AssigneeTrigger.scss';
-import {UPDATE_TASK_HISTORY} from './TaskHistory';
+import {UPDATE_HISTORY} from '../History';
 
 interface TaskInfoSummaryProps {
 	assignTo: AssigneeValue;
@@ -56,7 +56,7 @@ export default function TaskInfoSummary({
 								if (response.ok) {
 									displayStateSuccessToast();
 
-									Liferay.fire(UPDATE_TASK_HISTORY);
+									Liferay.fire(UPDATE_HISTORY);
 								}
 							}}
 							states={states}
@@ -79,7 +79,7 @@ export default function TaskInfoSummary({
 										(value as AssigneeValue).name
 									);
 
-									Liferay.fire(UPDATE_TASK_HISTORY);
+									Liferay.fire(UPDATE_HISTORY);
 								}
 							}}
 							showLabel={false}
