@@ -46,11 +46,16 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
+import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.model.ModelListener;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.audit.event.generators.constants.EventTypes;
 import com.liferay.portal.security.audit.event.generators.util.Attribute;
@@ -260,9 +265,57 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 	}
 
 	private Object _getAuditValue(ObjectField objectField, Object value) {
+		if (value == null) {
+			return null;
+		}
+
 		if (Objects.equals(
 				objectField.getBusinessType(),
-				ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
+				ObjectFieldConstants.BUSINESS_TYPE_ASSIGNEE)) {
+
+			long classNameId = MapUtil.getLong(
+				(Map<String, Long>)value, "classNameId");
+			long classPK = MapUtil.getLong((Map<String, Long>)value, "classPK");
+
+			return JSONUtil.put(
+				"classNameId", classNameId
+			).put(
+				"classPK", classPK
+			).put(
+				"name",
+				() -> {
+					ClassName className = _classNameLocalService.fetchClassName(
+						classNameId);
+
+					if (className == null) {
+						return StringPool.BLANK;
+					}
+
+					if (StringUtil.equals(
+							className.getValue(), Role.class.getName())) {
+
+						Role role = _roleLocalService.fetchRole(classPK);
+
+						if (role == null) {
+							return StringPool.BLANK;
+						}
+
+						return role.getName();
+					}
+
+					User user = _userLocalService.fetchUser(classPK);
+
+					if (user == null) {
+						return StringPool.BLANK;
+					}
+
+					return user.getFullName();
+				}
+			);
+		}
+		else if (Objects.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
 
 			long dlFileEntryId = GetterUtil.getLong(value);
 
@@ -536,6 +589,9 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 	private AuditRouter _auditRouter;
 
 	@Reference
+	private ClassNameLocalService _classNameLocalService;
+
+	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
 
 	@Reference
@@ -568,6 +624,9 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 
 	private ServiceTrackerList<RelevantObjectEntryModelListener>
 		_relevantObjectEntryModelListeners;
+
+	@Reference
+	private RoleLocalService _roleLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;
