@@ -8,6 +8,7 @@ import React from 'react';
 
 import {patchProjectById} from '../../utils/api';
 import {displayStateSuccessToast} from '../../utils/toastUtil';
+import {UPDATE_HISTORY} from '../History';
 import InfoSummary from '../InfoSummary';
 import StateSelector, {State} from '../StateSelector';
 import User, {UserProps} from './User';
@@ -48,6 +49,8 @@ export default function ProjectInfoSummary({
 
 								if (response.ok) {
 									displayStateSuccessToast();
+
+									Liferay.fire(UPDATE_HISTORY);
 								}
 							}}
 							states={states}
