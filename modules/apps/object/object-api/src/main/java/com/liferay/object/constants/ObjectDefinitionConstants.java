@@ -5,10 +5,16 @@
 
 package com.liferay.object.constants;
 
+import java.util.regex.Pattern;
+
 /**
  * @author Brian Wing Shun Chan
  */
 public class ObjectDefinitionConstants {
+
+	public static final Pattern CLASS_NAME_PATTERN = Pattern.compile(
+		"(com\\.liferay\\.object\\.model\\.ObjectDefinition#)([a-zA-Z]\\d" +
+			"[a-zA-Z]\\d)");
 
 	public static final String CLASS_NAME_PREFIX_CUSTOM_OBJECT_DEFINITION =
 		"com.liferay.object.model.ObjectDefinition#";
