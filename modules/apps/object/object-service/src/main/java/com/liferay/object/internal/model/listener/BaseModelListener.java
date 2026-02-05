@@ -42,7 +42,8 @@ public abstract class BaseModelListener<T extends BaseModel<T>>
 
 	protected String updateObjectDefinitionReferences(String value) {
 		value = _updateObjectDefinitionReferences(
-			ObjectDefinition::getClassName, _classNamePattern, value);
+			ObjectDefinition::getClassName,
+			ObjectDefinitionConstants.CLASS_NAME_PATTERN, value);
 		value = _updateObjectDefinitionReferences(
 			ObjectDefinition::getPortletId, _portletIdPattern, value);
 
@@ -135,9 +136,6 @@ public abstract class BaseModelListener<T extends BaseModel<T>>
 		return sb.toString();
 	}
 
-	private static final Pattern _classNamePattern = Pattern.compile(
-		"(com\\.liferay\\.object\\.model\\.ObjectDefinition#)([a-zA-Z]\\d" +
-			"[a-zA-Z]\\d)");
 	private static final Pattern _jsonClassNameIdPattern = Pattern.compile(
 		"(\"classNameId\"\\s*:\\s*\")(\\d+)(\")");
 	private static final Pattern _portletIdPattern = Pattern.compile(

@@ -18,6 +18,7 @@ import com.liferay.info.collection.provider.SingleFormVariationInfoCollectionPro
 import com.liferay.info.item.InfoItemServiceRegistry;
 import com.liferay.info.list.provider.item.selector.criterion.InfoListProviderItemSelectorReturnType;
 import com.liferay.item.selector.criteria.InfoListItemSelectorReturnType;
+import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectDefinitionSettingConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectDefinitionSetting;
@@ -33,7 +34,6 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Objects;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Lourdes Fernández Besada
@@ -112,8 +112,8 @@ public class CollectionUtil {
 		}
 
 		if (ExportImportThreadLocal.isImportInProcess()) {
-			Matcher matcher = _objectDefinitionClassNamePattern.matcher(
-				className);
+			Matcher matcher =
+				ObjectDefinitionConstants.CLASS_NAME_PATTERN.matcher(className);
 
 			if (matcher.find()) {
 				String oldClassName = matcher.group(1) + matcher.group(2);
@@ -314,10 +314,5 @@ public class CollectionUtil {
 
 		return collectionItemExternalReference;
 	}
-
-	private static final Pattern _objectDefinitionClassNamePattern =
-		Pattern.compile(
-			"(com\\.liferay\\.object\\.model\\.ObjectDefinition#)" +
-				"([a-zA-Z]\\d[a-zA-Z]\\d)");
 
 }
