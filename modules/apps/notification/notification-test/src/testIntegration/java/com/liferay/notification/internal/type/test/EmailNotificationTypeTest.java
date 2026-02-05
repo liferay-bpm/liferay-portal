@@ -29,6 +29,7 @@ import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.info.item.InfoItemServiceRegistry;
 import com.liferay.list.type.entry.util.ListTypeEntryUtil;
 import com.liferay.list.type.model.ListTypeDefinition;
+import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.constants.NotificationPortletKeys;
@@ -130,6 +131,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.mail.MailServiceTestUtil;
@@ -156,6 +158,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -454,6 +457,63 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 	}
 
 	@Test
+	public void testFreeMarkerNotificationWithLocalizedPicklistScenarios()
+		throws Exception {
+
+		User userFR1 = UserTestUtil.addUser(
+			group.getGroupId(), LocaleUtil.FRANCE);
+		User userFR2 = UserTestUtil.addUser(
+			group.getGroupId(), LocaleUtil.FRANCE);
+		User userPT = UserTestUtil.addUser(
+			group.getGroupId(), LocaleUtil.BRAZIL);
+
+		_testFreeMarkerPicklistLocalized(
+			false, LocaleUtil.US, Arrays.asList(userFR1, userPT), null,
+			List.of("Brazil"), 1);
+
+		_testFreeMarkerPicklistLocalized(
+			true, LocaleUtil.US, Arrays.asList(userFR1, userPT),
+			Map.of(LocaleUtil.US, "${ObjectField_countrypicklist.getData()}"),
+			List.of("Brésil", "Brasil"), 2);
+
+		_testFreeMarkerPicklistLocalized(
+			false, LocaleUtil.US, Arrays.asList(userFR1, userPT),
+			Map.of(
+				LocaleUtil.FRANCE, "${ObjectField_countrypicklist.getData()}"),
+			List.of("Brésil", "Brasil"), 2);
+
+		_testFreeMarkerPicklistLocalized(
+			false, LocaleUtil.US, Arrays.asList(userFR1, userFR2),
+			Map.of(
+				LocaleUtil.FRANCE, "${ObjectField_countrypicklist.getData()}"),
+			List.of("Brésil"), 1);
+
+		_testFreeMarkerPicklistLocalized(
+			false, LocaleUtil.US, Arrays.asList(userFR1, userPT),
+			HashMapBuilder.put(
+				LocaleUtil.BRAZIL, "${ObjectField_countrypicklist.getData()}"
+			).put(
+				LocaleUtil.FRANCE, "${ObjectField_countrypicklist.getData()}"
+			).build(),
+			List.of("Brésil", "Brasil"), 2);
+
+		_testFreeMarkerPicklistLocalized(
+			false, LocaleUtil.US, Arrays.asList(userFR1, userPT),
+			HashMapBuilder.put(
+				LocaleUtil.JAPAN, "${ObjectField_countrypicklist.getData()}"
+			).put(
+				LocaleUtil.US, "${ObjectField_countrypicklist.getData()}"
+			).build(),
+			List.of("Brazil"), 1);
+
+		_testFreeMarkerPicklistLocalized(
+			false, LocaleUtil.US, Arrays.asList(guestUser, userFR1),
+			Map.of(
+				LocaleUtil.FRANCE, "${ObjectField_countrypicklist.getData()}"),
+			List.of("Brazil", "Brésil"), 2);
+	}
+
+	@Test
 	public void testRichTextNotificationTemplateWithDifferentUserLocale()
 		throws Exception {
 
@@ -501,6 +561,57 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 
 			_objectActionLocalService.deleteObjectAction(objectAction);
 		}
+	}
+
+	@Test
+	public void testRichTextNotificationWithLocalizedBodies() throws Exception {
+		User userFR1 = UserTestUtil.addUser(
+			group.getGroupId(), LocaleUtil.FRANCE);
+		User userFR2 = UserTestUtil.addUser(
+			group.getGroupId(), LocaleUtil.FRANCE);
+		User userPT = UserTestUtil.addUser(
+			group.getGroupId(), LocaleUtil.BRAZIL);
+
+		_testRichTextNotificationWithLocalizedBodies(
+			false, LocaleUtil.US, Arrays.asList(userFR1, userPT),
+			_localizedBody("BODY_EN", null), List.of("BODY_EN"), 1);
+
+		_testRichTextNotificationWithLocalizedBodies(
+			true, LocaleUtil.US, Arrays.asList(userFR1, userPT),
+			_localizedBody("BODY_EN", null), List.of("BODY_EN", "BODY_EN"), 2);
+
+		_testRichTextNotificationWithLocalizedBodies(
+			false, LocaleUtil.US, Arrays.asList(userFR1, userPT),
+			_localizedBody("BODY_EN", Map.of(LocaleUtil.FRANCE, "BODY_FR")),
+			List.of("BODY_FR", "BODY_EN"), 2);
+
+		_testRichTextNotificationWithLocalizedBodies(
+			false, LocaleUtil.US, Arrays.asList(userFR1, userFR2),
+			_localizedBody("BODY_EN", Map.of(LocaleUtil.FRANCE, "BODY_FR")),
+			List.of("BODY_FR"), 1);
+
+		_testRichTextNotificationWithLocalizedBodies(
+			false, LocaleUtil.US, Arrays.asList(userFR1, userPT),
+			_localizedBody(
+				"BODY_EN",
+				HashMapBuilder.put(
+					LocaleUtil.BRAZIL, "BODY_PT"
+				).put(
+					LocaleUtil.FRANCE, "BODY_FR"
+				).put(
+					LocaleUtil.US, "BODY_EN"
+				).build()),
+			List.of("BODY_FR", "BODY_PT"), 2);
+
+		_testRichTextNotificationWithLocalizedBodies(
+			false, LocaleUtil.US, Arrays.asList(userFR1, userPT),
+			_localizedBody("BODY_EN", Map.of(LocaleUtil.JAPAN, "BODY_JP")),
+			List.of("BODY_EN"), 1);
+
+		_testRichTextNotificationWithLocalizedBodies(
+			false, LocaleUtil.US, Arrays.asList(guestUser, userFR1),
+			_localizedBody("BODY_EN", Map.of(LocaleUtil.FRANCE, "BODY_FR")),
+			List.of("BODY_EN", "BODY_FR"), 2);
 	}
 
 	@Test
@@ -1715,6 +1826,16 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 		return objectDefinition;
 	}
 
+	private void _addEmails(Set<String> emails, String csv) {
+		for (String email : StringUtil.split(csv)) {
+			email = StringUtil.trim(email);
+
+			if (Validator.isNotNull(email)) {
+				emails.add(email);
+			}
+		}
+	}
+
 	private NotificationTemplate _addNotificationTemplate(
 			String body, String editorType, Map<Locale, String> fromName,
 			boolean singleRecipient, Map<Locale, String> to)
@@ -1899,6 +2020,51 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 		return _roleLocalService.addRole(
 			RandomTestUtil.randomString(), user.getUserId(), null, 0,
 			RandomTestUtil.randomString(), null, null, type, null, null);
+	}
+
+	private void _assertBodiesAndRecipients(
+			List<NotificationQueueEntry> entries,
+			List<String> expectedRecipients, List<String> expectedBodies)
+		throws Exception {
+
+		List<String> actualBodies = new ArrayList<>();
+
+		for (NotificationQueueEntry entry : entries) {
+			actualBodies.add(entry.getBody());
+		}
+
+		Collections.sort(actualBodies);
+
+		List<String> sortedExpectedBodies = new ArrayList<>(expectedBodies);
+
+		Collections.sort(sortedExpectedBodies);
+
+		Assert.assertEquals(sortedExpectedBodies, actualBodies);
+
+		Set<String> allActualRecipients = new HashSet<>();
+
+		for (NotificationQueueEntry entry : entries) {
+			Map<String, Object> settingsMap =
+				NotificationRecipientSettingUtil.
+					getNotificationRecipientSettingsMap(entry);
+
+			_addEmails(
+				allActualRecipients,
+				(String)settingsMap.get(
+					NotificationRecipientSettingConstants.NAME_TO));
+			_addEmails(
+				allActualRecipients,
+				(String)settingsMap.get(
+					NotificationRecipientSettingConstants.NAME_CC));
+			_addEmails(
+				allActualRecipients,
+				(String)settingsMap.get(
+					NotificationRecipientSettingConstants.NAME_BCC));
+		}
+
+		for (String expectedRecipient : expectedRecipients) {
+			Assert.assertTrue(allActualRecipients.contains(expectedRecipient));
+		}
 	}
 
 	private void _assertMailMessage(String[] emailAddresses) {
@@ -2104,15 +2270,230 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 			"%]");
 	}
 
+	private LocalizedBody _localizedBody(
+		String body, Map<Locale, String> bodyMap) {
+
+		return new LocalizedBody(body, bodyMap);
+	}
+
+	private String _mergeTo(List<User> users) {
+		List<String> emailAddresses = new ArrayList<>();
+
+		for (User user : users) {
+			emailAddresses.add(user.getEmailAddress());
+		}
+
+		return StringUtil.merge(
+			emailAddresses.toArray(new String[0]), StringPool.COMMA);
+	}
+
 	private String _read(String fileName) throws Exception {
 		return new String(
 			FileUtil.getBytes(getClass(), "dependencies/" + fileName));
+	}
+
+	private void _setNotificationContextLocale(Locale locale) throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		if (serviceContext != null) {
+			ThemeDisplay themeDisplay = serviceContext.getThemeDisplay();
+
+			if (themeDisplay != null) {
+				themeDisplay.setLocale(locale);
+			}
+		}
+	}
+
+	private void _setTemplateBodies(
+			NotificationTemplate notificationTemplate, String enUSBody,
+			Map<Locale, String> extraBodies)
+		throws Exception {
+
+		notificationTemplate.setBody(enUSBody, LocaleUtil.US, LocaleUtil.US);
+
+		if ((extraBodies != null) && !extraBodies.isEmpty()) {
+			for (Map.Entry<Locale, String> e : extraBodies.entrySet()) {
+				Locale locale = e.getKey();
+				String value = e.getValue();
+
+				if ((locale == null) || Validator.isNull(value)) {
+					continue;
+				}
+
+				notificationTemplate.setBody(value, locale, LocaleUtil.US);
+			}
+		}
+
+		notificationTemplateLocalService.updateNotificationTemplate(
+			notificationTemplate);
 	}
 
 	private void _setUser(User user) {
 		PermissionThreadLocal.setPermissionChecker(
 			PermissionCheckerFactoryUtil.create(user));
 		PrincipalThreadLocal.setName(user.getUserId());
+	}
+
+	private void _testFreeMarkerPicklistLocalized(
+			boolean singleRecipient, Locale triggerLocale,
+			List<User> recipients, Map<Locale, String> extraBodies,
+			List<String> expectedBodies, int expectedEntries)
+		throws Exception {
+
+		List<String> expectedRecipients = new ArrayList<>();
+
+		for (User user : recipients) {
+			expectedRecipients.add(user.getEmailAddress());
+		}
+
+		String entryKey = "brazilkey";
+
+		ListTypeEntry listTypeEntry = ListTypeEntryUtil.createListTypeEntry(
+			entryKey,
+			HashMapBuilder.put(
+				LocaleUtil.BRAZIL, "Brasil"
+			).put(
+				LocaleUtil.FRANCE, "Brésil"
+			).put(
+				LocaleUtil.US, "Brazil"
+			).build());
+
+		ListTypeDefinition listTypeDefinition =
+			_listTypeDefinitionLocalService.addListTypeDefinition(
+				null, TestPropsValues.getUserId(),
+				LocalizedMapUtil.getLocalizedMap("Country"), false,
+				Collections.singletonList(listTypeEntry), new ServiceContext());
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				false, true, false,
+				Collections.singletonList(
+					new PicklistObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap("Country Picklist")
+					).name(
+						"countrypicklist"
+					).listTypeDefinitionId(
+						listTypeDefinition.getListTypeDefinitionId()
+					).build()),
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		MailServiceTestUtil.clearMessages();
+
+		String originalName = PrincipalThreadLocal.getName();
+
+		try {
+			String to = _mergeTo(recipients);
+
+			String body = "${ObjectField_countrypicklist.getData()}";
+
+			NotificationTemplate notificationTemplate =
+				_addNotificationTemplate(
+					body, NotificationTemplateConstants.EDITOR_TYPE_FREEMARKER,
+					Collections.singletonMap(
+						LocaleUtil.US, "[%CURRENT_USER_FIRST_NAME%]"),
+					singleRecipient,
+					Collections.singletonMap(LocaleUtil.US, to));
+
+			if ((extraBodies != null) && !extraBodies.isEmpty()) {
+				_setTemplateBodies(notificationTemplate, body, extraBodies);
+			}
+
+			_addObjectAction(
+				objectDefinition.getObjectDefinitionId(),
+				ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+				notificationTemplate.getNotificationTemplateId());
+
+			_setNotificationContextLocale(triggerLocale);
+			_setUser(user1);
+
+			objectEntryManager.addObjectEntry(
+				dtoConverterContext, objectDefinition,
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							"countrypicklist", entryKey
+						).build();
+					}
+				},
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+			List<NotificationQueueEntry> entries =
+				notificationQueueEntryLocalService.getNotificationEntries(
+					NotificationConstants.TYPE_EMAIL,
+					NotificationQueueEntryConstants.STATUS_SENT);
+
+			Assert.assertEquals(
+				entries.toString(), expectedEntries, entries.size());
+
+			_assertBodiesAndRecipients(
+				entries, expectedRecipients, expectedBodies);
+
+			for (NotificationQueueEntry entry : entries) {
+				notificationQueueEntryLocalService.deleteNotificationQueueEntry(
+					entry);
+			}
+		}
+		finally {
+			PrincipalThreadLocal.setName(originalName);
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinition.getObjectDefinitionId());
+
+			_listTypeDefinitionLocalService.deleteListTypeDefinition(
+				listTypeDefinition);
+
+			MailServiceTestUtil.clearMessages();
+		}
+	}
+
+	private void _testRichTextNotificationWithLocalizedBodies(
+			boolean singleRecipient, Locale triggerLocale,
+			List<User> recipients, LocalizedBody bodies,
+			List<String> expectedBodies, int expectedEntries)
+		throws Exception {
+
+		List<String> expectedRecipients = new ArrayList<>();
+
+		for (User user : recipients) {
+			expectedRecipients.add(user.getEmailAddress());
+		}
+
+		String to = _mergeTo(recipients);
+
+		NotificationTemplate notificationTemplate = _addNotificationTemplate(
+			bodies._body, NotificationTemplateConstants.EDITOR_TYPE_RICH_TEXT,
+			Collections.singletonMap(
+				LocaleUtil.US, "[%CURRENT_USER_FIRST_NAME%]"),
+			singleRecipient, Collections.singletonMap(LocaleUtil.US, to));
+
+		if ((bodies._bodyMap != null) && !bodies._bodyMap.isEmpty()) {
+			_setTemplateBodies(
+				notificationTemplate, bodies._body, bodies._bodyMap);
+		}
+
+		_setNotificationContextLocale(triggerLocale);
+
+		MailServiceTestUtil.clearMessages();
+
+		executeNotificationObjectAction(0L, notificationTemplate);
+
+		List<NotificationQueueEntry> entries =
+			notificationQueueEntryLocalService.getNotificationEntries(
+				NotificationConstants.TYPE_EMAIL,
+				NotificationQueueEntryConstants.STATUS_SENT);
+
+		Assert.assertEquals(
+			entries.toString(), expectedEntries, entries.size());
+
+		_assertBodiesAndRecipients(entries, expectedRecipients, expectedBodies);
+
+		for (NotificationQueueEntry entry : entries) {
+			notificationQueueEntryLocalService.deleteNotificationQueueEntry(
+				entry);
+		}
+
+		MailServiceTestUtil.clearMessages();
 	}
 
 	private void _testSendNotification(
@@ -2411,6 +2792,18 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 
 	@Inject
 	private UserLocalService _userLocalService;
+
+	private static class LocalizedBody {
+
+		private LocalizedBody(String body, Map<Locale, String> bodyMap) {
+			_body = body;
+			_bodyMap = bodyMap;
+		}
+
+		private final String _body;
+		private final Map<Locale, String> _bodyMap;
+
+	}
 
 	private static class TestTemplateContextContributor
 		implements TemplateContextContributor {
