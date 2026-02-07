@@ -581,7 +581,7 @@ public class DDMIndexerImplTest {
 		DDMForm ddmForm = DDMStructureTestUtil.getSampleDDMForm(
 			_FIELD_NAME, "string", indexType, true,
 			DDMFormFieldTypeConstants.TEXT, new Locale[] {LocaleUtil.US},
-			LocaleUtil.US);
+			LocaleUtil.US, null);
 
 		_ddmIndexer.addAttributes(
 			document, _createDDMStructure(ddmForm),
@@ -631,7 +631,7 @@ public class DDMIndexerImplTest {
 		DDMForm ddmForm = DDMStructureTestUtil.getSampleDDMForm(
 			_FIELD_NAME, "string", "text", true,
 			DDMFormFieldTypeConstants.RICH_TEXT, new Locale[] {LocaleUtil.US},
-			LocaleUtil.US);
+			LocaleUtil.US, null);
 
 		DDMStructure ddmStructure = _createDDMStructure(ddmForm);
 

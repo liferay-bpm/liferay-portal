@@ -179,15 +179,6 @@ public class DDMStructureTestUtil {
 
 	public static DDMForm getSampleDDMForm(
 		String name, String dataType, String indexType, boolean repeatable,
-		String type, Locale[] availableLocalesArray, Locale defaultLocale) {
-
-		return getSampleDDMForm(
-			name, dataType, indexType, repeatable, type, availableLocalesArray,
-			defaultLocale, null);
-	}
-
-	public static DDMForm getSampleDDMForm(
-		String name, String dataType, String indexType, boolean repeatable,
 		String type, Locale[] availableLocalesArray, Locale defaultLocale,
 		Map<String, String> fieldValues) {
 
