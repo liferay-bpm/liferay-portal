@@ -15,7 +15,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.site.cmp.site.initializer.internal.constants.CMPActionConstants;
@@ -38,11 +37,9 @@ public class ViewProjectsSectionDisplayContext
 
 	public ViewProjectsSectionDisplayContext(
 		HttpServletRequest httpServletRequest,
-		ObjectDefinition objectDefinition, UserLocalService userLocalService) {
+		ObjectDefinition objectDefinition) {
 
 		super(httpServletRequest, objectDefinition);
-
-		_userLocalService = userLocalService;
 	}
 
 	public String getAPIURL() {
@@ -157,12 +154,9 @@ public class ViewProjectsSectionDisplayContext
 
 	public List<FDSFilter> getFDSFilters() {
 		return ListUtil.fromArray(
-			new DueDateRangeFDSFilter(),
-			new ProjectManagerSelectionFDSFilter(_userLocalService),
-			new ProjectSponsorSelectionFDSFilter(_userLocalService),
+			new DueDateRangeFDSFilter(), new ProjectManagerSelectionFDSFilter(),
+			new ProjectSponsorSelectionFDSFilter(),
 			new StateSelectionFDSFilter());
 	}
-
-	private final UserLocalService _userLocalService;
 
 }

@@ -7,7 +7,6 @@ package com.liferay.site.cmp.site.initializer.internal.fragment.renderer;
 
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.site.cmp.site.initializer.internal.display.context.ViewProjectsSectionDisplayContext;
@@ -46,8 +45,7 @@ public class ViewProjectsJSPSectionFragmentRenderer
 			httpServletRequest,
 			_objectDefinitionLocalService.
 				fetchObjectDefinitionByExternalReferenceCode(
-					"L_CMP_PROJECT", themeDisplay.getCompanyId()),
-			_userLocalService);
+					"L_CMP_PROJECT", themeDisplay.getCompanyId()));
 	}
 
 	@Override
@@ -57,8 +55,5 @@ public class ViewProjectsJSPSectionFragmentRenderer
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }
