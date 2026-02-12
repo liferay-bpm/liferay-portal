@@ -8,12 +8,8 @@ package com.liferay.headless.cmp.internal.resource.v1_0;
 import com.liferay.depot.constants.DepotRolesConstants;
 import com.liferay.headless.cmp.dto.v1_0.TaskAssignee;
 import com.liferay.headless.cmp.resource.v1_0.TaskAssigneeResource;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.RoleService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
@@ -42,79 +38,77 @@ public class TaskAssigneeResourceImpl extends BaseTaskAssigneeResourceImpl {
 
 	@Override
 	public Page<TaskAssignee> getTaskAssigneesPage(String search, String type) {
-		List<TaskAssignee> taskAssignees = new ArrayList<>();
+		if (Validator.isNotNull(type) &&
+			!StringUtil.equalsIgnoreCase(type, "Role") &&
+			!StringUtil.equalsIgnoreCase(type, "User")) {
 
-		if (Validator.isNull(type)) {
-			taskAssignees.addAll(_getRoles(search));
-			taskAssignees.addAll(_getUsers(search));
-		}
-		else if (StringUtil.equalsIgnoreCase("Role", type)) {
-			taskAssignees.addAll(_getRoles(search));
-		}
-		else if (StringUtil.equalsIgnoreCase("User", type)) {
-			taskAssignees.addAll(_getUsers(search));
-		}
-		else {
 			throw new BadRequestException("Invalid type: " + type);
 		}
 
-		return Page.of(taskAssignees);
-	}
+		List<TaskAssignee> taskAssignees = new ArrayList<>();
 
-	private List<TaskAssignee> _getRoles(String search) {
-		return transform(
-			_roleService.search(
-				CompanyThreadLocal.getCompanyId(), search,
-				new Integer[] {RoleConstants.TYPE_DEPOT}, null,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null),
-			role -> {
-				if (StringUtil.equals(
-						DepotRolesConstants.ASSET_LIBRARY_CONNECTED_SITE_MEMBER,
-						role.getName())) {
+		if (Validator.isNull(type) ||
+			StringUtil.equalsIgnoreCase(type, "Role")) {
 
-					return null;
-				}
+			taskAssignees.addAll(
+				transform(
+					_roleService.search(
+						contextCompany.getCompanyId(), search,
+						new Integer[] {RoleConstants.TYPE_DEPOT}, null,
+						QueryUtil.ALL_POS, QueryUtil.ALL_POS, null),
+					role -> {
+						if (StringUtil.equals(
+								DepotRolesConstants.
+									ASSET_LIBRARY_CONNECTED_SITE_MEMBER,
+								role.getName())) {
 
-				return new TaskAssignee() {
-					{
-						setExternalReferenceCode(
-							role::getExternalReferenceCode);
-						setId(role::getRoleId);
-						setName(role::getName);
-						setType(
-							() -> StringUtil.extractLast(
-								Role.class.getName(), StringPool.PERIOD));
-					}
-				};
-			});
-	}
+							return null;
+						}
 
-	private List<TaskAssignee> _getUsers(String search) {
-		return transform(
-			CMSUserUtil.getUsers(search),
-			user -> new TaskAssignee() {
-				{
-					setExternalReferenceCode(user::getExternalReferenceCode);
-					setId(user::getUserId);
-					setName(user::getFullName);
-					setPortrait(
-						() -> {
-							if (user.getPortraitId() == 0) {
-								return null;
+						return new TaskAssignee() {
+							{
+								setExternalReferenceCode(
+									role::getExternalReferenceCode);
+								setId(role::getRoleId);
+								setName(role::getName);
+								setType(() -> "Role");
 							}
+						};
+					}));
+		}
 
-							return user.getPortraitURL(
-								new ThemeDisplay() {
-									{
-										setPathImage(_portal.getPathImage());
+		if (Validator.isNull(type) ||
+			StringUtil.equalsIgnoreCase(type, "User")) {
+
+			taskAssignees.addAll(
+				transform(
+					CMSUserUtil.getUsers(search),
+					user -> new TaskAssignee() {
+						{
+							setExternalReferenceCode(
+								user::getExternalReferenceCode);
+							setId(user::getUserId);
+							setName(user::getFullName);
+							setPortrait(
+								() -> {
+									if (user.getPortraitId() == 0) {
+										return null;
 									}
+
+									return user.getPortraitURL(
+										new ThemeDisplay() {
+											{
+												setPathImage(
+													_portal.getPathImage());
+											}
+										});
 								});
-						});
-					setType(
-						() -> StringUtil.extractLast(
-							User.class.getName(), StringPool.PERIOD));
-				}
-			});
+							setType(() -> "User");
+						}
+					}));
+		}
+
+		return Page.of(taskAssignees);
 	}
 
 	@Reference

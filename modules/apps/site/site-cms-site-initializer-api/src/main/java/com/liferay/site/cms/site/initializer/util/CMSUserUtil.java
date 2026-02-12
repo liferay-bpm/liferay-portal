@@ -19,7 +19,10 @@ import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserGroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -40,15 +43,21 @@ public class CMSUserUtil {
 			DepotEntryLocalServiceUtil.getDepotEntryGroupIds(
 				CompanyThreadLocal.getCompanyId(), DepotConstants.TYPE_SPACE),
 			groupId -> {
-				if (!_isAssetLibraryAdminOrAssetLibraryMember(groupId)) {
-					return null;
+				PermissionChecker permissionChecker =
+					PermissionThreadLocal.getPermissionChecker();
+
+				if (permissionChecker.isGroupAdmin(groupId) ||
+					GroupLocalServiceUtil.hasUserGroup(
+						PrincipalThreadLocal.getUserId(), groupId)) {
+
+					return groupId;
 				}
 
-				return groupId;
+				return null;
 			});
 
-		if (depotEntryGroupIds.isEmpty()) {
-			return new TreeSet<>();
+		if (ListUtil.isEmpty(depotEntryGroupIds)) {
+			return Collections.emptySet();
 		}
 
 		Set<User> users = new TreeSet<>(
@@ -60,43 +69,25 @@ public class CMSUserUtil {
 				ArrayUtil.toLongArray(depotEntryGroupIds), null, keywords,
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS));
 
-		long[] userGroupIds = _getUserGroupIds(depotEntryGroupIds);
+		Set<Long> depotEntryUserGroupIds = new HashSet<>();
 
-		if (userGroupIds.length > 0) {
+		for (long depotEntryGroupId : depotEntryGroupIds) {
+			depotEntryUserGroupIds.addAll(
+				TransformUtil.transform(
+					UserGroupLocalServiceUtil.getGroupUserGroups(
+						depotEntryGroupId),
+					UserGroup::getUserGroupId));
+		}
+
+		if (SetUtil.isNotEmpty(depotEntryUserGroupIds)) {
 			users.addAll(
 				UserLocalServiceUtil.searchBySocial(
-					CompanyThreadLocal.getCompanyId(), null, userGroupIds, null,
+					CompanyThreadLocal.getCompanyId(), null,
+					ArrayUtil.toLongArray(depotEntryUserGroupIds), null,
 					QueryUtil.ALL_POS, QueryUtil.ALL_POS));
 		}
 
 		return users;
-	}
-
-	private static long[] _getUserGroupIds(List<Long> groupIds) {
-		Set<Long> userGroupIds = new HashSet<>();
-
-		for (long groupId : groupIds) {
-			userGroupIds.addAll(
-				TransformUtil.transform(
-					UserGroupLocalServiceUtil.getGroupUserGroups(groupId),
-					UserGroup::getUserGroupId));
-		}
-
-		return ArrayUtil.toLongArray(userGroupIds);
-	}
-
-	private static boolean _isAssetLibraryAdminOrAssetLibraryMember(
-		long groupId) {
-
-		PermissionChecker permissionChecker =
-			PermissionThreadLocal.getPermissionChecker();
-
-		if (permissionChecker.isGroupAdmin(groupId)) {
-			return true;
-		}
-
-		return GroupLocalServiceUtil.hasUserGroup(
-			PrincipalThreadLocal.getUserId(), groupId);
 	}
 
 }
