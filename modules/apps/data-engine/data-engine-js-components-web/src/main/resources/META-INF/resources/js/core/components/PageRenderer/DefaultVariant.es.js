@@ -117,16 +117,10 @@ export function Page({
 	invalidFormMessage,
 	pageIndex,
 }) {
-	const descriptionId = `pageDescription${pageIndex}`;
-	const titleId = `pageTitle${pageIndex}`;
-
 	return (
 		<div
-			aria-describedby={descriptionId}
-			aria-labelledby={titleId}
 			className="active ddm-form-page lfr-ddm-form-page"
 			data-ddm-page={pageIndex}
-			role="group"
 		>
 			{invalidFormMessage && (
 				<span aria-atomic="true" aria-live="polite" className="sr-only">
@@ -136,11 +130,7 @@ export function Page({
 				</span>
 			)}
 
-			{Header &&
-				React.cloneElement(Header, {
-					descriptionId,
-					titleId,
-				})}
+			{Header}
 
 			{children}
 		</div>
@@ -149,7 +139,7 @@ export function Page({
 
 Page.displayName = 'DefaultVariant.Page';
 
-export function PageHeader({description, descriptionId, title, titleId}) {
+export function PageHeader({description, title}) {
 	const {portletId} = useFormState();
 	const isWebContentPortlet = portletId.includes(
 		JOURNAL_WEB_PORTLET_NAMESPACE
@@ -157,16 +147,9 @@ export function PageHeader({description, descriptionId, title, titleId}) {
 
 	return (
 		<>
-			{title && (
-				<div className="lfr-ddm-form-page-title" id={titleId}>
-					{title}
-				</div>
-			)}
+			{title && <div className="lfr-ddm-form-page-title">{title}</div>}
 			{!isWebContentPortlet && description && (
-				<div
-					className="lfr-ddm-form-page-description"
-					id={descriptionId}
-				>
+				<div className="lfr-ddm-form-page-description">
 					{description}
 				</div>
 			)}

@@ -22,10 +22,7 @@ export function MultiStep({activePage, editable, pages}) {
 	const dispatch = useForm();
 
 	return (
-		<div
-			aria-hidden="true"
-			className="ddm-form-pagination position-relative wizard-mode"
-		>
+		<div className="ddm-form-pagination position-relative wizard-mode">
 			<ol className="ddm-wizard multi-step-indicator-label-top multi-step-nav multi-step-nav-collapse-sm">
 				{pages.map((page, index) => (
 					<li
