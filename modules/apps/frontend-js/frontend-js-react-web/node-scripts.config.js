@@ -23,7 +23,7 @@ module.exports = {
 	symbols: {
 		'prop-types': ['*', 'default'],
 		'react': ['*', 'default'],
-		'react-dnd': ['*'],
+		'react-dnd': ['*', 'default'],
 		'react-dom': ['*', 'default'],
 	},
 };

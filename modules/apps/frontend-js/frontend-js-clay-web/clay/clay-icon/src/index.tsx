@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import React from 'react';
 import warning from 'warning';
 
-const ClayIconSpriteContext = React.createContext('');
+export const ClayIconSpriteContext = React.createContext('');
 
 interface IProps extends React.SVGAttributes<SVGSVGElement> {
 	className?: string;
@@ -56,4 +56,3 @@ const Icon = React.forwardRef<SVGSVGElement, IProps>(
 Icon.displayName = 'ClayIcon';
 
 export default Icon;
-export {ClayIconSpriteContext};
