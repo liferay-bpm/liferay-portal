@@ -5,7 +5,7 @@
 
 import path from 'path';
 
-import {PORTAL_DIR} from '../util/locations.mjs';
+import {getRootDir} from '../util/constants.mjs';
 import format from './format.mjs';
 
 export default async function main() {
@@ -16,5 +16,8 @@ export default async function main() {
 		process.exit(2);
 	}
 
-	await format(true, [path.relative(PORTAL_DIR, path.resolve(filePath))]);
+	const rootDir = await getRootDir();
+	const portalDir = path.resolve(rootDir, '..');
+
+	await format(true, [path.relative(portalDir, path.resolve(filePath))]);
 }

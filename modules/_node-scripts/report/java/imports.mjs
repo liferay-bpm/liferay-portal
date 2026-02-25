@@ -7,18 +7,24 @@ import fg from 'fast-glob';
 import fs from 'fs/promises';
 import path from 'path';
 
+import {getRootDir} from '../../util/constants.mjs';
 import getYarnWorkspaceProjects from '../../util/getYarnWorkspaceProjects.mjs';
-import {PORTAL_DIR} from '../../util/locations.mjs';
 
 export default async function main() {
-	const projectDirectories = await getYarnWorkspaceProjects();
+
+	/* eslint-disable-next-line prefer-const */
+	let [projectDirectories, rootDir] = await Promise.all([
+		getYarnWorkspaceProjects(),
+		getRootDir(),
+	]);
 
 	// Go back one dir because we need to search for occurrences in non OSGI code
 
-	projectDirectories.push(path.join(PORTAL_DIR, 'portal-impl'));
-	projectDirectories.push(path.join(PORTAL_DIR, 'portal-kernel'));
-	projectDirectories.push(path.join(PORTAL_DIR, 'portal-web'));
-	projectDirectories.push(path.join(PORTAL_DIR, 'util-taglib'));
+	rootDir = path.resolve(rootDir, '..');
+	projectDirectories.push(path.join(rootDir, 'portal-impl'));
+	projectDirectories.push(path.join(rootDir, 'portal-kernel'));
+	projectDirectories.push(path.join(rootDir, 'portal-web'));
+	projectDirectories.push(path.join(rootDir, 'util-taglib'));
 
 	const results = await Promise.all(
 		projectDirectories.map(async (projectDir) => {
@@ -59,7 +65,7 @@ export default async function main() {
 
 	Object.entries(projectImportsSymbols).forEach(
 		([projectDir, importsSymbols]) => {
-			const projectRelDir = path.relative(PORTAL_DIR, projectDir);
+			const projectRelDir = path.relative(rootDir, projectDir);
 
 			Object.entries(importsSymbols).forEach(([importPath, symbols]) => {
 				lines.push(

@@ -6,9 +6,9 @@
 import fg from 'fast-glob';
 import path from 'path';
 
+import {getRootDir} from '../util/constants.mjs';
 import getNamedArguments from '../util/getNamedArguments.mjs';
 import gitUtil from '../util/gitUtil.mjs';
-import {MODULES_DIR, PORTAL_DIR} from '../util/locations.mjs';
 import format from './format.mjs';
 
 export default async function main() {
@@ -22,10 +22,12 @@ export default async function main() {
 		});
 
 	const cwd = path.resolve('.');
+	const rootDir = await getRootDir();
+	const portalDir = path.resolve(rootDir, '..');
 
 	let files;
 
-	if (cwd === MODULES_DIR) {
+	if (cwd === rootDir) {
 		if (currentBranch) {
 			files = await gitUtil('current-branch');
 		}
@@ -59,7 +61,7 @@ export default async function main() {
 
 		files = files
 			.map((file) => path.resolve(cwd, file))
-			.map((file) => path.relative(PORTAL_DIR, file));
+			.map((file) => path.relative(portalDir, file));
 	}
 
 	console.log('📝 Running format...\n');

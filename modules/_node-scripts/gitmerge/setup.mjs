@@ -6,10 +6,11 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import {PORTAL_DIR} from '../util/locations.mjs';
+import {getRootDir} from '../util/constants.mjs';
 
 export default async function main() {
-	const gitConfigPath = path.resolve(PORTAL_DIR, '.git', 'config');
+	const rootDir = await getRootDir();
+	const gitConfigPath = path.resolve(rootDir, '..', '.git', 'config');
 
 	let contents = await fs.readFile(gitConfigPath, 'utf-8');
 

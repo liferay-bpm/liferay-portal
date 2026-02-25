@@ -6,13 +6,13 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import fileExists from '../../../util/fileExists.mjs';
-import getFlatName from '../../../util/getFlatName.mjs';
 import {
 	BUILD_SASS_CACHE_PATH,
 	SRC_PATH,
 	WORK_IMPORT_PATH,
-} from '../../../util/locations.mjs';
+} from '../../../util/constants.mjs';
+import fileExists from '../../../util/fileExists.mjs';
+import getFlatName from '../../../util/getFlatName.mjs';
 import extractFileHash from '../../util/extractFileHash.mjs';
 import CrossSubmoduleImportsChecker from '../util/CrossSubmoduleImportsChecker.mjs';
 import getCSSLoadJavaScript from '../util/getCSSLoadJavaScript.mjs';

@@ -9,10 +9,10 @@ import runPreflight from '../preflight/runPreflight.mjs';
 import checkProjects from '../tsc/checkProjects.mjs';
 import extractProjectDirs from '../tsc/extractProjectDirs.mjs';
 import visitOutdatedTsconfigFiles from '../tsconfig/visitOutdatedTsconfigFiles.mjs';
+import {getRootDir} from '../util/constants.mjs';
 import getFilePaths from '../util/getFilePaths.mjs';
 import getNamedArguments from '../util/getNamedArguments.mjs';
 import gitUtil from '../util/gitUtil.mjs';
-import {MODULES_DIR} from '../util/locations.mjs';
 import format from './format.mjs';
 
 export default async function main() {
@@ -22,12 +22,14 @@ export default async function main() {
 		ignoreTypescript: '--ignore-typescript',
 	});
 
+	const rootDir = await getRootDir();
+
 	let files;
 
 	if (all) {
 		console.log(`⚠️ Formatting all files`);
 
-		files = await getFilePaths(MODULES_DIR);
+		files = await getFilePaths(rootDir);
 	}
 	else {
 		console.log(`⚠️ Formatting files on current branch`);
@@ -61,7 +63,7 @@ export default async function main() {
 
 		await visitOutdatedTsconfigFiles((filePath) => {
 			console.error(
-				`   · ${path.relative(MODULES_DIR, filePath)} is outdated`
+				`   · ${path.relative(rootDir, filePath)} is outdated`
 			);
 
 			checksPassed = false;

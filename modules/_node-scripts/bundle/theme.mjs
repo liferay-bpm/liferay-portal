@@ -6,9 +6,9 @@
 import {$} from 'execa';
 import path from 'path';
 
-import {MODULES_DIR} from '../util/locations.mjs';
+import {getRootDir} from '../util/constants.mjs';
 
-const ROOT_DIR = '<RootDir>';
+const MODULES_DIR = '<RootDir>';
 const BUILD_ARGS = {
 	'--css-common-path': path.normalize('build_gradle/frontend-css-common'),
 	'--sass-include-paths': path.normalize(`${MODULES_DIR}/node_modules`),
@@ -24,11 +24,13 @@ const BUILD_ARGS = {
  * Wrapper to run `gulp` tasks for a theme in the liferay-portal repo.
  */
 export default async function run() {
+	const rootDir = await getRootDir();
+
 	const args = [];
 
 	Object.keys(BUILD_ARGS).forEach((key) => {
 		const value = BUILD_ARGS[key];
-		args.push(key, value.replace(ROOT_DIR, MODULES_DIR));
+		args.push(key, value.replace(MODULES_DIR, rootDir));
 	});
 
 	await $({stdio: 'inherit'})('gulp', ['build', ...args]);

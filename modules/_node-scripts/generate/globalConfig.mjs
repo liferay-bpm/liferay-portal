@@ -7,18 +7,22 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import format from '../format/format.mjs';
+import {getRootDir} from '../util/constants.mjs';
 import {createGlobalConfig} from '../util/createGlobalConfig.mjs';
-import {
-	GLOBAL_NODE_SCRIPTS_CONFIG_FILE,
-	PORTAL_DIR,
-} from '../util/locations.mjs';
 
 export default async function main() {
+	const rootDir = await getRootDir();
+
 	const config = await createGlobalConfig();
 
-	await fs.writeFile(GLOBAL_NODE_SCRIPTS_CONFIG_FILE, config);
+	const globalConfigPath = path.join(rootDir, 'node-scripts.config.js');
+
+	await fs.writeFile(globalConfigPath, config);
 
 	await format(true, [
-		path.relative(PORTAL_DIR, GLOBAL_NODE_SCRIPTS_CONFIG_FILE),
+		path.relative(
+			path.resolve(rootDir, '..'),
+			path.resolve(globalConfigPath)
+		),
 	]);
 }

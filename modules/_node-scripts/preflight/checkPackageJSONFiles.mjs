@@ -7,7 +7,7 @@ import fg from 'fast-glob';
 import fs from 'fs';
 import path from 'path';
 
-import {GLOBAL_NODE_SCRIPTS_CONFIG_FILE} from '../util/locations.mjs';
+import {getRootDir} from '../util/constants.mjs';
 import projectScopeRequire from '../util/projectScopeRequire.mjs';
 
 /**
@@ -168,8 +168,16 @@ export async function checkPackageJSONFiles() {
 async function collectDefinedDependencies() {
 	let rootConfig = {};
 
+	const rootDir = await getRootDir();
+
+	if (!rootDir) {
+		return new Set();
+	}
+
 	try {
-		rootConfig = await projectScopeRequire(GLOBAL_NODE_SCRIPTS_CONFIG_FILE);
+		rootConfig = await projectScopeRequire(
+			path.join(rootDir, 'node-scripts.config.js')
+		);
 	}
 	catch (error) {
 		return new Set();

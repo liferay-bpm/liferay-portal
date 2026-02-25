@@ -5,13 +5,15 @@
 
 import path from 'path';
 
+import {getRootDir} from './constants.mjs';
 import fileExists from './fileExists.mjs';
-import {MODULES_DIR} from './locations.mjs';
 
 export default async function getFileProjectDir(filePath) {
+	const rootDir = await getRootDir();
+
 	let dir = path.resolve(path.dirname(filePath));
 
-	while (dir !== MODULES_DIR) {
+	while (dir !== rootDir) {
 		if (await fileExists(path.join(dir, 'build.gradle'))) {
 			return dir;
 		}

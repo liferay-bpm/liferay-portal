@@ -6,7 +6,7 @@
 import fg from 'fast-glob';
 import path from 'path';
 
-import {MODULES_DIR} from '../util/locations.mjs';
+import {getRootDir} from '../util/constants.mjs';
 
 const REGEX_API_DIR = /\/resources\/js\/api\/api\.(js|ts)$/;
 
@@ -22,9 +22,11 @@ export async function checkAPISubmodules() {
 		ignore: ['**/build', '**/classes', '**/node_modules'],
 	});
 
+	const rootDir = await getRootDir();
+
 	const configs = await Promise.all(
 		nodeScriptConfigs.map(async (configPath) => {
-			const module = await import(path.join(MODULES_DIR, configPath));
+			const module = await import(path.join(rootDir, configPath));
 
 			return {config: module.default, path: configPath};
 		})

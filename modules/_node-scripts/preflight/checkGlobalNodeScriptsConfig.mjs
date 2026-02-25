@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import {getRootDir} from '../util/constants.mjs';
 import {createGlobalConfig} from '../util/createGlobalConfig.mjs';
-import {MODULES_DIR} from '../util/locations.mjs';
 import projectScopeRequire from '../util/projectScopeRequire.mjs';
 
 export async function checkGlobalNodeScriptsConfig() {
+	const rootDir = await getRootDir();
 	const rootConfig = await projectScopeRequire(
 		'./node-scripts.config.js',
-		MODULES_DIR
+		rootDir
 	);
 
 	const nextHash = await createGlobalConfig(true);
