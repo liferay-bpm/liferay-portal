@@ -100,11 +100,11 @@ test('cannot save a workflow definition that has a groovy action when script man
 
 	await nodePropertiesSidebarPage.addActionButton.click();
 
-	await actionPage.fillWorkflowAction(
-		'Groovy Action',
-		'scriptTest',
-		'Groovy'
-	);
+	await actionPage.fillWorkflowAction({
+		name: 'Groovy Action',
+		script: 'scriptTest',
+		typeOption: 'Groovy',
+	});
 
 	await diagramViewPage.saveWorkflowDefinition();
 
@@ -139,7 +139,11 @@ test('cannot save a workflow definition that has a java action when the script m
 
 	await nodePropertiesSidebarPage.addActionButton.click();
 
-	await actionPage.fillWorkflowAction('Java Action', 'scriptTest', 'Java');
+	await actionPage.fillWorkflowAction({
+		name: 'Java Action',
+		script: 'scriptTest',
+		typeOption: 'Java',
+	});
 
 	await diagramViewPage.saveWorkflowDefinition();
 
@@ -154,6 +158,82 @@ test('cannot save a workflow definition that has a java action when the script m
 	await diagramViewPage.saveWorkflowDefinition();
 
 	await expect(page.getByText('Error Updating Definition')).toBeVisible();
+});
+
+test('can save a workflow definition that has a customer extension action after changing from an UI edited UpdateStatus to a customer extension action', async ({
+	actionPage,
+	apiHelpers,
+	diagramViewPage,
+	nodePropertiesSidebarPage,
+	page,
+	processBuilderPage,
+}) => {
+	const workflowDefinition =
+		await apiHelpers.headlessAdminWorkflow.postWorkflowDefinitionSave(
+			workflowDefinitionName,
+			getWorkflowDefinition('sample-start-end')
+		);
+
+	workflowDefinitionName = workflowDefinition.name;
+
+	await processBuilderPage.goto();
+
+	await processBuilderPage.clickWorkflowDefinitionName(
+		workflowDefinitionName
+	);
+
+	await diagramViewPage.clickNode('StartStart');
+
+	await nodePropertiesSidebarPage.addActionButton.click();
+
+	await actionPage.fillWorkflowAction({
+		name: 'Test Name',
+		statusOption: '0',
+		typeOption: 'Update Status',
+	});
+
+	await diagramViewPage.saveWorkflowDefinition();
+
+	await actionPage.backButton.click();
+
+	await diagramViewPage.clickNode('StartStart');
+
+	await nodePropertiesSidebarPage.editActionButton.click();
+
+	const typeActionOption = 'function#liferay-sample-etc-spring-boot-workflow-action-1';
+
+	await actionPage.fillWorkflowAction({
+		name: 'Test Name',
+		typeOption: typeActionOption,
+	});
+
+	await diagramViewPage.saveWorkflowDefinition();
+
+	await expect(
+		page.getByText('Workflow saved.')
+	).toBeVisible();
+
+	await actionPage.backButton.click();
+
+	await diagramViewPage.clickNode('StartStart');
+
+	await actionPage.editActionButton.click();
+
+	await expect(actionPage.selectActionType).toHaveValue(typeActionOption);
+
+	await diagramViewPage.publishWorkflowDefinition();
+
+	await expect(
+		page.getByText('Workflow published successfully.')
+	).toBeVisible();
+
+	await actionPage.backButton.click();
+
+	await diagramViewPage.clickNode('StartStart');
+
+	await actionPage.editActionButton.click();
+
+	await expect(actionPage.selectActionType).toHaveValue(typeActionOption);
 });
 
 test('can save a workflow definition that has a customer extension action after changing from an UpdateStatus to a customer extension action', async ({

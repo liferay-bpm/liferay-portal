@@ -79,7 +79,11 @@ export class NodePropertiesSidebarPage {
 			'week'
 		);
 
-		await this.actionPage.fillWorkflowAction(name, script, typeOption);
+		await this.actionPage.fillWorkflowAction({
+			name,
+			script,
+			typeOption,
+		});
 	}
 
 	async createNotification(notification: Notification) {
