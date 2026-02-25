@@ -21,11 +21,12 @@ import writeMainBridge from './amd/writeMainBridge.mjs';
 import writeManifestJson from './amd/writeManifestJson.mjs';
 import writePackageJson from './amd/writePackageJson.mjs';
 import processCSSFiles from './css/processCSSFiles.mjs';
+import writeCSSExportsLoaderModules from './cssLoad/writeCSSExportsLoaderModules.mjs';
 import bundleCSSExports from './esbuild/bundleCSSExports.mjs';
 import bundleJavaScriptExports from './esbuild/bundleJavaScriptExports.mjs';
 import bundleJavaScriptMain from './esbuild/bundleJavaScriptMain.mjs';
 import processSassFiles from './sass/processSassFiles.mjs';
-import writeTimings from './util/writeTimings.mjs';
+import writeTimings from './writeTimings.mjs';
 
 export default async function main() {
 	const start = Date.now();
@@ -87,7 +88,7 @@ export default async function main() {
 
 		// CSS exports bundling
 
-		bundleCSSExports(projectExports, projectWebContextPath),
+		bundleCSSExports(projectExports),
 
 		// AMD bridging
 
@@ -112,6 +113,8 @@ export default async function main() {
 			projectExports
 		),
 	]);
+
+	await writeCSSExportsLoaderModules(projectExports, projectWebContextPath);
 
 	await writeTimings(start, endConfig);
 }

@@ -52,10 +52,8 @@ async function doRunEsbuild(esbuildesbuildConfig, configName) {
 async function writeDebugEsbuildConfig(esbuildConfig, configName) {
 	const configFilePath = path.join(
 		'build',
-		'node-scripts',
-		'esbuild',
-		'config',
-		`${configName}.json`
+		'node-build',
+		`${configName}.esbuild.config.json`
 	);
 
 	await fs.mkdir(path.dirname(configFilePath), {recursive: true});

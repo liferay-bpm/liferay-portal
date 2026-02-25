@@ -13,10 +13,15 @@ import {
 	BUNDLE_REPORTS_PATH,
 } from '../../util/constants.mjs';
 import objectSF from '../../util/objectSF.mjs';
+import getCssLoaderPlugin from './plugins/getCssLoaderPlugin.mjs';
+import getExactAliasPlugin from './plugins/getExactAliasPlugin.mjs';
+import getExternalsPlugin from './plugins/getExternalsPlugin.mjs';
+import getImportBridgesPlugin from './plugins/getImportBridgesPlugin.mjs';
 import getLiferayLanguageGetPlugin from './plugins/getLiferayLanguageGetPlugin.mjs';
-import getLinkerPlugin from './plugins/getLinkerPlugin.mjs';
-import relocateSourcemap from './util/relocateSourcemap.mjs';
-import runEsbuild from './util/runEsbuild.mjs';
+import getRuntimeLinkerPlugin from './plugins/getRuntimeLinkerPlugin.mjs';
+import getScssLoaderPlugin from './plugins/getScssLoaderPlugin.mjs';
+import relocateSourcemap from './relocateSourcemap.mjs';
+import runEsbuild from './runEsbuild.mjs';
 
 export default async function bundleJavaScriptMain(
 	globalImports,
@@ -44,6 +49,7 @@ export default async function bundleJavaScriptMain(
 			})),
 			{in: path.resolve(mainEntryPoint), out: 'index'},
 		],
+		external: ['ckeditor5'],
 		format: 'esm',
 		loader: {
 			'.js': 'jsx',
@@ -52,14 +58,17 @@ export default async function bundleJavaScriptMain(
 		},
 		outdir: BUILD_MAIN_EXPORTS_PATH,
 		plugins: [
+			getCssLoaderPlugin(globalImports, 'main'),
+			getExactAliasPlugin(globalImports, 'main'),
+			getExternalsPlugin(),
+			getImportBridgesPlugin(globalImports, overridenPackageSymbols),
 			getLiferayLanguageGetPlugin(projectWebContextPath, languageJSON),
-			getLinkerPlugin(
-				globalImports,
-				overridenPackageSymbols,
-				projectWebContextPath,
-				'main',
-				projectEntryPoints
+			getRuntimeLinkerPlugin(
+				mainEntryPoint,
+				projectDescription,
+				submodules
 			),
+			getScssLoaderPlugin(projectWebContextPath),
 		],
 		sourcemap: true,
 		target: ['es2022'],
