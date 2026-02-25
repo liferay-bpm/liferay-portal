@@ -7,7 +7,7 @@ import {ClayCheckbox, ClayInput, ClayToggle} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import React from 'react';
 
-import {getNonLocalizableFieldMessage} from '../api/api';
+import {getNonLocalizableFieldMessage} from '../api/FieldBase/translation';
 
 import type {FieldChangeEventHandler, LocalizedValue} from '../types';
 

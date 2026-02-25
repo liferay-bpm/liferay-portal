@@ -4,4 +4,3 @@
  */
 
 export {default as ReactFieldBase} from './FieldBase/ReactFieldBase';
-export {getNonLocalizableFieldMessage} from './FieldBase/translation';
