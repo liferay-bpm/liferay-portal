@@ -6,6 +6,8 @@
 package com.liferay.site.cmp.site.initializer.internal.model.listener;
 
 import com.liferay.depot.constants.DepotRolesConstants;
+import com.liferay.headless.asset.library.resource.v1_0.RoleResource;
+import com.liferay.headless.asset.library.resource.v1_0.UserAccountResource;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -25,6 +27,7 @@ import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -32,18 +35,24 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.vulcan.pagination.Page;
 
 import java.io.Serializable;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -88,6 +97,7 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		try {
 			_updateGroup(objectEntry);
 			_updateProjectCompletionRate(objectEntry);
+			_updateProjectManagerProjectSponsorUserAccountRoles(objectEntry);
 		}
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
@@ -280,6 +290,102 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 			new ServiceContext());
 	}
 
+	private void _updateProjectManagerProjectSponsorUserAccountRoles(
+			ObjectEntry objectEntry)
+		throws Exception {
+
+		ObjectDefinition objectDefinition = objectEntry.getObjectDefinition();
+
+		if (!StringUtil.equals(
+				objectDefinition.getExternalReferenceCode(), "L_CMP_PROJECT")) {
+
+			return;
+		}
+
+		Group group = _groupLocalService.fetchGroup(objectEntry.getGroupId());
+
+		_updateUserAccountRoles(
+			group.getExternalReferenceCode(),
+			Arrays.asList(
+				DepotRolesConstants.ASSET_LIBRARY_ADMINISTRATOR,
+				DepotRolesConstants.ASSET_LIBRARY_MEMBER),
+			MapUtil.getLong(
+				objectEntry.getValues(), "r_userToCMPProjectManager_userId",
+				0));
+
+		_updateUserAccountRoles(
+			group.getExternalReferenceCode(),
+			Collections.singletonList(DepotRolesConstants.ASSET_LIBRARY_MEMBER),
+			MapUtil.getLong(
+				objectEntry.getValues(), "r_userToCMPProjectSponsor_userId",
+				0));
+	}
+
+	private void _updateUserAccountRoles(
+			String groupExternalReferenceCode, List<String> roleNames,
+			long userId)
+		throws Exception {
+
+		if (userId == 0) {
+			return;
+		}
+
+		User user = _userLocalService.fetchUser(userId);
+
+		UserAccountResource.Builder userAccountResourceBuilder =
+			_userAccountResourceFactory.create();
+
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		UserAccountResource userAccountResource =
+			userAccountResourceBuilder.user(
+				serviceContext.fetchUser()
+			).build();
+
+		userAccountResource.putAssetLibraryUserAccount(
+			groupExternalReferenceCode, user.getExternalReferenceCode());
+
+		RoleResource.Builder roleResoureceBuilder =
+			_roleResourceFactory.create();
+
+		RoleResource roleResource = roleResoureceBuilder.user(
+			serviceContext.fetchUser()
+		).build();
+
+		Page<com.liferay.headless.asset.library.dto.v1_0.Role>
+			assetLibraryUserAccountRolesPage =
+				roleResource.getAssetLibraryUserAccountRolesPage(
+					groupExternalReferenceCode,
+					user.getExternalReferenceCode());
+
+		Set<com.liferay.headless.asset.library.dto.v1_0.Role> roles =
+			new HashSet<>();
+
+		assetLibraryUserAccountRolesPage.getItems(
+		).forEach(
+			role -> roles.add(
+				new com.liferay.headless.asset.library.dto.v1_0.Role() {
+					{
+						setName(role::getName);
+					}
+				})
+		);
+
+		roleNames.forEach(
+			roleName -> roles.add(
+				new com.liferay.headless.asset.library.dto.v1_0.Role() {
+					{
+						setName(() -> roleName);
+					}
+				}));
+
+		roleResource.putAssetLibraryUserAccountRolesPage(
+			groupExternalReferenceCode, user.getExternalReferenceCode(),
+			roles.toArray(
+				new com.liferay.headless.asset.library.dto.v1_0.Role[0]));
+	}
+
 	@Reference(
 		target = "(filter.factory.key=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT + ")"
 	)
@@ -302,5 +408,14 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 
 	@Reference
 	private RoleLocalService _roleLocalService;
+
+	@Reference
+	private RoleResource.Factory _roleResourceFactory;
+
+	@Reference
+	private UserAccountResource.Factory _userAccountResourceFactory;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }
