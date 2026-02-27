@@ -99,6 +99,9 @@ const objectPagesTest = test.extend<{
 	objectLayoutsPage: async ({page}, use) => {
 		await use(new ObjectLayoutsPage(page));
 	},
+	objectRelationshipFormPage: async ({page}, use) => {
+		await use(new ObjectRelationshipFormPage(page, '.modal-content'));
+	},
 	objectRelationshipsPage: async ({page}, use) => {
 		await use(new ObjectRelationshipsPage(page));
 	},
