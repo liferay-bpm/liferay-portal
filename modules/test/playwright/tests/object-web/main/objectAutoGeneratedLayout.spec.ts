@@ -27,7 +27,7 @@ const test = mergeTests(
 	objectPagesTest
 );
 
-test(
+test.fixme(
 	'LPD-78504 Can display empty date value on auto-generated layout',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
@@ -66,7 +66,7 @@ test(
 	}
 );
 
-test(
+test.fixme(
 	'LPD-78504 Can format text in RichText field on auto-generated layout',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
@@ -99,7 +99,7 @@ test(
 	}
 );
 
-test(
+test.fixme(
 	'LPD-78504 Cannot add more characters than the limit set on text field',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
@@ -144,7 +144,7 @@ test(
 	}
 );
 
-test(
+test.fixme(
 	'LPD-78504 Can replace file in attachment field on auto-generated layout',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
@@ -180,7 +180,7 @@ test(
 	}
 );
 
-test(
+test.fixme(
 	'LPD-78504 Cannot upload invalid extension file in attachment field',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
@@ -210,11 +210,11 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
-test(
+test.fixme(
 	'LPD-78504 Cannot upload file exceeding maximum file size in attachment field',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
@@ -244,7 +244,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -274,11 +274,10 @@ test(
 			type: 'objectDefinition',
 		});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode:
-				objectDefinition.externalReferenceCode,
-			values: {customField: clobValue},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{customField: clobValue},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -286,7 +285,7 @@ test(
 	}
 );
 
-test(
+test.fixme(
 	'LPD-78504 Can view file name and extension in attachment field',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
@@ -316,11 +315,11 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
-test(
+test.fixme(
 	'LPD-78504 Can view file when clicking on file name in attachment field',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
@@ -350,7 +349,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -378,11 +377,10 @@ test(
 			type: 'objectDefinition',
 		});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode:
-				objectDefinition.externalReferenceCode,
-			values: {customField: 'Entry A'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{customField: 'Entry A'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 

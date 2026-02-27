@@ -12,7 +12,7 @@ import {featureFlagsTest} from '../../../fixtures/featureFlagsTest';
 import {isolatedSiteTest} from '../../../fixtures/isolatedSiteTest';
 import {loginTest} from '../../../fixtures/loginTest';
 import {objectPagesTest} from '../../../fixtures/objectPagesTest';
-import getRandomString from '../../../utils/getRandomString';
+import {getRandomInt} from '../../../utils/getRandomInt';
 
 const test = mergeTests(
 	apiHelpersTest,
@@ -30,11 +30,11 @@ test(
 	'LPD-78504 Cannot select unpublished object for a display page template',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, displayPageTemplatesPage, page}) => {
-		const objectName = 'CustomObject' + getRandomString();
+		const objectName = 'CustomObject' + getRandomInt();
 
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				name: objectName,
+				objectDefinitionExternalReferenceCode: objectName,
 				status: {code: 2},
 			});
 

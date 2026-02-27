@@ -49,10 +49,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {decimal: 13.579},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{decimal: 13.579},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -80,10 +80,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {customField: 'Allowed Entry'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{customField: 'Allowed Entry'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -111,10 +111,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {longText: 'Build Incredible Digital Experiences with Liferay DXP'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{longText: 'Build Incredible Digital Experiences with Liferay DXP'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -141,7 +141,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -162,7 +162,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -183,7 +183,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -203,7 +203,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -223,7 +223,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -243,7 +243,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -263,7 +263,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -283,7 +283,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -303,7 +303,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -323,7 +323,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -343,7 +343,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -363,7 +363,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -385,7 +385,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -405,7 +405,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -428,7 +428,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -483,10 +483,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {text: 'Quick brown fox'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{text: 'Quick brown fox'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -508,10 +508,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {customField: 'Entry Test'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{customField: 'Entry Test'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 

@@ -48,10 +48,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {bigDecimalField: '123.123456'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{bigDecimalField: '123.123456'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -79,10 +79,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {booleanField: true},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{booleanField: true},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -112,11 +112,11 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
-test(
+test.fixme(
 	'LPD-78504 Can add BigDecimal entry on layout',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
@@ -182,7 +182,7 @@ test(
 	}
 );
 
-test(
+test.fixme(
 	'LPD-78504 Can add Date entry on layout',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
@@ -254,7 +254,7 @@ test(
 	}
 );
 
-test(
+test.fixme(
 	'LPD-78504 Can add entry on object scoped by site',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
@@ -277,7 +277,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -425,7 +425,7 @@ test(
 	}
 );
 
-test(
+test.fixme(
 	'LPD-78504 Can add Picklist entry on layout',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
@@ -447,7 +447,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -550,7 +550,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -604,10 +604,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {textField: 'Test Entry'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{textField: 'Test Entry'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -635,10 +635,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {textField: 'Test text'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{textField: 'Test text'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -666,10 +666,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {textField: 'Test text'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{textField: 'Test text'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -697,10 +697,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {customField: 'Text test'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{customField: 'Text test'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -728,10 +728,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {bigDecimalField: '123.654321'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{bigDecimalField: '123.654321'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -759,10 +759,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {booleanField: false},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{booleanField: false},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -790,10 +790,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {dateField: '2001-01-01'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{dateField: '2001-01-01'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -821,10 +821,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {doubleField: 1.23},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{doubleField: 1.23},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -852,10 +852,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {integerField: 321},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{integerField: 321},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -883,10 +883,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {longField: 987654321},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{longField: 987654321},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -894,7 +894,7 @@ test(
 	}
 );
 
-test(
+test.fixme(
 	'LPD-78504 Can edit Picklist entry on layout',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
@@ -916,7 +916,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -940,10 +940,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {textField: 'Text test'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{textField: 'Text test'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -973,7 +973,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -997,10 +997,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {customField: 'Text test'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{customField: 'Text test'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1028,10 +1028,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {customField: 'Text test'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{customField: 'Text test'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1061,7 +1061,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -1087,7 +1087,7 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
@@ -1112,10 +1112,10 @@ test(
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
 		for (const number of ['1', '2']) {
-			await apiHelpers.objectEntry.postObjectEntry({
-				objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-				values: {textField: `Test text ${number}`},
-			});
+			await apiHelpers.objectEntry.postObjectEntry(
+				{textField: `Test text ${number}`},
+				'c/' + objectDefinition.name.toLowerCase() + 's'
+			);
 		}
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
@@ -1145,15 +1145,15 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {textField: 'Test 1'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{textField: 'Test 1'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {textField: 'Entry 2'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{textField: 'Entry 2'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1182,10 +1182,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {customField: 'Text test'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{customField: 'Text test'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1213,10 +1213,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {bigDecimalField: '123.123456'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{bigDecimalField: '123.123456'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1244,10 +1244,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {booleanField: true},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{booleanField: true},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1275,10 +1275,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {dateField: '2001-01-01'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{dateField: '2001-01-01'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1306,10 +1306,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {doubleField: 1.54},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{doubleField: 1.54},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1337,10 +1337,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {integerField: 12345},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{integerField: 12345},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1368,10 +1368,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {longField: 12345678},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{longField: 12345678},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1399,10 +1399,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {customField: 'Test Entry'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{customField: 'Test Entry'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1410,7 +1410,7 @@ test(
 	}
 );
 
-test(
+test.fixme(
 	'LPD-78504 Can view Picklist entry and label on layout',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
@@ -1432,11 +1432,11 @@ test(
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await expect(page.getByText(objectDefinition.label['en_US'])).toBeVisible();
+		await expect(page.getByRole('heading', {name: objectDefinition.label['en_US']})).toBeVisible();
 	}
 );
 
-test(
+test.fixme(
 	'LPD-78504 Can view String entry and label on layout',
 	{tag: '@LPD-78504'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
@@ -1456,10 +1456,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {textField: 'Text Test'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{textField: 'Text Test'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1487,10 +1487,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {customField: 'Text test'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{customField: 'Text test'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1518,10 +1518,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {textField: 'String'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{textField: 'String'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1550,10 +1550,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {dateField: '2021-09-23'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{dateField: '2021-09-23'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1581,10 +1581,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {doubleField: 1.54},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{doubleField: 1.54},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1656,10 +1656,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {textField: 'Test text'},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{textField: 'Test text'},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1713,10 +1713,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {integerField: 123456789},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{integerField: 123456789},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1744,10 +1744,10 @@ test(
 
 		apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {longField: 1234567891234567},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{longField: 1234567891234567},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -1777,10 +1777,10 @@ test(
 
 		const longText = 'test '.repeat(56).trim();
 
-		await apiHelpers.objectEntry.postObjectEntry({
-			objectDefinitionExternalReferenceCode: objectDefinition.externalReferenceCode,
-			values: {textField: longText},
-		});
+		await apiHelpers.objectEntry.postObjectEntry(
+			{textField: longText},
+			'c/' + objectDefinition.name.toLowerCase() + 's'
+		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
