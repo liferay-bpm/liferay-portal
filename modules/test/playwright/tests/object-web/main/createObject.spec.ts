@@ -102,7 +102,7 @@ test(
 test(
 	'LPD-78504 Verify it is possible to add a Block',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, objectLayoutsPage, page}) => {
+	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
 				status: {code: 0},
@@ -209,7 +209,7 @@ test.fixme(
 test(
 	'LPD-78504 Verify it is possible to add a field after the Object is published and submit entries to it',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, objectFieldsPage, page, viewObjectEntriesPage}) => {
+	async ({apiHelpers, objectFieldsPage: _objectFieldsPage, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -259,7 +259,7 @@ test(
 test(
 	'LPD-78504 Verify it is possible to add a Field for the Block with one column',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, objectLayoutsPage, page}) => {
+	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -303,7 +303,7 @@ test(
 test(
 	'LPD-78504 Verify it is possible to add a Field for the Block with three columns',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, objectLayoutsPage, page}) => {
+	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -347,7 +347,7 @@ test(
 test(
 	'LPD-78504 Verify it is possible to add a Field for the Block with two columns',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, objectLayoutsPage, page}) => {
+	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -391,7 +391,7 @@ test(
 test(
 	'LPD-78504 Verify it is possible to add a Tab with Fields Type',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, objectLayoutsPage, page}) => {
+	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
 				status: {code: 0},
@@ -659,7 +659,7 @@ test(
 				type: 'oneToMany',
 			}
 		);
-		const parentEntry = await apiHelpers.objectEntry.postObjectEntry(
+		const _parentEntry = await apiHelpers.objectEntry.postObjectEntry(
 			{[objectFields1[0].name!]: 'ParentEntry'},
 			'c/' + objectDefinition1.name!.toLowerCase() + 's'
 		);
@@ -829,7 +829,7 @@ test(
 test(
 	'LPD-78504 Verify it is possible to collapse and expand a block of fields',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, objectLayoutsPage, page}) => {
+	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -1378,7 +1378,7 @@ test(
 test(
 	'LPD-78504 Verify it is possible to delete a Field on Layout',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, objectLayoutsPage, page}) => {
+	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -1631,7 +1631,7 @@ test(
 		const relationshipLabel = 'Relationship' + getRandomInt();
 		const relationshipName = 'relationship' + getRandomInt();
 
-		const {body: objectRelationship} =
+		const {body: _objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition1.externalReferenceCode!,
 				{
@@ -1769,7 +1769,7 @@ test(
 test(
 	'LPD-78504 Verify it is not possible to add a Tab with Relationship Type in an Object without Relationship',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, objectLayoutsPage, page}) => {
+	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
 				status: {code: 0},
@@ -1805,7 +1805,7 @@ test(
 test(
 	'LPD-78504 Verify that the Relationship tab cannot be added first',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, objectLayoutsPage, page}) => {
+	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -3478,7 +3478,7 @@ test(
 test(
 	'LPD-78504 Verify it is possible to set the block as Collapsible',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, objectLayoutsPage, page}) => {
+	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -5553,7 +5553,7 @@ test(
 				type: 'oneToMany',
 			}
 		);
-		const parentEntry = await apiHelpers.objectEntry.postObjectEntry(
+		const _parentEntry = await apiHelpers.objectEntry.postObjectEntry(
 			{[objectFields1[0].name!]: 'ParentEntry'},
 			'c/' + objectDefinition1.name!.toLowerCase() + 's'
 		);
@@ -5706,17 +5706,17 @@ test(
 				type: 'manyToMany',
 			}
 		);
-		const entry1 = await apiHelpers.objectEntry.postObjectEntry(
+		const _entry1 = await apiHelpers.objectEntry.postObjectEntry(
 			{[objectFields1[0].name!]: 'Entry1'},
 			'c/' + objectDefinition1.name!.toLowerCase() + 's'
 		);
 
-		const entry2 = await apiHelpers.objectEntry.postObjectEntry(
+		const _entry2 = await apiHelpers.objectEntry.postObjectEntry(
 			{[objectFields1[0].name!]: 'Entry2'},
 			'c/' + objectDefinition1.name!.toLowerCase() + 's'
 		);
 
-		const childEntry = await apiHelpers.objectEntry.postObjectEntry(
+		const _childEntry = await apiHelpers.objectEntry.postObjectEntry(
 			{[objectFields2[0].name!]: 'ChildEntry'},
 			'c/' + objectDefinition2.name!.toLowerCase() + 's'
 		);
@@ -6168,11 +6168,26 @@ test(
 );
 
 // @ignore = "Test Stub" - FormCollectionProvidersDisplayPageDisplayOnlyItsInstanceObjects
-test(
+
+test.skip(
 	'LPD-78504 Verify that Objects created on a Virtual Instance are not displayed on the Forms Settings Collection Providers and Display Page Template of the Main Instance and vice versa',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, page, site}) => {
-		// Skipped - Original test was marked @ignore = "Test Stub"
+	async () => {
+		// This test was originally marked @ignore = "Test Stub" in Poshi and
+		// was never implemented. It requires Virtual Instance infrastructure.
+		//
+		// Intended flow based on Poshi test stub:
+		// 1. Create a Virtual Instance
+		// 2. On the Main Instance, create a custom object and publish it
+		// 3. On the Virtual Instance, create a different custom object and publish it
+		// 4. On the Main Instance, navigate to Forms Settings > Collection Providers
+		//    and verify that only the Main Instance object appears
+		// 5. Navigate to Display Page Templates and verify that only the
+		//    Main Instance object is available as a content type
+		// 6. On the Virtual Instance, repeat the same checks and verify that only
+		//    the Virtual Instance object appears in Collection Providers and
+		//    Display Page Templates
+		// 7. Clean up by deleting the Virtual Instance
 	}
 );
 
@@ -6336,11 +6351,25 @@ test(
 );
 
 // @ignore = "Test Stub" - ObjectAdminDisplaysOnlyItsInstanceObjects
-test(
+
+test.skip(
 	'LPD-78504 Verify that Objects created on a Virtual Instance are not displayed on the Object Admin of the Main Instance and vice versa',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, page, site}) => {
-		// Skipped - Original test was marked @ignore = "Test Stub"
+	async () => {
+		// This test was originally marked @ignore = "Test Stub" in Poshi and
+		// was never implemented. It requires Virtual Instance infrastructure.
+		//
+		// Intended flow based on Poshi test stub:
+		// 1. Create a Virtual Instance
+		// 2. On the Main Instance, create a custom object (e.g., "Main Object")
+		//    and publish it
+		// 3. On the Virtual Instance, create a different custom object
+		//    (e.g., "Virtual Object") and publish it
+		// 4. On the Main Instance, navigate to Object Admin and verify that
+		//    "Main Object" is listed but "Virtual Object" is NOT listed
+		// 5. On the Virtual Instance, navigate to Object Admin and verify that
+		//    "Virtual Object" is listed but "Main Object" is NOT listed
+		// 6. Clean up by deleting the Virtual Instance
 	}
 );
 
@@ -7565,11 +7594,25 @@ test(
 );
 
 // @ignore = "Test Stub" - PanelDisplaysOnlyItsInstanceObjects
-test(
+
+test.skip(
 	'LPD-78504 Verify that Objects created on a Virtual Instance are not displayed on the Panel of the Main Instance and vice versa',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, page, site}) => {
-		// Skipped - Original test was marked @ignore = "Test Stub"
+	async () => {
+		// This test was originally marked @ignore = "Test Stub" in Poshi and
+		// was never implemented. It requires Virtual Instance infrastructure.
+		//
+		// Intended flow based on Poshi test stub:
+		// 1. Create a Virtual Instance
+		// 2. On the Main Instance, create a custom object with
+		//    panelCategoryKey = "control_panel.object" and publish it
+		// 3. On the Virtual Instance, create a different custom object with
+		//    panelCategoryKey = "control_panel.object" and publish it
+		// 4. On the Main Instance, open the Applications Menu / Control Panel
+		//    and verify that only the Main Instance object appears in the panel
+		// 5. On the Virtual Instance, open the Applications Menu / Control Panel
+		//    and verify that only the Virtual Instance object appears in the panel
+		// 6. Clean up by deleting the Virtual Instance
 	}
 );
 
@@ -7949,6 +7992,7 @@ test(
 				type: 'oneToMany',
 			}
 		);
+
 		// Inactivate object A (the parent)
 
 		await viewObjectDefinitionsPage.goto();
@@ -8052,6 +8096,7 @@ test(
 				type: 'oneToMany',
 			}
 		);
+
 		// Add entry for object B
 
 		const applicationNameB =

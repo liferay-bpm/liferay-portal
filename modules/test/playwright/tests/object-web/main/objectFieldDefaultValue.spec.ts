@@ -10,8 +10,9 @@ import {featureFlagsTest} from '../../../fixtures/featureFlagsTest';
 import {isolatedSiteTest} from '../../../fixtures/isolatedSiteTest';
 import {loginTest} from '../../../fixtures/loginTest';
 import {objectPagesTest} from '../../../fixtures/objectPagesTest';
-import getRandomString from '../../../utils/getRandomString';
 import {waitForAlert} from '../../../utils/waitForAlert';
+import {generateObjectFields} from './utils/generateObjectFields';
+import {postListTypeDefinitionListTypeEntries} from './utils/postListTypeDefinitionListTypeEntries';
 
 const test = mergeTests(
 	dataApiHelpersTest,
@@ -26,26 +27,209 @@ const test = mergeTests(
 test(
 	'LPD-78504 Can verify updating default value configuration for picklist field only affects new entries',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, page, site}) => {
-		// Migrated from: CanOnlyAffectNewEntriesByUpdatingConfiguration
-		// LPS-181204 - Verify updating the default value configuration for the Picklist field only affects new object entries
+	async ({apiHelpers, objectFieldsPage, page, viewObjectEntriesPage}) => {
+		const {listTypeDefinition, listTypeEntries} =
+			await postListTypeDefinitionListTypeEntries({
+				apiHelpers,
+				listTypeEntriesLength: 2,
+			});
+
+		const objectFields = generateObjectFields({
+			listTypeDefinitionExternalReferenceCode:
+				listTypeDefinition.externalReferenceCode,
+			objectFieldBusinessTypes: ['Picklist'],
+		});
+
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFields,
+				status: {code: 0},
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		const firstItemName = listTypeEntries[0].name;
+		const secondItemName = listTypeEntries[1].name;
+
+		await objectFieldsPage.goto(objectDefinition.label['en_US']);
+
+		await objectFieldsPage.setDefaultValue({
+			defaultValue: firstItemName,
+			objectFieldBusinessType: 'Picklist',
+			objectFieldName: objectFields[0].label['en_US'],
+		});
+
+		await viewObjectEntriesPage.goto(objectDefinition.className);
+
+		await viewObjectEntriesPage.clickAddObjectEntry(
+			objectDefinition.label['en_US']
+		);
+
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+		await waitForAlert(page);
+
+		await viewObjectEntriesPage.backButton.click();
+
+		await expect(
+			page.locator('td').getByText(firstItemName, {exact: true})
+		).toBeVisible();
+
+		await objectFieldsPage.goto(objectDefinition.label['en_US']);
+
+		await objectFieldsPage.setDefaultValue({
+			defaultValue: secondItemName,
+			objectFieldBusinessType: 'Picklist',
+			objectFieldName: objectFields[0].label['en_US'],
+		});
+
+		await viewObjectEntriesPage.goto(objectDefinition.className);
+
+		await viewObjectEntriesPage.clickAddObjectEntry(
+			objectDefinition.label['en_US']
+		);
+
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+		await waitForAlert(page);
+
+		await viewObjectEntriesPage.backButton.click();
+
+		await expect(
+			page.locator('td').getByText(firstItemName, {exact: true})
+		).toBeVisible();
+
+		await expect(
+			page.locator('td').getByText(secondItemName, {exact: true})
+		).toBeVisible();
 	}
 );
 
 test(
 	'LPD-78504 Can set picklist default value via expression builder',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, page, site}) => {
-		// Migrated from: CanSetPicklistViaExpressionBuilder
-		// LPS-163716 - Verify it is possible to create an object entry with the Picklist default value set via Expression Builder
+	async ({apiHelpers, objectFieldsPage, page, viewObjectEntriesPage}) => {
+		const {listTypeDefinition, listTypeEntries} =
+			await postListTypeDefinitionListTypeEntries({
+				apiHelpers,
+				listTypeEntriesLength: 5,
+			});
+
+		const objectFields = generateObjectFields({
+			listTypeDefinitionExternalReferenceCode:
+				listTypeDefinition.externalReferenceCode,
+			objectFieldBusinessTypes: ['Picklist', 'Text'],
+		});
+
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFields,
+				status: {code: 0},
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		const picklistFieldName = objectFields[0].label['en_US'];
+		const textFieldName = objectFields[1].name;
+
+		await objectFieldsPage.goto(objectDefinition.label['en_US']);
+
+		await objectFieldsPage.openObjectField(picklistFieldName);
+
+		await objectFieldsPage.advancedTab.click();
+
+		await objectFieldsPage.useDefaultValueToggle.check({timeout: 1000});
+
+		await objectFieldsPage.iframeLocator
+			.getByRole('radio', {name: 'Expression Builder'})
+			.check();
+
+		await objectFieldsPage.iframeLocator
+			.getByLabel('Default ValueMandatory')
+			.fill(textFieldName);
+
+		await objectFieldsPage.editFieldSaveButton.click();
+
+		await waitForAlert(
+			page,
+			'The object field was updated successfully'
+		);
+
+		const firstItemKey = listTypeEntries[0].key;
+		const firstItemName = listTypeEntries[0].name;
+		const applicationName =
+			'c/' + objectDefinition.name.toLowerCase() + 's';
+
+		await apiHelpers.objectEntry.postObjectEntry(
+			{[textFieldName]: firstItemKey},
+			applicationName
+		);
+
+		await viewObjectEntriesPage.goto(objectDefinition.className);
+
+		await expect(
+			page.locator('td').getByText(firstItemName, {exact: true})
+		).toBeVisible();
 	}
 );
 
 test(
 	'LPD-78504 Can set picklist default value via input as value',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, page, site}) => {
-		// Migrated from: CanSetPicklistViaInputAsValue
-		// LPS-163716 - Verify it is possible to create an object entry with the Picklist default value set via Input as Value
+	async ({apiHelpers, objectFieldsPage, page, viewObjectEntriesPage}) => {
+		const {listTypeDefinition, listTypeEntries} =
+			await postListTypeDefinitionListTypeEntries({
+				apiHelpers,
+				listTypeEntriesLength: 2,
+			});
+
+		const objectFields = generateObjectFields({
+			listTypeDefinitionExternalReferenceCode:
+				listTypeDefinition.externalReferenceCode,
+			objectFieldBusinessTypes: ['Picklist'],
+		});
+
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFields,
+				status: {code: 0},
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		const defaultItemName = listTypeEntries[0].name;
+
+		await objectFieldsPage.goto(objectDefinition.label['en_US']);
+
+		await objectFieldsPage.setDefaultValue({
+			defaultValue: defaultItemName,
+			objectFieldBusinessType: 'Picklist',
+			objectFieldName: objectFields[0].label['en_US'],
+		});
+
+		await viewObjectEntriesPage.goto(objectDefinition.className);
+
+		await viewObjectEntriesPage.clickAddObjectEntry(
+			objectDefinition.label['en_US']
+		);
+
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+		await waitForAlert(page);
+
+		await viewObjectEntriesPage.backButton.click();
+
+		await expect(
+			page.locator('td').getByText(defaultItemName, {exact: true})
+		).toBeVisible();
 	}
 );

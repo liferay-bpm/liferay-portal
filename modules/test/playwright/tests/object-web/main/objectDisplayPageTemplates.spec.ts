@@ -45,6 +45,29 @@ test(
 
 		await displayPageTemplatesPage.goto();
 
-		await expect(page.locator('body')).toBeVisible();
+		await page
+			.getByRole('button', {name: 'New'})
+			.click();
+
+		await page
+			.getByRole('menuitem', {name: 'Display Page Template'})
+			.click();
+
+		await page.getByRole('button', {name: 'Blank'}).click();
+
+		const contentTypeSelect = page.getByLabel('Content Type');
+
+		await expect(contentTypeSelect).toBeVisible();
+
+		const options = contentTypeSelect.locator('option');
+
+		const optionTexts = await options.allTextContents();
+
+		expect(
+			optionTexts.some(
+				(text) =>
+					text === objectDefinition.label['en_US']
+			)
+		).toBe(false);
 	}
 );
