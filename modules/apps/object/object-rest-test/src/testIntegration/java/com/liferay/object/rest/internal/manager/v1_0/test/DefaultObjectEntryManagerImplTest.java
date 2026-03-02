@@ -147,6 +147,7 @@ import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.WorkflowInstanceLink;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
@@ -168,6 +169,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
+import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.TestInfo;
@@ -201,6 +203,9 @@ import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.workflow.WorkflowDefinition;
+import com.liferay.portal.kernel.workflow.WorkflowInstance;
+import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManager;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.hits.SearchHit;
@@ -226,6 +231,7 @@ import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.permission.Permission;
 import com.liferay.portal.vulcan.scope.Scope;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
+import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
 import java.io.ByteArrayInputStream;
@@ -6673,6 +6679,292 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
+	public void testGetObjectEntryWithMissingParentObjectEntryReference()
+		throws Exception {
+
+		// Account entry restricted scope
+
+		ObjectDefinition childObjectDefinition =
+			objectDefinitionLocalService.fetchObjectDefinition(
+				companyId, "C_AA");
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.addObjectRelationship(
+				null, adminUser.getUserId(),
+				_accountEntryObjectDefinition.getObjectDefinitionId(),
+				childObjectDefinition.getObjectDefinitionId(), 0,
+				ObjectRelationshipConstants.DELETION_TYPE_CASCADE, false,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				StringUtil.randomId(), false,
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+
+		childObjectDefinition.setAccountEntryRestrictedObjectFieldId(
+			objectRelationship.getObjectFieldId2());
+
+		childObjectDefinition.setAccountEntryRestricted(true);
+
+		childObjectDefinition =
+			objectDefinitionLocalService.updateObjectDefinition(
+				childObjectDefinition);
+
+		Node rootNode = _tree.getRootNode();
+
+		ObjectDefinition rootObjectDefinition =
+			objectDefinitionLocalService.getObjectDefinition(
+				rootNode.getPrimaryKey());
+
+		_addResourcePermission(
+			ObjectActionKeys.ADD_OBJECT_ENTRY, childObjectDefinition,
+			_buyerRole);
+
+		_addResourcePermission(
+			ObjectActionKeys.ADD_OBJECT_ENTRY, rootObjectDefinition,
+			_buyerRole);
+
+		_addResourcePermission(
+			ActionKeys.UPDATE, rootObjectDefinition, _buyerRole);
+
+		AccountEntry accountEntry1 = _addAccountEntry();
+
+		User user1 = UserTestUtil.addUser();
+
+		_setUser(user1);
+
+		_assignAccountEntryRole(accountEntry1, _buyerRole, user1);
+
+		ObjectEntry objectEntry1 = _defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext, rootObjectDefinition,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						"r_oneToManyRelationshipName2_accountEntryId",
+						accountEntry1.getAccountEntryId()
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		ObjectField relationshipObjectField =
+			_objectFieldLocalService.getObjectField(
+				objectRelationship.getObjectFieldId2());
+
+		ObjectEntry objectEntry2 = _defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext, childObjectDefinition,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						relationshipObjectField.getName(),
+						accountEntry1.getAccountEntryId()
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		Assert.assertNotNull(
+			_defaultObjectEntryManager.getObjectEntry(
+				_simpleDTOConverterContext, childObjectDefinition,
+				objectEntry2.getId()));
+
+		AccountEntry accountEntry2 = _addAccountEntry();
+
+		Node childNode = _tree.getNode(
+			childObjectDefinition.getObjectDefinitionId());
+
+		Edge edge = childNode.getEdge();
+
+		ObjectEntry relatedObjectEntry =
+			_defaultObjectEntryManager.addRelatedObjectEntry(
+				_simpleDTOConverterContext,
+				new ObjectEntry() {
+					{
+						properties = new HashMap<>();
+					}
+				},
+				objectEntry1.getId(),
+				_objectRelationshipLocalService.getObjectRelationship(
+					edge.getObjectRelationshipId()));
+
+		_removeResourcePermission(
+			ActionKeys.UPDATE, rootObjectDefinition, _buyerRole);
+
+		User user2 = UserTestUtil.addUser();
+
+		_setUser(user2);
+
+		_assignAccountEntryRole(accountEntry2, _buyerRole, user2);
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", user2.getUserId(), " must have VIEW permission for ",
+				rootObjectDefinition.getClassName(), StringPool.SPACE,
+				objectEntry1.getId()),
+			() -> _defaultObjectEntryManager.getObjectEntry(
+				_simpleDTOConverterContext, rootObjectDefinition,
+				relatedObjectEntry.getId()));
+
+		ObjectEntry finalObjectEntry = objectEntry2;
+
+		ObjectDefinition finalChildObjectDefinition = childObjectDefinition;
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", user2.getUserId(), " must have VIEW permission for ",
+				childObjectDefinition.getClassName(), StringPool.SPACE,
+				finalObjectEntry.getId()),
+			() -> _defaultObjectEntryManager.getObjectEntry(
+				_simpleDTOConverterContext, finalChildObjectDefinition,
+				finalObjectEntry.getId()));
+
+		// Regular roles permissions
+
+		_removeResourcePermission(
+			ObjectActionKeys.ADD_OBJECT_ENTRY, childObjectDefinition,
+			_buyerRole);
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", user2.getUserId(),
+				" must have ADD_OBJECT_ENTRY permission for ",
+				childObjectDefinition.getResourceName(), StringPool.SPACE),
+			() -> _defaultObjectEntryManager.addObjectEntry(
+				_simpleDTOConverterContext, finalChildObjectDefinition,
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							relationshipObjectField.getName(),
+							accountEntry2.getAccountEntryId()
+						).build();
+					}
+				},
+				ObjectDefinitionConstants.SCOPE_COMPANY));
+
+		_removeResourcePermission(
+			ObjectActionKeys.ADD_OBJECT_ENTRY, rootObjectDefinition,
+			_buyerRole);
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", user2.getUserId(),
+				" must have ADD_OBJECT_ENTRY permission for ",
+				childObjectDefinition.getResourceName(), StringPool.SPACE),
+			() -> _defaultObjectEntryManager.addObjectEntry(
+				_simpleDTOConverterContext, finalChildObjectDefinition,
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							relationshipObjectField.getName(),
+							accountEntry2.getAccountEntryId()
+						).build();
+					}
+				},
+				ObjectDefinitionConstants.SCOPE_COMPANY));
+
+		_addResourcePermission(
+			ObjectActionKeys.ADD_OBJECT_ENTRY, childObjectDefinition,
+			_buyerRole);
+
+		objectEntry1 = _defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext, childObjectDefinition,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						relationshipObjectField.getName(),
+						accountEntry2.getAccountEntryId()
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		Assert.assertNotNull(objectEntry1);
+
+		_addResourcePermission(
+			ActionKeys.VIEW, childObjectDefinition, _buyerRole);
+
+		objectEntry2 = _objectEntryManager.getObjectEntry(
+			companyId, _createDTOConverterContext(user2),
+			objectEntry1.getExternalReferenceCode(), finalChildObjectDefinition,
+			null);
+
+		Assert.assertEquals(
+			objectEntry1.getExternalReferenceCode(),
+			objectEntry2.getExternalReferenceCode());
+
+		// Workflow definition links
+
+		_setUser(adminUser);
+
+		String childWorkflowDefinitionName = RandomTestUtil.randomString();
+
+		String rootWorkflowDefinitionName = "Single Approver";
+
+		_deployWorkflowDefinition(
+			rootWorkflowDefinitionName, childWorkflowDefinitionName);
+
+		Group group = _groupLocalService.getCompanyGroup(companyId);
+
+		_addWorkflowDefinitionLink(
+			childObjectDefinition.getClassName(), group.getGroupId(),
+			childWorkflowDefinitionName);
+
+		_addWorkflowDefinitionLink(
+			rootObjectDefinition.getClassName(), group.getGroupId(),
+			rootWorkflowDefinitionName);
+
+		objectEntry1 = _defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext, rootObjectDefinition,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						"r_oneToManyRelationshipName2_accountEntryId",
+						accountEntry1.getAccountEntryId()
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		objectEntry2 = _defaultObjectEntryManager.addRelatedObjectEntry(
+			_simpleDTOConverterContext,
+			new ObjectEntry() {
+				{
+					properties = new HashMap<>();
+				}
+			},
+			objectEntry1.getId(),
+			_objectRelationshipLocalService.getObjectRelationship(
+				edge.getObjectRelationshipId()));
+
+		ObjectEntry objectEntry3 = _defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext, childObjectDefinition,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						relationshipObjectField.getName(),
+						accountEntry2.getAccountEntryId()
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		_assertObjectEntryStatus(
+			WorkflowConstants.STATUS_PENDING, objectEntry2);
+
+		_assertObjectEntryStatus(
+			WorkflowConstants.STATUS_PENDING, objectEntry3);
+
+		_assertWorkflowDefinitionName(
+			rootObjectDefinition.getClassName(), companyId, group.getGroupId(),
+			rootWorkflowDefinitionName, objectEntry1);
+
+		_assertWorkflowDefinitionName(
+			childObjectDefinition.getClassName(), companyId, group.getGroupId(),
+			childWorkflowDefinitionName, objectEntry3);
+	}
+
+	@Test
 	public void testGetRelatedObjectEntries() throws Exception {
 		_testGetRelatedObjectEntries(
 			_companyObjectEntryA, _companyObjectRelationshipA_AA, null,
@@ -10094,6 +10386,19 @@ public class DefaultObjectEntryManagerImplTest
 		return organization;
 	}
 
+	private void _addWorkflowDefinitionLink(
+			String className, long groupId, String workflowDefinitionName)
+		throws Exception {
+
+		WorkflowDefinition workflowDefinition =
+			_workflowDefinitionManager.getLatestWorkflowDefinition(
+				companyId, workflowDefinitionName);
+
+		_workflowDefinitionLinkLocalService.addWorkflowDefinitionLink(
+			null, adminUser.getUserId(), companyId, groupId, className, 0, 0,
+			workflowDefinition.getName(), workflowDefinition.getVersion());
+	}
+
 	private void _assertActions(
 			List<String> actions1, List<String> actions2,
 			ObjectDefinition objectDefinition, long objectEntryId)
@@ -10348,6 +10653,21 @@ public class DefaultObjectEntryManagerImplTest
 			expectedObjectEntry.getStatus(), actualObjectEntry.getStatus());
 	}
 
+	private void _assertObjectEntry(
+		ObjectEntry expectedObjectEntry, Page<ObjectEntry> objectEntryPage) {
+
+		Collection<ObjectEntry> items = objectEntryPage.getItems();
+
+		Assert.assertEquals(items.toString(), 1, items.size());
+
+		ObjectEntry actualObjectEntry = items.iterator(
+		).next();
+
+		Assert.assertEquals(
+			expectedObjectEntry.getExternalReferenceCode(),
+			actualObjectEntry.getExternalReferenceCode());
+	}
+
 	private void _assertObjectEntryStatus(
 			int expectedStatusCode, ObjectEntry objectEntry)
 		throws Exception {
@@ -10420,6 +10740,28 @@ public class DefaultObjectEntryManagerImplTest
 
 		Assert.assertEquals(
 			expectedValue, properties.get("textObjectFieldName"));
+	}
+
+	private void _assertWorkflowDefinitionName(
+			String className, long companyId, long groupId,
+			String expectedWorkflowDefinitionName, ObjectEntry objectEntry)
+		throws Exception {
+
+		WorkflowInstanceLink workflowInstanceLink =
+			_workflowInstanceLinkLocalService.fetchWorkflowInstanceLink(
+				companyId, groupId, className, objectEntry.getId());
+
+		Assert.assertNotNull(workflowInstanceLink);
+
+		WorkflowInstance workflowInstance =
+			_workflowInstanceManager.getWorkflowInstance(
+				companyId, workflowInstanceLink.getWorkflowInstanceId());
+
+		Assert.assertNotNull(workflowInstance);
+
+		Assert.assertEquals(
+			expectedWorkflowDefinitionName,
+			workflowInstance.getWorkflowDefinitionName());
 	}
 
 	private void _assignAccountEntryRole(
@@ -10561,6 +10903,22 @@ public class DefaultObjectEntryManagerImplTest
 			deleteAccountEntryOrganizationRel(
 				accountEntry.getAccountEntryId(),
 				organization.getOrganizationId());
+	}
+
+	private void _deployWorkflowDefinition(
+			String workflowDefinitionName1, String workflowDefinitionName2)
+		throws Exception {
+
+		WorkflowDefinition workflowDefinition =
+			_workflowDefinitionManager.getLatestWorkflowDefinition(
+				companyId, workflowDefinitionName1);
+
+		String content = workflowDefinition.getContent();
+
+		_workflowDefinitionManager.deployWorkflowDefinition(
+			content.getBytes(), companyId, RandomTestUtil.randomString(),
+			workflowDefinitionName2, workflowDefinitionName2,
+			adminUser.getUserId());
 	}
 
 	private ObjectDefinition _enableObjectEntryVersioning() {
@@ -10744,6 +11102,13 @@ public class DefaultObjectEntryManagerImplTest
 		throws Exception {
 
 		_removeResourcePermission(actionId, _objectDefinition3, role);
+	}
+
+	private void _setUser(User user) {
+		PermissionThreadLocal.setPermissionChecker(
+			PermissionCheckerFactoryUtil.create(user));
+
+		PrincipalThreadLocal.setName(user.getUserId());
 	}
 
 	private void _testAddObjectEntryAccountEntryRestriction(
@@ -12351,6 +12716,15 @@ public class DefaultObjectEntryManagerImplTest
 	@Inject
 	private WorkflowDefinitionLinkLocalService
 		_workflowDefinitionLinkLocalService;
+
+	@Inject
+	private WorkflowDefinitionManager _workflowDefinitionManager;
+
+	@Inject
+	private WorkflowInstanceLinkLocalService _workflowInstanceLinkLocalService;
+
+	@Inject
+	private WorkflowInstanceManager _workflowInstanceManager;
 
 	@Inject
 	private WorkflowTaskManager _workflowTaskManager;
