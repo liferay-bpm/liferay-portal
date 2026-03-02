@@ -156,6 +156,25 @@ describe('FormSupport', () => {
 		).toMatchSnapshot();
 	});
 
+	it('normalizes single remaining column to size 12 after nested cleanup', () => {
+		pages = JSON.parse(JSON.stringify(mockPageWithNested));
+
+		const nestedFieldset =
+			pages[0].rows[0].columns[0].fields[0].nestedFields[0];
+
+		expect(nestedFieldset.rows[0].columns[0].fields).toEqual([]);
+
+		FormSupport.removeNestedEmptyRows(pages, 0);
+
+		const updatedRows = nestedFieldset.rows;
+
+		expect(updatedRows).toHaveLength(1);
+
+		expect(updatedRows[0].columns).toHaveLength(1);
+
+		expect(updatedRows[0].columns[0].size).toBe(12);
+	});
+
 	it('removes a column from pages and reorder', () => {
 		const columnIndex = 1;
 		const pageIndex = 0;
