@@ -171,6 +171,13 @@ function cleanRow(row) {
 		.map(cleanColumn)
 		.filter((column) => !!column.fields.length);
 
+	if (row.columns.length === 1) {
+		row.columns[0] = {
+			...row.columns[0],
+			size: 12,
+		};
+	}
+
 	return row;
 }
 
