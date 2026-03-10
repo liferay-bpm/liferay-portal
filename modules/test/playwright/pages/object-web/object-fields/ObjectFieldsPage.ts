@@ -5,7 +5,7 @@
 
 import {FrameLocator, Locator, Page, test} from '@playwright/test';
 
-import {waitForAlert} from '../../../utils/waitForAlert';
+import {waitForPageToBeLoaded} from '../../../utils/waitForPageToBeLoaded';
 import {ViewObjectDefinitionsPage} from '../ViewObjectDefinitionsPage';
 
 export class ObjectFieldsPage {
@@ -178,10 +178,7 @@ export class ObjectFieldsPage {
 
 			await this.editFieldSaveButton.click();
 
-			await waitForAlert(
-				this.page,
-				'The object field was updated successfully'
-			);
+			await waitForPageToBeLoaded(this.page);
 		});
 	}
 
@@ -275,10 +272,7 @@ export class ObjectFieldsPage {
 
 			await this.editFieldSaveButton.click();
 
-			await waitForAlert(
-				this.page,
-				'The object field was updated successfully'
-			);
+			await waitForPageToBeLoaded(this.page);
 		});
 	}
 
