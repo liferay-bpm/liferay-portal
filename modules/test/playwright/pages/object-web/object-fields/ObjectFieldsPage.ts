@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {FrameLocator, Locator, Page, test} from '@playwright/test';
+import {FrameLocator, Locator, Page, expect, test} from '@playwright/test';
 
+import {clickAndExpectToBeVisible} from '../../../utils/clickAndExpectToBeVisible';
 import {waitForPageToBeLoaded} from '../../../utils/waitForPageToBeLoaded';
 import {ViewObjectDefinitionsPage} from '../ViewObjectDefinitionsPage';
 
@@ -176,7 +177,15 @@ export class ObjectFieldsPage {
 
 			await this.useDefaultValueToggle.uncheck();
 
+			await this.page.waitForTimeout(1000); // Wait for any UI change after unchecking.
+
 			await this.editFieldSaveButton.click();
+
+			await expect(this.page.locator('.alert-danger')).toBeHidden(); // Catch any error alerts that appear.
+
+			await this.page
+				.locator('.fds-side-panel')
+				.waitFor({state: 'hidden'});
 
 			await waitForPageToBeLoaded(this.page);
 		});
@@ -277,6 +286,10 @@ export class ObjectFieldsPage {
 			}
 
 			await this.editFieldSaveButton.click();
+
+			await this.page
+				.locator('.fds-side-panel')
+				.waitFor({state: 'hidden'});
 
 			await waitForPageToBeLoaded(this.page);
 		});
