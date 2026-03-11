@@ -2905,6 +2905,30 @@ public class ObjectDefinitionLocalServiceTest {
 			Assert.assertNotEquals(
 				objectDefinition1.getClassName(),
 				objectDefinition2.getClassName());
+
+			_assertObjectDefinitionSetting(
+				objectDefinition2,
+				ObjectDefinitionSettingConstants.NAME_OLD_CLASS_NAME,
+				objectDefinition1.getClassName());
+
+			ObjectDefinition objectDefinition3 =
+				ObjectDefinitionTestUtil.publishObjectDefinition();
+
+			objectDefinition3 = _updateCustomObjectDefinition(
+				objectDefinition1.getClassName(), objectDefinition3);
+
+			_assertObjectDefinitionSetting(
+				objectDefinition3,
+				ObjectDefinitionSettingConstants.NAME_OLD_CLASS_NAME,
+				objectDefinition1.getClassName());
+
+			objectDefinition3 = _updateCustomObjectDefinition(
+				objectDefinition2.getClassName(), objectDefinition3);
+
+			_assertObjectDefinitionSetting(
+				objectDefinition3,
+				ObjectDefinitionSettingConstants.NAME_OLD_CLASS_NAME,
+				objectDefinition1.getClassName());
 		}
 		finally {
 			_companyLocalService.deleteCompany(company);
@@ -3925,6 +3949,19 @@ public class ObjectDefinitionLocalServiceTest {
 			objectDefinition.getDefaultLanguageId());
 
 		Assert.assertEquals(pluralLabelPLOEntryKey.getValue(), pluralLabel);
+	}
+
+	private void _assertObjectDefinitionSetting(
+		ObjectDefinition objectDefinition, String objectDefinitionSettingName,
+		String objectDefinitionSettingValue) {
+
+		ObjectDefinitionSetting objectDefinitionSetting =
+			_objectDefinitionSettingLocalService.fetchObjectDefinitionSetting(
+				objectDefinition.getObjectDefinitionId(),
+				objectDefinitionSettingName);
+
+		Assert.assertEquals(
+			objectDefinitionSettingValue, objectDefinitionSetting.getValue());
 	}
 
 	private void _assertObjectDefinitionSettingsValues(
