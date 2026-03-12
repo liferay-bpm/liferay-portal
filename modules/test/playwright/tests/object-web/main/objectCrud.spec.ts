@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {ObjectRelationshipAPI} from '@liferay/object-admin-rest-client-js';
+import {
+	ObjectDefinition,
+	ObjectRelationshipAPI,
+} from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
 
 import {dataApiHelpersTest} from '../../../fixtures/dataApiHelpersTest';
@@ -28,43 +31,54 @@ const test = mergeTests(
 // Migrated from Object.testcase
 
 test(
-	'LPD-78504 Verify that it is possible to delete an object after deleting the relationship',
-	{tag: '@LPD-78504'},
-	async ({apiHelpers, objectRelationshipsPage, page, viewObjectDefinitionsPage}) => {
-		const objectFields = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
-		});
+	'Verify that it is possible to delete an object after deleting the relationship',
+	{tag: '@LPS-150886'},
+	async ({
+		apiHelpers,
+		objectRelationshipsPage,
+		page,
+		viewObjectDefinitionsPage,
+	}) => {
+		let objectDefinition1: ObjectDefinition;
+		let objectDefinition2: ObjectDefinition;
+		let relationshipName: string;
 
-		const objectDefinition1 =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields,
-				status: {code: 0},
+		await test.step('Create object definitions', async () => {
+			const objectFields = generateObjectFields({
+				objectFieldBusinessTypes: ['Text'],
 			});
 
-		apiHelpers.data.push({
-			id: objectDefinition1.id,
-			type: 'objectDefinition',
-		});
+			objectDefinition1 =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFields,
+					status: {code: 0},
+				});
 
-		const objectDefinition2 =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields: generateObjectFields({
-					objectFieldBusinessTypes: ['Text'],
-				}),
-				status: {code: 0},
+			apiHelpers.data.push({
+				id: objectDefinition1.id,
+				type: 'objectDefinition',
 			});
 
-		apiHelpers.data.push({
-			id: objectDefinition2.id,
-			type: 'objectDefinition',
+			objectDefinition2 =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFields: generateObjectFields({
+						objectFieldBusinessTypes: ['Text'],
+					}),
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition2.id,
+				type: 'objectDefinition',
+			});
 		});
 
-		const objectRelationshipAPIClient =
-			await apiHelpers.buildRestClient(ObjectRelationshipAPI);
+		await test.step('Create object relationship', async () => {
+			const objectRelationshipAPIClient =
+				await apiHelpers.buildRestClient(ObjectRelationshipAPI);
 
-		const relationshipName = 'relationship' + getRandomInt();
+			relationshipName = 'relationship' + getRandomInt();
 
-		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition1.externalReferenceCode!,
 				{
@@ -77,79 +91,80 @@ test(
 					type: 'oneToMany',
 				}
 			);
+		});
 
-		// Verify cannot delete an object that has a relationship
+		await test.step('Verify that an object that has a relationship cannot be deleted', async () => {
+			await viewObjectDefinitionsPage.goto();
 
-		await viewObjectDefinitionsPage.goto();
+			await viewObjectDefinitionsPage.clickObjectDefinitionActionButton(
+				objectDefinition1.label['en_US']
+			);
 
-		await viewObjectDefinitionsPage.clickObjectDefinitionActionButton(
-			objectDefinition1.label['en_US']
-		);
+			await viewObjectDefinitionsPage.deleteObjectDefinitionOption.click();
 
-		await viewObjectDefinitionsPage.deleteObjectDefinitionOption.click();
+			await expect(page.getByText('Deletion Not Allowed')).toBeVisible();
 
-		await expect(
-			page.getByText('Deletion Not Allowed')
-		).toBeVisible();
+			await page.getByRole('button', {name: 'Done'}).click();
+		});
 
-		await page.getByRole('button', {name: 'Done'}).click();
+		await test.step('Delete the relationship first', async () => {
+			await objectRelationshipsPage.goto(
+				objectDefinition1.label['en_US']
+			);
 
-		// Delete the relationship first
+			await objectRelationshipsPage.actionsButton.click();
 
-		await objectRelationshipsPage.goto(objectDefinition1.label['en_US']);
+			await objectRelationshipsPage.deleteObjectRelationshipOption.click();
 
-		await objectRelationshipsPage.actionsButton.click();
+			await page
+				.getByPlaceholder('Confirm relationship name', {exact: false})
+				.fill(relationshipName);
 
-		await objectRelationshipsPage.deleteObjectRelationshipOption.click();
+			await page.getByRole('button', {name: 'Delete'}).click();
 
-		await page
-			.getByPlaceholder('Confirm relationship name', {exact: false})
-			.fill(relationshipName);
+			await expect(page.getByText('No Results Found')).toBeVisible({
+				timeout: 15000,
+			});
+		});
 
-		await page.getByRole('button', {name: 'Delete'}).click();
+		await test.step('Now delete the object definition', async () => {
+			await viewObjectDefinitionsPage.goto();
 
-		await expect(
-			page.getByText('No Results Found')
-		).toBeVisible({timeout: 15000});
+			await viewObjectDefinitionsPage.clickObjectDefinitionActionButton(
+				objectDefinition1.label['en_US']
+			);
 
-		// Now delete the object definition
+			await viewObjectDefinitionsPage.deleteObjectDefinitionOption.click();
 
-		await viewObjectDefinitionsPage.goto();
+			await page
+				.getByPlaceholder('Confirm Object Definition Name')
+				.fill(objectDefinition1.name);
 
-		await viewObjectDefinitionsPage.clickObjectDefinitionActionButton(
-			objectDefinition1.label['en_US']
-		);
+			await page
+				.getByRole('button', {exact: true, name: 'Delete'})
+				.click();
 
-		await viewObjectDefinitionsPage.deleteObjectDefinitionOption.click();
+			apiHelpers.data.splice(
+				apiHelpers.data.findIndex(
+					(object) =>
+						object.id === objectDefinition1.id &&
+						object.type === 'objectDefinition'
+				),
+				1
+			);
 
-		await page
-			.getByPlaceholder('Confirm Object Definition Name')
-			.fill(objectDefinition1.name);
-
-		await page
-			.getByRole('button', {exact: true, name: 'Delete'})
-			.click();
-
-		apiHelpers.data.splice(
-			apiHelpers.data.findIndex(
-				(object) =>
-					object.id === objectDefinition1.id &&
-					object.type === 'objectDefinition'
-			),
-			1
-		);
-
-		await expect(
-			viewObjectDefinitionsPage.frontendDataSetEntries.filter({
-				hasText: objectDefinition1.label['en_US'],
-			})
-		).toBeHidden();
+			await expect(
+				viewObjectDefinitionsPage.frontendDataSetEntries.filter({
+					hasText: objectDefinition1.label['en_US'],
+				})
+			).toBeHidden();
+		});
 	}
 );
 
 test(
-	'LPD-78504 Verify that it is possible to delete a published object',
-	{tag: '@LPD-78504'},
+	'Verify that it is possible to delete a published object',
+	{tag: '@LPS-150886'},
 	async ({apiHelpers, page, viewObjectDefinitionsPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -178,9 +193,7 @@ test(
 			.getByPlaceholder('Confirm Object Definition Name')
 			.fill(objectDefinition.name);
 
-		await page
-			.getByRole('button', {exact: true, name: 'Delete'})
-			.click();
+		await page.getByRole('button', {exact: true, name: 'Delete'}).click();
 
 		apiHelpers.data.splice(
 			apiHelpers.data.findIndex(
@@ -200,9 +213,14 @@ test(
 );
 
 test(
-	'LPD-78504 Verify it is the user is able to delete a relationship of object native',
-	{tag: '@LPD-78504'},
-	async ({apiHelpers, objectRelationshipsPage, page, viewObjectDefinitionsPage}) => {
+	'Verify it is the user is able to delete a relationship of object native',
+	{tag: '@LPS-135406'},
+	async ({
+		apiHelpers,
+		objectRelationshipsPage,
+		page,
+		viewObjectDefinitionsPage,
+	}) => {
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
 				status: {code: 0},
@@ -213,8 +231,9 @@ test(
 			type: 'objectDefinition',
 		});
 
-		const objectRelationshipAPIClient =
-			await apiHelpers.buildRestClient(ObjectRelationshipAPI);
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
+		);
 
 		const relationshipLabel = 'Relationship' + getRandomInt();
 		const relationshipName = 'relationship' + getRandomInt();
@@ -261,9 +280,9 @@ test(
 
 		await page.getByRole('button', {name: 'Delete'}).click();
 
-		await expect(
-			page.getByText('No Results Found')
-		).toBeVisible({timeout: 15000});
+		await expect(page.getByText('No Results Found')).toBeVisible({
+			timeout: 15000,
+		});
 
 		apiHelpers.data.splice(
 			apiHelpers.data.findIndex(
@@ -277,8 +296,8 @@ test(
 );
 
 test(
-	'LPD-78504 Verify that it is possible to filter object entries by API',
-	{tag: '@LPD-78504'},
+	'Verify that it is possible to filter object entries by API',
+	{tag: '@LPS-158615'},
 	async ({apiHelpers}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: [
@@ -331,8 +350,8 @@ test(
 );
 
 test(
-	'LPD-78504 Verify that it is not possible to delete an object that has a relationship',
-	{tag: '@LPD-78504'},
+	'Verify that it is not possible to delete an object that has a relationship',
+	{tag: '@LPS-150886'},
 	async ({apiHelpers, page, viewObjectDefinitionsPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -362,8 +381,9 @@ test(
 			type: 'objectDefinition',
 		});
 
-		const objectRelationshipAPIClient =
-			await apiHelpers.buildRestClient(ObjectRelationshipAPI);
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
+		);
 
 		await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 			objectDefinition.externalReferenceCode!,
@@ -386,15 +406,13 @@ test(
 
 		await viewObjectDefinitionsPage.deleteObjectDefinitionOption.click();
 
-		await expect(
-			page.getByText('Deletion Not Allowed')
-		).toBeVisible();
+		await expect(page.getByText('Deletion Not Allowed')).toBeVisible();
 	}
 );
 
 test(
-	'LPD-78504 Verify that the custom object label cannot be used to confirm the deletion',
-	{tag: '@LPD-78504'},
+	'Verify that the custom object label cannot be used to confirm the deletion',
+	{tag: '@LPS-150886'},
 	async ({apiHelpers, page, viewObjectDefinitionsPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -436,116 +454,109 @@ test(
 	}
 );
 
-test(
-	'LPD-78504 Verify it is possible to search object entries by API',
-	{tag: '@LPD-78504'},
-	async ({apiHelpers}) => {
-		const objectFields = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
+test('Verify it is possible to search object entries by API', async ({
+	apiHelpers,
+}) => {
+	const objectFields = generateObjectFields({
+		objectFieldBusinessTypes: ['Text'],
+	});
+
+	const objectDefinition =
+		await apiHelpers.objectAdmin.postRandomObjectDefinition({
+			objectFields,
+			status: {code: 0},
 		});
 
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields,
-				status: {code: 0},
-			});
+	apiHelpers.data.push({
+		id: objectDefinition.id,
+		type: 'objectDefinition',
+	});
 
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
+	const applicationName = 'c/' + objectDefinition.name.toLowerCase() + 's';
+	const fieldName = objectFields[0].name!;
+
+	const entryA = await apiHelpers.objectEntry.postObjectEntry(
+		{[fieldName]: 'EntryA'},
+		applicationName
+	);
+
+	await apiHelpers.objectEntry.postObjectEntry(
+		{[fieldName]: 'EntryB'},
+		applicationName
+	);
+
+	await apiHelpers.objectEntry.postObjectEntry(
+		{[fieldName]: 'EntryC'},
+		applicationName
+	);
+
+	const searchParams = new URLSearchParams();
+	searchParams.append('search', 'EntryA');
+
+	const {items} =
+		await apiHelpers.objectEntry.getObjectDefinitionObjectEntries(
+			applicationName,
+			searchParams
+		);
+
+	expect(items.length).toBeGreaterThan(0);
+	expect(items[0].id).toBe(entryA.id);
+});
+
+test('Verify it is possible to sort object entries by API', async ({
+	apiHelpers,
+}) => {
+	const objectFields = generateObjectFields({
+		objectFieldBusinessTypes: [
+			{businessType: 'Text', indexedAsKeyword: true},
+		],
+	});
+
+	const objectDefinition =
+		await apiHelpers.objectAdmin.postRandomObjectDefinition({
+			objectFields,
+			status: {code: 0},
 		});
 
-		const applicationName =
-			'c/' + objectDefinition.name.toLowerCase() + 's';
-		const fieldName = objectFields[0].name!;
+	apiHelpers.data.push({
+		id: objectDefinition.id,
+		type: 'objectDefinition',
+	});
 
-		const entryA = await apiHelpers.objectEntry.postObjectEntry(
-			{[fieldName]: 'EntryA'},
-			applicationName
+	const applicationName = 'c/' + objectDefinition.name.toLowerCase() + 's';
+	const fieldName = objectFields[0].name!;
+
+	await apiHelpers.objectEntry.postObjectEntry(
+		{[fieldName]: 'EntryC'},
+		applicationName
+	);
+
+	await apiHelpers.objectEntry.postObjectEntry(
+		{[fieldName]: 'EntryZ'},
+		applicationName
+	);
+
+	await apiHelpers.objectEntry.postObjectEntry(
+		{[fieldName]: 'EntryA'},
+		applicationName
+	);
+
+	const searchParams = new URLSearchParams();
+	searchParams.append('sort', `${fieldName}:asc`);
+
+	const {items} =
+		await apiHelpers.objectEntry.getObjectDefinitionObjectEntries(
+			applicationName,
+			searchParams
 		);
 
-		await apiHelpers.objectEntry.postObjectEntry(
-			{[fieldName]: 'EntryB'},
-			applicationName
-		);
-
-		await apiHelpers.objectEntry.postObjectEntry(
-			{[fieldName]: 'EntryC'},
-			applicationName
-		);
-
-		const searchParams = new URLSearchParams();
-		searchParams.append('search', 'EntryA');
-
-		const {items} =
-			await apiHelpers.objectEntry.getObjectDefinitionObjectEntries(
-				applicationName,
-				searchParams
-			);
-
-		expect(items.length).toBeGreaterThan(0);
-		expect(items[0].id).toBe(entryA.id);
-	}
-);
-
-test(
-	'LPD-78504 Verify it is possible to sort object entries by API',
-	{tag: '@LPD-78504'},
-	async ({apiHelpers}) => {
-		const objectFields = generateObjectFields({
-			objectFieldBusinessTypes: [
-				{businessType: 'Text', indexedAsKeyword: true},
-			],
-		});
-
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields,
-				status: {code: 0},
-			});
-
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
-
-		const applicationName =
-			'c/' + objectDefinition.name.toLowerCase() + 's';
-		const fieldName = objectFields[0].name!;
-
-		await apiHelpers.objectEntry.postObjectEntry(
-			{[fieldName]: 'EntryC'},
-			applicationName
-		);
-
-		await apiHelpers.objectEntry.postObjectEntry(
-			{[fieldName]: 'EntryZ'},
-			applicationName
-		);
-
-		await apiHelpers.objectEntry.postObjectEntry(
-			{[fieldName]: 'EntryA'},
-			applicationName
-		);
-
-		const searchParams = new URLSearchParams();
-		searchParams.append('sort', `${fieldName}:asc`);
-
-		const {items} =
-			await apiHelpers.objectEntry.getObjectDefinitionObjectEntries(
-				applicationName,
-				searchParams
-			);
-
-		expect(items[0][fieldName]).toBe('EntryA');
-		expect(items[1][fieldName]).toBe('EntryC');
-		expect(items[2][fieldName]).toBe('EntryZ');
-	}
-);
+	expect(items[0][fieldName]).toBe('EntryA');
+	expect(items[1][fieldName]).toBe('EntryC');
+	expect(items[2][fieldName]).toBe('EntryZ');
+});
 
 test.fixme(
-	'LPD-78504 Verify it is possible to update Custom Object when changing the localization on Instance Settings',
-	{tag: '@LPD-78504'},
+	'Verify it is possible to update Custom Object when changing the localization on Instance Settings',
 	async ({apiHelpers, page, viewObjectDefinitionsPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -616,8 +627,8 @@ test.fixme(
 );
 
 test(
-	'LPD-78504 Verify it is possible to update the label of relationship field of custom object from a native object',
-	{tag: '@LPD-78504'},
+	'Verify it is possible to update the label of relationship field of custom object from a native object',
+	{tag: '@LPS-135406'},
 	async ({apiHelpers, objectFieldsPage, page, viewObjectDefinitionsPage}) => {
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
@@ -629,8 +640,9 @@ test(
 			type: 'objectDefinition',
 		});
 
-		const objectRelationshipAPIClient =
-			await apiHelpers.buildRestClient(ObjectRelationshipAPI);
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
+		);
 
 		const relationshipLabel = 'Relationship' + getRandomInt();
 
@@ -667,10 +679,7 @@ test(
 
 		await objectFieldsPage.editFieldSaveButton.click();
 
-		await waitForAlert(
-			page,
-			'The object field was updated successfully'
-		);
+		await waitForAlert(page, 'The object field was updated successfully');
 
 		await page.reload();
 
@@ -679,9 +688,14 @@ test(
 );
 
 test(
-	'LPD-78504 Verify it is possible to update the label of relationship of native object',
-	{tag: '@LPD-78504'},
-	async ({apiHelpers, objectRelationshipsPage, page, viewObjectDefinitionsPage}) => {
+	'Verify it is possible to update the label of relationship of native object',
+	{tag: '@LPS-135406'},
+	async ({
+		apiHelpers,
+		objectRelationshipsPage,
+		page,
+		viewObjectDefinitionsPage,
+	}) => {
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
 				status: {code: 0},
@@ -692,8 +706,9 @@ test(
 			type: 'objectDefinition',
 		});
 
-		const objectRelationshipAPIClient =
-			await apiHelpers.buildRestClient(ObjectRelationshipAPI);
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
+		);
 
 		const relationshipLabel = 'Relationship' + getRandomInt();
 
@@ -745,8 +760,8 @@ test(
 );
 
 test(
-	'LPD-78504 Verify that an error message is shown when the user enters the wrong value in the confirmation field',
-	{tag: '@LPD-78504'},
+	'Verify that an error message is shown when the user enters the wrong value in the confirmation field',
+	{tag: '@LPS-162024'},
 	async ({apiHelpers, page, viewObjectDefinitionsPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -775,58 +790,59 @@ test(
 			.getByPlaceholder('Confirm Object Definition Name')
 			.fill('wrongvalue');
 
-		await expect(
-			page.getByText('Input does not match')
-		).toBeVisible();
+		await expect(page.getByText('Input does not match')).toBeVisible();
 	}
 );
 
-test(
-	'LPD-78504 Verify that it is possible to view the custom object after restarting portal',
-	{tag: '@LPD-78504'},
-	async ({apiHelpers, page, viewObjectDefinitionsPage}) => {
-		const objectFields = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
+test('Verify that it is possible to view the custom object after restarting portal', async ({
+	apiHelpers,
+	page,
+	viewObjectDefinitionsPage,
+}) => {
+	const objectFields = generateObjectFields({
+		objectFieldBusinessTypes: ['Text'],
+	});
+
+	const objectDefinition =
+		await apiHelpers.objectAdmin.postRandomObjectDefinition({
+			objectFields,
+			status: {code: 0},
 		});
 
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields,
-				status: {code: 0},
-			});
+	apiHelpers.data.push({
+		id: objectDefinition.id,
+		type: 'objectDefinition',
+	});
 
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
+	const applicationName = 'c/' + objectDefinition.name.toLowerCase() + 's';
+	const fieldName = objectFields[0].name!;
 
-		const applicationName =
-			'c/' + objectDefinition.name.toLowerCase() + 's';
-		const fieldName = objectFields[0].name!;
+	await apiHelpers.objectEntry.postObjectEntry(
+		{[fieldName]: 'Entry Test'},
+		applicationName
+	);
 
-		await apiHelpers.objectEntry.postObjectEntry(
-			{[fieldName]: 'Entry Test'},
-			applicationName
-		);
+	// Simulate "restart" by navigating away and back
 
-		// Simulate "restart" by navigating away and back
+	await page.goto('/');
 
-		await page.goto('/');
+	await viewObjectDefinitionsPage.goto();
 
-		await viewObjectDefinitionsPage.goto();
-
-		await expect(
-			viewObjectDefinitionsPage.frontendDataSetEntries.filter({
-				hasText: objectDefinition.label['en_US'],
-			})
-		).toBeVisible();
-	}
-);
+	await expect(
+		viewObjectDefinitionsPage.frontendDataSetEntries.filter({
+			hasText: objectDefinition.label['en_US'],
+		})
+	).toBeVisible();
+});
 
 test.fixme(
-	'LPD-78504 Verify it is possible to add an Object Entry Title Field when changing the localization on Instance Settings',
-	{tag: '@LPD-78504'},
-	async ({apiHelpers, page, viewObjectDefinitionsPage, viewObjectEntriesPage}) => {
+	'Verify it is possible to add an Object Entry Title Field when changing the localization on Instance Settings',
+	async ({
+		apiHelpers,
+		page,
+		viewObjectDefinitionsPage,
+		viewObjectEntriesPage,
+	}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -842,8 +858,9 @@ test.fixme(
 			type: 'objectDefinition',
 		});
 
-		const objectRelationshipAPIClient =
-			await apiHelpers.buildRestClient(ObjectRelationshipAPI);
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
+		);
 
 		await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 			'L_ACCOUNT_ENTRY',
@@ -908,8 +925,8 @@ test.fixme(
 );
 
 test(
-	'LPD-78504 Verify that the delete modal contains a warning message with the number of entries that will be deleted',
-	{tag: '@LPD-78504'},
+	'Verify that the delete modal contains a warning message with the number of entries that will be deleted',
+	{tag: '@LPS-150886'},
 	async ({apiHelpers, page, viewObjectDefinitionsPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -948,9 +965,7 @@ test(
 
 		await viewObjectDefinitionsPage.deleteObjectDefinitionOption.click();
 
-		await expect(
-			page.getByText('Delete Object Definition')
-		).toBeVisible();
+		await expect(page.getByText('Delete Object Definition')).toBeVisible();
 
 		await expect(page.getByText('2 object entries')).toBeVisible();
 	}
