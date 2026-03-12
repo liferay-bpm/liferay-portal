@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import {
+	ObjectDefinition,
+	ObjectFolder,
+} from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
 
 import {dataApiHelpersTest} from '../../../fixtures/dataApiHelpersTest';
@@ -23,75 +27,83 @@ const test = mergeTests(
 
 // Migrated from ObjectFolder.testcase
 
-test.fixme(
-	'LPD-78504 Verify Object definitions can be moved to the current folder when the user is in the model builder view',
-	{tag: '@LPD-78504'},
+test(
+	'Verify Object definitions can be moved to the current folder when the user is in the model builder view',
+	{tag: '@LPS-185681'},
 	async ({
 		apiHelpers,
 		modelBuilderDiagramPage,
 		modelBuilderLeftSidebarPage,
 		page,
-		viewObjectDefinitionsPage,
+		viewObjectDefinitionsPage: _viewObjectDefinitionsPage,
 	}) => {
-		const folderA =
-			await apiHelpers.objectAdmin.postRandomObjectFolder();
+		let folderA: ObjectFolder;
+		let folderB: ObjectFolder;
+		let objectDefinition: ObjectDefinition;
 
-		apiHelpers.data.push({id: folderA.id, type: 'objectFolder'});
+		await test.step('Create folders and object definition', async () => {
+			folderA = await apiHelpers.objectAdmin.postRandomObjectFolder();
 
-		const folderB =
-			await apiHelpers.objectAdmin.postRandomObjectFolder();
+			apiHelpers.data.push({id: folderA.id, type: 'objectFolder'});
 
-		apiHelpers.data.push({id: folderB.id, type: 'objectFolder'});
+			folderB = await apiHelpers.objectAdmin.postRandomObjectFolder();
 
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFolderExternalReferenceCode:
-					folderA.externalReferenceCode,
-				status: {code: 0},
+			apiHelpers.data.push({id: folderB.id, type: 'objectFolder'});
+
+			objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFolderExternalReferenceCode:
+						folderA.externalReferenceCode,
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+		});
+
+		await test.step('Navigate to Folder B via Model Builder sidebar', async () => {
+
+			// Navigate to Folder A in Model Builder
+
+			await modelBuilderDiagramPage.goto({
+				objectFolderName: folderA.name,
 			});
 
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
+			// Navigate to Folder B via left sidebar
+
+			const folderBLocator =
+				modelBuilderLeftSidebarPage.getOtherObjectFolderLocator(
+					folderB.label['en_US']
+				);
+
+			await folderBLocator.getByTitle('Go to Folder').click();
 		});
 
-		// Navigate to Folder A in Model Builder
+		await test.step('Move object definition to current folder', async () => {
 
-		await modelBuilderDiagramPage.goto({
-			objectFolderName: folderA.name,
-		});
+			// The object from Folder A should appear in the "Other Folders" section
 
-		// Navigate to Folder B via left sidebar
+			await modelBuilderLeftSidebarPage.collapseOtherFoldersButton.click();
 
-		await modelBuilderLeftSidebarPage.collapseOtherFoldersButton.click();
+			// Click the kebab menu for the object and move to current folder
 
-		const folderBLocator =
-			modelBuilderLeftSidebarPage.getOtherObjectFolderLocator(
-				folderB.label['en_US']
+			await modelBuilderLeftSidebarPage.clickObjectDefinitionActionsButtonInSidebar(
+				objectDefinition.label['en_US']
 			);
 
-		await folderBLocator.getByTitle('Go to Folder').click();
+			await page
+				.getByRole('menuitem', {name: 'Move to Current Folder'})
+				.click();
+		});
 
-		// The object from Folder A should appear in the "Other Folders" section
-
-		await modelBuilderLeftSidebarPage.collapseOtherFoldersButton.click();
-
-		// Click the kebab menu for the object and move to current folder
-
-		await modelBuilderLeftSidebarPage.clickObjectDefinitionActionsButtonInSidebar(
-			objectDefinition.label['en_US']
-		);
-
-		await page
-			.getByRole('menuitem', {name: 'Move to Current Folder'})
-			.click();
-
-		// Verify the object is now in Folder B's sidebar
-
-		await expect(
-			modelBuilderLeftSidebarPage.sidebarItems.filter({
-				hasText: objectDefinition.label['en_US'],
-			})
-		).toBeVisible();
+		await test.step('Check that the object definition is visible in Folder B sidebar', async () => {
+			await expect(
+				modelBuilderLeftSidebarPage.sidebarItems.filter({
+					hasText: objectDefinition.label['en_US'],
+				})
+			).toBeVisible();
+		});
 	}
 );
