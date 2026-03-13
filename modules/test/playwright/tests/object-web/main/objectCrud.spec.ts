@@ -17,6 +17,7 @@ import {loginTest} from '../../../fixtures/loginTest';
 import {objectPagesTest} from '../../../fixtures/objectPagesTest';
 import {getRandomInt} from '../../../utils/getRandomInt';
 import {waitForAlert} from '../../../utils/waitForAlert';
+import {localizationPagesTest} from '../../site-admin-web/main/fixtures/localizationPagesTest';
 import {generateObjectFields} from './utils/generateObjectFields';
 
 const test = mergeTests(
@@ -25,6 +26,7 @@ const test = mergeTests(
 		'LPS-178052': {enabled: true},
 	}),
 	isolatedSiteTest,
+	localizationPagesTest,
 	loginTest(),
 	objectPagesTest
 );
@@ -348,6 +350,7 @@ test(
 		);
 
 		const searchParams = new URLSearchParams();
+
 		searchParams.append('filter', `${fieldName} eq 'Apple'`);
 
 		const {items} =
@@ -503,6 +506,7 @@ test('Verify it is possible to search object entries by API', async ({
 	);
 
 	const searchParams = new URLSearchParams();
+
 	searchParams.append('search', 'EntryA');
 
 	const {items} =
@@ -554,6 +558,7 @@ test('Verify it is possible to sort object entries by API', async ({
 	);
 
 	const searchParams = new URLSearchParams();
+
 	searchParams.append('sort', `${fieldName}:asc`);
 
 	const {items} =
@@ -567,14 +572,20 @@ test('Verify it is possible to sort object entries by API', async ({
 	expect(items[2][fieldName]).toBe('EntryZ');
 });
 
-test.fixme(
-	'Verify it is possible to update Custom Object when changing the localization on Instance Settings',
-	async ({apiHelpers, page, viewObjectDefinitionsPage}) => {
+test('Verify it is possible to update Custom Object when changing the localization on Instance Settings', async ({
+	apiHelpers,
+	localizationInstanceSettingsPage,
+	page,
+	viewObjectDefinitionsPage,
+}) => {
+	let objectDefinition: ObjectDefinition;
+
+	await test.step('Create a custom object', async () => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
 
-		const objectDefinition =
+		objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
 				objectFields,
 				status: {code: 0},
@@ -584,59 +595,62 @@ test.fixme(
 			id: objectDefinition.id,
 			type: 'objectDefinition',
 		});
+	});
 
-		// Navigate to Instance Settings > Localization and change default language
+	try {
+		await test.step('Change default language to Portuguese', async () => {
+			await localizationInstanceSettingsPage.goto('Language');
 
-		await page.goto(
-			'/group/guest/~/control_panel/manage/-/instance_settings'
-		);
+			await localizationInstanceSettingsPage.defaultLanguageSelect.selectOption(
+				'pt_BR'
+			);
 
-		await page.getByRole('link', {name: 'Localization'}).click();
+			await localizationInstanceSettingsPage.saveSettings();
+		});
 
-		await page.getByRole('link', {name: 'Language'}).click();
+		await test.step('Navigate to Object Admin and update the object label', async () => {
+			await viewObjectDefinitionsPage.goto();
 
-		// Change default language to Portuguese (Brazil)
+			await viewObjectDefinitionsPage.clickEditObjectDefinitionLink(
+				objectDefinition.label['en_US']
+			);
 
-		await page.getByRole('combobox').selectOption('pt_BR');
+			const newLabel = 'Objeto Personalizado ' + getRandomInt();
+			const newPluralLabel = 'Objetos Personalizados ' + getRandomInt();
 
-		await page.getByRole('button', {name: 'Save'}).click();
+			await page
+				.getByLabel('LabelMandatory', {exact: true})
+				.pressSequentially(newLabel);
+			await page
+				.getByLabel('Plural LabelMandatory', {exact: true})
+				.pressSequentially(newPluralLabel);
 
-		await waitForAlert(page);
+			await page.getByRole('button', {name: 'Save'}).click();
 
-		// Navigate to Object Admin and update the object label
+			await waitForAlert(page, 'The object was saved successfully.');
 
-		await viewObjectDefinitionsPage.goto();
+			await page.waitForLoadState('networkidle');
 
-		await viewObjectDefinitionsPage.clickEditObjectDefinitionLink(
-			objectDefinition.label['en_US']
-		);
-
-		const newLabel = 'Objeto Personalizado ' + getRandomInt();
-
-		await page.getByLabel('LabelMandatory').clear();
-		await page.getByLabel('LabelMandatory').fill(newLabel);
-
-		await page.getByRole('button', {name: 'Save'}).click();
-
-		await waitForAlert(page);
-
-		await expect(page.getByLabel('LabelMandatory')).toHaveValue(newLabel);
-
-		// Restore default language to English
-
-		await page.goto(
-			'/group/guest/~/control_panel/manage/-/instance_settings'
-		);
-
-		await page.getByRole('link', {name: 'Localization'}).click();
-
-		await page.getByRole('link', {name: 'Language'}).click();
-
-		await page.getByRole('combobox').selectOption('en_US');
-
-		await page.getByRole('button', {name: 'Save'}).click();
+			await expect(
+				page.getByLabel('LabelMandatory', {exact: true})
+			).toHaveValue(newLabel);
+			await expect(
+				page.getByLabel('Plural LabelMandatory', {exact: true})
+			).toHaveValue(newPluralLabel);
+		});
 	}
-);
+	finally {
+		await test.step('Restore default language to English', async () => {
+			await localizationInstanceSettingsPage.goto('Language');
+
+			await localizationInstanceSettingsPage.defaultLanguageSelect.selectOption(
+				'en_US'
+			);
+
+			await localizationInstanceSettingsPage.saveSettings();
+		});
+	}
+});
 
 test(
 	'Verify it is possible to update the label of relationship field of custom object from a native object',
@@ -839,85 +853,151 @@ test('Verify it is possible to view the custom object after restarting portal', 
 
 test.fixme(
 	'Verify it is possible to add an Object Entry Title Field when changing the localization on Instance Settings',
-	async ({apiHelpers, page, viewObjectDefinitionsPage}) => {
-		const objectFields = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
-		});
+	async ({
+		apiHelpers,
+		localizationInstanceSettingsPage,
+		page,
+		viewObjectDefinitionsPage,
+		viewObjectEntriesPage,
+	}) => {
+		let objectDefinition: ObjectDefinition;
+		let relationshipLabel: string;
+		let relationshipName: string;
 
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields,
-				status: {code: 0},
+		await test.step('Create an Account and a Custom Object with a Relationship 1toM of Account to Custom Object', async () => {
+			await apiHelpers.headlessAdminUser.postAccount();
+
+			const objectFields = generateObjectFields({
+				objectFieldBusinessTypes: ['Text'],
 			});
 
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
+			objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFields,
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+
+			const objectRelationshipAPIClient =
+				await apiHelpers.buildRestClient(ObjectRelationshipAPI);
+
+			relationshipLabel = 'Relationship';
+			relationshipName = 'relationship' + getRandomInt();
+
+			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+				'L_ACCOUNT',
+				{
+					label: {en_US: relationshipLabel},
+					name: relationshipName,
+					objectDefinitionExternalReferenceCode2:
+						objectDefinition.externalReferenceCode,
+					objectDefinitionId2: objectDefinition.id,
+					objectDefinitionName2: objectDefinition.name,
+					type: 'oneToMany',
+				}
+			);
 		});
 
-		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
-			ObjectRelationshipAPI
-		);
+		try {
+			await test.step('Change the default language in the virtual instance to Portuguese', async () => {
+				await localizationInstanceSettingsPage.goto('Language');
 
-		await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
-			'L_ACCOUNT_ENTRY',
-			{
-				label: {en_US: 'Relationship'},
-				name: 'relationship' + getRandomInt(),
-				objectDefinitionExternalReferenceCode2:
-					objectDefinition.externalReferenceCode,
-				objectDefinitionId2: objectDefinition.id,
-				objectDefinitionName2: objectDefinition.name,
-				type: 'oneToMany',
-			}
-		);
+				await localizationInstanceSettingsPage.defaultLanguageSelect.selectOption(
+					'pt_BR'
+				);
 
-		// Change default language to Portuguese (Brazil)
+				await localizationInstanceSettingsPage.saveSettings();
+			});
 
-		await page.goto(
-			'/group/guest/~/control_panel/manage/-/instance_settings'
-		);
+			await test.step('Change the title field in the System Object and publish the Custom Object', async () => {
+				await viewObjectDefinitionsPage.goto();
 
-		await page.getByRole('link', {name: 'Localization'}).click();
+				await viewObjectDefinitionsPage.clickEditObjectDefinitionLink(
+					'Account'
+				);
 
-		await page.getByRole('link', {name: 'Language'}).click();
+				await page
+					.getByRole('combobox', {name: 'Entry Title Field'})
+					.click();
 
-		await page.getByRole('combobox').selectOption('pt_BR');
+				await page.getByRole('option', {name: 'Type'}).click();
 
-		await page.getByRole('button', {name: 'Save'}).click();
+				await viewObjectEntriesPage.saveObjectEntryButton.click();
 
-		await waitForAlert(page);
+				await waitForAlert(page, 'The object was saved successfully.');
 
-		// Set the title field on Account system object
+				await page.waitForLoadState('networkidle');
+			});
 
-		await viewObjectDefinitionsPage.goto();
+			await test.step('Create an entry using the title field selected', async () => {
+				await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await viewObjectDefinitionsPage.clickEditObjectDefinitionLink(
-			'Account'
-		);
+				await viewObjectEntriesPage.clickAddObjectEntry(
+					objectDefinition.label['en_US']
+				);
 
-		await page.getByLabel('Object Entry Title Field').click();
-		await page.getByRole('option', {name: 'Type'}).click();
+				await page.getByLabel(relationshipLabel).click();
 
-		await page.getByRole('button', {name: 'Save'}).click();
+				await page
+					.getByRole('option', {name: /business/i})
+					.first()
+					.click();
 
-		await waitForAlert(page);
+				await viewObjectEntriesPage.saveObjectEntryButton.click();
 
-		// Publish the custom object
+				await waitForAlert(page, 'The object was saved successfully.');
 
-		// Restore default language to English
+				await page.waitForLoadState('networkidle');
+			});
 
-		await page.goto(
-			'/group/guest/~/control_panel/manage/-/instance_settings'
-		);
+			await test.step('Verify the title field of System Object is present', async () => {
+				await viewObjectEntriesPage.backButton.click();
 
-		await page.getByRole('link', {name: 'Localization'}).click();
+				await expect(
+					page.getByRole('cell', {name: /business/i}).first()
+				).toBeVisible();
 
-		await page.getByRole('link', {name: 'Language'}).click();
+				await page
+					.getByRole('cell', {name: /business/i})
+					.first()
+					.click();
 
-		await page.getByRole('combobox').selectOption('en_US');
+				await expect(page.getByText(/business/i).first()).toBeVisible();
+			});
+		}
+		finally {
+			await test.step('Restore default language to English', async () => {
+				await localizationInstanceSettingsPage.goto('Language');
 
-		await page.getByRole('button', {name: 'Save'}).click();
+				await localizationInstanceSettingsPage.defaultLanguageSelect.selectOption(
+					'en_US'
+				);
+
+				await localizationInstanceSettingsPage.saveSettings();
+			});
+
+			await test.step('Restore Account Entry Title Field', async () => {
+				await viewObjectDefinitionsPage.goto();
+
+				await viewObjectDefinitionsPage.clickEditObjectDefinitionLink(
+					'Account'
+				);
+
+				await page
+					.getByRole('combobox', {name: 'Entry Title Field'})
+					.click();
+
+				await page.getByRole('option', {name: 'Name'}).click();
+
+				await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+				await waitForAlert(page, 'The object was saved successfully.');
+			});
+		}
 	}
 );
 
