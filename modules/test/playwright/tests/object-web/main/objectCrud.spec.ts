@@ -32,7 +32,7 @@ const test = mergeTests(
 // Migrated from Object.testcase
 
 test(
-	'Verify that it is possible to delete an object after deleting the relationship',
+	'Verify it is possible to delete an object after deleting the relationship',
 	{tag: '@LPS-150886'},
 	async ({
 		apiHelpers,
@@ -164,7 +164,7 @@ test(
 );
 
 test(
-	'Verify that it is possible to delete a published object',
+	'Verify it is possible to delete a published object',
 	{tag: '@LPS-150886'},
 	async ({apiHelpers, page, viewObjectDefinitionsPage}) => {
 		const objectFields = generateObjectFields({
@@ -308,7 +308,7 @@ test(
 );
 
 test(
-	'Verify that it is possible to filter object entries by API',
+	'Verify it is possible to filter object entries by API',
 	{tag: '@LPS-158615'},
 	async ({apiHelpers}) => {
 		const objectFields = generateObjectFields({
@@ -362,7 +362,7 @@ test(
 );
 
 test(
-	'Verify that it is not possible to delete an object that has a relationship',
+	'Verify it is not possible to delete an object that has a relationship',
 	{tag: '@LPS-150886'},
 	async ({apiHelpers, page, viewObjectDefinitionsPage}) => {
 		const objectFields = generateObjectFields({
@@ -423,7 +423,7 @@ test(
 );
 
 test(
-	'Verify that the custom object label cannot be used to confirm the deletion',
+	'Verify the custom object label cannot be used to confirm the deletion',
 	{tag: '@LPS-150886'},
 	async ({apiHelpers, page, viewObjectDefinitionsPage}) => {
 		const objectFields = generateObjectFields({
@@ -762,7 +762,7 @@ test(
 );
 
 test(
-	'Verify that an error message is shown when the user enters the wrong value in the confirmation field',
+	'Verify an error message is shown when the user enters the wrong value in the confirmation field',
 	{tag: '@LPS-162024'},
 	async ({apiHelpers, page, viewObjectDefinitionsPage}) => {
 		const objectFields = generateObjectFields({
@@ -796,7 +796,7 @@ test(
 	}
 );
 
-test('Verify that it is possible to view the custom object after restarting portal', async ({
+test('Verify it is possible to view the custom object after restarting portal', async ({
 	apiHelpers,
 	page,
 	viewObjectDefinitionsPage,
@@ -922,7 +922,7 @@ test.fixme(
 );
 
 test(
-	'Verify that the delete modal contains a warning message with the number of entries that will be deleted',
+	'Verify the delete modal contains a warning message with the number of entries that will be deleted',
 	{tag: '@LPS-150886'},
 	async ({apiHelpers, page, viewObjectDefinitionsPage}) => {
 		const objectFields = generateObjectFields({
