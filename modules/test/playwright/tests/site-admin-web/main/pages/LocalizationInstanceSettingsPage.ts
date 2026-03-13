@@ -12,6 +12,7 @@ export class LocalizationInstanceSettingsPage {
 	readonly instanceSettingsPage: InstanceSettingsPage;
 	readonly availableLanguages: Locator;
 	readonly currentLanguages: Locator;
+	readonly defaultLanguageSelect: Locator;
 	readonly defaultLanguage: Locator;
 	readonly moveToAvaiable: Locator;
 	readonly moveToCurrent: Locator;
@@ -22,6 +23,7 @@ export class LocalizationInstanceSettingsPage {
 		this.instanceSettingsPage = new InstanceSettingsPage(page);
 		this.availableLanguages = page.getByLabel('Available', {exact: true});
 		this.currentLanguages = page.getByLabel('In Use', {exact: true});
+		this.defaultLanguageSelect = page.getByLabel(/Default Language/);
 		this.defaultLanguage = page.getByRole('option', {selected: true});
 		this.moveToAvaiable = page.getByLabel(
 			'Move selected items from In Use to Available.'
