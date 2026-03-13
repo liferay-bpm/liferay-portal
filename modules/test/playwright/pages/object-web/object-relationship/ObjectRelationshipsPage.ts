@@ -5,6 +5,7 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {waitForPageToBeLoaded} from '../../../utils/waitForPageToBeLoaded';
 import {ViewObjectDefinitionsPage} from '../ViewObjectDefinitionsPage';
 
 export class ObjectRelationshipsPage {
@@ -18,7 +19,9 @@ export class ObjectRelationshipsPage {
 	readonly inheritanceModalDisableButton: Locator;
 	readonly inheritanceModalHeader: Locator;
 	readonly inheritanceWarningMessage: Locator;
+	readonly labelInput: Locator;
 	readonly multipleParentInheritanceErrorMessage: Locator;
+	readonly page: Page;
 	readonly relationshipTabItem: Locator;
 	readonly saveObjectRelationshipButton: Locator;
 	readonly viewObjectDefinitionsPage: ViewObjectDefinitionsPage;
@@ -52,11 +55,13 @@ export class ObjectRelationshipsPage {
 			.getByText(
 				'Error:Unable to bind the object definitions when the child object definition is bound to another object definition'
 			);
+		this.labelInput = page.frameLocator('iframe').getByLabel('Label');
 		this.multipleParentInheritanceErrorMessage = page
 			.frameLocator('iframe')
 			.getByText(
 				'Error:You cannot enable inheritance because there are already child entries in the regular relationship.'
 			);
+		this.page = page;
 		this.relationshipTabItem = page.getByRole('link', {
 			name: 'Relationships',
 		});
@@ -64,6 +69,14 @@ export class ObjectRelationshipsPage {
 			.frameLocator('iframe')
 			.getByRole('button', {name: 'Save'});
 		this.viewObjectDefinitionsPage = new ViewObjectDefinitionsPage(page);
+	}
+
+	async saveObjectRelationship() {
+		await this.saveObjectRelationshipButton.click();
+
+		await this.page.locator('.fds-side-panel').waitFor({state: 'hidden'});
+
+		await waitForPageToBeLoaded(this.page);
 	}
 
 	async goto(objectDefinitionLabel: string, objectFolderLabel?: string) {

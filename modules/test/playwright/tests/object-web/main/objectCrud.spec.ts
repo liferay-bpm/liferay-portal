@@ -5,6 +5,7 @@
 
 import {
 	ObjectDefinition,
+	ObjectRelationship,
 	ObjectRelationshipAPI,
 } from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
@@ -213,7 +214,7 @@ test(
 );
 
 test(
-	'Verify it is the user is able to delete a relationship of object native',
+	'Verify it is possible to delete a relationship of a native object',
 	{tag: '@LPS-135406'},
 	async ({
 		apiHelpers,
@@ -221,77 +222,88 @@ test(
 		page,
 		viewObjectDefinitionsPage,
 	}) => {
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
+		let userObjectRelationship: ObjectRelationship;
+		let relationshipLabel: string;
+		let relationshipName: string;
+
+		await test.step('Create object definition and relationship', async () => {
+			const objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
 			});
 
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
+			const objectRelationshipAPIClient =
+				await apiHelpers.buildRestClient(ObjectRelationshipAPI);
+
+			relationshipLabel = 'Relationship' + getRandomInt();
+			relationshipName = 'relationship' + getRandomInt();
+
+			const {body: objectRelationship} =
+				await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+					'L_USER',
+					{
+						label: {en_US: relationshipLabel},
+						name: relationshipName,
+						objectDefinitionExternalReferenceCode2:
+							objectDefinition.externalReferenceCode,
+						objectDefinitionId2: objectDefinition.id,
+						objectDefinitionName2: objectDefinition.name,
+						type: 'oneToMany',
+					}
+				);
+
+			userObjectRelationship = objectRelationship;
+
+			apiHelpers.data.push({
+				id: objectRelationship.id,
+				type: 'objectRelationship',
+			});
 		});
 
-		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
-			ObjectRelationshipAPI
-		);
+		await test.step("Navigate to the User system object's Relationships tab", async () => {
+			await viewObjectDefinitionsPage.goto();
 
-		const relationshipLabel = 'Relationship' + getRandomInt();
-		const relationshipName = 'relationship' + getRandomInt();
-
-		const {body: objectRelationship} =
-			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
-				'L_USER',
-				{
-					label: {en_US: relationshipLabel},
-					name: relationshipName,
-					objectDefinitionExternalReferenceCode2:
-						objectDefinition.externalReferenceCode,
-					objectDefinitionId2: objectDefinition.id,
-					objectDefinitionName2: objectDefinition.name,
-					type: 'oneToMany',
-				}
+			await viewObjectDefinitionsPage.clickEditObjectDefinitionLink(
+				'User'
 			);
 
-		apiHelpers.data.push({
-			id: objectRelationship.id,
-			type: 'objectRelationship',
+			await objectRelationshipsPage.relationshipTabItem.click();
 		});
 
-		// Navigate to the User system object's Relationships tab
+		await test.step('Delete the relationship', async () => {
+			await page
+				.getByRole('row', {name: relationshipLabel})
+				.getByRole('button')
+				.click();
 
-		await viewObjectDefinitionsPage.goto();
+			await objectRelationshipsPage.deleteObjectRelationshipOption.click();
 
-		await viewObjectDefinitionsPage.clickEditObjectDefinitionLink('User');
+			await page
+				.getByPlaceholder('Confirm relationship name', {exact: false})
+				.fill(relationshipName);
 
-		await objectRelationshipsPage.relationshipTabItem.click();
+			await page.getByRole('button', {name: 'Delete'}).click();
 
-		// Delete the relationship
-
-		await page
-			.getByRole('row', {name: relationshipLabel})
-			.getByRole('button')
-			.click();
-
-		await objectRelationshipsPage.deleteObjectRelationshipOption.click();
-
-		await page
-			.getByPlaceholder('Confirm relationship name', {exact: false})
-			.fill(relationshipName);
-
-		await page.getByRole('button', {name: 'Delete'}).click();
-
-		await expect(page.getByText('No Results Found')).toBeVisible({
-			timeout: 15000,
+			apiHelpers.data.splice(
+				apiHelpers.data.findIndex(
+					(object) =>
+						object.id === userObjectRelationship.id &&
+						object.type === 'objectRelationship'
+				),
+				1
+			);
 		});
 
-		apiHelpers.data.splice(
-			apiHelpers.data.findIndex(
-				(object) =>
-					object.id === objectRelationship.id &&
-					object.type === 'objectRelationship'
-			),
-			1
-		);
+		await test.step('Check that the relationship is deleted', async () => {
+			await expect(
+				page.getByRole('link', {name: relationshipName})
+			).not.toBeVisible();
+		});
 	}
 );
 
@@ -629,7 +641,7 @@ test.fixme(
 test(
 	'Verify it is possible to update the label of relationship field of custom object from a native object',
 	{tag: '@LPS-135406'},
-	async ({apiHelpers, objectFieldsPage, page, viewObjectDefinitionsPage}) => {
+	async ({apiHelpers, objectFieldsPage, page}) => {
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
 				status: {code: 0},
@@ -731,31 +743,21 @@ test(
 			type: 'objectRelationship',
 		});
 
-		// Navigate to the User system object's Relationships tab
-
 		await viewObjectDefinitionsPage.goto();
 
 		await viewObjectDefinitionsPage.clickEditObjectDefinitionLink('User');
 
 		await objectRelationshipsPage.relationshipTabItem.click();
 
-		// Click on the relationship to open edit form
+		await page.getByRole('link', {name: relationshipLabel}).click();
 
-		await page.getByText(relationshipLabel).click();
-
-		const iframeLocator = page.frameLocator('iframe');
 		const newLabel = 'New Relationship' + getRandomInt();
 
-		await iframeLocator.getByLabel('LabelMandatory').clear();
-		await iframeLocator.getByLabel('LabelMandatory').fill(newLabel);
+		await objectRelationshipsPage.labelInput.fill(newLabel);
 
-		await objectRelationshipsPage.saveObjectRelationshipButton.click();
+		await objectRelationshipsPage.saveObjectRelationship();
 
-		await page.waitForTimeout(2000);
-
-		await page.reload();
-
-		await expect(page.getByText(newLabel)).toBeVisible();
+		await expect(page.getByRole('link', {name: newLabel})).toBeVisible();
 	}
 );
 
@@ -837,12 +839,7 @@ test('Verify that it is possible to view the custom object after restarting port
 
 test.fixme(
 	'Verify it is possible to add an Object Entry Title Field when changing the localization on Instance Settings',
-	async ({
-		apiHelpers,
-		page,
-		viewObjectDefinitionsPage,
-		viewObjectEntriesPage,
-	}) => {
+	async ({apiHelpers, page, viewObjectDefinitionsPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
