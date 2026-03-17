@@ -6,6 +6,7 @@
 package com.liferay.calendar.web.internal.upgrade.v1_1_0;
 
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.upgrade.PortalPreferencesUpgradeProcess;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LoggingTimer;
@@ -43,6 +44,53 @@ public class UpgradePortalPreferences extends PortalPreferencesUpgradeProcess {
 	@Override
 	protected void doUpgrade() throws Exception {
 		_populatePreferenceNamesMap();
+
+		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
+				StringBundler.concat(
+					"select portalPreferencesId, index_, key_ from ",
+					"PortalPreferenceValue where namespace = ",
+					"'com.liferay.portal.kernel.util.SessionClicks' and key_ ",
+					"like 'com.liferay.calendar.web%'"));
+			PreparedStatement preparedStatement2 = connection.prepareStatement(
+				StringBundler.concat(
+					"select portalPreferenceValueId, key_ from ",
+					"PortalPreferenceValue where portalPreferencesId = ? and ",
+					"index_ = ? and namespace = 'com.liferay.portal.util.",
+					"SessionClicks' and key_ like 'calendar-%'"));
+			PreparedStatement preparedStatement3 =
+				AutoBatchPreparedStatementUtil.autoBatch(
+					connection,
+					"delete from PortalPreferenceValue where " +
+						"portalPreferenceValueId = ?");
+			ResultSet resultSet1 = preparedStatement1.executeQuery()) {
+
+			while (resultSet1.next()) {
+				preparedStatement2.setLong(
+					1, resultSet1.getLong("portalPreferencesId"));
+				preparedStatement2.setInt(2, resultSet1.getInt("index_"));
+
+				try (ResultSet resultSet2 = preparedStatement2.executeQuery()) {
+					while (resultSet2.next()) {
+						if (!StringUtil.equals(
+								_preferenceNamesMap.get(
+									_NAMESPACE_OLD_SESSION_CLICKS +
+										resultSet2.getString("key_")),
+								_NAMESPACE_NEW_SESSION_CLICKS +
+									resultSet1.getString("key_"))) {
+
+							continue;
+						}
+
+						preparedStatement3.setLong(
+							1, resultSet2.getLong("portalPreferenceValueId"));
+
+						preparedStatement3.addBatch();
+					}
+				}
+			}
+
+			preparedStatement3.executeBatch();
+		}
 
 		super.doUpgrade();
 	}
