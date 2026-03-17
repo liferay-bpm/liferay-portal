@@ -29,8 +29,7 @@ const test = mergeTests(
 );
 
 test(
-	'LPD-78504 Can add multiple One-to-Many relations with Native Object',
-	{tag: '@LPD-78504'},
+	'LPS-145393 Can add multiple One-to-Many relations with Native Object',
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -76,50 +75,65 @@ test(
 			type: 'objectRelationship',
 		});
 
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition.id
-		);
-
 		const textFieldName = objectFields[0].name;
 
-		const _entryA = await apiHelpers.objectEntry.postObjectEntry(
+		const entryA = await apiHelpers.objectEntry.postObjectEntry(
 			{[textFieldName]: 'Entry A'},
 			`c/${objectDefinition.name.toLowerCase()}s`
 		);
 
-		const _entryB = await apiHelpers.objectEntry.postObjectEntry(
+		const entryB = await apiHelpers.objectEntry.postObjectEntry(
 			{[textFieldName]: 'Entry B'},
 			`c/${objectDefinition.name.toLowerCase()}s`
 		);
 
+		expect(entryA.id).toBeTruthy();
+		expect(entryB.id).toBeTruthy();
+
 		for (const entryLabel of ['Entry A', 'Entry B']) {
 			await viewObjectEntriesPage.goto(objectDefinition.className);
 
-			await page.getByRole('cell').getByRole('link').filter({hasText: entryLabel}).first().click();
+			const row = page.getByRole('row', {name: new RegExp(entryLabel)});
 
-			await viewObjectEntriesPage.editObjectEntryForm.waitFor({state: 'visible'});
+			await expect(row).toBeVisible();
 
-			await page.getByLabel('Relationship').first().fill(userAccount.givenName);
+			const actionsButton = row
+				.getByRole('button', {name: 'Actions'})
+				.first();
 
-			await page.getByRole('option', {name: userAccount.givenName}).click();
+			if (await actionsButton.isVisible()) {
+				await actionsButton.click();
+			}
+			else {
+				await row.getByRole('button').last().click();
+			}
+
+			await viewObjectEntriesPage.frontendDatasetViewAction.click();
+
+			await viewObjectEntriesPage.editObjectEntryForm.waitFor({
+				state: 'visible',
+			});
+
+			await page.getByPlaceholder('Search').click();
+
+			await page
+				.getByRole('menuitem', {name: userAccount.givenName})
+				.click();
 
 			await viewObjectEntriesPage.saveObjectEntryButton.click();
 
 			await expect(viewObjectEntriesPage.successMessage).toBeVisible();
 
-			await expect(
-				page.getByText(userAccount.givenName)
-			).toBeVisible();
+			await expect(page.getByPlaceholder('Search')).toHaveValue(
+				userAccount.givenName.toLowerCase()
+			);
 		}
 	}
 );
 
 test(
-	'LPD-78504 Can add One-to-Many relation with Native Object',
-	{tag: '@LPD-78504'},
+	'LPS-145393 Can add One-to-Many relation with Native Object',
+	{tag: '@LPS-145393'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -164,13 +178,6 @@ test(
 			id: objectRelationship.id,
 			type: 'objectRelationship',
 		});
-
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition.id
-		);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
@@ -178,24 +185,26 @@ test(
 			objectDefinition.label['en_US']
 		);
 
-		await page.getByLabel('Relationship').first().fill(userAccount.givenName);
+		await page.getByPlaceholder('Search').click();
 
-		await page.getByRole('option', {name: userAccount.givenName}).click();
+		await page
+			.getByRole('menuitem', {name: userAccount.givenName})
+			.click();
 
 		await viewObjectEntriesPage.saveObjectEntryButton.click();
 
 		await expect(viewObjectEntriesPage.successMessage).toBeVisible();
 
-		await expect(
-			page.getByText(userAccount.givenName)
-		).toBeVisible();
+		expect(
+			(await page.getByPlaceholder('Search').inputValue()).toLowerCase()
+		).toBe(userAccount.givenName.toLowerCase());
 	}
 );
 
 test(
-	'LPD-78504 Can add tabs for self Many-to-Many relationship',
-	{tag: '@LPD-78504'},
-	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
+	'LPS-163656 - Can add tabs for self Many-to-Many relationship',
+	{tag: '@LPS-163656'},
+	async ({apiHelpers, objectLayoutsPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -274,18 +283,28 @@ test(
 
 		await objectLayoutsPage.createObjectLayoutTab('Field Tab');
 
-		for (const tabLabel of ['Relationship Tab A', 'Relationship Tab B']) {
+		const tabs = [
+			{optionIndex: 0, tabLabel: 'Relationship Tab A'},
+			{optionIndex: 1, tabLabel: 'Relationship Tab B'},
+		];
+
+		for (const {optionIndex, tabLabel} of tabs) {
 			await objectLayoutsPage.addTab.click();
 
-			await objectLayoutsPage.labelInput.fill(tabLabel);
+			const addTabDialog =
+				objectLayoutsPage.iframeLocator.getByLabel('Add Tab');
 
-			await objectLayoutsPage.relationshipType.click();
+			await addTabDialog.getByLabel('Label').fill(tabLabel);
 
-			await objectLayoutsPage.fieldList.click();
+			await addTabDialog.getByText('Relationships', {exact: true}).click();
+
+			await addTabDialog
+				.getByRole('combobox', {name: 'Relationship'})
+				.click();
 
 			await objectLayoutsPage.iframeLocator
-				.getByRole('option', {name: 'Relationship'})
-				.first()
+				.getByRole('option')
+				.nth(optionIndex)
 				.click();
 
 			await objectLayoutsPage.saveTabButton.click();
@@ -304,8 +323,8 @@ test(
 );
 
 test(
-	'LPD-78504 Can create Many-to-Many relationship with Native Object',
-	{tag: '@LPD-78504'},
+	'LPS-146754 Can create Many-to-Many relationship with Native Object',
+	{tag: '@LPS-146754'},
 	async ({
 		addNewObjectRelationshipModalPage,
 		apiHelpers,
@@ -357,8 +376,8 @@ test(
 );
 
 test(
-	'LPD-78504 Can create One-to-Many relationship for Native Object',
-	{tag: '@LPD-78504'},
+	'LPS-145393 Can create One-to-Many relationship for Native Object',
+	{tag: '@LPS-145393'},
 	async ({
 		addNewObjectRelationshipModalPage,
 		apiHelpers,
@@ -403,8 +422,8 @@ test(
 );
 
 test(
-	'LPD-78504 Can create One-to-Many relationship with Native Object',
-	{tag: '@LPD-78504'},
+	'LPS-151676 Can create One-to-Many relationship with Native Object',
+	{tag: '@LPS-151676'},
 	async ({
 		addNewObjectRelationshipModalPage,
 		apiHelpers,
@@ -449,8 +468,8 @@ test(
 );
 
 test(
-	'LPD-78504 Can delete entries using Cascade deletion type',
-	{tag: '@LPD-78504'},
+	'LPS-163661 Can delete entries using Cascade deletion type',
+	{tag: '@LPS-163661'},
 	async ({apiHelpers, objectLayoutsPage, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -461,7 +480,7 @@ test(
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
 				objectFields,
-				status: {code: 0},
+				status: {code: 2},
 				titleObjectFieldName: textFieldName,
 			});
 
@@ -515,15 +534,17 @@ test(
 		await objectLayoutsPage.createObjectRelationshipTab(
 			layoutName,
 			'Relationship Tab',
-			'Relationship'
-		);
-
+			'Relationship Parent'
+		);  
+		
 		await objectLayoutsPage.setObjectLayoutAsDefault();
 
-		await objectLayoutsPage.iframeLocator
+		const saveButton = objectLayoutsPage.iframeLocator
 			.getByRole('button', {name: 'Save'})
-			.first()
-			.click();
+			.first();
+
+		await expect(saveButton).toBeVisible();
+		await saveButton.dispatchEvent('click');
 
 		const objectDefinitionAPIClient =
 			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
@@ -532,70 +553,108 @@ test(
 			objectDefinition.id
 		);
 
+		const {body: publishedObjectDefinition} =
+			await objectDefinitionAPIClient.getObjectDefinition(
+				objectDefinition.id
+			);
+
+		const objectEntriesClassName = publishedObjectDefinition.className;
+
 		const restPath = `c/${objectDefinition.name.toLowerCase()}s`;
 
-		const _entryA = await apiHelpers.objectEntry.postObjectEntry(
+		const entryA = await apiHelpers.objectEntry.postObjectEntry(
 			{[textFieldName]: 'Entry A'},
 			restPath
 		);
 
-		const _entryB = await apiHelpers.objectEntry.postObjectEntry(
+		const entryB = await apiHelpers.objectEntry.postObjectEntry(
 			{[textFieldName]: 'Entry B'},
 			restPath
 		);
 
-		const _entryC = await apiHelpers.objectEntry.postObjectEntry(
+		const entryC = await apiHelpers.objectEntry.postObjectEntry(
 			{[textFieldName]: 'Entry C'},
 			restPath
 		);
 
-		await viewObjectEntriesPage.goto(objectDefinition.className);
+		expect(entryA.id).toBeTruthy();
+		expect(entryB.id).toBeTruthy();
+		expect(entryC.id).toBeTruthy();
 
-		await page.getByRole('cell').getByRole('link').filter({hasText: 'Entry A'}).first().click();
+		await viewObjectEntriesPage.goto(objectEntriesClassName);
 
-		await page.getByRole('tab', {name: 'Relationship Tab'}).click();
+		const entryARow = page.getByRole('row', {name: /Entry A/});
 
-		await page.getByLabel('Add Relationship').first().click();
+		await expect(entryARow).toBeVisible();
 
-		await page.frameLocator('iframe[title="Select"]').getByRole('link', {name: 'Entry B'}).click();
+		await entryARow.getByRole('button', {name: 'Actions'}).click();
+		await page.getByRole('menuitem', {name: 'View'}).click();
+
+		const relationshipTab = page.getByRole('link', {
+			exact: true,
+			name: 'Relationship Tab',
+		});
+
+		await expect(relationshipTab).toBeVisible();
+		await relationshipTab.click();
+
+		await page.getByLabel('Select Existing One').first().click();
+
+		const selectFrame = page.frameLocator('iframe[title="Select"]');
+
+		await expect(
+			selectFrame.getByText('Entry B', {exact: true}).first()
+		).toBeVisible();
+
+		await selectFrame.getByText('Entry B', {exact: true}).first().click();
 
 		await page.waitForTimeout(1000);
 
-		await viewObjectEntriesPage.goto(objectDefinition.className);
+		await viewObjectEntriesPage.goto(objectEntriesClassName);
 
-		await page.getByRole('cell').getByRole('link').filter({hasText: 'Entry B'}).first().click();
+		const entryBOpenRow = page.getByRole('row', {name: /Entry B/});
 
-		await page.getByRole('tab', {name: 'Relationship Tab'}).click();
+		await expect(entryBOpenRow).toBeVisible();
 
-		await page.getByLabel('Add Relationship').first().click();
+		await entryBOpenRow.getByRole('button', {name: 'Actions'}).click();
+		await page.getByRole('menuitem', {name: 'View'}).click();
 
-		await page.frameLocator('iframe[title="Select"]').getByRole('link', {name: 'Entry C'}).click();
+		await expect(relationshipTab).toBeVisible();
+		await relationshipTab.click();
+
+		await page.getByLabel('Select Existing One').first().click();
+
+		await expect(
+			selectFrame.getByText('Entry C', {exact: true}).first()
+		).toBeVisible();
+
+		await selectFrame.getByText('Entry C', {exact: true}).first().click();
 
 		await page.waitForTimeout(1000);
 
-		await viewObjectEntriesPage.goto(objectDefinition.className);
+		await viewObjectEntriesPage.goto(objectEntriesClassName);
 
-		await page.getByRole('button', {name: 'Actions'}).filter({hasText: ''}).first().click();
+		const entryBRow = page.getByRole('row', {name: /Entry B/});
+
+		await expect(entryBRow).toBeVisible();
+
+		await entryBRow.getByRole('button', {name: 'Actions'}).click();
 		await page.getByRole('menuitem', {name: 'Delete'}).click();
 		await page.getByRole('button', {name: 'Delete'}).click();
 
-		await expect(
-			page.getByRole('cell').getByRole('link').filter({hasText: 'Entry B'})
-		).toBeHidden();
+		const entryAFinalRow = page.getByRole('row', {name: /Entry A/});
+		const entryBFinalRow = page.getByRole('row', {name: /Entry B/});
+		const entryCFinalRow = page.getByRole('row', {name: /Entry C/});
 
-		await expect(
-			page.getByRole('cell').getByRole('link').filter({hasText: 'Entry C'})
-		).toBeHidden();
-
-		await expect(
-			page.getByRole('cell').getByRole('link').filter({hasText: 'Entry A'})
-		).toBeVisible();
+		await expect(entryBFinalRow).toBeHidden();
+		await expect(entryCFinalRow).toBeHidden();
+		await expect(entryAFinalRow).toBeVisible();
 	}
 );
 
 test(
-	'LPD-78504 Can delete Many-to-Many relationship between Custom Object entry and Native Object entry',
-	{tag: '@LPD-78504'},
+	'LPS-146754 Can delete Many-to-Many relationship between Custom Object entry and Native Object entry',
+	{tag: '@LPS-146754'},
 	async ({apiHelpers, objectLayoutsPage, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -604,7 +663,7 @@ test(
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
 				objectFields,
-				status: {code: 0},
+				status: {code: 2},
 			});
 
 		apiHelpers.data.push({
@@ -651,6 +710,13 @@ test(
 			objectDefinition.id
 		);
 
+		const {body: publishedObjectDefinition} =
+			await objectDefinitionAPIClient.getObjectDefinition(
+				objectDefinition.id
+			);
+
+		const objectEntriesClassName = publishedObjectDefinition.className;
+
 		const textFieldName = objectFields[0].name;
 
 		await objectLayoutsPage.goto(objectDefinition.label['en_US']);
@@ -666,61 +732,113 @@ test(
 			objectLayoutTabName: 'Field Tab',
 		});
 
-		await objectLayoutsPage.createObjectRelationshipTab(
-			layoutName,
-			'Relationship Tab',
-			'Relationship'
-		);
+		await objectLayoutsPage.addTab.click();
+		await objectLayoutsPage.labelInput.fill('Relationship Tab');
+		await objectLayoutsPage.relationshipType.click();
+		await objectLayoutsPage.fieldList.click();
 
+		const exactRelationshipFieldOption = objectLayoutsPage.iframeLocator
+			.getByRole('option', {exact: true, name: 'Relationship'});
+
+		if (await exactRelationshipFieldOption.count()) {
+			await exactRelationshipFieldOption.click();
+		}
+		else {
+			await objectLayoutsPage.iframeLocator
+				.getByRole('option')
+				.filter({hasText: 'Relationship'})
+				.first()
+				.click();
+		}
+
+		await objectLayoutsPage.saveTabButton.click();
 		await objectLayoutsPage.setObjectLayoutAsDefault();
 
-		await objectLayoutsPage.iframeLocator
+		const saveButton = page
+			.frameLocator('iframe')
 			.getByRole('button', {name: 'Save'})
-			.first()
-			.click();
+			.first();
+
+		await expect(saveButton).toBeVisible();
+		await saveButton.dispatchEvent('click');
+		await page.waitForLoadState('domcontentloaded');
 
 		const restPath = `c/${objectDefinition.name.toLowerCase()}s`;
 
-		const _entryA = await apiHelpers.objectEntry.postObjectEntry(
+		await apiHelpers.objectEntry.postObjectEntry(
 			{[textFieldName]: 'Entry A'},
 			restPath
 		);
 
-		const _entryB = await apiHelpers.objectEntry.postObjectEntry(
+		await apiHelpers.objectEntry.postObjectEntry(
 			{[textFieldName]: 'Entry B'},
 			restPath
 		);
 
 		for (const entryLabel of ['Entry A', 'Entry B']) {
-			await viewObjectEntriesPage.goto(objectDefinition.className);
+			await viewObjectEntriesPage.goto(objectEntriesClassName);
 
-			await page.getByRole('cell').getByRole('link').filter({hasText: entryLabel}).first().click();
+			const entryRow = page.getByRole('row', {
+				name: new RegExp(entryLabel),
+			});
 
-			await page.getByRole('tab', {name: 'Relationship Tab'}).click();
+			await expect(entryRow).toBeVisible();
 
-			await page.getByLabel('Add Relationship').first().click();
+			await entryRow.getByRole('button', {name: 'Actions'}).click();
+			await page.getByRole('menuitem', {name: 'View'}).click();
 
-			await page.frameLocator('iframe[title="Select"]').getByRole('link', {name: userAccount1.givenName}).click();
+			const relationshipTab = page.getByText('Relationship Tab', {
+				exact: true,
+			});
 
+			await expect(relationshipTab).toBeVisible();
+			await relationshipTab.click();
+
+			await page.getByLabel('Select Existing One').first().click();
+
+			await page
+				.frameLocator('iframe[title="Select"]')
+				.getByText(String(userAccount1.id), {exact: true}).first().click();
 			await page.waitForTimeout(1000);
 
 			await page.reload();
 
-			await page.getByRole('tab', {name: 'Relationship Tab'}).click();
+			const relationshipTabLink = page.getByRole('link', {
+				exact: true,
+				name: 'Relationship Tab',
+			});
 
-			await page.getByLabel('Add Relationship').first().click();
+			await expect(relationshipTabLink).toBeVisible();
+			await relationshipTabLink.click();
 
-			await page.frameLocator('iframe[title="Select"]').getByRole('link', {name: userAccount2.givenName}).click();
+			await page.getByLabel('Select Existing One').first().click();
+
+			await page
+				.frameLocator('iframe[title="Select"]')
+				.getByText(String(userAccount2.id), {exact: true})
+				.click();
 
 			await page.waitForTimeout(1000);
 		}
 
 		for (const entryLabel of ['Entry A', 'Entry B']) {
-			await viewObjectEntriesPage.goto(objectDefinition.className);
+			await viewObjectEntriesPage.goto(objectEntriesClassName);
 
-			await page.getByRole('cell').getByRole('link').filter({hasText: entryLabel}).first().click();
+			const entryRow = page.getByRole('row', {
+				name: new RegExp(entryLabel),
+			});
 
-			await page.getByRole('tab', {name: 'Relationship Tab'}).click();
+			await expect(entryRow).toBeVisible();
+
+			await entryRow.getByRole('button', {name: 'Actions'}).click();
+			await page.getByRole('menuitem', {name: 'View'}).click();
+
+			const relationshipTab = page.getByText('Relationship Tab', {
+				exact: true,
+			});
+
+			await expect(relationshipTab).toBeVisible();
+			await relationshipTab.click();
 
 			const actionsButtons = page.getByRole('button', {name: 'Actions'});
 
@@ -739,19 +857,14 @@ test(
 			}
 		}
 
-		await expect(
-			page.getByText(userAccount1.givenName)
-		).toBeHidden();
-
-		await expect(
-			page.getByText(userAccount2.givenName)
-		).toBeHidden();
+		await expect(page.getByText(userAccount1.givenName)).toBeHidden();
+		await expect(page.getByText(userAccount2.givenName)).toBeHidden();
 	}
 );
 
 test(
-	'LPD-78504 Can delete Many-to-Many relationship from parent side',
-	{tag: '@LPD-78504'},
+	'LPS-152508 Can delete Many-to-Many relationship from parent side',
+	{tag: '@LPS-152508'},
 	async ({apiHelpers, objectRelationshipsPage, page}) => {
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
@@ -789,22 +902,19 @@ test(
 			type: 'objectRelationship',
 		});
 
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition.id
-		);
-
 		await objectRelationshipsPage.goto('User');
 
 		await objectRelationshipsPage.actionsButton.first().click();
 
 		await objectRelationshipsPage.deleteObjectRelationshipOption.click();
 
-		await page.frameLocator('iframe').getByPlaceholder('').fill(relationshipName);
+		const deleteDialog = page.getByRole('dialog');
 
-		await page.frameLocator('iframe').getByRole('button', {name: 'Delete'}).click();
+		await expect(deleteDialog).toBeVisible();
+
+		await deleteDialog.getByRole('textbox').fill(relationshipName);
+
+		await deleteDialog.getByRole('button', {name: 'Delete'}).click();
 
 		await expect(
 			page.getByRole('link', {exact: true, name: 'Relationship'})
@@ -822,56 +932,49 @@ test(
 );
 
 test(
-	'LPD-78504 Can delete One-to-Many relationship',
-	{tag: '@LPD-78504'},
+	'LPS-151676 Can delete One-to-Many relationship',
+	{tag: '@LPS-151676'},
 	async ({apiHelpers, objectRelationshipsPage, page}) => {
 		const objectFields = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
+		objectFieldBusinessTypes: ['Text'],
 		});
 
 		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields,
-				status: {code: 0},
-			});
+		await apiHelpers.objectAdmin.postRandomObjectDefinition({
+			objectFields,
+			status: {code: 0},
+		});
 
 		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
+		id: objectDefinition.id,
+		type: 'objectDefinition',
 		});
 
 		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
-			ObjectRelationshipAPI
+		ObjectRelationshipAPI
 		);
 
 		const relationshipName = 'rel' + getRandomInt();
 
 		const {body: objectRelationship} =
-			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
-				'L_USER',
-				{
-					label: {en_US: 'Relationship'},
-					name: relationshipName,
-					objectDefinitionExternalReferenceCode1: 'L_USER',
-					objectDefinitionExternalReferenceCode2:
-						objectDefinition.externalReferenceCode,
-					objectDefinitionId2: objectDefinition.id,
-					objectDefinitionName2: objectDefinition.name,
-					type: 'oneToMany',
-				}
-			);
+		await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+			'L_USER',
+			{
+			label: {en_US: 'Relationship'},
+			name: relationshipName,
+			objectDefinitionExternalReferenceCode1: 'L_USER',
+			objectDefinitionExternalReferenceCode2:
+				objectDefinition.externalReferenceCode,
+			objectDefinitionId2: objectDefinition.id,
+			objectDefinitionName2: objectDefinition.name,
+			type: 'oneToMany',
+			}
+		);
 
 		apiHelpers.data.push({
-			id: objectRelationship.id,
-			type: 'objectRelationship',
+		id: objectRelationship.id,
+		type: 'objectRelationship',
 		});
-
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition.id
-		);
 
 		await objectRelationshipsPage.goto('User');
 
@@ -879,23 +982,27 @@ test(
 
 		await objectRelationshipsPage.deleteObjectRelationshipOption.click();
 
-		await page.frameLocator('iframe').getByPlaceholder('').fill(relationshipName);
+		const deleteDialog = page.getByRole('dialog');
 
-		await page.frameLocator('iframe').getByRole('button', {name: 'Delete'}).click();
+		await expect(deleteDialog).toBeVisible();
+
+		await deleteDialog.getByRole('textbox').fill(relationshipName);
+
+		await deleteDialog.getByRole('button', {name: 'Delete'}).click();
 
 		await expect(
-			page.getByRole('link', {exact: true, name: 'Relationship'})
+		page.getByRole('link', {exact: true, name: 'Relationship'})
 		).toBeHidden();
 
 		apiHelpers.data.splice(
-			apiHelpers.data.findIndex(
-				(item) =>
-					item.id === objectRelationship.id &&
-					item.type === 'objectRelationship'
-			),
-			1
+		apiHelpers.data.findIndex(
+			(item) =>
+			item.id === objectRelationship.id &&
+			item.type === 'objectRelationship'
+		),
+		1
 		);
-	}
+  }
 );
 
 test(
@@ -949,13 +1056,6 @@ test(
 			type: 'objectRelationship',
 		});
 
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition.id
-		);
-
 		const textFieldName = objectFields[0].name;
 
 		await objectLayoutsPage.goto(objectDefinition.label['en_US']);
@@ -971,77 +1071,129 @@ test(
 			objectLayoutTabName: 'Field Tab',
 		});
 
-		await objectLayoutsPage.createObjectRelationshipTab(
-			layoutName,
-			'Relationship Tab',
-			'Relationship'
-		);
+		await objectLayoutsPage.addTab.click();
+		await objectLayoutsPage.labelInput.fill('Relationship Tab');
+		await objectLayoutsPage.relationshipType.click();
+		await objectLayoutsPage.fieldList.click();
 
+		const exactRelationshipFieldOption = objectLayoutsPage.iframeLocator
+			.getByRole('option', {exact: true, name: 'Relationship'});
+
+		if (await exactRelationshipFieldOption.count()) {
+			await exactRelationshipFieldOption.click();
+		}
+		else {
+			await objectLayoutsPage.iframeLocator
+				.getByRole('option')
+				.filter({hasText: 'Relationship'})
+				.first()
+				.click();
+		}
+
+		await objectLayoutsPage.saveTabButton.click();
 		await objectLayoutsPage.setObjectLayoutAsDefault();
 
-		await objectLayoutsPage.iframeLocator
+		const saveButton = page
+			.frameLocator('iframe')
 			.getByRole('button', {name: 'Save'})
-			.first()
-			.click();
+			.first();
+
+		await expect(saveButton).toBeVisible();
+		await saveButton.click();
+		await page.waitForLoadState('domcontentloaded');
 
 		const restPath = `c/${objectDefinition.name.toLowerCase()}s`;
 
-		const _entryA = await apiHelpers.objectEntry.postObjectEntry(
+		const entryA = await apiHelpers.objectEntry.postObjectEntry(
 			{[textFieldName]: 'Entry A'},
 			restPath
 		);
 
-		const _entryB = await apiHelpers.objectEntry.postObjectEntry(
+		await apiHelpers.objectEntry.postObjectEntry(
 			{[textFieldName]: 'Entry B'},
 			restPath
 		);
 
-		await viewObjectEntriesPage.goto(objectDefinition.className);
+		const addUserAccount1RelationshipResponse = await apiHelpers.putResponse(
+			`${apiHelpers.baseUrl}${restPath}/${entryA.id}/${relationshipName}/${userAccount1.id}`
+		);
+		const addUserAccount2RelationshipResponse = await apiHelpers.putResponse(
+			`${apiHelpers.baseUrl}${restPath}/${entryA.id}/${relationshipName}/${userAccount2.id}`
+		);
 
-		await page.getByRole('cell').getByRole('link').filter({hasText: 'Entry A'}).first().click();
+		await expect(addUserAccount1RelationshipResponse).toBeOK();
+		await expect(addUserAccount2RelationshipResponse).toBeOK();
 
-		await page.getByRole('tab', {name: 'Relationship Tab'}).click();
+		const relatedUsers = await apiHelpers.get(
+			`${apiHelpers.baseUrl}${restPath}/${entryA.id}/${relationshipName}`
+		);
 
-		await page.getByLabel('Add Relationship').first().click();
-
-		await page.frameLocator('iframe[title="Select"]').getByRole('link', {name: userAccount1.givenName}).click();
-
-		await page.waitForTimeout(1000);
-
-		await page.reload();
-
-		await page.getByRole('tab', {name: 'Relationship Tab'}).click();
-
-		await page.getByLabel('Add Relationship').first().click();
-
-		await page.frameLocator('iframe[title="Select"]').getByRole('link', {name: userAccount2.givenName}).click();
-
-		await page.waitForTimeout(1000);
+		expect(relatedUsers.items).toHaveLength(2);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await page.getByRole('cell').getByRole('link').filter({hasText: 'Entry A'}).first().click();
+		const entryARow = page.getByRole('row', {name: /Entry A/});
 
-		await page.getByRole('tab', {name: 'Relationship Tab'}).click();
+		await expect(entryARow).toBeVisible();
 
-		const actionsButtons = page.getByRole('button', {name: 'Actions'});
+		await entryARow.getByRole('button', {name: 'Actions'}).click();
+		await page.getByRole('menuitem', {name: 'View'}).click();
 
-		await actionsButtons.first().click();
-		await page.getByRole('menuitem', {name: 'Delete'}).click();
-		await page.getByRole('button', {name: 'Delete'}).click();
+		await page.waitForLoadState('domcontentloaded');
 
-		await page.waitForTimeout(1000);
+		const relationshipTab = page
+			.getByRole('link', {
+				exact: true,				
+				name: 'Relationship Tab',
+			})
+			.or(
+				page.getByText('Relationship Tab', {
+					exact: true,
+				})
+			)
+			.first();
+
+		await expect(relationshipTab).toBeVisible();
+		await relationshipTab.click();
+
+		const userAccount1Row = page
+			.getByRole('row')
+			.filter({
+				hasText: new RegExp(userAccount1.givenName!, 'i'),
+			})
+			.first();
+		const userAccount2Row = page
+			.getByRole('row')
+			.filter({
+				hasText: new RegExp(userAccount2.givenName!, 'i'),
+			})
+			.first();
+
+		await expect(userAccount1Row).toBeVisible();
+		await expect(userAccount2Row).toBeVisible();
+
+		const deleteButtons = page.getByLabel('Delete');
+
+		for (let i = 0; i < 2; i++) {
+			await expect(deleteButtons.first()).toBeVisible();
+			await deleteButtons.first().click();
+
+			const deleteDialogButton = page
+				.getByRole('dialog')
+				.getByRole('button', {name: 'Delete'});
+
+			if (
+				await deleteDialogButton.isVisible({timeout: 1000}).catch(() => false)
+			) {
+				await deleteDialogButton.click();
+			}
+		}
 
 		await expect(
-			page.getByText(userAccount1.givenName)
+			page.getByText(new RegExp(userAccount1.givenName!, 'i'))
 		).toBeHidden();
-
-		await actionsButtons.first().click();
-		await page.getByRole('menuitem', {name: 'Delete'}).click();
-		await page.getByRole('button', {name: 'Delete'}).click();
-
 		await expect(
-			page.getByText(userAccount2.givenName)
+			page.getByText(new RegExp(userAccount2.givenName!, 'i'))
 		).toBeHidden();
 	}
 );
@@ -1109,24 +1261,44 @@ test(
 			objectLayoutTabName: 'Field Tab',
 		});
 
-		await objectLayoutsPage.createObjectRelationshipTab(
-			layoutName,
-			'Relationship Tab',
-			'Relationship'
-		);
-
+		await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
 		await objectLayoutsPage.setObjectLayoutAsDefault();
+		await objectLayoutsPage.layoutTab.click();
 
-		await objectLayoutsPage.iframeLocator
+		await objectLayoutsPage.addTab.click();
+		await objectLayoutsPage.labelInput.fill('Relationship Tab');
+		await objectLayoutsPage.relationshipType.click();
+		await objectLayoutsPage.fieldList.click();
+
+		const exactRelationshipFieldOption =
+			objectLayoutsPage.iframeLocator.getByRole('option', {
+				exact: true,
+				name: 'Relationship',
+			});
+
+		if (await exactRelationshipFieldOption.count()) {
+			await exactRelationshipFieldOption.click();
+		}
+		else {
+			await objectLayoutsPage.iframeLocator
+				.getByRole('option')
+				.filter({hasText: 'Relationship'})
+				.first()
+				.click();
+		}
+
+		await objectLayoutsPage.saveTabButton.click();
+
+		const saveButton = page
+			.frameLocator('iframe')
 			.getByRole('button', {name: 'Save'})
-			.first()
-			.click();
+			.first();
 
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition.id
+		await expect(saveButton).toBeVisible();
+		await saveButton.dispatchEvent('click');
+		await waitForAlert(
+			page,
+			'Success:The object layout was updated successfully'
 		);
 
 		const restPath = `c/${objectDefinition.name.toLowerCase()}s`;
@@ -1141,39 +1313,86 @@ test(
 			restPath
 		);
 
-		await viewObjectEntriesPage.goto(objectDefinition.className);
+		const openEntryRelationshipTab = async (entryLabel: string) => {
+			await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await page.getByRole('cell').getByRole('link').filter({hasText: 'Entry A'}).first().click();
+			const entryRow = page.getByRole('row', {
+				name: new RegExp(entryLabel),
+			});
 
-		await page.getByRole('tab', {name: 'Relationship Tab'}).click();
+			await expect(entryRow).toBeVisible();
 
-		await page.getByLabel('Add Relationship').first().click();
+			await entryRow.getByRole('button', {name: 'Actions'}).click();
+			await page.getByRole('menuitem', {name: 'View'}).click();
 
-		await page.frameLocator('iframe[title="Select"]').getByRole('link', {name: 'Entry B'}).click();
+			await page.waitForLoadState('domcontentloaded');
+
+			const relationshipTab = page
+				.getByRole('link', {
+					exact: true,
+					name: 'Relationship Tab',
+				})
+				.or(
+					page.getByText('Relationship Tab', {
+						exact: true,
+					})
+				)
+				.first();
+
+			await expect(relationshipTab).toBeVisible();
+			await relationshipTab.click();
+		};
+
+		const selectExistingRelationshipEntry = async (entryLabel: string) => {
+			const selectExistingOneButton = page
+				.getByRole('button', {name: 'Select Existing One'})
+				.first();
+
+			try {
+				await expect(selectExistingOneButton).toBeVisible({
+					timeout: 3000,
+				});
+				await selectExistingOneButton.click();
+			}
+			catch {
+				await page.getByRole('button', {name: 'New'}).first().click();
+				await page
+					.getByRole('menuitem', {name: 'Select Existing One'})
+					.click();
+			}
+
+			const relationshipEntry = page
+				.frameLocator('iframe[title="Select"]')
+				.getByText(entryLabel, {exact: true})
+				.first();
+
+			await expect(relationshipEntry).toBeVisible();
+			await relationshipEntry.click();
+		};
+
+		await openEntryRelationshipTab('Entry A');
+
+		await selectExistingRelationshipEntry('Entry B');
+
+		await page.waitForTimeout(1000);
+
+		await openEntryRelationshipTab('Entry B');
+
+		await selectExistingRelationshipEntry('Entry A');
 
 		await page.waitForTimeout(1000);
 
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await page.getByRole('cell').getByRole('link').filter({hasText: 'Entry B'}).first().click();
+		const tableBody = page.locator('tbody');
 
-		await page.getByRole('tab', {name: 'Relationship Tab'}).click();
-
-		await page.getByLabel('Add Relationship').first().click();
-
-		await page.frameLocator('iframe[title="Select"]').getByRole('link', {name: 'Entry A'}).click();
-
-		await page.waitForTimeout(1000);
-
-		await viewObjectEntriesPage.goto(objectDefinition.className);
-
+		await expect(tableBody.locator('tr')).toHaveCount(2);
 		await expect(
-			page.getByRole('cell').getByRole('link').filter({hasText: 'Entry A'})
-		).toBeVisible();
-
+			tableBody.getByText('Entry A', {exact: true})
+		).toHaveCount(2);
 		await expect(
-			page.getByRole('cell').getByRole('link').filter({hasText: 'Entry B'})
-		).toBeVisible();
+			tableBody.getByText('Entry B', {exact: true})
+		).toHaveCount(2);
 	}
 );
 
@@ -1216,17 +1435,6 @@ test(
 			type: 'objectDefinition',
 		});
 
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition1.id
-		);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition2.id
-		);
-
 		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
 			ObjectRelationshipAPI
 		);
@@ -1268,66 +1476,126 @@ test(
 			objectLayoutTabName: 'Field Tab',
 		});
 
-		await objectLayoutsPage.createObjectRelationshipTab(
-			layoutName,
-			'Relationship Tab',
-			'Relationship'
-		);
-
+		await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
 		await objectLayoutsPage.setObjectLayoutAsDefault();
+		await objectLayoutsPage.layoutTab.click();
 
-		await objectLayoutsPage.iframeLocator
+		await objectLayoutsPage.addTab.click();
+		await objectLayoutsPage.labelInput.fill('Relationship Tab');
+		await objectLayoutsPage.relationshipType.click();
+		await objectLayoutsPage.fieldList.click();
+
+		const exactRelationshipFieldOption =
+			objectLayoutsPage.iframeLocator.getByRole('option', {
+				exact: true,
+				name: 'Relationship',
+			});
+
+		if (await exactRelationshipFieldOption.count()) {
+			await exactRelationshipFieldOption.click();
+		}
+		else {
+			await objectLayoutsPage.iframeLocator
+				.getByRole('option')
+				.filter({hasText: 'Relationship'})
+				.first()
+				.click();
+		}
+
+		await objectLayoutsPage.saveTabButton.click();
+
+		const saveButton = objectLayoutsPage.iframeLocator
 			.getByRole('button', {name: 'Save'})
-			.first()
-			.click();
+			.first();
+
+		await expect(saveButton).toBeVisible();
+		await saveButton.dispatchEvent('click');
+		await waitForAlert(
+			page,
+			'Success:The object layout was updated successfully'
+		);
 
 		const restPath1 = `c/${objectDefinition1.name.toLowerCase()}s`;
 		const restPath2 = `c/${objectDefinition2.name.toLowerCase()}s`;
 
-		await apiHelpers.objectEntry.postObjectEntry(
+		const entryA = await apiHelpers.objectEntry.postObjectEntry(
 			{[textFieldName1]: 'Entry A'},
 			restPath1
 		);
 
-		await apiHelpers.objectEntry.postObjectEntry(
+		const entryB = await apiHelpers.objectEntry.postObjectEntry(
 			{[textFieldName2]: 'Entry B'},
 			restPath2
 		);
 
-		await viewObjectEntriesPage.goto(objectDefinition1.className);
+		await apiHelpers.objectEntry.putByExternalReferenceCodeCurrentExternalReferenceCodeObjectRelationshipNameRelatedExternalReferenceCode(
+			{
+				applicationName: restPath1,
+				currentExternalReferenceCode: entryA.externalReferenceCode,
+				objectRelationshipName: relationshipName,
+				relatedExternalReferenceCode: entryB.externalReferenceCode,
+			}
+		);
 
-		await page.getByRole('cell').getByRole('link').filter({hasText: 'Entry A'}).first().click();
+		const openObjectEntry = async (
+			className: string,
+			entryLabel: string
+		) => {
+			await viewObjectEntriesPage.goto(className);
 
-		await page.getByRole('tab', {name: 'Relationship Tab'}).click();
+			const entryRow = page.getByRole('row', {
+				name: new RegExp(entryLabel),
+			});
 
-		await page.getByLabel('Add Relationship').first().click();
+			await expect(entryRow).toBeVisible();
 
-		await page.frameLocator('iframe[title="Select"]').getByRole('link', {name: 'Entry B'}).click();
+			await entryRow.getByRole('button', {name: 'Actions'}).click();
+			await page.getByRole('menuitem', {name: 'View'}).click();
 
-		await page.waitForTimeout(1000);
+			await page.waitForLoadState('domcontentloaded');
+		};
 
+		const openRelationshipTab = async () => {
+			const relationshipTab = page
+				.getByRole('link', {
+					exact: true,
+					name: 'Relationship Tab',
+				})
+				.or(
+					page.getByText('Relationship Tab', {
+						exact: true,
+					})
+				)
+				.first();
+
+			await expect(relationshipTab).toBeVisible();
+			await relationshipTab.click();
+		};
+
+		await openObjectEntry(objectDefinition1.className, 'Entry A');
+		await openRelationshipTab();
 		await expect(
-			page.getByText('Entry B')
+			page
+				.getByRole('row')
+				.filter({hasText: 'Entry B'})
+				.first()
 		).toBeVisible();
 
-		await viewObjectEntriesPage.goto(objectDefinition2.className);
-
-		await page.getByRole('cell').getByRole('link').filter({hasText: 'Entry B'}).first().click();
-
+		await openObjectEntry(objectDefinition2.className, 'Entry B');
 		await page.getByLabel(objectFields2[0].label['en_US'], {exact: true}).fill('Entry C');
 
-		await page.getByRole('button', {name: 'Save'}).click();
+		await viewObjectEntriesPage.saveObjectEntryButton.click();
 
 		await waitForAlert(page);
 
-		await viewObjectEntriesPage.goto(objectDefinition1.className);
-
-		await page.getByRole('cell').getByRole('link').filter({hasText: 'Entry A'}).first().click();
-
-		await page.getByRole('tab', {name: 'Relationship Tab'}).click();
+		await openObjectEntry(objectDefinition1.className, 'Entry A');
+		await openRelationshipTab();
 
 		await expect(
-			page.getByText('Entry C')
+			page
+				.getByRole('row')
+				.filter({hasText: 'Entry C'})
+				.first()
 		).toBeVisible();
 	}
 );
@@ -1424,13 +1692,6 @@ test(
 			type: 'objectRelationship',
 		});
 
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition.id
-		);
-
 		await objectRelationshipsPage.goto(
 			objectDefinition.label['en_US']
 		);
@@ -1439,9 +1700,15 @@ test(
 
 		await objectRelationshipsPage.deleteObjectRelationshipOption.click();
 
+		await expect(page.getByText('Deletion Not Allowed')).toBeVisible();
 		await expect(
 			page.getByText(
-				'This relationship cannot be deleted from the child side.'
+				'You do not have permission to delete this relationship.'
+			)
+		).toBeVisible();
+		await expect(
+			page.getByText(
+				'You cannot delete a relationship from here. To delete the relationship, you must delete it from the parent object definition.'
 			)
 		).toBeVisible();
 	}
@@ -1489,13 +1756,6 @@ test(
 			type: 'objectRelationship',
 		});
 
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition.id
-		);
-
 		await objectRelationshipsPage.goto(
 			objectDefinition.label['en_US']
 		);
@@ -1504,13 +1764,30 @@ test(
 
 		await objectRelationshipsPage.deleteObjectRelationshipOption.click();
 
-		await page.frameLocator('iframe').getByPlaceholder('').fill('IncorrectInput');
+		const deleteRelationshipDialog = page.getByRole('dialog', {
+			name: 'Delete Relationship',
+		});
 
-		await page.frameLocator('iframe').getByRole('button', {name: 'Delete'}).click();
+		const confirmRelationshipNameInput =
+			deleteRelationshipDialog.getByPlaceholder(
+				'Confirm Relationship Name'
+			);
+		const incorrectRelationshipName = `${relationshipName}-wrong`;
+
+		await expect(confirmRelationshipNameInput).toBeVisible();
+		await confirmRelationshipNameInput.fill(incorrectRelationshipName);
 
 		await expect(
-			page.frameLocator('iframe').getByText('Input and relationship name do not match.')
+			deleteRelationshipDialog.getByText(
+				'Input and relationship name do not match.'
+			)
 		).toBeVisible();
+		await expect(
+			deleteRelationshipDialog.getByRole('button', {
+				exact: true,
+				name: 'Delete',
+			})
+		).toBeDisabled();
 	}
 );
 
@@ -1566,7 +1843,7 @@ test(
 test(
 	'LPD-78504 Cannot leave Relationship tab on first place by removing fields tab',
 	{tag: '@LPD-78504'},
-	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
+	async ({apiHelpers, objectLayoutsPage, page}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -1636,11 +1913,24 @@ test(
 			.click();
 		await objectLayoutsPage.saveTabButton.click();
 
-		await objectLayoutsPage.iframeLocator.getByText('Field Tab').click();
+		const fieldTabCard = objectLayoutsPage.iframeLocator
+			.getByText('Field Tab', {exact: true})
+			.first()
+			.locator(
+				'xpath=ancestor::*[.//*[@aria-label="More Actions"]][1]'
+			);
+
+		await fieldTabCard.getByLabel('More Actions').click();
 
 		await objectLayoutsPage.iframeLocator
 			.getByRole('menuitem', {name: 'Delete'})
 			.click();
+
+		await expect(
+			objectLayoutsPage.iframeLocator.getByText('Field Tab', {
+				exact: true,
+			})
+		).toHaveCount(0);
 
 		await objectLayoutsPage.createObjectLayoutTab('Field Tab');
 
@@ -1656,11 +1946,9 @@ test(
 
 		await objectLayoutsPage.saveUpdateLayoutButton.click();
 
-		await expect(
-			objectLayoutsPage.iframeLocator.getByText(
-				"The layout's first tab must be a field tab."
-			)
-		).toBeVisible();
+		await waitForAlert(page, "The layout's first tab must be a field tab.", {
+			type: 'danger',
+		});
 	}
 );
 
@@ -1724,24 +2012,44 @@ test(
 			objectLayoutTabName: 'Field Tab',
 		});
 
-		await objectLayoutsPage.createObjectRelationshipTab(
-			layoutName,
-			'Relationship Tab',
-			'Relationship'
-		);
-
+		await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
 		await objectLayoutsPage.setObjectLayoutAsDefault();
+		await objectLayoutsPage.layoutTab.click();
 
-		await objectLayoutsPage.iframeLocator
+		await objectLayoutsPage.addTab.click();
+		await objectLayoutsPage.labelInput.fill('Relationship Tab');
+		await objectLayoutsPage.relationshipType.click();
+		await objectLayoutsPage.fieldList.click();
+
+		const exactRelationshipFieldOption =
+			objectLayoutsPage.iframeLocator.getByRole('option', {
+				exact: true,
+				name: 'Relationship',
+			});
+
+		if (await exactRelationshipFieldOption.count()) {
+			await exactRelationshipFieldOption.click();
+		}
+		else {
+			await objectLayoutsPage.iframeLocator
+				.getByRole('option')
+				.filter({hasText: 'Relationship'})
+				.first()
+				.click();
+		}
+
+		await objectLayoutsPage.saveTabButton.click();
+
+		const saveButton = page
+			.frameLocator('iframe')
 			.getByRole('button', {name: 'Save'})
-			.first()
-			.click();
+			.first();
 
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition.id
+		await expect(saveButton).toBeVisible();
+		await saveButton.dispatchEvent('click');
+		await waitForAlert(
+			page,
+			'Success:The object layout was updated successfully'
 		);
 
 		const restPath = `c/${objectDefinition.name.toLowerCase()}s`;
@@ -1751,18 +2059,59 @@ test(
 			restPath
 		);
 
-		await viewObjectEntriesPage.goto(objectDefinition.className);
+		const openEntryRelationshipTab = async (entryLabel: string) => {
+			await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await page.getByRole('cell').getByRole('link').filter({hasText: 'Entry Test'}).first().click();
+			const entryRow = page.getByRole('row', {
+				name: new RegExp(entryLabel),
+			});
 
-		await page.getByRole('tab', {name: 'Relationship Tab'}).click();
+			await expect(entryRow).toBeVisible();
 
-		await page.getByLabel('Add Relationship').first().click();
+			await entryRow.getByRole('button', {name: 'Actions'}).click();
+			await page.getByRole('menuitem', {name: 'View'}).click();
+
+			await page.waitForLoadState('domcontentloaded');
+
+			const relationshipTab = page
+				.getByRole('link', {
+					exact: true,
+					name: 'Relationship Tab',
+				})
+				.or(
+					page.getByText('Relationship Tab', {
+						exact: true,
+					})
+				)
+				.first();
+
+			await expect(relationshipTab).toBeVisible();
+			await relationshipTab.click();
+		};
+
+		await openEntryRelationshipTab('Entry Test');
+
+		const selectExistingOneButton = page
+			.getByRole('button', {name: 'Select Existing One'})
+			.first();
+
+		try {
+			await expect(selectExistingOneButton).toBeVisible({
+				timeout: 3000,
+			});
+			await selectExistingOneButton.click();
+		}
+		catch {
+			await page.getByRole('button', {name: 'New'}).first().click();
+			await page
+				.getByRole('menuitem', {name: 'Select Existing One'})
+				.click();
+		}
 
 		const selectFrame = page.frameLocator('iframe[title="Select"]');
 
 		await expect(
-			selectFrame.getByRole('link', {name: 'Entry Test'})
+			selectFrame.getByText('Entry Test', {exact: true})
 		).toBeHidden();
 	}
 );
@@ -1813,13 +2162,15 @@ test(
 
 		await editObjectDetailsPage.goToDetailsTab();
 
-		await page.getByText('Entry Title Field').click();
+		await editObjectDetailsPage.entryTitleField.click();
 
 		const titleFieldOptions = page.getByRole('listbox');
 
 		await expect(
-			titleFieldOptions.getByRole('option', {name: 'Relationship'})
-		).toBeHidden();
+			titleFieldOptions
+				.getByRole('option')
+				.filter({hasText: /^Relationship\b/})
+		).toHaveCount(0);
 	}
 );
 
@@ -1870,13 +2221,6 @@ test(
 			type: 'objectRelationship',
 		});
 
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition.id
-		);
-
 		await objectRelationshipsPage.goto(
 			objectDefinition.label['en_US']
 		);
@@ -1892,13 +2236,26 @@ test(
 			iframe.getByLabel('NameMandatory')
 		).toBeDisabled();
 
-		await expect(
-			iframe.getByText(objectDefinition.label['en_US'])
-		).toBeVisible();
+		const objectDefinitionInputs = iframe.locator(
+			`input[value="${objectDefinition.label['en_US']}"]`
+		);
+		const objectDefinitionSelect = iframe.getByPlaceholder(
+			'Search for an object definition'
+		);
 
-		await expect(
-			iframe.getByText('Many to Many')
-		).toBeVisible();
+		await expect(objectDefinitionInputs).toHaveCount(2);
+		await expect(objectDefinitionSelect).toBeDisabled();
+		await expect(objectDefinitionSelect).toHaveValue(
+			objectDefinition.label['en_US']
+		);
+
+		const typeField = iframe.getByRole('combobox', {
+			exact: true,
+			name: 'Type Mandatory',
+		});
+
+		await expect(typeField).toBeDisabled();
+		await expect(typeField).toHaveText('Many to Many');
 	}
 );
 
@@ -1953,13 +2310,6 @@ test(
 			type: 'objectRelationship',
 		});
 
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition.id
-		);
-
 		const textFieldName = objectFields[0].name;
 
 		await objectLayoutsPage.goto(objectDefinition.label['en_US']);
@@ -1975,18 +2325,36 @@ test(
 			objectLayoutTabName: 'Field Tab',
 		});
 
-		await objectLayoutsPage.createObjectRelationshipTab(
-			layoutName,
-			'Relationship Tab',
-			'Relationship'
-		);
+		await objectLayoutsPage.addTab.click();
+		await objectLayoutsPage.labelInput.fill('Relationship Tab');
+		await objectLayoutsPage.relationshipType.click();
+		await objectLayoutsPage.fieldList.click();
 
+		const exactRelationshipFieldOption = objectLayoutsPage.iframeLocator
+			.getByRole('option', {exact: true, name: 'Relationship'});
+
+		if (await exactRelationshipFieldOption.count()) {
+			await exactRelationshipFieldOption.click();
+		}
+		else {
+			await objectLayoutsPage.iframeLocator
+				.getByRole('option')
+				.filter({hasText: 'Relationship'})
+				.first()
+				.click();
+		}
+
+		await objectLayoutsPage.saveTabButton.click();
 		await objectLayoutsPage.setObjectLayoutAsDefault();
 
-		await objectLayoutsPage.iframeLocator
+		const saveButton = page
+			.frameLocator('iframe')
 			.getByRole('button', {name: 'Save'})
-			.first()
-			.click();
+			.first();
+
+		await expect(saveButton).toBeVisible();
+		await saveButton.click();
+		await page.waitForLoadState('domcontentloaded');
 
 		const restPath = `c/${objectDefinition.name.toLowerCase()}s`;
 
@@ -2000,28 +2368,105 @@ test(
 			restPath
 		);
 
-		for (const entryLabel of ['Entry A', 'Entry B']) {
+		const openEntryRelationshipTab = async (entryLabel: string) => {
 			await viewObjectEntriesPage.goto(objectDefinition.className);
 
-			await page.getByRole('cell').getByRole('link').filter({hasText: entryLabel}).first().click();
+			const entryRow = page.getByRole('row', {
+				name: new RegExp(entryLabel),
+			});
 
-			await page.getByRole('tab', {name: 'Relationship Tab'}).click();
+			await expect(entryRow).toBeVisible();
 
-			await page.getByLabel('Add Relationship').first().click();
+			await entryRow.getByRole('button', {name: 'Actions'}).click();
+			await page.getByRole('menuitem', {name: 'View'}).click();
 
-			await page.frameLocator('iframe[title="Select"]').getByRole('link', {name: userAccount1.givenName}).click();
+			await page.waitForLoadState('domcontentloaded');
+
+			const relationshipTab = page
+				.getByRole('link', {
+					exact: true,
+					name: 'Relationship Tab',
+				})
+				.or(
+					page.getByText('Relationship Tab', {
+						exact: true,
+					})
+				)
+				.first();
+
+			await expect(relationshipTab).toBeVisible();
+			await relationshipTab.click();
+		};
+
+		const selectExistingRelationshipEntry = async (userAccount: TUserAccount) => {
+			const addRelationshipButton = page
+				.getByLabel('Add Relationship')
+				.first();
+			const selectExistingOneButton = page
+				.getByLabel('Select Existing One')
+				.first();
+
+			try {
+				await expect(addRelationshipButton).toBeVisible({
+					timeout: 3000,
+				});
+				await addRelationshipButton.click();
+			}
+			catch {
+				try {
+					await expect(selectExistingOneButton).toBeVisible({
+						timeout: 3000,
+					});
+					await selectExistingOneButton.click();
+				}
+				catch {
+					await page.getByRole('button', {name: 'New'}).first().click();
+					await page
+						.getByRole('menuitem', {name: 'Select Existing One'})
+						.click();
+				}
+			}
+
+			const relationshipEntry = page
+				.frameLocator('iframe[title="Select"]')
+				.getByText(String(userAccount.id), {exact: true})
+				.first();
+
+			await expect(relationshipEntry).toBeVisible();
+			await relationshipEntry.click();
+			await page.waitForTimeout(1000);
+		};
+
+		const getRelatedUserRow = (userAccount: TUserAccount) =>
+			page
+				.getByRole('row')
+				.filter({
+					hasText: new RegExp(
+						`${userAccount.givenName}|${userAccount.id}`,
+						'i'
+					),
+				})
+				.first();
+
+		for (const entryLabel of ['Entry A', 'Entry B']) {
+			await openEntryRelationshipTab(entryLabel);
+
+			await selectExistingRelationshipEntry(userAccount1);
 
 			await page.waitForTimeout(1000);
 
-			await expect(page.getByText(userAccount1.givenName)).toBeVisible();
+			await openEntryRelationshipTab(entryLabel);
 
-			await page.getByLabel('Add Relationship').first().click();
+			await expect(getRelatedUserRow(userAccount1)).toBeVisible();
 
-			await page.frameLocator('iframe[title="Select"]').getByRole('link', {name: userAccount2.givenName}).click();
+			await selectExistingRelationshipEntry(userAccount2);
 
 			await page.waitForTimeout(1000);
 
-			await expect(page.getByText(userAccount2.givenName)).toBeVisible();
+			await openEntryRelationshipTab(entryLabel);
+
+			await expect(getRelatedUserRow(userAccount1)).toBeVisible();
+			await expect(getRelatedUserRow(userAccount2)).toBeVisible();
 		}
 	}
 );
@@ -2080,13 +2525,6 @@ test(
 			type: 'objectRelationship',
 		});
 
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition.id
-		);
-
 		const textFieldName = objectFields[0].name;
 
 		await objectLayoutsPage.goto(objectDefinition.label['en_US']);
@@ -2102,18 +2540,36 @@ test(
 			objectLayoutTabName: 'Field Tab',
 		});
 
-		await objectLayoutsPage.createObjectRelationshipTab(
-			layoutName,
-			'Relationship Tab',
-			'Relationship'
-		);
+		await objectLayoutsPage.addTab.click();
+		await objectLayoutsPage.labelInput.fill('Relationship Tab');
+		await objectLayoutsPage.relationshipType.click();
+		await objectLayoutsPage.fieldList.click();
 
+		const exactRelationshipFieldOption = objectLayoutsPage.iframeLocator
+			.getByRole('option', {exact: true, name: 'Relationship'});
+
+		if (await exactRelationshipFieldOption.count()) {
+			await exactRelationshipFieldOption.click();
+		}
+		else {
+			await objectLayoutsPage.iframeLocator
+				.getByRole('option')
+				.filter({hasText: 'Relationship'})
+				.first()
+				.click();
+		}
+
+		await objectLayoutsPage.saveTabButton.click();
 		await objectLayoutsPage.setObjectLayoutAsDefault();
 
-		await objectLayoutsPage.iframeLocator
+		const saveButton = page
+			.frameLocator('iframe')
 			.getByRole('button', {name: 'Save'})
-			.first()
-			.click();
+			.first();
+
+		await expect(saveButton).toBeVisible();
+		await saveButton.click();
+		await page.waitForLoadState('domcontentloaded');
 
 		const restPath = `c/${objectDefinition.name.toLowerCase()}s`;
 
@@ -2122,20 +2578,90 @@ test(
 			restPath
 		);
 
-		await viewObjectEntriesPage.goto(objectDefinition.className);
+		const openEntryRelationshipTab = async (entryLabel: string) => {
+			await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await page.getByRole('cell').getByRole('link').filter({hasText: 'Entry A'}).first().click();
+			const entryRow = page.getByRole('row', {
+				name: new RegExp(entryLabel),
+			});
 
-		await page.getByRole('tab', {name: 'Relationship Tab'}).click();
+			await expect(entryRow).toBeVisible();
+
+			await entryRow.getByRole('button', {name: 'Actions'}).click();
+			await page.getByRole('menuitem', {name: 'View'}).click();
+
+			await page.waitForLoadState('domcontentloaded');
+
+			const relationshipTab = page
+				.getByRole('link', {
+					exact: true,
+					name: 'Relationship Tab',
+				})
+				.or(
+					page.getByText('Relationship Tab', {
+						exact: true,
+					})
+				)
+				.first();
+
+			await expect(relationshipTab).toBeVisible();
+			await relationshipTab.click();
+		};
+
+		const selectExistingRelationshipEntry = async (
+			userAccountId: number | string
+		) => {
+			const addRelationshipButton = page
+				.getByLabel('Add Relationship')
+				.first();
+			const selectExistingOneButton = page
+				.getByLabel('Select Existing One')
+				.first();
+
+			try {
+				await expect(addRelationshipButton).toBeVisible({
+					timeout: 3000,
+				});
+				await addRelationshipButton.click();
+			}
+			catch {
+				try {
+					await expect(selectExistingOneButton).toBeVisible({
+						timeout: 3000,
+					});
+					await selectExistingOneButton.click();
+				}
+				catch {
+					await page.getByRole('button', {name: 'New'}).first().click();
+					await page
+						.getByRole('menuitem', {name: 'Select Existing One'})
+						.click();
+				}
+			}
+
+			const relationshipEntry = page
+				.frameLocator('iframe[title="Select"]')
+				.getByText(String(userAccountId), {exact: true})
+				.first();
+
+			await expect(relationshipEntry).toBeVisible();
+			await relationshipEntry.click();
+		};
 
 		for (const userAccount of [userAccount1, userAccount2, userAccount3]) {
-			await page.getByLabel('Add Relationship').first().click();
-
-			await page.frameLocator('iframe[title="Select"]').getByRole('link', {name: userAccount.givenName}).click();
-
+			await openEntryRelationshipTab('Entry A');
+			await selectExistingRelationshipEntry(userAccount.id);
 			await page.waitForTimeout(1000);
+			await openEntryRelationshipTab('Entry A');
 
-			await expect(page.getByText(userAccount.givenName)).toBeVisible();
+			await expect(
+				page
+					.getByRole('row')
+					.filter({
+						hasText: new RegExp(userAccount.givenName!, 'i'),
+					})
+					.first()
+			).toBeVisible();
 		}
 	}
 );
@@ -2189,30 +2715,23 @@ test(
 			type: 'objectRelationship',
 		});
 
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition.id
-		);
-
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
 		await viewObjectEntriesPage.clickAddObjectEntry(
 			objectDefinition.label['en_US']
 		);
 
-		await page.getByLabel('Relationship').first().fill(userAccount.givenName);
-
-		await page.getByRole('option', {name: userAccount.givenName}).click();
+		await viewObjectEntriesPage.selectDropdownItemWithSearch(
+			userAccount.givenName!
+		);
 
 		await viewObjectEntriesPage.saveObjectEntryButton.click();
 
 		await expect(viewObjectEntriesPage.successMessage).toBeVisible();
 
-		await expect(
-			page.getByText(userAccount.givenName)
-		).toBeVisible();
+		await expect(page.getByPlaceholder('Search')).toHaveValue(
+			userAccount.givenName!.toLowerCase()
+		);
 	}
 );
 
@@ -2338,13 +2857,6 @@ test(
 			type: 'objectRelationship',
 		});
 
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition.id
-		);
-
 		await objectRelationshipsPage.goto(
 			objectDefinition.label['en_US']
 		);
@@ -2424,13 +2936,6 @@ test(
 			type: 'objectRelationship',
 		});
 
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition.id
-		);
-
 		await objectLayoutsPage.goto(objectDefinition.label['en_US']);
 
 		const layoutName = 'Layout' + getRandomInt();
@@ -2444,18 +2949,34 @@ test(
 			objectLayoutTabName: 'Field Tab',
 		});
 
-		await objectLayoutsPage.createObjectRelationshipTab(
-			layoutName,
-			'Relationship Tab',
-			'Relationship'
-		);
+		await objectLayoutsPage.addTab.click();
+		await objectLayoutsPage.labelInput.fill('Relationship Tab');
+		await objectLayoutsPage.relationshipType.click();
+		await objectLayoutsPage.fieldList.click();
 
+		const exactRelationshipFieldOption = objectLayoutsPage.iframeLocator
+			.getByRole('option', {exact: true, name: 'Relationship'});
+
+		if (await exactRelationshipFieldOption.count()) {
+			await exactRelationshipFieldOption.click();
+		}
+		else {
+			await objectLayoutsPage.iframeLocator
+				.getByRole('option')
+				.filter({hasText: 'Relationship'})
+				.first()
+				.click();
+		}
+
+		await objectLayoutsPage.saveTabButton.click();
 		await objectLayoutsPage.setObjectLayoutAsDefault();
 
-		await objectLayoutsPage.iframeLocator
+		const saveButton = objectLayoutsPage.iframeLocator
 			.getByRole('button', {name: 'Save'})
-			.first()
-			.click();
+			.first();
+
+		await expect(saveButton).toBeVisible();
+		await saveButton.dispatchEvent('click');
 
 		const restPath = `c/${objectDefinition.name.toLowerCase()}s`;
 
@@ -2469,20 +2990,71 @@ test(
 			restPath
 		);
 
-		await viewObjectEntriesPage.goto(objectDefinition.className);
+		const openEntryRelationshipTab = async (entryLabel: string) => {
+			await viewObjectEntriesPage.goto(objectDefinition.className);
 
-		await page.getByRole('cell').getByRole('link').filter({hasText: 'Entry Test A'}).first().click();
+			const entryRow = page.getByRole('row', {
+				name: new RegExp(entryLabel),
+			});
 
-		await page.getByRole('tab', {name: 'Relationship Tab'}).click();
+			await expect(entryRow).toBeVisible();
 
-		await page.getByLabel('Add Relationship').first().click();
+			await entryRow.getByRole('button', {name: 'Actions'}).click();
+			await page.getByRole('menuitem', {name: 'View'}).click();
 
-		await page.frameLocator('iframe[title="Select"]').getByRole('link', {name: 'Entry Test B'}).click();
+			await page.waitForLoadState('domcontentloaded');
+
+			const relationshipTab = page
+				.getByRole('link', {
+					exact: true,
+					name: 'Relationship Tab',
+				})
+				.or(
+					page.getByText('Relationship Tab', {
+						exact: true,
+					})
+				)
+				.first();
+
+			await expect(relationshipTab).toBeVisible();
+			await relationshipTab.click();
+		};
+
+		await openEntryRelationshipTab('Entry Test A');
+
+		const selectExistingOneButton = page
+			.getByRole('button', {name: 'Select Existing One'})
+			.first();
+
+		try {
+			await expect(selectExistingOneButton).toBeVisible({
+				timeout: 3000,
+			});
+			await selectExistingOneButton.click();
+		}
+		catch {
+			await page.getByRole('button', {name: 'New'}).first().click();
+			await page
+				.getByRole('menuitem', {name: 'Select Existing One'})
+				.click();
+		}
+
+		const relationshipEntry = page
+			.frameLocator('iframe[title="Select"]')
+			.getByText('Entry Test B', {exact: true})
+			.first();
+
+		await expect(relationshipEntry).toBeVisible();
+		await relationshipEntry.click();
 
 		await page.waitForTimeout(1000);
+		await openEntryRelationshipTab('Entry Test A');
 
 		await expect(
-			page.getByText('Entry Test B')
+			page
+				.getByRole('row')
+				.filter({hasText: 'Entry Test B'})
+				.first()
 		).toBeVisible();
 	}
 );
@@ -2495,21 +3067,29 @@ test(
 
 		await editObjectDetailsPage.goToDetailsTab();
 
-		await page.getByText('Entry Title Field').click();
+		if (
+			!(await editObjectDetailsPage.entryTitleField
+				.first()
+				.textContent())
+				?.includes('Screen Name')
+		) {
+			await editObjectDetailsPage.entryTitleField.click();
 
-		await page.getByRole('option', {name: 'Screen Name'}).click();
+			await page
+				.getByRole('option', {exact: true, name: 'Screen Name'})
+				.click();
 
-		await editObjectDetailsPage.saveObjectDefinition();
-
-		await waitForAlert(page);
+			await editObjectDetailsPage.saveObjectDefinition();
+			await page.waitForLoadState('networkidle');
+		}
 
 		await editObjectDetailsPage.goto('User');
 
 		await editObjectDetailsPage.goToDetailsTab();
 
-		await expect(
-			page.getByText('Screen Name')
-		).toBeVisible();
+		await expect(editObjectDetailsPage.entryTitleField).toContainText(
+			'Screen Name'
+		);
 	}
 );
 
@@ -2566,13 +3146,15 @@ test(
 
 		await addNewObjectRelationshipModalPage.objectRelationshipFormPage.reverseOrderButton.click();
 
-		await expect(
-			addNewObjectRelationshipModalPage.objectRelationshipFormPage.oneRecordOfInput
-		).toHaveText(objectDefinition2.label['en_US']);
+		const modalContent = page.locator('.modal-content');
 
 		await expect(
-			addNewObjectRelationshipModalPage.objectRelationshipFormPage.manyRecordsOfInput
-		).toHaveText(objectDefinition1.label['en_US']);
+			modalContent.getByLabel('One Record Of')
+		).toHaveValue(objectDefinition2.label['en_US']);
+
+		await expect(
+			modalContent.getByLabel('Many Records Of')
+		).toHaveValue(objectDefinition1.label['en_US']);
 
 		const objectRelationship =
 			await addNewObjectRelationshipModalPage.objectRelationshipFormPage.saveButton.click().then(
@@ -2619,13 +3201,6 @@ test(
 			type: 'objectDefinition',
 		});
 
-		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		await objectDefinitionAPIClient.postObjectDefinitionPublish(
-			objectDefinition.id
-		);
-
 		const textFieldName = objectFields[0].name;
 		const restPath = `c/${objectDefinition.name.toLowerCase()}s`;
 
@@ -2655,7 +3230,7 @@ test(
 		await viewObjectEntriesPage.goto(objectDefinition.className);
 
 		await expect(
-			page.getByRole('cell').getByRole('link').filter({hasText: 'Entry Test'})
+			page.getByRole('row').filter({hasText: 'Entry Test'}).first()
 		).toBeVisible();
 	}
 );
@@ -2702,3 +3277,4 @@ test(
 		).toBeHidden();
 	}
 );
+
