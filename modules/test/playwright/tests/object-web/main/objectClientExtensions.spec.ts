@@ -342,3 +342,45 @@ test('Can trigger object validation as a client extension', async ({
 		page.locator('.cell-name').getByText('Valid Name')
 	).toBeVisible();
 });
+
+test(
+	'LPD-78504 Can trigger action with unmodifiable system object definition using client extension',
+	{tag: '@LPD-78504'},
+	async ({apiHelpers, editObjectActionPage, viewObjectActionsPage}) => {
+		await viewObjectActionsPage.goto('User');
+
+		await editObjectActionPage.addNewAction({
+			thenOption:
+				'object-action-executor[function#liferay-sample-etc-spring-boot-object-action-2]',
+			whenOption: 'On After Add',
+		});
+
+		const randomNumber = getRandomInt();
+
+		const userAccount =
+			await apiHelpers.headlessAdminUser.postUserAccount({
+				alternateName: 'usersn' + randomNumber,
+				emailAddress: 'userea' + randomNumber + '@liferay.com',
+				familyName: 'userln' + randomNumber,
+				givenName: 'userfn' + randomNumber,
+			});
+
+		await expect
+			.poll(
+				async () => {
+					const updatedUser =
+						await apiHelpers.headlessAdminUser.getUserAccountByEmailAddress(
+							userAccount.emailAddress
+						);
+
+					return updatedUser.alternateName;
+				},
+				{
+					message:
+						'Expected user alternateName to be updated to givenName by client extension action',
+					timeout: 10000,
+				}
+			)
+			.toBe('userfn' + randomNumber);
+	}
+);
