@@ -49,385 +49,6 @@ test.beforeEach(async ({apiHelpers}) => {
 	createdObjectDefinition = newObjectDefinition;
 });
 
-test.describe('Manage object actions through object actions tab', () => {
-	test('notification action section must display all persisted notifications', async ({
-		apiHelpers,
-		editObjectActionPage,
-		page,
-		viewObjectActionsPage,
-	}) => {
-		const names: string[] = [];
-
-		for (let index = 1; index <= 21; index++) {
-			const notificationTemplate =
-				await apiHelpers.notification.postRandomNotificationTemplate(
-					'notification template test ' + getRandomInt()
-				);
-
-			apiHelpers.data.push({
-				id: notificationTemplate.id,
-				type: 'notificationTemplate',
-			});
-
-			names.push(
-				notificationTemplate.name + ' ' + notificationTemplate.type
-			);
-		}
-
-		await viewObjectActionsPage.goto(
-			createdObjectDefinition.label['en_US']
-		);
-
-		await viewObjectActionsPage.openObjectActionSidePanel();
-
-		await editObjectActionPage.openActionBuilderTab();
-
-		await editObjectActionPage.chooseNotificationOption();
-
-		await editObjectActionPage.clickInputNotificationsCombo();
-
-		for (let index = 0; index < names.length; index++) {
-			await expect(
-				page
-					.frameLocator('iframe')
-					.getByRole('option', {name: names[index]})
-			).toBeVisible();
-		}
-	});
-
-	test('can create actions related to commerce order object', async ({
-		apiHelpers,
-		editObjectActionPage,
-		page,
-		viewObjectActionsPage,
-	}) => {
-		await viewObjectActionsPage.goto('Commerce Order');
-
-		const objectActionsMock = [
-			{
-				objectAction: 'On Order Status Update',
-			},
-			{
-				objectAction: 'On Payment Status Update',
-			},
-			{
-				objectAction: 'On Subscription Status Update',
-			},
-		] as {objectAction: string}[];
-
-		for (const {objectAction} of objectActionsMock) {
-			await editObjectActionPage.addNewAction({
-				thenOption: 'Split Order by Catalog',
-				whenOption: objectAction,
-			});
-		}
-
-		const objectActionAPIClient =
-			await apiHelpers.buildRestClient(ObjectActionAPI);
-
-		const {body: objectActions} =
-			await objectActionAPIClient.getObjectDefinitionByExternalReferenceCodeObjectActionsPage(
-				'L_COMMERCE_ORDER'
-			);
-
-		objectActions.items.forEach((objectAction: ObjectAction) =>
-			apiHelpers.data.push({id: objectAction.id, type: 'objectAction'})
-		);
-
-		for (const {objectAction} of objectActionsMock) {
-			await expect(
-				page.getByRole('link', {name: objectAction})
-			).toBeVisible();
-		}
-	});
-
-	test('can create an email notification object action using user preferred language', async ({
-		apiHelpers,
-		editObjectActionPage,
-		page,
-		viewObjectActionsPage,
-	}) => {
-		const notificationTemplateName =
-			'notification template test ' + getRandomInt();
-
-		const notificationTemplate =
-			await apiHelpers.notification.postRandomNotificationTemplate(
-				notificationTemplateName,
-				'test' + getRandomInt() + '@liferay.com'
-			);
-
-		apiHelpers.data.push({
-			id: notificationTemplate.id,
-			type: 'notificationTemplate',
-		});
-
-		await viewObjectActionsPage.goto(
-			createdObjectDefinition.label['en_US']
-		);
-
-		await editObjectActionPage.addNewAction({
-			notificationTemplateName,
-			thenOption: 'Notification',
-			whenOption: 'On After Add',
-		});
-
-		await page.waitForLoadState('networkidle');
-
-		await viewObjectActionsPage.frontendDataSetItems
-			.filter({
-				hasText: 'On After Add',
-			})
-			.click();
-
-		await editObjectActionPage.openActionBuilderTab();
-
-		await expect(editObjectActionPage.userPreferredLanguage).toBeChecked();
-
-		await editObjectActionPage.checkbox.uncheck();
-
-		await editObjectActionPage.saveButton.click();
-
-		await page.waitForLoadState('networkidle');
-
-		await viewObjectActionsPage.frontendDataSetItems
-			.filter({
-				hasText: 'On After Add',
-			})
-			.click();
-
-		await editObjectActionPage.openActionBuilderTab();
-
-		await expect(
-			editObjectActionPage.userPreferredLanguage
-		).not.toBeChecked();
-	});
-
-	test('can create and update condition with expression builder', async ({
-		apiHelpers,
-		editObjectActionPage,
-		page,
-		viewObjectActionsPage,
-	}) => {
-		const notificationTemplateName =
-			'notification template test ' + getRandomInt();
-
-		const notificationTemplate =
-			await apiHelpers.notification.postRandomNotificationTemplate(
-				notificationTemplateName,
-				'test' + getRandomInt() + '@liferay.com'
-			);
-
-		apiHelpers.data.push({
-			id: notificationTemplate.id,
-			type: 'notificationTemplate',
-		});
-
-		await viewObjectActionsPage.goto(
-			createdObjectDefinition.label['en_US']
-		);
-
-		await editObjectActionPage.addNewAction({
-			expressionBuilderValue: 'Expression',
-			notificationTemplateName,
-			thenOption: 'Notification',
-			whenOption: 'On After Add',
-		});
-
-		await page.waitForLoadState('networkidle');
-
-		await page.getByRole('link', {name: 'On After Add'}).click();
-
-		await editObjectActionPage.openActionBuilderTab();
-
-		await expect(editObjectActionPage.expressionInput).toHaveValue(
-			'Expression'
-		);
-
-		await editObjectActionPage.fillExpression('newExpression');
-
-		await editObjectActionPage.saveButton.click();
-
-		await page.waitForLoadState('networkidle');
-
-		await page.getByRole('link', {name: 'On After Add'}).click();
-
-		await editObjectActionPage.openActionBuilderTab();
-
-		await expect(editObjectActionPage.expressionInput).toHaveValue(
-			'newExpression'
-		);
-	});
-});
-
-test('can send notification email via download action', async ({
-	apiHelpers,
-	page,
-	viewObjectEntriesPage,
-}) => {
-
-	// Create email notification template
-
-	const senderEmail: string = 'test' + getRandomInt() + '@liferay.com';
-
-	const notificationTemplate =
-		await apiHelpers.notification.postRandomNotificationTemplate(
-			'notification template test ' + getRandomInt(),
-			senderEmail
-		);
-
-	apiHelpers.data.push({
-		id: notificationTemplate.id,
-		type: 'notificationTemplate',
-	});
-
-	// Create object definition with an attachment field
-
-	const objectDefinition =
-		await apiHelpers.objectAdmin.postRandomObjectDefinition({
-			objectFields: [mockedObjectFields.attachmentFieldUserComputer],
-			status: {code: 0},
-		});
-
-	apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
-
-	// Create an action to send notification after attachment download
-
-	const objectActionAPIClient =
-		await apiHelpers.buildRestClient(ObjectActionAPI);
-
-	await objectActionAPIClient.postObjectDefinitionByExternalReferenceCodeObjectAction(
-		objectDefinition.externalReferenceCode,
-		{
-			active: true,
-			label: {
-				en_US: 'downloadAttachmentArchive',
-			},
-			name: 'downloadAttachmentArchive',
-			objectActionExecutorKey: 'notification',
-			objectActionTriggerKey: 'onAfterAttachmentDownload',
-			parameters: {
-				notificationTemplateId: notificationTemplate.id,
-				type: 'email',
-			},
-		}
-	);
-
-	// Create an object entry
-
-	await viewObjectEntriesPage.goto(objectDefinition.className);
-
-	await viewObjectEntriesPage.clickAddObjectEntry(objectDefinition.name);
-
-	const fileChooserPromise = page.waitForEvent('filechooser');
-
-	await viewObjectEntriesPage.selectFileButton.click();
-
-	const fileChooser = await fileChooserPromise;
-
-	await fileChooser.setFiles(
-		path.join(__dirname, 'dependencies', 'sampleFile.txt')
-	);
-
-	await viewObjectEntriesPage.page
-		.getByText('sampleFile.txt')
-		.waitFor({state: 'visible'});
-
-	await viewObjectEntriesPage.saveObjectEntryButton.click();
-
-	await waitForAlert(page);
-
-	// Download attachment from object entry
-
-	await viewObjectEntriesPage.goto(objectDefinition.className);
-
-	await page
-		.getByRole('button', {name: 'Search'})
-		.waitFor({state: 'visible'});
-
-	await viewObjectEntriesPage.page.getByText('sampleFile.txt').click();
-
-	// Verify if the email was sent
-
-	const notificationQueueEntries =
-		await apiHelpers.notification.getNotificationQueueEntriesPage(
-			senderEmail
-		);
-
-	const notificationQueueEntriesId = notificationQueueEntries.items.map(
-		(item: any) => item.id
-	);
-
-	for (const notificationQueueEntryId of notificationQueueEntriesId) {
-		apiHelpers.data.push({
-			id: notificationQueueEntryId,
-			type: 'notificationQueueEntry',
-		});
-	}
-
-	expect(notificationQueueEntries.items.length).toBeTruthy();
-});
-
-test(
-	'Can add user notification actions to system objects that have a user notification handler only',
-	{tag: ['@LPD-77313']},
-	async ({apiHelpers, editObjectActionPage, page, viewObjectActionsPage}) => {
-		let notificationTemplate;
-
-		await test.step('Create an user notification template', async () => {
-			notificationTemplate =
-				await apiHelpers.notification.postNotificationTemplate({
-					editorType: 'richText',
-					name: 'Commerce Order Note Template',
-					recipientType: 'term',
-					recipients: [
-						{
-							term: '[%COMMERCEORDERNOTE_RECIPIENT_IDS%]',
-						},
-					],
-					subject: {
-						en_US: '[%COMMERCEORDERNOTE_ORDERID%]',
-					},
-					type: 'userNotification',
-				});
-
-			apiHelpers.data.push({
-				id: notificationTemplate.id,
-				type: 'notificationTemplate',
-			});
-		});
-
-		await test.step('Verify that the notification template is shown for Commerce Order Note system object', async () => {
-			await viewObjectActionsPage.goto('Commerce Order Note');
-			await viewObjectActionsPage.openObjectActionSidePanel();
-
-			await editObjectActionPage.openActionBuilderTab();
-			await editObjectActionPage.chooseNotificationOption();
-			await editObjectActionPage.clickInputNotificationsCombo();
-
-			await expect(
-				page.frameLocator('iframe').getByRole('option', {
-					name: `${notificationTemplate?.name} User Notification`,
-				})
-			).toBeVisible();
-		});
-
-		await test.step('Verify that the notification template is not shown for Commerce Order system object', async () => {
-			await viewObjectActionsPage.goto('Commerce Order');
-			await viewObjectActionsPage.openObjectActionSidePanel();
-
-			await editObjectActionPage.openActionBuilderTab();
-			await editObjectActionPage.chooseNotificationOption();
-			await editObjectActionPage.clickInputNotificationsCombo();
-
-			await expect(
-				page.frameLocator('iframe').getByRole('option', {
-					name: `${notificationTemplate?.name} User Notification`,
-				})
-			).toHaveCount(0);
-		});
-	}
-);
-
 test(
 	'Can activate or deactivate an action',
 	async ({apiHelpers, page, viewObjectActionsPage}) => {
@@ -591,6 +212,67 @@ test(
 			true,
 			'Test requires Commerce Product system object and User target action type not available in the Playwright framework'
 		);
+	}
+);
+
+test(
+	'Can add user notification actions to system objects that have a user notification handler only',
+	{tag: ['@LPD-77313']},
+	async ({apiHelpers, editObjectActionPage, page, viewObjectActionsPage}) => {
+		let notificationTemplate;
+
+		await test.step('Create an user notification template', async () => {
+			notificationTemplate =
+				await apiHelpers.notification.postNotificationTemplate({
+					editorType: 'richText',
+					name: 'Commerce Order Note Template',
+					recipientType: 'term',
+					recipients: [
+						{
+							term: '[%COMMERCEORDERNOTE_RECIPIENT_IDS%]',
+						},
+					],
+					subject: {
+						en_US: '[%COMMERCEORDERNOTE_ORDERID%]',
+					},
+					type: 'userNotification',
+				});
+
+			apiHelpers.data.push({
+				id: notificationTemplate.id,
+				type: 'notificationTemplate',
+			});
+		});
+
+		await test.step('Verify that the notification template is shown for Commerce Order Note system object', async () => {
+			await viewObjectActionsPage.goto('Commerce Order Note');
+			await viewObjectActionsPage.openObjectActionSidePanel();
+
+			await editObjectActionPage.openActionBuilderTab();
+			await editObjectActionPage.chooseNotificationOption();
+			await editObjectActionPage.clickInputNotificationsCombo();
+
+			await expect(
+				page.frameLocator('iframe').getByRole('option', {
+					name: `${notificationTemplate?.name} User Notification`,
+				})
+			).toBeVisible();
+		});
+
+		await test.step('Verify that the notification template is not shown for Commerce Order system object', async () => {
+			await viewObjectActionsPage.goto('Commerce Order');
+			await viewObjectActionsPage.openObjectActionSidePanel();
+
+			await editObjectActionPage.openActionBuilderTab();
+			await editObjectActionPage.chooseNotificationOption();
+			await editObjectActionPage.clickInputNotificationsCombo();
+
+			await expect(
+				page.frameLocator('iframe').getByRole('option', {
+					name: `${notificationTemplate?.name} User Notification`,
+				})
+			).toHaveCount(0);
+		});
 	}
 );
 
@@ -940,20 +622,6 @@ test(
 );
 
 test(
-	'Can use formula field with user notification action',
-	async () => {
-
-		// Migrated from: CanFormulaFieldBeUsedWithUserNotification
-		// Verify that the user can use Formula Field with User Notification
-
-		test.fixme(
-			true,
-			'Test requires User Notification template, Formula field configuration, and user login switching infrastructure not available in the Playwright framework'
-		);
-	}
-);
-
-test(
 	'Can manage standalone permissions in roles',
 	async () => {
 
@@ -963,194 +631,6 @@ test(
 		test.fixme(
 			true,
 			'Test requires standalone action type, role management, and permissions infrastructure not available in the Playwright framework'
-		);
-	}
-);
-
-test(
-	'Cannot leave action name, when and then fields blank',
-	async ({apiHelpers, editObjectActionPage, page, viewObjectActionsPage}) => {
-
-		// Migrated from: CannotLeaveActionNameBlank
-		// LPS-139008 - Verify it is not possible to leave the Action Name field blank
-
-		let objectDefinition: ObjectDefinition;
-
-		await test.step('Given an object definition is created', async () => {
-			objectDefinition =
-				await apiHelpers.objectAdmin.postRandomObjectDefinition({
-					status: {code: 0},
-				});
-
-			apiHelpers.data.push({
-				id: objectDefinition.id,
-				type: 'objectDefinition',
-			});
-		});
-
-		await test.step('When saving an action without a name', async () => {
-			await viewObjectActionsPage.goto(objectDefinition.label['en_US']);
-
-			await viewObjectActionsPage.openObjectActionSidePanel();
-
-			const iframe = page.frameLocator('iframe');
-
-			await iframe.getByRole('button', {name: 'Save'}).click();
-
-			await expect(iframe.getByText('Required').first()).toBeVisible();
-		});
-
-		await test.step('Then saving without when field shows required error', async () => {
-			const iframe = page.frameLocator('iframe');
-
-			await iframe.getByPlaceholder('Text to translate').fill('Action Label');
-
-			await iframe.getByRole('button', {name: 'Save'}).click();
-
-			await editObjectActionPage.openActionBuilderTab();
-
-			await expect(iframe.getByText('Required').first()).toBeVisible();
-		});
-
-		await test.step('And saving without then field shows required error', async () => {
-			const iframe = page.frameLocator('iframe');
-
-			await editObjectActionPage.inputWhenCombo.click();
-
-			await iframe.getByRole('option', {name: 'On After Add'}).click();
-
-			await iframe.getByRole('button', {name: 'Save'}).click();
-
-			await expect(iframe.getByText('Required')).toBeVisible();
-		});
-	}
-);
-
-test(
-	'Cannot leave URL blank when webhook is selected',
-	async ({apiHelpers, editObjectActionPage, page, viewObjectActionsPage}) => {
-
-		// Migrated from: CannotLeaveURLBlank
-		// LPS-139008 - Verify it is not possible to leave the URL field blank when Webhook is selected
-
-		let objectDefinition: ObjectDefinition;
-
-		await test.step('Given an object definition is created', async () => {
-			objectDefinition =
-				await apiHelpers.objectAdmin.postRandomObjectDefinition({
-					status: {code: 0},
-				});
-
-			apiHelpers.data.push({
-				id: objectDefinition.id,
-				type: 'objectDefinition',
-			});
-		});
-
-		await test.step('When a webhook action is configured without a URL', async () => {
-			await viewObjectActionsPage.goto(objectDefinition.label['en_US']);
-
-			await viewObjectActionsPage.openObjectActionSidePanel();
-
-			const iframe = page.frameLocator('iframe');
-
-			await iframe.getByPlaceholder('Text to translate').fill('Action Label');
-
-			await editObjectActionPage.openActionBuilderTab();
-
-			await editObjectActionPage.inputWhenCombo.click();
-			await iframe.getByRole('option', {name: 'On After Add'}).click();
-
-			await editObjectActionPage.inputThenCombo.click();
-			await iframe.getByRole('option', {name: 'Webhook'}).click();
-
-			await iframe.getByRole('button', {name: 'Save'}).click();
-		});
-
-		await test.step('Then a required error is shown for the URL field', async () => {
-			const iframe = page.frameLocator('iframe');
-
-			await expect(iframe.getByText('Required')).toBeVisible();
-		});
-	}
-);
-
-test(
-	'Cannot save action without expression builder value',
-	async ({apiHelpers, editObjectActionPage, page, viewObjectActionsPage}) => {
-
-		// Migrated from: CannotSaveWithoutExpressionBuilder
-		// LPS-156319 - Verify that the Expression Builder field is required
-
-		const objectFields = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
-		});
-
-		let objectDefinition: ObjectDefinition;
-
-		await test.step('Given an object with a field is created', async () => {
-			objectDefinition =
-				await apiHelpers.objectAdmin.postRandomObjectDefinition({
-					objectFields,
-					status: {code: 0},
-				});
-
-			apiHelpers.data.push({
-				id: objectDefinition.id,
-				type: 'objectDefinition',
-			});
-		});
-
-		await test.step('When an action is configured with condition enabled but no expression', async () => {
-			await viewObjectActionsPage.goto(objectDefinition.label['en_US']);
-
-			await viewObjectActionsPage.openObjectActionSidePanel();
-
-			const iframe = page.frameLocator('iframe');
-
-			await iframe
-				.getByPlaceholder('Text to translate')
-				.fill('Custom Action');
-
-			await editObjectActionPage.openActionBuilderTab();
-
-			await editObjectActionPage.inputWhenCombo.click();
-			await iframe.getByRole('option', {name: 'On After Add'}).click();
-
-			await iframe.getByLabel('Enable Condition').check();
-
-			await editObjectActionPage.inputThenCombo.click();
-			await iframe.getByRole('option', {name: 'Webhook'}).click();
-
-			await iframe.locator('input[name="url"]').fill('http://localhost:8080');
-
-			await iframe.getByRole('button', {name: 'Save'}).click();
-		});
-
-		await test.step('Then a required error is shown and the action is not saved', async () => {
-			const iframe = page.frameLocator('iframe');
-
-			await expect(iframe.getByText('Required')).toBeVisible();
-
-			await page.reload();
-
-			await viewObjectActionsPage.actionsTabItem.click();
-
-			await expect(page.getByText('No Results Found')).toBeVisible();
-		});
-	}
-);
-
-test(
-	'Cannot see deactivated standalone action in dropdown menu',
-	async () => {
-
-		// Migrated from: CanNotSeeDeactivatedStandaloneAction
-		// LPS-169994 - Verify a deactivated standalone action is not displayed in the dropdown menu
-
-		test.fixme(
-			true,
-			'Test requires standalone action type, object entry kebab menu interaction, and action visibility verification not available in the Playwright framework'
 		);
 	}
 );
@@ -1243,6 +723,114 @@ test(
 		});
 	}
 );
+
+test('can send notification email via download action', async ({
+	apiHelpers,
+	page,
+	viewObjectEntriesPage,
+}) => {
+
+	// Create email notification template
+
+	const senderEmail: string = 'test' + getRandomInt() + '@liferay.com';
+
+	const notificationTemplate =
+		await apiHelpers.notification.postRandomNotificationTemplate(
+			'notification template test ' + getRandomInt(),
+			senderEmail
+		);
+
+	apiHelpers.data.push({
+		id: notificationTemplate.id,
+		type: 'notificationTemplate',
+	});
+
+	// Create object definition with an attachment field
+
+	const objectDefinition =
+		await apiHelpers.objectAdmin.postRandomObjectDefinition({
+			objectFields: [mockedObjectFields.attachmentFieldUserComputer],
+			status: {code: 0},
+		});
+
+	apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
+
+	// Create an action to send notification after attachment download
+
+	const objectActionAPIClient =
+		await apiHelpers.buildRestClient(ObjectActionAPI);
+
+	await objectActionAPIClient.postObjectDefinitionByExternalReferenceCodeObjectAction(
+		objectDefinition.externalReferenceCode,
+		{
+			active: true,
+			label: {
+				en_US: 'downloadAttachmentArchive',
+			},
+			name: 'downloadAttachmentArchive',
+			objectActionExecutorKey: 'notification',
+			objectActionTriggerKey: 'onAfterAttachmentDownload',
+			parameters: {
+				notificationTemplateId: notificationTemplate.id,
+				type: 'email',
+			},
+		}
+	);
+
+	// Create an object entry
+
+	await viewObjectEntriesPage.goto(objectDefinition.className);
+
+	await viewObjectEntriesPage.clickAddObjectEntry(objectDefinition.name);
+
+	const fileChooserPromise = page.waitForEvent('filechooser');
+
+	await viewObjectEntriesPage.selectFileButton.click();
+
+	const fileChooser = await fileChooserPromise;
+
+	await fileChooser.setFiles(
+		path.join(__dirname, 'dependencies', 'sampleFile.txt')
+	);
+
+	await viewObjectEntriesPage.page
+		.getByText('sampleFile.txt')
+		.waitFor({state: 'visible'});
+
+	await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+	await waitForAlert(page);
+
+	// Download attachment from object entry
+
+	await viewObjectEntriesPage.goto(objectDefinition.className);
+
+	await page
+		.getByRole('button', {name: 'Search'})
+		.waitFor({state: 'visible'});
+
+	await viewObjectEntriesPage.page.getByText('sampleFile.txt').click();
+
+	// Verify if the email was sent
+
+	const notificationQueueEntries =
+		await apiHelpers.notification.getNotificationQueueEntriesPage(
+			senderEmail
+		);
+
+	const notificationQueueEntriesId = notificationQueueEntries.items.map(
+		(item: any) => item.id
+	);
+
+	for (const notificationQueueEntryId of notificationQueueEntriesId) {
+		apiHelpers.data.push({
+			id: notificationQueueEntryId,
+			type: 'notificationQueueEntry',
+		});
+	}
+
+	expect(notificationQueueEntries.items.length).toBeTruthy();
+});
 
 test(
 	'Can trigger action after disabling expression condition',
@@ -1446,15 +1034,15 @@ test(
 );
 
 test(
-	'Can verify unpublished object with standalone action does not show in permissions',
+	'Can use formula field with user notification action',
 	async () => {
 
-		// Migrated from: CheckStandaloneActionPermissionOfUnpublishedObject
-		// LPS-173774 - Verify that an unpublished object with a standalone action does NOT show up in permissions
+		// Migrated from: CanFormulaFieldBeUsedWithUserNotification
+		// Verify that the user can use Formula Field with User Notification
 
 		test.fixme(
 			true,
-			'Test requires standalone action type on unpublished object, role permissions UI navigation, and permission verification infrastructure not available in the Playwright framework'
+			'Test requires User Notification template, Formula field configuration, and user login switching infrastructure not available in the Playwright framework'
 		);
 	}
 );
@@ -1495,3 +1083,414 @@ test(
 		});
 	}
 );
+
+test(
+	'Can verify unpublished object with standalone action does not show in permissions',
+	async () => {
+
+		// Migrated from: CheckStandaloneActionPermissionOfUnpublishedObject
+		// LPS-173774 - Verify that an unpublished object with a standalone action does NOT show up in permissions
+
+		test.fixme(
+			true,
+			'Test requires standalone action type on unpublished object, role permissions UI navigation, and permission verification infrastructure not available in the Playwright framework'
+		);
+	}
+);
+
+test(
+	'Cannot leave action name, when and then fields blank',
+	async ({apiHelpers, editObjectActionPage, page, viewObjectActionsPage}) => {
+
+		// Migrated from: CannotLeaveActionNameBlank
+		// LPS-139008 - Verify it is not possible to leave the Action Name field blank
+
+		let objectDefinition: ObjectDefinition;
+
+		await test.step('Given an object definition is created', async () => {
+			objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+		});
+
+		await test.step('When saving an action without a name', async () => {
+			await viewObjectActionsPage.goto(objectDefinition.label['en_US']);
+
+			await viewObjectActionsPage.openObjectActionSidePanel();
+
+			const iframe = page.frameLocator('iframe');
+
+			await iframe.getByRole('button', {name: 'Save'}).click();
+			await expect(iframe.getByText('Required').first()).toBeVisible();
+		});
+
+		await test.step('Then saving without when field shows required error', async () => {
+			const iframe = page.frameLocator('iframe');
+
+			await iframe.getByPlaceholder('Text to translate').fill('Action Label');
+
+			await iframe.getByRole('button', {name: 'Save'}).click();
+
+			await editObjectActionPage.openActionBuilderTab();
+
+			await expect(iframe.getByText('Required').first()).toBeVisible();
+		});
+
+		await test.step('And saving without then field shows required error', async () => {
+			const iframe = page.frameLocator('iframe');
+
+			await editObjectActionPage.inputWhenCombo.click();
+
+			await iframe.getByRole('option', {name: 'On After Add'}).click();
+
+			await iframe.getByRole('button', {name: 'Save'}).click();
+
+			await expect(iframe.getByText('Required')).toBeVisible();
+		});
+	}
+);
+
+test(
+	'Cannot leave URL blank when webhook is selected',
+	async ({apiHelpers, editObjectActionPage, page, viewObjectActionsPage}) => {
+
+		// Migrated from: CannotLeaveURLBlank
+		// LPS-139008 - Verify it is not possible to leave the URL field blank when Webhook is selected
+
+		let objectDefinition: ObjectDefinition;
+
+		await test.step('Given an object definition is created', async () => {
+			objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+		});
+
+		await test.step('When a webhook action is configured without a URL', async () => {
+			await viewObjectActionsPage.goto(objectDefinition.label['en_US']);
+
+			await viewObjectActionsPage.openObjectActionSidePanel();
+
+			const iframe = page.frameLocator('iframe');
+
+			await iframe.getByPlaceholder('Text to translate').fill('Action Label');
+
+			await editObjectActionPage.openActionBuilderTab();
+
+			await editObjectActionPage.inputWhenCombo.click();
+			await iframe.getByRole('option', {name: 'On After Add'}).click();
+
+			await editObjectActionPage.inputThenCombo.click();
+			await iframe.getByRole('option', {name: 'Webhook'}).click();
+
+			await iframe.getByRole('button', {name: 'Save'}).click();
+		});
+
+		await test.step('Then a required error is shown for the URL field', async () => {
+			const iframe = page.frameLocator('iframe');
+
+			await expect(iframe.getByText('Required')).toBeVisible();
+		});
+	}
+);
+
+test(
+	'Cannot save action without expression builder value',
+	async ({apiHelpers, editObjectActionPage, page, viewObjectActionsPage}) => {
+
+		// Migrated from: CannotSaveWithoutExpressionBuilder
+		// LPS-156319 - Verify that the Expression Builder field is required
+
+		const objectFields = generateObjectFields({
+			objectFieldBusinessTypes: ['Text'],
+		});
+
+		let objectDefinition: ObjectDefinition;
+
+		await test.step('Given an object with a field is created', async () => {
+			objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFields,
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+		});
+
+		await test.step('When an action is configured with condition enabled but no expression', async () => {
+			await viewObjectActionsPage.goto(objectDefinition.label['en_US']);
+
+			await viewObjectActionsPage.openObjectActionSidePanel();
+
+			const iframe = page.frameLocator('iframe');
+
+			await iframe
+				.getByPlaceholder('Text to translate')
+				.fill('Custom Action');
+
+			await editObjectActionPage.openActionBuilderTab();
+
+			await editObjectActionPage.inputWhenCombo.click();
+			await iframe.getByRole('option', {name: 'On After Add'}).click();
+
+			await iframe.getByLabel('Enable Condition').check();
+
+			await editObjectActionPage.inputThenCombo.click();
+			await iframe.getByRole('option', {name: 'Webhook'}).click();
+
+			await iframe.locator('input[name="url"]').fill('http://localhost:8080');
+
+			await iframe.getByRole('button', {name: 'Save'}).click();
+		});
+
+		await test.step('Then a required error is shown and the action is not saved', async () => {
+			const iframe = page.frameLocator('iframe');
+
+			await expect(iframe.getByText('Required')).toBeVisible();
+
+			await page.reload();
+
+			await viewObjectActionsPage.actionsTabItem.click();
+
+			await expect(page.getByText('No Results Found')).toBeVisible();
+		});
+	}
+);
+
+test(
+	'Cannot see deactivated standalone action in dropdown menu',
+	async () => {
+
+		// Migrated from: CanNotSeeDeactivatedStandaloneAction
+		// LPS-169994 - Verify a deactivated standalone action is not displayed in the dropdown menu
+
+		test.fixme(
+			true,
+			'Test requires standalone action type, object entry kebab menu interaction, and action visibility verification not available in the Playwright framework'
+		);
+	}
+);
+
+test.describe('Manage object actions through object actions tab', () => {
+	test('can create actions related to commerce order object', async ({
+		apiHelpers,
+		editObjectActionPage,
+		page,
+		viewObjectActionsPage,
+	}) => {
+		await viewObjectActionsPage.goto('Commerce Order');
+
+		const objectActionsMock = [
+			{
+				objectAction: 'On Order Status Update',
+			},
+			{
+				objectAction: 'On Payment Status Update',
+			},
+			{
+				objectAction: 'On Subscription Status Update',
+			},
+		] as {objectAction: string}[];
+
+		for (const {objectAction} of objectActionsMock) {
+			await editObjectActionPage.addNewAction({
+				thenOption: 'Split Order by Catalog',
+				whenOption: objectAction,
+			});
+		}
+
+		const objectActionAPIClient =
+			await apiHelpers.buildRestClient(ObjectActionAPI);
+
+		const {body: objectActions} =
+			await objectActionAPIClient.getObjectDefinitionByExternalReferenceCodeObjectActionsPage(
+				'L_COMMERCE_ORDER'
+			);
+
+		objectActions.items.forEach((objectAction: ObjectAction) =>
+			apiHelpers.data.push({id: objectAction.id, type: 'objectAction'})
+		);
+
+		for (const {objectAction} of objectActionsMock) {
+			await expect(
+				page.getByRole('link', {name: objectAction})
+			).toBeVisible();
+		}
+	});
+
+	test('can create an email notification object action using user preferred language', async ({
+		apiHelpers,
+		editObjectActionPage,
+		page,
+		viewObjectActionsPage,
+	}) => {
+		const notificationTemplateName =
+			'notification template test ' + getRandomInt();
+
+		const notificationTemplate =
+			await apiHelpers.notification.postRandomNotificationTemplate(
+				notificationTemplateName,
+				'test' + getRandomInt() + '@liferay.com'
+			);
+
+		apiHelpers.data.push({
+			id: notificationTemplate.id,
+			type: 'notificationTemplate',
+		});
+
+		await viewObjectActionsPage.goto(
+			createdObjectDefinition.label['en_US']
+		);
+
+		await editObjectActionPage.addNewAction({
+			notificationTemplateName,
+			thenOption: 'Notification',
+			whenOption: 'On After Add',
+		});
+
+		await page.waitForLoadState('networkidle');
+
+		await viewObjectActionsPage.frontendDataSetItems
+			.filter({
+				hasText: 'On After Add',
+			})
+			.click();
+
+		await editObjectActionPage.openActionBuilderTab();
+
+		await expect(editObjectActionPage.userPreferredLanguage).toBeChecked();
+
+		await editObjectActionPage.checkbox.uncheck();
+
+		await editObjectActionPage.saveButton.click();
+
+		await page.waitForLoadState('networkidle');
+
+		await viewObjectActionsPage.frontendDataSetItems
+			.filter({
+				hasText: 'On After Add',
+			})
+			.click();
+
+		await editObjectActionPage.openActionBuilderTab();
+
+		await expect(
+			editObjectActionPage.userPreferredLanguage
+		).not.toBeChecked();
+	});
+
+	test('can create and update condition with expression builder', async ({
+		apiHelpers,
+		editObjectActionPage,
+		page,
+		viewObjectActionsPage,
+	}) => {
+		const notificationTemplateName =
+			'notification template test ' + getRandomInt();
+
+		const notificationTemplate =
+			await apiHelpers.notification.postRandomNotificationTemplate(
+				notificationTemplateName,
+				'test' + getRandomInt() + '@liferay.com'
+			);
+
+		apiHelpers.data.push({
+			id: notificationTemplate.id,
+			type: 'notificationTemplate',
+		});
+
+		await viewObjectActionsPage.goto(
+			createdObjectDefinition.label['en_US']
+		);
+
+		await editObjectActionPage.addNewAction({
+			expressionBuilderValue: 'Expression',
+			notificationTemplateName,
+			thenOption: 'Notification',
+			whenOption: 'On After Add',
+		});
+
+		await page.waitForLoadState('networkidle');
+
+		await page.getByRole('link', {name: 'On After Add'}).click();
+
+		await editObjectActionPage.openActionBuilderTab();
+
+		await expect(editObjectActionPage.expressionInput).toHaveValue(
+			'Expression'
+		);
+
+		await editObjectActionPage.fillExpression('newExpression');
+
+		await editObjectActionPage.saveButton.click();
+
+		await page.waitForLoadState('networkidle');
+
+		await page.getByRole('link', {name: 'On After Add'}).click();
+
+		await editObjectActionPage.openActionBuilderTab();
+
+		await expect(editObjectActionPage.expressionInput).toHaveValue(
+			'newExpression'
+		);
+	});
+
+	test('notification action section must display all persisted notifications', async ({
+		apiHelpers,
+		editObjectActionPage,
+		page,
+		viewObjectActionsPage,
+	}) => {
+		const names: string[] = [];
+
+		for (let index = 1; index <= 21; index++) {
+			const notificationTemplate =
+				await apiHelpers.notification.postRandomNotificationTemplate(
+					'notification template test ' + getRandomInt()
+				);
+
+			apiHelpers.data.push({
+				id: notificationTemplate.id,
+				type: 'notificationTemplate',
+			});
+
+			names.push(
+				notificationTemplate.name + ' ' + notificationTemplate.type
+			);
+		}
+
+		await viewObjectActionsPage.goto(
+			createdObjectDefinition.label['en_US']
+		);
+
+		await viewObjectActionsPage.openObjectActionSidePanel();
+
+		await editObjectActionPage.openActionBuilderTab();
+
+		await editObjectActionPage.chooseNotificationOption();
+
+		await editObjectActionPage.clickInputNotificationsCombo();
+
+		for (let index = 0; index < names.length; index++) {
+			await expect(
+				page
+					.frameLocator('iframe')
+					.getByRole('option', {name: names[index]})
+			).toBeVisible();
+		}
+	});
+});
