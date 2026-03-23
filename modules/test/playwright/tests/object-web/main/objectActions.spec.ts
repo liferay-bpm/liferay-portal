@@ -50,12 +50,8 @@ test.beforeEach(async ({apiHelpers}) => {
 });
 
 test(
-	'Can activate or deactivate an action',
+	'can activate or deactivate an action',
 	async ({apiHelpers, page, viewObjectActionsPage}) => {
-
-		// Migrated from: CanActivateOrDeactivateAction
-		// LPS-145665 - Verify that it's possible to activate and deactivate an Action
-
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -216,8 +212,7 @@ test(
 );
 
 test(
-	'Can add user notification actions to system objects that have a user notification handler only',
-	{tag: ['@LPD-77313']},
+	'can add user notification actions to system objects that have a user notification handler only',
 	async ({apiHelpers, editObjectActionPage, page, viewObjectActionsPage}) => {
 		let notificationTemplate;
 
@@ -277,12 +272,8 @@ test(
 );
 
 test(
-	'Can create a webhook action with expression builder condition',
+	'can create a webhook action with expression builder condition',
 	async ({apiHelpers, editObjectActionPage, page, viewObjectActionsPage}) => {
-
-		// Migrated from: CanCreateActionWithExpressionBuilder
-		// LPS-156312 - Assert an Action can be created with Expression Builder
-
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -379,12 +370,8 @@ test(
 );
 
 test(
-	'Can delete an action',
+	'can delete an action',
 	async ({apiHelpers, page, viewObjectActionsPage}) => {
-
-		// Migrated from: CanDeleteAction
-		// LPS-139008 - Verify it is possible to delete an Action
-
 		let objectDefinition: ObjectDefinition;
 
 		await test.step('Given an object with an action is created', async () => {
@@ -442,12 +429,8 @@ test(
 );
 
 test(
-	'Can edit an action name',
+	'can edit an action name',
 	async ({apiHelpers, page, viewObjectActionsPage}) => {
-
-		// Migrated from: CanEditActionName
-		// LPS-145665 - Verify that you can edit the Action name
-
 		let objectDefinition: ObjectDefinition;
 
 		await test.step('Given an object with an action is created', async () => {
@@ -536,12 +519,8 @@ test(
 );
 
 test(
-	'Can enable and disable condition on an action',
+	'can enable and disable condition on an action',
 	async ({apiHelpers, editObjectActionPage, page, viewObjectActionsPage}) => {
-
-		// Migrated from: CanEnableAndDisableCondition
-		// LPS-145665 - Verify that the admin user is able to enable and disable Condition
-
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -636,12 +615,8 @@ test(
 );
 
 test(
-	'Can search for an action',
+	'can search for an action',
 	async ({apiHelpers, page, viewObjectActionsPage}) => {
-
-		// Migrated from: CanSearchAction
-		// LPS-139008 - Verify it is possible to search for an Action
-
 		let objectDefinition: ObjectDefinition;
 
 		await test.step('Given an object with two actions is created', async () => {
@@ -959,12 +934,8 @@ test(
 );
 
 test(
-	'Can use expression with webhook action',
+	'can use expression with webhook action',
 	async ({apiHelpers, page, viewObjectActionsPage}) => {
-
-		// Migrated from: CanUseExpressionWithWebhook
-		// LPS-156347 - Verify that the expression works with Webhooks
-
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -1048,12 +1019,8 @@ test(
 );
 
 test(
-	'Can verify condition card is hidden when using on subscription status update trigger',
+	'can verify condition card is hidden when using on subscription status update trigger',
 	async ({editObjectActionPage, page, viewObjectActionsPage}) => {
-
-		// Migrated from: VerifyTheConditionCardAreHidden
-		// LPS-171802 - Verify if the Condition card is hidden when using the trigger On Subscription Status Update
-
 		await test.step('Given the Commerce Order system object definition', async () => {
 			await viewObjectActionsPage.goto('Commerce Order');
 		});
@@ -1099,12 +1066,8 @@ test(
 );
 
 test(
-	'Cannot leave action name, when and then fields blank',
+	'cannot leave action name, when and then fields blank',
 	async ({apiHelpers, editObjectActionPage, page, viewObjectActionsPage}) => {
-
-		// Migrated from: CannotLeaveActionNameBlank
-		// LPS-139008 - Verify it is not possible to leave the Action Name field blank
-
 		let objectDefinition: ObjectDefinition;
 
 		await test.step('Given an object definition is created', async () => {
@@ -1157,12 +1120,8 @@ test(
 );
 
 test(
-	'Cannot leave URL blank when webhook is selected',
+	'cannot leave URL blank when webhook is selected',
 	async ({apiHelpers, editObjectActionPage, page, viewObjectActionsPage}) => {
-
-		// Migrated from: CannotLeaveURLBlank
-		// LPS-139008 - Verify it is not possible to leave the URL field blank when Webhook is selected
-
 		let objectDefinition: ObjectDefinition;
 
 		await test.step('Given an object definition is created', async () => {
@@ -1206,12 +1165,8 @@ test(
 );
 
 test(
-	'Cannot save action without expression builder value',
+	'cannot save action without expression builder value',
 	async ({apiHelpers, editObjectActionPage, page, viewObjectActionsPage}) => {
-
-		// Migrated from: CannotSaveWithoutExpressionBuilder
-		// LPS-156319 - Verify that the Expression Builder field is required
-
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
