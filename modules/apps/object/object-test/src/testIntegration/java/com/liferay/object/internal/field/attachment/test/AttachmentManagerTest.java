@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.security.auth.CompanyInheritableThreadLocalCallable;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
@@ -52,6 +53,14 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -267,6 +276,67 @@ public class AttachmentManagerTest {
 		catch (FileSizeException fileSizeException) {
 			Assert.assertNotNull(fileSizeException);
 		}
+	}
+
+	@Test
+	public void testGetOrAddFileEntryConcurrentSameBaseName() throws Exception {
+		int threadCount = 10;
+
+		CountDownLatch startLatch = new CountDownLatch(1);
+		CountDownLatch doneLatch = new CountDownLatch(threadCount);
+
+		List<Exception> errors = new CopyOnWriteArrayList<>();
+		List<FileEntry> results = new CopyOnWriteArrayList<>();
+
+		ExecutorService executorService = Executors.newFixedThreadPool(
+			threadCount);
+
+		long groupId = TestPropsValues.getGroupId();
+
+		for (int i = 0; i < threadCount; i++) {
+			executorService.submit(
+				new CompanyInheritableThreadLocalCallable<Runnable>(
+					() -> {
+						try {
+							startLatch.await();
+
+							results.add(
+								_attachmentManager.getOrAddFileEntry(
+									_objectField.getCompanyId(),
+									RandomTestUtil.randomString(),
+									DLTestUtil.randomTextFileBytes(),
+									"file.png", groupId,
+									_objectField.getObjectFieldId(),
+									ServiceContextTestUtil.
+										getServiceContext()));
+						}
+						catch (Exception exception) {
+							errors.add(exception);
+						}
+						finally {
+							doneLatch.countDown();
+						}
+
+						return null;
+					}));
+		}
+
+		startLatch.countDown();
+
+		doneLatch.await(60, TimeUnit.SECONDS);
+
+		executorService.shutdown();
+
+		Assert.assertTrue(errors.isEmpty());
+		Assert.assertEquals(results.toString(), threadCount, results.size());
+
+		Set<String> titles = new HashSet<>();
+
+		for (FileEntry result : results) {
+			titles.add(result.getTitle());
+		}
+
+		Assert.assertEquals(titles.toString(), threadCount, titles.size());
 	}
 
 	private ObjectDefinition _addObjectDefinition(String acceptedFileExtensions)
