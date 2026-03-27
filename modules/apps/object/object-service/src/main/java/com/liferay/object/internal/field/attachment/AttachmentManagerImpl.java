@@ -32,6 +32,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.lock.LockManagerUtil;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
@@ -39,11 +40,15 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.transaction.Propagation;
+import com.liferay.portal.kernel.transaction.TransactionConfig;
+import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.upload.configuration.UploadServletRequestConfigurationProvider;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MimeTypes;
+import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.documentlibrary.util.DLAppUtil;
 
@@ -52,6 +57,10 @@ import java.io.InputStream;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -181,28 +190,68 @@ public class AttachmentManagerImpl implements AttachmentManager {
 		_validateObjectDefinitionSettings(
 			fileContent, fileName, objectFieldId, serviceContext.getUserId());
 
-		DLFolder dlFolder = getDLFolder(
-			companyId, groupId, objectFieldId, serviceContext,
-			serviceContext.getUserId());
+		String baseTitle = FileUtil.stripExtension(fileName);
 
-		try (InputStream inputStream = new ByteArrayInputStream(fileContent)) {
-			String title = DLUtil.getUniqueTitle(
-				groupId, dlFolder.getFolderId(),
-				FileUtil.stripExtension(fileName));
-			String sourceFileName = DLUtil.getUniqueFileName(
-				groupId, dlFolder.getFolderId(), fileName, true);
-			String mimeType = _mimeTypes.getContentType(inputStream, fileName);
+		String key = StringBundler.concat(
+			groupId, StringPool.POUND, objectFieldId, StringPool.POUND,
+			serviceContext.getUserId(), StringPool.POUND, baseTitle);
 
-			_validateDLSettings(
-				companyId, groupId,
-				DLAppUtil.getExtension(title, sourceFileName), mimeType,
-				fileContent.length, sourceFileName);
+		ReentrantLock lock = _lockKeys.computeIfAbsent(
+			key, k -> new ReentrantLock());
 
-			return _dlAppLocalService.addFileEntry(
-				externalReferenceCode, serviceContext.getUserId(),
-				dlFolder.getRepositoryId(), dlFolder.getFolderId(),
-				sourceFileName, mimeType, title, StringPool.BLANK, null, null,
-				fileContent, null, null, null, serviceContext);
+		if (!lock.tryLock(30, TimeUnit.SECONDS)) {
+			throw new PortalException(
+				"Timeout waiting for file upload lock: " + key);
+		}
+
+		String className = FileEntry.class.getName();
+
+		try {
+			return TransactionInvokerUtil.invoke(
+				_transactionConfig,
+				() -> {
+					LockManagerUtil.lock(
+						serviceContext.getUserId(), className, key,
+						String.valueOf(serviceContext.getUserId()), false,
+						Time.MINUTE * 5);
+
+					try (InputStream inputStream = new ByteArrayInputStream(
+							fileContent)) {
+
+						DLFolder dlFolder = getDLFolder(
+							companyId, groupId, objectFieldId, serviceContext,
+							serviceContext.getUserId());
+
+						String title = DLUtil.getUniqueTitle(
+							groupId, dlFolder.getFolderId(), baseTitle);
+						String sourceFileName = DLUtil.getUniqueFileName(
+							groupId, dlFolder.getFolderId(), fileName, true);
+
+						String mimeType = _mimeTypes.getContentType(
+							inputStream, fileName);
+
+						_validateDLSettings(
+							companyId, groupId,
+							DLAppUtil.getExtension(title, sourceFileName),
+							mimeType, fileContent.length, sourceFileName);
+
+						return _dlAppLocalService.addFileEntry(
+							externalReferenceCode, serviceContext.getUserId(),
+							dlFolder.getRepositoryId(), dlFolder.getFolderId(),
+							sourceFileName, mimeType, title, StringPool.BLANK,
+							null, null, fileContent, null, null, null,
+							serviceContext);
+					}
+					finally {
+						LockManagerUtil.unlock(className, key);
+					}
+				});
+		}
+		catch (Throwable throwable) {
+			throw new Exception(throwable);
+		}
+		finally {
+			lock.unlock();
 		}
 	}
 
@@ -422,6 +471,12 @@ public class AttachmentManagerImpl implements AttachmentManager {
 	}
 
 	private static final long _FILE_LENGTH_MB = 1024 * 1024;
+
+	private static final ConcurrentMap<String, ReentrantLock> _lockKeys =
+		new ConcurrentHashMap<>();
+	private static final TransactionConfig _transactionConfig =
+		TransactionConfig.Factory.create(
+			Propagation.REQUIRES_NEW, new Class<?>[] {Exception.class});
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
