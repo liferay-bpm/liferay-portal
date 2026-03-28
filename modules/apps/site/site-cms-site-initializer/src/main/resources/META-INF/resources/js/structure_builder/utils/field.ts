@@ -17,6 +17,7 @@ export const FIELD_TYPES = [
 	'rich-text',
 	'integer',
 	'decimal',
+	'phone-number',
 	'select-from-list',
 	'date',
 	'datetime',
@@ -31,6 +32,7 @@ export const FIELD_TYPE_LABEL: Record<FieldType, string> = {
 	'decimal': Liferay.Language.get('decimal'),
 	'integer': Liferay.Language.get('numeric'),
 	'long-text': Liferay.Language.get('long-text'),
+	'phone-number': Liferay.Language.get('phone-number'),
 	'rich-text': Liferay.Language.get('rich-text'),
 	'select-from-list': Liferay.Language.get('select-from-list'),
 	'text': Liferay.Language.get('text'),
@@ -44,6 +46,7 @@ export const FIELD_TYPE_ICON: Record<FieldType, string> = {
 	'decimal': 'decimal',
 	'integer': 'number',
 	'long-text': 'field-area',
+	'phone-number': 'phone',
 	'rich-text': 'textbox',
 	'select-from-list': 'select',
 	'text': 'custom-field',
@@ -74,6 +77,8 @@ export function getFieldBusinessType(
 			return 'Integer';
 		case 'long-text':
 			return 'LongText';
+		case 'phone-number':
+			return 'PhoneNumber';
 		case 'rich-text':
 			return 'RichText';
 		case 'text':
@@ -92,6 +97,7 @@ export const FIELD_TYPE_TO_DB_TYPE: Record<FieldType, string> = {
 	'decimal': 'Double',
 	'integer': 'Integer',
 	'long-text': 'Clob',
+	'phone-number': 'String',
 	'rich-text': 'Clob',
 	'select-from-list': 'String',
 	'text': 'String',

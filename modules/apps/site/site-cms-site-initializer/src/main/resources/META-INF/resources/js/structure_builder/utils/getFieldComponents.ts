@@ -23,6 +23,7 @@ const GETTERS: Record<FieldType, () => Partial<FieldComponents>> = {
 	'decimal': () => ({}),
 	'integer': getNumericFieldComponents,
 	'long-text': getLongTextFieldComponents,
+	'phone-number': () => ({}),
 	'rich-text': () => ({}),
 	'select-from-list': getSelectFromListFieldComponents,
 	'text': getTextFieldComponents,

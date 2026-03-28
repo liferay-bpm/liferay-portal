@@ -362,6 +362,7 @@ function getFieldType(objectField: ObjectField): FieldType {
 		Decimal: 'decimal',
 		Integer: 'integer',
 		LongText: 'long-text',
+		PhoneNumber: 'phone-number',
 		RichText: 'rich-text',
 		Text: 'text',
 	} as const;

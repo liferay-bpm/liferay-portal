@@ -9,6 +9,7 @@ export function isFieldTextSearchable(field: Field) {
 	switch (field.type) {
 		case 'text':
 		case 'long-text':
+		case 'phone-number':
 		case 'rich-text':
 		case 'select-from-list':
 		case 'upload':
