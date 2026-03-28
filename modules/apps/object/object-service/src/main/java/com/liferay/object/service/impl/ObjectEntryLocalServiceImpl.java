@@ -313,6 +313,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 import javax.crypto.spec.SecretKeySpec;
 
@@ -7746,6 +7747,28 @@ public class ObjectEntryLocalServiceImpl
 				}
 			}
 		}
+		else if (objectField.compareBusinessType(
+					ObjectFieldConstants.BUSINESS_TYPE_PHONE_NUMBER)) {
+
+			String phoneNumber = GetterUtil.getString(value);
+
+			if (Validator.isNotNull(phoneNumber) &&
+				!_phoneNumberPattern.matcher(
+					phoneNumber
+				).matches()) {
+
+				_handle(
+					new ObjectEntryValuesException.InvalidPhoneNumber(
+						objectField.getName()),
+					validationErrors);
+			}
+
+			_validateTextMaxLength(
+				DynamicObjectDefinitionTableUtil.getMaxLength(
+					objectField.getBusinessType()),
+				phoneNumber, objectField.getObjectFieldId(),
+				objectField.getName(), validationErrors);
+		}
 		else if (StringUtil.equals(
 					objectField.getDBType(),
 					ObjectFieldConstants.DB_TYPE_STRING)) {
@@ -7962,6 +7985,8 @@ public class ObjectEntryLocalServiceImpl
 		_objectRelationshipLocalServiceSnapshot = new Snapshot<>(
 			ObjectEntryLocalServiceImpl.class,
 			ObjectRelationshipLocalService.class, null);
+	private static final Pattern _phoneNumberPattern = Pattern.compile(
+		"^\\+?[0-9\\s\\-().]{1,50}$");
 
 	private static final Map<Class<?>, Function<Object, Serializable>>
 		_putValueFunctions =
