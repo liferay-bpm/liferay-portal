@@ -3599,6 +3599,10 @@ public class ObjectDefinitionLocalServiceImpl
 
 			if (StringUtil.equals(
 					ObjectDefinitionSettingConstants.
+						NAME_ROOT_ENTRY_SCOPING_MODE,
+					objectDefinitionSettingsValue.getKey()) ||
+				StringUtil.equals(
+					ObjectDefinitionSettingConstants.
 						NAME_ROOT_OBJECT_DEFINITION_EXTERNAL_REFERENCE_CODES,
 					objectDefinitionSettingsValue.getKey()) ||
 				StringUtil.equals(
@@ -3875,6 +3879,7 @@ public class ObjectDefinitionLocalServiceImpl
 	private final Set<String> _allowedObjectDefinitionSettingNames = Set.of(
 		ObjectDefinitionSettingConstants.NAME_ACCEPT_ALL_GROUPS,
 		ObjectDefinitionSettingConstants.NAME_ACCEPTED_GROUP_IDS,
+		ObjectDefinitionSettingConstants.NAME_ROOT_ENTRY_SCOPING_MODE,
 		ObjectDefinitionSettingConstants.
 			NAME_ROOT_OBJECT_DEFINITION_EXTERNAL_REFERENCE_CODES);
 

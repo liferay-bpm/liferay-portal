@@ -174,6 +174,25 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 	}
 
 	@Override
+	public String getRootEntryScopingMode() {
+		if (!FeatureFlagManagerUtil.isEnabled(getCompanyId(), "LPD-34594")) {
+			return ObjectDefinitionSettingConstants.
+				VALUE_ROOT_ENTRY_SCOPING_MODE_STRICT;
+		}
+
+		String value = ObjectDefinitionSettingUtil.getValue(
+			ObjectDefinitionSettingConstants.NAME_ROOT_ENTRY_SCOPING_MODE,
+			getObjectDefinitionSettings());
+
+		if (value == null) {
+			return ObjectDefinitionSettingConstants.
+				VALUE_ROOT_ENTRY_SCOPING_MODE_STRICT;
+		}
+
+		return value;
+	}
+
+	@Override
 	public String getRootObjectDefinitionExternalReferenceCode() {
 		long rootObjectDefinitionId = getRootObjectDefinitionId();
 
@@ -323,6 +342,14 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 
 		return ArrayUtil.contains(
 			getRootObjectDefinitionIds(), getObjectDefinitionId());
+	}
+
+	@Override
+	public boolean isStrictRootScoping() {
+		return Objects.equals(
+			getRootEntryScopingMode(),
+			ObjectDefinitionSettingConstants.
+				VALUE_ROOT_ENTRY_SCOPING_MODE_STRICT);
 	}
 
 	@Override
