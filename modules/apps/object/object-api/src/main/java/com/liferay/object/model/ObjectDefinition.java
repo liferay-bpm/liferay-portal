@@ -75,6 +75,8 @@ public interface ObjectDefinition
 
 	public String getRESTContextPath();
 
+	public String getRootEntryScopingMode();
+
 	public String getRootObjectDefinitionExternalReferenceCode();
 
 	public long getRootObjectDefinitionId();
@@ -95,6 +97,8 @@ public interface ObjectDefinition
 
 	public boolean isModifiableAndSystem();
 
+	public boolean isStrictRootScoping();
+
 	public boolean isRootDescendantNode();
 
 	public boolean isRootDescendantNode(long rootObjectDefinitionId);
@@ -114,4 +118,4 @@ public interface ObjectDefinition
 	public void setObjectFolder(ObjectFolder objectFolder);
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:1332771215
+// LIFERAY-SERVICE-BUILDER-HASH:2120176812

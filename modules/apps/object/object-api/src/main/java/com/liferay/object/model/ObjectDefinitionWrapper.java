@@ -916,6 +916,11 @@ public class ObjectDefinitionWrapper
 	}
 
 	@Override
+	public String getRootEntryScopingMode() {
+		return model.getRootEntryScopingMode();
+	}
+
+	@Override
 	public String getRootObjectDefinitionExternalReferenceCode() {
 		return model.getRootObjectDefinitionExternalReferenceCode();
 	}
@@ -1218,6 +1223,11 @@ public class ObjectDefinitionWrapper
 	@Override
 	public boolean isRootNode() {
 		return model.isRootNode();
+	}
+
+	@Override
+	public boolean isStrictRootScoping() {
+		return model.isStrictRootScoping();
 	}
 
 	/**
@@ -1857,4 +1867,4 @@ public class ObjectDefinitionWrapper
 	}
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:1348279319
+// LIFERAY-SERVICE-BUILDER-HASH:262216246
