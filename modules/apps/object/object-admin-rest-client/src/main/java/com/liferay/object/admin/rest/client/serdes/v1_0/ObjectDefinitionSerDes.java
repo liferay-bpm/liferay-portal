@@ -637,6 +637,18 @@ public class ObjectDefinitionSerDes {
 			sb.append("\"");
 		}
 
+		if (objectDefinition.getRootEntryScopingMode() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"rootEntryScopingMode\": ");
+
+			sb.append("\"");
+			sb.append(objectDefinition.getRootEntryScopingMode());
+			sb.append("\"");
+		}
+
 		if (objectDefinition.getRootObjectDefinitionExternalReferenceCode() !=
 				null) {
 
@@ -1131,6 +1143,15 @@ public class ObjectDefinitionSerDes {
 				String.valueOf(objectDefinition.getRestContextPath()));
 		}
 
+		if (objectDefinition.getRootEntryScopingMode() == null) {
+			map.put("rootEntryScopingMode", null);
+		}
+		else {
+			map.put(
+				"rootEntryScopingMode",
+				String.valueOf(objectDefinition.getRootEntryScopingMode()));
+		}
+
 		if (objectDefinition.getRootObjectDefinitionExternalReferenceCode() ==
 				null) {
 
@@ -1366,6 +1387,11 @@ public class ObjectDefinitionSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "restContextPath")) {
+				return false;
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "rootEntryScopingMode")) {
+
 				return false;
 			}
 			else if (Objects.equals(
@@ -1775,6 +1801,15 @@ public class ObjectDefinitionSerDes {
 				if (jsonParserFieldValue != null) {
 					objectDefinition.setRestContextPath(
 						(String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "rootEntryScopingMode")) {
+
+				if (jsonParserFieldValue != null) {
+					objectDefinition.setRootEntryScopingMode(
+						ObjectDefinition.RootEntryScopingMode.create(
+							(String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(

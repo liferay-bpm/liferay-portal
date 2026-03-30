@@ -934,6 +934,38 @@ public class ObjectDefinition implements Cloneable, Serializable {
 
 	protected String restContextPath;
 
+	public RootEntryScopingMode getRootEntryScopingMode() {
+		return rootEntryScopingMode;
+	}
+
+	public String getRootEntryScopingModeAsString() {
+		if (rootEntryScopingMode == null) {
+			return null;
+		}
+
+		return rootEntryScopingMode.toString();
+	}
+
+	public void setRootEntryScopingMode(
+		RootEntryScopingMode rootEntryScopingMode) {
+
+		this.rootEntryScopingMode = rootEntryScopingMode;
+	}
+
+	public void setRootEntryScopingMode(
+		UnsafeSupplier<RootEntryScopingMode, Exception>
+			rootEntryScopingModeUnsafeSupplier) {
+
+		try {
+			rootEntryScopingMode = rootEntryScopingModeUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected RootEntryScopingMode rootEntryScopingMode;
+
 	public String getRootObjectDefinitionExternalReferenceCode() {
 		return rootObjectDefinitionExternalReferenceCode;
 	}
@@ -1119,6 +1151,39 @@ public class ObjectDefinition implements Cloneable, Serializable {
 
 	public String toString() {
 		return ObjectDefinitionSerDes.toJSON(this);
+	}
+
+	public static enum RootEntryScopingMode {
+
+		FLEXIBLE("flexible"), STRICT("strict");
+
+		public static RootEntryScopingMode create(String value) {
+			for (RootEntryScopingMode rootEntryScopingMode : values()) {
+				if (Objects.equals(rootEntryScopingMode.getValue(), value) ||
+					Objects.equals(rootEntryScopingMode.name(), value)) {
+
+					return rootEntryScopingMode;
+				}
+			}
+
+			return null;
+		}
+
+		public String getValue() {
+			return _value;
+		}
+
+		@Override
+		public String toString() {
+			return _value;
+		}
+
+		private RootEntryScopingMode(String value) {
+			_value = value;
+		}
+
+		private final String _value;
+
 	}
 
 }

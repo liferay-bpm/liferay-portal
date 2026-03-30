@@ -5,9 +5,12 @@
 
 package com.liferay.object.admin.rest.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.headless.delivery.dto.v1_0.Creator;
 import com.liferay.petra.function.UnsafeSupplier;
@@ -1790,6 +1793,63 @@ public class ObjectDefinition implements Serializable {
 	private Supplier<String> _restContextPathSupplier;
 
 	@io.swagger.v3.oas.annotations.media.Schema
+	@JsonGetter("rootEntryScopingMode")
+	@Valid
+	public RootEntryScopingMode getRootEntryScopingMode() {
+		if (_rootEntryScopingModeSupplier != null) {
+			rootEntryScopingMode = _rootEntryScopingModeSupplier.get();
+
+			_rootEntryScopingModeSupplier = null;
+		}
+
+		return rootEntryScopingMode;
+	}
+
+	@JsonIgnore
+	public String getRootEntryScopingModeAsString() {
+		RootEntryScopingMode rootEntryScopingMode = getRootEntryScopingMode();
+
+		if (rootEntryScopingMode == null) {
+			return null;
+		}
+
+		return rootEntryScopingMode.toString();
+	}
+
+	public void setRootEntryScopingMode(
+		RootEntryScopingMode rootEntryScopingMode) {
+
+		this.rootEntryScopingMode = rootEntryScopingMode;
+
+		_rootEntryScopingModeSupplier = null;
+	}
+
+	@JsonIgnore
+	public void setRootEntryScopingMode(
+		UnsafeSupplier<RootEntryScopingMode, Exception>
+			rootEntryScopingModeUnsafeSupplier) {
+
+		_rootEntryScopingModeSupplier = () -> {
+			try {
+				return rootEntryScopingModeUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected RootEntryScopingMode rootEntryScopingMode;
+
+	@JsonIgnore
+	private Supplier<RootEntryScopingMode> _rootEntryScopingModeSupplier;
+
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getRootObjectDefinitionExternalReferenceCode() {
 		if (_rootObjectDefinitionExternalReferenceCodeSupplier != null) {
 			rootObjectDefinitionExternalReferenceCode =
@@ -2744,6 +2804,20 @@ public class ObjectDefinition implements Serializable {
 			sb.append("\"");
 		}
 
+		RootEntryScopingMode rootEntryScopingMode = getRootEntryScopingMode();
+
+		if (rootEntryScopingMode != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"rootEntryScopingMode\": ");
+
+			sb.append("\"");
+			sb.append(rootEntryScopingMode);
+			sb.append("\"");
+		}
+
 		String rootObjectDefinitionExternalReferenceCode =
 			getRootObjectDefinitionExternalReferenceCode();
 
@@ -2867,6 +2941,44 @@ public class ObjectDefinition implements Serializable {
 		name = "x-class-name"
 	)
 	public String xClassName;
+
+	@GraphQLName("RootEntryScopingMode")
+	public static enum RootEntryScopingMode {
+
+		FLEXIBLE("flexible"), STRICT("strict");
+
+		@JsonCreator
+		public static RootEntryScopingMode create(String value) {
+			if ((value == null) || value.equals("")) {
+				return null;
+			}
+
+			for (RootEntryScopingMode rootEntryScopingMode : values()) {
+				if (Objects.equals(rootEntryScopingMode.getValue(), value)) {
+					return rootEntryScopingMode;
+				}
+			}
+
+			throw new IllegalArgumentException("Invalid enum value: " + value);
+		}
+
+		@JsonValue
+		public String getValue() {
+			return _value;
+		}
+
+		@Override
+		public String toString() {
+			return _value;
+		}
+
+		private RootEntryScopingMode(String value) {
+			_value = value;
+		}
+
+		private final String _value;
+
+	}
 
 	private static String _escape(Object object) {
 		return StringUtil.replace(

@@ -2126,6 +2126,16 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 			}
 
 			if (Objects.equals(
+					"rootEntryScopingMode", additionalAssertFieldName)) {
+
+				if (objectDefinition.getRootEntryScopingMode() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
 					"rootObjectDefinitionExternalReferenceCode",
 					additionalAssertFieldName)) {
 
@@ -2808,6 +2818,19 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				if (!Objects.deepEquals(
 						objectDefinition1.getRestContextPath(),
 						objectDefinition2.getRestContextPath())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"rootEntryScopingMode", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						objectDefinition1.getRootEntryScopingMode(),
+						objectDefinition2.getRootEntryScopingMode())) {
 
 					return false;
 				}
@@ -3672,6 +3695,11 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 			}
 
 			return sb.toString();
+		}
+
+		if (entityFieldName.equals("rootEntryScopingMode")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals(

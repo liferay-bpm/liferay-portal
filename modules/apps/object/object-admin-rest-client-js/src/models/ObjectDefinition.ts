@@ -62,6 +62,7 @@
 			"pluralLabel"?: {[key: string]: string;};
 			"portlet"?: boolean;
 			"restContextPath"?: string;
+			"rootEntryScopingMode"?: 'flexible' | 'strict';
 			"rootObjectDefinitionExternalReferenceCode"?: string;
 			"scope"?: string;
 			"status"?: Status;
@@ -281,6 +282,11 @@
 			baseName: "restContextPath",
 			name: "restContextPath",
 			type: "string",
+		},
+		{
+			baseName: "rootEntryScopingMode",
+			name: "rootEntryScopingMode",
+			type: "'flexible' | 'strict'",
 		},
 		{
 			baseName: "rootObjectDefinitionExternalReferenceCode",
