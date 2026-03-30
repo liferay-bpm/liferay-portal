@@ -714,6 +714,7 @@
 				"en_US": "Data Set Actions"
 			},
 			"portlet": false,
+			"rootEntryScopingMode": "strict",
 			"rootObjectDefinitionExternalReferenceCode": "L_DATA_SET",
 			"scope": "company",
 			"status": {
@@ -799,6 +800,7 @@
 				"en_US": "Data Set Cards Sections"
 			},
 			"portlet": false,
+			"rootEntryScopingMode": "strict",
 			"rootObjectDefinitionExternalReferenceCode": "L_DATA_SET",
 			"scope": "company",
 			"status": {
@@ -888,6 +890,7 @@
 				"en_US": "Data Set Client Extension Filters"
 			},
 			"portlet": false,
+			"rootEntryScopingMode": "strict",
 			"rootObjectDefinitionExternalReferenceCode": "L_DATA_SET",
 			"scope": "company",
 			"status": {
@@ -1009,6 +1012,7 @@
 				"en_US": "Data Set Date Filters"
 			},
 			"portlet": false,
+			"rootEntryScopingMode": "strict",
 			"rootObjectDefinitionExternalReferenceCode": "L_DATA_SET",
 			"scope": "company",
 			"status": {
@@ -1094,6 +1098,7 @@
 				"en_US": "Data Set List Sections"
 			},
 			"portlet": false,
+			"rootEntryScopingMode": "strict",
 			"rootObjectDefinitionExternalReferenceCode": "L_DATA_SET",
 			"scope": "company",
 			"status": {
@@ -1327,6 +1332,7 @@
 				"en_US": "Data Set Selection Filters"
 			},
 			"portlet": false,
+			"rootEntryScopingMode": "strict",
 			"rootObjectDefinitionExternalReferenceCode": "L_DATA_SET",
 			"scope": "company",
 			"status": {
@@ -1432,6 +1438,7 @@
 				"en_US": "Data Set Sorts"
 			},
 			"portlet": false,
+			"rootEntryScopingMode": "strict",
 			"rootObjectDefinitionExternalReferenceCode": "L_DATA_SET",
 			"scope": "company",
 			"status": {
@@ -1569,6 +1576,7 @@
 				"en_US": "Data Set Table Sections"
 			},
 			"portlet": false,
+			"rootEntryScopingMode": "strict",
 			"rootObjectDefinitionExternalReferenceCode": "L_DATA_SET",
 			"scope": "company",
 			"status": {
@@ -1671,6 +1679,7 @@
 				"en_US": "Data Set Snapshots"
 			},
 			"portlet": false,
+			"rootEntryScopingMode": "flexible",
 			"scope": "company",
 			"status": {
 				"code": 0
