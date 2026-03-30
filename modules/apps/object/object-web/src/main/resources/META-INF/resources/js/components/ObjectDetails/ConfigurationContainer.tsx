@@ -4,6 +4,7 @@
  */
 
 import ClayForm from '@clayui/form';
+import {ClaySelectWithOption} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import {ClayTooltipProvider} from '@clayui/tooltip';
 import {Toggle} from '@liferay/object-js-components-web';
@@ -258,6 +259,43 @@ export function ConfigurationContainer({
 					</ClayForm.Group>
 				</>
 			)}
+
+			{Liferay.FeatureFlags['LPD-34594'] &&
+				values.rootObjectDefinitionExternalReferenceCode && (
+					<ClayForm.Group>
+						<label htmlFor="rootEntryScopingMode">
+							{Liferay.Language.get('root-scoping-mode')}
+						</label>
+
+						<ClaySelectWithOption
+							disabled={disabled}
+							id="rootEntryScopingMode"
+							onChange={(event) => {
+								setValues({
+									rootEntryScopingMode: event.target.value,
+								});
+
+								if (onSubmit) {
+									onSubmit({
+										rootEntryScopingMode:
+											event.target.value,
+									});
+								}
+							}}
+							options={[
+								{
+									label: Liferay.Language.get('strict'),
+									value: 'strict',
+								},
+								{
+									label: Liferay.Language.get('flexible'),
+									value: 'flexible',
+								},
+							]}
+							value={values.rootEntryScopingMode || 'strict'}
+						/>
+					</ClayForm.Group>
+				)}
 		</div>
 	);
 }
