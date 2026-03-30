@@ -21,6 +21,9 @@ public class ObjectDefinitionSettingConstants {
 
 	public static final String NAME_OLD_CLASS_NAME_ID = "oldClassNameId";
 
+	public static final String NAME_ROOT_ENTRY_SCOPING_MODE =
+		"rootEntryScopingMode";
+
 	public static final String
 		NAME_ROOT_OBJECT_DEFINITION_EXTERNAL_REFERENCE_CODES =
 			"rootObjectDefinitionExternalReferenceCodes";
@@ -29,5 +32,10 @@ public class ObjectDefinitionSettingConstants {
 		"rootObjectDefinitionIds";
 
 	public static final String NAME_VISIBLE = "visible";
+
+	public static final String VALUE_ROOT_ENTRY_SCOPING_MODE_FLEXIBLE =
+		"flexible";
+
+	public static final String VALUE_ROOT_ENTRY_SCOPING_MODE_STRICT = "strict";
 
 }
