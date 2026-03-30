@@ -356,6 +356,19 @@ public class ObjectDefinitionUtil {
 						serviceBuilderObjectDefinition.getPluralLabelMap()));
 				setPortlet(serviceBuilderObjectDefinition::isPortlet);
 				setRestContextPath(() -> finalRESTContextPath);
+				setRootEntryScopingMode(
+					() -> {
+						if (!FeatureFlagManagerUtil.isEnabled(
+								serviceBuilderObjectDefinition.getCompanyId(),
+								"LPD-34594")) {
+
+							return null;
+						}
+
+						return ObjectDefinition.RootEntryScopingMode.create(
+							serviceBuilderObjectDefinition.
+								getRootEntryScopingMode());
+					});
 				setRootObjectDefinitionExternalReferenceCode(
 					() -> {
 						if (!FeatureFlagManagerUtil.isEnabled(

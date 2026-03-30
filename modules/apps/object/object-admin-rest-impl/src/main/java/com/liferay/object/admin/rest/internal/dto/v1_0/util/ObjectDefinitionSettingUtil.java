@@ -5,13 +5,16 @@
 
 package com.liferay.object.admin.rest.internal.dto.v1_0.util;
 
+import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinitionSetting;
 import com.liferay.object.constants.ObjectDefinitionSettingConstants;
 import com.liferay.object.service.ObjectDefinitionSettingLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
 
@@ -19,6 +22,37 @@ import java.util.List;
  * @author Pedro Tavares
  */
 public class ObjectDefinitionSettingUtil {
+
+	public static ObjectDefinitionSetting[] mergeRootEntryScopingMode(
+		ObjectDefinition objectDefinition) {
+
+		ObjectDefinitionSetting[] settings =
+			objectDefinition.getObjectDefinitionSettings();
+
+		String rootEntryScopingMode =
+			objectDefinition.getRootEntryScopingModeAsString();
+
+		if (Validator.isNull(rootEntryScopingMode)) {
+			return settings;
+		}
+
+		ObjectDefinitionSetting scopingModeSetting =
+			new ObjectDefinitionSetting() {
+				{
+					setName(
+						() ->
+							ObjectDefinitionSettingConstants.
+								NAME_ROOT_ENTRY_SCOPING_MODE);
+					setValue(() -> rootEntryScopingMode);
+				}
+			};
+
+		if (settings == null) {
+			return new ObjectDefinitionSetting[] {scopingModeSetting};
+		}
+
+		return ArrayUtil.append(settings, scopingModeSetting);
+	}
 
 	public static List<com.liferay.object.model.ObjectDefinitionSetting>
 		toObjectDefinitionSettings(
