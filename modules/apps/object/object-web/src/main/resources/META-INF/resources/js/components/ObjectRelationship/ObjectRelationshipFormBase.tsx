@@ -387,8 +387,19 @@ export function ObjectRelationshipFormBase({
 				values.type === 'oneToMany' &&
 				Liferay.FeatureFlags['LPD-34594'] && (
 					<ObjectRelationshipInheritanceCheckbox
+						childRootEntryScopingMode={
+							objectDefinition2?.rootEntryScopingMode
+						}
 						learnResources={learnResources}
 						onChange={onChangeInheritanceCheckbox}
+						onScopingModeChange={(value) => {
+							if (objectDefinition2) {
+								setObjectDefinition2({
+									...objectDefinition2,
+									rootEntryScopingMode: value,
+								});
+							}
+						}}
 						values={values}
 					/>
 				)}

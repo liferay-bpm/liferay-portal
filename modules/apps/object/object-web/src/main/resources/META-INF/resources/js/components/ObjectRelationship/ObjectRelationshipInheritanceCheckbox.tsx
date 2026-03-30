@@ -4,7 +4,7 @@
  */
 
 import ClayAlert from '@clayui/alert';
-import {ClayCheckbox} from '@clayui/form';
+import {ClayCheckbox, ClaySelectWithOption} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import ClayPopover from '@clayui/popover';
 import React, {useState} from 'react';
@@ -18,16 +18,20 @@ import {
 } from 'frontend-js-components-web';
 
 interface ObjectRelationshipInheritanceCheckbox {
+	childRootEntryScopingMode?: string;
 	learnResources: ILearnResourceContext;
 	onChange: (
 		event: React.ChangeEvent<HTMLInputElement>
 	) => Promise<void> | void;
+	onScopingModeChange?: (value: string) => void;
 	values: Partial<ObjectRelationship>;
 }
 
 export function ObjectRelationshipInheritanceCheckbox({
+	childRootEntryScopingMode,
 	learnResources,
 	onChange,
+	onScopingModeChange,
 	values,
 }: ObjectRelationshipInheritanceCheckbox) {
 	const [showPopover, setShowPopover] = useState(false);
@@ -79,6 +83,32 @@ export function ObjectRelationshipInheritanceCheckbox({
 					/>
 				</LearnResourcesContext.Provider>
 			</ClayAlert>
+
+			{values.edge && onScopingModeChange && (
+				<div className="mt-3">
+					<label htmlFor="childRootEntryScopingMode">
+						{Liferay.Language.get('child-scoping-mode')}
+					</label>
+
+					<ClaySelectWithOption
+						id="childRootEntryScopingMode"
+						onChange={(event) =>
+							onScopingModeChange(event.target.value)
+						}
+						options={[
+							{
+								label: Liferay.Language.get('strict'),
+								value: 'strict',
+							},
+							{
+								label: Liferay.Language.get('flexible'),
+								value: 'flexible',
+							},
+						]}
+						value={childRootEntryScopingMode || 'strict'}
+					/>
+				</div>
+			)}
 		</>
 	);
 }
