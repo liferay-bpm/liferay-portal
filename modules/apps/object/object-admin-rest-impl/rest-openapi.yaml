@@ -171,6 +171,9 @@ components:
                 restContextPath:
                     readOnly: true
                     type: string
+                rootEntryScopingMode:
+                    enum: [flexible, strict]
+                    type: string
                 rootObjectDefinitionExternalReferenceCode:
                     readOnly: true
                     type: string
