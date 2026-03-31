@@ -4648,27 +4648,14 @@ public class ObjectEntryLocalServiceImpl
 				_getHeadObjectEntryPredicate(preferApproved)
 			).and(
 				() -> {
-					if (!related || (objectEntry == null)) {
-						return null;
-					}
+					if (!related || (objectEntry == null) ||
+						(objectEntry.getRootObjectEntryId() == 0)) {
 
-					long rootObjectEntryId = objectEntry.getRootObjectEntryId();
-
-					if (objectDefinition.isStrictRootScoping()) {
-						if (rootObjectEntryId == 0) {
-							return null;
-						}
-
-						return ObjectEntryTable.INSTANCE.rootObjectEntryId.eq(
-							rootObjectEntryId);
-					}
-
-					if (rootObjectEntryId == 0) {
 						return null;
 					}
 
 					return ObjectEntryTable.INSTANCE.rootObjectEntryId.eq(
-						rootObjectEntryId);
+						objectEntry.getRootObjectEntryId());
 				}
 			).and(
 				() -> {

@@ -224,7 +224,7 @@ interface ObjectDefinition {
 	pluralLabel: LocalizedValue<string>;
 	portlet: boolean;
 	restContextPath: string;
-	rootEntryScopingMode?: string;
+	rootEntryScopingMode?: 'flexible' | 'strict';
 	rootObjectDefinitionExternalReferenceCode: string;
 	scope: string;
 	status: {

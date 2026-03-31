@@ -18,12 +18,12 @@ import {
 } from 'frontend-js-components-web';
 
 interface ObjectRelationshipInheritanceCheckbox {
-	childRootEntryScopingMode?: string;
+	childRootEntryScopingMode?: 'flexible' | 'strict';
 	learnResources: ILearnResourceContext;
 	onChange: (
 		event: React.ChangeEvent<HTMLInputElement>
 	) => Promise<void> | void;
-	onScopingModeChange?: (value: string) => void;
+	onScopingModeChange?: (value: 'flexible' | 'strict') => void;
 	values: Partial<ObjectRelationship>;
 }
 
