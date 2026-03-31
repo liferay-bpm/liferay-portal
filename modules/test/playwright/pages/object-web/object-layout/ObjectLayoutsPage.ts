@@ -171,9 +171,21 @@ export class ObjectLayoutsPage {
 
 		await this.fieldList.fill(relationshipField);
 
-		await this.iframeLocator
-			.getByRole('option', {name: relationshipField})
-			.click();
+		const exactRelationshipFieldOption = this.iframeLocator.getByRole(
+			'option',
+			{exact: true, name: relationshipField}
+		);
+
+		if (await exactRelationshipFieldOption.count()) {
+			await exactRelationshipFieldOption.click();
+		}
+		else {
+			await this.iframeLocator
+				.getByRole('option')
+				.filter({hasText: relationshipField})
+				.first()
+				.click();
+		}
 
 		await this.saveTabButton.click();
 
