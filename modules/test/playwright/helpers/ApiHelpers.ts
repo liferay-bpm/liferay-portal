@@ -100,6 +100,28 @@ interface RequestOptions<T> {
 }
 
 async function getCSRFTokenHeader(page: Page) {
+	for (let attempt = 0; attempt < 3; attempt++) {
+		try {
+			const authToken = await page.evaluate(() => Liferay.authToken);
+
+			return {
+				'x-csrf-token': authToken,
+			};
+		}
+		catch (error) {
+			if (
+				error instanceof Error &&
+				error.message.includes('Execution context was destroyed')
+			) {
+				await page.waitForLoadState('domcontentloaded').catch(() => {});
+
+				continue;
+			}
+
+			throw error;
+		}
+	}
+
 	const authToken = await page.evaluate(() => Liferay.authToken);
 
 	return {
