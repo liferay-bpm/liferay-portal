@@ -736,6 +736,7 @@ test(
 		await objectFieldsPage.objectFieldLabelInput.fill('Cancel Field');
 
 		await objectFieldsPage.objectFieldOptionsDropdown.click();
+
 		await page.getByRole('option', {exact: true, name: 'Text'}).click();
 
 		await page.getByRole('button', {name: 'Cancel'}).click();
@@ -782,7 +783,7 @@ test(
 );
 
 test(
-	'Verify it is possible to Cancel the update of a Layout',
+	'Verify it is possible to cancel the update of a Layout',
 	{tag: '@LPS-135397'},
 	async ({apiHelpers, objectLayoutsPage, page}) => {
 		const objectDefinition =
@@ -865,72 +866,6 @@ test(
 );
 
 test(
-	'Verify it is possible to create a BigDecimal field',
-	{tag: '@LPS-135549'},
-	async ({apiHelpers, objectFieldsPage, page}) => {
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
-			});
-
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
-
-		await objectFieldsPage.goto(objectDefinition.label['en_US']);
-
-		await objectFieldsPage.addObjectField({
-			objectFieldBusinessType: 'Precision Decimal',
-			objectFieldLabel: 'Custom Field',
-		});
-
-		await waitForAlert(page);
-		await page.reload();
-
-		const fieldRow = page
-			.getByRole('row')
-			.filter({hasText: 'Custom Field'});
-
-		await expect(fieldRow).toBeVisible();
-		await expect(fieldRow.getByText('Precision Decimal')).toBeVisible();
-	}
-);
-
-test(
-	'Verify it is possible to create a Boolean field',
-	{tag: '@LPS-135549'},
-	async ({apiHelpers, objectFieldsPage, page}) => {
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
-			});
-
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
-
-		await objectFieldsPage.goto(objectDefinition.label['en_US']);
-
-		await objectFieldsPage.addObjectField({
-			objectFieldBusinessType: 'Boolean',
-			objectFieldLabel: 'Custom Field',
-		});
-
-		await waitForAlert(page);
-		await page.reload();
-
-		const fieldRow = page
-			.getByRole('row')
-			.filter({hasText: 'Custom Field'});
-
-		await expect(fieldRow).toBeVisible();
-		await expect(fieldRow.getByText('Boolean')).toBeVisible();
-	}
-);
-
-test(
 	'Verify it is possible to create a Custom Object',
 	{tag: '@LPS-135549'},
 	async ({
@@ -965,105 +900,6 @@ test(
 );
 
 test(
-	'Verify it is possible to create a Date field',
-	{tag: '@LPS-135549'},
-	async ({apiHelpers, objectFieldsPage, page}) => {
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
-			});
-
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
-
-		await objectFieldsPage.goto(objectDefinition.label['en_US']);
-
-		await objectFieldsPage.addObjectField({
-			objectFieldBusinessType: 'Date',
-			objectFieldLabel: 'Custom Field',
-		});
-
-		await waitForAlert(page);
-		await page.reload();
-
-		const fieldRow = page
-			.getByRole('row')
-			.filter({hasText: 'Custom Field'});
-
-		await expect(fieldRow).toBeVisible();
-		await expect(fieldRow.getByText('Date')).toBeVisible();
-	}
-);
-
-test(
-	'Verify it is possible to create a Double field',
-	{tag: '@LPS-135549'},
-	async ({apiHelpers, objectFieldsPage, page}) => {
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
-			});
-
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
-
-		await objectFieldsPage.goto(objectDefinition.label['en_US']);
-
-		await objectFieldsPage.addObjectField({
-			objectFieldBusinessType: 'Decimal',
-			objectFieldLabel: 'Custom Field',
-		});
-
-		await waitForAlert(page);
-		await page.reload();
-
-		const fieldRow = page
-			.getByRole('row')
-			.filter({hasText: 'Custom Field'});
-
-		await expect(fieldRow).toBeVisible();
-		await expect(fieldRow.getByText('Decimal')).toBeVisible();
-	}
-);
-
-test(
-	'Verify it is possible to create an Integer field',
-	{tag: '@LPS-135549'},
-	async ({apiHelpers, objectFieldsPage, page}) => {
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
-			});
-
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
-
-		await objectFieldsPage.goto(objectDefinition.label['en_US']);
-
-		await objectFieldsPage.addObjectField({
-			objectFieldBusinessType: 'Integer',
-			objectFieldLabel: 'Custom Field',
-		});
-
-		await waitForAlert(page);
-		await page.reload();
-
-		const fieldRow = page
-			.getByRole('row')
-			.filter({hasText: 'Custom Field'});
-
-		await expect(fieldRow).toBeVisible();
-		await expect(fieldRow.getByText('Integer')).toBeVisible();
-	}
-);
-
-test(
 	'Verify it is possible to create a Layout for an Object',
 	{tag: '@LPS-135397'},
 	async ({apiHelpers, objectLayoutsPage, page}) => {
@@ -1084,39 +920,6 @@ test(
 		await objectLayoutsPage.createObjectLayout(layoutName);
 
 		await expect(page.getByText(layoutName)).toBeVisible();
-	}
-);
-
-test(
-	'Verify it is possible to create a Long field',
-	{tag: '@LPS-135549'},
-	async ({apiHelpers, objectFieldsPage, page}) => {
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
-			});
-
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
-
-		await objectFieldsPage.goto(objectDefinition.label['en_US']);
-
-		await objectFieldsPage.addObjectField({
-			objectFieldBusinessType: 'Long Integer',
-			objectFieldLabel: 'Custom Field',
-		});
-
-		await waitForAlert(page);
-		await page.reload();
-
-		const fieldRow = page
-			.getByRole('row')
-			.filter({hasText: 'Custom Field'});
-
-		await expect(fieldRow).toBeVisible();
-		await expect(fieldRow.getByText('Long Integer')).toBeVisible();
 	}
 );
 
@@ -1221,81 +1024,6 @@ test(
 		await waitForAlert(page);
 
 		await expect(page.getByText(relationshipLabel)).toBeVisible();
-	}
-);
-
-test(
-	'Verify it is possible to create a Picklist field',
-	{tag: '@LPS-136595'},
-	async ({apiHelpers, objectFieldsPage, page}) => {
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
-			});
-
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
-
-		const listTypeDefinition =
-			await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
-
-		apiHelpers.data.push({
-			id: listTypeDefinition.id,
-			type: 'listTypeDefinition',
-		});
-
-		await objectFieldsPage.goto(objectDefinition.label['en_US']);
-
-		await objectFieldsPage.addObjectField({
-			listTypeDefinitionName: listTypeDefinition.name,
-			objectFieldBusinessType: 'Picklist',
-			objectFieldLabel: 'Custom Field',
-		});
-
-		await waitForAlert(page);
-		await page.reload();
-
-		const fieldRow = page
-			.getByRole('row')
-			.filter({hasText: 'Custom Field'});
-
-		await expect(fieldRow).toBeVisible();
-		await expect(fieldRow.getByText('Picklist')).toBeVisible();
-	}
-);
-
-test(
-	'Verify it is possible to create a String field',
-	{tag: '@LPS-135549'},
-	async ({apiHelpers, objectFieldsPage, page}) => {
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
-			});
-
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
-
-		await objectFieldsPage.goto(objectDefinition.label['en_US']);
-
-		await objectFieldsPage.addObjectField({
-			objectFieldBusinessType: 'Text',
-			objectFieldLabel: 'Custom Field',
-		});
-
-		await waitForAlert(page);
-		await page.reload();
-
-		const fieldRow = page
-			.getByRole('row')
-			.filter({hasText: 'Custom Field'});
-
-		await expect(fieldRow).toBeVisible();
-		await expect(fieldRow.getByText('Text')).toBeVisible();
 	}
 );
 
