@@ -1006,8 +1006,8 @@ test(
 );
 
 test(
-	'LPD-78504 Can delete One-to-Many relationship between Custom Object entry and Native Object entry',
-	{tag: '@LPD-78504'},
+	'LPS-151676 Can delete One-to-Many relationship between Custom Object entry and Native Object entry',
+	{tag: '@LPS-151676'},
 	async ({apiHelpers, objectLayoutsPage, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -1199,8 +1199,8 @@ test(
 );
 
 test(
-	'LPD-78504 Can do nested relation in a One-to-Many relationship',
-	{tag: '@LPD-78504'},
+	'LPS-147906 Can do nested relation in a One-to-Many relationship',
+	{tag: '@LPS-147906'},
 	async ({apiHelpers, objectLayoutsPage, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -1397,8 +1397,8 @@ test(
 );
 
 test(
-	'LPD-78504 Can edit Many-to-Many relationship of Custom Object entries',
-	{tag: '@LPD-78504'},
+	'LPS-157229 Can edit Many-to-Many relationship of Custom Object entries',
+	{tag: '@LPS-157229'},
 	async ({apiHelpers, objectLayoutsPage, page, viewObjectEntriesPage}) => {
 		const objectFields1 = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -1601,8 +1601,8 @@ test(
 );
 
 test(
-	'LPD-78504 Can identify Parent and Child relationship through labels',
-	{tag: '@LPD-78504'},
+	'LPS-163654 Can identify Parent and Child relationship through labels',
+	{tag: '@LPS-163654'},
 	async ({
 		addNewObjectRelationshipModalPage,
 		apiHelpers,
@@ -1653,8 +1653,8 @@ test(
 );
 
 test(
-	'LPD-78504 Cannot delete Many-to-Many relationship from child side',
-	{tag: '@LPD-78504'},
+	'LPS-152508 Cannot delete Many-to-Many relationship from child side',
+	{tag: '@LPS-152508'},
 	async ({apiHelpers, objectRelationshipsPage, page}) => {
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
@@ -1715,8 +1715,8 @@ test(
 );
 
 test(
-	'LPD-78504 Cannot delete relationship with incorrect input',
-	{tag: '@LPD-78504'},
+	'LPS-152508 Cannot delete relationship with incorrect input',
+	{tag: '@LPS-152508'},
 	async ({apiHelpers, objectRelationshipsPage, page}) => {
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
@@ -1792,8 +1792,8 @@ test(
 );
 
 test(
-	'LPD-78504 Cannot leave Relationship Label blank',
-	{tag: '@LPD-78504'},
+	'LPS-135400 Cannot leave Relationship Label blank',
+	{tag: '@LPS-135400'},
 	async ({
 		addNewObjectRelationshipModalPage,
 		apiHelpers,
@@ -1841,8 +1841,8 @@ test(
 );
 
 test(
-	'LPD-78504 Cannot leave Relationship tab on first place by removing fields tab',
-	{tag: '@LPD-78504'},
+	'LPS-135397 Cannot leave Relationship tab on first place by removing fields tab',
+	{tag: '@LPS-135397'},
 	async ({apiHelpers, objectLayoutsPage, page}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -1953,8 +1953,8 @@ test(
 );
 
 test(
-	'LPD-78504 Cannot relate an entry with itself',
-	{tag: '@LPD-78504'},
+	'LPS-163658 Cannot relate an entry with itself',
+	{tag: '@LPS-163658'},
 	async ({
 		addNewObjectRelationshipModalPage,
 		apiHelpers,
@@ -2117,8 +2117,8 @@ test(
 );
 
 test(
-	'LPD-78504 Cannot select Relationship field for Object Entry Title',
-	{tag: '@LPD-78504'},
+	'LPS-139803 Cannot select Relationship field for Object Entry Title',
+	{tag: '@LPS-139803'},
 	async ({apiHelpers, editObjectDetailsPage, page}) => {
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
@@ -2175,8 +2175,8 @@ test(
 );
 
 test(
-	'LPD-78504 Cannot update Name, Type or Object from parent Relationship',
-	{tag: '@LPD-78504'},
+	'LPS-163655 Cannot update Name, Type or Object from parent Relationship',
+	{tag: '@LPS-163655'},
 	async ({apiHelpers, objectRelationshipsPage, page}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -2260,8 +2260,8 @@ test(
 );
 
 test(
-	'LPD-78504 Can relate Many-to-Many Custom Object entry with Native Object entries',
-	{tag: '@LPD-78504'},
+	'LPS-146754 Can relate Many-to-Many Custom Object entry with Native Object entries',
+	{tag: '@LPS-146754'},
 	async ({apiHelpers, objectLayoutsPage, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -2472,8 +2472,8 @@ test(
 );
 
 test(
-	'LPD-78504 Can relate One-to-Many Custom Object entry with Native Object entries',
-	{tag: '@LPD-78504'},
+	'LPS-151676 Can relate One-to-Many Custom Object entry with Native Object entries',
+	{tag: '@LPS-151676'},
 	async ({apiHelpers, objectLayoutsPage, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -2667,8 +2667,8 @@ test(
 );
 
 test(
-	'LPD-78504 Can relate One-to-Many Native Object with Custom site scoped Object',
-	{tag: '@LPD-78504'},
+	'LPS-145393 Can relate One-to-Many Native Object with Custom site scoped Object',
+	{tag: '@LPS-145393'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -2736,8 +2736,8 @@ test(
 );
 
 test(
-	'LPD-78504 Can see label when creating Relationship Tab',
-	{tag: '@LPD-78504'},
+	'LPS-163660 Can see label when creating Relationship Tab',
+	{tag: '@LPS-163660'},
 	async ({
 		addNewObjectRelationshipModalPage,
 		apiHelpers,
@@ -2811,8 +2811,7 @@ test(
 );
 
 test(
-	'LPD-78504 Can see label when editing Relationship',
-	{tag: '@LPD-78504'},
+	'Can see label when editing Relationship',
 	async ({apiHelpers, objectRelationshipsPage, page}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -2887,8 +2886,8 @@ test(
 );
 
 test(
-	'LPD-78504 Can see related entries on Relationship tab',
-	{tag: '@LPD-78504'},
+	'LPS-158478 Can see related entries on Relationship tab',
+	{tag: '@LPS-158478'},
 	async ({apiHelpers, objectLayoutsPage, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -3060,8 +3059,8 @@ test(
 );
 
 test(
-	'LPD-78504 Can set Title Field for Native Object',
-	{tag: '@LPD-78504'},
+	'LPS-145393 Can set Title Field for Native Object',
+	{tag: '@LPS-145393'},
 	async ({apiHelpers: _apiHelpers, editObjectDetailsPage, page}) => {
 		await editObjectDetailsPage.goto('User');
 
@@ -3094,8 +3093,8 @@ test(
 );
 
 test(
-	'LPD-78504 Can switch relationship order between parent and child',
-	{tag: '@LPD-78504'},
+	'LPS-193697 Can switch relationship order between parent and child',
+	{tag: '@LPS-193697'},
 	async ({
 		addNewObjectRelationshipModalPage,
 		apiHelpers,
@@ -3177,8 +3176,8 @@ test(
 );
 
 test(
-	'LPD-78504 Can view and add Object entries after creating a Relationship',
-	{tag: '@LPD-78504'},
+	'LPS-143021 Can view and add Object entries after creating a Relationship',
+	{tag: '@LPS-143021'},
 	async ({
 		addNewObjectRelationshipModalPage,
 		apiHelpers,
@@ -3236,8 +3235,8 @@ test(
 );
 
 test(
-	'LPD-78504 Switch button is not present when M:M relationship is selected',
-	{tag: '@LPD-78504'},
+	'LPS-193697 Switch button is not present when M:M relationship is selected',
+	{tag: '@LPS-193697'},
 	async ({
 		addNewObjectRelationshipModalPage,
 		apiHelpers,
