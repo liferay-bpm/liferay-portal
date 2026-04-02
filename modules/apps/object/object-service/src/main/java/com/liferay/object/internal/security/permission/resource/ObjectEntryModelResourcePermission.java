@@ -171,7 +171,8 @@ public class ObjectEntryModelResourcePermission
 				actionId) ||
 			permissionChecker.hasPermission(
 				objectEntry.getGroupId(), objectDefinition.getClassName(),
-				objectEntry.getHeadObjectEntryId(), actionId)) {
+				objectEntry.getHeadObjectEntryId(), actionId) ||
+			permissionChecker.isGroupAdmin(objectEntry.getGroupId())) {
 
 			return true;
 		}
