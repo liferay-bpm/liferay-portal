@@ -163,6 +163,7 @@ import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -197,6 +198,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
@@ -230,11 +232,17 @@ import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.site.cms.site.initializer.test.util.CMSTestUtil;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriInfo;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 
 import java.math.BigDecimal;
+
+import java.net.URI;
 
 import java.sql.Timestamp;
 
@@ -7203,6 +7211,81 @@ public class DefaultObjectEntryManagerImplTest
 					dtoConverterContext,
 					objectEntry1.getExternalReferenceCode(), _objectDefinition4,
 					_group.getGroupKey(), 1)));
+
+		PermissionChecker originalPermissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+		String originalName = PrincipalThreadLocal.getName();
+
+		try {
+			User user = UserTestUtil.addUser();
+
+			Role role = _roleLocalService.getRole(
+				companyId, RoleConstants.SITE_ADMINISTRATOR);
+
+			_userGroupRoleLocalService.addUserGroupRoles(
+				user.getUserId(), _group.getGroupId(),
+				new long[] {role.getRoleId()});
+
+			_resourceActionLocalService.checkResourceActions(
+				_objectDefinition4.getClassName(),
+				List.of(ObjectActionKeys.OBJECT_ENTRY_HISTORY));
+
+			_resourcePermissionLocalService.setResourcePermissions(
+				companyId, _objectDefinition4.getClassName(),
+				ResourceConstants.SCOPE_COMPANY, String.valueOf(companyId),
+				role.getRoleId(),
+				new String[] {
+					ActionKeys.VIEW, ActionKeys.UPDATE,
+					ObjectActionKeys.OBJECT_ENTRY_HISTORY
+				});
+
+			_resourcePermissionLocalService.setResourcePermissions(
+				companyId, _objectDefinition4.getResourceName(),
+				ResourceConstants.SCOPE_COMPANY, String.valueOf(companyId),
+				role.getRoleId(),
+				new String[] {ObjectActionKeys.ADD_OBJECT_ENTRY});
+
+			PermissionThreadLocal.setPermissionChecker(
+				PermissionCheckerFactoryUtil.create(user));
+
+			PrincipalThreadLocal.setName(user.getUserId());
+
+			objectEntry1 = _addObjectEntry(
+				_objectDefinition4,
+				ObjectEntryFolderConstants.
+					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+				_group.getGroupKey(), 1);
+
+			DTOConverterContext dtoConverterContext =
+				new DefaultDTOConverterContext(
+					false, Collections.emptyMap(), dtoConverterRegistry, null,
+					LocaleUtil.getDefault(), _createURIInfo(), user);
+
+			page = _defaultObjectEntryManager.getVersionedObjectEntries(
+				dtoConverterContext, objectEntry1.getExternalReferenceCode(),
+				_objectDefinition4, _group.getGroupKey(), null, null);
+
+			assertEquals(
+				(List<ObjectEntry>)page.getItems(),
+				ListUtil.fromArray(
+					_defaultObjectEntryManager.getObjectEntryByVersion(
+						dtoConverterContext,
+						objectEntry1.getExternalReferenceCode(),
+						_objectDefinition4, _group.getGroupKey(), 1)));
+
+			List<ObjectEntry> items = (List<ObjectEntry>)page.getItems();
+
+			ObjectEntry objectEntry = items.get(0);
+
+			Map<String, Map<String, String>> actions = objectEntry.getActions();
+
+			Assert.assertTrue(actions.containsKey("copy"));
+		}
+		finally {
+			PermissionThreadLocal.setPermissionChecker(
+				originalPermissionChecker);
+			PrincipalThreadLocal.setName(originalName);
+		}
 	}
 
 	@FeatureFlag("LPD-17564")
@@ -10588,6 +10671,33 @@ public class DefaultObjectEntryManagerImplTest
 		return objectFieldSetting;
 	}
 
+	private UriInfo _createURIInfo() {
+		return (UriInfo)ProxyUtil.newProxyInstance(
+			UriInfo.class.getClassLoader(), new Class<?>[] {UriInfo.class},
+			(proxy, method, args) -> {
+				String methodName = method.getName();
+
+				if (methodName.equals("getQueryParameters") ||
+					methodName.equals("getPathParameters")) {
+
+					return new MultivaluedHashMap<>();
+				}
+
+				if (methodName.endsWith("Builder")) {
+					return UriBuilder.fromUri(
+						"http://localhost:8080/o/c/entries");
+				}
+
+				if (methodName.equals("getBaseUri") ||
+					methodName.equals("getRequestUri")) {
+
+					return new URI("http://localhost:8080/o/c/entries");
+				}
+
+				return null;
+			});
+	}
+
 	private void _deleteAccountEntryOrganizationRel(
 			AccountEntry accountEntry, Organization organization)
 		throws Exception {
@@ -12228,6 +12338,10 @@ public class DefaultObjectEntryManagerImplTest
 
 	private static String _originalName;
 	private static PermissionChecker _originalPermissionChecker;
+
+	@Inject
+	private static ResourceActionLocalService _resourceActionLocalService;
+
 	private static DateFormat _simpleDateFormat;
 	private static DTOConverterContext _simpleDTOConverterContext;
 	private static ObjectDefinition _siteObjectDefinitionA;
