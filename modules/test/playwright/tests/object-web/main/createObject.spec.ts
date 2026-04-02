@@ -100,358 +100,528 @@ test(
 	}
 );
 
-test(
-	'Verify it is possible to add a Block',
-	{tag: '@LPS-135397'},
-	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
+test.describe('Layouts Tab', () => {
+	test(
+		'Verify it is possible to add a Block',
+		{tag: '@LPS-135397'},
+		async ({apiHelpers, objectLayoutsPage}) => {
+			const objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
 			});
 
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
+			await objectLayoutsPage.goto(objectDefinition.label['en_US']);
 
-		await objectLayoutsPage.goto(objectDefinition.label['en_US']);
+			const layoutName = 'Layout' + getRandomInt();
 
-		const layoutName = 'Layout' + getRandomInt();
+			await objectLayoutsPage.createObjectLayout(layoutName);
 
-		await objectLayoutsPage.createObjectLayout(layoutName);
+			await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
 
-		await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
+			await objectLayoutsPage.layoutTab.click();
 
-		await objectLayoutsPage.layoutTab.click();
+			await objectLayoutsPage.createObjectLayoutTab('Field Tab');
 
-		await objectLayoutsPage.createObjectLayoutTab('Field Tab');
-
-		await objectLayoutsPage.createObjectLayoutBlock({
-			objectLayoutRegularBlockName: 'Block Name',
-		});
-
-		await expect(
-			objectLayoutsPage.iframeLocator.getByText('Block Name')
-		).toBeVisible();
-	}
-);
-
-test.fixme(
-	'Verify it is possible to add Entries with Custom Layout Created',
-	{tag: '@LPS-135397'},
-	async ({apiHelpers, objectLayoutsPage, page, viewObjectEntriesPage}) => {
-		const objectFields = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
-		});
-
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields,
-				status: {code: 0},
+			await objectLayoutsPage.createObjectLayoutBlock({
+				objectLayoutRegularBlockName: 'Block Name',
 			});
 
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
+			await expect(
+				objectLayoutsPage.iframeLocator.getByText('Block Name')
+			).toBeVisible();
+		}
+	);
 
-		await objectLayoutsPage.goto(objectDefinition.label['en_US']);
-
-		const layoutName = 'Layout' + getRandomInt();
-
-		await objectLayoutsPage.createObjectLayout(layoutName);
-
-		await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
-
-		await objectLayoutsPage.layoutTab.click();
-
-		await objectLayoutsPage.createObjectLayoutTab('Field Tab');
-
-		await objectLayoutsPage.createObjectLayoutBlock({
-			objectLayoutRegularBlockName: 'Block',
-		});
-
-		await objectLayoutsPage.openObjectLayoutObjectField();
-
-		await objectLayoutsPage.addObjectLayoutObjectField(
-			objectFields[0].label!['en_US']
-		);
-
-		await objectLayoutsPage.iframeLocator
-			.getByRole('button', {name: 'Save'})
-			.first()
-			.click();
-
-		await waitForAlert(page);
-
-		await objectLayoutsPage.setObjectLayoutAsDefault();
-
-		await waitForAlert(page);
-
-		await viewObjectEntriesPage.goto(objectDefinition.className);
-
-		await viewObjectEntriesPage.clickAddObjectEntry(
-			objectDefinition.label['en_US']
-		);
-
-		await expect(page.getByText('Block')).toBeVisible();
-
-		await expect(
-			page.getByLabel(objectFields[0].label!['en_US'])
-		).toBeVisible();
-	}
-);
-
-test(
-	'Verify it is possible to add a field after the Object is published and submit entries to it',
-	{tag: '@LPS-135635'},
-	async ({
-		apiHelpers,
-		objectFieldsPage: _objectFieldsPage,
-		page,
-		viewObjectEntriesPage,
-	}) => {
-		const objectFields = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
-		});
-
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields,
-				panelCategoryKey: 'control_panel.object',
-				scope: 'company',
-				status: {code: 0},
+	test(
+		'Verify it is possible to add a Field for the Block with 1 column',
+		{tag: '@LPS-135397'},
+		async ({apiHelpers, objectLayoutsPage}) => {
+			const objectFields = generateObjectFields({
+				objectFieldBusinessTypes: ['Text'],
 			});
 
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
+			const objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFields,
+					status: {code: 0},
+				});
 
-		const newField = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
-		});
-
-		const objectFieldAPIClient =
-			await apiHelpers.buildRestClient(ObjectFieldAPI);
-
-		await objectFieldAPIClient.postObjectDefinitionObjectField(
-			objectDefinition.id!,
-			newField[0]
-		);
-
-		await viewObjectEntriesPage.goto(objectDefinition.name!);
-
-		await viewObjectEntriesPage.clickAddObjectEntry(
-			objectDefinition.label['en_US']
-		);
-
-		await viewObjectEntriesPage.fillObjectEntry({
-			objectFieldValue: 'String Entry',
-		});
-
-		await viewObjectEntriesPage.saveObjectEntryButton.click();
-
-		await waitForAlert(page);
-	}
-);
-
-test(
-	'Verify it is possible to add a Field for the Block with one column',
-	{tag: '@LPS-135397'},
-	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
-		const objectFields = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
-		});
-
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields,
-				status: {code: 0},
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
 			});
 
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
+			await objectLayoutsPage.goto(objectDefinition.label['en_US']);
 
-		await objectLayoutsPage.goto(objectDefinition.label['en_US']);
+			const layoutName = 'Layout' + getRandomInt();
 
-		const layoutName = 'Layout' + getRandomInt();
+			await objectLayoutsPage.createObjectLayout(layoutName);
 
-		await objectLayoutsPage.createObjectLayout(layoutName);
+			await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
 
-		await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
+			await objectLayoutsPage.layoutTab.click();
 
-		await objectLayoutsPage.layoutTab.click();
+			await objectLayoutsPage.createObjectLayoutContent({
+				objectFieldNames: [objectFields[0].label!['en_US']],
+				objectLayoutName: layoutName,
+				objectLayoutRegularBlockName: 'Block Name',
+				objectLayoutTabName: 'Field Tab',
+			});
 
-		await objectLayoutsPage.createObjectLayoutContent({
-			objectFieldNames: [objectFields[0].label!['en_US']],
-			objectLayoutName: layoutName,
-			objectLayoutRegularBlockName: 'Block Name',
-			objectLayoutTabName: 'Field Tab',
-		});
+			await expect(
+				objectLayoutsPage.layoutTabPanel.getByText(
+					objectFields[0].label!['en_US']
+				)
+			).toBeVisible();
+		}
+	);
 
-		await expect(
-			objectLayoutsPage.layoutTabPanel.getByText(
+	test(
+		'Verify it is possible to add a Field for the Block with 2 columns',
+		{tag: '@LPS-135397'},
+		async ({apiHelpers, objectLayoutsPage}) => {
+			const objectFields = generateObjectFields({
+				objectFieldBusinessTypes: ['Text'],
+			});
+
+			const objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFields,
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+
+			await objectLayoutsPage.goto(objectDefinition.label['en_US']);
+
+			const layoutName = 'Layout' + getRandomInt();
+
+			await objectLayoutsPage.createObjectLayout(layoutName);
+
+			await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
+
+			await objectLayoutsPage.layoutTab.click();
+
+			await objectLayoutsPage.createObjectLayoutContent({
+				objectFieldNames: [objectFields[0].label!['en_US']],
+				objectLayoutName: layoutName,
+				objectLayoutRegularBlockName: 'Block Name',
+				objectLayoutTabName: 'Field Tab',
+			});
+
+			await expect(
+				objectLayoutsPage.layoutTabPanel.getByText(
+					objectFields[0].label!['en_US']
+				)
+			).toBeVisible();
+		}
+	);
+
+	test(
+		'Verify it is possible to add a Field for the Block with 3 columns',
+		{tag: '@LPS-135397'},
+		async ({apiHelpers, objectLayoutsPage}) => {
+			const objectFields = generateObjectFields({
+				objectFieldBusinessTypes: ['Text'],
+			});
+
+			const objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFields,
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+
+			await objectLayoutsPage.goto(objectDefinition.label['en_US']);
+
+			const layoutName = 'Layout' + getRandomInt();
+
+			await objectLayoutsPage.createObjectLayout(layoutName);
+
+			await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
+
+			await objectLayoutsPage.layoutTab.click();
+
+			await objectLayoutsPage.createObjectLayoutContent({
+				objectFieldNames: [objectFields[0].label!['en_US']],
+				objectLayoutName: layoutName,
+				objectLayoutRegularBlockName: 'Block Name',
+				objectLayoutTabName: 'Field Tab',
+			});
+
+			await expect(
+				objectLayoutsPage.layoutTabPanel.getByText(
+					objectFields[0].label!['en_US']
+				)
+			).toBeVisible();
+		}
+	);
+
+	test(
+		'Verify it is possible to add a Tab with Fields Type',
+		{tag: '@LPS-135397'},
+		async ({apiHelpers, objectLayoutsPage}) => {
+			const objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+
+			await objectLayoutsPage.goto(objectDefinition.label['en_US']);
+
+			const layoutName = 'Layout' + getRandomInt();
+
+			await objectLayoutsPage.createObjectLayout(layoutName);
+
+			await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
+
+			await objectLayoutsPage.layoutTab.click();
+
+			await objectLayoutsPage.createObjectLayoutTab('Field Tab');
+
+			await expect(
+				objectLayoutsPage.iframeLocator.getByText('Field Tab')
+			).toBeVisible();
+		}
+	);
+
+	test(
+		'Verify it is possible to collapse and expand a block of fields',
+		{tag: '@LPS-135397'},
+		async ({apiHelpers, objectLayoutsPage}) => {
+			const objectFields = generateObjectFields({
+				objectFieldBusinessTypes: ['Text'],
+			});
+
+			const objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFields,
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+
+			await objectLayoutsPage.goto(objectDefinition.label['en_US']);
+
+			const layoutName = 'Layout' + getRandomInt();
+
+			await objectLayoutsPage.createObjectLayout(layoutName);
+
+			await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
+
+			await objectLayoutsPage.layoutTab.click();
+
+			await objectLayoutsPage.createObjectLayoutContent({
+				objectFieldNames: [objectFields[0].label!['en_US']],
+				objectLayoutName: layoutName,
+				objectLayoutRegularBlockName: 'Block 1',
+				objectLayoutTabName: 'Field Tab',
+			});
+
+			await objectLayoutsPage.toggleCollapsible('Block 1');
+
+			await expect(
+				objectLayoutsPage.iframeLocator.getByRole('switch', {
+					name: 'Collapsible',
+				})
+			).toBeChecked();
+		}
+	);
+
+	test.fixme(
+		'Verify it is possible to add Entries with Custom Layout Created',
+		{tag: '@LPS-135397'},
+		async ({
+			apiHelpers,
+			objectLayoutsPage,
+			page,
+			viewObjectEntriesPage,
+		}) => {
+			const objectFields = generateObjectFields({
+				objectFieldBusinessTypes: ['Text'],
+			});
+
+			const objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFields,
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+
+			await objectLayoutsPage.goto(objectDefinition.label['en_US']);
+
+			const layoutName = 'Layout' + getRandomInt();
+
+			await objectLayoutsPage.createObjectLayout(layoutName);
+
+			await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
+
+			await objectLayoutsPage.layoutTab.click();
+
+			await objectLayoutsPage.createObjectLayoutTab('Field Tab');
+
+			await objectLayoutsPage.createObjectLayoutBlock({
+				objectLayoutRegularBlockName: 'Block',
+			});
+
+			await objectLayoutsPage.openObjectLayoutObjectField();
+
+			await objectLayoutsPage.addObjectLayoutObjectField(
 				objectFields[0].label!['en_US']
-			)
-		).toBeVisible();
-	}
-);
+			);
 
-test(
-	'Verify it is possible to add a Field for the Block with three columns',
-	{tag: '@LPS-135397'},
-	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
-		const objectFields = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
-		});
+			await objectLayoutsPage.iframeLocator
+				.getByRole('button', {name: 'Save'})
+				.first()
+				.click();
 
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields,
-				status: {code: 0},
+			await waitForAlert(page);
+
+			await objectLayoutsPage.setObjectLayoutAsDefault();
+
+			await waitForAlert(page);
+
+			await viewObjectEntriesPage.goto(objectDefinition.className);
+
+			await viewObjectEntriesPage.clickAddObjectEntry(
+				objectDefinition.label['en_US']
+			);
+
+			await expect(page.getByText('Block')).toBeVisible();
+
+			await expect(
+				page.getByLabel(objectFields[0].label!['en_US'])
+			).toBeVisible();
+		}
+	);
+});
+
+test.describe('Fields Tab', () => {
+	test(
+		'Verify it is possible to add a field after the Object is published and submit entries to it',
+		{tag: '@LPS-135635'},
+		async ({apiHelpers, page, viewObjectEntriesPage}) => {
+			const objectFields = generateObjectFields({
+				objectFieldBusinessTypes: ['Text'],
 			});
 
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
+			const objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFields,
+					panelCategoryKey: 'control_panel.object',
+					scope: 'company',
+					status: {code: 0},
+				});
 
-		await objectLayoutsPage.goto(objectDefinition.label['en_US']);
-
-		const layoutName = 'Layout' + getRandomInt();
-
-		await objectLayoutsPage.createObjectLayout(layoutName);
-
-		await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
-
-		await objectLayoutsPage.layoutTab.click();
-
-		await objectLayoutsPage.createObjectLayoutContent({
-			objectFieldNames: [objectFields[0].label!['en_US']],
-			objectLayoutName: layoutName,
-			objectLayoutRegularBlockName: 'Block Name',
-			objectLayoutTabName: 'Field Tab',
-		});
-
-		await expect(
-			objectLayoutsPage.layoutTabPanel.getByText(
-				objectFields[0].label!['en_US']
-			)
-		).toBeVisible();
-	}
-);
-
-test(
-	'Verify it is possible to add a Field for the Block with two columns',
-	{tag: '@LPS-135397'},
-	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
-		const objectFields = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
-		});
-
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields,
-				status: {code: 0},
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
 			});
 
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
-
-		await objectLayoutsPage.goto(objectDefinition.label['en_US']);
-
-		const layoutName = 'Layout' + getRandomInt();
-
-		await objectLayoutsPage.createObjectLayout(layoutName);
-
-		await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
-
-		await objectLayoutsPage.layoutTab.click();
-
-		await objectLayoutsPage.createObjectLayoutContent({
-			objectFieldNames: [objectFields[0].label!['en_US']],
-			objectLayoutName: layoutName,
-			objectLayoutRegularBlockName: 'Block Name',
-			objectLayoutTabName: 'Field Tab',
-		});
-
-		await expect(
-			objectLayoutsPage.layoutTabPanel.getByText(
-				objectFields[0].label!['en_US']
-			)
-		).toBeVisible();
-	}
-);
-
-test(
-	'Verify it is possible to add a Tab with Fields Type',
-	{tag: '@LPS-135397'},
-	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
+			const newField = generateObjectFields({
+				objectFieldBusinessTypes: ['Text'],
 			});
 
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
+			const objectFieldAPIClient =
+				await apiHelpers.buildRestClient(ObjectFieldAPI);
 
-		await objectLayoutsPage.goto(objectDefinition.label['en_US']);
+			await objectFieldAPIClient.postObjectDefinitionObjectField(
+				objectDefinition.id!,
+				newField[0]
+			);
 
-		const layoutName = 'Layout' + getRandomInt();
+			await viewObjectEntriesPage.goto(objectDefinition.name!);
 
-		await objectLayoutsPage.createObjectLayout(layoutName);
+			await viewObjectEntriesPage.clickAddObjectEntry(
+				objectDefinition.label['en_US']
+			);
 
-		await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
-
-		await objectLayoutsPage.layoutTab.click();
-
-		await objectLayoutsPage.createObjectLayoutTab('Field Tab');
-
-		await expect(
-			objectLayoutsPage.iframeLocator.getByText('Field Tab')
-		).toBeVisible();
-	}
-);
-
-test(
-	'Verify it is possible to add an Object Entry Title Field',
-	{tag: '@LPS-139803'},
-	async ({apiHelpers, editObjectDetailsPage, page}) => {
-		const objectFields = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
-		});
-
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields,
-				status: {code: 0},
+			await viewObjectEntriesPage.fillObjectEntry({
+				objectFieldValue: 'String Entry',
 			});
 
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
+			await viewObjectEntriesPage.saveObjectEntryButton.click();
 
-		await editObjectDetailsPage.goto(objectDefinition.label['en_US']);
-		await editObjectDetailsPage.goToDetailsTab();
+			await waitForAlert(page);
+		}
+	);
+});
 
-		await page.getByLabel('Entry Display').first().click();
-		await page
-			.getByRole('option', {name: objectFields[0].label!['en_US']})
-			.click();
+test.describe('Details Tab', () => {
+	test(
+		'Verify it is possible to add an Object Entry Title Field',
+		{tag: '@LPS-139803'},
+		async ({apiHelpers, editObjectDetailsPage, page}) => {
+			const objectFields = generateObjectFields({
+				objectFieldBusinessTypes: ['Text'],
+			});
 
-		await editObjectDetailsPage.saveObjectDefinition();
+			const objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFields,
+					status: {code: 0},
+				});
 
-		await waitForAlert(page);
-	}
-);
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+
+			await editObjectDetailsPage.goto(objectDefinition.label['en_US']);
+			await editObjectDetailsPage.goToDetailsTab();
+
+			await page.getByLabel('Entry Display').first().click();
+			await page
+				.getByRole('option', {name: objectFields[0].label!['en_US']})
+				.click();
+
+			await editObjectDetailsPage.saveObjectDefinition();
+
+			await waitForAlert(page);
+		}
+	);
+});
+
+test.describe('Relationships Tab', () => {
+	test(
+		'Verify it is possible to create a Many to Many Relationship',
+		{tag: '@LPS-135401'},
+		async ({
+			addNewObjectRelationshipModalPage,
+			apiHelpers,
+			objectRelationshipsPage,
+			page,
+		}) => {
+			const objectDefinition1 =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					status: {code: 0},
+				});
+
+			const objectDefinition2 =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition1.id,
+				type: 'objectDefinition',
+			});
+			apiHelpers.data.push({
+				id: objectDefinition2.id,
+				type: 'objectDefinition',
+			});
+
+			await objectRelationshipsPage.goto(
+				objectDefinition1.label['en_US']
+			);
+
+			await objectRelationshipsPage.addObjectRelationshipButton.click();
+
+			const relationshipLabel = 'Relationship' + getRandomInt();
+
+			const objectRelationship =
+				await addNewObjectRelationshipModalPage.handleForm({
+					manyRecordsOf: objectDefinition2.label['en_US'],
+					objectRelationshipLabel: relationshipLabel,
+					type: 'Many to Many',
+				});
+
+			apiHelpers.data.push({
+				id: objectRelationship.id,
+				type: 'objectRelationship',
+			});
+
+			await waitForAlert(
+				page,
+				'Success:Relationship was created successfully'
+			);
+
+			await expect(page.getByRole('link', {name: relationshipLabel})).toBeVisible();
+		}
+	);
+
+	test(
+		'Verify it is possible to create a One to Many Relationship',
+		{tag: '@LPS-135400'},
+		async ({
+			addNewObjectRelationshipModalPage,
+			apiHelpers,
+			objectRelationshipsPage,
+			page,
+		}) => {
+			const objectDefinition1 =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					status: {code: 0},
+				});
+
+			const objectDefinition2 =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition1.id,
+				type: 'objectDefinition',
+			});
+			apiHelpers.data.push({
+				id: objectDefinition2.id,
+				type: 'objectDefinition',
+			});
+
+			await objectRelationshipsPage.goto(
+				objectDefinition1.label['en_US']
+			);
+
+			await objectRelationshipsPage.addObjectRelationshipButton.click();
+
+			const relationshipLabel = 'Relationship' + getRandomInt();
+
+			const objectRelationship =
+				await addNewObjectRelationshipModalPage.handleForm({
+					manyRecordsOf: objectDefinition2.label['en_US'],
+					objectRelationshipLabel: relationshipLabel,
+					type: 'One to Many',
+				});
+
+			apiHelpers.data.push({
+				id: objectRelationship.id,
+				type: 'objectRelationship',
+			});
+
+			await waitForAlert(
+				page,
+				'Success:Relationship was created successfully'
+			);
+
+			await expect(
+				page.getByRole('link', {name: relationshipLabel})
+			).toBeVisible();
+		}
+	);
+});
 
 test(
 	'Verify it is possible to add an Object with the Add Object Definition permission',
@@ -539,158 +709,159 @@ test(
 	}
 );
 
-test(
-	'Verify it is possible to add a relation with an entry through the Relationship field',
-	{tag: '@LPS-135400'},
-	async ({apiHelpers, page, viewObjectEntriesPage}) => {
-		const objectFields1 = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
-		});
-
-		const objectDefinition1 =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields: objectFields1,
-				status: {code: 0},
+test.describe('Object Entries Page', () => {
+	test(
+		'Verify it is possible to add a relation with an entry through the Relationship field',
+		{tag: '@LPS-135400'},
+		async ({apiHelpers, page, viewObjectEntriesPage}) => {
+			const objectFields1 = generateObjectFields({
+				objectFieldBusinessTypes: ['Text'],
 			});
 
-		const objectDefinition2 =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
+			const objectDefinition1 =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFields: objectFields1,
+					status: {code: 0},
+				});
+
+			const objectDefinition2 =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition1.id,
+				type: 'objectDefinition',
+			});
+			apiHelpers.data.push({
+				id: objectDefinition2.id,
+				type: 'objectDefinition',
 			});
 
-		apiHelpers.data.push({
-			id: objectDefinition1.id,
-			type: 'objectDefinition',
-		});
-		apiHelpers.data.push({
-			id: objectDefinition2.id,
-			type: 'objectDefinition',
-		});
+			const objectRelationshipAPIClient =
+				await apiHelpers.buildRestClient(ObjectRelationshipAPI);
 
-		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
-			ObjectRelationshipAPI
-		);
+			const relationshipLabel = 'Relationship' + getRandomInt();
 
-		const relationshipLabel = 'Relationship' + getRandomInt();
+			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+				objectDefinition1.externalReferenceCode!,
+				{
+					label: {en_US: relationshipLabel},
+					name: 'relationship' + getRandomInt(),
+					objectDefinitionExternalReferenceCode2:
+						objectDefinition2.externalReferenceCode,
+					objectDefinitionId2: objectDefinition2.id,
+					objectDefinitionName2: objectDefinition2.name,
+					type: 'oneToMany',
+				}
+			);
+			const parentEntry = await apiHelpers.objectEntry.postObjectEntry(
+				{[objectFields1[0].name!]: 'ParentEntry'},
+				'c/' + objectDefinition1.name!.toLowerCase() + 's'
+			);
 
-		await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
-			objectDefinition1.externalReferenceCode!,
-			{
-				label: {en_US: relationshipLabel},
-				name: 'relationship' + getRandomInt(),
-				objectDefinitionExternalReferenceCode2:
-					objectDefinition2.externalReferenceCode,
-				objectDefinitionId2: objectDefinition2.id,
-				objectDefinitionName2: objectDefinition2.name,
-				type: 'oneToMany',
-			}
-		);
-		const parentEntry = await apiHelpers.objectEntry.postObjectEntry(
-			{[objectFields1[0].name!]: 'ParentEntry'},
-			'c/' + objectDefinition1.name!.toLowerCase() + 's'
-		);
+			await viewObjectEntriesPage.goto(objectDefinition2.className);
 
-		await viewObjectEntriesPage.goto(objectDefinition2.className);
+			await viewObjectEntriesPage.clickAddObjectEntry(
+				objectDefinition2.label['en_US']
+			);
 
-		await viewObjectEntriesPage.clickAddObjectEntry(
-			objectDefinition2.label['en_US']
-		);
+			await page.getByLabel(relationshipLabel).click();
+			await page
+				.getByRole('option', {name: parentEntry.id!.toString()})
+				.first()
+				.click();
 
-		await page.getByLabel(relationshipLabel).click();
-		await page
-			.getByRole('option', {name: parentEntry.id!.toString()})
-			.first()
-			.click();
+			await viewObjectEntriesPage.saveObjectEntryButton.click();
 
-		await viewObjectEntriesPage.saveObjectEntryButton.click();
+			await expect(viewObjectEntriesPage.successMessage).toBeVisible();
+		}
+	);
 
-		await expect(viewObjectEntriesPage.successMessage).toBeVisible();
-	}
-);
-
-test(
-	'Verify it is possible to add many relations through the Relationship tab',
-	{tag: '@LPS-135400'},
-	async ({apiHelpers, page, viewObjectEntriesPage}) => {
-		const objectFields1 = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
-		});
-
-		const objectDefinition1 =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields: objectFields1,
-				status: {code: 0},
+	test(
+		'Verify it is possible to add many relations through the Relationship tab',
+		{tag: '@LPS-135400'},
+		async ({apiHelpers, page, viewObjectEntriesPage}) => {
+			const objectFields1 = generateObjectFields({
+				objectFieldBusinessTypes: ['Text'],
 			});
 
-		const objectFields2 = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
-		});
+			const objectDefinition1 =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFields: objectFields1,
+					status: {code: 0},
+				});
 
-		const objectDefinition2 =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields: objectFields2,
-				status: {code: 0},
+			const objectFields2 = generateObjectFields({
+				objectFieldBusinessTypes: ['Text'],
 			});
 
-		apiHelpers.data.push({
-			id: objectDefinition1.id,
-			type: 'objectDefinition',
-		});
-		apiHelpers.data.push({
-			id: objectDefinition2.id,
-			type: 'objectDefinition',
-		});
+			const objectDefinition2 =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFields: objectFields2,
+					status: {code: 0},
+				});
 
-		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
-			ObjectRelationshipAPI
-		);
+			apiHelpers.data.push({
+				id: objectDefinition1.id,
+				type: 'objectDefinition',
+			});
+			apiHelpers.data.push({
+				id: objectDefinition2.id,
+				type: 'objectDefinition',
+			});
 
-		const relationshipLabel = 'Relationship' + getRandomInt();
+			const objectRelationshipAPIClient =
+				await apiHelpers.buildRestClient(ObjectRelationshipAPI);
 
-		await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
-			objectDefinition1.externalReferenceCode!,
-			{
-				label: {en_US: relationshipLabel},
-				name: 'relationship' + getRandomInt(),
-				objectDefinitionExternalReferenceCode2:
-					objectDefinition2.externalReferenceCode,
-				objectDefinitionId2: objectDefinition2.id,
-				objectDefinitionName2: objectDefinition2.name,
-				type: 'oneToMany',
-			}
-		);
-		const _parentEntry = await apiHelpers.objectEntry.postObjectEntry(
-			{[objectFields1[0].name!]: 'ParentEntry'},
-			'c/' + objectDefinition1.name!.toLowerCase() + 's'
-		);
+			const relationshipLabel = 'Relationship' + getRandomInt();
 
-		await apiHelpers.objectEntry.postObjectEntry(
-			{[objectFields2[0].name!]: 'ChildEntry1'},
-			'c/' + objectDefinition2.name!.toLowerCase() + 's'
-		);
+			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+				objectDefinition1.externalReferenceCode!,
+				{
+					label: {en_US: relationshipLabel},
+					name: 'relationship' + getRandomInt(),
+					objectDefinitionExternalReferenceCode2:
+						objectDefinition2.externalReferenceCode,
+					objectDefinitionId2: objectDefinition2.id,
+					objectDefinitionName2: objectDefinition2.name,
+					type: 'oneToMany',
+				}
+			);
 
-		await apiHelpers.objectEntry.postObjectEntry(
-			{[objectFields2[0].name!]: 'ChildEntry2'},
-			'c/' + objectDefinition2.name!.toLowerCase() + 's'
-		);
+			await apiHelpers.objectEntry.postObjectEntry(
+				{[objectFields1[0].name!]: 'ParentEntry'},
+				'c/' + objectDefinition1.name!.toLowerCase() + 's'
+			);
 
-		await viewObjectEntriesPage.goto(objectDefinition1.className);
+			await apiHelpers.objectEntry.postObjectEntry(
+				{[objectFields2[0].name!]: 'ChildEntry1'},
+				'c/' + objectDefinition2.name!.toLowerCase() + 's'
+			);
 
-		await page.locator('.lfr-object-entry').first().click();
+			await apiHelpers.objectEntry.postObjectEntry(
+				{[objectFields2[0].name!]: 'ChildEntry2'},
+				'c/' + objectDefinition2.name!.toLowerCase() + 's'
+			);
 
-		await page.getByRole('tab', {name: relationshipLabel}).click();
+			await viewObjectEntriesPage.goto(objectDefinition1.className);
 
-		await page.getByRole('button', {name: 'Add'}).click();
+			await page.locator('.lfr-object-entry').first().click();
 
-		await page.getByRole('checkbox').first().check();
-		await page.getByRole('checkbox').nth(1).check();
+			await page.getByRole('tab', {name: relationshipLabel}).click();
 
-		await page.getByRole('button', {name: 'Add'}).click();
+			await page.getByRole('button', {name: 'Add'}).click();
 
-		await expect(page.getByText('ChildEntry1')).toBeVisible();
-		await expect(page.getByText('ChildEntry2')).toBeVisible();
-	}
-);
+			await page.getByRole('checkbox').first().check();
+			await page.getByRole('checkbox').nth(1).check();
+
+			await page.getByRole('button', {name: 'Add'}).click();
+
+			await expect(page.getByText('ChildEntry1')).toBeVisible();
+			await expect(page.getByText('ChildEntry2')).toBeVisible();
+		}
+	);
+});
 
 test(
 	'Verify it is possible to cancel the creation of a Custom Object',
@@ -820,52 +991,6 @@ test(
 );
 
 test(
-	'Verify it is possible to collapse and expand a block of fields',
-	{tag: '@LPS-135397'},
-	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
-		const objectFields = generateObjectFields({
-			objectFieldBusinessTypes: ['Text'],
-		});
-
-		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFields,
-				status: {code: 0},
-			});
-
-		apiHelpers.data.push({
-			id: objectDefinition.id,
-			type: 'objectDefinition',
-		});
-
-		await objectLayoutsPage.goto(objectDefinition.label['en_US']);
-
-		const layoutName = 'Layout' + getRandomInt();
-
-		await objectLayoutsPage.createObjectLayout(layoutName);
-
-		await objectLayoutsPage.openObjectLayoutConfiguration(layoutName);
-
-		await objectLayoutsPage.layoutTab.click();
-
-		await objectLayoutsPage.createObjectLayoutContent({
-			objectFieldNames: [objectFields[0].label!['en_US']],
-			objectLayoutName: layoutName,
-			objectLayoutRegularBlockName: 'Block 1',
-			objectLayoutTabName: 'Field Tab',
-		});
-
-		await objectLayoutsPage.toggleCollapsible('Block 1');
-
-		await expect(
-			objectLayoutsPage.iframeLocator.getByRole('switch', {
-				name: 'Collapsible',
-			})
-		).toBeChecked();
-	}
-);
-
-test(
 	'Verify it is possible to create a Custom Object',
 	{tag: '@LPS-135549'},
 	async ({
@@ -920,110 +1045,6 @@ test(
 		await objectLayoutsPage.createObjectLayout(layoutName);
 
 		await expect(page.getByText(layoutName)).toBeVisible();
-	}
-);
-
-test(
-	'Verify it is possible to create a Many to Many Relationship',
-	{tag: '@LPS-135401'},
-	async ({
-		addNewObjectRelationshipModalPage,
-		apiHelpers,
-		objectRelationshipsPage,
-		page,
-	}) => {
-		const objectDefinition1 =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
-			});
-
-		const objectDefinition2 =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
-			});
-
-		apiHelpers.data.push({
-			id: objectDefinition1.id,
-			type: 'objectDefinition',
-		});
-		apiHelpers.data.push({
-			id: objectDefinition2.id,
-			type: 'objectDefinition',
-		});
-
-		await objectRelationshipsPage.goto(objectDefinition1.label['en_US']);
-
-		await objectRelationshipsPage.addObjectRelationshipButton.click();
-
-		const relationshipLabel = 'Relationship' + getRandomInt();
-
-		const objectRelationship =
-			await addNewObjectRelationshipModalPage.handleForm({
-				manyRecordsOf: objectDefinition2.label['en_US'],
-				objectRelationshipLabel: relationshipLabel,
-				type: 'Many to Many',
-			});
-
-		apiHelpers.data.push({
-			id: objectRelationship.id,
-			type: 'objectRelationship',
-		});
-
-		await waitForAlert(page);
-
-		await expect(page.getByText(relationshipLabel)).toBeVisible();
-	}
-);
-
-test(
-	'Verify it is possible to create a One to Many Relationship',
-	{tag: '@LPS-135400'},
-	async ({
-		addNewObjectRelationshipModalPage,
-		apiHelpers,
-		objectRelationshipsPage,
-		page,
-	}) => {
-		const objectDefinition1 =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
-			});
-
-		const objectDefinition2 =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				status: {code: 0},
-			});
-
-		apiHelpers.data.push({
-			id: objectDefinition1.id,
-			type: 'objectDefinition',
-		});
-		apiHelpers.data.push({
-			id: objectDefinition2.id,
-			type: 'objectDefinition',
-		});
-
-		await objectRelationshipsPage.goto(objectDefinition1.label['en_US']);
-
-		await objectRelationshipsPage.addObjectRelationshipButton.click();
-
-		const relationshipLabel = 'Relationship' + getRandomInt();
-
-		const objectRelationship =
-			await addNewObjectRelationshipModalPage.handleForm({
-				manyRecordsOf: objectDefinition2.label['en_US'],
-				objectRelationshipLabel: relationshipLabel,
-				type: 'One to Many',
-			});
-
-		apiHelpers.data.push({
-			id: objectRelationship.id,
-			type: 'objectRelationship',
-		});
-
-		await waitForAlert(page);
-
-		await expect(page.getByText(relationshipLabel)).toBeVisible();
 	}
 );
 
@@ -1092,7 +1113,7 @@ test(
 test(
 	'Verify it is possible to delete a Field on Layout',
 	{tag: '@LPS-135397'},
-	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
+	async ({apiHelpers, objectLayoutsPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -1482,7 +1503,7 @@ test(
 test(
 	'Verify it is not possible to add a Tab with Relationship Type in an Object without Relationship',
 	{tag: '@LPS-135397'},
-	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
+	async ({apiHelpers, objectLayoutsPage}) => {
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
 				status: {code: 0},
@@ -1518,7 +1539,7 @@ test(
 test(
 	'Verify that the Relationship tab cannot be added first',
 	{tag: '@LPS-135397'},
-	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
+	async ({apiHelpers, objectLayoutsPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
@@ -3151,7 +3172,7 @@ test(
 test(
 	'Verify it is possible to set the block as Collapsible',
 	{tag: '@LPS-135397'},
-	async ({apiHelpers, objectLayoutsPage, page: _page}) => {
+	async ({apiHelpers, objectLayoutsPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
 		});
