@@ -293,7 +293,7 @@ test(
 		});
 
 		await expect(
-			objectLayoutsPage.iframeLocator.getByText(
+			objectLayoutsPage.layoutTabPanel.getByText(
 				objectFields[0].label!['en_US']
 			)
 		).toBeVisible();
@@ -337,7 +337,7 @@ test(
 		});
 
 		await expect(
-			objectLayoutsPage.iframeLocator.getByText(
+			objectLayoutsPage.layoutTabPanel.getByText(
 				objectFields[0].label!['en_US']
 			)
 		).toBeVisible();
@@ -381,7 +381,7 @@ test(
 		});
 
 		await expect(
-			objectLayoutsPage.iframeLocator.getByText(
+			objectLayoutsPage.layoutTabPanel.getByText(
 				objectFields[0].label!['en_US']
 			)
 		).toBeVisible();

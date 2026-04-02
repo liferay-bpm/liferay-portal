@@ -20,6 +20,7 @@ export class ObjectLayoutsPage {
 	readonly iframeLocator: FrameLocator;
 	readonly labelInput: Locator;
 	readonly layoutNameInput: Locator;
+	readonly layoutTabPanel: Locator;
 	readonly layoutsTabItem: Locator;
 	readonly layoutTab: Locator;
 	readonly markAsDefaultButton: Locator;
@@ -58,6 +59,9 @@ export class ObjectLayoutsPage {
 			.nth(0);
 		this.labelInput = this.iframeLocator.getByLabel('Label');
 		this.layoutNameInput = page.getByLabel('Name');
+		this.layoutTabPanel = this.iframeLocator.locator(
+			'.layout-tab__tab .object-admin-panel'
+		);
 		this.layoutsTabItem = page.getByRole('link', {name: 'Layouts'});
 		this.layoutTab = this.iframeLocator.getByRole('tab', {name: 'Layout'});
 		this.markAsDefaultButton =
