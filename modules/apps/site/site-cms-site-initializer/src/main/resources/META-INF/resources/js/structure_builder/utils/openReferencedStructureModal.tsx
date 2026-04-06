@@ -197,14 +197,15 @@ function getItems(
 	const items = [];
 
 	// Exclude objectDefinitions that are repeatable groups,
-	// main objectDefinition itself and objectDefinitions
-	// that have a circular dependency with the main one
+	// main objectDefinition itself, system objectDefinitions
+	// and objectDefinitions that have a circular dependency with the main one
 
 	for (const objectDefinition of Object.values(objectDefinitions)) {
 		if (
 			objectDefinition.externalReferenceCode === mainStructureERC ||
 			objectDefinition.objectFolderExternalReferenceCode ===
 				'L_CMS_STRUCTURE_REPEATABLE_GROUPS' ||
+			objectDefinition.system ||
 			hasCircularDependency(
 				objectDefinition,
 				objectDefinitions,
