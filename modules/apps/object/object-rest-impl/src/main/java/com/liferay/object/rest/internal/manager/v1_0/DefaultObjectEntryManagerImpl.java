@@ -18,8 +18,10 @@ import com.liferay.object.comment.ObjectEntryComment;
 import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.constants.ObjectFolderConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.entry.folder.subscription.util.ObjectEntryFolderSubscriptionUtil;
 import com.liferay.object.entry.util.ObjectEntryDTOConverterUtil;
@@ -36,6 +38,7 @@ import com.liferay.object.model.ObjectEntryTable;
 import com.liferay.object.model.ObjectEntryVersion;
 import com.liferay.object.model.ObjectEntryVersionTable;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectFolder;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.model.ObjectRelationshipModel;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
@@ -1390,7 +1393,7 @@ public class DefaultObjectEntryManagerImpl
 						objectDefinition.getObjectDefinitionId(),
 						_getObjectEntryFolderId(
 							objectDefinition.getCompanyId(), groupId,
-							objectEntry, serviceContext),
+							objectEntry, objectDefinition, serviceContext),
 						_toObjectValues(
 							0L, dtoConverterContext.getLocale(),
 							objectDefinition, objectEntry, scopeKey,
@@ -1611,7 +1614,7 @@ public class DefaultObjectEntryManagerImpl
 				groupId, objectDefinition.getObjectDefinitionId(),
 				_getObjectEntryFolderId(
 					objectDefinition.getCompanyId(), groupId, objectEntry,
-					serviceContext),
+					objectDefinition, serviceContext),
 				objectEntry.getDefaultLanguageId(), values, serviceContext);
 
 		return _toObjectEntry(
@@ -1889,16 +1892,16 @@ public class DefaultObjectEntryManagerImpl
 		ServiceContext serviceContext = _createServiceContext(
 			dtoConverterContext, objectDefinition, objectEntry, scopeKey);
 
+		com.liferay.object.model.ObjectEntry parentServiceBuilderObjectEntry =
+			_objectEntryService.fetchObjectEntry(objectEntryId);
+
 		return _toObjectEntry(
 			dtoConverterContext, objectDefinition,
 			_addOrUpdateNestedObjectEntries(
 				dtoConverterContext, objectDefinition, objectEntry,
 				_getObjectRelationships(objectDefinition, objectEntry),
 				_objectEntryService.addObjectEntry(
-					groupId, objectDefinition.getObjectDefinitionId(),
-					_getObjectEntryFolderId(
-						objectDefinition.getCompanyId(), groupId, objectEntry,
-						serviceContext),
+					groupId, objectDefinition.getObjectDefinitionId(), 0,
 					objectEntry.getDefaultLanguageId(),
 					_toObjectValues(
 						objectField.getObjectFieldId(),
@@ -1906,7 +1909,7 @@ public class DefaultObjectEntryManagerImpl
 						objectEntry, scopeKey, serviceContext),
 					serviceContext),
 				scopeKey),
-			_objectEntryService.fetchObjectEntry(objectEntryId));
+			parentServiceBuilderObjectEntry);
 	}
 
 	private void _checkApprovedObjectEntry(
@@ -2383,14 +2386,52 @@ public class DefaultObjectEntryManagerImpl
 
 	private long _getObjectEntryFolderId(
 			long companyId, long groupId, ObjectEntry objectEntry,
-			ServiceContext serviceContext)
+			ObjectDefinition objectDefinition, ServiceContext serviceContext)
 		throws Exception {
 
 		String objectEntryFolderExternalReferenceCode =
 			objectEntry.getObjectEntryFolderExternalReferenceCode();
 
 		if (Validator.isNull(objectEntryFolderExternalReferenceCode)) {
-			return GetterUtil.getLong(objectEntry.getObjectEntryFolderId());
+			long objectEntryFolderId = GetterUtil.getLong(
+				objectEntry.getObjectEntryFolderId());
+
+			if ((objectEntryFolderId != 0) ||
+				!FeatureFlagManagerUtil.isEnabled(companyId, "LPD-17564") ||
+				(groupId == 0)) {
+
+				return objectEntryFolderId;
+			}
+
+			Group group = _groupLocalService.fetchGroup(groupId);
+
+			if ((group == null) || !group.isDepot()) {
+				return objectEntryFolderId;
+			}
+
+			DepotEntry depotEntry =
+				_depotEntryLocalService.fetchGroupDepotEntry(groupId);
+
+			if ((depotEntry == null) ||
+				(depotEntry.getType() != DepotConstants.TYPE_SPACE)) {
+
+				return objectEntryFolderId;
+			}
+
+			ObjectFolder objectFolder = objectDefinition.getObjectFolder();
+
+			if ((objectFolder != null) &&
+				Objects.equals(
+					objectFolder.getExternalReferenceCode(),
+					ObjectFolderConstants.EXTERNAL_REFERENCE_CODE_FILE_TYPES)) {
+
+				objectEntryFolderExternalReferenceCode =
+					ObjectEntryFolderConstants.EXTERNAL_REFERENCE_CODE_FILES;
+			}
+			else {
+				objectEntryFolderExternalReferenceCode =
+					ObjectEntryFolderConstants.EXTERNAL_REFERENCE_CODE_CONTENTS;
+			}
 		}
 
 		ObjectEntryFolder objectEntryFolder =
@@ -3760,7 +3801,7 @@ public class DefaultObjectEntryManagerImpl
 					_getObjectEntryFolderId(
 						serviceBuilderObjectEntry.getCompanyId(),
 						serviceBuilderObjectEntry.getGroupId(), objectEntry,
-						serviceContext),
+						objectDefinition, serviceContext),
 					values, serviceContext);
 		}
 		else {
@@ -3769,7 +3810,7 @@ public class DefaultObjectEntryManagerImpl
 				_getObjectEntryFolderId(
 					serviceBuilderObjectEntry.getCompanyId(),
 					serviceBuilderObjectEntry.getGroupId(), objectEntry,
-					serviceContext),
+					objectDefinition, serviceContext),
 				values, serviceContext);
 		}
 
