@@ -7,15 +7,21 @@ package com.liferay.object.internal.field.business.type.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.exception.ObjectEntryValuesException;
+import com.liferay.object.exception.ObjectFieldSettingValueException;
 import com.liferay.object.field.builder.PhoneNumberObjectFieldBuilder;
+import com.liferay.object.field.business.type.ObjectFieldBusinessType;
+import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
-import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.rest.test.util.ObjectEntryTestUtil;
+import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
+import com.liferay.object.service.ObjectEntryLocalServiceUtil;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
+import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -48,6 +54,10 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 
 	@Before
 	public void setUp() throws Exception {
+		_objectFieldBusinessType =
+			_objectFieldBusinessTypeRegistry.getObjectFieldBusinessType(
+				ObjectFieldConstants.BUSINESS_TYPE_PHONE_NUMBER);
+
 		_objectDefinition =
 			ObjectDefinitionTestUtil.addCustomObjectDefinition();
 
@@ -64,28 +74,48 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 			).build());
 
 		_objectDefinition =
-			_objectDefinitionLocalService.publishCustomObjectDefinition(
+			ObjectDefinitionLocalServiceUtil.publishCustomObjectDefinition(
 				TestPropsValues.getUserId(),
 				_objectDefinition.getObjectDefinitionId());
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		_objectDefinitionLocalService.deleteObjectDefinition(
+		ObjectDefinitionLocalServiceUtil.deleteObjectDefinition(
 			_objectDefinition.getObjectDefinitionId());
 	}
 
 	@Test
 	public void testAddObjectEntryWithEmptyPhoneNumber() throws Exception {
-		ObjectEntry objectEntry = _objectEntryLocalService.addObjectEntry(
-			TestPropsValues.getUserId(), 0,
-			_objectDefinition.getObjectDefinitionId(),
+		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
+			_objectDefinition,
 			HashMapBuilder.<String, Serializable>put(
 				"phoneNumberField", ""
-			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			).build());
 
 		Assert.assertNotNull(objectEntry);
+	}
+
+	@Test
+	public void testAddObjectEntryWithInvalidDigitsOnlyPhoneNumber()
+		throws Exception {
+
+		try {
+			ObjectEntryTestUtil.addObjectEntry(
+				_objectDefinition,
+				HashMapBuilder.<String, Serializable>put(
+					"phoneNumberField", "5551234567"
+				).build());
+
+			Assert.fail();
+		}
+		catch (ObjectEntryValuesException.InvalidPhoneNumber
+					objectEntryValuesException) {
+
+			Assert.assertEquals(
+				"phoneNumberField",
+				objectEntryValuesException.getObjectFieldName());
+		}
 	}
 
 	@Test
@@ -93,21 +123,20 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 		throws Exception {
 
 		try {
-			_objectEntryLocalService.addObjectEntry(
-				TestPropsValues.getUserId(), 0,
-				_objectDefinition.getObjectDefinitionId(),
+			ObjectEntryTestUtil.addObjectEntry(
+				_objectDefinition,
 				HashMapBuilder.<String, Serializable>put(
 					"phoneNumberField", "abc123"
-				).build(),
-				ServiceContextTestUtil.getServiceContext());
+				).build());
 
 			Assert.fail();
 		}
 		catch (ObjectEntryValuesException.InvalidPhoneNumber
-					invalidPhoneNumber) {
+					objectEntryValuesException) {
 
 			Assert.assertEquals(
-				"phoneNumberField", invalidPhoneNumber.getObjectFieldName());
+				"phoneNumberField",
+				objectEntryValuesException.getObjectFieldName());
 		}
 	}
 
@@ -116,71 +145,99 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 		throws Exception {
 
 		try {
-			_objectEntryLocalService.addObjectEntry(
-				TestPropsValues.getUserId(), 0,
-				_objectDefinition.getObjectDefinitionId(),
+			ObjectEntryTestUtil.addObjectEntry(
+				_objectDefinition,
 				HashMapBuilder.<String, Serializable>put(
 					"phoneNumberField", "+1@555#1234"
-				).build(),
-				ServiceContextTestUtil.getServiceContext());
+				).build());
 
 			Assert.fail();
 		}
 		catch (ObjectEntryValuesException.InvalidPhoneNumber
-					invalidPhoneNumber) {
+					objectEntryValuesException) {
 
 			Assert.assertEquals(
-				"phoneNumberField", invalidPhoneNumber.getObjectFieldName());
+				"phoneNumberField",
+				objectEntryValuesException.getObjectFieldName());
 		}
 	}
 
 	@Test
-	public void testAddObjectEntryWithValidDigitsOnlyPhoneNumber()
+	public void testAddObjectEntryWithInvalidPhoneNumberWithLessThan7Digits()
 		throws Exception {
 
-		ObjectEntry objectEntry = _objectEntryLocalService.addObjectEntry(
-			TestPropsValues.getUserId(), 0,
-			_objectDefinition.getObjectDefinitionId(),
-			HashMapBuilder.<String, Serializable>put(
-				"phoneNumberField", "5551234567"
-			).build(),
-			ServiceContextTestUtil.getServiceContext());
+		try {
+			ObjectEntryTestUtil.addObjectEntry(
+				_objectDefinition,
+				HashMapBuilder.<String, Serializable>put(
+					"phoneNumberField", "+123456"
+				).build());
 
-		Assert.assertEquals(
-			"5551234567",
-			objectEntry.getValues().get("phoneNumberField"));
+			Assert.fail();
+		}
+		catch (ObjectEntryValuesException.InvalidPhoneNumber
+					objectEntryValuesException) {
+
+			Assert.assertEquals(
+				"phoneNumberField",
+				objectEntryValuesException.getObjectFieldName());
+		}
+	}
+
+	@Test
+	public void testAddObjectEntryWithInvalidPhoneNumberWithMoreThan15Digits()
+		throws Exception {
+
+		try {
+			ObjectEntryTestUtil.addObjectEntry(
+				_objectDefinition,
+				HashMapBuilder.<String, Serializable>put(
+					"phoneNumberField", "+1234567890123456"
+				).build());
+
+			Assert.fail();
+		}
+		catch (ObjectEntryValuesException.InvalidPhoneNumber
+					objectEntryValuesException) {
+
+			Assert.assertEquals(
+				"phoneNumberField",
+				objectEntryValuesException.getObjectFieldName());
+		}
 	}
 
 	@Test
 	public void testAddObjectEntryWithValidE164PhoneNumber() throws Exception {
-		ObjectEntry objectEntry = _objectEntryLocalService.addObjectEntry(
-			TestPropsValues.getUserId(), 0,
-			_objectDefinition.getObjectDefinitionId(),
+		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
+			_objectDefinition,
 			HashMapBuilder.<String, Serializable>put(
 				"phoneNumberField", "+15551234567"
-			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			).build());
 
 		Assert.assertEquals(
 			"+15551234567",
-			objectEntry.getValues().get("phoneNumberField"));
+			objectEntry.getValues(
+			).get(
+				"phoneNumberField"
+			));
 	}
 
 	@Test
 	public void testAddObjectEntryWithValidFormattedPhoneNumber()
 		throws Exception {
 
-		ObjectEntry objectEntry = _objectEntryLocalService.addObjectEntry(
-			TestPropsValues.getUserId(), 0,
-			_objectDefinition.getObjectDefinitionId(),
+		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
+			_objectDefinition,
 			HashMapBuilder.<String, Serializable>put(
 				"phoneNumberField", "+1 (555) 123-4567"
-			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			).build());
 
 		Assert.assertEquals(
 			"+1 (555) 123-4567",
-			objectEntry.getValues().get("phoneNumberField"));
+			objectEntry.getValues(
+			).get(
+				"phoneNumberField"
+			));
 	}
 
 	@Test
@@ -194,16 +251,15 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 
 	@Test
 	public void testUpdateObjectEntryPhoneNumber() throws Exception {
-		ObjectEntry objectEntry = _objectEntryLocalService.addObjectEntry(
-			TestPropsValues.getUserId(), 0,
-			_objectDefinition.getObjectDefinitionId(),
+		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
+			_objectDefinition,
 			HashMapBuilder.<String, Serializable>put(
 				"phoneNumberField", "+15551234567"
-			).build(),
-			ServiceContextTestUtil.getServiceContext());
+			).build());
 
-		objectEntry = _objectEntryLocalService.updateObjectEntry(
+		objectEntry = ObjectEntryLocalServiceUtil.updateObjectEntry(
 			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
+			objectEntry.getObjectEntryFolderId(),
 			HashMapBuilder.<String, Serializable>put(
 				"phoneNumberField", "+449876543210"
 			).build(),
@@ -211,16 +267,36 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 
 		Assert.assertEquals(
 			"+449876543210",
-			objectEntry.getValues().get("phoneNumberField"));
+			objectEntry.getValues(
+			).get(
+				"phoneNumberField"
+			));
+	}
+
+	@Test
+	public void testValidateObjectFieldSettingsDefaultValue() {
+		AssertUtils.assertFailure(
+			ObjectFieldSettingValueException.InvalidValue.class,
+			"The value 5551234567 of setting \"defaultValue\" is invalid for " +
+				"object field \"phoneNumberField\"",
+			() ->
+				_objectFieldBusinessType.
+					validateObjectFieldSettingsDefaultValue(
+						_objectField,
+						HashMapBuilder.put(
+							ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
+							"5551234567"
+						).put(
+							ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+							ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
+						).build()));
 	}
 
 	private ObjectDefinition _objectDefinition;
 	private ObjectField _objectField;
+	private ObjectFieldBusinessType _objectFieldBusinessType;
 
 	@Inject
-	private ObjectDefinitionLocalService _objectDefinitionLocalService;
-
-	@Inject
-	private ObjectEntryLocalService _objectEntryLocalService;
+	private ObjectFieldBusinessTypeRegistry _objectFieldBusinessTypeRegistry;
 
 }

@@ -50,6 +50,7 @@ import com.liferay.object.field.builder.IntegerObjectFieldBuilder;
 import com.liferay.object.field.builder.LongIntegerObjectFieldBuilder;
 import com.liferay.object.field.builder.MultiselectPicklistObjectFieldBuilder;
 import com.liferay.object.field.builder.ObjectFieldBuilder;
+import com.liferay.object.field.builder.PhoneNumberObjectFieldBuilder;
 import com.liferay.object.field.builder.PicklistObjectFieldBuilder;
 import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
@@ -2708,6 +2709,55 @@ public class ObjectFieldLocalServiceTest {
 
 		_assertObjectEntryDefaultValue(
 			defaultValue, textObjectField, new HashMap<>());
+
+		// Business type phone number
+
+		defaultValue = "+1 (555) 123-4567";
+
+		ObjectField phoneNumberObjectField = _addCustomObjectField(
+			new PhoneNumberObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"a" + RandomTestUtil.randomString()
+			).objectDefinitionId(
+				objectDefinition.getObjectDefinitionId()
+			).objectFieldSettings(
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE
+					).value(
+						defaultValue
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE
+					).value(
+						ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_PREFIX_TYPE
+					).value(
+						ObjectFieldSettingConstants.VALUE_DEFINE_BY_USER
+					).build())
+			).build());
+
+		_assertObjectFieldSettingsValues(
+			phoneNumberObjectField.getObjectFieldId(),
+			HashMapBuilder.put(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE, defaultValue
+			).put(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+				ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
+			).put(
+				ObjectFieldSettingConstants.NAME_PREFIX_TYPE,
+				ObjectFieldSettingConstants.VALUE_DEFINE_BY_USER
+			).build());
+
+		_assertObjectEntryDefaultValue(
+			defaultValue, phoneNumberObjectField, new HashMap<>());
 
 		Assert.assertNull(
 			_objectFieldSettingLocalService.fetchObjectFieldSetting(
