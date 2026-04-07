@@ -124,12 +124,28 @@ public class UpdateStructureStrutsAction implements StrutsAction {
 				serviceBuilderObjectRelationship :
 					_objectRelationshipLocalService.
 						getObjectRelationshipsByObjectDefinitionId2(
-							objectDefinitionId, false)) {
+							objectDefinitionId, true)) {
 
-			if (!serviceBuilderObjectRelationship.isReverse()) {
-				_objectRelationshipLocalService.deleteObjectRelationship(
-					serviceBuilderObjectRelationship);
+			if (serviceBuilderObjectRelationship.isReverse()) {
+				continue;
 			}
+
+			if (serviceBuilderObjectRelationship.isEdge()) {
+				serviceBuilderObjectRelationship =
+					_objectRelationshipLocalService.updateObjectRelationship(
+						serviceBuilderObjectRelationship.
+							getExternalReferenceCode(),
+						serviceBuilderObjectRelationship.
+							getObjectRelationshipId(),
+						serviceBuilderObjectRelationship.
+							getParameterObjectFieldId(),
+						serviceBuilderObjectRelationship.getDeletionType(),
+						false, serviceBuilderObjectRelationship.getLabelMap(),
+						null);
+			}
+
+			_objectRelationshipLocalService.deleteObjectRelationship(
+				serviceBuilderObjectRelationship);
 		}
 	}
 
@@ -279,6 +295,24 @@ public class UpdateStructureStrutsAction implements StrutsAction {
 										"objectRelationshipERC"),
 									_companyId,
 									objectDefinition.getObjectDefinitionId());
+
+					if (serviceBuilderObjectRelationship.isEdge()) {
+						serviceBuilderObjectRelationship =
+							_objectRelationshipLocalService.
+								updateObjectRelationship(
+									serviceBuilderObjectRelationship.
+										getExternalReferenceCode(),
+									serviceBuilderObjectRelationship.
+										getObjectRelationshipId(),
+									serviceBuilderObjectRelationship.
+										getParameterObjectFieldId(),
+									serviceBuilderObjectRelationship.
+										getDeletionType(),
+									false,
+									serviceBuilderObjectRelationship.
+										getLabelMap(),
+									null);
+					}
 
 					_objectRelationshipLocalService.deleteObjectRelationship(
 						serviceBuilderObjectRelationship);
