@@ -8,7 +8,9 @@ package com.liferay.object.internal.field.business.type;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.dynamic.data.mapping.form.field.type.constants.ObjectDDMFormFieldTypeConstants;
+import com.liferay.object.exception.ObjectFieldSettingValueException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
+import com.liferay.object.internal.field.util.PhoneNumberObjectFieldValueUtil;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -122,6 +124,16 @@ public class PhoneNumberObjectFieldBusinessType
 		if (Validator.isNull(defaultValue)) {
 			return;
 		}
+
+		if (!_isValid(defaultValue)) {
+			throw new ObjectFieldSettingValueException.InvalidValue(
+				objectField.getName(),
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE, defaultValue);
+		}
+	}
+
+	private boolean _isValid(String phoneNumber) {
+		return PhoneNumberObjectFieldValueUtil.isValid(phoneNumber);
 	}
 
 	@Reference
