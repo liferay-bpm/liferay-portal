@@ -2388,7 +2388,11 @@ public class DefaultObjectEntryManagerImpl
 			serviceBuilderObjectEntry);
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
-		_checkRootDescendantNode(serviceBuilderObjectEntry, false);
+		_checkRootDescendantNode(
+			serviceBuilderObjectEntry,
+			GetterUtil.getBoolean(
+				dtoConverterContext.getAttribute(
+					"skipCheckRootDescendantNode")));
 
 		return _toObjectEntry(
 			dtoConverterContext, objectDefinition, serviceBuilderObjectEntry,

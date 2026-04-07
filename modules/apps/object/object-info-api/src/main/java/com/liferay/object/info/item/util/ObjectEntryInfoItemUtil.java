@@ -81,6 +81,9 @@ public class ObjectEntryInfoItemUtil {
 				"objectEntryVersion", objectEntryVersion);
 		}
 
+		dtoConverterContext.setAttribute(
+			"skipCheckRootDescendantNode", Boolean.TRUE);
+
 		try {
 			return objectEntryManager.getObjectEntry(
 				themeDisplay.getCompanyId(), dtoConverterContext,
