@@ -13,6 +13,7 @@ import com.liferay.object.exception.ObjectFieldSettingValueException;
 import com.liferay.object.field.builder.PhoneNumberObjectFieldBuilder;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
+import com.liferay.object.field.setting.builder.ObjectFieldSettingBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -32,6 +33,9 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.io.Serializable;
+
+import java.util.Arrays;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -69,6 +73,14 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
 			).name(
 				"phoneNumberField"
+			).objectFieldSettings(
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_UNIQUE_VALUES
+					).value(
+						Boolean.TRUE.toString()
+					).build())
 			).objectDefinitionId(
 				_objectDefinition.getObjectDefinitionId()
 			).build());
@@ -214,12 +226,9 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 				"phoneNumberField", "+15551234567"
 			).build());
 
-		Assert.assertEquals(
-			"+15551234567",
-			objectEntry.getValues(
-			).get(
-				"phoneNumberField"
-			));
+		Map<String, Serializable> values = objectEntry.getValues();
+
+		Assert.assertEquals("+15551234567", values.get("phoneNumberField"));
 	}
 
 	@Test
@@ -232,12 +241,37 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 				"phoneNumberField", "+1 (555) 123-4567"
 			).build());
 
-		Assert.assertEquals(
-			"+1 (555) 123-4567",
-			objectEntry.getValues(
-			).get(
-				"phoneNumberField"
-			));
+		Map<String, Serializable> values = objectEntry.getValues();
+
+		Assert.assertEquals("+15551234567", values.get("phoneNumberField"));
+	}
+
+	@Test
+	public void testAddObjectEntryWithValidNormalizedUniquePhoneNumber()
+		throws Exception {
+
+		ObjectEntryTestUtil.addObjectEntry(
+			_objectDefinition,
+			HashMapBuilder.<String, Serializable>put(
+				"phoneNumberField", "+1 (555) 123-4567"
+			).build());
+
+		try {
+			ObjectEntryTestUtil.addObjectEntry(
+				_objectDefinition,
+				HashMapBuilder.<String, Serializable>put(
+					"phoneNumberField", "+15551234567"
+				).build());
+
+			Assert.fail();
+		}
+		catch (ObjectEntryValuesException.UniqueValueConstraintViolation
+					objectEntryValuesException) {
+
+			Assert.assertEquals(
+				"the-x-is-already-in-use",
+				objectEntryValuesException.getMessageKey());
+		}
 	}
 
 	@Test
@@ -261,16 +295,13 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
 			objectEntry.getObjectEntryFolderId(),
 			HashMapBuilder.<String, Serializable>put(
-				"phoneNumberField", "+449876543210"
+				"phoneNumberField", "+44 9876 543210"
 			).build(),
 			ServiceContextTestUtil.getServiceContext());
 
-		Assert.assertEquals(
-			"+449876543210",
-			objectEntry.getValues(
-			).get(
-				"phoneNumberField"
-			));
+		Map<String, Serializable> values = objectEntry.getValues();
+
+		Assert.assertEquals("+449876543210", values.get("phoneNumberField"));
 	}
 
 	@Test
