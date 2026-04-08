@@ -416,16 +416,20 @@ public class ObjectEntryLocalServiceImpl
 
 		_contributeValues(groupId, objectDefinition, userId, values);
 
+		List<ObjectField> objectFields =
+			_objectFieldLocalService.getObjectFields(
+				objectDefinition.getObjectDefinitionId());
+
+		_normalizePhoneNumberValues(objectFields, values);
+
 		Map<ObjectField, Set<DLFileEntry>> dlFileEntriesMap = new HashMap<>();
 		long objectEntryId = counterLocalService.increment();
 		User user = _userLocalService.getUser(userId);
 
 		_validateValues(
 			defaultLanguageId, dlFileEntriesMap, null, groupId,
-			user.isGuestUser(), objectDefinition, null,
-			_objectFieldLocalService.getObjectFields(
-				objectDefinition.getObjectDefinitionId()),
-			false, serviceContext, null, userId, null, values);
+			user.isGuestUser(), objectDefinition, null, objectFields, false,
+			serviceContext, null, userId, null, values);
 
 		_addDLFileEntries(
 			dlFileEntriesMap, groupId, objectDefinition, objectEntryId,
@@ -5822,6 +5826,42 @@ public class ObjectEntryLocalServiceImpl
 		return objectEntry;
 	}
 
+	private void _normalizePhoneNumberValues(
+		List<ObjectField> objectFields, Map<String, Serializable> values) {
+
+		for (ObjectField objectField : objectFields) {
+			if (!objectField.compareBusinessType(
+					ObjectFieldConstants.BUSINESS_TYPE_PHONE_NUMBER)) {
+
+				continue;
+			}
+
+			if (values.containsKey(objectField.getName())) {
+				values.put(
+					objectField.getName(),
+					PhoneNumberObjectFieldValueUtil.normalize(
+						GetterUtil.getString(
+							values.get(objectField.getName()))));
+			}
+
+			Map<String, Serializable> localizedValues =
+				(Map<String, Serializable>)values.get(
+					objectField.getI18nObjectFieldName());
+
+			if (MapUtil.isEmpty(localizedValues)) {
+				continue;
+			}
+
+			for (Map.Entry<String, Serializable> entry :
+					localizedValues.entrySet()) {
+
+				entry.setValue(
+					PhoneNumberObjectFieldValueUtil.normalize(
+						GetterUtil.getString(entry.getValue())));
+			}
+		}
+	}
+
 	private void _performActions(
 			long objectDefinitionId,
 			ActionableDynamicQuery.PerformActionMethod<?> performActionMethod)
@@ -6698,17 +6738,20 @@ public class ObjectEntryLocalServiceImpl
 		_contributeValues(
 			objectEntry.getGroupId(), objectDefinition, userId, values);
 
+		List<ObjectField> objectFields =
+			_objectFieldLocalService.getObjectFields(
+				objectDefinition.getObjectDefinitionId());
+
+		_normalizePhoneNumberValues(objectFields, values);
+
 		Map<ObjectField, Set<DLFileEntry>> dlFileEntriesMap = new HashMap<>();
 
 		_validateValues(
 			objectEntry.getDefaultLanguageId(), dlFileEntriesMap,
 			objectEntry.getValues(), objectEntry.getGroupId(),
 			user.isGuestUser(), objectDefinition,
-			objectEntry.getObjectEntryId(),
-			_objectFieldLocalService.getObjectFields(
-				objectDefinition.getObjectDefinitionId()),
-			partialUpdate, serviceContext, objectEntry.getStatus(), userId,
-			null, values);
+			objectEntry.getObjectEntryId(), objectFields, partialUpdate,
+			serviceContext, objectEntry.getStatus(), userId, null, values);
 
 		_addDLFileEntries(
 			dlFileEntriesMap, objectEntry.getGroupId(), objectDefinition,

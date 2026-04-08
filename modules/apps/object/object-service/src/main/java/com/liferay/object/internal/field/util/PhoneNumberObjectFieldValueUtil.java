@@ -39,6 +39,36 @@ public class PhoneNumberObjectFieldValueUtil {
 		return false;
 	}
 
+	public static String normalize(String phoneNumber) {
+		if (phoneNumber == null) {
+			return null;
+		}
+
+		StringBuilder stringBuilder = new StringBuilder();
+
+		for (int i = 0; i < phoneNumber.length(); i++) {
+			char c = phoneNumber.charAt(i);
+
+			if (((c == '+') && (stringBuilder.length() == 0)) ||
+				Character.isDigit(c)) {
+
+				stringBuilder.append(c);
+
+				continue;
+			}
+
+			if (Character.isWhitespace(c) || (c == '-') || (c == '(') ||
+				(c == ')') || (c == '.')) {
+
+				continue;
+			}
+
+			stringBuilder.append(c);
+		}
+
+		return stringBuilder.toString();
+	}
+
 	private PhoneNumberObjectFieldValueUtil() {
 	}
 
