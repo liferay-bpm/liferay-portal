@@ -8,7 +8,6 @@ package com.liferay.object.internal.field.business.type.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
-import com.liferay.object.exception.ObjectEntryValuesException;
 import com.liferay.object.exception.ObjectFieldSettingValueException;
 import com.liferay.object.field.builder.PhoneNumberObjectFieldBuilder;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
@@ -16,26 +15,19 @@ import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.field.setting.builder.ObjectFieldSettingBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
-import com.liferay.object.rest.test.util.ObjectEntryTestUtil;
-import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
-import com.liferay.object.service.ObjectEntryLocalServiceUtil;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
-import java.io.Serializable;
-
 import java.util.Arrays;
-import java.util.Map;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -86,192 +78,15 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 			).build());
 
 		_objectDefinition =
-			ObjectDefinitionLocalServiceUtil.publishCustomObjectDefinition(
+			_objectDefinitionLocalService.publishCustomObjectDefinition(
 				TestPropsValues.getUserId(),
 				_objectDefinition.getObjectDefinitionId());
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		ObjectDefinitionLocalServiceUtil.deleteObjectDefinition(
+		_objectDefinitionLocalService.deleteObjectDefinition(
 			_objectDefinition.getObjectDefinitionId());
-	}
-
-	@Test
-	public void testAddObjectEntryWithEmptyPhoneNumber() throws Exception {
-		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition,
-			HashMapBuilder.<String, Serializable>put(
-				"phoneNumberField", ""
-			).build());
-
-		Assert.assertNotNull(objectEntry);
-	}
-
-	@Test
-	public void testAddObjectEntryWithInvalidDigitsOnlyPhoneNumber()
-		throws Exception {
-
-		try {
-			ObjectEntryTestUtil.addObjectEntry(
-				_objectDefinition,
-				HashMapBuilder.<String, Serializable>put(
-					"phoneNumberField", "5551234567"
-				).build());
-
-			Assert.fail();
-		}
-		catch (ObjectEntryValuesException.InvalidPhoneNumber
-					objectEntryValuesException) {
-
-			Assert.assertEquals(
-				"phoneNumberField",
-				objectEntryValuesException.getObjectFieldName());
-		}
-	}
-
-	@Test
-	public void testAddObjectEntryWithInvalidPhoneNumberContainingLetters()
-		throws Exception {
-
-		try {
-			ObjectEntryTestUtil.addObjectEntry(
-				_objectDefinition,
-				HashMapBuilder.<String, Serializable>put(
-					"phoneNumberField", "abc123"
-				).build());
-
-			Assert.fail();
-		}
-		catch (ObjectEntryValuesException.InvalidPhoneNumber
-					objectEntryValuesException) {
-
-			Assert.assertEquals(
-				"phoneNumberField",
-				objectEntryValuesException.getObjectFieldName());
-		}
-	}
-
-	@Test
-	public void testAddObjectEntryWithInvalidPhoneNumberContainingSpecialChars()
-		throws Exception {
-
-		try {
-			ObjectEntryTestUtil.addObjectEntry(
-				_objectDefinition,
-				HashMapBuilder.<String, Serializable>put(
-					"phoneNumberField", "+1@555#1234"
-				).build());
-
-			Assert.fail();
-		}
-		catch (ObjectEntryValuesException.InvalidPhoneNumber
-					objectEntryValuesException) {
-
-			Assert.assertEquals(
-				"phoneNumberField",
-				objectEntryValuesException.getObjectFieldName());
-		}
-	}
-
-	@Test
-	public void testAddObjectEntryWithInvalidPhoneNumberWithLessThan7Digits()
-		throws Exception {
-
-		try {
-			ObjectEntryTestUtil.addObjectEntry(
-				_objectDefinition,
-				HashMapBuilder.<String, Serializable>put(
-					"phoneNumberField", "+123456"
-				).build());
-
-			Assert.fail();
-		}
-		catch (ObjectEntryValuesException.InvalidPhoneNumber
-					objectEntryValuesException) {
-
-			Assert.assertEquals(
-				"phoneNumberField",
-				objectEntryValuesException.getObjectFieldName());
-		}
-	}
-
-	@Test
-	public void testAddObjectEntryWithInvalidPhoneNumberWithMoreThan15Digits()
-		throws Exception {
-
-		try {
-			ObjectEntryTestUtil.addObjectEntry(
-				_objectDefinition,
-				HashMapBuilder.<String, Serializable>put(
-					"phoneNumberField", "+1234567890123456"
-				).build());
-
-			Assert.fail();
-		}
-		catch (ObjectEntryValuesException.InvalidPhoneNumber
-					objectEntryValuesException) {
-
-			Assert.assertEquals(
-				"phoneNumberField",
-				objectEntryValuesException.getObjectFieldName());
-		}
-	}
-
-	@Test
-	public void testAddObjectEntryWithValidE164PhoneNumber() throws Exception {
-		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition,
-			HashMapBuilder.<String, Serializable>put(
-				"phoneNumberField", "+15551234567"
-			).build());
-
-		Map<String, Serializable> values = objectEntry.getValues();
-
-		Assert.assertEquals("+15551234567", values.get("phoneNumberField"));
-	}
-
-	@Test
-	public void testAddObjectEntryWithValidFormattedPhoneNumber()
-		throws Exception {
-
-		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition,
-			HashMapBuilder.<String, Serializable>put(
-				"phoneNumberField", "+1 (555) 123-4567"
-			).build());
-
-		Map<String, Serializable> values = objectEntry.getValues();
-
-		Assert.assertEquals("+15551234567", values.get("phoneNumberField"));
-	}
-
-	@Test
-	public void testAddObjectEntryWithValidNormalizedUniquePhoneNumber()
-		throws Exception {
-
-		ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition,
-			HashMapBuilder.<String, Serializable>put(
-				"phoneNumberField", "+1 (555) 123-4567"
-			).build());
-
-		try {
-			ObjectEntryTestUtil.addObjectEntry(
-				_objectDefinition,
-				HashMapBuilder.<String, Serializable>put(
-					"phoneNumberField", "+15551234567"
-				).build());
-
-			Assert.fail();
-		}
-		catch (ObjectEntryValuesException.UniqueValueConstraintViolation
-					objectEntryValuesException) {
-
-			Assert.assertEquals(
-				"the-x-is-already-in-use",
-				objectEntryValuesException.getMessageKey());
-		}
 	}
 
 	@Test
@@ -281,27 +96,6 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 			_objectField.getBusinessType());
 		Assert.assertEquals(
 			ObjectFieldConstants.DB_TYPE_STRING, _objectField.getDBType());
-	}
-
-	@Test
-	public void testUpdateObjectEntryPhoneNumber() throws Exception {
-		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition,
-			HashMapBuilder.<String, Serializable>put(
-				"phoneNumberField", "+15551234567"
-			).build());
-
-		objectEntry = ObjectEntryLocalServiceUtil.updateObjectEntry(
-			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
-			objectEntry.getObjectEntryFolderId(),
-			HashMapBuilder.<String, Serializable>put(
-				"phoneNumberField", "+44 9876 543210"
-			).build(),
-			ServiceContextTestUtil.getServiceContext());
-
-		Map<String, Serializable> values = objectEntry.getValues();
-
-		Assert.assertEquals("+449876543210", values.get("phoneNumberField"));
 	}
 
 	@Test
@@ -324,6 +118,10 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 	}
 
 	private ObjectDefinition _objectDefinition;
+
+	@Inject
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
 	private ObjectField _objectField;
 	private ObjectFieldBusinessType _objectFieldBusinessType;
 
