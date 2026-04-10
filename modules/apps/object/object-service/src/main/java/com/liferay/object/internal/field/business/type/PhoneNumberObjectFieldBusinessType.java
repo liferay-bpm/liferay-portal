@@ -19,10 +19,14 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.extension.PropertyDefinition;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -42,8 +46,8 @@ public class PhoneNumberObjectFieldBusinessType
 		return SetUtil.fromArray(
 			ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
 			ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
-			ObjectFieldSettingConstants.NAME_MAX_LENGTH,
-			ObjectFieldSettingConstants.NAME_SHOW_COUNTER,
+			ObjectFieldSettingConstants.NAME_PREFIX,
+			ObjectFieldSettingConstants.NAME_PREFIX_TYPE,
 			ObjectFieldSettingConstants.NAME_UNIQUE_VALUES);
 	}
 
@@ -79,6 +83,14 @@ public class PhoneNumberObjectFieldBusinessType
 	}
 
 	@Override
+	public Set<String> getRequiredObjectFieldSettingsNames(
+		ObjectField objectField) {
+
+		return Collections.singleton(
+			ObjectFieldSettingConstants.NAME_PREFIX_TYPE);
+	}
+
+	@Override
 	public Set<String> getUnmodifiableObjectFieldSettingsNames() {
 		return Collections.singleton(
 			ObjectFieldSettingConstants.NAME_UNIQUE_VALUES);
@@ -99,10 +111,44 @@ public class PhoneNumberObjectFieldBusinessType
 			objectField.getName(),
 			ObjectFieldSettingConstants.NAME_UNIQUE_VALUES,
 			objectFieldSettingsValues);
-		validateRelatedObjectFieldSettings(
-			objectField, ObjectFieldSettingConstants.NAME_SHOW_COUNTER,
-			ObjectFieldSettingConstants.NAME_MAX_LENGTH,
-			objectFieldSettingsValues);
+
+		String prefixType = objectFieldSettingsValues.get(
+			ObjectFieldSettingConstants.NAME_PREFIX_TYPE);
+
+		if (Objects.equals(
+				prefixType, ObjectFieldSettingConstants.VALUE_DEFINE_BY_USER)) {
+
+			validateNotAllowedObjectFieldSettingNames(
+				SetUtil.fromArray(ObjectFieldSettingConstants.NAME_PREFIX),
+				objectField.getName(), objectFieldSettingsValues);
+		}
+		else if (Objects.equals(
+					prefixType, ObjectFieldSettingConstants.VALUE_FIXED)) {
+
+			String prefix = objectFieldSettingsValues.get(
+				ObjectFieldSettingConstants.NAME_PREFIX);
+
+			if (Validator.isNull(prefix)) {
+				throw new ObjectFieldSettingValueException.
+					MissingRequiredValues(
+						objectField.getName(),
+						Collections.singleton(
+							ObjectFieldSettingConstants.NAME_PREFIX));
+			}
+
+			Matcher matcher = _prefixPattern.matcher(prefix);
+
+			if (!matcher.matches()) {
+				throw new ObjectFieldSettingValueException.InvalidValue(
+					objectField.getName(),
+					ObjectFieldSettingConstants.NAME_PREFIX, prefix);
+			}
+		}
+		else {
+			throw new ObjectFieldSettingValueException.InvalidValue(
+				objectField.getName(),
+				ObjectFieldSettingConstants.NAME_PREFIX_TYPE, prefixType);
+		}
 	}
 
 	@Override
@@ -135,6 +181,9 @@ public class PhoneNumberObjectFieldBusinessType
 	private boolean _isValid(String phoneNumber) {
 		return PhoneNumberObjectFieldValueUtil.isValid(phoneNumber);
 	}
+
+	private static final Pattern _prefixPattern = Pattern.compile(
+		"^\\+[1-9][0-9]{0,2}$");
 
 	@Reference
 	private Language _language;

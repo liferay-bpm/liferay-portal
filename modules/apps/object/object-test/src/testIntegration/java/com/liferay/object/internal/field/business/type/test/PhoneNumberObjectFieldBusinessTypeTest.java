@@ -8,6 +8,7 @@ package com.liferay.object.internal.field.business.type.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.exception.ObjectFieldSettingNameException;
 import com.liferay.object.exception.ObjectFieldSettingValueException;
 import com.liferay.object.field.builder.PhoneNumberObjectFieldBuilder;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
@@ -69,6 +70,12 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 				Arrays.asList(
 					new ObjectFieldSettingBuilder(
 					).name(
+						ObjectFieldSettingConstants.NAME_PREFIX_TYPE
+					).value(
+						ObjectFieldSettingConstants.VALUE_DEFINE_BY_USER
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
 						ObjectFieldSettingConstants.NAME_UNIQUE_VALUES
 					).value(
 						Boolean.TRUE.toString()
@@ -99,7 +106,16 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 	}
 
 	@Test
-	public void testValidateObjectFieldSettingsDefaultValue() {
+	public void testValidateObjectFieldSettingsDefaultValue() throws Exception {
+		_objectFieldBusinessType.validateObjectFieldSettingsDefaultValue(
+			_objectField,
+			HashMapBuilder.put(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE, "+15551234567"
+			).put(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+				ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
+			).build());
+
 		AssertUtils.assertFailure(
 			ObjectFieldSettingValueException.InvalidValue.class,
 			"The value 5551234567 of setting \"defaultValue\" is invalid for " +
@@ -115,6 +131,100 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 							ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
 							ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
 						).build()));
+	}
+
+	@Test
+	public void testValidateObjectFieldSettingsPrefix() throws Exception {
+		_objectFieldBusinessType.validateObjectFieldSettings(
+			_objectField,
+			Arrays.asList(
+				new ObjectFieldSettingBuilder(
+				).name(
+					ObjectFieldSettingConstants.NAME_PREFIX_TYPE
+				).value(
+					ObjectFieldSettingConstants.VALUE_DEFINE_BY_USER
+				).build()));
+
+		_objectFieldBusinessType.validateObjectFieldSettings(
+			_objectField,
+			Arrays.asList(
+				new ObjectFieldSettingBuilder(
+				).name(
+					ObjectFieldSettingConstants.NAME_PREFIX_TYPE
+				).value(
+					ObjectFieldSettingConstants.VALUE_FIXED
+				).build(),
+				new ObjectFieldSettingBuilder(
+				).name(
+					ObjectFieldSettingConstants.NAME_PREFIX
+				).value(
+					"+1"
+				).build()));
+
+		AssertUtils.assertFailure(
+			ObjectFieldSettingValueException.InvalidValue.class,
+			"The value definedByUser of setting \"prefixType\" is invalid " +
+				"for object field \"phoneNumberField\"",
+			() -> _objectFieldBusinessType.validateObjectFieldSettings(
+				_objectField,
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_PREFIX_TYPE
+					).value(
+						"definedByUser"
+					).build())));
+		AssertUtils.assertFailure(
+			ObjectFieldSettingValueException.InvalidValue.class,
+			"The value 1 of setting \"prefix\" is invalid for object field " +
+				"\"phoneNumberField\"",
+			() -> _objectFieldBusinessType.validateObjectFieldSettings(
+				_objectField,
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_PREFIX_TYPE
+					).value(
+						ObjectFieldSettingConstants.VALUE_FIXED
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_PREFIX
+					).value(
+						"1"
+					).build())));
+		AssertUtils.assertFailure(
+			ObjectFieldSettingValueException.MissingRequiredValues.class,
+			"The settings \"prefix\" are required for object field " +
+				"\"phoneNumberField\"",
+			() -> _objectFieldBusinessType.validateObjectFieldSettings(
+				_objectField,
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_PREFIX_TYPE
+					).value(
+						ObjectFieldSettingConstants.VALUE_FIXED
+					).build())));
+		AssertUtils.assertFailure(
+			ObjectFieldSettingNameException.NotAllowedNames.class,
+			"The settings prefix are not allowed for object field " +
+				"phoneNumberField",
+			() -> _objectFieldBusinessType.validateObjectFieldSettings(
+				_objectField,
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_PREFIX_TYPE
+					).value(
+						ObjectFieldSettingConstants.VALUE_DEFINE_BY_USER
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_PREFIX
+					).value(
+						"+1"
+					).build())));
 	}
 
 	private ObjectDefinition _objectDefinition;
