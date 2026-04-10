@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
@@ -41,6 +42,7 @@ import org.junit.runner.RunWith;
 /**
  * @author Marco Leo
  */
+@FeatureFlag("LPD-83570")
 @RunWith(Arquillian.class)
 public class PhoneNumberObjectFieldBusinessTypeTest {
 

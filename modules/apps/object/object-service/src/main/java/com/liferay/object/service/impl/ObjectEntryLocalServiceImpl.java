@@ -420,8 +420,6 @@ public class ObjectEntryLocalServiceImpl
 			_objectFieldLocalService.getObjectFields(
 				objectDefinition.getObjectDefinitionId());
 
-		_normalizePhoneNumberValues(objectFields, values);
-
 		Map<ObjectField, Set<DLFileEntry>> dlFileEntriesMap = new HashMap<>();
 		long objectEntryId = counterLocalService.increment();
 		User user = _userLocalService.getUser(userId);
@@ -5860,47 +5858,6 @@ public class ObjectEntryLocalServiceImpl
 		return objectEntry;
 	}
 
-	private void _normalizePhoneNumberValues(
-			List<ObjectField> objectFields, Map<String, Serializable> values)
-		throws PortalException {
-
-		for (ObjectField objectField : objectFields) {
-			if (!objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_PHONE_NUMBER)) {
-
-				continue;
-			}
-
-			if (values.containsKey(objectField.getName())) {
-				values.put(
-					objectField.getName(),
-					PhoneNumberObjectFieldValueUtil.normalize(
-						_getPhoneNumberValue(
-							objectField,
-							GetterUtil.getString(
-								values.get(objectField.getName())))));
-			}
-
-			Map<String, Serializable> localizedValues =
-				(Map<String, Serializable>)values.get(
-					objectField.getI18nObjectFieldName());
-
-			if (MapUtil.isEmpty(localizedValues)) {
-				continue;
-			}
-
-			for (Map.Entry<String, Serializable> entry :
-					localizedValues.entrySet()) {
-
-				entry.setValue(
-					PhoneNumberObjectFieldValueUtil.normalize(
-						_getPhoneNumberValue(
-							objectField,
-							GetterUtil.getString(entry.getValue()))));
-			}
-		}
-	}
-
 	private void _performActions(
 			long objectDefinitionId,
 			ActionableDynamicQuery.PerformActionMethod<?> performActionMethod)
@@ -6780,8 +6737,6 @@ public class ObjectEntryLocalServiceImpl
 		List<ObjectField> objectFields =
 			_objectFieldLocalService.getObjectFields(
 				objectDefinition.getObjectDefinitionId());
-
-		_normalizePhoneNumberValues(objectFields, values);
 
 		Map<ObjectField, Set<DLFileEntry>> dlFileEntriesMap = new HashMap<>();
 
@@ -7970,6 +7925,18 @@ public class ObjectEntryLocalServiceImpl
 			if (!objectField.isLocalized() &&
 				(values.get(objectField.getName()) != null)) {
 
+				if (objectField.compareBusinessType(
+						ObjectFieldConstants.BUSINESS_TYPE_PHONE_NUMBER)) {
+
+					values.put(
+						objectField.getName(),
+						_getPhoneNumberValue(
+							objectField,
+							PhoneNumberObjectFieldValueUtil.normalize(
+								GetterUtil.getString(
+									values.get(objectField.getName())))));
+				}
+
 				_validateValues(
 					dlFileEntriesMap, existingValues, groupId, guestUser,
 					objectDefinition, objectEntryId, objectField, userId,
@@ -7987,6 +7954,16 @@ public class ObjectEntryLocalServiceImpl
 
 			for (Map.Entry<String, Serializable> entry :
 					localizedValues.entrySet()) {
+
+				if (objectField.compareBusinessType(
+						ObjectFieldConstants.BUSINESS_TYPE_PHONE_NUMBER)) {
+
+					entry.setValue(
+						_getPhoneNumberValue(
+							objectField,
+							PhoneNumberObjectFieldValueUtil.normalize(
+								GetterUtil.getString(entry.getValue()))));
+				}
 
 				_validateValues(
 					dlFileEntriesMap, existingValues, groupId, guestUser,

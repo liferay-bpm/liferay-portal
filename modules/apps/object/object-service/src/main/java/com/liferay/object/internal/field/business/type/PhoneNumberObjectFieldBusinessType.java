@@ -11,9 +11,11 @@ import com.liferay.object.dynamic.data.mapping.form.field.type.constants.ObjectD
 import com.liferay.object.exception.ObjectFieldSettingValueException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.internal.field.util.PhoneNumberObjectFieldValueUtil;
+import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -94,6 +96,12 @@ public class PhoneNumberObjectFieldBusinessType
 	public Set<String> getUnmodifiableObjectFieldSettingsNames() {
 		return Collections.singleton(
 			ObjectFieldSettingConstants.NAME_UNIQUE_VALUES);
+	}
+
+	@Override
+	public boolean isVisible(ObjectDefinition objectDefinition) {
+		return FeatureFlagManagerUtil.isEnabled(
+			objectDefinition.getCompanyId(), "LPD-83570");
 	}
 
 	@Override
