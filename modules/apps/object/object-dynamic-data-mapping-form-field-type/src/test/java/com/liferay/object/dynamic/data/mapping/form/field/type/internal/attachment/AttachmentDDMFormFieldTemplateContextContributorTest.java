@@ -92,6 +92,56 @@ public class AttachmentDDMFormFieldTemplateContextContributorTest
 	}
 
 	@Test
+	public void testGetGroupId() {
+		long groupId = RandomTestUtil.randomLong();
+
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext =
+			new DDMFormFieldRenderingContext();
+
+		HttpServletRequest httpServletRequest = new MockHttpServletRequest();
+
+		ThemeDisplay themeDisplay = Mockito.mock(ThemeDisplay.class);
+
+		Mockito.when(
+			themeDisplay.getCompanyGroupId()
+		).thenReturn(
+			groupId
+		);
+
+		httpServletRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
+
+		Assert.assertEquals(
+			groupId,
+			(long)ReflectionTestUtil.invoke(
+				_attachmentDDMFormFieldTemplateContextContributor,
+				"_getGroupId",
+				new Class<?>[] {
+					DDMFormField.class, DDMFormFieldRenderingContext.class,
+					HttpServletRequest.class
+				},
+				_ddmFormField, ddmFormFieldRenderingContext,
+				httpServletRequest));
+
+		groupId = RandomTestUtil.randomLong();
+
+		_ddmFormField.setProperty("groupAware", true);
+
+		ddmFormFieldRenderingContext.setProperty("groupId", groupId);
+
+		Assert.assertEquals(
+			groupId,
+			(long)ReflectionTestUtil.invoke(
+				_attachmentDDMFormFieldTemplateContextContributor,
+				"_getGroupId",
+				new Class<?>[] {
+					DDMFormField.class, DDMFormFieldRenderingContext.class,
+					HttpServletRequest.class
+				},
+				_ddmFormField, ddmFormFieldRenderingContext,
+				httpServletRequest));
+	}
+
+	@Test
 	public void testGetParametersFileEntryProperties() throws Exception {
 		_ddmFormField.setProperty("localizedObjectField", true);
 		_ddmFormField.setProperty(
