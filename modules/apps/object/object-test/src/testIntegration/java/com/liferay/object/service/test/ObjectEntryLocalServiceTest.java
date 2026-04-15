@@ -2675,7 +2675,7 @@ public class ObjectEntryLocalServiceTest {
 			},
 			_objectEntryLocalService, _objectRelationshipLocalService);
 	}
-	
+
 	@Test
 	public void testAddObjectEntryWithHierarchyAndWorkflow() throws Exception {
 		ObjectDefinition objectDefinitionA =
