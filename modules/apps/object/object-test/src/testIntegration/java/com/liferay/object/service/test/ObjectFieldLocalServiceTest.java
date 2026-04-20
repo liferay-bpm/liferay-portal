@@ -2600,6 +2600,100 @@ public class ObjectFieldLocalServiceTest {
 						"true"
 					).build())));
 
+		// Business type phone number
+
+		defaultValue = "+1 (555) 123-4567";
+
+		ObjectField phoneNumberObjectField = _addCustomObjectField(
+			new PhoneNumberObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"a" + RandomTestUtil.randomString()
+			).objectDefinitionId(
+				objectDefinition.getObjectDefinitionId()
+			).objectFieldSettings(
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE
+					).value(
+						defaultValue
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE
+					).value(
+						ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_PREFIX_TYPE
+					).value(
+						ObjectFieldSettingConstants.VALUE_DEFINE_BY_USER
+					).build())
+			).build());
+
+		_assertObjectFieldSettingsValues(
+			phoneNumberObjectField.getObjectFieldId(),
+			HashMapBuilder.put(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE, defaultValue
+			).put(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+				ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
+			).put(
+				ObjectFieldSettingConstants.NAME_PREFIX_TYPE,
+				ObjectFieldSettingConstants.VALUE_DEFINE_BY_USER
+			).build());
+
+		_assertObjectEntryDefaultValue(
+			"+15551234567", phoneNumberObjectField, new HashMap<>());
+
+		_addOrUpdateCustomObjectField(
+			phoneNumberObjectField,
+			Arrays.asList(
+				new ObjectFieldSettingBuilder(
+				).name(
+					ObjectFieldSettingConstants.NAME_DEFAULT_VALUE
+				).value(
+					"5551234567"
+				).build(),
+				new ObjectFieldSettingBuilder(
+				).name(
+					ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE
+				).value(
+					ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
+				).build(),
+				new ObjectFieldSettingBuilder(
+				).name(
+					ObjectFieldSettingConstants.NAME_PREFIX_TYPE
+				).value(
+					ObjectFieldSettingConstants.VALUE_FIXED
+				).build(),
+				new ObjectFieldSettingBuilder(
+				).name(
+					ObjectFieldSettingConstants.NAME_PREFIX
+				).value(
+					"+1"
+				).build()));
+
+		_assertObjectFieldSettingsValues(
+			phoneNumberObjectField.getObjectFieldId(),
+			HashMapBuilder.put(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE, "5551234567"
+			).put(
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+				ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
+			).put(
+				ObjectFieldSettingConstants.NAME_PREFIX, "+1"
+			).put(
+				ObjectFieldSettingConstants.NAME_PREFIX_TYPE,
+				ObjectFieldSettingConstants.VALUE_FIXED
+			).build());
+
+		_assertObjectEntryDefaultValue(
+			"+15551234567", phoneNumberObjectField, new HashMap<>());
+
 		// Business type picklist
 
 		ObjectField picklistObjectField = _addPicklistObjectField(
@@ -2710,55 +2804,6 @@ public class ObjectFieldLocalServiceTest {
 
 		_assertObjectEntryDefaultValue(
 			defaultValue, textObjectField, new HashMap<>());
-
-		// Business type phone number
-
-		defaultValue = "+1 (555) 123-4567";
-
-		ObjectField phoneNumberObjectField = _addCustomObjectField(
-			new PhoneNumberObjectFieldBuilder(
-			).labelMap(
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
-			).name(
-				"a" + RandomTestUtil.randomString()
-			).objectDefinitionId(
-				objectDefinition.getObjectDefinitionId()
-			).objectFieldSettings(
-				Arrays.asList(
-					new ObjectFieldSettingBuilder(
-					).name(
-						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE
-					).value(
-						defaultValue
-					).build(),
-					new ObjectFieldSettingBuilder(
-					).name(
-						ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE
-					).value(
-						ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
-					).build(),
-					new ObjectFieldSettingBuilder(
-					).name(
-						ObjectFieldSettingConstants.NAME_PREFIX_TYPE
-					).value(
-						ObjectFieldSettingConstants.VALUE_DEFINE_BY_USER
-					).build())
-			).build());
-
-		_assertObjectFieldSettingsValues(
-			phoneNumberObjectField.getObjectFieldId(),
-			HashMapBuilder.put(
-				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE, defaultValue
-			).put(
-				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
-				ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
-			).put(
-				ObjectFieldSettingConstants.NAME_PREFIX_TYPE,
-				ObjectFieldSettingConstants.VALUE_DEFINE_BY_USER
-			).build());
-
-		_assertObjectEntryDefaultValue(
-			"+15551234567", phoneNumberObjectField, new HashMap<>());
 
 		Assert.assertNull(
 			_objectFieldSettingLocalService.fetchObjectFieldSetting(

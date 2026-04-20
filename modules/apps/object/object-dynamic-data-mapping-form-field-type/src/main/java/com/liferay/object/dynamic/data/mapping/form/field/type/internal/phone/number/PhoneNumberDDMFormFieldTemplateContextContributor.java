@@ -10,14 +10,15 @@ import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.dynamic.data.mapping.util.DDMFormFieldTemplateContextContributorUtil;
+import com.liferay.dynamic.data.mapping.util.DDMFormFieldValueUtil;
 import com.liferay.object.dynamic.data.mapping.form.field.type.constants.ObjectDDMFormFieldTypeConstants;
-import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.service.CountryLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropsValues;
@@ -25,6 +26,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -60,17 +62,13 @@ public class PhoneNumberDDMFormFieldTemplateContextContributor
 		).put(
 			"value",
 			() -> {
-				String value = ddmFormFieldRenderingContext.getValue();
-
-				if (Validator.isNull(value)) {
-					return null;
-				}
-
 				if (localizedObjectField) {
-					return _jsonFactory.looseDeserialize(value);
+					return DDMFormFieldValueUtil.getValueJSONObject(
+						ddmFormFieldRenderingContext);
 				}
 
-				return value;
+				return GetterUtil.getString(
+					ddmFormFieldRenderingContext.getValue());
 			}
 		).putAll(
 			DDMFormFieldTemplateContextContributorUtil.
@@ -79,50 +77,41 @@ public class PhoneNumberDDMFormFieldTemplateContextContributor
 		).build();
 	}
 
-	private Set<String> _getAvailableLocaleCountryA2s() {
-		Set<String> availableLocaleCountryA2s = _availableLocaleCountryA2s;
-
-		if (availableLocaleCountryA2s != null) {
-			return availableLocaleCountryA2s;
+	private Set<String> _getAvailableCountryA2List() {
+		if (_availableCountryA2List != null) {
+			return _availableCountryA2List;
 		}
 
-		Set<String> countryA2s = new HashSet<>();
+		Set<String> countryA2List = new HashSet<>();
 
 		for (String languageId : PropsValues.LOCALES) {
-			Locale availableLocale = LocaleUtil.fromLanguageId(
-				languageId, false);
+			Locale locale = LocaleUtil.fromLanguageId(languageId, false);
 
-			String countryA2 = availableLocale.getCountry();
+			String country = locale.getCountry();
 
-			if (Validator.isNotNull(countryA2)) {
-				countryA2s.add(countryA2);
+			if (Validator.isNotNull(country)) {
+				countryA2List.add(country);
 			}
 		}
 
-		availableLocaleCountryA2s = Collections.unmodifiableSet(countryA2s);
+		_availableCountryA2List = countryA2List;
 
-		_availableLocaleCountryA2s = availableLocaleCountryA2s;
-
-		return availableLocaleCountryA2s;
+		return _availableCountryA2List;
 	}
 
 	private List<Map<String, String>> _getCountries() {
-		List<Map<String, String>> countries = new ArrayList<>();
-
-		long companyId = 0;
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
-		if (serviceContext != null) {
-			companyId = serviceContext.getCompanyId();
+		if (serviceContext == null) {
+			return Collections.emptyList();
 		}
+
+		long companyId = serviceContext.getCompanyId();
 
 		if (companyId == 0) {
-			return countries;
+			return Collections.emptyList();
 		}
-
-		Set<String> availableLocaleCountryA2s = _getAvailableLocaleCountryA2s();
 
 		Locale locale = LocaleThreadLocal.getThemeDisplayLocale();
 
@@ -130,10 +119,14 @@ public class PhoneNumberDDMFormFieldTemplateContextContributor
 			locale = LocaleUtil.getDefault();
 		}
 
+		List<Map<String, String>> countries = new ArrayList<>();
+
+		Set<String> availableCountryA2List = _getAvailableCountryA2List();
+
 		for (Country country :
 				_countryLocalService.getCompanyCountries(companyId, true)) {
 
-			if (!availableLocaleCountryA2s.contains(country.getA2())) {
+			if (!availableCountryA2List.contains(country.getA2())) {
 				continue;
 			}
 
@@ -153,15 +146,13 @@ public class PhoneNumberDDMFormFieldTemplateContextContributor
 				).build());
 		}
 
-		return countries;
+		return ListUtil.sort(
+			countries, Comparator.comparing(country -> country.get("name")));
 	}
 
-	private static volatile Set<String> _availableLocaleCountryA2s;
+	private volatile Set<String> _availableCountryA2List;
 
 	@Reference
 	private CountryLocalService _countryLocalService;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 }

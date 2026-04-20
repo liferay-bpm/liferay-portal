@@ -83,7 +83,6 @@ import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.internal.entry.util.ObjectEntrySearchUtil;
-import com.liferay.object.internal.field.util.PhoneNumberObjectFieldValueUtil;
 import com.liferay.object.internal.filter.parser.CurrentUserObjectFilterParser;
 import com.liferay.object.internal.filter.parser.DateRangeObjectFilterParser;
 import com.liferay.object.internal.filter.parser.EqualityOperatorsObjectFilterParser;
@@ -416,18 +415,16 @@ public class ObjectEntryLocalServiceImpl
 
 		_contributeValues(groupId, objectDefinition, userId, values);
 
-		List<ObjectField> objectFields =
-			_objectFieldLocalService.getObjectFields(
-				objectDefinition.getObjectDefinitionId());
-
 		Map<ObjectField, Set<DLFileEntry>> dlFileEntriesMap = new HashMap<>();
 		long objectEntryId = counterLocalService.increment();
 		User user = _userLocalService.getUser(userId);
 
 		_validateValues(
 			defaultLanguageId, dlFileEntriesMap, null, groupId,
-			user.isGuestUser(), objectDefinition, null, objectFields, false,
-			serviceContext, null, userId, null, values);
+			user.isGuestUser(), objectDefinition, null,
+			_objectFieldLocalService.getObjectFields(
+				objectDefinition.getObjectDefinitionId()),
+			false, serviceContext, null, userId, null, values);
 
 		_addDLFileEntries(
 			dlFileEntriesMap, groupId, objectDefinition, objectEntryId,
@@ -4782,40 +4779,6 @@ public class ObjectEntryLocalServiceImpl
 		return permissionWherePredicate;
 	}
 
-	private String _getPhoneNumberValue(
-			ObjectField objectField, String phoneNumber)
-		throws PortalException {
-
-		if (StringUtil.equals(
-				ObjectFieldSettingUtil.getValue(
-					ObjectFieldSettingConstants.NAME_PREFIX_TYPE, objectField),
-				ObjectFieldSettingConstants.VALUE_DEFINE_BY_USER) ||
-			Validator.isNull(phoneNumber)) {
-
-			return phoneNumber;
-		}
-
-		String prefix = ObjectFieldSettingUtil.getValue(
-			ObjectFieldSettingConstants.NAME_PREFIX, objectField);
-
-		if (Validator.isNull(prefix)) {
-			return phoneNumber;
-		}
-
-		if (StringUtil.startsWith(phoneNumber, StringPool.PLUS)) {
-			if (StringUtil.startsWith(phoneNumber, prefix) &&
-				(phoneNumber.length() > prefix.length())) {
-
-				return phoneNumber;
-			}
-
-			throw new ObjectEntryValuesException.InvalidPhoneNumber(
-				objectField.getName(), phoneNumber);
-		}
-
-		return prefix + phoneNumber;
-	}
-
 	private Column<?, Long> _getPrimaryKeyColumn(
 		DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
 		DynamicObjectDefinitionTable extensionDynamicObjectDefinitionTable,
@@ -6734,18 +6697,17 @@ public class ObjectEntryLocalServiceImpl
 		_contributeValues(
 			objectEntry.getGroupId(), objectDefinition, userId, values);
 
-		List<ObjectField> objectFields =
-			_objectFieldLocalService.getObjectFields(
-				objectDefinition.getObjectDefinitionId());
-
 		Map<ObjectField, Set<DLFileEntry>> dlFileEntriesMap = new HashMap<>();
 
 		_validateValues(
 			objectEntry.getDefaultLanguageId(), dlFileEntriesMap,
 			objectEntry.getValues(), objectEntry.getGroupId(),
 			user.isGuestUser(), objectDefinition,
-			objectEntry.getObjectEntryId(), objectFields, partialUpdate,
-			serviceContext, objectEntry.getStatus(), userId, null, values);
+			objectEntry.getObjectEntryId(),
+			_objectFieldLocalService.getObjectFields(
+				objectDefinition.getObjectDefinitionId()),
+			partialUpdate, serviceContext, objectEntry.getStatus(), userId,
+			null, values);
 
 		_addDLFileEntries(
 			dlFileEntriesMap, objectEntry.getGroupId(), objectDefinition,
@@ -7836,20 +7798,6 @@ public class ObjectEntryLocalServiceImpl
 				}
 			}
 		}
-		else if (objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_PHONE_NUMBER)) {
-
-			String phoneNumber = GetterUtil.getString(value);
-
-			if (!phoneNumber.isEmpty() &&
-				!PhoneNumberObjectFieldValueUtil.isValid(phoneNumber)) {
-
-				_handle(
-					new ObjectEntryValuesException.InvalidPhoneNumber(
-						objectField.getName(), phoneNumber),
-					validationErrors);
-			}
-		}
 		else if (StringUtil.equals(
 					objectField.getDBType(),
 					ObjectFieldConstants.DB_TYPE_STRING)) {
@@ -7922,20 +7870,17 @@ public class ObjectEntryLocalServiceImpl
 				defaultLanguageId, existingValues, objectField, partialUpdate,
 				serviceContext, status, validationErrors, values);
 
+			ObjectFieldBusinessType objectFieldBusinessType =
+				_objectFieldBusinessTypeRegistry.getObjectFieldBusinessType(
+					objectField.getBusinessType());
+
 			if (!objectField.isLocalized() &&
 				(values.get(objectField.getName()) != null)) {
 
-				if (objectField.compareBusinessType(
-						ObjectFieldConstants.BUSINESS_TYPE_PHONE_NUMBER)) {
-
-					values.put(
-						objectField.getName(),
-						_getPhoneNumberValue(
-							objectField,
-							PhoneNumberObjectFieldValueUtil.normalize(
-								GetterUtil.getString(
-									values.get(objectField.getName())))));
-				}
+				values.put(
+					objectField.getName(),
+					objectFieldBusinessType.processValue(
+						objectField, values.get(objectField.getName())));
 
 				_validateValues(
 					dlFileEntriesMap, existingValues, groupId, guestUser,
@@ -7955,15 +7900,9 @@ public class ObjectEntryLocalServiceImpl
 			for (Map.Entry<String, Serializable> entry :
 					localizedValues.entrySet()) {
 
-				if (objectField.compareBusinessType(
-						ObjectFieldConstants.BUSINESS_TYPE_PHONE_NUMBER)) {
-
-					entry.setValue(
-						_getPhoneNumberValue(
-							objectField,
-							PhoneNumberObjectFieldValueUtil.normalize(
-								GetterUtil.getString(entry.getValue()))));
-				}
+				entry.setValue(
+					objectFieldBusinessType.processValue(
+						objectField, entry.getValue()));
 
 				_validateValues(
 					dlFileEntriesMap, existingValues, groupId, guestUser,
