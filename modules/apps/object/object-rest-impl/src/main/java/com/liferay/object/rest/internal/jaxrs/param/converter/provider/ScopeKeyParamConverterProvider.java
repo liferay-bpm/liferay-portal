@@ -5,13 +5,16 @@
 
 package com.liferay.object.rest.internal.jaxrs.param.converter.provider;
 
-import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.scope.ObjectScopeProvider;
+import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.vulcan.util.GroupUtil;
 
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
@@ -34,8 +37,12 @@ import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 public class ScopeKeyParamConverterProvider
 	implements ParamConverter<String>, ParamConverterProvider {
 
-	public ScopeKeyParamConverterProvider(GroupLocalService groupLocalService) {
+	public ScopeKeyParamConverterProvider(
+		GroupLocalService groupLocalService,
+		ObjectScopeProviderRegistry objectScopeProviderRegistry) {
+
 		_groupLocalService = groupLocalService;
+		_objectScopeProviderRegistry = objectScopeProviderRegistry;
 	}
 
 	@Override
@@ -44,35 +51,42 @@ public class ScopeKeyParamConverterProvider
 			return null;
 		}
 
-		if (StringUtil.equals(
-				_objectDefinition.getScope(),
-				ObjectDefinitionConstants.SCOPE_DEPOT) ||
-			StringUtil.equals(
-				_objectDefinition.getScope(),
-				ObjectDefinitionConstants.SCOPE_SITE)) {
+		ObjectScopeProvider objectScopeProvider =
+			_objectScopeProviderRegistry.getObjectScopeProvider(
+				_objectDefinition.getScope());
 
-			String groupId = _getGroupId(_company.getCompanyId(), parameter);
-
-			if (groupId != null) {
-				return groupId;
-			}
-
-			String groupType = "asset library";
-
-			if (StringUtil.equals(
-					_objectDefinition.getScope(),
-					ObjectDefinitionConstants.SCOPE_SITE)) {
-
-				groupType = "site";
-			}
-
-			throw new NotFoundException(
-				StringBundler.concat(
-					"Unable to get a valid ", groupType, " with group ID ",
-					parameter));
+		if (!objectScopeProvider.isGroupAware()) {
+			throw new InternalServerErrorException(
+				"Unexpected scopeKey parameter for scope " +
+					_objectDefinition.getScope());
 		}
 
-		throw new InternalServerErrorException("Unexpected scopeKey parameter");
+		String groupId;
+
+		try {
+			groupId = objectScopeProvider.resolveScopeKey(
+				_company.getCompanyId(), parameter, _groupLocalService);
+		}
+		catch (PortalException portalException) {
+			throw new InternalServerErrorException(
+				portalException.getMessage(), portalException);
+		}
+
+		if (groupId == null) {
+			throw new NotFoundException(
+				StringBundler.concat(
+					"Unable to resolve scopeKey ", parameter, " for scope ",
+					_objectDefinition.getScope()));
+		}
+
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		if (serviceContext != null) {
+			serviceContext.setAttribute("scopeKey", parameter);
+		}
+
+		return groupId;
 	}
 
 	@Override
@@ -89,17 +103,6 @@ public class ScopeKeyParamConverterProvider
 	@Override
 	public String toString(String parameter) {
 		return String.valueOf(parameter);
-	}
-
-	private String _getGroupId(long companyId, String scopeKey) {
-		Long groupId = GroupUtil.getGroupId(
-			companyId, scopeKey, _groupLocalService);
-
-		if (groupId == null) {
-			return null;
-		}
-
-		return String.valueOf(groupId);
 	}
 
 	private boolean _hasScopeKeyAnnotation(Annotation[] annotations) {
@@ -123,6 +126,8 @@ public class ScopeKeyParamConverterProvider
 
 	@Context
 	private ObjectDefinition _objectDefinition;
+
+	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 
 	@Context
 	private UriInfo _uriInfo;

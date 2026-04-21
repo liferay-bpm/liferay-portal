@@ -6,6 +6,8 @@
 package com.liferay.object.scope;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.vulcan.util.GroupUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -28,5 +30,20 @@ public interface ObjectScopeProvider {
 	public boolean isGroupAware();
 
 	public boolean isValidGroupId(long groupId);
+
+	public default String resolveScopeKey(
+			long companyId, String scopeKey,
+			GroupLocalService groupLocalService)
+		throws PortalException {
+
+		Long groupId = GroupUtil.getGroupId(
+			companyId, scopeKey, groupLocalService);
+
+		if (groupId == null) {
+			return null;
+		}
+
+		return String.valueOf(groupId);
+	}
 
 }

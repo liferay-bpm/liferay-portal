@@ -6,6 +6,7 @@
 package com.liferay.object.rest.internal.jaxrs.feature;
 
 import com.liferay.object.rest.internal.jaxrs.param.converter.provider.ScopeKeyParamConverterProvider;
+import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -32,7 +33,8 @@ public class ObjectFeature implements Feature {
 	@Override
 	public boolean configure(FeatureContext featureContext) {
 		featureContext.register(
-			new ScopeKeyParamConverterProvider(_groupLocalService));
+			new ScopeKeyParamConverterProvider(
+				_groupLocalService, _objectScopeProviderRegistry));
 
 		return true;
 	}
@@ -45,5 +47,8 @@ public class ObjectFeature implements Feature {
 
 	@Reference
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
+
+	@Reference
+	private ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 
 }
