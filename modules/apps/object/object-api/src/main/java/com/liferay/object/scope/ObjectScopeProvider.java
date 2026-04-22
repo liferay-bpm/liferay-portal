@@ -5,7 +5,9 @@
 
 package com.liferay.object.scope;
 
+import com.liferay.object.model.ObjectEntry;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.vulcan.util.GroupUtil;
 
@@ -26,6 +28,18 @@ public interface ObjectScopeProvider {
 	public String getLabel(Locale locale);
 
 	public String[] getRootPanelCategoryKeys();
+
+	public default String getScopeKey(
+		GroupLocalService groupLocalService, ObjectEntry objectEntry) {
+
+		Group group = groupLocalService.fetchGroup(objectEntry.getGroupId());
+
+		if (group == null) {
+			return null;
+		}
+
+		return group.getGroupKey();
+	}
 
 	public boolean isGroupAware();
 

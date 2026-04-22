@@ -842,13 +842,8 @@ public class ObjectEntryDTOConverter
 			return null;
 		}
 
-		Group group = _groupLocalService.fetchGroup(objectEntry.getGroupId());
-
-		if (group == null) {
-			return null;
-		}
-
-		return group.getGroupKey();
+		return objectScopeProvider.getScopeKey(
+			_groupLocalService, objectEntry);
 	}
 
 	private Serializable _getValue(
