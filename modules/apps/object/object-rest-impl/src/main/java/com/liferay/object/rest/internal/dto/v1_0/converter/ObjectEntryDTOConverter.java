@@ -842,8 +842,7 @@ public class ObjectEntryDTOConverter
 			return null;
 		}
 
-		return objectScopeProvider.getScopeKey(
-			_groupLocalService, objectEntry);
+		return objectScopeProvider.getScopeKey(_groupLocalService, objectEntry);
 	}
 
 	private Serializable _getValue(
