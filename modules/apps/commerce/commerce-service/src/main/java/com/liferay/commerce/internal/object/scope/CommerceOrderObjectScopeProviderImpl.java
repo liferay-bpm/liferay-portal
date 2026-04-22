@@ -8,6 +8,7 @@ package com.liferay.commerce.internal.object.scope;
 import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.service.CommerceOrderLocalService;
+import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
@@ -61,6 +62,22 @@ public class CommerceOrderObjectScopeProviderImpl
 	@Override
 	public String[] getRootPanelCategoryKeys() {
 		return new String[0];
+	}
+
+	@Override
+	public String getScopeKey(
+		GroupLocalService groupLocalService, ObjectEntry objectEntry) {
+
+		long commerceOrderId = GetterUtil.getLong(
+			objectEntry.getValues().get(
+				"r_commerceOrderToCommerceOrderAttachments_commerceOrderId"));
+
+		if (commerceOrderId > 0) {
+			return String.valueOf(commerceOrderId);
+		}
+
+		return ObjectScopeProvider.super.getScopeKey(
+			groupLocalService, objectEntry);
 	}
 
 	@Override
