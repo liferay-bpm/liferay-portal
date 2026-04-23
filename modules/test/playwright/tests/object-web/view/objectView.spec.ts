@@ -1836,17 +1836,13 @@ test(
 
 		yesterday.setDate(yesterday.getDate() - 1);
 
-		const tomorrow = new Date(today);
-
-		tomorrow.setDate(tomorrow.getDate() + 1);
-
 		const formatDate = (d: Date) =>
 			`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
 		await page.getByLabel('From').fill(formatDate(yesterday));
 		await page
 			.getByRole('textbox', {name: 'To'})
-			.fill(formatDate(tomorrow));
+			.fill(formatDate(today));
 
 		await page.getByRole('button', {name: 'Add Filter'}).click();
 
@@ -1936,17 +1932,13 @@ test(
 
 		yesterday.setDate(yesterday.getDate() - 1);
 
-		const tomorrow = new Date(today);
-
-		tomorrow.setDate(tomorrow.getDate() + 1);
-
 		const formatDate = (d: Date) =>
 			`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
 		await page.getByLabel('From').fill(formatDate(yesterday));
 		await page
 			.getByRole('textbox', {name: 'To'})
-			.fill(formatDate(tomorrow));
+			.fill(formatDate(today));
 
 		await page.getByRole('button', {name: 'Add Filter'}).click();
 
