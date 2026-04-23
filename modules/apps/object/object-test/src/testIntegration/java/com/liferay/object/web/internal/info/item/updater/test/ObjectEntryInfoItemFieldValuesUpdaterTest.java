@@ -283,8 +283,8 @@ public class ObjectEntryInfoItemFieldValuesUpdaterTest
 		Map<String, Serializable> values = objectEntryLocalService.getValues(
 			parentObjectEntry.getObjectEntryId());
 
-		Map<String, Object> localizedValues =
-			(Map<String, Object>)values.get("text_i18n");
+		Map<String, Object> localizedValues = (Map<String, Object>)values.get(
+			"text_i18n");
 
 		Assert.assertEquals(enValue, localizedValues.get("en_US"));
 		Assert.assertEquals(ptValue, localizedValues.get("pt_BR"));
@@ -294,8 +294,7 @@ public class ObjectEntryInfoItemFieldValuesUpdaterTest
 				0, childObjectDefinition.getObjectDefinitionId(),
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
-		Assert.assertEquals(
-			objectEntries.toString(), 1, objectEntries.size());
+		Assert.assertEquals(objectEntries.toString(), 1, objectEntries.size());
 
 		ObjectEntry childObjectEntry = objectEntries.get(0);
 
