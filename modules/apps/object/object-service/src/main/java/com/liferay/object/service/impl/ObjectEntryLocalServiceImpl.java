@@ -2429,7 +2429,10 @@ public class ObjectEntryLocalServiceImpl
 			objectEntry = _addObjectEntryVersion(objectDefinition, objectEntry);
 		}
 
-		if (objectDefinition.isRootNode()) {
+		if (objectDefinition.isRootNode() &&
+			(status != WorkflowConstants.STATUS_IN_TRASH) &&
+			!originalObjectEntry.isInTrash()) {
+
 			_updateRootDescendantNodeObjectEntryStatus(
 				userId, objectEntry, serviceContext);
 		}
