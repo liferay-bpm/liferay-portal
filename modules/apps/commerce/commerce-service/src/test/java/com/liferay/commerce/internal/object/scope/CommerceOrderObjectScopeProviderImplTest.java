@@ -166,6 +166,8 @@ public class CommerceOrderObjectScopeProviderImplTest {
 		Assert.assertTrue(
 			_commerceOrderObjectScopeProviderImpl.isValidGroupId(groupId));
 
+		ServiceContextThreadLocal.popServiceContext();
+
 		serviceContext = new ServiceContext();
 
 		serviceContext.setAttribute(

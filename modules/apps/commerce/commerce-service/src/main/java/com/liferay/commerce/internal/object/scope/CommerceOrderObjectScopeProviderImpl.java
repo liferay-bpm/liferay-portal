@@ -16,6 +16,7 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -68,11 +69,9 @@ public class CommerceOrderObjectScopeProviderImpl
 	public String getScopeKey(
 		GroupLocalService groupLocalService, ObjectEntry objectEntry) {
 
-		long commerceOrderId = GetterUtil.getLong(
-			objectEntry.getValues(
-			).get(
-				"r_commerceOrderToCommerceOrderAttachments_commerceOrderId"
-			));
+		long commerceOrderId = MapUtil.getLong(
+			objectEntry.getValues(),
+			"r_commerceOrderToCommerceOrderAttachments_commerceOrderId");
 
 		if (commerceOrderId > 0) {
 			return String.valueOf(commerceOrderId);

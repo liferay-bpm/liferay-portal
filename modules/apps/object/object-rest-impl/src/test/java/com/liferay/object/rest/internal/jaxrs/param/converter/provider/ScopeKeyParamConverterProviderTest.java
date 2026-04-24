@@ -124,8 +124,8 @@ public class ScopeKeyParamConverterProviderTest {
 			companyId
 		);
 
-		String scopeKey = RandomTestUtil.randomString();
 		String groupId = String.valueOf(RandomTestUtil.randomLong());
+		String scopeKey = RandomTestUtil.randomString();
 
 		Mockito.when(
 			_objectScopeProvider.resolveScopeKey(
