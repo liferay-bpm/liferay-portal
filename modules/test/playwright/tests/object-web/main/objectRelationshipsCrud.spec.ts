@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2000 Liferay, Inc. https://liferay.com
+ * SPDX-FileCopyrightText: (c) 2026 Liferay, Inc. https://liferay.com
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
@@ -29,7 +29,8 @@ const test = mergeTests(
 );
 
 test(
-	'LPS-145393 Can add multiple One-to-Many relations with Native Object',
+	'LPS-145393 Can add multiple One-to-Many relations with System Object',
+	{tag: '@LPS-145393'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
 			objectFieldBusinessTypes: ['Text'],
@@ -53,14 +54,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'relationship' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				'L_USER',
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1: 'L_USER',
 					objectDefinitionExternalReferenceCode2:
 						objectDefinition.externalReferenceCode,
@@ -132,7 +133,7 @@ test(
 );
 
 test(
-	'LPS-145393 Can add One-to-Many relation with Native Object',
+	'LPS-145393 Can add One-to-Many relation with System Object',
 	{tag: '@LPS-145393'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
@@ -157,14 +158,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'relationship' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				'L_USER',
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1: 'L_USER',
 					objectDefinitionExternalReferenceCode2:
 						objectDefinition.externalReferenceCode,
@@ -224,15 +225,15 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName1 = 'rel' + getRandomInt();
-		const relationshipName2 = 'rel' + getRandomInt();
+		const objectRelationshipName1 = 'objectRelationshipName' + Math.floor(Math.random() * 99);
+		const objectRelationshipName2 = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship1} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition.externalReferenceCode,
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName1,
+					name: objectRelationshipName1,
 					objectDefinitionExternalReferenceCode1:
 						objectDefinition.externalReferenceCode,
 					objectDefinitionExternalReferenceCode2:
@@ -254,7 +255,7 @@ test(
 				objectDefinition.externalReferenceCode,
 				{
 					label: {en_US: 'Relationship 2'},
-					name: relationshipName2,
+					name: objectRelationshipName2,
 					objectDefinitionExternalReferenceCode1:
 						objectDefinition.externalReferenceCode,
 					objectDefinitionExternalReferenceCode2:
@@ -323,7 +324,7 @@ test(
 );
 
 test(
-	'LPS-146754 Can create Many-to-Many relationship with Native Object',
+	'LPS-146754 Can create Many-to-Many relationship with System Object',
 	{tag: '@LPS-146754'},
 	async ({
 		addNewObjectRelationshipModalPage,
@@ -376,7 +377,7 @@ test(
 );
 
 test(
-	'LPS-145393 Can create One-to-Many relationship for Native Object',
+	'LPS-145393 Can create One-to-Many relationship for System Object',
 	{tag: '@LPS-145393'},
 	async ({
 		addNewObjectRelationshipModalPage,
@@ -422,7 +423,7 @@ test(
 );
 
 test(
-	'LPS-151676 Can create One-to-Many relationship with Native Object',
+	'LPS-151676 Can create One-to-Many relationship with System Object',
 	{tag: '@LPS-151676'},
 	async ({
 		addNewObjectRelationshipModalPage,
@@ -493,7 +494,7 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
@@ -501,7 +502,7 @@ test(
 				{
 					deletionType: 'cascade',
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1:
 						objectDefinition.externalReferenceCode,
 					objectDefinitionExternalReferenceCode2:
@@ -642,18 +643,20 @@ test(
 		await page.getByRole('menuitem', {name: 'Delete'}).click();
 		await page.getByRole('button', {name: 'Delete'}).click();
 
-		const entryAFinalRow = page.getByRole('row', {name: /Entry A/});
-		const entryBFinalRow = page.getByRole('row', {name: /Entry B/});
-		const entryCFinalRow = page.getByRole('row', {name: /Entry C/});
-
-		await expect(entryBFinalRow).toBeHidden();
-		await expect(entryCFinalRow).toBeHidden();
-		await expect(entryAFinalRow).toBeVisible();
+		await expect(
+			page.getByRole('row', {name: /Entry B/})
+		).toBeHidden();
+		await expect(
+			page.getByRole('row', {name: /Entry C/})
+		).toBeHidden();
+		await expect(
+			page.getByRole('row', {name: /Entry A/})
+		).toBeVisible();
 	}
 );
 
 test(
-	'LPS-146754 Can delete Many-to-Many relationship between Custom Object entry and Native Object entry',
+	'LPS-146754 Can delete Many-to-Many relationship between Custom Object entry and System Object entry',
 	{tag: '@LPS-146754'},
 	async ({apiHelpers, objectLayoutsPage, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
@@ -681,14 +684,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition.externalReferenceCode,
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1:
 						objectDefinition.externalReferenceCode,
 					objectDefinitionExternalReferenceCode2: 'L_USER',
@@ -880,14 +883,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				'L_USER',
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1: 'L_USER',
 					objectDefinitionExternalReferenceCode2:
 						objectDefinition.externalReferenceCode,
@@ -912,7 +915,7 @@ test(
 
 		await expect(deleteDialog).toBeVisible();
 
-		await deleteDialog.getByRole('textbox').fill(relationshipName);
+		await deleteDialog.getByRole('textbox').fill(objectRelationshipName);
 
 		await deleteDialog.getByRole('button', {name: 'Delete'}).click();
 
@@ -954,14 +957,14 @@ test(
 		ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 		await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 			'L_USER',
 			{
 			label: {en_US: 'Relationship'},
-			name: relationshipName,
+			name: objectRelationshipName,
 			objectDefinitionExternalReferenceCode1: 'L_USER',
 			objectDefinitionExternalReferenceCode2:
 				objectDefinition.externalReferenceCode,
@@ -986,7 +989,7 @@ test(
 
 		await expect(deleteDialog).toBeVisible();
 
-		await deleteDialog.getByRole('textbox').fill(relationshipName);
+		await deleteDialog.getByRole('textbox').fill(objectRelationshipName);
 
 		await deleteDialog.getByRole('button', {name: 'Delete'}).click();
 
@@ -1006,7 +1009,7 @@ test(
 );
 
 test(
-	'LPS-151676 Can delete One-to-Many relationship between Custom Object entry and Native Object entry',
+	'LPS-151676 Can delete One-to-Many relationship between Custom Object entry and System Object entry',
 	{tag: '@LPS-151676'},
 	async ({apiHelpers, objectLayoutsPage, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
@@ -1034,14 +1037,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition.externalReferenceCode,
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1:
 						objectDefinition.externalReferenceCode,
 					objectDefinitionExternalReferenceCode2: 'L_USER',
@@ -1115,17 +1118,17 @@ test(
 		);
 
 		const addUserAccount1RelationshipResponse = await apiHelpers.putResponse(
-			`${apiHelpers.baseUrl}${restPath}/${entryA.id}/${relationshipName}/${userAccount1.id}`
+			`${apiHelpers.baseUrl}${restPath}/${entryA.id}/${objectRelationshipName}/${userAccount1.id}`
 		);
 		const addUserAccount2RelationshipResponse = await apiHelpers.putResponse(
-			`${apiHelpers.baseUrl}${restPath}/${entryA.id}/${relationshipName}/${userAccount2.id}`
+			`${apiHelpers.baseUrl}${restPath}/${entryA.id}/${objectRelationshipName}/${userAccount2.id}`
 		);
 
 		await expect(addUserAccount1RelationshipResponse).toBeOK();
 		await expect(addUserAccount2RelationshipResponse).toBeOK();
 
 		const relatedUsers = await apiHelpers.get(
-			`${apiHelpers.baseUrl}${restPath}/${entryA.id}/${relationshipName}`
+			`${apiHelpers.baseUrl}${restPath}/${entryA.id}/${objectRelationshipName}`
 		);
 
 		expect(relatedUsers.items).toHaveLength(2);
@@ -1224,14 +1227,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition.externalReferenceCode,
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1:
 						objectDefinition.externalReferenceCode,
 					objectDefinitionExternalReferenceCode2:
@@ -1439,14 +1442,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition1.externalReferenceCode,
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1:
 						objectDefinition1.externalReferenceCode,
 					objectDefinitionExternalReferenceCode2:
@@ -1532,7 +1535,7 @@ test(
 			{
 				applicationName: restPath1,
 				currentExternalReferenceCode: entryA.externalReferenceCode,
-				objectRelationshipName: relationshipName,
+				objectRelationshipName,
 				relatedExternalReferenceCode: entryB.externalReferenceCode,
 			}
 		);
@@ -1670,14 +1673,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				'L_USER',
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1: 'L_USER',
 					objectDefinitionExternalReferenceCode2:
 						objectDefinition.externalReferenceCode,
@@ -1732,14 +1735,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition.externalReferenceCode,
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1:
 						objectDefinition.externalReferenceCode,
 					objectDefinitionExternalReferenceCode2:
@@ -1772,7 +1775,7 @@ test(
 			deleteRelationshipDialog.getByPlaceholder(
 				'Confirm Relationship Name'
 			);
-		const incorrectRelationshipName = `${relationshipName}-wrong`;
+		const incorrectRelationshipName = `${objectRelationshipName}-wrong`;
 
 		await expect(confirmRelationshipNameInput).toBeVisible();
 		await confirmRelationshipNameInput.fill(incorrectRelationshipName);
@@ -1863,14 +1866,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition.externalReferenceCode,
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1:
 						objectDefinition.externalReferenceCode,
 					objectDefinitionExternalReferenceCode2:
@@ -2134,14 +2137,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition.externalReferenceCode,
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1:
 						objectDefinition.externalReferenceCode,
 					objectDefinitionExternalReferenceCode2:
@@ -2197,14 +2200,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition.externalReferenceCode,
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1:
 						objectDefinition.externalReferenceCode,
 					objectDefinitionExternalReferenceCode2:
@@ -2260,7 +2263,7 @@ test(
 );
 
 test(
-	'LPS-146754 Can relate Many-to-Many Custom Object entry with Native Object entries',
+	'LPS-146754 Can relate Many-to-Many Custom Object entry with System Object entries',
 	{tag: '@LPS-146754'},
 	async ({apiHelpers, objectLayoutsPage, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
@@ -2288,14 +2291,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition.externalReferenceCode,
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1:
 						objectDefinition.externalReferenceCode,
 					objectDefinitionExternalReferenceCode2: 'L_USER',
@@ -2472,7 +2475,7 @@ test(
 );
 
 test(
-	'LPS-151676 Can relate One-to-Many Custom Object entry with Native Object entries',
+	'LPS-151676 Can relate One-to-Many Custom Object entry with System Object entries',
 	{tag: '@LPS-151676'},
 	async ({apiHelpers, objectLayoutsPage, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
@@ -2503,14 +2506,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition.externalReferenceCode,
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1:
 						objectDefinition.externalReferenceCode,
 					objectDefinitionExternalReferenceCode2: 'L_USER',
@@ -2667,7 +2670,7 @@ test(
 );
 
 test(
-	'LPS-145393 Can relate One-to-Many Native Object with Custom site scoped Object',
+	'LPS-145393 Can relate One-to-Many System Object with Custom site scoped Object',
 	{tag: '@LPS-145393'},
 	async ({apiHelpers, page, viewObjectEntriesPage}) => {
 		const objectFields = generateObjectFields({
@@ -2693,14 +2696,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				'L_USER',
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1: 'L_USER',
 					objectDefinitionExternalReferenceCode2:
 						objectDefinition.externalReferenceCode,
@@ -2832,14 +2835,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition.externalReferenceCode,
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1:
 						objectDefinition.externalReferenceCode,
 					objectDefinitionExternalReferenceCode2:
@@ -2911,14 +2914,14 @@ test(
 			ObjectRelationshipAPI
 		);
 
-		const relationshipName = 'rel' + getRandomInt();
+		const objectRelationshipName = 'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const {body: objectRelationship} =
 			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
 				objectDefinition.externalReferenceCode,
 				{
 					label: {en_US: 'Relationship'},
-					name: relationshipName,
+					name: objectRelationshipName,
 					objectDefinitionExternalReferenceCode1:
 						objectDefinition.externalReferenceCode,
 					objectDefinitionExternalReferenceCode2:
@@ -3059,7 +3062,7 @@ test(
 );
 
 test(
-	'LPS-145393 Can set Title Field for Native Object',
+	'LPS-145393 Can set Title Field for System Object',
 	{tag: '@LPS-145393'},
 	async ({apiHelpers: _apiHelpers, editObjectDetailsPage, page}) => {
 		await editObjectDetailsPage.goto('User');
