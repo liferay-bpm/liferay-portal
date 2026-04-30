@@ -16,7 +16,7 @@ import {loginTest} from '../../../fixtures/loginTest';
 import {objectPagesTest} from '../../../fixtures/objectPagesTest';
 import {getRandomInt} from '../../../utils/getRandomInt';
 import {waitForAlert} from '../../../utils/waitForAlert';
-import {generateObjectFields} from './utils/generateObjectFields';
+import {generateObjectFields} from '../utils/generateObjectFields';
 
 const test = mergeTests(
 	dataApiHelpersTest,
@@ -131,6 +131,13 @@ test(
 			id: objectRelationship.id,
 			type: 'objectRelationship',
 		});
+
+		const objectDefinitionAPIClient =
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+
+		await objectDefinitionAPIClient.postObjectDefinitionPublish(
+			objectDefinition.id
+		);
 
 		const restPath = `c/${objectDefinition.name.toLowerCase()}s`;
 
@@ -363,23 +370,46 @@ test(
 
 			const actionsButtons = page.getByRole('button', {name: 'Actions'});
 
-			if (await actionsButtons.first().isVisible()) {
-				await actionsButtons.first().click();
-				await page.getByRole('menuitem', {name: 'Delete'}).click();
-				await page.getByRole('button', {name: 'Delete'}).click();
+			const trashLinks = page.locator(
+				'tbody tr [aria-label="Delete"]'
+			);
 
-				await page.waitForTimeout(1000);
-			}
+			await page
+				.locator('tbody tr')
+				.first()
+				.waitFor({state: 'visible', timeout: 15000});
 
-			if (await actionsButtons.first().isVisible()) {
-				await actionsButtons.first().click();
-				await page.getByRole('menuitem', {name: 'Delete'}).click();
-				await page.getByRole('button', {name: 'Delete'}).click();
+			while (
+				(await actionsButtons
+					.first()
+					.isVisible({timeout: 1000})
+					.catch(() => false)) ||
+				(await trashLinks
+					.first()
+					.isVisible({timeout: 1000})
+					.catch(() => false))
+			) {
+				if (await actionsButtons.first().isVisible().catch(() => false)) {
+					await actionsButtons.first().click();
+					await page.getByRole('menuitem', {name: 'Delete'}).click();
+					await page
+						.getByRole('button', {name: 'Delete'})
+						.click();
+				}
+				else {
+					await trashLinks.first().click();
+				}
+
+				await page.waitForTimeout(1500);
 			}
 		}
 
-		await expect(page.getByText(userAccount1.givenName)).toBeHidden();
-		await expect(page.getByText(userAccount2.givenName)).toBeHidden();
+		await expect(
+			page.getByText(userAccount1.givenName.toLowerCase())
+		).toBeHidden();
+		await expect(
+			page.getByText(userAccount2.givenName.toLowerCase())
+		).toBeHidden();
 	}
 );
 
@@ -576,14 +606,13 @@ test(
 				.getByRole('button', {name: 'Select Existing One'})
 				.first();
 
-			if (
-				await selectExistingOneButton
-					.isVisible({timeout: 3000})
-					.catch(() => false)
-			) {
+			try {
+				await expect(selectExistingOneButton).toBeVisible({
+					timeout: 3000,
+				});
 				await selectExistingOneButton.click();
 			}
-			else {
+			catch {
 				await page.getByRole('button', {name: 'New'}).first().click();
 				await page
 					.getByRole('menuitem', {name: 'Select Existing One'})
@@ -1160,14 +1189,13 @@ test(
 			.getByRole('button', {name: 'Select Existing One'})
 			.first();
 
-		if (
-			await selectExistingOneButton
-				.isVisible({timeout: 3000})
-				.catch(() => false)
-		) {
+		try {
+			await expect(selectExistingOneButton).toBeVisible({
+				timeout: 3000,
+			});
 			await selectExistingOneButton.click();
 		}
-		else {
+		catch {
 			await page.getByRole('button', {name: 'New'}).first().click();
 			await page
 				.getByRole('menuitem', {name: 'Select Existing One'})
@@ -1449,25 +1477,25 @@ test(
 				.getByLabel('Select Existing One')
 				.first();
 
-			if (
-				await addRelationshipButton
-					.isVisible({timeout: 3000})
-					.catch(() => false)
-			) {
+			try {
+				await expect(addRelationshipButton).toBeVisible({
+					timeout: 3000,
+				});
 				await addRelationshipButton.click();
 			}
-			else if (
-				await selectExistingOneButton
-					.isVisible({timeout: 3000})
-					.catch(() => false)
-			) {
-				await selectExistingOneButton.click();
-			}
-			else {
-				await page.getByRole('button', {name: 'New'}).first().click();
-				await page
-					.getByRole('menuitem', {name: 'Select Existing One'})
-					.click();
+			catch {
+				try {
+					await expect(selectExistingOneButton).toBeVisible({
+						timeout: 3000,
+					});
+					await selectExistingOneButton.click();
+				}
+				catch {
+					await page.getByRole('button', {name: 'New'}).first().click();
+					await page
+						.getByRole('menuitem', {name: 'Select Existing One'})
+						.click();
+				}
 			}
 
 			const relationshipEntry = page
@@ -1577,9 +1605,9 @@ test(
 
 		await expect(viewObjectEntriesPage.successMessage).toBeVisible();
 
-		await expect(page.getByPlaceholder('Search')).toHaveValue(
-			userAccount.givenName!.toLowerCase()
-		);
+		expect(
+			(await page.getByPlaceholder('Search').inputValue()).toLowerCase()
+		).toBe(userAccount.givenName!.toLowerCase());
 	}
 );
 
@@ -1775,14 +1803,13 @@ test(
 			.getByRole('button', {name: 'Select Existing One'})
 			.first();
 
-		if (
-			await selectExistingOneButton
-				.isVisible({timeout: 3000})
-				.catch(() => false)
-		) {
+		try {
+			await expect(selectExistingOneButton).toBeVisible({
+				timeout: 3000,
+			});
 			await selectExistingOneButton.click();
 		}
-		else {
+		catch {
 			await page.getByRole('button', {name: 'New'}).first().click();
 			await page
 				.getByRole('menuitem', {name: 'Select Existing One'})

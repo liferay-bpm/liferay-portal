@@ -5158,9 +5158,9 @@ test.describe('Manage object entries through View Object Entries', () => {
 
 				await expect(viewObjectEntriesPage.successMessage).toBeVisible();
 
-				await expect(page.getByPlaceholder('Search')).toHaveValue(
-					userAccount.givenName.toLowerCase()
-				);
+				expect(
+					(await page.getByPlaceholder('Search').inputValue()).toLowerCase()
+				).toBe(userAccount.givenName.toLowerCase());
 			}
 		}
 	);

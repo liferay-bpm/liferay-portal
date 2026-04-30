@@ -166,21 +166,23 @@ export class ObjectLayoutsPage {
 
 		await this.relationshipType.click();
 
-		await this.fieldList.fill(relationshipField);
+		await this.fieldList.click();
 
 		const exactRelationshipFieldOption = this.iframeLocator.getByRole(
 			'option',
 			{exact: true, name: relationshipField}
 		);
 
-		const fuzzyRelationshipFieldOption = this.iframeLocator
-			.getByRole('option')
-			.filter({hasText: relationshipField})
-			.first();
-
-		await exactRelationshipFieldOption
-			.or(fuzzyRelationshipFieldOption)
-			.click();
+		if (await exactRelationshipFieldOption.count()) {
+			await exactRelationshipFieldOption.click();
+		}
+		else {
+			await this.iframeLocator
+				.getByRole('option')
+				.filter({hasText: relationshipField})
+				.first()
+				.click();
+		}
 
 		await this.saveTabButton.click();
 	}
