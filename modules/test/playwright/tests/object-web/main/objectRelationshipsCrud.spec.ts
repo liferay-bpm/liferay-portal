@@ -735,26 +735,10 @@ test(
 			objectLayoutTabName: 'Field Tab',
 		});
 
-		await objectLayoutsPage.addTab.click();
-		await objectLayoutsPage.labelInput.fill('Relationship Tab');
-		await objectLayoutsPage.relationshipType.click();
-		await objectLayoutsPage.fieldList.click();
-
-		const exactRelationshipFieldOption = objectLayoutsPage.iframeLocator
-			.getByRole('option', {exact: true, name: 'Relationship'});
-
-		if (await exactRelationshipFieldOption.count()) {
-			await exactRelationshipFieldOption.click();
-		}
-		else {
-			await objectLayoutsPage.iframeLocator
-				.getByRole('option')
-				.filter({hasText: 'Relationship'})
-				.first()
-				.click();
-		}
-
-		await objectLayoutsPage.saveTabButton.click();
+		await objectLayoutsPage.addRelationshipTab(
+			'Relationship Tab',
+			'Relationship'
+		);
 		await objectLayoutsPage.setObjectLayoutAsDefault();
 
 		const saveButton = page
@@ -1074,26 +1058,10 @@ test(
 			objectLayoutTabName: 'Field Tab',
 		});
 
-		await objectLayoutsPage.addTab.click();
-		await objectLayoutsPage.labelInput.fill('Relationship Tab');
-		await objectLayoutsPage.relationshipType.click();
-		await objectLayoutsPage.fieldList.click();
-
-		const exactRelationshipFieldOption = objectLayoutsPage.iframeLocator
-			.getByRole('option', {exact: true, name: 'Relationship'});
-
-		if (await exactRelationshipFieldOption.count()) {
-			await exactRelationshipFieldOption.click();
-		}
-		else {
-			await objectLayoutsPage.iframeLocator
-				.getByRole('option')
-				.filter({hasText: 'Relationship'})
-				.first()
-				.click();
-		}
-
-		await objectLayoutsPage.saveTabButton.click();
+		await objectLayoutsPage.addRelationshipTab(
+			'Relationship Tab',
+			'Relationship'
+		);
 		await objectLayoutsPage.setObjectLayoutAsDefault();
 
 		const saveButton = page
@@ -1144,17 +1112,10 @@ test(
 
 		await page.waitForLoadState('domcontentloaded');
 
-		const relationshipTab = page
-			.getByRole('link', {
-				exact: true,				
-				name: 'Relationship Tab',
-			})
-			.or(
-				page.getByText('Relationship Tab', {
-					exact: true,
-				})
-			)
-			.first();
+		const relationshipTab = page.getByRole('link', {
+			exact: true,
+			name: 'Relationship Tab',
+		});
 
 		await expect(relationshipTab).toBeVisible();
 		await relationshipTab.click();
@@ -1268,29 +1229,10 @@ test(
 		await objectLayoutsPage.setObjectLayoutAsDefault();
 		await objectLayoutsPage.layoutTab.click();
 
-		await objectLayoutsPage.addTab.click();
-		await objectLayoutsPage.labelInput.fill('Relationship Tab');
-		await objectLayoutsPage.relationshipType.click();
-		await objectLayoutsPage.fieldList.click();
-
-		const exactRelationshipFieldOption =
-			objectLayoutsPage.iframeLocator.getByRole('option', {
-				exact: true,
-				name: 'Relationship',
-			});
-
-		if (await exactRelationshipFieldOption.count()) {
-			await exactRelationshipFieldOption.click();
-		}
-		else {
-			await objectLayoutsPage.iframeLocator
-				.getByRole('option')
-				.filter({hasText: 'Relationship'})
-				.first()
-				.click();
-		}
-
-		await objectLayoutsPage.saveTabButton.click();
+		await objectLayoutsPage.addRelationshipTab(
+			'Relationship Tab',
+			'Relationship'
+		);
 
 		const saveButton = page
 			.frameLocator('iframe')
@@ -1330,17 +1272,10 @@ test(
 
 			await page.waitForLoadState('domcontentloaded');
 
-			const relationshipTab = page
-				.getByRole('link', {
-					exact: true,
-					name: 'Relationship Tab',
-				})
-				.or(
-					page.getByText('Relationship Tab', {
-						exact: true,
-					})
-				)
-				.first();
+			const relationshipTab = page.getByRole('link', {
+				exact: true,
+				name: 'Relationship Tab',
+			});
 
 			await expect(relationshipTab).toBeVisible();
 			await relationshipTab.click();
@@ -1351,13 +1286,14 @@ test(
 				.getByRole('button', {name: 'Select Existing One'})
 				.first();
 
-			try {
-				await expect(selectExistingOneButton).toBeVisible({
-					timeout: 3000,
-				});
+			if (
+				await selectExistingOneButton
+					.isVisible({timeout: 3000})
+					.catch(() => false)
+			) {
 				await selectExistingOneButton.click();
 			}
-			catch {
+			else {
 				await page.getByRole('button', {name: 'New'}).first().click();
 				await page
 					.getByRole('menuitem', {name: 'Select Existing One'})
@@ -1483,29 +1419,10 @@ test(
 		await objectLayoutsPage.setObjectLayoutAsDefault();
 		await objectLayoutsPage.layoutTab.click();
 
-		await objectLayoutsPage.addTab.click();
-		await objectLayoutsPage.labelInput.fill('Relationship Tab');
-		await objectLayoutsPage.relationshipType.click();
-		await objectLayoutsPage.fieldList.click();
-
-		const exactRelationshipFieldOption =
-			objectLayoutsPage.iframeLocator.getByRole('option', {
-				exact: true,
-				name: 'Relationship',
-			});
-
-		if (await exactRelationshipFieldOption.count()) {
-			await exactRelationshipFieldOption.click();
-		}
-		else {
-			await objectLayoutsPage.iframeLocator
-				.getByRole('option')
-				.filter({hasText: 'Relationship'})
-				.first()
-				.click();
-		}
-
-		await objectLayoutsPage.saveTabButton.click();
+		await objectLayoutsPage.addRelationshipTab(
+			'Relationship Tab',
+			'Relationship'
+		);
 
 		const saveButton = objectLayoutsPage.iframeLocator
 			.getByRole('button', {name: 'Save'})
@@ -1559,17 +1476,10 @@ test(
 		};
 
 		const openRelationshipTab = async () => {
-			const relationshipTab = page
-				.getByRole('link', {
-					exact: true,
-					name: 'Relationship Tab',
-				})
-				.or(
-					page.getByText('Relationship Tab', {
-						exact: true,
-					})
-				)
-				.first();
+			const relationshipTab = page.getByRole('link', {
+				exact: true,
+				name: 'Relationship Tab',
+			});
 
 			await expect(relationshipTab).toBeVisible();
 			await relationshipTab.click();
@@ -2019,29 +1929,10 @@ test(
 		await objectLayoutsPage.setObjectLayoutAsDefault();
 		await objectLayoutsPage.layoutTab.click();
 
-		await objectLayoutsPage.addTab.click();
-		await objectLayoutsPage.labelInput.fill('Relationship Tab');
-		await objectLayoutsPage.relationshipType.click();
-		await objectLayoutsPage.fieldList.click();
-
-		const exactRelationshipFieldOption =
-			objectLayoutsPage.iframeLocator.getByRole('option', {
-				exact: true,
-				name: 'Relationship',
-			});
-
-		if (await exactRelationshipFieldOption.count()) {
-			await exactRelationshipFieldOption.click();
-		}
-		else {
-			await objectLayoutsPage.iframeLocator
-				.getByRole('option')
-				.filter({hasText: 'Relationship'})
-				.first()
-				.click();
-		}
-
-		await objectLayoutsPage.saveTabButton.click();
+		await objectLayoutsPage.addRelationshipTab(
+			'Relationship Tab',
+			'Relationship'
+		);
 
 		const saveButton = page
 			.frameLocator('iframe')
@@ -2076,17 +1967,10 @@ test(
 
 			await page.waitForLoadState('domcontentloaded');
 
-			const relationshipTab = page
-				.getByRole('link', {
-					exact: true,
-					name: 'Relationship Tab',
-				})
-				.or(
-					page.getByText('Relationship Tab', {
-						exact: true,
-					})
-				)
-				.first();
+			const relationshipTab = page.getByRole('link', {
+				exact: true,
+				name: 'Relationship Tab',
+			});
 
 			await expect(relationshipTab).toBeVisible();
 			await relationshipTab.click();
@@ -2098,13 +1982,14 @@ test(
 			.getByRole('button', {name: 'Select Existing One'})
 			.first();
 
-		try {
-			await expect(selectExistingOneButton).toBeVisible({
-				timeout: 3000,
-			});
+		if (
+			await selectExistingOneButton
+				.isVisible({timeout: 3000})
+				.catch(() => false)
+		) {
 			await selectExistingOneButton.click();
 		}
-		catch {
+		else {
 			await page.getByRole('button', {name: 'New'}).first().click();
 			await page
 				.getByRole('menuitem', {name: 'Select Existing One'})
@@ -2328,26 +2213,10 @@ test(
 			objectLayoutTabName: 'Field Tab',
 		});
 
-		await objectLayoutsPage.addTab.click();
-		await objectLayoutsPage.labelInput.fill('Relationship Tab');
-		await objectLayoutsPage.relationshipType.click();
-		await objectLayoutsPage.fieldList.click();
-
-		const exactRelationshipFieldOption = objectLayoutsPage.iframeLocator
-			.getByRole('option', {exact: true, name: 'Relationship'});
-
-		if (await exactRelationshipFieldOption.count()) {
-			await exactRelationshipFieldOption.click();
-		}
-		else {
-			await objectLayoutsPage.iframeLocator
-				.getByRole('option')
-				.filter({hasText: 'Relationship'})
-				.first()
-				.click();
-		}
-
-		await objectLayoutsPage.saveTabButton.click();
+		await objectLayoutsPage.addRelationshipTab(
+			'Relationship Tab',
+			'Relationship'
+		);
 		await objectLayoutsPage.setObjectLayoutAsDefault();
 
 		const saveButton = page
@@ -2385,17 +2254,10 @@ test(
 
 			await page.waitForLoadState('domcontentloaded');
 
-			const relationshipTab = page
-				.getByRole('link', {
-					exact: true,
-					name: 'Relationship Tab',
-				})
-				.or(
-					page.getByText('Relationship Tab', {
-						exact: true,
-					})
-				)
-				.first();
+			const relationshipTab = page.getByRole('link', {
+				exact: true,
+				name: 'Relationship Tab',
+			});
 
 			await expect(relationshipTab).toBeVisible();
 			await relationshipTab.click();
@@ -2409,25 +2271,25 @@ test(
 				.getByLabel('Select Existing One')
 				.first();
 
-			try {
-				await expect(addRelationshipButton).toBeVisible({
-					timeout: 3000,
-				});
+			if (
+				await addRelationshipButton
+					.isVisible({timeout: 3000})
+					.catch(() => false)
+			) {
 				await addRelationshipButton.click();
 			}
-			catch {
-				try {
-					await expect(selectExistingOneButton).toBeVisible({
-						timeout: 3000,
-					});
-					await selectExistingOneButton.click();
-				}
-				catch {
-					await page.getByRole('button', {name: 'New'}).first().click();
-					await page
-						.getByRole('menuitem', {name: 'Select Existing One'})
-						.click();
-				}
+			else if (
+				await selectExistingOneButton
+					.isVisible({timeout: 3000})
+					.catch(() => false)
+			) {
+				await selectExistingOneButton.click();
+			}
+			else {
+				await page.getByRole('button', {name: 'New'}).first().click();
+				await page
+					.getByRole('menuitem', {name: 'Select Existing One'})
+					.click();
 			}
 
 			const relationshipEntry = page
@@ -2543,26 +2405,10 @@ test(
 			objectLayoutTabName: 'Field Tab',
 		});
 
-		await objectLayoutsPage.addTab.click();
-		await objectLayoutsPage.labelInput.fill('Relationship Tab');
-		await objectLayoutsPage.relationshipType.click();
-		await objectLayoutsPage.fieldList.click();
-
-		const exactRelationshipFieldOption = objectLayoutsPage.iframeLocator
-			.getByRole('option', {exact: true, name: 'Relationship'});
-
-		if (await exactRelationshipFieldOption.count()) {
-			await exactRelationshipFieldOption.click();
-		}
-		else {
-			await objectLayoutsPage.iframeLocator
-				.getByRole('option')
-				.filter({hasText: 'Relationship'})
-				.first()
-				.click();
-		}
-
-		await objectLayoutsPage.saveTabButton.click();
+		await objectLayoutsPage.addRelationshipTab(
+			'Relationship Tab',
+			'Relationship'
+		);
 		await objectLayoutsPage.setObjectLayoutAsDefault();
 
 		const saveButton = page
@@ -2595,17 +2441,10 @@ test(
 
 			await page.waitForLoadState('domcontentloaded');
 
-			const relationshipTab = page
-				.getByRole('link', {
-					exact: true,
-					name: 'Relationship Tab',
-				})
-				.or(
-					page.getByText('Relationship Tab', {
-						exact: true,
-					})
-				)
-				.first();
+			const relationshipTab = page.getByRole('link', {
+				exact: true,
+				name: 'Relationship Tab',
+			});
 
 			await expect(relationshipTab).toBeVisible();
 			await relationshipTab.click();
@@ -2621,25 +2460,25 @@ test(
 				.getByLabel('Select Existing One')
 				.first();
 
-			try {
-				await expect(addRelationshipButton).toBeVisible({
-					timeout: 3000,
-				});
+			if (
+				await addRelationshipButton
+					.isVisible({timeout: 3000})
+					.catch(() => false)
+			) {
 				await addRelationshipButton.click();
 			}
-			catch {
-				try {
-					await expect(selectExistingOneButton).toBeVisible({
-						timeout: 3000,
-					});
-					await selectExistingOneButton.click();
-				}
-				catch {
-					await page.getByRole('button', {name: 'New'}).first().click();
-					await page
-						.getByRole('menuitem', {name: 'Select Existing One'})
-						.click();
-				}
+			else if (
+				await selectExistingOneButton
+					.isVisible({timeout: 3000})
+					.catch(() => false)
+			) {
+				await selectExistingOneButton.click();
+			}
+			else {
+				await page.getByRole('button', {name: 'New'}).first().click();
+				await page
+					.getByRole('menuitem', {name: 'Select Existing One'})
+					.click();
 			}
 
 			const relationshipEntry = page
@@ -2951,26 +2790,10 @@ test(
 			objectLayoutTabName: 'Field Tab',
 		});
 
-		await objectLayoutsPage.addTab.click();
-		await objectLayoutsPage.labelInput.fill('Relationship Tab');
-		await objectLayoutsPage.relationshipType.click();
-		await objectLayoutsPage.fieldList.click();
-
-		const exactRelationshipFieldOption = objectLayoutsPage.iframeLocator
-			.getByRole('option', {exact: true, name: 'Relationship'});
-
-		if (await exactRelationshipFieldOption.count()) {
-			await exactRelationshipFieldOption.click();
-		}
-		else {
-			await objectLayoutsPage.iframeLocator
-				.getByRole('option')
-				.filter({hasText: 'Relationship'})
-				.first()
-				.click();
-		}
-
-		await objectLayoutsPage.saveTabButton.click();
+		await objectLayoutsPage.addRelationshipTab(
+			'Relationship Tab',
+			'Relationship'
+		);
 		await objectLayoutsPage.setObjectLayoutAsDefault();
 
 		const saveButton = objectLayoutsPage.iframeLocator
@@ -3006,17 +2829,10 @@ test(
 
 			await page.waitForLoadState('domcontentloaded');
 
-			const relationshipTab = page
-				.getByRole('link', {
-					exact: true,
-					name: 'Relationship Tab',
-				})
-				.or(
-					page.getByText('Relationship Tab', {
-						exact: true,
-					})
-				)
-				.first();
+			const relationshipTab = page.getByRole('link', {
+				exact: true,
+				name: 'Relationship Tab',
+			});
 
 			await expect(relationshipTab).toBeVisible();
 			await relationshipTab.click();
@@ -3028,13 +2844,14 @@ test(
 			.getByRole('button', {name: 'Select Existing One'})
 			.first();
 
-		try {
-			await expect(selectExistingOneButton).toBeVisible({
-				timeout: 3000,
-			});
+		if (
+			await selectExistingOneButton
+				.isVisible({timeout: 3000})
+				.catch(() => false)
+		) {
 			await selectExistingOneButton.click();
 		}
-		catch {
+		else {
 			await page.getByRole('button', {name: 'New'}).first().click();
 			await page
 				.getByRole('menuitem', {name: 'Select Existing One'})

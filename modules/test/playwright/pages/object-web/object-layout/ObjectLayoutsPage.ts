@@ -156,13 +156,10 @@ export class ObjectLayoutsPage {
 		await this.saveTabButton.click();
 	}
 
-	async createObjectRelationshipTab(
-		objectLayoutName: string,
+	async addRelationshipTab(
 		objectLayoutTabName: string,
 		relationshipField: string
 	) {
-		await this.openObjectLayoutConfiguration(objectLayoutName);
-
 		await this.addTab.click();
 
 		await this.labelInput.fill(objectLayoutTabName);
@@ -176,18 +173,26 @@ export class ObjectLayoutsPage {
 			{exact: true, name: relationshipField}
 		);
 
-		if (await exactRelationshipFieldOption.count()) {
-			await exactRelationshipFieldOption.click();
-		}
-		else {
-			await this.iframeLocator
-				.getByRole('option')
-				.filter({hasText: relationshipField})
-				.first()
-				.click();
-		}
+		const fuzzyRelationshipFieldOption = this.iframeLocator
+			.getByRole('option')
+			.filter({hasText: relationshipField})
+			.first();
+
+		await exactRelationshipFieldOption
+			.or(fuzzyRelationshipFieldOption)
+			.click();
 
 		await this.saveTabButton.click();
+	}
+
+	async createObjectRelationshipTab(
+		objectLayoutName: string,
+		objectLayoutTabName: string,
+		relationshipField: string
+	) {
+		await this.openObjectLayoutConfiguration(objectLayoutName);
+
+		await this.addRelationshipTab(objectLayoutTabName, relationshipField);
 
 		await this.saveUpdateLayoutButton.click();
 	}
