@@ -68,6 +68,15 @@ public interface ObjectEntryManager {
 			objectDefinition, existingObjectEntry, scopeKey);
 	}
 
+	public default ObjectEntry updateObjectEntry(
+			DTOConverterContext dtoConverterContext,
+			ObjectDefinition objectDefinition, long objectEntryId,
+			ObjectEntry objectEntry)
+		throws Exception {
+
+		throw new UnsupportedOperationException();
+	}
+
 	public ObjectEntry updateObjectEntry(
 			long companyId, DTOConverterContext dtoConverterContext,
 			String externalReferenceCode, ObjectDefinition objectDefinition,
