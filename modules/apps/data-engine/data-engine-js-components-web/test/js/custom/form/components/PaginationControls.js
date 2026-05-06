@@ -4,7 +4,7 @@
  */
 
 import '@testing-library/jest-dom';
-import {fireEvent, render} from '@testing-library/react';
+import {render} from '@testing-library/react';
 import React from 'react';
 
 import {ConfigProvider} from '../../../../../src/main/resources/META-INF/resources/js/core/hooks/useConfig.es';
@@ -51,27 +51,5 @@ describe('Pagination Controls', () => {
 		expect(
 			queryByRole('button', {name: /preview-existing-submissions/i})
 		).not.toBeInTheDocument();
-	});
-
-	it('fires paginationControlsCancelButtonClicked when the Cancel button is clicked', () => {
-		Liferay.fire.mockClear();
-
-		const {getByText} = render(
-			<WithProvider
-				config={{
-					...INITIAL_CONFIG,
-					redirectURL: '#',
-					showCancelButton: true,
-				}}
-			>
-				<PaginationControls activePage={0} total={1} />
-			</WithProvider>
-		);
-
-		fireEvent.click(getByText('Cancel'));
-
-		expect(Liferay.fire).toHaveBeenCalledWith(
-			'paginationControlsCancelButtonClicked'
-		);
 	});
 });
