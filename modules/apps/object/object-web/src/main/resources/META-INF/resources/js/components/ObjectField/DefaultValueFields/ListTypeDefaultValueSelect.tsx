@@ -71,6 +71,7 @@ const ListTypeDefaultValueSelect: React.FC<
 				<ListTypeEntryBaseField
 					creationLanguageId={creationLanguageId}
 					error={error}
+					key={values.listTypeDefinitionId}
 					label={label}
 					onChange={handleChange}
 					picklistItems={listTypeEntries}
