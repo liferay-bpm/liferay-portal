@@ -102,6 +102,11 @@ export function PaginationControls({
 					<a
 						className="btn btn-cancel btn-secondary"
 						href={redirectURL}
+						onClick={() => {
+							Liferay.fire(
+								'paginationControlsCancelButtonClicked'
+							);
+						}}
 					>
 						{cancelLabel}
 					</a>
