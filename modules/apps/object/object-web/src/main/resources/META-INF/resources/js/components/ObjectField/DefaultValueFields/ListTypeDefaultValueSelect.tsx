@@ -58,6 +58,9 @@ const ListTypeDefaultValueSelect: React.FC<
 						}))
 					);
 				}
+				else {
+					setListTypeEntries(undefined);
+				}
 			});
 		}
 	}, [defaultValue, setValues, values, values.listTypeDefinitionId]);
