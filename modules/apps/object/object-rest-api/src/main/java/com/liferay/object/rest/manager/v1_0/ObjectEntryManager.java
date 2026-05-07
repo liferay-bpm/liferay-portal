@@ -51,6 +51,15 @@ public interface ObjectEntryManager {
 	public String getStorageType();
 
 	public default ObjectEntry partialUpdateObjectEntry(
+			DTOConverterContext dtoConverterContext,
+			ObjectDefinition objectDefinition, long objectEntryId,
+			ObjectEntry objectEntry)
+		throws Exception {
+
+		throw new UnsupportedOperationException();
+	}
+
+	public default ObjectEntry partialUpdateObjectEntry(
 			long companyId, DTOConverterContext dtoConverterContext,
 			String externalReferenceCode, ObjectDefinition objectDefinition,
 			ObjectEntry objectEntry, String scopeKey)
