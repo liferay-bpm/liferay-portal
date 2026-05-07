@@ -865,13 +865,12 @@ public class ObjectEntryResourceImpl
 			Long objectEntryId, ObjectEntry objectEntry)
 		throws Exception {
 
-		DefaultObjectEntryManager defaultObjectEntryManager =
-			DefaultObjectEntryManagerProvider.provide(
-				_objectEntryManagerRegistry.getObjectEntryManager(
-					_objectDefinition.getCompanyId(),
-					_objectDefinition.getStorageType()));
+		ObjectEntryManager objectEntryManager =
+			_objectEntryManagerRegistry.getObjectEntryManager(
+				_objectDefinition.getCompanyId(),
+				_objectDefinition.getStorageType());
 
-		return defaultObjectEntryManager.partialUpdateObjectEntry(
+		return objectEntryManager.partialUpdateObjectEntry(
 			_getDTOConverterContext(objectEntryId), _objectDefinition,
 			objectEntryId, objectEntry);
 	}
@@ -1322,13 +1321,12 @@ public class ObjectEntryResourceImpl
 			Long objectEntryId, ObjectEntry objectEntry)
 		throws Exception {
 
-		DefaultObjectEntryManager defaultObjectEntryManager =
-			DefaultObjectEntryManagerProvider.provide(
-				_objectEntryManagerRegistry.getObjectEntryManager(
-					_objectDefinition.getCompanyId(),
-					_objectDefinition.getStorageType()));
+		ObjectEntryManager objectEntryManager =
+			_objectEntryManagerRegistry.getObjectEntryManager(
+				_objectDefinition.getCompanyId(),
+				_objectDefinition.getStorageType());
 
-		return defaultObjectEntryManager.updateObjectEntry(
+		return objectEntryManager.updateObjectEntry(
 			_getDTOConverterContext(objectEntryId), _objectDefinition,
 			objectEntryId, objectEntry);
 	}
