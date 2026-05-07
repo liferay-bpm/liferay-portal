@@ -12,6 +12,7 @@ import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.scope.CompanyScoped;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.test.rule.Inject;
@@ -101,6 +102,65 @@ public class ObjectEntryManagerRegistryImplTest {
 		Assert.assertNull(
 			_objectEntryManagerRegistry.getObjectEntryManager(
 				1, RandomTestUtil.randomString()));
+	}
+
+	@Test
+	@TestInfo("LPD-72651")
+	public void testObjectEntryManagerIdBasedDefaultMethods() throws Exception {
+
+		// Non-overriding manager: default methods throw
+		// UnsupportedOperationException
+
+		TestObjectEntryManager testObjectEntryManager =
+			new TestObjectEntryManager(0, false);
+
+		Assert.assertThrows(
+			UnsupportedOperationException.class,
+			() -> testObjectEntryManager.deleteObjectEntry(null, 0));
+		Assert.assertThrows(
+			UnsupportedOperationException.class,
+			() -> testObjectEntryManager.getObjectEntry(null, null, 0));
+		Assert.assertThrows(
+			UnsupportedOperationException.class,
+			() -> testObjectEntryManager.partialUpdateObjectEntry(
+				null, null, 0, null));
+		Assert.assertThrows(
+			UnsupportedOperationException.class,
+			() -> testObjectEntryManager.updateObjectEntry(
+				null, null, 0, null));
+
+		// Overriding manager: ID-based calls are dispatched without cast
+
+		TrackingObjectEntryManager trackingObjectEntryManager =
+			new TrackingObjectEntryManager();
+
+		ServiceRegistration<ObjectEntryManager> serviceRegistration = _register(
+			trackingObjectEntryManager);
+
+		try {
+			ObjectEntryManager objectEntryManager =
+				_objectEntryManagerRegistry.getObjectEntryManager(
+					0, "tracking");
+
+			Assert.assertSame(trackingObjectEntryManager, objectEntryManager);
+
+			objectEntryManager.deleteObjectEntry(null, 1L);
+			objectEntryManager.getObjectEntry(null, null, 1L);
+			objectEntryManager.partialUpdateObjectEntry(null, null, 1L, null);
+			objectEntryManager.updateObjectEntry(null, null, 1L, null);
+
+			Assert.assertTrue(
+				trackingObjectEntryManager.deleteObjectEntryByIdCalled);
+			Assert.assertTrue(
+				trackingObjectEntryManager.getObjectEntryByIdCalled);
+			Assert.assertTrue(
+				trackingObjectEntryManager.partialUpdateObjectEntryByIdCalled);
+			Assert.assertTrue(
+				trackingObjectEntryManager.updateObjectEntryByIdCalled);
+		}
+		finally {
+			_unregister(serviceRegistration);
+		}
 	}
 
 	private ServiceRegistration<ObjectEntryManager> _register(
@@ -207,6 +267,118 @@ public class ObjectEntryManagerRegistryImplTest {
 
 		private final long _allowedCompanyId;
 		private final boolean _fail;
+
+	}
+
+	private static class TrackingObjectEntryManager
+		implements ObjectEntryManager {
+
+		@Override
+		public ObjectEntry addObjectEntry(
+				DTOConverterContext dtoConverterContext,
+				ObjectDefinition objectDefinition, ObjectEntry objectEntry,
+				String scopeKey)
+			throws Exception {
+
+			return null;
+		}
+
+		@Override
+		public void deleteObjectEntry(
+				long companyId, DTOConverterContext dtoConverterContext,
+				String externalReferenceCode, ObjectDefinition objectDefinition,
+				String scopeKey)
+			throws Exception {
+		}
+
+		@Override
+		public void deleteObjectEntry(
+				ObjectDefinition objectDefinition, long objectEntryId)
+			throws Exception {
+
+			deleteObjectEntryByIdCalled = true;
+		}
+
+		@Override
+		public Page<ObjectEntry> getObjectEntries(
+				long companyId, ObjectDefinition objectDefinition,
+				String scopeKey, Aggregation aggregation,
+				DTOConverterContext dtoConverterContext, String filterString,
+				Pagination pagination, String search, Sort[] sorts)
+			throws Exception {
+
+			return null;
+		}
+
+		@Override
+		public ObjectEntry getObjectEntry(
+				DTOConverterContext dtoConverterContext,
+				ObjectDefinition objectDefinition, long objectEntryId)
+			throws Exception {
+
+			getObjectEntryByIdCalled = true;
+
+			return null;
+		}
+
+		@Override
+		public ObjectEntry getObjectEntry(
+				long companyId, DTOConverterContext dtoConverterContext,
+				String externalReferenceCode, ObjectDefinition objectDefinition,
+				String scopeKey)
+			throws Exception {
+
+			return null;
+		}
+
+		@Override
+		public String getStorageLabel(Locale locale) {
+			return "tracking";
+		}
+
+		@Override
+		public String getStorageType() {
+			return "tracking";
+		}
+
+		@Override
+		public ObjectEntry partialUpdateObjectEntry(
+				DTOConverterContext dtoConverterContext,
+				ObjectDefinition objectDefinition, long objectEntryId,
+				ObjectEntry objectEntry)
+			throws Exception {
+
+			partialUpdateObjectEntryByIdCalled = true;
+
+			return null;
+		}
+
+		@Override
+		public ObjectEntry updateObjectEntry(
+				DTOConverterContext dtoConverterContext,
+				ObjectDefinition objectDefinition, long objectEntryId,
+				ObjectEntry objectEntry)
+			throws Exception {
+
+			updateObjectEntryByIdCalled = true;
+
+			return null;
+		}
+
+		@Override
+		public ObjectEntry updateObjectEntry(
+				long companyId, DTOConverterContext dtoConverterContext,
+				String externalReferenceCode, ObjectDefinition objectDefinition,
+				ObjectEntry objectEntry, String scopeKey)
+			throws Exception {
+
+			return null;
+		}
+
+		public boolean deleteObjectEntryByIdCalled;
+		public boolean getObjectEntryByIdCalled;
+		public boolean partialUpdateObjectEntryByIdCalled;
+		public boolean updateObjectEntryByIdCalled;
 
 	}
 
