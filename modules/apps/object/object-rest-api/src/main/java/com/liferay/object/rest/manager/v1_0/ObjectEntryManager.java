@@ -33,12 +33,27 @@ public interface ObjectEntryManager {
 			String scopeKey)
 		throws Exception;
 
+	public default void deleteObjectEntry(
+			ObjectDefinition objectDefinition, long objectEntryId)
+		throws Exception {
+
+		throw new UnsupportedOperationException();
+	}
+
 	public Page<ObjectEntry> getObjectEntries(
 			long companyId, ObjectDefinition objectDefinition, String scopeKey,
 			Aggregation aggregation, DTOConverterContext dtoConverterContext,
 			String filterString, Pagination pagination, String search,
 			Sort[] sorts)
 		throws Exception;
+
+	public default ObjectEntry getObjectEntry(
+			DTOConverterContext dtoConverterContext,
+			ObjectDefinition objectDefinition, long objectEntryId)
+		throws Exception {
+
+		throw new UnsupportedOperationException();
+	}
 
 	public ObjectEntry getObjectEntry(
 			long companyId, DTOConverterContext dtoConverterContext,
