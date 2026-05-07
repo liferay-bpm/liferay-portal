@@ -326,14 +326,12 @@ public class ObjectEntryResourceImpl
 
 	@Override
 	public void deleteObjectEntry(Long objectEntryId) throws Exception {
-		DefaultObjectEntryManager defaultObjectEntryManager =
-			DefaultObjectEntryManagerProvider.provide(
-				_objectEntryManagerRegistry.getObjectEntryManager(
-					_objectDefinition.getCompanyId(),
-					_objectDefinition.getStorageType()));
+		ObjectEntryManager objectEntryManager =
+			_objectEntryManagerRegistry.getObjectEntryManager(
+				_objectDefinition.getCompanyId(),
+				_objectDefinition.getStorageType());
 
-		defaultObjectEntryManager.deleteObjectEntry(
-			_objectDefinition, objectEntryId);
+		objectEntryManager.deleteObjectEntry(_objectDefinition, objectEntryId);
 	}
 
 	@Override
@@ -636,13 +634,12 @@ public class ObjectEntryResourceImpl
 
 	@Override
 	public ObjectEntry getObjectEntry(Long objectEntryId) throws Exception {
-		DefaultObjectEntryManager defaultObjectEntryManager =
-			DefaultObjectEntryManagerProvider.provide(
-				_objectEntryManagerRegistry.getObjectEntryManager(
-					_objectDefinition.getCompanyId(),
-					_objectDefinition.getStorageType()));
+		ObjectEntryManager objectEntryManager =
+			_objectEntryManagerRegistry.getObjectEntryManager(
+				_objectDefinition.getCompanyId(),
+				_objectDefinition.getStorageType());
 
-		return defaultObjectEntryManager.getObjectEntry(
+		return objectEntryManager.getObjectEntry(
 			_getDTOConverterContext(objectEntryId), _objectDefinition,
 			objectEntryId);
 	}
