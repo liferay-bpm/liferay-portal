@@ -246,13 +246,19 @@ export default function ObjectFieldFormBase({
 		})) as LabelValueObject[];
 	}, [listTypeDefinitions]);
 
-	const selectedListTypeDefinitionExternalReferenceCode = useMemo(() => {
+	const selectedListTypeDefinition = useMemo(() => {
 		return listTypeDefinitions.find(
 			({externalReferenceCode}) =>
 				values.listTypeDefinitionExternalReferenceCode ===
 				externalReferenceCode
-		)?.externalReferenceCode;
+		);
 	}, [listTypeDefinitions, values.listTypeDefinitionExternalReferenceCode]);
+
+	const selectedListTypeDefinitionExternalReferenceCode =
+		selectedListTypeDefinition?.externalReferenceCode;
+
+	const hasListTypeEntries =
+		!!selectedListTypeDefinition?.listTypeEntries?.length;
 
 	const handleTypeChange = async (selectedBusinessType: string) => {
 		const selectedObjectFieldBusinessTypeInfo =
@@ -626,6 +632,17 @@ export default function ObjectFieldFormBase({
 												externalReferenceCode === value
 										);
 									if (selectedListTypeDefinition) {
+										const hasListTypeEntries =
+											!!selectedListTypeDefinition
+												.listTypeEntries?.length;
+										const nextRequired =
+											!hasListTypeEntries && values.state
+												? false
+												: values.required;
+										const nextState = hasListTypeEntries
+											? values.state
+											: false;
+
 										setValues({
 											listTypeDefinitionExternalReferenceCode:
 												selectedListTypeDefinition.externalReferenceCode,
@@ -639,6 +656,8 @@ export default function ObjectFieldFormBase({
 													],
 													values
 												),
+											required: nextRequired,
+											state: nextState,
 										});
 
 										if (onSubmit) {
@@ -656,6 +675,8 @@ export default function ObjectFieldFormBase({
 														],
 														values
 													),
+												required: nextRequired,
+												state: nextState,
 											});
 										}
 									}
@@ -802,7 +823,11 @@ export default function ObjectFieldFormBase({
 				validListTypeDefinitionId && (
 					<ClayForm.Group>
 						<Toggle
-							disabled={disabled || !objectDefinition?.modifiable}
+							disabled={
+								disabled ||
+								!objectDefinition?.modifiable ||
+								!hasListTypeEntries
+							}
 							label={Liferay.Language.get('mark-as-state')}
 							name="state"
 							onToggle={(state) => {
