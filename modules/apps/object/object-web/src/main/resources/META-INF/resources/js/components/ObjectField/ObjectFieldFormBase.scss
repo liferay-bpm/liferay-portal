@@ -16,7 +16,8 @@
 		}
 	}
 
-	&-mandatory-toggle {
+	&-mandatory-toggle,
+	&-mark-as-state-toggle {
 		align-items: center;
 		color: #6b6c7e;
 		display: flex;

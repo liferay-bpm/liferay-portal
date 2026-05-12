@@ -821,7 +821,12 @@ export default function ObjectFieldFormBase({
 
 			{values.businessType === 'Picklist' &&
 				validListTypeDefinitionId && (
-					<ClayForm.Group>
+					<ClayForm.Group
+						className="lfr-objects__object-field-form-base-mark-as-state-toggle"
+						onMouseLeave={() => {
+							setShowPopover(false);
+						}}
+					>
 						<Toggle
 							disabled={
 								disabled ||
@@ -835,6 +840,33 @@ export default function ObjectFieldFormBase({
 							}}
 							toggled={values.state}
 						/>
+
+						{!hasListTypeEntries && (
+							<ClayPopover
+								alignPosition="top"
+								closeOnClickOutside={true}
+								disableScroll
+								onMouseLeave={() => setShowPopover(false)}
+								onMouseOver={() => setShowPopover(true)}
+								onShowChange={setShowPopover}
+								show={showPopover}
+								trigger={
+									<ClayIcon
+										aria-label={Liferay.Language.get(
+											'help-text'
+										)}
+										className="mandatory-tooltip-icon"
+										onFocus={() => setShowPopover(true)}
+										onMouseOver={() => setShowPopover(true)}
+										symbol="question-circle-full"
+									/>
+								}
+							>
+								{Liferay.Language.get(
+									'this-picklist-has-no-items-so-it-cannot-be-marked-as-state'
+								)}
+							</ClayPopover>
+						)}
 					</ClayForm.Group>
 				)}
 
