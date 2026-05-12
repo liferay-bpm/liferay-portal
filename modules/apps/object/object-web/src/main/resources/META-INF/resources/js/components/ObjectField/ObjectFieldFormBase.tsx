@@ -739,7 +739,11 @@ export default function ObjectFieldFormBase({
 			{children}
 
 			<ClayForm.Group
-				className="lfr-objects__object-field-form-base-mandatory-toggle"
+				className={classNames({
+					'lfr-objects__object-field-form-base-mandatory-toggle':
+						Liferay.FeatureFlags['LPD-34594'] &&
+						objectRelationship?.edge,
+				})}
 				onMouseLeave={() => {
 					setShowPopover(false);
 				}}
