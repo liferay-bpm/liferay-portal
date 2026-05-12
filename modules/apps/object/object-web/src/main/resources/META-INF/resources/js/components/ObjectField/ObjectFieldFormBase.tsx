@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import ClayAlert from '@clayui/alert';
 import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import {Option, Text} from '@clayui/core';
 import ClayForm from '@clayui/form';
@@ -743,6 +744,22 @@ export default function ObjectFieldFormBase({
 					setShowPopover(false);
 				}}
 			>
+				{(values.businessType === 'Picklist' ||
+					values.businessType === 'MultiselectPicklist') &&
+					validListTypeDefinitionId &&
+					!hasListTypeEntries &&
+					values.required && (
+						<ClayAlert
+							className="mb-3"
+							displayType="warning"
+							title={Liferay.Language.get('warning')}
+						>
+							{Liferay.Language.get(
+								'this-picklist-has-no-items-so-making-it-mandatory-will-prevent-users-from-creating-object-entries-until-at-least-one-item-is-added-to-the-picklist'
+							)}
+						</ClayAlert>
+					)}
+
 				{values.businessType !== 'Aggregation' &&
 					values.businessType !== 'AutoIncrement' &&
 					values.businessType !== 'Formula' && (
