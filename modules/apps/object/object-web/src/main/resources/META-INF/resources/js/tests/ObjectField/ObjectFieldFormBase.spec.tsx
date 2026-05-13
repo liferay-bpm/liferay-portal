@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import {API} from '@liferay/object-js-components-web';
+
 import '@testing-library/jest-dom';
 import {fireEvent, render, screen} from '@testing-library/react';
 
@@ -35,12 +37,26 @@ const objectFieldFormBaseDefaultProps = {
 	learnResources: {
 		leanrResourceName: {general: {en_US: {message: 'Test Message'}}},
 	},
-	objectField: {
-		businessType: 'Relationship' as ObjectFieldBusinessTypeName,
-	},
 	objectFieldBusinessTypesInfo: [],
 	objectRelationshipId: 1,
 	setValues: () => {},
+};
+
+const objectFieldFormBaseRelationshipProps = {
+	...objectFieldFormBaseDefaultProps,
+	objectField: {
+		businessType: 'Relationship' as ObjectFieldBusinessTypeName,
+	},
+};
+
+const objectFieldFormBaseEmptyPicklistProps = {
+	...objectFieldFormBaseDefaultProps,
+	objectField: {
+		businessType: 'Picklist' as ObjectFieldBusinessTypeName,
+		listTypeDefinitionExternalReferenceCode: 'empty-picklist-erc',
+		listTypeDefinitionId: 1,
+		state: false,
+	},
 };
 
 jest.mock('frontend-js-web', () => ({
@@ -92,7 +108,9 @@ describe('when the root model feature flag [LPD-34594] is disabled', () => {
 			});
 
 			render(
-				<ObjectFieldFormBase {...objectFieldFormBaseDefaultProps} />
+				<ObjectFieldFormBase
+					{...objectFieldFormBaseRelationshipProps}
+				/>
 			);
 
 			expect(
@@ -108,7 +126,9 @@ describe('when the root model feature flag [LPD-34594] is disabled', () => {
 			});
 
 			render(
-				<ObjectFieldFormBase {...objectFieldFormBaseDefaultProps} />
+				<ObjectFieldFormBase
+					{...objectFieldFormBaseRelationshipProps}
+				/>
 			);
 
 			const mandatoryToggle = await screen.findByRole('switch', {
@@ -126,7 +146,9 @@ describe('when the root model feature flag [LPD-34594] is disabled', () => {
 			});
 
 			render(
-				<ObjectFieldFormBase {...objectFieldFormBaseDefaultProps} />
+				<ObjectFieldFormBase
+					{...objectFieldFormBaseRelationshipProps}
+				/>
 			);
 
 			const mandatoryToggle = await screen.findByRole('switch', {
@@ -158,7 +180,9 @@ describe('when the root model feature flag [LPD-34594] is enabled', () => {
 			});
 
 			render(
-				<ObjectFieldFormBase {...objectFieldFormBaseDefaultProps} />
+				<ObjectFieldFormBase
+					{...objectFieldFormBaseRelationshipProps}
+				/>
 			);
 
 			expect(
@@ -174,7 +198,9 @@ describe('when the root model feature flag [LPD-34594] is enabled', () => {
 			});
 
 			render(
-				<ObjectFieldFormBase {...objectFieldFormBaseDefaultProps} />
+				<ObjectFieldFormBase
+					{...objectFieldFormBaseRelationshipProps}
+				/>
 			);
 
 			const mandatoryToggle = await screen.findByRole('switch', {
@@ -192,7 +218,9 @@ describe('when the root model feature flag [LPD-34594] is enabled', () => {
 			});
 
 			render(
-				<ObjectFieldFormBase {...objectFieldFormBaseDefaultProps} />
+				<ObjectFieldFormBase
+					{...objectFieldFormBaseRelationshipProps}
+				/>
 			);
 
 			const mandatoryToggle = await screen.findByRole('switch', {
@@ -210,7 +238,9 @@ describe('when the root model feature flag [LPD-34594] is enabled', () => {
 			});
 
 			render(
-				<ObjectFieldFormBase {...objectFieldFormBaseDefaultProps} />
+				<ObjectFieldFormBase
+					{...objectFieldFormBaseRelationshipProps}
+				/>
 			);
 
 			const mandatoryToggle = await screen.findByRole('switch', {
@@ -228,7 +258,9 @@ describe('when the root model feature flag [LPD-34594] is enabled', () => {
 			});
 
 			render(
-				<ObjectFieldFormBase {...objectFieldFormBaseDefaultProps} />
+				<ObjectFieldFormBase
+					{...objectFieldFormBaseRelationshipProps}
+				/>
 			);
 
 			const icon = await screen.findByLabelText('help-text');
@@ -245,5 +277,73 @@ describe('when the root model feature flag [LPD-34594] is enabled', () => {
 				await screen.findByText('inheritance-relationships-fields')
 			).toBeInTheDocument();
 		});
+	});
+});
+
+describe('when a picklist without items is selected', () => {
+	beforeEach(() => {
+		jest.spyOn(API, 'getListTypeDefinitions').mockResolvedValue([
+			{
+				externalReferenceCode: 'empty-picklist-erc',
+				id: 1,
+				listTypeEntries: [],
+				name: 'Empty Picklist',
+			} as any,
+		]);
+	});
+
+	it('shows Mark as State as disabled and unchecked', async () => {
+		render(
+			<ObjectFieldFormBase {...objectFieldFormBaseEmptyPicklistProps} />
+		);
+
+		const markAsStateToggle = await screen.findByRole('switch', {
+			name: 'mark-as-state',
+		});
+
+		expect(markAsStateToggle).toBeDisabled();
+		expect(markAsStateToggle).not.toBeChecked();
+	});
+
+	it('renders help text and popover explaining why Mark as State is disabled', async () => {
+		render(
+			<ObjectFieldFormBase {...objectFieldFormBaseEmptyPicklistProps} />
+		);
+
+		const icon = await screen.findByLabelText('help-text');
+
+		expect(icon).toBeInTheDocument();
+
+		expect(
+			screen.queryByText(
+				'this-picklist-has-no-items-so-it-cannot-be-marked-as-state'
+			)
+		).not.toBeInTheDocument();
+
+		fireEvent.mouseOver(icon);
+
+		expect(
+			await screen.findByText(
+				'this-picklist-has-no-items-so-it-cannot-be-marked-as-state'
+			)
+		).toBeInTheDocument();
+	});
+
+	it('shows a warning message when the field is marked as Mandatory', async () => {
+		render(
+			<ObjectFieldFormBase
+				{...objectFieldFormBaseEmptyPicklistProps}
+				objectField={{
+					...objectFieldFormBaseEmptyPicklistProps.objectField,
+					required: true,
+				}}
+			/>
+		);
+
+		expect(
+			screen.queryByText(
+				'this-picklist-has-no-items-so-making-it-mandatory-will-prevent-users-from-creating-object-entries-until-at-least-one-item-is-added-to-the-picklist'
+			)
+		).toBeInTheDocument();
 	});
 });

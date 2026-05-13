@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import {API} from '@liferay/object-js-components-web';
+
 // @ts-ignore
 
 import fetchMock from 'fetch-mock';
@@ -95,5 +97,77 @@ describe('The ModalAddObjectField', () => {
 				'an-object-definition-can-only-have-one-assignee-field'
 			)
 		).toBeVisible();
+	});
+});
+
+describe('when a picklist without items is selected', () => {
+	afterEach(() => {
+		fetchMock.restore();
+		jest.restoreAllMocks();
+	});
+
+	beforeEach(() => {
+		fetchMock.get('http://localhost/url', {
+			objectFieldBusinessTypes: [
+				{
+					businessType: 'Picklist',
+					dbType: 'String',
+					description: '',
+					label: 'Picklist',
+				},
+			],
+		});
+
+		fetchMock.get(OBJECT_DEFINITION_BY_EXTERNAL_REFERENCE_CODE_URL, {
+			body: objectDefinition,
+		});
+
+		jest.spyOn(API, 'getListTypeDefinitions').mockResolvedValue([
+			{
+				externalReferenceCode: 'empty-picklist-erc',
+				id: 1,
+				listTypeEntries: [],
+				name: 'Empty Picklist',
+			} as any,
+		]);
+	});
+
+	it('does not show the Default Value dropdown', async () => {
+		renderComponent();
+
+		await waitFor(async () => {
+			expect(await screen.findByText('new-field')).toBeInTheDocument();
+		});
+
+		fireEvent.change(await screen.findByLabelText('label' + 'mandatory'), {
+			target: {value: 'My Empty Picklist Field'},
+		});
+
+		fireEvent.click(await screen.findByText('type'));
+		fireEvent.click(await screen.findByText('Picklist'));
+
+		fireEvent.click(await screen.findByText('picklist'));
+		fireEvent.click(await screen.findByText('Empty Picklist'));
+
+		const markAsStateToggle = await screen.findByRole('switch', {
+			name: 'mark-as-state',
+		});
+
+		expect(markAsStateToggle).toBeDisabled();
+		expect(markAsStateToggle).not.toBeChecked();
+
+		expect(screen.queryByText('default-value')).not.toBeInTheDocument();
+
+		const mandatoryToggle = await screen.findByRole('switch', {
+			name: 'mandatory',
+		});
+
+		fireEvent.click(mandatoryToggle);
+
+		expect(
+			screen.queryByText(
+				'this-picklist-has-no-items-so-making-it-mandatory-will-prevent-users-from-creating-object-entries-until-at-least-one-item-is-added-to-the-picklist'
+			)
+		).toBeInTheDocument();
 	});
 });
