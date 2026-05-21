@@ -42,6 +42,8 @@ public class ObjectFieldSettingConstants {
 
 	public static final String NAME_PREFIX = "prefix";
 
+	public static final String NAME_PREFIX_COUNTRY_A2 = "prefixCountryA2";
+
 	public static final String NAME_PREFIX_TYPE = "prefixType";
 
 	public static final String NAME_SHOW_COUNTER = "showCounter";
