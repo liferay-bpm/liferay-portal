@@ -219,6 +219,76 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 				ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
 			).build());
 
+		// Prefix country A2
+
+		AssertUtils.assertFailure(
+			ObjectFieldSettingValueException.InvalidValue.class,
+			StringBundler.concat(
+				"The value us of setting \"prefixCountryA2\" is invalid for ",
+				"object field \"", _OBJECT_FIELD_NAME, "\""),
+			() -> _objectFieldBusinessType.validateObjectFieldSettings(
+				_objectField,
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_PREFIX
+					).value(
+						"+1"
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_PREFIX_COUNTRY_A2
+					).value(
+						"us"
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_PREFIX_TYPE
+					).value(
+						ObjectFieldSettingConstants.VALUE_FIXED
+					).build())));
+		AssertUtils.assertFailure(
+			ObjectFieldSettingNameException.NotAllowedNames.class,
+			"The settings prefixCountryA2 are not allowed for object field " +
+				_OBJECT_FIELD_NAME,
+			() -> _objectFieldBusinessType.validateObjectFieldSettings(
+				_objectField,
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_PREFIX_COUNTRY_A2
+					).value(
+						"US"
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_PREFIX_TYPE
+					).value(
+						ObjectFieldSettingConstants.VALUE_DEFINED_BY_USER
+					).build())));
+
+		_objectFieldBusinessType.validateObjectFieldSettings(
+			_objectField,
+			Arrays.asList(
+				new ObjectFieldSettingBuilder(
+				).name(
+					ObjectFieldSettingConstants.NAME_PREFIX
+				).value(
+					"+1"
+				).build(),
+				new ObjectFieldSettingBuilder(
+				).name(
+					ObjectFieldSettingConstants.NAME_PREFIX_COUNTRY_A2
+				).value(
+					"US"
+				).build(),
+				new ObjectFieldSettingBuilder(
+				).name(
+					ObjectFieldSettingConstants.NAME_PREFIX_TYPE
+				).value(
+					ObjectFieldSettingConstants.VALUE_FIXED
+				).build()));
+
 		// Prefix type
 
 		AssertUtils.assertFailure(
