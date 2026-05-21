@@ -66,6 +66,9 @@ public class PhoneNumberDDMFormFieldTemplateContextContributor
 		).put(
 			"prefix", GetterUtil.getString(ddmFormField.getProperty("prefix"))
 		).put(
+			"prefixCountryA2",
+			GetterUtil.getString(ddmFormField.getProperty("prefixCountryA2"))
+		).put(
 			"prefixType",
 			GetterUtil.getString(ddmFormField.getProperty("prefixType"))
 		).put(
