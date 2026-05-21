@@ -69,6 +69,7 @@ public class PhoneNumberObjectFieldBusinessType
 			ObjectFieldSettingConstants.NAME_DEFAULT_VALUE,
 			ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
 			ObjectFieldSettingConstants.NAME_PREFIX,
+			ObjectFieldSettingConstants.NAME_PREFIX_COUNTRY_A2,
 			ObjectFieldSettingConstants.NAME_PREFIX_TYPE,
 			ObjectFieldSettingConstants.NAME_UNIQUE_VALUES);
 	}
@@ -197,7 +198,9 @@ public class PhoneNumberObjectFieldBusinessType
 				ObjectFieldSettingConstants.VALUE_DEFINED_BY_USER)) {
 
 			validateNotAllowedObjectFieldSettingNames(
-				SetUtil.fromArray(ObjectFieldSettingConstants.NAME_PREFIX),
+				SetUtil.fromArray(
+					ObjectFieldSettingConstants.NAME_PREFIX,
+					ObjectFieldSettingConstants.NAME_PREFIX_COUNTRY_A2),
 				objectField.getName(), objectFieldSettingsValues);
 		}
 		else if (Objects.equals(
@@ -220,6 +223,20 @@ public class PhoneNumberObjectFieldBusinessType
 				throw new ObjectFieldSettingValueException.InvalidValue(
 					objectField.getName(),
 					ObjectFieldSettingConstants.NAME_PREFIX, prefix);
+			}
+
+			String prefixCountryA2 = objectFieldSettingsValues.get(
+				ObjectFieldSettingConstants.NAME_PREFIX_COUNTRY_A2);
+
+			if (Validator.isNotNull(prefixCountryA2)) {
+				matcher = _prefixCountryA2Pattern.matcher(prefixCountryA2);
+
+				if (!matcher.matches()) {
+					throw new ObjectFieldSettingValueException.InvalidValue(
+						objectField.getName(),
+						ObjectFieldSettingConstants.NAME_PREFIX_COUNTRY_A2,
+						prefixCountryA2);
+				}
 			}
 		}
 		else {
@@ -386,6 +403,8 @@ public class PhoneNumberObjectFieldBusinessType
 
 	private static final Pattern _phoneNumberPattern = Pattern.compile(
 		"^\\+[0-9]{7,15}$");
+	private static final Pattern _prefixCountryA2Pattern = Pattern.compile(
+		"^[A-Z]{2}$");
 	private static final Pattern _prefixPattern = Pattern.compile(
 		"^\\+[1-9][0-9]{0,2}$");
 
