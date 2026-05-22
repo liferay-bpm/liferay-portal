@@ -5756,10 +5756,11 @@ test.describe('Manage object entries through View Object Entries', () => {
 
 	test(
 		'can add an entry with phone number object field where prefix type is fixed',
-		{tag: ['@LPD-83570']},
+		{tag: ['@LPD-83570', '@LPD-91322']},
 		async ({apiHelpers, page, viewObjectEntriesPage}) => {
 			const localNumber = '11987654321';
 			const prefix = '+1';
+			const prefixCountryA2 = 'US';
 
 			const objectFields = generateObjectFields({
 				objectFieldBusinessTypes: [
@@ -5774,6 +5775,10 @@ test.describe('Manage object entries through View Object Entries', () => {
 								name: 'prefix',
 								value: prefix,
 							},
+							{
+								name: 'prefixCountryA2',
+								value: prefixCountryA2,
+							},
 						],
 					},
 				],
@@ -5784,6 +5789,8 @@ test.describe('Manage object entries through View Object Entries', () => {
 			const fieldContainer = page.getByRole('group', {
 				name: objectFieldLabel,
 			});
+
+			const usFlagIcon = fieldContainer.locator('svg.lexicon-icon-en-us');
 
 			let objectDefinition: ObjectDefinition;
 
@@ -5827,6 +5834,8 @@ test.describe('Manage object entries through View Object Entries', () => {
 			await test.step('Fill the phone number field and save the entry', async () => {
 				await expect(fieldContainer.getByText(prefix)).toBeVisible();
 
+				await expect(usFlagIcon).toBeVisible();
+
 				await fieldContainer
 					.getByLabel('Phone Number')
 					.fill(localNumber);
@@ -5846,6 +5855,8 @@ test.describe('Manage object entries through View Object Entries', () => {
 					.click();
 
 				await expect(fieldContainer.getByText(prefix)).toBeVisible();
+
+				await expect(usFlagIcon).toBeVisible();
 
 				await expect(
 					fieldContainer.getByLabel('Phone Number')
