@@ -37,6 +37,7 @@ interface BasePhoneNumberProps {
 	onFocus?: (event: React.FocusEvent) => void;
 	predefinedValue?: string;
 	prefix?: string;
+	prefixCountryA2?: string;
 	prefixType?: PrefixType;
 	readOnly?: boolean;
 	valid?: boolean;
@@ -84,6 +85,7 @@ const LocalizablePhoneNumber = ({
 	onFocus,
 	predefinedValue,
 	prefix,
+	prefixCountryA2,
 	prefixType = PREFIX_TYPE.DEFINED_BY_USER,
 	readOnly,
 	valid = true,
@@ -150,6 +152,7 @@ const LocalizablePhoneNumber = ({
 					onChange={handleChange}
 					onFocus={onFocus}
 					prefix={prefix}
+					prefixCountryA2={prefixCountryA2}
 					prefixType={prefixType}
 					value={currentValue}
 				/>
@@ -177,6 +180,7 @@ const NonLocalizablePhoneNumber = ({
 	onFocus,
 	predefinedValue,
 	prefix,
+	prefixCountryA2,
 	prefixType = PREFIX_TYPE.DEFINED_BY_USER,
 	readOnly,
 	valid = true,
@@ -231,6 +235,7 @@ const NonLocalizablePhoneNumber = ({
 					onChange={handleChange}
 					onFocus={onFocus}
 					prefix={prefix}
+					prefixCountryA2={prefixCountryA2}
 					prefixType={prefixType}
 					value={initialValue || predefinedValue}
 				/>

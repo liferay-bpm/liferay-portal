@@ -26,6 +26,7 @@ interface PhoneNumberInputProps {
 	onChange?: (event: {target: {value: string}}) => void;
 	onFocus?: (event: React.FocusEvent) => void;
 	prefix?: string;
+	prefixCountryA2?: CountryInfo['a2'];
 	prefixType?: PrefixType;
 	value?: string;
 }
@@ -39,6 +40,7 @@ export function PhoneNumberInput({
 	onChange,
 	onFocus,
 	prefix,
+	prefixCountryA2,
 	prefixType = PREFIX_TYPE.DEFINED_BY_USER,
 	value = '',
 }: PhoneNumberInputProps) {
@@ -47,18 +49,13 @@ export function PhoneNumberInput({
 		getDefaultCountry(countries)
 	);
 
-	const fixedCountry =
-		prefixType === PREFIX_TYPE.FIXED
-			? countries.find((country) => `+${country.idd}` === prefix)
-			: null;
-
-	const fixedFlagSymbol = fixedCountry ? getFlagSymbol(fixedCountry.a2) : '';
+	const fixedFlagSymbol = getFlagSymbol(prefixCountryA2 ?? '');
 
 	const handleValueChange = (country: CountryInfo, number: string) => {
 		if (onChange) {
 			const resolvedPrefix =
 				prefixType === PREFIX_TYPE.FIXED
-					? prefix || ''
+					? prefix ?? ''
 					: `+${country.idd}`;
 
 			const sanitizedNumber = number.replace(/\D/g, '');

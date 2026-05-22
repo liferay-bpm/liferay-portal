@@ -383,6 +383,7 @@ type ObjectFieldSettingName =
 	| 'objectRelationshipName'
 	| 'output'
 	| 'prefix'
+	| 'prefixCountryA2'
 	| 'prefixType'
 	| 'script'
 	| 'showCounter'

@@ -10,6 +10,7 @@ import {
 	PREFIX_TYPE,
 	PrefixType,
 	SingleSelect,
+	getDefaultCountry,
 } from '@liferay/object-js-components-web';
 import React from 'react';
 
@@ -39,12 +40,14 @@ export function PhoneNumberProperties({
 
 	const settings = normalizeFieldSettings(objectFieldSettings);
 
-	const prefix = settings.prefix || '+1';
+	const defaultCountry = getDefaultCountry(countries);
+
+	const prefixCountryA2 = settings.prefixCountryA2 || defaultCountry.a2;
 	const prefixType = settings.prefixType || PREFIX_TYPE.DEFINED_BY_USER;
 
 	const selectedCountry =
-		countries.find((country) => `+${country.idd}` === prefix) ||
-		countries[0];
+		countries.find((country) => country.a2 === prefixCountryA2) ||
+		defaultCountry;
 
 	const handlePrefixTypeChange = (value: PrefixType) => {
 		let updatedSettings = updateFieldSettings(objectFieldSettings, {
@@ -54,13 +57,20 @@ export function PhoneNumberProperties({
 
 		if (value === PREFIX_TYPE.DEFINED_BY_USER) {
 			updatedSettings = updatedSettings.filter(
-				(setting) => setting.name !== 'prefix'
+				(setting) =>
+					setting.name !== 'prefix' &&
+					setting.name !== 'prefixCountryA2'
 			);
 		}
 		else if (value === PREFIX_TYPE.FIXED) {
 			updatedSettings = updateFieldSettings(updatedSettings, {
 				name: 'prefix',
-				value: `+${countries[0].idd}`,
+				value: `+${defaultCountry.idd}`,
+			});
+
+			updatedSettings = updateFieldSettings(updatedSettings, {
+				name: 'prefixCountryA2',
+				value: defaultCountry.a2,
 			});
 		}
 
@@ -77,9 +87,14 @@ export function PhoneNumberProperties({
 	};
 
 	const handlePrefixChange = (country: CountryInfo) => {
-		const updatedSettings = updateFieldSettings(objectFieldSettings, {
+		let updatedSettings = updateFieldSettings(objectFieldSettings, {
 			name: 'prefix',
 			value: `+${country.idd}`,
+		});
+
+		updatedSettings = updateFieldSettings(updatedSettings, {
+			name: 'prefixCountryA2',
+			value: country.a2,
 		});
 
 		setValues({
