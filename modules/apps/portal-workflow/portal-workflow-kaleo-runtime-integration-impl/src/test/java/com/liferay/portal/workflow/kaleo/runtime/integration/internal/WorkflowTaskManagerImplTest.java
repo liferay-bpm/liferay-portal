@@ -14,6 +14,7 @@ import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.security.permission.SimplePermissionChecker;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.portal.workflow.kaleo.runtime.TaskManager;
 
 import org.junit.After;
 import org.junit.Before;
@@ -75,18 +76,30 @@ public class WorkflowTaskManagerImplTest {
 			null, null, null);
 	}
 
-	@Test(expected = PrincipalException.MustHavePermission.class)
-	public void testAssignWorkflowTaskToUserThrowsExceptionWhenAssigneeUserDoesNotExist()
+	@Test
+	public void testAssignWorkflowTaskToUserWhenAssigneeUserBelongsToSameVirtualInstance()
 		throws Exception {
 
-		long companyId = RandomTestUtil.randomLong();
+		ReflectionTestUtil.setFieldValue(
+			_workflowTaskManagerImpl, "_taskManager",
+			Mockito.mock(TaskManager.class));
+
+		User assigneeUser = Mockito.mock(User.class);
 
 		long assigneeUserId = RandomTestUtil.randomLong();
 
 		Mockito.when(
 			_userLocalService.fetchUser(assigneeUserId)
 		).thenReturn(
-			null
+			assigneeUser
+		);
+
+		long companyId = RandomTestUtil.randomLong();
+
+		Mockito.when(
+			assigneeUser.getCompanyId()
+		).thenReturn(
+			companyId
 		);
 
 		_workflowTaskManagerImpl.assignWorkflowTaskToUser(
