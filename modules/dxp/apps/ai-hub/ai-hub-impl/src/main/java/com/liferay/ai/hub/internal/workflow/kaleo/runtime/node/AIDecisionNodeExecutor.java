@@ -18,6 +18,7 @@ import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.VariablesUti
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.petra.lang.SafeCloseable;
+import com.liferay.portal.kernel.audit.AuditRouter;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.log.Log;
@@ -193,11 +194,12 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 				}
 			).retrievalAugmentor(
 				RetrievalAugmentorUtil.createRetrievalAugmentor(
-					kaleoInstanceToken.getCompanyId(), _dtoConverterRegistry,
-					_fieldConfigBuilderFactory, _highlightBuilderFactory,
-					kaleoNodeSettingValues, serviceContext.getLocale(),
-					_objectEntryManager, _searchEngineAdapter,
-					serviceContext.getUserId(), workflowContext)
+					_auditRouter, kaleoInstanceToken.getCompanyId(),
+					_dtoConverterRegistry, _fieldConfigBuilderFactory,
+					_highlightBuilderFactory, kaleoNodeSettingValues,
+					serviceContext.getLocale(), _objectEntryManager,
+					_searchEngineAdapter, serviceContext.getUserId(),
+					workflowContext, kaleoInstanceToken.getKaleoInstanceId())
 			).systemMessageProviderFunction(
 				memoryId -> prompt
 			).tools(
@@ -244,6 +246,9 @@ public class AIDecisionNodeExecutor extends BaseNodeExecutor {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AIDecisionNodeExecutor.class);
+
+	@Reference
+	private AuditRouter _auditRouter;
 
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;

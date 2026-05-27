@@ -18,6 +18,7 @@ import com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util.VariablesUti
 import com.liferay.ai.hub.rest.resource.v1_0.util.SseUtil;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
+import com.liferay.portal.kernel.audit.AuditRouter;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
@@ -172,11 +173,12 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 				}
 			).retrievalAugmentor(
 				RetrievalAugmentorUtil.createRetrievalAugmentor(
-					kaleoInstanceToken.getCompanyId(), _dtoConverterRegistry,
-					_fieldConfigBuilderFactory, _highlightBuilderFactory,
-					kaleoNodeSettingValues, serviceContext.getLocale(),
-					_objectEntryManager, _searchEngineAdapter,
-					serviceContext.getUserId(), workflowContext)
+					_auditRouter, kaleoInstanceToken.getCompanyId(),
+					_dtoConverterRegistry, _fieldConfigBuilderFactory,
+					_highlightBuilderFactory, kaleoNodeSettingValues,
+					serviceContext.getLocale(), _objectEntryManager,
+					_searchEngineAdapter, serviceContext.getUserId(),
+					workflowContext, kaleoInstanceToken.getKaleoInstanceId())
 			).systemMessageProviderFunction(
 				memoryId -> prompt
 			).toolProvider(
@@ -275,6 +277,9 @@ public class LLMNodeExecutor extends BaseNodeExecutor {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		LLMNodeExecutor.class);
+
+	@Reference
+	private AuditRouter _auditRouter;
 
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;

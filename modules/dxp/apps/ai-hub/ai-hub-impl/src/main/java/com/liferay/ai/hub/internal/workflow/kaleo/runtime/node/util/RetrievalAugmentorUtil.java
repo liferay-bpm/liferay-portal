@@ -5,14 +5,23 @@
 
 package com.liferay.ai.hub.internal.workflow.kaleo.runtime.node.util;
 
+import com.liferay.account.model.AccountEntry;
+import com.liferay.ai.hub.audit.constants.AIHubEventTypes;
+import com.liferay.ai.hub.audit.constants.AIHubReferenceDatabaseQueryAuditConstants;
 import com.liferay.ai.hub.internal.web.search.LiferayWebSearchEngine;
+import com.liferay.ai.hub.util.AccountEntryUtil;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.audit.AuditMessage;
+import com.liferay.portal.kernel.audit.AuditRouter;
 import com.liferay.portal.kernel.encryptor.EncryptorUtil;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
@@ -21,7 +30,10 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
@@ -50,6 +62,7 @@ import dev.langchain4j.rag.query.router.DefaultQueryRouter;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -61,28 +74,31 @@ import java.util.Objects;
 public class RetrievalAugmentorUtil {
 
 	public static RetrievalAugmentor createRetrievalAugmentor(
-		long companyId, DTOConverterRegistry dtoConverterRegistry,
+		AuditRouter auditRouter, long companyId,
+		DTOConverterRegistry dtoConverterRegistry,
 		FieldConfigBuilderFactory fieldConfigBuilderFactory,
 		HighlightBuilderFactory highlightBuilderFactory,
 		Map<String, String> kaleoNodeSettingValues, Locale locale,
 		ObjectEntryManager objectEntryManager,
 		SearchEngineAdapter searchEngineAdapter, long userId,
-		Map<String, Serializable> workflowContext) {
+		Map<String, Serializable> workflowContext, long workflowInstanceId) {
 
 		List<ContentRetriever> contentRetrievers = new ArrayList<>();
 
 		ContentRetriever contentRetriever =
 			_createElasticsearchContentRetriever(
-				companyId, dtoConverterRegistry, fieldConfigBuilderFactory,
-				highlightBuilderFactory, locale, objectEntryManager,
-				searchEngineAdapter, userId, workflowContext);
+				auditRouter, companyId, dtoConverterRegistry,
+				fieldConfigBuilderFactory, highlightBuilderFactory, locale,
+				objectEntryManager, searchEngineAdapter, userId,
+				workflowContext, workflowInstanceId);
 
 		if (contentRetriever != null) {
 			contentRetrievers.add(contentRetriever);
 		}
 
 		contentRetriever = _createLiferayWebSearchContentRetriever(
-			companyId, kaleoNodeSettingValues, workflowContext);
+			auditRouter, companyId, kaleoNodeSettingValues, userId,
+			workflowContext, workflowInstanceId);
 
 		if (contentRetriever != null) {
 			contentRetrievers.add(contentRetriever);
@@ -104,12 +120,13 @@ public class RetrievalAugmentorUtil {
 	}
 
 	private static ContentRetriever _createElasticsearchContentRetriever(
-		long companyId, DTOConverterRegistry dtoConverterRegistry,
+		AuditRouter auditRouter, long companyId,
+		DTOConverterRegistry dtoConverterRegistry,
 		FieldConfigBuilderFactory fieldConfigBuilderFactory,
 		HighlightBuilderFactory highlightBuilderFactory, Locale locale,
 		ObjectEntryManager objectEntryManager,
 		SearchEngineAdapter searchEngineAdapter, long userId,
-		Map<String, Serializable> workflowContext) {
+		Map<String, Serializable> workflowContext, long workflowInstanceId) {
 
 		NestedFieldsContext nestedFieldsContext =
 			NestedFieldsContextThreadLocal.getAndSetNestedFieldsContext(
@@ -144,14 +161,25 @@ public class RetrievalAugmentorUtil {
 				return null;
 			}
 
-			return query -> _search(
-				fieldConfigBuilderFactory, highlightBuilderFactory,
-				TransformUtil.transform(
-					contentRetrieversObjectEntries,
-					contentRetriever -> GetterUtil.getString(
-						contentRetriever.getPropertyValue("indexName")),
-					String.class),
-				query, searchEngineAdapter);
+			return query -> {
+				List<Content> contents = _search(
+					fieldConfigBuilderFactory, highlightBuilderFactory,
+					TransformUtil.transform(
+						contentRetrieversObjectEntries,
+						contentRetriever -> GetterUtil.getString(
+							contentRetriever.getPropertyValue("indexName")),
+						String.class),
+					query, searchEngineAdapter);
+
+				_route(
+					auditRouter, companyId, contentRetrieversObjectEntries,
+					contents, query,
+					AIHubReferenceDatabaseQueryAuditConstants.
+						SOURCE_TYPE_DATA_SOURCE,
+					userId, workflowContext, workflowInstanceId);
+
+				return contents;
+			};
 		}
 		catch (Exception exception) {
 			_log.error(exception);
@@ -165,8 +193,9 @@ public class RetrievalAugmentorUtil {
 	}
 
 	private static ContentRetriever _createLiferayWebSearchContentRetriever(
-		long companyId, Map<String, String> kaleoNodeSettingValues,
-		Map<String, Serializable> workflowContext) {
+		AuditRouter auditRouter, long companyId,
+		Map<String, String> kaleoNodeSettingValues, long userId,
+		Map<String, Serializable> workflowContext, long workflowInstanceId) {
 
 		if (kaleoNodeSettingValues.get("rag") == null) {
 			return null;
@@ -184,18 +213,31 @@ public class RetrievalAugmentorUtil {
 
 				Company company = CompanyLocalServiceUtil.getCompany(companyId);
 
-				return WebSearchContentRetriever.builder(
-				).webSearchEngine(
-					new LiferayWebSearchEngine(
-						contentRetrieverJSONObject.getString(
-							"blueprintExternalReferenceCode"),
-						companyId,
-						GetterUtil.getLong(
-							workflowContext.get("oAuth2ApplicationId")),
-						EncryptorUtil.decrypt(
-							company.getKeyObj(),
-							(String)workflowContext.get("userToken")))
-				).build();
+				ContentRetriever contentRetriever =
+					WebSearchContentRetriever.builder(
+					).webSearchEngine(
+						new LiferayWebSearchEngine(
+							contentRetrieverJSONObject.getString(
+								"blueprintExternalReferenceCode"),
+							companyId,
+							GetterUtil.getLong(
+								workflowContext.get("oAuth2ApplicationId")),
+							EncryptorUtil.decrypt(
+								company.getKeyObj(),
+								(String)workflowContext.get("userToken")))
+					).build();
+
+				return query -> {
+					List<Content> contents = contentRetriever.retrieve(query);
+
+					_route(
+						auditRouter, companyId, null, contents, query,
+						AIHubReferenceDatabaseQueryAuditConstants.
+							SOURCE_TYPE_LIFERAY_SEARCH,
+						userId, workflowContext, workflowInstanceId);
+
+					return contents;
+				};
 			}
 		}
 		catch (Exception exception) {
@@ -205,6 +247,70 @@ public class RetrievalAugmentorUtil {
 		}
 
 		return null;
+	}
+
+	private static void _route(
+		AuditRouter auditRouter, long companyId,
+		ObjectEntry[] contentRetrieversObjectEntries, List<Content> contents,
+		Query query, String sourceType, long userId,
+		Map<String, Serializable> workflowContext, long workflowInstanceId) {
+
+		try {
+			AccountEntry accountEntry = AccountEntryUtil.getUserAccountEntry(
+				userId);
+
+			long accountEntryId = 0;
+
+			if (accountEntry != null) {
+				accountEntryId = accountEntry.getAccountEntryId();
+			}
+
+			auditRouter.route(
+				new AuditMessage(
+					0, companyId, userId,
+					PortalUtil.getUserName(userId, StringPool.BLANK),
+					new Date(), accountEntryId,
+					JSONUtil.put(
+						"agentDefinitionExternalReferenceCode",
+						MapUtil.getString(
+							workflowContext,
+							"agentDefinitionExternalReferenceCode")
+					).put(
+						"dataSources",
+						() -> {
+							if (ArrayUtil.isEmpty(
+									contentRetrieversObjectEntries)) {
+
+								return null;
+							}
+
+							return JSONUtil.toJSONArray(
+								contentRetrieversObjectEntries,
+								contentRetrieversObjectEntry ->
+									contentRetrieversObjectEntry.
+										getExternalReferenceCode());
+						}
+					).put(
+						"query", query.text()
+					).put(
+						"results", _toJSONArray(contents)
+					).put(
+						"sourceType", sourceType
+					).put(
+						"sseEventSinkKey",
+						MapUtil.getString(workflowContext, "sseEventSinkKey")
+					).put(
+						"workflowInstanceId", workflowInstanceId
+					),
+					WorkflowInstance.class.getName(),
+					String.valueOf(workflowInstanceId), null,
+					AIHubEventTypes.AI_HUB_REFERENCE_DATABASE_QUERY, null));
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(exception);
+			}
+		}
 	}
 
 	private static List<Content> _search(
@@ -261,6 +367,31 @@ public class RetrievalAugmentorUtil {
 		}
 
 		return contents;
+	}
+
+	private static JSONArray _toJSONArray(List<Content> contents) {
+		JSONArray resultsJSONArray = JSONFactoryUtil.createJSONArray();
+
+		for (Content content : contents) {
+			TextSegment textSegment = content.textSegment();
+
+			Metadata metadata = textSegment.metadata();
+
+			Map<String, Object> metadataMap = metadata.toMap();
+
+			resultsJSONArray.put(
+				JSONUtil.put(
+					"className", MapUtil.getString(metadataMap, "className")
+				).put(
+					"score", MapUtil.getString(metadataMap, "score")
+				).put(
+					"text", StringUtil.shorten(textSegment.text(), 500)
+				).put(
+					"url", MapUtil.getString(metadataMap, "url")
+				));
+		}
+
+		return resultsJSONArray;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
