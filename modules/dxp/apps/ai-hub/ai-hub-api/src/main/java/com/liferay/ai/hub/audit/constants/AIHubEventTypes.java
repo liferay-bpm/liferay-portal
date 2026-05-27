@@ -21,4 +21,7 @@ public interface AIHubEventTypes {
 	public static final String AI_HUB_AGENT_FLOW_UPDATE =
 		"AI_HUB_AGENT_FLOW_UPDATE";
 
+	public static final String AI_HUB_REFERENCE_DATABASE_QUERY =
+		"AI_HUB_REFERENCE_DATABASE_QUERY";
+
 }
