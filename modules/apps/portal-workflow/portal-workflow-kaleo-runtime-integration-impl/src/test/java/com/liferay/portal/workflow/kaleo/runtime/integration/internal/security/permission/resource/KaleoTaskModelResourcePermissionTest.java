@@ -5,12 +5,10 @@
 
 package com.liferay.portal.workflow.kaleo.runtime.integration.internal.security.permission.resource;
 
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.workflow.WorkflowTask;
-import com.liferay.portal.security.permission.SimplePermissionChecker;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.workflow.kaleo.KaleoWorkflowModelConverter;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken;
@@ -34,61 +32,67 @@ public class KaleoTaskModelResourcePermissionTest {
 		LiferayUnitTestRule.INSTANCE;
 
 	@Test
-	public void testContainsFalseWhenKaleoTaskInstanceTokenBelongsToDifferentVirtualInstance()
-		throws Exception {
+	public void testContains() throws Exception {
+
+		// Kaleo task instance token from different company
+
+		KaleoTaskInstanceToken kaleoTaskInstanceToken1 = Mockito.mock(
+			KaleoTaskInstanceToken.class);
 
 		long companyId = RandomTestUtil.randomLong();
 
-		KaleoTaskInstanceToken kaleoTaskInstanceToken = Mockito.mock(
-			KaleoTaskInstanceToken.class);
-
 		Mockito.when(
-			kaleoTaskInstanceToken.getCompanyId()
+			kaleoTaskInstanceToken1.getCompanyId()
 		).thenReturn(
 			companyId
+		);
+
+		PermissionChecker permissionChecker1 = Mockito.mock(
+			PermissionChecker.class);
+
+		Mockito.when(
+			permissionChecker1.getCompanyId()
+		).thenReturn(
+			companyId + 1
 		);
 
 		Assert.assertFalse(
 			_kaleoTaskModelResourcePermission.contains(
-				_mockPermissionChecker(companyId + 1), kaleoTaskInstanceToken,
-				null));
-	}
+				permissionChecker1, kaleoTaskInstanceToken1, null));
 
-	@Test
-	public void testWhenKaleoTaskInstanceTokenBelongsToSameVirtualInstance()
-		throws Exception {
+		// Kaleo task instance token from same company
+
+		KaleoTaskInstanceToken kaleoTaskInstanceToken2 = Mockito.mock(
+			KaleoTaskInstanceToken.class);
+
+		Mockito.when(
+			kaleoTaskInstanceToken2.getCompanyId()
+		).thenReturn(
+			companyId
+		);
 
 		KaleoWorkflowModelConverter kaleoWorkflowModelConverter = Mockito.mock(
 			KaleoWorkflowModelConverter.class);
-		WorkflowTaskPermission workflowTaskPermission = Mockito.mock(
-			WorkflowTaskPermission.class);
 
 		ReflectionTestUtil.setFieldValue(
 			_kaleoTaskModelResourcePermission, "_kaleoWorkflowModelConverter",
 			kaleoWorkflowModelConverter);
-		ReflectionTestUtil.setFieldValue(
-			_kaleoTaskModelResourcePermission, "_workflowTaskPermission",
-			workflowTaskPermission);
-
-		long companyId = RandomTestUtil.randomLong();
-
-		KaleoTaskInstanceToken kaleoTaskInstanceToken = Mockito.mock(
-			KaleoTaskInstanceToken.class);
-
-		Mockito.when(
-			kaleoTaskInstanceToken.getCompanyId()
-		).thenReturn(
-			companyId
-		);
 
 		WorkflowTask workflowTask = Mockito.mock(WorkflowTask.class);
 
 		Mockito.when(
 			kaleoWorkflowModelConverter.toWorkflowTask(
-				Mockito.eq(kaleoTaskInstanceToken), Mockito.any())
+				Mockito.eq(kaleoTaskInstanceToken2), Mockito.any())
 		).thenReturn(
 			workflowTask
 		);
+
+		WorkflowTaskPermission workflowTaskPermission = Mockito.mock(
+			WorkflowTaskPermission.class);
+
+		ReflectionTestUtil.setFieldValue(
+			_kaleoTaskModelResourcePermission, "_workflowTaskPermission",
+			workflowTaskPermission);
 
 		Mockito.when(
 			workflowTaskPermission.contains(
@@ -97,29 +101,19 @@ public class KaleoTaskModelResourcePermissionTest {
 			true
 		);
 
+		PermissionChecker permissionChecker2 = Mockito.mock(
+			PermissionChecker.class);
+
+		Mockito.when(
+			permissionChecker2.getCompanyId()
+		).thenReturn(
+			companyId
+		);
+
 		Assert.assertTrue(
 			_kaleoTaskModelResourcePermission.contains(
-				_mockPermissionChecker(companyId), kaleoTaskInstanceToken,
-				null));
+				permissionChecker2, kaleoTaskInstanceToken2, null));
 	}
-
-	private PermissionChecker _mockPermissionChecker(long companyId) {
-		return new SimplePermissionChecker() {
-
-			@Override
-			public long getCompanyId() {
-				return companyId;
-			}
-
-			@Override
-			public User getUser() {
-				return _user;
-			}
-
-		};
-	}
-
-	private static final User _user = Mockito.mock(User.class);
 
 	private final KaleoTaskModelResourcePermission
 		_kaleoTaskModelResourcePermission =

@@ -12,11 +12,11 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.security.permission.SimplePermissionChecker;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.workflow.kaleo.runtime.TaskManager;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -41,8 +41,16 @@ public class WorkflowTaskManagerImplTest {
 		ReflectionTestUtil.setFieldValue(
 			_workflowTaskManagerImpl, "_userLocalService", _userLocalService);
 
-		PermissionThreadLocal.setPermissionChecker(
-			_mockPermissionChecker(_USER_ID));
+		PermissionChecker permissionChecker = Mockito.mock(
+			PermissionChecker.class);
+
+		Mockito.when(
+			permissionChecker.getUserId()
+		).thenReturn(
+			_USER_ID
+		);
+
+		PermissionThreadLocal.setPermissionChecker(permissionChecker);
 	}
 
 	@After
@@ -50,72 +58,68 @@ public class WorkflowTaskManagerImplTest {
 		PermissionThreadLocal.setPermissionChecker(null);
 	}
 
-	@Test(expected = PrincipalException.MustHavePermission.class)
-	public void testAssignWorkflowTaskToUserThrowsExceptionWhenAssigneeUserBelongsToDifferentVirtualInstance()
-		throws Exception {
+	@Test
+	public void testAssignWorkflowTaskToUser() throws Exception {
 
-		long companyId = RandomTestUtil.randomLong();
-		long assigneeUserId = RandomTestUtil.randomLong();
+		// User from different company
 
-		User assigneeUser = Mockito.mock(User.class);
+		long assigneeUserId1 = RandomTestUtil.randomLong();
+
+		User assigneeUser1 = Mockito.mock(User.class);
 
 		Mockito.when(
-			assigneeUser.getCompanyId()
+			_userLocalService.fetchUser(assigneeUserId1)
+		).thenReturn(
+			assigneeUser1
+		);
+
+		long companyId = RandomTestUtil.randomLong();
+
+		Mockito.when(
+			assigneeUser1.getCompanyId()
 		).thenReturn(
 			companyId + 1
 		);
 
-		Mockito.when(
-			_userLocalService.fetchUser(assigneeUserId)
-		).thenReturn(
-			assigneeUser
-		);
+		try {
+			_workflowTaskManagerImpl.assignWorkflowTaskToUser(
+				companyId, _USER_ID, RandomTestUtil.randomLong(),
+				assigneeUserId1, null, null, null);
 
-		_workflowTaskManagerImpl.assignWorkflowTaskToUser(
-			companyId, _USER_ID, RandomTestUtil.randomLong(), assigneeUserId,
-			null, null, null);
-	}
+			Assert.fail();
+		}
+		catch (PrincipalException.MustHavePermission principalException) {
+			Assert.assertEquals(
+				User.class.getName(), principalException.resourceName);
+			Assert.assertEquals(
+				assigneeUserId1, principalException.resourceId);
+		}
 
-	@Test
-	public void testAssignWorkflowTaskToUserWhenAssigneeUserBelongsToSameVirtualInstance()
-		throws Exception {
+		// User from same company
 
 		ReflectionTestUtil.setFieldValue(
 			_workflowTaskManagerImpl, "_taskManager",
 			Mockito.mock(TaskManager.class));
 
-		User assigneeUser = Mockito.mock(User.class);
+		long assigneeUserId2 = RandomTestUtil.randomLong();
 
-		long assigneeUserId = RandomTestUtil.randomLong();
+		User assigneeUser2 = Mockito.mock(User.class);
 
 		Mockito.when(
-			_userLocalService.fetchUser(assigneeUserId)
+			_userLocalService.fetchUser(assigneeUserId2)
 		).thenReturn(
-			assigneeUser
+			assigneeUser2
 		);
 
-		long companyId = RandomTestUtil.randomLong();
-
 		Mockito.when(
-			assigneeUser.getCompanyId()
+			assigneeUser2.getCompanyId()
 		).thenReturn(
 			companyId
 		);
 
 		_workflowTaskManagerImpl.assignWorkflowTaskToUser(
-			companyId, _USER_ID, RandomTestUtil.randomLong(), assigneeUserId,
+			companyId, _USER_ID, RandomTestUtil.randomLong(), assigneeUserId2,
 			null, null, null);
-	}
-
-	private PermissionChecker _mockPermissionChecker(long userId) {
-		return new SimplePermissionChecker() {
-
-			@Override
-			public long getUserId() {
-				return userId;
-			}
-
-		};
 	}
 
 	private static final long _USER_ID = RandomTestUtil.randomLong();
