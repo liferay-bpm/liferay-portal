@@ -6,8 +6,11 @@
 package com.liferay.site.cms.site.initializer.internal.upgrade.registry;
 
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectDefinitionSettingLocalService;
+import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFolderLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 import com.liferay.site.cms.site.initializer.internal.upgrade.v1_0_0.CMSObjectRelationshipEdgeUpgradeProcess;
@@ -30,6 +33,8 @@ public class SiteCMSSiteInitializerUpgradeStepRegistrator
 			"0.0.1", "1.0.0",
 			new CMSObjectRelationshipEdgeUpgradeProcess(
 				_companyLocalService, _objectDefinitionLocalService,
+				_objectDefinitionPersistence,
+				_objectDefinitionSettingLocalService, _objectEntryLocalService,
 				_objectFolderLocalService, _objectRelationshipLocalService));
 	}
 
@@ -38,6 +43,16 @@ public class SiteCMSSiteInitializerUpgradeStepRegistrator
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
+	private ObjectDefinitionPersistence _objectDefinitionPersistence;
+
+	@Reference
+	private ObjectDefinitionSettingLocalService
+		_objectDefinitionSettingLocalService;
+
+	@Reference
+	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Reference
 	private ObjectFolderLocalService _objectFolderLocalService;
