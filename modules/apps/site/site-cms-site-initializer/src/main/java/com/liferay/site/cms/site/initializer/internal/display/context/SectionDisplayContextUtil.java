@@ -117,13 +117,14 @@ public class SectionDisplayContextUtil {
 			httpServletRequest.getAttribute(InfoDisplayWebKeys.INFO_ITEM),
 			rootObjectEntryFolderExternalReferenceCode);
 
-		StringBundler sb = new StringBundler(12);
+		StringBundler sb = new StringBundler(13);
 
 		sb.append("emptySearch=true&filter=");
 
 		if (objectEntryFolder != null) {
 			sb.append("folderId eq ");
 			sb.append(objectEntryFolder.getObjectEntryFolderId());
+			sb.append(" and cmsTreeChild eq false");
 
 			if (objectEntryFolder.getStatus() ==
 					WorkflowConstants.STATUS_IN_TRASH) {
