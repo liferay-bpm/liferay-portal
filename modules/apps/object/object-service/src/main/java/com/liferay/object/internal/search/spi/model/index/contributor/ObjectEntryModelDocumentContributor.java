@@ -439,8 +439,7 @@ public class ObjectEntryModelDocumentContributor
 				Field.EXPIRATION_DATE, objectEntry.getExpirationDate());
 			document.addDate(Field.REVIEW_DATE, objectEntry.getReviewDate());
 
-			_contributeObjectEntryFolder(
-				document, objectEntry.getObjectEntryFolderId());
+			_contributeObjectEntryFolder(document, objectEntry);
 
 			if (values == null) {
 				values = objectEntry.getIndexedValues();
@@ -496,7 +495,9 @@ public class ObjectEntryModelDocumentContributor
 	}
 
 	private void _contributeObjectEntryFolder(
-		Document document, long objectEntryFolderId) {
+		Document document, ObjectEntry objectEntry) {
+
+		long objectEntryFolderId = objectEntry.getObjectEntryFolderId();
 
 		document.addKeyword(Field.FOLDER_ID, objectEntryFolderId);
 
@@ -528,6 +529,8 @@ public class ObjectEntryModelDocumentContributor
 			rootObjectEntryFolder.getObjectEntryFolderId() ==
 				objectEntryFolderId);
 		document.addKeyword("cms_section", cmsSection);
+		document.addKeyword(
+			"cms_tree_child", _isObjectEntryTreeChild(objectEntry));
 	}
 
 	private void _contributeTextEmbeddings(
@@ -715,6 +718,18 @@ public class ObjectEntryModelDocumentContributor
 		}
 
 		return value;
+	}
+
+	private boolean _isObjectEntryTreeChild(ObjectEntry objectEntry) {
+		long rootObjectEntryId = objectEntry.getRootObjectEntryId();
+
+		if ((rootObjectEntryId != 0) &&
+			(rootObjectEntryId != objectEntry.getObjectEntryId())) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private String _translate(Boolean value) {
