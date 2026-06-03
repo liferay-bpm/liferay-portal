@@ -108,8 +108,8 @@ public class CMSObjectRelationshipEdgeUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private List<ObjectRelationship> _getCMSObjectRelationships(
-		long companyId) {
+	private List<ObjectRelationship> _getCMSObjectRelationships(long companyId)
+		throws UpgradeException {
 
 		List<ObjectRelationship> objectRelationships = new ArrayList<>();
 		Set<Long> objectDefinitionIds = new HashSet<>();
@@ -137,7 +137,7 @@ public class CMSObjectRelationshipEdgeUpgradeProcess extends UpgradeProcess {
 			}
 		}
 
-		return objectRelationships;
+		return _sortObjectRelationships(objectRelationships);
 	}
 
 	private String _getExceptionMessage(
@@ -184,6 +184,53 @@ public class CMSObjectRelationshipEdgeUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
+	private List<ObjectRelationship> _sortObjectRelationships(
+			List<ObjectRelationship> objectRelationships)
+		throws UpgradeException {
+
+		List<ObjectRelationship> sortedObjectRelationships = new ArrayList<>(
+			objectRelationships.size());
+
+		while (!objectRelationships.isEmpty()) {
+			List<ObjectRelationship> rootObjectRelationships =
+				new ArrayList<>();
+
+			for (ObjectRelationship objectRelationship : objectRelationships) {
+				long objectDefinitionId1 =
+					objectRelationship.getObjectDefinitionId1();
+
+				if (!ListUtil.exists(
+						objectRelationships,
+						parentObjectRelationship ->
+							parentObjectRelationship.getObjectDefinitionId2() ==
+								objectDefinitionId1)) {
+
+					rootObjectRelationships.add(objectRelationship);
+				}
+			}
+
+			if (rootObjectRelationships.isEmpty()) {
+				List<String> objectRelationshipNames = new ArrayList<>(
+					objectRelationships.size());
+
+				for (ObjectRelationship objectRelationship :
+						objectRelationships) {
+
+					objectRelationshipNames.add(objectRelationship.getName());
+				}
+
+				throw new UpgradeException(
+					"These CMS object relationships form a cycle: " +
+						StringUtil.merge(objectRelationshipNames, ", "));
+			}
+
+			objectRelationships.removeAll(rootObjectRelationships);
+			sortedObjectRelationships.addAll(rootObjectRelationships);
+		}
+
+		return sortedObjectRelationships;
+	}
+
 	private void _upgradeCompany(long companyId) throws PortalException {
 		for (String externalReferenceCode :
 				_CMS_ROOT_FOLDER_EXTERNAL_REFERENCE_CODES) {
@@ -224,22 +271,19 @@ public class CMSObjectRelationshipEdgeUpgradeProcess extends UpgradeProcess {
 				continue;
 			}
 
-			_objectRelationshipLocalService.updateObjectRelationship(
-				currentObjectRelationship.getExternalReferenceCode(),
-				currentObjectRelationship.getObjectRelationshipId(),
-				currentObjectRelationship.getParameterObjectFieldId(),
-				currentObjectRelationship.getDeletionType(), true,
-				currentObjectRelationship.getLabelMap(), null);
+			objectRelationship =
+				_objectRelationshipLocalService.updateObjectRelationship(
+					currentObjectRelationship.getExternalReferenceCode(),
+					currentObjectRelationship.getObjectRelationshipId(),
+					currentObjectRelationship.getParameterObjectFieldId(),
+					currentObjectRelationship.getDeletionType(), true,
+					currentObjectRelationship.getLabelMap(), null);
 
 			if (FeatureFlagManagerUtil.isEnabled(
-					currentObjectRelationship.getCompanyId(), "LPD-34594")) {
+					objectRelationship.getCompanyId(), "LPD-34594")) {
 
 				continue;
 			}
-
-			objectRelationship =
-				_objectRelationshipLocalService.fetchObjectRelationship(
-					currentObjectRelationship.getObjectRelationshipId());
 
 			ObjectDefinitionTreeUtil.bindObjectDefinitions(
 				_objectDefinitionLocalService, _objectDefinitionPersistence,
