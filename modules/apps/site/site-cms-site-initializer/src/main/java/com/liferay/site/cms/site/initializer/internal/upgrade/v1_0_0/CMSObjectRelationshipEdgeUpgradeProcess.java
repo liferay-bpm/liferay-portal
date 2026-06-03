@@ -137,7 +137,7 @@ public class CMSObjectRelationshipEdgeUpgradeProcess extends UpgradeProcess {
 			}
 		}
 
-		return objectRelationships;
+		return _sortObjectRelationships(objectRelationships);
 	}
 
 	private String _getExceptionMessage(
@@ -182,6 +182,43 @@ public class CMSObjectRelationshipEdgeUpgradeProcess extends UpgradeProcess {
 				objectRelationship.getObjectDefinitionId2(),
 				objectDefinitionIds, objectRelationships);
 		}
+	}
+
+	private List<ObjectRelationship> _sortObjectRelationships(
+		List<ObjectRelationship> objectRelationships) {
+
+		List<ObjectRelationship> sortedObjectRelationships = new ArrayList<>(
+			objectRelationships.size());
+
+		while (!objectRelationships.isEmpty()) {
+			List<ObjectRelationship> rootObjectRelationships =
+				new ArrayList<>();
+
+			for (ObjectRelationship objectRelationship : objectRelationships) {
+				long objectDefinitionId1 =
+					objectRelationship.getObjectDefinitionId1();
+
+				if (!ListUtil.exists(
+						objectRelationships,
+						parentObjectRelationship ->
+							parentObjectRelationship.getObjectDefinitionId2() ==
+								objectDefinitionId1)) {
+
+					rootObjectRelationships.add(objectRelationship);
+				}
+			}
+
+			if (rootObjectRelationships.isEmpty()) {
+				sortedObjectRelationships.addAll(objectRelationships);
+
+				break;
+			}
+
+			objectRelationships.removeAll(rootObjectRelationships);
+			sortedObjectRelationships.addAll(rootObjectRelationships);
+		}
+
+		return sortedObjectRelationships;
 	}
 
 	private void _upgradeCompany(long companyId) throws PortalException {
