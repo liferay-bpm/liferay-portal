@@ -50,33 +50,31 @@ const ListTypeDefaultValueSelect: React.FC<
 			API.getListTypeDefinitionListTypeEntries(
 				values.listTypeDefinitionId
 			).then((items) => {
-				if (items.length) {
-					setListTypeEntries(
-						items.map((item) => ({
-							...item,
-							name_i18n: fixLocaleKeys(item.name_i18n),
-						}))
-					);
-				}
+				setListTypeEntries(
+					items.map((item) => ({
+						...item,
+						name_i18n: fixLocaleKeys(item.name_i18n),
+					}))
+				);
 			});
 		}
 	}, [defaultValue, setValues, values, values.listTypeDefinitionId]);
 
+	if (!listTypeEntries || !values.listTypeDefinitionId) {
+		return null;
+	}
+
 	return (
-		<>
-			{listTypeEntries && values.listTypeDefinitionId && (
-				<ListTypeEntryBaseField
-					creationLanguageId={creationLanguageId}
-					error={error}
-					label={label}
-					onChange={handleChange}
-					picklistItems={listTypeEntries}
-					placeholder={Liferay.Language.get('choose-an-option')}
-					required={required}
-					selectedPicklistItemKey={defaultValue as string | undefined}
-				/>
-			)}
-		</>
+		<ListTypeEntryBaseField
+			creationLanguageId={creationLanguageId}
+			error={error}
+			label={label}
+			onChange={handleChange}
+			picklistItems={listTypeEntries}
+			placeholder={Liferay.Language.get('choose-an-option')}
+			required={required}
+			selectedPicklistItemKey={defaultValue as string | undefined}
+		/>
 	);
 };
 
