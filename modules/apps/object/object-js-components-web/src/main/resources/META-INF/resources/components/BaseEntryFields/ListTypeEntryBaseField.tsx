@@ -37,35 +37,35 @@ export function ListTypeEntryBaseField({
 	required,
 	selectedPicklistItemKey,
 }: ListTypeEntryBaseFieldProps) {
+
+	// Key the picker on the available item keys so it is remounted whenever the
+	// set of options changes, including when it becomes empty. Without the
+	// remount the picker keeps showing a value selected for a previous list.
+
 	return (
-		<>
-			{picklistItems.length ? (
-				<SingleSelect
-					error={error}
-					items={picklistItems.map((item) => ({
-						label: creationLanguageId
-							? getLocalizableLabel({
-									fallbackLanguageId: creationLanguageId,
-									labels: item.name_i18n,
-								})
-							: item.name,
-						value: item.key,
-					}))}
-					label={label}
-					onSelectionChange={(value) => {
-						onChange(
-							picklistItems.find((item) => item.key === value)
-						);
-					}}
-					placeholder={placeholder}
-					required={required}
-					selectedKey={
-						picklistItems.find(
-							(item) => item.key === selectedPicklistItemKey
-						)?.key
-					}
-				/>
-			) : null}
-		</>
+		<SingleSelect
+			error={error}
+			items={picklistItems.map((item) => ({
+				label: creationLanguageId
+					? getLocalizableLabel({
+							fallbackLanguageId: creationLanguageId,
+							labels: item.name_i18n,
+						})
+					: item.name,
+				value: item.key,
+			}))}
+			key={picklistItems.map((item) => item.key).join()}
+			label={label}
+			onSelectionChange={(value) => {
+				onChange(picklistItems.find((item) => item.key === value));
+			}}
+			placeholder={placeholder}
+			required={required}
+			selectedKey={
+				picklistItems.find(
+					(item) => item.key === selectedPicklistItemKey
+				)?.key
+			}
+		/>
 	);
 }
