@@ -71,11 +71,16 @@ public class ScriptManagementConfigurationHelperImpl
 			ConfigurationAdminPortletKeys.SYSTEM_SETTINGS);
 
 		url = HttpComponentsUtil.addParameter(
-			url, namespace + "configurationScreenKey", "script-management");
+			url, namespace + "factoryPid",
+			ScriptManagementConfiguration.class.getName());
+
+		url = HttpComponentsUtil.addParameter(
+			url, namespace + "mvcRenderCommandName",
+			"/configuration_admin/edit_configuration");
 
 		return HttpComponentsUtil.addParameter(
-			url, namespace + "mvcRenderCommandName",
-			"/configuration_admin/view_configuration_screen");
+			url, namespace + "pid",
+			ScriptManagementConfiguration.class.getName());
 	}
 
 	@Override
