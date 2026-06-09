@@ -11,6 +11,7 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.workflow.WorkflowDefinition;
 import com.liferay.portal.security.script.management.groovy.script.use.GroovyScriptUse;
 import com.liferay.portal.security.script.management.groovy.script.uses.factory.GroovyScriptUsesFactory;
 import com.liferay.portal.workflow.constants.WorkflowDefinitionConstants;
@@ -66,6 +67,26 @@ public class WorkflowDefinitionGroovyScriptUsesFactory
 						workflowDefinition.getVersion(),
 						_workflowPortletTabRegistry));
 			});
+	}
+
+	@Override
+	public boolean hasActiveUses() throws Exception {
+		for (WorkflowDefinition workflowDefinition :
+				_workflowDefinitionManager.getActiveWorkflowDefinitions(
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS)) {
+
+			if (WorkflowDefinitionGroovyScriptUseDetector.detect(
+					workflowDefinition.getContent(), _jsonFactory) &&
+				!Objects.equals(
+					workflowDefinition.getName(),
+					WorkflowDefinitionConstants.
+						NAME_MESSAGE_BOARDS_USER_STATS_MODERATION)) {
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Reference
