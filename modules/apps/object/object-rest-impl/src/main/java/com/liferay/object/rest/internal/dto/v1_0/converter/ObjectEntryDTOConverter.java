@@ -268,8 +268,6 @@ public class ObjectEntryDTOConverter
 			() -> _toAuditEvents(
 				dtoConverterContext, objectDefinition,
 				serviceBuilderObjectEntry));
-		objectEntry.setComments(
-			() -> _toComments(objectDefinition, serviceBuilderObjectEntry));
 		objectEntry.setCreator(
 			() -> {
 				long userId = _getAttribute(
@@ -418,6 +416,7 @@ public class ObjectEntryDTOConverter
 						serviceBuilderObjectEntry.getGroupId(),
 						dtoConverterContext.getLocale(), objectDefinition,
 						serviceBuilderObjectEntry.getObjectEntryId(),
+						serviceBuilderObjectEntry,
 						dtoConverterContext.getUserId(),
 						objectEntryVersion.getVersion());
 				}
@@ -426,7 +425,7 @@ public class ObjectEntryDTOConverter
 					serviceBuilderObjectEntry.getGroupId(),
 					dtoConverterContext.getLocale(), objectDefinition,
 					serviceBuilderObjectEntry.getObjectEntryId(),
-					dtoConverterContext.getUserId(),
+					serviceBuilderObjectEntry, dtoConverterContext.getUserId(),
 					serviceBuilderObjectEntry.getVersion());
 			});
 		objectEntry.setTaxonomyCategoryBriefs(
@@ -988,7 +987,7 @@ public class ObjectEntryDTOConverter
 		throws Exception {
 
 		return NestedFieldsSupplier.supply(
-			"comments",
+			"systemProperties.comments",
 			nestedFieldNames -> {
 				if ((!Objects.equals(
 						objectDefinition.getScope(),
@@ -1271,10 +1270,15 @@ public class ObjectEntryDTOConverter
 
 	private SystemProperties _toSystemProperties(
 			long groupId, Locale locale, ObjectDefinition objectDefinition,
-			long objectEntryId, long userId, int versionInt)
+			long objectEntryId,
+			com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry,
+			long userId, int versionInt)
 		throws Exception {
 
 		Group group = _groupLocalService.fetchGroup(groupId);
+
+		Comment[] nestedComments = _toComments(
+			objectDefinition, serviceBuilderObjectEntry);
 
 		SharingEntry nestedSharingEntry = NestedFieldsSupplier.supply(
 			"systemProperties.collaboratorBrief",
@@ -1291,7 +1295,8 @@ public class ObjectEntryDTOConverter
 					locale, objectDefinition));
 
 		if (!objectDefinition.isEnableObjectEntryVersioning() &&
-			(group == null) && (nestedObjectDefinitionBrief == null) &&
+			(group == null) && (nestedComments == null) &&
+			(nestedObjectDefinitionBrief == null) &&
 			(nestedSharingEntry == null)) {
 
 			return null;
@@ -1307,6 +1312,7 @@ public class ObjectEntryDTOConverter
 
 						return _toCollaboratorBrief(nestedSharingEntry);
 					});
+				setComments(() -> nestedComments);
 				setObjectDefinitionBrief(() -> nestedObjectDefinitionBrief);
 				setScope(
 					() -> {

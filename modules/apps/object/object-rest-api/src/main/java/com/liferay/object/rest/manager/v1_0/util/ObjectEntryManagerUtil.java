@@ -10,6 +10,7 @@ import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
+import com.liferay.object.rest.dto.v1_0.SystemProperties;
 import com.liferay.object.service.ObjectFieldLocalServiceUtil;
 
 import java.util.Map;
@@ -23,8 +24,26 @@ public class ObjectEntryManagerUtil {
 		ObjectEntry existingObjectEntry, long objectDefinitionId,
 		ObjectEntry objectEntry) {
 
-		if (objectEntry.getComments() != null) {
-			existingObjectEntry.setComments(objectEntry::getComments);
+		SystemProperties objectEntrySystemProperties =
+			objectEntry.getSystemProperties();
+
+		if ((objectEntrySystemProperties != null) &&
+			(objectEntrySystemProperties.getComments() != null)) {
+
+			SystemProperties mergedSystemProperties =
+				existingObjectEntry.getSystemProperties();
+
+			if (mergedSystemProperties == null) {
+				mergedSystemProperties = new SystemProperties();
+			}
+
+			SystemProperties finalSystemProperties = mergedSystemProperties;
+
+			finalSystemProperties.setComments(
+				objectEntrySystemProperties::getComments);
+
+			existingObjectEntry.setSystemProperties(
+				() -> finalSystemProperties);
 		}
 
 		if (objectEntry.getDateCreated() != null) {

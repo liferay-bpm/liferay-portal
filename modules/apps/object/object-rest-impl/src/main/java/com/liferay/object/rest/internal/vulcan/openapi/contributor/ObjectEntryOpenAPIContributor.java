@@ -212,7 +212,9 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 			schemas.remove("TaxonomyCategoryBrief");
 		}
 
-		if (!_objectDefinition.isEnableObjectEntryVersioning()) {
+		if (!_objectDefinition.isEnableComments() &&
+			!_objectDefinition.isEnableObjectEntryVersioning()) {
+
 			objectDefinitionSchemaProperties.remove("systemProperties");
 
 			schemas.remove("SystemProperties");
