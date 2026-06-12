@@ -11301,15 +11301,19 @@ public class ObjectEntryResourceTest {
 		com.liferay.object.rest.dto.v1_0.ObjectEntry objectEntry =
 			new com.liferay.object.rest.dto.v1_0.ObjectEntry() {
 				{
-					comments = new Comment[] {
-						new Comment() {
-							{
-								externalReferenceCode =
-									RandomTestUtil.randomString();
-								parentCommentExternalReferenceCode =
-									parentExternalReferenceCode;
-								text = RandomTestUtil.randomString();
-							}
+					systemProperties = new SystemProperties() {
+						{
+							comments = new Comment[] {
+								new Comment() {
+									{
+										externalReferenceCode =
+											RandomTestUtil.randomString();
+										parentCommentExternalReferenceCode =
+											parentExternalReferenceCode;
+										text = RandomTestUtil.randomString();
+									}
+								}
+							};
 						}
 					};
 				}
@@ -19571,20 +19575,24 @@ public class ObjectEntryResourceTest {
 		com.liferay.object.rest.dto.v1_0.ObjectEntry objectEntry =
 			new com.liferay.object.rest.dto.v1_0.ObjectEntry() {
 				{
-					comments = new Comment[] {
-						new Comment() {
-							{
-								externalReferenceCode =
-									RandomTestUtil.randomString();
-								parentCommentExternalReferenceCode =
-									parentExternalReferenceCode;
-								text = RandomTestUtil.randomString();
-							}
-						}
-					};
 					properties = HashMapBuilder.<String, Object>put(
 						_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
 					).build();
+					systemProperties = new SystemProperties() {
+						{
+							comments = new Comment[] {
+								new Comment() {
+									{
+										externalReferenceCode =
+											RandomTestUtil.randomString();
+										parentCommentExternalReferenceCode =
+											parentExternalReferenceCode;
+										text = RandomTestUtil.randomString();
+									}
+								}
+							};
+						}
+					};
 				}
 			};
 
