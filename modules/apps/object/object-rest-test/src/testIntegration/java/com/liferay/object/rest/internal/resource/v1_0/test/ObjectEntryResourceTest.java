@@ -17358,10 +17358,9 @@ public class ObjectEntryResourceTest {
 			).toString(),
 			endpoint, Http.Method.POST);
 
+		JSONArray jsonArray = null;
 		JSONObject systemPropertiesJSONObject = jsonObject.getJSONObject(
 			"systemProperties");
-
-		JSONArray jsonArray = null;
 
 		if (systemPropertiesJSONObject != null) {
 			jsonArray = systemPropertiesJSONObject.getJSONArray("comments");
