@@ -30,20 +30,18 @@ public class ObjectEntryManagerUtil {
 		if ((objectEntrySystemProperties != null) &&
 			(objectEntrySystemProperties.getComments() != null)) {
 
-			SystemProperties mergedSystemProperties =
+			SystemProperties existingSystemProperties =
 				existingObjectEntry.getSystemProperties();
 
-			if (mergedSystemProperties == null) {
-				mergedSystemProperties = new SystemProperties();
-			}
+			SystemProperties mergedSystemProperties =
+				(existingSystemProperties != null) ? existingSystemProperties :
+					new SystemProperties();
 
-			SystemProperties finalSystemProperties = mergedSystemProperties;
-
-			finalSystemProperties.setComments(
+			mergedSystemProperties.setComments(
 				objectEntrySystemProperties::getComments);
 
 			existingObjectEntry.setSystemProperties(
-				() -> finalSystemProperties);
+				() -> mergedSystemProperties);
 		}
 
 		if (objectEntry.getDateCreated() != null) {
