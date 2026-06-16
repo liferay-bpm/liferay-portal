@@ -30,11 +30,13 @@ import com.liferay.object.field.builder.AttachmentObjectFieldBuilder;
 import com.liferay.object.field.builder.DateTimeObjectFieldBuilder;
 import com.liferay.object.field.builder.PicklistObjectFieldBuilder;
 import com.liferay.object.field.builder.TextObjectFieldBuilder;
+import com.liferay.object.info.item.util.ObjectEntryInfoItemUtil;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
@@ -53,6 +55,7 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -85,6 +88,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -175,6 +179,12 @@ public class ObjectEntryInfoItemFieldValuesProviderTest {
 				Collections.emptyList()
 			).state(
 				false
+			).build(),
+			new TextObjectFieldBuilder(
+			).labelMap(
+				RandomTestUtil.randomLocaleStringMap()
+			).name(
+				"textObjectFieldName"
 			).build());
 
 		_childObjectDefinition =
@@ -195,14 +205,15 @@ public class ObjectEntryInfoItemFieldValuesProviderTest {
 				TestPropsValues.getUserId(),
 				_parentObjectDefinition.getObjectDefinitionId());
 
-		_objectRelationshipLocalService.addObjectRelationship(
-			null, TestPropsValues.getUserId(),
-			_parentObjectDefinition.getObjectDefinitionId(),
-			_childObjectDefinition.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_CASCADE, false,
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			"oneToManyRelationshipName", false,
-			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+		_objectRelationship =
+			_objectRelationshipLocalService.addObjectRelationship(
+				null, TestPropsValues.getUserId(),
+				_parentObjectDefinition.getObjectDefinitionId(),
+				_childObjectDefinition.getObjectDefinitionId(), 0,
+				ObjectRelationshipConstants.DELETION_TYPE_CASCADE, false,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"oneToManyRelationshipName", false,
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 	}
 
 	@FeatureFlag("LPD-17564")
@@ -431,6 +442,77 @@ public class ObjectEntryInfoItemFieldValuesProviderTest {
 		finally {
 			ServiceContextThreadLocal.popServiceContext();
 		}
+	}
+
+	@Test
+	public void testObjectEntryInfoItemFieldValuesProviderWithRelatedObjectEntries()
+		throws Exception {
+
+		ObjectEntry parentObjectEntry = _objectEntryLocalService.addObjectEntry(
+			TestPropsValues.getGroupId(), TestPropsValues.getUserId(),
+			_parentObjectDefinition.getObjectDefinitionId(),
+			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+			null, Collections.emptyMap(),
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId()));
+		ObjectField relationshipObjectField =
+			_objectFieldLocalService.fetchObjectField(
+				_objectRelationship.getObjectFieldId2());
+		String textObjectFieldValue1 = RandomTestUtil.randomString();
+
+		_objectEntryLocalService.addObjectEntry(
+			TestPropsValues.getGroupId(), TestPropsValues.getUserId(),
+			_childObjectDefinition.getObjectDefinitionId(),
+			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+			null,
+			HashMapBuilder.<String, Serializable>put(
+				relationshipObjectField.getName(),
+				parentObjectEntry.getObjectEntryId()
+			).put(
+				"textObjectFieldName", textObjectFieldValue1
+			).build(),
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId()));
+
+		String textObjectFieldValue2 = RandomTestUtil.randomString();
+
+		_objectEntryLocalService.addObjectEntry(
+			TestPropsValues.getGroupId(), TestPropsValues.getUserId(),
+			_childObjectDefinition.getObjectDefinitionId(),
+			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+			null,
+			HashMapBuilder.<String, Serializable>put(
+				relationshipObjectField.getName(),
+				parentObjectEntry.getObjectEntryId()
+			).put(
+				"textObjectFieldName", textObjectFieldValue2
+			).build(),
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId()));
+
+		_pushServiceContext(_getThemeDisplay(StringPool.BLANK, "UTC"));
+
+		InfoItemFieldValuesProvider<ObjectEntry> infoItemFieldValuesProvider =
+			_infoItemServiceRegistry.getFirstInfoItemService(
+				InfoItemFieldValuesProvider.class,
+				_parentObjectDefinition.getClassName());
+
+		InfoItemFieldValues infoItemFieldValues =
+			infoItemFieldValuesProvider.getInfoItemFieldValues(
+				parentObjectEntry);
+
+		String namespace = ObjectEntryInfoItemUtil.getInfoFieldNamespace(
+			_childObjectDefinition, _objectRelationship);
+
+		InfoFieldValue<Object> infoFieldValue =
+			infoItemFieldValues.getInfoFieldValue(
+				namespace + "_textObjectFieldName");
+
+		AssertUtils.assertEquals(
+			Arrays.asList(textObjectFieldValue1, textObjectFieldValue2),
+			(List<String>)infoFieldValue.getValue());
+
+		ServiceContextThreadLocal.popServiceContext();
 	}
 
 	private ObjectDefinition _addObjectDefinition(
@@ -714,6 +796,8 @@ public class ObjectEntryInfoItemFieldValuesProviderTest {
 
 	@Inject
 	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
+
+	private ObjectRelationship _objectRelationship;
 
 	@Inject
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
