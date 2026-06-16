@@ -139,12 +139,6 @@ public class ObjectEntryInfoItemValuesProviderUtil {
 				continue;
 			}
 
-			Object value = values.get(objectField.getName());
-
-			if (objectField.isLocalized()) {
-				value = values.get(objectField.getI18nObjectFieldName());
-			}
-
 			_addInfoFieldValue(
 				defaultLanguageId, dlAppLocalService, dlURLHelper,
 				infoFieldValues, listTypeEntryLocalService, objectDefinition,
@@ -152,7 +146,7 @@ public class ObjectEntryInfoItemValuesProviderUtil {
 				objectFieldInfoFieldConverter,
 				ObjectField.class.getSimpleName(),
 				objectRelationshipLocalService, serviceBuilderObjectEntry,
-				themeDisplay, value);
+				themeDisplay, values);
 
 			if (!objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
@@ -200,13 +194,6 @@ public class ObjectEntryInfoItemValuesProviderUtil {
 					ObjectEntryInfoItemUtil.getInfoFieldNamespace(
 						parentObjectDefinition, objectRelationship);
 
-				value = properties.get(relatedObjectField.getName());
-
-				if (relatedObjectField.isLocalized()) {
-					value = properties.get(
-						relatedObjectField.getI18nObjectFieldName());
-				}
-
 				_addInfoFieldValue(
 					relatedObjectEntryDefaultLanguageId, dlAppLocalService,
 					dlURLHelper, infoFieldValues, listTypeEntryLocalService,
@@ -214,7 +201,7 @@ public class ObjectEntryInfoItemValuesProviderUtil {
 					objectEntryService, relatedObjectField,
 					objectFieldInfoFieldConverter, namespace,
 					objectRelationshipLocalService,
-					serviceBuilderRelatedObjectEntry, themeDisplay, value);
+					serviceBuilderRelatedObjectEntry, themeDisplay, properties);
 
 				infoFieldValues.add(
 					new InfoFieldValue<>(
@@ -329,8 +316,14 @@ public class ObjectEntryInfoItemValuesProviderUtil {
 			String objectFieldNamespace,
 			ObjectRelationshipLocalService objectRelationshipLocalService,
 			com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry,
-			ThemeDisplay themeDisplay, Object value)
+			ThemeDisplay themeDisplay, Map<String, Object> values)
 		throws Exception {
+
+		Object value = values.get(objectField.getName());
+
+		if (objectField.isLocalized()) {
+			value = values.get(objectField.getI18nObjectFieldName());
+		}
 
 		if (value == null) {
 			infoFieldValues.add(
@@ -465,9 +458,12 @@ public class ObjectEntryInfoItemValuesProviderUtil {
 					InfoLocalizedValue<Object> infoLocalizedValue =
 						(InfoLocalizedValue<Object>)infoFieldValue;
 
-					Map<Locale, Object> values = infoLocalizedValue.getValues();
+					Map<Locale, Object> localizedValues =
+						infoLocalizedValue.getValues();
 
-					for (Map.Entry<Locale, Object> entry : values.entrySet()) {
+					for (Map.Entry<Locale, Object> entry :
+							localizedValues.entrySet()) {
+
 						FileEntry fileEntry = dlAppLocalService.fetchFileEntry(
 							GetterUtil.getLong(entry.getValue()));
 
