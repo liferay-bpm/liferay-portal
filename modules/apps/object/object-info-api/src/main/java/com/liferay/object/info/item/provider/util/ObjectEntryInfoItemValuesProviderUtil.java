@@ -39,6 +39,8 @@ import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
+import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManager;
+import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManagerProvider;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectActionLocalService;
@@ -49,6 +51,7 @@ import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -66,6 +69,9 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
+import com.liferay.portal.vulcan.pagination.Page;
+import com.liferay.portal.vulcan.pagination.Pagination;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -74,10 +80,12 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Carolina Barbosa
@@ -302,6 +310,113 @@ public class ObjectEntryInfoItemValuesProviderUtil {
 		}
 
 		return null;
+	}
+
+	public static List<InfoFieldValue<Object>> getRelatedInfoFieldValues(
+			DLAppLocalService dlAppLocalService, DLURLHelper dlURLHelper,
+			ListTypeEntryLocalService listTypeEntryLocalService,
+			ObjectDefinition objectDefinition,
+			ObjectDefinitionLocalService objectDefinitionLocalService,
+			ObjectEntryLocalService objectEntryLocalService,
+			ObjectEntryManagerRegistry objectEntryManagerRegistry,
+			ObjectEntryService objectEntryService,
+			ObjectFieldInfoFieldConverter objectFieldInfoFieldConverter,
+			ObjectFieldLocalService objectFieldLocalService,
+			ObjectRelationshipLocalService objectRelationshipLocalService,
+			com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry,
+			ThemeDisplay themeDisplay)
+		throws Exception {
+
+		if (themeDisplay == null) {
+			return Collections.emptyList();
+		}
+
+		List<InfoFieldValue<Object>> relatedInfoFieldValues = new ArrayList<>();
+
+		for (ObjectRelationship objectRelationship :
+				objectRelationshipLocalService.getObjectRelationships(
+					objectDefinition.getObjectDefinitionId(),
+					ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
+
+			if (objectRelationship.isSelf() ||
+				Objects.equals(
+					objectDefinition.getObjectDefinitionId(),
+					objectRelationship.getObjectDefinitionId2())) {
+
+				continue;
+			}
+
+			ObjectDefinition relatedObjectDefinition =
+				objectDefinitionLocalService.fetchObjectDefinition(
+					objectRelationship.getObjectDefinitionId2());
+
+			if ((relatedObjectDefinition == null) ||
+				!relatedObjectDefinition.isDefaultStorageType() ||
+				relatedObjectDefinition.isUnmodifiableSystemObject()) {
+
+				continue;
+			}
+
+			DefaultObjectEntryManager defaultObjectEntryManager =
+				DefaultObjectEntryManagerProvider.provide(
+					objectEntryManagerRegistry.getObjectEntryManager(
+						relatedObjectDefinition.getCompanyId(),
+						relatedObjectDefinition.getStorageType()));
+
+			Page<ObjectEntry> relatedObjectEntriesPage =
+				defaultObjectEntryManager.getRelatedObjectEntries(
+					null,
+					new DefaultDTOConverterContext(
+						false, null, null, null, null, themeDisplay.getLocale(),
+						null, themeDisplay.getUser()),
+					serviceBuilderObjectEntry.getExternalReferenceCode(), null,
+					objectRelationship,
+					Pagination.of(QueryUtil.ALL_POS, QueryUtil.ALL_POS),
+					String.valueOf(serviceBuilderObjectEntry.getGroupId()),
+					null, null);
+
+			List<ObjectEntry> relatedObjectEntries = ListUtil.fromCollection(
+				relatedObjectEntriesPage.getItems());
+
+			if (ListUtil.isEmpty(relatedObjectEntries)) {
+				continue;
+			}
+
+			for (ObjectField objectField :
+					objectFieldLocalService.getObjectFields(
+						relatedObjectDefinition.getObjectDefinitionId(),
+						false)) {
+
+				List<InfoFieldValue<Object>> infoFieldValues =
+					new ArrayList<>();
+
+				for (ObjectEntry relatedObjectEntry : relatedObjectEntries) {
+					_addInfoFieldValue(
+						relatedObjectEntry.getDefaultLanguageId(),
+						dlAppLocalService, dlURLHelper, infoFieldValues,
+						listTypeEntryLocalService, relatedObjectDefinition,
+						objectEntryLocalService, objectEntryService,
+						objectField, objectFieldInfoFieldConverter,
+						ObjectField.class.getSimpleName(),
+						objectRelationshipLocalService, null, themeDisplay,
+						relatedObjectEntry.getProperties());
+				}
+
+				relatedInfoFieldValues.add(
+					new InfoFieldValue<>(
+						objectFieldInfoFieldConverter.getInfoField(
+							false,
+							ObjectEntryInfoItemUtil.getInfoFieldNamespace(
+								relatedObjectDefinition, objectRelationship),
+							objectField),
+						TransformUtil.transform(
+							infoFieldValues,
+							infoFieldValue -> infoFieldValue.getValue(
+								themeDisplay.getLocale()))));
+			}
+		}
+
+		return relatedInfoFieldValues;
 	}
 
 	private static void _addInfoFieldValue(

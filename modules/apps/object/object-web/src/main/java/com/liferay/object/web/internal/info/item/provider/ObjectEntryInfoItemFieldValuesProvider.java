@@ -269,6 +269,14 @@ public class ObjectEntryInfoItemFieldValuesProvider
 					objectEntry.getObjectDefinitionId()),
 				_objectRelationshipLocalService, _objectScopeProviderRegistry,
 				_portal, objectEntry, themeDisplay, properties));
+		objectEntryFieldValues.addAll(
+			ObjectEntryInfoItemValuesProviderUtil.getRelatedInfoFieldValues(
+				_dlAppLocalService, _dlURLHelper, _listTypeEntryLocalService,
+				_objectDefinition, _objectDefinitionLocalService,
+				_objectEntryLocalService, _objectEntryManagerRegistry,
+				_objectEntryService, _objectFieldInfoFieldConverter,
+				_objectFieldLocalService, _objectRelationshipLocalService,
+				objectEntry, themeDisplay));
 
 		objectEntryFieldValues.add(
 			new InfoFieldValue<>(
