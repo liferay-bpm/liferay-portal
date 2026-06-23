@@ -19,6 +19,7 @@ import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectStateFlowLocalService;
 import com.liferay.object.service.ObjectStateLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.RoleService;
@@ -63,10 +64,10 @@ public class ViewWorkflowTasksSectionDisplayContext
 
 	@Override
 	public String getAPIURL() {
-		String searchURL = WorkflowTaskSearchURLUtil.getSearchURL(
-			objectDefinition.getExternalReferenceCode());
-
-		return searchURL + "&nestedFields=embedded";
+		return StringBundler.concat(
+			WorkflowTaskSearchURLUtil.getSearchURL(
+				objectDefinition.getExternalReferenceCode()),
+			"&nestedFields=embedded");
 	}
 
 	@Override
