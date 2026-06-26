@@ -587,64 +587,6 @@ describe('Field DocumentLibrary', () => {
 			navigator.sendBeacon = originalSendBeacon;
 		});
 
-		it('cleans up intermediate replacements on unload after multiple replaces in edit mode', () => {
-			Liferay.ThemeDisplay.isSignedIn = jest.fn(() => false);
-
-			renderField({
-				allowGuestUsers: true,
-				value: valueWithFileEntry(42),
-			});
-
-			triggerGuestUpload();
-			completeUpload(88);
-			triggerGuestUpload();
-			completeUpload(99);
-			triggerBeforeUnload();
-
-			expectDeleted(88, 99);
-		});
-
-		it('deletes both the previous and current upload on new-entry abandon after replace', () => {
-			Liferay.ThemeDisplay.isSignedIn = jest.fn(() => false);
-
-			renderField({allowGuestUsers: true, value: '{}'});
-
-			triggerGuestUpload();
-			completeUpload(88);
-			triggerGuestUpload();
-			completeUpload(99);
-			triggerBeforeUnload();
-
-			expectDeleted(88, 99);
-		});
-
-		it('deletes only the replacement on unload when replacing in edit mode', () => {
-			Liferay.ThemeDisplay.isSignedIn = jest.fn(() => false);
-
-			renderField({
-				allowGuestUsers: true,
-				value: valueWithFileEntry(42),
-			});
-
-			triggerGuestUpload();
-			completeUpload(99);
-			triggerBeforeUnload();
-
-			expectDeleted(99);
-		});
-
-		it('deletes the new entry session upload on abandon', () => {
-			Liferay.ThemeDisplay.isSignedIn = jest.fn(() => false);
-
-			renderField({allowGuestUsers: true, value: '{}'});
-
-			triggerGuestUpload();
-			completeUpload(99);
-			triggerBeforeUnload();
-
-			expectDeleted(99);
-		});
-
 		it('deletes the original on Save after Clear', () => {
 			renderField({value: valueWithFileEntry(42)});
 
@@ -677,21 +619,6 @@ describe('Field DocumentLibrary', () => {
 			expectNoDeletes();
 		});
 
-		it('cleans up the orphan on SPA navigation away from a replaced entry', () => {
-			Liferay.ThemeDisplay.isSignedIn = jest.fn(() => false);
-
-			renderField({
-				allowGuestUsers: true,
-				value: valueWithFileEntry(42),
-			});
-
-			triggerGuestUpload();
-			completeUpload(99);
-			triggerBeforeNavigate();
-
-			expectDeleted(99);
-		});
-
 		it('does not delete on unload when read-only (LPP-63922)', () => {
 			renderField({readOnly: true, value: valueWithFileEntry(42)});
 
@@ -718,7 +645,34 @@ describe('Field DocumentLibrary', () => {
 			expectNoDeletes();
 		});
 
-		it('preserves the original on Cancel after Replace and cleans the orphan on unload', () => {
+		it('preserves the current replacement on SPA navigation away from a replaced entry', () => {
+			Liferay.ThemeDisplay.isSignedIn = jest.fn(() => false);
+
+			renderField({
+				allowGuestUsers: true,
+				value: valueWithFileEntry(42),
+			});
+
+			triggerGuestUpload();
+			completeUpload(99);
+			triggerBeforeNavigate();
+
+			expectNoDeletes();
+		});
+
+		it('preserves the new entry session upload on abandon', () => {
+			Liferay.ThemeDisplay.isSignedIn = jest.fn(() => false);
+
+			renderField({allowGuestUsers: true, value: '{}'});
+
+			triggerGuestUpload();
+			completeUpload(99);
+			triggerBeforeUnload();
+
+			expectNoDeletes();
+		});
+
+		it('preserves the original and the current replacement on unload after replace in edit mode', () => {
 			Liferay.ThemeDisplay.isSignedIn = jest.fn(() => false);
 
 			renderField({
@@ -730,7 +684,38 @@ describe('Field DocumentLibrary', () => {
 			completeUpload(99);
 			triggerBeforeUnload();
 
-			expectDeleted(99);
+			expectNoDeletes();
+		});
+
+		it('reclaims intermediate replacements but preserves the current upload on unload in edit mode', () => {
+			Liferay.ThemeDisplay.isSignedIn = jest.fn(() => false);
+
+			renderField({
+				allowGuestUsers: true,
+				value: valueWithFileEntry(42),
+			});
+
+			triggerGuestUpload();
+			completeUpload(88);
+			triggerGuestUpload();
+			completeUpload(99);
+			triggerBeforeUnload();
+
+			expectDeleted(88);
+		});
+
+		it('reclaims the superseded upload but preserves the current upload on new-entry abandon after replace', () => {
+			Liferay.ThemeDisplay.isSignedIn = jest.fn(() => false);
+
+			renderField({allowGuestUsers: true, value: '{}'});
+
+			triggerGuestUpload();
+			completeUpload(88);
+			triggerGuestUpload();
+			completeUpload(99);
+			triggerBeforeUnload();
+
+			expectDeleted(88);
 		});
 	});
 });

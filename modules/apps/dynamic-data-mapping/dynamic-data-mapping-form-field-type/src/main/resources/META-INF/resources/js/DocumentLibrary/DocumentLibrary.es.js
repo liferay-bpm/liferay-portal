@@ -322,7 +322,6 @@ const GuestUploadFile = ({
 };
 
 function useFileLifecycle({
-	currentValue,
 	fileEntryDeleteURL,
 	portletNamespace,
 	readOnly,
@@ -390,15 +389,7 @@ function useFileLifecycle({
 				return;
 			}
 
-			const currentFileEntryId = getFileEntryId(currentValue);
 			const originalFileEntryId = originalFileEntryIdRef.current;
-
-			if (
-				currentFileEntryId &&
-				currentFileEntryId !== originalFileEntryId
-			) {
-				deleteFileEntry(currentFileEntryId, {beacon: true});
-			}
 
 			pendingDeletionsRef.current.forEach((fileEntryId) => {
 				if (fileEntryId !== originalFileEntryId) {
@@ -414,7 +405,7 @@ function useFileLifecycle({
 			window.removeEventListener('beforeunload', handleBeforeUnload);
 			Liferay.detach('beforeNavigate', handleBeforeUnload);
 		};
-	}, [currentValue, deleteFileEntry, readOnly]);
+	}, [deleteFileEntry, readOnly]);
 
 	useEffect(() => {
 		const onSubmit = () => {
@@ -476,7 +467,6 @@ const Main = ({
 	const [progress, setProgress] = useState(0);
 
 	const {stagePendingDeletion} = useFileLifecycle({
-		currentValue,
 		fileEntryDeleteURL,
 		portletNamespace,
 		readOnly,
