@@ -20,12 +20,14 @@ import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
+import com.liferay.dynamic.data.mapping.test.util.DDMFormLayoutTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -62,7 +64,32 @@ public class AddFormInstanceRecordMVCCommandUtilTest {
 			false, RandomTestUtil.randomBoolean(),
 			new UnlocalizedValue(_STRING_VALUE));
 
-		_assertDDMFormFields(false, new UnlocalizedValue(StringPool.BLANK));
+		_assertDDMFormFields(
+			false, new UnlocalizedValue(StringPool.BLANK), true);
+	}
+
+	@Test
+	public void testDisabledPageField() throws Exception {
+		DDMForm ddmForm = DDMFormTestUtil.createDDMForm();
+
+		_createDDMFormFields(ddmForm, false, RandomTestUtil.randomBoolean());
+
+		_createDDMFormValues(ddmForm, new UnlocalizedValue(_STRING_VALUE));
+
+		AddFormInstanceRecordMVCCommandUtil.updateNonevaluableDDMFormFields(
+			ddmForm.getDDMFormFieldsMap(true), Collections.emptyMap(),
+			_ddmFormValues.getDDMFormFieldValuesMap(true),
+			DDMFormLayoutTestUtil.createDDMFormLayout(
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				new String[] {_FIELD_NAME, _NESTED_FIELD_NAME}),
+			Collections.singleton(0));
+
+		Assert.assertTrue(
+			GetterUtil.getBoolean(
+				_ddmFormField.getProperty("persistNonevaluableValue")));
+		Assert.assertEquals(
+			new UnlocalizedValue(StringPool.BLANK),
+			_getFieldValue(_FIELD_NAME));
 	}
 
 	@Test
@@ -75,7 +102,8 @@ public class AddFormInstanceRecordMVCCommandUtilTest {
 			).build(),
 			false, required, new UnlocalizedValue(_STRING_VALUE));
 
-		_assertDDMFormFields(required, new UnlocalizedValue(_STRING_VALUE));
+		_assertDDMFormFields(
+			required, new UnlocalizedValue(_STRING_VALUE), false);
 	}
 
 	@Test
@@ -99,6 +127,10 @@ public class AddFormInstanceRecordMVCCommandUtilTest {
 		Assert.assertEquals(
 			StringPool.BLANK, value.getString(LocaleUtil.BRAZIL));
 		Assert.assertEquals(StringPool.BLANK, value.getString(LocaleUtil.US));
+
+		Assert.assertTrue(
+			GetterUtil.getBoolean(
+				_ddmFormField.getProperty("persistNonevaluableValue")));
 	}
 
 	@Test
@@ -110,7 +142,8 @@ public class AddFormInstanceRecordMVCCommandUtilTest {
 			false, RandomTestUtil.randomBoolean(),
 			new UnlocalizedValue(_STRING_VALUE));
 
-		_assertDDMFormFields(false, new UnlocalizedValue(StringPool.BLANK));
+		_assertDDMFormFields(
+			false, new UnlocalizedValue(StringPool.BLANK), true);
 	}
 
 	@Test
@@ -122,7 +155,7 @@ public class AddFormInstanceRecordMVCCommandUtilTest {
 			RandomTestUtil.randomBoolean(), RandomTestUtil.randomBoolean(),
 			null);
 
-		_assertDDMFormFields(false, null);
+		_assertDDMFormFields(false, null, true);
 	}
 
 	@Test(expected = FormInstanceExpiredException.class)
@@ -164,13 +197,19 @@ public class AddFormInstanceRecordMVCCommandUtilTest {
 			).build(),
 			false, required, new UnlocalizedValue(_STRING_VALUE));
 
-		_assertDDMFormFields(required, new UnlocalizedValue(_STRING_VALUE));
+		_assertDDMFormFields(
+			required, new UnlocalizedValue(_STRING_VALUE), false);
 	}
 
 	private void _assertDDMFormFields(
-		boolean expectedRequired, Value expectedValue) {
+		boolean expectedRequired, Value expectedValue,
+		boolean expectedPersistNonevaluableValue) {
 
 		Assert.assertEquals(expectedRequired, _ddmFormField.isRequired());
+		Assert.assertEquals(
+			expectedPersistNonevaluableValue,
+			GetterUtil.getBoolean(
+				_ddmFormField.getProperty("persistNonevaluableValue")));
 		Assert.assertEquals(expectedValue, _getFieldValue(_FIELD_NAME));
 		Assert.assertEquals(expectedValue, _getFieldValue(_NESTED_FIELD_NAME));
 	}
