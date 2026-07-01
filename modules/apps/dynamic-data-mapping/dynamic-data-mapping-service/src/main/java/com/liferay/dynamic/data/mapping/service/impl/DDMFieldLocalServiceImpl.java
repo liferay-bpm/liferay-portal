@@ -868,7 +868,7 @@ public class DDMFieldLocalServiceImpl extends DDMFieldLocalServiceBaseImpl {
 
 			DDMField ddmField = ddmFieldEntry.getKey();
 
-			if (_persistReadOnlyValues(
+			if (_persistFieldValues(
 					ddmField, ddmFieldAttributeEntries, ddmFieldInfosMap,
 					ddmFieldsAttributesMap, ddmFormFieldsMap)) {
 
@@ -1096,7 +1096,7 @@ public class DDMFieldLocalServiceImpl extends DDMFieldLocalServiceBaseImpl {
 		return jsonObject.toString();
 	}
 
-	private boolean _persistReadOnlyValues(
+	private boolean _persistFieldValues(
 		DDMField ddmField,
 		List<Map.Entry<DDMFieldAttribute, DDMFieldAttributeInfo>>
 			ddmFieldAttributeEntries,
@@ -1114,8 +1114,10 @@ public class DDMFieldLocalServiceImpl extends DDMFieldLocalServiceBaseImpl {
 			ddmField.getFieldName());
 
 		if ((ddmFormField == null) ||
-			!GetterUtil.getBoolean(
-				ddmFormField.getProperty("persistReadOnlyValue"))) {
+			(!GetterUtil.getBoolean(
+				ddmFormField.getProperty("persistNonevaluableValue")) &&
+			 !GetterUtil.getBoolean(
+				 ddmFormField.getProperty("persistReadOnlyValue")))) {
 
 			return false;
 		}
