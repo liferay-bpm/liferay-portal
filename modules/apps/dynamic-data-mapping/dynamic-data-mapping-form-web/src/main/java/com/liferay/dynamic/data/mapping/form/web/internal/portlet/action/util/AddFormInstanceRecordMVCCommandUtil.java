@@ -91,6 +91,7 @@ public class AddFormInstanceRecordMVCCommandUtil {
 			}
 
 			ddmFormField.setDDMFormFieldValidation(null);
+			ddmFormField.setProperty("persistNonevaluableValue", true);
 			ddmFormField.setRequired(false);
 
 			for (DDMFormFieldValue ddmFormFieldValue :
