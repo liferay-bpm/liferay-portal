@@ -24,6 +24,7 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -33,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -45,6 +47,7 @@ public class AddFormInstanceRecordMVCCommandUtil {
 			Map<DDMFormEvaluatorFieldContextKey, Map<String, Object>>
 				ddmFormFieldsPropertyChanges,
 			Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap,
+			Map<String, List<DDMFormFieldValue>> existingDDMFormFieldValuesMap,
 			DDMFormLayout ddmFormLayout, Set<Integer> disabledPagesIndexes)
 		throws Exception {
 
@@ -102,7 +105,13 @@ public class AddFormInstanceRecordMVCCommandUtil {
 					continue;
 				}
 
-				if (ddmFormField.isLocalizable()) {
+				Value existingValue = _getExistingValue(
+					existingDDMFormFieldValuesMap, ddmFormFieldValue);
+
+				if (existingValue != null) {
+					ddmFormFieldValue.setValue(existingValue);
+				}
+				else if (ddmFormField.isLocalizable()) {
 					LocalizedValue localizedValue = new LocalizedValue(
 						value.getDefaultLocale());
 
@@ -180,6 +189,42 @@ public class AddFormInstanceRecordMVCCommandUtil {
 					" has already submitted an entry in form instance ",
 					ddmFormInstance.getFormInstanceId()));
 		}
+	}
+
+	private static Value _getExistingValue(
+		Map<String, List<DDMFormFieldValue>> existingDDMFormFieldValuesMap,
+		DDMFormFieldValue ddmFormFieldValue) {
+
+		if (existingDDMFormFieldValuesMap == null) {
+			return null;
+		}
+
+		List<DDMFormFieldValue> existingDDMFormFieldValues =
+			existingDDMFormFieldValuesMap.get(ddmFormFieldValue.getName());
+
+		if (ListUtil.isEmpty(existingDDMFormFieldValues)) {
+			return null;
+		}
+
+		for (DDMFormFieldValue existingDDMFormFieldValue :
+				existingDDMFormFieldValues) {
+
+			if (Objects.equals(
+					existingDDMFormFieldValue.getInstanceId(),
+					ddmFormFieldValue.getInstanceId())) {
+
+				return existingDDMFormFieldValue.getValue();
+			}
+		}
+
+		if (existingDDMFormFieldValues.size() == 1) {
+			DDMFormFieldValue existingDDMFormFieldValue =
+				existingDDMFormFieldValues.get(0);
+
+			return existingDDMFormFieldValue.getValue();
+		}
+
+		return null;
 	}
 
 }

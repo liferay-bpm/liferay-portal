@@ -30,6 +30,7 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService;
+import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -55,6 +56,7 @@ import jakarta.portlet.ActionRequest;
 import jakarta.portlet.ActionResponse;
 import jakarta.portlet.PortletSession;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -150,11 +152,29 @@ public class AddFormInstanceRecordMVCActionCommand
 
 		DDMStructure ddmStructure = ddmFormInstance.getStructure();
 
+		long formInstanceRecordId = ParamUtil.getLong(
+			actionRequest, "formInstanceRecordId");
+
+		Map<String, List<DDMFormFieldValue>> existingDDMFormFieldValuesMap =
+			null;
+
+		if (formInstanceRecordId != 0) {
+			DDMFormInstanceRecord ddmFormInstanceRecord =
+				_ddmFormInstanceRecordService.getFormInstanceRecord(
+					formInstanceRecordId);
+
+			DDMFormValues existingDDMFormValues =
+				ddmFormInstanceRecord.getDDMFormValues();
+
+			existingDDMFormFieldValuesMap =
+				existingDDMFormValues.getDDMFormFieldValuesMap(true);
+		}
+
 		AddFormInstanceRecordMVCCommandUtil.updateNonevaluableDDMFormFields(
 			ddmForm.getDDMFormFieldsMap(true),
 			ddmFormEvaluatorEvaluateResponse.getDDMFormFieldsPropertyChanges(),
 			ddmFormValues.getDDMFormFieldValuesMap(true),
-			ddmStructure.getDDMFormLayout(),
+			existingDDMFormFieldValuesMap, ddmStructure.getDDMFormLayout(),
 			ddmFormEvaluatorEvaluateResponse.getDisabledPagesIndexes());
 
 		AddFormInstanceRecordMVCCommandUtil.updateReadOnlyDDMFormFields(
