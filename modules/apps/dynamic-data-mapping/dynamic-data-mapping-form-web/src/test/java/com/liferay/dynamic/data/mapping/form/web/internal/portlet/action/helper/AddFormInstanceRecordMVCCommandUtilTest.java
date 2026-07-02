@@ -33,6 +33,7 @@ import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import jakarta.portlet.ActionRequest;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -114,6 +115,20 @@ public class AddFormInstanceRecordMVCCommandUtilTest {
 	}
 
 	@Test
+	public void testInvisibleFieldWithExistingValue() throws Exception {
+		_updateNonevaluableDDMFormFields(
+			HashMapBuilder.<String, Object>put(
+				"visible", false
+			).build(),
+			false, RandomTestUtil.randomBoolean(),
+			new UnlocalizedValue(StringPool.BLANK),
+			_createExistingDDMFormFieldValuesMap(
+				new UnlocalizedValue(_STRING_VALUE)));
+
+		_assertDDMFormFields(false, new UnlocalizedValue(_STRING_VALUE));
+	}
+
+	@Test
 	public void testInvisibleFieldWithNullValue() throws Exception {
 		_updateNonevaluableDDMFormFields(
 			HashMapBuilder.<String, Object>put(
@@ -123,6 +138,32 @@ public class AddFormInstanceRecordMVCCommandUtilTest {
 			null);
 
 		_assertDDMFormFields(false, null);
+	}
+
+	@Test
+	public void testInvisibleFieldWithUnmatchedRepeatableExistingValues()
+		throws Exception {
+
+		_updateNonevaluableDDMFormFields(
+			HashMapBuilder.<String, Object>put(
+				"visible", false
+			).build(),
+			false, RandomTestUtil.randomBoolean(),
+			new UnlocalizedValue(_STRING_VALUE),
+			HashMapBuilder.<String, List<DDMFormFieldValue>>put(
+				_FIELD_NAME,
+				Arrays.asList(
+					DDMFormValuesTestUtil.createDDMFormFieldValue(
+						RandomTestUtil.randomString(), _FIELD_NAME,
+						new UnlocalizedValue(RandomTestUtil.randomString())),
+					DDMFormValuesTestUtil.createDDMFormFieldValue(
+						RandomTestUtil.randomString(), _FIELD_NAME,
+						new UnlocalizedValue(RandomTestUtil.randomString())))
+			).build());
+
+		Assert.assertEquals(
+			new UnlocalizedValue(StringPool.BLANK),
+			_getFieldValue(_FIELD_NAME));
 	}
 
 	@Test(expected = FormInstanceExpiredException.class)
@@ -210,6 +251,22 @@ public class AddFormInstanceRecordMVCCommandUtilTest {
 				_NESTED_FIELD_INSTANCE_ID, _NESTED_FIELD_NAME, value));
 
 		_ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
+	}
+
+	private Map<String, List<DDMFormFieldValue>>
+		_createExistingDDMFormFieldValuesMap(Value value) {
+
+		return HashMapBuilder.<String, List<DDMFormFieldValue>>put(
+			_FIELD_NAME,
+			Collections.singletonList(
+				DDMFormValuesTestUtil.createDDMFormFieldValue(
+					_FIELD_INSTANCE_ID, _FIELD_NAME, value))
+		).put(
+			_NESTED_FIELD_NAME,
+			Collections.singletonList(
+				DDMFormValuesTestUtil.createDDMFormFieldValue(
+					_NESTED_FIELD_INSTANCE_ID, _NESTED_FIELD_NAME, value))
+		).build();
 	}
 
 	private Value _getFieldValue(String fieldName) {
@@ -304,6 +361,16 @@ public class AddFormInstanceRecordMVCCommandUtilTest {
 			boolean required, Value value)
 		throws Exception {
 
+		_updateNonevaluableDDMFormFields(
+			fieldChangesProperties, localizable, required, value, null);
+	}
+
+	private void _updateNonevaluableDDMFormFields(
+			Map<String, Object> fieldChangesProperties, boolean localizable,
+			boolean required, Value value,
+			Map<String, List<DDMFormFieldValue>> existingDDMFormFieldValuesMap)
+		throws Exception {
+
 		DDMForm ddmForm = DDMFormTestUtil.createDDMForm();
 
 		_createDDMFormFields(ddmForm, localizable, required);
@@ -321,7 +388,8 @@ public class AddFormInstanceRecordMVCCommandUtilTest {
 					_NESTED_FIELD_NAME, _NESTED_FIELD_INSTANCE_ID),
 				fieldChangesProperties
 			).build(),
-			_ddmFormValues.getDDMFormFieldValuesMap(true), new DDMFormLayout(),
+			_ddmFormValues.getDDMFormFieldValuesMap(true),
+			existingDDMFormFieldValuesMap, new DDMFormLayout(),
 			Collections.emptySet());
 	}
 
