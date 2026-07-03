@@ -67,11 +67,6 @@ public class AddFormInstanceRecordMVCCommandUtil {
 			return;
 		}
 
-		// Keep every field a rule has hidden exactly as it was persisted,
-		// dropping whatever was submitted for it, so editing an entry does not
-		// blank a hidden field (LPP-64665). Nested fields are handled
-		// recursively and the original field order is preserved.
-
 		ddmFormValues.setDDMFormFieldValues(
 			_restoreInvisibleDDMFormFieldValues(
 				invisibleDDMFormFieldNames,
