@@ -125,6 +125,68 @@ public class AddFormInstanceRecordMVCCommandUtilTest {
 		_assertDDMFormFields(false, null);
 	}
 
+	@Test
+	public void testInvisibleRepeatableFieldKeepsAllPersistedInstances()
+		throws Exception {
+
+		DDMForm ddmForm = DDMFormTestUtil.createDDMForm();
+
+		DDMFormField ddmFormField = DDMFormTestUtil.createTextDDMFormField(
+			_FIELD_NAME, false, false, false);
+
+		ddmFormField.setRepeatable(true);
+
+		ddmForm.addDDMFormField(ddmFormField);
+
+		DDMFormValues ddmFormValues = DDMFormValuesTestUtil.createDDMFormValues(
+			ddmForm);
+
+		ddmFormValues.addDDMFormFieldValue(
+			DDMFormValuesTestUtil.createDDMFormFieldValue(
+				"instanceId0", _FIELD_NAME,
+				new UnlocalizedValue(StringPool.BLANK)));
+
+		DDMFormValues persistedDDMFormValues =
+			DDMFormValuesTestUtil.createDDMFormValues(ddmForm);
+
+		persistedDDMFormValues.addDDMFormFieldValue(
+			DDMFormValuesTestUtil.createDDMFormFieldValue(
+				"instanceId0", _FIELD_NAME, new UnlocalizedValue("value0")));
+		persistedDDMFormValues.addDDMFormFieldValue(
+			DDMFormValuesTestUtil.createDDMFormFieldValue(
+				"instanceId1", _FIELD_NAME, new UnlocalizedValue("value1")));
+
+		AddFormInstanceRecordMVCCommandUtil.updateInvisibleDDMFormFieldValues(
+			HashMapBuilder.put(
+				new DDMFormEvaluatorFieldContextKey(_FIELD_NAME, "instanceId0"),
+				HashMapBuilder.<String, Object>put(
+					"visible", false
+				).build()
+			).build(),
+			ddmFormValues, persistedDDMFormValues);
+
+		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
+			ddmFormValues.getDDMFormFieldValuesMap(false);
+
+		List<DDMFormFieldValue> ddmFormFieldValues = ddmFormFieldValuesMap.get(
+			_FIELD_NAME);
+
+		Assert.assertEquals(
+			ddmFormFieldValues.toString(), 2, ddmFormFieldValues.size());
+
+		DDMFormFieldValue ddmFormFieldValue = ddmFormFieldValues.get(0);
+
+		Value value = ddmFormFieldValue.getValue();
+
+		Assert.assertEquals("value0", value.getString(LocaleUtil.US));
+
+		ddmFormFieldValue = ddmFormFieldValues.get(1);
+
+		value = ddmFormFieldValue.getValue();
+
+		Assert.assertEquals("value1", value.getString(LocaleUtil.US));
+	}
+
 	@Test(expected = FormInstanceExpiredException.class)
 	public void testValidateExpirationStatus() throws Exception {
 		ThemeDisplay themeDisplay = _mockThemeDisplay();
