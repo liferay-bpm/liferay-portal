@@ -126,6 +126,66 @@ public class AddFormInstanceRecordMVCCommandUtilTest {
 	}
 
 	@Test
+	public void testInvisibleNestedFieldKeepsPersistedValue() throws Exception {
+		DDMFormFieldValue ddmFormFieldValue =
+			DDMFormValuesTestUtil.createDDMFormFieldValue(
+				"parentInstanceId", "parent", new UnlocalizedValue(""));
+
+		ddmFormFieldValue.addNestedDDMFormFieldValue(
+			DDMFormValuesTestUtil.createDDMFormFieldValue(
+				"childInstanceId", "child",
+				new UnlocalizedValue(StringPool.BLANK)));
+
+		DDMFormValues ddmFormValues = DDMFormValuesTestUtil.createDDMFormValues(
+			DDMFormTestUtil.createDDMForm());
+
+		ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
+
+		DDMFormFieldValue persistedDDMFormFieldValue =
+			DDMFormValuesTestUtil.createDDMFormFieldValue(
+				"parentInstanceId", "parent", new UnlocalizedValue(""));
+
+		persistedDDMFormFieldValue.addNestedDDMFormFieldValue(
+			DDMFormValuesTestUtil.createDDMFormFieldValue(
+				"childInstanceId", "child", new UnlocalizedValue("kept")));
+
+		DDMFormValues persistedDDMFormValues =
+			DDMFormValuesTestUtil.createDDMFormValues(
+				DDMFormTestUtil.createDDMForm());
+
+		persistedDDMFormValues.addDDMFormFieldValue(persistedDDMFormFieldValue);
+
+		AddFormInstanceRecordMVCCommandUtil.updateInvisibleDDMFormFieldValues(
+			HashMapBuilder.put(
+				new DDMFormEvaluatorFieldContextKey("child", "childInstanceId"),
+				HashMapBuilder.<String, Object>put(
+					"visible", false
+				).build()
+			).build(),
+			ddmFormValues, persistedDDMFormValues);
+
+		DDMFormFieldValue parentDDMFormFieldValue =
+			ddmFormValues.getDDMFormFieldValues(
+			).get(
+				0
+			);
+
+		List<DDMFormFieldValue> nestedDDMFormFieldValues =
+			parentDDMFormFieldValue.getNestedDDMFormFieldValues();
+
+		Assert.assertEquals(
+			nestedDDMFormFieldValues.toString(), 1,
+			nestedDDMFormFieldValues.size());
+
+		DDMFormFieldValue childDDMFormFieldValue = nestedDDMFormFieldValues.get(
+			0);
+
+		Value value = childDDMFormFieldValue.getValue();
+
+		Assert.assertEquals("kept", value.getString(LocaleUtil.US));
+	}
+
+	@Test
 	public void testInvisibleRepeatableFieldKeepsAllPersistedInstances()
 		throws Exception {
 
