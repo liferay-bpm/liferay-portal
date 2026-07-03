@@ -67,29 +67,16 @@ public class AddFormInstanceRecordMVCCommandUtil {
 			return;
 		}
 
-		List<DDMFormFieldValue> newDDMFormFieldValues = new ArrayList<>();
+		// Keep every field a rule has hidden exactly as it was persisted,
+		// dropping whatever was submitted for it, so editing an entry does not
+		// blank a hidden field (LPP-64665). Nested fields are handled
+		// recursively and the original field order is preserved.
 
-		for (DDMFormFieldValue ddmFormFieldValue :
-				ddmFormValues.getDDMFormFieldValues()) {
-
-			if (!invisibleDDMFormFieldNames.contains(
-					ddmFormFieldValue.getName())) {
-
-				newDDMFormFieldValues.add(ddmFormFieldValue);
-			}
-		}
-
-		for (DDMFormFieldValue persistedDDMFormFieldValue :
-				persistedDDMFormValues.getDDMFormFieldValues()) {
-
-			if (invisibleDDMFormFieldNames.contains(
-					persistedDDMFormFieldValue.getName())) {
-
-				newDDMFormFieldValues.add(persistedDDMFormFieldValue);
-			}
-		}
-
-		ddmFormValues.setDDMFormFieldValues(newDDMFormFieldValues);
+		ddmFormValues.setDDMFormFieldValues(
+			_restoreInvisibleDDMFormFieldValues(
+				invisibleDDMFormFieldNames,
+				ddmFormValues.getDDMFormFieldValues(),
+				persistedDDMFormValues.getDDMFormFieldValues()));
 	}
 
 	public static void updateNonevaluableDDMFormFields(
@@ -232,6 +219,108 @@ public class AddFormInstanceRecordMVCCommandUtil {
 					" has already submitted an entry in form instance ",
 					ddmFormInstance.getFormInstanceId()));
 		}
+	}
+
+	private static void _addDDMFormFieldValuesByName(
+		List<DDMFormFieldValue> ddmFormFieldValues,
+		List<DDMFormFieldValue> sourceDDMFormFieldValues, String name) {
+
+		for (DDMFormFieldValue sourceDDMFormFieldValue :
+				sourceDDMFormFieldValues) {
+
+			if (name.equals(sourceDDMFormFieldValue.getName())) {
+				ddmFormFieldValues.add(sourceDDMFormFieldValue);
+			}
+		}
+	}
+
+	private static DDMFormFieldValue _getDDMFormFieldValueByInstanceId(
+		List<DDMFormFieldValue> ddmFormFieldValues, String instanceId) {
+
+		if (instanceId == null) {
+			return null;
+		}
+
+		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
+			if (instanceId.equals(ddmFormFieldValue.getInstanceId())) {
+				return ddmFormFieldValue;
+			}
+		}
+
+		return null;
+	}
+
+	private static List<DDMFormFieldValue> _restoreInvisibleDDMFormFieldValues(
+		Set<String> invisibleDDMFormFieldNames,
+		List<DDMFormFieldValue> ddmFormFieldValues,
+		List<DDMFormFieldValue> persistedDDMFormFieldValues) {
+
+		List<DDMFormFieldValue> newDDMFormFieldValues = new ArrayList<>();
+
+		Set<String> restoredDDMFormFieldNames = new HashSet<>();
+
+		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
+			String name = ddmFormFieldValue.getName();
+
+			if (invisibleDDMFormFieldNames.contains(name)) {
+				if (!restoredDDMFormFieldNames.contains(name)) {
+					_addDDMFormFieldValuesByName(
+						newDDMFormFieldValues, persistedDDMFormFieldValues,
+						name);
+
+					restoredDDMFormFieldNames.add(name);
+				}
+
+				continue;
+			}
+
+			DDMFormFieldValue persistedDDMFormFieldValue =
+				_getDDMFormFieldValueByInstanceId(
+					persistedDDMFormFieldValues,
+					ddmFormFieldValue.getInstanceId());
+
+			if (persistedDDMFormFieldValue != null) {
+				List<DDMFormFieldValue> nestedDDMFormFieldValues =
+					ddmFormFieldValue.getNestedDDMFormFieldValues();
+
+				if (!nestedDDMFormFieldValues.isEmpty()) {
+					List<DDMFormFieldValue> newNestedDDMFormFieldValues =
+						_restoreInvisibleDDMFormFieldValues(
+							invisibleDDMFormFieldNames,
+							nestedDDMFormFieldValues,
+							persistedDDMFormFieldValue.
+								getNestedDDMFormFieldValues());
+
+					nestedDDMFormFieldValues.clear();
+
+					for (DDMFormFieldValue newNestedDDMFormFieldValue :
+							newNestedDDMFormFieldValues) {
+
+						ddmFormFieldValue.addNestedDDMFormFieldValue(
+							newNestedDDMFormFieldValue);
+					}
+				}
+			}
+
+			newDDMFormFieldValues.add(ddmFormFieldValue);
+		}
+
+		for (DDMFormFieldValue persistedDDMFormFieldValue :
+				persistedDDMFormFieldValues) {
+
+			String name = persistedDDMFormFieldValue.getName();
+
+			if (invisibleDDMFormFieldNames.contains(name) &&
+				!restoredDDMFormFieldNames.contains(name)) {
+
+				_addDDMFormFieldValuesByName(
+					newDDMFormFieldValues, persistedDDMFormFieldValues, name);
+
+				restoredDDMFormFieldNames.add(name);
+			}
+		}
+
+		return newDDMFormFieldValues;
 	}
 
 }
