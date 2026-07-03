@@ -282,14 +282,17 @@ public class AddFormInstanceRecordMVCCommandUtil {
 			if (persistedDDMFormFieldValue != null) {
 				List<DDMFormFieldValue> nestedDDMFormFieldValues =
 					ddmFormFieldValue.getNestedDDMFormFieldValues();
+				List<DDMFormFieldValue> persistedNestedDDMFormFieldValues =
+					persistedDDMFormFieldValue.getNestedDDMFormFieldValues();
 
-				if (!nestedDDMFormFieldValues.isEmpty()) {
+				if (!nestedDDMFormFieldValues.isEmpty() ||
+					!persistedNestedDDMFormFieldValues.isEmpty()) {
+
 					List<DDMFormFieldValue> newNestedDDMFormFieldValues =
 						_restoreInvisibleDDMFormFieldValues(
 							invisibleDDMFormFieldNames,
 							nestedDDMFormFieldValues,
-							persistedDDMFormFieldValue.
-								getNestedDDMFormFieldValues());
+							persistedNestedDDMFormFieldValues);
 
 					nestedDDMFormFieldValues.clear();
 
