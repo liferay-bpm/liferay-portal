@@ -394,8 +394,9 @@ public class ObjectEntriesTableFDSView extends BaseTableFDSView {
 
 		if (Validator.isNull(objectField.getRelationshipType())) {
 			_addFDSTableSchemaField(
-				objectField.getBusinessType(), null, objectField.getDBType(),
-				fdsTableSchemaBuilder,
+				objectField.getBusinessType(),
+				_getLocalizedTextContentRenderer(objectField),
+				objectField.getDBType(), fdsTableSchemaBuilder,
 				_getFieldName(
 					objectField.getBusinessType(), objectField.getName()),
 				label, false, objectField.getObjectFieldSettings(),
@@ -514,6 +515,20 @@ public class ObjectEntriesTableFDSView extends BaseTableFDSView {
 		}
 
 		return defaultLabel;
+	}
+
+	private String _getLocalizedTextContentRenderer(ObjectField objectField) {
+
+		// A localized field displays the value in the request locale, falling
+		// back to the site default language and then to nothing. Render the
+		// value the REST layer already resolved for the entry instead of
+		// letting the data set fall back to any available translation.
+
+		if (objectField.isLocalized()) {
+			return "localizedTextDataRenderer";
+		}
+
+		return null;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
