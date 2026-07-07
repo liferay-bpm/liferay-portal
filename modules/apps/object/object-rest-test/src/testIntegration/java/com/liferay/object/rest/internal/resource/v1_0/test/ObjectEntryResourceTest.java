@@ -6198,6 +6198,66 @@ public class ObjectEntryResourceTest {
 	}
 
 	@Test
+	public void testGetObjectEntriesPageWithFilterOnMtoMRelatedLocalizedField()
+		throws Exception {
+
+		ObjectDefinition objectDefinition1 =
+			_createObjectDefinitionWithLocalizedTextField(
+				ObjectDefinitionTestUtil.getRandomName(),
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+		ObjectDefinition objectDefinition2 =
+			_createObjectDefinitionWithLocalizedTextField(
+				ObjectDefinitionTestUtil.getRandomName(),
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		String objectEntryValue1 = RandomTestUtil.randomString();
+
+		ObjectEntry objectEntry1 = ObjectEntryTestUtil.addObjectEntry(
+			objectDefinition1,
+			HashMapBuilder.<String, Serializable>put(
+				_OBJECT_FIELD_NAME_TEXT, objectEntryValue1
+			).put(
+				_OBJECT_FIELD_NAME_TEXT + "_i18n",
+				HashMapBuilder.<String, Serializable>put(
+					"en_US", objectEntryValue1
+				).build()
+			).build());
+
+		String objectEntryValue2 = RandomTestUtil.randomString();
+
+		ObjectEntry objectEntry2 = ObjectEntryTestUtil.addObjectEntry(
+			objectDefinition2,
+			HashMapBuilder.<String, Serializable>put(
+				_OBJECT_FIELD_NAME_TEXT, objectEntryValue2
+			).put(
+				_OBJECT_FIELD_NAME_TEXT + "_i18n",
+				HashMapBuilder.<String, Serializable>put(
+					"en_US", objectEntryValue2
+				).build()
+			).build());
+
+		ObjectRelationship objectRelationship =
+			_addObjectRelationshipAndRelateObjectEntries(
+				objectDefinition1, objectDefinition2,
+				objectEntry1.getObjectEntryId(),
+				objectEntry2.getObjectEntryId(),
+				ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
+
+		_assertObjectEntriesPageWithFilterOnRelatedLocalizedField(
+			objectDefinition1, objectEntryValue1, objectEntryValue2,
+			objectRelationship);
+		_assertObjectEntriesPageWithFilterOnRelatedLocalizedField(
+			objectDefinition2, objectEntryValue2, objectEntryValue1,
+			objectRelationship);
+
+		_objectRelationshipLocalService.deleteObjectRelationship(
+			objectRelationship);
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition1);
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition2);
+	}
+
+	@Test
 	public void testGetObjectEntriesPageWithLocalizedObjectField()
 		throws Exception {
 
@@ -16283,6 +16343,41 @@ public class ObjectEntryResourceTest {
 		Assert.assertNull(jsonObject.get("title"));
 	}
 
+	private void _assertObjectEntriesPageWithFilterOnRelatedLocalizedField(
+			ObjectDefinition objectDefinition, String expectedObjectFieldValue,
+			String relatedObjectFieldValue,
+			ObjectRelationship objectRelationship)
+		throws Exception {
+
+		String filterString = StringBundler.concat(
+			objectRelationship.getName(), "/", _OBJECT_FIELD_NAME_TEXT, " eq '",
+			relatedObjectFieldValue, "'");
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null,
+			StringBundler.concat(
+				objectDefinition.getRESTContextPath(), "?filter=",
+				URLCodec.encodeURL(filterString), "&nestedFields=",
+				objectRelationship.getName()),
+			Http.Method.GET);
+
+		JSONArray itemsJSONArray = jsonObject.getJSONArray("items");
+
+		Assert.assertEquals(
+			itemsJSONArray.toString(), 1, itemsJSONArray.length());
+
+		JSONObject itemJSONObject = itemsJSONArray.getJSONObject(0);
+
+		Assert.assertEquals(
+			expectedObjectFieldValue,
+			itemJSONObject.getString(_OBJECT_FIELD_NAME_TEXT));
+		Assert.assertEquals(
+			relatedObjectFieldValue,
+			JSONUtil.getValueAsString(
+				itemJSONObject, "JSONArray/" + objectRelationship.getName(),
+				"Object/0", "Object/" + _OBJECT_FIELD_NAME_TEXT));
+	}
+
 	private void _assertObjectEntryField(
 		JSONObject objectEntryJSONObject, String objectFieldName,
 		String objectFieldValue) {
@@ -16435,6 +16530,26 @@ public class ObjectEntryResourceTest {
 						).value(
 							StringPool.SLASH + objectDefinitionName
 						).build())
+				).build()),
+			scope, TestPropsValues.getUserId());
+	}
+
+	private ObjectDefinition _createObjectDefinitionWithLocalizedTextField(
+			String objectDefinitionName, String scope)
+		throws Exception {
+
+		return ObjectDefinitionTestUtil.publishObjectDefinition(
+			objectDefinitionName,
+			Collections.singletonList(
+				new TextObjectFieldBuilder(
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap(_OBJECT_FIELD_NAME_TEXT)
+				).localized(
+					true
+				).name(
+					_OBJECT_FIELD_NAME_TEXT
+				).required(
+					true
 				).build()),
 			scope, TestPropsValues.getUserId());
 	}
