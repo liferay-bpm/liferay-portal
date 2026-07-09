@@ -23,6 +23,8 @@ import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
@@ -227,6 +229,31 @@ public class OrganizationSystemObjectDefinitionManagerTest
 	}
 
 	@Test
+	@TestInfo("LPD-97608")
+	public void testGetOrAddEmptyBaseModelWithOrganizationMember()
+		throws Exception {
+
+		setUser(TestPropsValues.getUser());
+
+		_organization = OrganizationTestUtil.addOrganization();
+
+		_user = UserTestUtil.addUser();
+
+		_organizationLocalService.addUserOrganization(
+			_user.getUserId(), _organization);
+
+		setUser(_user);
+
+		Organization organization =
+			(Organization)systemObjectDefinitionManager.getOrAddEmptyBaseModel(
+				_organization.getExternalReferenceCode(), _user);
+
+		Assert.assertEquals(
+			_organization.getOrganizationId(),
+			organization.getOrganizationId());
+	}
+
+	@Test
 	public void testGetters() throws Exception {
 		Assert.assertEquals(
 			"L_ORGANIZATION",
@@ -355,7 +382,13 @@ public class OrganizationSystemObjectDefinitionManagerTest
 	@Inject
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
+	@DeleteAfterTestRun
+	private Organization _organization;
+
 	@Inject
 	private OrganizationLocalService _organizationLocalService;
+
+	@DeleteAfterTestRun
+	private User _user;
 
 }
