@@ -1979,7 +1979,7 @@ const FrontendDataSetContent = ({
 		setAdditionalAPIURLParameters(parameters);
 	}
 
-	const selectable = !!selectionType;
+	const selectable = !!selectionType && (activeView.selectable ?? true);
 
 	const {className} = useFDSDrop({
 		targetDropRef: dataSetWrapperRef,
@@ -2129,7 +2129,7 @@ const FrontendDataSetContent = ({
 				selectedItems,
 				selectedItemsKey,
 				selectedItemsValue,
-				selectionType,
+				selectionType: selectable ? selectionType : undefined,
 				showBulkActionsManagementBar,
 				showBulkActionsManagementBarActions,
 				showInfoPanel: infoPanelComponent ? true : false,
