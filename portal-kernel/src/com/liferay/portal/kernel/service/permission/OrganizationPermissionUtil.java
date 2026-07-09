@@ -6,11 +6,14 @@
 package com.liferay.portal.kernel.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.OrganizationConstants;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.UserBag;
 import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 
@@ -81,6 +84,12 @@ public class OrganizationPermissionUtil {
 			String actionId)
 		throws PortalException {
 
+		if (actionId.equals(ActionKeys.VIEW) &&
+			_hasUserOrg(organization, permissionChecker)) {
+
+			return true;
+		}
+
 		return _contains(
 			permissionChecker, organization.getGroupId(), organization,
 			actionId);
@@ -121,5 +130,25 @@ public class OrganizationPermissionUtil {
 
 		return false;
 	}
+
+	private static boolean _hasUserOrg(
+		Organization organization, PermissionChecker permissionChecker) {
+
+		try {
+			UserBag userBag = permissionChecker.getUserBag();
+
+			return userBag.hasUserOrg(organization);
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
+
+			return false;
+		}
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		OrganizationPermissionUtil.class);
 
 }
