@@ -374,6 +374,27 @@ export default function CalendarView({
 
 			<FullCalendar
 				datesSet={({view}) => setTitle(view.title)}
+				dayCellContent={(arg) => (
+					<>
+						{arg.dayNumberText}
+
+						<ClayButtonWithIcon
+							aria-label={Liferay.Language.get('add-task')}
+							borderless
+							className="lfr__calendar-view-add-task-button"
+							displayType="secondary"
+							onClick={() =>
+								openCreateTaskModal(
+									dateUtils.format(arg.date, 'yyyy-MM-dd')
+								)
+							}
+							rounded
+							size="xs"
+							symbol="plus"
+							title={Liferay.Language.get('add-task')}
+						/>
+					</>
+				)}
 				dayHeaderFormat={{weekday: 'long'}}
 				dayMaxEvents
 				drop={async (arg) => {
@@ -466,29 +487,6 @@ export default function CalendarView({
 				moreLinkHint={Liferay.Language.get('view-all-tasks')}
 				plugins={[dayGridPlugin, interactionPlugin]}
 				ref={calendarRef}
-				{...(Liferay.FeatureFlags['LPD-69885'] && {
-					dayCellContent: (arg) => (
-						<>
-							{arg.dayNumberText}
-
-							<ClayButtonWithIcon
-								aria-label={Liferay.Language.get('add-task')}
-								borderless
-								className="lfr__calendar-view-add-task-button"
-								displayType="secondary"
-								onClick={() =>
-									openCreateTaskModal(
-										dateUtils.format(arg.date, 'yyyy-MM-dd')
-									)
-								}
-								rounded
-								size="xs"
-								symbol="plus"
-								title={Liferay.Language.get('add-task')}
-							/>
-						</>
-					),
-				})}
 			/>
 
 			{moreLinkPopover && (
