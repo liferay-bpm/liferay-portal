@@ -12,6 +12,8 @@ import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.learn.LearnMessageUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -64,6 +66,7 @@ public class AddSpaceMembersFragmentRenderer
 		String assetLibraryName = StringPool.BLANK;
 		long creatorUserId = 0;
 		String externalReferenceCode = StringPool.BLANK;
+		boolean hasAssignMembersPermission = false;
 		DepotEntry depotEntry = _depotEntryLocalService.fetchDepotEntry(
 			assetLibraryId);
 
@@ -75,6 +78,9 @@ public class AddSpaceMembersFragmentRenderer
 				themeDisplay.getLocale());
 			creatorUserId = group.getCreatorUserId();
 			externalReferenceCode = group.getExternalReferenceCode();
+			hasAssignMembersPermission = _groupModelResourcePermission.contains(
+				themeDisplay.getPermissionChecker(), group.getGroupId(),
+				ActionKeys.ASSIGN_MEMBERS);
 		}
 
 		return HashMapBuilder.<String, Object>put(
@@ -88,7 +94,7 @@ public class AddSpaceMembersFragmentRenderer
 		).put(
 			"externalReferenceCode", externalReferenceCode
 		).put(
-			"hasAssignMembersPermission", true
+			"hasAssignMembersPermission", hasAssignMembersPermission
 		).put(
 			"learnResources",
 			LearnMessageUtil.getReactDataJSONObject("site-cms-site-initializer")
@@ -100,5 +106,10 @@ public class AddSpaceMembersFragmentRenderer
 
 	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference(
+		target = "(model.class.name=com.liferay.portal.kernel.model.Group)"
+	)
+	private ModelResourcePermission<Group> _groupModelResourcePermission;
 
 }

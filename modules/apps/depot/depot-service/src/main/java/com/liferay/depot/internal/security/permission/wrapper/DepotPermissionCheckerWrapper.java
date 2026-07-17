@@ -253,8 +253,20 @@ public class DepotPermissionCheckerWrapper extends PermissionCheckerWrapper {
 						return true;
 					}
 
-					return _depotEntryModelResourcePermission.contains(
-						this, group.getClassPK(), actionId);
+					if (_depotEntryModelResourcePermission.contains(
+							this, group.getClassPK(), actionId)) {
+
+						return true;
+					}
+
+					if (StringUtil.equals(
+							actionId, ActionKeys.ASSIGN_MEMBERS) ||
+						StringUtil.equals(actionId, ActionKeys.VIEW_MEMBERS)) {
+
+						return null;
+					}
+
+					return false;
 				}
 				catch (PortalException portalException) {
 					_log.error(portalException);
