@@ -602,7 +602,7 @@ public class EditRolePermissionsNavigationDisplayContext {
 			objectDefinition.getObjectDefinitionSettings());
 
 		if (Validator.isNull(domain)) {
-			return true;
+			return false;
 		}
 
 		return Objects.equals(domain, _role.getSubtype());
