@@ -123,7 +123,7 @@ public class EditRolePermissionsNavigationDisplayContextTest {
 				null
 			);
 
-			Assert.assertTrue(
+			Assert.assertFalse(
 				_invokeHasObjectDefinitionValidDomain(
 					Mockito.mock(ObjectDefinition.class)));
 
