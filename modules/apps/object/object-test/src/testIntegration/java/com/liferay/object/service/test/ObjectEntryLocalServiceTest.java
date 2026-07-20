@@ -5622,6 +5622,22 @@ public class ObjectEntryLocalServiceTest {
 	}
 
 	@Test
+	public void testGetPrimaryKeysWithLocalizedObjectFieldForCompanyScopeObjectDefinition()
+		throws Exception {
+
+		_assertGetPrimaryKeysWithLocalizedObjectField(
+			0, ObjectDefinitionConstants.SCOPE_COMPANY);
+	}
+
+	@Test
+	public void testGetPrimaryKeysWithLocalizedObjectFieldForSiteScopeObjectDefinition()
+		throws Exception {
+
+		_assertGetPrimaryKeysWithLocalizedObjectField(
+			TestPropsValues.getGroupId(), ObjectDefinitionConstants.SCOPE_SITE);
+	}
+
+	@Test
 	public void testGetValuesList() throws Exception {
 		Sort[] sorts = {new Sort("id", false)};
 
@@ -8914,6 +8930,56 @@ public class ObjectEntryLocalServiceTest {
 			friendlyURLEntries.toString(), 0, friendlyURLEntries.size());
 	}
 
+	private void _assertGetPrimaryKeysWithLocalizedObjectField(
+			long groupId, String scope)
+		throws Exception {
+
+		ObjectField objectField = _getLocalizedTextObjectField();
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				Collections.singletonList(objectField), scope);
+
+		String value = RandomTestUtil.randomString();
+
+		ObjectEntry objectEntry = _addObjectEntry(
+			groupId, objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				objectField.getI18nObjectFieldName(),
+				HashMapBuilder.put(
+					"en_US", value
+				).build()
+			).build());
+
+		Locale themeDisplayLocale = LocaleThreadLocal.getThemeDisplayLocale();
+
+		LocaleThreadLocal.setThemeDisplayLocale(LocaleUtil.BRAZIL);
+
+		try {
+			Assert.assertEquals(
+				Collections.singletonList(objectEntry.getObjectEntryId()),
+				_objectEntryLocalService.getPrimaryKeys(
+					new Long[] {groupId}, TestPropsValues.getCompanyId(),
+					TestPropsValues.getUserId(),
+					objectDefinition.getObjectDefinitionId(), null, false,
+					value, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null));
+
+			Assert.assertEquals(
+				Collections.emptyList(),
+				_objectEntryLocalService.getPrimaryKeys(
+					new Long[] {groupId}, TestPropsValues.getCompanyId(),
+					TestPropsValues.getUserId(),
+					objectDefinition.getObjectDefinitionId(), null, false,
+					RandomTestUtil.randomString(), QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null));
+		}
+		finally {
+			LocaleThreadLocal.setThemeDisplayLocale(themeDisplayLocale);
+		}
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+	}
+
 	private void _assertGetWorkflowInstancesSize(
 			String assetClassName, long assetClassPK, int expectedSize)
 		throws Exception {
@@ -9119,6 +9185,19 @@ public class ObjectEntryLocalServiceTest {
 				"com/liferay/object/service/test/dependencies/" + fileName));
 
 		return content.getBytes();
+	}
+
+	private ObjectField _getLocalizedTextObjectField() {
+		return new TextObjectFieldBuilder(
+		).indexed(
+			true
+		).labelMap(
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+		).localized(
+			true
+		).name(
+			"a" + RandomTestUtil.randomString()
+		).build();
 	}
 
 	private String _getMultiselectPicklistObjectFieldValue(
