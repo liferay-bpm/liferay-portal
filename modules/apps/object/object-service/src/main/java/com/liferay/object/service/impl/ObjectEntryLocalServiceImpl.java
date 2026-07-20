@@ -4927,9 +4927,27 @@ public class ObjectEntryLocalServiceImpl
 				column, objectField, search);
 		}
 
-		return ObjectEntrySearchUtil.getObjectFieldPredicate(
-			objectField.getBusinessType(), column, objectField.getDBType(),
-			search);
+		Predicate objectFieldPredicate =
+			ObjectEntrySearchUtil.getObjectFieldPredicate(
+				objectField.getBusinessType(), column, objectField.getDBType(),
+				search);
+
+		if (!objectField.isLocalized() || (objectFieldPredicate == null)) {
+			return objectFieldPredicate;
+		}
+
+		DynamicObjectDefinitionLocalizationTable
+			dynamicObjectDefinitionLocalizationTable =
+				(DynamicObjectDefinitionLocalizationTable)table;
+
+		return ObjectEntryTable.INSTANCE.objectEntryId.in(
+			DSLQueryFactoryUtil.select(
+				dynamicObjectDefinitionLocalizationTable.getForeignKeyColumn()
+			).from(
+				dynamicObjectDefinitionLocalizationTable
+			).where(
+				objectFieldPredicate
+			));
 	}
 
 	private GroupByStep _getOneToManyObjectEntriesGroupByStep(
