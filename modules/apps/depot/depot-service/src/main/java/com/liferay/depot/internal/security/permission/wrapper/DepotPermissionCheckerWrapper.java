@@ -420,7 +420,8 @@ public class DepotPermissionCheckerWrapper extends PermissionCheckerWrapper {
 				DepotRolesConstants.ASSET_LIBRARY_ADMINISTRATOR, true) ||
 			_userGroupRoleLocalService.hasUserGroupRole(
 				getUserId(), liveGroup.getGroupId(),
-				DepotRolesConstants.ASSET_LIBRARY_OWNER, true)) {
+				DepotRolesConstants.ASSET_LIBRARY_OWNER, true) ||
+			_isProjectManager(liveGroup)) {
 
 			return true;
 		}
@@ -498,6 +499,20 @@ public class DepotPermissionCheckerWrapper extends PermissionCheckerWrapper {
 			getUserId(), group.getGroupId(), roleName, value);
 
 		return value;
+	}
+
+	private boolean _isProjectManager(Group group) throws PortalException {
+		long depotEntryType = GetterUtil.getInteger(
+			group.getTypeSettingsProperty("depotEntryType"),
+			DepotConstants.TYPE_ASSET_LIBRARY);
+
+		if (depotEntryType != DepotConstants.TYPE_PROJECT) {
+			return false;
+		}
+
+		return _userGroupRoleLocalService.hasUserGroupRole(
+			getUserId(), group.getGroupId(),
+			DepotRolesConstants.PROJECT_MANAGER, true);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
