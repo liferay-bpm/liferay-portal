@@ -124,6 +124,30 @@ public class DepotTestUtil {
 		}
 	}
 
+	public static void withProjectManager(
+			DepotEntry depotEntry,
+			UnsafeConsumer<User, Exception> unsafeConsumer)
+		throws Exception {
+
+		Role role = RoleLocalServiceUtil.fetchRole(
+			TestPropsValues.getCompanyId(),
+			DepotRolesConstants.PROJECT_MANAGER);
+
+		if (role == null) {
+			RoleLocalServiceUtil.addRole(
+				RoleConstants.toSystemRoleExternalReferenceCode(
+					DepotRolesConstants.PROJECT_MANAGER),
+				TestPropsValues.getUserId(), null, 0,
+				DepotRolesConstants.PROJECT_MANAGER, null, null,
+				RoleConstants.TYPE_DEPOT, DepotRolesConstants.SUBTYPE_PROJECT,
+				null);
+		}
+
+		_withGroupUser(
+			depotEntry.getGroupId(), DepotRolesConstants.PROJECT_MANAGER,
+			unsafeConsumer);
+	}
+
 	public static void withRegularUser(
 			UnsafeBiConsumer<User, Role, Exception> unsafeBiConsumer)
 		throws Exception {

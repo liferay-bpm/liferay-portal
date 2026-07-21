@@ -15,6 +15,7 @@ import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
@@ -88,16 +89,15 @@ public class ObjectEntryModelListenerTest {
 			ActionKeys.UPDATE_DISCUSSION, ActionKeys.VIEW);
 
 		_assertResourceActions(
-			projectObjectEntry, DepotRolesConstants.ASSET_LIBRARY_ADMINISTRATOR,
+			projectObjectEntry, DepotRolesConstants.PROJECT_CONTRIBUTOR,
+			ActionKeys.ADD_DISCUSSION, ActionKeys.VIEW);
+		_assertResourceActions(
+			projectObjectEntry, DepotRolesConstants.PROJECT_MANAGER,
 			ActionKeys.ADD_DISCUSSION, ActionKeys.DELETE,
 			ActionKeys.DELETE_DISCUSSION, ActionKeys.PERMISSIONS,
 			ActionKeys.UPDATE, ActionKeys.UPDATE_DISCUSSION, ActionKeys.VIEW);
 		_assertResourceActions(
-			projectObjectEntry,
-			DepotRolesConstants.ASSET_LIBRARY_CONTENT_REVIEWER,
-			ActionKeys.ADD_DISCUSSION, ActionKeys.VIEW);
-		_assertResourceActions(
-			projectObjectEntry, DepotRolesConstants.ASSET_LIBRARY_MEMBER,
+			projectObjectEntry, DepotRolesConstants.PROJECT_MEMBER,
 			ActionKeys.ADD_DISCUSSION, ActionKeys.VIEW);
 
 		ObjectEntry taskObjectEntry = CMPTestUtil.addTaskObjectEntry(
@@ -108,17 +108,17 @@ public class ObjectEntryModelListenerTest {
 			ActionKeys.DELETE, ActionKeys.DELETE_DISCUSSION,
 			ActionKeys.PERMISSIONS, ActionKeys.UPDATE,
 			ActionKeys.UPDATE_DISCUSSION, ActionKeys.VIEW);
+
 		_assertResourceActions(
-			taskObjectEntry, DepotRolesConstants.ASSET_LIBRARY_ADMINISTRATOR,
+			taskObjectEntry, DepotRolesConstants.PROJECT_CONTRIBUTOR,
+			ActionKeys.ADD_DISCUSSION, ActionKeys.UPDATE, ActionKeys.VIEW);
+		_assertResourceActions(
+			taskObjectEntry, DepotRolesConstants.PROJECT_MANAGER,
 			ActionKeys.ADD_DISCUSSION, ActionKeys.DELETE,
 			ActionKeys.DELETE_DISCUSSION, ActionKeys.PERMISSIONS,
 			ActionKeys.UPDATE, ActionKeys.UPDATE_DISCUSSION, ActionKeys.VIEW);
 		_assertResourceActions(
-			taskObjectEntry, DepotRolesConstants.ASSET_LIBRARY_CONTENT_REVIEWER,
-			ActionKeys.ADD_DISCUSSION, ActionKeys.DELETE,
-			ActionKeys.PERMISSIONS, ActionKeys.UPDATE, ActionKeys.VIEW);
-		_assertResourceActions(
-			taskObjectEntry, DepotRolesConstants.ASSET_LIBRARY_MEMBER,
+			taskObjectEntry, DepotRolesConstants.PROJECT_MEMBER,
 			ActionKeys.ADD_DISCUSSION, ActionKeys.VIEW);
 	}
 
@@ -142,14 +142,10 @@ public class ObjectEntryModelListenerTest {
 			ServiceContextTestUtil.getServiceContext());
 
 		_assertUserGroupRoles(
-			2,
-			List.of(
-				DepotRolesConstants.ASSET_LIBRARY_ADMINISTRATOR,
-				DepotRolesConstants.ASSET_LIBRARY_MEMBER),
+			1, Collections.singletonList(DepotRolesConstants.PROJECT_MANAGER),
 			projectObjectEntry.getGroupId(), user1.getUserId());
 		_assertUserGroupRoles(
-			1,
-			Collections.singletonList(DepotRolesConstants.ASSET_LIBRARY_MEMBER),
+			1, Collections.singletonList(DepotRolesConstants.PROJECT_MEMBER),
 			projectObjectEntry.getGroupId(), user2.getUserId());
 	}
 
@@ -157,8 +153,16 @@ public class ObjectEntryModelListenerTest {
 			ObjectEntry objectEntry, String roleName, String... actionIds)
 		throws Exception {
 
-		Role role = _roleLocalService.getRole(
+		Role role = _roleLocalService.fetchRole(
 			TestPropsValues.getCompanyId(), roleName);
+
+		if (role == null) {
+			role = _roleLocalService.addRole(
+				RoleConstants.toSystemRoleExternalReferenceCode(roleName),
+				TestPropsValues.getUserId(), null, 0, roleName, null, null,
+				RoleConstants.TYPE_DEPOT, DepotRolesConstants.SUBTYPE_PROJECT,
+				null);
+		}
 
 		ResourcePermission resourcePermission =
 			_resourcePermissionLocalService.getResourcePermission(

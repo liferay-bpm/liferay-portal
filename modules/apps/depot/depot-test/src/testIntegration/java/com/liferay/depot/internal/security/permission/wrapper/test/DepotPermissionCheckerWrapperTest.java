@@ -321,6 +321,24 @@ public class DepotPermissionCheckerWrapperTest {
 	}
 
 	@Test
+	public void testIsGroupAdminWithDepotGroupAndProjectManager()
+		throws Exception {
+
+		DepotEntry depotEntry = _addDepotEntry(
+			DepotConstants.TYPE_PROJECT, TestPropsValues.getUserId());
+
+		DepotTestUtil.withProjectManager(
+			depotEntry,
+			user -> {
+				PermissionChecker permissionChecker =
+					_permissionCheckerFactory.create(user);
+
+				Assert.assertTrue(
+					permissionChecker.isGroupAdmin(depotEntry.getGroupId()));
+			});
+	}
+
+	@Test
 	public void testIsGroupAdminWithGroup0AndNoOmniadmin() throws Exception {
 		DepotTestUtil.withRegularUser(
 			(user, role) -> {
@@ -687,18 +705,24 @@ public class DepotPermissionCheckerWrapperTest {
 					})));
 	}
 
-	private DepotEntry _addDepotEntry(long userId) throws PortalException {
+	private DepotEntry _addDepotEntry(int type, long userId)
+		throws PortalException {
+
 		DepotEntry depotEntry = _depotEntryLocalService.addDepotEntry(
 			HashMapBuilder.put(
 				LocaleUtil.getDefault(), RandomTestUtil.randomString()
 			).build(),
-			Collections.emptyMap(), DepotConstants.TYPE_ASSET_LIBRARY,
+			Collections.emptyMap(), type,
 			ServiceContextTestUtil.getServiceContext(
 				TestPropsValues.getGroupId(), userId));
 
 		_depotEntries.add(depotEntry);
 
 		return depotEntry;
+	}
+
+	private DepotEntry _addDepotEntry(long userId) throws PortalException {
+		return _addDepotEntry(DepotConstants.TYPE_ASSET_LIBRARY, userId);
 	}
 
 	private FileEntry _addFileEntry(DepotEntry depotEntry) throws Exception {
