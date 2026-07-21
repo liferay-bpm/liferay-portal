@@ -37,6 +37,7 @@ import com.liferay.site.initializer.SiteInitializerRegistry;
 import java.io.Serializable;
 
 import java.util.Collections;
+import java.util.Map;
 
 /**
  * @author Carolina Barbosa
@@ -72,6 +73,13 @@ public class CMPTestUtil {
 	public static ObjectEntry addCMPProjectObjectEntry()
 		throws PortalException {
 
+		return addCMPProjectObjectEntry(Collections.emptyMap());
+	}
+
+	public static ObjectEntry addCMPProjectObjectEntry(
+			Map<String, Serializable> values)
+		throws PortalException {
+
 		DepotEntry depotEntry = DepotEntryLocalServiceUtil.addDepotEntry(
 			Collections.singletonMap(
 				LocaleUtil.getDefault(), RandomTestUtil.randomString()),
@@ -95,6 +103,8 @@ public class CMPTestUtil {
 			objectDefinition.getObjectDefinitionId(), 0, null,
 			HashMapBuilder.<String, Serializable>put(
 				"title", RandomTestUtil.randomString()
+			).putAll(
+				values
 			).build(),
 			serviceContext);
 	}
