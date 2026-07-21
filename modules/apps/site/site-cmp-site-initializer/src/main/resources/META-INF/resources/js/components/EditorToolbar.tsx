@@ -15,11 +15,13 @@ import React, {useEffect, useId, useState} from 'react';
 export default function EditorToolbar({
 	backURL,
 	formSubmitURL,
+	hasUpdatePermission,
 	isNew,
 	title,
 }: {
 	backURL: string;
 	formSubmitURL?: string;
+	hasUpdatePermission: boolean;
 	isNew: boolean;
 	title: string;
 }) {
@@ -60,7 +62,7 @@ export default function EditorToolbar({
 					event.preventDefault();
 				}
 
-				if (isShortcut) {
+				if (isShortcut && hasUpdatePermission) {
 					(form as HTMLFormElement).submit();
 				}
 			};
@@ -70,7 +72,7 @@ export default function EditorToolbar({
 			return () =>
 				window.removeEventListener('keydown', handlePublishShortcut);
 		}
-	}, []);
+	}, [hasUpdatePermission]);
 
 	return (
 		<Toolbar
@@ -110,6 +112,7 @@ export default function EditorToolbar({
 					aria-labelledby={submitLabelId}
 					data-title={submitTitle}
 					data-title-set-as-html
+					disabled={!hasUpdatePermission}
 					form={formId}
 					onClick={() => {
 						const form = getForm();
