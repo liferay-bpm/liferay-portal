@@ -28,6 +28,8 @@ import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -51,6 +53,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
@@ -67,6 +70,7 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		throws ModelListenerException {
 
 		try {
+			_reindexAssetObjectEntry(objectEntry);
 			_setResourcePermissions(objectEntry);
 			_updateGroup(objectEntry);
 			_updateProjectCompletionRate(objectEntry);
@@ -81,6 +85,7 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		throws ModelListenerException {
 
 		try {
+			_reindexAssetObjectEntry(objectEntry);
 			_updateProjectCompletionRate(objectEntry);
 		}
 		catch (Exception exception) {
@@ -150,6 +155,51 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 			new Long[] {objectEntry.getGroupId()}, 0, 0,
 			objectEntry.getObjectDefinitionId(),
 			_filterFactory.create(filterString, objectDefinition), false, null);
+	}
+
+	private void _reindexAssetObjectEntry(ObjectEntry objectEntry)
+		throws Exception {
+
+		ObjectDefinition objectDefinition = objectEntry.getObjectDefinition();
+
+		if (!StringUtil.equals(
+				objectDefinition.getExternalReferenceCode(),
+				"L_CMP_PROJECT_ASSET_RELATIONSHIP")) {
+
+			return;
+		}
+
+		Map<String, Serializable> values = objectEntry.getValues();
+
+		Group group = _groupLocalService.fetchGroupByExternalReferenceCode(
+			MapUtil.getString(values, "groupExternalReferenceCode"),
+			objectEntry.getCompanyId());
+
+		if (group == null) {
+			return;
+		}
+
+		ObjectDefinition assetObjectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinitionByClassName(
+				objectEntry.getCompanyId(),
+				MapUtil.getString(values, "className"));
+
+		if (assetObjectDefinition == null) {
+			return;
+		}
+
+		ObjectEntry assetObjectEntry = _objectEntryLocalService.fetchObjectEntry(
+			MapUtil.getString(values, "classExternalReferenceCode"),
+			group.getGroupId(), assetObjectDefinition.getObjectDefinitionId());
+
+		if (assetObjectEntry == null) {
+			return;
+		}
+
+		Indexer<ObjectEntry> indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+			ObjectEntry.class);
+
+		indexer.reindex(assetObjectEntry);
 	}
 
 	private void _setResourcePermissions(ObjectEntry objectEntry)

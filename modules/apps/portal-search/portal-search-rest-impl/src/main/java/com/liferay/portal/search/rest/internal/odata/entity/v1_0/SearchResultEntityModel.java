@@ -39,6 +39,9 @@ public class SearchResultEntityModel implements EntityModel {
 					"cmpPersonaCategoryIds",
 					locale -> Field.ASSET_INTERNAL_CATEGORY_IDS)),
 			new CollectionEntityField(
+				new IntegerEntityField(
+					"cmpProjectIds", locale -> "cmpProjectIds")),
+			new CollectionEntityField(
 				new IntegerEntityField("groupIds", locale -> Field.GROUP_ID)),
 			new CollectionEntityField(
 				new IntegerEntityField(
