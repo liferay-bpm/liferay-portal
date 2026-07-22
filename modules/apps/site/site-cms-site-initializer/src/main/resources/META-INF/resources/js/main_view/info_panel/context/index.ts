@@ -20,6 +20,8 @@ export interface IAssetTypeInfoPanelContext {
 		name: string;
 	};
 	breadcrumbProps: IBreadcrumbProps;
+	cmpProjectAssetRelationshipObjectDefinitionId?: number | null;
+	cmpProjectObjectDefinitionId?: number | null;
 	cmsGroupId: number | string;
 	commentsProps: any;
 	dataSetId?: string;
