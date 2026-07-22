@@ -11,6 +11,7 @@ import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
+import com.liferay.bulk.rest.client.dto.v1_0.AddObjectToProjectBulkSelectionAction;
 import com.liferay.bulk.rest.client.dto.v1_0.AssignStructureDefaultWorkflowBulkSelectionAction;
 import com.liferay.bulk.rest.client.dto.v1_0.AssignToObjectBulkSelectionAction;
 import com.liferay.bulk.rest.client.dto.v1_0.BulkAction;
@@ -100,10 +101,12 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.FeatureFlag;
+import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
+import com.liferay.site.cmp.site.initializer.test.util.CMPTestUtil;
 import com.liferay.site.cms.site.initializer.test.util.CMSTestUtil;
 import com.liferay.site.cms.site.initializer.util.CMSDefaultPermissionUtil;
 
@@ -131,7 +134,9 @@ import org.osgi.framework.FrameworkUtil;
 /**
  * @author Alejandro Tardín
  */
-@FeatureFlag("LPD-17564")
+@FeatureFlags(
+	featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-58677")}
+)
 @RunWith(Arquillian.class)
 public class BulkActionResourceTest extends BaseBulkActionResourceTestCase {
 
@@ -172,6 +177,7 @@ public class BulkActionResourceTest extends BaseBulkActionResourceTestCase {
 	@Override
 	@Test
 	public void testPostBulkAction() throws Exception {
+		_testPostBulkActionWithTypeAddObjectToProject();
 		_testPostBulkActionWithTypeAssignStructureDefaultWorkflow();
 		_testPostBulkActionWithTypeAssignTo();
 		_testPostBulkActionWithTypeCopy();
@@ -636,6 +642,70 @@ public class BulkActionResourceTest extends BaseBulkActionResourceTestCase {
 			items.get(0), objectEntryFolder2.getObjectEntryFolderId(),
 			expectedDeletionType, 0L, null, objectEntryFolder2.getName(),
 			"FOLDER", null);
+	}
+
+	private void _testPostBulkActionWithTypeAddObjectToProject()
+		throws Exception {
+
+		CMPTestUtil.getOrAddGroup(BulkActionResourceTest.class);
+
+		ObjectEntry projectObjectEntry = CMPTestUtil.addProjectObjectEntry();
+
+		ObjectEntry objectEntry1 = ObjectEntryTestUtil.addObjectEntry(
+			_depotEntry2.getGroupId(), _cmsBasicWebContentObjectDefinition,
+			_getObjectEntryValues());
+		ObjectEntry objectEntry2 = ObjectEntryTestUtil.addObjectEntry(
+			_depotEntry2.getGroupId(), _cmsBasicWebContentObjectDefinition,
+			_getObjectEntryValues());
+
+		AddObjectToProjectBulkSelectionAction bulkAction =
+			new AddObjectToProjectBulkSelectionAction();
+
+		bulkAction.setBulkActionItems(
+			_toBulkActionItems(
+				_cmsBasicWebContentObjectDefinition, objectEntry1,
+				objectEntry2));
+		bulkAction.setProjectScopeKeys(
+			new String[] {String.valueOf(projectObjectEntry.getGroupId())});
+		bulkAction.setType(
+			BulkAction.Type.ADD_OBJECT_TO_PROJECT_BULK_SELECTION_ACTION);
+
+		_postBulkAction(bulkAction);
+
+		ObjectDefinition relationshipObjectDefinition =
+			_objectDefinitionLocalService.
+				getObjectDefinitionByExternalReferenceCode(
+					"L_CMP_PROJECT_ASSET_RELATIONSHIP",
+					testCompany.getCompanyId());
+
+		List<ObjectEntry> relationshipObjectEntries =
+			_objectEntryLocalService.getObjectEntries(
+				projectObjectEntry.getGroupId(),
+				relationshipObjectDefinition.getObjectDefinitionId(),
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		Assert.assertEquals(
+			relationshipObjectEntries.toString(), 2,
+			relationshipObjectEntries.size());
+
+		List<String> classExternalReferenceCodes = TransformUtil.transform(
+			relationshipObjectEntries,
+			relationshipObjectEntry -> {
+				Map<String, Serializable> values =
+					relationshipObjectEntry.getValues();
+
+				return GetterUtil.getString(
+					values.get("classExternalReferenceCode"));
+			});
+
+		Assert.assertTrue(
+			classExternalReferenceCodes.toString(),
+			classExternalReferenceCodes.contains(
+				objectEntry1.getExternalReferenceCode()));
+		Assert.assertTrue(
+			classExternalReferenceCodes.toString(),
+			classExternalReferenceCodes.contains(
+				objectEntry2.getExternalReferenceCode()));
 	}
 
 	private void _testPostBulkActionWithTypeAssignStructureDefaultWorkflow()
