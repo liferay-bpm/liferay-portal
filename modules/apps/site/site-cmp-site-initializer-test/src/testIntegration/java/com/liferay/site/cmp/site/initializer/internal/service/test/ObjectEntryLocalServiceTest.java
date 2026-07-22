@@ -54,6 +54,9 @@ public class ObjectEntryLocalServiceTest {
 
 	@Test
 	public void testDeleteObjectEntry() throws Exception {
+
+		// Project
+
 		ObjectEntry projectObjectEntry = CMPTestUtil.addProjectObjectEntry();
 
 		ObjectEntry projectAssetRelationshipObjectEntry =
@@ -67,6 +70,22 @@ public class ObjectEntryLocalServiceTest {
 		Assert.assertNull(
 			_objectEntryLocalService.fetchObjectEntry(
 				projectAssetRelationshipObjectEntry.getObjectEntryId()));
+
+		// Task
+
+		ObjectEntry taskObjectEntry = CMPTestUtil.addTaskObjectEntry();
+
+		ObjectEntry taskAssetRelationshipObjectEntry =
+			_addTaskAssetRelationshipObjectEntry(
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), taskObjectEntry);
+
+		_objectEntryLocalService.deleteObjectEntry(
+			taskObjectEntry.getObjectEntryId());
+
+		Assert.assertNull(
+			_objectEntryLocalService.fetchObjectEntry(
+				taskAssetRelationshipObjectEntry.getObjectEntryId()));
 	}
 
 	private ObjectEntry _addProjectAssetRelationshipObjectEntry(
@@ -92,6 +111,33 @@ public class ObjectEntryLocalServiceTest {
 			).put(
 				"r_cmpProjectToCMPProjectAssetRelationships_c_cmpProjectId",
 				projectObjectEntry.getObjectEntryId()
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+	}
+
+	private ObjectEntry _addTaskAssetRelationshipObjectEntry(
+			String classExternalReferenceCode, String className,
+			String groupExternalReferenceCode, ObjectEntry taskObjectEntry)
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.
+				getObjectDefinitionByExternalReferenceCode(
+					"L_CMP_TASK_ASSET_RELATIONSHIP",
+					TestPropsValues.getCompanyId());
+
+		return _objectEntryLocalService.addObjectEntry(
+			taskObjectEntry.getGroupId(), taskObjectEntry.getUserId(),
+			objectDefinition.getObjectDefinitionId(), 0, null,
+			HashMapBuilder.<String, Serializable>put(
+				"classExternalReferenceCode", classExternalReferenceCode
+			).put(
+				"className", className
+			).put(
+				"groupExternalReferenceCode", groupExternalReferenceCode
+			).put(
+				"r_cmpTaskToCMPTaskAssetRelationships_c_cmpTaskId",
+				taskObjectEntry.getObjectEntryId()
 			).build(),
 			ServiceContextTestUtil.getServiceContext());
 	}
