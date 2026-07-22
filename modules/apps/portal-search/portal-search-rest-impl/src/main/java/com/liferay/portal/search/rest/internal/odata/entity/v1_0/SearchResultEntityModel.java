@@ -42,6 +42,8 @@ public class SearchResultEntityModel implements EntityModel {
 				new IntegerEntityField(
 					"cmpProjectIds", locale -> "cmpProjectIds")),
 			new CollectionEntityField(
+				new IntegerEntityField("cmpTaskIds", locale -> "cmpTaskIds")),
+			new CollectionEntityField(
 				new IntegerEntityField("groupIds", locale -> Field.GROUP_ID)),
 			new CollectionEntityField(
 				new IntegerEntityField(

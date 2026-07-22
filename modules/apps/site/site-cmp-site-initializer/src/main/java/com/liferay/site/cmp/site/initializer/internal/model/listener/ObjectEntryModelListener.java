@@ -164,7 +164,10 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 
 		if (!StringUtil.equals(
 				objectDefinition.getExternalReferenceCode(),
-				"L_CMP_PROJECT_ASSET_RELATIONSHIP")) {
+				"L_CMP_PROJECT_ASSET_RELATIONSHIP") &&
+			!StringUtil.equals(
+				objectDefinition.getExternalReferenceCode(),
+				"L_CMP_TASK_ASSET_RELATIONSHIP")) {
 
 			return;
 		}
@@ -188,9 +191,11 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 			return;
 		}
 
-		ObjectEntry assetObjectEntry = _objectEntryLocalService.fetchObjectEntry(
-			MapUtil.getString(values, "classExternalReferenceCode"),
-			group.getGroupId(), assetObjectDefinition.getObjectDefinitionId());
+		ObjectEntry assetObjectEntry =
+			_objectEntryLocalService.fetchObjectEntry(
+				MapUtil.getString(values, "classExternalReferenceCode"),
+				group.getGroupId(),
+				assetObjectDefinition.getObjectDefinitionId());
 
 		if (assetObjectEntry == null) {
 			return;
