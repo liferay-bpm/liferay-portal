@@ -15,11 +15,13 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.info.constants.InfoDisplayWebKeys;
 import com.liferay.info.localized.InfoLocalizedValue;
 import com.liferay.object.constants.ObjectFolderConstants;
+import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntryFolder;
 import com.liferay.object.service.ObjectDefinitionService;
 import com.liferay.object.service.ObjectEntryFolderLocalServiceUtil;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -136,6 +138,38 @@ public abstract class BaseSectionDisplayContext {
 			SectionDisplayContextUtil.getDepotEntriesJSONArray(
 				httpServletRequest,
 				getRootObjectEntryFolderExternalReferenceCode())
+		).put(
+			"cmpProjectLinkObjectDefinitionId",
+			() -> {
+				if (!FeatureFlagManagerUtil.isEnabled(
+						themeDisplay.getCompanyId(), "LPD-58677")) {
+
+					return null;
+				}
+
+				ObjectDefinition objectDefinition =
+					_objectDefinitionService.
+						getObjectDefinitionByExternalReferenceCode(
+							"L_CMP_PROJECT_LINK", themeDisplay.getCompanyId());
+
+				return objectDefinition.getObjectDefinitionId();
+			}
+		).put(
+			"cmpProjectObjectDefinitionId",
+			() -> {
+				if (!FeatureFlagManagerUtil.isEnabled(
+						themeDisplay.getCompanyId(), "LPD-58677")) {
+
+					return null;
+				}
+
+				ObjectDefinition objectDefinition =
+					_objectDefinitionService.
+						getObjectDefinitionByExternalReferenceCode(
+							"L_CMP_PROJECT", themeDisplay.getCompanyId());
+
+				return objectDefinition.getObjectDefinitionId();
+			}
 		).put(
 			"cmsGroupId",
 			() -> {
