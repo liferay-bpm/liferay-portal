@@ -7,30 +7,23 @@ package com.liferay.site.cmp.site.initializer.internal.search.spi.model.index.co
 
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectEntryFolderConstants;
-import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryFolder;
 import com.liferay.object.rest.filter.factory.FilterFactory;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryFolderLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.CharPool;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
-
-import java.util.List;
+import com.liferay.site.cmp.site.initializer.internal.search.spi.model.index.contributor.helper.CMPLinkedObjectEntryUtil;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -56,45 +49,24 @@ public class CMPObjectEntryModelDocumentContributor
 	}
 
 	private void _addLinkedObjectEntryIds(
-			Document document, String documentFieldName, Group group,
+			Document document, String documentFieldName,
 			String linkObjectDefinitionExternalReferenceCode,
 			ObjectEntry objectEntry, String relationshipFieldName)
 		throws PortalException {
 
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.
-				fetchObjectDefinitionByExternalReferenceCode(
-					linkObjectDefinitionExternalReferenceCode,
-					objectEntry.getCompanyId());
+		long[] linkedObjectEntryIds =
+			CMPLinkedObjectEntryUtil.getLinkedObjectEntryIds(
+				_filterFactory, _groupLocalService,
+				_objectDefinitionLocalService, objectEntry,
+				_objectEntryLocalService,
+				linkObjectDefinitionExternalReferenceCode,
+				relationshipFieldName);
 
-		if (objectDefinition == null) {
+		if (linkedObjectEntryIds.length == 0) {
 			return;
 		}
 
-		List<Long> objectEntryIds = _objectEntryLocalService.getPrimaryKeys(
-			new Long[0], objectEntry.getCompanyId(), 0,
-			objectDefinition.getObjectDefinitionId(),
-			_filterFactory.create(
-				StringBundler.concat(
-					"className eq '", objectEntry.getModelClassName(),
-					"' and classExternalReferenceCode eq '",
-					objectEntry.getExternalReferenceCode(),
-					"' and groupExternalReferenceCode eq '",
-					group.getExternalReferenceCode(), "'"),
-				objectDefinition),
-			false, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
-
-		if (objectEntryIds.isEmpty()) {
-			return;
-		}
-
-		document.addKeyword(
-			documentFieldName,
-			TransformUtil.transformToLongArray(
-				objectEntryIds,
-				objectEntryId -> MapUtil.getLong(
-					_objectEntryLocalService.getValues(objectEntryId),
-					relationshipFieldName)));
+		document.addKeyword(documentFieldName, linkedObjectEntryIds);
 	}
 
 	private void _contribute(Document document, ObjectEntry objectEntry)
@@ -121,18 +93,12 @@ public class CMPObjectEntryModelDocumentContributor
 			return;
 		}
 
-		Group group = _groupLocalService.fetchGroup(objectEntry.getGroupId());
-
-		if (group == null) {
-			return;
-		}
-
 		_addLinkedObjectEntryIds(
-			document, "cmpProjectIds", group,
-			"L_CMP_PROJECT_ASSET_RELATIONSHIP", objectEntry,
+			document, "cmpProjectIds", "L_CMP_PROJECT_ASSET_RELATIONSHIP",
+			objectEntry,
 			"r_cmpProjectToCMPProjectAssetRelationships_c_cmpProjectId");
 		_addLinkedObjectEntryIds(
-			document, "cmpTaskIds", group, "L_CMP_TASK_ASSET_RELATIONSHIP",
+			document, "cmpTaskIds", "L_CMP_TASK_ASSET_RELATIONSHIP",
 			objectEntry, "r_cmpTaskToCMPTaskAssetRelationships_c_cmpTaskId");
 	}
 
