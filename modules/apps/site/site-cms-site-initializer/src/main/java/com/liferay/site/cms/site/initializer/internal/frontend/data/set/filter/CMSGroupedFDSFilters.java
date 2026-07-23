@@ -51,8 +51,8 @@ public class CMSGroupedFDSFilters implements GroupedFDSFilters {
 				LanguageUtil.get(resourceBundle, "filter-by"),
 				JSONUtil.putAll(
 					"scopeGroupId", "objectDefinitionExternalReferenceCode",
-					"taxonomyCategoryIds", "keywords", "extension", "creatorId",
-					"status")),
+					"taxonomyCategoryIds", "keywords", "cmpProjectIds",
+					"extension", "creatorId", "status")),
 			JSONUtil.put(
 				LanguageUtil.get(resourceBundle, "filter-by-date"),
 				JSONUtil.putAll(
