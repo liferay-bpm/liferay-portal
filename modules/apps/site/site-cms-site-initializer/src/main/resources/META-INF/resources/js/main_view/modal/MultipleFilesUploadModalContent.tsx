@@ -20,24 +20,32 @@ import ApiHelper from '../../common/services/ApiHelper';
 import {AssetLibrary} from '../../common/types/AssetLibrary';
 import {Space} from '../../common/types/Space';
 
+import type {ObjectEntryLinkContext} from '../props_transformer/RelatedAssetsFDSPropsTransformer';
+
 const sequentialUploadBatches: UploadBatchesCallback = (files) =>
 	files.map((file) => [file]);
 
 export default function MultipleFilesUploadModalContent({
 	assetLibraries,
 	baseAssetLibraryViewURL,
+	documentClassName,
 	filesToUpload,
 	loadData,
+	objectEntryId,
+	objectRelationshipFieldName,
 	onModalClose,
 	parentObjectEntryFolderExternalReferenceCode,
+	restContextPath,
+	scopeGroupId,
 }: {
 	assetLibraries: AssetLibrary[];
 	baseAssetLibraryViewURL: string;
+	documentClassName?: string;
 	filesToUpload?: FileData[];
 	loadData?: () => void;
 	onModalClose: () => void;
 	parentObjectEntryFolderExternalReferenceCode: string;
-}) {
+} & Partial<ObjectEntryLinkContext>) {
 	const [groupId, setGroupId] = useState<number>(
 		assetLibraries?.length === 1 ? assetLibraries?.[0].groupId : 0
 	);
@@ -82,7 +90,7 @@ export default function MultipleFilesUploadModalContent({
 
 		const fileBase64 = await getFileAsBase64(fileData.file);
 
-		return await ApiHelper.post(
+		const result = await ApiHelper.post<{externalReferenceCode: string}>(
 			`/o/cms/basic-documents/scopes/${groupId}`,
 			{
 				file: {
@@ -94,6 +102,33 @@ export default function MultipleFilesUploadModalContent({
 				title: fileData.name,
 			}
 		);
+
+		if (
+			documentClassName &&
+			objectRelationshipFieldName &&
+			restContextPath &&
+			result.data
+		) {
+			const assetLibrary = assetLibraries?.find(
+				(library) => Number(library.groupId) === Number(groupId)
+			);
+
+			if (assetLibrary) {
+				await ApiHelper.post(
+					`${restContextPath}/scopes/${scopeGroupId}`,
+					{
+						classExternalReferenceCode:
+							result.data.externalReferenceCode,
+						className: documentClassName,
+						groupExternalReferenceCode:
+							assetLibrary.externalReferenceCode,
+						[objectRelationshipFieldName]: Number(objectEntryId),
+					}
+				);
+			}
+		}
+
+		return result;
 	};
 
 	const onUploadComplete = ({
