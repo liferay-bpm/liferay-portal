@@ -10,10 +10,13 @@ import multipleFilesUploadAction, {
 	MultipleFileUploaderData,
 } from './multipleFilesUploadAction';
 
+import type {LinkObjectEntryContext} from '../RelatedAssetsFDSPropsTransformer';
+
 export default function fileDropAction(
 	additionalProps: MultipleFileUploaderData & {
 		baseFolderViewURL: string;
 		candidateAssetLibraries: AssetLibrary[];
+		linkObjectEntryContext?: LinkObjectEntryContext;
 		loadData?: () => void;
 		redirect: string;
 	},
@@ -28,6 +31,8 @@ export default function fileDropAction(
 		baseAssetLibraryViewURL,
 		baseFolderViewURL,
 		candidateAssetLibraries,
+		documentClassName,
+		linkObjectEntryContext,
 		loadData,
 		parentObjectEntryFolderExternalReferenceCode,
 		redirect,
@@ -35,8 +40,10 @@ export default function fileDropAction(
 
 	multipleFilesUploadAction(
 		{
+			...linkObjectEntryContext,
 			assetLibraries: candidateAssetLibraries,
 			baseAssetLibraryViewURL,
+			documentClassName,
 			filesToUpload: droppedFiles.map((file: any) => ({
 				errorMessage: '',
 				failed: false,
