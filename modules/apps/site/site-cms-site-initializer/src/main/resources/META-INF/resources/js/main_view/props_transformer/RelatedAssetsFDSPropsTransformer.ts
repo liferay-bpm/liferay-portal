@@ -18,6 +18,13 @@ import fileDropAction from './actions/fileDropAction';
 import {MultipleFileUploaderData} from './actions/multipleFilesUploadAction';
 import transformFDSBulkActions from './utils/transformFDSBulkActions';
 
+export type ObjectEntryLinkContext = {
+	objectEntryId: string;
+	objectRelationshipFieldName: string;
+	restContextPath: string;
+	scopeGroupId: string;
+};
+
 export default function RelatedAssetsFDSPropsTransformer({
 	additionalProps,
 	bulkActions = [],
@@ -27,7 +34,10 @@ export default function RelatedAssetsFDSPropsTransformer({
 	views,
 	...otherProps
 }: {
-	additionalProps: AdditionalProps & MultipleFileUploaderData;
+	additionalProps: AdditionalProps &
+		MultipleFileUploaderData & {
+			objectEntryLinkContext: ObjectEntryLinkContext;
+		};
 	bulkActions: Array<IBulkActionItem>;
 	creationMenu: any;
 	id: string;
@@ -77,25 +87,53 @@ export default function RelatedAssetsFDSPropsTransformer({
 			loadData: () => {};
 		}) {
 			if (action.data.id === 'unlink-asset') {
-				const {actions, embedded} = itemData;
+				const {embedded, entryClassName} = itemData;
+				const {
+					objectEntryId,
+					objectRelationshipFieldName,
+					restContextPath,
+					scopeGroupId,
+				} = additionalProps.objectEntryLinkContext;
 
-				await ApiHelper.patch(
-					{
-						keywords: embedded.keywords?.filter(
-							(keyword) =>
-								!additionalProps.keywords
-									?.split(',')
-									.includes(keyword)
+				const filter = [
+					`${objectRelationshipFieldName} eq '${objectEntryId}'`,
+					`className eq '${entryClassName}'`,
+					`classExternalReferenceCode eq '${embedded.externalReferenceCode}'`,
+					`groupExternalReferenceCode eq '${embedded.systemProperties.scope.externalReferenceCode}'`,
+				].join(' and ');
+
+				const {data, error} = await ApiHelper.get<{
+					items: Array<{id: number}>;
+				}>(
+					`${restContextPath}/scopes/${scopeGroupId}?filter=${encodeURIComponent(
+						filter
+					)}`
+				);
+
+				const linkObjectEntry = data?.items?.[0];
+
+				if (error || !linkObjectEntry) {
+					openToast({
+						message: Liferay.Language.get(
+							'an-unexpected-error-occurred'
 						),
-					},
-					actions.update.href
+						type: 'danger',
+					});
+
+					return;
+				}
+
+				const {error: deleteError} = await ApiHelper.delete(
+					`${restContextPath}/${linkObjectEntry.id}`
 				);
 
 				openToast({
-					message: Liferay.Language.get(
-						'your-request-completed-successfully'
-					),
-					type: 'success',
+					message: deleteError
+						? Liferay.Language.get('an-unexpected-error-occurred')
+						: Liferay.Language.get(
+								'your-request-completed-successfully'
+							),
+					type: deleteError ? 'danger' : 'success',
 				});
 
 				loadData();

@@ -28,7 +28,6 @@ export default function fileDropAction(
 		baseAssetLibraryViewURL,
 		baseFolderViewURL,
 		candidateAssetLibraries,
-		keywords,
 		loadData,
 		parentObjectEntryFolderExternalReferenceCode,
 		redirect,
@@ -45,7 +44,6 @@ export default function fileDropAction(
 				name: file.name,
 				size: file.size,
 			})),
-			keywords,
 			parentObjectEntryFolderExternalReferenceCode: dropTarget
 				? dropTarget.embedded?.externalReferenceCode
 				: parentObjectEntryFolderExternalReferenceCode,

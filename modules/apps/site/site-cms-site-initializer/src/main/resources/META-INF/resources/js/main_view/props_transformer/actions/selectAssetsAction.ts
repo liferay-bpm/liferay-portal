@@ -10,22 +10,33 @@ import {v4 as uuidv4} from 'uuid';
 
 import ApiHelper from '../../../common/services/ApiHelper';
 
+import type {ObjectEntryLinkContext} from '../RelatedAssetsFDSPropsTransformer';
+
 type Asset = {
-	actions: {
-		update: {href: string};
-	};
 	embedded: {
+		externalReferenceCode: string;
 		file?: {
 			mimeType: string;
 		};
 		id: number;
-		keywords: string[];
+		systemProperties: {
+			scope: {
+				externalReferenceCode: string;
+			};
+		};
 		title: string;
 	};
+	entryClassName: string;
 };
 
 export default function selectAssetsAction(
-	{keywords, searchAPIURL}: {keywords: string; searchAPIURL: string},
+	{
+		objectEntryId,
+		objectRelationshipFieldName,
+		restContextPath,
+		scopeGroupId,
+		searchAPIURL,
+	}: ObjectEntryLinkContext & {searchAPIURL: string},
 	loadData?: () => void
 ) {
 	openItemSelectorModal({
@@ -83,27 +94,33 @@ export default function selectAssetsAction(
 		},
 		multiSelect: true,
 		onItemsChange: async (assets: Asset[]) => {
-			await Promise.all(
-				assets.map(async (asset: Asset) => {
-					const {actions, embedded} = asset;
+			const results = await Promise.all(
+				assets.map((asset: Asset) => {
+					const {embedded, entryClassName} = asset;
 
-					await ApiHelper.patch(
+					return ApiHelper.post(
+						`${restContextPath}/scopes/${scopeGroupId}`,
 						{
-							keywords: [
-								...keywords.split(','),
-								...embedded.keywords,
-							],
-						},
-						actions.update.href
+							classExternalReferenceCode:
+								embedded.externalReferenceCode,
+							className: entryClassName,
+							groupExternalReferenceCode:
+								embedded.systemProperties.scope
+									.externalReferenceCode,
+							[objectRelationshipFieldName]:
+								Number(objectEntryId),
+						}
 					);
 				})
 			);
 
+			const failedResult = results.find((result) => result.error);
+
 			openToast({
-				message: Liferay.Language.get(
-					'your-request-completed-successfully'
-				),
-				type: 'success',
+				message:
+					failedResult?.error ||
+					Liferay.Language.get('your-request-completed-successfully'),
+				type: failedResult ? 'danger' : 'success',
 			});
 
 			loadData?.();
