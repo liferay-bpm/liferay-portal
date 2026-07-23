@@ -61,6 +61,48 @@ public class CMPObjectEntryModelDocumentContributor
 		}
 	}
 
+	private void _addLinkedObjectEntryIds(
+			Document document, String documentFieldName, Group group,
+			String linkObjectDefinitionExternalReferenceCode,
+			ObjectEntry objectEntry, String relationshipFieldName)
+		throws PortalException {
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.
+				fetchObjectDefinitionByExternalReferenceCode(
+					linkObjectDefinitionExternalReferenceCode,
+					objectEntry.getCompanyId());
+
+		if (objectDefinition == null) {
+			return;
+		}
+
+		List<Long> objectEntryIds = _objectEntryLocalService.getPrimaryKeys(
+			new Long[0], objectEntry.getCompanyId(), 0,
+			objectDefinition.getObjectDefinitionId(),
+			_filterFactory.create(
+				StringBundler.concat(
+					"classExternalReferenceCode eq '",
+					objectEntry.getExternalReferenceCode(),
+					"' and className eq '", objectEntry.getModelClassName(),
+					"' and groupExternalReferenceCode eq '",
+					group.getExternalReferenceCode(), "'"),
+				objectDefinition),
+			false, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		if (objectEntryIds.isEmpty()) {
+			return;
+		}
+
+		document.addKeyword(
+			documentFieldName,
+			TransformUtil.transformToLongArray(
+				objectEntryIds,
+				objectEntryId -> MapUtil.getLong(
+					_objectEntryLocalService.getValues(objectEntryId),
+					relationshipFieldName)));
+	}
+
 	private void _contribute(Document document, ObjectEntry objectEntry)
 		throws PortalException {
 
@@ -85,45 +127,18 @@ public class CMPObjectEntryModelDocumentContributor
 			return;
 		}
 
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.
-				fetchObjectDefinitionByExternalReferenceCode(
-					"L_CMP_PROJECT_LINK", objectEntry.getCompanyId());
-
-		if (objectDefinition == null) {
-			return;
-		}
-
 		Group group = _groupLocalService.fetchGroup(objectEntry.getGroupId());
 
 		if (group == null) {
 			return;
 		}
 
-		List<Long> objectEntryIds = _objectEntryLocalService.getPrimaryKeys(
-			new Long[0], objectEntry.getCompanyId(), 0,
-			objectDefinition.getObjectDefinitionId(),
-			_filterFactory.create(
-				StringBundler.concat(
-					"classExternalReferenceCode eq '",
-					objectEntry.getExternalReferenceCode(),
-					"' and className eq '", objectEntry.getModelClassName(),
-					"' and groupExternalReferenceCode eq '",
-					group.getExternalReferenceCode(), "'"),
-				objectDefinition),
-			false, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
-
-		if (objectEntryIds.isEmpty()) {
-			return;
-		}
-
-		document.addKeyword(
-			"cmpProjectIds",
-			TransformUtil.transformToLongArray(
-				objectEntryIds,
-				objectEntryId -> MapUtil.getLong(
-					_objectEntryLocalService.getValues(objectEntryId),
-					"r_cmpProjectToCMPProjectLinks_c_cmpProjectId")));
+		_addLinkedObjectEntryIds(
+			document, "cmpProjectIds", group, "L_CMP_PROJECT_LINK", objectEntry,
+			"r_cmpProjectToCMPProjectLinks_c_cmpProjectId");
+		_addLinkedObjectEntryIds(
+			document, "cmpTaskIds", group, "L_CMP_TASK_LINK",
+			objectEntry, "r_cmpTaskToCMPTaskLinks_c_cmpTaskId");
 	}
 
 	private ObjectEntryFolder _getRootObjectEntryFolder(

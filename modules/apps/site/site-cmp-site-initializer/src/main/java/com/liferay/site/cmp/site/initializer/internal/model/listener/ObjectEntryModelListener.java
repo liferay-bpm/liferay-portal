@@ -70,7 +70,7 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		throws ModelListenerException {
 
 		try {
-			_reindexLinkedObjectEntry(objectEntry);
+			_reindexObjectEntry(objectEntry);
 			_setResourcePermissions(objectEntry);
 			_updateGroup(objectEntry);
 			_updateProjectCompletionRate(objectEntry);
@@ -85,7 +85,7 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		throws ModelListenerException {
 
 		try {
-			_reindexLinkedObjectEntry(objectEntry);
+			_reindexObjectEntry(objectEntry);
 			_updateProjectCompletionRate(objectEntry);
 		}
 		catch (Exception exception) {
@@ -155,29 +155,28 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 
 		return new String[] {ActionKeys.ADD_DISCUSSION, ActionKeys.VIEW};
 	}
+	private void _reindexObjectEntry(ObjectEntry objectEntry) {
+		ObjectDefinition objectDefinition = objectEntry.getObjectDefinition();
 
-	private void _reindexLinkedObjectEntry(
-		ObjectEntry cmpProjectLinkObjectEntry) {
-
-		ObjectDefinition cmpProjectLinkObjectDefinition =
-			cmpProjectLinkObjectEntry.getObjectDefinition();
+		String objectDefinitionExternalReferenceCode =
+			objectDefinition.getExternalReferenceCode();
 
 		if (!StringUtil.equals(
-				cmpProjectLinkObjectDefinition.getExternalReferenceCode(),
-				"L_CMP_PROJECT_LINK")) {
+				objectDefinitionExternalReferenceCode, "L_CMP_PROJECT_LINK") &&
+			!StringUtil.equals(
+				objectDefinitionExternalReferenceCode, "L_CMP_TASK_LINK")) {
 
 			return;
 		}
-
-		Map<String, Serializable> values =
-			cmpProjectLinkObjectEntry.getValues();
 
 		TransactionCallbackUtil.registerCommitCallback(
 			() -> {
 				Group group =
 					_groupLocalService.fetchGroupByExternalReferenceCode(
-						MapUtil.getString(values, "groupExternalReferenceCode"),
-						cmpProjectLinkObjectEntry.getCompanyId());
+						MapUtil.getString(
+							objectEntry.getValues(),
+							"groupExternalReferenceCode"),
+						objectEntry.getCompanyId());
 
 				if (group == null) {
 					return null;
@@ -186,8 +185,9 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 				ObjectDefinition linkedObjectDefinition =
 					_objectDefinitionLocalService.
 						fetchObjectDefinitionByClassName(
-							cmpProjectLinkObjectEntry.getCompanyId(),
-							MapUtil.getString(values, "className"));
+							objectEntry.getCompanyId(),
+							MapUtil.getString(
+								objectEntry.getValues(), "className"));
 
 				if (linkedObjectDefinition == null) {
 					return null;
@@ -195,7 +195,9 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 
 				ObjectEntry linkedObjectEntry =
 					_objectEntryLocalService.fetchObjectEntry(
-						MapUtil.getString(values, "classExternalReferenceCode"),
+						MapUtil.getString(
+							objectEntry.getValues(),
+							"classExternalReferenceCode"),
 						group.getGroupId(),
 						linkedObjectDefinition.getObjectDefinitionId());
 
