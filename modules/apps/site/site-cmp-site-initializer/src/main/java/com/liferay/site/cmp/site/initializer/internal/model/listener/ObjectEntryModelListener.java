@@ -27,6 +27,8 @@ import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -35,6 +37,7 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserGroupRoleService;
 import com.liferay.portal.kernel.service.UserService;
+import com.liferay.portal.kernel.transaction.TransactionCallbackUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -50,6 +53,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
@@ -66,6 +70,7 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		throws ModelListenerException {
 
 		try {
+			_reindexLinkedObjectEntry(objectEntry);
 			_setResourcePermissions(objectEntry);
 			_updateGroup(objectEntry);
 			_updateProjectCompletionRate(objectEntry);
@@ -80,6 +85,7 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		throws ModelListenerException {
 
 		try {
+			_reindexLinkedObjectEntry(objectEntry);
 			_updateProjectCompletionRate(objectEntry);
 		}
 		catch (Exception exception) {
@@ -148,6 +154,63 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		}
 
 		return new String[] {ActionKeys.ADD_DISCUSSION, ActionKeys.VIEW};
+	}
+
+	private void _reindexLinkedObjectEntry(
+		ObjectEntry cmpProjectLinkObjectEntry) {
+
+		ObjectDefinition cmpProjectLinkObjectDefinition =
+			cmpProjectLinkObjectEntry.getObjectDefinition();
+
+		if (!StringUtil.equals(
+				cmpProjectLinkObjectDefinition.getExternalReferenceCode(),
+				"L_CMP_PROJECT_LINK")) {
+
+			return;
+		}
+
+		Map<String, Serializable> values =
+			cmpProjectLinkObjectEntry.getValues();
+
+		TransactionCallbackUtil.registerCommitCallback(
+			() -> {
+				Group group =
+					_groupLocalService.fetchGroupByExternalReferenceCode(
+						MapUtil.getString(values, "groupExternalReferenceCode"),
+						cmpProjectLinkObjectEntry.getCompanyId());
+
+				if (group == null) {
+					return null;
+				}
+
+				ObjectDefinition linkedObjectDefinition =
+					_objectDefinitionLocalService.
+						fetchObjectDefinitionByClassName(
+							cmpProjectLinkObjectEntry.getCompanyId(),
+							MapUtil.getString(values, "className"));
+
+				if (linkedObjectDefinition == null) {
+					return null;
+				}
+
+				ObjectEntry linkedObjectEntry =
+					_objectEntryLocalService.fetchObjectEntry(
+						MapUtil.getString(values, "classExternalReferenceCode"),
+						group.getGroupId(),
+						linkedObjectDefinition.getObjectDefinitionId());
+
+				if (linkedObjectEntry == null) {
+					return null;
+				}
+
+				Indexer<ObjectEntry> indexer =
+					IndexerRegistryUtil.nullSafeGetIndexer(
+						linkedObjectDefinition.getClassName());
+
+				indexer.reindex(linkedObjectEntry);
+
+				return null;
+			});
 	}
 
 	private void _setResourcePermissions(ObjectEntry objectEntry)
