@@ -12,6 +12,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemBuilder;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectDefinitionService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -41,6 +42,7 @@ public class ViewRelatedAssetsSectionDisplayContext
 		DLConfiguration dlConfiguration, GroupLocalService groupLocalService,
 		HttpServletRequest httpServletRequest, Language language,
 		ObjectDefinition objectDefinition,
+		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectDefinitionService objectDefinitionService,
 		ObjectEntry objectEntry, Portal portal,
 		TranslationInfoItemFieldValuesExporterRegistry
@@ -52,12 +54,16 @@ public class ViewRelatedAssetsSectionDisplayContext
 			objectDefinitionService, objectEntry, portal,
 			translationInfoItemFieldValuesExporterRegistry);
 
+		_objectDefinitionLocalService = objectDefinitionLocalService;
+
 		_linkedAssetsFilterFieldName = _getLinkedAssetsFilterFieldName();
 	}
 
 	@Override
 	public Map<String, Object> getAdditionalProps() {
 		return HashMapBuilder.<String, Object>put(
+			"documentClassName", _getCMSBasicDocumentClassName()
+		).put(
 			"objectEntryLinkContext", _getObjectEntryLinkContext()
 		).putAll(
 			super.getAdditionalProps()
@@ -73,7 +79,17 @@ public class ViewRelatedAssetsSectionDisplayContext
 				"baseAssetLibraryViewURL",
 				ActionUtil.getBaseSpaceURL(themeDisplay)
 			).putData(
+				"documentClassName", _getCMSBasicDocumentClassName()
+			).putData(
+				"objectEntryId", String.valueOf(objectEntry.getObjectEntryId())
+			).putData(
+				"objectRelationshipFieldName", _getObjectRelationshipFieldName()
+			).putData(
 				"parentObjectEntryFolderExternalReferenceCode", StringPool.BLANK
+			).putData(
+				"restContextPath", _getRESTContextPath()
+			).putData(
+				"scopeGroupId", String.valueOf(objectEntry.getGroupId())
 			).setIcon(
 				"upload-multiple"
 			).setLabel(
@@ -145,16 +161,17 @@ public class ViewRelatedAssetsSectionDisplayContext
 			_linkedAssetsFilterFieldName, objectEntry.getObjectEntryId());
 	}
 
-	private Map<String, Object> _getObjectEntryLinkContext() {
-		return HashMapBuilder.<String, Object>put(
-			"objectEntryId", String.valueOf(objectEntry.getObjectEntryId())
-		).put(
-			"objectRelationshipFieldName", _getObjectRelationshipFieldName()
-		).put(
-			"restContextPath", _getRESTContextPath()
-		).put(
-			"scopeGroupId", String.valueOf(objectEntry.getGroupId())
-		).build();
+	private String _getCMSBasicDocumentClassName() {
+		ObjectDefinition cmsBasicDocumentObjectDefinition =
+			_objectDefinitionLocalService.
+				fetchObjectDefinitionByExternalReferenceCode(
+					"L_CMS_BASIC_DOCUMENT", objectEntry.getCompanyId());
+
+		if (cmsBasicDocumentObjectDefinition == null) {
+			return StringPool.BLANK;
+		}
+
+		return cmsBasicDocumentObjectDefinition.getClassName();
 	}
 
 	private String _getLinkedAssetsFilterFieldName() {
@@ -165,6 +182,18 @@ public class ViewRelatedAssetsSectionDisplayContext
 		}
 
 		return "cmpTaskObjectEntryIds";
+	}
+
+	private Map<String, Object> _getObjectEntryLinkContext() {
+		return HashMapBuilder.<String, Object>put(
+			"objectEntryId", String.valueOf(objectEntry.getObjectEntryId())
+		).put(
+			"objectRelationshipFieldName", _getObjectRelationshipFieldName()
+		).put(
+			"restContextPath", _getRESTContextPath()
+		).put(
+			"scopeGroupId", String.valueOf(objectEntry.getGroupId())
+		).build();
 	}
 
 	private String _getObjectRelationshipFieldName() {
@@ -188,5 +217,6 @@ public class ViewRelatedAssetsSectionDisplayContext
 	}
 
 	private final String _linkedAssetsFilterFieldName;
+	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 }
