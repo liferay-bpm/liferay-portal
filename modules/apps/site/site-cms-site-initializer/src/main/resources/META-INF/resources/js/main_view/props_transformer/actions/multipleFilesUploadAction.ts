@@ -9,11 +9,14 @@ import {AssetLibrary} from '../../../common/types/AssetLibrary';
 import {openCMSModal} from '../../../common/utils/openCMSModal';
 import MultipleFilesUploadModalContent from '../../modal/MultipleFilesUploadModalContent';
 
+import type {LinkObjectRelationship} from '../RelatedAssetsFDSPropsTransformer';
+
 export type MultipleFileUploaderData = {
 	assetLibraries: AssetLibrary[];
 	baseAssetLibraryViewURL: string;
+	documentClassName?: string;
 	parentObjectEntryFolderExternalReferenceCode: string;
-};
+} & Partial<LinkObjectRelationship>;
 
 export default function multipleFilesUploadAction(
 	data: MultipleFileUploaderData & {
