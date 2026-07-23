@@ -5,7 +5,6 @@
 
 package com.liferay.site.cms.site.initializer.internal.fragment.renderer;
 
-import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.document.library.configuration.DLConfiguration;
 import com.liferay.fragment.renderer.FragmentRenderer;
@@ -55,8 +54,8 @@ public class ViewAllRelatedAssetsJSPSectionFragmentRenderer
 		ObjectEntry objectEntry = (ObjectEntry)object;
 
 		return new ViewAllRelatedAssetsSectionDisplayContext(
-			_assetTagLocalService, _depotEntryLocalService, _dlConfiguration,
-			groupLocalService, httpServletRequest, language,
+			_depotEntryLocalService, _dlConfiguration, groupLocalService,
+			httpServletRequest, language,
 			_objectDefinitionLocalService.fetchObjectDefinition(
 				objectEntry.getObjectDefinitionId()),
 			_objectDefinitionLocalService, _objectDefinitionService,
@@ -70,9 +69,6 @@ public class ViewAllRelatedAssetsJSPSectionFragmentRenderer
 	protected String getJSPPath() {
 		return "/view_all_related_assets.jsp";
 	}
-
-	@Reference
-	private AssetTagLocalService _assetTagLocalService;
 
 	@Reference
 	private DepotEntryLocalService _depotEntryLocalService;
