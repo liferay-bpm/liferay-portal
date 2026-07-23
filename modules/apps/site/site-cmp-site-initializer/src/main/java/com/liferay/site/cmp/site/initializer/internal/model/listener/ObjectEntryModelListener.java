@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserGroupRoleService;
 import com.liferay.portal.kernel.service.UserService;
+import com.liferay.portal.kernel.transaction.TransactionCallbackUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -207,6 +208,64 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		}
 
 		return new String[] {ActionKeys.ADD_DISCUSSION, ActionKeys.VIEW};
+	}
+	private void _reindexLinkedObjectEntry(ObjectEntry objectEntry) {
+		ObjectDefinition objectDefinition = objectEntry.getObjectDefinition();
+
+		if (!StringUtil.equals(
+				objectDefinition.getExternalReferenceCode(),
+				"L_CMP_PROJECT_LINK") &&
+			!StringUtil.equals(
+				objectDefinition.getExternalReferenceCode(),
+				"L_CMP_TASK_LINK")) {
+
+			return;
+		}
+
+		TransactionCallbackUtil.registerCommitCallback(
+			() -> {
+				Group group =
+					_groupLocalService.fetchGroupByExternalReferenceCode(
+						MapUtil.getString(
+							objectEntry.getValues(),
+							"groupExternalReferenceCode"),
+						objectEntry.getCompanyId());
+
+				if (group == null) {
+					return null;
+				}
+
+				ObjectDefinition linkedObjectDefinition =
+					_objectDefinitionLocalService.
+						fetchObjectDefinitionByClassName(
+							objectEntry.getCompanyId(),
+							MapUtil.getString(
+								objectEntry.getValues(), "className"));
+
+				if (linkedObjectDefinition == null) {
+					return null;
+				}
+
+				ObjectEntry linkedObjectEntry =
+					_objectEntryLocalService.fetchObjectEntry(
+						MapUtil.getString(
+							objectEntry.getValues(),
+							"classExternalReferenceCode"),
+						group.getGroupId(),
+						linkedObjectDefinition.getObjectDefinitionId());
+
+				if (linkedObjectEntry == null) {
+					return null;
+				}
+
+				Indexer<ObjectEntry> indexer =
+					IndexerRegistryUtil.nullSafeGetIndexer(
+						linkedObjectDefinition.getClassName());
+
+				indexer.reindex(linkedObjectEntry);
+
+				return null;
+			});
 	}
 
 	private void _setResourcePermissions(ObjectEntry objectEntry)
