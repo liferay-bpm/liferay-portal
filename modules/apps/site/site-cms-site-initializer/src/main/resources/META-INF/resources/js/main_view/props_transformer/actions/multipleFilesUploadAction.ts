@@ -12,7 +12,6 @@ import MultipleFilesUploadModalContent from '../../modal/MultipleFilesUploadModa
 export type MultipleFileUploaderData = {
 	assetLibraries: AssetLibrary[];
 	baseAssetLibraryViewURL: string;
-	keywords?: string;
 	parentObjectEntryFolderExternalReferenceCode: string;
 };
 

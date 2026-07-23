@@ -27,7 +27,6 @@ export default function MultipleFilesUploadModalContent({
 	assetLibraries,
 	baseAssetLibraryViewURL,
 	filesToUpload,
-	keywords,
 	loadData,
 	onModalClose,
 	parentObjectEntryFolderExternalReferenceCode,
@@ -35,7 +34,6 @@ export default function MultipleFilesUploadModalContent({
 	assetLibraries: AssetLibrary[];
 	baseAssetLibraryViewURL: string;
 	filesToUpload?: FileData[];
-	keywords?: string;
 	loadData?: () => void;
 	onModalClose: () => void;
 	parentObjectEntryFolderExternalReferenceCode: string;
@@ -91,7 +89,6 @@ export default function MultipleFilesUploadModalContent({
 					fileBase64,
 					name: fileData.name,
 				},
-				keywords: keywords?.split(','),
 				objectEntryFolderExternalReferenceCode:
 					parentObjectEntryFolderExternalReferenceCode || 'L_FILES',
 				title: fileData.name,
