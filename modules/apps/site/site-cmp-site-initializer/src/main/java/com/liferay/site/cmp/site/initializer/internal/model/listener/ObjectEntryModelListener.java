@@ -14,6 +14,7 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.sql.dsl.expression.Predicate;
+import com.liferay.portal.kernel.audit.AuditRouter;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -29,7 +30,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -46,6 +46,8 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.security.audit.event.generators.util.Attribute;
+import com.liferay.portal.security.audit.event.generators.util.AuditMessageBuilder;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskInstanceTokenLocalService;
 import com.liferay.site.cmp.site.initializer.internal.util.RoleUtil;
@@ -74,6 +76,7 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 
 		try {
 			_reindexLinkedObjectEntry(objectEntry);
+			_route("CMP_ADD_ASSET", objectEntry);
 			_setResourcePermissions(objectEntry);
 			_updateGroup(objectEntry);
 			_updateProjectCompletionRate(objectEntry);
@@ -89,6 +92,7 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 
 		try {
 			_reindexLinkedObjectEntry(objectEntry);
+			_route("CMP_REMOVE_ASSET", objectEntry);
 			_updateProjectCompletionRate(objectEntry);
 		}
 		catch (Exception exception) {
@@ -111,58 +115,37 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		}
 	}
 
-	private void _reindexLinkedObjectEntry(
-		ObjectEntry cmpProjectLinkObjectEntry) throws Exception {
+	private String _getAssetObjectEntryTitle(
+			long companyId, Map<String, Serializable> values)
+		throws Exception {
 
-		ObjectDefinition cmpProjectLinkObjectDefinition =
-			cmpProjectLinkObjectEntry.getObjectDefinition();
-
-		if (!StringUtil.equals(
-			cmpProjectLinkObjectDefinition.getExternalReferenceCode(),
-			"L_CMP_PROJECT_LINK")) {
-
-			return;
-		}
-
-		Map<String, Serializable> values =
-			cmpProjectLinkObjectEntry.getValues();
-
-		Group group =
-			_groupLocalService.fetchGroupByExternalReferenceCode(
-				MapUtil.getString(values, "groupExternalReferenceCode"),
-				cmpProjectLinkObjectEntry.getCompanyId());
+		Group group = _groupLocalService.fetchGroupByExternalReferenceCode(
+			MapUtil.getString(values, "groupExternalReferenceCode"), companyId);
 
 		if (group == null) {
-			return;
+			return null;
 		}
 
-		ObjectDefinition linkedObjectDefinition =
-			_objectDefinitionLocalService.
-				fetchObjectDefinitionByClassName(
-					cmpProjectLinkObjectEntry.getCompanyId(),
-					MapUtil.getString(values, "className"));
+		ObjectDefinition assetObjectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinitionByClassName(
+				companyId, MapUtil.getString(values, "className"));
 
-		if (linkedObjectDefinition == null) {
-			return;
+		if (assetObjectDefinition == null) {
+			return null;
 		}
 
-		ObjectEntry linkedObjectEntry =
+		ObjectEntry assetObjectEntry =
 			_objectEntryLocalService.fetchObjectEntry(
 				MapUtil.getString(values, "classExternalReferenceCode"),
 				group.getGroupId(),
-				linkedObjectDefinition.getObjectDefinitionId());
+				assetObjectDefinition.getObjectDefinitionId());
 
-		if (linkedObjectEntry == null) {
-			return;
+		if (assetObjectEntry == null) {
+			return null;
 		}
 
-		Indexer<ObjectEntry> indexer =
-			IndexerRegistryUtil.nullSafeGetIndexer(
-				linkedObjectDefinition.getClassName());
-
-		indexer.reindex(linkedObjectEntry);
+		return assetObjectEntry.getTitleValue();
 	}
-
 
 	private JSONObject _getCMPDefaultPermissionJSONObject(
 		ObjectDefinition objectDefinition) {
@@ -287,6 +270,58 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 
 				return null;
 			});
+	}
+
+	private void _route(String eventType, ObjectEntry objectEntry)
+		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled(
+				objectEntry.getCompanyId(), "LPD-58677")) {
+
+			return;
+		}
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				objectEntry.getObjectDefinitionId());
+
+		if ((objectDefinition == null) ||
+			!StringUtil.equals(
+				objectDefinition.getExternalReferenceCode(),
+				"L_CMP_TASK_LINK")) {
+
+			return;
+		}
+
+		ObjectEntry cmpTaskObjectEntry =
+			_objectEntryLocalService.fetchObjectEntry(
+				MapUtil.getLong(
+					objectEntry.getValues(),
+					"r_cmpTaskToCMPTaskLinks_c_cmpTaskId"));
+
+		if (cmpTaskObjectEntry == null) {
+			return;
+		}
+
+		ObjectDefinition cmpTaskObjectDefinition =
+			cmpTaskObjectEntry.getObjectDefinition();
+
+		if (!cmpTaskObjectDefinition.isEnableObjectEntryHistory()) {
+			return;
+		}
+
+		String title = _getAssetObjectEntryTitle(
+			objectEntry.getCompanyId(), objectEntry.getValues());
+
+		if (title == null) {
+			return;
+		}
+
+		_auditRouter.route(
+			AuditMessageBuilder.buildAuditMessage(
+				cmpTaskObjectEntry.getModelClassName(),
+				cmpTaskObjectEntry.getObjectEntryId(), eventType,
+				Collections.singletonList(new Attribute(title))));
 	}
 
 	private void _setResourcePermissions(ObjectEntry objectEntry)
@@ -500,6 +535,9 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 					return role.getRoleId();
 				}));
 	}
+
+	@Reference
+	private AuditRouter _auditRouter;
 
 	@Reference(
 		target = "(filter.factory.key=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT + ")"
