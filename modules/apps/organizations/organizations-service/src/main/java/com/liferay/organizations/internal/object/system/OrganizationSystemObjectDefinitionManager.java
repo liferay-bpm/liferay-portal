@@ -16,6 +16,7 @@ import com.liferay.object.system.JaxRsApplicationDescriptor;
 import com.liferay.object.system.SystemObjectDefinitionManager;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.Table;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.BaseModel;
@@ -82,7 +83,9 @@ public class OrganizationSystemObjectDefinitionManager
 
 	@Override
 	public String getAdditionalAPIURLParameters() {
-		return "fields=id,name&flatten=true";
+		return StringBundler.concat(
+			"fields=", getRESTDTOIdPropertyName(), StringPool.COMMA,
+			getTitleObjectFieldName(), "&flatten=true");
 	}
 
 	@Override
