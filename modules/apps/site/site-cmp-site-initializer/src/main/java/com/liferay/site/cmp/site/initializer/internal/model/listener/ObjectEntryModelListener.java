@@ -27,6 +27,9 @@ import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -50,6 +53,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
@@ -66,6 +70,7 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		throws ModelListenerException {
 
 		try {
+			_reindexLinkedObjectEntry(objectEntry);
 			_setResourcePermissions(objectEntry);
 			_updateGroup(objectEntry);
 			_updateProjectCompletionRate(objectEntry);
@@ -80,6 +85,7 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		throws ModelListenerException {
 
 		try {
+			_reindexLinkedObjectEntry(objectEntry);
 			_updateProjectCompletionRate(objectEntry);
 		}
 		catch (Exception exception) {
@@ -101,6 +107,59 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 			throw new ModelListenerException(exception);
 		}
 	}
+
+	private void _reindexLinkedObjectEntry(
+		ObjectEntry cmpProjectLinkObjectEntry) throws Exception {
+
+		ObjectDefinition cmpProjectLinkObjectDefinition =
+			cmpProjectLinkObjectEntry.getObjectDefinition();
+
+		if (!StringUtil.equals(
+			cmpProjectLinkObjectDefinition.getExternalReferenceCode(),
+			"L_CMP_PROJECT_LINK")) {
+
+			return;
+		}
+
+		Map<String, Serializable> values =
+			cmpProjectLinkObjectEntry.getValues();
+
+		Group group =
+			_groupLocalService.fetchGroupByExternalReferenceCode(
+				MapUtil.getString(values, "groupExternalReferenceCode"),
+				cmpProjectLinkObjectEntry.getCompanyId());
+
+		if (group == null) {
+			return;
+		}
+
+		ObjectDefinition linkedObjectDefinition =
+			_objectDefinitionLocalService.
+				fetchObjectDefinitionByClassName(
+					cmpProjectLinkObjectEntry.getCompanyId(),
+					MapUtil.getString(values, "className"));
+
+		if (linkedObjectDefinition == null) {
+			return;
+		}
+
+		ObjectEntry linkedObjectEntry =
+			_objectEntryLocalService.fetchObjectEntry(
+				MapUtil.getString(values, "classExternalReferenceCode"),
+				group.getGroupId(),
+				linkedObjectDefinition.getObjectDefinitionId());
+
+		if (linkedObjectEntry == null) {
+			return;
+		}
+
+		Indexer<ObjectEntry> indexer =
+			IndexerRegistryUtil.nullSafeGetIndexer(
+				linkedObjectDefinition.getClassName());
+
+		indexer.reindex(linkedObjectEntry);
+	}
+
 
 	private JSONObject _getCMPDefaultPermissionJSONObject(
 		ObjectDefinition objectDefinition) {
