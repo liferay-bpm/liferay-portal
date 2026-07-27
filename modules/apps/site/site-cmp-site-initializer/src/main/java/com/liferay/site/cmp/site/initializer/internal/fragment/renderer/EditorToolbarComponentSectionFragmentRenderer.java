@@ -83,6 +83,17 @@ public class EditorToolbarComponentSectionFragmentRenderer
 		return HashMapBuilder.<String, Object>put(
 			"backURL", ParamUtil.getString(httpServletRequest, "redirect")
 		).put(
+			"discardURL",
+			() -> {
+				if (!objectEntry.isDraft()) {
+					return null;
+				}
+
+				return StringBundler.concat(
+					"/o", objectDefinition.getRESTContextPath(), "/",
+					objectEntry.getObjectEntryId());
+			}
+		).put(
 			"formSubmitURL",
 			() -> {
 				String action = ParamUtil.getString(

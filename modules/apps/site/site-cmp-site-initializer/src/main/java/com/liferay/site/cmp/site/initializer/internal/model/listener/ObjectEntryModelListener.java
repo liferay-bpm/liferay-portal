@@ -6,6 +6,8 @@
 package com.liferay.site.cmp.site.initializer.internal.model.listener;
 
 import com.liferay.depot.constants.DepotRolesConstants;
+import com.liferay.depot.model.DepotEntry;
+import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -80,6 +82,7 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		throws ModelListenerException {
 
 		try {
+			_deleteProjectAssetLibrary(objectEntry);
 			_updateProjectCompletionRate(objectEntry);
 		}
 		catch (Exception exception) {
@@ -99,6 +102,32 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		}
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
+		}
+	}
+
+	private void _deleteProjectAssetLibrary(ObjectEntry objectEntry)
+		throws Exception {
+
+		if (!objectEntry.isDraft()) {
+			return;
+		}
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				objectEntry.getObjectDefinitionId());
+
+		if ((objectDefinition == null) ||
+			!StringUtil.equals(
+				objectDefinition.getExternalReferenceCode(), "L_CMP_PROJECT")) {
+
+			return;
+		}
+
+		DepotEntry depotEntry = _depotEntryLocalService.fetchGroupDepotEntry(
+			objectEntry.getGroupId());
+
+		if (depotEntry != null) {
+			_depotEntryLocalService.deleteDepotEntry(depotEntry);
 		}
 	}
 
@@ -361,6 +390,9 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 					return role.getRoleId();
 				}));
 	}
+
+	@Reference
+	private DepotEntryLocalService _depotEntryLocalService;
 
 	@Reference(
 		target = "(filter.factory.key=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT + ")"
