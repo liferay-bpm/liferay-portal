@@ -7,6 +7,7 @@ package com.liferay.site.cmp.site.initializer.internal.model.listener.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.depot.constants.DepotRolesConstants;
+import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectEntryLocalService;
@@ -29,6 +30,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
@@ -133,6 +135,25 @@ public class ObjectEntryModelListenerTest {
 	}
 
 	@Test
+	public void testOnAfterRemove() throws Exception {
+		ObjectEntry projectObjectEntry = CMPTestUtil.addCMPProjectObjectEntry();
+
+		long groupId = projectObjectEntry.getGroupId();
+
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_DRAFT, projectObjectEntry.getStatus());
+
+		Assert.assertNotNull(
+			_depotEntryLocalService.fetchGroupDepotEntry(groupId));
+
+		_objectEntryLocalService.deleteObjectEntry(projectObjectEntry);
+
+		Assert.assertNull(
+			_depotEntryLocalService.fetchGroupDepotEntry(groupId));
+		Assert.assertNull(_groupLocalService.fetchGroup(groupId));
+	}
+
+	@Test
 	public void testOnAfterUpdate() throws Exception {
 		ObjectEntry cmpProjectObjectEntry =
 			CMPTestUtil.addCMPProjectObjectEntry();
@@ -204,6 +225,9 @@ public class ObjectEntryModelListenerTest {
 		Assert.assertTrue(
 			userGroupRoleNames.containsAll(expectedUserGroupRoleNames));
 	}
+
+	@Inject
+	private DepotEntryLocalService _depotEntryLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;
