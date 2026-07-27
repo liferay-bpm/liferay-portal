@@ -9,11 +9,12 @@ import ClayLink from '@clayui/link';
 import {AIAssistantTriggerButton} from '@liferay/ai-hub-cell-js-components-web';
 import {isCtrlOrMeta} from '@liferay/layout-js-components-web';
 import {Toolbar} from '@liferay/site-cms-site-initializer';
-import {sessionStorage, sub} from 'frontend-js-web';
+import {fetch, navigate, sessionStorage, sub} from 'frontend-js-web';
 import React, {useEffect, useId, useState} from 'react';
 
 export default function EditorToolbar({
 	backURL,
+	discardURL,
 	formSubmitURL,
 	groupId,
 	hasUpdatePermission,
@@ -21,6 +22,7 @@ export default function EditorToolbar({
 	title,
 }: {
 	backURL: string;
+	discardURL?: string;
 	formSubmitURL?: string;
 	groupId: number;
 	hasUpdatePermission: boolean;
@@ -105,6 +107,17 @@ export default function EditorToolbar({
 					button
 					displayType="secondary"
 					href={backURL}
+					onClick={
+						discardURL
+							? (event) => {
+									event.preventDefault();
+
+									fetch(discardURL, {
+										method: 'DELETE',
+									}).finally(() => navigate(backURL));
+								}
+							: undefined
+					}
 					small
 				>
 					{Liferay.Language.get('cancel')}

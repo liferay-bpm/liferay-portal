@@ -28,13 +28,24 @@ export default function CategorizationProjects({
 
 	useEffect(() => {
 		const loadProjects = async () => {
-			const response = await ApiHelper.getAll<Project>({
-				filter: "type eq 'Project'",
-				url: '/o/headless-asset-library/v1.0/asset-libraries',
-			});
+			const [assetLibraries, approvedProjectScopeIds] = await Promise.all(
+				[
+					ApiHelper.getAll<Project>({
+						filter: "type eq 'Project'",
+						url: '/o/headless-asset-library/v1.0/asset-libraries',
+					}),
+					getApprovedProjectScopeIds(),
+				]
+			);
+
+			const projects = approvedProjectScopeIds
+				? assetLibraries.filter((item) =>
+						approvedProjectScopeIds.has(item.siteId)
+					)
+				: assetLibraries;
 
 			setSourceItems(
-				response.map(
+				projects.map(
 					(item): ProjectItem => ({
 						displayType: item.settings?.logoColor,
 						label: item.name,
@@ -80,5 +91,23 @@ export default function CategorizationProjects({
 			preselectedItems={preselectedItems}
 			sourceItems={sourceItems}
 		/>
+	);
+}
+
+async function getApprovedProjectScopeIds(): Promise<Set<number> | null> {
+	const {data, error} = await ApiHelper.get<{
+		items?: {embedded?: {scopeId?: number}}[];
+	}>(
+		"/o/search/v1.0/search?emptySearch=true&nestedFields=embedded&pageSize=-1&filter=objectDefinitionExternalReferenceCode eq 'l_cmp_project' and status eq 0"
+	);
+
+	if (error !== null) {
+		return null;
+	}
+
+	return new Set(
+		(data?.items ?? [])
+			.map((item) => item.embedded?.scopeId)
+			.filter((scopeId): scopeId is number => scopeId !== undefined)
 	);
 }
