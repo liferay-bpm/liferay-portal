@@ -117,6 +117,16 @@ export class EditVocabularyPage {
 		await this.nameInput.fill(name);
 	}
 
+	async openProjectSelector() {
+		if (await this.projectCheckbox.isChecked()) {
+			await this.projectCheckbox.click();
+
+			await expect(this.projectCheckbox).not.toBeChecked();
+		}
+
+		await this.projectSelector.click();
+	}
+
 	async selectAssetTypes(assetType: string) {
 		if (await this.assetTypeCheckbox.isChecked()) {
 			await this.assetTypeCheckbox.click();

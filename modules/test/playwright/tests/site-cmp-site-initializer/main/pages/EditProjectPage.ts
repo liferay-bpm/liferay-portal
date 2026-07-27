@@ -15,12 +15,16 @@ const PLACEHOLDERS: Record<VocabularyField, string> = {
 };
 
 export class EditProjectPage {
+	readonly cancelButton: Locator;
 	readonly page: Page;
 	readonly saveButton: Locator;
 	readonly titleInput: Locator;
 
 	constructor(page: Page) {
 		this.page = page;
+		this.cancelButton = page.getByRole('link', {
+			name: 'Cancel',
+		});
 		this.saveButton = page.getByRole('button', {
 			name: 'Save',
 		});

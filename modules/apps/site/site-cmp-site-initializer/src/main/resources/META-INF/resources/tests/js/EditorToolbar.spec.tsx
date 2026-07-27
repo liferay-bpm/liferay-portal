@@ -4,8 +4,8 @@
  */
 
 import '@testing-library/jest-dom';
-import {fireEvent, render, screen} from '@testing-library/react';
-import {sessionStorage} from 'frontend-js-web';
+import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {fetch, navigate, sessionStorage} from 'frontend-js-web';
 import React from 'react';
 
 import EditorToolbar from '../../js/components/EditorToolbar';
@@ -28,7 +28,11 @@ jest.mock('@clayui/form', () => ({
 
 jest.mock('@clayui/link', () => ({
 	__esModule: true,
-	default: ({children, href}: any) => <a href={href}>{children}</a>,
+	default: ({children, href, onClick}: any) => (
+		<a href={href} onClick={onClick}>
+			{children}
+		</a>
+	),
 }));
 
 jest.mock('@liferay/layout-js-components-web', () => ({
@@ -44,6 +48,8 @@ jest.mock('@liferay/site-cms-site-initializer', () => {
 });
 
 jest.mock('frontend-js-web', () => ({
+	fetch: jest.fn(() => Promise.resolve({ok: true})),
+	navigate: jest.fn(),
 	sessionStorage: {
 		TYPES: {NECESSARY: 'NECESSARY'},
 		getItem: jest.fn(),
@@ -65,9 +71,11 @@ const SUCCESS_MESSAGE_KEY =
 	'com.liferay.site.cmp.site.initializer.successMessage';
 
 const renderComponent = ({
+	discardURL,
 	hasUpdatePermission = true,
 	isNew = false,
 }: {
+	discardURL?: string;
 	hasUpdatePermission?: boolean;
 	isNew?: boolean;
 } = {}) =>
@@ -75,6 +83,7 @@ const renderComponent = ({
 		<>
 			<EditorToolbar
 				backURL="/back"
+				discardURL={discardURL}
 				groupId={0}
 				hasUpdatePermission={hasUpdatePermission}
 				isNew={isNew}
@@ -199,5 +208,28 @@ describe('EditorToolbar', () => {
 		);
 
 		expect(form.submit).not.toHaveBeenCalled();
+	});
+
+	it('discards the draft entry and navigates back when canceling', async () => {
+		renderComponent({
+			discardURL: '/o/c/cmpprojects/123',
+			isNew: true,
+		});
+
+		fireEvent.click(screen.getByText('cancel'));
+
+		expect(fetch).toHaveBeenCalledWith('/o/c/cmpprojects/123', {
+			method: 'DELETE',
+		});
+
+		await waitFor(() => expect(navigate).toHaveBeenCalledWith('/back'));
+	});
+
+	it('does not discard anything when canceling an existing entry', () => {
+		renderComponent({isNew: false});
+
+		fireEvent.click(screen.getByText('cancel'));
+
+		expect(fetch).not.toHaveBeenCalled();
 	});
 });
