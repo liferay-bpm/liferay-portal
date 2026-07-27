@@ -44,10 +44,6 @@ public class SiteInitializerUtil {
 			long companyId, SiteInitializer siteInitializer)
 		throws PortalException {
 
-		if (!FeatureFlagManagerUtil.isEnabled(companyId, "LPD-58677")) {
-			return;
-		}
-
 		Group group = GroupLocalServiceUtil.getGroup(
 			companyId, GroupConstants.CMS);
 
@@ -109,7 +105,7 @@ public class SiteInitializerUtil {
 			SiteInitializer cmsSiteInitializer, long companyId)
 		throws PortalException {
 
-		if (!FeatureFlagManagerUtil.isEnabled(companyId, "LPD-58677") ||
+		if (!FeatureFlagManagerUtil.isEnabled(companyId, "LPD-17564") ||
 			!LicenseManagerUtil.isAppEnabled(App.CMP)) {
 
 			return;

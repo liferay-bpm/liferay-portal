@@ -339,13 +339,7 @@ public class DepotAdminSelectRoleDisplayContext {
 			if (_group != null) {
 				roles = _filterGroupRoles(roles);
 
-				if (FeatureFlagManagerUtil.isEnabled(
-						_themeDisplay.getCompanyId(), "LPD-17564") ||
-					FeatureFlagManagerUtil.isEnabled(
-						_themeDisplay.getCompanyId(), "LPD-58677")) {
-
-					roles = DepotRoleUtil.filter(_group.getGroupId(), roles);
-				}
+				roles = DepotRoleUtil.filter(_group.getGroupId(), roles);
 			}
 
 			roleSearch.setResultsAndTotal(roles);

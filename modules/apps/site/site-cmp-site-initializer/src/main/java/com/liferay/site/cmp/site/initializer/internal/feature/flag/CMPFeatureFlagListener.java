@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author José Abelenda
  */
 @Component(
-	property = "feature.flag.key=LPD-58677", service = FeatureFlagListener.class
+	property = "feature.flag.key=LPD-17564", service = FeatureFlagListener.class
 )
 public class CMPFeatureFlagListener implements FeatureFlagListener {
 
@@ -34,7 +34,7 @@ public class CMPFeatureFlagListener implements FeatureFlagListener {
 	public void onValue(
 		long companyId, String featureFlagKey, boolean enabled) {
 
-		if (!enabled || !Objects.equals(featureFlagKey, "LPD-58677") ||
+		if (!enabled || !Objects.equals(featureFlagKey, "LPD-17564") ||
 			!LicenseManagerUtil.isAppEnabled(App.CMP)) {
 
 			return;

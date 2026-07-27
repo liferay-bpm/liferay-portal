@@ -239,10 +239,6 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 	}
 
 	public boolean isCMP() {
-		if (!FeatureFlagManagerUtil.isEnabled(getCompanyId(), "LPD-58677")) {
-			return false;
-		}
-
 		if (Objects.equals(getExternalReferenceCode(), "L_CMP_PROJECT") ||
 			Objects.equals(getExternalReferenceCode(), "L_CMP_TASK")) {
 

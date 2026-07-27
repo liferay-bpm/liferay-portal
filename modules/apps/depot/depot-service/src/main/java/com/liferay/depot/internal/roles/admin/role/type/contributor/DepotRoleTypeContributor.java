@@ -61,11 +61,7 @@ public class DepotRoleTypeContributor implements RoleTypeContributor {
 			subtypes.add(DepotRolesConstants.SUBTYPE_DESIGN_LIBRARY);
 		}
 
-		if (FeatureFlagManagerUtil.isEnabled(
-				CompanyThreadLocal.getCompanyId(), "LPD-58677")) {
-
-			subtypes.add(DepotRolesConstants.SUBTYPE_PROJECT);
-		}
+		subtypes.add(DepotRolesConstants.SUBTYPE_PROJECT);
 
 		if (FeatureFlagManagerUtil.isEnabled(
 				CompanyThreadLocal.getCompanyId(), "LPD-17564")) {

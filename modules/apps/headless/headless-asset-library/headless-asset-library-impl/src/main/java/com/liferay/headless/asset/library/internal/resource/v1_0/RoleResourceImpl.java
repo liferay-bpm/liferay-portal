@@ -13,7 +13,6 @@ import com.liferay.portal.kernel.exception.NoSuchGroupException;
 import com.liferay.portal.kernel.exception.NoSuchUserException;
 import com.liferay.portal.kernel.exception.NoSuchUserGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
@@ -61,16 +60,9 @@ public class RoleResourceImpl extends BaseRoleResourceImpl {
 
 		_checkAssetLibraryAdminOrAssetLibraryMember(group.getGroupId());
 
-		List<com.liferay.portal.kernel.model.Role> roles =
-			_roleLocalService.getTypeRoles(RoleConstants.TYPE_DEPOT);
-
-		if (FeatureFlagManagerUtil.isEnabled(
-				contextCompany.getCompanyId(), "LPD-17564") ||
-			FeatureFlagManagerUtil.isEnabled(
-				contextCompany.getCompanyId(), "LPD-58677")) {
-
-			roles = DepotRoleUtil.filter(group.getGroupId(), roles);
-		}
+		List<com.liferay.portal.kernel.model.Role> roles = DepotRoleUtil.filter(
+			group.getGroupId(),
+			_roleLocalService.getTypeRoles(RoleConstants.TYPE_DEPOT));
 
 		if (pagination == null) {
 			return Page.of(transform(roles, this::_toRole));
