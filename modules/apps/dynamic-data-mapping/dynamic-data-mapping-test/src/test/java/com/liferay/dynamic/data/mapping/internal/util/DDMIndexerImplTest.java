@@ -313,6 +313,68 @@ public class DDMIndexerImplTest {
 	}
 
 	@Test
+	public void testFormWithRepeatableSelectFieldAndLegacyDDMIndexFieldsEnabled() {
+		DDMIndexer ddmIndexer = _createDDMIndexer(true);
+
+		ReflectionTestUtil.setFieldValue(
+			ddmIndexer, "_jsonFactory", new JSONFactoryImpl());
+
+		Document document = _createDocument();
+
+		Locale[] availableLocales = {LocaleUtil.US};
+		String indexType = "keyword";
+
+		DDMForm ddmForm = DDMStructureTestUtil.getSampleDDMForm(
+			_FIELD_NAME, "string", indexType, true,
+			DDMFormFieldTypeConstants.SELECT, availableLocales, LocaleUtil.US);
+
+		String optionLabel = RandomTestUtil.randomString();
+		String optionValue = RandomTestUtil.randomString();
+
+		_setDDMFormFieldOptions(
+			availableLocales, ddmForm, LocaleUtil.US,
+			HashMapBuilder.put(
+				optionValue, optionLabel
+			).build());
+
+		DDMStructure ddmStructure = _createDDMStructure(ddmForm);
+
+		ddmIndexer.addAttributes(
+			document, ddmStructure,
+			_createDDMFormValues(
+				ddmForm,
+				DDMFormValuesTestUtil.createDDMFormFieldValue(
+					_FIELD_NAME,
+					DDMFormValuesTestUtil.createLocalizedValue(
+						StringBundler.concat("[\"", optionValue, "\"]"),
+						LocaleUtil.US)),
+				DDMFormValuesTestUtil.createDDMFormFieldValue(
+					_FIELD_NAME,
+					DDMFormValuesTestUtil.createLocalizedValue(
+						StringBundler.concat("[\"", optionValue, "\"]"),
+						LocaleUtil.US))));
+
+		Assert.assertArrayEquals(
+			new String[] {
+				StringBundler.concat("[\"", optionValue, "\"]"),
+				StringBundler.concat("[\"", optionValue, "\"]")
+			},
+			document.getValues(
+				StringBundler.concat(
+					"ddm__keyword__", ddmStructure.getStructureId(), "__",
+					_FIELD_NAME, "_en_US")));
+		Assert.assertArrayEquals(
+			new String[] {
+				StringBundler.concat("[\"", optionLabel, "\"]"),
+				StringBundler.concat("[\"", optionLabel, "\"]")
+			},
+			document.getValues(
+				StringBundler.concat(
+					"ddm__keyword__", ddmStructure.getStructureId(), "__",
+					_FIELD_NAME, "_en_US_String")));
+	}
+
+	@Test
 	public void testFormWithSelectField() throws JSONException {
 		Document document = _createDocument();
 
