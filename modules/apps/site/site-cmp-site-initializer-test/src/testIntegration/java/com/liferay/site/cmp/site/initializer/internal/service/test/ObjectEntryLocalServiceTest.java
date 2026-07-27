@@ -35,9 +35,7 @@ import org.junit.runner.RunWith;
 /**
  * @author Guilherme Camacho
  */
-@FeatureFlags(
-	featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-58677")}
-)
+@FeatureFlags(featureFlags = @FeatureFlag("LPD-17564"))
 @RunWith(Arquillian.class)
 public class ObjectEntryLocalServiceTest {
 

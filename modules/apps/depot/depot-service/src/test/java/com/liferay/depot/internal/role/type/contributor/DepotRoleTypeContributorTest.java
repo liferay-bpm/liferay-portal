@@ -86,23 +86,6 @@ public class DepotRoleTypeContributorTest {
 				false
 			);
 
-			mockedStatic.when(
-				() -> FeatureFlagManagerUtil.isEnabled(
-					Mockito.anyLong(), Mockito.eq("LPD-58677"))
-			).thenReturn(
-				false
-			);
-
-			Assert.assertArrayEquals(
-				new String[0], _depotRoleTypeContributor.getSubtypes());
-
-			mockedStatic.when(
-				() -> FeatureFlagManagerUtil.isEnabled(
-					Mockito.anyLong(), Mockito.eq("LPD-58677"))
-			).thenReturn(
-				true
-			);
-
 			Assert.assertArrayEquals(
 				new String[] {DepotRolesConstants.SUBTYPE_PROJECT},
 				_depotRoleTypeContributor.getSubtypes());
@@ -110,24 +93,6 @@ public class DepotRoleTypeContributorTest {
 			mockedStatic.when(
 				() -> FeatureFlagManagerUtil.isEnabled(
 					Mockito.anyLong(), Mockito.eq("LPD-17564"))
-			).thenReturn(
-				true
-			);
-
-			mockedStatic.when(
-				() -> FeatureFlagManagerUtil.isEnabled(
-					Mockito.anyLong(), Mockito.eq("LPD-58677"))
-			).thenReturn(
-				false
-			);
-
-			Assert.assertArrayEquals(
-				new String[] {DepotRolesConstants.SUBTYPE_SPACE},
-				_depotRoleTypeContributor.getSubtypes());
-
-			mockedStatic.when(
-				() -> FeatureFlagManagerUtil.isEnabled(
-					Mockito.anyLong(), Mockito.eq("LPD-58677"))
 			).thenReturn(
 				true
 			);

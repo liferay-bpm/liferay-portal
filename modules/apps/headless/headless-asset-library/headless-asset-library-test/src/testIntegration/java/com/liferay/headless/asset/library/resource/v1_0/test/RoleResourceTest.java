@@ -88,9 +88,7 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 			testDepotEntry.getGroupId(), _userGroup);
 	}
 
-	@FeatureFlags(
-		featureFlags = {@FeatureFlag("LPD-17564"), @FeatureFlag("LPD-58677")}
-	)
+	@FeatureFlags(featureFlags = @FeatureFlag("LPD-17564"))
 	@Override
 	@Test
 	public void testGetAssetLibraryRolesPage() throws Exception {

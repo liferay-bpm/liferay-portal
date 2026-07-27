@@ -57,7 +57,6 @@ public class ViewAllSpacesDisplayContextTest
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
 
-	@FeatureFlag("LPD-58677")
 	@Test
 	public void testGetAdditionalProps() throws Exception {
 		Role role1 = _roleLocalService.addRole(
