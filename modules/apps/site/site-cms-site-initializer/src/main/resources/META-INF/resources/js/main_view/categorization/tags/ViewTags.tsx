@@ -37,7 +37,7 @@ export default function ViewTags({
 	vocabulariesURL: string;
 }) {
 	const NAME_TABLE_CELL_RENDERER_NAME = 'NameTableCellRenderer';
-	const VIEWS_SPACE_TABLE_CELL_RENDERER_NAME = 'ViewsSpaceTableCellRenderer';
+	const VIEWS_SCOPE_TABLE_CELL_RENDERER_NAME = 'ViewsScopeTableCellRenderer';
 
 	const creationMenu = {
 		primaryItems: [
@@ -70,7 +70,17 @@ export default function ViewTags({
 			id: 'groupIds',
 			itemKey: 'siteId',
 			itemLabel: 'name',
-			label: 'Space',
+			label: Liferay.Language.get('space'),
+			multiple: true,
+			type: 'selection',
+		},
+		{
+			apiURL: "/o/headless-asset-library/v1.0/asset-libraries?filter=type eq 'Project'",
+			entityFieldType: 'string',
+			id: 'projects',
+			itemKey: 'siteId',
+			itemLabel: 'name',
+			label: Liferay.Language.get('project'),
 			multiple: true,
 			type: 'selection',
 		},
@@ -91,9 +101,9 @@ export default function ViewTags({
 						sortable: true,
 					},
 					{
-						contentRenderer: VIEWS_SPACE_TABLE_CELL_RENDERER_NAME,
+						contentRenderer: VIEWS_SCOPE_TABLE_CELL_RENDERER_NAME,
 						fieldName: 'assetLibraries',
-						label: Liferay.Language.get('space'),
+						label: Liferay.Language.get('scope'),
 						sortable: false,
 					},
 					{
@@ -175,6 +185,7 @@ export default function ViewTags({
 					closeModal,
 					editTagURL: itemData.actions.replace.href,
 					loadData,
+					projects: itemData.projects,
 					tagId: itemData.id,
 					tagName: itemData.name,
 				}),
@@ -270,7 +281,7 @@ export default function ViewTags({
 						},
 						{
 							component: MultipleScopesRenderer,
-							name: VIEWS_SPACE_TABLE_CELL_RENDERER_NAME,
+							name: VIEWS_SCOPE_TABLE_CELL_RENDERER_NAME,
 							type: 'internal',
 						},
 					],
