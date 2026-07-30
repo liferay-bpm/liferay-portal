@@ -1463,7 +1463,7 @@ test(
 		await apiHelpers.headlessAssetLibrary.putAssetLibraryUserAccountRoles(
 			project.systemProperties.scope.externalReferenceCode,
 			user.externalReferenceCode,
-			['Asset Library Administrator']
+			['Project Member']
 		);
 
 		const assignedBlogTitle = getRandomString();
