@@ -42,6 +42,7 @@ import com.liferay.object.constants.ObjectPortletKeys;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.definition.util.ObjectDefinitionUtil;
 import com.liferay.object.definition.util.ObjectDefinitionValidationThreadLocal;
+import com.liferay.object.exception.DuplicateObjectViewExternalReferenceCodeException;
 import com.liferay.object.exception.ObjectDefinitionStatusException;
 import com.liferay.object.exception.ObjectDefinitionStorageTypeException;
 import com.liferay.object.model.ObjectActionModel;
@@ -334,6 +335,8 @@ public class ObjectDefinitionResourceImpl
 			throw new ObjectDefinitionStorageTypeException();
 		}
 
+		_validateObjectViews(objectDefinition.getObjectViews());
+
 		_addListTypeDefinition(objectDefinition);
 
 		com.liferay.object.model.ObjectDefinition
@@ -574,6 +577,8 @@ public class ObjectDefinitionResourceImpl
 
 			throw new ObjectDefinitionStorageTypeException();
 		}
+
+		_validateObjectViews(objectDefinition.getObjectViews());
 
 		com.liferay.object.model.ObjectDefinition
 			serviceBuilderObjectDefinition =
@@ -932,7 +937,29 @@ public class ObjectDefinitionResourceImpl
 		ObjectView[] objectViews = objectDefinition.getObjectViews();
 
 		if (objectViews != null) {
-			_objectViewLocalService.deleteObjectViews(objectDefinitionId);
+			List<ObjectView> objectViewsList = ListUtil.fromArray(objectViews);
+
+			if (_hasObjectViewExternalReferenceCodes(objectViewsList)) {
+				Set<String> deleteObjectViewsERCs =
+					SetUtil.asymmetricDifference(
+						transform(
+							_objectViewLocalService.getObjectViews(
+								objectDefinitionId),
+							com.liferay.object.model.ObjectView::
+								getExternalReferenceCode),
+						transform(
+							objectViewsList,
+							ObjectView::getExternalReferenceCode));
+
+				for (String deleteObjectViewsERC : deleteObjectViewsERCs) {
+					_objectViewLocalService.deleteObjectView(
+						_objectViewLocalService.fetchObjectView(
+							deleteObjectViewsERC, objectDefinitionId));
+				}
+			}
+			else {
+				_objectViewLocalService.deleteObjectViews(objectDefinitionId);
+			}
 		}
 
 		_addObjectDefinitionResources(
@@ -1224,6 +1251,18 @@ public class ObjectDefinitionResourceImpl
 			).build();
 
 			for (ObjectView objectView : objectViews) {
+				com.liferay.object.model.ObjectView serviceBuilderObjectView =
+					_objectViewLocalService.fetchObjectView(
+						objectView.getExternalReferenceCode(),
+						objectDefinitionId);
+
+				if (serviceBuilderObjectView != null) {
+					objectViewResource.putObjectView(
+						serviceBuilderObjectView.getObjectViewId(), objectView);
+
+					continue;
+				}
+
 				objectViewResource.postObjectDefinitionObjectView(
 					objectDefinitionId, objectView);
 			}
@@ -1401,6 +1440,18 @@ public class ObjectDefinitionResourceImpl
 		return objectFolder.getObjectFolderId();
 	}
 
+	private boolean _hasObjectViewExternalReferenceCodes(
+		List<ObjectView> objectViews) {
+
+		for (ObjectView objectView : objectViews) {
+			if (Validator.isNull(objectView.getExternalReferenceCode())) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	private boolean _isAccumulateError() {
 		if (contextHttpServletRequest != null) {
 			return ParamUtil.getBoolean(
@@ -1565,6 +1616,21 @@ public class ObjectDefinitionResourceImpl
 				serviceBuilderObjectField.isState(),
 				serviceBuilderObjectField.isSystem(),
 				serviceBuilderObjectField.getObjectFieldSettings());
+		}
+	}
+
+	private void _validateObjectViews(ObjectView[] objectViews) {
+		Set<String> externalReferenceCodes = new HashSet<>();
+
+		for (ObjectView objectView : ListUtil.fromArray(objectViews)) {
+			String externalReferenceCode =
+				objectView.getExternalReferenceCode();
+
+			if (Validator.isNotNull(externalReferenceCode) &&
+				!externalReferenceCodes.add(externalReferenceCode)) {
+
+				throw new DuplicateObjectViewExternalReferenceCodeException();
+			}
 		}
 	}
 
