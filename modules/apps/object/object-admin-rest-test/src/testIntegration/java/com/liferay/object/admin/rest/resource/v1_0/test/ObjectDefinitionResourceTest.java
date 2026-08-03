@@ -27,6 +27,8 @@ import com.liferay.object.admin.rest.client.dto.v1_0.ObjectLayoutTab;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectRelationship;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectValidationRule;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectValidationRuleSetting;
+import com.liferay.object.admin.rest.client.dto.v1_0.ObjectView;
+import com.liferay.object.admin.rest.client.dto.v1_0.ObjectViewColumn;
 import com.liferay.object.admin.rest.client.dto.v1_0.Status;
 import com.liferay.object.admin.rest.client.dto.v1_0.WorkflowDefinitionLink;
 import com.liferay.object.admin.rest.client.pagination.Page;
@@ -2061,6 +2063,7 @@ public class ObjectDefinitionResourceTest
 
 		_testPutObjectDefinitionByExternalReferenceCodeWithSystemAggregationObjectField();
 		_testPutObjectDefinitionWithAllowStandaloneObjectEntry();
+		_testPutObjectDefinitionWithObjectViewExternalReferenceCode();
 		_testPutObjectDefinitionWithPermissions();
 	}
 
@@ -2555,6 +2558,25 @@ public class ObjectDefinitionResourceTest
 			Arrays.toString(objectFields), 1, objectFields.length);
 
 		return objectFields[0];
+	}
+
+	private ObjectView _getObjectView(
+			Long objectDefinitionId, String externalReferenceCode)
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			objectDefinitionResource.getObjectDefinition(objectDefinitionId);
+
+		for (ObjectView objectView : objectDefinition.getObjectViews()) {
+			if (Objects.equals(
+					objectView.getExternalReferenceCode(),
+					externalReferenceCode)) {
+
+				return objectView;
+			}
+		}
+
+		return null;
 	}
 
 	private Set<String> _getOpenAPIOperationIds(String restContextPath)
@@ -3675,6 +3697,111 @@ public class ObjectDefinitionResourceTest
 			parentObjectDefinition.getId());
 		_objectDefinitionLocalService.deleteObjectDefinition(
 			childObjectDefinition.getId());
+	}
+
+	private void _testPutObjectDefinitionWithObjectViewExternalReferenceCode()
+		throws Exception {
+
+		// Import the object view
+
+		ObjectDefinition objectDefinition = _addObjectDefinition(
+			_randomModifiableSystemObjectDefinition());
+
+		String objectViewExternalReferenceCode = RandomTestUtil.randomString();
+
+		ObjectView objectView = new ObjectView() {
+			{
+				defaultObjectView = true;
+				externalReferenceCode = objectViewExternalReferenceCode;
+				name = Collections.singletonMap(
+					"en_US", RandomTestUtil.randomString());
+				objectViewColumns = new ObjectViewColumn[] {
+					new ObjectViewColumn() {
+						{
+							label = Collections.singletonMap(
+								"en_US", RandomTestUtil.randomString());
+							objectFieldName = "customObjectField";
+							priority = 0;
+						}
+					}
+				};
+			}
+		};
+
+		objectDefinition.setObjectViews(new ObjectView[] {objectView});
+
+		objectDefinitionResource.putObjectDefinition(
+			objectDefinition.getId(), objectDefinition);
+
+		ObjectView persistedObjectView = _getObjectView(
+			objectDefinition.getId(), objectViewExternalReferenceCode);
+
+		Assert.assertNotNull(persistedObjectView);
+
+		Long objectViewId = persistedObjectView.getId();
+
+		// Reimport the same object view
+
+		objectDefinitionResource.putObjectDefinition(
+			objectDefinition.getId(), objectDefinition);
+
+		persistedObjectView = _getObjectView(
+			objectDefinition.getId(), objectViewExternalReferenceCode);
+
+		Assert.assertEquals(objectViewId, persistedObjectView.getId());
+
+		// Reimport without the object views property
+
+		objectDefinition.setObjectViews((ObjectView[])null);
+
+		objectDefinitionResource.putObjectDefinition(
+			objectDefinition.getId(), objectDefinition);
+
+		persistedObjectView = _getObjectView(
+			objectDefinition.getId(), objectViewExternalReferenceCode);
+
+		Assert.assertEquals(objectViewId, persistedObjectView.getId());
+
+		// Reimport duplicate external reference codes
+
+		objectDefinition.setObjectViews(
+			new ObjectView[] {objectView, objectView});
+
+		try {
+			objectDefinitionResource.putObjectDefinition(
+				objectDefinition.getId(), objectDefinition);
+
+			Assert.fail();
+		}
+		catch (Problem.ProblemException problemException) {
+			Problem problem = problemException.getProblem();
+
+			Assert.assertEquals("BAD_REQUEST", problem.getStatus());
+		}
+
+		// Reimport a legacy object view without an external reference code
+
+		objectView.setExternalReferenceCode((String)null);
+
+		objectDefinition.setObjectViews(new ObjectView[] {objectView});
+
+		objectDefinition = objectDefinitionResource.putObjectDefinition(
+			objectDefinition.getId(), objectDefinition);
+
+		Assert.assertEquals(1, objectDefinition.getObjectViews().length);
+		Assert.assertNotNull(
+			objectDefinition.getObjectViews()[0].getExternalReferenceCode());
+
+		// Reimport without the object view
+
+		objectDefinition.setObjectViews(new ObjectView[0]);
+
+		objectDefinitionResource.putObjectDefinition(
+			objectDefinition.getId(), objectDefinition);
+
+		Assert.assertNull(
+			_getObjectView(
+				objectDefinition.getId(), objectViewExternalReferenceCode));
 	}
 
 	private void _testPutObjectDefinitionWithPermissions() throws Exception {
