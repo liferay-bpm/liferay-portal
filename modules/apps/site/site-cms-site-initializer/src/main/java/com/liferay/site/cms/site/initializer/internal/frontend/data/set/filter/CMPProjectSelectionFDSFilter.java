@@ -26,6 +26,9 @@ import org.osgi.service.component.annotations.Reference;
 		"frontend.data.set.name=" + CMSSiteInitializerFDSNames.ALL_SECTION,
 		"frontend.data.set.name=" + CMSSiteInitializerFDSNames.CONTENTS_SECTION,
 		"frontend.data.set.name=" + CMSSiteInitializerFDSNames.FILES_SECTION,
+		"frontend.data.set.name=" + CMSSiteInitializerFDSNames.RECYCLE_BIN_SECTION,
+		"frontend.data.set.name=" + CMSSiteInitializerFDSNames.VIEW_CONTENTS_FOLDER,
+		"frontend.data.set.name=" + CMSSiteInitializerFDSNames.VIEW_FILES_FOLDER,
 		"service.ranking:Integer=88"
 	},
 	service = FDSFilter.class
@@ -34,10 +37,7 @@ public class CMPProjectSelectionFDSFilter extends BaseSelectionFDSFilter {
 
 	@Override
 	public String getAPIURL() {
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.
-				fetchObjectDefinitionByExternalReferenceCode(
-					"L_CMP_PROJECT", CompanyThreadLocal.getCompanyId());
+		ObjectDefinition objectDefinition = _fetchCMPProjectObjectDefinition();
 
 		if (objectDefinition == null) {
 			return null;
@@ -85,8 +85,20 @@ public class CMPProjectSelectionFDSFilter extends BaseSelectionFDSFilter {
 
 	@Override
 	public boolean isEnabled() {
-		return FeatureFlagManagerUtil.isEnabled(
-			CompanyThreadLocal.getCompanyId(), "LPD-58677");
+		if (FeatureFlagManagerUtil.isEnabled(
+				CompanyThreadLocal.getCompanyId(), "LPD-58677") &&
+			(_fetchCMPProjectObjectDefinition() != null)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private ObjectDefinition _fetchCMPProjectObjectDefinition() {
+		return _objectDefinitionLocalService.
+			fetchObjectDefinitionByExternalReferenceCode(
+				"L_CMP_PROJECT", CompanyThreadLocal.getCompanyId());
 	}
 
 	@Reference
