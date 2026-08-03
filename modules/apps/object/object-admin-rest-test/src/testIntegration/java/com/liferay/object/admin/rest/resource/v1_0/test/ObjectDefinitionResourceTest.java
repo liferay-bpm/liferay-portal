@@ -27,6 +27,8 @@ import com.liferay.object.admin.rest.client.dto.v1_0.ObjectLayoutTab;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectRelationship;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectValidationRule;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectValidationRuleSetting;
+import com.liferay.object.admin.rest.client.dto.v1_0.ObjectView;
+import com.liferay.object.admin.rest.client.dto.v1_0.ObjectViewColumn;
 import com.liferay.object.admin.rest.client.dto.v1_0.Status;
 import com.liferay.object.admin.rest.client.dto.v1_0.WorkflowDefinitionLink;
 import com.liferay.object.admin.rest.client.pagination.Page;
@@ -2064,6 +2066,70 @@ public class ObjectDefinitionResourceTest
 		_testPutObjectDefinitionWithPermissions();
 	}
 
+	@Test
+	public void testPutObjectDefinitionObjectViewExternalReferenceCode()
+		throws Exception {
+
+		ObjectDefinition objectDefinition = _addObjectDefinition(
+			_randomModifiableSystemObjectDefinition());
+
+		String objectViewExternalReferenceCode =
+			"L_" + RandomTestUtil.randomString();
+
+		ObjectView objectView = new ObjectView() {
+			{
+				defaultObjectView = true;
+				externalReferenceCode = objectViewExternalReferenceCode;
+				name = Collections.singletonMap(
+					"en_US", RandomTestUtil.randomString());
+				objectViewColumns = new ObjectViewColumn[] {
+					new ObjectViewColumn() {
+						{
+							label = Collections.singletonMap(
+								"en_US", RandomTestUtil.randomString());
+							objectFieldName = "customObjectField";
+							priority = 0;
+						}
+					}
+				};
+			}
+		};
+
+		objectDefinition.setObjectViews(new ObjectView[] {objectView});
+
+		objectDefinitionResource.putObjectDefinition(
+			objectDefinition.getId(), objectDefinition);
+
+		ObjectView persistedObjectView = _getObjectView(
+			objectDefinition.getId(), objectViewExternalReferenceCode);
+
+		Assert.assertNotNull(persistedObjectView);
+
+		Long objectViewId = persistedObjectView.getId();
+
+		// Reimporting the same object definition must keep the object view
+		// primary key stable
+
+		objectDefinitionResource.putObjectDefinition(
+			objectDefinition.getId(), objectDefinition);
+
+		persistedObjectView = _getObjectView(
+			objectDefinition.getId(), objectViewExternalReferenceCode);
+
+		Assert.assertEquals(objectViewId, persistedObjectView.getId());
+
+		// Reimporting without the object view must reconcile the removal
+
+		objectDefinition.setObjectViews(new ObjectView[0]);
+
+		objectDefinitionResource.putObjectDefinition(
+			objectDefinition.getId(), objectDefinition);
+
+		Assert.assertNull(
+			_getObjectView(
+				objectDefinition.getId(), objectViewExternalReferenceCode));
+	}
+
 	@Override
 	protected String[] getAdditionalAssertFieldNames() {
 		return new String[] {"name", "status"};
@@ -2555,6 +2621,25 @@ public class ObjectDefinitionResourceTest
 			Arrays.toString(objectFields), 1, objectFields.length);
 
 		return objectFields[0];
+	}
+
+	private ObjectView _getObjectView(
+			Long objectDefinitionId, String externalReferenceCode)
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			objectDefinitionResource.getObjectDefinition(objectDefinitionId);
+
+		for (ObjectView objectView : objectDefinition.getObjectViews()) {
+			if (Objects.equals(
+					objectView.getExternalReferenceCode(),
+					externalReferenceCode)) {
+
+				return objectView;
+			}
+		}
+
+		return null;
 	}
 
 	private Set<String> _getOpenAPIOperationIds(String restContextPath)

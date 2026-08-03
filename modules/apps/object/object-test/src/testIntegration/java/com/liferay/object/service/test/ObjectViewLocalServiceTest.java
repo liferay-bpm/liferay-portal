@@ -106,7 +106,7 @@ public class ObjectViewLocalServiceTest {
 	@Test
 	public void testAddObjectView() throws Exception {
 		_objectViewLocalService.addObjectView(
-			TestPropsValues.getUserId(),
+			null, TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			Arrays.asList(_createObjectViewColumn("Able", "able", false)),
@@ -156,7 +156,7 @@ public class ObjectViewLocalServiceTest {
 		_objectDefinition = _addObjectDefinition();
 
 		_objectViewLocalService.addObjectView(
-			TestPropsValues.getUserId(),
+			null, TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			Arrays.asList(
@@ -185,7 +185,7 @@ public class ObjectViewLocalServiceTest {
 			Collections.emptyList(), Collections.emptyList());
 
 		_objectViewLocalService.addObjectView(
-			TestPropsValues.getUserId(),
+			null, TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			_createObjectViewColumnsWithoutLabel(), Collections.emptyList(),
@@ -288,8 +288,8 @@ public class ObjectViewLocalServiceTest {
 		ObjectView objectView = _addObjectView();
 
 		objectView = _objectViewLocalService.updateObjectView(
-			objectView.getObjectViewId(), objectView.isDefaultObjectView(),
-			objectView.getNameMap(),
+			null, objectView.getObjectViewId(),
+			objectView.isDefaultObjectView(), objectView.getNameMap(),
 			Collections.singletonList(
 				_createObjectViewColumn("Fox", "fox", false)),
 			Collections.emptyList(),
@@ -315,7 +315,7 @@ public class ObjectViewLocalServiceTest {
 				"with object views",
 			_objectDefinitionAA,
 			_objectViewLocalService.addObjectView(
-				TestPropsValues.getUserId(),
+				null, TestPropsValues.getUserId(),
 				_objectDefinitionAA.getObjectDefinitionId(), false,
 				RandomTestUtil.randomLocaleStringMap(),
 				List.of(
@@ -403,9 +403,10 @@ public class ObjectViewLocalServiceTest {
 				_createObjectViewSortColumn("love", "zulu")));
 
 		objectView = _objectViewLocalService.updateObjectView(
-			objectView.getObjectViewId(), objectView.isDefaultObjectView(),
-			objectView.getNameMap(), Collections.emptyList(),
-			Collections.emptyList(), Collections.emptyList());
+			null, objectView.getObjectViewId(),
+			objectView.isDefaultObjectView(), objectView.getNameMap(),
+			Collections.emptyList(), Collections.emptyList(),
+			Collections.emptyList());
 
 		objectViewColumns = objectView.getObjectViewColumns();
 
@@ -418,9 +419,10 @@ public class ObjectViewLocalServiceTest {
 			objectViewSortColumns.toString(), 0, objectViewSortColumns.size());
 
 		_objectViewLocalService.updateObjectView(
-			objectView.getObjectViewId(), objectView.isDefaultObjectView(),
-			objectView.getNameMap(), _createObjectViewColumnsWithoutLabel(),
-			Collections.emptyList(), Collections.emptyList());
+			null, objectView.getObjectViewId(),
+			objectView.isDefaultObjectView(), objectView.getNameMap(),
+			_createObjectViewColumnsWithoutLabel(), Collections.emptyList(),
+			Collections.emptyList());
 
 		_deleteObjectFields();
 
@@ -476,7 +478,7 @@ public class ObjectViewLocalServiceTest {
 		_objectFieldLocalService.addObjectField(objectField);
 
 		return _objectViewLocalService.addObjectView(
-			TestPropsValues.getUserId(),
+			null, TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			Arrays.asList(
@@ -503,7 +505,7 @@ public class ObjectViewLocalServiceTest {
 		AssertUtils.assertFailure(
 			ObjectViewFilterColumnException.class, errorMessage,
 			() -> _objectViewLocalService.addObjectView(
-				TestPropsValues.getUserId(),
+				null, TestPropsValues.getUserId(),
 				_objectDefinition.getObjectDefinitionId(), false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				Collections.emptyList(),
@@ -527,13 +529,13 @@ public class ObjectViewLocalServiceTest {
 			() -> {
 				if (objectView != null) {
 					_objectViewLocalService.updateObjectView(
-						objectView.getObjectViewId(), defaultObjectView,
+						null, objectView.getObjectViewId(), defaultObjectView,
 						objectView.getNameMap(), objectViewColumns,
 						objectViewFilterColumns, objectViewSortColumns);
 				}
 				else {
 					_objectViewLocalService.addObjectView(
-						TestPropsValues.getUserId(),
+						null, TestPropsValues.getUserId(),
 						objectDefinition.getObjectDefinitionId(),
 						defaultObjectView,
 						LocalizedMapUtil.getLocalizedMap(
@@ -764,7 +766,7 @@ public class ObjectViewLocalServiceTest {
 			ServiceContextTestUtil.getServiceContext());
 
 		_objectViewLocalService.addObjectView(
-			TestPropsValues.getUserId(),
+			null, TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			Collections.emptyList(),
@@ -783,7 +785,7 @@ public class ObjectViewLocalServiceTest {
 		User user2 = UserTestUtil.addUser();
 
 		_objectViewLocalService.addObjectView(
-			TestPropsValues.getUserId(),
+			null, TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			Collections.emptyList(),
