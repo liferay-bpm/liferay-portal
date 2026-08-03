@@ -929,12 +929,6 @@ public class ObjectDefinitionResourceImpl
 					deleteObjectValidationRulesERC, objectDefinitionId));
 		}
 
-		ObjectView[] objectViews = objectDefinition.getObjectViews();
-
-		if (objectViews != null) {
-			_objectViewLocalService.deleteObjectViews(objectDefinitionId);
-		}
-
 		_addObjectDefinitionResources(
 			accountEntryRestrictedObjectRelationshipsNames,
 			objectDefinition.getDefaultLanguageId(),
@@ -942,7 +936,7 @@ public class ObjectDefinitionResourceImpl
 			objectLayouts,
 			objectRelationships.toArray(new ObjectRelationship[0]),
 			objectValidationRules.toArray(new ObjectValidationRule[0]),
-			objectViews);
+			objectDefinition.getObjectViews());
 
 		_updateAggregationObjectFields(
 			serviceBuilderObjectDefinition.getDBTableName(),
@@ -1223,7 +1217,42 @@ public class ObjectDefinitionResourceImpl
 				contextUser
 			).build();
 
+			Set<String> externalReferenceCodes = new HashSet<>();
+
 			for (ObjectView objectView : objectViews) {
+				if (Validator.isNotNull(
+						objectView.getExternalReferenceCode())) {
+
+					externalReferenceCodes.add(
+						objectView.getExternalReferenceCode());
+				}
+			}
+
+			for (com.liferay.object.model.ObjectView serviceBuilderObjectView :
+					_objectViewLocalService.getObjectViews(
+						objectDefinitionId)) {
+
+				if (!externalReferenceCodes.contains(
+						serviceBuilderObjectView.getExternalReferenceCode())) {
+
+					_objectViewLocalService.deleteObjectView(
+						serviceBuilderObjectView.getObjectViewId());
+				}
+			}
+
+			for (ObjectView objectView : objectViews) {
+				com.liferay.object.model.ObjectView serviceBuilderObjectView =
+					_objectViewLocalService.fetchObjectView(
+						objectView.getExternalReferenceCode(),
+						objectDefinitionId);
+
+				if (serviceBuilderObjectView != null) {
+					objectViewResource.putObjectView(
+						serviceBuilderObjectView.getObjectViewId(), objectView);
+
+					continue;
+				}
+
 				objectViewResource.postObjectDefinitionObjectView(
 					objectDefinitionId, objectView);
 			}
