@@ -13,6 +13,7 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
@@ -76,12 +77,29 @@ public class EditorToolbarComponentSectionFragmentRenderer
 			_objectDefinitionLocalService.fetchObjectDefinition(
 				objectEntry.getObjectDefinitionId());
 
+		if (objectDefinition == null) {
+			return Collections.emptyMap();
+		}
+
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
 		return HashMapBuilder.<String, Object>put(
 			"backURL", ParamUtil.getString(httpServletRequest, "redirect")
+		).put(
+			"discardURL",
+			() -> {
+				if (!objectEntry.isDraft() ||
+					!_isCMPProjectObjectDefinition(objectDefinition)) {
+
+					return null;
+				}
+
+				return StringBundler.concat(
+					"/o", objectDefinition.getRESTContextPath(),
+					StringPool.SLASH, objectEntry.getObjectEntryId());
+			}
 		).put(
 			"formSubmitURL",
 			() -> {
@@ -114,10 +132,7 @@ public class EditorToolbarComponentSectionFragmentRenderer
 						"&action=", CMPActionConstants.CREATE_GLOBAL_TASK);
 				}
 
-				if (Objects.equals(
-						objectDefinition.getExternalReferenceCode(),
-						"L_CMP_PROJECT")) {
-
+				if (_isCMPProjectObjectDefinition(objectDefinition)) {
 					String baseViewProjectURL =
 						ActionUtil.getBaseViewProjectURL(
 							objectDefinition, themeDisplay);
@@ -146,10 +161,7 @@ public class EditorToolbarComponentSectionFragmentRenderer
 		).put(
 			"title",
 			() -> {
-				if (Objects.equals(
-						objectDefinition.getExternalReferenceCode(),
-						"L_CMP_PROJECT")) {
-
+				if (_isCMPProjectObjectDefinition(objectDefinition)) {
 					return LanguageUtil.get(
 						themeDisplay.getLocale(),
 						objectEntry.isDraft() ? "new-project" : "edit-project");
@@ -179,6 +191,13 @@ public class EditorToolbarComponentSectionFragmentRenderer
 		}
 
 		return (ObjectEntry)displayObject;
+	}
+
+	private boolean _isCMPProjectObjectDefinition(
+		ObjectDefinition objectDefinition) {
+
+		return Objects.equals(
+			objectDefinition.getExternalReferenceCode(), "L_CMP_PROJECT");
 	}
 
 	@Reference
