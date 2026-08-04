@@ -791,10 +791,15 @@ projectVocabularyTest.describe('Project selection tests', () => {
 		async ({apiHelpers, editVocabularyPage, page, vocabulariesPage}) => {
 			const projectName = getRandomString();
 
-			await apiHelpers.headlessAssetLibrary.createAssetLibrary({
-				name: projectName,
-				settings: {},
-				type: 'Project',
+			const projectEntry = await apiHelpers.objectEntry.postObjectEntry(
+				{title: projectName},
+				'cmp/projects'
+			);
+
+			apiHelpers.data.push({
+				applicationName: 'cmp/projects',
+				id: projectEntry.id,
+				type: 'objectEntry',
 			});
 
 			const name = `Vocabulary${getRandomInt()}`;
@@ -837,6 +842,44 @@ projectVocabularyTest.describe('Project selection tests', () => {
 				),
 				trigger: modalSaveButton,
 			});
+		}
+	);
+
+	projectVocabularyTest(
+		'Does not list a ghost project in the project selector',
+		{tag: '@LPD-97935'},
+		async ({apiHelpers, editVocabularyPage, page}) => {
+			const approvedProjectTitle = getRandomString();
+			const ghostProjectName = getRandomString();
+
+			await apiHelpers.headlessAssetLibrary.createAssetLibrary({
+				name: ghostProjectName,
+				settings: {},
+				type: 'Project',
+			});
+
+			const projectEntry = await apiHelpers.objectEntry.postObjectEntry(
+				{title: approvedProjectTitle},
+				'cmp/projects'
+			);
+
+			apiHelpers.data.push({
+				applicationName: 'cmp/projects',
+				id: projectEntry.id,
+				type: 'objectEntry',
+			});
+
+			await editVocabularyPage.goto();
+
+			await editVocabularyPage.openProjectSelector();
+
+			await expect(
+				page.getByRole('option', {name: approvedProjectTitle})
+			).toHaveCount(1);
+
+			await expect(
+				page.getByRole('option', {name: ghostProjectName})
+			).toHaveCount(0);
 		}
 	);
 
