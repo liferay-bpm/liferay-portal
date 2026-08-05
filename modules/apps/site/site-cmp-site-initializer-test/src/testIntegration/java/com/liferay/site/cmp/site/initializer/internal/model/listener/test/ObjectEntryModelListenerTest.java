@@ -183,6 +183,24 @@ public class ObjectEntryModelListenerTest {
 	}
 
 	@Test
+	public void testOnAfterRemove() throws Exception {
+		ObjectEntry cmpProjectObjectEntry =
+			CMPTestUtil.addCMPProjectObjectEntry();
+
+		long groupId = cmpProjectObjectEntry.getGroupId();
+
+		Assert.assertNotNull(
+			_depotEntryLocalService.fetchGroupDepotEntry(groupId));
+
+		_objectEntryLocalService.deleteObjectEntry(
+			cmpProjectObjectEntry.getObjectEntryId());
+
+		Assert.assertNull(
+			_depotEntryLocalService.fetchGroupDepotEntry(groupId));
+		Assert.assertNull(_groupLocalService.fetchGroup(groupId));
+	}
+
+	@Test
 	public void testOnAfterUpdate() throws Exception {
 		ObjectEntry cmpProjectObjectEntry =
 			CMPTestUtil.addCMPProjectObjectEntry();
