@@ -53,6 +53,7 @@ import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.related.models.ObjectRelatedModelsPredicateProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistryUtil;
 import com.liferay.object.rest.context.path.RESTContextPathResolver;
+import com.liferay.object.rest.filter.factory.FilterFactory;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -70,6 +71,7 @@ import com.liferay.object.tree.Node;
 import com.liferay.object.tree.ObjectDefinitionTreeFactory;
 import com.liferay.object.tree.Tree;
 import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.db.partition.util.DBPartitionUtil;
@@ -137,6 +139,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		DepotEntryGroupRelLocalService depotEntryGroupRelLocalService,
 		DepotEntryLocalService depotEntryLocalService,
 		DLFileEntryLocalService dlFileEntryLocalService,
+		FilterFactory<Predicate> filterFactory,
 		GroupLocalService groupLocalService,
 		KaleoDefinitionLocalService kaleoDefinitionLocalService,
 		ListTypeLocalService listTypeLocalService,
@@ -175,6 +178,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		_depotEntryGroupRelLocalService = depotEntryGroupRelLocalService;
 		_depotEntryLocalService = depotEntryLocalService;
 		_dlFileEntryLocalService = dlFileEntryLocalService;
+		_filterFactory = filterFactory;
 		_groupLocalService = groupLocalService;
 		_kaleoDefinitionLocalService = kaleoDefinitionLocalService;
 		_listTypeLocalService = listTypeLocalService;
@@ -344,8 +348,10 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					ModelDocumentContributor.class,
 					new ObjectEntryModelDocumentContributor(
 						_accountEntryOrganizationRelLocalService,
-						_dlFileEntryLocalService,
+						_dlFileEntryLocalService, _filterFactory,
+						_groupLocalService, _objectDefinitionLocalService,
 						_objectEntryFolderLocalService,
+						_objectEntryLocalService,
 						_objectFieldBusinessTypeRegistry,
 						_textEmbeddingDocumentContributor),
 					HashMapDictionaryBuilder.<String, Object>put(
@@ -694,6 +700,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		_depotEntryGroupRelLocalService;
 	private final DepotEntryLocalService _depotEntryLocalService;
 	private final DLFileEntryLocalService _dlFileEntryLocalService;
+	private final FilterFactory<Predicate> _filterFactory;
 	private final GroupLocalService _groupLocalService;
 	private final KaleoDefinitionLocalService _kaleoDefinitionLocalService;
 	private final ListTypeLocalService _listTypeLocalService;

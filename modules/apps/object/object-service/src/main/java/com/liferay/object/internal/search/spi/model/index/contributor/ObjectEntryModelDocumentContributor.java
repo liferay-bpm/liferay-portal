@@ -23,20 +23,29 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFolder;
 import com.liferay.object.model.bag.ObjectFieldBag;
 import com.liferay.object.rest.dto.v1_0.ListEntry;
+import com.liferay.object.rest.filter.factory.FilterFactory;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryFolderLocalService;
+import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.base.BaseTable;
+import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.FieldArray;
 import com.liferay.portal.kernel.search.ReindexCacheThreadLocal;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.BigDecimalUtil;
@@ -78,14 +87,22 @@ public class ObjectEntryModelDocumentContributor
 		AccountEntryOrganizationRelLocalService
 			accountEntryOrganizationRelLocalService,
 		DLFileEntryLocalService dlFileEntryLocalService,
+		FilterFactory<Predicate> filterFactory,
+		GroupLocalService groupLocalService,
+		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectEntryFolderLocalService objectEntryFolderLocalService,
+		ObjectEntryLocalService objectEntryLocalService,
 		ObjectFieldBusinessTypeRegistry objectFieldBusinessTypeRegistry,
 		TextEmbeddingDocumentContributor textEmbeddingDocumentContributor) {
 
 		_accountEntryOrganizationRelLocalService =
 			accountEntryOrganizationRelLocalService;
 		_dlFileEntryLocalService = dlFileEntryLocalService;
+		_filterFactory = filterFactory;
+		_groupLocalService = groupLocalService;
+		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryFolderLocalService = objectEntryFolderLocalService;
+		_objectEntryLocalService = objectEntryLocalService;
 		_objectFieldBusinessTypeRegistry = objectFieldBusinessTypeRegistry;
 		_textEmbeddingDocumentContributor = textEmbeddingDocumentContributor;
 	}
@@ -571,8 +588,12 @@ public class ObjectEntryModelDocumentContributor
 		document.addKeyword(
 			"rootDescendantNode", objectEntry.isRootDescendantNode());
 
-		_contributeObjectEntryFolder(
+		String cmsSection = _contributeObjectEntryFolder(
 			document, objectEntry.getObjectEntryFolderId());
+
+		if (cmsSection != null) {
+			_contributeCMPLinkedObjectEntryIds(document, objectEntry);
+		}
 
 		if (objectDefinition.isCMP()) {
 			if (values == null) {
@@ -607,6 +628,33 @@ public class ObjectEntryModelDocumentContributor
 		textEmbeddingContentHelper.contribute(document);
 	}
 
+	private void _contributeCMPLinkedObjectEntryIds(
+			Document document, ObjectEntry objectEntry)
+		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled(
+				objectEntry.getCompanyId(), "LPD-58677")) {
+
+			return;
+		}
+
+		long[] cmpTaskObjectEntryIds = _getLinkedObjectEntryIds(
+			"L_CMP_TASK_LINK", objectEntry,
+			"r_cmpTaskToCMPTaskLinks_c_cmpTaskId");
+
+		long[] cmpProjectObjectEntryIds = _getCMPProjectObjectEntryIds(
+			cmpTaskObjectEntryIds, objectEntry);
+
+		if (cmpProjectObjectEntryIds.length > 0) {
+			document.addKeyword(
+				"cmpProjectObjectEntryIds", cmpProjectObjectEntryIds);
+		}
+
+		if (cmpTaskObjectEntryIds.length > 0) {
+			document.addKeyword("cmpTaskObjectEntryIds", cmpTaskObjectEntryIds);
+		}
+	}
+
 	private void _contributeFile(Document document, long fileEntryId) {
 		DLFileEntry fileEntry = DLFileEntryLocalServiceUtil.fetchDLFileEntry(
 			fileEntryId);
@@ -616,7 +664,7 @@ public class ObjectEntryModelDocumentContributor
 		}
 	}
 
-	private void _contributeObjectEntryFolder(
+	private String _contributeObjectEntryFolder(
 		Document document, long objectEntryFolderId) {
 
 		document.addKeyword(Field.FOLDER_ID, objectEntryFolderId);
@@ -626,21 +674,21 @@ public class ObjectEntryModelDocumentContributor
 				objectEntryFolderId);
 
 		if (objectEntryFolder == null) {
-			return;
+			return null;
 		}
 
 		ObjectEntryFolder rootObjectEntryFolder = _getRootObjectEntryFolder(
 			objectEntryFolder);
 
 		if (rootObjectEntryFolder == null) {
-			return;
+			return null;
 		}
 
 		String cmsSection = _getCMSSection(
 			rootObjectEntryFolder.getExternalReferenceCode());
 
 		if (cmsSection == null) {
-			return;
+			return null;
 		}
 
 		document.addKeyword(
@@ -648,6 +696,40 @@ public class ObjectEntryModelDocumentContributor
 			rootObjectEntryFolder.getObjectEntryFolderId() ==
 				objectEntryFolderId);
 		document.addKeyword("cms_section", cmsSection);
+
+		return cmsSection;
+	}
+
+	private long[] _getCMPProjectObjectEntryIds(
+			long[] cmpTaskObjectEntryIds, ObjectEntry objectEntry)
+		throws Exception {
+
+		return ArrayUtil.unique(
+			ArrayUtil.append(
+				_getLinkedObjectEntryIds(
+					"L_CMP_PROJECT_LINK", objectEntry,
+					"r_cmpProjectToCMPProjectLinks_c_cmpProjectId"),
+				TransformUtil.transformToLongArray(
+					ListUtil.fromArray(cmpTaskObjectEntryIds),
+					cmpTaskObjectEntryId -> {
+						ObjectEntry cmpTaskObjectEntry =
+							_objectEntryLocalService.fetchObjectEntry(
+								cmpTaskObjectEntryId);
+
+						if (cmpTaskObjectEntry == null) {
+							return null;
+						}
+
+						long cmpProjectObjectEntryId = MapUtil.getLong(
+							cmpTaskObjectEntry.getValues(),
+							"r_cmpProjectToCMPTasks_c_cmpProjectId");
+
+						if (cmpProjectObjectEntryId == 0) {
+							return null;
+						}
+
+						return cmpProjectObjectEntryId;
+					})));
 	}
 
 	private String _getCMSSection(String externalReferenceCode) {
@@ -746,6 +828,47 @@ public class ObjectEntryModelDocumentContributor
 		}
 
 		return StringPool.BLANK;
+	}
+
+	private long[] _getLinkedObjectEntryIds(
+			String objectDefinitionExternalReferenceCode,
+			ObjectEntry objectEntry, String relationshipObjectFieldName)
+		throws Exception {
+
+		Group group = _groupLocalService.fetchGroup(objectEntry.getGroupId());
+
+		if (group == null) {
+			return new long[0];
+		}
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.
+				fetchObjectDefinitionByExternalReferenceCode(
+					objectDefinitionExternalReferenceCode,
+					objectEntry.getCompanyId());
+
+		if (objectDefinition == null) {
+			return new long[0];
+		}
+
+		List<Long> objectEntryIds = _objectEntryLocalService.getPrimaryKeys(
+			new Long[0], objectEntry.getCompanyId(), 0,
+			objectDefinition.getObjectDefinitionId(),
+			_filterFactory.create(
+				StringBundler.concat(
+					"className eq '", objectEntry.getModelClassName(),
+					"' and classExternalReferenceCode eq '",
+					objectEntry.getExternalReferenceCode(),
+					"' and groupExternalReferenceCode eq '",
+					group.getExternalReferenceCode(), "'"),
+				objectDefinition),
+			false, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		return TransformUtil.transformToLongArray(
+			objectEntryIds,
+			objectEntryId -> MapUtil.getLong(
+				_objectEntryLocalService.getValues(objectEntryId),
+				relationshipObjectFieldName));
 	}
 
 	private long[] _getOrganizationIds(Long accountEntryId) {
@@ -855,7 +978,11 @@ public class ObjectEntryModelDocumentContributor
 	private final AccountEntryOrganizationRelLocalService
 		_accountEntryOrganizationRelLocalService;
 	private final DLFileEntryLocalService _dlFileEntryLocalService;
+	private final FilterFactory<Predicate> _filterFactory;
+	private final GroupLocalService _groupLocalService;
+	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectEntryFolderLocalService _objectEntryFolderLocalService;
+	private final ObjectEntryLocalService _objectEntryLocalService;
 	private final ObjectFieldBusinessTypeRegistry
 		_objectFieldBusinessTypeRegistry;
 	private final TextEmbeddingDocumentContributor

@@ -7,6 +7,7 @@ package com.liferay.object.internal.search;
 
 import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.internal.search.spi.model.index.contributor.ObjectEntryModelDocumentContributor;
 import com.liferay.object.internal.search.spi.model.result.contributor.ObjectEntryModelSummaryContributor;
@@ -18,15 +19,18 @@ import com.liferay.object.model.ObjectFieldTable;
 import com.liferay.object.model.ObjectFolder;
 import com.liferay.object.model.ObjectFolderTable;
 import com.liferay.object.model.bag.ObjectFieldBag;
+import com.liferay.object.rest.filter.factory.FilterFactory;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryFolderLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFolderLocalService;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
+import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.search.ReindexCacheThreadLocal;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.search.indexer.IndexerDocumentBuilder;
 import com.liferay.portal.search.ml.embedding.text.TextEmbeddingDocumentContributor;
@@ -83,7 +87,9 @@ public class ObjectEntryModelSearchConfigurator
 			objectEntryModelDocumentContributor =
 				new ObjectEntryModelDocumentContributor(
 					_accountEntryOrganizationRelLocalService,
-					_dlFileEntryLocalService, _objectEntryFolderLocalService,
+					_dlFileEntryLocalService, _filterFactory,
+					_groupLocalService, _objectDefinitionLocalService,
+					_objectEntryFolderLocalService, _objectEntryLocalService,
 					_objectFieldBusinessTypeRegistry,
 					_textEmbeddingDocumentContributor);
 
@@ -213,6 +219,14 @@ public class ObjectEntryModelSearchConfigurator
 
 	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
+
+	@Reference(
+		target = "(filter.factory.key=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT + ")"
+	)
+	private FilterFactory<Predicate> _filterFactory;
+
+	@Reference
+	private GroupLocalService _groupLocalService;
 
 	private ServiceRegistration<ModelDocumentContributor<?>>
 		_modelDocumentContributorServiceRegistration;

@@ -91,6 +91,7 @@ import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionLocalizationTable
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionLocalizationTableFactory;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTableFactory;
+import com.liferay.object.rest.filter.factory.FilterFactory;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectActionLocalService;
@@ -120,6 +121,7 @@ import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.Table;
+import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -1065,7 +1067,7 @@ public class ObjectDefinitionLocalServiceImpl
 			_accountEntryLocalService, _accountEntryOrganizationRelLocalService,
 			_assetEntryLocalService, _bundleContext,
 			_depotEntryGroupRelLocalService, _depotEntryLocalService,
-			_dlFileEntryLocalService, _groupLocalService,
+			_dlFileEntryLocalService, _filterFactory, _groupLocalService,
 			_kaleoDefinitionLocalService, _listTypeLocalService,
 			_objectActionLocalService, objectDefinitionLocalService,
 			_objectDefinitionSettingLocalService,
@@ -4047,6 +4049,11 @@ public class ObjectDefinitionLocalServiceImpl
 
 	@Reference
 	private EmptyModelManager _emptyModelManager;
+
+	@Reference(
+		target = "(filter.factory.key=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT + ")"
+	)
+	private FilterFactory<Predicate> _filterFactory;
 
 	@Reference
 	private FragmentEntryLinkCache _fragmentEntryLinkCache;
