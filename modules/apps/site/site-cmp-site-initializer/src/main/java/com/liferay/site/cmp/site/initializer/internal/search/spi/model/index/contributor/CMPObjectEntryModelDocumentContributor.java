@@ -5,6 +5,7 @@
 
 package com.liferay.site.cmp.site.initializer.internal.search.spi.model.index.contributor;
 
+import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryFolder;
@@ -29,11 +30,21 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
 import com.liferay.site.cmp.site.initializer.internal.util.CMPLinkedObjectEntryUtil;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Pedro Leite
  */
+@Component(
+	property = "indexer.class.name=com.liferay.object.model.ObjectEntry",
+	service = ModelDocumentContributor.class
+)
 public class CMPObjectEntryModelDocumentContributor
 	implements ModelDocumentContributor<ObjectEntry> {
+
+	public CMPObjectEntryModelDocumentContributor() {
+	}
 
 	public CMPObjectEntryModelDocumentContributor(
 		FilterFactory<Predicate> filterFactory,
@@ -167,10 +178,21 @@ public class CMPObjectEntryModelDocumentContributor
 	private static final Log _log = LogFactoryUtil.getLog(
 		CMPObjectEntryModelDocumentContributor.class);
 
-	private final FilterFactory<Predicate> _filterFactory;
-	private final GroupLocalService _groupLocalService;
-	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
-	private final ObjectEntryFolderLocalService _objectEntryFolderLocalService;
-	private final ObjectEntryLocalService _objectEntryLocalService;
+	@Reference(
+		target = "(filter.factory.key=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT + ")"
+	)
+	private FilterFactory<Predicate> _filterFactory;
+
+	@Reference
+	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
+	private ObjectEntryFolderLocalService _objectEntryFolderLocalService;
+
+	@Reference
+	private ObjectEntryLocalService _objectEntryLocalService;
 
 }
