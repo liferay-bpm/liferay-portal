@@ -37,7 +37,14 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.props.test.util.PropsTemporarySwapper;
+import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
+import com.liferay.portal.search.query.QueriesUtil;
+import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
+import com.liferay.portal.search.searcher.SearchResponse;
+import com.liferay.portal.search.searcher.Searcher;
+import com.liferay.portal.search.test.rule.SearchTestRule;
 import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -98,6 +105,43 @@ public class CMPObjectEntryModelDocumentContributorTest {
 		_testContributeWithFeatureFlagDisabled();
 	}
 
+	@Test
+	public void testContributeAfterMoveObjectEntryToTrash() throws Exception {
+		ObjectEntry linkedObjectEntry1 = _addLinkedObjectEntry(
+			_objectDefinition1);
+
+		ObjectEntry cmpProjectObjectEntry =
+			CMPTestUtil.addCMPProjectObjectEntry();
+
+		CMPTestUtil.addCMPProjectLinkObjectEntry(
+			cmpProjectObjectEntry, linkedObjectEntry1);
+
+		_assertSearchByCMPProjectObjectEntry(
+			cmpProjectObjectEntry, linkedObjectEntry1,
+			WorkflowConstants.STATUS_APPROVED);
+
+		ObjectEntry linkedObjectEntry2 =
+			_objectEntryLocalService.moveObjectEntryToTrash(
+				TestPropsValues.getUserId(), linkedObjectEntry1,
+				ServiceContextTestUtil.getServiceContext(
+					_depotEntry.getGroupId()));
+
+		_assertSearchByCMPProjectObjectEntry(
+			cmpProjectObjectEntry, linkedObjectEntry1,
+			WorkflowConstants.STATUS_IN_TRASH);
+
+		_objectEntryLocalService.restoreObjectEntryFromTrash(
+			TestPropsValues.getUserId(), linkedObjectEntry2,
+			ServiceContextTestUtil.getServiceContext(_depotEntry.getGroupId()));
+
+		_assertSearchByCMPProjectObjectEntry(
+			cmpProjectObjectEntry, linkedObjectEntry2,
+			WorkflowConstants.STATUS_APPROVED);
+	}
+
+	@Rule
+	public SearchTestRule searchTestRule = new SearchTestRule();
+
 	private ObjectEntry _addLinkedObjectEntry(ObjectDefinition objectDefinition)
 		throws Exception {
 
@@ -140,6 +184,37 @@ public class CMPObjectEntryModelDocumentContributorTest {
 					objectEntry -> String.valueOf(
 						objectEntry.getObjectEntryId()))),
 			ListUtil.sort(Arrays.asList(field.getValues())));
+	}
+
+	private void _assertSearchByCMPProjectObjectEntry(
+			ObjectEntry cmpProjectObjectEntry, ObjectEntry linkedObjectEntry,
+			int status)
+		throws Exception {
+
+		SearchResponse searchResponse = _searcher.search(
+			_searchRequestBuilderFactory.builder(
+			).companyId(
+				TestPropsValues.getCompanyId()
+			).emptySearchEnabled(
+				true
+			).entryClassNames(
+				linkedObjectEntry.getModelClassName()
+			).withSearchContext(
+				searchContext -> searchContext.setAttribute(
+					Field.STATUS, status)
+			).addComplexQueryPart(
+				_complexQueryPartBuilderFactory.builder(
+				).query(
+					QueriesUtil.term(
+						"cmpProjectObjectEntryIds",
+						String.valueOf(
+							cmpProjectObjectEntry.getObjectEntryId()))
+				).build()
+			).build());
+
+		Assert.assertEquals(
+			searchResponse.getRequestString(), 1,
+			searchResponse.getTotalHits());
 	}
 
 	private ObjectDefinition _publishObjectDefinition() throws Exception {
@@ -285,6 +360,9 @@ public class CMPObjectEntryModelDocumentContributorTest {
 		}
 	}
 
+	@Inject
+	private ComplexQueryPartBuilderFactory _complexQueryPartBuilderFactory;
+
 	@DeleteAfterTestRun
 	private DepotEntry _depotEntry;
 
@@ -309,5 +387,11 @@ public class CMPObjectEntryModelDocumentContributorTest {
 
 	@Inject
 	private ObjectFolderLocalService _objectFolderLocalService;
+
+	@Inject
+	private Searcher _searcher;
+
+	@Inject
+	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
 
 }
