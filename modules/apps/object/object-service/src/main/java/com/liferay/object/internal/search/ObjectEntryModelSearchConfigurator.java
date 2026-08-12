@@ -284,11 +284,15 @@ public class ObjectEntryModelSearchConfigurator
 
 		@Override
 		public IndexerWriterMode getIndexerWriterMode(ObjectEntry objectEntry) {
-			if (objectEntry.isHead()) {
-				return IndexerWriterMode.UPDATE;
+			if (!objectEntry.isHead()) {
+				return IndexerWriterMode.DELETE;
 			}
 
-			return IndexerWriterMode.DELETE;
+			if (!ReindexCacheThreadLocal.isFullMode()) {
+				return IndexerWriterMode.SKIP;
+			}
+
+			return IndexerWriterMode.UPDATE;
 		}
 
 		@Override

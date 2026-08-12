@@ -1609,6 +1609,8 @@ public class ObjectEntryLocalServiceImpl
 			new HashMap<>(), objectEntry.getObjectEntryId(), false,
 			new HashMap<>());
 
+		_reindex(objectEntry);
+
 		return objectEntry;
 	}
 
@@ -2245,19 +2247,19 @@ public class ObjectEntryLocalServiceImpl
 			_objectDefinitionPersistence.findByPrimaryKey(
 				objectEntry.getObjectDefinitionId());
 
-		if (!objectDefinition.isEnableObjectEntryVersioning()) {
-			return objectEntry;
+		if (objectDefinition.isEnableObjectEntryVersioning()) {
+			int objectEntryVersionsCount =
+				_objectEntryVersionPersistence.countByObjectEntryId(
+					objectEntry.getObjectEntryId());
+
+			if (objectEntryVersionsCount > 0) {
+				_objectEntryVersionLocalService.
+					updateLatestObjectEntryVersionModifiedDate(
+						modifiedDate, objectEntry.getObjectEntryId());
+			}
 		}
 
-		int objectEntryVersionsCount =
-			_objectEntryVersionPersistence.countByObjectEntryId(
-				objectEntry.getObjectEntryId());
-
-		if (objectEntryVersionsCount > 0) {
-			_objectEntryVersionLocalService.
-				updateLatestObjectEntryVersionModifiedDate(
-					modifiedDate, objectEntry.getObjectEntryId());
-		}
+		_reindex(objectEntry);
 
 		return objectEntry;
 	}
