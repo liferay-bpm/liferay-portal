@@ -2568,6 +2568,20 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 				"JSONArray/" + languageId),
 			"listTypeEntryKey1", "listTypeEntryKey2");
 
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				BaseExceptionMapper.class.getName(), LoggerTestUtil.OFF)) {
+
+			Assert.assertEquals(
+				Response.Status.BAD_REQUEST.getStatusCode(),
+				HTTPTestUtil.invokeToHttpCode(
+					JSONUtil.put(
+						objectFieldName, JSONUtil.putAll(1, 2)
+					).toString(),
+					"headless-admin-user/v1.0/user-accounts/" +
+						user.getUserId(),
+					Http.Method.PATCH));
+		}
+
 		_objectFieldLocalService.deleteObjectField(localizedObjectField);
 		_objectFieldLocalService.deleteObjectField(objectField);
 
