@@ -250,6 +250,7 @@
 		<!-- Other fields -->
 
 		<column name="tagId" type="long" />
+		<column name="depotEntryType" type="int" />
 
 		<!-- Finder methods -->
 
@@ -262,6 +263,19 @@
 		<finder name="G_T" return-type="AssetTagGroupRel">
 			<finder-column name="groupId" />
 			<finder-column name="tagId" />
+		</finder>
+		<finder name="G_D" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="depotEntryType" />
+		</finder>
+		<finder name="T_D" return-type="Collection">
+			<finder-column name="tagId" />
+			<finder-column name="depotEntryType" />
+		</finder>
+		<finder name="G_T_D" return-type="AssetTagGroupRel">
+			<finder-column name="groupId" />
+			<finder-column name="tagId" />
+			<finder-column name="depotEntryType" />
 		</finder>
 	</entity>
 	<entity external-reference-code="group" local-service="true" name="AssetVocabulary" remote-service="true" uuid="true">
