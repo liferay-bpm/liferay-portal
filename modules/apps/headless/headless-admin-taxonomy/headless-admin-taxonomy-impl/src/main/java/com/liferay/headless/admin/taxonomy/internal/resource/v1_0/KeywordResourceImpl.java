@@ -347,7 +347,8 @@ public class KeywordResourceImpl
 		_assetTagGroupRelLocalService.setAssetTagGroupRels(
 			assetTag.getTagId(),
 			TaxonomyGroupUtil.getAssetLibraryGroupIds(
-				keyword.getAssetLibraries(), assetTag.getCompanyId()));
+				keyword.getAssetLibraries(), assetTag.getCompanyId()),
+			DepotConstants.TYPE_SPACE);
 
 		return _toKeyword(assetTag);
 	}
@@ -364,7 +365,8 @@ public class KeywordResourceImpl
 
 		_assetTagGroupRelLocalService.setAssetTagGroupRels(
 			assetTag.getTagId(),
-			new long[] {GroupConstants.ANY_PARENT_GROUP_ID});
+			new long[] {GroupConstants.ANY_PARENT_GROUP_ID},
+			DepotConstants.TYPE_SPACE);
 	}
 
 	@Override
@@ -434,7 +436,8 @@ public class KeywordResourceImpl
 
 			_assetTagGroupRelLocalService.setAssetTagGroupRels(
 				assetTag.getTagId(),
-				new long[] {GroupConstants.ANY_PARENT_GROUP_ID});
+				new long[] {GroupConstants.ANY_PARENT_GROUP_ID},
+				DepotConstants.TYPE_SPACE);
 
 			return assetTag;
 		}
@@ -453,7 +456,8 @@ public class KeywordResourceImpl
 			keyword.getName(), new ServiceContext());
 
 		_assetTagGroupRelLocalService.setAssetTagGroupRels(
-			assetTag.getTagId(), assetLibraryGroupIds);
+			assetTag.getTagId(), assetLibraryGroupIds,
+			DepotConstants.TYPE_SPACE);
 
 		return assetTag;
 	}
@@ -609,8 +613,9 @@ public class KeywordResourceImpl
 
 		if (group.isCMS()) {
 			List<Long> existingGroupIds = transform(
-				_assetTagGroupRelLocalService.getAssetTagGroupRelsByTagId(
-					assetTag.getTagId()),
+				_assetTagGroupRelLocalService.
+					getAssetTagGroupRelsByTagIdAndDepotEntryType(
+						assetTag.getTagId(), DepotConstants.TYPE_SPACE),
 				assetTagGroupRel -> assetTagGroupRel.getGroupId());
 
 			_assetTagGroupRelLocalService.setAssetTagGroupRels(
@@ -618,7 +623,8 @@ public class KeywordResourceImpl
 				ArrayUtil.append(
 					ArrayUtil.toLongArray(existingGroupIds),
 					TaxonomyGroupUtil.getAssetLibraryGroupIds(
-						keyword.getAssetLibraries(), group.getCompanyId())));
+						keyword.getAssetLibraries(), group.getCompanyId())),
+				DepotConstants.TYPE_SPACE);
 		}
 
 		return _toKeyword(assetTag);
