@@ -6,8 +6,12 @@
 package com.liferay.site.cms.site.initializer.internal.model.listener.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.asset.kernel.model.AssetTag;
+import com.liferay.asset.kernel.model.AssetTagGroupRel;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.model.AssetVocabularyGroupRel;
+import com.liferay.asset.kernel.service.AssetTagGroupRelLocalService;
+import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyGroupRelLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.depot.constants.DepotConstants;
@@ -49,6 +53,13 @@ public class DepotEntryModelListenerTest {
 			PermissionCheckerMethodTestRule.INSTANCE);
 
 	@Test
+	@TestInfo("LPD-101177")
+	public void testOnBeforeRemoveUpdateAssetTagGroupRel() throws Exception {
+		_testOnBeforeRemoveUpdateAssetTagGroupRel(DepotConstants.TYPE_PROJECT);
+		_testOnBeforeRemoveUpdateAssetTagGroupRel(DepotConstants.TYPE_SPACE);
+	}
+
+	@Test
 	@TestInfo("LPD-83676")
 	public void testOnBeforeRemoveUpdateAssetVocabularyGroupRel()
 		throws Exception {
@@ -57,6 +68,68 @@ public class DepotEntryModelListenerTest {
 			DepotConstants.TYPE_PROJECT);
 		_testOnBeforeRemoveUpdateAssetVocabularyGroupRel(
 			DepotConstants.TYPE_SPACE);
+	}
+
+	private DepotEntry _addDepotEntry(Group cmsGroup, int depotEntryType)
+		throws Exception {
+
+		return _depotEntryLocalService.addDepotEntry(
+			Collections.singletonMap(
+				LocaleUtil.getDefault(), RandomTestUtil.randomString()),
+			null, depotEntryType,
+			ServiceContextTestUtil.getServiceContext(
+				cmsGroup.getGroupId(), TestPropsValues.getUserId()));
+	}
+
+	private void _testOnBeforeRemoveUpdateAssetTagGroupRel(int depotEntryType)
+		throws Exception {
+
+		Group cmsGroup = _groupLocalService.getGroup(
+			TestPropsValues.getCompanyId(), GroupConstants.CMS);
+
+		AssetTag assetTag = _assetTagLocalService.addTag(
+			null, TestPropsValues.getUserId(), cmsGroup.getGroupId(),
+			RandomTestUtil.randomString(),
+			ServiceContextTestUtil.getServiceContext(
+				cmsGroup.getGroupId(), TestPropsValues.getUserId()));
+
+		DepotEntry depotEntry1 = _addDepotEntry(cmsGroup, depotEntryType);
+		DepotEntry depotEntry2 = _addDepotEntry(cmsGroup, depotEntryType);
+
+		_assetTagGroupRelLocalService.setAssetTagGroupRels(
+			assetTag.getTagId(),
+			new long[] {depotEntry1.getGroupId(), depotEntry2.getGroupId()},
+			depotEntryType);
+
+		_depotEntryLocalService.deleteDepotEntry(depotEntry1);
+
+		List<AssetTagGroupRel> assetTagGroupRels =
+			_assetTagGroupRelLocalService.
+				getAssetTagGroupRelsByTagIdAndDepotEntryType(
+					assetTag.getTagId(), depotEntryType);
+
+		Assert.assertEquals(
+			assetTagGroupRels.toString(), 1, assetTagGroupRels.size());
+
+		AssetTagGroupRel assetTagGroupRel = assetTagGroupRels.get(0);
+
+		Assert.assertEquals(
+			depotEntry2.getGroupId(), assetTagGroupRel.getGroupId());
+
+		_depotEntryLocalService.deleteDepotEntry(depotEntry2);
+
+		assetTagGroupRels =
+			_assetTagGroupRelLocalService.
+				getAssetTagGroupRelsByTagIdAndDepotEntryType(
+					assetTag.getTagId(), depotEntryType);
+
+		Assert.assertEquals(
+			assetTagGroupRels.toString(), 1, assetTagGroupRels.size());
+
+		assetTagGroupRel = assetTagGroupRels.get(0);
+
+		Assert.assertEquals(
+			GroupConstants.ANY_PARENT_GROUP_ID, assetTagGroupRel.getGroupId());
 	}
 
 	private void _testOnBeforeRemoveUpdateAssetVocabularyGroupRel(
@@ -89,19 +162,9 @@ public class DepotEntryModelListenerTest {
 			GroupConstants.ANY_PARENT_GROUP_ID,
 			assetVocabularyGroupRel.getGroupId());
 
-		DepotEntry depotEntry1 = _depotEntryLocalService.addDepotEntry(
-			Collections.singletonMap(
-				LocaleUtil.getDefault(), RandomTestUtil.randomString()),
-			null, depotEntryType,
-			ServiceContextTestUtil.getServiceContext(
-				cmsGroup.getGroupId(), TestPropsValues.getUserId()));
+		DepotEntry depotEntry1 = _addDepotEntry(cmsGroup, depotEntryType);
 
-		DepotEntry depotEntry2 = _depotEntryLocalService.addDepotEntry(
-			Collections.singletonMap(
-				LocaleUtil.getDefault(), RandomTestUtil.randomString()),
-			null, depotEntryType,
-			ServiceContextTestUtil.getServiceContext(
-				cmsGroup.getGroupId(), TestPropsValues.getUserId()));
+		DepotEntry depotEntry2 = _addDepotEntry(cmsGroup, depotEntryType);
 
 		long[] groupIds = {depotEntry1.getGroupId(), depotEntry2.getGroupId()};
 
@@ -176,6 +239,12 @@ public class DepotEntryModelListenerTest {
 			assetVocabularyGroupRels.toString(), 0,
 			assetVocabularyGroupRels.size());
 	}
+
+	@Inject
+	private AssetTagGroupRelLocalService _assetTagGroupRelLocalService;
+
+	@Inject
+	private AssetTagLocalService _assetTagLocalService;
 
 	@Inject
 	private AssetVocabularyGroupRelLocalService

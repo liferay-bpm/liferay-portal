@@ -117,6 +117,14 @@ public class AssetTagIndexerIndexedFieldsTest {
 			new long[] {group1.getGroupId(), group2.getGroupId()},
 			DepotConstants.TYPE_SPACE);
 
+		Group group3 = GroupTestUtil.addGroup();
+		Group group4 = GroupTestUtil.addGroup();
+
+		_assetTagGroupRelLocalService.setAssetTagGroupRels(
+			assetTag.getTagId(),
+			new long[] {group3.getGroupId(), group4.getGroupId()},
+			DepotConstants.TYPE_PROJECT);
+
 		String searchTerm = String.valueOf(assetTag.getPrimaryKey());
 
 		assertFieldValues(_expectedFieldValues(assetTag), searchTerm);
@@ -214,19 +222,12 @@ public class AssetTagIndexerIndexedFieldsTest {
 		).put(
 			"groupExternalReferenceCode", _group.getExternalReferenceCode()
 		).put(
-			"groupIds",
-			() -> {
-				List<Long> groupIds = ListUtil.toList(
-					_assetTagGroupRelLocalService.getAssetTagGroupRelsByTagId(
-						assetTag.getTagId()),
-					AssetTagGroupRel::getGroupId);
-
-				Collections.sort(groupIds);
-
-				return String.valueOf(groupIds);
-			}
+			"groupIds", () -> _getGroupIds(assetTag, DepotConstants.TYPE_SPACE)
 		).put(
 			"name_String_sortable", StringUtil.toLowerCase(assetTag.getName())
+		).put(
+			"projectDepotEntryGroupIds",
+			() -> _getGroupIds(assetTag, DepotConstants.TYPE_PROJECT)
 		).put(
 			"scopeGroupExternalReferenceCode", _group.getExternalReferenceCode()
 		).put(
@@ -253,6 +254,18 @@ public class AssetTagIndexerIndexedFieldsTest {
 		).query(
 			query
 		).build();
+	}
+
+	private String _getGroupIds(AssetTag assetTag, int depotEntryType) {
+		List<Long> groupIds = ListUtil.toList(
+			_assetTagGroupRelLocalService.
+				getAssetTagGroupRelsByTagIdAndDepotEntryType(
+					assetTag.getTagId(), depotEntryType),
+			AssetTagGroupRel::getGroupId);
+
+		Collections.sort(groupIds);
+
+		return String.valueOf(groupIds);
 	}
 
 	private void _populateDates(AssetTag assetTag, Map<String, String> map) {
