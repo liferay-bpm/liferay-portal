@@ -135,7 +135,12 @@ public class DefaultPropertyValidator implements PropertyValidator {
 
 	private boolean _isReadable(Set<Class<?>> classes, Object object) {
 		for (Class<?> clazz : classes) {
-			if (ObjectMapperUtil.readValue(clazz, object) != null) {
+			if (clazz == String.class) {
+				if (object instanceof String) {
+					return true;
+				}
+			}
+			else if (ObjectMapperUtil.readValue(clazz, object) != null) {
 				return true;
 			}
 		}
