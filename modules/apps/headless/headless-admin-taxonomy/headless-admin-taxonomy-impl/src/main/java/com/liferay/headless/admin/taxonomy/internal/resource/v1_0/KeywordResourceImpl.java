@@ -6,6 +6,7 @@
 package com.liferay.headless.admin.taxonomy.internal.resource.v1_0;
 
 import com.liferay.asset.kernel.model.AssetTag;
+import com.liferay.asset.kernel.model.AssetTagGroupRel;
 import com.liferay.asset.kernel.service.AssetTagGroupRelLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.kernel.service.AssetTagService;
@@ -44,6 +45,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -60,7 +62,6 @@ import com.liferay.portlet.asset.service.permission.AssetTagsPermission;
 import jakarta.ws.rs.core.MultivaluedMap;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
@@ -344,11 +345,7 @@ public class KeywordResourceImpl
 			keyword.getExternalReferenceCode(), keywordId, keyword.getName(),
 			null);
 
-		_assetTagGroupRelLocalService.setAssetTagGroupRels(
-			assetTag.getTagId(),
-			TaxonomyGroupUtil.getAssetLibraryGroupIds(
-				keyword.getAssetLibraries(), assetTag.getCompanyId()),
-			DepotConstants.TYPE_SPACE);
+		_setAssetTagGroupRels(assetTag, keyword);
 
 		return _toKeyword(assetTag);
 	}
@@ -363,6 +360,10 @@ public class KeywordResourceImpl
 			_assetTagService.mergeTags(fromKeywordId, toKeywordId);
 		}
 
+		_assetTagGroupRelLocalService.setAssetTagGroupRels(
+			assetTag.getTagId(),
+			new long[] {GroupConstants.ANY_PARENT_GROUP_ID},
+			DepotConstants.TYPE_PROJECT);
 		_assetTagGroupRelLocalService.setAssetTagGroupRels(
 			assetTag.getTagId(),
 			new long[] {GroupConstants.ANY_PARENT_GROUP_ID},
@@ -429,37 +430,91 @@ public class KeywordResourceImpl
 				new ServiceContext());
 		}
 
-		if (ArrayUtil.isEmpty(keyword.getAssetLibraries())) {
-			AssetTag assetTag = _assetTagService.addTag(
-				externalReferenceCode, siteId, keyword.getName(),
-				new ServiceContext());
-
-			_assetTagGroupRelLocalService.setAssetTagGroupRels(
-				assetTag.getTagId(),
-				new long[] {GroupConstants.ANY_PARENT_GROUP_ID},
-				DepotConstants.TYPE_SPACE);
-
-			return assetTag;
-		}
-
 		long[] assetLibraryGroupIds = TaxonomyGroupUtil.getAssetLibraryGroupIds(
 			keyword.getAssetLibraries(), group.getCompanyId());
 
-		for (long assetLibraryGroupId : assetLibraryGroupIds) {
-			AssetTagsPermission.check(
-				PermissionThreadLocal.getPermissionChecker(),
-				assetLibraryGroupId, ActionKeys.MANAGE_TAG);
+		AssetTag assetTag = null;
+
+		if (ArrayUtil.isEmpty(keyword.getAssetLibraries())) {
+			assetTag = _assetTagService.addTag(
+				externalReferenceCode, siteId, keyword.getName(),
+				new ServiceContext());
+		}
+		else {
+			for (long assetLibraryGroupId : assetLibraryGroupIds) {
+				AssetTagsPermission.check(
+					PermissionThreadLocal.getPermissionChecker(),
+					assetLibraryGroupId, ActionKeys.MANAGE_TAG);
+			}
+
+			assetTag = _assetTagLocalService.addTag(
+				externalReferenceCode, contextUser.getUserId(), siteId,
+				keyword.getName(), new ServiceContext());
 		}
 
-		AssetTag assetTag = _assetTagLocalService.addTag(
-			externalReferenceCode, contextUser.getUserId(), siteId,
-			keyword.getName(), new ServiceContext());
-
+		_assetTagGroupRelLocalService.setAssetTagGroupRels(
+			assetTag.getTagId(),
+			TaxonomyGroupUtil.getProjectGroupIds(
+				keyword.getProjects(), group.getCompanyId()),
+			DepotConstants.TYPE_PROJECT);
 		_assetTagGroupRelLocalService.setAssetTagGroupRels(
 			assetTag.getTagId(), assetLibraryGroupIds,
 			DepotConstants.TYPE_SPACE);
 
 		return assetTag;
+	}
+
+	private BooleanFilter _getDepotEntryBooleanFilter(
+			int depotEntryType, long groupId)
+		throws Exception {
+
+		BooleanFilter depotEntryBooleanFilter = new BooleanFilter();
+
+		String fieldName = "groupIds";
+
+		if (depotEntryType == DepotConstants.TYPE_PROJECT) {
+			fieldName = "projectDepotEntryGroupIds";
+		}
+
+		TermsFilter termsFilter = new TermsFilter(fieldName);
+
+		termsFilter.addValues(
+			String.valueOf(groupId),
+			String.valueOf(GroupConstants.ANY_PARENT_GROUP_ID));
+
+		depotEntryBooleanFilter.add(termsFilter, BooleanClauseOccur.SHOULD);
+
+		BooleanFilter cmsGroupBooleanFilter = new BooleanFilter();
+
+		cmsGroupBooleanFilter.add(
+			new ExistsFilter(fieldName), BooleanClauseOccur.MUST_NOT);
+		cmsGroupBooleanFilter.addRequiredTerm(
+			Field.GROUP_ID,
+			TaxonomyGroupUtil.getCMSGroupId(contextCompany.getCompanyId()));
+
+		depotEntryBooleanFilter.add(
+			cmsGroupBooleanFilter, BooleanClauseOccur.SHOULD);
+
+		return depotEntryBooleanFilter;
+	}
+
+	private int _getDepotEntryType(long groupId) throws Exception {
+		DepotEntry depotEntry = _depotEntryService.fetchGroupDepotEntry(
+			groupId);
+
+		if (depotEntry == null) {
+			return DepotConstants.TYPE_ANY;
+		}
+
+		return depotEntry.getType();
+	}
+
+	private long[] _getGroupIds(long tagId, int depotEntryType) {
+		return ListUtil.toLongArray(
+			_assetTagGroupRelLocalService.
+				getAssetTagGroupRelsByTagIdAndDepotEntryType(
+					tagId, depotEntryType),
+			AssetTagGroupRel::getGroupId);
 	}
 
 	private Page<Keyword> _getKeywordsPage(
@@ -468,12 +523,16 @@ public class KeywordResourceImpl
 			Pagination pagination, Sort[] sorts)
 		throws Exception {
 
-		boolean spaceDepotEntry = _isSpaceDepotEntry(groupId);
+		int depotEntryType = _getDepotEntryType(groupId);
+
+		boolean scopedDepotEntry =
+			(depotEntryType == DepotConstants.TYPE_PROJECT) ||
+			(depotEntryType == DepotConstants.TYPE_SPACE);
 
 		return SearchUtil.search(
 			actions,
 			booleanQuery -> {
-				if (!spaceDepotEntry) {
+				if (!scopedDepotEntry) {
 					return;
 				}
 
@@ -481,7 +540,8 @@ public class KeywordResourceImpl
 					booleanQuery.getPreBooleanFilter();
 
 				booleanFilter.add(
-					_getSpaceBooleanFilter(groupId), BooleanClauseOccur.MUST);
+					_getDepotEntryBooleanFilter(depotEntryType, groupId),
+					BooleanClauseOccur.MUST);
 			},
 			filter, AssetTag.class.getName(), search, pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
@@ -498,7 +558,7 @@ public class KeywordResourceImpl
 				searchContext.setUserId(UserConstants.USER_ID_DEFAULT);
 				searchContext.setVulcanCheckPermissions(false);
 
-				if (!spaceDepotEntry) {
+				if (!scopedDepotEntry) {
 					searchContext.setGroupIds(
 						new long[] {
 							groupId, GroupConstants.ANY_PARENT_GROUP_ID
@@ -533,33 +593,6 @@ public class KeywordResourceImpl
 		return projectionList;
 	}
 
-	private BooleanFilter _getSpaceBooleanFilter(long groupId)
-		throws Exception {
-
-		BooleanFilter spaceBooleanFilter = new BooleanFilter();
-
-		TermsFilter groupIdsTermsFilter = new TermsFilter("groupIds");
-
-		groupIdsTermsFilter.addValues(
-			String.valueOf(groupId),
-			String.valueOf(GroupConstants.ANY_PARENT_GROUP_ID));
-
-		spaceBooleanFilter.add(groupIdsTermsFilter, BooleanClauseOccur.SHOULD);
-
-		BooleanFilter cmsGroupBooleanFilter = new BooleanFilter();
-
-		cmsGroupBooleanFilter.add(
-			new ExistsFilter("groupIds"), BooleanClauseOccur.MUST_NOT);
-		cmsGroupBooleanFilter.addRequiredTerm(
-			Field.GROUP_ID,
-			TaxonomyGroupUtil.getCMSGroupId(contextCompany.getCompanyId()));
-
-		spaceBooleanFilter.add(
-			cmsGroupBooleanFilter, BooleanClauseOccur.SHOULD);
-
-		return spaceBooleanFilter;
-	}
-
 	private long _getTotalCount(String search, Long siteId) {
 		DynamicQuery dynamicQuery = _assetTagLocalService.dynamicQuery();
 
@@ -578,19 +611,6 @@ public class KeywordResourceImpl
 		}
 
 		return _assetTagLocalService.dynamicQueryCount(dynamicQuery);
-	}
-
-	private boolean _isSpaceDepotEntry(long groupId) throws Exception {
-		DepotEntry depotEntry = _depotEntryService.fetchGroupDepotEntry(
-			groupId);
-
-		if ((depotEntry != null) &&
-			(depotEntry.getType() == DepotConstants.TYPE_SPACE)) {
-
-			return true;
-		}
-
-		return false;
 	}
 
 	private Keyword _patchSiteKeyword(
@@ -612,19 +632,27 @@ public class KeywordResourceImpl
 		Group group = _groupLocalService.getGroup(siteId);
 
 		if (group.isCMS()) {
-			List<Long> existingGroupIds = transform(
-				_assetTagGroupRelLocalService.
-					getAssetTagGroupRelsByTagIdAndDepotEntryType(
-						assetTag.getTagId(), DepotConstants.TYPE_SPACE),
-				assetTagGroupRel -> assetTagGroupRel.getGroupId());
+			if (keyword.getProjects() != null) {
+				_assetTagGroupRelLocalService.setAssetTagGroupRels(
+					assetTag.getTagId(),
+					ArrayUtil.append(
+						_getGroupIds(
+							assetTag.getTagId(), DepotConstants.TYPE_PROJECT),
+						TaxonomyGroupUtil.getProjectGroupIds(
+							keyword.getProjects(), group.getCompanyId())),
+					DepotConstants.TYPE_PROJECT);
+			}
 
-			_assetTagGroupRelLocalService.setAssetTagGroupRels(
-				assetTag.getTagId(),
-				ArrayUtil.append(
-					ArrayUtil.toLongArray(existingGroupIds),
-					TaxonomyGroupUtil.getAssetLibraryGroupIds(
-						keyword.getAssetLibraries(), group.getCompanyId())),
-				DepotConstants.TYPE_SPACE);
+			if (keyword.getAssetLibraries() != null) {
+				_assetTagGroupRelLocalService.setAssetTagGroupRels(
+					assetTag.getTagId(),
+					ArrayUtil.append(
+						_getGroupIds(
+							assetTag.getTagId(), DepotConstants.TYPE_SPACE),
+						TaxonomyGroupUtil.getAssetLibraryGroupIds(
+							keyword.getAssetLibraries(), group.getCompanyId())),
+					DepotConstants.TYPE_SPACE);
+			}
 		}
 
 		return _toKeyword(assetTag);
@@ -638,6 +666,32 @@ public class KeywordResourceImpl
 			_addAssetTag(
 				externalReferenceCode, _groupLocalService.getGroup(siteId),
 				keyword, siteId));
+	}
+
+	private void _setAssetTagGroupRels(AssetTag assetTag, Keyword keyword)
+		throws Exception {
+
+		Group group = _groupLocalService.fetchGroup(assetTag.getGroupId());
+
+		if ((group == null) || !group.isCMS()) {
+			return;
+		}
+
+		if (keyword.getProjects() != null) {
+			_assetTagGroupRelLocalService.setAssetTagGroupRels(
+				assetTag.getTagId(),
+				TaxonomyGroupUtil.getProjectGroupIds(
+					keyword.getProjects(), assetTag.getCompanyId()),
+				DepotConstants.TYPE_PROJECT);
+		}
+
+		if (keyword.getAssetLibraries() != null) {
+			_assetTagGroupRelLocalService.setAssetTagGroupRels(
+				assetTag.getTagId(),
+				TaxonomyGroupUtil.getAssetLibraryGroupIds(
+					keyword.getAssetLibraries(), assetTag.getCompanyId()),
+				DepotConstants.TYPE_SPACE);
+		}
 	}
 
 	private AssetTag _toAssetTag(Object[] assetTags) {

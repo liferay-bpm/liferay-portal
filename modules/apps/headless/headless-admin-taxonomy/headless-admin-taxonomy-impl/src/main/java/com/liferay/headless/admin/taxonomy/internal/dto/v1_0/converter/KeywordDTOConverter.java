@@ -8,9 +8,12 @@ package com.liferay.headless.admin.taxonomy.internal.dto.v1_0.converter;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.kernel.service.AssetTagGroupRelLocalService;
+import com.liferay.depot.constants.DepotConstants;
 import com.liferay.headless.admin.taxonomy.dto.v1_0.AssetLibrary;
 import com.liferay.headless.admin.taxonomy.dto.v1_0.Keyword;
+import com.liferay.headless.admin.taxonomy.dto.v1_0.Project;
 import com.liferay.headless.admin.taxonomy.internal.dto.v1_0.util.CreatorUtil;
+import com.liferay.headless.admin.taxonomy.internal.util.TaxonomyGroupUtil;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.search.Hits;
@@ -21,7 +24,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.util.GroupUtil;
-import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
 import org.osgi.service.component.annotations.Component;
@@ -54,58 +56,12 @@ public class KeywordDTOConverter implements DTOConverter<AssetTag, Keyword> {
 				setAssetLibraries(
 					() -> TransformUtil.transformToArray(
 						_assetTagGroupRelLocalService.
-							getAssetTagGroupRelsByTagId(assetTag.getTagId()),
-						assetTagGroupRel -> {
-							Group depotEntryGroup =
-								_groupLocalService.fetchGroup(
-									assetTagGroupRel.getGroupId());
-
-							return new AssetLibrary() {
-								{
-									setExternalReferenceCode(
-										() -> {
-											if (depotEntryGroup == null) {
-												return null;
-											}
-
-											return depotEntryGroup.
-												getExternalReferenceCode();
-										});
-									setId(assetTagGroupRel::getGroupId);
-									setName(
-										() -> {
-											if (depotEntryGroup == null) {
-												return null;
-											}
-
-											return depotEntryGroup.
-												getDescriptiveName(
-													dtoConverterContext.
-														getLocale());
-										});
-									setName_i18n(
-										() -> {
-											if (depotEntryGroup == null) {
-												return null;
-											}
-
-											return LocalizedMapUtil.getI18nMap(
-												dtoConverterContext.
-													isAcceptAllLanguages(),
-												depotEntryGroup.getNameMap());
-										});
-									setScopeKey(
-										() -> {
-											if (depotEntryGroup == null) {
-												return null;
-											}
-
-											return depotEntryGroup.
-												getGroupKey();
-										});
-								}
-							};
-						},
+							getAssetTagGroupRelsByTagIdAndDepotEntryType(
+								assetTag.getTagId(), DepotConstants.TYPE_SPACE),
+						assetTagGroupRel -> TaxonomyGroupUtil.toAssetLibrary(
+							assetTagGroupRel.getGroupId(),
+							dtoConverterContext.isAcceptAllLanguages(),
+							dtoConverterContext.getLocale()),
 						AssetLibrary.class));
 				setAssetLibraryKey(
 					() -> {
@@ -146,6 +102,17 @@ public class KeywordDTOConverter implements DTOConverter<AssetTag, Keyword> {
 						return hits.getLength();
 					});
 				setName(assetTag::getName);
+				setProjects(
+					() -> TransformUtil.transformToArray(
+						_assetTagGroupRelLocalService.
+							getAssetTagGroupRelsByTagIdAndDepotEntryType(
+								assetTag.getTagId(),
+								DepotConstants.TYPE_PROJECT),
+						assetTagGroupRel -> TaxonomyGroupUtil.toProject(
+							assetTagGroupRel.getGroupId(),
+							dtoConverterContext.isAcceptAllLanguages(),
+							dtoConverterContext.getLocale()),
+						Project.class));
 				setSiteExternalReferenceCode(
 					() -> {
 						if (group == null) {
