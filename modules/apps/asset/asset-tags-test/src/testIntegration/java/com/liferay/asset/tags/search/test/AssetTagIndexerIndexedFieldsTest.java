@@ -38,6 +38,7 @@ import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.test.rule.SearchTestRule;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
 import com.liferay.portal.search.test.util.IndexedFieldsFixture;
+import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -61,6 +62,7 @@ import org.junit.runner.RunWith;
  * @author Luan Maoski
  * @author Lucas Marques
  */
+@FeatureFlag("LPD-99403")
 @RunWith(Arquillian.class)
 public class AssetTagIndexerIndexedFieldsTest {
 

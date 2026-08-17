@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionList;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Type;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.UserConstants;
@@ -360,10 +361,15 @@ public class KeywordResourceImpl
 			_assetTagService.mergeTags(fromKeywordId, toKeywordId);
 		}
 
-		_assetTagGroupRelLocalService.setAssetTagGroupRels(
-			assetTag.getTagId(),
-			new long[] {GroupConstants.ANY_PARENT_GROUP_ID},
-			DepotConstants.TYPE_PROJECT);
+		if (FeatureFlagManagerUtil.isEnabled(
+				assetTag.getCompanyId(), "LPD-99403")) {
+
+			_assetTagGroupRelLocalService.setAssetTagGroupRels(
+				assetTag.getTagId(),
+				new long[] {GroupConstants.ANY_PARENT_GROUP_ID},
+				DepotConstants.TYPE_PROJECT);
+		}
+
 		_assetTagGroupRelLocalService.setAssetTagGroupRels(
 			assetTag.getTagId(),
 			new long[] {GroupConstants.ANY_PARENT_GROUP_ID},
@@ -452,11 +458,16 @@ public class KeywordResourceImpl
 				keyword.getName(), new ServiceContext());
 		}
 
-		_assetTagGroupRelLocalService.setAssetTagGroupRels(
-			assetTag.getTagId(),
-			TaxonomyGroupUtil.getProjectGroupIds(
-				keyword.getProjects(), group.getCompanyId()),
-			DepotConstants.TYPE_PROJECT);
+		if (FeatureFlagManagerUtil.isEnabled(
+				group.getCompanyId(), "LPD-99403")) {
+
+			_assetTagGroupRelLocalService.setAssetTagGroupRels(
+				assetTag.getTagId(),
+				TaxonomyGroupUtil.getProjectGroupIds(
+					keyword.getProjects(), group.getCompanyId()),
+				DepotConstants.TYPE_PROJECT);
+		}
+
 		_assetTagGroupRelLocalService.setAssetTagGroupRels(
 			assetTag.getTagId(), assetLibraryGroupIds,
 			DepotConstants.TYPE_SPACE);
@@ -526,7 +537,9 @@ public class KeywordResourceImpl
 		int depotEntryType = _getDepotEntryType(groupId);
 
 		boolean scopedDepotEntry =
-			(depotEntryType == DepotConstants.TYPE_PROJECT) ||
+			(FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-99403") &&
+			 (depotEntryType == DepotConstants.TYPE_PROJECT)) ||
 			(depotEntryType == DepotConstants.TYPE_SPACE);
 
 		return SearchUtil.search(
@@ -632,7 +645,10 @@ public class KeywordResourceImpl
 		Group group = _groupLocalService.getGroup(siteId);
 
 		if (group.isCMS()) {
-			if (keyword.getProjects() != null) {
+			if (FeatureFlagManagerUtil.isEnabled(
+					group.getCompanyId(), "LPD-99403") &&
+				(keyword.getProjects() != null)) {
+
 				_assetTagGroupRelLocalService.setAssetTagGroupRels(
 					assetTag.getTagId(),
 					ArrayUtil.append(
@@ -677,7 +693,10 @@ public class KeywordResourceImpl
 			return;
 		}
 
-		if (keyword.getProjects() != null) {
+		if (FeatureFlagManagerUtil.isEnabled(
+				assetTag.getCompanyId(), "LPD-99403") &&
+			(keyword.getProjects() != null)) {
+
 			_assetTagGroupRelLocalService.setAssetTagGroupRels(
 				assetTag.getTagId(),
 				TaxonomyGroupUtil.getProjectGroupIds(

@@ -9,6 +9,7 @@ import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.model.AssetTagGroupRel;
 import com.liferay.asset.kernel.service.AssetTagGroupRelLocalService;
 import com.liferay.depot.constants.DepotConstants;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
@@ -37,9 +38,15 @@ public class AssetTagModelDocumentContributor
 		document.addKeyword(
 			"groupIds",
 			_getGroupIds(assetTag.getTagId(), DepotConstants.TYPE_SPACE));
-		document.addKeyword(
-			"projectDepotEntryGroupIds",
-			_getGroupIds(assetTag.getTagId(), DepotConstants.TYPE_PROJECT));
+
+		if (FeatureFlagManagerUtil.isEnabled(
+				assetTag.getCompanyId(), "LPD-99403")) {
+
+			document.addKeyword(
+				"projectDepotEntryGroupIds",
+				_getGroupIds(assetTag.getTagId(), DepotConstants.TYPE_PROJECT));
+		}
+
 		document.addKeyword(
 			"subscribed",
 			_subscriptionLocalService.isSubscribed(
