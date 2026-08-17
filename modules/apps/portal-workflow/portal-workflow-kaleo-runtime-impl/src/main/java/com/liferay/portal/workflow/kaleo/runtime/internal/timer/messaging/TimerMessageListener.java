@@ -94,15 +94,35 @@ public class TimerMessageListener extends BaseMessageListener {
 
 	@Override
 	protected void doReceive(Message message) throws Exception {
+		long kaleoTimerInstanceTokenId = message.getLong(
+			"kaleoTimerInstanceTokenId");
+
 		KaleoTimerInstanceToken kaleoTimerInstanceToken =
-			_getKaleoTimerInstanceToken(message);
+			_kaleoTimerInstanceTokenLocalService.fetchKaleoTimerInstanceToken(
+				kaleoTimerInstanceTokenId);
+
+		if (kaleoTimerInstanceToken == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to find Kaleo timer instance token " +
+						kaleoTimerInstanceTokenId);
+			}
+
+			return;
+		}
 
 		if (kaleoTimerInstanceToken.isCompleted()) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					"Skipping completed Kaleo timer instance token " +
-						kaleoTimerInstanceToken.getKaleoTimerInstanceTokenId());
+						kaleoTimerInstanceTokenId);
 			}
+
+			SchedulerEngineHelperUtil.delete(
+				SchedulerUtil.getGroupName(
+					kaleoTimerInstanceToken.getCompanyId(),
+					kaleoTimerInstanceTokenId),
+				StorageType.PERSISTED);
 
 			return;
 		}
@@ -132,16 +152,6 @@ public class TimerMessageListener extends BaseMessageListener {
 					kaleoTimerInstanceToken.getKaleoTimerInstanceTokenId()),
 				StorageType.PERSISTED);
 		}
-	}
-
-	private KaleoTimerInstanceToken _getKaleoTimerInstanceToken(Message message)
-		throws Exception {
-
-		long kaleoTimerInstanceTokenId = message.getLong(
-			"kaleoTimerInstanceTokenId");
-
-		return _kaleoTimerInstanceTokenLocalService.getKaleoTimerInstanceToken(
-			kaleoTimerInstanceTokenId);
 	}
 
 	private static final int _MAXIMUM_QUEUE_SIZE = 200;
