@@ -61,11 +61,18 @@ public abstract class BaseWorkflowMetricsReindexer
 			Thread.sleep(1000);
 		}
 		else {
-			workflowMetricsIndex.removeIndex(
+
+			// Create the index when it is missing, then clear it by deleting
+			// its documents. Deleting the index itself would leave a window in
+			// which it does not exist, and the workflow metrics indexers write
+			// asynchronously, so any write landing in that window fails with an
+			// index_not_found_exception.
+
+			workflowMetricsIndex.createIndex(
 				searchCapabilities, searchEngineAdapter, indexNameBuilder,
 				companyId);
 
-			workflowMetricsIndex.createIndex(
+			workflowMetricsIndex.deleteAllDocuments(
 				searchCapabilities, searchEngineAdapter, indexNameBuilder,
 				companyId);
 		}
