@@ -256,6 +256,34 @@ public class TimerExecutorTest {
 			initialInboxSize, MailServiceTestUtil.getInboxSize());
 	}
 
+	@Test
+	public void testExecuteTimerWithDeletedKaleoTimerInstanceToken()
+		throws Exception {
+
+		KaleoTimerInstanceToken kaleoTimerInstanceToken =
+			_addKaleoTimerInstanceToken("Timer Notification");
+
+		Message message = _getMessage(kaleoTimerInstanceToken);
+
+		_kaleoTimerInstanceTokenLocalService.deleteKaleoTimerInstanceToken(
+			kaleoTimerInstanceToken);
+
+		int initialInboxSize = MailServiceTestUtil.getInboxSize();
+
+		_messageListener.receive(message);
+
+		Assert.assertEquals(
+			initialInboxSize, MailServiceTestUtil.getInboxSize());
+
+		String schedulerGroupName = _getSchedulerGroupName(
+			kaleoTimerInstanceToken);
+
+		Assert.assertNotNull(
+			SchedulerEngineHelperUtil.getScheduledJob(
+				schedulerGroupName, schedulerGroupName,
+				StorageType.PERSISTED));
+	}
+
 	private KaleoInstanceToken _addKaleoInstanceToken(KaleoTask kaleoTask)
 		throws Exception {
 
@@ -341,9 +369,8 @@ public class TimerExecutorTest {
 	private Message _getMessage(KaleoTimerInstanceToken kaleoTimerInstanceToken)
 		throws Exception {
 
-		String schedulerGroupName = SchedulerUtil.getGroupName(
-			kaleoTimerInstanceToken.getCompanyId(),
-			kaleoTimerInstanceToken.getKaleoTimerInstanceTokenId());
+		String schedulerGroupName = _getSchedulerGroupName(
+			kaleoTimerInstanceToken);
 
 		SchedulerResponse schedulerResponse =
 			SchedulerEngineHelperUtil.getScheduledJob(
@@ -359,6 +386,14 @@ public class TimerExecutorTest {
 		message.put("companyId", kaleoTimerInstanceToken.getCompanyId());
 
 		return message;
+	}
+
+	private String _getSchedulerGroupName(
+		KaleoTimerInstanceToken kaleoTimerInstanceToken) {
+
+		return SchedulerUtil.getGroupName(
+			kaleoTimerInstanceToken.getCompanyId(),
+			kaleoTimerInstanceToken.getKaleoTimerInstanceTokenId());
 	}
 
 	private static ServiceRegistration<WorkflowHandler<?>>
