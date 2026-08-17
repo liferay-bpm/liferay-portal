@@ -5,6 +5,7 @@
 
 package com.liferay.object.internal.upgrade.v13_3_0.test;
 
+import com.liferay.account.model.AccountEntry;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
@@ -13,12 +14,15 @@ import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.field.builder.AttachmentObjectFieldBuilder;
 import com.liferay.object.field.setting.builder.ObjectFieldSettingBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
@@ -47,6 +51,7 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 import com.liferay.portal.upgrade.test.util.UpgradeTestUtil;
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
@@ -76,6 +81,7 @@ public class AttachmentObjectFieldDownloadPermissionUpgradeProcessTest {
 	public void testUpgrade() throws Exception {
 		_testUpgradeWithDraftObjectDefinition();
 		_testUpgradeWithPublishedObjectDefinition();
+		_testUpgradeWithUnmodifiableSystemObjectDefinition();
 	}
 
 	private DLFileEntry _addDLFileEntry() throws Exception {
@@ -295,6 +301,74 @@ public class AttachmentObjectFieldDownloadPermissionUpgradeProcessTest {
 		_assertHasResourcePermissions(actionId, className, companyId, primKey);
 	}
 
+	private void _testUpgradeWithUnmodifiableSystemObjectDefinition()
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				TestPropsValues.getCompanyId(),
+				AccountEntry.class.getSimpleName());
+
+		Assert.assertTrue(objectDefinition.isUnmodifiableSystemObject());
+
+		ObjectField objectField = ObjectFieldUtil.addCustomObjectField(
+			new AttachmentObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				StringUtil.randomId()
+			).objectDefinitionId(
+				objectDefinition.getObjectDefinitionId()
+			).objectFieldSettings(
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.
+							NAME_ACCEPTED_FILE_EXTENSIONS
+					).value(
+						"txt"
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_FILE_SOURCE
+					).value(
+						ObjectFieldSettingConstants.VALUE_DOCS_AND_MEDIA
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_MAX_FILE_SIZE
+					).value(
+						"100"
+					).build())
+			).userId(
+				TestPropsValues.getUserId()
+			).build());
+
+		String actionId = objectField.getAttachmentDownloadActionKey();
+
+		UpgradeProcess upgradeProcess = _getUpgradeProcess();
+
+		upgradeProcess.upgrade();
+
+		_entityCache.clearCache();
+
+		Assert.assertNull(
+			_resourceActionLocalService.fetchResourceAction(
+				objectDefinition.getClassName(), actionId));
+
+		long companyId = objectDefinition.getCompanyId();
+
+		for (Locale locale : _language.getCompanyAvailableLocales(companyId)) {
+			Assert.assertNull(
+				_ploEntryLocalService.fetchPLOEntry(
+					companyId, "action." + actionId,
+					LocaleUtil.toLanguageId(locale)));
+		}
+
+		_objectFieldLocalService.deleteObjectField(
+			objectField.getObjectFieldId());
+	}
+
 	private static final String _CLASS_NAME =
 		"com.liferay.object.internal.upgrade.v13_3_0." +
 			"AttachmentObjectFieldDownloadPermissionUpgradeProcess";
@@ -312,7 +386,13 @@ public class AttachmentObjectFieldDownloadPermissionUpgradeProcessTest {
 	private Language _language;
 
 	@Inject
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Inject
 	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Inject
+	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@Inject
 	private PLOEntryLocalService _ploEntryLocalService;
