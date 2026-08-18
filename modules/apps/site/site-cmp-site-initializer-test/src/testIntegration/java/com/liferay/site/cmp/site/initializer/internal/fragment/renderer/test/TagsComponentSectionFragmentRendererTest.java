@@ -23,7 +23,9 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.util.Collections;
+import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -93,11 +95,23 @@ public class TagsComponentSectionFragmentRendererTest
 				"projectGroupId", cmpProjectObjectEntry.getGroupId()
 			).build(),
 			getProps());
+
+		_testGetPropsWithTaskObjectEntry();
 	}
 
 	@Override
 	protected FragmentRenderer getFragmentRenderer() {
 		return _fragmentRenderer;
+	}
+
+	private void _testGetPropsWithTaskObjectEntry() throws Exception {
+		mockHttpServletRequest = getMockHttpServletRequest(
+			cmpTaskObjectDefinition, cmpTaskObjectEntry);
+
+		Map<String, Object> props = getProps();
+
+		Assert.assertEquals(
+			cmpProjectObjectEntry.getGroupId(), props.get("projectGroupId"));
 	}
 
 	@Inject(
