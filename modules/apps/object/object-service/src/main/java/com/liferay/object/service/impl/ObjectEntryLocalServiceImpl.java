@@ -21,6 +21,9 @@ import com.liferay.asset.kernel.service.AssetTagGroupRelLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyGroupRelLocalService;
 import com.liferay.asset.link.constants.AssetLinkConstants;
 import com.liferay.asset.link.service.AssetLinkLocalService;
+import com.liferay.depot.constants.DepotConstants;
+import com.liferay.depot.model.DepotEntry;
+import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.depot.util.DepotRoleUtil;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFolder;
@@ -185,6 +188,7 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.encryptor.Encryptor;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -4354,6 +4358,21 @@ public class ObjectEntryLocalServiceImpl
 		return joinStep.where(predicate);
 	}
 
+	private long[] _getAssetTagIds(long groupId, int depotEntryType) {
+		if (depotEntryType == DepotConstants.TYPE_ANY) {
+			return TransformUtil.transformToLongArray(
+				_assetTagGroupRelLocalService.getAssetTagGroupRelsByGroupId(
+					groupId),
+				AssetTagGroupRel::getTagId);
+		}
+
+		return TransformUtil.transformToLongArray(
+			_assetTagGroupRelLocalService.
+				getAssetTagGroupRelsByGroupIdAndDepotEntryType(
+					groupId, depotEntryType),
+			AssetTagGroupRel::getTagId);
+	}
+
 	private String _getAutoIncrementSortableValue(
 		String prefix, String suffix, String value) {
 
@@ -4464,6 +4483,29 @@ public class ObjectEntryLocalServiceImpl
 
 		throw new ObjectEntryDefaultLanguageIdException(
 			"Language ID " + defaultLanguageId + " is not available");
+	}
+
+	private int _getDepotEntryType(long companyId, long groupId) {
+		if (!FeatureFlagManagerUtil.isEnabled(companyId, "LPD-99403")) {
+			return DepotConstants.TYPE_ANY;
+		}
+
+		DepotEntry depotEntry = _depotEntryLocalService.fetchGroupDepotEntry(
+			groupId);
+
+		if (depotEntry == null) {
+			return DepotConstants.TYPE_ANY;
+		}
+
+		int depotEntryType = depotEntry.getType();
+
+		if ((depotEntryType != DepotConstants.TYPE_PROJECT) &&
+			(depotEntryType != DepotConstants.TYPE_SPACE)) {
+
+			return DepotConstants.TYPE_ANY;
+		}
+
+		return depotEntryType;
 	}
 
 	private DSLQuery _getExtensionDynamicObjectDefinitionTableSelectDSLQuery(
@@ -6143,6 +6185,19 @@ public class ObjectEntryLocalServiceImpl
 		return staticValues;
 	}
 
+	private boolean _isUnscopedAssetTag(long tagId, int depotEntryType) {
+		if (depotEntryType == DepotConstants.TYPE_ANY) {
+			return false;
+		}
+
+		List<AssetTagGroupRel> assetTagGroupRels =
+			_assetTagGroupRelLocalService.
+				getAssetTagGroupRelsByTagIdAndDepotEntryType(
+					tagId, depotEntryType);
+
+		return assetTagGroupRels.isEmpty();
+	}
+
 	private List<Object[]> _list(
 			DSLQuery dslQuery, ObjectFieldBag objectFieldBag,
 			Expression<?>[] selectExpressions)
@@ -6483,24 +6538,25 @@ public class ObjectEntryLocalServiceImpl
 			return;
 		}
 
-		String[] assetTagNames = assetEntry.getTagNames();
+		int depotEntryType = _getDepotEntryType(
+			assetEntry.getCompanyId(), groupId);
 
 		long[] tagIds = ArrayUtil.unique(
 			ArrayUtil.append(
-				TransformUtil.transformToLongArray(
-					_assetTagGroupRelLocalService.getAssetTagGroupRelsByGroupId(
-						groupId),
-					AssetTagGroupRel::getTagId),
-				TransformUtil.transformToLongArray(
-					_assetTagGroupRelLocalService.getAssetTagGroupRelsByGroupId(
-						-1),
-					AssetTagGroupRel::getTagId)));
+				_getAssetTagIds(groupId, depotEntryType),
+				_getAssetTagIds(
+					GroupConstants.ANY_PARENT_GROUP_ID, depotEntryType)));
+
+		String[] assetTagNames = assetEntry.getTagNames();
 
 		for (AssetTag assetTag : assetEntry.getTags()) {
-			if (!ArrayUtil.contains(tagIds, assetTag.getTagId())) {
-				assetTagNames = ArrayUtil.remove(
-					assetTagNames, assetTag.getName());
+			if (ArrayUtil.contains(tagIds, assetTag.getTagId()) ||
+				_isUnscopedAssetTag(assetTag.getTagId(), depotEntryType)) {
+
+				continue;
 			}
+
+			assetTagNames = ArrayUtil.remove(assetTagNames, assetTag.getName());
 		}
 
 		serviceContext.setAssetTagNames(assetTagNames);
@@ -8676,6 +8732,9 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private DDMExpressionFactory _ddmExpressionFactory;
+
+	@Reference
+	private DepotEntryLocalService _depotEntryLocalService;
 
 	@Reference
 	private DiscussionPermission _discussionPermission;
