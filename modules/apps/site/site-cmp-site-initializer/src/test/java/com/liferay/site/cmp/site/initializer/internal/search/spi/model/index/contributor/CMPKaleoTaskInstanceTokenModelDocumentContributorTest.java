@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken;
 
@@ -37,6 +38,7 @@ import org.mockito.Mockito;
 /**
  * @author Guilherme Camacho
  */
+@FeatureFlag("LPD-58677")
 public class CMPKaleoTaskInstanceTokenModelDocumentContributorTest {
 
 	@ClassRule
@@ -66,6 +68,19 @@ public class CMPKaleoTaskInstanceTokenModelDocumentContributorTest {
 		_setUpKaleoTaskInstanceToken();
 		_setUpObjectDefinitionLocalService();
 		_setUpObjectEntryLocalService();
+	}
+
+	@FeatureFlag(enable = false, value = "LPD-58677")
+	@Test
+	public void testContributeWhenFeatureFlagIsDisabled() {
+		_cmpKaleoTaskInstanceTokenModelDocumentContributor.contribute(
+			Mockito.mock(Document.class), _kaleoTaskInstanceToken);
+
+		Mockito.verify(
+			_objectEntryLocalService, Mockito.never()
+		).fetchObjectEntry(
+			Mockito.anyLong()
+		);
 	}
 
 	@Test
