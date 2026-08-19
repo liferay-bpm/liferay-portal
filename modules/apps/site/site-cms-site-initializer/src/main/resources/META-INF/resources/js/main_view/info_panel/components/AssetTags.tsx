@@ -34,6 +34,7 @@ const AssetTags = ({
 	hasUpdatePermission,
 	inputSize,
 	objectEntry,
+	projectGroupId,
 	titleClassName,
 	updateObjectEntry,
 }: {
@@ -46,6 +47,7 @@ const AssetTags = ({
 	hasUpdatePermission?: boolean;
 	inputSize?: CategorizationInputSize;
 	objectEntry: IAssetObjectEntry | EntryCategorizationDTO;
+	projectGroupId?: number | string | null;
 	titleClassName?: string;
 	updateObjectEntry: (object: EntryCategorizationDTO) => void | Promise<void>;
 }) => {
@@ -55,9 +57,10 @@ const AssetTags = ({
 	const scopeId = useMemo(
 		() =>
 			(objectEntry as IAssetObjectEntry).scopeId ||
+			projectGroupId ||
 			assetLibraryId ||
 			cmsGroupId,
-		[assetLibraryId, cmsGroupId, objectEntry]
+		[assetLibraryId, cmsGroupId, objectEntry, projectGroupId]
 	);
 
 	const apiURL = useMemo(() => {
@@ -107,9 +110,10 @@ const AssetTags = ({
 
 	const createAndAddKeyword = useCallback(async () => {
 		const {data, error} = await TagService.createTag({
-			assetLibraryId: scopeId,
+			assetLibraryId: projectGroupId ? null : scopeId,
 			cmsGroupId,
 			name: value,
+			projectGroupId,
 		});
 
 		if (data) {
@@ -120,7 +124,7 @@ const AssetTags = ({
 		else if (error) {
 			console.error('Failed to create new keyword.', error);
 		}
-	}, [addKeyword, cmsGroupId, scopeId, value]);
+	}, [addKeyword, cmsGroupId, projectGroupId, scopeId, value]);
 
 	const removeKeyword = useCallback(
 		async (keyword: string) => {
