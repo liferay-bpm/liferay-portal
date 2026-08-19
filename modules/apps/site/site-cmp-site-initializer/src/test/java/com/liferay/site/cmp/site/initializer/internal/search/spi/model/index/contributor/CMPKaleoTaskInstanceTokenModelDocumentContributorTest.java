@@ -11,6 +11,8 @@ import com.liferay.object.rest.filter.factory.FilterFactory;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.petra.sql.dsl.expression.Predicate;
+import com.liferay.portal.kernel.license.util.App;
+import com.liferay.portal.kernel.license.util.LicenseManagerUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
@@ -26,12 +28,14 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.AdditionalMatchers;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 /**
@@ -64,8 +68,28 @@ public class CMPKaleoTaskInstanceTokenModelDocumentContributorTest {
 
 		_setUpGroupLocalService();
 		_setUpKaleoTaskInstanceToken();
+		_setUpLicenseManagerUtil(true);
 		_setUpObjectDefinitionLocalService();
 		_setUpObjectEntryLocalService();
+	}
+
+	@After
+	public void tearDown() {
+		_licenseManagerUtilMockedStatic.close();
+	}
+
+	@Test
+	public void testContributeWhenCMPIsDisabled() {
+		_setUpLicenseManagerUtil(false);
+
+		_cmpKaleoTaskInstanceTokenModelDocumentContributor.contribute(
+			Mockito.mock(Document.class), _kaleoTaskInstanceToken);
+
+		Mockito.verify(
+			_objectEntryLocalService, Mockito.never()
+		).fetchObjectEntry(
+			Mockito.anyLong()
+		);
 	}
 
 	@Test
@@ -167,6 +191,14 @@ public class CMPKaleoTaskInstanceTokenModelDocumentContributorTest {
 		);
 	}
 
+	private void _setUpLicenseManagerUtil(boolean enabled) {
+		_licenseManagerUtilMockedStatic.when(
+			() -> LicenseManagerUtil.isAppEnabled(App.CMP)
+		).thenReturn(
+			enabled
+		);
+	}
+
 	private void _setUpObjectDefinitionLocalService() {
 		Mockito.when(
 			_objectDefinitionLocalService.
@@ -196,6 +228,9 @@ public class CMPKaleoTaskInstanceTokenModelDocumentContributorTest {
 		GroupLocalService.class);
 	private final KaleoTaskInstanceToken _kaleoTaskInstanceToken = Mockito.mock(
 		KaleoTaskInstanceToken.class);
+	private final MockedStatic<LicenseManagerUtil>
+		_licenseManagerUtilMockedStatic = Mockito.mockStatic(
+			LicenseManagerUtil.class);
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService =
 		Mockito.mock(ObjectDefinitionLocalService.class);
 	private final ObjectEntryLocalService _objectEntryLocalService =
