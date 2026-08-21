@@ -82,14 +82,12 @@ public class TaxonomyGroupUtil {
 				continue;
 			}
 
-			Group group = _fetchGroup(
+			Long groupId = _fetchProjectGroupId(
 				companyId, project.getExternalReferenceCode(), project.getId(),
 				project.getScopeKey());
 
-			if ((group != null) &&
-				_isGroupDepotEntryType(group, DepotConstants.TYPE_PROJECT)) {
-
-				groupIds.add(group.getGroupId());
+			if (groupId != null) {
+				groupIds.add(groupId);
 			}
 		}
 
@@ -230,6 +228,53 @@ public class TaxonomyGroupUtil {
 		}
 
 		return null;
+	}
+
+	private static Long _fetchProjectGroupId(
+			long companyId, String externalReferenceCode, Long id,
+			String scopeKey)
+		throws PortalException {
+
+		if (Validator.isNull(externalReferenceCode) &&
+			Validator.isNull(scopeKey)) {
+
+			if (id == null) {
+				throw new IllegalArgumentException(
+					"No project external reference code, ID, or scope key " +
+						"was specified");
+			}
+
+			if (id == GroupConstants.ANY_PARENT_GROUP_ID) {
+				return null;
+			}
+		}
+
+		Group group = _fetchGroup(
+			companyId, externalReferenceCode, id, scopeKey);
+
+		if ((group == null) ||
+			!_isGroupDepotEntryType(group, DepotConstants.TYPE_PROJECT)) {
+
+			throw new IllegalArgumentException(
+				"No project exists with " +
+					_getScopeIdentifier(externalReferenceCode, id, scopeKey));
+		}
+
+		return group.getGroupId();
+	}
+
+	private static String _getScopeIdentifier(
+		String externalReferenceCode, Long id, String scopeKey) {
+
+		if (Validator.isNotNull(externalReferenceCode)) {
+			return "external reference code " + externalReferenceCode;
+		}
+
+		if (Validator.isNotNull(scopeKey)) {
+			return "scope key " + scopeKey;
+		}
+
+		return "ID " + id;
 	}
 
 	private static boolean _isGroupDepotEntryType(
