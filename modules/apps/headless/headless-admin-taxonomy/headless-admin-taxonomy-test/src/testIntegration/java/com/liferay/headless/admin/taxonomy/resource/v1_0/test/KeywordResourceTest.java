@@ -512,6 +512,9 @@ public class KeywordResourceTest extends BaseKeywordResourceTestCase {
 			postKeyword, DepotConstants.TYPE_SPACE,
 			GroupConstants.ANY_PARENT_GROUP_ID);
 
+		_testPostSiteKeywordRejectsInvalidProjects();
+		_testPostSiteKeywordWithAnyParentGroupProject();
+
 		testGroup = originalTestGroup;
 	}
 
@@ -851,6 +854,18 @@ public class KeywordResourceTest extends BaseKeywordResourceTestCase {
 		return keywordResource.postSiteKeyword(testGroup.getGroupId(), keyword);
 	}
 
+	private HttpInvoker.HttpResponse _postKeywordWithProjectsHttpResponse(
+			Project... projects)
+		throws Exception {
+
+		Keyword keyword = randomKeyword();
+
+		keyword.setProjects(projects);
+
+		return keywordResource.postSiteKeywordHttpResponse(
+			testGroup.getGroupId(), keyword);
+	}
+
 	private Project _randomProject() throws Exception {
 		DepotEntry depotEntry = _depotEntryLocalService.addDepotEntry(
 			RandomTestUtil.randomLocaleStringMap(), null,
@@ -1029,6 +1044,45 @@ public class KeywordResourceTest extends BaseKeywordResourceTestCase {
 
 		_assertSingletonAssetTagGroupRel(
 			patchKeyword, DepotConstants.TYPE_SPACE, assetLibrary.getId());
+	}
+
+	private void _testPostSiteKeywordRejectsInvalidProjects() throws Exception {
+		AssetLibrary assetLibrary = _randomSpaceAssetLibrary();
+
+		assertHttpResponseStatusCode(
+			400,
+			_postKeywordWithProjectsHttpResponse(
+				new Project() {
+					{
+						id = assetLibrary.getId();
+						scopeKey = assetLibrary.getScopeKey();
+					}
+				}));
+
+		assertHttpResponseStatusCode(
+			400,
+			_postKeywordWithProjectsHttpResponse(
+				new Project() {
+					{
+						id = RandomTestUtil.randomLong();
+					}
+				}));
+		assertHttpResponseStatusCode(
+			400, _postKeywordWithProjectsHttpResponse(new Project()));
+	}
+
+	private void _testPostSiteKeywordWithAnyParentGroupProject()
+		throws Exception {
+
+		Keyword postKeyword = _postKeywordWithProjects(
+			new Project() {
+				{
+					id = (long)GroupConstants.ANY_PARENT_GROUP_ID;
+				}
+			});
+
+		_assertSingletonProject(
+			postKeyword, (long)GroupConstants.ANY_PARENT_GROUP_ID);
 	}
 
 	private void _testPutKeywordKeepsProjectScopeWhenProjectsAreNull()
