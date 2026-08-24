@@ -10,8 +10,8 @@ import com.liferay.list.type.service.ListTypeEntryLocalServiceUtil;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.bag.ObjectFieldBag;
 import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
-import com.liferay.object.service.ObjectFieldLocalServiceUtil;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -63,8 +63,6 @@ public class AssetListTypePropertiesUtilTest {
 			ListTypeEntryLocalServiceUtil.class);
 		_objectDefinitionLocalServiceUtilMockedStatic = Mockito.mockStatic(
 			ObjectDefinitionLocalServiceUtil.class);
-		_objectFieldLocalServiceUtilMockedStatic = Mockito.mockStatic(
-			ObjectFieldLocalServiceUtil.class);
 		_portalUtilMockedStatic = Mockito.mockStatic(PortalUtil.class);
 	}
 
@@ -73,7 +71,6 @@ public class AssetListTypePropertiesUtilTest {
 		_featureFlagManagerUtilMockedStatic.close();
 		_listTypeEntryLocalServiceUtilMockedStatic.close();
 		_objectDefinitionLocalServiceUtilMockedStatic.close();
-		_objectFieldLocalServiceUtilMockedStatic.close();
 		_portalUtilMockedStatic.close();
 	}
 
@@ -82,7 +79,6 @@ public class AssetListTypePropertiesUtilTest {
 		_featureFlagManagerUtilMockedStatic.reset();
 		_listTypeEntryLocalServiceUtilMockedStatic.reset();
 		_objectDefinitionLocalServiceUtilMockedStatic.reset();
-		_objectFieldLocalServiceUtilMockedStatic.reset();
 		_portalUtilMockedStatic.reset();
 
 		_featureFlagManagerUtilMockedStatic.when(
@@ -244,41 +240,6 @@ public class AssetListTypePropertiesUtilTest {
 
 		Assert.assertEquals(
 			itemsJSONArray.toString(), 0, itemsJSONArray.length());
-	}
-
-	@Test
-	public void testGetTypePropertiesJSONArrayExcludesMetadataFieldsFromTypeGroup() {
-		_setUpObjectDefinition(
-			_CLASS_NAME_ID_1, _LABEL_1, _CLASS_TYPE_ID_1,
-			Arrays.asList(
-				_mockObjectField(
-					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT, false,
-					RandomTestUtil.randomString()),
-				_mockObjectField(
-					ObjectFieldConstants.BUSINESS_TYPE_TEXT, true,
-					RandomTestUtil.randomString()),
-				_mockObjectField(
-					ObjectFieldConstants.BUSINESS_TYPE_TEXT, false, "title")));
-
-		JSONArray jsonArray =
-			AssetListTypePropertiesUtil.getTypePropertiesJSONArray(
-				new long[] {_CLASS_NAME_ID_1}, new long[] {_CLASS_TYPE_ID_1},
-				_COMPANY_ID, LocaleUtil.US);
-
-		Assert.assertEquals(jsonArray.toString(), 2, jsonArray.length());
-
-		JSONArray itemsJSONArray = JSONUtil.getValueAsJSONArray(
-			jsonArray, "JSONObject/1", "JSONArray/items");
-
-		Assert.assertEquals(
-			itemsJSONArray.toString(), 1, itemsJSONArray.length());
-		Assert.assertEquals(
-			"title",
-			itemsJSONArray.getJSONObject(
-				0
-			).getString(
-				"name"
-			));
 	}
 
 	@Test
@@ -517,11 +478,18 @@ public class AssetListTypePropertiesUtilTest {
 			objectDefinition
 		);
 
-		_objectFieldLocalServiceUtilMockedStatic.when(
-			() -> ObjectFieldLocalServiceUtil.getObjectFields(
-				objectDefinitionId)
+		ObjectFieldBag objectFieldBag = Mockito.mock(ObjectFieldBag.class);
+
+		Mockito.when(
+			objectFieldBag.getNestedIndexedObjectFields()
 		).thenReturn(
 			objectFields
+		);
+
+		Mockito.when(
+			objectDefinition.getObjectFieldBag()
+		).thenReturn(
+			objectFieldBag
 		);
 
 		_portalUtilMockedStatic.when(
@@ -551,8 +519,6 @@ public class AssetListTypePropertiesUtilTest {
 		_listTypeEntryLocalServiceUtilMockedStatic;
 	private static MockedStatic<ObjectDefinitionLocalServiceUtil>
 		_objectDefinitionLocalServiceUtilMockedStatic;
-	private static MockedStatic<ObjectFieldLocalServiceUtil>
-		_objectFieldLocalServiceUtilMockedStatic;
 	private static MockedStatic<PortalUtil> _portalUtilMockedStatic;
 
 }
