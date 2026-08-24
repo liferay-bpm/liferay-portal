@@ -1300,8 +1300,7 @@ public class DefaultObjectEntryManagerImpl
 
 		return _updateObjectEntry(
 			0L, dtoConverterContext, objectDefinition, existingObjectEntry,
-			objectEntryId, true, false,
-			untouchedRelationshipObjectFieldNames);
+			objectEntryId, true, false, untouchedRelationshipObjectFieldNames);
 	}
 
 	@Override
@@ -4134,8 +4133,7 @@ public class DefaultObjectEntryManagerImpl
 			long companyId, DTOConverterContext dtoConverterContext,
 			String externalReferenceCode, ObjectDefinition objectDefinition,
 			ObjectEntry objectEntry, boolean partialUpdateNestedObjectEntries,
-			String scopeKey,
-			Set<String> untouchedRelationshipObjectFieldNames)
+			String scopeKey, Set<String> untouchedRelationshipObjectFieldNames)
 		throws Exception {
 
 		long groupId = getGroupId(objectDefinition, scopeKey);
@@ -4255,8 +4253,7 @@ public class DefaultObjectEntryManagerImpl
 			String externalReferenceCode, ObjectEntry objectEntry,
 			ObjectRelationship objectRelationship,
 			String parentExternalReferenceCode, boolean partialUpdate,
-			String scopeKey,
-			Set<String> untouchedRelationshipObjectFieldNames)
+			String scopeKey, Set<String> untouchedRelationshipObjectFieldNames)
 		throws Exception {
 
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
