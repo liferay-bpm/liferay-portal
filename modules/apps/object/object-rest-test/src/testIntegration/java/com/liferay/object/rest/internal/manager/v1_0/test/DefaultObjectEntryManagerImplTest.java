@@ -8332,6 +8332,86 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
+	public void testPartialUpdateObjectEntryByExternalReferenceCodeWithUntouchedRelationshipObjectField()
+		throws Exception {
+
+		// LPD-103553 Partial updates by external reference code must not
+		// resolve relationship object fields that are absent from the request
+
+		AccountEntry accountEntry1 = _addAccountEntry();
+		AccountEntry accountEntry2 = _addAccountEntry();
+
+		ObjectEntry objectEntry = _addObjectEntry(accountEntry1);
+
+		_user = _addUser();
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			companyId, _objectDefinition3.getClassName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(objectEntry.getId()), role.getRoleId(),
+			new String[] {ActionKeys.UPDATE, ActionKeys.VIEW});
+
+		_userLocalService.addRoleUser(role.getRoleId(), _user);
+
+		ObjectEntry patchedObjectEntry =
+			_defaultObjectEntryManager.partialUpdateObjectEntry(
+				companyId, _simpleDTOConverterContext,
+				objectEntry.getExternalReferenceCode(), _objectDefinition3,
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							"textObjectFieldName1", "textObjectFieldValue1"
+						).build();
+					}
+				},
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		Assert.assertEquals(
+			"textObjectFieldValue1",
+			patchedObjectEntry.getPropertyValue("textObjectFieldName1"));
+		Assert.assertEquals(
+			accountEntry1.getAccountEntryId(),
+			GetterUtil.getLong(
+				patchedObjectEntry.getPropertyValue(
+					"r_oneToManyRelationshipName1_accountEntryId")));
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", _user.getUserId(), " must have VIEW permission for ",
+				AccountEntry.class.getName(), StringPool.SPACE,
+				accountEntry2.getAccountEntryId()),
+			() -> _defaultObjectEntryManager.partialUpdateObjectEntry(
+				companyId, _simpleDTOConverterContext,
+				objectEntry.getExternalReferenceCode(), _objectDefinition3,
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							"r_oneToManyRelationshipName1_accountEntryId",
+							accountEntry2.getAccountEntryId()
+						).build();
+					}
+				},
+				ObjectDefinitionConstants.SCOPE_COMPANY));
+
+		ObjectEntry unchangedObjectEntry =
+			_defaultObjectEntryManager.getObjectEntry(
+				_simpleDTOConverterContext, _objectDefinition3,
+				objectEntry.getId());
+
+		Assert.assertEquals(
+			"textObjectFieldValue1",
+			unchangedObjectEntry.getPropertyValue("textObjectFieldName1"));
+		Assert.assertEquals(
+			accountEntry1.getAccountEntryId(),
+			GetterUtil.getLong(
+				unchangedObjectEntry.getPropertyValue(
+					"r_oneToManyRelationshipName1_accountEntryId")));
+	}
+
+	@Test
 	public void testPartialUpdateObjectEntryWithAttachmentObjectField()
 		throws Exception {
 
@@ -8783,6 +8863,315 @@ public class DefaultObjectEntryManagerImplTest
 				updatedObjectEntry.getProperties(), "textObjectField"));
 
 		objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+	}
+
+	@Test
+	public void testPartialUpdateObjectEntryWithUntouchedCustomRelationshipObjectField()
+		throws Exception {
+
+		// LPD-103553 Partial updates must not resolve custom object
+		// relationship fields that are absent from the request
+
+		ObjectEntry parentObjectEntry1 =
+			_defaultObjectEntryManager.addObjectEntry(
+				_simpleDTOConverterContext, _objectDefinition1,
+				new ObjectEntry() {
+					{
+						properties = Collections.emptyMap();
+					}
+				},
+				null);
+		ObjectEntry parentObjectEntry2 =
+			_defaultObjectEntryManager.addObjectEntry(
+				_simpleDTOConverterContext, _objectDefinition1,
+				new ObjectEntry() {
+					{
+						properties = Collections.emptyMap();
+					}
+				},
+				null);
+
+		ObjectEntry objectEntry = _defaultObjectEntryManager.addObjectEntry(
+			_simpleDTOConverterContext, _objectDefinition2,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						_objectRelationshipFieldName, parentObjectEntry1.getId()
+					).put(
+						"textObjectFieldName", "textObjectFieldValue"
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		_user = _addUser();
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			companyId, _objectDefinition2.getClassName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(objectEntry.getId()), role.getRoleId(),
+			new String[] {ActionKeys.UPDATE, ActionKeys.VIEW});
+
+		_userLocalService.addRoleUser(role.getRoleId(), _user);
+
+		ObjectEntry patchedObjectEntry =
+			_defaultObjectEntryManager.partialUpdateObjectEntry(
+				_simpleDTOConverterContext, _objectDefinition2,
+				objectEntry.getId(),
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							"textObjectFieldName", "textObjectFieldValue1"
+						).build();
+					}
+				});
+
+		Assert.assertEquals(
+			"textObjectFieldValue1",
+			patchedObjectEntry.getPropertyValue("textObjectFieldName"));
+		Assert.assertEquals(
+			GetterUtil.getLong(parentObjectEntry1.getId()),
+			GetterUtil.getLong(
+				patchedObjectEntry.getPropertyValue(
+					_objectRelationshipFieldName)));
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", _user.getUserId(), " must have VIEW permission for ",
+				_objectDefinition1.getClassName(), StringPool.SPACE,
+				parentObjectEntry2.getId()),
+			() -> _defaultObjectEntryManager.partialUpdateObjectEntry(
+				_simpleDTOConverterContext, _objectDefinition2,
+				objectEntry.getId(),
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							_objectRelationshipFieldName,
+							parentObjectEntry2.getId()
+						).build();
+					}
+				}));
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", _user.getUserId(), " must have VIEW permission for ",
+				_objectDefinition1.getClassName(), StringPool.SPACE,
+				parentObjectEntry2.getId()),
+			() -> _defaultObjectEntryManager.partialUpdateObjectEntry(
+				_simpleDTOConverterContext, _objectDefinition2,
+				objectEntry.getId(),
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							_objectRelationshipERCObjectFieldName,
+							parentObjectEntry2.getExternalReferenceCode()
+						).build();
+					}
+				}));
+
+		ObjectEntry unchangedObjectEntry =
+			_defaultObjectEntryManager.getObjectEntry(
+				_simpleDTOConverterContext, _objectDefinition2,
+				objectEntry.getId());
+
+		Assert.assertEquals(
+			"textObjectFieldValue1",
+			unchangedObjectEntry.getPropertyValue("textObjectFieldName"));
+		Assert.assertEquals(
+			GetterUtil.getLong(parentObjectEntry1.getId()),
+			GetterUtil.getLong(
+				unchangedObjectEntry.getPropertyValue(
+					_objectRelationshipFieldName)));
+	}
+
+	@Test
+	public void testPartialUpdateObjectEntryWithUntouchedRelationshipObjectField()
+		throws Exception {
+
+		// LPD-103553 Partial updates must not resolve relationship object
+		// fields that are absent from the request
+
+		AccountEntry accountEntry1 = _addAccountEntry();
+		AccountEntry accountEntry2 = _addAccountEntry();
+
+		ObjectEntry objectEntry = _addObjectEntry(accountEntry1);
+
+		_user = _addUser();
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			companyId, _objectDefinition3.getClassName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(objectEntry.getId()), role.getRoleId(),
+			new String[] {ActionKeys.UPDATE, ActionKeys.VIEW});
+
+		_userLocalService.addRoleUser(role.getRoleId(), _user);
+
+		ObjectEntry patchedObjectEntry =
+			_defaultObjectEntryManager.partialUpdateObjectEntry(
+				_simpleDTOConverterContext, _objectDefinition3,
+				objectEntry.getId(),
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							"textObjectFieldName1", "textObjectFieldValue1"
+						).build();
+					}
+				});
+
+		Assert.assertEquals(
+			"textObjectFieldValue1",
+			patchedObjectEntry.getPropertyValue("textObjectFieldName1"));
+		Assert.assertEquals(
+			accountEntry1.getAccountEntryId(),
+			GetterUtil.getLong(
+				patchedObjectEntry.getPropertyValue(
+					"r_oneToManyRelationshipName1_accountEntryId")));
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", _user.getUserId(), " must have VIEW permission for ",
+				AccountEntry.class.getName(), StringPool.SPACE,
+				accountEntry2.getAccountEntryId()),
+			() -> _defaultObjectEntryManager.partialUpdateObjectEntry(
+				_simpleDTOConverterContext, _objectDefinition3,
+				objectEntry.getId(),
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							"r_oneToManyRelationshipName1_accountEntryId",
+							accountEntry2.getAccountEntryId()
+						).build();
+					}
+				}));
+
+		ObjectEntry unchangedObjectEntry =
+			_defaultObjectEntryManager.getObjectEntry(
+				_simpleDTOConverterContext, _objectDefinition3,
+				objectEntry.getId());
+
+		Assert.assertEquals(
+			"textObjectFieldValue1",
+			unchangedObjectEntry.getPropertyValue("textObjectFieldName1"));
+		Assert.assertEquals(
+			accountEntry1.getAccountEntryId(),
+			GetterUtil.getLong(
+				unchangedObjectEntry.getPropertyValue(
+					"r_oneToManyRelationshipName1_accountEntryId")));
+	}
+
+	@Test
+	public void testPartialUpdateRelatedObjectEntryWithUntouchedRelationshipObjectField()
+		throws Exception {
+
+		// LPD-103553 Related object entry partial updates must not resolve
+		// relationship object fields that are absent from the request
+
+		AccountEntry accountEntry = _addAccountEntry();
+
+		ObjectDefinition parentObjectDefinition = _addObjectDefinition();
+		ObjectDefinition childObjectDefinition = _addObjectDefinition();
+
+		ObjectRelationship parentObjectRelationship = TreeTestUtil.bind(
+			parentObjectDefinition.getObjectDefinitionId(),
+			childObjectDefinition.getObjectDefinitionId(),
+			_objectRelationshipLocalService);
+
+		ObjectRelationship accountEntryObjectRelationship =
+			_objectRelationshipLocalService.addObjectRelationship(
+				null, adminUser.getUserId(),
+				_accountEntryObjectDefinition.getObjectDefinitionId(),
+				childObjectDefinition.getObjectDefinitionId(), 0,
+				ObjectRelationshipConstants.DELETION_TYPE_CASCADE, false,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"oneToManyRelationshipName3", false,
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+
+		ObjectField parentObjectField = objectFieldLocalService.getObjectField(
+			parentObjectRelationship.getObjectFieldId2());
+		ObjectField accountEntryObjectField =
+			objectFieldLocalService.getObjectField(
+				accountEntryObjectRelationship.getObjectFieldId2());
+
+		ObjectEntry parentObjectEntry =
+			_defaultObjectEntryManager.addObjectEntry(
+				_simpleDTOConverterContext, parentObjectDefinition,
+				new ObjectEntry() {
+					{
+						properties = Collections.emptyMap();
+					}
+				},
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		ObjectEntry objectEntry =
+			_defaultObjectEntryManager.addRelatedObjectEntry(
+				_createDTOConverterContext(),
+				parentObjectEntry.getExternalReferenceCode(),
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							accountEntryObjectField.getName(),
+							accountEntry.getAccountEntryId()
+						).put(
+							parentObjectField::getName,
+							parentObjectEntry.getId()
+						).put(
+							"textObjectFieldName", "textObjectFieldValue"
+						).build();
+					}
+				},
+				parentObjectRelationship,
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		_user = _addUser();
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			companyId, childObjectDefinition.getClassName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(objectEntry.getId()), role.getRoleId(),
+			new String[] {ActionKeys.UPDATE, ActionKeys.VIEW});
+		_resourcePermissionLocalService.setResourcePermissions(
+			companyId, parentObjectDefinition.getClassName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(parentObjectEntry.getId()), role.getRoleId(),
+			new String[] {ActionKeys.VIEW});
+
+		_userLocalService.addRoleUser(role.getRoleId(), _user);
+
+		ObjectEntry patchedObjectEntry =
+			_defaultObjectEntryManager.partialUpdateRelatedObjectEntry(
+				_simpleDTOConverterContext,
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							"textObjectFieldName", "textObjectFieldValue1"
+						).build();
+					}
+				},
+				objectEntry.getId(), parentObjectRelationship,
+				parentObjectEntry.getId());
+
+		Assert.assertEquals(
+			"textObjectFieldValue1",
+			patchedObjectEntry.getPropertyValue("textObjectFieldName"));
+		Assert.assertEquals(
+			accountEntry.getAccountEntryId(),
+			GetterUtil.getLong(
+				patchedObjectEntry.getPropertyValue(
+					accountEntryObjectField.getName())));
+
+		objectDefinitionLocalService.deleteObjectDefinition(
+			childObjectDefinition);
+		objectDefinitionLocalService.deleteObjectDefinition(
+			parentObjectDefinition);
 	}
 
 	@Test
