@@ -474,16 +474,8 @@ public class ObjectEntryModelDocumentContributor
 
 		ObjectFieldBag objectFieldBag = objectDefinition.getObjectFieldBag();
 
-		List<ObjectField> objectFields = null;
-
-		if (objectDefinition.isModifiableAndSystem()) {
-			objectFields = ListUtil.filter(
-				objectFieldBag.getIndexedObjectFields(),
-				objectField -> !objectField.isMetadata());
-		}
-		else {
-			objectFields = objectFieldBag.getNonsystemIndexedObjectFields();
-		}
+		List<ObjectField> objectFields =
+			objectFieldBag.getNestedIndexedObjectFields();
 
 		TextEmbeddingContentHelper<ObjectEntry> textEmbeddingContentHelper =
 			new TextEmbeddingContentHelper<>(
