@@ -114,7 +114,6 @@ import com.liferay.layout.utility.page.service.LayoutUtilityPageEntryLocalServic
 import com.liferay.list.type.exception.NoSuchListTypeDefinitionException;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.message.boards.model.MBMessage;
-import com.liferay.notification.exception.NoSuchNotificationTemplateException;
 import com.liferay.notification.rest.dto.v1_0.NotificationTemplate;
 import com.liferay.notification.rest.resource.v1_0.NotificationTemplateResource;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
@@ -3337,24 +3336,11 @@ public class BundleSiteInitializer implements SiteInitializer {
 				serviceContext.fetchUser()
 			).build();
 
-		try {
+		notificationTemplate =
 			notificationTemplateResource.
-				getNotificationTemplateByExternalReferenceCode(
-					notificationTemplate.getExternalReferenceCode());
-
-			notificationTemplate =
-				notificationTemplateResource.
-					putNotificationTemplateByExternalReferenceCode(
-						notificationTemplate.getExternalReferenceCode(),
-						notificationTemplate);
-		}
-		catch (NoSuchNotificationTemplateException
-					noSuchNotificationTemplateException) {
-
-			notificationTemplate =
-				notificationTemplateResource.postNotificationTemplate(
+				putNotificationTemplateByExternalReferenceCode(
+					notificationTemplate.getExternalReferenceCode(),
 					notificationTemplate);
-		}
 
 		json = SiteInitializerUtil.read(
 			resourcePath + "notification-template.object-actions.json",
