@@ -8,6 +8,7 @@ package com.liferay.notification.rest.internal.resource.v1_0;
 import com.liferay.notification.constants.NotificationActionKeys;
 import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.context.NotificationContext;
+import com.liferay.notification.exception.NoSuchNotificationTemplateException;
 import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.notification.model.NotificationTemplateAttachment;
@@ -105,10 +106,19 @@ public class NotificationTemplateResourceImpl
 			String externalReferenceCode)
 		throws Exception {
 
-		return _toNotificationTemplate(
-			_notificationTemplateService.
-				fetchNotificationTemplateByExternalReferenceCode(
-					externalReferenceCode, contextCompany.getCompanyId()));
+		com.liferay.notification.model.NotificationTemplate
+			serviceBuilderNotificationTemplate =
+				_notificationTemplateService.
+					fetchNotificationTemplateByExternalReferenceCode(
+						externalReferenceCode, contextCompany.getCompanyId());
+
+		if (serviceBuilderNotificationTemplate == null) {
+			throw new NoSuchNotificationTemplateException(
+				"No notification template found with external reference code " +
+					externalReferenceCode);
+		}
+
+		return _toNotificationTemplate(serviceBuilderNotificationTemplate);
 	}
 
 	@Override
