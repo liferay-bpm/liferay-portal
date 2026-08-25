@@ -2519,8 +2519,6 @@ public class BundleSiteInitializerTest {
 				getNotificationTemplateByExternalReferenceCode(
 					"TESTNOTIFICATIONTEMPLATE1");
 
-		Assert.assertNotNull(notificationTemplate);
-
 		Map<String, String> bodyMap = notificationTemplate.getBody();
 
 		Assert.assertEquals(
@@ -2555,8 +2553,6 @@ public class BundleSiteInitializerTest {
 				getNotificationTemplateByExternalReferenceCode(
 					"TESTNOTIFICATIONTEMPLATE2");
 
-		Assert.assertNotNull(notificationTemplate);
-
 		bodyMap = notificationTemplate.getBody();
 
 		Assert.assertEquals(
@@ -2590,8 +2586,6 @@ public class BundleSiteInitializerTest {
 				getNotificationTemplateByExternalReferenceCode(
 					"TESTNOTIFICATIONTEMPLATE1");
 
-		Assert.assertNotNull(notificationTemplate);
-
 		Map<String, String> bodyMap = notificationTemplate.getBody();
 
 		Assert.assertEquals(
@@ -2613,8 +2607,6 @@ public class BundleSiteInitializerTest {
 			notificationTemplateResource.
 				getNotificationTemplateByExternalReferenceCode(
 					"TESTNOTIFICATIONTEMPLATE2");
-
-		Assert.assertNotNull(notificationTemplate);
 
 		bodyMap = notificationTemplate.getBody();
 
@@ -2638,8 +2630,6 @@ public class BundleSiteInitializerTest {
 			notificationTemplateResource.
 				getNotificationTemplateByExternalReferenceCode(
 					"TESTNOTIFICATIONTEMPLATE3");
-
-		Assert.assertNotNull(notificationTemplate);
 
 		bodyMap = notificationTemplate.getBody();
 
