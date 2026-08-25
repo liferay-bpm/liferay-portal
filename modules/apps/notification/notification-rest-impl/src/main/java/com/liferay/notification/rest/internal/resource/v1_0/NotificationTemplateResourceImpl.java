@@ -26,17 +26,21 @@ import com.liferay.notification.type.NotificationType;
 import com.liferay.notification.type.NotificationTypeServiceTracker;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.rest.dto.v1_0.util.CreatorUtil;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
@@ -125,6 +129,11 @@ public class NotificationTemplateResourceImpl
 
 				return com.liferay.notification.model.NotificationTemplate.
 					class;
+			}
+
+			@Override
+			public List<String> getNestedFields() {
+				return List.of("creator");
 			}
 
 			@Override
@@ -406,6 +415,9 @@ public class NotificationTemplateResourceImpl
 			_notificationTypeServiceTracker.getNotificationType(
 				serviceBuilderNotificationTemplate.getType());
 
+		User user = _userLocalService.fetchUser(
+			serviceBuilderNotificationTemplate.getUserId());
+
 		return new NotificationTemplate() {
 			{
 				setActions(
@@ -486,6 +498,8 @@ public class NotificationTemplateResourceImpl
 				setBody(
 					() -> LocalizedMapUtil.getLanguageIdMap(
 						serviceBuilderNotificationTemplate.getBodyMap()));
+				setCreator(
+					() -> CreatorUtil.toCreator(_portal, contextUriInfo, user));
 				setDateCreated(
 					serviceBuilderNotificationTemplate::getCreateDate);
 				setDateModified(
@@ -566,5 +580,11 @@ public class NotificationTemplateResourceImpl
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }
