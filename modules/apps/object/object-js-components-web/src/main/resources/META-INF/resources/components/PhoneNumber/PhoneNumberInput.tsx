@@ -12,6 +12,7 @@ import {
 	COUNTRY_SOURCE,
 	CountryInfo,
 	CountrySource,
+	findCountry,
 	getDefaultCountry,
 	getFlagSymbol,
 	parsePhoneValue,
@@ -47,7 +48,7 @@ export function PhoneNumberInput({
 		getDefaultCountry(countries)
 	);
 
-	const fixedCountry = countries.find((c) => c.a2 === country);
+	const fixedCountry = findCountry(countries, country);
 
 	const fixedFlagSymbol = fixedCountry ? getFlagSymbol(fixedCountry.a2) : '';
 	const fixedPrefix = fixedCountry ? `+${fixedCountry.idd}` : '';
@@ -94,9 +95,7 @@ export function PhoneNumberInput({
 				countries
 			);
 
-			const country = countries.find(
-				(country) => country.a2 === countryA2
-			);
+			const country = findCountry(countries, countryA2);
 
 			setSelectedCountry(country || getDefaultCountry(countries));
 			setLocalNumber(parsedLocalNumber);
@@ -120,7 +119,7 @@ export function PhoneNumberInput({
 							</span>
 						)}
 
-						{fixedPrefix}
+						{fixedPrefix || country}
 					</ClayInput.GroupText>
 				) : (
 					<CountryCodePicker

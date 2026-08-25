@@ -125,12 +125,32 @@ export const COUNTRY_SOURCE = {
 export type CountrySource =
 	(typeof COUNTRY_SOURCE)[keyof typeof COUNTRY_SOURCE];
 
+/**
+ * Finds a country by its ISO 3166-1 alpha-2 code, ignoring case, so that a
+ * country stored as "br" still resolves to Brazil. Returns `undefined` when
+ * the code is empty or is not one of the countries the field offers.
+ */
+export function findCountry(
+	countries: CountryInfo[],
+	a2?: string
+): CountryInfo | undefined {
+	if (!a2) {
+		return undefined;
+	}
+
+	const upperCaseA2 = a2.toUpperCase();
+
+	return countries.find(
+		(country) => country.a2.toUpperCase() === upperCaseA2
+	);
+}
+
 export function getCombinedValue(
 	countryA2: string,
 	localNumber: string,
 	countries: CountryInfo[] = DEFAULT_COUNTRIES
 ): string {
-	const country = countries.find((c) => c.a2 === countryA2);
+	const country = findCountry(countries, countryA2);
 
 	if (country && localNumber) {
 		return `+${country.idd}${localNumber}`;
@@ -143,10 +163,7 @@ export function getDefaultCountry(countries: CountryInfo[]): CountryInfo {
 	const defaultLanguageCountryA2 =
 		Liferay.ThemeDisplay.getDefaultLanguageId().split('_')[1] ?? '';
 
-	return (
-		countries.find((country) => country.a2 === defaultLanguageCountryA2) ||
-		countries[0]
-	);
+	return findCountry(countries, defaultLanguageCountryA2) || countries[0];
 }
 
 export function getFlagSymbol(a2: string): string {
@@ -180,11 +197,7 @@ export function parsePhoneValue(
 	const parsed = parsePhoneNumber(value);
 
 	if (parsed?.country) {
-		const isSupportedCountry = countries.some(
-			(country) => country.a2 === parsed.country
-		);
-
-		if (isSupportedCountry) {
+		if (findCountry(countries, parsed.country)) {
 			return {
 				countryA2: parsed.country,
 				localNumber: parsed.nationalNumber,
