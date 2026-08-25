@@ -431,6 +431,7 @@ public class NotificationTemplateResourceImpl
 			_notificationTypeServiceTracker.getNotificationType(
 				serviceBuilderNotificationTemplate.getType());
 
+		Locale locale = _getLocale();
 		String permissionName =
 			com.liferay.notification.model.NotificationTemplate.class.getName();
 		User user = _userLocalService.fetchUser(
@@ -533,7 +534,8 @@ public class NotificationTemplateResourceImpl
 				setId(
 					serviceBuilderNotificationTemplate::
 						getNotificationTemplateId);
-				setName(serviceBuilderNotificationTemplate::getName);
+				setName(
+					() -> serviceBuilderNotificationTemplate.getName(locale));
 				setName_i18n(
 					() -> LocalizedMapUtil.getLanguageIdMap(
 						serviceBuilderNotificationTemplate.getNameMap()));
@@ -593,7 +595,7 @@ public class NotificationTemplateResourceImpl
 				setType(serviceBuilderNotificationTemplate::getType);
 				setTypeLabel(
 					() -> _language.get(
-						_getLocale(), notificationType.getTypeLanguageKey()));
+						locale, notificationType.getTypeLanguageKey()));
 			}
 		};
 	}
