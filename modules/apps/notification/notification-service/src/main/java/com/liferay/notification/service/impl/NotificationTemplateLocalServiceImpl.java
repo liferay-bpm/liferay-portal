@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -116,12 +117,25 @@ public class NotificationTemplateLocalServiceImpl
 		notificationTemplate = notificationTemplatePersistence.update(
 			notificationTemplate);
 
-		_resourceLocalService.addResources(
-			notificationTemplate.getCompanyId(), 0,
-			notificationTemplate.getUserId(),
-			NotificationTemplate.class.getName(),
-			notificationTemplate.getNotificationTemplateId(), false, true,
-			true);
+		ModelPermissions modelPermissions =
+			notificationContext.getModelPermissions();
+
+		if (modelPermissions == null) {
+			_resourceLocalService.addResources(
+				notificationTemplate.getCompanyId(), 0,
+				notificationTemplate.getUserId(),
+				NotificationTemplate.class.getName(),
+				notificationTemplate.getNotificationTemplateId(), false, true,
+				true);
+		}
+		else {
+			_resourceLocalService.addModelResources(
+				notificationTemplate.getCompanyId(), 0,
+				notificationTemplate.getUserId(),
+				NotificationTemplate.class.getName(),
+				notificationTemplate.getNotificationTemplateId(),
+				modelPermissions);
+		}
 
 		NotificationRecipient notificationRecipient =
 			notificationContext.getNotificationRecipient();
