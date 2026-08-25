@@ -16,8 +16,11 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectDefinitionService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -75,13 +78,21 @@ public class ViewRelatedAssetsSectionDisplayContext
 
 	@Override
 	public Map<String, Object> getAdditionalProps() {
-		return HashMapBuilder.<String, Object>put(
-			"documentClassName", _cmsBasicDocumentClassName
-		).put(
-			"objectEntryLinkProps", _getObjectEntryLinkProps()
-		).putAll(
-			super.getAdditionalProps()
-		).build();
+		Map<String, Object> additionalProps = super.getAdditionalProps();
+
+		try {
+			additionalProps.put("breadcrumbProps", getBreadcrumbProps());
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException);
+			}
+		}
+
+		additionalProps.put("documentClassName", _cmsBasicDocumentClassName);
+		additionalProps.put("objectEntryLinkProps", _getObjectEntryLinkProps());
+
+		return additionalProps;
 	}
 
 	@Override
@@ -202,6 +213,9 @@ public class ViewRelatedAssetsSectionDisplayContext
 			"scopeGroupId", String.valueOf(objectEntry.getGroupId())
 		).build();
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ViewRelatedAssetsSectionDisplayContext.class);
 
 	private final String _cmsBasicDocumentClassName;
 	private final String _relatedObjectEntriesFilterFieldName;
