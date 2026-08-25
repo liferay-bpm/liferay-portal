@@ -8,6 +8,7 @@ package com.liferay.notification.rest.internal.resource.v1_0;
 import com.liferay.notification.constants.NotificationActionKeys;
 import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.context.NotificationContext;
+import com.liferay.notification.exception.NoSuchNotificationTemplateException;
 import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.notification.model.NotificationTemplateAttachment;
@@ -23,6 +24,7 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.search.Field;
@@ -105,10 +107,20 @@ public class NotificationTemplateResourceImpl
 			String externalReferenceCode)
 		throws Exception {
 
-		return _toNotificationTemplate(
-			_notificationTemplateService.
-				fetchNotificationTemplateByExternalReferenceCode(
-					externalReferenceCode, contextCompany.getCompanyId()));
+		com.liferay.notification.model.NotificationTemplate
+			serviceBuilderNotificationTemplate =
+				_notificationTemplateService.
+					fetchNotificationTemplateByExternalReferenceCode(
+						externalReferenceCode, contextCompany.getCompanyId());
+
+		if (serviceBuilderNotificationTemplate == null) {
+			throw new NoSuchNotificationTemplateException(
+				StringBundler.concat(
+					"No notification template exists with external reference ",
+					"code \"", externalReferenceCode, "\""));
+		}
+
+		return _toNotificationTemplate(serviceBuilderNotificationTemplate);
 	}
 
 	@Override
