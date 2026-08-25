@@ -99,10 +99,11 @@ public abstract class BaseRelatedAssetsSectionDisplayContext
 	@Override
 	protected String getCMSSectionFilterString() {
 		return appendStatus(
-			StringBundler.concat(
-				"(cmsSection eq 'contents' or cmsSection eq 'files') and ",
-				getRelatedObjectEntriesFilterString(),
-				" and rootDescendantNode eq false"));
+			appendGroupIds(
+				StringBundler.concat(
+					"(cmsSection eq 'contents' or cmsSection eq 'files') and ",
+					getRelatedObjectEntriesFilterString(),
+					" and rootDescendantNode eq false")));
 	}
 
 	protected abstract String getRelatedObjectEntriesFilterString();
