@@ -68,7 +68,7 @@ public class ObjectFieldCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(55);
+		StringBundler sb = new StringBundler(57);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -108,6 +108,8 @@ public class ObjectFieldCacheModel
 		sb.append(indexedLanguageId);
 		sb.append(", label=");
 		sb.append(label);
+		sb.append(", description=");
+		sb.append(description);
 		sb.append(", localized=");
 		sb.append(localized);
 		sb.append(", name=");
@@ -222,6 +224,13 @@ public class ObjectFieldCacheModel
 			objectFieldImpl.setLabel(label);
 		}
 
+		if (description == null) {
+			objectFieldImpl.setDescription("");
+		}
+		else {
+			objectFieldImpl.setDescription(description);
+		}
+
 		objectFieldImpl.setLocalized(localized);
 
 		if (name == null) {
@@ -292,6 +301,7 @@ public class ObjectFieldCacheModel
 		indexedAsKeyword = objectInput.readBoolean();
 		indexedLanguageId = objectInput.readUTF();
 		label = objectInput.readUTF();
+		description = objectInput.readUTF();
 
 		localized = objectInput.readBoolean();
 		name = objectInput.readUTF();
@@ -390,6 +400,13 @@ public class ObjectFieldCacheModel
 			objectOutput.writeUTF(label);
 		}
 
+		if (description == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(description);
+		}
+
 		objectOutput.writeBoolean(localized);
 
 		if (name == null) {
@@ -446,6 +463,7 @@ public class ObjectFieldCacheModel
 	public boolean indexedAsKeyword;
 	public String indexedLanguageId;
 	public String label;
+	public String description;
 	public boolean localized;
 	public String name;
 	public String readOnly;
@@ -456,4 +474,4 @@ public class ObjectFieldCacheModel
 	public boolean system;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-179531582
+// LIFERAY-SERVICE-BUILDER-HASH:1688704614

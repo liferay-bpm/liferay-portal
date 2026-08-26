@@ -119,6 +119,9 @@ public class ObjectDefinitionTable extends BaseTable<ObjectDefinitionTable> {
 			Column.FLAG_DEFAULT);
 	public final Column<ObjectDefinitionTable, String> label = createColumn(
 		"label", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
+	public final Column<ObjectDefinitionTable, String> description =
+		createColumn(
+			"description", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<ObjectDefinitionTable, Boolean> modifiable =
 		createColumn(
 			"modifiable", Boolean.class, Types.BOOLEAN, Column.FLAG_DEFAULT);
@@ -161,4 +164,4 @@ public class ObjectDefinitionTable extends BaseTable<ObjectDefinitionTable> {
 	}
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:368111822
+// LIFERAY-SERVICE-BUILDER-HASH:459912858

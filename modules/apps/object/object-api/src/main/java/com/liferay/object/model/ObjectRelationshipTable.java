@@ -76,6 +76,9 @@ public class ObjectRelationshipTable
 		"edge", Boolean.class, Types.BOOLEAN, Column.FLAG_DEFAULT);
 	public final Column<ObjectRelationshipTable, String> label = createColumn(
 		"label", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
+	public final Column<ObjectRelationshipTable, String> description =
+		createColumn(
+			"description", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<ObjectRelationshipTable, String> name = createColumn(
 		"name", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<ObjectRelationshipTable, Boolean> reverse =
@@ -91,4 +94,4 @@ public class ObjectRelationshipTable
 	}
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1124712290
+// LIFERAY-SERVICE-BUILDER-HASH:-873174857
