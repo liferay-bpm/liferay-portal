@@ -1172,8 +1172,8 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 
 		ObjectDefinition objectDefinition =
 			objectDefinitionLocalService.addCustomObjectDefinition(
-				null, TestPropsValues.getUserId(), 0, null, true, false, true,
-				false, true, false, false, false, false, null,
+				null, TestPropsValues.getUserId(), 0, null, null, true, false,
+				true, false, true, false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1793,8 +1793,8 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 
 		ObjectDefinition objectDefinition =
 			objectDefinitionLocalService.addCustomObjectDefinition(
-				null, TestPropsValues.getUserId(), 0, null, true, false, true,
-				false, true, false, false, false, false, null,
+				null, TestPropsValues.getUserId(), 0, null, null, true, false,
+				true, false, true, false, false, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionTestUtil.getRandomName(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -1823,7 +1823,7 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 						null, TestPropsValues.getUserId(),
 						accountEntryObjectDefinition.getObjectDefinitionId(),
 						objectDefinition.getObjectDefinitionId(), 0,
-						ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+						ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null,
 						false,
 						LocalizedMapUtil.getLocalizedMap(
 							RandomTestUtil.randomString()),
