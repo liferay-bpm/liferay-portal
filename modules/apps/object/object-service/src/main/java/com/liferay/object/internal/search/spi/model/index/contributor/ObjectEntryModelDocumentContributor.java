@@ -472,10 +472,8 @@ public class ObjectEntryModelDocumentContributor
 		document.addKeyword(
 			"objectDefinitionName", objectDefinition.getShortName());
 
-		ObjectFieldBag objectFieldBag = objectDefinition.getObjectFieldBag();
-
-		List<ObjectField> objectFields =
-			objectFieldBag.getNestedIndexedObjectFields();
+		List<ObjectField> objectFields = objectDefinition.getObjectFieldBag(
+		).getNestedIndexedObjectFields();
 
 		TextEmbeddingContentHelper<ObjectEntry> textEmbeddingContentHelper =
 			new TextEmbeddingContentHelper<>(

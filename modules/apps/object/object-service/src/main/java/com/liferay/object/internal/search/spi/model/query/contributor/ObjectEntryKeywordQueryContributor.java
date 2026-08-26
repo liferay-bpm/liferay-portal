@@ -115,10 +115,8 @@ public class ObjectEntryKeywordQueryContributor
 		}
 
 		if (objectFields == null) {
-			ObjectFieldBag objectFieldBag =
-				_objectDefinition.getObjectFieldBag();
-
-			objectFields = objectFieldBag.getNestedIndexedObjectFields();
+			objectFields = _objectDefinition.getObjectFieldBag(
+			).getNestedIndexedObjectFields();
 		}
 
 		Locale defaultLocale = LocaleUtil.fromLanguageId(
