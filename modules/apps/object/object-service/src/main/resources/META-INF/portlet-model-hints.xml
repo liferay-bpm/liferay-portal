@@ -68,6 +68,7 @@
 		<field localized="true" name="label" type="String">
 			<validator name="required" />
 		</field>
+		<field localized="true" name="description" type="String" />
 		<field name="modifiable" type="boolean" />
 		<field name="name" type="String" />
 		<field name="panelAppOrder" type="String" />
@@ -195,6 +196,7 @@
 		<field name="indexedAsKeyword" type="boolean" />
 		<field name="indexedLanguageId" type="String" />
 		<field localized="true" name="label" type="String" />
+		<field localized="true" name="description" type="String" />
 		<field name="localized" type="boolean" />
 		<field name="name" type="String" />
 		<field name="readOnly" type="String" />
@@ -349,6 +351,7 @@
 		<field name="DBTableName" type="String" />
 		<field name="edge" type="boolean" />
 		<field localized="true" name="label" type="String" />
+		<field localized="true" name="description" type="String" />
 		<field name="name" type="String" />
 		<field name="reverse" type="boolean" />
 		<field name="system" type="boolean" />

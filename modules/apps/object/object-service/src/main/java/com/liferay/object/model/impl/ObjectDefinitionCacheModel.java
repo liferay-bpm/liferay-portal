@@ -69,7 +69,7 @@ public class ObjectDefinitionCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(85);
+		StringBundler sb = new StringBundler(87);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -129,6 +129,8 @@ public class ObjectDefinitionCacheModel
 		sb.append(friendlyURLSeparator);
 		sb.append(", label=");
 		sb.append(label);
+		sb.append(", description=");
+		sb.append(description);
 		sb.append(", modifiable=");
 		sb.append(modifiable);
 		sb.append(", name=");
@@ -259,6 +261,13 @@ public class ObjectDefinitionCacheModel
 			objectDefinitionImpl.setLabel(label);
 		}
 
+		if (description == null) {
+			objectDefinitionImpl.setDescription("");
+		}
+		else {
+			objectDefinitionImpl.setDescription(description);
+		}
+
 		objectDefinitionImpl.setModifiable(modifiable);
 
 		if (name == null) {
@@ -379,6 +388,7 @@ public class ObjectDefinitionCacheModel
 		enableObjectEntryVersioning = objectInput.readBoolean();
 		friendlyURLSeparator = objectInput.readUTF();
 		label = objectInput.readUTF();
+		description = objectInput.readUTF();
 
 		modifiable = objectInput.readBoolean();
 		name = objectInput.readUTF();
@@ -493,6 +503,13 @@ public class ObjectDefinitionCacheModel
 			objectOutput.writeUTF(label);
 		}
 
+		if (description == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(description);
+		}
+
 		objectOutput.writeBoolean(modifiable);
 
 		if (name == null) {
@@ -589,6 +606,7 @@ public class ObjectDefinitionCacheModel
 	public boolean enableObjectEntryVersioning;
 	public String friendlyURLSeparator;
 	public String label;
+	public String description;
 	public boolean modifiable;
 	public String name;
 	public String panelAppOrder;
@@ -604,4 +622,4 @@ public class ObjectDefinitionCacheModel
 	public int status;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-2015390850
+// LIFERAY-SERVICE-BUILDER-HASH:-1048261844

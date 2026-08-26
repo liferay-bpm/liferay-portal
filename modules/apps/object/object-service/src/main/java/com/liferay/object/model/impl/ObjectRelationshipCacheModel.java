@@ -69,7 +69,7 @@ public class ObjectRelationshipCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(43);
+		StringBundler sb = new StringBundler(45);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -105,6 +105,8 @@ public class ObjectRelationshipCacheModel
 		sb.append(edge);
 		sb.append(", label=");
 		sb.append(label);
+		sb.append(", description=");
+		sb.append(description);
 		sb.append(", name=");
 		sb.append(name);
 		sb.append(", reverse=");
@@ -194,6 +196,13 @@ public class ObjectRelationshipCacheModel
 			objectRelationshipImpl.setLabel(label);
 		}
 
+		if (description == null) {
+			objectRelationshipImpl.setDescription("");
+		}
+		else {
+			objectRelationshipImpl.setDescription(description);
+		}
+
 		if (name == null) {
 			objectRelationshipImpl.setName("");
 		}
@@ -243,6 +252,7 @@ public class ObjectRelationshipCacheModel
 
 		edge = objectInput.readBoolean();
 		label = objectInput.readUTF();
+		description = objectInput.readUTF();
 		name = objectInput.readUTF();
 
 		reverse = objectInput.readBoolean();
@@ -316,6 +326,13 @@ public class ObjectRelationshipCacheModel
 			objectOutput.writeUTF(label);
 		}
 
+		if (description == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(description);
+		}
+
 		if (name == null) {
 			objectOutput.writeUTF("");
 		}
@@ -352,10 +369,11 @@ public class ObjectRelationshipCacheModel
 	public String dbTableName;
 	public boolean edge;
 	public String label;
+	public String description;
 	public String name;
 	public boolean reverse;
 	public boolean system;
 	public String type;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:225164513
+// LIFERAY-SERVICE-BUILDER-HASH:384792067

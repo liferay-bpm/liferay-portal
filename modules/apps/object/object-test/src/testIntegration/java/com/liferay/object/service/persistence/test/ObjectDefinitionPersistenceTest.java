@@ -182,6 +182,8 @@ public class ObjectDefinitionPersistenceTest {
 
 		newObjectDefinition.setLabel(RandomTestUtil.randomString());
 
+		newObjectDefinition.setDescription(RandomTestUtil.randomString());
+
 		newObjectDefinition.setModifiable(RandomTestUtil.randomBoolean());
 
 		newObjectDefinition.setName(RandomTestUtil.randomString());
@@ -302,6 +304,9 @@ public class ObjectDefinitionPersistenceTest {
 		Assert.assertEquals(
 			existingObjectDefinition.getLabel(),
 			newObjectDefinition.getLabel());
+		Assert.assertEquals(
+			existingObjectDefinition.getDescription(),
+			newObjectDefinition.getDescription());
 		Assert.assertEquals(
 			existingObjectDefinition.isModifiable(),
 			newObjectDefinition.isModifiable());
@@ -565,11 +570,11 @@ public class ObjectDefinitionPersistenceTest {
 			"enableObjectEntryHistory", true, "enableObjectEntrySchedule", true,
 			"enableObjectEntrySubscription", true,
 			"enableObjectEntryVersioning", true, "friendlyURLSeparator", true,
-			"label", true, "modifiable", true, "name", true, "panelAppOrder",
-			true, "panelCategoryKey", true, "pkObjectFieldDBColumnName", true,
-			"pkObjectFieldName", true, "pluralLabel", true, "portlet", true,
-			"scope", true, "storageType", true, "system", true, "version", true,
-			"status", true);
+			"label", true, "description", true, "modifiable", true, "name",
+			true, "panelAppOrder", true, "panelCategoryKey", true,
+			"pkObjectFieldDBColumnName", true, "pkObjectFieldName", true,
+			"pluralLabel", true, "portlet", true, "scope", true, "storageType",
+			true, "system", true, "version", true, "status", true);
 	}
 
 	@Test
@@ -950,6 +955,8 @@ public class ObjectDefinitionPersistenceTest {
 
 		objectDefinition.setLabel(RandomTestUtil.randomString());
 
+		objectDefinition.setDescription(RandomTestUtil.randomString());
+
 		objectDefinition.setModifiable(RandomTestUtil.randomBoolean());
 
 		objectDefinition.setName(RandomTestUtil.randomString());
@@ -988,4 +995,4 @@ public class ObjectDefinitionPersistenceTest {
 	private ClassLoader _dynamicQueryClassLoader;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-932054519
+// LIFERAY-SERVICE-BUILDER-HASH:-1380825390
