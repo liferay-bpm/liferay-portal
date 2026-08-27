@@ -260,16 +260,17 @@ public class NotificationTemplateResourceImpl
 				_roleLocalService));
 		notificationContext.setNotificationRecipient(
 			NotificationUtil.toNotificationRecipient(contextUser, 0L));
-		notificationContext.setNotificationRecipientSettings(
-			NotificationUtil.toNotificationRecipientSetting(
-				0L,
-				_notificationTypeServiceTracker.getNotificationType(
-					notificationTemplate.getType()),
-				notificationTemplate.getRecipients(), contextUser));
 		notificationContext.setNotificationTemplate(
 			NotificationUtil.toNotificationTemplate(
 				0L, notificationTemplate, _objectDefinitionLocalService,
 				contextUser));
+
+		notificationContext.setNotificationRecipientSettings(
+			NotificationUtil.toNotificationRecipientSetting(
+				notificationContext, 0L,
+				_notificationTypeServiceTracker.getNotificationType(
+					notificationTemplate.getType()),
+				notificationTemplate.getRecipients(), contextUser));
 
 		return _toNotificationTemplate(
 			_notificationTemplateService.addNotificationTemplate(
@@ -359,17 +360,19 @@ public class NotificationTemplateResourceImpl
 				contextUser, notificationTemplateId);
 
 		notificationContext.setNotificationRecipient(notificationRecipient);
-		notificationContext.setNotificationRecipientSettings(
-			NotificationUtil.toNotificationRecipientSetting(
-				notificationRecipient.getNotificationRecipientId(),
-				_notificationTypeServiceTracker.getNotificationType(
-					notificationTemplate.getType()),
-				notificationTemplate.getRecipients(), contextUser));
 
 		notificationContext.setNotificationTemplate(
 			NotificationUtil.toNotificationTemplate(
 				notificationTemplateId, notificationTemplate,
 				_objectDefinitionLocalService, contextUser));
+
+		notificationContext.setNotificationRecipientSettings(
+			NotificationUtil.toNotificationRecipientSetting(
+				notificationContext,
+				notificationRecipient.getNotificationRecipientId(),
+				_notificationTypeServiceTracker.getNotificationType(
+					notificationTemplate.getType()),
+				notificationTemplate.getRecipients(), contextUser));
 
 		return _toNotificationTemplate(
 			_notificationTemplateService.updateNotificationTemplate(

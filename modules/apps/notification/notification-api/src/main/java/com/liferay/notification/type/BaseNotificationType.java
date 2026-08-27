@@ -6,6 +6,8 @@
 package com.liferay.notification.type;
 
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
+import com.liferay.exportimport.report.constants.ExportImportReportEntryConstants;
+import com.liferay.exportimport.report.service.ExportImportReportEntryLocalService;
 import com.liferay.notification.constants.NotificationQueueEntryConstants;
 import com.liferay.notification.constants.NotificationRecipientConstants;
 import com.liferay.notification.constants.NotificationRecipientSettingConstants;
@@ -41,6 +43,7 @@ import com.liferay.portal.kernel.exception.NoSuchRoleException;
 import com.liferay.portal.kernel.exception.NoSuchUserGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Role;
@@ -54,6 +57,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -117,6 +121,16 @@ public abstract class BaseNotificationType implements NotificationType {
 		createNotificationRecipientSettings(
 			long notificationRecipientId, Object[] recipients, User user) {
 
+		return createNotificationRecipientSettings(
+			null, notificationRecipientId, recipients, user);
+	}
+
+	@Override
+	public List<NotificationRecipientSetting>
+		createNotificationRecipientSettings(
+			NotificationContext notificationContext,
+			long notificationRecipientId, Object[] recipients, User user) {
+
 		List<NotificationRecipientSetting> notificationRecipientSettings =
 			new ArrayList<>();
 
@@ -141,7 +155,7 @@ public abstract class BaseNotificationType implements NotificationType {
 							getRecipientTypeName(entry.getKey())));
 
 				_addNotificationRecipientSetting(
-					entry, notificationRecipientId,
+					entry, notificationContext, notificationRecipientId,
 					notificationRecipientSettings, recipientMap, recipientType,
 					user);
 			}
@@ -406,6 +420,10 @@ public abstract class BaseNotificationType implements NotificationType {
 	}
 
 	@Reference
+	protected ExportImportReportEntryLocalService
+		exportImportReportEntryLocalService;
+
+	@Reference
 	protected NotificationQueueEntryLocalService
 		notificationQueueEntryLocalService;
 
@@ -437,7 +455,8 @@ public abstract class BaseNotificationType implements NotificationType {
 	protected UserLocalService userLocalService;
 
 	private void _addNotificationRecipientSetting(
-		Map.Entry<String, Object> entry, long notificationRecipientId,
+		Map.Entry<String, Object> entry,
+		NotificationContext notificationContext, long notificationRecipientId,
 		List<NotificationRecipientSetting> notificationRecipientSettings,
 		Map<String, Object> recipientMap, String recipientType, User user) {
 
@@ -541,6 +560,32 @@ public abstract class BaseNotificationType implements NotificationType {
 					notificationRecipientSettings, user, userGroup.getName());
 			}
 		}
+		else if (Objects.equals(
+					entry.getKey(),
+					NotificationRecipientSettingConstants.
+						NAME_USER_SCREEN_NAME) &&
+				 !NotificationTypeUtil.isTermValue(
+					 GetterUtil.getString(entry.getValue()))) {
+
+			User recipientUser = _resolveUser(
+				GetterUtil.getString(
+					recipientMap.get(
+						NotificationRecipientSettingConstants.
+							NAME_USER_EXTERNAL_REFERENCE_CODE)),
+				GetterUtil.getString(entry.getValue()), user);
+
+			if (recipientUser != null) {
+				_addNotificationRecipientSetting(
+					entry.getKey(), notificationRecipientId,
+					notificationRecipientSettings, user,
+					recipientUser.getScreenName());
+			}
+			else {
+				_reportUnresolvedUserRecipient(
+					notificationContext, GetterUtil.getString(entry.getValue()),
+					user);
+			}
+		}
 		else {
 			_addNotificationRecipientSetting(
 				entry.getKey(), notificationRecipientId,
@@ -575,6 +620,38 @@ public abstract class BaseNotificationType implements NotificationType {
 		notificationRecipientSettings.add(notificationRecipientSetting);
 	}
 
+	private void _reportUnresolvedUserRecipient(
+		NotificationContext notificationContext, String screenName, User user) {
+
+		if (!ExportImportThreadLocal.isImportInProcess() ||
+			(notificationContext == null) ||
+			(notificationContext.getNotificationTemplate() == null)) {
+
+			return;
+		}
+
+		NotificationTemplate notificationTemplate =
+			notificationContext.getNotificationTemplate();
+
+		exportImportReportEntryLocalService.getOrAddExportImportReportEntry(
+			0, user.getCompanyId(),
+			notificationTemplate.getExternalReferenceCode(),
+			portal.getClassNameId(NotificationTemplate.class.getName()),
+			notificationTemplate.getNotificationTemplateId(),
+			GetterUtil.getLong(
+				ExportImportThreadLocal.getExportImportConfigurationId()),
+			ExportImportReportEntryConstants.TYPE_WARNING,
+			LanguageUtil.format(
+				LocaleUtil.getDefault(),
+				"the-user-x-does-not-exist-and-was-removed-from-the-" +
+					"recipients-of-notification-template-x",
+				new Object[] {
+					screenName,
+					notificationTemplate.getName(LocaleUtil.getDefault())
+				}),
+			null, "notification-template");
+	}
+
 	private Role _resolveRole(
 		String externalReferenceCode, String name, String typeLabel,
 		User user) {
@@ -602,6 +679,27 @@ public abstract class BaseNotificationType implements NotificationType {
 		}
 
 		return roleLocalService.fetchRole(user.getCompanyId(), name);
+	}
+
+	private User _resolveUser(
+		String externalReferenceCode, String screenName, User user) {
+
+		if (Validator.isNotNull(externalReferenceCode)) {
+			User recipientUser =
+				userLocalService.fetchUserByExternalReferenceCode(
+					externalReferenceCode, user.getCompanyId());
+
+			if (recipientUser != null) {
+				return recipientUser;
+			}
+		}
+
+		if (Validator.isNull(screenName)) {
+			return null;
+		}
+
+		return userLocalService.fetchUserByScreenName(
+			user.getCompanyId(), screenName);
 	}
 
 	private UserGroup _resolveUserGroup(
@@ -651,6 +749,7 @@ public abstract class BaseNotificationType implements NotificationType {
 
 		if (Objects.equals(
 				name, NotificationRecipientSettingConstants.NAME_ROLE_NAME)) {
+
 			Role role = roleLocalService.fetchRole(
 				notificationRecipientSetting.getCompanyId(),
 				notificationRecipientSetting.getValue());
