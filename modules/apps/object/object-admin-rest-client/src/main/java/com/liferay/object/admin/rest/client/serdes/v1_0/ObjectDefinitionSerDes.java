@@ -179,6 +179,16 @@ public class ObjectDefinitionSerDes {
 			sb.append("\"");
 		}
 
+		if (objectDefinition.getDescription() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"description\": ");
+
+			sb.append(_toJSON(objectDefinition.getDescription()));
+		}
+
 		if (objectDefinition.getEnableCategorization() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -847,6 +857,15 @@ public class ObjectDefinitionSerDes {
 				String.valueOf(objectDefinition.getDefaultLanguageId()));
 		}
 
+		if (objectDefinition.getDescription() == null) {
+			map.put("description", null);
+		}
+		else {
+			map.put(
+				"description",
+				String.valueOf(objectDefinition.getDescription()));
+		}
+
 		if (objectDefinition.getEnableCategorization() == null) {
 			map.put("enableCategorization", null);
 		}
@@ -1240,6 +1259,9 @@ public class ObjectDefinitionSerDes {
 			else if (Objects.equals(jsonParserFieldName, "defaultLanguageId")) {
 				return false;
 			}
+			else if (Objects.equals(jsonParserFieldName, "description")) {
+				return true;
+			}
 			else if (Objects.equals(
 						jsonParserFieldName, "enableCategorization")) {
 
@@ -1458,6 +1480,12 @@ public class ObjectDefinitionSerDes {
 				if (jsonParserFieldValue != null) {
 					objectDefinition.setDefaultLanguageId(
 						(String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "description")) {
+				if (jsonParserFieldValue != null) {
+					objectDefinition.setDescription(
+						(Map<String, String>)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(
@@ -1921,4 +1949,4 @@ public class ObjectDefinitionSerDes {
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:-722551517
+// LIFERAY-REST-BUILDER-HASH:-1980833552
