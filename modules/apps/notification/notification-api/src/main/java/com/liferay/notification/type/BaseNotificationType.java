@@ -5,6 +5,7 @@
 
 package com.liferay.notification.type;
 
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.notification.constants.NotificationQueueEntryConstants;
 import com.liferay.notification.constants.NotificationRecipientConstants;
 import com.liferay.notification.constants.NotificationRecipientSettingConstants;
@@ -12,6 +13,7 @@ import com.liferay.notification.constants.NotificationTemplateConstants;
 import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.exception.NotificationQueueEntrySubjectException;
 import com.liferay.notification.exception.NotificationRecipientSettingNameException;
+import com.liferay.notification.exception.NotificationRecipientSettingValueException;
 import com.liferay.notification.exception.NotificationTemplateAttachmentObjectFieldIdException;
 import com.liferay.notification.exception.NotificationTemplateDescriptionException;
 import com.liferay.notification.exception.NotificationTemplateEditorTypeException;
@@ -34,6 +36,8 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
 import com.liferay.object.service.ObjectFieldLocalServiceUtil;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.portal.kernel.exception.NoSuchRoleException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -137,7 +141,8 @@ public abstract class BaseNotificationType implements NotificationType {
 
 				_addNotificationRecipientSetting(
 					entry, notificationRecipientId,
-					notificationRecipientSettings, recipientType, user);
+					notificationRecipientSettings, recipientMap, recipientType,
+					user);
 			}
 		}
 
@@ -433,7 +438,7 @@ public abstract class BaseNotificationType implements NotificationType {
 	private void _addNotificationRecipientSetting(
 		Map.Entry<String, Object> entry, long notificationRecipientId,
 		List<NotificationRecipientSetting> notificationRecipientSettings,
-		String recipientType, User user) {
+		Map<String, Object> recipientMap, String recipientType, User user) {
 
 		if (Objects.equals(
 				recipientType, NotificationRecipientConstants.TYPE_ROLE)) {
@@ -441,31 +446,30 @@ public abstract class BaseNotificationType implements NotificationType {
 			Set<String> roleNames = new HashSet<>();
 
 			for (Map<String, String> roleMap : _toList(entry.getValue())) {
-				String roleName = roleMap.get(
-					NotificationRecipientSettingConstants.NAME_ROLE_NAME);
-
-				if (Validator.isNull(roleName) ||
-					roleNames.contains(roleName)) {
-
-					continue;
-				}
-
-				Role role = roleLocalService.fetchRole(
-					user.getCompanyId(), roleName);
+				Role role = _resolveRole(
+					roleMap.get(
+						NotificationRecipientSettingConstants.
+							NAME_ROLE_EXTERNAL_REFERENCE_CODE),
+					roleMap.get(
+						NotificationRecipientSettingConstants.NAME_ROLE_NAME),
+					roleMap.get(
+						NotificationRecipientSettingConstants.NAME_ROLE_TYPE),
+					user);
 
 				if ((role == null) ||
 					((role.getType() != RoleConstants.TYPE_ACCOUNT) &&
 					 (role.getType() != RoleConstants.TYPE_ORGANIZATION) &&
-					 (role.getType() != RoleConstants.TYPE_REGULAR))) {
+					 (role.getType() != RoleConstants.TYPE_REGULAR)) ||
+					roleNames.contains(role.getName())) {
 
 					continue;
 				}
 
-				roleNames.add(roleName);
+				roleNames.add(role.getName());
 
 				_addNotificationRecipientSetting(
 					entry.getKey(), notificationRecipientId,
-					notificationRecipientSettings, user, roleName);
+					notificationRecipientSettings, user, role.getName());
 			}
 		}
 		else if (Objects.equals(
@@ -496,6 +500,27 @@ public abstract class BaseNotificationType implements NotificationType {
 				_addNotificationRecipientSetting(
 					entry.getKey(), notificationRecipientId,
 					notificationRecipientSettings, user, userGroupName);
+			}
+		}
+		else if (Objects.equals(
+					entry.getKey(),
+					NotificationRecipientSettingConstants.NAME_ROLE_NAME)) {
+
+			Role role = _resolveRole(
+				GetterUtil.getString(
+					recipientMap.get(
+						NotificationRecipientSettingConstants.
+							NAME_ROLE_EXTERNAL_REFERENCE_CODE)),
+				GetterUtil.getString(entry.getValue()),
+				GetterUtil.getString(
+					recipientMap.get(
+						NotificationRecipientSettingConstants.NAME_ROLE_TYPE)),
+				user);
+
+			if (role != null) {
+				_addNotificationRecipientSetting(
+					entry.getKey(), notificationRecipientId,
+					notificationRecipientSettings, user, role.getName());
 			}
 		}
 		else {
@@ -530,6 +555,35 @@ public abstract class BaseNotificationType implements NotificationType {
 		}
 
 		notificationRecipientSettings.add(notificationRecipientSetting);
+	}
+
+	private Role _resolveRole(
+		String externalReferenceCode, String name, String typeLabel,
+		User user) {
+
+		if (Validator.isNotNull(externalReferenceCode)) {
+			try {
+				return roleLocalService.getOrAddEmptyRole(
+					externalReferenceCode, user.getCompanyId(),
+					user.getUserId(), null, 0, name,
+					RoleConstants.getLabelType(typeLabel));
+			}
+			catch (NoSuchRoleException noSuchRoleException) {
+				return ReflectionUtil.throwException(
+					new NotificationRecipientSettingValueException.
+						RoleMustExist(
+							externalReferenceCode, noSuchRoleException));
+			}
+			catch (PortalException portalException) {
+				return ReflectionUtil.throwException(portalException);
+			}
+		}
+
+		if (Validator.isNull(name)) {
+			return null;
+		}
+
+		return roleLocalService.fetchRole(user.getCompanyId(), name);
 	}
 
 	private List<Map<String, String>> _toList(Object value) {
