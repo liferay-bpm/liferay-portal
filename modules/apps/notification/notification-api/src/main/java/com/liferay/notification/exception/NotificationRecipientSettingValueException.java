@@ -35,6 +35,20 @@ public class NotificationRecipientSettingValueException
 
 	}
 
+	public static class RoleMustExist
+		extends NotificationRecipientSettingValueException {
+
+		public RoleMustExist(
+			String externalReferenceCode, Throwable throwable) {
+
+			super(
+				"No Role exists with the external reference code " +
+					externalReferenceCode,
+				"the-role-recipient-does-not-exist", throwable);
+		}
+
+	}
+
 	public static class ToMustNotBeNull
 		extends NotificationRecipientSettingValueException {
 
@@ -48,6 +62,14 @@ public class NotificationRecipientSettingValueException
 		String message, String messageKey) {
 
 		super(message);
+
+		_messageKey = messageKey;
+	}
+
+	private NotificationRecipientSettingValueException(
+		String message, String messageKey, Throwable throwable) {
+
+		super(message, throwable);
 
 		_messageKey = messageKey;
 	}
