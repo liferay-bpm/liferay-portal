@@ -16,6 +16,8 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.field.builder.MultiselectPicklistObjectFieldBuilder;
+import com.liferay.object.field.builder.PicklistObjectFieldBuilder;
+import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.field.setting.builder.ObjectFieldSettingBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
@@ -43,6 +45,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -448,6 +451,161 @@ public class OpenAPIResourceTest {
 
 		Assert.assertNotNull(propertiesJSONObject.opt("comments"));
 		Assert.assertNull(propertiesJSONObject.opt("version"));
+	}
+
+	@Test
+	public void testGetOpenAPIWithDescriptions() throws Exception {
+		ListTypeDefinition listTypeDefinition =
+			_listTypeDefinitionLocalService.addListTypeDefinition(
+				null, TestPropsValues.getUserId(),
+				Collections.singletonMap(
+					LocaleUtil.US, RandomTestUtil.randomString()),
+				false,
+				TransformUtil.transformToList(
+					new String[] {"value1", "value2"},
+					listTypeValue -> ListTypeEntryUtil.createListTypeEntry(
+						listTypeValue,
+						Collections.singletonMap(
+							LocaleUtil.US, listTypeValue))),
+				new ServiceContext());
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				"Object5",
+				Arrays.asList(
+					new TextObjectFieldBuilder(
+					).descriptionMap(
+						HashMapBuilder.put(
+							LocaleUtil.US, "Field description"
+						).build()
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap("field5")
+					).name(
+						"field5"
+					).build(),
+					new MultiselectPicklistObjectFieldBuilder(
+					).descriptionMap(
+						HashMapBuilder.put(
+							LocaleUtil.US,
+							"Multiselect picklist field description"
+						).build()
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap("field6")
+					).listTypeDefinitionId(
+						listTypeDefinition.getListTypeDefinitionId()
+					).name(
+						"field6"
+					).build(),
+					new PicklistObjectFieldBuilder(
+					).descriptionMap(
+						HashMapBuilder.put(
+							LocaleUtil.US, "Picklist field description"
+						).build()
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap("field7")
+					).listTypeDefinitionId(
+						listTypeDefinition.getListTypeDefinitionId()
+					).name(
+						"field7"
+					).build()),
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		objectDefinition.setDescriptionMap(
+			HashMapBuilder.put(
+				LocaleUtil.US, "Object definition description"
+			).build());
+
+		objectDefinition = _objectDefinitionLocalService.updateObjectDefinition(
+			objectDefinition);
+
+		_objectDefinitions.add(objectDefinition);
+
+		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
+			null, TestPropsValues.getUserId(),
+			_objectDefinition.getObjectDefinitionId(),
+			objectDefinition.getObjectDefinitionId(), 0,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+			HashMapBuilder.put(
+				LocaleUtil.US, "Relationship description"
+			).build(),
+			false, LocalizedMapUtil.getLocalizedMap("relationship5"),
+			"relationship5", false,
+			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null, objectDefinition.getRESTContextPath() + "/openapi.json",
+			Http.Method.GET);
+
+		JSONObject objectDefinitionSchemaJSONObject = jsonObject.getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			objectDefinition.getShortName()
+		);
+
+		Assert.assertEquals(
+			"Object definition description",
+			objectDefinitionSchemaJSONObject.getString("description"));
+
+		JSONObject propertiesJSONObject =
+			objectDefinitionSchemaJSONObject.getJSONObject("properties");
+
+		Assert.assertEquals(
+			"Field description",
+			propertiesJSONObject.getJSONObject(
+				"field5"
+			).getString(
+				"description"
+			));
+
+		JSONObject multiselectPicklistFieldJSONObject =
+			propertiesJSONObject.getJSONObject("field6");
+
+		Assert.assertEquals(
+			"Multiselect picklist field description",
+			multiselectPicklistFieldJSONObject.getString("description"));
+		Assert.assertEquals(
+			"#/components/schemas/ListEntry",
+			multiselectPicklistFieldJSONObject.getJSONObject(
+				"items"
+			).getString(
+				"$ref"
+			));
+
+		JSONObject picklistFieldJSONObject = propertiesJSONObject.getJSONObject(
+			"field7");
+
+		Assert.assertEquals(
+			"Picklist field description",
+			picklistFieldJSONObject.getString("description"));
+		Assert.assertEquals(
+			"#/components/schemas/ListEntry",
+			picklistFieldJSONObject.getJSONArray(
+				"allOf"
+			).getJSONObject(
+				0
+			).getString(
+				"$ref"
+			));
+		Assert.assertEquals(
+			"properties", picklistFieldJSONObject.getString("x-parent-map"));
+
+		JSONObject relationshipJSONObject = propertiesJSONObject.getJSONObject(
+			"relationship5");
+
+		Assert.assertEquals(
+			"Relationship description",
+			relationshipJSONObject.getString("description"));
+		Assert.assertEquals(
+			"#/components/schemas/" + _objectDefinition.getShortName(),
+			relationshipJSONObject.getJSONArray(
+				"allOf"
+			).getJSONObject(
+				0
+			).getString(
+				"$ref"
+			));
 	}
 
 	@Test
