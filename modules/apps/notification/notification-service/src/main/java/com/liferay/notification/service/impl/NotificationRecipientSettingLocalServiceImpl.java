@@ -5,16 +5,23 @@
 
 package com.liferay.notification.service.impl;
 
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
+import com.liferay.exportimport.report.constants.ExportImportReportEntryConstants;
+import com.liferay.exportimport.report.service.ExportImportReportEntryLocalService;
 import com.liferay.notification.constants.NotificationRecipientConstants;
 import com.liferay.notification.constants.NotificationRecipientSettingConstants;
+import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.exception.NotificationRecipientSettingValueException;
 import com.liferay.notification.model.NotificationRecipientSetting;
+import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.notification.service.base.NotificationRecipientSettingLocalServiceBaseImpl;
+import com.liferay.notification.type.util.NotificationTypeUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.NoSuchRoleException;
 import com.liferay.portal.kernel.exception.NoSuchUserGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
@@ -25,6 +32,8 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserGroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
@@ -82,6 +91,16 @@ public class NotificationRecipientSettingLocalServiceImpl
 		createNotificationRecipientSettings(
 			long notificationRecipientId, Object[] recipients, User user) {
 
+		return createNotificationRecipientSettings(
+			null, notificationRecipientId, recipients, user);
+	}
+
+	@Override
+	public List<NotificationRecipientSetting>
+		createNotificationRecipientSettings(
+			NotificationContext notificationContext,
+			long notificationRecipientId, Object[] recipients, User user) {
+
 		List<NotificationRecipientSetting> notificationRecipientSettings =
 			new ArrayList<>();
 
@@ -101,7 +120,7 @@ public class NotificationRecipientSettingLocalServiceImpl
 				}
 
 				_addNotificationRecipientSetting(
-					entry, notificationRecipientId,
+					entry, notificationContext, notificationRecipientId,
 					notificationRecipientSettings, recipientMap,
 					GetterUtil.getString(
 						recipientMap.get(
@@ -146,7 +165,8 @@ public class NotificationRecipientSettingLocalServiceImpl
 	}
 
 	private void _addNotificationRecipientSetting(
-		Map.Entry<String, Object> entry, long notificationRecipientId,
+		Map.Entry<String, Object> entry,
+		NotificationContext notificationContext, long notificationRecipientId,
 		List<NotificationRecipientSetting> notificationRecipientSettings,
 		Map<String, Object> recipientMap, String recipientType, User user) {
 
@@ -250,6 +270,32 @@ public class NotificationRecipientSettingLocalServiceImpl
 					notificationRecipientSettings, user, userGroup.getName());
 			}
 		}
+		else if (Objects.equals(
+					entry.getKey(),
+					NotificationRecipientSettingConstants.
+						NAME_USER_SCREEN_NAME) &&
+				 !NotificationTypeUtil.isTermValue(
+					 GetterUtil.getString(entry.getValue()))) {
+
+			User recipientUser = _resolveUser(
+				GetterUtil.getString(
+					recipientMap.get(
+						NotificationRecipientSettingConstants.
+							NAME_USER_EXTERNAL_REFERENCE_CODE)),
+				GetterUtil.getString(entry.getValue()), user);
+
+			if (recipientUser != null) {
+				_addNotificationRecipientSetting(
+					entry.getKey(), notificationRecipientId,
+					notificationRecipientSettings, user,
+					recipientUser.getScreenName());
+			}
+			else {
+				_reportUnresolvedUserRecipient(
+					notificationContext, GetterUtil.getString(entry.getValue()),
+					user);
+			}
+		}
 		else {
 			_addNotificationRecipientSetting(
 				entry.getKey(), notificationRecipientId,
@@ -283,6 +329,38 @@ public class NotificationRecipientSettingLocalServiceImpl
 		notificationRecipientSettings.add(notificationRecipientSetting);
 	}
 
+	private void _reportUnresolvedUserRecipient(
+		NotificationContext notificationContext, String screenName, User user) {
+
+		if (!ExportImportThreadLocal.isImportInProcess() ||
+			(notificationContext == null) ||
+			(notificationContext.getNotificationTemplate() == null)) {
+
+			return;
+		}
+
+		NotificationTemplate notificationTemplate =
+			notificationContext.getNotificationTemplate();
+
+		_exportImportReportEntryLocalService.getOrAddExportImportReportEntry(
+			0, user.getCompanyId(),
+			notificationTemplate.getExternalReferenceCode(),
+			_portal.getClassNameId(NotificationTemplate.class.getName()),
+			notificationTemplate.getNotificationTemplateId(),
+			GetterUtil.getLong(
+				ExportImportThreadLocal.getExportImportConfigurationId()),
+			ExportImportReportEntryConstants.TYPE_WARNING,
+			_language.format(
+				LocaleUtil.getDefault(),
+				"the-user-x-does-not-exist-and-was-removed-from-the-" +
+					"recipients-of-notification-template-x",
+				new Object[] {
+					screenName,
+					notificationTemplate.getName(LocaleUtil.getDefault())
+				}),
+			null, "notification-template");
+	}
+
 	private Role _resolveRole(
 		String externalReferenceCode, String name, String typeLabel,
 		User user) {
@@ -310,6 +388,27 @@ public class NotificationRecipientSettingLocalServiceImpl
 		}
 
 		return _roleLocalService.fetchRole(user.getCompanyId(), name);
+	}
+
+	private User _resolveUser(
+		String externalReferenceCode, String screenName, User user) {
+
+		if (Validator.isNotNull(externalReferenceCode)) {
+			User recipientUser =
+				_userLocalService.fetchUserByExternalReferenceCode(
+					externalReferenceCode, user.getCompanyId());
+
+			if (recipientUser != null) {
+				return recipientUser;
+			}
+		}
+
+		if (Validator.isNull(screenName)) {
+			return null;
+		}
+
+		return _userLocalService.fetchUserByScreenName(
+			user.getCompanyId(), screenName);
 	}
 
 	private UserGroup _resolveUserGroup(
@@ -359,6 +458,16 @@ public class NotificationRecipientSettingLocalServiceImpl
 
 		return (List<Map<String, String>>)value;
 	}
+
+	@Reference
+	private ExportImportReportEntryLocalService
+		_exportImportReportEntryLocalService;
+
+	@Reference
+	private Language _language;
+
+	@Reference
+	private Portal _portal;
 
 	@Reference
 	private RoleLocalService _roleLocalService;
