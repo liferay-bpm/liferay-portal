@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.extension.EntityExtensionHandler;
 import com.liferay.portal.vulcan.extension.ExtensionProviderRegistry;
 import com.liferay.portal.vulcan.extension.PropertyDefinition;
@@ -508,6 +509,14 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 			Schema additionalPropertiesSchema = (Schema)additionalProperties;
 
 			_updateSchemaReferences(additionalPropertiesSchema, schemaPrefix);
+		}
+
+		List<Schema> allOfSchemas = schema.getAllOf();
+
+		if (ListUtil.isNotEmpty(allOfSchemas)) {
+			for (Schema allOfSchema : allOfSchemas) {
+				_updateSchemaReferences(allOfSchema, schemaPrefix);
+			}
 		}
 
 		if (schema instanceof ArraySchema) {
@@ -1082,6 +1091,14 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 
 					_replaceReference(entry, propertySchema);
 
+					List<Schema> allOfSchemas = propertySchema.getAllOf();
+
+					if (ListUtil.isNotEmpty(allOfSchemas)) {
+						for (Schema allOfSchema : allOfSchemas) {
+							_replaceReference(entry, allOfSchema);
+						}
+					}
+
 					if (propertySchema instanceof ArraySchema) {
 						ArraySchema arraySchema = (ArraySchema)propertySchema;
 
@@ -1193,9 +1210,21 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 						if (StringUtil.equals(
 								childDTOProperty.getType(), "Object")) {
 
-							schema.set$ref(
+							String ref =
 								"#/components/schemas/" +
-									childDTOProperty.getName());
+									childDTOProperty.getName();
+
+							if (Validator.isNull(schema.getDescription())) {
+								schema.set$ref(ref);
+							}
+							else {
+								schema.addAllOfItem(
+									new Schema() {
+										{
+											set$ref(ref);
+										}
+									});
+							}
 						}
 						else {
 							schema.addProperties(
