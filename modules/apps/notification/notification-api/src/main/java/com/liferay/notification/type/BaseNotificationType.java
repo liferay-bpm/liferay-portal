@@ -38,6 +38,7 @@ import com.liferay.object.service.ObjectFieldLocalServiceUtil;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.exception.NoSuchRoleException;
+import com.liferay.portal.kernel.exception.NoSuchUserGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -479,27 +480,26 @@ public abstract class BaseNotificationType implements NotificationType {
 			Set<String> userGroupNames = new HashSet<>();
 
 			for (Map<String, String> userGroupMap : _toList(entry.getValue())) {
-				String userGroupName = userGroupMap.get(
-					NotificationRecipientSettingConstants.NAME_USER_GROUP_NAME);
+				UserGroup userGroup = _resolveUserGroup(
+					userGroupMap.get(
+						NotificationRecipientSettingConstants.
+							NAME_USER_GROUP_EXTERNAL_REFERENCE_CODE),
+					userGroupMap.get(
+						NotificationRecipientSettingConstants.
+							NAME_USER_GROUP_NAME),
+					user);
 
-				if (Validator.isNull(userGroupName) ||
-					userGroupNames.contains(userGroupName)) {
+				if ((userGroup == null) ||
+					userGroupNames.contains(userGroup.getName())) {
 
 					continue;
 				}
 
-				UserGroup userGroup = userGroupLocalService.fetchUserGroup(
-					user.getCompanyId(), userGroupName);
-
-				if (userGroup == null) {
-					continue;
-				}
-
-				userGroupNames.add(userGroupName);
+				userGroupNames.add(userGroup.getName());
 
 				_addNotificationRecipientSetting(
 					entry.getKey(), notificationRecipientId,
-					notificationRecipientSettings, user, userGroupName);
+					notificationRecipientSettings, user, userGroup.getName());
 			}
 		}
 		else if (Objects.equals(
@@ -521,6 +521,24 @@ public abstract class BaseNotificationType implements NotificationType {
 				_addNotificationRecipientSetting(
 					entry.getKey(), notificationRecipientId,
 					notificationRecipientSettings, user, role.getName());
+			}
+		}
+		else if (Objects.equals(
+					entry.getKey(),
+					NotificationRecipientSettingConstants.
+						NAME_USER_GROUP_NAME)) {
+
+			UserGroup userGroup = _resolveUserGroup(
+				GetterUtil.getString(
+					recipientMap.get(
+						NotificationRecipientSettingConstants.
+							NAME_USER_GROUP_EXTERNAL_REFERENCE_CODE)),
+				GetterUtil.getString(entry.getValue()), user);
+
+			if (userGroup != null) {
+				_addNotificationRecipientSetting(
+					entry.getKey(), notificationRecipientId,
+					notificationRecipientSettings, user, userGroup.getName());
 			}
 		}
 		else {
@@ -584,6 +602,33 @@ public abstract class BaseNotificationType implements NotificationType {
 		}
 
 		return roleLocalService.fetchRole(user.getCompanyId(), name);
+	}
+
+	private UserGroup _resolveUserGroup(
+		String externalReferenceCode, String name, User user) {
+
+		if (Validator.isNotNull(externalReferenceCode)) {
+			try {
+				return userGroupLocalService.getOrAddEmptyUserGroup(
+					externalReferenceCode, user.getCompanyId(),
+					user.getUserId(), name);
+			}
+			catch (NoSuchUserGroupException noSuchUserGroupException) {
+				return ReflectionUtil.throwException(
+					new NotificationRecipientSettingValueException.
+						UserGroupMustExist(
+							externalReferenceCode, noSuchUserGroupException));
+			}
+			catch (PortalException portalException) {
+				return ReflectionUtil.throwException(portalException);
+			}
+		}
+
+		if (Validator.isNull(name)) {
+			return null;
+		}
+
+		return userGroupLocalService.fetchUserGroup(user.getCompanyId(), name);
 	}
 
 	private List<Map<String, String>> _toList(Object value) {
