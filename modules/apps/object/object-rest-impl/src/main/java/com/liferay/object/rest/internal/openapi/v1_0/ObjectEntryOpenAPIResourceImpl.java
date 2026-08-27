@@ -494,6 +494,14 @@ public class ObjectEntryOpenAPIResourceImpl
 			return itemsSchema.get$ref();
 		}
 
+		List<Schema> allOfSchemas = schema.getAllOf();
+
+		if (ListUtil.isNotEmpty(allOfSchemas)) {
+			Schema allOfSchema = allOfSchemas.get(0);
+
+			return allOfSchema.get$ref();
+		}
+
 		return schema.get$ref();
 	}
 
