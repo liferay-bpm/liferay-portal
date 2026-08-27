@@ -85,7 +85,9 @@ public class NotificationRecipientSettingLocalServiceImpl
 			Map<String, Object> recipientMap = (Map<String, Object>)recipient;
 
 			for (Map.Entry<String, Object> entry : recipientMap.entrySet()) {
-				if (Objects.equals(
+				if (NotificationRecipientSettingConstants.
+						isRecipientMetadataName(entry.getKey()) ||
+					Objects.equals(
 						recipientMap.get(
 							NotificationRecipientSettingConstants.
 								getRecipientTypeName(entry.getKey())),
