@@ -149,6 +149,49 @@ public class ObjectRelationship implements Serializable {
 	private Supplier<DeletionType> _deletionTypeSupplier;
 
 	@io.swagger.v3.oas.annotations.media.Schema
+	@Valid
+	public Map<String, String> getDescription() {
+		if (_descriptionSupplier != null) {
+			description = _descriptionSupplier.get();
+
+			_descriptionSupplier = null;
+		}
+
+		return description;
+	}
+
+	public void setDescription(Map<String, String> description) {
+		this.description = description;
+
+		_descriptionSupplier = null;
+	}
+
+	@JsonIgnore
+	public void setDescription(
+		UnsafeSupplier<Map<String, String>, Exception>
+			descriptionUnsafeSupplier) {
+
+		_descriptionSupplier = () -> {
+			try {
+				return descriptionUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Map<String, String> description;
+
+	@JsonIgnore
+	private Supplier<Map<String, String>> _descriptionSupplier;
+
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getEdge() {
 		if (_edgeSupplier != null) {
 			edge = _edgeSupplier.get();
@@ -1006,6 +1049,18 @@ public class ObjectRelationship implements Serializable {
 			sb.append("\"");
 		}
 
+		Map<String, String> description = getDescription();
+
+		if (description != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"description\": ");
+
+			sb.append(_toJSON(description));
+		}
+
 		Boolean edge = getEdge();
 
 		if (edge != null) {
@@ -1444,4 +1499,4 @@ public class ObjectRelationship implements Serializable {
 	private Map<String, Serializable> _extendedProperties;
 
 }
-// LIFERAY-REST-BUILDER-HASH:658558504
+// LIFERAY-REST-BUILDER-HASH:-713437300
