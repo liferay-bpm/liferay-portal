@@ -268,6 +268,9 @@ public class ObjectFieldUtil {
 		}
 
 		serviceBuilderObjectField.setLabelMap(localizedLabelMap);
+		serviceBuilderObjectField.setDescriptionMap(
+			LocalizedMapUtil.populateLocalizedMap(
+				objectField.getDescription()));
 
 		serviceBuilderObjectField.setLocalized(
 			GetterUtil.getBoolean(objectField.getLocalized()));
