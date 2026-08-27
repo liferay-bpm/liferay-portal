@@ -12,8 +12,10 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetCategoryConstants;
 import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.asset.kernel.service.AssetTagGroupRelLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyGroupRelLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
@@ -216,6 +218,7 @@ import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.BigDecimalUtil;
 import com.liferay.portal.kernel.util.Constants;
@@ -1535,11 +1538,8 @@ public class ObjectEntryLocalServiceTest {
 
 		serviceContext.setAssetTagNames(new String[] {assetTagName});
 
-		DepotEntry depotEntry = _depotEntryLocalService.addDepotEntry(
-			RandomTestUtil.randomLocaleStringMap(),
-			RandomTestUtil.randomLocaleStringMap(),
-			DepotConstants.TYPE_ASSET_LIBRARY,
-			ServiceContextTestUtil.getServiceContext());
+		DepotEntry depotEntry = _addDepotEntry(
+			DepotConstants.TYPE_ASSET_LIBRARY);
 
 		_addObjectEntry(
 			depotEntry.getGroupId(), objectDefinition,
@@ -1993,20 +1993,14 @@ public class ObjectEntryLocalServiceTest {
 				ObjectDefinitionSettingConstants.NAME_DOMAIN,
 				DepotRolesConstants.SUBTYPE_PROJECT);
 
-		DepotEntry depotEntry1 = _depotEntryLocalService.addDepotEntry(
-			RandomTestUtil.randomLocaleStringMap(),
-			RandomTestUtil.randomLocaleStringMap(), DepotConstants.TYPE_PROJECT,
-			ServiceContextTestUtil.getServiceContext());
+		DepotEntry depotEntry1 = _addDepotEntry(DepotConstants.TYPE_PROJECT);
 
 		_addObjectEntry(
 			depotEntry1.getGroupId(),
 			_domainObjectDefinition.getObjectDefinitionId(),
 			Collections.emptyMap());
 
-		DepotEntry depotEntry2 = _depotEntryLocalService.addDepotEntry(
-			RandomTestUtil.randomLocaleStringMap(),
-			RandomTestUtil.randomLocaleStringMap(), DepotConstants.TYPE_SPACE,
-			ServiceContextTestUtil.getServiceContext());
+		DepotEntry depotEntry2 = _addDepotEntry(DepotConstants.TYPE_SPACE);
 
 		AssertUtils.assertFailure(
 			ObjectEntryGroupIdException.InvalidGroupIdForDomain.class,
@@ -3234,11 +3228,8 @@ public class ObjectEntryLocalServiceTest {
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 				"objectRelationship");
 
-		DepotEntry depotEntry1 = _depotEntryLocalService.addDepotEntry(
-			RandomTestUtil.randomLocaleStringMap(),
-			RandomTestUtil.randomLocaleStringMap(),
-			DepotConstants.TYPE_ASSET_LIBRARY,
-			ServiceContextTestUtil.getServiceContext());
+		DepotEntry depotEntry1 = _addDepotEntry(
+			DepotConstants.TYPE_ASSET_LIBRARY);
 
 		ObjectEntry objectEntry1 = _addObjectEntry(
 			depotEntry1.getGroupId(), objectDefinition1.getObjectDefinitionId(),
@@ -3260,11 +3251,8 @@ public class ObjectEntryLocalServiceTest {
 			_objectEntryLocalService.getValues(
 				objectEntry2.getObjectEntryId()));
 
-		DepotEntry depotEntry2 = _depotEntryLocalService.addDepotEntry(
-			RandomTestUtil.randomLocaleStringMap(),
-			RandomTestUtil.randomLocaleStringMap(),
-			DepotConstants.TYPE_ASSET_LIBRARY,
-			ServiceContextTestUtil.getServiceContext());
+		DepotEntry depotEntry2 = _addDepotEntry(
+			DepotConstants.TYPE_ASSET_LIBRARY);
 
 		AssertUtils.assertFailure(
 			ObjectEntryValuesException.InvalidValue.class,
@@ -6595,6 +6583,77 @@ public class ObjectEntryLocalServiceTest {
 			WorkflowConstants.STATUS_DRAFT, trashEntry.getStatus());
 	}
 
+	@FeatureFlag("LPD-99403")
+	@Test
+	public void testMoveObjectEntryWithAssetTagScopedByDepotEntryType()
+		throws Exception {
+
+		ObjectFolder objectFolder =
+			_objectFolderLocalService.getOrAddEmptyObjectFolder(
+				ObjectFolderConstants.
+					EXTERNAL_REFERENCE_CODE_CONTENT_STRUCTURES,
+				TestPropsValues.getCompanyId(), TestPropsValues.getUserId());
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				ObjectDefinitionTestUtil.getRandomName(),
+				Arrays.asList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING, "name", "name")),
+				objectFolder.getObjectFolderId(),
+				ObjectDefinitionConstants.SCOPE_DEPOT,
+				TestPropsValues.getUserId());
+
+		_objectDefinitionSettingLocalService.addObjectDefinitionSetting(
+			TestPropsValues.getUserId(),
+			objectDefinition.getObjectDefinitionId(),
+			ObjectDefinitionSettingConstants.NAME_ACCEPT_ALL_GROUPS,
+			StringPool.TRUE);
+
+		DepotEntry depotEntry1 = _addDepotEntry(DepotConstants.TYPE_PROJECT);
+		DepotEntry depotEntry2 = _addDepotEntry(DepotConstants.TYPE_PROJECT);
+		DepotEntry depotEntry3 = _addDepotEntry(DepotConstants.TYPE_SPACE);
+		DepotEntry depotEntry4 = _addDepotEntry(DepotConstants.TYPE_SPACE);
+
+		AssetTag assetTag1 = _addAssetTag(
+			depotEntry1.getGroupId(), GroupConstants.ANY_PARENT_GROUP_ID);
+		AssetTag assetTag2 = _addAssetTag(
+			GroupConstants.ANY_PARENT_GROUP_ID,
+			GroupConstants.ANY_PARENT_GROUP_ID);
+		AssetTag assetTag3 = _addSpaceScopedAssetTag(
+			GroupConstants.ANY_PARENT_GROUP_ID);
+		AssetTag assetTag4 = _addAssetTag(
+			GroupConstants.ANY_PARENT_GROUP_ID, depotEntry3.getGroupId());
+
+		String[] assetTagNames = {
+			assetTag1.getName(), assetTag2.getName(), assetTag3.getName(),
+			assetTag4.getName()
+		};
+
+		_assertMovedObjectEntryAssetTagNames(
+			assetTagNames, assetTagNames, objectDefinition,
+			depotEntry1.getGroupId(), depotEntry1.getGroupId());
+
+		_assertMovedObjectEntryAssetTagNames(
+			assetTagNames,
+			new String[] {
+				assetTag2.getName(), assetTag3.getName(), assetTag4.getName()
+			},
+			objectDefinition, depotEntry2.getGroupId(),
+			depotEntry1.getGroupId());
+
+		_assertMovedObjectEntryAssetTagNames(
+			assetTagNames,
+			new String[] {
+				assetTag1.getName(), assetTag2.getName(), assetTag3.getName()
+			},
+			objectDefinition, depotEntry4.getGroupId(),
+			depotEntry3.getGroupId());
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+	}
+
 	@Test
 	public void testPartialUpdateObjectEntry() throws Exception {
 		_assertCount(0);
@@ -7218,11 +7277,8 @@ public class ObjectEntryLocalServiceTest {
 
 		Assert.assertEquals(depotEntry1.getGroupId(), objectEntry.getGroupId());
 
-		DepotEntry depotEntry2 = _depotEntryLocalService.addDepotEntry(
-			RandomTestUtil.randomLocaleStringMap(),
-			RandomTestUtil.randomLocaleStringMap(),
-			DepotConstants.TYPE_ASSET_LIBRARY,
-			ServiceContextTestUtil.getServiceContext());
+		DepotEntry depotEntry2 = _addDepotEntry(
+			DepotConstants.TYPE_ASSET_LIBRARY);
 
 		AssertUtils.assertFailure(
 			NoSuchObjectDefinitionException.class, null,
@@ -9017,6 +9073,18 @@ public class ObjectEntryLocalServiceTest {
 			group.getGroupId(), assetVocabulary.getVocabularyId());
 	}
 
+	private AssetTag _addAssetTag(long projectGroupId, long spaceGroupId)
+		throws Exception {
+
+		AssetTag assetTag = _addSpaceScopedAssetTag(spaceGroupId);
+
+		_assetTagGroupRelLocalService.setAssetTagGroupRels(
+			assetTag.getTagId(), new long[] {projectGroupId},
+			DepotConstants.TYPE_PROJECT);
+
+		return assetTag;
+	}
+
 	private ObjectField _addAttachmentObjectField(String fileSource)
 		throws Exception {
 
@@ -9055,10 +9123,7 @@ public class ObjectEntryLocalServiceTest {
 	}
 
 	private ObjectEntry _addCMSBasicDocumentObjectEntry() throws Exception {
-		DepotEntry depotEntry = _depotEntryLocalService.addDepotEntry(
-			RandomTestUtil.randomLocaleStringMap(),
-			RandomTestUtil.randomLocaleStringMap(), DepotConstants.TYPE_SPACE,
-			ServiceContextTestUtil.getServiceContext());
+		DepotEntry depotEntry = _addDepotEntry(DepotConstants.TYPE_SPACE);
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.
@@ -9115,6 +9180,13 @@ public class ObjectEntryLocalServiceTest {
 			objectField.getReadOnlyConditionExpression(),
 			objectField.isRequired(), objectField.isState(),
 			objectField.getObjectFieldSettings());
+	}
+
+	private DepotEntry _addDepotEntry(int depotEntryType) throws Exception {
+		return _depotEntryLocalService.addDepotEntry(
+			RandomTestUtil.randomLocaleStringMap(),
+			RandomTestUtil.randomLocaleStringMap(), depotEntryType,
+			ServiceContextTestUtil.getServiceContext());
 	}
 
 	private DLFileEntry _addDLFileEntry() throws Exception {
@@ -9340,6 +9412,21 @@ public class ObjectEntryLocalServiceTest {
 			_objectDefinition.getObjectDefinitionId(), values);
 	}
 
+	private AssetTag _addSpaceScopedAssetTag(long spaceGroupId)
+		throws Exception {
+
+		Group group = _groupLocalService.fetchGroup(
+			TestPropsValues.getCompanyId(), GroupConstants.CMS);
+
+		AssetTag assetTag = AssetTestUtil.addTag(group.getGroupId());
+
+		_assetTagGroupRelLocalService.setAssetTagGroupRels(
+			assetTag.getTagId(), new long[] {spaceGroupId},
+			DepotConstants.TYPE_SPACE);
+
+		return assetTag;
+	}
+
 	private void _addSystemObjectField(ObjectField objectField)
 		throws Exception {
 
@@ -9531,6 +9618,45 @@ public class ObjectEntryLocalServiceTest {
 				0, _objectDefinition.getObjectDefinitionId(), keywords, 0, 20);
 
 		Assert.assertEquals(count, baseModelSearchResult.getLength());
+	}
+
+	private void _assertMovedObjectEntryAssetTagNames(
+			String[] assetTagNames, String[] expectedAssetTagNames,
+			ObjectDefinition objectDefinition, long objectEntryFolderGroupId,
+			long objectEntryGroupId)
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext();
+
+		serviceContext.setAssetTagNames(ArrayUtil.clone(assetTagNames));
+
+		Map<String, Serializable> values =
+			HashMapBuilder.<String, Serializable>put(
+				"name", StringUtil.randomString()
+			).build();
+
+		ObjectEntry objectEntry = _addObjectEntry(
+			objectEntryGroupId, objectDefinition, values, serviceContext);
+
+		ObjectEntryFolder objectEntryFolder =
+			_objectEntryFolderLocalService.addObjectEntryFolder(
+				null, objectEntryFolderGroupId, TestPropsValues.getUserId(),
+				ObjectEntryFolderConstants.
+					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+				RandomTestUtil.randomString(),
+				RandomTestUtil.randomLocaleStringMap(),
+				RandomTestUtil.randomString(), serviceContext);
+
+		_objectEntryLocalService.moveObjectEntry(
+			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
+			objectEntryFolder.getObjectEntryFolderId(), values, serviceContext);
+
+		AssetEntry assetEntry = _assetEntryLocalService.getEntry(
+			objectDefinition.getClassName(), objectEntry.getObjectEntryId());
+
+		AssertUtils.assertEqualsSorted(
+			ArrayUtil.clone(expectedAssetTagNames), assetEntry.getTagNames());
 	}
 
 	private void _assertObjectActionStatus(
@@ -11545,6 +11671,9 @@ public class ObjectEntryLocalServiceTest {
 
 	@Inject
 	private AssetEntryLocalService _assetEntryLocalService;
+
+	@Inject
+	private AssetTagGroupRelLocalService _assetTagGroupRelLocalService;
 
 	@Inject
 	private AssetTagLocalService _assetTagLocalService;

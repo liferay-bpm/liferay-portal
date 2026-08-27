@@ -81,7 +81,8 @@ public class KeywordDTOConverterTest {
 			RandomTestUtil.randomString(), _serviceContext);
 
 		_assetTagGroupRelLocalService.setAssetTagGroupRels(
-			assetTag.getTagId(), new long[] {_depotEntryGroup.getGroupId()});
+			assetTag.getTagId(), new long[] {_depotEntryGroup.getGroupId()},
+			DepotConstants.TYPE_SPACE);
 
 		Keyword keyword = _toDTO(assetTag);
 

@@ -10,6 +10,7 @@ import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.model.AssetTagGroupRel;
 import com.liferay.asset.kernel.service.AssetTagGroupRelLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
+import com.liferay.depot.constants.DepotConstants;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
@@ -37,6 +38,7 @@ import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.test.rule.SearchTestRule;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
 import com.liferay.portal.search.test.util.IndexedFieldsFixture;
+import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -60,6 +62,7 @@ import org.junit.runner.RunWith;
  * @author Luan Maoski
  * @author Lucas Marques
  */
+@FeatureFlag("LPD-99403")
 @RunWith(Arquillian.class)
 public class AssetTagIndexerIndexedFieldsTest {
 
@@ -113,7 +116,16 @@ public class AssetTagIndexerIndexedFieldsTest {
 
 		_assetTagGroupRelLocalService.setAssetTagGroupRels(
 			assetTag.getTagId(),
-			new long[] {group1.getGroupId(), group2.getGroupId()});
+			new long[] {group1.getGroupId(), group2.getGroupId()},
+			DepotConstants.TYPE_SPACE);
+
+		Group group3 = GroupTestUtil.addGroup();
+		Group group4 = GroupTestUtil.addGroup();
+
+		_assetTagGroupRelLocalService.setAssetTagGroupRels(
+			assetTag.getTagId(),
+			new long[] {group3.getGroupId(), group4.getGroupId()},
+			DepotConstants.TYPE_PROJECT);
 
 		String searchTerm = String.valueOf(assetTag.getPrimaryKey());
 
@@ -212,19 +224,12 @@ public class AssetTagIndexerIndexedFieldsTest {
 		).put(
 			"groupExternalReferenceCode", _group.getExternalReferenceCode()
 		).put(
-			"groupIds",
-			() -> {
-				List<Long> groupIds = ListUtil.toList(
-					_assetTagGroupRelLocalService.getAssetTagGroupRelsByTagId(
-						assetTag.getTagId()),
-					AssetTagGroupRel::getGroupId);
-
-				Collections.sort(groupIds);
-
-				return String.valueOf(groupIds);
-			}
+			"groupIds", () -> _getGroupIds(assetTag, DepotConstants.TYPE_SPACE)
 		).put(
 			"name_String_sortable", StringUtil.toLowerCase(assetTag.getName())
+		).put(
+			"projectDepotEntryGroupIds",
+			() -> _getGroupIds(assetTag, DepotConstants.TYPE_PROJECT)
 		).put(
 			"scopeGroupExternalReferenceCode", _group.getExternalReferenceCode()
 		).put(
@@ -251,6 +256,18 @@ public class AssetTagIndexerIndexedFieldsTest {
 		).query(
 			query
 		).build();
+	}
+
+	private String _getGroupIds(AssetTag assetTag, int depotEntryType) {
+		List<Long> groupIds = ListUtil.toList(
+			_assetTagGroupRelLocalService.
+				getAssetTagGroupRelsByTagIdAndDepotEntryType(
+					assetTag.getTagId(), depotEntryType),
+			AssetTagGroupRel::getGroupId);
+
+		Collections.sort(groupIds);
+
+		return String.valueOf(groupIds);
 	}
 
 	private void _populateDates(AssetTag assetTag, Map<String, String> map) {

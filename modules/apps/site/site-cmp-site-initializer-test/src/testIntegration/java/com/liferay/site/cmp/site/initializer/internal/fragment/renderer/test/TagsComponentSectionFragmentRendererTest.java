@@ -23,7 +23,9 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.util.Collections;
+import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,7 +34,9 @@ import org.junit.runner.RunWith;
 /**
  * @author Carolina Barbosa
  */
-@FeatureFlags(featureFlags = @FeatureFlag("LPD-58677"))
+@FeatureFlags(
+	featureFlags = {@FeatureFlag("LPD-58677"), @FeatureFlag("LPD-99403")}
+)
 @RunWith(Arquillian.class)
 public class TagsComponentSectionFragmentRendererTest
 	extends BaseComponentSectionFragmentRendererTestCase {
@@ -71,6 +75,8 @@ public class TagsComponentSectionFragmentRendererTest
 				"hasUpdatePermission", true
 			).put(
 				"objectEntryKeywords", new String[] {keyword1, keyword2}
+			).put(
+				"projectGroupId", cmpProjectObjectEntry.getGroupId()
 			).build(),
 			getProps());
 
@@ -85,13 +91,27 @@ public class TagsComponentSectionFragmentRendererTest
 				"hasUpdatePermission", false
 			).put(
 				"objectEntryKeywords", new String[] {keyword1, keyword2}
+			).put(
+				"projectGroupId", cmpProjectObjectEntry.getGroupId()
 			).build(),
 			getProps());
+
+		_testGetPropsWithTaskObjectEntry();
 	}
 
 	@Override
 	protected FragmentRenderer getFragmentRenderer() {
 		return _fragmentRenderer;
+	}
+
+	private void _testGetPropsWithTaskObjectEntry() throws Exception {
+		mockHttpServletRequest = getMockHttpServletRequest(
+			cmpTaskObjectDefinition, cmpTaskObjectEntry);
+
+		Map<String, Object> props = getProps();
+
+		Assert.assertEquals(
+			cmpProjectObjectEntry.getGroupId(), props.get("projectGroupId"));
 	}
 
 	@Inject(

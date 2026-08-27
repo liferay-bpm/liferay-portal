@@ -17,6 +17,7 @@ const PLACEHOLDERS: Record<VocabularyField, string> = {
 export class EditProjectPage {
 	readonly page: Page;
 	readonly saveButton: Locator;
+	readonly tagInput: Locator;
 	readonly titleInput: Locator;
 
 	constructor(page: Page) {
@@ -24,6 +25,7 @@ export class EditProjectPage {
 		this.saveButton = page.getByRole('button', {
 			name: 'Save',
 		});
+		this.tagInput = page.getByPlaceholder('Add Tag');
 		this.titleInput = page.getByPlaceholder('Untitled Project');
 	}
 
@@ -31,6 +33,20 @@ export class EditProjectPage {
 		return this.getVocabularyMultiSelect(field)
 			.locator('.lfr-cmp__vocabulary-multi-select-selected')
 			.getByText(categoryName, {exact: true});
+	}
+
+	getCreateTagAction(tagName: string): Locator {
+		return this.page.getByText(`Create New Tag: ${tagName}`);
+	}
+
+	getSelectedTag(tagName: string): Locator {
+		return this.page
+			.locator('.asset-tags')
+			.getByText(tagName, {exact: true});
+	}
+
+	getTagOption(tagName: string): Locator {
+		return this.page.getByRole('option', {exact: true, name: tagName});
 	}
 
 	getVocabularyMultiSelect(field: VocabularyField): Locator {
@@ -44,6 +60,11 @@ export class EditProjectPage {
 			.locator('.label', {hasText: categoryName})
 			.getByRole('button', {name: 'Remove'})
 			.click();
+	}
+
+	async searchTags(query: string) {
+		await this.tagInput.click();
+		await this.tagInput.fill(query);
 	}
 
 	async selectCategory(field: VocabularyField, categoryName: string) {

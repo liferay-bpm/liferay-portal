@@ -8,6 +8,8 @@ package com.liferay.asset.tags.internal.search.spi.model.index.contributor;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.model.AssetTagGroupRel;
 import com.liferay.asset.kernel.service.AssetTagGroupRelLocalService;
+import com.liferay.depot.constants.DepotConstants;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
@@ -33,7 +35,18 @@ public class AssetTagModelDocumentContributor
 	public void contribute(Document document, AssetTag assetTag) {
 		document.addTextSortable(Field.NAME, assetTag.getName());
 		document.addNumberSortable("assetCount", assetTag.getAssetCount());
-		document.addKeyword("groupIds", _getGroupIds(assetTag.getTagId()));
+		document.addKeyword(
+			"groupIds",
+			_getGroupIds(assetTag.getTagId(), DepotConstants.TYPE_SPACE));
+
+		if (FeatureFlagManagerUtil.isEnabled(
+				assetTag.getCompanyId(), "LPD-99403")) {
+
+			document.addKeyword(
+				"projectDepotEntryGroupIds",
+				_getGroupIds(assetTag.getTagId(), DepotConstants.TYPE_PROJECT));
+		}
+
 		document.addKeyword(
 			"subscribed",
 			_subscriptionLocalService.isSubscribed(
@@ -41,9 +54,11 @@ public class AssetTagModelDocumentContributor
 				AssetTag.class.getName(), assetTag.getTagId()));
 	}
 
-	private long[] _getGroupIds(long tagId) {
+	private long[] _getGroupIds(long tagId, int depotEntryType) {
 		return ListUtil.toLongArray(
-			_assetTagGroupRelLocalService.getAssetTagGroupRelsByTagId(tagId),
+			_assetTagGroupRelLocalService.
+				getAssetTagGroupRelsByTagIdAndDepotEntryType(
+					tagId, depotEntryType),
 			AssetTagGroupRel::getGroupId);
 	}
 
