@@ -7,22 +7,16 @@ package com.liferay.content.marketing.platform.web.internal.fragment.renderer.te
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.fragment.renderer.FragmentRenderer;
-import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.model.GroupConstants;
-import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
-import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
-import java.util.Collections;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -32,10 +26,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * @author Carolina Barbosa
+ * @author Yuri Monteiro
  */
 @RunWith(Arquillian.class)
-public class TagsComponentSectionFragmentRendererTest
+public class CategorizationComponentSectionFragmentRendererTest
 	extends BaseComponentSectionFragmentRendererTestCase {
 
 	@ClassRule
@@ -47,49 +41,24 @@ public class TagsComponentSectionFragmentRendererTest
 
 	@Test
 	public void testGetProps() throws Exception {
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext();
-
-		String keyword1 = RandomTestUtil.randomString();
-		String keyword2 = RandomTestUtil.randomString();
-
-		serviceContext.setAssetTagNames(new String[] {keyword1, keyword2});
-
-		cmpProjectObjectEntry =
-			_objectEntryLocalService.partialUpdateObjectEntry(
-				cmpProjectObjectEntry.getUserId(),
-				cmpProjectObjectEntry.getObjectEntryId(),
-				cmpProjectObjectEntry.getObjectEntryFolderId(),
-				Collections.emptyMap(), serviceContext);
-
-		themeDisplay.setPermissionChecker(
-			PermissionThreadLocal.getPermissionChecker());
-
 		AssertUtils.assertEquals(
 			HashMapBuilder.<String, Object>put(
 				"cmsGroupId", themeDisplay.getScopeGroupId()
+			).put(
+				"funnelStagesVocabularyERC", "L_CMP_FUNNEL_STAGE"
 			).put(
 				"hasUpdatePermission", true
 			).put(
-				"objectEntryKeywords", new String[] {keyword1, keyword2}
+				"objectEntryKeywords", new String[0]
+			).put(
+				"personasVocabularyERC", "L_CMP_PERSONAS"
 			).put(
 				"projectGroupId", GroupConstants.DEFAULT_PARENT_GROUP_ID
-			).build(),
-			getProps());
-
-		themeDisplay.setPermissionChecker(
-			PermissionThreadLocal.getPermissionChecker(
-				UserTestUtil.addUser(), false));
-
-		AssertUtils.assertEquals(
-			HashMapBuilder.<String, Object>put(
-				"cmsGroupId", themeDisplay.getScopeGroupId()
 			).put(
-				"hasUpdatePermission", false
+				"selectedFunnelStageCategories",
+				JSONFactoryUtil.createJSONArray()
 			).put(
-				"objectEntryKeywords", new String[] {keyword1, keyword2}
-			).put(
-				"projectGroupId", GroupConstants.DEFAULT_PARENT_GROUP_ID
+				"selectedPersonaCategories", JSONFactoryUtil.createJSONArray()
 			).build(),
 			getProps());
 	}
@@ -112,11 +81,8 @@ public class TagsComponentSectionFragmentRendererTest
 	}
 
 	@Inject(
-		filter = "component.name=com.liferay.content.marketing.platform.web.internal.fragment.renderer.TagsComponentSectionFragmentRenderer"
+		filter = "component.name=com.liferay.content.marketing.platform.web.internal.fragment.renderer.CategorizationComponentSectionFragmentRenderer"
 	)
 	private FragmentRenderer _fragmentRenderer;
-
-	@Inject
-	private ObjectEntryLocalService _objectEntryLocalService;
 
 }
