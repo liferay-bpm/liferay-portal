@@ -32,7 +32,9 @@ import org.junit.runner.RunWith;
 /**
  * @author Carolina Barbosa
  */
-@FeatureFlags(featureFlags = @FeatureFlag("LPD-58677"))
+@FeatureFlags(
+	featureFlags = {@FeatureFlag("LPD-58677"), @FeatureFlag("LPD-99403")}
+)
 @RunWith(Arquillian.class)
 public class TagsComponentSectionFragmentRendererTest
 	extends BaseComponentSectionFragmentRendererTestCase {
@@ -71,6 +73,8 @@ public class TagsComponentSectionFragmentRendererTest
 				"hasUpdatePermission", true
 			).put(
 				"objectEntryKeywords", new String[] {keyword1, keyword2}
+			).put(
+				"projectGroupId", cmpProjectObjectEntry.getGroupId()
 			).build(),
 			getProps());
 
@@ -85,6 +89,8 @@ public class TagsComponentSectionFragmentRendererTest
 				"hasUpdatePermission", false
 			).put(
 				"objectEntryKeywords", new String[] {keyword1, keyword2}
+			).put(
+				"projectGroupId", cmpProjectObjectEntry.getGroupId()
 			).build(),
 			getProps());
 	}
