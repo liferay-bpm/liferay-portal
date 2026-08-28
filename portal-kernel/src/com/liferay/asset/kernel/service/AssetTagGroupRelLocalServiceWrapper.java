@@ -323,10 +323,10 @@ public class AssetTagGroupRelLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.List<AssetTagGroupRel> getAssetTagGroupRelsByGroupyId(
+	public java.util.List<AssetTagGroupRel> getAssetTagGroupRelsByGroupId(
 		long groupId) {
 
-		return _assetTagGroupRelLocalService.getAssetTagGroupRelsByGroupyId(
+		return _assetTagGroupRelLocalService.getAssetTagGroupRelsByGroupId(
 			groupId);
 	}
 
