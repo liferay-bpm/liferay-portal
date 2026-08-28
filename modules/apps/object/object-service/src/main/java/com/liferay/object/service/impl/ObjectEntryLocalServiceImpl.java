@@ -6498,11 +6498,11 @@ public class ObjectEntryLocalServiceImpl
 			ArrayUtil.append(
 				TransformUtil.transformToLongArray(
 					_assetTagGroupRelLocalService.
-						getAssetTagGroupRelsByGroupyId(groupId),
+						getAssetTagGroupRelsByGroupId(groupId),
 					AssetTagGroupRel::getTagId),
 				TransformUtil.transformToLongArray(
 					_assetTagGroupRelLocalService.
-						getAssetTagGroupRelsByGroupyId(-1),
+						getAssetTagGroupRelsByGroupId(-1),
 					AssetTagGroupRel::getTagId)));
 
 		for (AssetTag assetTag : assetEntry.getTags()) {
