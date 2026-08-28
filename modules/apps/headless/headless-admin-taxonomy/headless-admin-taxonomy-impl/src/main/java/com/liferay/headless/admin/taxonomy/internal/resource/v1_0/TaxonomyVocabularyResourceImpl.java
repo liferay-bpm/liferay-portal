@@ -37,6 +37,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
@@ -527,12 +528,18 @@ public class TaxonomyVocabularyResourceImpl
 
 		if (group.isCMS()) {
 			if (ArrayUtil.isNotEmpty(taxonomyVocabulary.getProjects())) {
+				long[] projectGroupIds = TaxonomyGroupUtil.getProjectGroupIds(
+					taxonomyVocabulary.getProjects(), group.getCompanyId());
+
+				if (ArrayUtil.isEmpty(projectGroupIds)) {
+					projectGroupIds = new long[] {
+						GroupConstants.ANY_PARENT_GROUP_ID
+					};
+				}
+
 				_assetVocabularyGroupRelLocalService.
 					setAssetVocabularyGroupRels(
-						assetVocabulary.getVocabularyId(),
-						TaxonomyGroupUtil.getProjectGroupIds(
-							taxonomyVocabulary.getProjects(),
-							group.getCompanyId()),
+						assetVocabulary.getVocabularyId(), projectGroupIds,
 						DepotConstants.TYPE_PROJECT);
 			}
 
@@ -1169,11 +1176,18 @@ public class TaxonomyVocabularyResourceImpl
 
 		if (group.isCMS()) {
 			if (taxonomyVocabulary.getProjects() != null) {
+				long[] projectGroupIds = TaxonomyGroupUtil.getProjectGroupIds(
+					taxonomyVocabulary.getProjects(), companyId);
+
+				if (ArrayUtil.isEmpty(projectGroupIds)) {
+					projectGroupIds = new long[] {
+						GroupConstants.ANY_PARENT_GROUP_ID
+					};
+				}
+
 				_assetVocabularyGroupRelLocalService.
 					setAssetVocabularyGroupRels(
-						assetVocabulary.getVocabularyId(),
-						TaxonomyGroupUtil.getProjectGroupIds(
-							taxonomyVocabulary.getProjects(), companyId),
+						assetVocabulary.getVocabularyId(), projectGroupIds,
 						DepotConstants.TYPE_PROJECT);
 			}
 
