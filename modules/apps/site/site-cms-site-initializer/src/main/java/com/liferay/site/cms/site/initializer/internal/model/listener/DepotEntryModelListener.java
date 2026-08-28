@@ -12,6 +12,7 @@ import com.liferay.asset.kernel.service.AssetVocabularyGroupRelLocalService;
 import com.liferay.depot.constants.DepotConstants;
 import com.liferay.depot.model.DepotEntry;
 import com.liferay.portal.kernel.exception.ModelListenerException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ModelListener;
@@ -59,6 +60,12 @@ public class DepotEntryModelListener extends BaseModelListener<DepotEntry> {
 							assetVocabularyGroupRel.getVocabularyId(),
 							depotEntry.getType());
 				}
+			}
+
+			if (!FeatureFlagManagerUtil.isEnabled(
+					depotEntry.getCompanyId(), "LPD-99403")) {
+
+				return;
 			}
 
 			List<AssetTagGroupRel> assetTagGroupRels =
