@@ -833,6 +833,17 @@ public class PortalUpgradeProcessRegistryImpl
 
 		upgradeVersionTreeMap.put(
 			new Version(39, 0, 0), new UpgradeCompanyInfo());
+
+		upgradeVersionTreeMap.put(
+			new Version(39, 1, 0),
+			UpgradeProcessFactory.addColumns(
+				"AssetTagGroupRel", "depotEntryType INTEGER"),
+			UpgradeProcessFactory.runSQL(
+				"update AssetTagGroupRel set depotEntryType = 1"));
+
+		upgradeVersionTreeMap.put(
+			new Version(39, 2, 0),
+			new AssetTagGroupRelAllProjectsUpgradeProcess());
 	}
 
 }
