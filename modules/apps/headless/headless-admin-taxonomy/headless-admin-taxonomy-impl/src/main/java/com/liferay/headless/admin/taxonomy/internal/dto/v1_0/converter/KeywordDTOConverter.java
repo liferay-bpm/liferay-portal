@@ -8,6 +8,7 @@ package com.liferay.headless.admin.taxonomy.internal.dto.v1_0.converter;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.kernel.service.AssetTagGroupRelLocalService;
+import com.liferay.depot.constants.DepotConstants;
 import com.liferay.headless.admin.taxonomy.dto.v1_0.AssetLibrary;
 import com.liferay.headless.admin.taxonomy.dto.v1_0.Keyword;
 import com.liferay.headless.admin.taxonomy.internal.dto.v1_0.util.CreatorUtil;
@@ -56,7 +57,8 @@ public class KeywordDTOConverter implements DTOConverter<AssetTag, Keyword> {
 				setAssetLibraries(
 					() -> TransformUtil.transformToArray(
 						_assetTagGroupRelLocalService.
-							getAssetTagGroupRelsByTagId(assetTag.getTagId()),
+							getAssetTagGroupRelsByTagIdAndDepotEntryType(
+								assetTag.getTagId(), DepotConstants.TYPE_SPACE),
 						assetTagGroupRel -> {
 							Group depotEntryGroup =
 								_groupLocalService.fetchGroup(
