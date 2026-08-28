@@ -90,6 +90,8 @@ public class TagsComponentSectionFragmentRendererTest
 				"projectGroupId", cmpProjectObjectEntry.getGroupId()
 			).build(),
 			getProps());
+
+		testGetPropsWithTaskObjectEntry();
 	}
 
 	@Override
