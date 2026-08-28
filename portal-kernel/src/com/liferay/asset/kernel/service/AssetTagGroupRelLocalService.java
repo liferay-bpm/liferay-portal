@@ -265,7 +265,7 @@ public interface AssetTagGroupRelLocalService
 	public List<AssetTagGroupRel> getAssetTagGroupRels(int start, int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<AssetTagGroupRel> getAssetTagGroupRelsByGroupyId(long groupId);
+	public List<AssetTagGroupRel> getAssetTagGroupRelsByGroupId(long groupId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<AssetTagGroupRel> getAssetTagGroupRelsByTagId(long tagId);
