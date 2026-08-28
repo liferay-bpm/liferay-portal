@@ -58,7 +58,7 @@ public class KeywordDTOConverterTest {
 		_depotEntry = DepotEntryLocalServiceUtil.addDepotEntry(
 			Collections.singletonMap(
 				LocaleUtil.getDefault(), RandomTestUtil.randomString()),
-			null, DepotConstants.TYPE_ASSET_LIBRARY,
+			null, DepotConstants.TYPE_SPACE,
 			new ServiceContext() {
 				{
 					setCompanyId(TestPropsValues.getCompanyId());
@@ -81,7 +81,8 @@ public class KeywordDTOConverterTest {
 			RandomTestUtil.randomString(), _serviceContext);
 
 		_assetTagGroupRelLocalService.setAssetTagGroupRels(
-			assetTag.getTagId(), new long[] {_depotEntryGroup.getGroupId()});
+			assetTag.getTagId(), new long[] {_depotEntryGroup.getGroupId()},
+			DepotConstants.TYPE_SPACE);
 
 		Keyword keyword = _toDTO(assetTag);
 

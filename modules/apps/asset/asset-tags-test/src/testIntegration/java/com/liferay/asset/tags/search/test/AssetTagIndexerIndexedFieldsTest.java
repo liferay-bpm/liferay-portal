@@ -10,6 +10,7 @@ import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.model.AssetTagGroupRel;
 import com.liferay.asset.kernel.service.AssetTagGroupRelLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
+import com.liferay.depot.constants.DepotConstants;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
@@ -113,7 +114,8 @@ public class AssetTagIndexerIndexedFieldsTest {
 
 		_assetTagGroupRelLocalService.setAssetTagGroupRels(
 			assetTag.getTagId(),
-			new long[] {group1.getGroupId(), group2.getGroupId()});
+			new long[] {group1.getGroupId(), group2.getGroupId()},
+			DepotConstants.TYPE_SPACE);
 
 		String searchTerm = String.valueOf(assetTag.getPrimaryKey());
 

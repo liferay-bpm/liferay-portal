@@ -6497,12 +6497,12 @@ public class ObjectEntryLocalServiceImpl
 		long[] tagIds = ArrayUtil.unique(
 			ArrayUtil.append(
 				TransformUtil.transformToLongArray(
-					_assetTagGroupRelLocalService.
-						getAssetTagGroupRelsByGroupId(groupId),
+					_assetTagGroupRelLocalService.getAssetTagGroupRelsByGroupId(
+						groupId),
 					AssetTagGroupRel::getTagId),
 				TransformUtil.transformToLongArray(
-					_assetTagGroupRelLocalService.
-						getAssetTagGroupRelsByGroupId(-1),
+					_assetTagGroupRelLocalService.getAssetTagGroupRelsByGroupId(
+						-1),
 					AssetTagGroupRel::getTagId)));
 
 		for (AssetTag assetTag : assetEntry.getTags()) {
