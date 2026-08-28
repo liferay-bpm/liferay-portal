@@ -288,10 +288,10 @@ public class AssetTagGroupRelLocalServiceUtil {
 		return getService().getAssetTagGroupRels(start, end);
 	}
 
-	public static List<AssetTagGroupRel> getAssetTagGroupRelsByGroupyId(
+	public static List<AssetTagGroupRel> getAssetTagGroupRelsByGroupId(
 		long groupId) {
 
-		return getService().getAssetTagGroupRelsByGroupyId(groupId);
+		return getService().getAssetTagGroupRelsByGroupId(groupId);
 	}
 
 	public static List<AssetTagGroupRel> getAssetTagGroupRelsByTagId(
