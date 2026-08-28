@@ -17,9 +17,11 @@ import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Adolfo Pérez
@@ -96,6 +98,96 @@ public class TaxonomyGroupUtil {
 		}
 
 		return ArrayUtil.toLongArray(groupIds);
+	}
+
+	public static AssetLibrary toAssetLibrary(
+		long groupId, boolean acceptAllLanguages, Locale locale) {
+
+		Group group = GroupLocalServiceUtil.fetchGroup(groupId);
+
+		return new AssetLibrary() {
+			{
+				setExternalReferenceCode(
+					() -> {
+						if (group == null) {
+							return null;
+						}
+
+						return group.getExternalReferenceCode();
+					});
+				setId(() -> groupId);
+				setName(
+					() -> {
+						if (group == null) {
+							return null;
+						}
+
+						return group.getDescriptiveName(locale);
+					});
+				setName_i18n(
+					() -> {
+						if (group == null) {
+							return null;
+						}
+
+						return LocalizedMapUtil.getI18nMap(
+							acceptAllLanguages, group.getNameMap());
+					});
+				setScopeKey(
+					() -> {
+						if (group == null) {
+							return null;
+						}
+
+						return group.getGroupKey();
+					});
+			}
+		};
+	}
+
+	public static Project toProject(
+		long groupId, boolean acceptAllLanguages, Locale locale) {
+
+		Group group = GroupLocalServiceUtil.fetchGroup(groupId);
+
+		return new Project() {
+			{
+				setExternalReferenceCode(
+					() -> {
+						if (group == null) {
+							return null;
+						}
+
+						return group.getExternalReferenceCode();
+					});
+				setId(() -> groupId);
+				setName(
+					() -> {
+						if (group == null) {
+							return null;
+						}
+
+						return group.getDescriptiveName(locale);
+					});
+				setName_i18n(
+					() -> {
+						if (group == null) {
+							return null;
+						}
+
+						return LocalizedMapUtil.getI18nMap(
+							acceptAllLanguages, group.getNameMap());
+					});
+				setScopeKey(
+					() -> {
+						if (group == null) {
+							return null;
+						}
+
+						return group.getGroupKey();
+					});
+			}
+		};
 	}
 
 	private static Group _fetchGroup(
