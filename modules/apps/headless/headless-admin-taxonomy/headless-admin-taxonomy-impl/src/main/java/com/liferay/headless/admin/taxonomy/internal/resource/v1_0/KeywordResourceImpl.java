@@ -432,15 +432,12 @@ public class KeywordResourceImpl
 				new ServiceContext());
 		}
 
-		long[] assetLibraryGroupIds = TaxonomyGroupUtil.getAssetLibraryGroupIds(
-			keyword.getAssetLibraries(), group.getCompanyId());
-
 		long[] projectGroupIds = new long[0];
 
 		if (FeatureFlagManagerUtil.isEnabled(
 				group.getCompanyId(), "LPD-99403")) {
 
-			projectGroupIds = _getProjectGroupIds(
+			projectGroupIds = _getValidatedProjectGroupIds(
 				group.getCompanyId(), keyword);
 
 			for (long projectGroupId : projectGroupIds) {
@@ -454,12 +451,15 @@ public class KeywordResourceImpl
 			}
 		}
 
-		AssetTag assetTag = _fetchReusableAssetTag(
+		AssetTag assetTag = _reuseAssetTag(
 			externalReferenceCode, keyword, projectGroupIds, siteId);
 
 		if (assetTag != null) {
 			return assetTag;
 		}
+
+		long[] assetLibraryGroupIds = TaxonomyGroupUtil.getAssetLibraryGroupIds(
+			keyword.getAssetLibraries(), group.getCompanyId());
 
 		if (ArrayUtil.isEmpty(keyword.getAssetLibraries())) {
 			assetTag = _assetTagService.addTag(
@@ -491,72 +491,27 @@ public class KeywordResourceImpl
 		return assetTag;
 	}
 
-	private AssetTag _fetchReusableAssetTag(
-			String externalReferenceCode, Keyword keyword,
-			long[] projectGroupIds, Long siteId)
-		throws Exception {
-
-		boolean projectScoped = false;
-
-		for (long projectGroupId : projectGroupIds) {
-			if (projectGroupId != GroupConstants.ANY_PARENT_GROUP_ID) {
-				projectScoped = true;
-
-				break;
-			}
-		}
-
-		if (!projectScoped) {
-			return null;
-		}
-
-		AssetTag assetTag = _assetTagLocalService.fetchTag(
-			siteId, keyword.getName());
-
-		if (assetTag == null) {
-			return null;
-		}
-
-		if (Validator.isNotNull(externalReferenceCode) &&
-			!externalReferenceCode.equals(
-				assetTag.getExternalReferenceCode())) {
-
-			return null;
-		}
-
-		long[] currentProjectGroupIds = _getGroupIds(
-			DepotConstants.TYPE_PROJECT, assetTag.getTagId());
-
-		if (ArrayUtil.contains(
-				currentProjectGroupIds, GroupConstants.ANY_PARENT_GROUP_ID)) {
-
-			return assetTag;
-		}
-
-		long[] uniqueProjectGroupIds = ArrayUtil.unique(
-			ArrayUtil.append(currentProjectGroupIds, projectGroupIds));
-
-		if (uniqueProjectGroupIds.length != currentProjectGroupIds.length) {
-			_setProjectAssetTagGroupRels(
-				uniqueProjectGroupIds, assetTag.getTagId());
-		}
-
-		return assetTag;
-	}
-
 	private BooleanFilter _getDepotEntryBooleanFilter(
 			int depotEntryType, long groupId)
 		throws Exception {
 
 		BooleanFilter depotEntryBooleanFilter = new BooleanFilter();
 
-		String fieldName = "groupIds";
-
 		if (depotEntryType == DepotConstants.TYPE_PROJECT) {
-			fieldName = "projectDepotEntryGroupIds";
+			TermsFilter projectTermsFilter = new TermsFilter(
+				"projectDepotEntryGroupIds");
+
+			projectTermsFilter.addValues(
+				String.valueOf(groupId),
+				String.valueOf(GroupConstants.ANY_PARENT_GROUP_ID));
+
+			depotEntryBooleanFilter.add(
+				projectTermsFilter, BooleanClauseOccur.SHOULD);
+
+			return depotEntryBooleanFilter;
 		}
 
-		TermsFilter termsFilter = new TermsFilter(fieldName);
+		TermsFilter termsFilter = new TermsFilter("groupIds");
 
 		termsFilter.addValues(
 			String.valueOf(groupId),
@@ -564,14 +519,10 @@ public class KeywordResourceImpl
 
 		depotEntryBooleanFilter.add(termsFilter, BooleanClauseOccur.SHOULD);
 
-		if (depotEntryType == DepotConstants.TYPE_PROJECT) {
-			return depotEntryBooleanFilter;
-		}
-
 		BooleanFilter cmsGroupBooleanFilter = new BooleanFilter();
 
 		cmsGroupBooleanFilter.add(
-			new ExistsFilter(fieldName), BooleanClauseOccur.MUST_NOT);
+			new ExistsFilter("groupIds"), BooleanClauseOccur.MUST_NOT);
 		cmsGroupBooleanFilter.addRequiredTerm(
 			Field.GROUP_ID,
 			TaxonomyGroupUtil.getCMSGroupId(contextCompany.getCompanyId()));
@@ -657,17 +608,6 @@ public class KeywordResourceImpl
 					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))));
 	}
 
-	private long[] _getProjectGroupIds(long companyId, Keyword keyword)
-		throws Exception {
-
-		if (ArrayUtil.isEmpty(keyword.getProjects())) {
-			return new long[0];
-		}
-
-		return TaxonomyGroupUtil.getProjectGroupIds(
-			keyword.getProjects(), companyId);
-	}
-
 	private ProjectionList _getProjectionList() {
 		ProjectionList projectionList = ProjectionFactoryUtil.projectionList();
 
@@ -710,6 +650,19 @@ public class KeywordResourceImpl
 		return _assetTagLocalService.dynamicQueryCount(dynamicQuery);
 	}
 
+	private long[] _getValidatedProjectGroupIds(long companyId, Keyword keyword)
+		throws Exception {
+
+		if (ArrayUtil.isEmpty(keyword.getProjects())) {
+			return new long[0];
+		}
+
+		TaxonomyGroupUtil.validateProjects(keyword.getProjects(), companyId);
+
+		return TaxonomyGroupUtil.getProjectGroupIds(
+			keyword.getProjects(), companyId);
+	}
+
 	private Keyword _patchSiteKeyword(
 			String externalReferenceCode, Keyword keyword, Long siteId)
 		throws Exception {
@@ -737,7 +690,8 @@ public class KeywordResourceImpl
 					ArrayUtil.append(
 						_getGroupIds(
 							DepotConstants.TYPE_PROJECT, assetTag.getTagId()),
-						_getProjectGroupIds(group.getCompanyId(), keyword)),
+						_getValidatedProjectGroupIds(
+							group.getCompanyId(), keyword)),
 					assetTag.getTagId());
 			}
 
@@ -766,6 +720,56 @@ public class KeywordResourceImpl
 				keyword, siteId));
 	}
 
+	private AssetTag _reuseAssetTag(
+			String externalReferenceCode, Keyword keyword,
+			long[] projectGroupIds, Long siteId)
+		throws Exception {
+
+		boolean projectScoped = false;
+
+		for (long projectGroupId : projectGroupIds) {
+			if (projectGroupId != GroupConstants.ANY_PARENT_GROUP_ID) {
+				projectScoped = true;
+
+				break;
+			}
+		}
+
+		if (!projectScoped) {
+			return null;
+		}
+
+		AssetTag assetTag = _assetTagLocalService.fetchTag(
+			siteId, keyword.getName());
+
+		if ((assetTag == null) ||
+			(Validator.isNotNull(externalReferenceCode) &&
+			 !externalReferenceCode.equals(
+				 assetTag.getExternalReferenceCode()))) {
+
+			return null;
+		}
+
+		long[] currentProjectGroupIds = _getGroupIds(
+			DepotConstants.TYPE_PROJECT, assetTag.getTagId());
+
+		if (ArrayUtil.contains(
+				currentProjectGroupIds, GroupConstants.ANY_PARENT_GROUP_ID)) {
+
+			return assetTag;
+		}
+
+		long[] uniqueProjectGroupIds = ArrayUtil.unique(
+			ArrayUtil.append(currentProjectGroupIds, projectGroupIds));
+
+		if (uniqueProjectGroupIds.length != currentProjectGroupIds.length) {
+			_setProjectAssetTagGroupRels(
+				uniqueProjectGroupIds, assetTag.getTagId());
+		}
+
+		return assetTag;
+	}
+
 	private void _setAssetTagGroupRels(AssetTag assetTag, Keyword keyword)
 		throws Exception {
 
@@ -780,7 +784,7 @@ public class KeywordResourceImpl
 			(keyword.getProjects() != null)) {
 
 			_setProjectAssetTagGroupRels(
-				_getProjectGroupIds(assetTag.getCompanyId(), keyword),
+				_getValidatedProjectGroupIds(assetTag.getCompanyId(), keyword),
 				assetTag.getTagId());
 		}
 

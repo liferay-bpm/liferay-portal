@@ -101,7 +101,7 @@ public class TaxonomyGroupUtil {
 	}
 
 	public static AssetLibrary toAssetLibrary(
-		long groupId, boolean acceptAllLanguages, Locale locale) {
+		boolean acceptAllLanguages, long groupId, Locale locale) {
 
 		Group group = GroupLocalServiceUtil.fetchGroup(groupId);
 
@@ -146,7 +146,7 @@ public class TaxonomyGroupUtil {
 	}
 
 	public static Project toProject(
-		long groupId, boolean acceptAllLanguages, Locale locale) {
+		boolean acceptAllLanguages, long groupId, Locale locale) {
 
 		Group group = GroupLocalServiceUtil.fetchGroup(groupId);
 
@@ -188,6 +188,24 @@ public class TaxonomyGroupUtil {
 					});
 			}
 		};
+	}
+
+	public static void validateProjects(Project[] projects, long companyId)
+		throws PortalException {
+
+		if (ArrayUtil.isEmpty(projects)) {
+			return;
+		}
+
+		for (Project project : projects) {
+			if (project == null) {
+				continue;
+			}
+
+			_validateProject(
+				companyId, project.getExternalReferenceCode(), project.getId(),
+				project.getScopeKey());
+		}
 	}
 
 	private static Group _fetchGroup(
@@ -232,6 +250,20 @@ public class TaxonomyGroupUtil {
 		return null;
 	}
 
+	private static String _getScopeIdentifier(
+		String externalReferenceCode, Long id, String scopeKey) {
+
+		if (Validator.isNotNull(externalReferenceCode)) {
+			return "external reference code " + externalReferenceCode;
+		}
+
+		if (Validator.isNotNull(scopeKey)) {
+			return "scope key " + scopeKey;
+		}
+
+		return "ID " + id;
+	}
+
 	private static boolean _isGroupDepotEntryType(
 		Group group, int depotEntryType) {
 
@@ -243,6 +275,37 @@ public class TaxonomyGroupUtil {
 		}
 
 		return false;
+	}
+
+	private static void _validateProject(
+			long companyId, String externalReferenceCode, Long id,
+			String scopeKey)
+		throws PortalException {
+
+		if (Validator.isNull(externalReferenceCode) &&
+			Validator.isNull(scopeKey)) {
+
+			if (id == null) {
+				throw new IllegalArgumentException(
+					"No project external reference code, ID, or scope key " +
+						"was specified");
+			}
+
+			if (id == GroupConstants.ANY_PARENT_GROUP_ID) {
+				return;
+			}
+		}
+
+		Group group = _fetchGroup(
+			companyId, externalReferenceCode, id, scopeKey);
+
+		if ((group == null) ||
+			!_isGroupDepotEntryType(group, DepotConstants.TYPE_PROJECT)) {
+
+			throw new IllegalArgumentException(
+				"No project exists with " +
+					_getScopeIdentifier(externalReferenceCode, id, scopeKey));
+		}
 	}
 
 	private static final long[] _GROUP_IDS_ALL = {-1L};
