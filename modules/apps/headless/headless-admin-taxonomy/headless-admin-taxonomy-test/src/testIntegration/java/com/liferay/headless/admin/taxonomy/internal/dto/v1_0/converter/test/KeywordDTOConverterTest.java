@@ -15,6 +15,7 @@ import com.liferay.depot.service.DepotEntryLocalServiceUtil;
 import com.liferay.headless.admin.taxonomy.dto.v1_0.AssetLibrary;
 import com.liferay.headless.admin.taxonomy.dto.v1_0.Keyword;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -83,6 +84,10 @@ public class KeywordDTOConverterTest {
 		_assetTagGroupRelLocalService.setAssetTagGroupRels(
 			assetTag.getTagId(), new long[] {_depotEntryGroup.getGroupId()},
 			DepotConstants.TYPE_SPACE);
+		_assetTagGroupRelLocalService.setAssetTagGroupRels(
+			assetTag.getTagId(),
+			new long[] {GroupConstants.ANY_PARENT_GROUP_ID},
+			DepotConstants.TYPE_PROJECT);
 
 		Keyword keyword = _toDTO(assetTag);
 
