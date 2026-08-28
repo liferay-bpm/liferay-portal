@@ -7,6 +7,7 @@ package com.liferay.headless.admin.taxonomy.client.serdes.v1_0;
 
 import com.liferay.headless.admin.taxonomy.client.dto.v1_0.AssetLibrary;
 import com.liferay.headless.admin.taxonomy.client.dto.v1_0.Keyword;
+import com.liferay.headless.admin.taxonomy.client.dto.v1_0.Project;
 import com.liferay.headless.admin.taxonomy.client.json.BaseJSONParser;
 
 import jakarta.annotation.Generated;
@@ -182,6 +183,26 @@ public class KeywordSerDes {
 			sb.append("\"");
 		}
 
+		if (keyword.getProjects() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"projects\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < keyword.getProjects().length; i++) {
+				sb.append(String.valueOf(keyword.getProjects()[i]));
+
+				if ((i + 1) < keyword.getProjects().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
 		if (keyword.getSiteExternalReferenceCode() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -318,6 +339,13 @@ public class KeywordSerDes {
 			map.put("name", String.valueOf(keyword.getName()));
 		}
 
+		if (keyword.getProjects() == null) {
+			map.put("projects", null);
+		}
+		else {
+			map.put("projects", String.valueOf(keyword.getProjects()));
+		}
+
 		if (keyword.getSiteExternalReferenceCode() == null) {
 			map.put("siteExternalReferenceCode", null);
 		}
@@ -388,6 +416,9 @@ public class KeywordSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "name")) {
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "projects")) {
 				return false;
 			}
 			else if (Objects.equals(
@@ -477,6 +508,22 @@ public class KeywordSerDes {
 			else if (Objects.equals(jsonParserFieldName, "name")) {
 				if (jsonParserFieldValue != null) {
 					keyword.setName((String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "projects")) {
+				if (jsonParserFieldValue != null) {
+					Object[] jsonParserFieldValues =
+						(Object[])jsonParserFieldValue;
+
+					Project[] projectsArray =
+						new Project[jsonParserFieldValues.length];
+
+					for (int i = 0; i < projectsArray.length; i++) {
+						projectsArray[i] = ProjectSerDes.toDTO(
+							(String)jsonParserFieldValues[i]);
+					}
+
+					keyword.setProjects(projectsArray);
 				}
 			}
 			else if (Objects.equals(
@@ -579,4 +626,4 @@ public class KeywordSerDes {
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:-816825089
+// LIFERAY-REST-BUILDER-HASH:1403191786
