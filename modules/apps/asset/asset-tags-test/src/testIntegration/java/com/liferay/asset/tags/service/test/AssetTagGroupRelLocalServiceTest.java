@@ -96,7 +96,7 @@ public class AssetTagGroupRelLocalServiceTest {
 		}
 
 		List<AssetTagGroupRel> assetTagGroupRels =
-			_assetTagGroupRelLocalService.getAssetTagGroupRelsByGroupyId(
+			_assetTagGroupRelLocalService.getAssetTagGroupRelsByGroupId(
 				group.getGroupId());
 
 		Assert.assertEquals(
@@ -113,7 +113,7 @@ public class AssetTagGroupRelLocalServiceTest {
 		_groupLocalService.deleteGroup(group);
 
 		assetTagGroupRels =
-			_assetTagGroupRelLocalService.getAssetTagGroupRelsByGroupyId(
+			_assetTagGroupRelLocalService.getAssetTagGroupRelsByGroupId(
 				group.getGroupId());
 
 		Assert.assertTrue(assetTagGroupRels.isEmpty());
