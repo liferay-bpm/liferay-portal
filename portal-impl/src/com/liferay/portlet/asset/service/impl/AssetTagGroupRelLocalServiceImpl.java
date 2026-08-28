@@ -57,7 +57,7 @@ public class AssetTagGroupRelLocalServiceImpl
 	}
 
 	@Override
-	public List<AssetTagGroupRel> getAssetTagGroupRelsByGroupyId(long groupId) {
+	public List<AssetTagGroupRel> getAssetTagGroupRelsByGroupId(long groupId) {
 		return assetTagGroupRelPersistence.findByGroupId(groupId);
 	}
 
