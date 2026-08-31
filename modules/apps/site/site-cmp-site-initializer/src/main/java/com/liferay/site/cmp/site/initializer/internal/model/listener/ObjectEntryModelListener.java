@@ -21,7 +21,6 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.sql.dsl.expression.Predicate;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.audit.AuditRouter;
 import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.exception.ModelListenerException;
@@ -54,19 +53,18 @@ import com.liferay.portal.kernel.service.UserGroupRoleService;
 import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.security.audit.event.generators.util.Attribute;
 import com.liferay.portal.security.audit.event.generators.util.AuditMessageBuilder;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskInstanceTokenLocalService;
 import com.liferay.site.cmp.site.initializer.internal.util.CMPObjectEntryUtil;
+import com.liferay.site.cmp.site.initializer.internal.util.CMPProjectCompletionRateUtil;
 import com.liferay.site.cmp.site.initializer.internal.util.RoleUtil;
 import com.liferay.site.cmp.site.initializer.internal.util.SiteInitializerUtil;
 import com.liferay.site.cms.site.initializer.util.CMSObjectEntryUtil;
@@ -79,7 +77,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -242,20 +239,6 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		).put(
 			RoleConstants.OWNER, actionIds
 		);
-	}
-
-	private int _getCount(
-			String filterString, ObjectDefinition objectDefinition,
-			ObjectEntry objectEntry)
-		throws Exception {
-
-		return _objectEntryLocalService.getValuesListCount(
-			new Long[] {objectEntry.getGroupId()}, 0, 0,
-			objectEntry.getObjectDefinitionId(),
-			_filterFactory.create(
-				"status ne " + WorkflowConstants.STATUS_DRAFT + filterString,
-				objectDefinition),
-			false, null);
 	}
 
 	private String _getLinkedObjectEntryTitle(
@@ -535,43 +518,8 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 			return;
 		}
 
-		ObjectEntry parentObjectEntry =
-			_objectEntryLocalService.fetchObjectEntry(
-				MapUtil.getLong(
-					objectEntry.getValues(),
-					"r_cmpProjectToCMPTasks_c_cmpProjectId"));
-
-		if (parentObjectEntry == null) {
-			return;
-		}
-
-		int totalCount = _getCount(
-			StringPool.BLANK, objectDefinition, objectEntry);
-
-		int completionRate = 0;
-
-		if (totalCount != 0) {
-			int filteredCount = _getCount(
-				" and state eq 'done'", objectDefinition, objectEntry);
-
-			completionRate = (filteredCount * 100) / totalCount;
-		}
-
-		if (Objects.equals(
-				MapUtil.getInteger(
-					parentObjectEntry.getValues(), "completionRate"),
-				completionRate)) {
-
-			return;
-		}
-
-		_objectEntryLocalService.partialUpdateObjectEntry(
-			parentObjectEntry.getUserId(), parentObjectEntry.getObjectEntryId(),
-			parentObjectEntry.getObjectEntryFolderId(),
-			HashMapBuilder.<String, Serializable>put(
-				"completionRate", completionRate
-			).build(),
-			new ServiceContext());
+		CMPProjectCompletionRateUtil.updateProjectCompletionRate(
+			_filterFactory, objectDefinition, objectEntry);
 	}
 
 	private void _updateProjectManagerProjectSponsorUserGroupRoles(
