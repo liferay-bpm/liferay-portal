@@ -92,6 +92,9 @@ public class ObjectEntryModelListenerTest {
 
 	@Test
 	public void testOnAfterCreate() throws Exception {
+
+		// Creating a CMP object entry sets its resource permissions
+
 		ObjectEntry cmpProjectObjectEntry =
 			CMPTestUtil.addCMPProjectObjectEntry();
 
@@ -185,6 +188,28 @@ public class ObjectEntryModelListenerTest {
 		_assertResourceActions(
 			cmpTaskLinkObjectEntry, DepotRolesConstants.PROJECT_MEMBER,
 			ActionKeys.VIEW);
+
+		// Creating a CMP task updates the completion rate only when published
+
+		cmpTaskObjectEntry = CMPTestUtil.addCMPTaskObjectEntry(
+			cmpProjectObjectEntry, WorkflowConstants.ACTION_PUBLISH);
+
+		_partialUpdateObjectEntry(
+			cmpTaskObjectEntry,
+			HashMapBuilder.<String, Serializable>put(
+				"state", "inProgress"
+			).build());
+		_partialUpdateObjectEntry(
+			cmpTaskObjectEntry,
+			HashMapBuilder.<String, Serializable>put(
+				"state", "done"
+			).build());
+
+		_assertCompletionRate(cmpProjectObjectEntry, 100);
+
+		CMPTestUtil.addCMPTaskObjectEntry(cmpProjectObjectEntry);
+
+		_assertCompletionRate(cmpProjectObjectEntry, 100);
 	}
 
 	@Test
@@ -287,12 +312,8 @@ public class ObjectEntryModelListenerTest {
 
 		cmpProjectObjectEntry.setValues(values);
 
-		cmpProjectObjectEntry =
-			_objectEntryLocalService.partialUpdateObjectEntry(
-				TestPropsValues.getUserId(),
-				cmpProjectObjectEntry.getObjectEntryId(),
-				cmpProjectObjectEntry.getObjectEntryFolderId(), values,
-				ServiceContextTestUtil.getServiceContext());
+		cmpProjectObjectEntry = _partialUpdateObjectEntry(
+			cmpProjectObjectEntry, values);
 
 		_assertUserGroupRoles(
 			1, Collections.singletonList(DepotRolesConstants.PROJECT_MANAGER),
@@ -359,6 +380,18 @@ public class ObjectEntryModelListenerTest {
 				cmpTaskLinkObjectEntry.getObjectEntryId()));
 	}
 
+	private void _assertCompletionRate(
+			ObjectEntry cmpProjectObjectEntry, int expectedCompletionRate)
+		throws Exception {
+
+		ObjectEntry objectEntry = _objectEntryLocalService.getObjectEntry(
+			cmpProjectObjectEntry.getObjectEntryId());
+
+		Assert.assertEquals(
+			expectedCompletionRate,
+			MapUtil.getInteger(objectEntry.getValues(), "completionRate"));
+	}
+
 	private void _assertResourceActions(
 			ObjectEntry objectEntry, String roleName, String... actionIds)
 		throws Exception {
@@ -400,6 +433,16 @@ public class ObjectEntryModelListenerTest {
 
 		Assert.assertTrue(
 			userGroupRoleNames.containsAll(expectedUserGroupRoleNames));
+	}
+
+	private ObjectEntry _partialUpdateObjectEntry(
+			ObjectEntry objectEntry, Map<String, Serializable> values)
+		throws Exception {
+
+		return _objectEntryLocalService.partialUpdateObjectEntry(
+			objectEntry.getUserId(), objectEntry.getObjectEntryId(),
+			objectEntry.getObjectEntryFolderId(), values,
+			ServiceContextTestUtil.getServiceContext());
 	}
 
 	@DeleteAfterTestRun
