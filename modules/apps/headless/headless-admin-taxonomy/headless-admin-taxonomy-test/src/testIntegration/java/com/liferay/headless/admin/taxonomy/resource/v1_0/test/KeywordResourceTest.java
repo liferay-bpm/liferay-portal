@@ -1073,42 +1073,6 @@ public class KeywordResourceTest extends BaseKeywordResourceTestCase {
 		Assert.assertEquals(originalTotalCount + 1, page.getTotalCount());
 	}
 
-	private void _testPutSiteKeywordByExternalReferenceCodeDuplicateName()
-		throws Exception {
-
-		Keyword keyword =
-			testPutSiteKeywordByExternalReferenceCode_createKeyword();
-
-		keywordResource.putSiteKeywordByExternalReferenceCode(
-			testGroup.getGroupId(),
-			StringUtil.toLowerCase(RandomTestUtil.randomString()), keyword);
-
-		Keyword duplicateNameKeyword =
-			keywordResource.putSiteKeywordByExternalReferenceCode(
-				testGroup.getGroupId(),
-				StringUtil.toLowerCase(RandomTestUtil.randomString()), keyword);
-
-		Assert.assertEquals(keyword.getName(), duplicateNameKeyword.getName());
-	}
-
-	private void _testPutSiteKeywordByExternalReferenceCodeValidKeyword()
-		throws Exception {
-
-		String externalReferenceCode = StringUtil.toLowerCase(
-			RandomTestUtil.randomString());
-
-		Keyword keyword =
-			testPutSiteKeywordByExternalReferenceCode_createKeyword();
-
-		Keyword putKeyword =
-			keywordResource.putSiteKeywordByExternalReferenceCode(
-				keyword.getSiteId(), externalReferenceCode, keyword);
-
-		Assert.assertEquals(
-			externalReferenceCode, putKeyword.getExternalReferenceCode());
-		assertValid(putKeyword);
-	}
-
 	private void _testPatchSiteKeywordAppendsProjects() throws Exception {
 		Project project1 = _randomProject();
 
@@ -1309,6 +1273,42 @@ public class KeywordResourceTest extends BaseKeywordResourceTestCase {
 			postKeyword.getId(), postKeyword);
 
 		_assertNoAssetTagGroupRels(DepotConstants.TYPE_PROJECT, putKeyword);
+	}
+
+	private void _testPutSiteKeywordByExternalReferenceCodeDuplicateName()
+		throws Exception {
+
+		Keyword keyword =
+			testPutSiteKeywordByExternalReferenceCode_createKeyword();
+
+		keywordResource.putSiteKeywordByExternalReferenceCode(
+			testGroup.getGroupId(),
+			StringUtil.toLowerCase(RandomTestUtil.randomString()), keyword);
+
+		Keyword duplicateNameKeyword =
+			keywordResource.putSiteKeywordByExternalReferenceCode(
+				testGroup.getGroupId(),
+				StringUtil.toLowerCase(RandomTestUtil.randomString()), keyword);
+
+		Assert.assertEquals(keyword.getName(), duplicateNameKeyword.getName());
+	}
+
+	private void _testPutSiteKeywordByExternalReferenceCodeValidKeyword()
+		throws Exception {
+
+		String externalReferenceCode = StringUtil.toLowerCase(
+			RandomTestUtil.randomString());
+
+		Keyword keyword =
+			testPutSiteKeywordByExternalReferenceCode_createKeyword();
+
+		Keyword putKeyword =
+			keywordResource.putSiteKeywordByExternalReferenceCode(
+				keyword.getSiteId(), externalReferenceCode, keyword);
+
+		Assert.assertEquals(
+			externalReferenceCode, putKeyword.getExternalReferenceCode());
+		assertValid(putKeyword);
 	}
 
 	@DeleteAfterTestRun
