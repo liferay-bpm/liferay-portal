@@ -26,6 +26,7 @@ import ObjectFoldersSideBar from './ObjectFoldersSidebar';
 import {
 	canCreateInObjectFolder,
 	deleteObjectDefinition,
+	getDefaultObjectFolder,
 	getObjectDefinitionsFilter,
 	getObjectFolderActions,
 } from './objectDefinitionUtil';
@@ -286,11 +287,20 @@ export default function ViewObjectDefinitions({
 		allObjectFolders: ObjectFoldersRequestInfo,
 		currentURL: URL
 	) => {
-		currentURL.searchParams.set('objectFolderName', 'Default');
+		const defaultObjectFolder = getDefaultObjectFolder(
+			allObjectFolders.items
+		);
 
-		window.history.replaceState(null, '', currentURL.href);
+		if (defaultObjectFolder) {
+			currentURL.searchParams.set(
+				'objectFolderName',
+				defaultObjectFolder.name
+			);
 
-		setSelectedObjectFolder(allObjectFolders.items[0]);
+			window.history.replaceState(null, '', currentURL.href);
+		}
+
+		setSelectedObjectFolder(defaultObjectFolder);
 	};
 
 	useEffect(() => {

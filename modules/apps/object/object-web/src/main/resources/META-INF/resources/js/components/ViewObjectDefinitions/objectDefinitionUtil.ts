@@ -41,6 +41,8 @@ type ObjectDefinitionNodeActionsProps = {
 	};
 };
 
+const DEFAULT_OBJECT_FOLDER_NAME = 'Default';
+
 export async function deleteObjectFolder(id: number, objectFolderName: string) {
 	await API.deleteObjectFolder(Number(id)).then(() => {
 		Liferay.Util.openToast({
@@ -178,6 +180,22 @@ export async function getDbTableName({
 	}>(objectDefinitionInfoURL);
 
 	return objectDefinitionInfoResponse.tableName;
+}
+
+/**
+ * Returns the folder named Default, falling back to the first folder. The
+ * object folder listing comes from the search index with no sort applied, so
+ * the first item is not necessarily the Default folder, and a rebuilding index
+ * can leave the Default folder out of the listing altogether.
+ */
+export function getDefaultObjectFolder(
+	objectFolders: ObjectFolder[]
+): ObjectFolder | undefined {
+	return (
+		objectFolders.find(
+			(objectFolder) => objectFolder.name === DEFAULT_OBJECT_FOLDER_NAME
+		) ?? objectFolders[0]
+	);
 }
 
 export function getObjectDefinitionNodeActions({
