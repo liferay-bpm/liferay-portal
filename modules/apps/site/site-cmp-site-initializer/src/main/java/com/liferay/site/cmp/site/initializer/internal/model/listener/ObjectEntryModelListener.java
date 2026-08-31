@@ -126,7 +126,6 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 
 		try {
 			_updateGroup(objectEntry);
-			_updateProjectCompletionRate(objectEntry);
 			_updateProjectManagerProjectSponsorUserGroupRoles(objectEntry);
 		}
 		catch (Exception exception) {
