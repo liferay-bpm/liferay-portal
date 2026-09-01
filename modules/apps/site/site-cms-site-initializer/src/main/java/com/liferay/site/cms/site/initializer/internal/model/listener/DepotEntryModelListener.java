@@ -5,11 +5,14 @@
 
 package com.liferay.site.cms.site.initializer.internal.model.listener;
 
+import com.liferay.asset.kernel.model.AssetTagGroupRel;
 import com.liferay.asset.kernel.model.AssetVocabularyGroupRel;
+import com.liferay.asset.kernel.service.AssetTagGroupRelLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyGroupRelLocalService;
 import com.liferay.depot.constants.DepotConstants;
 import com.liferay.depot.model.DepotEntry;
 import com.liferay.portal.kernel.exception.ModelListenerException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ModelListener;
@@ -58,11 +61,38 @@ public class DepotEntryModelListener extends BaseModelListener<DepotEntry> {
 							depotEntry.getType());
 				}
 			}
+
+			if (!FeatureFlagManagerUtil.isEnabled(
+					depotEntry.getCompanyId(), "LPD-99403")) {
+
+				return;
+			}
+
+			List<AssetTagGroupRel> assetTagGroupRels =
+				_assetTagGroupRelLocalService.
+					getAssetTagGroupRelsByGroupIdAndDepotEntryType(
+						depotEntry.getGroupId(), depotEntry.getType());
+
+			for (AssetTagGroupRel assetTagGroupRel : assetTagGroupRels) {
+				List<AssetTagGroupRel> tagAssetTagGroupRels =
+					_assetTagGroupRelLocalService.
+						getAssetTagGroupRelsByTagIdAndDepotEntryType(
+							assetTagGroupRel.getTagId(), depotEntry.getType());
+
+				if (tagAssetTagGroupRels.size() == 1) {
+					_assetTagGroupRelLocalService.addAssetTagGroupRel(
+						GroupConstants.ANY_PARENT_GROUP_ID,
+						assetTagGroupRel.getTagId(), depotEntry.getType());
+				}
+			}
 		}
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
 		}
 	}
+
+	@Reference
+	private AssetTagGroupRelLocalService _assetTagGroupRelLocalService;
 
 	@Reference
 	private AssetVocabularyGroupRelLocalService
