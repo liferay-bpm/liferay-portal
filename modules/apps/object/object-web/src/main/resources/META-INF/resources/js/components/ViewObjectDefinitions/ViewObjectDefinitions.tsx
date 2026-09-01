@@ -331,9 +331,16 @@ export default function ViewObjectDefinitions({
 
 	useEffect(() => {
 		const makeFetch = async () => {
-			const allObjectFolders = await API.getAllObjectFolders();
+			try {
+				const allObjectFolders = await API.getAllObjectFolders();
 
-			if (allObjectFolders) {
+				if (!allObjectFolders?.items) {
+					setObjectFoldersRequestInfo(undefined);
+					setSelectedObjectFolder(undefined);
+
+					return;
+				}
+
 				setObjectFoldersRequestInfo(allObjectFolders);
 
 				const objectDefinitions = await API.getAllObjectDefinitions();
@@ -356,16 +363,14 @@ export default function ViewObjectDefinitions({
 				else {
 					setDefaultToSearchParams(allObjectFolders, currentURL);
 				}
-
-				setLoading(false);
-
-				return;
 			}
-
-			setObjectFoldersRequestInfo(undefined);
-			setSelectedObjectFolder(undefined);
-
-			setLoading(false);
+			catch (error) {
+				setObjectFoldersRequestInfo(undefined);
+				setSelectedObjectFolder(undefined);
+			}
+			finally {
+				setLoading(false);
+			}
 		};
 
 		makeFetch();
