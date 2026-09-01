@@ -69,6 +69,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -84,6 +85,16 @@ public class LayoutImportBackgroundTaskExecutorTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
+
+	@BeforeClass
+	public static void setUpClass() {
+		_objectFieldValueAttachmentDocsAndMedia =
+			DLTestUtil.randomTextFileBytes();
+		_objectFieldValueAttachmentShowFilesInDocsAndMedia =
+			DLTestUtil.randomTextFileBytes();
+		_objectFieldValueAttachmentUserComputer =
+			DLTestUtil.randomTextFileBytes();
+	}
 
 	@Test
 	public void testGetStatusCompletedWithErrors() throws Exception {
@@ -423,14 +434,13 @@ public class LayoutImportBackgroundTaskExecutorTest {
 			TestPropsValues.getCompanyId());
 
 		DLFileEntry dlFileEntry = _addDLFileEntry(
-			_OBJECT_FIELD_VALUE_ATTACHMENT_DOCS_AND_MEDIA,
-			company.getGroupId());
+			_objectFieldValueAttachmentDocsAndMedia, company.getGroupId());
 
 		FileEntry tempFileEntry1 = _addTempFileEntry(
-			_OBJECT_FIELD_VALUE_ATTACHMENT_SHOW_FILES_IN_DOCS_AND_MEDIA,
+			_objectFieldValueAttachmentShowFilesInDocsAndMedia,
 			objectDefinition);
 		FileEntry tempFileEntry2 = _addTempFileEntry(
-			_OBJECT_FIELD_VALUE_ATTACHMENT_USER_COMPUTER, objectDefinition);
+			_objectFieldValueAttachmentUserComputer, objectDefinition);
 
 		return _objectEntryLocalService.addObjectEntry(
 			groupId, TestPropsValues.getUserId(),
@@ -577,15 +587,9 @@ public class LayoutImportBackgroundTaskExecutorTest {
 	private static final String _OBJECT_FIELD_NAME_TEXT =
 		"x" + RandomTestUtil.randomString();
 
-	private static final byte[] _OBJECT_FIELD_VALUE_ATTACHMENT_DOCS_AND_MEDIA =
-		DLTestUtil.randomTextFileBytes();
-
-	private static final byte[]
-		_OBJECT_FIELD_VALUE_ATTACHMENT_SHOW_FILES_IN_DOCS_AND_MEDIA =
-			DLTestUtil.randomTextFileBytes();
-
-	private static final byte[] _OBJECT_FIELD_VALUE_ATTACHMENT_USER_COMPUTER =
-		DLTestUtil.randomTextFileBytes();
+	private static byte[] _objectFieldValueAttachmentDocsAndMedia;
+	private static byte[] _objectFieldValueAttachmentShowFilesInDocsAndMedia;
+	private static byte[] _objectFieldValueAttachmentUserComputer;
 
 	@Inject
 	private BackgroundTaskLocalService _backgroundTaskLocalService;
