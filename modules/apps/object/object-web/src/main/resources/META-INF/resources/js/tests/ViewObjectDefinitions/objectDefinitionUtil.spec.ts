@@ -5,8 +5,11 @@
 
 import {
 	canCreateInObjectFolder,
+	getDefaultObjectFolder,
 	getObjectDefinitionsFilter,
 } from '../../components/ViewObjectDefinitions/objectDefinitionUtil';
+
+const objectFolder = (name: string) => ({name}) as ObjectFolder;
 
 describe('canCreateInObjectFolder', () => {
 	it('returns false when no folder is selected', () => {
@@ -25,6 +28,30 @@ describe('canCreateInObjectFolder', () => {
 				externalReferenceCode: 'L_CMS_CONTENT_STRUCTURES',
 			})
 		).toBe(false);
+	});
+});
+
+describe('getDefaultObjectFolder', () => {
+	it('returns the Default folder when it is not the first folder', () => {
+		expect(
+			getDefaultObjectFolder([
+				objectFolder('CMSContentStructures'),
+				objectFolder('Default'),
+			])
+		).toEqual(objectFolder('Default'));
+	});
+
+	it('returns the first folder when none is named Default', () => {
+		expect(
+			getDefaultObjectFolder([
+				objectFolder('CMSContentStructures'),
+				objectFolder('CMSFileTypes'),
+			])
+		).toEqual(objectFolder('CMSContentStructures'));
+	});
+
+	it('returns undefined when there are no folders', () => {
+		expect(getDefaultObjectFolder([])).toBeUndefined();
 	});
 });
 
