@@ -5,9 +5,14 @@
 
 package com.liferay.notification.rest.internal.resource.v1_0;
 
+import com.liferay.exportimport.constants.ExportImportConstants;
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate;
 import com.liferay.notification.constants.NotificationActionKeys;
 import com.liferay.notification.constants.NotificationConstants;
+import com.liferay.notification.constants.NotificationPortletKeys;
 import com.liferay.notification.context.NotificationContext;
+import com.liferay.notification.exception.NoSuchNotificationTemplateException;
 import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.notification.model.NotificationTemplateAttachment;
@@ -21,30 +26,46 @@ import com.liferay.notification.type.NotificationType;
 import com.liferay.notification.type.NotificationTypeServiceTracker;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.rest.dto.v1_0.util.CreatorUtil;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.PermissionService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
+import com.liferay.portal.vulcan.fields.NestedFieldsSupplier;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.permission.ModelPermissionsUtil;
+import com.liferay.portal.vulcan.permission.Permission;
+import com.liferay.portal.vulcan.permission.PermissionUtil;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
 import jakarta.ws.rs.core.MultivaluedMap;
 
+import java.io.Serializable;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -55,10 +76,13 @@ import org.osgi.service.component.annotations.ServiceScope;
  */
 @Component(
 	properties = "OSGI-INF/liferay/rest/v1_0/notification-template.properties",
+	property = "export.import.vulcan.batch.engine.task.item.delegate=true",
 	scope = ServiceScope.PROTOTYPE, service = NotificationTemplateResource.class
 )
 public class NotificationTemplateResourceImpl
-	extends BaseNotificationTemplateResourceImpl {
+	extends BaseNotificationTemplateResourceImpl
+	implements ExportImportVulcanBatchEngineTaskItemDelegate
+		<NotificationTemplate> {
 
 	@Override
 	public void deleteNotificationTemplate(Long notificationTemplateId)
@@ -69,8 +93,82 @@ public class NotificationTemplateResourceImpl
 	}
 
 	@Override
+	public void deleteNotificationTemplateByExternalReferenceCode(
+			String externalReferenceCode)
+		throws Exception {
+
+		com.liferay.notification.model.NotificationTemplate
+			serviceBuilderNotificationTemplate =
+				_notificationTemplateService.
+					fetchNotificationTemplateByExternalReferenceCode(
+						externalReferenceCode, contextCompany.getCompanyId());
+
+		if (serviceBuilderNotificationTemplate != null) {
+			_notificationTemplateService.deleteNotificationTemplate(
+				serviceBuilderNotificationTemplate);
+		}
+	}
+
+	@Override
 	public EntityModel getEntityModel(MultivaluedMap multivaluedMap) {
 		return _entityModel;
+	}
+
+	@Override
+	public ExportImportDescriptor
+		<com.liferay.notification.model.NotificationTemplate>
+			getExportImportDescriptor() {
+
+		return new ExportImportDescriptor<>() {
+
+			@Override
+			public String getKey() {
+				return NotificationTemplateResourceImpl.class.getName();
+			}
+
+			@Override
+			public String getLabelLanguageKey() {
+				return "notification-templates";
+			}
+
+			@Override
+			public Class<com.liferay.notification.model.NotificationTemplate>
+				getModelClass() {
+
+				return com.liferay.notification.model.NotificationTemplate.
+					class;
+			}
+
+			@Override
+			public List<String> getNestedFields() {
+				return List.of("creator");
+			}
+
+			@Override
+			public Map<String, Serializable> getParameters(
+				PortletDataContext portletDataContext) {
+
+				return HashMapBuilder.<String, Serializable>put(
+					"filter", "system eq false"
+				).build();
+			}
+
+			@Override
+			public String getPortletId() {
+				return NotificationPortletKeys.NOTIFICATION_TEMPLATES;
+			}
+
+			@Override
+			public Scope getScope() {
+				return Scope.COMPANY;
+			}
+
+			@Override
+			public String getSectionKey() {
+				return ExportImportConstants.SECTION_KEY_CONTENT_AND_DATA;
+			}
+
+		};
 	}
 
 	@Override
@@ -88,10 +186,20 @@ public class NotificationTemplateResourceImpl
 			String externalReferenceCode)
 		throws Exception {
 
-		return _toNotificationTemplate(
-			_notificationTemplateService.
-				fetchNotificationTemplateByExternalReferenceCode(
-					externalReferenceCode, contextCompany.getCompanyId()));
+		com.liferay.notification.model.NotificationTemplate
+			serviceBuilderNotificationTemplate =
+				_notificationTemplateService.
+					fetchNotificationTemplateByExternalReferenceCode(
+						externalReferenceCode, contextCompany.getCompanyId());
+
+		if (serviceBuilderNotificationTemplate == null) {
+			throw new NoSuchNotificationTemplateException(
+				StringBundler.concat(
+					"No notification template exists with external reference ",
+					"code \"", externalReferenceCode, "\""));
+		}
+
+		return _toNotificationTemplate(serviceBuilderNotificationTemplate);
 	}
 
 	@Override
@@ -142,18 +250,27 @@ public class NotificationTemplateResourceImpl
 				notificationTemplate, _objectFieldLocalService);
 
 		notificationContext.setCompanyId(contextCompany.getCompanyId());
+		notificationContext.setModelPermissions(
+			ModelPermissionsUtil.toModelPermissions(
+				contextCompany.getCompanyId(),
+				notificationTemplate.getPermissions(), 0,
+				com.liferay.notification.model.NotificationTemplate.class.
+					getName(),
+				resourceActionLocalService, _resourcePermissionLocalService,
+				_roleLocalService));
 		notificationContext.setNotificationRecipient(
 			NotificationUtil.toNotificationRecipient(contextUser, 0L));
-		notificationContext.setNotificationRecipientSettings(
-			NotificationUtil.toNotificationRecipientSetting(
-				0L,
-				_notificationTypeServiceTracker.getNotificationType(
-					notificationTemplate.getType()),
-				notificationTemplate.getRecipients(), contextUser));
 		notificationContext.setNotificationTemplate(
 			NotificationUtil.toNotificationTemplate(
 				0L, notificationTemplate, _objectDefinitionLocalService,
 				contextUser));
+
+		notificationContext.setNotificationRecipientSettings(
+			NotificationUtil.toNotificationRecipientSetting(
+				notificationContext, 0L,
+				_notificationTypeServiceTracker.getNotificationType(
+					notificationTemplate.getType()),
+				notificationTemplate.getRecipients(), contextUser));
 
 		return _toNotificationTemplate(
 			_notificationTemplateService.addNotificationTemplate(
@@ -243,17 +360,19 @@ public class NotificationTemplateResourceImpl
 				contextUser, notificationTemplateId);
 
 		notificationContext.setNotificationRecipient(notificationRecipient);
-		notificationContext.setNotificationRecipientSettings(
-			NotificationUtil.toNotificationRecipientSetting(
-				notificationRecipient.getNotificationRecipientId(),
-				_notificationTypeServiceTracker.getNotificationType(
-					notificationTemplate.getType()),
-				notificationTemplate.getRecipients(), contextUser));
 
 		notificationContext.setNotificationTemplate(
 			NotificationUtil.toNotificationTemplate(
 				notificationTemplateId, notificationTemplate,
 				_objectDefinitionLocalService, contextUser));
+
+		notificationContext.setNotificationRecipientSettings(
+			NotificationUtil.toNotificationRecipientSetting(
+				notificationContext,
+				notificationRecipient.getNotificationRecipientId(),
+				_notificationTypeServiceTracker.getNotificationType(
+					notificationTemplate.getType()),
+				notificationTemplate.getRecipients(), contextUser));
 
 		return _toNotificationTemplate(
 			_notificationTemplateService.updateNotificationTemplate(
@@ -314,6 +433,12 @@ public class NotificationTemplateResourceImpl
 		NotificationType notificationType =
 			_notificationTypeServiceTracker.getNotificationType(
 				serviceBuilderNotificationTemplate.getType());
+
+		Locale locale = _getLocale();
+		String permissionName =
+			com.liferay.notification.model.NotificationTemplate.class.getName();
+		User user = _userLocalService.fetchUser(
+			serviceBuilderNotificationTemplate.getUserId());
 
 		return new NotificationTemplate() {
 			{
@@ -395,6 +520,8 @@ public class NotificationTemplateResourceImpl
 				setBody(
 					() -> LocalizedMapUtil.getLanguageIdMap(
 						serviceBuilderNotificationTemplate.getBodyMap()));
+				setCreator(
+					() -> CreatorUtil.toCreator(_portal, contextUriInfo, user));
 				setDateCreated(
 					serviceBuilderNotificationTemplate::getCreateDate);
 				setDateModified(
@@ -410,7 +537,8 @@ public class NotificationTemplateResourceImpl
 				setId(
 					serviceBuilderNotificationTemplate::
 						getNotificationTemplateId);
-				setName(serviceBuilderNotificationTemplate::getName);
+				setName(
+					() -> serviceBuilderNotificationTemplate.getName(locale));
 				setName_i18n(
 					() -> LocalizedMapUtil.getLanguageIdMap(
 						serviceBuilderNotificationTemplate.getNameMap()));
@@ -430,6 +558,27 @@ public class NotificationTemplateResourceImpl
 					});
 				setObjectDefinitionId(
 					serviceBuilderNotificationTemplate::getObjectDefinitionId);
+				setPermissions(
+					() -> NestedFieldsSupplier.supply(
+						"permissions",
+						nestedFieldNames -> {
+							_permissionService.checkPermission(
+								contextCompany.getGroupId(), permissionName,
+								serviceBuilderNotificationTemplate.
+									getNotificationTemplateId());
+
+							Collection<Permission> permissions =
+								PermissionUtil.getPermissions(
+									serviceBuilderNotificationTemplate.
+										getCompanyId(),
+									resourceActionLocalService.
+										getResourceActions(permissionName),
+									serviceBuilderNotificationTemplate.
+										getNotificationTemplateId(),
+									permissionName, null);
+
+							return permissions.toArray(new Permission[0]);
+						}));
 				setRecipients(
 					() -> {
 						NotificationRecipient notificationRecipient =
@@ -449,7 +598,7 @@ public class NotificationTemplateResourceImpl
 				setType(serviceBuilderNotificationTemplate::getType);
 				setTypeLabel(
 					() -> _language.get(
-						_getLocale(), notificationType.getTypeLanguageKey()));
+						locale, notificationType.getTypeLanguageKey()));
 			}
 		};
 	}
@@ -475,5 +624,20 @@ public class NotificationTemplateResourceImpl
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
+	private PermissionService _permissionService;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Reference
+	private RoleLocalService _roleLocalService;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

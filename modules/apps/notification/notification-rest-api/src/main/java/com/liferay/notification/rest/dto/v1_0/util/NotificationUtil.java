@@ -113,6 +113,16 @@ public class NotificationUtil {
 			notificationRecipientId, recipients, user);
 	}
 
+	public static List<NotificationRecipientSetting>
+		toNotificationRecipientSetting(
+			NotificationContext notificationContext,
+			long notificationRecipientId, NotificationType notificationType,
+			Object[] recipients, User user) {
+
+		return notificationType.createNotificationRecipientSettings(
+			notificationContext, notificationRecipientId, recipients, user);
+	}
+
 	public static NotificationTemplate toNotificationTemplate(
 		long notificationTemplateId,
 		com.liferay.notification.rest.dto.v1_0.NotificationTemplate
@@ -165,8 +175,10 @@ public class NotificationUtil {
 			notificationTemplate.getDescription());
 		serviceBuilderNotificationTemplate.setEditorType(
 			GetterUtil.getString(notificationTemplate.getEditorTypeAsString()));
-		serviceBuilderNotificationTemplate.setName(
-			notificationTemplate.getName());
+		serviceBuilderNotificationTemplate.setNameMap(
+			LocalizedMapUtil.populateLocalizedMap(
+				null, notificationTemplate.getName_i18n(),
+				notificationTemplate.getName()));
 		serviceBuilderNotificationTemplate.setRecipientType(
 			notificationTemplate.getRecipientType());
 		serviceBuilderNotificationTemplate.setSubjectMap(

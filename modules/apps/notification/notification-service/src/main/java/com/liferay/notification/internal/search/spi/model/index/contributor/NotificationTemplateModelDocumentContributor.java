@@ -31,6 +31,7 @@ public class NotificationTemplateModelDocumentContributor
 		document.addLocalizedKeyword(
 			Field.getSortableFieldName(Field.NAME),
 			notificationTemplate.getNameMap(), true);
+		document.addKeyword("system", notificationTemplate.isSystem());
 		document.remove(Field.USER_NAME);
 	}
 

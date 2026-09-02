@@ -55,7 +55,10 @@ import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserGroup;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -81,6 +84,7 @@ import com.liferay.portal.kernel.transaction.TransactionCallbackUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.KeyValuePair;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -460,10 +464,18 @@ public class EmailNotificationType extends BaseNotificationType {
 	public Object[] toRecipients(
 		List<NotificationRecipientSetting> notificationRecipientSettings) {
 
-		return new Object[] {
-			NotificationRecipientSettingUtil.toMap(
-				notificationRecipientSettings)
-		};
+		Map<String, Object> map = NotificationRecipientSettingUtil.toMap(
+			notificationRecipientSettings);
+
+		if (ListUtil.isNotEmpty(notificationRecipientSettings)) {
+			NotificationRecipientSetting notificationRecipientSetting =
+				notificationRecipientSettings.get(0);
+
+			_addRecipientMetadata(
+				notificationRecipientSetting.getCompanyId(), map);
+		}
+
+		return new Object[] {map};
 	}
 
 	@Override
@@ -552,6 +564,81 @@ public class EmailNotificationType extends BaseNotificationType {
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(exception);
+				}
+			}
+		}
+	}
+
+	private void _addRecipientMetadata(
+		long companyId, Map<String, Object> map) {
+
+		for (String name :
+				new String[] {
+					NotificationRecipientSettingConstants.NAME_BCC,
+					NotificationRecipientSettingConstants.NAME_CC,
+					NotificationRecipientSettingConstants.NAME_TO
+				}) {
+
+			String recipientType = GetterUtil.getString(
+				map.get(
+					NotificationRecipientSettingConstants.getRecipientTypeName(
+						name)));
+
+			if (!Objects.equals(
+					recipientType, NotificationRecipientConstants.TYPE_ROLE) &&
+				!Objects.equals(
+					recipientType,
+					NotificationRecipientConstants.TYPE_USER_GROUP)) {
+
+				continue;
+			}
+
+			List<Map<String, String>> recipientMaps =
+				(List<Map<String, String>>)map.get(name);
+
+			if (recipientMaps == null) {
+				continue;
+			}
+
+			if (Objects.equals(
+					recipientType, NotificationRecipientConstants.TYPE_ROLE)) {
+
+				for (Map<String, String> roleMap : recipientMaps) {
+					Role role = roleLocalService.fetchRole(
+						companyId,
+						roleMap.get(
+							NotificationRecipientSettingConstants.
+								NAME_ROLE_NAME));
+
+					if (role == null) {
+						continue;
+					}
+
+					roleMap.put(
+						NotificationRecipientSettingConstants.
+							NAME_ROLE_EXTERNAL_REFERENCE_CODE,
+						role.getExternalReferenceCode());
+					roleMap.put(
+						NotificationRecipientSettingConstants.NAME_ROLE_TYPE,
+						RoleConstants.getTypeLabel(role.getType()));
+				}
+			}
+			else {
+				for (Map<String, String> userGroupMap : recipientMaps) {
+					UserGroup userGroup = userGroupLocalService.fetchUserGroup(
+						companyId,
+						userGroupMap.get(
+							NotificationRecipientSettingConstants.
+								NAME_USER_GROUP_NAME));
+
+					if (userGroup == null) {
+						continue;
+					}
+
+					userGroupMap.put(
+						NotificationRecipientSettingConstants.
+							NAME_USER_GROUP_EXTERNAL_REFERENCE_CODE,
+						userGroup.getExternalReferenceCode());
 				}
 			}
 		}
