@@ -334,7 +334,7 @@ export default function ViewObjectDefinitions({
 			try {
 				const allObjectFolders = await API.getAllObjectFolders();
 
-				if (!allObjectFolders?.items) {
+				if (!allObjectFolders?.items?.length) {
 					setObjectFoldersRequestInfo(undefined);
 					setSelectedObjectFolder(undefined);
 
