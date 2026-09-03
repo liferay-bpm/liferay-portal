@@ -119,6 +119,22 @@ describe('BulkUpdateWorkflowStateModalContent', () => {
 		taskId = 0;
 	});
 
+	it('badges the version only for a workflow present at more than one', () => {
+		renderModal([
+			task({assetTitle: 'One', workflowDefinitionVersion: '1'}),
+			task({assetTitle: 'Two', workflowDefinitionVersion: '2'}),
+			task({assetTitle: 'Three', workflowDefinitionName: 'Workflow B'}),
+		]);
+
+		expect(
+			screen.getAllByRole('group', {name: 'Workflow A version-x'})
+		).toHaveLength(2);
+
+		expect(
+			screen.getByRole('group', {name: 'Workflow B'})
+		).toBeInTheDocument();
+	});
+
 	it('excludes a deselected task from the transitions it hands over', () => {
 		renderModal([task({assetTitle: 'One'}), task({assetTitle: 'Two'})]);
 
@@ -231,5 +247,27 @@ describe('BulkUpdateWorkflowStateModalContent', () => {
 				.getAllByRole('link')
 				.map((node) => node.textContent?.split('(')[0])
 		).toEqual(['A1', 'A2', 'A10', 'B1']);
+	});
+
+	it('warns only when a workflow is present at more than one version', () => {
+		const {queryByText, unmount} = renderModal([
+			task({assetTitle: 'One'}),
+			task({assetTitle: 'Two', workflowDefinitionName: 'Workflow B'}),
+		]);
+
+		expect(
+			queryByText('this-workflow-was-updated')
+		).not.toBeInTheDocument();
+
+		unmount();
+
+		renderModal([
+			task({assetTitle: 'One', workflowDefinitionVersion: '1'}),
+			task({assetTitle: 'Two', workflowDefinitionVersion: '2'}),
+		]);
+
+		expect(
+			screen.getByText('this-workflow-was-updated')
+		).toBeInTheDocument();
 	});
 });
