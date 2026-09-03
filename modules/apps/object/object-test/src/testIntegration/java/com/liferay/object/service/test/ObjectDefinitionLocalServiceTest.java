@@ -5120,7 +5120,8 @@ public class ObjectDefinitionLocalServiceTest {
 		objectAction.setExternalReferenceCode(objectActionName);
 		objectAction.setActive(true);
 		objectAction.setConditionExpression(StringPool.BLANK);
-		objectAction.setDescription(RandomTestUtil.randomString());
+		objectAction.setDescriptionMap(
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()));
 		objectAction.setErrorMessageMap(
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()));
 		objectAction.setLabelMap(
