@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
@@ -50,7 +51,8 @@ public class ObjectActionUtil {
 					serviceBuilderObjectAction::getConditionExpression);
 				setDateCreated(serviceBuilderObjectAction::getCreateDate);
 				setDateModified(serviceBuilderObjectAction::getModifiedDate);
-				setDescription(serviceBuilderObjectAction::getDescription);
+				setDescription(
+					() -> _getDescriptionMap(serviceBuilderObjectAction));
 				setErrorMessage(
 					() -> LocalizedMapUtil.getLanguageIdMap(
 						serviceBuilderObjectAction.getErrorMessageMap()));
@@ -176,6 +178,19 @@ public class ObjectActionUtil {
 		return UnicodePropertiesBuilder.create(
 			map, true
 		).build();
+	}
+
+	private static Map<String, String> _getDescriptionMap(
+		com.liferay.object.model.ObjectAction serviceBuilderObjectAction) {
+
+		Map<Locale, String> descriptionMap =
+			serviceBuilderObjectAction.getDescriptionMap();
+
+		if (MapUtil.isEmpty(descriptionMap)) {
+			return null;
+		}
+
+		return LocalizedMapUtil.getLanguageIdMap(descriptionMap);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
