@@ -46,11 +46,13 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -148,7 +150,15 @@ public class ObjectFolderResourceImpl extends BaseObjectFolderResourceImpl {
 			_log.error(
 				StringBundler.concat(
 					"LPD-102351 object folders count ", page.getTotalCount(),
-					" for company ", contextCompany.getCompanyId()));
+					" for company ", contextCompany.getCompanyId(),
+					", folders ",
+					StringUtil.merge(
+						TransformUtil.transform(
+							page.getItems(),
+							objectFolder -> StringBundler.concat(
+								objectFolder.getName(), " (",
+								objectFolder.getExternalReferenceCode(), ")")),
+						", ")));
 
 			return page;
 		}
