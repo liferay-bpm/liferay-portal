@@ -94,12 +94,12 @@ public class ObjectActionCacheModel
 		sb.append(active);
 		sb.append(", conditionExpression=");
 		sb.append(conditionExpression);
-		sb.append(", description=");
-		sb.append(description);
 		sb.append(", errorMessage=");
 		sb.append(errorMessage);
 		sb.append(", label=");
 		sb.append(label);
+		sb.append(", description=");
+		sb.append(description);
 		sb.append(", name=");
 		sb.append(name);
 		sb.append(", objectActionExecutorKey=");
@@ -172,13 +172,6 @@ public class ObjectActionCacheModel
 			objectActionImpl.setConditionExpression(conditionExpression);
 		}
 
-		if (description == null) {
-			objectActionImpl.setDescription("");
-		}
-		else {
-			objectActionImpl.setDescription(description);
-		}
-
 		if (errorMessage == null) {
 			objectActionImpl.setErrorMessage("");
 		}
@@ -191,6 +184,13 @@ public class ObjectActionCacheModel
 		}
 		else {
 			objectActionImpl.setLabel(label);
+		}
+
+		if (description == null) {
+			objectActionImpl.setDescription("");
+		}
+		else {
+			objectActionImpl.setDescription(description);
 		}
 
 		if (name == null) {
@@ -251,9 +251,9 @@ public class ObjectActionCacheModel
 
 		active = objectInput.readBoolean();
 		conditionExpression = (String)objectInput.readObject();
-		description = objectInput.readUTF();
 		errorMessage = objectInput.readUTF();
 		label = objectInput.readUTF();
+		description = objectInput.readUTF();
 		name = objectInput.readUTF();
 		objectActionExecutorKey = objectInput.readUTF();
 		objectActionTriggerKey = objectInput.readUTF();
@@ -309,13 +309,6 @@ public class ObjectActionCacheModel
 			objectOutput.writeObject(conditionExpression);
 		}
 
-		if (description == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(description);
-		}
-
 		if (errorMessage == null) {
 			objectOutput.writeUTF("");
 		}
@@ -328,6 +321,13 @@ public class ObjectActionCacheModel
 		}
 		else {
 			objectOutput.writeUTF(label);
+		}
+
+		if (description == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(description);
 		}
 
 		if (name == null) {
@@ -375,9 +375,9 @@ public class ObjectActionCacheModel
 	public long objectDefinitionId;
 	public boolean active;
 	public String conditionExpression;
-	public String description;
 	public String errorMessage;
 	public String label;
+	public String description;
 	public String name;
 	public String objectActionExecutorKey;
 	public String objectActionTriggerKey;
@@ -386,4 +386,4 @@ public class ObjectActionCacheModel
 	public int status;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-379932176
+// LIFERAY-SERVICE-BUILDER-HASH:-780016606
