@@ -30,6 +30,7 @@ import com.liferay.object.rest.dto.v1_0.util.CreatorUtil;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Field;
@@ -96,6 +97,8 @@ public class NotificationTemplateResourceImpl
 	public void deleteNotificationTemplateByExternalReferenceCode(
 			String externalReferenceCode)
 		throws Exception {
+
+		_checkFeatureFlag();
 
 		com.liferay.notification.model.NotificationTemplate
 			serviceBuilderNotificationTemplate =
@@ -166,6 +169,12 @@ public class NotificationTemplateResourceImpl
 			@Override
 			public String getSectionKey() {
 				return ExportImportConstants.SECTION_KEY_CONTENT_AND_DATA;
+			}
+
+			@Override
+			public boolean isActive(PortletDataContext portletDataContext) {
+				return FeatureFlagManagerUtil.isEnabled(
+					portletDataContext.getCompanyId(), "LPD-49854");
 			}
 
 		};
@@ -411,6 +420,14 @@ public class NotificationTemplateResourceImpl
 		}
 	}
 
+	private void _checkFeatureFlag() {
+		if (!FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-49854")) {
+
+			throw new UnsupportedOperationException();
+		}
+	}
+
 	private Locale _getLocale() {
 		if (contextUser != null) {
 			return contextUser.getLocale();
@@ -422,6 +439,12 @@ public class NotificationTemplateResourceImpl
 	private ModelPermissions _toModelPermissions(
 			NotificationTemplate notificationTemplate, long primKey)
 		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-49854")) {
+
+			return null;
+		}
 
 		return ModelPermissionsUtil.toModelPermissions(
 			contextCompany.getCompanyId(),
@@ -525,7 +548,16 @@ public class NotificationTemplateResourceImpl
 					() -> LocalizedMapUtil.getLanguageIdMap(
 						serviceBuilderNotificationTemplate.getBodyMap()));
 				setCreator(
-					() -> CreatorUtil.toCreator(_portal, contextUriInfo, user));
+					() -> {
+						if (!FeatureFlagManagerUtil.isEnabled(
+								contextCompany.getCompanyId(), "LPD-49854")) {
+
+							return null;
+						}
+
+						return CreatorUtil.toCreator(
+							_portal, contextUriInfo, user);
+					});
 				setDateCreated(
 					serviceBuilderNotificationTemplate::getCreateDate);
 				setDateModified(
@@ -563,26 +595,34 @@ public class NotificationTemplateResourceImpl
 				setObjectDefinitionId(
 					serviceBuilderNotificationTemplate::getObjectDefinitionId);
 				setPermissions(
-					() -> NestedFieldsSupplier.supply(
-						"permissions",
-						nestedFieldNames -> {
-							_permissionService.checkPermission(
-								contextCompany.getGroupId(), permissionName,
-								serviceBuilderNotificationTemplate.
-									getNotificationTemplateId());
+					() -> {
+						if (!FeatureFlagManagerUtil.isEnabled(
+								contextCompany.getCompanyId(), "LPD-49854")) {
 
-							Collection<Permission> permissions =
-								PermissionUtil.getPermissions(
-									serviceBuilderNotificationTemplate.
-										getCompanyId(),
-									resourceActionLocalService.
-										getResourceActions(permissionName),
-									serviceBuilderNotificationTemplate.
-										getNotificationTemplateId(),
-									permissionName, null);
+							return null;
+						}
 
-							return permissions.toArray(new Permission[0]);
-						}));
+						return NestedFieldsSupplier.supply(
+							"permissions",
+							nestedFieldNames -> {
+								_permissionService.checkPermission(
+									contextCompany.getGroupId(), permissionName,
+									serviceBuilderNotificationTemplate.
+										getNotificationTemplateId());
+
+								Collection<Permission> permissions =
+									PermissionUtil.getPermissions(
+										serviceBuilderNotificationTemplate.
+											getCompanyId(),
+										resourceActionLocalService.
+											getResourceActions(permissionName),
+										serviceBuilderNotificationTemplate.
+											getNotificationTemplateId(),
+										permissionName, null);
+
+								return permissions.toArray(new Permission[0]);
+							});
+					});
 				setRecipients(
 					() -> {
 						NotificationRecipient notificationRecipient =
