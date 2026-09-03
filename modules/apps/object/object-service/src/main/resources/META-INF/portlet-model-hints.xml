@@ -16,11 +16,11 @@
 		<field name="conditionExpression" type="String">
 			<hint-collection name="CLOB" />
 		</field>
-		<field name="description" type="String">
-			<hint-collection name="TEXTAREA" />
-		</field>
 		<field localized="true" name="errorMessage" type="String" />
 		<field localized="true" name="label" type="String" />
+		<field localized="true" name="description" type="String">
+			<hint-collection name="TEXTAREA" />
+		</field>
 		<field name="name" type="String" />
 		<field name="objectActionExecutorKey" type="String">
 			<hint name="max-length">255</hint>
