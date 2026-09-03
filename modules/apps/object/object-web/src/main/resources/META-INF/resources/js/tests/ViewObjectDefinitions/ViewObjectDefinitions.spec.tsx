@@ -44,6 +44,28 @@ type FetchMock = {
 };
 
 describe('ViewObjectDefinitions', () => {
+	it('renders the object folders sidebar when the object folders listing is empty', async () => {
+		(fetch as unknown as FetchMock).mockResponseOnce(
+			JSON.stringify({items: [], totalCount: 0})
+		);
+
+		render(<ViewObjectDefinitions {...defaultProps} />);
+
+		expect(
+			await screen.findByText(OBJECT_FOLDERS_TITLE)
+		).toBeInTheDocument();
+
+		// The sidebar title renders in every non-loading state, so also
+		// assert the component stopped at the folder request instead of
+		// continuing down the success path to the object definitions request
+		// and the folder controls.
+
+		expect(fetch).toHaveBeenCalledTimes(1);
+		expect(
+			screen.queryByLabelText('add-object-folder')
+		).not.toBeInTheDocument();
+	});
+
 	it('renders the object folders sidebar when the object folders request fails', async () => {
 		(fetch as unknown as FetchMock).mockResponseOnce(
 			JSON.stringify({status: 'INTERNAL_SERVER_ERROR'}),
@@ -55,5 +77,10 @@ describe('ViewObjectDefinitions', () => {
 		expect(
 			await screen.findByText(OBJECT_FOLDERS_TITLE)
 		).toBeInTheDocument();
+
+		expect(fetch).toHaveBeenCalledTimes(1);
+		expect(
+			screen.queryByLabelText('add-object-folder')
+		).not.toBeInTheDocument();
 	});
 });
