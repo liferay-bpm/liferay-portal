@@ -271,8 +271,18 @@ public class ObjectEntryDTOConverter
 				serviceBuilderObjectEntry));
 		objectEntry.setCreator(
 			() -> {
+				ObjectEntryVersion creatorObjectEntryVersion =
+					objectEntryVersion;
+
+				if (creatorObjectEntryVersion == null) {
+					creatorObjectEntryVersion =
+						(ObjectEntryVersion)dtoConverterContext.getAttribute(
+							"latestApprovedObjectEntryVersion");
+				}
+
 				long userId = _getAttribute(
-					objectEntryVersion, ObjectEntryVersionModel::getUserId,
+					creatorObjectEntryVersion,
+					ObjectEntryVersionModel::getUserId,
 					serviceBuilderObjectEntry, ObjectEntryModel::getUserId);
 
 				return CreatorUtil.toCreator(

@@ -180,6 +180,7 @@ import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.constants.TestDataConstants;
+import com.liferay.portal.kernel.test.context.ContextUserReplace;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -7102,6 +7103,52 @@ public class DefaultObjectEntryManagerImplTest
 				objectField.isIndexed(),
 				objectEntryContentJSONObject.has(objectField.getName()));
 		}
+	}
+
+	@Test
+	public void testGetObjectEntryWithDifferentUser() throws Exception {
+		_enableObjectEntryVersioning();
+
+		ObjectEntry objectEntry = _addObjectEntry(
+			_objectDefinition1,
+			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+			null, 1);
+
+		User user = UserTestUtil.addOmniadminUser();
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				user)) {
+
+			objectEntry = _defaultObjectEntryManager.updateObjectEntry(
+				TestPropsValues.getCompanyId(),
+				_createDTOConverterContext(user),
+				objectEntry.getExternalReferenceCode(), _objectDefinition1,
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							"textObjectFieldName", RandomTestUtil.randomString()
+						).build();
+						systemProperties = new SystemProperties() {
+							{
+								version = new Version() {
+									{
+										number = 2;
+									}
+								};
+							}
+						};
+					}
+				},
+				objectEntry.getScopeKey());
+		}
+
+		objectEntry = _defaultObjectEntryManager.getObjectEntry(
+			dtoConverterContext, _objectDefinition1, objectEntry.getId());
+
+		Creator creator = objectEntry.getCreator();
+
+		Assert.assertEquals(Long.valueOf(user.getUserId()), creator.getId());
+		Assert.assertEquals(user.getFullName(), creator.getName());
 	}
 
 	@Test
