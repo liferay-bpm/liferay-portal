@@ -108,6 +108,7 @@
 		<column name="enableObjectEntryVersioning" type="boolean" />
 		<column name="friendlyURLSeparator" type="String" />
 		<column localized="true" name="label" type="String" />
+		<column localized="true" name="description" type="String" />
 		<column name="modifiable" type="boolean" />
 		<column name="name" type="String" />
 		<column name="panelAppOrder" type="String" />
@@ -460,6 +461,7 @@
 		<column name="indexedAsKeyword" type="boolean" />
 		<column name="indexedLanguageId" type="String" />
 		<column localized="true" name="label" type="String" />
+		<column localized="true" name="description" type="String" />
 		<column name="localized" type="boolean" />
 		<column name="name" type="String" />
 		<column name="readOnly" type="String" />
@@ -834,6 +836,7 @@
 		<column method-name="DBTableName" name="dbTableName" type="String" />
 		<column name="edge" type="boolean" />
 		<column localized="true" name="label" type="String" />
+		<column localized="true" name="description" type="String" />
 		<column name="name" type="String" />
 		<column name="reverse" type="boolean" />
 		<column name="system" type="boolean" />
