@@ -67,8 +67,7 @@ public class AssetTagGroupRelUpgradeProcessTest {
 
 	@Test
 	public void testUpgrade() throws Exception {
-		UpgradeProcess upgradeProcess =
-			new AssetTagGroupRelUpgradeProcess();
+		UpgradeProcess upgradeProcess = new AssetTagGroupRelUpgradeProcess();
 
 		_upgrade(upgradeProcess);
 

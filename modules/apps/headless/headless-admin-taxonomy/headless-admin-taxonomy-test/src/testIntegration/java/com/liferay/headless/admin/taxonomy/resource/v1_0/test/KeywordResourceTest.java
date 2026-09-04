@@ -1126,9 +1126,7 @@ public class KeywordResourceTest extends BaseKeywordResourceTestCase {
 			patchKeyword);
 	}
 
-	private void _testPostSiteKeywordIgnoresUnknownProjects()
-		throws Exception {
-
+	private void _testPostSiteKeywordIgnoresUnknownProjects() throws Exception {
 		AssetLibrary assetLibrary = _randomSpaceAssetLibrary();
 
 		_assertNoAssetTagGroupRels(
@@ -1247,6 +1245,21 @@ public class KeywordResourceTest extends BaseKeywordResourceTestCase {
 		_assertSingletonProject(project.getId(), putKeyword);
 	}
 
+	private void _testPutKeywordResetsProjectScope() throws Exception {
+		Project project = _randomProject();
+
+		Keyword postKeyword = _postKeywordWithProjects(project);
+
+		_assertSingletonProject(project.getId(), postKeyword);
+
+		postKeyword.setProjects(new Project[0]);
+
+		Keyword putKeyword = keywordResource.putKeyword(
+			postKeyword.getId(), postKeyword);
+
+		_assertNoAssetTagGroupRels(DepotConstants.TYPE_PROJECT, putKeyword);
+	}
+
 	private void _testPutKeywordResetsSpaceScopeWhenAssetLibrariesAreNull()
 		throws Exception {
 
@@ -1276,21 +1289,6 @@ public class KeywordResourceTest extends BaseKeywordResourceTestCase {
 			Arrays.toString(assetLibraries),
 			Long.valueOf(GroupConstants.ANY_PARENT_GROUP_ID),
 			assetLibraries[0].getId());
-	}
-
-	private void _testPutKeywordResetsProjectScope() throws Exception {
-		Project project = _randomProject();
-
-		Keyword postKeyword = _postKeywordWithProjects(project);
-
-		_assertSingletonProject(project.getId(), postKeyword);
-
-		postKeyword.setProjects(new Project[0]);
-
-		Keyword putKeyword = keywordResource.putKeyword(
-			postKeyword.getId(), postKeyword);
-
-		_assertNoAssetTagGroupRels(DepotConstants.TYPE_PROJECT, putKeyword);
 	}
 
 	private void _testPutSiteKeywordByExternalReferenceCodeAppliesScope()

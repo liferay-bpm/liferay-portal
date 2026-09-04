@@ -842,8 +842,7 @@ public class PortalUpgradeProcessRegistryImpl
 				"update AssetTagGroupRel set depotEntryType = 1"));
 
 		upgradeVersionTreeMap.put(
-			new Version(39, 2, 0),
-			new AssetTagGroupRelUpgradeProcess());
+			new Version(39, 2, 0), new AssetTagGroupRelUpgradeProcess());
 	}
 
 }
