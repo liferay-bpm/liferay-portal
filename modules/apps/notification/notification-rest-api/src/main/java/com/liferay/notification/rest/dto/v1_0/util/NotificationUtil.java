@@ -165,8 +165,10 @@ public class NotificationUtil {
 			notificationTemplate.getDescription());
 		serviceBuilderNotificationTemplate.setEditorType(
 			GetterUtil.getString(notificationTemplate.getEditorTypeAsString()));
-		serviceBuilderNotificationTemplate.setName(
-			notificationTemplate.getName());
+		serviceBuilderNotificationTemplate.setNameMap(
+			LocalizedMapUtil.populateLocalizedMap(
+				null, notificationTemplate.getName_i18n(),
+				notificationTemplate.getName()));
 		serviceBuilderNotificationTemplate.setRecipientType(
 			notificationTemplate.getRecipientType());
 		serviceBuilderNotificationTemplate.setSubjectMap(

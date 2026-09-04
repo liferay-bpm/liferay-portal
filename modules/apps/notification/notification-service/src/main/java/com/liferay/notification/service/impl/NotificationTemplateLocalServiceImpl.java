@@ -31,13 +31,21 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.ResourcePermission;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
+import com.liferay.portal.kernel.service.PermissionService;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourceLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -46,6 +54,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -116,12 +125,25 @@ public class NotificationTemplateLocalServiceImpl
 		notificationTemplate = notificationTemplatePersistence.update(
 			notificationTemplate);
 
-		_resourceLocalService.addResources(
-			notificationTemplate.getCompanyId(), 0,
-			notificationTemplate.getUserId(),
-			NotificationTemplate.class.getName(),
-			notificationTemplate.getNotificationTemplateId(), false, true,
-			true);
+		ModelPermissions modelPermissions =
+			notificationContext.getModelPermissions();
+
+		if (modelPermissions == null) {
+			_resourceLocalService.addResources(
+				notificationTemplate.getCompanyId(), 0,
+				notificationTemplate.getUserId(),
+				NotificationTemplate.class.getName(),
+				notificationTemplate.getNotificationTemplateId(), false, true,
+				true);
+		}
+		else {
+			_resourceLocalService.addModelResources(
+				notificationTemplate.getCompanyId(), 0,
+				notificationTemplate.getUserId(),
+				NotificationTemplate.class.getName(),
+				notificationTemplate.getNotificationTemplateId(),
+				modelPermissions);
+		}
 
 		NotificationRecipient notificationRecipient =
 			notificationContext.getNotificationRecipient();
@@ -456,6 +478,8 @@ public class NotificationTemplateLocalServiceImpl
 					attachmentObjectFieldId);
 		}
 
+		_updateResourcePermissions(notificationContext, notificationTemplate);
+
 		return notificationTemplate;
 	}
 
@@ -507,6 +531,56 @@ public class NotificationTemplateLocalServiceImpl
 		return notificationTemplate;
 	}
 
+	private void _updateResourcePermissions(
+			NotificationContext notificationContext,
+			NotificationTemplate notificationTemplate)
+		throws PortalException {
+
+		ModelPermissions modelPermissions =
+			notificationContext.getModelPermissions();
+
+		if (modelPermissions == null) {
+			return;
+		}
+
+		String primKey = String.valueOf(
+			notificationTemplate.getNotificationTemplateId());
+
+		_permissionService.checkPermission(
+			0, NotificationTemplate.class.getName(), primKey);
+
+		List<ResourceAction> resourceActions =
+			_resourceActionLocalService.getResourceActions(
+				NotificationTemplate.class.getName());
+		Collection<String> roleNames = modelPermissions.getRoleNames();
+
+		for (ResourcePermission resourcePermission :
+				_resourcePermissionLocalService.getResourcePermissions(
+					notificationTemplate.getCompanyId(),
+					NotificationTemplate.class.getName(),
+					ResourceConstants.SCOPE_INDIVIDUAL, primKey)) {
+
+			Role role = _roleLocalService.fetchRole(
+				resourcePermission.getRoleId());
+
+			if ((role == null) || roleNames.contains(role.getName())) {
+				continue;
+			}
+
+			for (ResourceAction resourceAction : resourceActions) {
+				_resourcePermissionLocalService.removeResourcePermission(
+					notificationTemplate.getCompanyId(),
+					NotificationTemplate.class.getName(),
+					ResourceConstants.SCOPE_INDIVIDUAL, primKey,
+					role.getRoleId(), resourceAction.getActionId());
+			}
+		}
+
+		_resourcePermissionLocalService.updateResourcePermissions(
+			notificationTemplate.getCompanyId(), 0,
+			NotificationTemplate.class.getName(), primKey, modelPermissions);
+	}
+
 	private void _validate(NotificationContext notificationContext)
 		throws PortalException {
 
@@ -544,10 +618,22 @@ public class NotificationTemplateLocalServiceImpl
 	private NotificationTypeServiceTracker _notificationTypeServiceTracker;
 
 	@Reference
+	private PermissionService _permissionService;
+
+	@Reference
 	private Portal _portal;
 
 	@Reference
+	private ResourceActionLocalService _resourceActionLocalService;
+
+	@Reference
 	private ResourceLocalService _resourceLocalService;
+
+	@Reference
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Reference
+	private RoleLocalService _roleLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;
