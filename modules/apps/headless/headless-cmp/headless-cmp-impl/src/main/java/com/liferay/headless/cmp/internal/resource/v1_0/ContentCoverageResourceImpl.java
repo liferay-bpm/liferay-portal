@@ -38,6 +38,7 @@ import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.site.cms.site.initializer.constants.CMSWorkflowConstants;
+import com.liferay.site.cms.site.initializer.util.CMPLicenseUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +61,8 @@ public class ContentCoverageResourceImpl
 	@Override
 	public ContentCoverage getProjectContentCoverage(Long projectId)
 		throws Exception {
+
+		CMPLicenseUtil.checkAppEnabled();
 
 		if (!FeatureFlagManagerUtil.isEnabled(
 				contextCompany.getCompanyId(), "LPD-58677")) {
