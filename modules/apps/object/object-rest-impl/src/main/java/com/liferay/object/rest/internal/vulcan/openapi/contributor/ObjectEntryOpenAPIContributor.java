@@ -419,12 +419,9 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 				put(
 					new Operation() {
 						{
-							if (Validator.isNotNull(
-									objectAction.getDescription())) {
-
-								description(objectAction.getDescription());
-							}
-
+							description(
+								ObjectDescriptionUtil.getDescription(
+									_objectDefinition, objectAction));
 							operationId(
 								StringBundler.concat(
 									"put", _objectDefinition.getShortName(),

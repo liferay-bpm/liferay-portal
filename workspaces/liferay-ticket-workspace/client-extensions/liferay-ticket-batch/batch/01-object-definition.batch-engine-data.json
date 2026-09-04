@@ -55,7 +55,8 @@
 				{
 					"active": true,
 					"conditionExpression": "ticketStatus == 'open'",
-					"description": "",
+					"description": {
+					},
 					"errorMessage": {
 					},
 					"label": {

@@ -133,11 +133,11 @@ public class ObjectActionPersistenceTest {
 
 		newObjectAction.setConditionExpression(RandomTestUtil.randomString());
 
-		newObjectAction.setDescription(RandomTestUtil.randomString());
-
 		newObjectAction.setErrorMessage(RandomTestUtil.randomString());
 
 		newObjectAction.setLabel(RandomTestUtil.randomString());
+
+		newObjectAction.setDescription(RandomTestUtil.randomString());
 
 		newObjectAction.setName(RandomTestUtil.randomString());
 
@@ -193,13 +193,13 @@ public class ObjectActionPersistenceTest {
 			existingObjectAction.getConditionExpression(),
 			newObjectAction.getConditionExpression());
 		Assert.assertEquals(
-			existingObjectAction.getDescription(),
-			newObjectAction.getDescription());
-		Assert.assertEquals(
 			existingObjectAction.getErrorMessage(),
 			newObjectAction.getErrorMessage());
 		Assert.assertEquals(
 			existingObjectAction.getLabel(), newObjectAction.getLabel());
+		Assert.assertEquals(
+			existingObjectAction.getDescription(),
+			newObjectAction.getDescription());
 		Assert.assertEquals(
 			existingObjectAction.getName(), newObjectAction.getName());
 		Assert.assertEquals(
@@ -336,7 +336,7 @@ public class ObjectActionPersistenceTest {
 			"externalReferenceCode", true, "objectActionId", true, "companyId",
 			true, "userId", true, "userName", true, "createDate", true,
 			"modifiedDate", true, "objectDefinitionId", true, "active", true,
-			"description", true, "errorMessage", true, "label", true, "name",
+			"errorMessage", true, "label", true, "description", true, "name",
 			true, "objectActionExecutorKey", true, "objectActionTriggerKey",
 			true, "system", true, "status", true);
 	}
@@ -679,11 +679,11 @@ public class ObjectActionPersistenceTest {
 
 		objectAction.setConditionExpression(RandomTestUtil.randomString());
 
-		objectAction.setDescription(RandomTestUtil.randomString());
-
 		objectAction.setErrorMessage(RandomTestUtil.randomString());
 
 		objectAction.setLabel(RandomTestUtil.randomString());
+
+		objectAction.setDescription(RandomTestUtil.randomString());
 
 		objectAction.setName(RandomTestUtil.randomString());
 
@@ -707,4 +707,4 @@ public class ObjectActionPersistenceTest {
 	private ClassLoader _dynamicQueryClassLoader;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-513795542
+// LIFERAY-SERVICE-BUILDER-HASH:-644101498

@@ -123,11 +123,7 @@ public class ObjectActionSerDes {
 
 			sb.append("\"description\": ");
 
-			sb.append("\"");
-
-			sb.append(_escape(objectAction.getDescription()));
-
-			sb.append("\"");
+			sb.append(_toJSON(objectAction.getDescription()));
 		}
 
 		if (objectAction.getErrorMessage() != null) {
@@ -430,7 +426,7 @@ public class ObjectActionSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "description")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "errorMessage")) {
 				return true;
@@ -510,7 +506,8 @@ public class ObjectActionSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "description")) {
 				if (jsonParserFieldValue != null) {
-					objectAction.setDescription((String)jsonParserFieldValue);
+					objectAction.setDescription(
+						(Map<String, String>)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "errorMessage")) {
@@ -658,4 +655,4 @@ public class ObjectActionSerDes {
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:543528549
+// LIFERAY-REST-BUILDER-HASH:-1728807712

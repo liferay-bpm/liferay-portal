@@ -2390,7 +2390,7 @@ public class EditableFragmentEntryProcessorTest {
 		return _objectActionLocalService.addObjectAction(
 			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
 			objectDefinitionId, true, StringPool.BLANK,
-			RandomTestUtil.randomString(),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			labelMap, RandomTestUtil.randomString(),
 			ObjectActionExecutorConstants.KEY_WEBHOOK,
