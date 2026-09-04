@@ -20,6 +20,7 @@ import com.liferay.object.service.ObjectEntryService;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.time.LocalDate;
 
@@ -91,8 +92,10 @@ public class TaskStatisticsResourceImpl extends BaseTaskStatisticsResourceImpl {
 		return _objectEntryLocalService.getValuesListCount(
 			groupIds.toArray(new Long[0]), 0, 0,
 			cmpTaskObjectDefinition.getObjectDefinitionId(),
-			_filterFactory.create(filterString, cmpTaskObjectDefinition), true,
-			null);
+			_filterFactory.create(
+				"status ne " + WorkflowConstants.STATUS_DRAFT + filterString,
+				cmpTaskObjectDefinition),
+			false, null);
 	}
 
 	private TaskStatistics _toTaskStatistics(
@@ -104,15 +107,15 @@ public class TaskStatisticsResourceImpl extends BaseTaskStatisticsResourceImpl {
 				setBlockedCount(
 					() -> _getCount(
 						cmpProjectObjectEntry, cmpTaskObjectDefinition,
-						"state eq 'blocked'"));
+						" and state eq 'blocked'"));
 				setInProgressCount(
 					() -> _getCount(
 						cmpProjectObjectEntry, cmpTaskObjectDefinition,
-						"state eq 'inProgress'"));
+						" and state eq 'inProgress'"));
 				setOverdueCount(
 					() -> _getCount(
 						cmpProjectObjectEntry, cmpTaskObjectDefinition,
-						"dueDate lt " + LocalDate.now() +
+						" and dueDate lt " + LocalDate.now() +
 							" and state ne 'done'"));
 				setTotalCount(
 					() -> _getCount(
