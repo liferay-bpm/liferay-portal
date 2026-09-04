@@ -391,6 +391,40 @@ public class OpenAPIResourceTest {
 
 	@FeatureFlag("LPS-180090")
 	@Test
+	public void testGetOpenAPIWhenActionDescriptionIsNull() throws Exception {
+		_objectActionLocalService.addObjectAction(
+			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
+			null,
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			"objectAction", ObjectActionExecutorConstants.KEY_WEBHOOK,
+			ObjectActionTriggerConstants.KEY_STANDALONE,
+			UnicodePropertiesBuilder.put(
+				"secret", "standalone"
+			).put(
+				"url", "https://standalone.com"
+			).build(),
+			false);
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null, _objectDefinition.getRESTContextPath() + "/openapi.json",
+			Http.Method.GET);
+
+		JSONObject pathItemJSONObject = jsonObject.getJSONObject(
+			"paths"
+		).getJSONObject(
+			"/{object1Id}/object-actions/objectAction"
+		);
+
+		JSONObject operationJSONObject = pathItemJSONObject.getJSONObject(
+			"put");
+
+		Assert.assertFalse(operationJSONObject.has("description"));
+	}
+
+	@FeatureFlag("LPS-180090")
+	@Test
 	public void testGetOpenAPIWithActions() throws Exception {
 		_assertOpenAPI("expected_openapi_actions.json", _objectDefinition);
 
