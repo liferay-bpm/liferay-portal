@@ -294,11 +294,11 @@ public class AssetTagIndexerIndexedFieldsTest {
 	private ComplexQueryPartBuilderFactory _complexQueryPartBuilderFactory;
 
 	private Group _group;
+	private GroupSearchFixture _groupSearchFixture;
 
 	@DeleteAfterTestRun
 	private List<Group> _groups;
 
-	private GroupSearchFixture _groupSearchFixture;
 	private IndexedFieldsFixture _indexedFieldsFixture;
 
 	@DeleteAfterTestRun
