@@ -5,8 +5,12 @@
 
 import {
 	canCreateInObjectFolder,
+	getDefaultObjectFolder,
 	getObjectDefinitionsFilter,
 } from '../../components/ViewObjectDefinitions/objectDefinitionUtil';
+
+const objectFolder = (externalReferenceCode: string, name: string) =>
+	({externalReferenceCode, name}) as ObjectFolder;
 
 describe('canCreateInObjectFolder', () => {
 	it('returns false when no folder is selected', () => {
@@ -25,6 +29,38 @@ describe('canCreateInObjectFolder', () => {
 				externalReferenceCode: 'L_CMS_CONTENT_STRUCTURES',
 			})
 		).toBe(false);
+	});
+});
+
+describe('getDefaultObjectFolder', () => {
+	it('returns the first folder when none has the default external reference code', () => {
+		expect(
+			getDefaultObjectFolder([
+				objectFolder(
+					'L_CMS_CONTENT_STRUCTURES',
+					'CMSContentStructures'
+				),
+				objectFolder('L_CMS_FILE_TYPES', 'CMSFileTypes'),
+			])
+		).toEqual(
+			objectFolder('L_CMS_CONTENT_STRUCTURES', 'CMSContentStructures')
+		);
+	});
+
+	it('returns the folder with the default external reference code even when renamed', () => {
+		expect(
+			getDefaultObjectFolder([
+				objectFolder(
+					'L_CMS_CONTENT_STRUCTURES',
+					'CMSContentStructures'
+				),
+				objectFolder('default', 'My Objects'),
+			])
+		).toEqual(objectFolder('default', 'My Objects'));
+	});
+
+	it('returns undefined when there are no folders', () => {
+		expect(getDefaultObjectFolder([])).toBeUndefined();
 	});
 });
 

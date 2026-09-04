@@ -26,6 +26,7 @@ import ObjectFoldersSideBar from './ObjectFoldersSidebar';
 import {
 	canCreateInObjectFolder,
 	deleteObjectDefinition,
+	getDefaultObjectFolder,
 	getObjectDefinitionsFilter,
 	getObjectFolderActions,
 } from './objectDefinitionUtil';
@@ -286,11 +287,20 @@ export default function ViewObjectDefinitions({
 		allObjectFolders: ObjectFoldersRequestInfo,
 		currentURL: URL
 	) => {
-		currentURL.searchParams.set('objectFolderName', 'Default');
+		const defaultObjectFolder = getDefaultObjectFolder(
+			allObjectFolders.items
+		);
 
-		window.history.replaceState(null, '', currentURL.href);
+		if (defaultObjectFolder) {
+			currentURL.searchParams.set(
+				'objectFolderName',
+				defaultObjectFolder.name
+			);
 
-		setSelectedObjectFolder(allObjectFolders.items[0]);
+			window.history.replaceState(null, '', currentURL.href);
+		}
+
+		setSelectedObjectFolder(defaultObjectFolder);
 	};
 
 	useEffect(() => {
@@ -321,9 +331,16 @@ export default function ViewObjectDefinitions({
 
 	useEffect(() => {
 		const makeFetch = async () => {
-			const allObjectFolders = await API.getAllObjectFolders();
+			try {
+				const allObjectFolders = await API.getAllObjectFolders();
 
-			if (allObjectFolders) {
+				if (!allObjectFolders?.items?.length) {
+					setObjectFoldersRequestInfo(undefined);
+					setSelectedObjectFolder(undefined);
+
+					return;
+				}
+
 				setObjectFoldersRequestInfo(allObjectFolders);
 
 				const objectDefinitions = await API.getAllObjectDefinitions();
@@ -346,16 +363,14 @@ export default function ViewObjectDefinitions({
 				else {
 					setDefaultToSearchParams(allObjectFolders, currentURL);
 				}
-
-				setLoading(false);
-
-				return;
 			}
-
-			setObjectFoldersRequestInfo(undefined);
-			setSelectedObjectFolder(undefined);
-
-			setLoading(false);
+			catch (error) {
+				setObjectFoldersRequestInfo(undefined);
+				setSelectedObjectFolder(undefined);
+			}
+			finally {
+				setLoading(false);
+			}
 		};
 
 		makeFetch();

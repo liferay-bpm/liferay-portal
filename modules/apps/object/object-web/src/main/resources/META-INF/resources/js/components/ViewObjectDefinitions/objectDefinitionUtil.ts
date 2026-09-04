@@ -41,6 +41,10 @@ type ObjectDefinitionNodeActionsProps = {
 	};
 };
 
+// The value of ObjectFolderConstants.EXTERNAL_REFERENCE_CODE_DEFAULT.
+
+const DEFAULT_OBJECT_FOLDER_EXTERNAL_REFERENCE_CODE = 'default';
+
 export async function deleteObjectFolder(id: number, objectFolderName: string) {
 	await API.deleteObjectFolder(Number(id)).then(() => {
 		Liferay.Util.openToast({
@@ -178,6 +182,25 @@ export async function getDbTableName({
 	}>(objectDefinitionInfoURL);
 
 	return objectDefinitionInfoResponse.tableName;
+}
+
+/**
+ * Returns the Default folder, falling back to the first folder. The folder is
+ * matched by its external reference code because the name is user-editable
+ * display text. The object folder listing comes from the search index with no
+ * sort applied, so the first item is not necessarily the Default folder, and a
+ * rebuilding index can leave the Default folder out of the listing altogether.
+ */
+export function getDefaultObjectFolder(
+	objectFolders: ObjectFolder[]
+): ObjectFolder | undefined {
+	return (
+		objectFolders.find(
+			(objectFolder) =>
+				objectFolder.externalReferenceCode ===
+				DEFAULT_OBJECT_FOLDER_EXTERNAL_REFERENCE_CODE
+		) ?? objectFolders[0]
+	);
 }
 
 export function getObjectDefinitionNodeActions({

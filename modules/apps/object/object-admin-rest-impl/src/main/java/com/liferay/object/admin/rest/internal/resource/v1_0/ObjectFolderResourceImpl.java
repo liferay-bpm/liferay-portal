@@ -32,6 +32,7 @@ import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectValidationRuleLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Field;
@@ -45,11 +46,13 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,49 +98,78 @@ public class ObjectFolderResourceImpl extends BaseObjectFolderResourceImpl {
 			String search, Pagination pagination)
 		throws Exception {
 
-		return SearchUtil.search(
-			HashMapBuilder.put(
-				"create",
-				addAction(
-					ObjectActionKeys.ADD_OBJECT_FOLDER, "postObjectFolder",
-					ObjectConstants.RESOURCE_NAME,
-					contextCompany.getCompanyId())
-			).put(
-				"createBatch",
-				addAction(
-					ObjectActionKeys.ADD_OBJECT_FOLDER, "postObjectFolderBatch",
-					ObjectConstants.RESOURCE_NAME,
-					contextCompany.getCompanyId())
-			).put(
-				"deleteBatch",
-				addAction(
-					ActionKeys.DELETE, "deleteObjectFolderBatch",
-					com.liferay.object.model.ObjectFolder.class.getName(), null)
-			).put(
-				"get",
-				addAction(
-					ActionKeys.VIEW, "getObjectFoldersPage",
-					com.liferay.object.model.ObjectFolder.class.getName(), null)
-			).put(
-				"updateBatch",
-				addAction(
-					ActionKeys.UPDATE, "putObjectFolderBatch",
-					com.liferay.object.model.ObjectFolder.class.getName(), null)
-			).build(),
-			booleanQuery -> {
-			},
-			null, com.liferay.object.model.ObjectFolder.class.getName(), search,
-			pagination,
-			queryConfig -> queryConfig.setSelectedFieldNames(
-				Field.ENTRY_CLASS_PK),
-			searchContext -> {
-				searchContext.setAttribute(Field.NAME, search);
-				searchContext.setCompanyId(contextCompany.getCompanyId());
-			},
-			null,
-			document -> _toObjectFolder(
-				_objectFolderService.getObjectFolder(
-					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))));
+		try {
+			Page<ObjectFolder> page = SearchUtil.search(
+				HashMapBuilder.put(
+					"create",
+					addAction(
+						ObjectActionKeys.ADD_OBJECT_FOLDER, "postObjectFolder",
+						ObjectConstants.RESOURCE_NAME,
+						contextCompany.getCompanyId())
+				).put(
+					"createBatch",
+					addAction(
+						ObjectActionKeys.ADD_OBJECT_FOLDER,
+						"postObjectFolderBatch", ObjectConstants.RESOURCE_NAME,
+						contextCompany.getCompanyId())
+				).put(
+					"deleteBatch",
+					addAction(
+						ActionKeys.DELETE, "deleteObjectFolderBatch",
+						com.liferay.object.model.ObjectFolder.class.getName(),
+						null)
+				).put(
+					"get",
+					addAction(
+						ActionKeys.VIEW, "getObjectFoldersPage",
+						com.liferay.object.model.ObjectFolder.class.getName(),
+						null)
+				).put(
+					"updateBatch",
+					addAction(
+						ActionKeys.UPDATE, "putObjectFolderBatch",
+						com.liferay.object.model.ObjectFolder.class.getName(),
+						null)
+				).build(),
+				booleanQuery -> {
+				},
+				null, com.liferay.object.model.ObjectFolder.class.getName(),
+				search, pagination,
+				queryConfig -> queryConfig.setSelectedFieldNames(
+					Field.ENTRY_CLASS_PK),
+				searchContext -> {
+					searchContext.setAttribute(Field.NAME, search);
+					searchContext.setCompanyId(contextCompany.getCompanyId());
+				},
+				null,
+				document -> _toObjectFolder(
+					_objectFolderService.getObjectFolder(
+						GetterUtil.getLong(
+							document.get(Field.ENTRY_CLASS_PK)))));
+
+			_log.error(
+				StringBundler.concat(
+					"LPD-102351 object folders count ", page.getTotalCount(),
+					" for company ", contextCompany.getCompanyId(),
+					", folders ",
+					StringUtil.merge(
+						TransformUtil.transform(
+							page.getItems(),
+							objectFolder -> StringBundler.concat(
+								objectFolder.getName(), " (",
+								objectFolder.getExternalReferenceCode(), ")")),
+						", ")));
+
+			return page;
+		}
+		catch (Exception exception) {
+			_log.error(
+				"LPD-102351 object folders request failed for company " +
+					contextCompany.getCompanyId(),
+				exception);
+
+			throw exception;
+		}
 	}
 
 	@Override
