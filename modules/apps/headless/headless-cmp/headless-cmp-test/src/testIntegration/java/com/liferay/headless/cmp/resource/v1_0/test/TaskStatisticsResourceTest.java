@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -111,6 +112,8 @@ public class TaskStatisticsResourceTest
 			1, GetterUtil.getLong(taskStatistics2.getTotalCount()));
 
 		_testGetProjectTaskStatisticsWithAppDisabled();
+		_testGetProjectTaskStatisticsWithDraftTask();
+		_testGetProjectTaskStatisticsWithExpiredTask();
 		_testGetProjectTaskStatisticsWithoutViewPermission();
 	}
 
@@ -173,6 +176,40 @@ public class TaskStatisticsResourceTest
 			200,
 			taskStatisticsResource.getProjectTaskStatisticsHttpResponse(
 				_cmpProjectObjectEntry1.getObjectEntryId()));
+	}
+
+	private void _testGetProjectTaskStatisticsWithDraftTask() throws Exception {
+		CMPTestUtil.addCMPTaskObjectEntry(_cmpProjectObjectEntry1);
+
+		TaskStatistics taskStatistics =
+			taskStatisticsResource.getProjectTaskStatistics(
+				_cmpProjectObjectEntry1.getObjectEntryId());
+
+		Assert.assertEquals(
+			2, GetterUtil.getLong(taskStatistics.getTotalCount()));
+	}
+
+	private void _testGetProjectTaskStatisticsWithExpiredTask()
+		throws Exception {
+
+		ObjectEntry cmpTaskObjectEntry = _partialUpdateObjectEntry(
+			null, CMPTestUtil.addCMPTaskObjectEntry(_cmpProjectObjectEntry1),
+			"blocked");
+
+		_objectEntryLocalService.updateStatus(
+			cmpTaskObjectEntry.getUserId(),
+			cmpTaskObjectEntry.getObjectEntryId(),
+			WorkflowConstants.STATUS_EXPIRED,
+			ServiceContextTestUtil.getServiceContext());
+
+		TaskStatistics taskStatistics =
+			taskStatisticsResource.getProjectTaskStatistics(
+				_cmpProjectObjectEntry1.getObjectEntryId());
+
+		Assert.assertEquals(
+			2, GetterUtil.getLong(taskStatistics.getBlockedCount()));
+		Assert.assertEquals(
+			3, GetterUtil.getLong(taskStatistics.getTotalCount()));
 	}
 
 	private void _testGetProjectTaskStatisticsWithoutViewPermission()
