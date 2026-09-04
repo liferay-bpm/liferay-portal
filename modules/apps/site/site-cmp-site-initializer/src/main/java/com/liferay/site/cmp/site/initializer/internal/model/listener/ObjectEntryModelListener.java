@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
-import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ModelListener;
@@ -42,7 +41,10 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -51,8 +53,8 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserGroupRoleService;
 import com.liferay.portal.kernel.service.UserService;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -68,11 +70,11 @@ import com.liferay.site.cmp.site.initializer.internal.util.CMPObjectEntryUtil;
 import com.liferay.site.cmp.site.initializer.internal.util.RoleUtil;
 import com.liferay.site.cmp.site.initializer.internal.util.SiteInitializerUtil;
 import com.liferay.site.cms.site.initializer.util.CMSObjectEntryUtil;
+import com.liferay.site.cms.site.initializer.util.CMSUserUtil;
 import com.liferay.site.initializer.SiteInitializer;
 
 import java.io.Serializable;
 
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -99,6 +101,8 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 			_setResourcePermissions(objectEntry);
 			_updateGroup(objectEntry);
 			_updateProjectCompletionRate(objectEntry);
+			_updateProjectManagerProjectSponsorUserGroupRoles(
+				null, objectEntry);
 		}
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
@@ -128,7 +132,8 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		try {
 			_updateGroup(objectEntry);
 			_updateProjectCompletionRate(objectEntry);
-			_updateProjectManagerProjectSponsorUserGroupRoles(objectEntry);
+			_updateProjectManagerProjectSponsorUserGroupRoles(
+				originalObjectEntry, objectEntry);
 		}
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
@@ -144,6 +149,49 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		}
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
+		}
+	}
+
+	private void _addUserGroupRoles(
+			long companyId, long groupId, long originalUserId,
+			List<String> roleNames, long userId)
+		throws Exception {
+
+		if ((userId == 0) || (originalUserId == userId)) {
+			return;
+		}
+
+		if (!_groupLocalService.hasUserGroup(userId, groupId)) {
+			_userService.addGroupUsers(
+				groupId, new long[] {userId}, new ServiceContext());
+		}
+
+		_userGroupRoleService.addUserGroupRoles(
+			userId, groupId,
+			TransformUtil.transformToLongArray(
+				roleNames,
+				roleName -> {
+					Role role = RoleUtil.getOrAddProjectRole(
+						companyId, roleName, userId);
+
+					return role.getRoleId();
+				}));
+	}
+
+	private void _checkAssignableUser(
+			PermissionChecker permissionChecker, long userId)
+		throws Exception {
+
+		if (userId == 0) {
+			return;
+		}
+
+		if (!CMSUserUtil.isAssignableUser(
+				permissionChecker, _userService.getUserById(userId))) {
+
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, User.class.getName(), userId,
+				ActionKeys.UPDATE);
 		}
 	}
 
@@ -191,6 +239,35 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		}
 
 		_depotEntryLocalService.deleteDepotEntry(depotEntry);
+	}
+
+	private void _deleteUserGroupRoles(
+			long companyId, long groupId, long originalUserId,
+			List<String> roleNames, long userId)
+		throws Exception {
+
+		if ((originalUserId == 0) || (originalUserId == userId)) {
+			return;
+		}
+
+		long[] roleIds = TransformUtil.transformToLongArray(
+			roleNames,
+			roleName -> {
+				Role role = _roleLocalService.fetchRole(companyId, roleName);
+
+				if (role == null) {
+					return null;
+				}
+
+				return role.getRoleId();
+			});
+
+		if (roleIds.length == 0) {
+			return;
+		}
+
+		_userGroupRoleService.deleteUserGroupRoles(
+			originalUserId, groupId, roleIds);
 	}
 
 	private ObjectEntry _fetchLinkedObjectEntry(
@@ -287,6 +364,16 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		}
 
 		return new String[] {ActionKeys.ADD_DISCUSSION, ActionKeys.VIEW};
+	}
+
+	private long _getRelatedUserId(
+		ObjectEntry objectEntry, String objectFieldName) {
+
+		if (objectEntry == null) {
+			return 0;
+		}
+
+		return MapUtil.getLong(objectEntry.getValues(), objectFieldName, 0);
 	}
 
 	private void _initializeSite(ObjectEntry objectEntry) {
@@ -569,7 +656,7 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 	}
 
 	private void _updateProjectManagerProjectSponsorUserGroupRoles(
-			ObjectEntry objectEntry)
+			ObjectEntry originalObjectEntry, ObjectEntry objectEntry)
 		throws Exception {
 
 		ObjectDefinition objectDefinition = objectEntry.getObjectDefinition();
@@ -580,69 +667,61 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 			return;
 		}
 
-		_updateUserGroupRoles(
-			objectEntry.getGroupId(),
-			Collections.singletonList(DepotRolesConstants.PROJECT_MANAGER),
-			MapUtil.getLong(
-				objectEntry.getValues(), "r_userToCMPProjectManager_userId",
-				0));
-		_updateUserGroupRoles(
-			objectEntry.getGroupId(),
-			Collections.singletonList(DepotRolesConstants.PROJECT_MEMBER),
-			MapUtil.getLong(
-				objectEntry.getValues(), "r_userToCMPProjectSponsor_userId",
-				0));
-	}
+		long originalProjectManagerUserId = _getRelatedUserId(
+			originalObjectEntry, "r_userToCMPProjectManager_userId");
+		long originalProjectSponsorUserId = _getRelatedUserId(
+			originalObjectEntry, "r_userToCMPProjectSponsor_userId");
+		long projectManagerUserId = _getRelatedUserId(
+			objectEntry, "r_userToCMPProjectManager_userId");
+		long projectSponsorUserId = _getRelatedUserId(
+			objectEntry, "r_userToCMPProjectSponsor_userId");
 
-	private User _updateUser(long[] groupIds, Long userId) throws Exception {
-		User user = _userService.getUserById(userId);
+		if ((originalProjectManagerUserId == projectManagerUserId) &&
+			(originalProjectSponsorUserId == projectSponsorUserId)) {
 
-		Contact contact = user.getContact();
-
-		Calendar calendar = CalendarFactoryUtil.getCalendar();
-
-		calendar.setTime(user.getBirthday());
-
-		return _userService.updateUser(
-			user.getUserId(), user.getPassword(), null, null,
-			user.isPasswordReset(), null, null, user.getScreenName(),
-			user.getEmailAddress(), user.getLanguageId(), user.getTimeZoneId(),
-			user.getGreeting(), user.getComments(), user.getFirstName(),
-			user.getMiddleName(), user.getLastName(),
-			contact.getPrefixListTypeId(), contact.getSuffixListTypeId(),
-			user.isMale(), calendar.get(Calendar.MONTH),
-			calendar.get(Calendar.DATE), calendar.get(Calendar.YEAR),
-			contact.getSmsSn(), contact.getFacebookSn(), contact.getJabberSn(),
-			contact.getSkypeSn(), contact.getTwitterSn(), user.getJobTitle(),
-			groupIds, user.getOrganizationIds(), null, null,
-			user.getUserGroupIds(), new ServiceContext());
-	}
-
-	private void _updateUserGroupRoles(
-			long groupId, List<String> roleNames, long userId)
-		throws Exception {
-
-		if (userId == 0) {
 			return;
 		}
 
-		User user = _userService.getUserById(userId);
+		long groupId = objectEntry.getGroupId();
 
-		user = _updateUser(
-			ArrayUtil.append(user.getGroupIds(), groupId), userId);
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
 
-		long companyId = user.getCompanyId();
+		GroupPermissionUtil.check(
+			permissionChecker, groupId, ActionKeys.ASSIGN_MEMBERS);
 
-		_userGroupRoleService.addUserGroupRoles(
-			user.getUserId(), groupId,
-			TransformUtil.transformToLongArray(
-				roleNames,
-				roleName -> {
-					Role role = RoleUtil.getOrAddProjectRole(
-						companyId, roleName, userId);
+		if (originalProjectManagerUserId != projectManagerUserId) {
+			_checkAssignableUser(
+				permissionChecker, originalProjectManagerUserId);
+			_checkAssignableUser(permissionChecker, projectManagerUserId);
+		}
 
-					return role.getRoleId();
-				}));
+		if (originalProjectSponsorUserId != projectSponsorUserId) {
+			_checkAssignableUser(
+				permissionChecker, originalProjectSponsorUserId);
+			_checkAssignableUser(permissionChecker, projectSponsorUserId);
+		}
+
+		long companyId = objectEntry.getCompanyId();
+
+		List<String> projectManagerRoleNames = Collections.singletonList(
+			DepotRolesConstants.PROJECT_MANAGER);
+		List<String> projectSponsorRoleNames = Collections.singletonList(
+			DepotRolesConstants.PROJECT_MEMBER);
+
+		_addUserGroupRoles(
+			companyId, groupId, originalProjectManagerUserId,
+			projectManagerRoleNames, projectManagerUserId);
+		_addUserGroupRoles(
+			companyId, groupId, originalProjectSponsorUserId,
+			projectSponsorRoleNames, projectSponsorUserId);
+
+		_deleteUserGroupRoles(
+			companyId, groupId, originalProjectSponsorUserId,
+			projectSponsorRoleNames, projectSponsorUserId);
+		_deleteUserGroupRoles(
+			companyId, groupId, originalProjectManagerUserId,
+			projectManagerRoleNames, projectManagerUserId);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

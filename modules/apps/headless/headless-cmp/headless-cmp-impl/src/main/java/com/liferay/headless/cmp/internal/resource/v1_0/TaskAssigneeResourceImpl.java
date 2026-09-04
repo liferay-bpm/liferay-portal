@@ -13,6 +13,8 @@ import com.liferay.object.service.ObjectEntryService;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.RoleService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -24,6 +26,7 @@ import com.liferay.portal.kernel.util.comparator.UserFirstNameComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.site.cms.site.initializer.users.provider.CMSUsersProvider;
+import com.liferay.site.cms.site.initializer.util.CMSUserUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,12 +60,32 @@ public class TaskAssigneeResourceImpl extends BaseTaskAssigneeResourceImpl {
 	}
 
 	@Override
-	public Page<TaskAssignee> getTaskAssigneesPage(String search, String type) {
+	public Page<TaskAssignee> getTaskAssigneesPage(String search, String type)
+		throws Exception {
+
 		return _getTaskAssigneesPage(null, search, type);
 	}
 
+	private List<User> _filterAssignableUsers(List<User> users)
+		throws Exception {
+
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		List<User> assignableUsers = new ArrayList<>(users.size());
+
+		for (User user : users) {
+			if (CMSUserUtil.isAssignableUser(permissionChecker, user)) {
+				assignableUsers.add(user);
+			}
+		}
+
+		return assignableUsers;
+	}
+
 	private Page<TaskAssignee> _getTaskAssigneesPage(
-		ObjectEntry objectEntry, String search, String type) {
+			ObjectEntry objectEntry, String search, String type)
+		throws Exception {
 
 		List<TaskAssignee> taskAssignees = new ArrayList<>();
 
@@ -113,6 +136,10 @@ public class TaskAssigneeResourceImpl extends BaseTaskAssigneeResourceImpl {
 						"usersGroups", objectEntry.getGroupId()
 					).build(),
 					0, 20, UserFirstNameComparator.getInstance(true));
+			}
+
+			if (StringUtil.equalsIgnoreCase(type, "User")) {
+				users = _filterAssignableUsers(users);
 			}
 
 			taskAssignees.addAll(

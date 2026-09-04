@@ -12,11 +12,15 @@ import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.headless.cmp.client.dto.v1_0.TaskAssignee;
 import com.liferay.headless.cmp.client.pagination.Page;
+import com.liferay.headless.cmp.client.resource.v1_0.TaskAssigneeResource;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
@@ -24,7 +28,11 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
@@ -141,11 +149,7 @@ public class TaskAssigneeResourceTest extends BaseTaskAssigneeResourceTestCase {
 			null, null, RoleConstants.TYPE_DEPOT,
 			DepotRolesConstants.SUBTYPE_PROJECT, null);
 
-		User user = UserTestUtil.addUser(
-			TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
-			RandomTestUtil.randomString(), LocaleUtil.getDefault(), "John",
-			"Doe", new long[] {_depotEntry.getGroupId()},
-			ServiceContextTestUtil.getServiceContext());
+		User user = _addUser(_depotEntry.getGroupId(), "John", "Doe");
 
 		Page<TaskAssignee> page = taskAssigneeResource.getTaskAssigneesPage(
 			"Custom", null);
@@ -188,10 +192,22 @@ public class TaskAssigneeResourceTest extends BaseTaskAssigneeResourceTestCase {
 			"Role", taskAssigneeResource.getTaskAssigneesPage(null, "Role"));
 		_assertTaskAssigneeType(
 			"User", taskAssigneeResource.getTaskAssigneesPage(null, "User"));
+
+		_testGetTaskAssigneesPageWithSpaceAdministrator();
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
 		return new String[] {"externalReferenceCode", "name", "type"};
+	}
+
+	private User _addUser(long groupId, String firstName, String lastName)
+		throws Exception {
+
+		return UserTestUtil.addUser(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			RandomTestUtil.randomString(), LocaleUtil.getDefault(), firstName,
+			lastName, new long[] {groupId},
+			ServiceContextTestUtil.getServiceContext());
 	}
 
 	private void _assertTaskAssigneeType(
@@ -202,6 +218,90 @@ public class TaskAssigneeResourceTest extends BaseTaskAssigneeResourceTestCase {
 		}
 	}
 
+	private long[] _getTaskAssigneeIds(Page<TaskAssignee> page) {
+		return TransformUtil.transformToLongArray(
+			page.getItems(),
+			taskAssignee -> GetterUtil.getLong(taskAssignee.getId()));
+	}
+
+	private void _testGetTaskAssigneesPageWithSpaceAdministrator()
+		throws Exception {
+
+		DepotEntry depotEntry = _depotEntryLocalService.addDepotEntry(
+			RandomTestUtil.randomLocaleStringMap(),
+			RandomTestUtil.randomLocaleStringMap(), DepotConstants.TYPE_SPACE,
+			ServiceContextTestUtil.getServiceContext());
+
+		long groupId = depotEntry.getGroupId();
+
+		User spaceAdministratorUser = UserTestUtil.addUser(
+			testCompany, PropsValues.DEFAULT_ADMIN_PASSWORD);
+
+		_userLocalService.updateEmailAddressVerified(
+			spaceAdministratorUser.getUserId(), true);
+
+		_userLocalService.addGroupUsers(
+			groupId, new long[] {spaceAdministratorUser.getUserId()});
+
+		Role assetLibraryAdministratorRole = _roleLocalService.getRole(
+			TestPropsValues.getCompanyId(),
+			DepotRolesConstants.ASSET_LIBRARY_ADMINISTRATOR);
+
+		_userGroupRoleLocalService.addUserGroupRoles(
+			spaceAdministratorUser.getUserId(), groupId,
+			new long[] {assetLibraryAdministratorRole.getRoleId()});
+
+		TaskAssigneeResource spaceAdministratorTaskAssigneeResource =
+			TaskAssigneeResource.builder(
+			).authentication(
+				spaceAdministratorUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(),
+				PortalUtil.getPortalServerPort(false), "http"
+			).locale(
+				LocaleUtil.getDefault()
+			).build();
+
+		String lastName = RandomTestUtil.randomString();
+
+		User administratorUser = _addUser(
+			groupId, RandomTestUtil.randomString(), lastName);
+
+		Role administratorRole = _roleLocalService.getRole(
+			TestPropsValues.getCompanyId(), RoleConstants.ADMINISTRATOR);
+
+		_roleLocalService.addUserRoles(
+			administratorUser.getUserId(),
+			new long[] {administratorRole.getRoleId()});
+
+		User assignableUser = _addUser(
+			groupId, RandomTestUtil.randomString(), lastName);
+
+		long[] taskAssigneeIds = _getTaskAssigneeIds(
+			spaceAdministratorTaskAssigneeResource.getTaskAssigneesPage(
+				lastName, "User"));
+
+		Assert.assertFalse(
+			ArrayUtil.contains(taskAssigneeIds, administratorUser.getUserId()));
+		Assert.assertTrue(
+			ArrayUtil.contains(taskAssigneeIds, assignableUser.getUserId()));
+
+		Assert.assertTrue(
+			ArrayUtil.contains(
+				_getTaskAssigneeIds(
+					spaceAdministratorTaskAssigneeResource.getTaskAssigneesPage(
+						lastName, null)),
+				administratorUser.getUserId()));
+
+		Assert.assertTrue(
+			ArrayUtil.contains(
+				_getTaskAssigneeIds(
+					taskAssigneeResource.getTaskAssigneesPage(
+						lastName, "User")),
+				administratorUser.getUserId()));
+	}
+
 	@DeleteAfterTestRun
 	private DepotEntry _depotEntry;
 
@@ -210,5 +310,11 @@ public class TaskAssigneeResourceTest extends BaseTaskAssigneeResourceTestCase {
 
 	@Inject
 	private RoleLocalService _roleLocalService;
+
+	@Inject
+	private UserGroupRoleLocalService _userGroupRoleLocalService;
+
+	@Inject
+	private UserLocalService _userLocalService;
 
 }
