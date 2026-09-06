@@ -221,7 +221,7 @@ public class PhoneNumberObjectFieldBusinessType
 			Country country = _countryLocalService.fetchCountryByA2(
 				objectField.getCompanyId(), StringUtil.toUpperCase(countryA2));
 
-			if ((country == null) || Validator.isNull(country.getIdd())) {
+			if ((country == null) || !_isSupportedCountry(country)) {
 				throw new ObjectFieldSettingValueException.InvalidValue(
 					objectField.getName(),
 					ObjectFieldSettingConstants.NAME_COUNTRY, countryA2);
@@ -344,23 +344,15 @@ public class PhoneNumberObjectFieldBusinessType
 		for (Country country :
 				_countryLocalService.getCompanyCountries(companyId, true)) {
 
-			String a2 = country.getA2();
-
-			if (!_a2s.contains(a2)) {
-				continue;
-			}
-
-			String idd = country.getIdd();
-
-			if (Validator.isNull(idd)) {
+			if (!_isSupportedCountry(country)) {
 				continue;
 			}
 
 			countries.add(
 				HashMapBuilder.put(
-					"a2", a2
+					"a2", country.getA2()
 				).put(
-					"idd", idd
+					"idd", country.getIdd()
 				).put(
 					"name", country.getTitle(languageId)
 				).build());
@@ -368,6 +360,16 @@ public class PhoneNumberObjectFieldBusinessType
 
 		return ListUtil.sort(
 			countries, Comparator.comparing(country -> country.get("name")));
+	}
+
+	private boolean _isSupportedCountry(Country country) {
+		if (!_a2s.contains(country.getA2()) ||
+			Validator.isNull(country.getIdd())) {
+
+			return false;
+		}
+
+		return true;
 	}
 
 	private boolean _isValid(String phoneNumber) {

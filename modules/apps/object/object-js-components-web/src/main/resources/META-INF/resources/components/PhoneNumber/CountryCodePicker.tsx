@@ -8,7 +8,12 @@ import {Option, Picker} from '@clayui/core';
 import ClayIcon from '@clayui/icon';
 import React from 'react';
 
-import {CountryInfo, getDefaultCountry, getFlagSymbol} from './phoneNumberUtil';
+import {
+	CountryInfo,
+	findCountry,
+	getDefaultCountry,
+	getFlagSymbol,
+} from './phoneNumberUtil';
 
 type CountryCodePickerProps = Omit<
 	React.ComponentProps<typeof Picker>,
@@ -20,9 +25,12 @@ type CountryCodePickerProps = Omit<
 
 const PickerTrigger = React.forwardRef<
 	HTMLDivElement,
-	{selectedCountry: CountryInfo} & React.ComponentProps<typeof ClayButton>
->(({selectedCountry, ...otherProps}, ref) => {
-	const flagSymbol = getFlagSymbol(selectedCountry.a2);
+	{
+		countryA2: string;
+		selectedCountry?: CountryInfo;
+	} & React.ComponentProps<typeof ClayButton>
+>(({countryA2, selectedCountry, ...otherProps}, ref) => {
+	const flagSymbol = selectedCountry ? getFlagSymbol(selectedCountry.a2) : '';
 
 	return (
 		<button {...(otherProps as any)} ref={ref}>
@@ -32,7 +40,9 @@ const PickerTrigger = React.forwardRef<
 				</span>
 			)}
 
-			<span>+{selectedCountry.idd}</span>
+			<span>
+				{selectedCountry ? `+${selectedCountry.idd}` : countryA2}
+			</span>
 		</button>
 	);
 });
@@ -44,19 +54,22 @@ export function CountryCodePicker({
 	selectedKey,
 	...otherProps
 }: CountryCodePickerProps) {
-	const selectedCountry =
-		countries.find((country) => country.a2 === selectedKey) ||
-		getDefaultCountry(countries);
+	const countryA2 = selectedKey ? String(selectedKey) : '';
+
+	const selectedCountry = countryA2
+		? findCountry(countries, countryA2)
+		: getDefaultCountry(countries);
 
 	return (
 		<Picker
 			{...otherProps}
 			aria-label={Liferay.Language.get('country-code')}
 			as={PickerTrigger}
+			countryA2={countryA2}
 			disabled={disabled}
 			items={countries}
 			onSelectionChange={(key) => {
-				const country = countries.find((country) => country.a2 === key);
+				const country = findCountry(countries, String(key));
 
 				if (country) {
 					onSelectionChange(country);
@@ -64,7 +77,7 @@ export function CountryCodePicker({
 			}}
 			searchable
 			selectedCountry={selectedCountry}
-			selectedKey={selectedCountry.a2}
+			selectedKey={selectedCountry?.a2 ?? ''}
 		>
 			{(country: CountryInfo) => {
 				const flagSymbol = getFlagSymbol(country.a2);
