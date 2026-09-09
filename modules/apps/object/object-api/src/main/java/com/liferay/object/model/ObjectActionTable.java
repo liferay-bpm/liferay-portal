@@ -53,12 +53,12 @@ public class ObjectActionTable extends BaseTable<ObjectActionTable> {
 	public final Column<ObjectActionTable, Clob> conditionExpression =
 		createColumn(
 			"conditionExpression", Clob.class, Types.CLOB, Column.FLAG_DEFAULT);
-	public final Column<ObjectActionTable, String> description = createColumn(
-		"description", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<ObjectActionTable, String> errorMessage = createColumn(
 		"errorMessage", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<ObjectActionTable, String> label = createColumn(
 		"label", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
+	public final Column<ObjectActionTable, String> description = createColumn(
+		"description", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<ObjectActionTable, String> name = createColumn(
 		"name", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<ObjectActionTable, String> objectActionExecutorKey =
@@ -81,4 +81,4 @@ public class ObjectActionTable extends BaseTable<ObjectActionTable> {
 	}
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:337843256
+// LIFERAY-SERVICE-BUILDER-HASH:-1440672520

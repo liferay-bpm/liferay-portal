@@ -46,7 +46,8 @@
 				},
 				{
 					"active": true,
-					"description": "",
+					"description": {
+					},
 					"label": {
 						"en_US": "Configure Event Stream on Add"
 					},
@@ -81,7 +82,8 @@
 				},
 				{
 					"active": true,
-					"description": "",
+					"description": {
+					},
 					"label": {
 						"en_US": "Unconfigure Event Stream"
 					},
