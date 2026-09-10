@@ -17,9 +17,11 @@ import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Adolfo Pérez
@@ -69,8 +71,22 @@ public class TaxonomyGroupUtil {
 	public static long[] getProjectGroupIds(Project[] projects, long companyId)
 		throws PortalException {
 
-		if (ArrayUtil.isEmpty(projects)) {
+		long[] projectGroupIds = getResolvedProjectGroupIds(
+			projects, companyId);
+
+		if (ArrayUtil.isEmpty(projectGroupIds)) {
 			return _GROUP_IDS_ALL;
+		}
+
+		return projectGroupIds;
+	}
+
+	public static long[] getResolvedProjectGroupIds(
+			Project[] projects, long companyId)
+		throws PortalException {
+
+		if (ArrayUtil.isEmpty(projects)) {
+			return new long[0];
 		}
 
 		List<Long> groupIds = new ArrayList<>();
@@ -78,6 +94,10 @@ public class TaxonomyGroupUtil {
 		for (Project project : projects) {
 			if (project == null) {
 				continue;
+			}
+
+			if (_isAllProjects(project)) {
+				return _GROUP_IDS_ALL;
 			}
 
 			Group group = _fetchGroup(
@@ -91,11 +111,97 @@ public class TaxonomyGroupUtil {
 			}
 		}
 
-		if (groupIds.isEmpty()) {
-			return _GROUP_IDS_ALL;
-		}
-
 		return ArrayUtil.toLongArray(groupIds);
+	}
+
+	public static AssetLibrary toAssetLibrary(
+		boolean acceptAllLanguages, long groupId, Locale locale) {
+
+		Group group = GroupLocalServiceUtil.fetchGroup(groupId);
+
+		return new AssetLibrary() {
+			{
+				setExternalReferenceCode(
+					() -> {
+						if (group == null) {
+							return null;
+						}
+
+						return group.getExternalReferenceCode();
+					});
+				setId(() -> groupId);
+				setName(
+					() -> {
+						if (group == null) {
+							return null;
+						}
+
+						return group.getDescriptiveName(locale);
+					});
+				setName_i18n(
+					() -> {
+						if (group == null) {
+							return null;
+						}
+
+						return LocalizedMapUtil.getI18nMap(
+							acceptAllLanguages, group.getNameMap());
+					});
+				setScopeKey(
+					() -> {
+						if (group == null) {
+							return null;
+						}
+
+						return group.getGroupKey();
+					});
+			}
+		};
+	}
+
+	public static Project toProject(
+		boolean acceptAllLanguages, long groupId, Locale locale) {
+
+		Group group = GroupLocalServiceUtil.fetchGroup(groupId);
+
+		return new Project() {
+			{
+				setExternalReferenceCode(
+					() -> {
+						if (group == null) {
+							return null;
+						}
+
+						return group.getExternalReferenceCode();
+					});
+				setId(() -> groupId);
+				setName(
+					() -> {
+						if (group == null) {
+							return null;
+						}
+
+						return group.getDescriptiveName(locale);
+					});
+				setName_i18n(
+					() -> {
+						if (group == null) {
+							return null;
+						}
+
+						return LocalizedMapUtil.getI18nMap(
+							acceptAllLanguages, group.getNameMap());
+					});
+				setScopeKey(
+					() -> {
+						if (group == null) {
+							return null;
+						}
+
+						return group.getGroupKey();
+					});
+			}
+		};
 	}
 
 	private static Group _fetchGroup(
@@ -138,6 +244,22 @@ public class TaxonomyGroupUtil {
 		}
 
 		return null;
+	}
+
+	private static boolean _isAllProjects(Project project) {
+		if (Validator.isNotNull(project.getExternalReferenceCode()) ||
+			Validator.isNotNull(project.getScopeKey())) {
+
+			return false;
+		}
+
+		Long id = project.getId();
+
+		if ((id != null) && (id == GroupConstants.ANY_PARENT_GROUP_ID)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private static boolean _isGroupDepotEntryType(

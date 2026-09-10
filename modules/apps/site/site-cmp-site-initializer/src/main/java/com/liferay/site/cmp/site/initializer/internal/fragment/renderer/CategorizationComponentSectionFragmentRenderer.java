@@ -107,6 +107,9 @@ public class CategorizationComponentSectionFragmentRenderer
 		).put(
 			"personasVocabularyERC", "L_CMP_PERSONAS"
 		).put(
+			"projectGroupId",
+			ObjectEntryUtil.getProjectDepotEntryGroupId(objectEntry)
+		).put(
 			"selectedFunnelStageCategories",
 			() -> _getSelectedAssetCategoriesJSONArray(
 				assetCategories, "L_CMP_FUNNEL_STAGE", themeDisplay)
