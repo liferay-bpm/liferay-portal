@@ -189,6 +189,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -1304,6 +1305,10 @@ public class DefaultObjectEntryManagerImpl
 			ObjectEntry objectEntry)
 		throws Exception {
 
+		Set<String> untouchedRelationshipObjectFieldNames =
+			_getUntouchedRelationshipObjectFieldNames(
+				objectDefinition, objectEntry);
+
 		ObjectEntry existingObjectEntry =
 			ObjectEntryManagerUtil.partialUpdateObjectEntry(
 				getObjectEntry(
@@ -1312,7 +1317,7 @@ public class DefaultObjectEntryManagerImpl
 
 		return _updateObjectEntry(
 			0L, dtoConverterContext, objectDefinition, existingObjectEntry,
-			objectEntryId, true, false);
+			objectEntryId, true, false, untouchedRelationshipObjectFieldNames);
 	}
 
 	@Override
@@ -1321,6 +1326,10 @@ public class DefaultObjectEntryManagerImpl
 			String externalReferenceCode, ObjectDefinition objectDefinition,
 			ObjectEntry objectEntry, String scopeKey)
 		throws Exception {
+
+		Set<String> untouchedRelationshipObjectFieldNames =
+			_getUntouchedRelationshipObjectFieldNames(
+				objectDefinition, objectEntry);
 
 		ObjectEntry existingObjectEntry =
 			ObjectEntryManagerUtil.partialUpdateObjectEntry(
@@ -1331,7 +1340,8 @@ public class DefaultObjectEntryManagerImpl
 
 		return _updateObjectEntry(
 			companyId, dtoConverterContext, externalReferenceCode,
-			objectDefinition, existingObjectEntry, true, scopeKey);
+			objectDefinition, existingObjectEntry, true, scopeKey,
+			untouchedRelationshipObjectFieldNames);
 	}
 
 	@Override
@@ -1345,6 +1355,10 @@ public class DefaultObjectEntryManagerImpl
 			_objectDefinitionLocalService.getObjectDefinition(
 				objectRelationship.getObjectDefinitionId2());
 
+		Set<String> untouchedRelationshipObjectFieldNames =
+			_getUntouchedRelationshipObjectFieldNames(
+				objectDefinition2, objectEntry);
+
 		return _updateRelatedObjectEntry(
 			dtoConverterContext,
 			ObjectEntryManagerUtil.partialUpdateObjectEntry(
@@ -1352,7 +1366,8 @@ public class DefaultObjectEntryManagerImpl
 					dtoConverterContext, objectEntryId, objectRelationship,
 					parentObjectEntryId),
 				objectDefinition2.getObjectDefinitionId(), objectEntry),
-			objectEntryId, objectRelationship, parentObjectEntryId, true);
+			objectEntryId, objectRelationship, parentObjectEntryId, true,
+			untouchedRelationshipObjectFieldNames);
 	}
 
 	@Override
@@ -1367,6 +1382,10 @@ public class DefaultObjectEntryManagerImpl
 			_objectDefinitionLocalService.getObjectDefinition(
 				objectRelationship.getObjectDefinitionId2());
 
+		Set<String> untouchedRelationshipObjectFieldNames =
+			_getUntouchedRelationshipObjectFieldNames(
+				objectDefinition2, objectEntry);
+
 		return _updateRelatedObjectEntry(
 			dtoConverterContext, externalReferenceCode,
 			ObjectEntryManagerUtil.partialUpdateObjectEntry(
@@ -1374,7 +1393,8 @@ public class DefaultObjectEntryManagerImpl
 					dtoConverterContext, externalReferenceCode,
 					objectRelationship, parentExternalReferenceCode, scopeKey),
 				objectDefinition2.getObjectDefinitionId(), objectEntry),
-			objectRelationship, parentExternalReferenceCode, true, scopeKey);
+			objectRelationship, parentExternalReferenceCode, true, scopeKey,
+			untouchedRelationshipObjectFieldNames);
 	}
 
 	@Override
@@ -3189,6 +3209,51 @@ public class DefaultObjectEntryManagerImpl
 		return GetterUtil.getString(values.get(titleObjectField.getName()));
 	}
 
+	private Set<String> _getUntouchedRelationshipObjectFieldNames(
+		ObjectDefinition objectDefinition, ObjectEntry objectEntry) {
+
+		Map<String, Object> properties = objectEntry.getProperties();
+
+		if (properties == null) {
+			properties = Collections.emptyMap();
+		}
+
+		Set<String> untouchedRelationshipObjectFieldNames = new HashSet<>();
+
+		for (ObjectField objectField :
+				_objectFieldLocalService.getObjectFieldsByBusinessType(
+					objectDefinition.getObjectDefinitionId(),
+					ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
+
+			String objectFieldName = objectField.getName();
+
+			String[] objectFieldNameParts = objectFieldName.split(
+				StringPool.UNDERLINE);
+
+			if (objectFieldNameParts.length < 2) {
+				continue;
+			}
+
+			String objectRelationshipName = objectFieldNameParts[1];
+
+			if (properties.containsKey(objectFieldName) ||
+				properties.containsKey(objectRelationshipName) ||
+				properties.containsKey(objectRelationshipName + "ERC") ||
+				properties.containsKey(
+					ObjectFieldSettingUtil.getValue(
+						ObjectFieldSettingConstants.
+							NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME,
+						objectField))) {
+
+				continue;
+			}
+
+			untouchedRelationshipObjectFieldNames.add(objectFieldName);
+		}
+
+		return untouchedRelationshipObjectFieldNames;
+	}
+
 	private Serializable _getValue(
 		Locale locale, ObjectField objectField, Object value) {
 
@@ -3896,6 +3961,18 @@ public class DefaultObjectEntryManagerImpl
 			String scopeKey, ServiceContext serviceContext)
 		throws Exception {
 
+		return _toObjectValues(
+			allowedRelationshipObjectFieldId, locale, objectDefinition,
+			objectEntry, scopeKey, serviceContext, Collections.emptySet());
+	}
+
+	private Map<String, Serializable> _toObjectValues(
+			long allowedRelationshipObjectFieldId, Locale locale,
+			ObjectDefinition objectDefinition, ObjectEntry objectEntry,
+			String scopeKey, ServiceContext serviceContext,
+			Set<String> untouchedRelationshipObjectFieldNames)
+		throws Exception {
+
 		Map<String, Serializable> values = new HashMap<>();
 
 		Map<String, Object> properties = HashMapBuilder.<String, Object>putAll(
@@ -3922,6 +3999,21 @@ public class DefaultObjectEntryManagerImpl
 
 			if (relationshipObjectFieldIds.contains(
 					objectField.getObjectFieldId())) {
+
+				continue;
+			}
+
+			if (untouchedRelationshipObjectFieldNames.contains(
+					objectField.getName())) {
+
+				Object relationshipValue = properties.get(
+					objectField.getName());
+
+				if (relationshipValue != null) {
+					values.put(
+						objectField.getName(),
+						GetterUtil.getLong(relationshipValue));
+				}
 
 				continue;
 			}
@@ -4091,6 +4183,21 @@ public class DefaultObjectEntryManagerImpl
 			boolean skipCheckRootDescendantNode)
 		throws Exception {
 
+		return _updateObjectEntry(
+			allowedRelationshipObjectFieldId, dtoConverterContext,
+			objectDefinition, objectEntry, objectEntryId, partialUpdate,
+			skipCheckRootDescendantNode, Collections.emptySet());
+	}
+
+	private ObjectEntry _updateObjectEntry(
+			long allowedRelationshipObjectFieldId,
+			DTOConverterContext dtoConverterContext,
+			ObjectDefinition objectDefinition, ObjectEntry objectEntry,
+			long objectEntryId, boolean partialUpdate,
+			boolean skipCheckRootDescendantNode,
+			Set<String> untouchedRelationshipObjectFieldNames)
+		throws Exception {
+
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
 			_objectEntryService.getObjectEntry(objectEntryId);
 
@@ -4113,7 +4220,8 @@ public class DefaultObjectEntryManagerImpl
 
 		Map<String, Serializable> values = _toObjectValues(
 			allowedRelationshipObjectFieldId, dtoConverterContext.getLocale(),
-			objectDefinition, objectEntry, scopeKey, serviceContext);
+			objectDefinition, objectEntry, scopeKey, serviceContext,
+			untouchedRelationshipObjectFieldNames);
 
 		if (partialUpdate) {
 			Set<Map.Entry<String, Serializable>> entries = values.entrySet();
@@ -4164,6 +4272,19 @@ public class DefaultObjectEntryManagerImpl
 			String scopeKey)
 		throws Exception {
 
+		return _updateObjectEntry(
+			companyId, dtoConverterContext, externalReferenceCode,
+			objectDefinition, objectEntry, partialUpdateNestedObjectEntries,
+			scopeKey, Collections.emptySet());
+	}
+
+	private ObjectEntry _updateObjectEntry(
+			long companyId, DTOConverterContext dtoConverterContext,
+			String externalReferenceCode, ObjectDefinition objectDefinition,
+			ObjectEntry objectEntry, boolean partialUpdateNestedObjectEntries,
+			String scopeKey, Set<String> untouchedRelationshipObjectFieldNames)
+		throws Exception {
+
 		long groupId = getGroupId(objectDefinition, scopeKey);
 
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
@@ -4200,7 +4321,8 @@ public class DefaultObjectEntryManagerImpl
 						_toObjectValues(
 							0L, dtoConverterContext.getLocale(),
 							objectDefinition, objectEntry, scopeKey,
-							serviceContext),
+							serviceContext,
+							untouchedRelationshipObjectFieldNames),
 						serviceContext),
 					serviceContext),
 				scopeKey),
@@ -4213,12 +4335,29 @@ public class DefaultObjectEntryManagerImpl
 			long parentObjectEntryId, boolean partialUpdate)
 		throws Exception {
 
+		return _updateRelatedObjectEntry(
+			dtoConverterContext, objectEntry, objectEntryId, objectRelationship,
+			parentObjectEntryId, partialUpdate, Collections.emptySet());
+	}
+
+	private ObjectEntry _updateRelatedObjectEntry(
+			DTOConverterContext dtoConverterContext, ObjectEntry objectEntry,
+			long objectEntryId, ObjectRelationship objectRelationship,
+			long parentObjectEntryId, boolean partialUpdate,
+			Set<String> untouchedRelationshipObjectFieldNames)
+		throws Exception {
+
 		Map<String, Object> properties = objectEntry.getProperties();
 
 		ObjectField objectField = _objectFieldLocalService.getObjectField(
 			objectRelationship.getObjectFieldId2());
 
 		properties.put(objectField.getName(), parentObjectEntryId);
+
+		untouchedRelationshipObjectFieldNames = new HashSet<>(
+			untouchedRelationshipObjectFieldNames);
+
+		untouchedRelationshipObjectFieldNames.remove(objectField.getName());
 
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
 			_objectEntryService.getObjectEntry(objectEntryId);
@@ -4240,7 +4379,8 @@ public class DefaultObjectEntryManagerImpl
 			objectRelationship.getObjectFieldId2(), dtoConverterContext,
 			_objectDefinitionLocalService.getObjectDefinition(
 				objectRelationship.getObjectDefinitionId2()),
-			objectEntry, objectEntryId, partialUpdate, true);
+			objectEntry, objectEntryId, partialUpdate, true,
+			untouchedRelationshipObjectFieldNames);
 	}
 
 	private ObjectEntry _updateRelatedObjectEntry(
@@ -4249,6 +4389,20 @@ public class DefaultObjectEntryManagerImpl
 			ObjectRelationship objectRelationship,
 			String parentExternalReferenceCode, boolean partialUpdate,
 			String scopeKey)
+		throws Exception {
+
+		return _updateRelatedObjectEntry(
+			dtoConverterContext, externalReferenceCode, objectEntry,
+			objectRelationship, parentExternalReferenceCode, partialUpdate,
+			scopeKey, Collections.emptySet());
+	}
+
+	private ObjectEntry _updateRelatedObjectEntry(
+			DTOConverterContext dtoConverterContext,
+			String externalReferenceCode, ObjectEntry objectEntry,
+			ObjectRelationship objectRelationship,
+			String parentExternalReferenceCode, boolean partialUpdate,
+			String scopeKey, Set<String> untouchedRelationshipObjectFieldNames)
 		throws Exception {
 
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
@@ -4271,7 +4425,8 @@ public class DefaultObjectEntryManagerImpl
 		return _updateRelatedObjectEntry(
 			dtoConverterContext, objectEntry,
 			serviceBuilderObjectEntry.getObjectEntryId(), objectRelationship,
-			parentServiceBuilderObjectEntry.getObjectEntryId(), partialUpdate);
+			parentServiceBuilderObjectEntry.getObjectEntryId(), partialUpdate,
+			untouchedRelationshipObjectFieldNames);
 	}
 
 	private com.liferay.object.model.ObjectEntry _updateStatus(
