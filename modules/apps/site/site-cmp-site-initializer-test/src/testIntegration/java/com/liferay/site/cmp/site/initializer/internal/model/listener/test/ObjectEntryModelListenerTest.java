@@ -186,7 +186,8 @@ public class ObjectEntryModelListenerTest {
 			cmpTaskLinkObjectEntry, DepotRolesConstants.PROJECT_MEMBER,
 			ActionKeys.VIEW);
 
-		// Creating a CMP task updates the completion rate only when published
+		// Creating a CMP task object entry updates the completion rate only
+		// when published
 
 		cmpTaskObjectEntry = CMPTestUtil.addCMPTaskObjectEntry(
 			cmpProjectObjectEntry, WorkflowConstants.ACTION_PUBLISH);
@@ -212,7 +213,8 @@ public class ObjectEntryModelListenerTest {
 	@Test
 	public void testOnAfterRemove() throws Exception {
 
-		// Deleting a CMP project with a staged asset library rolls back
+		// Deleting a CMP project object entry with a staged asset library rolls
+		// back
 
 		ObjectEntry cmpProjectObjectEntry =
 			CMPTestUtil.addCMPProjectObjectEntry(
@@ -247,7 +249,7 @@ public class ObjectEntryModelListenerTest {
 		_objectEntryLocalService.deleteObjectEntry(
 			cmpProjectObjectEntry.getObjectEntryId());
 
-		// Deleting a draft CMP project deletes its asset library
+		// Deleting a draft CMP project object entry deletes its asset library
 
 		cmpProjectObjectEntry = CMPTestUtil.addCMPProjectObjectEntry();
 
@@ -266,7 +268,8 @@ public class ObjectEntryModelListenerTest {
 			_depotEntryLocalService.fetchGroupDepotEntry(groupId));
 		Assert.assertNull(_groupLocalService.fetchGroup(groupId));
 
-		// Deleting an approved CMP project deletes its asset library and tasks
+		// Deleting an approved CMP project object entry deletes its asset
+		// library and CMP task object entries
 
 		cmpProjectObjectEntry = CMPTestUtil.addCMPProjectObjectEntry(
 			WorkflowConstants.ACTION_PUBLISH);
