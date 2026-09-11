@@ -779,6 +779,11 @@ public class ObjectServiceUpgradeStepRegistrator
 					"' where panelCategoryKey in ('",
 					StringUtil.merge(_REMOVED_PANEL_CATEGORY_KEYS, "', '"),
 					"')")));
+
+		registry.register(
+			"13.7.0", "13.7.1",
+			new com.liferay.object.internal.upgrade.v13_7_1.
+				SchemaUpgradeProcess());
 	}
 
 	private static final String[] _REMOVED_PANEL_CATEGORY_KEYS = {
