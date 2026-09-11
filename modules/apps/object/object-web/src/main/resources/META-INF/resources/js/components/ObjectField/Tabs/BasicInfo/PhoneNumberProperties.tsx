@@ -46,9 +46,6 @@ export function PhoneNumberProperties({
 	const countrySource =
 		settings.countrySource || COUNTRY_SOURCE.DEFINED_BY_USER;
 
-	const selectedCountry =
-		countries.find((c) => c.a2 === country) || defaultCountry;
-
 	const handleCountrySourceChange = (value: CountrySource) => {
 		let updatedSettings = updateFieldSettings(objectFieldSettings, {
 			name: 'countrySource',
@@ -131,7 +128,7 @@ export function PhoneNumberProperties({
 							aria-labelledby={countryPickerId}
 							countries={countries}
 							onSelectionChange={handleCountryChange}
-							selectedKey={selectedCountry?.a2}
+							selectedKey={country as string}
 						/>
 					</ClayForm.Group>
 				</div>

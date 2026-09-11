@@ -20,6 +20,8 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -32,6 +34,10 @@ import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -78,6 +84,29 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 		_objectFieldBusinessType =
 			_objectFieldBusinessTypeRegistry.getObjectFieldBusinessType(
 				ObjectFieldConstants.BUSINESS_TYPE_PHONE_NUMBER);
+	}
+
+	@Test
+	public void testGetRenderingProperties() throws Exception {
+		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setCompanyId(TestPropsValues.getCompanyId());
+
+		ServiceContextThreadLocal.pushServiceContext(serviceContext);
+
+		try {
+			Set<String> a2s = _getRenderedCountryA2s();
+
+			Assert.assertTrue(a2s.contains("US"));
+
+			// Antarctica has an IDD but backs no portal locale, so the field
+			// type does not offer it
+
+			Assert.assertFalse(a2s.contains("AQ"));
+		}
+		finally {
+			ServiceContextThreadLocal.popServiceContext();
+		}
 	}
 
 	@Test
@@ -164,6 +193,27 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 		AssertUtils.assertFailure(
 			ObjectFieldSettingValueException.InvalidValue.class,
 			StringBundler.concat(
+				"The value AQ of setting \"country\" is invalid for object ",
+				"field \"", _OBJECT_FIELD_NAME, "\""),
+			() -> _objectFieldBusinessType.validateObjectFieldSettings(
+				_objectField,
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_COUNTRY
+					).value(
+						"AQ"
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						ObjectFieldSettingConstants.NAME_COUNTRY_SOURCE
+					).value(
+						ObjectFieldSettingConstants.VALUE_FIXED
+					).build())));
+
+		AssertUtils.assertFailure(
+			ObjectFieldSettingValueException.InvalidValue.class,
+			StringBundler.concat(
 				"The value ZZ of setting \"country\" is invalid for object ",
 				"field \"", _OBJECT_FIELD_NAME, "\""),
 			() -> _objectFieldBusinessType.validateObjectFieldSettings(
@@ -181,6 +231,7 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 					).value(
 						ObjectFieldSettingConstants.VALUE_FIXED
 					).build())));
+
 		AssertUtils.assertFailure(
 			ObjectFieldSettingValueException.MissingRequiredValues.class,
 			StringBundler.concat(
@@ -337,6 +388,22 @@ public class PhoneNumberObjectFieldBusinessTypeTest {
 				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
 				ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE
 			).build());
+	}
+
+	private Set<String> _getRenderedCountryA2s() {
+		Set<String> a2s = new HashSet<>();
+
+		Map<String, Object> renderingProperties =
+			_objectFieldBusinessType.getRenderingProperties();
+
+		for (Map<String, String> country :
+				(List<Map<String, String>>)renderingProperties.get(
+					"countries")) {
+
+			a2s.add(country.get("a2"));
+		}
+
+		return a2s;
 	}
 
 	private static final String _OBJECT_FIELD_NAME =
