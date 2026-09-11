@@ -138,6 +138,8 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.SystemEvent;
+import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
@@ -161,6 +163,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.SystemEventLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
@@ -2780,6 +2783,25 @@ public class ObjectDefinitionLocalServiceTest {
 				_objectDefinitionSettingLocalService.
 					getObjectDefinitionSettings(
 						objectDefinition.getObjectDefinitionId())));
+
+		// System event
+
+		List<SystemEvent> systemEvents =
+			_systemEventLocalService.getSystemEvents(
+				0,
+				_classNameLocalService.getClassNameId(
+					objectDefinition.getModelClassName()),
+				objectDefinition.getObjectDefinitionId());
+
+		Assert.assertEquals(systemEvents.toString(), 1, systemEvents.size());
+
+		SystemEvent systemEvent = systemEvents.get(0);
+
+		Assert.assertEquals(
+			objectDefinition.getExternalReferenceCode(),
+			systemEvent.getClassExternalReferenceCode());
+		Assert.assertEquals(
+			SystemEventConstants.TYPE_DELETE, systemEvent.getType());
 
 		// Workflow definition links
 
@@ -6098,6 +6120,9 @@ public class ObjectDefinitionLocalServiceTest {
 
 	@Inject
 	private SharingEntryLocalService _sharingEntryLocalService;
+
+	@Inject
+	private SystemEventLocalService _systemEventLocalService;
 
 	@Inject
 	private WorkflowDefinitionLinkLocalService

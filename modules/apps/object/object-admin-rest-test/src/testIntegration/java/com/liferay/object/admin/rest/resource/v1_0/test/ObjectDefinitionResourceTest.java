@@ -58,6 +58,7 @@ import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFolderLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
+import com.liferay.object.test.util.ObjectEntryTestUtil;
 import com.liferay.object.test.util.TreeTestUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -72,12 +73,15 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.SystemEvent;
+import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.SystemEventLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.TestInfo;
@@ -160,6 +164,14 @@ public class ObjectDefinitionResourceTest
 			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			RandomTestUtil.randomString());
+	}
+
+	@Override
+	@Test
+	public void testDeleteObjectDefinition() throws Exception {
+		super.testDeleteObjectDefinition();
+
+		_testDeleteObjectDefinitionWithMassDeleteMode();
 	}
 
 	@Override
@@ -2878,6 +2890,52 @@ public class ObjectDefinitionResourceTest
 			});
 	}
 
+	private void _testDeleteObjectDefinitionWithMassDeleteMode()
+		throws Exception {
+
+		ObjectDefinition objectDefinition = _addObjectDefinition(
+			randomObjectDefinition());
+
+		com.liferay.object.model.ObjectDefinition
+			serviceBuilderObjectDefinition =
+				_objectDefinitionLocalService.publishCustomObjectDefinition(
+					TestPropsValues.getUserId(), objectDefinition.getId());
+
+		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
+			serviceBuilderObjectDefinition);
+
+		objectDefinitionResource.deleteObjectDefinition(
+			objectDefinition.getId());
+
+		List<SystemEvent> systemEvents =
+			_systemEventLocalService.getSystemEvents(
+				0,
+				PortalUtil.getClassNameId(
+					serviceBuilderObjectDefinition.getModelClassName()),
+				serviceBuilderObjectDefinition.getObjectDefinitionId(),
+				SystemEventConstants.TYPE_DELETE);
+
+		Assert.assertEquals(systemEvents.toString(), 1, systemEvents.size());
+
+		SystemEvent systemEvent = systemEvents.get(0);
+
+		Assert.assertEquals(
+			serviceBuilderObjectDefinition.getExternalReferenceCode(),
+			systemEvent.getClassExternalReferenceCode());
+
+		List<SystemEvent> objectEntrySystemEvents =
+			_systemEventLocalService.getSystemEvents(
+				objectEntry.getGroupId(),
+				PortalUtil.getClassNameId(
+					serviceBuilderObjectDefinition.getClassName()),
+				objectEntry.getObjectEntryId(),
+				SystemEventConstants.TYPE_DELETE);
+
+		Assert.assertTrue(
+			objectEntrySystemEvents.toString(),
+			objectEntrySystemEvents.isEmpty());
+	}
+
 	private void _testGetObjectDefinition() throws Exception {
 		super.testGetObjectDefinition();
 
@@ -4186,6 +4244,9 @@ public class ObjectDefinitionResourceTest
 
 	@Inject
 	private RoleLocalService _roleLocalService;
+
+	@Inject
+	private SystemEventLocalService _systemEventLocalService;
 
 	@Inject
 	private WorkflowDefinitionLinkLocalService

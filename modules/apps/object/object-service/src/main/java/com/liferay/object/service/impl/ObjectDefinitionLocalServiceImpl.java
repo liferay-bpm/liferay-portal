@@ -501,7 +501,8 @@ public class ObjectDefinitionLocalServiceImpl
 		ObjectDefinition objectDefinition =
 			objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
-		return deleteObjectDefinition(objectDefinition);
+		return objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinition);
 	}
 
 	@Indexable(type = IndexableType.DELETE)
@@ -745,6 +746,16 @@ public class ObjectDefinitionLocalServiceImpl
 			for (String name : names) {
 				_resourcePermissionLocalService.deleteResourcePermissions(name);
 			}
+		}
+
+		if (MassDeleteCacheThreadLocal.isMassDeleteMode()) {
+			_systemEventLocalService.addSystemEvent(
+				objectDefinition.getCompanyId(),
+				objectDefinition.getExternalReferenceCode(),
+				ObjectDefinition.class.getName(),
+				objectDefinition.getObjectDefinitionId(),
+				objectDefinition.getUuid(), StringPool.BLANK,
+				SystemEventConstants.TYPE_DELETE, StringPool.BLANK);
 		}
 
 		return objectDefinition;
