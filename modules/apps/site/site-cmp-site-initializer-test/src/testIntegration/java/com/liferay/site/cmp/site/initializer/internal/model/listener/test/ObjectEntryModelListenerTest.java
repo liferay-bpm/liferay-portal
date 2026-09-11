@@ -13,7 +13,9 @@ import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.exportimport.kernel.service.StagingLocalService;
 import com.liferay.object.constants.ObjectActionKeys;
+import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.ModelListenerException;
@@ -28,6 +30,7 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -300,6 +303,47 @@ public class ObjectEntryModelListenerTest {
 	}
 
 	@Test
+	public void testOnBeforeCreate() throws Exception {
+
+		// A user who is not a member of the linked asset's space cannot link
+		// the asset
+
+		ObjectEntry cmsBasicWebContentObjectEntry =
+			CMPTestUtil.addCMSBasicWebContentObjectEntry(
+				_depotEntry, RandomTestUtil.randomString());
+
+		ObjectEntry cmpTaskObjectEntry = CMPTestUtil.addCMPTaskObjectEntry();
+
+		User user = UserTestUtil.addUser(cmpTaskObjectEntry.getGroupId());
+
+		try {
+			_addCMPTaskLinkObjectEntry(
+				cmpTaskObjectEntry, cmsBasicWebContentObjectEntry,
+				user.getUserId());
+
+			Assert.fail();
+		}
+		catch (ModelListenerException modelListenerException) {
+			Throwable throwable = modelListenerException.getCause();
+
+			String message = throwable.getMessage();
+
+			Assert.assertTrue(
+				message, message.contains("must be a member of space"));
+		}
+
+		// A member of the linked asset's space can link the asset
+
+		_userLocalService.addGroupUser(
+			_depotEntry.getGroupId(), user.getUserId());
+
+		Assert.assertNotNull(
+			_addCMPTaskLinkObjectEntry(
+				cmpTaskObjectEntry, cmsBasicWebContentObjectEntry,
+				user.getUserId()));
+	}
+
+	@Test
 	public void testOnBeforeRemove() throws Exception {
 
 		// Deleting a CMS object entry deletes its links
@@ -356,6 +400,36 @@ public class ObjectEntryModelListenerTest {
 				cmpTaskLinkObjectEntry.getObjectEntryId()));
 	}
 
+	private ObjectEntry _addCMPTaskLinkObjectEntry(
+			ObjectEntry cmpTaskObjectEntry, ObjectEntry linkedObjectEntry,
+			long userId)
+		throws Exception {
+
+		Group group = _groupLocalService.getGroup(
+			linkedObjectEntry.getGroupId());
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.
+				getObjectDefinitionByExternalReferenceCode(
+					"L_CMP_TASK_LINK", TestPropsValues.getCompanyId());
+
+		return _objectEntryLocalService.addObjectEntry(
+			cmpTaskObjectEntry.getGroupId(), userId,
+			objectDefinition.getObjectDefinitionId(), 0, null,
+			HashMapBuilder.<String, Serializable>put(
+				"classExternalReferenceCode",
+				linkedObjectEntry.getExternalReferenceCode()
+			).put(
+				"className", linkedObjectEntry.getModelClassName()
+			).put(
+				"groupExternalReferenceCode", group.getExternalReferenceCode()
+			).put(
+				"r_cmpTaskToCMPTaskLinks_c_cmpTaskId",
+				cmpTaskObjectEntry.getObjectEntryId()
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+	}
+
 	private void _assertResourceActions(
 			ObjectEntry objectEntry, String roleName, String... actionIds)
 		throws Exception {
@@ -409,6 +483,9 @@ public class ObjectEntryModelListenerTest {
 	private GroupLocalService _groupLocalService;
 
 	@Inject
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Inject
 	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Inject
@@ -422,5 +499,8 @@ public class ObjectEntryModelListenerTest {
 
 	@Inject
 	private StagingLocalService _stagingLocalService;
+
+	@Inject
+	private UserLocalService _userLocalService;
 
 }
