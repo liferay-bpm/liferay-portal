@@ -3378,7 +3378,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 				jsonObject.getLong("objectDefinitionId"),
 				jsonObject.getBoolean("active"),
 				jsonObject.getString("conditionExpression"),
-				jsonObject.getString("description"),
+				SiteInitializerUtil.toMap(jsonObject.getString("description")),
 				SiteInitializerUtil.toMap(jsonObject.getString("errorMessage")),
 				SiteInitializerUtil.toMap(jsonObject.getString("label")),
 				jsonObject.getString("name"),
@@ -3449,7 +3449,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 					jsonObject.getLong("objectDefinitionId"),
 					objectActionJSONObject.getBoolean("active"),
 					objectActionJSONObject.getString("conditionExpression"),
-					objectActionJSONObject.getString("description"),
+					SiteInitializerUtil.toMap(
+						objectActionJSONObject.getString("description")),
 					SiteInitializerUtil.toMap(
 						objectActionJSONObject.getString("errorMessage")),
 					SiteInitializerUtil.toMap(
