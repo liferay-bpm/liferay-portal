@@ -785,6 +785,11 @@ public class ObjectServiceUpgradeStepRegistrator
 			"13.7.0", "13.8.0",
 			new LayoutPageTemplateEntryClassNameIdUpgradeProcess(
 				_companyLocalService));
+
+		registry.register(
+			"13.8.0", "13.9.0",
+			UpgradeProcessFactory.addColumns(
+				"ObjectField", "description STRING null"));
 	}
 
 	private static final String[] _REMOVED_PANEL_CATEGORY_KEYS = {
