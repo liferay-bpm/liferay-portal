@@ -8,8 +8,65 @@ import path from 'path';
 
 import DeserializeUtil from '../../../../../src/main/resources/META-INF/resources/designer/js/definition-builder/source-builder/deserializeUtil';
 
-describe('DeserializeUtil', () => {
-	it('getElements should make transition names unique only when they share the same source node', () => {
+const getReviewTaskData = (fileName) => {
+	const xmlFilePath = path.join(
+		__dirname,
+		`../../../../dependencies/${fileName}`
+	);
+
+	const xmlFileContent = fs.readFileSync(xmlFilePath, 'utf8');
+
+	const deserializeUtil = new DeserializeUtil(xmlFileContent);
+
+	const elements = deserializeUtil.getElements();
+
+	const task = elements.find((element) => element.id === 'Review');
+
+	return task.data;
+};
+
+describe('Deserializing a notification whose recipients omit optional elements', () => {
+	it('Reads a role recipient that omits auto-create', () => {
+		const data = getReviewTaskData(
+			'no-auto-create-role-recipient-workflow-definition.xml'
+		);
+
+		expect(data.notifications.recipients[0][0]).toEqual({
+			assignmentType: ['roleType'],
+			roleName: ['Portal Content Reviewer'],
+			roleType: ['regular'],
+		});
+	});
+
+	it('Reads an empty recipients element', () => {
+		const data = getReviewTaskData(
+			'empty-recipients-workflow-definition.xml'
+		);
+
+		expect(data.notifications.name).toEqual(['Review Notification']);
+	});
+});
+
+describe('Deserializing a task whose assignments omit optional elements', () => {
+	it('Reads an empty assignments element', () => {
+		const data = getReviewTaskData(
+			'empty-assignments-workflow-definition.xml'
+		);
+
+		expect(data.assignments).toEqual({});
+	});
+
+	it('Reads assignments that declare an empty roles element', () => {
+		const data = getReviewTaskData(
+			'empty-roles-assignments-workflow-definition.xml'
+		);
+
+		expect(data.assignments).toEqual({});
+	});
+});
+
+describe('Deserializing transitions that share a name', () => {
+	it('Renames a transition only when its source node already uses the name', () => {
 		const xmlFilePath = path.join(
 			__dirname,
 			'../../../../dependencies/same-name-transitions-workflow-definition.xml'
