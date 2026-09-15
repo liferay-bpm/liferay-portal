@@ -9,10 +9,12 @@ import {
 	CountryInfo,
 	CountrySource,
 	PhoneNumberInput,
+	findCountry,
 } from '@liferay/object-js-components-web';
 import {useFormState} from 'data-engine-js-components-web';
 import {LocalesDropdown} from 'dynamic-data-mapping-form-field-type';
 import {ReactFieldBase as FieldBase} from 'dynamic-data-mapping-form-field-type/api';
+import {sub} from 'frontend-js-web';
 import React, {useState} from 'react';
 
 import type {
@@ -58,6 +60,26 @@ type PhoneNumberProps =
 	| (LocalizablePhoneNumberProps & {localizedObjectField: true})
 	| (NonLocalizablePhoneNumberProps & {localizedObjectField?: false});
 
+const getUnavailableCountryState = (
+	countries: CountryInfo[],
+	countrySource: CountrySource,
+	country?: string
+) => {
+	if (
+		countrySource !== COUNTRY_SOURCE.FIXED ||
+		!country ||
+		findCountry(countries, country)
+	) {
+		return {};
+	}
+
+	return {
+		displayErrors: true,
+		errorMessage: sub(Liferay.Language.get('x-is-not-available'), country),
+		valid: false,
+	};
+};
+
 const getValidationState = (value: string) => {
 	if (value && !PHONE_NUMBER_PATTERN.test(value)) {
 		return {
@@ -93,10 +115,12 @@ const LocalizablePhoneNumber = ({
 	const currentValue = value[editingLanguageId] ?? predefinedValue ?? '';
 	const disabled = readOnly || otherProps.disabled;
 
-	const validationState =
-		touched || otherProps.pageValidationFailed
+	const validationState = {
+		...(touched || otherProps.pageValidationFailed
 			? getValidationState(currentValue)
-			: {};
+			: {}),
+		...getUnavailableCountryState(countries, countrySource, country),
+	};
 
 	const handleBlur = (event: React.FocusEvent) => {
 		setTouched(true);
@@ -123,7 +147,7 @@ const LocalizablePhoneNumber = ({
 			<ClayInput.Group aria-label={otherProps.label} role="group">
 				<PhoneNumberInput
 					countries={countries}
-					country={country}
+					countryA2={country}
 					countrySource={countrySource}
 					disabled={disabled}
 					id={otherProps.id as string}
@@ -167,10 +191,12 @@ const NonLocalizablePhoneNumber = ({
 
 	const disabled = readOnly || otherProps.disabled;
 
-	const validationState =
-		touched || otherProps.pageValidationFailed
+	const validationState = {
+		...(touched || otherProps.pageValidationFailed
 			? getValidationState(combinedValue)
-			: {};
+			: {}),
+		...getUnavailableCountryState(countries, countrySource, country),
+	};
 
 	const handleBlur = (event: React.FocusEvent) => {
 		setTouched(true);
@@ -194,7 +220,7 @@ const NonLocalizablePhoneNumber = ({
 			<ClayInput.Group aria-label={otherProps.label} role="group">
 				<PhoneNumberInput
 					countries={countries}
-					country={country}
+					countryA2={country}
 					countrySource={countrySource}
 					disabled={disabled}
 					id={otherProps.id as string}
