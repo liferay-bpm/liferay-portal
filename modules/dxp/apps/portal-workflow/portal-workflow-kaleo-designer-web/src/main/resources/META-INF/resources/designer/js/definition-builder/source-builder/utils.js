@@ -84,7 +84,7 @@ export function parseAssignments(node) {
 		}
 	}
 
-	if (assignments.assignmentType[0] === 'roleType') {
+	if (assignments.assignmentType?.[0] === 'roleType') {
 		assignments.autoCreate = autoCreateValues[0];
 		assignments.roleName = roleNames[0];
 		assignments.roleType = roleTypes[0];
