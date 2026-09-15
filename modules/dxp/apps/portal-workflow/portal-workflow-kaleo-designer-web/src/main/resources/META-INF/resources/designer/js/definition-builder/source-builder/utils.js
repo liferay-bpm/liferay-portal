@@ -27,6 +27,11 @@ export function parseActions(node) {
 
 export function parseAssignments(node) {
 	const assignments = {};
+
+	if (!Array.isArray(node.assignments)) {
+		return assignments;
+	}
+
 	const autoCreateValues = [];
 	const roleNames = [];
 	const roleTypes = [];
@@ -239,10 +244,9 @@ export function parseNotifications(node) {
 			}
 		}
 
-		if (
-			item.assignees ||
-			(item['recipients'] && 'assignees' in item['recipients'][0])
-		) {
+		const recipient = item['recipients']?.[0];
+
+		if (item.assignees || recipient?.['assignees'] !== undefined) {
 			if (receptionType) {
 				notifications.recipients[index].push({
 					assignmentType: ['taskAssignees'],
@@ -323,7 +327,7 @@ export function parseNotifications(node) {
 				}
 			}
 		}
-		else if (item['recipients'] && item['recipients'][0]?.['user']) {
+		else if (recipient?.['user']) {
 			const emailAddress = [];
 
 			item['recipients'].forEach((item) => {
@@ -349,7 +353,7 @@ export function parseNotifications(node) {
 			}
 		}
 
-		const roles = item['recipients']?.[0]?.['roles'];
+		const roles = recipient?.['roles'];
 
 		if (item['role-type'] || roles?.['role-type']) {
 			const autoCreate = item['auto-create'] || roles?.['auto-create'];
