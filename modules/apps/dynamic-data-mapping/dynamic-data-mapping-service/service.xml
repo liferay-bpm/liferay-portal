@@ -168,6 +168,9 @@
 
 		<!-- Finder methods -->
 
+		<finder name="FieldId" return-type="Collection">
+			<finder-column name="fieldId" />
+		</finder>
 		<finder name="StorageId" return-type="Collection">
 			<finder-column name="storageId" />
 		</finder>
