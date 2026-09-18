@@ -30,6 +30,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Before;
 
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -121,6 +122,16 @@ public abstract class BaseComponentSectionFragmentRendererTestCase {
 				FragmentRendererContext.class, HttpServletRequest.class
 			},
 			null, mockHttpServletRequest);
+	}
+
+	protected void testGetPropsWithTaskObjectEntry() throws Exception {
+		mockHttpServletRequest = getMockHttpServletRequest(
+			cmpTaskObjectDefinition, cmpTaskObjectEntry);
+
+		Map<String, Object> props = getProps();
+
+		Assert.assertEquals(
+			cmpProjectObjectEntry.getGroupId(), props.get("projectGroupId"));
 	}
 
 	protected ObjectDefinition cmpProjectObjectDefinition;
