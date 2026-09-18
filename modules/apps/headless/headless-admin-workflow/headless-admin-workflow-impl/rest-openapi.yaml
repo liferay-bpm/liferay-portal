@@ -178,6 +178,16 @@ components:
                     readOnly: true
                     type: string
             type: object
+        Status:
+            properties:
+                code:
+                    format: int32
+                    type: integer
+                label:
+                    type: string
+                label_i18n:
+                    type: string
+            type: object
         Transition:
             description:
                 Represents the transition to be launched by the task's workflow.
@@ -240,8 +250,14 @@ components:
                         $ref: "#/components/schemas/Node"
                     readOnly: true
                     type: array
+                permissions:
+                    items:
+                        type: permission
+                    type: array
                 scope:
                     type: string
+                status:
+                    $ref: "#/components/schemas/Status"
                 system:
                     type: boolean
                 title:
@@ -772,6 +788,47 @@ paths:
             tags: ["WorkflowDefinition"]
         post:
             operationId: postWorkflowDefinition
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/WorkflowDefinition"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/WorkflowDefinition"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/WorkflowDefinition"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/WorkflowDefinition"
+            tags: ["WorkflowDefinition"]
+    "/workflow-definitions/by-external-reference-code/{externalReferenceCode}":
+        delete:
+            operationId: deleteWorkflowDefinitionByExternalReferenceCode
+            parameters:
+                -   in: path
+                    name: externalReferenceCode
+                    required: true
+                    schema:
+                        type: string
+            responses:
+                204:
+                    content:
+                        application/json: {}
+                        application/xml: {}
+            tags: ["WorkflowDefinition"]
+        put:
+            operationId: putWorkflowDefinitionByExternalReferenceCode
+            parameters:
+                -   in: path
+                    name: externalReferenceCode
+                    required: true
+                    schema:
+                        type: string
             requestBody:
                 content:
                     application/json:

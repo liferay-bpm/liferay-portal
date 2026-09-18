@@ -10,8 +10,11 @@ import com.liferay.account.model.AccountEntry;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.headless.admin.workflow.client.dto.v1_0.Node;
+import com.liferay.headless.admin.workflow.client.dto.v1_0.Status;
 import com.liferay.headless.admin.workflow.client.dto.v1_0.Transition;
 import com.liferay.headless.admin.workflow.client.dto.v1_0.WorkflowDefinition;
+import com.liferay.headless.admin.workflow.client.permission.Permission;
+import com.liferay.headless.admin.workflow.client.resource.v1_0.WorkflowDefinitionResource;
 import com.liferay.headless.admin.workflow.client.serdes.v1_0.WorkflowDefinitionSerDes;
 import com.liferay.headless.admin.workflow.resource.v1_0.test.util.WorkflowDefinitionTestUtil;
 import com.liferay.petra.io.StreamUtil;
@@ -22,6 +25,9 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DataGuard;
@@ -29,25 +35,32 @@ import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.workflow.constants.WorkflowDefinitionConstants;
 import com.liferay.portal.workflow.kaleo.definition.util.WorkflowDefinitionContentUtil;
+import com.liferay.portal.workflow.kaleo.model.KaleoDefinition;
+import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionLocalService;
 import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Ignore;
@@ -92,6 +105,27 @@ public class WorkflowDefinitionResourceTest
 			content.getBytes(), _workflowDefinition.getCompanyId(), null,
 			_workflowDefinition.getName(), _workflowDefinition.getTitle(),
 			_workflowDefinition.getUserId());
+	}
+
+	@Before
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+
+		User adminUser = UserTestUtil.getAdminUser(testCompany.getCompanyId());
+
+		_permissionsWorkflowDefinitionResource =
+			WorkflowDefinitionResource.builder(
+			).authentication(
+				adminUser.getEmailAddress(), PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(),
+				PortalUtil.getPortalServerPort(false), "http"
+			).locale(
+				LocaleUtil.getDefault()
+			).parameter(
+				"nestedFields", "permissions"
+			).build();
 	}
 
 	@After
@@ -297,6 +331,74 @@ public class WorkflowDefinitionResourceTest
 	}
 
 	@Override
+	@Test
+	public void testPutWorkflowDefinitionByExternalReferenceCode()
+		throws Exception {
+
+		WorkflowDefinition randomWorkflowDefinition =
+			randomWorkflowDefinition();
+
+		randomWorkflowDefinition.setPermissions(
+			new Permission[] {
+				new Permission() {
+					{
+						actionIds = new Object[] {ActionKeys.VIEW};
+						roleName = RoleConstants.SITE_MEMBER;
+					}
+				}
+			});
+
+		WorkflowDefinition putWorkflowDefinition =
+			workflowDefinitionResource.
+				putWorkflowDefinitionByExternalReferenceCode(
+					randomWorkflowDefinition.getExternalReferenceCode(),
+					randomWorkflowDefinition);
+
+		_workflowDefinitions.put(
+			putWorkflowDefinition.getName(), putWorkflowDefinition);
+
+		Assert.assertTrue(putWorkflowDefinition.getActive());
+
+		WorkflowDefinition getWorkflowDefinition =
+			_permissionsWorkflowDefinitionResource.getWorkflowDefinition(
+				putWorkflowDefinition.getId());
+
+		Permission siteMemberPermission = null;
+
+		for (Permission permission : getWorkflowDefinition.getPermissions()) {
+			if (Objects.equals(
+					permission.getRoleName(), RoleConstants.SITE_MEMBER)) {
+
+				siteMemberPermission = permission;
+
+				break;
+			}
+		}
+
+		Assert.assertArrayEquals(
+			new Object[] {ActionKeys.VIEW},
+			siteMemberPermission.getActionIds());
+
+		randomWorkflowDefinition.setStatus(
+			new Status() {
+				{
+					code = WorkflowConstants.STATUS_DRAFT;
+				}
+			});
+
+		putWorkflowDefinition =
+			workflowDefinitionResource.
+				putWorkflowDefinitionByExternalReferenceCode(
+					randomWorkflowDefinition.getExternalReferenceCode(),
+					randomWorkflowDefinition);
+
+		_workflowDefinitions.put(
+			putWorkflowDefinition.getName(), putWorkflowDefinition);
+
+		Assert.assertFalse(putWorkflowDefinition.getActive());
+	}
+
+	@Override
 	protected String[] getAdditionalAssertFieldNames() {
 		return new String[] {
 			"active", "name", "nodes", "scope", "system", "title", "title_i18n",
@@ -395,6 +497,15 @@ public class WorkflowDefinitionResourceTest
 	@Override
 	protected WorkflowDefinition
 			testDeleteWorkflowDefinition_addWorkflowDefinition()
+		throws Exception {
+
+		return testGetWorkflowDefinitionsPage_addWorkflowDefinition(
+			randomWorkflowDefinition());
+	}
+
+	@Override
+	protected WorkflowDefinition
+			testDeleteWorkflowDefinitionByExternalReferenceCode_addWorkflowDefinition()
 		throws Exception {
 
 		return testGetWorkflowDefinitionsPage_addWorkflowDefinition(
@@ -504,6 +615,34 @@ public class WorkflowDefinitionResourceTest
 		throws Exception {
 
 		return testGetWorkflowDefinition_addWorkflowDefinition();
+	}
+
+	@Override
+	protected WorkflowDefinition
+			testPutWorkflowDefinitionByExternalReferenceCode_addWorkflowDefinition()
+		throws Exception {
+
+		return testGetWorkflowDefinitionsPage_addWorkflowDefinition(
+			randomWorkflowDefinition());
+	}
+
+	@Override
+	protected WorkflowDefinition
+		testPutWorkflowDefinitionByExternalReferenceCode_getWorkflowDefinition(
+			String externalReferenceCode) {
+
+		try {
+			KaleoDefinition kaleoDefinition =
+				_kaleoDefinitionLocalService.
+					getKaleoDefinitionByExternalReferenceCode(
+						externalReferenceCode, testCompany.getCompanyId());
+
+			return workflowDefinitionResource.getWorkflowDefinition(
+				kaleoDefinition.getKaleoDefinitionId());
+		}
+		catch (Exception exception) {
+			return null;
+		}
 	}
 
 	private static void _undeployWorkflowDefinition(
@@ -633,6 +772,10 @@ public class WorkflowDefinitionResourceTest
 	@Inject
 	private GroupLocalService _groupLocalService;
 
+	@Inject
+	private KaleoDefinitionLocalService _kaleoDefinitionLocalService;
+
+	private WorkflowDefinitionResource _permissionsWorkflowDefinitionResource;
 	private final Map<String, WorkflowDefinition> _workflowDefinitions =
 		new HashMap<>();
 
