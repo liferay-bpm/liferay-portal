@@ -1808,6 +1808,19 @@ public class ObjectEntryLocalServiceImpl
 			(Function<Object, Object>)attributeGetterFunctions.get(
 				titleObjectField.getDBColumnName());
 
+		// The user's full name is exposed as the UserAccount DTO's "name"
+		// property, which is computed by User.getFullName() rather than backed
+		// by a column in the User_ table, so it has no attribute getter
+		// function
+
+		if ((function == null) && (baseModel instanceof User) &&
+			Objects.equals(titleObjectField.getName(), "name")) {
+
+			User user = (User)baseModel;
+
+			return user.getFullName();
+		}
+
 		return String.valueOf(function.apply(baseModel));
 	}
 
