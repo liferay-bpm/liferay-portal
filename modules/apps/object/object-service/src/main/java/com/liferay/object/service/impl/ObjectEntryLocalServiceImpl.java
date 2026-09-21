@@ -810,10 +810,10 @@ public class ObjectEntryLocalServiceImpl
 				objectEntry.getObjectDefinitionId());
 
 		_removeInvalidAssetCategories(
-			groupId, objectDefinition.getClassName(), objectEntryId,
+			objectDefinition.getClassName(), groupId, objectEntryId,
 			serviceContext);
 		_removeInvalidAssetTags(
-			groupId, objectDefinition.getClassName(), objectEntryId,
+			objectDefinition.getClassName(), groupId, objectEntryId,
 			serviceContext);
 
 		List<ObjectField> objectFields =
@@ -2047,10 +2047,10 @@ public class ObjectEntryLocalServiceImpl
 				objectEntry.getObjectDefinitionId());
 
 		_removeInvalidAssetCategories(
-			objectEntryFolder.getGroupId(), objectDefinition.getClassName(),
+			objectDefinition.getClassName(), objectEntryFolder.getGroupId(),
 			objectEntryId, serviceContext);
 		_removeInvalidAssetTags(
-			objectEntryFolder.getGroupId(), objectDefinition.getClassName(),
+			objectDefinition.getClassName(), objectEntryFolder.getGroupId(),
 			objectEntryId, serviceContext);
 
 		return _updateObjectEntry(
@@ -6917,7 +6917,7 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	private void _removeInvalidAssetCategories(
-			long groupId, String className, long objectEntryId,
+			String className, long groupId, long objectEntryId,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -6957,7 +6957,7 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	private void _removeInvalidAssetTags(
-			long groupId, String className, long objectEntryId,
+			String className, long groupId, long objectEntryId,
 			ServiceContext serviceContext)
 		throws PortalException {
 
