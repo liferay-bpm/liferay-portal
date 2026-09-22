@@ -44,4 +44,9 @@ public class ViewProjectSponsorAssigneeSectionDisplayContext
 		return getValueJSONObject("r_userToCMPProjectSponsor_userId");
 	}
 
+	@Override
+	protected long getProjectId() {
+		return objectEntry.getObjectEntryId();
+	}
+
 }

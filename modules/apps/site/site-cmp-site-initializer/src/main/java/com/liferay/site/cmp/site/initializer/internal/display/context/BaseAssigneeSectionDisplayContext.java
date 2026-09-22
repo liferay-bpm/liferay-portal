@@ -6,6 +6,7 @@
 package com.liferay.site.cmp.site.initializer.internal.display.context;
 
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -70,9 +71,12 @@ public abstract class BaseAssigneeSectionDisplayContext {
 
 	public abstract JSONObject getValueJSONObject() throws Exception;
 
+	protected abstract long getProjectId();
+
 	protected String getSearchURL() {
-		return themeDisplay.getPortalURL() +
-			"/o/headless-cmp/v1.0/task-assignees";
+		return StringBundler.concat(
+			themeDisplay.getPortalURL(), "/o/headless-cmp/v1.0/projects/",
+			getProjectId(), "/task-assignees");
 	}
 
 	protected JSONObject getValueJSONObject(String objectFieldName)
