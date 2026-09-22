@@ -648,6 +648,22 @@ public class ObjectEntryModelListenerTest {
 		_assertGroupMembershipWithoutUserGroupRoles(
 			cmpProjectObjectEntry, projectManagerUser);
 
+		// Clearing the project sponsor keeps their project member role
+
+		User projectMemberUser = UserTestUtil.addGroupUser(
+			_groupLocalService.getGroup(cmpProjectObjectEntry.getGroupId()),
+			DepotRolesConstants.PROJECT_MEMBER);
+
+		cmpProjectObjectEntry = _updateProjectManagerProjectSponsor(
+			cmpProjectObjectEntry, 0, projectMemberUser.getUserId(),
+			TestPropsValues.getUserId());
+
+		cmpProjectObjectEntry = _updateProjectManagerProjectSponsor(
+			cmpProjectObjectEntry, 0, 0, TestPropsValues.getUserId());
+
+		_assertGroupMembershipWithProjectMemberRole(
+			cmpProjectObjectEntry, projectMemberUser);
+
 		// Reassigning as the outgoing project manager keeps authority on save
 
 		cmpProjectObjectEntry = _updateProjectManagerProjectSponsor(
