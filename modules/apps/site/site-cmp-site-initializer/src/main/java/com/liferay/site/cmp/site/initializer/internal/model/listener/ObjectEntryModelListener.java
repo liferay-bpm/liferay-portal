@@ -639,10 +639,6 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 			projectSponsorRoleNames, projectSponsorUserId);
 
 		_deleteUserGroupRoles(
-			companyId, groupId, originalProjectSponsorUserId,
-			projectSponsorRoleNames, projectSponsorUserId);
-
-		_deleteUserGroupRoles(
 			companyId, groupId, originalProjectManagerUserId,
 			projectManagerRoleNames, projectManagerUserId);
 	}
