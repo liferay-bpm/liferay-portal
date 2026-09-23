@@ -10,3 +10,4 @@ export {default as GoogleMapsGeocoder} from './GoogleMapsGeocoder';
 export {default as GoogleMapsMarker} from './GoogleMapsMarker';
 export {default as GoogleMapsSearch} from './GoogleMapsSearch';
 export {default as MapGoogleMaps} from './MapGoogleMaps';
+export {default as loadGoogleMaps} from './loadGoogleMaps';
