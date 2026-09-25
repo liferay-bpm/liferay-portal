@@ -844,6 +844,16 @@ public class PortalUpgradeProcessRegistryImpl
 				"LayoutSetPrototype", "name", "TEXT null"),
 			UpgradeProcessFactory.alterColumnType(
 				"LayoutSetPrototype", "description", "TEXT null"));
+
+		upgradeVersionTreeMap.put(
+			new Version(39, 1, 0),
+			UpgradeProcessFactory.addColumns(
+				"AssetTagGroupRel", "depotEntryType INTEGER"),
+			UpgradeProcessFactory.runSQL(
+				"update AssetTagGroupRel set depotEntryType = 1"));
+
+		upgradeVersionTreeMap.put(
+			new Version(39, 2, 0), new AssetTagGroupRelUpgradeProcess());
 	}
 
 }
