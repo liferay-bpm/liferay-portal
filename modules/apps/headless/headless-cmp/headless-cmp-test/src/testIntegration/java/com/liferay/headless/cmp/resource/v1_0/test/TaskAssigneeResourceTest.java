@@ -139,6 +139,7 @@ public class TaskAssigneeResourceTest extends BaseTaskAssigneeResourceTestCase {
 				objectEntry.getObjectEntryId(), null, "User"));
 
 		_testGetProjectTaskAssigneesPageWithAppDisabled(objectEntry);
+		_testGetProjectTaskAssigneesPageWithProjectManager(objectEntry);
 	}
 
 	@Override
@@ -245,6 +246,73 @@ public class TaskAssigneeResourceTest extends BaseTaskAssigneeResourceTestCase {
 				objectEntry.getObjectEntryId(), null, null));
 	}
 
+	private void _testGetProjectTaskAssigneesPageWithProjectManager(
+			ObjectEntry objectEntry)
+		throws Exception {
+
+		long groupId = objectEntry.getGroupId();
+
+		User projectManagerUser = UserTestUtil.addUser(
+			testCompany, PropsValues.DEFAULT_ADMIN_PASSWORD);
+
+		_userLocalService.addGroupUsers(
+			groupId, new long[] {projectManagerUser.getUserId()});
+
+		_userLocalService.updateEmailAddressVerified(
+			projectManagerUser.getUserId(), true);
+
+		Role projectManagerRole = _roleLocalService.getRole(
+			TestPropsValues.getCompanyId(),
+			DepotRolesConstants.PROJECT_MANAGER);
+
+		_userGroupRoleLocalService.addUserGroupRoles(
+			projectManagerUser.getUserId(), groupId,
+			new long[] {projectManagerRole.getRoleId()});
+
+		String lastName = RandomTestUtil.randomString();
+
+		User companyAdminUser = _addUser(
+			groupId, RandomTestUtil.randomString(), lastName);
+
+		Role administratorRole = _roleLocalService.getRole(
+			TestPropsValues.getCompanyId(), RoleConstants.ADMINISTRATOR);
+
+		_roleLocalService.addUserRoles(
+			companyAdminUser.getUserId(),
+			new long[] {administratorRole.getRoleId()});
+
+		User assignableUser = _addUser(
+			groupId, RandomTestUtil.randomString(), lastName);
+
+		TaskAssigneeResource projectManagerTaskAssigneeResource =
+			TaskAssigneeResource.builder(
+			).authentication(
+				projectManagerUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(),
+				PortalUtil.getPortalServerPort(false), "http"
+			).locale(
+				LocaleUtil.getDefault()
+			).build();
+
+		long[] taskAssigneeIds = _getTaskAssigneeIds(
+			projectManagerTaskAssigneeResource.getProjectTaskAssigneesPage(
+				objectEntry.getObjectEntryId(), lastName, "User"));
+
+		Assert.assertFalse(
+			ArrayUtil.contains(taskAssigneeIds, companyAdminUser.getUserId()));
+		Assert.assertTrue(
+			ArrayUtil.contains(taskAssigneeIds, assignableUser.getUserId()));
+
+		Assert.assertTrue(
+			ArrayUtil.contains(
+				_getTaskAssigneeIds(
+					taskAssigneeResource.getProjectTaskAssigneesPage(
+						objectEntry.getObjectEntryId(), lastName, "User")),
+				companyAdminUser.getUserId()));
+	}
+
 	private void _testGetTaskAssigneesPageWithAppDisabled() throws Exception {
 		try (AutoCloseable autoCloseable =
 				CMPLicenseTestUtil.withAppDisabled()) {
@@ -304,14 +372,14 @@ public class TaskAssigneeResourceTest extends BaseTaskAssigneeResourceTestCase {
 
 		String lastName = RandomTestUtil.randomString();
 
-		User administratorUser = _addUser(
+		User companyAdminUser = _addUser(
 			groupId, RandomTestUtil.randomString(), lastName);
 
 		Role administratorRole = _roleLocalService.getRole(
 			TestPropsValues.getCompanyId(), RoleConstants.ADMINISTRATOR);
 
 		_roleLocalService.addUserRoles(
-			administratorUser.getUserId(),
+			companyAdminUser.getUserId(),
 			new long[] {administratorRole.getRoleId()});
 
 		User assignableUser = _addUser(
@@ -334,7 +402,7 @@ public class TaskAssigneeResourceTest extends BaseTaskAssigneeResourceTestCase {
 				lastName, "User"));
 
 		Assert.assertFalse(
-			ArrayUtil.contains(taskAssigneeIds, administratorUser.getUserId()));
+			ArrayUtil.contains(taskAssigneeIds, companyAdminUser.getUserId()));
 		Assert.assertTrue(
 			ArrayUtil.contains(taskAssigneeIds, assignableUser.getUserId()));
 
@@ -343,14 +411,14 @@ public class TaskAssigneeResourceTest extends BaseTaskAssigneeResourceTestCase {
 				_getTaskAssigneeIds(
 					spaceAdministratorTaskAssigneeResource.getTaskAssigneesPage(
 						lastName, null)),
-				administratorUser.getUserId()));
+				companyAdminUser.getUserId()));
 
 		Assert.assertTrue(
 			ArrayUtil.contains(
 				_getTaskAssigneeIds(
 					taskAssigneeResource.getTaskAssigneesPage(
 						lastName, "User")),
-				administratorUser.getUserId()));
+				companyAdminUser.getUserId()));
 	}
 
 	@DeleteAfterTestRun
