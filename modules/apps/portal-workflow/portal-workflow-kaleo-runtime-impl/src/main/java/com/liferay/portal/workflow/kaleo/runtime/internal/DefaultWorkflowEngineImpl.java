@@ -15,22 +15,27 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionCallbackUtil;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.kernel.workflow.DefaultWorkflowTransition;
 import com.liferay.portal.kernel.workflow.RequiredWorkflowDefinitionException;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionFileException;
 import com.liferay.portal.kernel.workflow.WorkflowException;
@@ -152,6 +157,8 @@ public class DefaultWorkflowEngineImpl
 		throws WorkflowException {
 
 		try {
+			_checkPermissions(serviceContext);
+
 			Definition definition = _workflowModelParser.parse(inputStream);
 
 			if (_workflowValidator != null) {
@@ -768,6 +775,24 @@ public class DefaultWorkflowEngineImpl
 		}
 	}
 
+	private void _checkPermissions(ServiceContext serviceContext)
+		throws PrincipalException {
+
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		if ((permissionChecker == null) ||
+			!GetterUtil.getBoolean(
+				serviceContext.getAttribute("checkPermission"), true)) {
+
+			return;
+		}
+
+		_portletResourcePermission.check(
+			permissionChecker, serviceContext.getScopeGroupId(),
+			ActionKeys.ADD_DEFINITION);
+	}
+
 	private void _executeTimer(ExecutionContext executionContext)
 		throws PortalException {
 
@@ -961,6 +986,11 @@ public class DefaultWorkflowEngineImpl
 
 	@Reference
 	private KaleoWorkflowModelConverter _kaleoWorkflowModelConverter;
+
+	@Reference(
+		target = "(resource.name=" + WorkflowConstants.RESOURCE_NAME + ")"
+	)
+	private PortletResourcePermission _portletResourcePermission;
 
 	@Reference
 	private UserLocalService _userLocalService;

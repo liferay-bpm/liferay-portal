@@ -9,11 +9,16 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.test.AssertUtils;
+import com.liferay.portal.kernel.test.context.ContextUserReplace;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -21,6 +26,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.DefaultWorkflowNodeSetting;
 import com.liferay.portal.kernel.workflow.NoSuchWorkflowDefinitionException;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
+import com.liferay.portal.kernel.workflow.WorkflowDefinitionFileException;
 import com.liferay.portal.kernel.workflow.WorkflowException;
 import com.liferay.portal.kernel.workflow.WorkflowNode;
 import com.liferay.portal.kernel.workflow.WorkflowNodeSetting;
@@ -509,6 +515,72 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 				StringUtil.randomId(), TestPropsValues.getUserId());
 
 		Assert.assertFalse(workflowDefinition.isSystem());
+	}
+
+	@Test
+	public void testDeployWorkflowDefinitionWithUnauthorizedSchemaLocation()
+		throws Exception {
+
+		String content = new String(
+			FileUtil.getBytes(
+				getResourceInputStream(
+					"single-approver-workflow-definition.xml")));
+
+		String schemaLocation =
+			"http://127.0.0.1/dtd/liferay-workflow-definition_7_4_0.xsd";
+
+		_testDeployWorkflowDefinitionWithUnauthorizedSchemaLocation(
+			StringUtil.replace(content, "www.liferay.com", "127.0.0.1"),
+			schemaLocation);
+
+		schemaLocation = "http://127.0.0.1/none.xsd";
+
+		_testDeployWorkflowDefinitionWithUnauthorizedSchemaLocation(
+			StringUtil.replace(
+				content, "xmlns:xsi=",
+				StringBundler.concat(
+					"xsi:noNamespaceSchemaLocation=\"", schemaLocation,
+					"\"\n\txmlns:xsi=")),
+			schemaLocation);
+
+		schemaLocation = "http://127.0.0.1/nested.xsd";
+
+		_testDeployWorkflowDefinitionWithUnauthorizedSchemaLocation(
+			StringUtil.replace(
+				content, "<name>Single Approver</name>",
+				StringBundler.concat(
+					"<name xmlns:zz=\"",
+					"http://www.w3.org/2001/XMLSchema-instance\" ",
+					"zz:schemaLocation=\"",
+					"urn:liferay.com:liferay-workflow_7.4.0 ", schemaLocation,
+					"\">Single Approver</name>")),
+			schemaLocation);
+	}
+
+	@Test
+	public void testDeployWorkflowDefinitionWithoutPermission()
+		throws Exception {
+
+		User user = UserTestUtil.addUser();
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				user, PermissionCheckerFactoryUtil.create(user))) {
+
+			String content = RandomTestUtil.randomString();
+
+			WorkflowException workflowException = Assert.assertThrows(
+				WorkflowException.class,
+				() -> _workflowDefinitionManager.deployWorkflowDefinition(
+					content.getBytes(), TestPropsValues.getCompanyId(), null,
+					RandomTestUtil.randomString(), StringPool.BLANK,
+					user.getUserId()));
+
+			Throwable throwable = workflowException.getCause();
+
+			Assert.assertTrue(
+				String.valueOf(throwable),
+				throwable instanceof PrincipalException.MustHavePermission);
+		}
 	}
 
 	@Test
@@ -1032,6 +1104,28 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 		return _workflowDefinitionManager.saveWorkflowDefinition(
 			bytes, TestPropsValues.getCompanyId(), null, StringUtil.randomId(),
 			title, TestPropsValues.getUserId());
+	}
+
+	private void _testDeployWorkflowDefinitionWithUnauthorizedSchemaLocation(
+			String content, String schemaLocation)
+		throws Exception {
+
+		WorkflowDefinitionFileException workflowDefinitionFileException =
+			Assert.assertThrows(
+				WorkflowDefinitionFileException.class,
+				() -> _workflowDefinitionManager.deployWorkflowDefinition(
+					content.getBytes(), TestPropsValues.getCompanyId(), null,
+					StringUtil.randomId(), StringPool.BLANK,
+					TestPropsValues.getUserId()));
+
+		Throwable throwable = workflowDefinitionFileException.getCause();
+
+		Throwable causeThrowable = throwable.getCause();
+
+		Assert.assertEquals(
+			"Unable to reference the XML schema location \"" + schemaLocation +
+				"\"",
+			causeThrowable.getMessage());
 	}
 
 	private void _testGetWorkflowDefinition(String externalReferenceCode)

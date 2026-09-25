@@ -5,6 +5,7 @@
 
 package com.liferay.portal.workflow.kaleo.definition.internal.parser;
 
+import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -14,6 +15,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionFileException;
 import com.liferay.portal.kernel.workflow.WorkflowException;
+import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
@@ -60,8 +62,10 @@ import com.liferay.portal.workflow.kaleo.definition.util.WorkflowDefinitionConte
 import java.io.InputStream;
 
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -93,10 +97,17 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 	@Override
 	public Definition parse(String content) throws WorkflowException {
 		try {
-			Document document = SAXReaderUtil.read(
-				WorkflowDefinitionContentUtil.toXML(content), _validate);
+			String xml = WorkflowDefinitionContentUtil.toXML(content);
 
-			return _parse(document);
+			boolean validate = _validate;
+
+			if (validate) {
+				Document document = SAXReaderUtil.read(xml, false);
+
+				_validateSchemaLocations(document.getRootElement());
+			}
+
+			return _parse(SAXReaderUtil.read(xml, validate));
 		}
 		catch (Exception exception) {
 			throw new WorkflowDefinitionFileException(
@@ -112,6 +123,36 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 	@Activate
 	protected void activate(Map<String, Object> properties) {
 		_validate = GetterUtil.getBoolean(properties.get("validating"), true);
+	}
+
+	private boolean _isAuthorizedSchemaLocation(String schemaLocation) {
+		if (schemaLocation.startsWith(_NAMESPACE_PREFIX)) {
+			return true;
+		}
+
+		if (!schemaLocation.startsWith(_SYSTEM_ID_PREFIX) ||
+			!schemaLocation.endsWith(_XSD_EXTENSION)) {
+
+			return false;
+		}
+
+		String version = schemaLocation.substring(
+			_SYSTEM_ID_PREFIX.length(),
+			schemaLocation.length() - _XSD_EXTENSION.length());
+
+		if (version.isEmpty()) {
+			return false;
+		}
+
+		for (int i = 0; i < version.length(); i++) {
+			char c = version.charAt(i);
+
+			if (!Character.isDigit(c) && (c != CharPool.UNDERLINE)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	private String _normalizeJSONArrayJSON(String json) throws Exception {
@@ -1224,6 +1265,70 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 			_parseTransition(definition, taskElement);
 		}
 	}
+
+	private void _validateSchemaLocations(Element rootElement)
+		throws WorkflowDefinitionFileException {
+
+		Deque<Element> elements = new LinkedList<>();
+
+		elements.push(rootElement);
+
+		while (!elements.isEmpty()) {
+			Element element = elements.pop();
+
+			for (Attribute attribute : element.attributes()) {
+				if (!_XML_SCHEMA_INSTANCE_NAMESPACE_URI.equals(
+						attribute.getNamespaceURI())) {
+
+					continue;
+				}
+
+				String name = attribute.getName();
+
+				if (!name.equals("noNamespaceSchemaLocation") &&
+					!name.equals("schemaLocation")) {
+
+					continue;
+				}
+
+				String value = StringUtil.replace(
+					attribute.getValue(),
+					new char[] {
+						CharPool.NEW_LINE, CharPool.RETURN, CharPool.TAB
+					},
+					new char[] {
+						CharPool.SPACE, CharPool.SPACE, CharPool.SPACE
+					});
+
+				for (String schemaLocation :
+						StringUtil.split(value, CharPool.SPACE)) {
+
+					if (schemaLocation.isEmpty() ||
+						_isAuthorizedSchemaLocation(schemaLocation)) {
+
+						continue;
+					}
+
+					throw new WorkflowDefinitionFileException(
+						"Unable to reference the XML schema location \"" +
+							schemaLocation + "\"");
+				}
+			}
+
+			elements.addAll(element.elements());
+		}
+	}
+
+	private static final String _NAMESPACE_PREFIX =
+		"urn:liferay.com:liferay-workflow_";
+
+	private static final String _SYSTEM_ID_PREFIX =
+		"http://www.liferay.com/dtd/liferay-workflow-definition_";
+
+	private static final String _XML_SCHEMA_INSTANCE_NAMESPACE_URI =
+		"http://www.w3.org/2001/XMLSchema-instance";
+
+	private static final String _XSD_EXTENSION = ".xsd";
 
 	@Reference
 	private JSONFactory _jsonFactory;
