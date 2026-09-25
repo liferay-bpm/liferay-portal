@@ -276,14 +276,16 @@ public class NotificationTemplateResourceImpl
 			_toModelPermissions(notificationTemplate, 0L));
 		notificationContext.setNotificationRecipient(
 			NotificationUtil.toNotificationRecipient(contextUser, 0L));
-		notificationContext.setNotificationRecipientSettings(
-			_notificationRecipientSettingLocalService.
-				createNotificationRecipientSettings(
-					0L, notificationTemplate.getRecipients(), contextUser));
 		notificationContext.setNotificationTemplate(
 			NotificationUtil.toNotificationTemplate(
 				0L, notificationTemplate, _objectDefinitionLocalService,
 				contextUser));
+
+		notificationContext.setNotificationRecipientSettings(
+			_notificationRecipientSettingLocalService.
+				createNotificationRecipientSettings(
+					notificationContext, 0L,
+					notificationTemplate.getRecipients(), contextUser));
 
 		return _toNotificationTemplate(
 			_notificationTemplateService.addNotificationTemplate(
@@ -380,16 +382,18 @@ public class NotificationTemplateResourceImpl
 				contextUser, notificationTemplateId);
 
 		notificationContext.setNotificationRecipient(notificationRecipient);
-		notificationContext.setNotificationRecipientSettings(
-			_notificationRecipientSettingLocalService.
-				createNotificationRecipientSettings(
-					notificationRecipient.getNotificationRecipientId(),
-					notificationTemplate.getRecipients(), contextUser));
 
 		notificationContext.setNotificationTemplate(
 			NotificationUtil.toNotificationTemplate(
 				notificationTemplateId, notificationTemplate,
 				_objectDefinitionLocalService, contextUser));
+
+		notificationContext.setNotificationRecipientSettings(
+			_notificationRecipientSettingLocalService.
+				createNotificationRecipientSettings(
+					notificationContext,
+					notificationRecipient.getNotificationRecipientId(),
+					notificationTemplate.getRecipients(), contextUser));
 
 		return _toNotificationTemplate(
 			_notificationTemplateService.updateNotificationTemplate(

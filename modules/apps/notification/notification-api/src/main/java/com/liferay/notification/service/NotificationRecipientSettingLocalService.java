@@ -6,6 +6,7 @@
 package com.liferay.notification.service;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
@@ -87,6 +88,11 @@ public interface NotificationRecipientSettingLocalService
 
 	public List<NotificationRecipientSetting>
 		createNotificationRecipientSettings(
+			long notificationRecipientId, Object[] recipients, User user);
+
+	public List<NotificationRecipientSetting>
+		createNotificationRecipientSettings(
+			NotificationContext notificationContext,
 			long notificationRecipientId, Object[] recipients, User user);
 
 	/**
@@ -321,4 +327,4 @@ public interface NotificationRecipientSettingLocalService
 		NotificationRecipientSetting notificationRecipientSetting);
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1171861353
+// LIFERAY-SERVICE-BUILDER-HASH:-1123134357

@@ -6,6 +6,7 @@
 package com.liferay.notification.type;
 
 import com.liferay.notification.constants.NotificationQueueEntryConstants;
+import com.liferay.notification.constants.NotificationRecipientSettingConstants;
 import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.exception.NotificationQueueEntrySubjectException;
 import com.liferay.notification.exception.NotificationRecipientSettingNameException;
@@ -27,7 +28,10 @@ import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
 import com.liferay.object.service.ObjectFieldLocalServiceUtil;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserGroup;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserGroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -126,12 +130,7 @@ public abstract class BaseNotificationType implements NotificationType {
 		List<NotificationRecipientSetting> notificationRecipientSettings) {
 
 		return TransformUtil.transformToArray(
-			notificationRecipientSettings,
-			notificationRecipientSetting -> HashMapBuilder.put(
-				notificationRecipientSetting.getName(),
-				notificationRecipientSetting.getValue()
-			).build(),
-			Object.class);
+			notificationRecipientSettings, this::_toRecipientMap, Object.class);
 	}
 
 	@Override
@@ -350,5 +349,68 @@ public abstract class BaseNotificationType implements NotificationType {
 	protected UserLocalService userLocalService;
 
 	protected Locale userLocale;
+
+	private Map<String, String> _toRecipientMap(
+		NotificationRecipientSetting notificationRecipientSetting) {
+
+		Map<String, String> map = HashMapBuilder.put(
+			notificationRecipientSetting.getName(),
+			notificationRecipientSetting.getValue()
+		).build();
+
+		String name = notificationRecipientSetting.getName();
+
+		if (Objects.equals(
+				name, NotificationRecipientSettingConstants.NAME_ROLE_NAME)) {
+
+			Role role = roleLocalService.fetchRole(
+				notificationRecipientSetting.getCompanyId(),
+				notificationRecipientSetting.getValue());
+
+			if (role != null) {
+				map.put(
+					NotificationRecipientSettingConstants.
+						NAME_ROLE_EXTERNAL_REFERENCE_CODE,
+					role.getExternalReferenceCode());
+				map.put(
+					NotificationRecipientSettingConstants.NAME_ROLE_TYPE,
+					RoleConstants.getTypeLabel(role.getType()));
+			}
+		}
+		else if (Objects.equals(
+					name,
+					NotificationRecipientSettingConstants.
+						NAME_USER_GROUP_NAME)) {
+
+			UserGroup userGroup = userGroupLocalService.fetchUserGroup(
+				notificationRecipientSetting.getCompanyId(),
+				notificationRecipientSetting.getValue());
+
+			if (userGroup != null) {
+				map.put(
+					NotificationRecipientSettingConstants.
+						NAME_USER_GROUP_EXTERNAL_REFERENCE_CODE,
+					userGroup.getExternalReferenceCode());
+			}
+		}
+		else if (Objects.equals(
+					name,
+					NotificationRecipientSettingConstants.
+						NAME_USER_SCREEN_NAME)) {
+
+			User user = userLocalService.fetchUserByScreenName(
+				notificationRecipientSetting.getCompanyId(),
+				notificationRecipientSetting.getValue());
+
+			if (user != null) {
+				map.put(
+					NotificationRecipientSettingConstants.
+						NAME_USER_EXTERNAL_REFERENCE_CODE,
+					user.getExternalReferenceCode());
+			}
+		}
+
+		return map;
+	}
 
 }
