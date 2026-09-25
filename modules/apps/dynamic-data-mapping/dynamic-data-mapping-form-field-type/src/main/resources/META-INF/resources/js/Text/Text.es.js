@@ -142,17 +142,22 @@ const Text = ({
 		shouldUpdateValue,
 	]);
 
-	const handleChangeInput = (event) => {
-		const {value} = event.target;
-
+	const getNormalizedValue = (value) => {
 		if (normalizeField) {
-			event.target.value = normalizeFieldName(value);
+			return normalizeFieldName(value);
 		}
-		else if (invalidCharacters) {
+
+		if (invalidCharacters) {
 			const regex = new RegExp(invalidCharacters, 'g');
 
-			event.target.value = value.replace(regex, '');
+			return value.replace(regex, '');
 		}
+
+		return value;
+	};
+
+	const handleChangeInput = (event) => {
+		event.target.value = getNormalizedValue(event.target.value);
 
 		onChange(event);
 		setValue(event.target.value);
@@ -184,7 +189,11 @@ const Text = ({
 							focusedTooltip.onBlur();
 							onBlur(event);
 
-							if (!preventChangeHandlerOnBlur) {
+							if (
+								!preventChangeHandlerOnBlur &&
+								getNormalizedValue(event.target.value) !==
+									(value ?? '')
+							) {
 								handleChangeInput(event);
 							}
 						}}

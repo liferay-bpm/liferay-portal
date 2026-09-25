@@ -242,6 +242,87 @@ describe('Field Text', () => {
 		expect(onChange).toHaveBeenCalled();
 	});
 
+	it('does not emit a field edit when the field is only focused and left', () => {
+		const onChange = jest.fn();
+
+		const {container} = render(
+			<TextWithProvider
+				{...defaultTextConfig}
+				onBlur={jest.fn()}
+				onChange={onChange}
+				onFocus={jest.fn()}
+			/>
+		);
+
+		act(() => {
+			jest.advanceTimersByTime(100);
+		});
+
+		const input = container.querySelector('input');
+
+		fireEvent.focus(input);
+		fireEvent.blur(input);
+
+		expect(onChange).not.toHaveBeenCalled();
+	});
+
+	it('does not emit a field edit when a translation is opened and left untouched', () => {
+		const onChange = jest.fn();
+
+		const props = {
+			...defaultTextConfig,
+			defaultLanguageId: 'en_US',
+			localizable: true,
+			localizedValue: {},
+			onBlur: jest.fn(),
+			onFocus: jest.fn(),
+		};
+
+		const {container, rerender} = render(
+			<TextWithProvider {...props} locale="en_US" onChange={onChange} />
+		);
+
+		act(() => {
+			jest.advanceTimersByTime(100);
+		});
+
+		rerender(
+			<TextWithProvider {...props} locale="ar_SA" onChange={onChange} />
+		);
+
+		const input = container.querySelector('input');
+
+		fireEvent.focus(input);
+		fireEvent.blur(input);
+
+		expect(onChange).not.toHaveBeenCalled();
+	});
+
+	it('emits a field edit when a browser extension autofills the field', () => {
+		const onChange = jest.fn();
+
+		const {container} = render(
+			<TextWithProvider
+				{...defaultTextConfig}
+				onBlur={jest.fn()}
+				onChange={onChange}
+				onFocus={jest.fn()}
+			/>
+		);
+
+		act(() => {
+			jest.advanceTimersByTime(100);
+		});
+
+		const input = container.querySelector('input');
+
+		input.value = 'autofilled';
+
+		fireEvent.blur(input);
+
+		expect(onChange).toHaveBeenCalled();
+	});
+
 	it('has a helptext', () => {
 		const {container} = render(
 			<TextWithProvider {...defaultTextConfig} tip="Type something" />
