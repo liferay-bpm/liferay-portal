@@ -14,18 +14,27 @@ import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectActionService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
+import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -86,6 +95,80 @@ public class ObjectActionServiceTest {
 		}
 
 		_testAddObjectAction(_user);
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		RoleTestUtil.addResourcePermission(
+			role, ObjectDefinition.class.getName(),
+			ResourceConstants.SCOPE_COMPANY,
+			String.valueOf(TestPropsValues.getCompanyId()), ActionKeys.UPDATE);
+
+		User user = _addUser(role);
+
+		_setUser(user);
+
+		// Allowed hosts
+
+		_assertMustBeCompanyAdmin(
+			user,
+			() -> _addWebhookObjectAction(
+				UnicodePropertiesBuilder.put(
+					"url", "https://standalone.com"
+				).put(
+					"urlHostsAllowed", "standalone.com"
+				).build()));
+
+		// Default values
+
+		_objectActionLocalService.deleteObjectAction(
+			_addWebhookObjectAction(
+				UnicodePropertiesBuilder.put(
+					"url", "https://standalone.com"
+				).put(
+					"urlHostsAllowed", ""
+				).put(
+					"urlLocalNetworkAccessEnabled", "false"
+				).build()));
+
+		// Local network access
+
+		_assertMustBeCompanyAdmin(
+			user,
+			() -> _addWebhookObjectAction(
+				UnicodePropertiesBuilder.put(
+					"url", "https://standalone.com"
+				).put(
+					"urlLocalNetworkAccessEnabled", "true"
+				).build()));
+
+		// Company administrator
+
+		_setUser(_user);
+
+		ObjectAction objectAction = _addWebhookObjectAction(
+			UnicodePropertiesBuilder.put(
+				"url", "https://standalone.com"
+			).put(
+				"urlHostsAllowed", "standalone.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
+			).build());
+
+		UnicodeProperties parametersUnicodeProperties =
+			objectAction.getParametersUnicodeProperties();
+
+		Assert.assertEquals(
+			"standalone.com",
+			parametersUnicodeProperties.get("urlHostsAllowed"));
+		Assert.assertEquals(
+			"true",
+			parametersUnicodeProperties.get("urlLocalNetworkAccessEnabled"));
+
+		_objectActionLocalService.deleteObjectAction(objectAction);
+
+		_userLocalService.deleteUser(user);
+
+		_roleLocalService.deleteRole(role);
 	}
 
 	@Test
@@ -141,6 +224,124 @@ public class ObjectActionServiceTest {
 		}
 
 		_testUpdateObjectAction(_user);
+
+		ObjectAction objectAction = _objectActionLocalService.addObjectAction(
+			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
+			RandomTestUtil.randomString(),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			RandomTestUtil.randomString(),
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			UnicodePropertiesBuilder.put(
+				"url", "https://standalone.com"
+			).put(
+				"urlHostsAllowed", "standalone.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
+			).build(),
+			false);
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		RoleTestUtil.addResourcePermission(
+			role, ObjectDefinition.class.getName(),
+			ResourceConstants.SCOPE_COMPANY,
+			String.valueOf(TestPropsValues.getCompanyId()), ActionKeys.UPDATE);
+
+		User user = _addUser(role);
+
+		_setUser(user);
+
+		// Allowed hosts
+
+		ObjectAction finalObjectAction = objectAction;
+
+		_assertMustBeCompanyAdmin(
+			user,
+			() -> _updateWebhookObjectAction(
+				ObjectActionExecutorConstants.KEY_WEBHOOK, finalObjectAction,
+				UnicodePropertiesBuilder.put(
+					"url", "https://standalone.com"
+				).put(
+					"urlHostsAllowed", "onafteradd.com"
+				).build()));
+
+		// Local network access
+
+		_assertMustBeCompanyAdmin(
+			user,
+			() -> _updateWebhookObjectAction(
+				ObjectActionExecutorConstants.KEY_WEBHOOK, finalObjectAction,
+				UnicodePropertiesBuilder.put(
+					"url", "https://standalone.com"
+				).put(
+					"urlLocalNetworkAccessEnabled", "false"
+				).build()));
+
+		// Object action executor
+
+		_assertMustBeCompanyAdmin(
+			user,
+			() -> _updateWebhookObjectAction(
+				ObjectActionExecutorConstants.KEY_GROOVY, finalObjectAction,
+				new UnicodeProperties()));
+
+		// Omitted parameters
+
+		objectAction = _updateWebhookObjectAction(
+			ObjectActionExecutorConstants.KEY_WEBHOOK, objectAction,
+			UnicodePropertiesBuilder.put(
+				"secret", RandomTestUtil.randomString()
+			).put(
+				"url", "https://standalone.com"
+			).build());
+
+		UnicodeProperties parametersUnicodeProperties =
+			objectAction.getParametersUnicodeProperties();
+
+		Assert.assertEquals(
+			"standalone.com",
+			parametersUnicodeProperties.get("urlHostsAllowed"));
+		Assert.assertEquals(
+			"true",
+			parametersUnicodeProperties.get("urlLocalNetworkAccessEnabled"));
+
+		// URL
+
+		_assertMustBeCompanyAdmin(
+			user,
+			() -> _updateWebhookObjectAction(
+				ObjectActionExecutorConstants.KEY_WEBHOOK, finalObjectAction,
+				UnicodePropertiesBuilder.put(
+					"url", "https://onafteradd.com"
+				).build()));
+
+		// Company administrator
+
+		_setUser(_user);
+
+		objectAction = _updateWebhookObjectAction(
+			ObjectActionExecutorConstants.KEY_WEBHOOK, objectAction,
+			UnicodePropertiesBuilder.put(
+				"url", "https://onafteradd.com"
+			).build());
+
+		parametersUnicodeProperties =
+			objectAction.getParametersUnicodeProperties();
+
+		Assert.assertFalse(
+			parametersUnicodeProperties.containsKey("urlHostsAllowed"));
+		Assert.assertFalse(
+			parametersUnicodeProperties.containsKey(
+				"urlLocalNetworkAccessEnabled"));
+
+		_objectActionLocalService.deleteObjectAction(objectAction);
+
+		_userLocalService.deleteUser(user);
+
+		_roleLocalService.deleteRole(role);
 	}
 
 	private ObjectAction _addObjectAction(User user) throws Exception {
@@ -157,6 +358,44 @@ public class ObjectActionServiceTest {
 				"url", RandomTestUtil.randomString()
 			).build(),
 			false);
+	}
+
+	private User _addUser(Role role) throws Exception {
+		User user = UserTestUtil.addUser();
+
+		_userLocalService.addRoleUser(role.getRoleId(), user);
+
+		return user;
+	}
+
+	private ObjectAction _addWebhookObjectAction(
+			UnicodeProperties parametersUnicodeProperties)
+		throws Exception {
+
+		return _objectActionService.addObjectAction(
+			RandomTestUtil.randomString(),
+			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
+			RandomTestUtil.randomString(),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			RandomTestUtil.randomString(),
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			parametersUnicodeProperties, false);
+	}
+
+	private void _assertMustBeCompanyAdmin(
+			User user, UnsafeRunnable<Exception> unsafeRunnable)
+		throws Exception {
+
+		try {
+			unsafeRunnable.run();
+
+			Assert.fail();
+		}
+		catch (PrincipalException.MustBeCompanyAdmin principalException) {
+			Assert.assertEquals(user.getUserId(), principalException.userId);
+		}
 	}
 
 	private void _setUser(User user) {
@@ -259,6 +498,22 @@ public class ObjectActionServiceTest {
 		}
 	}
 
+	private ObjectAction _updateWebhookObjectAction(
+			String objectActionExecutorKey, ObjectAction objectAction,
+			UnicodeProperties parametersUnicodeProperties)
+		throws Exception {
+
+		return _objectActionService.updateObjectAction(
+			objectAction.getExternalReferenceCode(),
+			objectAction.getObjectActionId(), true, StringPool.BLANK,
+			RandomTestUtil.randomString(),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			objectAction.getName(), objectActionExecutorKey,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			parametersUnicodeProperties);
+	}
+
 	private User _guestUser;
 
 	@Inject
@@ -275,6 +530,10 @@ public class ObjectActionServiceTest {
 
 	private String _originalName;
 	private PermissionChecker _originalPermissionChecker;
+
+	@Inject
+	private RoleLocalService _roleLocalService;
+
 	private User _user;
 
 	@Inject(type = UserLocalService.class)

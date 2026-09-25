@@ -498,6 +498,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "onafteradd"
 			).put(
 				"url", "https://onafteradd.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
 			).build(),
 			false);
 
@@ -552,6 +554,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "onafterdelete"
 			).put(
 				"url", "https://onafterdelete.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
 			).build(),
 			false);
 		ObjectAction objectAction3 = _addObjectAction(
@@ -562,6 +566,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "onafterupdate"
 			).put(
 				"url", "https://onafterupdate.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
 			).build(),
 			false);
 		ObjectAction objectAction4 = _addObjectAction(
@@ -999,6 +1005,8 @@ public class ObjectActionLocalServiceTest {
 					"secret", "onafterrootupdate"
 				).put(
 					"url", "https://onafterrootupdate.com"
+				).put(
+					"urlLocalNetworkAccessEnabled", "true"
 				).build());
 
 			ObjectEntry rootObjectEntry =
@@ -1856,6 +1864,62 @@ public class ObjectActionLocalServiceTest {
 	}
 
 	@Test
+	public void testAddObjectActionWithWebhookURLHostsAllowed()
+		throws Exception {
+
+		ObjectAction objectAction = _addObjectAction(
+			_objectDefinition.getObjectDefinitionId(),
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			UnicodePropertiesBuilder.put(
+				"url", "https://onafteradd.com"
+			).put(
+				"urlHostsAllowed", "onafteradd.com, [::1], 203.0.113.1"
+			).build());
+
+		UnicodeProperties parametersUnicodeProperties =
+			objectAction.getParametersUnicodeProperties();
+
+		Assert.assertEquals(
+			"onafteradd.com,[::1],203.0.113.1",
+			parametersUnicodeProperties.get("urlHostsAllowed"));
+
+		_objectActionLocalService.deleteObjectAction(objectAction);
+
+		for (String urlHostsAllowed :
+				new String[] {
+					",onafteradd.com", "::1", "example.com.",
+					"onafteradd.com/webhook", "onafteradd.com:",
+					"onafteradd.com:443", "onafteradd.com?query",
+					"user@onafteradd.com"
+				}) {
+
+			try {
+				_addObjectAction(
+					_objectDefinition.getObjectDefinitionId(),
+					ObjectActionExecutorConstants.KEY_WEBHOOK,
+					ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+					UnicodePropertiesBuilder.put(
+						"url", "https://onafteradd.com"
+					).put(
+						"urlHostsAllowed", urlHostsAllowed
+					).build());
+
+				Assert.fail(urlHostsAllowed);
+			}
+			catch (ObjectActionParametersException
+						objectActionParametersException) {
+
+				Assert.assertEquals(
+					HashMapBuilder.<String, Object>put(
+						"urlHostsAllowed", "invalid"
+					).build(),
+					objectActionParametersException.getMessageKeys());
+			}
+		}
+	}
+
+	@Test
 	public void testAddOrUpdateSubscriptionObjectActions() throws Exception {
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition();
@@ -2001,6 +2065,8 @@ public class ObjectActionLocalServiceTest {
 					"secret", "0123456789"
 				).put(
 					"url", "https://onafteradd.com"
+				).put(
+					"urlLocalNetworkAccessEnabled", "true"
 				).build(),
 				true);
 
@@ -2027,6 +2093,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "onafterupdate"
 			).put(
 				"url", "https://onafterupdate.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
 			).build());
 
 		_workflowDefinitionLinkLocalService.updateWorkflowDefinitionLink(
@@ -2091,6 +2159,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "onafterlogin"
 			).put(
 				"url", "https://onafterlogin.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
 			).build());
 
 		Assert.assertEquals(0, _argumentsList.size());
@@ -2542,6 +2612,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "onafterupdate"
 			).put(
 				"url", "https://onafterupdate.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
 			).build());
 
 		String expandoColumnName = "A" + RandomTestUtil.randomString();
@@ -2758,6 +2830,111 @@ public class ObjectActionLocalServiceTest {
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 
 		_userLocalService.deleteUser(user);
+	}
+
+	@Test
+	public void testExecuteObjectActionWithWebhookURL() throws Exception {
+		_publishCustomObjectDefinition();
+
+		// Allowed host
+
+		ObjectAction objectAction = _addObjectAction(
+			_objectDefinition.getObjectDefinitionId(),
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			UnicodePropertiesBuilder.put(
+				"url", "http://203.0.113.1/webhook"
+			).put(
+				"urlHostsAllowed", "203.0.113.1"
+			).build());
+
+		_assertWebhookObjectActionExecuted(
+			objectAction.getObjectActionId(), "http://203.0.113.1/webhook");
+
+		_objectActionLocalService.deleteObjectAction(objectAction);
+
+		// Disallowed host with local network access
+
+		objectAction = _addObjectAction(
+			_objectDefinition.getObjectDefinitionId(),
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			UnicodePropertiesBuilder.put(
+				"url", "http://127.0.0.1/webhook"
+			).put(
+				"urlHostsAllowed", "203.0.113.1"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
+			).build());
+
+		_assertWebhookObjectActionNotExecuted(objectAction.getObjectActionId());
+
+		_objectActionLocalService.deleteObjectAction(objectAction);
+
+		// Local network address
+
+		objectAction = _addObjectAction(
+			_objectDefinition.getObjectDefinitionId(),
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			UnicodePropertiesBuilder.put(
+				"url", "http://127.0.0.1/webhook"
+			).build());
+
+		_assertWebhookObjectActionNotExecuted(objectAction.getObjectActionId());
+
+		_objectActionLocalService.deleteObjectAction(objectAction);
+
+		// Local network address with allowed host
+
+		objectAction = _addObjectAction(
+			_objectDefinition.getObjectDefinitionId(),
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			UnicodePropertiesBuilder.put(
+				"url", "http://127.0.0.1/webhook"
+			).put(
+				"urlHostsAllowed", "127.0.0.1"
+			).build());
+
+		_assertWebhookObjectActionNotExecuted(objectAction.getObjectActionId());
+
+		_objectActionLocalService.deleteObjectAction(objectAction);
+
+		// Local network address with local network access
+
+		objectAction = _addObjectAction(
+			_objectDefinition.getObjectDefinitionId(),
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			UnicodePropertiesBuilder.put(
+				"url", "http://127.0.0.1/webhook"
+			).put(
+				"urlHostsAllowed", "127.0.0.1"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
+			).build());
+
+		_assertWebhookObjectActionExecuted(
+			objectAction.getObjectActionId(), "http://127.0.0.1/webhook");
+
+		_objectActionLocalService.deleteObjectAction(objectAction);
+
+		// Unsupported scheme
+
+		objectAction = _addObjectAction(
+			_objectDefinition.getObjectDefinitionId(),
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			UnicodePropertiesBuilder.put(
+				"url", "file:///etc/passwd"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
+			).build());
+
+		_assertWebhookObjectActionNotExecuted(objectAction.getObjectActionId());
+
+		_objectActionLocalService.deleteObjectAction(objectAction);
 	}
 
 	@Test
@@ -3170,6 +3347,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "0123456789"
 			).put(
 				"url", "https://onafteradd.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
 			).build(),
 			false);
 
@@ -3183,6 +3362,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "0123456789"
 			).put(
 				"url", "https://onafteradd.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
 			).build(),
 			ObjectActionConstants.STATUS_NEVER_RAN);
 
@@ -3225,6 +3406,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "0123456789"
 			).put(
 				"url", "https://onafterdelete.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
 			).build());
 
 		_assertObjectAction(
@@ -3237,6 +3420,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "0123456789"
 			).put(
 				"url", "https://onafterdelete.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
 			).build(),
 			ObjectActionConstants.STATUS_NEVER_RAN);
 
@@ -3255,6 +3440,8 @@ public class ObjectActionLocalServiceTest {
 					"secret", "0123456789"
 				).put(
 					"url", "https://onafteradd.com"
+				).put(
+					"urlLocalNetworkAccessEnabled", "true"
 				).build(),
 				true);
 
@@ -3302,6 +3489,8 @@ public class ObjectActionLocalServiceTest {
 					"secret", "0123456789"
 				).put(
 					"url", "https://onafteradd.com"
+				).put(
+					"urlLocalNetworkAccessEnabled", "true"
 				).build());
 		}
 		finally {
@@ -3323,6 +3512,52 @@ public class ObjectActionLocalServiceTest {
 
 		_objectActionLocalService.deleteObjectAction(objectAction);
 		_objectActionLocalService.deleteObjectAction(systemObjectAction);
+	}
+
+	@Test
+	public void testUpdateObjectActionWithWebhookNetworkParameters()
+		throws Exception {
+
+		ObjectAction objectAction = _addObjectAction(
+			_objectDefinition.getObjectDefinitionId(),
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			UnicodePropertiesBuilder.put(
+				"url", "https://onafteradd.com"
+			).put(
+				"urlHostsAllowed", "onafteradd.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
+			).build());
+
+		objectAction = _objectActionLocalService.updateObjectAction(
+			objectAction.getExternalReferenceCode(),
+			objectAction.getObjectActionId(), true, StringPool.BLANK,
+			RandomTestUtil.randomString(),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			objectAction.getName(), ObjectActionExecutorConstants.KEY_GROOVY,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			UnicodePropertiesBuilder.put(
+				"script", "println 'onAfterAdd'"
+			).put(
+				"urlHostsAllowed", "onafteradd.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
+			).build());
+
+		UnicodeProperties parametersUnicodeProperties =
+			objectAction.getParametersUnicodeProperties();
+
+		Assert.assertEquals(
+			"println 'onAfterAdd'", parametersUnicodeProperties.get("script"));
+		Assert.assertFalse(
+			parametersUnicodeProperties.containsKey("urlHostsAllowed"));
+		Assert.assertFalse(
+			parametersUnicodeProperties.containsKey(
+				"urlLocalNetworkAccessEnabled"));
+
+		_objectActionLocalService.deleteObjectAction(objectAction);
 	}
 
 	@Rule
@@ -3737,6 +3972,56 @@ public class ObjectActionLocalServiceTest {
 		}
 	}
 
+	private void _assertWebhookObjectActionExecuted(
+			long objectActionId, String url)
+		throws Exception {
+
+		_addObjectEntry(
+			_objectDefinition,
+			HashMapBuilder.<String, Serializable>put(
+				"firstName", RandomTestUtil.randomString()
+			).build());
+
+		Assert.assertEquals(1, _argumentsList.size());
+
+		Object[] arguments = _argumentsList.poll();
+
+		Http.Options options = (Http.Options)arguments[0];
+
+		Assert.assertEquals(url, options.getLocation());
+		Assert.assertFalse(options.isFollowRedirects());
+
+		ObjectAction objectAction = _objectActionLocalService.getObjectAction(
+			objectActionId);
+
+		Assert.assertEquals(
+			ObjectActionConstants.STATUS_SUCCESS, objectAction.getStatus());
+	}
+
+	private void _assertWebhookObjectActionNotExecuted(long objectActionId)
+		throws Exception {
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"com.liferay.object.internal.action.engine." +
+					"ObjectActionEngineImpl",
+				LoggerTestUtil.OFF)) {
+
+			_addObjectEntry(
+				_objectDefinition,
+				HashMapBuilder.<String, Serializable>put(
+					"firstName", RandomTestUtil.randomString()
+				).build());
+		}
+
+		Assert.assertEquals(0, _argumentsList.size());
+
+		ObjectAction objectAction = _objectActionLocalService.getObjectAction(
+			objectActionId);
+
+		Assert.assertEquals(
+			ObjectActionConstants.STATUS_FAILED, objectAction.getStatus());
+	}
+
 	private FutureTask<Void> _getAddObjectEntryFutureTask(String firstName) {
 		return new FutureTask<Void>(
 			new CompanyInheritableThreadLocalCallable(
@@ -3882,6 +4167,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "onafteradd"
 			).put(
 				"url", "https://onafteradd.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
 			).build());
 
 		Assert.assertEquals(0, _argumentsList.size());
@@ -3935,6 +4222,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "onafterdelete"
 			).put(
 				"url", "https://onafterdelete.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
 			).build());
 
 		Assert.assertEquals(0, _argumentsList.size());
@@ -3988,6 +4277,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "onafterupdate"
 			).put(
 				"url", "https://onafterupdate.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", "true"
 			).build());
 
 		ObjectEntry objectEntry5 = _objectEntryLocalService.addObjectEntry(

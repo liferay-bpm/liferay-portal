@@ -46,6 +46,7 @@ import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
@@ -71,6 +72,7 @@ import com.liferay.portal.kernel.spring.aop.Retry;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -80,6 +82,9 @@ import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.script.management.configuration.helper.ScriptManagementConfigurationHelper;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -585,6 +590,25 @@ public class ObjectActionLocalServiceImpl
 		return false;
 	}
 
+	private boolean _isValidHost(String host) {
+		if (host.endsWith(StringPool.PERIOD)) {
+			return false;
+		}
+
+		try {
+			URI uri = new URI(Http.HTTP_WITH_SLASH + host);
+
+			return Objects.equals(uri.getHost(), host);
+		}
+		catch (URISyntaxException uriSyntaxException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(uriSyntaxException);
+			}
+
+			return false;
+		}
+	}
+
 	private Map<Locale, String> _populateLabelMap(
 		Map<Locale, String> labelMap, String name, Locale locale) {
 
@@ -1006,6 +1030,33 @@ public class ObjectActionLocalServiceImpl
 			if (Validator.isNull(parametersUnicodeProperties.get("url"))) {
 				errorMessageKeys.put("url", "required");
 			}
+
+			String urlHostsAllowed = parametersUnicodeProperties.get(
+				"urlHostsAllowed");
+
+			if (urlHostsAllowed != null) {
+				urlHostsAllowed = StringUtil.removeChar(
+					urlHostsAllowed, CharPool.SPACE);
+
+				for (String host : StringUtil.split(urlHostsAllowed)) {
+					if (!_isValidHost(host)) {
+						errorMessageKeys.put("urlHostsAllowed", "invalid");
+
+						break;
+					}
+				}
+
+				parametersUnicodeProperties.put(
+					"urlHostsAllowed", urlHostsAllowed);
+			}
+		}
+
+		if (!Objects.equals(
+				objectActionExecutorKey,
+				ObjectActionExecutorConstants.KEY_WEBHOOK)) {
+
+			parametersUnicodeProperties.remove("urlHostsAllowed");
+			parametersUnicodeProperties.remove("urlLocalNetworkAccessEnabled");
 		}
 
 		if (Objects.nonNull(

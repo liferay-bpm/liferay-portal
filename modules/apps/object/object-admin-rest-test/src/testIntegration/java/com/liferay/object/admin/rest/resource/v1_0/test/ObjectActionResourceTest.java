@@ -13,12 +13,14 @@ import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
 
 import java.util.Collections;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -186,6 +188,30 @@ public class ObjectActionResourceTest extends BaseObjectActionResourceTestCase {
 		return objectActionResource.
 			postObjectDefinitionByExternalReferenceCodeObjectAction(
 				_objectDefinition.getExternalReferenceCode(), objectAction);
+	}
+
+	@Override
+	@Test
+	public void testPostObjectDefinitionObjectAction() throws Exception {
+		super.testPostObjectDefinitionObjectAction();
+
+		ObjectAction objectAction = randomObjectAction();
+
+		objectAction.setParameters(
+			HashMapBuilder.<String, Object>put(
+				"url", "https://standalone.com"
+			).put(
+				"urlLocalNetworkAccessEnabled", false
+			).build());
+
+		ObjectAction postObjectAction =
+			objectActionResource.postObjectDefinitionObjectAction(
+				_objectDefinition.getObjectDefinitionId(), objectAction);
+
+		Assert.assertEquals(
+			Boolean.FALSE,
+			postObjectAction.getParameters().get(
+				"urlLocalNetworkAccessEnabled"));
 	}
 
 	@Override

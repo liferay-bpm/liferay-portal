@@ -264,7 +264,7 @@ public class AccountEntryLocalServiceTest {
 				ObjectActionExecutorConstants.KEY_WEBHOOK,
 				ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
 				UnicodePropertiesBuilder.put(
-					"url", RandomTestUtil.randomString()
+					"url", "http://203.0.113.1"
 				).build(),
 				false);
 
@@ -325,7 +325,7 @@ public class AccountEntryLocalServiceTest {
 				ObjectActionExecutorConstants.KEY_WEBHOOK,
 				ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE,
 				UnicodePropertiesBuilder.put(
-					"url", RandomTestUtil.randomString()
+					"url", "http://203.0.113.1"
 				).build(),
 				false);
 
