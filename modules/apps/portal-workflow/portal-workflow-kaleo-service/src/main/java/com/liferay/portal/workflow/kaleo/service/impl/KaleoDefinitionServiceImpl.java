@@ -18,12 +18,14 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.workflow.constants.WorkflowDefinitionConstants;
 import com.liferay.portal.workflow.kaleo.internal.util.KaleoDefinitionScopeUtil;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinition;
 import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionLocalService;
 import com.liferay.portal.workflow.kaleo.service.base.KaleoDefinitionServiceBaseImpl;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -47,7 +49,9 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 			int version, ServiceContext serviceContext)
 		throws PortalException {
 
-		_checkPermissions(serviceContext);
+		_checkPermissions(
+			_getGroupId(serviceContext.getScopeGroupId(), scope),
+			serviceContext);
 
 		return _kaleoDefinitionLocalService.addKaleoDefinition(
 			externalReferenceCode, name, title, description, content, scope,
@@ -138,14 +142,20 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		_checkPermissions(serviceContext);
+		KaleoDefinition kaleoDefinition =
+			kaleoDefinitionPersistence.findByPrimaryKey(kaleoDefinitionId);
+
+		_checkPermissions(
+			_getGroupId(
+				kaleoDefinition.getGroupId(), kaleoDefinition.getScope()),
+			serviceContext);
 
 		return _kaleoDefinitionLocalService.updatedKaleoDefinition(
 			externalReferenceCode, kaleoDefinitionId, title, description,
 			content, system, serviceContext);
 	}
 
-	private void _checkPermissions(ServiceContext serviceContext)
+	private void _checkPermissions(long groupId, ServiceContext serviceContext)
 		throws PrincipalException {
 
 		PermissionChecker permissionChecker =
@@ -159,8 +169,15 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 		}
 
 		_portletResourcePermission.check(
-			permissionChecker, serviceContext.getScopeGroupId(),
-			ActionKeys.ADD_DEFINITION);
+			permissionChecker, groupId, ActionKeys.ADD_DEFINITION);
+	}
+
+	private long _getGroupId(long accountGroupId, String scope) {
+		if (Objects.equals(scope, WorkflowDefinitionConstants.SCOPE_AI)) {
+			return accountGroupId;
+		}
+
+		return WorkflowConstants.DEFAULT_GROUP_ID;
 	}
 
 	@Reference
