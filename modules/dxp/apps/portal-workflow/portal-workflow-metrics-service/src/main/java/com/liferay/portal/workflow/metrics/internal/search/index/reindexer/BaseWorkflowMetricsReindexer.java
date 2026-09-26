@@ -5,6 +5,7 @@
 
 package com.liferay.portal.workflow.metrics.internal.search.index.reindexer;
 
+import com.liferay.petra.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.module.service.Snapshot;
@@ -13,11 +14,13 @@ import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.index.SyncReindexManager;
 import com.liferay.portal.search.spi.reindexer.IndexReindexer;
+import com.liferay.portal.workflow.metrics.internal.petra.executor.WorkflowMetricsPortalExecutor;
 import com.liferay.portal.workflow.metrics.internal.search.index.WorkflowMetricsIndex;
 import com.liferay.portal.workflow.metrics.search.index.reindexer.WorkflowMetricsReindexer;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import org.osgi.service.component.annotations.Reference;
 
@@ -65,6 +68,13 @@ public abstract class BaseWorkflowMetricsReindexer
 			Thread.sleep(1000);
 		}
 		else {
+			NoticeableFuture<?> noticeableFuture =
+				workflowMetricsPortalExecutor.execute(
+					() -> {
+					});
+
+			noticeableFuture.get(30, TimeUnit.MINUTES);
+
 			workflowMetricsIndex.removeIndex(
 				searchCapabilities, searchEngineAdapter, indexNameBuilder,
 				companyId);
@@ -115,6 +125,9 @@ public abstract class BaseWorkflowMetricsReindexer
 
 	@Reference
 	protected SearchEngineAdapter searchEngineAdapter;
+
+	@Reference
+	protected WorkflowMetricsPortalExecutor workflowMetricsPortalExecutor;
 
 	private static final Snapshot<SyncReindexManager>
 		_syncReindexManagerSnapshot = new Snapshot<>(
