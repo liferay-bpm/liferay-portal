@@ -17,6 +17,7 @@ import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.notification.service.base.NotificationRecipientSettingLocalServiceBaseImpl;
 import com.liferay.notification.type.util.NotificationTypeUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.NoSuchRoleException;
 import com.liferay.portal.kernel.exception.NoSuchUserGroupException;
@@ -34,6 +35,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
@@ -104,6 +106,8 @@ public class NotificationRecipientSettingLocalServiceImpl
 		List<NotificationRecipientSetting> notificationRecipientSettings =
 			new ArrayList<>();
 
+		List<String> unresolvedUserScreenNames = new ArrayList<>();
+
 		for (Object recipient : recipients) {
 			Map<String, Object> recipientMap = (Map<String, Object>)recipient;
 
@@ -120,15 +124,18 @@ public class NotificationRecipientSettingLocalServiceImpl
 				}
 
 				_addNotificationRecipientSetting(
-					entry, notificationContext, notificationRecipientId,
+					entry, notificationRecipientId,
 					notificationRecipientSettings, recipientMap,
 					GetterUtil.getString(
 						recipientMap.get(
 							NotificationRecipientSettingConstants.
 								getRecipientTypeName(entry.getKey()))),
-					user);
+					unresolvedUserScreenNames, user);
 			}
 		}
+
+		_reportUnresolvedUserRecipients(
+			notificationContext, unresolvedUserScreenNames, user);
 
 		return notificationRecipientSettings;
 	}
@@ -165,10 +172,10 @@ public class NotificationRecipientSettingLocalServiceImpl
 	}
 
 	private void _addNotificationRecipientSetting(
-		Map.Entry<String, Object> entry,
-		NotificationContext notificationContext, long notificationRecipientId,
+		Map.Entry<String, Object> entry, long notificationRecipientId,
 		List<NotificationRecipientSetting> notificationRecipientSettings,
-		Map<String, Object> recipientMap, String recipientType, User user) {
+		Map<String, Object> recipientMap, String recipientType,
+		List<String> unresolvedUserScreenNames, User user) {
 
 		if (Objects.equals(
 				recipientType, NotificationRecipientConstants.TYPE_ROLE)) {
@@ -291,9 +298,8 @@ public class NotificationRecipientSettingLocalServiceImpl
 					recipientUser.getScreenName());
 			}
 			else {
-				_reportUnresolvedUserRecipient(
-					notificationContext, GetterUtil.getString(entry.getValue()),
-					user);
+				unresolvedUserScreenNames.add(
+					GetterUtil.getString(entry.getValue()));
 			}
 		}
 		else {
@@ -329,18 +335,33 @@ public class NotificationRecipientSettingLocalServiceImpl
 		notificationRecipientSettings.add(notificationRecipientSetting);
 	}
 
-	private void _reportUnresolvedUserRecipient(
-		NotificationContext notificationContext, String screenName, User user) {
+	private void _reportUnresolvedUserRecipients(
+		NotificationContext notificationContext,
+		List<String> unresolvedUserScreenNames, User user) {
 
-		if (!ExportImportThreadLocal.isImportInProcess() ||
-			(notificationContext == null) ||
-			(notificationContext.getNotificationTemplate() == null)) {
+		if (unresolvedUserScreenNames.isEmpty() ||
+			!ExportImportThreadLocal.isImportInProcess() ||
+			(notificationContext == null)) {
 
 			return;
 		}
 
 		NotificationTemplate notificationTemplate =
 			notificationContext.getNotificationTemplate();
+
+		if (notificationTemplate == null) {
+			return;
+		}
+
+		String key =
+			"the-users-x-do-not-exist-and-were-removed-from-the-recipients-" +
+				"of-notification-template-x";
+
+		if (unresolvedUserScreenNames.size() == 1) {
+			key =
+				"the-user-x-does-not-exist-and-was-removed-from-the-" +
+					"recipients-of-notification-template-x";
+		}
 
 		_exportImportReportEntryLocalService.getOrAddExportImportReportEntry(
 			0, user.getCompanyId(),
@@ -351,11 +372,10 @@ public class NotificationRecipientSettingLocalServiceImpl
 				ExportImportThreadLocal.getExportImportConfigurationId()),
 			ExportImportReportEntryConstants.TYPE_WARNING,
 			_language.format(
-				LocaleUtil.getDefault(),
-				"the-user-x-does-not-exist-and-was-removed-from-the-" +
-					"recipients-of-notification-template-x",
+				LocaleUtil.getDefault(), key,
 				new Object[] {
-					screenName,
+					StringUtil.merge(
+						unresolvedUserScreenNames, StringPool.COMMA_AND_SPACE),
 					notificationTemplate.getName(LocaleUtil.getDefault())
 				}),
 			null, "notification-template");
