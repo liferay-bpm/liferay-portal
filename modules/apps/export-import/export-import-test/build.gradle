@@ -51,7 +51,6 @@ dependencies {
 	testIntegrationImplementation project(":apps:portal-vulcan:portal-vulcan-api")
 	testIntegrationImplementation project(":apps:portal-workflow:portal-workflow-api")
 	testIntegrationImplementation project(":apps:portal-workflow:portal-workflow-kaleo-api")
-	testIntegrationImplementation project(":apps:roles:roles-admin-api")
 	testIntegrationImplementation project(":apps:segments:segments-api")
 	testIntegrationImplementation project(":apps:site-navigation:site-navigation-api")
 	testIntegrationImplementation project(":apps:site-navigation:site-navigation-menu-item-api")
