@@ -8,7 +8,6 @@ package com.liferay.site.cmp.site.initializer.internal.display.context;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.rest.dto.v1_0.Assignee;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.Language;
@@ -67,13 +66,9 @@ public class ViewAssigneeSectionDisplayContext
 	}
 
 	@Override
-	protected String getSearchURL() {
-		return StringBundler.concat(
-			themeDisplay.getPortalURL(), "/o/headless-cmp/v1.0/projects/",
-			MapUtil.getLong(
-				objectEntry.getValues(),
-				"r_cmpProjectToCMPTasks_c_cmpProjectId"),
-			"/task-assignees");
+	protected long getProjectId() {
+		return MapUtil.getLong(
+			objectEntry.getValues(), "r_cmpProjectToCMPTasks_c_cmpProjectId");
 	}
 
 	private final ObjectFieldBusinessType _assigneeObjectFieldBusinessType;

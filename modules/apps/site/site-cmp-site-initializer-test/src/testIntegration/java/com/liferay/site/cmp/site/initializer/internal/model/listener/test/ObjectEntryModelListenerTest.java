@@ -398,6 +398,18 @@ public class ObjectEntryModelListenerTest {
 				"completionRate"));
 	}
 
+	private void _assertGroupMembershipWithProjectMemberRole(
+		ObjectEntry cmpProjectObjectEntry, User user) {
+
+		_assertUserGroupRoles(
+			1, Collections.singletonList(DepotRolesConstants.PROJECT_MEMBER),
+			cmpProjectObjectEntry.getGroupId(), user.getUserId());
+
+		Assert.assertTrue(
+			_groupLocalService.hasUserGroup(
+				user.getUserId(), cmpProjectObjectEntry.getGroupId()));
+	}
+
 	private void _assertGroupMembershipWithoutUserGroupRoles(
 		ObjectEntry cmpProjectObjectEntry, User user) {
 
@@ -426,10 +438,10 @@ public class ObjectEntryModelListenerTest {
 
 		UserTestUtil.setUser(TestPropsValues.getUser());
 
+		_assertGroupMembershipWithProjectMemberRole(
+			cmpProjectObjectEntry, originalProjectSponsorUser);
 		_assertGroupMembershipWithoutUserGroupRoles(
 			cmpProjectObjectEntry, originalProjectManagerUser);
-		_assertGroupMembershipWithoutUserGroupRoles(
-			cmpProjectObjectEntry, originalProjectSponsorUser);
 		_assertUserGroupRoles(
 			1, Collections.singletonList(DepotRolesConstants.PROJECT_MANAGER),
 			cmpProjectObjectEntry.getGroupId(),
@@ -619,7 +631,7 @@ public class ObjectEntryModelListenerTest {
 				projectContributorUser.getUserId(),
 				cmpProjectObjectEntry.getGroupId()));
 
-		// Clearing the project manager and project sponsor revokes both holders
+		// Clearing both holders revokes only the project manager
 
 		User projectSponsorUser = UserTestUtil.addUser(
 			cmpProjectObjectEntry.getGroupId());
@@ -631,10 +643,26 @@ public class ObjectEntryModelListenerTest {
 		cmpProjectObjectEntry = _updateProjectManagerProjectSponsor(
 			cmpProjectObjectEntry, 0, 0, TestPropsValues.getUserId());
 
+		_assertGroupMembershipWithProjectMemberRole(
+			cmpProjectObjectEntry, projectSponsorUser);
 		_assertGroupMembershipWithoutUserGroupRoles(
 			cmpProjectObjectEntry, projectManagerUser);
-		_assertGroupMembershipWithoutUserGroupRoles(
-			cmpProjectObjectEntry, projectSponsorUser);
+
+		// Clearing the project sponsor keeps their project member role
+
+		User projectMemberUser = UserTestUtil.addGroupUser(
+			_groupLocalService.getGroup(cmpProjectObjectEntry.getGroupId()),
+			DepotRolesConstants.PROJECT_MEMBER);
+
+		cmpProjectObjectEntry = _updateProjectManagerProjectSponsor(
+			cmpProjectObjectEntry, 0, projectMemberUser.getUserId(),
+			TestPropsValues.getUserId());
+
+		cmpProjectObjectEntry = _updateProjectManagerProjectSponsor(
+			cmpProjectObjectEntry, 0, 0, TestPropsValues.getUserId());
+
+		_assertGroupMembershipWithProjectMemberRole(
+			cmpProjectObjectEntry, projectMemberUser);
 
 		// Reassigning as the outgoing project manager keeps authority on save
 
@@ -649,7 +677,7 @@ public class ObjectEntryModelListenerTest {
 		cmpProjectObjectEntry = _updateProjectManagerProjectSponsor(
 			cmpProjectObjectEntry, 0, 0, TestPropsValues.getUserId());
 
-		// Reassigning both roles revokes the previous holders
+		// Reassigning both roles revokes only the previous project manager
 
 		cmpProjectObjectEntry = _updateProjectManagerProjectSponsor(
 			cmpProjectObjectEntry, projectManagerUser.getUserId(),
@@ -717,7 +745,7 @@ public class ObjectEntryModelListenerTest {
 
 		UserTestUtil.setUser(TestPropsValues.getUser());
 
-		_assertGroupMembershipWithoutUserGroupRoles(
+		_assertGroupMembershipWithProjectMemberRole(
 			cmpProjectObjectEntry, user);
 
 		cmpProjectObjectEntry = _updateProjectManagerProjectSponsor(

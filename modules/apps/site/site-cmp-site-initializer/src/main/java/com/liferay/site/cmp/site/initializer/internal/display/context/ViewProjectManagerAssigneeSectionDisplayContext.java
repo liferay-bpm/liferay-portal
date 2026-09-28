@@ -44,4 +44,9 @@ public class ViewProjectManagerAssigneeSectionDisplayContext
 		return getValueJSONObject("r_userToCMPProjectManager_userId");
 	}
 
+	@Override
+	protected long getProjectId() {
+		return objectEntry.getObjectEntryId();
+	}
+
 }

@@ -8,6 +8,7 @@ package com.liferay.site.cmp.site.initializer.internal.display.context.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.object.rest.dto.v1_0.Assignee;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
@@ -54,7 +55,10 @@ public class ViewProjectManagerAssigneeSectionDisplayContextTest
 			"ObjectField_r_userToCMPProjectManager_userId",
 			properties.get("name"));
 		Assert.assertEquals(
-			"/o/headless-cmp/v1.0/task-assignees?type=user",
+			StringBundler.concat(
+				"/o/headless-cmp/v1.0/projects/",
+				cmpProjectObjectEntry.getObjectEntryId(),
+				"/task-assignees?type=user"),
 			properties.get("searchURL"));
 		Assert.assertTrue((Boolean)properties.get("usersOnly"));
 		Assert.assertTrue((Boolean)properties.get("visible"));
