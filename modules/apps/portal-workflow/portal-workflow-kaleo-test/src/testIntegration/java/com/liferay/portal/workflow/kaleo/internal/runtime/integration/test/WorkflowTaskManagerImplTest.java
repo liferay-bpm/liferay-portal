@@ -70,6 +70,7 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.OrganizationConstants;
+import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
@@ -79,7 +80,9 @@ import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
@@ -101,6 +104,7 @@ import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
@@ -127,6 +131,7 @@ import com.liferay.portal.security.permission.SimplePermissionChecker;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.workflow.comparator.WorkflowComparatorFactory;
+import com.liferay.portal.workflow.kaleo.exception.NoSuchInstanceException;
 import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
 
 import java.util.ArrayList;
@@ -147,6 +152,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 import org.junit.runner.RunWith;
 
 import org.osgi.service.cm.Configuration;
@@ -968,6 +974,358 @@ public class WorkflowTaskManagerImplTest extends BaseWorkflowManagerTestCase {
 	}
 
 	@Test
+	public void testGetWorkflowTasksByRole() throws Exception {
+
+		// Company administrator
+
+		_activateSingleApproverWorkflow(BlogsEntry.class.getName(), 0, 0);
+
+		_addBlogsEntry();
+
+		Role role = _roleLocalService.getRole(
+			_company.getCompanyId(), RoleConstants.PORTAL_CONTENT_REVIEWER);
+
+		_setPermissionChecker(_adminUser);
+
+		List<WorkflowTask> workflowTasks =
+			_workflowTaskManager.getWorkflowTasksByRole(
+				role.getRoleId(), false, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				null);
+
+		Assert.assertEquals(workflowTasks.toString(), 1, workflowTasks.size());
+
+		Assert.assertEquals(
+			1,
+			_workflowTaskManager.getWorkflowTaskCountByRole(
+				role.getRoleId(), false));
+
+		// Role member who is not a company administrator
+
+		_setPermissionChecker(_portalContentReviewerUser);
+
+		Assert.assertThrows(
+			PrincipalException.MustBeCompanyAdmin.class,
+			() -> _workflowTaskManager.getWorkflowTasksByRole(
+				role.getRoleId(), false, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				null));
+		Assert.assertThrows(
+			PrincipalException.MustBeCompanyAdmin.class,
+			() -> _workflowTaskManager.getWorkflowTaskCountByRole(
+				role.getRoleId(), false));
+
+		_deactivateWorkflow(BlogsEntry.class.getName(), 0, 0);
+	}
+
+	@Test
+	public void testGetWorkflowTasksBySubmittingUser() throws Exception {
+
+		// Submitting user
+
+		_activateSingleApproverWorkflow(BlogsEntry.class.getName(), 0, 0);
+
+		_addBlogsEntry();
+
+		_setPermissionChecker(_adminUser);
+
+		List<WorkflowTask> workflowTasks =
+			_workflowTaskManager.getWorkflowTasksBySubmittingUser(
+				_adminUser.getUserId(), false, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null);
+
+		Assert.assertEquals(workflowTasks.toString(), 1, workflowTasks.size());
+
+		Assert.assertEquals(
+			1,
+			_workflowTaskManager.getWorkflowTaskCountBySubmittingUser(
+				_adminUser.getUserId(), false));
+
+		// User who can view the submitting user but not the workflow task
+
+		_setPermissionChecker(_createUserWithUserViewPermission());
+
+		_assertMustHavePermission(
+			WorkflowTask.class.getName(),
+			() -> _workflowTaskManager.getWorkflowTasksBySubmittingUser(
+				_adminUser.getUserId(), false, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null));
+
+		// User who cannot view the submitting user
+
+		_setPermissionChecker(_siteMemberUser);
+
+		_assertMustHavePermission(
+			User.class.getName(),
+			() -> _workflowTaskManager.getWorkflowTasksBySubmittingUser(
+				_adminUser.getUserId(), false, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null));
+		_assertMustHavePermission(
+			User.class.getName(),
+			() -> _workflowTaskManager.getWorkflowTaskCountBySubmittingUser(
+				_adminUser.getUserId(), false));
+
+		_deactivateWorkflow(BlogsEntry.class.getName(), 0, 0);
+	}
+
+	@Test
+	public void testGetWorkflowTasksByUser() throws Exception {
+
+		// Assignee
+
+		_activateSingleApproverWorkflow(BlogsEntry.class.getName(), 0, 0);
+
+		_addBlogsEntry();
+
+		_assignWorkflowTaskToUser(_adminUser, _portalContentReviewerUser);
+
+		_setPermissionChecker(_portalContentReviewerUser);
+
+		List<WorkflowTask> workflowTasks =
+			_workflowTaskManager.getWorkflowTasksByUser(
+				_portalContentReviewerUser.getUserId(), false,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		Assert.assertEquals(workflowTasks.toString(), 1, workflowTasks.size());
+
+		Assert.assertEquals(
+			1,
+			_workflowTaskManager.getWorkflowTaskCountByUser(
+				_portalContentReviewerUser.getUserId(), false));
+
+		// User who can view the assignee but not the workflow task
+
+		_setPermissionChecker(_createUserWithUserViewPermission());
+
+		_assertMustHavePermission(
+			WorkflowTask.class.getName(),
+			() -> _workflowTaskManager.getWorkflowTasksByUser(
+				_portalContentReviewerUser.getUserId(), false,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null));
+
+		// User who cannot view the assignee
+
+		_setPermissionChecker(_siteMemberUser);
+
+		_assertMustHavePermission(
+			User.class.getName(),
+			() -> _workflowTaskManager.getWorkflowTasksByUser(
+				_portalContentReviewerUser.getUserId(), false,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null));
+		_assertMustHavePermission(
+			User.class.getName(),
+			() -> _workflowTaskManager.getWorkflowTaskCountByUser(
+				_portalContentReviewerUser.getUserId(), false));
+
+		_deactivateWorkflow(BlogsEntry.class.getName(), 0, 0);
+	}
+
+	@Test
+	public void testGetWorkflowTasksByUserRoles() throws Exception {
+
+		// Role member
+
+		_activateSingleApproverWorkflow(BlogsEntry.class.getName(), 0, 0);
+
+		_addBlogsEntry();
+
+		_setPermissionChecker(_portalContentReviewerUser);
+
+		List<WorkflowTask> workflowTasks =
+			_workflowTaskManager.getWorkflowTasksByUserRoles(
+				_portalContentReviewerUser.getUserId(), false,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		Assert.assertEquals(workflowTasks.toString(), 1, workflowTasks.size());
+
+		Assert.assertEquals(
+			1,
+			_workflowTaskManager.getWorkflowTaskCountByUserRoles(
+				_portalContentReviewerUser.getUserId(), false));
+
+		// User who can view the role member but not the workflow task
+
+		_setPermissionChecker(_createUserWithUserViewPermission());
+
+		workflowTasks = _workflowTaskManager.getWorkflowTasksByUserRoles(
+			_portalContentReviewerUser.getUserId(), false, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+
+		Assert.assertEquals(workflowTasks.toString(), 0, workflowTasks.size());
+
+		Assert.assertEquals(
+			0,
+			_workflowTaskManager.getWorkflowTaskCountByUserRoles(
+				_portalContentReviewerUser.getUserId(), false));
+
+		// User who cannot view the role member
+
+		_setPermissionChecker(_siteMemberUser);
+
+		_assertMustHavePermission(
+			User.class.getName(),
+			() -> _workflowTaskManager.getWorkflowTasksByUserRoles(
+				_portalContentReviewerUser.getUserId(), false,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null));
+		_assertMustHavePermission(
+			User.class.getName(),
+			() -> _workflowTaskManager.getWorkflowTaskCountByUserRoles(
+				_portalContentReviewerUser.getUserId(), false));
+
+		_deactivateWorkflow(BlogsEntry.class.getName(), 0, 0);
+	}
+
+	@Test
+	public void testGetWorkflowTasksByWorkflowInstance() throws Exception {
+
+		// Assignee
+
+		_activateSingleApproverWorkflow(BlogsEntry.class.getName(), 0, 0);
+
+		_addBlogsEntry();
+
+		WorkflowTask workflowTask = _getWorkflowTask();
+
+		_assignWorkflowTaskToUser(_adminUser, _siteMemberUser);
+
+		_setPermissionChecker(_siteMemberUser);
+
+		List<WorkflowTask> workflowTasks =
+			_workflowTaskManager.getWorkflowTasksByWorkflowInstance(
+				null, workflowTask.getWorkflowInstanceId(), false,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		Assert.assertEquals(workflowTasks.toString(), 1, workflowTasks.size());
+
+		Assert.assertEquals(
+			1,
+			_workflowTaskManager.getWorkflowTaskCountByWorkflowInstance(
+				null, workflowTask.getWorkflowInstanceId(), false));
+
+		// Assignee of a completed workflow task
+
+		_completeWorkflowTask(_siteMemberUser, Constants.REJECT);
+
+		workflowTasks = _workflowTaskManager.getWorkflowTasksByWorkflowInstance(
+			null, workflowTask.getWorkflowInstanceId(), null, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+
+		Assert.assertEquals(workflowTasks.toString(), 1, workflowTasks.size());
+
+		WorkflowTask completedWorkflowTask = workflowTasks.get(0);
+
+		Assert.assertEquals(
+			workflowTask.getWorkflowTaskId(),
+			completedWorkflowTask.getWorkflowTaskId());
+
+		workflowTasks = _workflowTaskManager.getWorkflowTasksByWorkflowInstance(
+			null, workflowTask.getWorkflowInstanceId(), null, 1, 2, null);
+
+		Assert.assertEquals(workflowTasks.toString(), 0, workflowTasks.size());
+
+		Assert.assertEquals(
+			1,
+			_workflowTaskManager.getWorkflowTaskCountByWorkflowInstance(
+				null, workflowTask.getWorkflowInstanceId(), null));
+		Assert.assertEquals(
+			1,
+			_workflowTaskManager.getWorkflowTaskCountByWorkflowInstance(
+				_siteMemberUser.getUserId(),
+				workflowTask.getWorkflowInstanceId(), null));
+
+		// Company administrator
+
+		_setPermissionChecker(_adminUser);
+
+		Assert.assertEquals(
+			2,
+			_workflowTaskManager.getWorkflowTaskCountByWorkflowInstance(
+				null, workflowTask.getWorkflowInstanceId(), null));
+
+		// Nonexistent workflow instance
+
+		Assert.assertThrows(
+			NoSuchInstanceException.class,
+			() -> _workflowTaskManager.getWorkflowTasksByWorkflowInstance(
+				_siteMemberUser.getUserId(), 0, false, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null));
+
+		// Submitter
+
+		BlogsEntry blogsEntry = _addBlogsEntry(_siteMemberUser);
+
+		WorkflowInstanceLink workflowInstanceLink =
+			workflowInstanceLinkLocalService.getWorkflowInstanceLink(
+				_company.getCompanyId(), _group.getGroupId(),
+				BlogsEntry.class.getName(), blogsEntry.getEntryId());
+
+		_setPermissionChecker(_siteMemberUser);
+
+		workflowTasks = _workflowTaskManager.getWorkflowTasksByWorkflowInstance(
+			null, workflowInstanceLink.getWorkflowInstanceId(), false,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		Assert.assertEquals(workflowTasks.toString(), 0, workflowTasks.size());
+
+		Assert.assertEquals(
+			0,
+			_workflowTaskManager.getWorkflowTaskCountByWorkflowInstance(
+				null, workflowInstanceLink.getWorkflowInstanceId(), false));
+
+		// User who can view the assignee but not the workflow instance
+
+		User user = _createUserWithUserViewPermission();
+
+		_setPermissionChecker(user);
+
+		Assert.assertThrows(
+			NoSuchInstanceException.class,
+			() -> _workflowTaskManager.getWorkflowTasksByWorkflowInstance(
+				null, workflowTask.getWorkflowInstanceId(), false,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null));
+		Assert.assertThrows(
+			NoSuchInstanceException.class,
+			() -> _workflowTaskManager.getWorkflowTasksByWorkflowInstance(
+				_siteMemberUser.getUserId(),
+				workflowTask.getWorkflowInstanceId(), false, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null));
+		Assert.assertThrows(
+			NoSuchInstanceException.class,
+			() -> _workflowTaskManager.getWorkflowTasksByWorkflowInstance(
+				user.getUserId(), workflowTask.getWorkflowInstanceId(), false,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null));
+		Assert.assertThrows(
+			NoSuchInstanceException.class,
+			() -> _workflowTaskManager.getWorkflowTaskCountByWorkflowInstance(
+				null, workflowTask.getWorkflowInstanceId(), false));
+
+		// User who cannot view the assignee
+
+		_setPermissionChecker(_siteMemberUser);
+
+		_assertMustHavePermission(
+			User.class.getName(),
+			() -> _workflowTaskManager.getWorkflowTasksByWorkflowInstance(
+				_portalContentReviewerUser.getUserId(), 0, false,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null));
+		_assertMustHavePermission(
+			User.class.getName(),
+			() -> _workflowTaskManager.getWorkflowTaskCountByWorkflowInstance(
+				_portalContentReviewerUser.getUserId(),
+				workflowTask.getWorkflowInstanceId(), false));
+
+		// User who is in another company
+
+		_setPermissionChecker(TestPropsValues.getUser());
+
+		Assert.assertThrows(
+			NoSuchInstanceException.class,
+			() -> _workflowTaskManager.getWorkflowTasksByWorkflowInstance(
+				null, workflowTask.getWorkflowInstanceId(), false,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null));
+
+		_deactivateWorkflow(BlogsEntry.class.getName(), 0, 0);
+	}
+
+	@Test
 	public void testIsNotifiableUser() throws Exception {
 		User user = UserTestUtil.addUser(_company);
 
@@ -1747,6 +2105,16 @@ public class WorkflowTaskManagerImplTest extends BaseWorkflowManagerTestCase {
 		}
 	}
 
+	private void _assertMustHavePermission(
+		String resourceName, ThrowingRunnable throwingRunnable) {
+
+		PrincipalException.MustHavePermission mustHavePermission =
+			Assert.assertThrows(
+				PrincipalException.MustHavePermission.class, throwingRunnable);
+
+		Assert.assertEquals(resourceName, mustHavePermission.resourceName);
+	}
+
 	private void _assignWorkflowTaskToUser(User user, User assigneeUser)
 		throws Exception {
 
@@ -1944,6 +2312,23 @@ public class WorkflowTaskManagerImplTest extends BaseWorkflowManagerTestCase {
 		return user;
 	}
 
+	private User _createUserWithUserViewPermission() throws Exception {
+		User user = _createUser(RoleConstants.SITE_MEMBER);
+
+		Role role = _roleLocalService.addRole(
+			null, _companyAdminUser.getUserId(), null, 0,
+			RandomTestUtil.randomString(), null, null,
+			RoleConstants.TYPE_REGULAR, null, _serviceContext);
+
+		RoleTestUtil.addResourcePermission(
+			role, User.class.getName(), ResourceConstants.SCOPE_COMPANY,
+			String.valueOf(_company.getCompanyId()), ActionKeys.VIEW);
+
+		_userLocalService.addRoleUser(role.getRoleId(), user);
+
+		return user;
+	}
+
 	private void _deactivateWorkflow(
 			long groupId, String className, long classPK, long typePK)
 		throws Exception {
@@ -2094,6 +2479,11 @@ public class WorkflowTaskManagerImplTest extends BaseWorkflowManagerTestCase {
 		return _workflowTaskManager.searchCount(
 			user.getCompanyId(), user.getUserId(), null, null, null, null, null,
 			null, null, null, false, true, null, null, false);
+	}
+
+	private void _setPermissionChecker(User user) throws Exception {
+		PermissionThreadLocal.setPermissionChecker(
+			PermissionCheckerFactoryUtil.create(user));
 	}
 
 	private void _setUpPermissionThreadLocal() throws Exception {
