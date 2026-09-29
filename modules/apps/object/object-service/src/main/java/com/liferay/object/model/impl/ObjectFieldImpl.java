@@ -56,6 +56,13 @@ public class ObjectFieldImpl extends ObjectFieldBaseImpl {
 			};
 		}
 
+		if (compareBusinessType(ObjectFieldConstants.BUSINESS_TYPE_LOCATION)) {
+			return new String[] {
+				"address_" + getDBColumnName(), "lat_" + getDBColumnName(),
+				"lng_" + getDBColumnName()
+			};
+		}
+
 		return new String[] {getDBColumnName()};
 	}
 

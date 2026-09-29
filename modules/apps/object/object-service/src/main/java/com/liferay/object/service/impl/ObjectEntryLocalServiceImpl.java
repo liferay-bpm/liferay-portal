@@ -5952,8 +5952,7 @@ public class ObjectEntryLocalServiceImpl
 					columnName, StringPool.UNDERLINE);
 
 				if ((parts.length == 2) &&
-					(Objects.equals(parts[0], "classNameId") ||
-					 Objects.equals(parts[0], "classPK"))) {
+					ArrayUtil.contains(_DB_COLUMN_NAME_PREFIXES, parts[0])) {
 
 					_putValue(
 						javaTypeClass, parts[0], object,
@@ -6810,21 +6809,17 @@ public class ObjectEntryLocalServiceImpl
 		Class<?> javaTypeClass = column.getJavaType();
 
 		if (columnName.endsWith(StringPool.UNDERLINE)) {
-			if (columnName.startsWith("class")) {
-				String[] parts = StringUtil.split(
-					columnName, StringPool.UNDERLINE);
+			String[] parts = StringUtil.split(columnName, StringPool.UNDERLINE);
 
-				if ((parts.length == 2) &&
-					(Objects.equals(parts[0], "classNameId") ||
-					 Objects.equals(parts[0], "classPK"))) {
+			if ((parts.length == 2) &&
+				ArrayUtil.contains(_DB_COLUMN_NAME_PREFIXES, parts[0])) {
 
-					_putValue(
-						javaTypeClass, parts[0], object,
-						(Map<String, Serializable>)values.computeIfAbsent(
-							parts[1], key -> new HashMap<>()));
+				_putValue(
+					javaTypeClass, parts[0], object,
+					(Map<String, Serializable>)values.computeIfAbsent(
+						parts[1], key -> new HashMap<>()));
 
-					return;
-				}
+				return;
 			}
 
 			columnName = columnName.substring(0, columnName.length() - 1);
@@ -7017,19 +7012,24 @@ public class ObjectEntryLocalServiceImpl
 				column.getSQLType(), value);
 		}
 		else if (objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_ASSIGNEE)) {
+					ObjectFieldConstants.BUSINESS_TYPE_ASSIGNEE) ||
+				 objectField.compareBusinessType(
+					 ObjectFieldConstants.BUSINESS_TYPE_LOCATION)) {
 
 			String columnName = StringUtil.extractFirst(
 				column.getName(), StringPool.UNDERLINE);
 
 			columnNames.set(index - 1, columnName);
 
+			Map<String, Serializable> valueMap =
+				(Map<String, Serializable>)value;
+
 			_setColumn(
 				columnNames, index,
 				(Map<String, Serializable>)insertedValues.computeIfAbsent(
 					objectField.getName(), key -> new HashMap<>()),
 				preparedStatement, column.getSQLType(),
-				MapUtil.getLong((Map<String, Serializable>)value, columnName));
+				valueMap.get(columnName));
 		}
 		else if (objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_ENCRYPTED)) {
@@ -8538,7 +8538,9 @@ public class ObjectEntryLocalServiceImpl
 				objectField.getName());
 		}
 		else if (objectField.compareBusinessType(
-					ObjectFieldConstants.BUSINESS_TYPE_ASSIGNEE)) {
+					ObjectFieldConstants.BUSINESS_TYPE_ASSIGNEE) ||
+				 objectField.compareBusinessType(
+					 ObjectFieldConstants.BUSINESS_TYPE_LOCATION)) {
 
 			if (MapUtil.isEmpty((Map<String, Serializable>)value)) {
 				throw new ObjectEntryValuesException.Required(
@@ -8676,7 +8678,10 @@ public class ObjectEntryLocalServiceImpl
 
 		if (StringUtil.equals(
 				objectField.getBusinessType(),
-				ObjectFieldConstants.BUSINESS_TYPE_ASSIGNEE)) {
+				ObjectFieldConstants.BUSINESS_TYPE_ASSIGNEE) ||
+			StringUtil.equals(
+				objectField.getBusinessType(),
+				ObjectFieldConstants.BUSINESS_TYPE_LOCATION)) {
 
 			return;
 		}
@@ -8993,6 +8998,10 @@ public class ObjectEntryLocalServiceImpl
 			throw new ObjectEntryStatusException("Draft status is not allowed");
 		}
 	}
+
+	private static final String[] _DB_COLUMN_NAME_PREFIXES = {
+		"address", "classNameId", "classPK", "lat", "lng"
+	};
 
 	private static final Expression<?>[] _EXPRESSIONS = {
 		ObjectEntryTable.INSTANCE.objectEntryId,
