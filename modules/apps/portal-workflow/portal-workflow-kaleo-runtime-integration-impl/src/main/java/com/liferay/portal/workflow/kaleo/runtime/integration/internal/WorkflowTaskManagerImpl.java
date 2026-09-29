@@ -380,6 +380,14 @@ public class WorkflowTaskManagerImpl implements WorkflowTaskManager {
 	}
 
 	@Override
+	public int getWorkflowTaskCountByRole(long roleId, Boolean completed)
+		throws PortalException {
+
+		return _kaleoTaskInstanceTokenService.getKaleoTaskInstanceTokensCount(
+			Role.class.getName(), roleId, completed);
+	}
+
+	@Override
 	public int getWorkflowTaskCountByRole(
 			long companyId, long roleId, Boolean completed)
 		throws WorkflowException {
@@ -396,6 +404,15 @@ public class WorkflowTaskManagerImpl implements WorkflowTaskManager {
 		catch (Exception exception) {
 			throw new WorkflowException(exception);
 		}
+	}
+
+	@Override
+	public int getWorkflowTaskCountBySubmittingUser(
+			long userId, Boolean completed)
+		throws PortalException {
+
+		return _kaleoTaskInstanceTokenService.
+			getSubmittingUserKaleoTaskInstanceTokensCount(userId, completed);
 	}
 
 	@Override
@@ -418,6 +435,14 @@ public class WorkflowTaskManagerImpl implements WorkflowTaskManager {
 	}
 
 	@Override
+	public int getWorkflowTaskCountByUser(long userId, Boolean completed)
+		throws PortalException {
+
+		return _kaleoTaskInstanceTokenService.getKaleoTaskInstanceTokensCount(
+			User.class.getName(), userId, completed);
+	}
+
+	@Override
 	public int getWorkflowTaskCountByUser(
 			long companyId, long userId, Boolean completed)
 		throws WorkflowException {
@@ -436,6 +461,14 @@ public class WorkflowTaskManagerImpl implements WorkflowTaskManager {
 		catch (Exception exception) {
 			throw new WorkflowException(exception);
 		}
+	}
+
+	@Override
+	public int getWorkflowTaskCountByUserRoles(long userId, Boolean completed)
+		throws PortalException {
+
+		return _kaleoTaskInstanceTokenService.
+			getUserRolesKaleoTaskInstanceTokensCount(userId, completed);
 	}
 
 	@Override
@@ -502,6 +535,15 @@ public class WorkflowTaskManagerImpl implements WorkflowTaskManager {
 	}
 
 	@Override
+	public int getWorkflowTaskCountByWorkflowInstance(
+			Long userId, long workflowInstanceId, Boolean completed)
+		throws PortalException {
+
+		return _kaleoTaskInstanceTokenService.getKaleoTaskInstanceTokensCount(
+			workflowInstanceId, userId, completed);
+	}
+
+	@Override
 	public List<WorkflowTransition> getWorkflowTaskWorkflowTransitions(
 			long workflowTaskId)
 		throws WorkflowException {
@@ -563,6 +605,19 @@ public class WorkflowTaskManagerImpl implements WorkflowTaskManager {
 
 	@Override
 	public List<WorkflowTask> getWorkflowTasksByRole(
+			long roleId, Boolean completed, int start, int end,
+			OrderByComparator<WorkflowTask> orderByComparator)
+		throws PortalException {
+
+		return _toWorkflowTasks(
+			_kaleoTaskInstanceTokenService.getKaleoTaskInstanceTokens(
+				Role.class.getName(), roleId, completed, start, end,
+				KaleoTaskInstanceTokenOrderByComparator.getOrderByComparator(
+					orderByComparator, _kaleoWorkflowModelConverter)));
+	}
+
+	@Override
+	public List<WorkflowTask> getWorkflowTasksByRole(
 			long companyId, long roleId, Boolean completed, int start, int end,
 			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException {
@@ -583,6 +638,21 @@ public class WorkflowTaskManagerImpl implements WorkflowTaskManager {
 		catch (Exception exception) {
 			throw new WorkflowException(exception);
 		}
+	}
+
+	@Override
+	public List<WorkflowTask> getWorkflowTasksBySubmittingUser(
+			long userId, Boolean completed, int start, int end,
+			OrderByComparator<WorkflowTask> orderByComparator)
+		throws PortalException {
+
+		return _toWorkflowTasks(
+			_kaleoTaskInstanceTokenService.
+				getSubmittingUserKaleoTaskInstanceTokens(
+					userId, completed, start, end,
+					KaleoTaskInstanceTokenOrderByComparator.
+						getOrderByComparator(
+							orderByComparator, _kaleoWorkflowModelConverter)));
 	}
 
 	@Override
@@ -615,6 +685,19 @@ public class WorkflowTaskManagerImpl implements WorkflowTaskManager {
 
 	@Override
 	public List<WorkflowTask> getWorkflowTasksByUser(
+			long userId, Boolean completed, int start, int end,
+			OrderByComparator<WorkflowTask> orderByComparator)
+		throws PortalException {
+
+		return _toWorkflowTasks(
+			_kaleoTaskInstanceTokenService.getKaleoTaskInstanceTokens(
+				User.class.getName(), userId, completed, start, end,
+				KaleoTaskInstanceTokenOrderByComparator.getOrderByComparator(
+					orderByComparator, _kaleoWorkflowModelConverter)));
+	}
+
+	@Override
+	public List<WorkflowTask> getWorkflowTasksByUser(
 			long companyId, long userId, Boolean completed, int start, int end,
 			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException {
@@ -635,6 +718,19 @@ public class WorkflowTaskManagerImpl implements WorkflowTaskManager {
 		catch (Exception exception) {
 			throw new WorkflowException(exception);
 		}
+	}
+
+	@Override
+	public List<WorkflowTask> getWorkflowTasksByUserRoles(
+			long userId, Boolean completed, int start, int end,
+			OrderByComparator<WorkflowTask> orderByComparator)
+		throws PortalException {
+
+		return _toWorkflowTasks(
+			_kaleoTaskInstanceTokenService.getUserRolesKaleoTaskInstanceTokens(
+				userId, completed, start, end,
+				KaleoTaskInstanceTokenOrderByComparator.getOrderByComparator(
+					orderByComparator, _kaleoWorkflowModelConverter)));
 	}
 
 	@Override
@@ -691,6 +787,19 @@ public class WorkflowTaskManagerImpl implements WorkflowTaskManager {
 		catch (Exception exception) {
 			throw new WorkflowException(exception);
 		}
+	}
+
+	@Override
+	public List<WorkflowTask> getWorkflowTasksByWorkflowInstance(
+			Long userId, long workflowInstanceId, Boolean completed, int start,
+			int end, OrderByComparator<WorkflowTask> orderByComparator)
+		throws PortalException {
+
+		return _toWorkflowTasks(
+			_kaleoTaskInstanceTokenService.getKaleoTaskInstanceTokens(
+				workflowInstanceId, userId, completed, start, end,
+				KaleoTaskInstanceTokenOrderByComparator.getOrderByComparator(
+					orderByComparator, _kaleoWorkflowModelConverter)));
 	}
 
 	@Override

@@ -140,6 +140,16 @@ public class WorkflowTaskManagerUtil {
 		return workflowTaskManager.getWorkflowTaskCount(companyId, completed);
 	}
 
+	public static int getWorkflowTaskCountByRole(long roleId, Boolean completed)
+		throws PortalException {
+
+		WorkflowTaskManager workflowTaskManager =
+			_workflowTaskManagerSnapshot.get();
+
+		return workflowTaskManager.getWorkflowTaskCountByRole(
+			roleId, completed);
+	}
+
 	public static int getWorkflowTaskCountByRole(
 			long companyId, long roleId, Boolean completed)
 		throws WorkflowException {
@@ -149,6 +159,17 @@ public class WorkflowTaskManagerUtil {
 
 		return workflowTaskManager.getWorkflowTaskCountByRole(
 			companyId, roleId, completed);
+	}
+
+	public static int getWorkflowTaskCountBySubmittingUser(
+			long userId, Boolean completed)
+		throws PortalException {
+
+		WorkflowTaskManager workflowTaskManager =
+			_workflowTaskManagerSnapshot.get();
+
+		return workflowTaskManager.getWorkflowTaskCountBySubmittingUser(
+			userId, completed);
 	}
 
 	public static int getWorkflowTaskCountBySubmittingUser(
@@ -162,6 +183,16 @@ public class WorkflowTaskManagerUtil {
 			companyId, userId, completed);
 	}
 
+	public static int getWorkflowTaskCountByUser(long userId, Boolean completed)
+		throws PortalException {
+
+		WorkflowTaskManager workflowTaskManager =
+			_workflowTaskManagerSnapshot.get();
+
+		return workflowTaskManager.getWorkflowTaskCountByUser(
+			userId, completed);
+	}
+
 	public static int getWorkflowTaskCountByUser(
 			long companyId, long userId, Boolean completed)
 		throws WorkflowException {
@@ -171,6 +202,17 @@ public class WorkflowTaskManagerUtil {
 
 		return workflowTaskManager.getWorkflowTaskCountByUser(
 			companyId, userId, completed);
+	}
+
+	public static int getWorkflowTaskCountByUserRoles(
+			long userId, Boolean completed)
+		throws PortalException {
+
+		WorkflowTaskManager workflowTaskManager =
+			_workflowTaskManagerSnapshot.get();
+
+		return workflowTaskManager.getWorkflowTaskCountByUserRoles(
+			userId, completed);
 	}
 
 	public static int getWorkflowTaskCountByUserRoles(
@@ -208,6 +250,17 @@ public class WorkflowTaskManagerUtil {
 			companyId, userId, workflowInstanceId, completed);
 	}
 
+	public static int getWorkflowTaskCountByWorkflowInstance(
+			Long userId, long workflowInstanceId, Boolean completed)
+		throws PortalException {
+
+		WorkflowTaskManager workflowTaskManager =
+			_workflowTaskManagerSnapshot.get();
+
+		return workflowTaskManager.getWorkflowTaskCountByWorkflowInstance(
+			userId, workflowInstanceId, completed);
+	}
+
 	public static List<WorkflowTransition> getWorkflowTaskWorkflowTransitions(
 			long workflowTaskId)
 		throws WorkflowException {
@@ -232,6 +285,18 @@ public class WorkflowTaskManagerUtil {
 	}
 
 	public static List<WorkflowTask> getWorkflowTasksByRole(
+			long roleId, Boolean completed, int start, int end,
+			OrderByComparator<WorkflowTask> orderByComparator)
+		throws PortalException {
+
+		WorkflowTaskManager workflowTaskManager =
+			_workflowTaskManagerSnapshot.get();
+
+		return workflowTaskManager.getWorkflowTasksByRole(
+			roleId, completed, start, end, orderByComparator);
+	}
+
+	public static List<WorkflowTask> getWorkflowTasksByRole(
 			long companyId, long roleId, Boolean completed, int start, int end,
 			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException {
@@ -241,6 +306,18 @@ public class WorkflowTaskManagerUtil {
 
 		return workflowTaskManager.getWorkflowTasksByRole(
 			companyId, roleId, completed, start, end, orderByComparator);
+	}
+
+	public static List<WorkflowTask> getWorkflowTasksBySubmittingUser(
+			long userId, Boolean completed, int start, int end,
+			OrderByComparator<WorkflowTask> orderByComparator)
+		throws PortalException {
+
+		WorkflowTaskManager workflowTaskManager =
+			_workflowTaskManagerSnapshot.get();
+
+		return workflowTaskManager.getWorkflowTasksBySubmittingUser(
+			userId, completed, start, end, orderByComparator);
 	}
 
 	public static List<WorkflowTask> getWorkflowTasksBySubmittingUser(
@@ -256,6 +333,18 @@ public class WorkflowTaskManagerUtil {
 	}
 
 	public static List<WorkflowTask> getWorkflowTasksByUser(
+			long userId, Boolean completed, int start, int end,
+			OrderByComparator<WorkflowTask> orderByComparator)
+		throws PortalException {
+
+		WorkflowTaskManager workflowTaskManager =
+			_workflowTaskManagerSnapshot.get();
+
+		return workflowTaskManager.getWorkflowTasksByUser(
+			userId, completed, start, end, orderByComparator);
+	}
+
+	public static List<WorkflowTask> getWorkflowTasksByUser(
 			long companyId, long userId, Boolean completed, int start, int end,
 			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException {
@@ -265,6 +354,18 @@ public class WorkflowTaskManagerUtil {
 
 		return workflowTaskManager.getWorkflowTasksByUser(
 			companyId, userId, completed, start, end, orderByComparator);
+	}
+
+	public static List<WorkflowTask> getWorkflowTasksByUserRoles(
+			long userId, Boolean completed, int start, int end,
+			OrderByComparator<WorkflowTask> orderByComparator)
+		throws PortalException {
+
+		WorkflowTaskManager workflowTaskManager =
+			_workflowTaskManagerSnapshot.get();
+
+		return workflowTaskManager.getWorkflowTasksByUserRoles(
+			userId, completed, start, end, orderByComparator);
 	}
 
 	public static List<WorkflowTask> getWorkflowTasksByUserRoles(
@@ -290,6 +391,19 @@ public class WorkflowTaskManagerUtil {
 
 		return workflowTaskManager.getWorkflowTasksByWorkflowInstance(
 			companyId, userId, workflowInstanceId, completed, start, end,
+			orderByComparator);
+	}
+
+	public static List<WorkflowTask> getWorkflowTasksByWorkflowInstance(
+			Long userId, long workflowInstanceId, Boolean completed, int start,
+			int end, OrderByComparator<WorkflowTask> orderByComparator)
+		throws PortalException {
+
+		WorkflowTaskManager workflowTaskManager =
+			_workflowTaskManagerSnapshot.get();
+
+		return workflowTaskManager.getWorkflowTasksByWorkflowInstance(
+			userId, workflowInstanceId, completed, start, end,
 			orderByComparator);
 	}
 
