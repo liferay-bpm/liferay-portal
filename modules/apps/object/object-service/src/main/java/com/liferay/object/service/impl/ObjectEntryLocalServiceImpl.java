@@ -5157,7 +5157,17 @@ public class ObjectEntryLocalServiceImpl
 				table, objectField.getDBColumnName(), search);
 		}
 
-		Column<?, ?> column = table.getColumn(objectField.getDBColumnName());
+		Column<?, ?> column = null;
+
+		if (objectField.compareBusinessType(
+				ObjectFieldConstants.BUSINESS_TYPE_LOCATION)) {
+
+			column = table.getColumn(
+				"address_" + objectField.getDBColumnName());
+		}
+		else {
+			column = table.getColumn(objectField.getDBColumnName());
+		}
 
 		if (column == null) {
 			return null;

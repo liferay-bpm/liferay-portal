@@ -185,7 +185,17 @@ public class ObjectEntryFieldSortDSLQueryVisitor
 			return table.getColumn(objectField.getSortableDBColumnName());
 		}
 
-		Column<?, ?> column = table.getColumn(objectField.getDBColumnName());
+		Column<?, ?> column = null;
+
+		if (objectField.compareBusinessType(
+				ObjectFieldConstants.BUSINESS_TYPE_LOCATION)) {
+
+			column = table.getColumn(
+				"address_" + objectField.getDBColumnName());
+		}
+		else {
+			column = table.getColumn(objectField.getDBColumnName());
+		}
 
 		if (column.getSQLType() == Types.CLOB) {
 			return DSLFunctionFactoryUtil.castClobText(
