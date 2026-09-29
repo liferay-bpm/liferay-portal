@@ -37,6 +37,49 @@ public class KaleoTaskInstanceTokenServiceWrapper
 			workflowTaskId);
 	}
 
+	@Override
+	public java.util.List<KaleoTaskInstanceToken> getKaleoTaskInstanceTokens(
+			long kaleoInstanceId, Long userId, Boolean completed, int start,
+			int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<KaleoTaskInstanceToken> orderByComparator)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _kaleoTaskInstanceTokenService.getKaleoTaskInstanceTokens(
+			kaleoInstanceId, userId, completed, start, end, orderByComparator);
+	}
+
+	@Override
+	public java.util.List<KaleoTaskInstanceToken> getKaleoTaskInstanceTokens(
+			String assigneeClassName, long assigneeClassPK, Boolean completed,
+			int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<KaleoTaskInstanceToken> orderByComparator)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _kaleoTaskInstanceTokenService.getKaleoTaskInstanceTokens(
+			assigneeClassName, assigneeClassPK, completed, start, end,
+			orderByComparator);
+	}
+
+	@Override
+	public int getKaleoTaskInstanceTokensCount(
+			long kaleoInstanceId, Long userId, Boolean completed)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _kaleoTaskInstanceTokenService.getKaleoTaskInstanceTokensCount(
+			kaleoInstanceId, userId, completed);
+	}
+
+	@Override
+	public int getKaleoTaskInstanceTokensCount(
+			String assigneeClassName, long assigneeClassPK, Boolean completed)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _kaleoTaskInstanceTokenService.getKaleoTaskInstanceTokensCount(
+			assigneeClassName, assigneeClassPK, completed);
+	}
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *
@@ -45,6 +88,50 @@ public class KaleoTaskInstanceTokenServiceWrapper
 	@Override
 	public String getOSGiServiceIdentifier() {
 		return _kaleoTaskInstanceTokenService.getOSGiServiceIdentifier();
+	}
+
+	@Override
+	public java.util.List<KaleoTaskInstanceToken>
+			getSubmittingUserKaleoTaskInstanceTokens(
+				long userId, Boolean completed, int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<KaleoTaskInstanceToken> orderByComparator)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _kaleoTaskInstanceTokenService.
+			getSubmittingUserKaleoTaskInstanceTokens(
+				userId, completed, start, end, orderByComparator);
+	}
+
+	@Override
+	public int getSubmittingUserKaleoTaskInstanceTokensCount(
+			long userId, Boolean completed)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _kaleoTaskInstanceTokenService.
+			getSubmittingUserKaleoTaskInstanceTokensCount(userId, completed);
+	}
+
+	@Override
+	public java.util.List<KaleoTaskInstanceToken>
+			getUserRolesKaleoTaskInstanceTokens(
+				long userId, Boolean completed, int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<KaleoTaskInstanceToken> orderByComparator)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _kaleoTaskInstanceTokenService.
+			getUserRolesKaleoTaskInstanceTokens(
+				userId, completed, start, end, orderByComparator);
+	}
+
+	@Override
+	public int getUserRolesKaleoTaskInstanceTokensCount(
+			long userId, Boolean completed)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _kaleoTaskInstanceTokenService.
+			getUserRolesKaleoTaskInstanceTokensCount(userId, completed);
 	}
 
 	@Override
@@ -62,4 +149,4 @@ public class KaleoTaskInstanceTokenServiceWrapper
 	private KaleoTaskInstanceTokenService _kaleoTaskInstanceTokenService;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1005836962
+// LIFERAY-SERVICE-BUILDER-HASH:1081490940
