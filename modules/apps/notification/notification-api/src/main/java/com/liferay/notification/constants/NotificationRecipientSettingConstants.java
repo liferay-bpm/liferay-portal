@@ -67,23 +67,4 @@ public class NotificationRecipientSettingConstants {
 		return null;
 	}
 
-	public static boolean isRecipientMetadataName(String recipientName) {
-		if (recipientName.equals(
-				NotificationRecipientSettingConstants.
-					NAME_ROLE_EXTERNAL_REFERENCE_CODE) ||
-			recipientName.equals(
-				NotificationRecipientSettingConstants.NAME_ROLE_TYPE) ||
-			recipientName.equals(
-				NotificationRecipientSettingConstants.
-					NAME_USER_EXTERNAL_REFERENCE_CODE) ||
-			recipientName.equals(
-				NotificationRecipientSettingConstants.
-					NAME_USER_GROUP_EXTERNAL_REFERENCE_CODE)) {
-
-			return true;
-		}
-
-		return false;
-	}
-
 }

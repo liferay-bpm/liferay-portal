@@ -209,6 +209,63 @@ public abstract class BaseNotificationType implements NotificationType {
 		}
 	}
 
+	protected void addRecipientReferences(
+		long companyId, Map<String, String> recipientMap) {
+
+		String roleName = recipientMap.get(
+			NotificationRecipientSettingConstants.NAME_ROLE_NAME);
+
+		if (roleName != null) {
+			Role role = roleLocalService.fetchRole(companyId, roleName);
+
+			if (role != null) {
+				recipientMap.put(
+					NotificationRecipientSettingConstants.
+						NAME_ROLE_EXTERNAL_REFERENCE_CODE,
+					role.getExternalReferenceCode());
+				recipientMap.put(
+					NotificationRecipientSettingConstants.NAME_ROLE_TYPE,
+					RoleConstants.getTypeLabel(role.getType()));
+			}
+
+			return;
+		}
+
+		String userGroupName = recipientMap.get(
+			NotificationRecipientSettingConstants.NAME_USER_GROUP_NAME);
+
+		if (userGroupName != null) {
+			UserGroup userGroup = userGroupLocalService.fetchUserGroup(
+				companyId, userGroupName);
+
+			if (userGroup != null) {
+				recipientMap.put(
+					NotificationRecipientSettingConstants.
+						NAME_USER_GROUP_EXTERNAL_REFERENCE_CODE,
+					userGroup.getExternalReferenceCode());
+			}
+
+			return;
+		}
+
+		String userScreenName = recipientMap.get(
+			NotificationRecipientSettingConstants.NAME_USER_SCREEN_NAME);
+
+		if ((userScreenName != null) &&
+			!NotificationTypeUtil.isTermValue(userScreenName)) {
+
+			User user = userLocalService.fetchUserByScreenName(
+				companyId, userScreenName);
+
+			if (user != null) {
+				recipientMap.put(
+					NotificationRecipientSettingConstants.
+						NAME_USER_EXTERNAL_REFERENCE_CODE,
+					user.getExternalReferenceCode());
+			}
+		}
+	}
+
 	protected NotificationRecipient createNotificationRecipient(
 		User user, long notificationQueueEntryId) {
 
@@ -353,64 +410,15 @@ public abstract class BaseNotificationType implements NotificationType {
 	private Map<String, String> _toRecipientMap(
 		NotificationRecipientSetting notificationRecipientSetting) {
 
-		Map<String, String> map = HashMapBuilder.put(
+		Map<String, String> recipientMap = HashMapBuilder.put(
 			notificationRecipientSetting.getName(),
 			notificationRecipientSetting.getValue()
 		).build();
 
-		String name = notificationRecipientSetting.getName();
+		addRecipientReferences(
+			notificationRecipientSetting.getCompanyId(), recipientMap);
 
-		if (Objects.equals(
-				name, NotificationRecipientSettingConstants.NAME_ROLE_NAME)) {
-
-			Role role = roleLocalService.fetchRole(
-				notificationRecipientSetting.getCompanyId(),
-				notificationRecipientSetting.getValue());
-
-			if (role != null) {
-				map.put(
-					NotificationRecipientSettingConstants.
-						NAME_ROLE_EXTERNAL_REFERENCE_CODE,
-					role.getExternalReferenceCode());
-				map.put(
-					NotificationRecipientSettingConstants.NAME_ROLE_TYPE,
-					RoleConstants.getTypeLabel(role.getType()));
-			}
-		}
-		else if (Objects.equals(
-					name,
-					NotificationRecipientSettingConstants.
-						NAME_USER_GROUP_NAME)) {
-
-			UserGroup userGroup = userGroupLocalService.fetchUserGroup(
-				notificationRecipientSetting.getCompanyId(),
-				notificationRecipientSetting.getValue());
-
-			if (userGroup != null) {
-				map.put(
-					NotificationRecipientSettingConstants.
-						NAME_USER_GROUP_EXTERNAL_REFERENCE_CODE,
-					userGroup.getExternalReferenceCode());
-			}
-		}
-		else if (Objects.equals(
-					name,
-					NotificationRecipientSettingConstants.
-						NAME_USER_SCREEN_NAME)) {
-
-			User user = userLocalService.fetchUserByScreenName(
-				notificationRecipientSetting.getCompanyId(),
-				notificationRecipientSetting.getValue());
-
-			if (user != null) {
-				map.put(
-					NotificationRecipientSettingConstants.
-						NAME_USER_EXTERNAL_REFERENCE_CODE,
-					user.getExternalReferenceCode());
-			}
-		}
-
-		return map;
+		return recipientMap;
 	}
 
 }

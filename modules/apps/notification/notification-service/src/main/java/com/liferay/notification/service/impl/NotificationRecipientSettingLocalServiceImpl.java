@@ -106,36 +106,45 @@ public class NotificationRecipientSettingLocalServiceImpl
 		List<NotificationRecipientSetting> notificationRecipientSettings =
 			new ArrayList<>();
 
-		List<String> unresolvedUserScreenNames = new ArrayList<>();
+		List<String> missingUserScreenNames = new ArrayList<>();
 
 		for (Object recipient : recipients) {
 			Map<String, Object> recipientMap = (Map<String, Object>)recipient;
 
 			for (Map.Entry<String, Object> entry : recipientMap.entrySet()) {
-				if (NotificationRecipientSettingConstants.
-						isRecipientMetadataName(entry.getKey()) ||
-					Objects.equals(
-						recipientMap.get(
-							NotificationRecipientSettingConstants.
-								getRecipientTypeName(entry.getKey())),
-						NotificationRecipientConstants.TYPE_SUBSCRIBERS)) {
-
+				if (_isRecipientReferenceName(entry.getKey())) {
 					continue;
 				}
 
-				_addNotificationRecipientSetting(
-					entry, notificationRecipientId,
-					notificationRecipientSettings, recipientMap,
-					GetterUtil.getString(
-						recipientMap.get(
-							NotificationRecipientSettingConstants.
-								getRecipientTypeName(entry.getKey()))),
-					unresolvedUserScreenNames, user);
+				String recipientType = GetterUtil.getString(
+					recipientMap.get(
+						NotificationRecipientSettingConstants.
+							getRecipientTypeName(entry.getKey())));
+
+				if (Objects.equals(
+						recipientType,
+						NotificationRecipientConstants.TYPE_ROLE) ||
+					Objects.equals(
+						recipientType,
+						NotificationRecipientConstants.TYPE_USER_GROUP)) {
+
+					_addMultipleValueNotificationRecipientSettings(
+						entry, notificationRecipientId,
+						notificationRecipientSettings, recipientType, user);
+				}
+				else if (!Objects.equals(
+							recipientType,
+							NotificationRecipientConstants.TYPE_SUBSCRIBERS)) {
+
+					_addSingleValueNotificationRecipientSetting(
+						entry, missingUserScreenNames, notificationRecipientId,
+						notificationRecipientSettings, recipientMap, user);
+				}
 			}
 		}
 
-		_reportUnresolvedUserRecipients(
-			notificationContext, unresolvedUserScreenNames, user);
+		_reportMissingUserRecipients(
+			missingUserScreenNames, notificationContext, user);
 
 		return notificationRecipientSettings;
 	}
@@ -171,11 +180,10 @@ public class NotificationRecipientSettingLocalServiceImpl
 			notificationRecipientSetting);
 	}
 
-	private void _addNotificationRecipientSetting(
+	private void _addMultipleValueNotificationRecipientSettings(
 		Map.Entry<String, Object> entry, long notificationRecipientId,
 		List<NotificationRecipientSetting> notificationRecipientSettings,
-		Map<String, Object> recipientMap, String recipientType,
-		List<String> unresolvedUserScreenNames, User user) {
+		String recipientType, User user) {
 
 		if (Objects.equals(
 				recipientType, NotificationRecipientConstants.TYPE_ROLE)) {
@@ -183,7 +191,7 @@ public class NotificationRecipientSettingLocalServiceImpl
 			Set<String> roleNames = new HashSet<>();
 
 			for (Map<String, String> roleMap : _toList(entry.getValue())) {
-				Role role = _resolveRole(
+				Role role = _getRole(
 					roleMap.get(
 						NotificationRecipientSettingConstants.
 							NAME_ROLE_EXTERNAL_REFERENCE_CODE),
@@ -209,14 +217,11 @@ public class NotificationRecipientSettingLocalServiceImpl
 					notificationRecipientSettings, user, role.getName());
 			}
 		}
-		else if (Objects.equals(
-					recipientType,
-					NotificationRecipientConstants.TYPE_USER_GROUP)) {
-
+		else {
 			Set<String> userGroupNames = new HashSet<>();
 
 			for (Map<String, String> userGroupMap : _toList(entry.getValue())) {
-				UserGroup userGroup = _resolveUserGroup(
+				UserGroup userGroup = _getUserGroup(
 					userGroupMap.get(
 						NotificationRecipientSettingConstants.
 							NAME_USER_GROUP_EXTERNAL_REFERENCE_CODE),
@@ -237,75 +242,6 @@ public class NotificationRecipientSettingLocalServiceImpl
 					entry.getKey(), notificationRecipientId,
 					notificationRecipientSettings, user, userGroup.getName());
 			}
-		}
-		else if (Objects.equals(
-					entry.getKey(),
-					NotificationRecipientSettingConstants.NAME_ROLE_NAME)) {
-
-			Role role = _resolveRole(
-				GetterUtil.getString(
-					recipientMap.get(
-						NotificationRecipientSettingConstants.
-							NAME_ROLE_EXTERNAL_REFERENCE_CODE)),
-				GetterUtil.getString(entry.getValue()),
-				GetterUtil.getString(
-					recipientMap.get(
-						NotificationRecipientSettingConstants.NAME_ROLE_TYPE)),
-				user);
-
-			if (role != null) {
-				_addNotificationRecipientSetting(
-					entry.getKey(), notificationRecipientId,
-					notificationRecipientSettings, user, role.getName());
-			}
-		}
-		else if (Objects.equals(
-					entry.getKey(),
-					NotificationRecipientSettingConstants.
-						NAME_USER_GROUP_NAME)) {
-
-			UserGroup userGroup = _resolveUserGroup(
-				GetterUtil.getString(
-					recipientMap.get(
-						NotificationRecipientSettingConstants.
-							NAME_USER_GROUP_EXTERNAL_REFERENCE_CODE)),
-				GetterUtil.getString(entry.getValue()), user);
-
-			if (userGroup != null) {
-				_addNotificationRecipientSetting(
-					entry.getKey(), notificationRecipientId,
-					notificationRecipientSettings, user, userGroup.getName());
-			}
-		}
-		else if (Objects.equals(
-					entry.getKey(),
-					NotificationRecipientSettingConstants.
-						NAME_USER_SCREEN_NAME) &&
-				 !NotificationTypeUtil.isTermValue(
-					 GetterUtil.getString(entry.getValue()))) {
-
-			User recipientUser = _resolveUser(
-				GetterUtil.getString(
-					recipientMap.get(
-						NotificationRecipientSettingConstants.
-							NAME_USER_EXTERNAL_REFERENCE_CODE)),
-				GetterUtil.getString(entry.getValue()), user);
-
-			if (recipientUser != null) {
-				_addNotificationRecipientSetting(
-					entry.getKey(), notificationRecipientId,
-					notificationRecipientSettings, user,
-					recipientUser.getScreenName());
-			}
-			else {
-				unresolvedUserScreenNames.add(
-					GetterUtil.getString(entry.getValue()));
-			}
-		}
-		else {
-			_addNotificationRecipientSetting(
-				entry.getKey(), notificationRecipientId,
-				notificationRecipientSettings, user, entry.getValue());
 		}
 	}
 
@@ -335,53 +271,84 @@ public class NotificationRecipientSettingLocalServiceImpl
 		notificationRecipientSettings.add(notificationRecipientSetting);
 	}
 
-	private void _reportUnresolvedUserRecipients(
-		NotificationContext notificationContext,
-		List<String> unresolvedUserScreenNames, User user) {
+	private void _addSingleValueNotificationRecipientSetting(
+		Map.Entry<String, Object> entry, List<String> missingUserScreenNames,
+		long notificationRecipientId,
+		List<NotificationRecipientSetting> notificationRecipientSettings,
+		Map<String, Object> recipientMap, User user) {
 
-		if (unresolvedUserScreenNames.isEmpty() ||
-			!ExportImportThreadLocal.isImportInProcess() ||
-			(notificationContext == null)) {
+		String value = GetterUtil.getString(entry.getValue());
 
-			return;
+		if (Objects.equals(
+				entry.getKey(),
+				NotificationRecipientSettingConstants.NAME_ROLE_NAME)) {
+
+			Role role = _getRole(
+				GetterUtil.getString(
+					recipientMap.get(
+						NotificationRecipientSettingConstants.
+							NAME_ROLE_EXTERNAL_REFERENCE_CODE)),
+				value,
+				GetterUtil.getString(
+					recipientMap.get(
+						NotificationRecipientSettingConstants.NAME_ROLE_TYPE)),
+				user);
+
+			if (role != null) {
+				_addNotificationRecipientSetting(
+					entry.getKey(), notificationRecipientId,
+					notificationRecipientSettings, user, role.getName());
+			}
 		}
+		else if (Objects.equals(
+					entry.getKey(),
+					NotificationRecipientSettingConstants.
+						NAME_USER_GROUP_NAME)) {
 
-		NotificationTemplate notificationTemplate =
-			notificationContext.getNotificationTemplate();
+			UserGroup userGroup = _getUserGroup(
+				GetterUtil.getString(
+					recipientMap.get(
+						NotificationRecipientSettingConstants.
+							NAME_USER_GROUP_EXTERNAL_REFERENCE_CODE)),
+				value, user);
 
-		if (notificationTemplate == null) {
-			return;
+			if (userGroup != null) {
+				_addNotificationRecipientSetting(
+					entry.getKey(), notificationRecipientId,
+					notificationRecipientSettings, user, userGroup.getName());
+			}
 		}
+		else if (Objects.equals(
+					entry.getKey(),
+					NotificationRecipientSettingConstants.
+						NAME_USER_SCREEN_NAME) &&
+				 !NotificationTypeUtil.isTermValue(value)) {
 
-		String key =
-			"the-users-x-do-not-exist-and-were-removed-from-the-recipients-" +
-				"of-notification-template-x";
+			User recipientUser = _getUser(
+				GetterUtil.getString(
+					recipientMap.get(
+						NotificationRecipientSettingConstants.
+							NAME_USER_EXTERNAL_REFERENCE_CODE)),
+				value, user);
 
-		if (unresolvedUserScreenNames.size() == 1) {
-			key =
-				"the-user-x-does-not-exist-and-was-removed-from-the-" +
-					"recipients-of-notification-template-x";
+			if (recipientUser != null) {
+				_addNotificationRecipientSetting(
+					entry.getKey(), notificationRecipientId,
+					notificationRecipientSettings, user,
+					recipientUser.getScreenName());
+			}
+			else {
+				missingUserScreenNames.add(value);
+			}
 		}
-
-		_exportImportReportEntryLocalService.getOrAddExportImportReportEntry(
-			0, user.getCompanyId(),
-			notificationTemplate.getExternalReferenceCode(),
-			_portal.getClassNameId(NotificationTemplate.class.getName()),
-			notificationTemplate.getNotificationTemplateId(),
-			GetterUtil.getLong(
-				ExportImportThreadLocal.getExportImportConfigurationId()),
-			ExportImportReportEntryConstants.TYPE_WARNING,
-			_language.format(
-				LocaleUtil.getDefault(), key,
-				new Object[] {
-					StringUtil.merge(
-						unresolvedUserScreenNames, StringPool.COMMA_AND_SPACE),
-					notificationTemplate.getName(LocaleUtil.getDefault())
-				}),
-			null, "notification-template");
+		else {
+			_addNotificationRecipientSetting(
+				entry.getKey(), notificationRecipientId,
+				notificationRecipientSettings, user, entry.getValue());
+		}
 	}
 
-	private Role _resolveRole(
+	private Role _getRole(
 		String externalReferenceCode, String name, String typeLabel,
 		User user) {
 
@@ -410,7 +377,7 @@ public class NotificationRecipientSettingLocalServiceImpl
 		return _roleLocalService.fetchRole(user.getCompanyId(), name);
 	}
 
-	private User _resolveUser(
+	private User _getUser(
 		String externalReferenceCode, String screenName, User user) {
 
 		if (Validator.isNotNull(externalReferenceCode)) {
@@ -431,7 +398,7 @@ public class NotificationRecipientSettingLocalServiceImpl
 			user.getCompanyId(), screenName);
 	}
 
-	private UserGroup _resolveUserGroup(
+	private UserGroup _getUserGroup(
 		String externalReferenceCode, String name, User user) {
 
 		if (Validator.isNotNull(externalReferenceCode)) {
@@ -456,6 +423,70 @@ public class NotificationRecipientSettingLocalServiceImpl
 		}
 
 		return _userGroupLocalService.fetchUserGroup(user.getCompanyId(), name);
+	}
+
+	private boolean _isRecipientReferenceName(String name) {
+		if (name.equals(
+				NotificationRecipientSettingConstants.
+					NAME_ROLE_EXTERNAL_REFERENCE_CODE) ||
+			name.equals(NotificationRecipientSettingConstants.NAME_ROLE_TYPE) ||
+			name.equals(
+				NotificationRecipientSettingConstants.
+					NAME_USER_EXTERNAL_REFERENCE_CODE) ||
+			name.equals(
+				NotificationRecipientSettingConstants.
+					NAME_USER_GROUP_EXTERNAL_REFERENCE_CODE)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private void _reportMissingUserRecipients(
+		List<String> missingUserScreenNames,
+		NotificationContext notificationContext, User user) {
+
+		if (missingUserScreenNames.isEmpty() ||
+			!ExportImportThreadLocal.isImportInProcess() ||
+			(notificationContext == null)) {
+
+			return;
+		}
+
+		NotificationTemplate notificationTemplate =
+			notificationContext.getNotificationTemplate();
+
+		if (notificationTemplate == null) {
+			return;
+		}
+
+		String key =
+			"the-users-x-do-not-exist-and-were-removed-from-the-recipients-" +
+				"of-notification-template-x";
+
+		if (missingUserScreenNames.size() == 1) {
+			key =
+				"the-user-x-does-not-exist-and-was-removed-from-the-" +
+					"recipients-of-notification-template-x";
+		}
+
+		_exportImportReportEntryLocalService.getOrAddExportImportReportEntry(
+			0, user.getCompanyId(),
+			notificationTemplate.getExternalReferenceCode(),
+			_portal.getClassNameId(NotificationTemplate.class.getName()),
+			notificationTemplate.getNotificationTemplateId(),
+			GetterUtil.getLong(
+				ExportImportThreadLocal.getExportImportConfigurationId()),
+			ExportImportReportEntryConstants.TYPE_WARNING,
+			_language.format(
+				LocaleUtil.getDefault(), key,
+				new Object[] {
+					StringUtil.merge(
+						missingUserScreenNames, StringPool.COMMA_AND_SPACE),
+					notificationTemplate.getName(LocaleUtil.getDefault())
+				}),
+			null, "notification-template");
 	}
 
 	private void _setValue(
