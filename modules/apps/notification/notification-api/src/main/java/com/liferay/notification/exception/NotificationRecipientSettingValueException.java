@@ -42,7 +42,7 @@ public class NotificationRecipientSettingValueException
 			String externalReferenceCode, Throwable throwable) {
 
 			super(
-				"No Role exists with the external reference code " +
+				"Unable to find role with external reference code " +
 					externalReferenceCode,
 				"the-role-recipient-does-not-exist", throwable);
 		}
@@ -65,7 +65,7 @@ public class NotificationRecipientSettingValueException
 			String externalReferenceCode, Throwable throwable) {
 
 			super(
-				"No UserGroup exists with the external reference code " +
+				"Unable to find user group with external reference code " +
 					externalReferenceCode,
 				"the-user-group-recipient-does-not-exist", throwable);
 		}
