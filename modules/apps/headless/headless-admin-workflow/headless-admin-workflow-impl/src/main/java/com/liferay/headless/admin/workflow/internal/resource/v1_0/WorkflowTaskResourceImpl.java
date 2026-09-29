@@ -88,15 +88,13 @@ public class WorkflowTaskResourceImpl extends BaseWorkflowTaskResourceImpl {
 			_getActions(),
 			transform(
 				_workflowTaskManager.getWorkflowTasksByWorkflowInstance(
-					contextCompany.getCompanyId(), assigneeId,
-					workflowInstanceId, completed,
+					assigneeId, workflowInstanceId, completed,
 					pagination.getStartPosition(), pagination.getEndPosition(),
 					null),
 				this::_toWorkflowTask),
 			pagination,
 			_workflowTaskManager.getWorkflowTaskCountByWorkflowInstance(
-				contextCompany.getCompanyId(), assigneeId, workflowInstanceId,
-				completed));
+				assigneeId, workflowInstanceId, completed));
 	}
 
 	@Override
@@ -108,14 +106,13 @@ public class WorkflowTaskResourceImpl extends BaseWorkflowTaskResourceImpl {
 			_getActions(),
 			transform(
 				_workflowTaskManager.getWorkflowTasksByWorkflowInstance(
-					contextCompany.getCompanyId(), null, workflowInstanceId,
-					completed, pagination.getStartPosition(),
-					pagination.getEndPosition(), null),
+					null, workflowInstanceId, completed,
+					pagination.getStartPosition(), pagination.getEndPosition(),
+					null),
 				this::_toWorkflowTask),
 			pagination,
 			_workflowTaskManager.getWorkflowTaskCountByWorkflowInstance(
-				contextCompany.getCompanyId(), null, workflowInstanceId,
-				completed));
+				null, workflowInstanceId, completed));
 	}
 
 	@Override
@@ -187,13 +184,11 @@ public class WorkflowTaskResourceImpl extends BaseWorkflowTaskResourceImpl {
 			_getActions(),
 			transform(
 				_workflowTaskManager.getWorkflowTasksByRole(
-					contextCompany.getCompanyId(), roleId, null,
-					pagination.getStartPosition(), pagination.getEndPosition(),
-					null),
+					roleId, null, pagination.getStartPosition(),
+					pagination.getEndPosition(), null),
 				this::_toWorkflowTask),
 			pagination,
-			_workflowTaskManager.getWorkflowTaskCountByRole(
-				contextCompany.getCompanyId(), roleId, null));
+			_workflowTaskManager.getWorkflowTaskCountByRole(roleId, null));
 	}
 
 	@Override
@@ -205,13 +200,11 @@ public class WorkflowTaskResourceImpl extends BaseWorkflowTaskResourceImpl {
 			_getActions(),
 			transform(
 				_workflowTaskManager.getWorkflowTasksByUser(
-					contextCompany.getCompanyId(), assigneeId, null,
-					pagination.getStartPosition(), pagination.getEndPosition(),
-					null),
+					assigneeId, null, pagination.getStartPosition(),
+					pagination.getEndPosition(), null),
 				this::_toWorkflowTask),
 			pagination,
-			_workflowTaskManager.getWorkflowTaskCountByUser(
-				contextCompany.getCompanyId(), assigneeId, null));
+			_workflowTaskManager.getWorkflowTaskCountByUser(assigneeId, null));
 	}
 
 	@Override
@@ -223,13 +216,12 @@ public class WorkflowTaskResourceImpl extends BaseWorkflowTaskResourceImpl {
 			_getActions(),
 			transform(
 				_workflowTaskManager.getWorkflowTasksByUserRoles(
-					contextCompany.getCompanyId(), assigneeId, null,
-					pagination.getStartPosition(), pagination.getEndPosition(),
-					null),
+					assigneeId, null, pagination.getStartPosition(),
+					pagination.getEndPosition(), null),
 				this::_toWorkflowTask),
 			pagination,
 			_workflowTaskManager.getWorkflowTaskCountByUserRoles(
-				contextCompany.getCompanyId(), assigneeId, null));
+				assigneeId, null));
 	}
 
 	@Override
@@ -241,13 +233,12 @@ public class WorkflowTaskResourceImpl extends BaseWorkflowTaskResourceImpl {
 			_getActions(),
 			transform(
 				_workflowTaskManager.getWorkflowTasksBySubmittingUser(
-					contextCompany.getCompanyId(), creatorId, null,
-					pagination.getStartPosition(), pagination.getEndPosition(),
-					null),
+					creatorId, null, pagination.getStartPosition(),
+					pagination.getEndPosition(), null),
 				this::_toWorkflowTask),
 			pagination,
 			_workflowTaskManager.getWorkflowTaskCountBySubmittingUser(
-				contextCompany.getCompanyId(), creatorId, null));
+				creatorId, null));
 	}
 
 	@Override
