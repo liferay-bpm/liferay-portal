@@ -6,16 +6,9 @@
 package com.liferay.portal.workflow.kaleo.definition.internal.deployment;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.security.auth.PrincipalException;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
-import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
-import com.liferay.portal.workflow.constants.WorkflowDefinitionConstants;
 import com.liferay.portal.workflow.kaleo.KaleoWorkflowModelConverter;
 import com.liferay.portal.workflow.kaleo.definition.Condition;
 import com.liferay.portal.workflow.kaleo.definition.Definition;
@@ -38,7 +31,6 @@ import com.liferay.portal.workflow.kaleo.service.KaleoTransitionLocalService;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -55,8 +47,6 @@ public class DefaultWorkflowDeployer implements WorkflowDeployer {
 			String scope, boolean system, Definition definition,
 			ServiceContext serviceContext)
 		throws PortalException {
-
-		_checkPermissions(scope, serviceContext);
 
 		KaleoDefinition kaleoDefinition = _addOrUpdateKaleoDefinition(
 			externalReferenceCode, title, name, scope, system, definition,
@@ -198,26 +188,6 @@ public class DefaultWorkflowDeployer implements WorkflowDeployer {
 			serviceContext);
 	}
 
-	private void _checkPermissions(String scope, ServiceContext serviceContext)
-		throws PrincipalException {
-
-		PermissionChecker permissionChecker =
-			PermissionThreadLocal.getPermissionChecker();
-
-		if (permissionChecker == null) {
-			return;
-		}
-
-		long groupId = WorkflowConstants.DEFAULT_GROUP_ID;
-
-		if (Objects.equals(scope, WorkflowDefinitionConstants.SCOPE_AI)) {
-			groupId = serviceContext.getScopeGroupId();
-		}
-
-		_portletResourcePermission.check(
-			permissionChecker, groupId, ActionKeys.ADD_DEFINITION);
-	}
-
 	@Reference
 	private KaleoConditionLocalService _kaleoConditionLocalService;
 
@@ -242,10 +212,5 @@ public class DefaultWorkflowDeployer implements WorkflowDeployer {
 
 	@Reference
 	private KaleoWorkflowModelConverter _kaleoWorkflowModelConverter;
-
-	@Reference(
-		target = "(resource.name=" + WorkflowConstants.RESOURCE_NAME + ")"
-	)
-	private PortletResourcePermission _portletResourcePermission;
 
 }
