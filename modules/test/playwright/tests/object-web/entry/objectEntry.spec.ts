@@ -3682,11 +3682,13 @@ test.describe('Manage object entries through View Object Entries', () => {
 				.click();
 
 			await expect(
-				page.locator('#editObjectEntry').getByPlaceholder('Search')
+				page
+					.locator('[id$="editObjectEntry"]')
+					.getByPlaceholder('Search')
 			).toHaveValue('Entry A');
 
 			await page
-				.locator('#editObjectEntry')
+				.locator('[id$="editObjectEntry"]')
 				.getByPlaceholder('Search')
 				.click();
 
@@ -3703,7 +3705,9 @@ test.describe('Manage object entries through View Object Entries', () => {
 				.click();
 
 			await expect(
-				page.locator('#editObjectEntry').getByPlaceholder('Search')
+				page
+					.locator('[id$="editObjectEntry"]')
+					.getByPlaceholder('Search')
 			).toHaveValue('Entry C');
 		});
 	});
