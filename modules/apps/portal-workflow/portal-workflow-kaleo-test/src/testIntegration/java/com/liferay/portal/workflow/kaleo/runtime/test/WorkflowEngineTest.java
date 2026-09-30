@@ -8,13 +8,18 @@ package com.liferay.portal.workflow.kaleo.runtime.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
+import com.liferay.portal.kernel.test.context.ContextUserReplace;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.workflow.RequiredWorkflowDefinitionException;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
@@ -129,6 +134,26 @@ public class WorkflowEngineTest {
 
 		_workflowDefinitionLinkLocalService.deleteWorkflowDefinitionLink(
 			workflowDefinitionLink);
+
+		_user = UserTestUtil.addUser();
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				_user)) {
+
+			WorkflowException workflowException = Assert.assertThrows(
+				WorkflowException.class,
+				() -> _workflowDefinitionManager.deployWorkflowDefinition(
+					RandomTestUtil.randomBytes(),
+					TestPropsValues.getCompanyId(), null,
+					RandomTestUtil.randomString(),
+					RandomTestUtil.randomString(), _user.getUserId()));
+
+			Throwable throwable = workflowException.getCause();
+
+			Assert.assertTrue(
+				String.valueOf(throwable),
+				throwable instanceof PrincipalException.MustHavePermission);
+		}
 	}
 
 	private InputStream _getResourceInputStream(String name) {
@@ -142,6 +167,9 @@ public class WorkflowEngineTest {
 
 	@Inject
 	private KaleoDefinitionLocalService _kaleoDefinitionLocalService;
+
+	@DeleteAfterTestRun
+	private User _user;
 
 	private WorkflowDefinition _workflowDefinition;
 	private WorkflowDefinitionLink _workflowDefinitionLink;
