@@ -122,6 +122,22 @@ public class LocationObjectFieldBusinessType
 			ObjectField objectField, long userId, Map<String, Object> values)
 		throws PortalException {
 
+		if (objectField.isLocalized()) {
+			Map<String, Object> localizedValues = super.getLocalizedValues(
+				null, objectField, userId, values);
+
+			if (localizedValues == null) {
+				return null;
+			}
+
+			for (Map.Entry<String, Object> entry : localizedValues.entrySet()) {
+				localizedValues.put(
+					entry.getKey(), String.valueOf(entry.getValue()));
+			}
+
+			return localizedValues;
+		}
+
 		return values.get(objectField.getName());
 	}
 
