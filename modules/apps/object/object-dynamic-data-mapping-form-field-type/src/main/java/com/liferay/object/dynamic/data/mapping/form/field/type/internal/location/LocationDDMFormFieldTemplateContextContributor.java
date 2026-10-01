@@ -70,12 +70,16 @@ public class LocationDDMFormFieldTemplateContextContributor
 					objectDefinition.getCompanyId(), googleMapsAPIKey);
 			}
 		).put(
+			"groupId", groupId
+		).put(
 			"mapProviderKey",
 			GetterUtil.getString(
 				MapProviderHelperUtil.getMapProviderKey(
 					_groupLocalService, objectDefinition.getCompanyId(),
 					groupId),
 				"OpenStreetMap")
+		).put(
+			"objectDefinitionId", objectDefinition.getObjectDefinitionId()
 		).putAll(
 			super.getParameters(ddmFormField, ddmFormFieldRenderingContext)
 		).build();
