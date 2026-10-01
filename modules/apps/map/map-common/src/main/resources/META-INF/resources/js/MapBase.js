@@ -76,6 +76,18 @@ class MapBase extends EventEmitter {
 		this._STATE_.data = data;
 	}
 
+	get draggablePin() {
+		return this._STATE_.draggablePin;
+	}
+
+	set draggablePin(draggablePin) {
+		this._STATE_.draggablePin = draggablePin;
+
+		if (this._geolocationMarker) {
+			this._geolocationMarker.setDraggable(draggablePin);
+		}
+	}
+
 	get geolocation() {
 		return this._STATE_.geolocation;
 	}
@@ -123,6 +135,7 @@ class MapBase extends EventEmitter {
 				MapBase.CONTROLS.ZOOM,
 			],
 			data,
+			draggablePin = true,
 			geolocation = false,
 			position = {location: {lat: 0, lng: 0}},
 			zoom = 11,
@@ -132,6 +145,7 @@ class MapBase extends EventEmitter {
 			boundingBox,
 			controls,
 			data,
+			draggablePin,
 			geolocation,
 			position,
 			zoom,
@@ -603,6 +617,7 @@ class MapBase extends EventEmitter {
 			this.constructor.MarkerImpl !== MarkerBase
 		) {
 			marker = new this.constructor.MarkerImpl({
+				draggable: this.draggablePin,
 				location,
 				map: this._map,
 			});
