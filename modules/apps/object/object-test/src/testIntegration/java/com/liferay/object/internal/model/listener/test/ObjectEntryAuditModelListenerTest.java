@@ -7,6 +7,7 @@ package com.liferay.object.internal.model.listener.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.constants.ObjectEntryFolderConstants;
+import com.liferay.object.field.builder.LocationObjectFieldBuilder;
 import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
@@ -120,6 +121,57 @@ public class ObjectEntryAuditModelListenerTest {
 			).put(
 				"description[pt_BR]", "Descrição"
 			).build());
+	}
+
+	@Test
+	public void testOnAfterCreateWithLocationObjectField() throws Exception {
+		ObjectField locationObjectField = ObjectFieldUtil.addCustomObjectField(
+			new LocationObjectFieldBuilder(
+			).labelMap(
+				RandomTestUtil.randomLocaleStringMap()
+			).name(
+				"location"
+			).objectDefinitionId(
+				_objectDefinition.getObjectDefinitionId()
+			).userId(
+				TestPropsValues.getUserId()
+			).build());
+
+		String address = RandomTestUtil.randomString();
+		double lat = RandomTestUtil.randomDouble();
+		double lng = RandomTestUtil.randomDouble();
+
+		_objectEntryLocalService.addObjectEntry(
+			0, TestPropsValues.getUserId(),
+			_objectDefinition.getObjectDefinitionId(),
+			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+			"en_US",
+			HashMapBuilder.<String, Serializable>put(
+				locationObjectField.getName(),
+				HashMapBuilder.<String, Serializable>put(
+					"address", address
+				).put(
+					"lat", lat
+				).put(
+					"lng", lng
+				).build()
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
+		JSONObject additionalInfoJSONObject = _pollAdditionalInfoJSONObject();
+
+		JSONObject locationJSONObject = additionalInfoJSONObject.getJSONObject(
+			locationObjectField.getName());
+
+		Assert.assertEquals(address, locationJSONObject.getString("address"));
+
+		JSONObject coordinatesJSONObject = locationJSONObject.getJSONObject(
+			"coordinates");
+
+		Assert.assertEquals(
+			lat, coordinatesJSONObject.getDouble("lat"), 0.0001);
+		Assert.assertEquals(
+			lng, coordinatesJSONObject.getDouble("lng"), 0.0001);
 	}
 
 	@Test
