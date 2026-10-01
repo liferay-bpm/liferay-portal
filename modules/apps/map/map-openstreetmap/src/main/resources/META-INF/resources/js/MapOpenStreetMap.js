@@ -61,6 +61,22 @@ class MapOpenStreetMap extends MapBase {
 	}
 
 	/**
+	 * Removes the Leaflet map so it releases its DOM and window listeners
+	 * instead of staying in memory. It also lets the container element hold
+	 * a new map, which Leaflet refuses while the old map is attached.
+	 * @review
+	 */
+	destructor() {
+		super.destructor();
+
+		if (this._map) {
+			this._map.remove();
+
+			this._map = null;
+		}
+	}
+
+	/**
 	 * @inheritDoc
 	 * @review
 	 */
