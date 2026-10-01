@@ -2514,6 +2514,91 @@ test(
 );
 
 test(
+	'can see entries with multiple default sort columns in custom view',
+	{tag: '@LPD-107718'},
+	async ({apiHelpers, page, viewObjectEntriesPage}) => {
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFields: [
+					{
+						DBType: 'String',
+						businessType: 'Text',
+						label: {en_US: 'groupField'},
+						name: 'groupField',
+					},
+					{
+						DBType: 'String',
+						businessType: 'Text',
+						label: {en_US: 'textField'},
+						name: 'textField',
+					},
+				],
+				status: {code: 0},
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		const applicationName =
+			'c/' + objectDefinition.name.toLowerCase() + 's';
+
+		for (const [groupField, textField] of [
+			['Group A', 'Entry 1'],
+			['Group B', 'Entry 2'],
+			['Group A', 'Entry 3'],
+		]) {
+			await apiHelpers.objectEntry.postObjectEntry(
+				{groupField, textField},
+				applicationName
+			);
+		}
+
+		const objectViewAPIClient =
+			await apiHelpers.buildRestClient(ObjectViewAPI);
+
+		await objectViewAPIClient.postObjectDefinitionObjectView(
+			objectDefinition.id,
+			{
+				defaultObjectView: true,
+				name: {en_US: 'CustomView' + getRandomInt()},
+				objectViewColumns: [
+					{
+						objectFieldName: 'groupField',
+						priority: 0,
+					},
+					{
+						objectFieldName: 'textField',
+						priority: 1,
+					},
+				],
+				objectViewSortColumns: [
+					{
+						objectFieldName: 'groupField',
+						priority: 0,
+						sortOrder: 'asc',
+					},
+					{
+						objectFieldName: 'textField',
+						priority: 1,
+						sortOrder: 'desc',
+					},
+				],
+			}
+		);
+
+		await viewObjectEntriesPage.goto(objectDefinition.className);
+
+		await expect(page.getByRole('cell')).toContainText([
+			'Entry 3',
+			'Entry 1',
+			'Entry 2',
+		]);
+	}
+);
+
+test(
 	'can see renamed column name on object view entries list',
 	{tag: '@LPS-147792'},
 	async ({
