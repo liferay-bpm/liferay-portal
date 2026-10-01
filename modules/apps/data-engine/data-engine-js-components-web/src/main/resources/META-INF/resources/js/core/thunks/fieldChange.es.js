@@ -15,9 +15,10 @@ const needsPageEvaluation = (
 	containerId,
 	defaultLanguageId,
 	editingLanguageId,
-	fieldName
+	fieldName,
+	portletNamespace
 ) => {
-	if (containerId === 'editObjectEntry') {
+	if (containerId === `${portletNamespace}editObjectEntry`) {
 		return editingLanguageId === defaultLanguageId;
 	}
 
@@ -141,7 +142,8 @@ export default function fieldChange({
 					containerId,
 					defaultLanguageId,
 					editingLanguageId,
-					fieldName
+					fieldName,
+					portletNamespace
 				))
 		) {
 			try {

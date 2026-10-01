@@ -871,8 +871,6 @@ public class ObjectEntryDisplayContextImpl
 		ddmFormRenderingContext.addProperty(
 			"availableLocales", LanguageUtil.getAvailableLocales(groupId));
 
-		ddmFormRenderingContext.setContainerId("editObjectEntry");
-
 		if (objectEntry != null) {
 			ddmFormRenderingContext.addProperty(
 				"objectEntryId", objectEntry.getId());
@@ -898,6 +896,8 @@ public class ObjectEntryDisplayContextImpl
 		LiferayPortletResponse liferayPortletResponse =
 			_objectRequestHelper.getLiferayPortletResponse();
 
+		ddmFormRenderingContext.setContainerId(
+			liferayPortletResponse.getNamespace() + "editObjectEntry");
 		ddmFormRenderingContext.setPortletNamespace(
 			liferayPortletResponse.getNamespace());
 
