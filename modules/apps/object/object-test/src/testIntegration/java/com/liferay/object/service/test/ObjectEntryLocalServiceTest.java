@@ -92,6 +92,7 @@ import com.liferay.object.field.builder.EmailAddressObjectFieldBuilder;
 import com.liferay.object.field.builder.EncryptedObjectFieldBuilder;
 import com.liferay.object.field.builder.FormulaObjectFieldBuilder;
 import com.liferay.object.field.builder.IntegerObjectFieldBuilder;
+import com.liferay.object.field.builder.LocationObjectFieldBuilder;
 import com.liferay.object.field.builder.LongIntegerObjectFieldBuilder;
 import com.liferay.object.field.builder.LongTextObjectFieldBuilder;
 import com.liferay.object.field.builder.MultiselectPicklistObjectFieldBuilder;
@@ -2225,7 +2226,7 @@ public class ObjectEntryLocalServiceTest {
 				AssertUtils.assertFailure(
 					IllegalArgumentException.class,
 					"Please insert an encryption key or remove the object's " +
-						"encryption field to recover these entries.",
+						"encryption field to recover these entries",
 					() -> _objectEntryLocalService.getValues(
 						objectEntry.getObjectEntryId()));
 
@@ -2284,7 +2285,7 @@ public class ObjectEntryLocalServiceTest {
 				AssertUtils.assertFailure(
 					IllegalArgumentException.class,
 					"Please insert an encryption key or remove the object's " +
-						"encryption field to recover these entries.",
+						"encryption field to recover these entries",
 					() -> _objectEntryLocalService.getValues(
 						objectEntry.getObjectEntryId()));
 
@@ -3117,6 +3118,60 @@ public class ObjectEntryLocalServiceTest {
 	}
 
 	@Test
+	public void testAddObjectEntryWithLocalizedLocationObjectField()
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition();
+
+		ObjectField objectField = ObjectFieldUtil.addCustomObjectField(
+			new LocationObjectFieldBuilder(
+			).labelMap(
+				RandomTestUtil.randomLocaleStringMap()
+			).localized(
+				true
+			).name(
+				"location"
+			).objectDefinitionId(
+				_objectDefinition.getObjectDefinitionId()
+			).userId(
+				TestPropsValues.getUserId()
+			).build());
+
+		Map<String, Serializable> localizedValues =
+			HashMapBuilder.<String, Serializable>put(
+				"en_US",
+				HashMapBuilder.<String, Serializable>put(
+					"address", RandomTestUtil.randomString()
+				).put(
+					"lat", RandomTestUtil.randomDouble()
+				).put(
+					"lng", RandomTestUtil.randomDouble()
+				).build()
+			).put(
+				"pt_BR",
+				HashMapBuilder.<String, Serializable>put(
+					"address", RandomTestUtil.randomString()
+				).put(
+					"lat", RandomTestUtil.randomDouble()
+				).put(
+					"lng", RandomTestUtil.randomDouble()
+				).build()
+			).build();
+
+		_assertObjectEntryLocalizedValues(
+			localizedValues,
+			_addObjectEntry(
+				objectDefinition,
+				HashMapBuilder.<String, Serializable>put(
+					objectField.getI18nObjectFieldName(),
+					(Serializable)localizedValues
+				).build(),
+				ServiceContextTestUtil.getServiceContext()),
+			objectField);
+	}
+
+	@Test
 	public void testAddObjectEntryWithLocalizedPhoneNumberObjectField()
 		throws Exception {
 
@@ -3179,6 +3234,49 @@ public class ObjectEntryLocalServiceTest {
 			objectEntry, objectField);
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+	}
+
+	@Test
+	public void testAddObjectEntryWithLocationObjectField() throws Exception {
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition();
+
+		ObjectField objectField = ObjectFieldUtil.addCustomObjectField(
+			new LocationObjectFieldBuilder(
+			).labelMap(
+				RandomTestUtil.randomLocaleStringMap()
+			).name(
+				"location"
+			).objectDefinitionId(
+				_objectDefinition.getObjectDefinitionId()
+			).userId(
+				TestPropsValues.getUserId()
+			).build());
+
+		Map<String, Serializable> values =
+			HashMapBuilder.<String, Serializable>put(
+				"address", RandomTestUtil.randomString()
+			).put(
+				"lat", RandomTestUtil.randomDouble()
+			).put(
+				"lng", RandomTestUtil.randomDouble()
+			).build();
+
+		_addObjectEntry(
+			objectDefinition,
+			HashMapBuilder.<String, Serializable>put(
+				objectField.getName(), (Serializable)values
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
+		List<Map<String, Serializable>> valuesList =
+			_objectEntryLocalService.getValuesList(
+				0, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+				objectDefinition.getObjectDefinitionId(), null, null,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		_assertObjectEntryValues(
+			2, values, valuesList.get(0), new String[] {"location"});
 	}
 
 	@Test
