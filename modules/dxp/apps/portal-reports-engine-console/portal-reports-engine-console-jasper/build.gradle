@@ -43,4 +43,6 @@ dependencies {
 	compileOnly project(":core:osgi-service-tracker-collections")
 	compileOnly project(":core:petra:petra-lang")
 	compileOnly project(":core:petra:petra-string")
+	testImplementation group: "com.liferay", name: "org.apache.commons.logging", version: "1.2.LIFERAY-PATCHED-4"
+	testImplementation group: "net.sf.jasperreports", name: "jasperreports", transitive: false, version: "6.20.0"
 }
