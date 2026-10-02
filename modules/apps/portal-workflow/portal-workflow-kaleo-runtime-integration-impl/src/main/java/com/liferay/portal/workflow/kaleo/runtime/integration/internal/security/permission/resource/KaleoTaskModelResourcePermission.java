@@ -71,6 +71,12 @@ public class KaleoTaskModelResourcePermission
 			return false;
 		}
 
+		if (permissionChecker.isOmniadmin() ||
+			permissionChecker.isCompanyAdmin()) {
+
+			return true;
+		}
+
 		WorkflowTask workflowTask = _kaleoWorkflowModelConverter.toWorkflowTask(
 			kaleoTaskInstanceToken,
 			WorkflowContextUtil.convert(

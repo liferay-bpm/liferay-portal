@@ -18,6 +18,7 @@ import com.liferay.headless.admin.workflow.client.dto.v1_0.WorkflowTaskAssignToU
 import com.liferay.headless.admin.workflow.client.dto.v1_0.WorkflowTasksBulkSelection;
 import com.liferay.headless.admin.workflow.client.pagination.Page;
 import com.liferay.headless.admin.workflow.client.pagination.Pagination;
+import com.liferay.headless.admin.workflow.client.resource.v1_0.WorkflowTaskResource;
 import com.liferay.headless.admin.workflow.resource.v1_0.test.util.AssigneeTestUtil;
 import com.liferay.headless.admin.workflow.resource.v1_0.test.util.ObjectReviewedTestUtil;
 import com.liferay.headless.admin.workflow.resource.v1_0.test.util.WorkflowDefinitionTestUtil;
@@ -27,17 +28,21 @@ import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.WorkflowInstanceLink;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -81,14 +86,27 @@ public class WorkflowTaskResourceTest extends BaseWorkflowTaskResourceTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
-		ObjectReviewed objectReviewed =
-			ObjectReviewedTestUtil.addObjectReviewed();
+		_objectReviewed = ObjectReviewedTestUtil.addObjectReviewed();
 
 		_workflowInstance = WorkflowInstanceTestUtil.addWorkflowInstance(
-			testGroup.getGroupId(), objectReviewed, _workflowDefinition);
+			testGroup.getGroupId(), _objectReviewed, _workflowDefinition);
 
 		_workflowTasks.addAll(
 			WorkflowTaskTestUtil.getWorkflowTasks(_workflowInstance.getId()));
+
+		String password = RandomTestUtil.randomString();
+
+		_user = UserTestUtil.addUser(testCompany, password);
+
+		_userWorkflowTaskResource = WorkflowTaskResource.builder(
+		).authentication(
+			_user.getEmailAddress(), password
+		).endpoint(
+			testCompany.getVirtualHostname(),
+			PortalUtil.getPortalServerPort(false), "http"
+		).locale(
+			LocaleUtil.getDefault()
+		).build();
 	}
 
 	@Override
@@ -124,6 +142,19 @@ public class WorkflowTaskResourceTest extends BaseWorkflowTaskResourceTestCase {
 			Arrays.asList(workflowTask1, workflowTask2),
 			(List<WorkflowTask>)page.getItems());
 		assertValid(page);
+
+		assertHttpResponseStatusCode(
+			404,
+			_userWorkflowTaskResource.
+				getWorkflowInstanceWorkflowTasksAssignedToUserPageHttpResponse(
+					_workflowInstance.getId(), null, null,
+					Pagination.of(10, 2)));
+		assertHttpResponseStatusCode(
+			404,
+			_userWorkflowTaskResource.
+				getWorkflowInstanceWorkflowTasksAssignedToUserPageHttpResponse(
+					_workflowInstance.getId(), TestPropsValues.getUserId(),
+					null, Pagination.of(10, 2)));
 	}
 
 	@Override
@@ -218,6 +249,14 @@ public class WorkflowTaskResourceTest extends BaseWorkflowTaskResourceTestCase {
 			pagination ->
 				workflowTaskResource.getWorkflowInstanceWorkflowTasksPage(
 					_workflowInstance.getId(), null, pagination));
+
+		assertHttpResponseStatusCode(
+			404,
+			_userWorkflowTaskResource.
+				getWorkflowInstanceWorkflowTasksPageHttpResponse(
+					_workflowInstance.getId(), null, Pagination.of(10, 2)));
+
+		_testGetWorkflowInstanceWorkflowTasksPageWithPaginationWithPermission();
 	}
 
 	@Override
@@ -343,6 +382,12 @@ public class WorkflowTaskResourceTest extends BaseWorkflowTaskResourceTestCase {
 			Collections.singletonList(workflowTask1),
 			(List<WorkflowTask>)page.getItems());
 		assertValid(page);
+
+		assertHttpResponseStatusCode(
+			404,
+			_userWorkflowTaskResource.
+				getWorkflowTasksAssignedToRolePageHttpResponse(
+					guestRole.getRoleId(), Pagination.of(10, 2)));
 	}
 
 	@Override
@@ -412,6 +457,12 @@ public class WorkflowTaskResourceTest extends BaseWorkflowTaskResourceTestCase {
 			Arrays.asList(workflowTask1, workflowTask2),
 			(List<WorkflowTask>)page.getItems());
 		assertValid(page);
+
+		assertHttpResponseStatusCode(
+			404,
+			_userWorkflowTaskResource.
+				getWorkflowTasksAssignedToUserPageHttpResponse(
+					TestPropsValues.getUserId(), Pagination.of(10, 2)));
 	}
 
 	@Override
@@ -484,6 +535,12 @@ public class WorkflowTaskResourceTest extends BaseWorkflowTaskResourceTestCase {
 		Assert.assertEquals(3, page.getTotalCount());
 
 		assertValid(page);
+
+		assertHttpResponseStatusCode(
+			404,
+			_userWorkflowTaskResource.
+				getWorkflowTasksAssignedToUserRolesPageHttpResponse(
+					assignee.getId(), Pagination.of(10, 2)));
 	}
 
 	@Override
@@ -549,6 +606,12 @@ public class WorkflowTaskResourceTest extends BaseWorkflowTaskResourceTestCase {
 				_workflowTasks.pop()),
 			(List<WorkflowTask>)page.getItems());
 		assertValid(page);
+
+		assertHttpResponseStatusCode(
+			404,
+			_userWorkflowTaskResource.
+				getWorkflowTasksSubmittingUserPageHttpResponse(
+					TestPropsValues.getUserId(), Pagination.of(10, 2)));
 	}
 
 	@Override
@@ -1126,15 +1189,54 @@ public class WorkflowTaskResourceTest extends BaseWorkflowTaskResourceTestCase {
 		assertEquals(_workflowTasks, (List<WorkflowTask>)page3.getItems());
 	}
 
+	private void _testGetWorkflowInstanceWorkflowTasksPageWithPaginationWithPermission()
+		throws Exception {
+
+		WorkflowInstanceLink workflowInstanceLink =
+			_workflowInstanceLinkLocalService.addWorkflowInstanceLink(
+				TestPropsValues.getUserId(), testCompany.getCompanyId(),
+				testGroup.getGroupId(), ObjectReviewed.class.getName(),
+				_objectReviewed.getId(), _workflowInstance.getId());
+
+		for (WorkflowTask workflowTask : _workflowTasks) {
+			workflowTaskResource.postWorkflowTaskAssignToUser(
+				workflowTask.getId(),
+				new WorkflowTaskAssignToUser() {
+					{
+						assigneeId = _user.getUserId();
+						workflowTaskId = workflowTask.getId();
+					}
+				});
+		}
+
+		Page<WorkflowTask> page =
+			_userWorkflowTaskResource.getWorkflowInstanceWorkflowTasksPage(
+				_workflowInstance.getId(), null,
+				Pagination.of(1, _workflowTasks.size()));
+
+		Assert.assertEquals(_workflowTasks.size(), page.getTotalCount());
+
+		_workflowInstanceLinkLocalService.deleteWorkflowInstanceLink(
+			workflowInstanceLink);
+	}
+
 	private static WorkflowDefinition _workflowDefinition;
+
+	private ObjectReviewed _objectReviewed;
 
 	@Inject
 	private RoleLocalService _roleLocalService;
 
+	private User _user;
+
 	@Inject
 	private UserLocalService _userLocalService;
 
+	private WorkflowTaskResource _userWorkflowTaskResource;
 	private WorkflowInstance _workflowInstance;
+
+	@Inject
+	private WorkflowInstanceLinkLocalService _workflowInstanceLinkLocalService;
 
 	@Inject
 	private WorkflowTaskManager _workflowTaskManager;

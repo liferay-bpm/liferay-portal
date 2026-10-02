@@ -14,7 +14,10 @@ import com.liferay.portal.kernel.service.BaseService;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken;
+
+import java.util.List;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -46,6 +49,30 @@ public interface KaleoTaskInstanceTokenService extends BaseService {
 	public KaleoTaskInstanceToken getKaleoTaskInstanceToken(long workflowTaskId)
 		throws PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<KaleoTaskInstanceToken> getKaleoTaskInstanceTokens(
+			long kaleoInstanceId, Long userId, Boolean completed, int start,
+			int end,
+			OrderByComparator<KaleoTaskInstanceToken> orderByComparator)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<KaleoTaskInstanceToken> getKaleoTaskInstanceTokens(
+			String assigneeClassName, long assigneeClassPK, Boolean completed,
+			int start, int end,
+			OrderByComparator<KaleoTaskInstanceToken> orderByComparator)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getKaleoTaskInstanceTokensCount(
+			long kaleoInstanceId, Long userId, Boolean completed)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getKaleoTaskInstanceTokensCount(
+			String assigneeClassName, long assigneeClassPK, Boolean completed)
+		throws PortalException;
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *
@@ -53,5 +80,28 @@ public interface KaleoTaskInstanceTokenService extends BaseService {
 	 */
 	public String getOSGiServiceIdentifier();
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<KaleoTaskInstanceToken>
+			getSubmittingUserKaleoTaskInstanceTokens(
+				long userId, Boolean completed, int start, int end,
+				OrderByComparator<KaleoTaskInstanceToken> orderByComparator)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getSubmittingUserKaleoTaskInstanceTokensCount(
+			long userId, Boolean completed)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<KaleoTaskInstanceToken> getUserRolesKaleoTaskInstanceTokens(
+			long userId, Boolean completed, int start, int end,
+			OrderByComparator<KaleoTaskInstanceToken> orderByComparator)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getUserRolesKaleoTaskInstanceTokensCount(
+			long userId, Boolean completed)
+		throws PortalException;
+
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1454329815
+// LIFERAY-SERVICE-BUILDER-HASH:783448222
