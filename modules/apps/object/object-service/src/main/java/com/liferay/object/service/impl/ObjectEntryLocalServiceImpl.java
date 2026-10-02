@@ -1702,8 +1702,10 @@ public class ObjectEntryLocalServiceImpl
 				primaryKeyColumn.eq(primaryKey)
 			));
 
+		BaseModel<?> baseModel = null;
+
 		if (!baseModels.isEmpty()) {
-			BaseModel<?> baseModel = baseModels.get(0);
+			baseModel = baseModels.get(0);
 
 			baseModelAttributes = baseModel.getModelAttributes();
 		}
@@ -1729,6 +1731,9 @@ public class ObjectEntryLocalServiceImpl
 				GetterUtil.get(baseModelAttributes.get("uuid"), primaryKey)
 			).build();
 
+		User user = null;
+		Map<String, Object> values = null;
+
 		for (ObjectField objectField :
 				_objectFieldPersistence.findByObjectDefinitionId(
 					objectDefinition.getObjectDefinitionId())) {
@@ -1737,9 +1742,32 @@ public class ObjectEntryLocalServiceImpl
 				continue;
 			}
 
-			Object value = GetterUtil.getObject(
-				baseModelAttributes.get(objectField.getDBColumnName()),
-				primaryKey);
+			Object value = null;
+
+			if ((baseModel != null) &&
+				!baseModelAttributes.containsKey(
+					objectField.getDBColumnName())) {
+
+				if (values == null) {
+					user = _userLocalService.fetchUser(
+						PrincipalThreadLocal.getUserId());
+
+					values = ObjectEntryDTOConverterUtil.toValues(
+						baseModel, _dtoConverterRegistry,
+						objectDefinition.getName(),
+						_systemObjectDefinitionManagerRegistry, user);
+				}
+
+				value = ObjectEntryValuesUtil.getTitleFieldValue(
+					objectField.getBusinessType(), baseModelAttributes,
+					objectField, user, values);
+			}
+
+			if (value == null) {
+				value = GetterUtil.getObject(
+					baseModelAttributes.get(objectField.getDBColumnName()),
+					primaryKey);
+			}
 
 			if (value instanceof String) {
 				value = _localization.getLocalization(
