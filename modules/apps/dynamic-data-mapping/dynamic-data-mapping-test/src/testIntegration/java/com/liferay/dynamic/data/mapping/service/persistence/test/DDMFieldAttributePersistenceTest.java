@@ -169,6 +169,13 @@ public class DDMFieldAttributePersistenceTest {
 	}
 
 	@Test
+	public void testCountByFieldId() throws Exception {
+		_persistence.countByFieldId(RandomTestUtil.nextLong());
+
+		_persistence.countByFieldId(0L);
+	}
+
+	@Test
 	public void testCountByStorageId() throws Exception {
 		_persistence.countByStorageId(RandomTestUtil.nextLong());
 
@@ -545,4 +552,4 @@ public class DDMFieldAttributePersistenceTest {
 	private ClassLoader _dynamicQueryClassLoader;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-7519291
+// LIFERAY-SERVICE-BUILDER-HASH:-91345420

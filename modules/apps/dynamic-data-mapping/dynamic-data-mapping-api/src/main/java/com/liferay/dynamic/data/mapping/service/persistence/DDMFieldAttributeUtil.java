@@ -127,6 +127,79 @@ public class DDMFieldAttributeUtil {
 	}
 
 	/**
+	 * Returns an ordered range of all the ddm field attributes where fieldId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.dynamic.data.mapping.model.impl.DDMFieldAttributeModelImpl</code>.
+	 * </p>
+	 *
+	 * @param fieldId the field ID
+	 * @param start the lower bound of the range of ddm field attributes
+	 * @param end the upper bound of the range of ddm field attributes (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching ddm field attributes
+	 */
+	public static List<DDMFieldAttribute> findByFieldId(
+		long fieldId, int start, int end,
+		OrderByComparator<DDMFieldAttribute> orderByComparator,
+		boolean useFinderCache) {
+
+		return getPersistence().findByFieldId(
+			fieldId, start, end, orderByComparator, useFinderCache);
+	}
+
+	/**
+	 * Returns the first ddm field attribute in the ordered set where fieldId = &#63;.
+	 *
+	 * @param fieldId the field ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching ddm field attribute
+	 * @throws NoSuchFieldAttributeException if a matching ddm field attribute could not be found
+	 */
+	public static DDMFieldAttribute findByFieldId_First(
+			long fieldId,
+			OrderByComparator<DDMFieldAttribute> orderByComparator)
+		throws com.liferay.dynamic.data.mapping.exception.
+			NoSuchFieldAttributeException {
+
+		return getPersistence().findByFieldId_First(fieldId, orderByComparator);
+	}
+
+	/**
+	 * Returns the first ddm field attribute in the ordered set where fieldId = &#63;.
+	 *
+	 * @param fieldId the field ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching ddm field attribute, or <code>null</code> if a matching ddm field attribute could not be found
+	 */
+	public static DDMFieldAttribute fetchByFieldId_First(
+		long fieldId, OrderByComparator<DDMFieldAttribute> orderByComparator) {
+
+		return getPersistence().fetchByFieldId_First(
+			fieldId, orderByComparator);
+	}
+
+	/**
+	 * Removes all the ddm field attributes where fieldId = &#63; from the database.
+	 *
+	 * @param fieldId the field ID
+	 */
+	public static void removeByFieldId(long fieldId) {
+		getPersistence().removeByFieldId(fieldId);
+	}
+
+	/**
+	 * Returns the number of ddm field attributes where fieldId = &#63;.
+	 *
+	 * @param fieldId the field ID
+	 * @return the number of matching ddm field attributes
+	 */
+	public static int countByFieldId(long fieldId) {
+		return getPersistence().countByFieldId(fieldId);
+	}
+
+	/**
 	 * Returns an ordered range of all the ddm field attributes where storageId = &#63;.
 	 *
 	 * <p>
@@ -622,6 +695,55 @@ public class DDMFieldAttributeUtil {
 	}
 
 	/**
+	 * Returns all the ddm field attributes where fieldId = &#63;.
+	 *
+	 * @param fieldId the field ID
+	 * @return the matching ddm field attributes
+	 */
+	public static List<DDMFieldAttribute> findByFieldId(long fieldId) {
+		return getPersistence().findByFieldId(fieldId);
+	}
+
+	/**
+	 * Returns a range of all the ddm field attributes where fieldId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.dynamic.data.mapping.model.impl.DDMFieldAttributeModelImpl</code>.
+	 * </p>
+	 *
+	 * @param fieldId the field ID
+	 * @param start the lower bound of the range of ddm field attributes
+	 * @param end the upper bound of the range of ddm field attributes (not inclusive)
+	 * @return the range of matching ddm field attributes
+	 */
+	public static List<DDMFieldAttribute> findByFieldId(
+		long fieldId, int start, int end) {
+
+		return getPersistence().findByFieldId(fieldId, start, end);
+	}
+
+	/**
+	 * Returns an ordered range of all the ddm field attributes where fieldId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.dynamic.data.mapping.model.impl.DDMFieldAttributeModelImpl</code>.
+	 * </p>
+	 *
+	 * @param fieldId the field ID
+	 * @param start the lower bound of the range of ddm field attributes
+	 * @param end the upper bound of the range of ddm field attributes (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching ddm field attributes
+	 */
+	public static List<DDMFieldAttribute> findByFieldId(
+		long fieldId, int start, int end,
+		OrderByComparator<DDMFieldAttribute> orderByComparator) {
+
+		return getPersistence().findByFieldId(
+			fieldId, start, end, orderByComparator);
+	}
+
+	/**
 	 * Returns all the ddm field attributes where storageId = &#63;.
 	 *
 	 * @param storageId the storage ID
@@ -902,4 +1024,4 @@ public class DDMFieldAttributeUtil {
 	private static volatile DDMFieldAttributePersistence _persistence;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:1219708509
+// LIFERAY-SERVICE-BUILDER-HASH:-1249694241

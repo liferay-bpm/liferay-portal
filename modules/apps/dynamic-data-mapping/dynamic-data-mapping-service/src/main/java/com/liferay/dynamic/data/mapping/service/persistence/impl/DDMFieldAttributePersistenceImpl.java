@@ -82,6 +82,91 @@ public class DDMFieldAttributePersistenceImpl
 
 	private CollectionPersistenceFinder
 		<DDMFieldAttribute, NoSuchFieldAttributeException>
+			_collectionPersistenceFinderByFieldId;
+
+	/**
+	 * Returns an ordered range of all the ddm field attributes where fieldId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DDMFieldAttributeModelImpl</code>.
+	 * </p>
+	 *
+	 * @param fieldId the field ID
+	 * @param start the lower bound of the range of ddm field attributes
+	 * @param end the upper bound of the range of ddm field attributes (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching ddm field attributes
+	 */
+	@Override
+	public List<DDMFieldAttribute> findByFieldId(
+		long fieldId, int start, int end,
+		OrderByComparator<DDMFieldAttribute> orderByComparator,
+		boolean useFinderCache) {
+
+		return _collectionPersistenceFinderByFieldId.find(
+			finderCache, new Object[] {fieldId}, start, end, orderByComparator,
+			useFinderCache);
+	}
+
+	/**
+	 * Returns the first ddm field attribute in the ordered set where fieldId = &#63;.
+	 *
+	 * @param fieldId the field ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching ddm field attribute
+	 * @throws NoSuchFieldAttributeException if a matching ddm field attribute could not be found
+	 */
+	@Override
+	public DDMFieldAttribute findByFieldId_First(
+			long fieldId,
+			OrderByComparator<DDMFieldAttribute> orderByComparator)
+		throws NoSuchFieldAttributeException {
+
+		return _collectionPersistenceFinderByFieldId.findFirst(
+			finderCache, new Object[] {fieldId}, orderByComparator);
+	}
+
+	/**
+	 * Returns the first ddm field attribute in the ordered set where fieldId = &#63;.
+	 *
+	 * @param fieldId the field ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching ddm field attribute, or <code>null</code> if a matching ddm field attribute could not be found
+	 */
+	@Override
+	public DDMFieldAttribute fetchByFieldId_First(
+		long fieldId, OrderByComparator<DDMFieldAttribute> orderByComparator) {
+
+		return _collectionPersistenceFinderByFieldId.fetchFirst(
+			finderCache, new Object[] {fieldId}, orderByComparator);
+	}
+
+	/**
+	 * Removes all the ddm field attributes where fieldId = &#63; from the database.
+	 *
+	 * @param fieldId the field ID
+	 */
+	@Override
+	public void removeByFieldId(long fieldId) {
+		_collectionPersistenceFinderByFieldId.remove(
+			finderCache, new Object[] {fieldId});
+	}
+
+	/**
+	 * Returns the number of ddm field attributes where fieldId = &#63;.
+	 *
+	 * @param fieldId the field ID
+	 * @return the number of matching ddm field attributes
+	 */
+	@Override
+	public int countByFieldId(long fieldId) {
+		return _collectionPersistenceFinderByFieldId.count(
+			finderCache, new Object[] {fieldId});
+	}
+
+	private CollectionPersistenceFinder
+		<DDMFieldAttribute, NoSuchFieldAttributeException>
 			_collectionPersistenceFinderByStorageId;
 
 	/**
@@ -815,6 +900,33 @@ public class DDMFieldAttributePersistenceImpl
 	 */
 	@Activate
 	public void activate() {
+		_collectionPersistenceFinderByFieldId =
+			new CollectionPersistenceFinder<>(
+				this,
+				new FinderPath(
+					FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByFieldId",
+					new String[] {
+						Long.class.getName(), Integer.class.getName(),
+						Integer.class.getName(),
+						OrderByComparator.class.getName()
+					},
+					new String[] {"fieldId"}, true),
+				new FinderPath(
+					FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByFieldId",
+					new String[] {Long.class.getName()},
+					new String[] {"fieldId"}, true),
+				new FinderPath(
+					FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByFieldId",
+					new String[] {Long.class.getName()},
+					new String[] {"fieldId"}, false),
+				_SQL_SELECT_DDMFIELDATTRIBUTE_WHERE,
+				_SQL_COUNT_DDMFIELDATTRIBUTE_WHERE,
+				DDMFieldAttributeModelImpl.ORDER_BY_JPQL, _ENTITY_ALIAS_PREFIX,
+				"", "", null,
+				new FinderColumn<>(
+					"ddmFieldAttribute.", "fieldId", FinderColumn.Type.LONG,
+					"=", true, true, DDMFieldAttribute::getFieldId));
+
 		_collectionPersistenceFinderByStorageId =
 			new CollectionPersistenceFinder<>(
 				this,
@@ -1025,4 +1137,4 @@ public class DDMFieldAttributePersistenceImpl
 	}
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1797003745
+// LIFERAY-SERVICE-BUILDER-HASH:1380225564
