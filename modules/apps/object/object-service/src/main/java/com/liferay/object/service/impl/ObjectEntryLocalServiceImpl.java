@@ -1732,6 +1732,7 @@ public class ObjectEntryLocalServiceImpl
 				GetterUtil.get(baseModelAttributes.get("uuid"), primaryKey)
 			).build();
 
+		User user = null;
 		Map<String, Object> values = null;
 
 		for (ObjectField objectField :
@@ -1749,15 +1750,18 @@ public class ObjectEntryLocalServiceImpl
 					objectField.getDBColumnName())) {
 
 				if (values == null) {
+					user = _userLocalService.fetchUser(
+						PrincipalThreadLocal.getUserId());
+
 					values = ObjectEntryDTOConverterUtil.toValues(
 						baseModel, _dtoConverterRegistry,
 						objectDefinition.getName(),
-						_systemObjectDefinitionManagerRegistry,
-						_userLocalService.fetchUser(
-							PrincipalThreadLocal.getUserId()));
+						_systemObjectDefinitionManagerRegistry, user);
 				}
 
-				value = values.get(objectField.getName());
+				value = ObjectEntryValuesUtil.getTitleFieldValue(
+					objectField.getBusinessType(), baseModelAttributes,
+					objectField, user, values);
 			}
 
 			if (value == null) {
