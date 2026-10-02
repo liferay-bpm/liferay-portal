@@ -6318,6 +6318,22 @@ public class ObjectEntryLocalServiceTest {
 	}
 
 	@Test
+	public void testGetSystemModelAttributes() throws Exception {
+		User user = TestPropsValues.getUser();
+
+		Map<String, Object> systemModelAttributes =
+			_objectEntryLocalService.getSystemModelAttributes(
+				_objectDefinitionLocalService.fetchObjectDefinitionByClassName(
+					TestPropsValues.getCompanyId(), User.class.getName()),
+				user.getUserId());
+
+		Assert.assertEquals(
+			user.getFirstName(), systemModelAttributes.get("givenName"));
+		Assert.assertEquals(
+			user.getFullName(), systemModelAttributes.get("name"));
+	}
+
+	@Test
 	public void testGetTitleValue() throws Exception {
 
 		// Modifiable custom object definition
@@ -6370,6 +6386,33 @@ public class ObjectEntryLocalServiceTest {
 			originalTitleObjectFieldId);
 
 		_cpDefinitionLocalService.deleteCPDefinition(cpDefinition);
+
+		// Unmodifiable system object definition with a computed field
+
+		objectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinitionByClassName(
+				TestPropsValues.getCompanyId(), User.class.getName());
+
+		originalTitleObjectFieldId = objectDefinition.getTitleObjectFieldId();
+
+		User user = TestPropsValues.getUser();
+
+		_assertGetTitleValue(
+			user.getMiddleName(), objectDefinition.getObjectDefinitionId(),
+			"additionalName", user.getUserId());
+		_assertGetTitleValue(
+			user.getLastName(), objectDefinition.getObjectDefinitionId(),
+			"familyName", user.getUserId());
+		_assertGetTitleValue(
+			user.getFirstName(), objectDefinition.getObjectDefinitionId(),
+			"givenName", user.getUserId());
+		_assertGetTitleValue(
+			user.getFullName(), objectDefinition.getObjectDefinitionId(),
+			"name", user.getUserId());
+
+		_objectDefinitionLocalService.updateTitleObjectFieldId(
+			objectDefinition.getObjectDefinitionId(),
+			originalTitleObjectFieldId);
 	}
 
 	@Test
