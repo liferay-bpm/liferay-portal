@@ -311,11 +311,6 @@ public class ObjectEntrySearchUtil {
 				titleObjectField.getName()),
 			titleObjectField.getDBType(), search);
 
-		// The user's full name is exposed as the UserAccount DTO's "name"
-		// property, which is computed by User.getFullName() rather than backed
-		// by a column in the User_ table, so search the first and last name
-		// columns instead
-
 		if ((objectFieldPredicate == null) &&
 			Objects.equals(
 				objectDefinition.getClassName(), User.class.getName()) &&
@@ -332,11 +327,9 @@ public class ObjectEntrySearchUtil {
 					objectDefinition.getObjectDefinitionId(), "givenName"),
 				titleObjectField.getDBType(), search);
 
-			if ((familyNamePredicate != null) && (givenNamePredicate != null)) {
-				objectFieldPredicate = givenNamePredicate.or(
-					familyNamePredicate
-				).withParentheses();
-			}
+			objectFieldPredicate = givenNamePredicate.or(
+				familyNamePredicate
+			).withParentheses();
 		}
 
 		long searchLong = GetterUtil.getLong(search);

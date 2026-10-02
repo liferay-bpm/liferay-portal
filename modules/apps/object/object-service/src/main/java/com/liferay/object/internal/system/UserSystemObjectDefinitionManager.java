@@ -181,12 +181,6 @@ public class UserSystemObjectDefinitionManager
 			).system(
 				true
 			).build(),
-
-			// The UserAccount DTO's "name" property is computed by
-			// User.getFullName() and is not backed by a column in the User_
-			// table. See ObjectEntryLocalServiceImpl#getTitleValue and
-			// ObjectEntrySearchUtil#getRelatedModelsPredicate.
-
 			new TextObjectFieldBuilder(
 			).labelMap(
 				createLabelMap("full-name")
