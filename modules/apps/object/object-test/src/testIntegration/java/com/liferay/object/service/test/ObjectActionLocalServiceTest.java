@@ -2414,7 +2414,7 @@ public class ObjectActionLocalServiceTest {
 			).labelMap(
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
 			).name(
-				"name"
+				"nickname"
 			).objectDefinitionId(
 				objectDefinition.getObjectDefinitionId()
 			).userId(
@@ -2424,7 +2424,7 @@ public class ObjectActionLocalServiceTest {
 		_objectActionLocalService.addObjectAction(
 			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
 			objectDefinition.getObjectDefinitionId(), true,
-			"oldValue(\"name\") == \"Paul\"",
+			"oldValue(\"nickname\") == \"Paul\"",
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -2452,7 +2452,7 @@ public class ObjectActionLocalServiceTest {
 			HashMapBuilder.putAll(
 				values
 			).put(
-				"name", "Paul"
+				"nickname", "Paul"
 			).build());
 
 		Assert.assertNull(_argumentsList.poll());
@@ -2462,7 +2462,7 @@ public class ObjectActionLocalServiceTest {
 			HashMapBuilder.putAll(
 				values
 			).put(
-				"name", RandomTestUtil.randomString()
+				"nickname", RandomTestUtil.randomString()
 			).build());
 
 		Assert.assertNotNull(_argumentsList.poll());
