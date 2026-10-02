@@ -9,11 +9,16 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.test.AssertUtils;
+import com.liferay.portal.kernel.test.context.ContextUserReplace;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DataGuard;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -563,6 +568,31 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	}
 
 	@Test
+	public void testDeployWorkflowDefinitionWithoutPermission()
+		throws Exception {
+
+		_user = UserTestUtil.addUser();
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				_user)) {
+
+			WorkflowException workflowException = Assert.assertThrows(
+				WorkflowException.class,
+				() -> _workflowDefinitionManager.deployWorkflowDefinition(
+					RandomTestUtil.randomBytes(),
+					TestPropsValues.getCompanyId(), null,
+					RandomTestUtil.randomString(), StringPool.BLANK,
+					_user.getUserId()));
+
+			Throwable throwable = workflowException.getCause();
+
+			Assert.assertTrue(
+				String.valueOf(throwable),
+				throwable instanceof PrincipalException.MustHavePermission);
+		}
+	}
+
+	@Test
 	public void testDeployWorkflowDraftDefinition() throws Exception {
 		WorkflowDefinition workflowDefinition = _saveWorkflowDefinition();
 
@@ -1097,6 +1127,9 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 			workflowDefinition.getExternalReferenceCode());
 		Assert.assertTrue(workflowDefinition.isActive());
 	}
+
+	@DeleteAfterTestRun
+	private User _user;
 
 	@Inject
 	private WorkflowDefinitionManager _workflowDefinitionManager;
