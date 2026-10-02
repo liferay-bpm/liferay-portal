@@ -261,6 +261,8 @@ import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+import com.liferay.portal.vulcan.fields.NestedFieldsContext;
+import com.liferay.portal.vulcan.fields.NestedFieldsContextThreadLocal;
 import com.liferay.portal.vulcan.util.LocalDateTimeUtil;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
@@ -6318,6 +6320,67 @@ public class ObjectEntryLocalServiceTest {
 	}
 
 	@Test
+	public void testGetSystemModelAttributes() throws Exception {
+
+		// Unmodifiable system object definition
+
+		CommerceCatalog commerceCatalog = CPTestUtil.getSystemCommerceCatalog(
+			TestPropsValues.getCompanyId());
+
+		CPDefinition cpDefinition = CPTestUtil.addCPDefinition(
+			commerceCatalog.getGroupId());
+
+		Map<String, Object> systemModelAttributes =
+			_objectEntryLocalService.getSystemModelAttributes(
+				_objectDefinitionLocalService.fetchObjectDefinitionByClassName(
+					TestPropsValues.getCompanyId(),
+					CPDefinition.class.getName()),
+				cpDefinition.getCProductId());
+
+		Assert.assertEquals(
+			cpDefinition.getName(), systemModelAttributes.get("name"));
+
+		_cpDefinitionLocalService.deleteCPDefinition(cpDefinition);
+
+		// Unmodifiable system object definition with a computed field
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinitionByClassName(
+				TestPropsValues.getCompanyId(), User.class.getName());
+		User user = TestPropsValues.getUser();
+
+		systemModelAttributes =
+			_objectEntryLocalService.getSystemModelAttributes(
+				objectDefinition, user.getUserId());
+
+		Assert.assertEquals(
+			user.getFirstName(), systemModelAttributes.get("givenName"));
+		Assert.assertEquals(
+			user.getFullName(), systemModelAttributes.get("name"));
+
+		// Unmodifiable system object definition with a nested metadata field
+
+		NestedFieldsContext originalNestedFieldsContext =
+			NestedFieldsContextThreadLocal.getNestedFieldsContext();
+
+		try {
+			NestedFieldsContextThreadLocal.setNestedFieldsContext(
+				new NestedFieldsContext(1, Arrays.asList("creator")));
+
+			systemModelAttributes =
+				_objectEntryLocalService.getSystemModelAttributes(
+					objectDefinition, user.getUserId());
+		}
+		finally {
+			NestedFieldsContextThreadLocal.setNestedFieldsContext(
+				originalNestedFieldsContext);
+		}
+
+		Assert.assertEquals(
+			user.getUserId(), systemModelAttributes.get("creator"));
+	}
+
+	@Test
 	public void testGetTitleValue() throws Exception {
 
 		// Modifiable custom object definition
@@ -6370,6 +6433,33 @@ public class ObjectEntryLocalServiceTest {
 			originalTitleObjectFieldId);
 
 		_cpDefinitionLocalService.deleteCPDefinition(cpDefinition);
+
+		// Unmodifiable system object definition with a computed field
+
+		objectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinitionByClassName(
+				TestPropsValues.getCompanyId(), User.class.getName());
+
+		originalTitleObjectFieldId = objectDefinition.getTitleObjectFieldId();
+
+		User user = TestPropsValues.getUser();
+
+		_assertGetTitleValue(
+			user.getMiddleName(), objectDefinition.getObjectDefinitionId(),
+			"additionalName", user.getUserId());
+		_assertGetTitleValue(
+			user.getLastName(), objectDefinition.getObjectDefinitionId(),
+			"familyName", user.getUserId());
+		_assertGetTitleValue(
+			user.getFirstName(), objectDefinition.getObjectDefinitionId(),
+			"givenName", user.getUserId());
+		_assertGetTitleValue(
+			user.getFullName(), objectDefinition.getObjectDefinitionId(),
+			"name", user.getUserId());
+
+		_objectDefinitionLocalService.updateTitleObjectFieldId(
+			objectDefinition.getObjectDefinitionId(),
+			originalTitleObjectFieldId);
 	}
 
 	@Test
