@@ -10411,13 +10411,6 @@ public class ObjectEntryLocalServiceTest {
 			objectField.getObjectFieldSettings());
 	}
 
-	private DepotEntry _addDepotEntry(int depotEntryType) throws Exception {
-		return _depotEntryLocalService.addDepotEntry(
-			RandomTestUtil.randomLocaleStringMap(),
-			RandomTestUtil.randomLocaleStringMap(), depotEntryType,
-			ServiceContextTestUtil.getServiceContext());
-	}
-
 	private DLFileEntry _addDLFileEntry() throws Exception {
 		Company company = _companyLocalService.getCompanyById(
 			TestPropsValues.getCompanyId());
@@ -10434,6 +10427,13 @@ public class ObjectEntryLocalServiceTest {
 
 		return _dlFileEntryLocalService.getFileEntry(
 			fileEntry.getFileEntryId());
+	}
+
+	private DepotEntry _addDepotEntry(int depotEntryType) throws Exception {
+		return _depotEntryLocalService.addDepotEntry(
+			RandomTestUtil.randomLocaleStringMap(),
+			RandomTestUtil.randomLocaleStringMap(), depotEntryType,
+			ServiceContextTestUtil.getServiceContext());
 	}
 
 	private ObjectAction _addObjectAction(
