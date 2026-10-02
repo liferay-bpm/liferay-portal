@@ -13,6 +13,7 @@ import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowInstanceResourc
 import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
@@ -48,6 +49,10 @@ public class WorkflowInstanceResourceImpl
 	@Override
 	public void deleteWorkflowInstance(Long workflowInstanceId)
 		throws Exception {
+
+		_kaleoInstanceModelResourcePermission.check(
+			PermissionThreadLocal.getPermissionChecker(), workflowInstanceId,
+			ActionKeys.DELETE);
 
 		_workflowInstanceManager.deleteWorkflowInstance(
 			contextCompany.getCompanyId(), workflowInstanceId);

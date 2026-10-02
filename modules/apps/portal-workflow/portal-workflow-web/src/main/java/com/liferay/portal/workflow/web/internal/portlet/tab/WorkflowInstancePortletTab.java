@@ -8,13 +8,17 @@ package com.liferay.portal.workflow.web.internal.portlet.tab;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManagerUtil;
 import com.liferay.portal.workflow.comparator.WorkflowComparatorFactory;
@@ -37,6 +41,9 @@ import jakarta.portlet.RenderResponse;
 
 import jakarta.servlet.ServletContext;
 
+import java.io.Serializable;
+
+import java.util.Map;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
@@ -180,6 +187,19 @@ public class WorkflowInstancePortletTab extends BaseWorkflowPortletTab {
 		if (workflowInstanceId != 0) {
 			workflowInstance = WorkflowInstanceManagerUtil.getWorkflowInstance(
 				themeDisplay.getCompanyId(), workflowInstanceId);
+
+			Map<String, Serializable> workflowContext =
+				workflowInstance.getWorkflowContext();
+
+			long companyId = GetterUtil.getLong(
+				workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+
+			if (companyId != themeDisplay.getCompanyId()) {
+				throw new PrincipalException.MustHavePermission(
+					themeDisplay.getPermissionChecker(),
+					WorkflowInstance.class.getName(), workflowInstanceId,
+					ActionKeys.VIEW);
+			}
 		}
 
 		renderRequest.setAttribute(WebKeys.WORKFLOW_INSTANCE, workflowInstance);
