@@ -199,7 +199,7 @@ public class LocationObjectFieldBusinessType
 			Long groupId, ObjectField objectField, Object value)
 		throws PortalException {
 
-		if (value == null) {
+		if (Validator.isNull(value)) {
 			return null;
 		}
 
