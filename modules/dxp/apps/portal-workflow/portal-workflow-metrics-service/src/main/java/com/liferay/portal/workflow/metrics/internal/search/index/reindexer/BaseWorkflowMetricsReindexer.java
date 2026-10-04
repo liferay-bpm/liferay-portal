@@ -5,7 +5,6 @@
 
 package com.liferay.portal.workflow.metrics.internal.search.index.reindexer;
 
-import com.liferay.petra.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.module.service.Snapshot;
@@ -20,7 +19,6 @@ import com.liferay.portal.workflow.metrics.search.index.reindexer.WorkflowMetric
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 import org.osgi.service.component.annotations.Reference;
 
@@ -68,12 +66,7 @@ public abstract class BaseWorkflowMetricsReindexer
 			Thread.sleep(1000);
 		}
 		else {
-			NoticeableFuture<?> noticeableFuture =
-				workflowMetricsPortalExecutor.execute(
-					() -> {
-					});
-
-			noticeableFuture.get(30, TimeUnit.MINUTES);
+			workflowMetricsPortalExecutor.await();
 
 			workflowMetricsIndex.removeIndex(
 				searchCapabilities, searchEngineAdapter, indexNameBuilder,
