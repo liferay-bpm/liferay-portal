@@ -83,12 +83,10 @@ public class ObjectActionResourceTest extends BaseObjectActionResourceTestCase {
 			objectActionResource.postObjectDefinitionObjectAction(
 				_objectDefinition.getObjectDefinitionId(), objectAction);
 
+		Map<String, ?> parameters = postObjectAction.getParameters();
+
 		Assert.assertEquals(
-			Boolean.FALSE,
-			postObjectAction.getParameters(
-			).get(
-				"urlLocalNetworkAccessEnabled"
-			));
+			Boolean.FALSE, parameters.get("urlLocalNetworkAccessEnabled"));
 	}
 
 	@Override

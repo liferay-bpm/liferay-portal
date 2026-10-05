@@ -1130,7 +1130,6 @@ public class ObjectActionLocalServiceTest {
 
 		// Delete object actions
 
-		_objectActionLocalService.deleteObjectAction(objectAction1);
 		_objectActionLocalService.deleteObjectAction(objectAction2);
 		_objectActionLocalService.deleteObjectAction(objectAction3);
 		_objectActionLocalService.deleteObjectAction(objectAction4);
@@ -2920,6 +2919,21 @@ public class ObjectActionLocalServiceTest {
 
 		_assertWebhookObjectActionNotExecuted(objectAction.getObjectActionId());
 
+		// Disallowed host without local network access
+
+		objectAction = _addObjectAction(
+			_objectDefinition.getObjectDefinitionId(),
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			UnicodePropertiesBuilder.put(
+				"url", "http://203.0.113.1/webhook"
+			).put(
+				"urlHostsAllowed", "198.51.100.1"
+			).build());
+
+		_assertWebhookObjectActionExecuted(
+			objectAction.getObjectActionId(), "http://203.0.113.1/webhook");
+
 		_objectActionLocalService.deleteObjectAction(objectAction);
 
 		// Local network address
@@ -2934,8 +2948,6 @@ public class ObjectActionLocalServiceTest {
 
 		_assertWebhookObjectActionNotExecuted(objectAction.getObjectActionId());
 
-		_objectActionLocalService.deleteObjectAction(objectAction);
-
 		// Local network address with allowed host
 
 		objectAction = _addObjectAction(
@@ -2949,8 +2961,6 @@ public class ObjectActionLocalServiceTest {
 			).build());
 
 		_assertWebhookObjectActionNotExecuted(objectAction.getObjectActionId());
-
-		_objectActionLocalService.deleteObjectAction(objectAction);
 
 		// Local network address with local network access
 
@@ -2984,8 +2994,6 @@ public class ObjectActionLocalServiceTest {
 			).build());
 
 		_assertWebhookObjectActionNotExecuted(objectAction.getObjectActionId());
-
-		_objectActionLocalService.deleteObjectAction(objectAction);
 	}
 
 	@Test
@@ -3626,7 +3634,7 @@ public class ObjectActionLocalServiceTest {
 		objectAction = _objectActionLocalService.updateObjectAction(
 			objectAction.getExternalReferenceCode(),
 			objectAction.getObjectActionId(), true, StringPool.BLANK,
-			RandomTestUtil.randomString(),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			objectAction.getName(), ObjectActionExecutorConstants.KEY_GROOVY,
@@ -3649,8 +3657,6 @@ public class ObjectActionLocalServiceTest {
 		Assert.assertFalse(
 			parametersUnicodeProperties.containsKey(
 				"urlLocalNetworkAccessEnabled"));
-
-		_objectActionLocalService.deleteObjectAction(objectAction);
 	}
 
 	@Rule
