@@ -90,6 +90,14 @@ public class WebhookObjectActionExecutorImpl implements ObjectActionExecutor {
 				return false;
 			}
 
+			if (!GetterUtil.getBoolean(
+					parametersUnicodeProperties.get(
+						"urlLocalNetworkAccessEnabled"))) {
+
+				return !InetAddressUtil.isLocalInetAddress(
+					InetAddressUtil.getInetAddressByName(host));
+			}
+
 			String[] urlHostsAllowed = StringUtil.split(
 				parametersUnicodeProperties.get("urlHostsAllowed"));
 
@@ -99,15 +107,7 @@ public class WebhookObjectActionExecutorImpl implements ObjectActionExecutor {
 				return false;
 			}
 
-			if (GetterUtil.getBoolean(
-					parametersUnicodeProperties.get(
-						"urlLocalNetworkAccessEnabled"))) {
-
-				return true;
-			}
-
-			return !InetAddressUtil.isLocalInetAddress(
-				InetAddressUtil.getInetAddressByName(host));
+			return true;
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
