@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
 import java.util.Map;
@@ -122,74 +121,60 @@ public class ObjectActionServiceImpl extends ObjectActionServiceBaseImpl {
 			parametersUnicodeProperties);
 	}
 
-	private String _getURLHostsAllowed(
-		UnicodeProperties parametersUnicodeProperties) {
-
-		return StringUtil.removeChar(
-			GetterUtil.getString(
-				parametersUnicodeProperties.get("urlHostsAllowed")),
-			CharPool.SPACE);
-	}
-
-	private boolean _isURLLocalNetworkAccessEnabled(
-		UnicodeProperties parametersUnicodeProperties) {
-
-		return GetterUtil.getBoolean(
-			parametersUnicodeProperties.get("urlLocalNetworkAccessEnabled"));
-	}
-
 	private void _validateParametersUnicodeProperties(
 			String objectActionExecutorKey,
 			UnicodeProperties oldParametersUnicodeProperties,
 			UnicodeProperties parametersUnicodeProperties)
 		throws PortalException {
 
+		if (!parametersUnicodeProperties.containsKey("urlHostsAllowed")) {
+			parametersUnicodeProperties.put(
+				"urlHostsAllowed",
+				oldParametersUnicodeProperties.get("urlHostsAllowed"));
+		}
+
+		if (!parametersUnicodeProperties.containsKey(
+				"urlLocalNetworkAccessEnabled")) {
+
+			parametersUnicodeProperties.put(
+				"urlLocalNetworkAccessEnabled",
+				oldParametersUnicodeProperties.get(
+					"urlLocalNetworkAccessEnabled"));
+		}
+
 		PermissionChecker permissionChecker = getPermissionChecker();
 
-		if (permissionChecker.isCompanyAdmin()) {
+		if (permissionChecker.isCompanyAdmin() ||
+			!Objects.equals(
+				objectActionExecutorKey,
+				ObjectActionExecutorConstants.KEY_WEBHOOK)) {
+
 			return;
 		}
 
-		for (String name :
-				new String[] {
-					"urlHostsAllowed", "urlLocalNetworkAccessEnabled"
-				}) {
+		String oldURLHostsAllowed = StringUtil.removeChar(
+			GetterUtil.getString(
+				oldParametersUnicodeProperties.get("urlHostsAllowed")),
+			CharPool.SPACE);
+		boolean oldURLLocalNetworkAccessEnabled = GetterUtil.getBoolean(
+			oldParametersUnicodeProperties.get("urlLocalNetworkAccessEnabled"));
+		String urlHostsAllowed = StringUtil.removeChar(
+			GetterUtil.getString(
+				parametersUnicodeProperties.get("urlHostsAllowed")),
+			CharPool.SPACE);
+		boolean urlLocalNetworkAccessEnabled = GetterUtil.getBoolean(
+			parametersUnicodeProperties.get("urlLocalNetworkAccessEnabled"));
 
-			if (!parametersUnicodeProperties.containsKey(name) &&
-				oldParametersUnicodeProperties.containsKey(name)) {
-
-				parametersUnicodeProperties.put(
-					name, oldParametersUnicodeProperties.get(name));
-			}
-		}
-
-		if (!Objects.equals(
-				_getURLHostsAllowed(oldParametersUnicodeProperties),
-				_getURLHostsAllowed(parametersUnicodeProperties)) ||
-			(_isURLLocalNetworkAccessEnabled(oldParametersUnicodeProperties) !=
-				_isURLLocalNetworkAccessEnabled(parametersUnicodeProperties))) {
+		if (!Objects.equals(oldURLHostsAllowed, urlHostsAllowed) ||
+			(oldURLLocalNetworkAccessEnabled != urlLocalNetworkAccessEnabled)) {
 
 			throw new PrincipalException.MustBeCompanyAdmin(permissionChecker);
 		}
 
-		if (!Objects.equals(
-				objectActionExecutorKey,
-				ObjectActionExecutorConstants.KEY_WEBHOOK)) {
-
-			if (Validator.isNotNull(
-					_getURLHostsAllowed(oldParametersUnicodeProperties)) ||
-				_isURLLocalNetworkAccessEnabled(
-					oldParametersUnicodeProperties)) {
-
-				throw new PrincipalException.MustBeCompanyAdmin(
-					permissionChecker);
-			}
-		}
-		else if (_isURLLocalNetworkAccessEnabled(
-					oldParametersUnicodeProperties) &&
-				 !Objects.equals(
-					 oldParametersUnicodeProperties.get("url"),
-					 parametersUnicodeProperties.get("url"))) {
+		if (oldURLLocalNetworkAccessEnabled &&
+			!Objects.equals(
+				oldParametersUnicodeProperties.get("url"),
+				parametersUnicodeProperties.get("url"))) {
 
 			throw new PrincipalException.MustBeCompanyAdmin(permissionChecker);
 		}

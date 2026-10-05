@@ -1022,14 +1022,11 @@ public class ObjectActionLocalServiceImpl
 				errorMessageKeys.put("url", "required");
 			}
 
-			String urlHostsAllowed = parametersUnicodeProperties.get(
-				"urlHostsAllowed");
-
-			if (urlHostsAllowed != null) {
-				parametersUnicodeProperties.put(
-					"urlHostsAllowed",
-					StringUtil.removeChar(urlHostsAllowed, CharPool.SPACE));
-			}
+			parametersUnicodeProperties.put(
+				"urlHostsAllowed",
+				StringUtil.removeChar(
+					parametersUnicodeProperties.get("urlHostsAllowed"),
+					CharPool.SPACE));
 		}
 
 		if (!Objects.equals(
