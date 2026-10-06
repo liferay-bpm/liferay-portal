@@ -53,8 +53,6 @@ import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
 
 import java.io.Serializable;
 
-import java.util.Collections;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -262,9 +260,10 @@ public class KaleoInstanceServiceTest {
 			Assert.assertNotNull(
 				_kaleoInstanceService.updateKaleoInstance(
 					kaleoInstance.getKaleoInstanceId(),
-					Collections.singletonMap(
+					HashMapBuilder.<String, Serializable>put(
 						RandomTestUtil.randomString(),
-						RandomTestUtil.randomString())));
+						RandomTestUtil.randomString()
+					).build()));
 		}
 
 		User user = UserTestUtil.addUser();
