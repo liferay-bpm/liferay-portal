@@ -5,7 +5,6 @@
 
 import ClayAutocomplete from '@clayui/autocomplete';
 import {ClayInput} from '@clayui/form';
-import {fetchPlace, fetchPlaceSuggestions} from '@liferay/map-google-maps';
 import {debounce} from 'frontend-js-web';
 import React, {useEffect, useMemo, useState} from 'react';
 
@@ -73,6 +72,10 @@ export function LocationInput({
 		() =>
 			debounce(async (input: string) => {
 				try {
+					const {fetchPlaceSuggestions} = await import(
+						'@liferay/map-google-maps'
+					);
+
 					setSuggestions(await fetchPlaceSuggestions(input));
 				}
 				catch {
@@ -123,6 +126,8 @@ export function LocationInput({
 		event.preventDefault();
 
 		setSuggestions([]);
+
+		const {fetchPlace} = await import('@liferay/map-google-maps');
 
 		const position = await fetchPlace(placePrediction);
 

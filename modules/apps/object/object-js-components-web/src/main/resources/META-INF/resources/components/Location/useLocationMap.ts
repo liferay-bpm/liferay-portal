@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {MapBase} from '@liferay/map-common';
-import {MapGoogleMaps, loadGoogleMaps} from '@liferay/map-google-maps';
-import {MapOpenStreetMap} from '@liferay/map-openstreetmap';
 import {useStableCallback} from 'frontend-js-components-web';
 import {useEffect, useRef} from 'react';
 
@@ -21,15 +18,6 @@ export interface MapPosition {
 	location: {lat: number; lng: number};
 	viewport?: unknown;
 }
-
-const {CONTROLS} = MapBase;
-
-const MAP_CONTROLS = [
-	CONTROLS.HOME,
-	CONTROLS.PAN,
-	CONTROLS.TYPE,
-	CONTROLS.ZOOM,
-];
 
 /**
  * Tells whether the map pin `position` already sits on the `locationValue`
@@ -107,14 +95,20 @@ export function useLocationMap({
 	useEffect(() => {
 		const googleMaps = mapProviderKey === MAP_PROVIDER.googleMaps;
 
+		let destroyed = false;
 		let detachGoogleMapsListener: (() => void) | undefined;
 
-		const createMap = () => {
-			const MapProvider = googleMaps ? MapGoogleMaps : MapOpenStreetMap;
+		const createMap = (MapBase: any, MapProvider: any) => {
+			const {CONTROLS} = MapBase;
 
 			const map = new MapProvider({
 				boundingBox: `#${mapElementId}`,
-				controls: MAP_CONTROLS,
+				controls: [
+					CONTROLS.HOME,
+					CONTROLS.PAN,
+					CONTROLS.TYPE,
+					CONTROLS.ZOOM,
+				],
 				draggablePin: !disabledRef.current,
 				geolocation: true,
 				position: valueRef.current
@@ -166,17 +160,33 @@ export function useLocationMap({
 			mapRef.current = map;
 		};
 
-		if (googleMaps) {
-			detachGoogleMapsListener = loadGoogleMaps(
-				googleMapsAPIKey,
-				createMap
-			);
-		}
-		else {
-			createMap();
-		}
+		// Imports the map packages only when a map is created, so that pages
+		// importing this package without a Location field do not load them.
+
+		Promise.all([
+			import('@liferay/map-common'),
+			googleMaps
+				? import('@liferay/map-google-maps')
+				: import('@liferay/map-openstreetmap'),
+		]).then(([{MapBase}, mapProviderModule]) => {
+			if (destroyed) {
+				return;
+			}
+
+			if (googleMaps) {
+				detachGoogleMapsListener = mapProviderModule.loadGoogleMaps(
+					googleMapsAPIKey,
+					() => createMap(MapBase, mapProviderModule.MapGoogleMaps)
+				);
+			}
+			else {
+				createMap(MapBase, mapProviderModule.MapOpenStreetMap);
+			}
+		});
 
 		return () => {
+			destroyed = true;
+
 			detachGoogleMapsListener?.();
 
 			mapRef.current?.destructor();
