@@ -4,12 +4,21 @@
  */
 
 import '@testing-library/jest-dom';
-import {act, fireEvent, render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import React from 'react';
 
 import Location from '../../js/Location/Location';
 
 const mockMapInstances: any[] = [];
+
+/**
+ * Waits for the map the field creates once its map packages are imported.
+ */
+async function waitForMap() {
+	await waitFor(() => expect(mockMapInstances).toHaveLength(1));
+
+	return mockMapInstances[0];
+}
 
 const RECIFE = {
 	address: '35 Alfândega Street, Recife, Pernambuco',
@@ -227,7 +236,7 @@ describe('Location', () => {
 		expect(screen.queryByTestId('addressInput')).not.toBeInTheDocument();
 	});
 
-	it('emits the address and coordinates when the pin moves', () => {
+	it('emits the address and coordinates when the pin moves', async () => {
 		const onChange = jest.fn();
 
 		render(
@@ -240,7 +249,7 @@ describe('Location', () => {
 			/>
 		);
 
-		const [map] = mockMapInstances;
+		const map = await waitForMap();
 
 		act(() => {
 			map.position = {address: 'Somewhere', location: {lat: 0, lng: 0}};
@@ -258,7 +267,7 @@ describe('Location', () => {
 		expect(screen.getByTestId('addressInput')).toHaveValue(RECIFE.address);
 	});
 
-	it('fixes the pin on the same map when the field becomes disabled', () => {
+	it('fixes the pin on the same map when the field becomes disabled', async () => {
 		const props = {
 			fieldName: 'address',
 			mapProviderKey: 'OpenStreetMap' as const,
@@ -269,13 +278,15 @@ describe('Location', () => {
 
 		const {rerender} = render(<Location {...props} />);
 
+		await waitForMap();
+
 		rerender(<Location {...props} readOnly />);
 
 		expect(mockMapInstances).toHaveLength(1);
 		expect(mockMapInstances[0].draggablePin).toBe(false);
 	});
 
-	it('ignores pin moves while the field is disabled', () => {
+	it('ignores pin moves while the field is disabled', async () => {
 		const onChange = jest.fn();
 
 		render(
@@ -289,7 +300,7 @@ describe('Location', () => {
 			/>
 		);
 
-		const [map] = mockMapInstances;
+		const map = await waitForMap();
 
 		act(() => {
 			map.position = {address: 'Somewhere', location: {lat: 0, lng: 0}};
@@ -302,7 +313,7 @@ describe('Location', () => {
 		expect(onChange).not.toHaveBeenCalled();
 	});
 
-	it('ignores the position the map reports while it initializes', () => {
+	it('ignores the position the map reports while it initializes', async () => {
 		const onChange = jest.fn();
 
 		render(
@@ -316,7 +327,7 @@ describe('Location', () => {
 			/>
 		);
 
-		const [map] = mockMapInstances;
+		const map = await waitForMap();
 
 		expect(map.config.draggablePin).toBe(true);
 		expect(map.config.position).toEqual(RECIFE);
@@ -395,7 +406,7 @@ describe('Location', () => {
 			/>
 		);
 
-		const [map] = mockMapInstances;
+		const map = await waitForMap();
 
 		act(() => {
 			map.position = {address: 'Somewhere', location: {lat: 0, lng: 0}};
@@ -422,7 +433,7 @@ describe('Location', () => {
 		jest.useRealTimers();
 	});
 
-	it('shows the map when the field is disabled', () => {
+	it('shows the map when the field is disabled', async () => {
 		render(
 			<Location
 				fieldName="address"
@@ -434,7 +445,7 @@ describe('Location', () => {
 			/>
 		);
 
-		const [map] = mockMapInstances;
+		const map = await waitForMap();
 
 		expect(map.config.draggablePin).toBe(false);
 		expect(map.config.position).toEqual(RECIFE);
@@ -458,7 +469,7 @@ describe('Location', () => {
 		expect(screen.getByTestId('addressInput')).toHaveValue(RECIFE.address);
 	});
 
-	it('stores the value under the editing language when localized', () => {
+	it('stores the value under the editing language when localized', async () => {
 		const onChange = jest.fn();
 
 		render(
@@ -474,7 +485,7 @@ describe('Location', () => {
 
 		expect(screen.getByTestId('localesDropdown')).toBeInTheDocument();
 
-		const [map] = mockMapInstances;
+		const map = await waitForMap();
 
 		act(() => {
 			map.position = {address: 'Somewhere', location: {lat: 0, lng: 0}};
@@ -494,7 +505,7 @@ describe('Location', () => {
 		});
 	});
 
-	it('uses a CSS-safe id for the map container', () => {
+	it('uses a CSS-safe id for the map container', async () => {
 		const name = '_ns_ddm$$address$xEpVTXMf$0$$en_US';
 
 		render(
@@ -506,7 +517,7 @@ describe('Location', () => {
 			/>
 		);
 
-		const [map] = mockMapInstances;
+		const map = await waitForMap();
 
 		expect(map.config.boundingBox).not.toContain('$');
 		expect(
