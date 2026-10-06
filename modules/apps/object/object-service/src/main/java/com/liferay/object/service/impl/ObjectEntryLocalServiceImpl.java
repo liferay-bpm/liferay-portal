@@ -8007,6 +8007,16 @@ public class ObjectEntryLocalServiceImpl
 			ObjectEntryThreadLocal.setSkipObjectValidationRules(false);
 		}
 
+		if (partialUpdate && (serviceContext.getAssetCategoryIds() == null)) {
+			AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
+				objectDefinition.getClassName(),
+				objectEntry.getObjectEntryId());
+
+			if (assetEntry != null) {
+				serviceContext.setAssetCategoryIds(assetEntry.getCategoryIds());
+			}
+		}
+
 		_updateAsset(
 			serviceContext.getUserId(), objectEntry,
 			serviceContext.getAssetCategoryIds(),
