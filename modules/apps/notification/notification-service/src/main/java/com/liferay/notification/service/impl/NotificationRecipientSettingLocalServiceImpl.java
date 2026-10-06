@@ -10,7 +10,6 @@ import com.liferay.exportimport.report.constants.ExportImportReportEntryConstant
 import com.liferay.exportimport.report.service.ExportImportReportEntryLocalService;
 import com.liferay.notification.constants.NotificationRecipientConstants;
 import com.liferay.notification.constants.NotificationRecipientSettingConstants;
-import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.exception.NotificationRecipientSettingValueException;
 import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.notification.model.NotificationTemplate;
@@ -95,17 +94,9 @@ public class NotificationRecipientSettingLocalServiceImpl
 	@Override
 	public List<NotificationRecipientSetting>
 		createNotificationRecipientSettings(
-			long notificationRecipientId, Object[] recipients, User user) {
-
-		return createNotificationRecipientSettings(
-			null, notificationRecipientId, recipients, user);
-	}
-
-	@Override
-	public List<NotificationRecipientSetting>
-		createNotificationRecipientSettings(
-			NotificationContext notificationContext,
-			long notificationRecipientId, Object[] recipients, User user) {
+			long notificationRecipientId,
+			NotificationTemplate notificationTemplate, Object[] recipients,
+			User user) {
 
 		List<NotificationRecipientSetting> notificationRecipientSettings =
 			new ArrayList<>();
@@ -148,9 +139,18 @@ public class NotificationRecipientSettingLocalServiceImpl
 		}
 
 		_reportMissingUserRecipients(
-			missingUserScreenNames, notificationContext, user);
+			missingUserScreenNames, notificationTemplate, user);
 
 		return notificationRecipientSettings;
+	}
+
+	@Override
+	public List<NotificationRecipientSetting>
+		createNotificationRecipientSettings(
+			long notificationRecipientId, Object[] recipients, User user) {
+
+		return createNotificationRecipientSettings(
+			notificationRecipientId, null, recipients, user);
 	}
 
 	@Override
@@ -461,30 +461,13 @@ public class NotificationRecipientSettingLocalServiceImpl
 
 	private void _reportMissingUserRecipients(
 		List<String> missingUserScreenNames,
-		NotificationContext notificationContext, User user) {
+		NotificationTemplate notificationTemplate, User user) {
 
 		if (missingUserScreenNames.isEmpty() ||
 			!ExportImportThreadLocal.isImportInProcess() ||
-			(notificationContext == null)) {
+			(notificationTemplate == null)) {
 
 			return;
-		}
-
-		NotificationTemplate notificationTemplate =
-			notificationContext.getNotificationTemplate();
-
-		if (notificationTemplate == null) {
-			return;
-		}
-
-		String key =
-			"the-users-x-do-not-exist-and-were-removed-from-the-recipients-" +
-				"of-notification-template-x";
-
-		if (missingUserScreenNames.size() == 1) {
-			key =
-				"the-user-x-does-not-exist-and-was-removed-from-the-" +
-					"recipients-of-notification-template-x";
 		}
 
 		_exportImportReportEntryLocalService.getOrAddExportImportReportEntry(
@@ -496,7 +479,9 @@ public class NotificationRecipientSettingLocalServiceImpl
 				ExportImportThreadLocal.getExportImportConfigurationId()),
 			ExportImportReportEntryConstants.TYPE_WARNING,
 			_language.format(
-				LocaleUtil.getDefault(), key,
+				LocaleUtil.getDefault(),
+				"the-following-users-do-not-exist-and-were-removed-from-the-" +
+					"recipients-of-notification-template-x-x",
 				new Object[] {
 					StringUtil.merge(
 						missingUserScreenNames, StringPool.COMMA_AND_SPACE),

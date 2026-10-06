@@ -284,7 +284,7 @@ public class NotificationTemplateResourceImpl
 		notificationContext.setNotificationRecipientSettings(
 			_notificationRecipientSettingLocalService.
 				createNotificationRecipientSettings(
-					notificationContext, 0L,
+					0L, notificationContext.getNotificationTemplate(),
 					notificationTemplate.getRecipients(), contextUser));
 
 		return _toNotificationTemplate(
@@ -391,8 +391,8 @@ public class NotificationTemplateResourceImpl
 		notificationContext.setNotificationRecipientSettings(
 			_notificationRecipientSettingLocalService.
 				createNotificationRecipientSettings(
-					notificationContext,
 					notificationRecipient.getNotificationRecipientId(),
+					notificationContext.getNotificationTemplate(),
 					notificationTemplate.getRecipients(), contextUser));
 
 		return _toNotificationTemplate(
