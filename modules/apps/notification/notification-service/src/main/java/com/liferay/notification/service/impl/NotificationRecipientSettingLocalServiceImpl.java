@@ -30,7 +30,9 @@ import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.RoleService;
 import com.liferay.portal.kernel.service.UserGroupLocalService;
+import com.liferay.portal.kernel.service.UserGroupService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -38,6 +40,8 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
+import com.liferay.roles.admin.role.type.contributor.RoleTypeContributor;
+import com.liferay.roles.admin.role.type.contributor.provider.RoleTypeContributorProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -354,10 +358,9 @@ public class NotificationRecipientSettingLocalServiceImpl
 
 		if (Validator.isNotNull(externalReferenceCode)) {
 			try {
-				return _roleLocalService.getOrAddEmptyRole(
-					externalReferenceCode, user.getCompanyId(),
-					user.getUserId(), null, 0, name,
-					RoleConstants.getLabelType(typeLabel));
+				return _roleService.getOrAddEmptyRole(
+					externalReferenceCode, _getRoleClassName(typeLabel), 0,
+					name, RoleConstants.getLabelType(typeLabel));
 			}
 			catch (NoSuchRoleException noSuchRoleException) {
 				return ReflectionUtil.throwException(
@@ -365,8 +368,8 @@ public class NotificationRecipientSettingLocalServiceImpl
 						RoleMustExist(
 							externalReferenceCode, noSuchRoleException));
 			}
-			catch (PortalException portalException) {
-				return ReflectionUtil.throwException(portalException);
+			catch (Exception exception) {
+				return ReflectionUtil.throwException(exception);
 			}
 		}
 
@@ -375,6 +378,20 @@ public class NotificationRecipientSettingLocalServiceImpl
 		}
 
 		return _roleLocalService.fetchRole(user.getCompanyId(), name);
+	}
+
+	private String _getRoleClassName(String typeLabel) {
+		for (RoleTypeContributor roleTypeContributor :
+				_roleTypeContributorProvider.getRoleTypeContributors()) {
+
+			if (StringUtil.equals(
+					roleTypeContributor.getTypeLabel(), typeLabel)) {
+
+				return roleTypeContributor.getClassName();
+			}
+		}
+
+		return null;
 	}
 
 	private User _getUser(
@@ -403,9 +420,8 @@ public class NotificationRecipientSettingLocalServiceImpl
 
 		if (Validator.isNotNull(externalReferenceCode)) {
 			try {
-				return _userGroupLocalService.getOrAddEmptyUserGroup(
-					externalReferenceCode, user.getCompanyId(),
-					user.getUserId(), name);
+				return _userGroupService.getOrAddEmptyUserGroup(
+					externalReferenceCode, name);
 			}
 			catch (NoSuchUserGroupException noSuchUserGroupException) {
 				return ReflectionUtil.throwException(
@@ -524,7 +540,16 @@ public class NotificationRecipientSettingLocalServiceImpl
 	private RoleLocalService _roleLocalService;
 
 	@Reference
+	private RoleService _roleService;
+
+	@Reference
+	private RoleTypeContributorProvider _roleTypeContributorProvider;
+
+	@Reference
 	private UserGroupLocalService _userGroupLocalService;
+
+	@Reference
+	private UserGroupService _userGroupService;
 
 	@Reference
 	private UserLocalService _userLocalService;
