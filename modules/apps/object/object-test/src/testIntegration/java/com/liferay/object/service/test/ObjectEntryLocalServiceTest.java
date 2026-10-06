@@ -7828,6 +7828,7 @@ public class ObjectEntryLocalServiceTest {
 
 		_testPartialUpdateObjectEntryExternalReferenceCode();
 		_testPartialUpdateObjectEntryObjectStateTransitions();
+		_testPartialUpdateObjectEntryWithAssetCategory();
 		_testPartialUpdateObjectEntryWithObjectRelationship();
 	}
 
@@ -12112,6 +12113,44 @@ public class ObjectEntryLocalServiceTest {
 
 		_objectEntryLocalService.deleteObjectEntry(
 			objectEntry.getObjectEntryId());
+	}
+
+	private void _testPartialUpdateObjectEntryWithAssetCategory()
+		throws Exception {
+
+		AssetCategory assetCategory = _addAssetCategory(
+			_groupLocalService.fetchGroup(TestPropsValues.getGroupId()));
+
+		ObjectEntry objectEntry = _addObjectEntry(
+			TestPropsValues.getGroupId(),
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				Collections.singletonList(
+					new TextObjectFieldBuilder(
+					).labelMap(
+						RandomTestUtil.randomLocaleStringMap()
+					).name(
+						"a" + RandomTestUtil.randomString()
+					).build()),
+				ObjectDefinitionConstants.SCOPE_SITE),
+			Collections.emptyMap(),
+			new ServiceContext() {
+				{
+					setAssetCategoryIds(
+						new long[] {assetCategory.getCategoryId()});
+				}
+			});
+
+		objectEntry = _objectEntryLocalService.partialUpdateObjectEntry(
+			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
+			objectEntry.getObjectEntryFolderId(), Collections.emptyMap(),
+			new ServiceContext());
+
+		AssetEntry assetEntry = _assetEntryLocalService.getEntry(
+			objectEntry.getModelClassName(), objectEntry.getObjectEntryId());
+
+		Assert.assertArrayEquals(
+			new long[] {assetCategory.getCategoryId()},
+			assetEntry.getCategoryIds());
 	}
 
 	private void _testPartialUpdateObjectEntryWithObjectRelationship()
