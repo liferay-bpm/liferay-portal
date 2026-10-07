@@ -1,0 +1,7 @@
+<jasperReport columnWidth="555" name="[$NAME$]" pageHeight="842" pageWidth="595" whenNoDataType="AllSectionsNoDetail">
+	<title height="40">
+		<element height="30" kind="textField" width="555" x="0" y="0">
+			<expression><![CDATA[[$EXPRESSION$]]]></expression>
+		</element>
+	</title>
+</jasperReport>
