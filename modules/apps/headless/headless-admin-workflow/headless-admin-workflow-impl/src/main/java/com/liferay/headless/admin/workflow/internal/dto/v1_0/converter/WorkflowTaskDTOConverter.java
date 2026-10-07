@@ -16,6 +16,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -85,12 +86,17 @@ public class WorkflowTaskDTOConverter
 		Locale locale, Map<String, Serializable> optionalAttributes,
 		com.liferay.portal.kernel.workflow.WorkflowTask workflowTask) {
 
+		ServiceContext serviceContext = (ServiceContext)optionalAttributes.get(
+			WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+
+		if (serviceContext == null) {
+			return null;
+		}
+
 		try {
 			WorkflowDefinition workflowDefinition =
 				_workflowDefinitionManager.liberalGetWorkflowDefinition(
-					GetterUtil.getLong(
-						optionalAttributes.get(
-							WorkflowConstants.CONTEXT_COMPANY_ID)),
+					serviceContext.getCompanyId(),
 					workflowTask.getWorkflowDefinitionName(),
 					workflowTask.getWorkflowDefinitionVersion());
 
