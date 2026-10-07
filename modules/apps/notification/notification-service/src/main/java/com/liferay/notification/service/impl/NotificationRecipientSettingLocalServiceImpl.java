@@ -265,8 +265,7 @@ public class NotificationRecipientSettingLocalServiceImpl
 		notificationRecipientSetting.setName(name);
 
 		if (value instanceof Map) {
-			notificationRecipientSetting.setValueMap(
-				LocalizedMapUtil.getLocalizedMap((Map)value));
+			notificationRecipientSetting.setValueMap(_toLocalizedMap(value));
 		}
 		else {
 			notificationRecipientSetting.setValue(String.valueOf(value));
@@ -509,6 +508,19 @@ public class NotificationRecipientSettingLocalServiceImpl
 		}
 
 		return (List<Map<String, String>>)value;
+	}
+
+	private Map<Locale, String> _toLocalizedMap(Object value) {
+		Map<?, ?> map = (Map<?, ?>)value;
+
+		for (Object key : map.keySet()) {
+			if (!(key instanceof Locale)) {
+				return LocalizedMapUtil.getLocalizedMap(
+					(Map<String, String>)value);
+			}
+		}
+
+		return (Map<Locale, String>)value;
 	}
 
 	@Reference
