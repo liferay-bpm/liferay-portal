@@ -47,6 +47,9 @@ Import-Package:\
 	!mondrian.*,\
 	\
 	!net.sf.cglib.proxy.*,\
+	!net.sf.jasperreports.data.excel.*,\
+	!net.sf.jasperreports.data.xls.*,\
+	!net.sf.jasperreports.data.xlsx.*,\
 	\
 	!net.sourceforge.barbecue.*,\
 	\
@@ -55,8 +58,10 @@ Import-Package:\
 	!org.apache.batik.dom.*,\
 	!org.apache.batik.ext.*,\
 	!org.apache.batik.gvt.*,\
+	!org.apache.batik.parser.*,\
 	!org.apache.batik.util.*,\
 	!org.apache.bcel.*,\
+	!org.apache.commons.beanutils2.*,\
 	!org.apache.commons.javaflow.*,\
 	!org.apache.commons.jci.*,\
 	!org.apache.log.*,\
@@ -82,8 +87,11 @@ Import-Package:\
 	!org.bouncycastle.cert.*,\
 	!org.bouncycastle.cms.*,\
 	!org.bouncycastle.crypto.*,\
+	!org.bouncycastle.jcajce.provider.asymmetric.x509.*,\
 	!org.bouncycastle.jce.provider.*,\
+	!org.bouncycastle.operator.*,\
 	!org.bouncycastle.operator.bc.*,\
+	!org.bouncycastle.operator.jcajce.*,\
 	!org.bouncycastle.tsp.*,\
 	!org.bouncycastle.util.*,\
 	\

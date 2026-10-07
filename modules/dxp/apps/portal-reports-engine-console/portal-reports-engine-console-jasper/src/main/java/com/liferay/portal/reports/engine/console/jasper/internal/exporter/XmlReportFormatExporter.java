@@ -7,8 +7,12 @@ package com.liferay.portal.reports.engine.console.jasper.internal.exporter;
 
 import com.liferay.portal.reports.engine.ReportFormatExporter;
 
-import net.sf.jasperreports.engine.JRExporter;
+import java.io.OutputStream;
+
 import net.sf.jasperreports.engine.export.JRXmlExporter;
+import net.sf.jasperreports.export.Exporter;
+import net.sf.jasperreports.export.ExporterOutput;
+import net.sf.jasperreports.export.SimpleXmlExporterOutput;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -20,8 +24,13 @@ import org.osgi.service.component.annotations.Component;
 public class XmlReportFormatExporter extends BaseReportFormatExporter {
 
 	@Override
-	protected JRExporter getJRExporter() {
+	protected Exporter getExporter() {
 		return new JRXmlExporter();
+	}
+
+	@Override
+	protected ExporterOutput getExporterOutput(OutputStream outputStream) {
+		return new SimpleXmlExporterOutput(outputStream);
 	}
 
 }
