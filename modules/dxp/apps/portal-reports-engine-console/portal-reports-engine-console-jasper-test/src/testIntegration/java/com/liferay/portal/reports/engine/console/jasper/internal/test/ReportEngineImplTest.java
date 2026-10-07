@@ -99,7 +99,7 @@ public class ReportEngineImplTest extends TestCase {
 	public void testExportPdfWithJapaneseCharacters() throws Exception {
 		_testExportPdfWithFontExtension(
 			"dependencies/reports_admin_template_japanese_characters.jrxml",
-			"本語の文字");
+			"日本語の文字");
 	}
 
 	@Test

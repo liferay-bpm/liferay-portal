@@ -1,6 +1,6 @@
 task upgradeTestResources(type: Zip)
 
-String jasperVersion = "5.2.0"
+String jasperVersion = "7.0.8"
 
 File jasperFile = file("jasperreports-${jasperVersion}-project.zip")
 FileTree jasperZipTree = zipTree(jasperFile)
