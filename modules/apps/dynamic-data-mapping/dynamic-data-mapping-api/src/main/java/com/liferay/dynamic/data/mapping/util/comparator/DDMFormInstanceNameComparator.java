@@ -6,8 +6,14 @@
 package com.liferay.dynamic.data.mapping.util.comparator;
 
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
+import com.liferay.portal.kernel.util.CollatorUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
+
+import java.text.Collator;
+
+import java.util.Locale;
 
 /**
  * @author Rafael Praxedes
@@ -33,10 +39,12 @@ public class DDMFormInstanceNameComparator
 	public int compare(
 		DDMFormInstance ddmFormInstance1, DDMFormInstance ddmFormInstance2) {
 
-		String name1 = StringUtil.toLowerCase(ddmFormInstance1.getName());
-		String name2 = StringUtil.toLowerCase(ddmFormInstance2.getName());
+		String name1 = StringUtil.toLowerCase(
+			ddmFormInstance1.getName(_locale));
+		String name2 = StringUtil.toLowerCase(
+			ddmFormInstance2.getName(_locale));
 
-		int value = name1.compareTo(name2);
+		int value = _collator.compare(name1, name2);
 
 		if (_ascending) {
 			return value;
@@ -66,6 +74,10 @@ public class DDMFormInstanceNameComparator
 
 	private DDMFormInstanceNameComparator(boolean ascending) {
 		_ascending = ascending;
+
+		_locale = LocaleUtil.getDefault();
+
+		_collator = CollatorUtil.getInstance(_locale);
 	}
 
 	private static final DDMFormInstanceNameComparator _INSTANCE_ASCENDING =
@@ -75,5 +87,7 @@ public class DDMFormInstanceNameComparator
 		new DDMFormInstanceNameComparator(false);
 
 	private final boolean _ascending;
+	private final Collator _collator;
+	private final Locale _locale;
 
 }

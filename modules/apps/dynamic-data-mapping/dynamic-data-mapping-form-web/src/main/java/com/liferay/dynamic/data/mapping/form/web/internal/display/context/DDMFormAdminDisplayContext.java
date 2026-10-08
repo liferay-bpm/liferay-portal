@@ -75,6 +75,7 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONArrayImpl;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.editor.configuration.EditorConfiguration;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigurationFactoryUtil;
@@ -1116,15 +1117,12 @@ public class DDMFormAdminDisplayContext {
 				getOrderByCol(), getOrderByType()));
 		ddmFormInstanceSearch.setOrderByType(getOrderByType());
 		ddmFormInstanceSearch.setResultsAndTotal(
-			() -> _ddmFormInstanceService.search(
-				ddmFormAdminRequestHelper.getCompanyId(),
-				ddmFormAdminRequestHelper.getScopeGroupId(), getKeywords(),
-				ddmFormInstanceSearch.getStart(),
-				ddmFormInstanceSearch.getEnd(),
-				ddmFormInstanceSearch.getOrderByComparator()),
-			_ddmFormInstanceService.searchCount(
-				ddmFormAdminRequestHelper.getCompanyId(),
-				ddmFormAdminRequestHelper.getScopeGroupId(), getKeywords()));
+			ListUtil.sort(
+				_ddmFormInstanceService.search(
+					ddmFormAdminRequestHelper.getCompanyId(),
+					ddmFormAdminRequestHelper.getScopeGroupId(), getKeywords(),
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null),
+				ddmFormInstanceSearch.getOrderByComparator()));
 		ddmFormInstanceSearch.setRowChecker(
 			new DDMFormInstanceRowChecker(renderResponse));
 
