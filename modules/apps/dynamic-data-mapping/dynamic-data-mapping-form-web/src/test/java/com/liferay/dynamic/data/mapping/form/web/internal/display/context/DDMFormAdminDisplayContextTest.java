@@ -34,16 +34,23 @@ import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
+import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.portlet.PortalPreferences;
+import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.portlet.MockLiferayPortletURL;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -59,14 +66,17 @@ import jakarta.portlet.RenderResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.Arrays;
 import java.util.Locale;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -89,6 +99,13 @@ public class DDMFormAdminDisplayContextTest {
 		_setUpResourceBundleLoaderUtil();
 
 		_setUpDDMFormDisplayContext();
+	}
+
+	@After
+	public void tearDown() {
+		_friendlyURLNormalizerUtilMockedStatic.close();
+		_portletPreferencesFactoryUtilMockedStatic.close();
+		_searchOrderByUtilMockedStatic.close();
 	}
 
 	@Test
@@ -152,6 +169,31 @@ public class DDMFormAdminDisplayContextTest {
 	}
 
 	@Test
+	public void testGetSearchContainer() {
+		DDMFormInstance ddmFormInstance1 = _mockDDMFormInstance("Beta");
+		DDMFormInstance ddmFormInstance2 = _mockDDMFormInstance("Alpha");
+		DDMFormInstance ddmFormInstance3 = _mockDDMFormInstance("Charlie");
+
+		Mockito.when(
+			_ddmFormInstanceService.search(
+				Mockito.anyLong(), Mockito.anyLong(), Mockito.any(),
+				Mockito.anyInt(), Mockito.anyInt(), Mockito.any())
+		).thenReturn(
+			ListUtil.fromArray(
+				ddmFormInstance1, ddmFormInstance2, ddmFormInstance3)
+		);
+
+		_setRenderRequestParamenter(SearchContainer.DEFAULT_DELTA_PARAM, "2");
+
+		SearchContainer<?> searchContainer = _getSearchContainer();
+
+		Assert.assertEquals(
+			Arrays.asList(ddmFormInstance2, ddmFormInstance1),
+			searchContainer.getResults());
+		Assert.assertEquals(3, searchContainer.getTotal());
+	}
+
+	@Test
 	public void testGetSharedFormURL() {
 		Assert.assertEquals(
 			getSharedFormURL(), _ddmFormAdminDisplayContext.getSharedFormURL());
@@ -210,6 +252,33 @@ public class DDMFormAdminDisplayContextTest {
 		return ddmFormContextToDDMFormValues;
 	}
 
+	private SearchContainer<?> _getSearchContainer() {
+		_portletPreferencesFactoryUtilMockedStatic.when(
+			() -> PortletPreferencesFactoryUtil.getPortalPreferences(
+				Mockito.any(PortletRequest.class))
+		).thenReturn(
+			Mockito.mock(PortalPreferences.class)
+		);
+
+		_searchOrderByUtilMockedStatic.when(
+			() -> SearchOrderByUtil.getOrderByCol(
+				Mockito.any(PortletRequest.class), Mockito.anyString(),
+				Mockito.anyString())
+		).thenReturn(
+			"name"
+		);
+
+		_searchOrderByUtilMockedStatic.when(
+			() -> SearchOrderByUtil.getOrderByType(
+				Mockito.any(PortletRequest.class), Mockito.anyString(),
+				Mockito.anyString())
+		).thenReturn(
+			"asc"
+		);
+
+		return _ddmFormAdminDisplayContext.getSearchContainer();
+	}
+
 	private DDMFormInstance _mockDDMFormInstance(
 			DDMFormInstanceSettings ddmFormInstanceSettings)
 		throws Exception {
@@ -264,6 +333,18 @@ public class DDMFormAdminDisplayContextTest {
 			ddmFormInstanceSettings.published()
 		).thenReturn(
 			published
+		);
+
+		return ddmFormInstance;
+	}
+
+	private DDMFormInstance _mockDDMFormInstance(String name) {
+		DDMFormInstance ddmFormInstance = Mockito.mock(DDMFormInstance.class);
+
+		Mockito.when(
+			ddmFormInstance.getName(Mockito.any(Locale.class))
+		).thenReturn(
+			name
 		);
 
 		return ddmFormInstance;
@@ -352,10 +433,19 @@ public class DDMFormAdminDisplayContextTest {
 	}
 
 	private void _setUpDDMFormDisplayContext() throws Exception {
+		_ddmFormInstanceService = _mockDDMFormInstanceService();
 		_renderRequest = Mockito.mock(RenderRequest.class);
 
+		RenderResponse renderResponse = Mockito.mock(RenderResponse.class);
+
+		Mockito.when(
+			renderResponse.createRenderURL()
+		).thenReturn(
+			new MockLiferayPortletURL()
+		);
+
 		_ddmFormAdminDisplayContext = new DDMFormAdminDisplayContext(
-			_renderRequest, Mockito.mock(RenderResponse.class),
+			_renderRequest, renderResponse,
 			Mockito.mock(DDMFormBuilderContextFactory.class),
 			Mockito.mock(DDMFormBuilderSettingsRetriever.class),
 			_getDDMFormContextToDDMFormValues(),
@@ -365,7 +455,7 @@ public class DDMFormAdminDisplayContextTest {
 			Mockito.mock(DDMFormInstanceRecordLocalService.class),
 			Mockito.mock(DDMFormInstanceRecordService.class),
 			Mockito.mock(DDMFormInstanceRecordWriterRegistry.class),
-			_mockDDMFormInstanceService(),
+			_ddmFormInstanceService,
 			Mockito.mock(DDMFormInstanceVersionLocalService.class),
 			Mockito.mock(DDMFormRenderer.class),
 			Mockito.mock(DDMFormTemplateContextFactory.class),
@@ -430,6 +520,16 @@ public class DDMFormAdminDisplayContextTest {
 		RandomTestUtil.randomLong();
 
 	private DDMFormAdminDisplayContext _ddmFormAdminDisplayContext;
+	private DDMFormInstanceService _ddmFormInstanceService;
+	private final MockedStatic<FriendlyURLNormalizerUtil>
+		_friendlyURLNormalizerUtilMockedStatic = Mockito.mockStatic(
+			FriendlyURLNormalizerUtil.class);
+	private final MockedStatic<PortletPreferencesFactoryUtil>
+		_portletPreferencesFactoryUtilMockedStatic = Mockito.mockStatic(
+			PortletPreferencesFactoryUtil.class);
 	private RenderRequest _renderRequest;
+	private final MockedStatic<SearchOrderByUtil>
+		_searchOrderByUtilMockedStatic = Mockito.mockStatic(
+			SearchOrderByUtil.class);
 
 }
