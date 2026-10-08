@@ -700,3 +700,90 @@ test('Can restrict site-scoped object portlet to the site where the role permiss
 		await expect(viewObjectEntriesPage.noPermissionMessage).toBeVisible();
 	});
 });
+
+test(
+	'Can update an object definition with the Update permission',
+	{tag: '@LPD-109321'},
+	async ({apiHelpers, editObjectDetailsPage, page}) => {
+		const objectFields = generateObjectFields({
+			objectFieldBusinessTypes: ['Text'],
+		});
+
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFields,
+				panelCategoryKey: 'site_administration.content',
+				scope: 'site',
+				status: {code: 2},
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		const objectFieldLabel = objectFields[0].label!['en_US'];
+		const label = 'UpdatedLabel' + getRandomInt();
+		const pluralLabel = 'UpdatedPlural' + getRandomInt();
+
+		await test.step('Switch to a user with the Update permission', async () => {
+			const user = await createUserWithPermissions(apiHelpers, [
+				{
+					actionIds: ['ACCESS_IN_CONTROL_PANEL', 'VIEW'],
+					resourceName:
+						'com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet',
+				},
+				{
+					actionIds: ['UPDATE', 'VIEW'],
+					resourceName: 'com.liferay.object.model.ObjectDefinition',
+				},
+			]);
+
+			await performUserSwitch(page, user.alternateName);
+		});
+
+		await test.step('Update the object definition details', async () => {
+			await editObjectDetailsPage.goto(objectDefinition.label['en_US']);
+
+			await editObjectDetailsPage.waitForDetailsFormLoaded();
+
+			await editObjectDetailsPage.labelInput.fill(label);
+			await editObjectDetailsPage.pluralLabelInput.fill(pluralLabel);
+			await editObjectDetailsPage.selectEntryTitleField(objectFieldLabel);
+			await editObjectDetailsPage.selectScope('Company');
+			await editObjectDetailsPage.selectPanelLink('Object');
+
+			const {reload} =
+				await editObjectDetailsPage.saveObjectDefinitionReturningReload();
+
+			await waitForAlert(
+				page,
+				'Success:The object was saved successfully.'
+			);
+
+			await reload;
+		});
+
+		await test.step('Verify the saved values', async () => {
+			await editObjectDetailsPage.goto(label);
+
+			await editObjectDetailsPage.waitForDetailsFormLoaded();
+
+			await expect(editObjectDetailsPage.labelInput).toHaveValue(label);
+			await expect(editObjectDetailsPage.pluralLabelInput).toHaveValue(
+				pluralLabel
+			);
+			await expect(
+				editObjectDetailsPage.entryTitleFieldCombobox
+			).toHaveText(objectFieldLabel);
+			await expect(editObjectDetailsPage.scopeCombobox).toHaveText(
+				'Company',
+				{ignoreCase: true}
+			);
+			await expect(editObjectDetailsPage.panelLinkCombobox).toHaveText(
+				'Object',
+				{ignoreCase: true}
+			);
+		});
+	}
+);
