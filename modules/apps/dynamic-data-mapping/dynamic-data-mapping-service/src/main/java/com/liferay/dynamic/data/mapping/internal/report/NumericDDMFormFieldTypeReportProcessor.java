@@ -7,6 +7,7 @@ package com.liferay.dynamic.data.mapping.internal.report;
 
 import com.liferay.dynamic.data.mapping.constants.DDMFormInstanceReportConstants;
 import com.liferay.dynamic.data.mapping.exception.NoSuchFormInstanceRecordVersionException;
+import com.liferay.dynamic.data.mapping.internal.util.DDMFormInstanceRecordThreadLocal;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion;
@@ -213,7 +214,9 @@ public class NumericDDMFormFieldTypeReportProcessor
 			_decrementCount("max", summaryJSONObject, valueBigDecimal);
 			_decrementCount("min", summaryJSONObject, valueBigDecimal);
 
-			if (lastMaxDeleted || lastMinDeleted) {
+			if ((lastMaxDeleted || lastMinDeleted) &&
+				!DDMFormInstanceRecordThreadLocal.isDeleteInProcess()) {
+
 				jsonObject.put("summary", summaryJSONObject);
 
 				DDMFormInstanceRecord ddmFormInstanceRecord =
