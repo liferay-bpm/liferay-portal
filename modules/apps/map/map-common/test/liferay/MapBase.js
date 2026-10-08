@@ -36,6 +36,8 @@ describe('MapBase', () => {
 
 		this.on = jest.fn();
 
+		this.setDraggable = jest.fn();
+
 		this.setPosition = function (location) {
 			this.location = location;
 		};
@@ -98,6 +100,36 @@ describe('MapBase', () => {
 			mapImpl.addMarker(location);
 
 			expect(MapImpl.MarkerImpl.mock.calls[0][0].map).toBe('map');
+		});
+
+		it('passes a draggable marker to the constructor by default', () => {
+			mapImpl._map = 'map';
+
+			mapImpl.addMarker(getLocation());
+
+			expect(MapImpl.MarkerImpl.mock.lastCall[0].draggable).toBe(true);
+		});
+
+		it('passes a fixed marker to the constructor when draggablePin is false', () => {
+			const fixedPinMapImpl = new MapImpl({draggablePin: false});
+
+			fixedPinMapImpl._map = 'map';
+
+			fixedPinMapImpl.addMarker(getLocation());
+
+			expect(MapImpl.MarkerImpl.mock.lastCall[0].draggable).toBe(false);
+		});
+
+		it('updates the existing marker when draggablePin changes', () => {
+			mapImpl._map = 'map';
+
+			mapImpl._geolocationMarker = mapImpl.addMarker(getLocation());
+
+			mapImpl.draggablePin = false;
+
+			expect(
+				mapImpl._geolocationMarker.setDraggable
+			).toHaveBeenCalledWith(false);
 		});
 
 		it('does nothing if MarkerImpl is not implemented', () => {
