@@ -2919,6 +2919,8 @@ public class ObjectActionLocalServiceTest {
 
 		_assertWebhookObjectActionNotExecuted(objectAction.getObjectActionId());
 
+		_objectActionLocalService.deleteObjectAction(objectAction);
+
 		// Disallowed host without local network access
 
 		objectAction = _addObjectAction(
@@ -2948,6 +2950,8 @@ public class ObjectActionLocalServiceTest {
 
 		_assertWebhookObjectActionNotExecuted(objectAction.getObjectActionId());
 
+		_objectActionLocalService.deleteObjectAction(objectAction);
+
 		// Local network address with allowed host
 
 		objectAction = _addObjectAction(
@@ -2961,6 +2965,8 @@ public class ObjectActionLocalServiceTest {
 			).build());
 
 		_assertWebhookObjectActionNotExecuted(objectAction.getObjectActionId());
+
+		_objectActionLocalService.deleteObjectAction(objectAction);
 
 		// Local network address with local network access
 
