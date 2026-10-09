@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -51,6 +52,7 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
@@ -816,62 +818,75 @@ public class ObjectValidationRuleLocalServiceTest {
 
 	@Test
 	public void testGetErrorLabel() throws Exception {
-		ObjectValidationRule objectValidationRule = _addObjectValidationRule(
-			StringPool.BLANK, ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY,
-			HashMapBuilder.put(
-				LocaleUtil.BRAZIL, RandomTestUtil.randomString()
-			).put(
-				LocaleUtil.US, RandomTestUtil.randomString()
-			).build(),
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			"invalidFields = true;");
-
-		User user = UserTestUtil.addUser();
-
-		user = _userLocalService.updateLanguageId(
-			user.getUserId(), LanguageUtil.getLanguageId(LocaleUtil.BRAZIL));
-
-		PermissionThreadLocal.setPermissionChecker(
-			PermissionCheckerFactoryUtil.create(user));
-
-		PrincipalThreadLocal.setName(user.getUserId());
-
-		_objectDefinitionLocalService.publishCustomObjectDefinition(
-			user.getUserId(), _objectDefinition.getObjectDefinitionId());
+		Locale originalThemeDisplayLocale =
+			LocaleThreadLocal.getThemeDisplayLocale();
+		PermissionChecker originalPermissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+		String originalName = PrincipalThreadLocal.getName();
 
 		try {
-			_objectEntryLocalService.addObjectEntry(
-				0, user.getUserId(), _objectDefinition.getObjectDefinitionId(),
-				ObjectEntryFolderConstants.
-					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
-				null,
-				HashMapBuilder.<String, Serializable>put(
-					"textObjectField", RandomTestUtil.randomString()
-				).build(),
-				ServiceContextTestUtil.getServiceContext());
 
-			Assert.fail();
+			// Authenticated user
+
+			ObjectValidationRule objectValidationRule =
+				_addObjectValidationRule(
+					StringPool.BLANK,
+					ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY,
+					HashMapBuilder.put(
+						LocaleUtil.BRAZIL, RandomTestUtil.randomString()
+					).put(
+						LocaleUtil.US, RandomTestUtil.randomString()
+					).build(),
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString()),
+					"invalidFields = true;");
+
+			User user = UserTestUtil.addUser();
+
+			user = _userLocalService.updateLanguageId(
+				user.getUserId(),
+				LanguageUtil.getLanguageId(LocaleUtil.BRAZIL));
+
+			LocaleThreadLocal.setThemeDisplayLocale(user.getLocale());
+
+			PermissionThreadLocal.setPermissionChecker(
+				PermissionCheckerFactoryUtil.create(user));
+
+			PrincipalThreadLocal.setName(user.getUserId());
+
+			_objectDefinitionLocalService.publishCustomObjectDefinition(
+				user.getUserId(), _objectDefinition.getObjectDefinitionId());
+
+			_testGetErrorLabel(
+				LocaleUtil.BRAZIL, objectValidationRule, user.getUserId());
+
+			// Guest user
+
+			User guestUser = _userLocalService.getGuestUser(
+				TestPropsValues.getCompanyId());
+
+			Locale themeDisplayLocale = LocaleUtil.BRAZIL;
+
+			if (Objects.equals(guestUser.getLocale(), themeDisplayLocale)) {
+				themeDisplayLocale = LocaleUtil.US;
+			}
+
+			LocaleThreadLocal.setThemeDisplayLocale(themeDisplayLocale);
+
+			PermissionThreadLocal.setPermissionChecker(
+				PermissionCheckerFactoryUtil.create(guestUser));
+
+			PrincipalThreadLocal.setName(guestUser.getUserId());
+
+			_testGetErrorLabel(
+				themeDisplayLocale, objectValidationRule,
+				guestUser.getUserId());
 		}
-		catch (ModelListenerException modelListenerException) {
-			ObjectValidationRuleEngineException
-				objectValidationRuleEngineException =
-					(ObjectValidationRuleEngineException)
-						modelListenerException.getCause();
-
-			List<ObjectValidationRuleResult> objectValidationRuleResults =
-				objectValidationRuleEngineException.
-					getObjectValidationRuleResults();
-
-			Assert.assertEquals(
-				objectValidationRuleResults.toString(), 1,
-				objectValidationRuleResults.size());
-
-			ObjectValidationRuleResult objectValidationRuleResult =
-				objectValidationRuleResults.get(0);
-
-			Assert.assertEquals(
-				objectValidationRule.getErrorLabel(user.getLanguageId()),
-				objectValidationRuleResult.getErrorMessage());
+		finally {
+			LocaleThreadLocal.setThemeDisplayLocale(originalThemeDisplayLocale);
+			PermissionThreadLocal.setPermissionChecker(
+				originalPermissionChecker);
+			PrincipalThreadLocal.setName(originalName);
 		}
 	}
 
@@ -1281,6 +1296,47 @@ public class ObjectValidationRuleLocalServiceTest {
 		Assert.assertNull(
 			_objectValidationRuleLocalService.fetchObjectValidationRule(
 				objectValidationRuleId));
+	}
+
+	private void _testGetErrorLabel(
+			Locale locale, ObjectValidationRule objectValidationRule,
+			long userId)
+		throws Exception {
+
+		try {
+			_objectEntryLocalService.addObjectEntry(
+				0, userId, _objectDefinition.getObjectDefinitionId(),
+				ObjectEntryFolderConstants.
+					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+				null,
+				HashMapBuilder.<String, Serializable>put(
+					"textObjectField", RandomTestUtil.randomString()
+				).build(),
+				ServiceContextTestUtil.getServiceContext());
+
+			Assert.fail();
+		}
+		catch (ModelListenerException modelListenerException) {
+			ObjectValidationRuleEngineException
+				objectValidationRuleEngineException =
+					(ObjectValidationRuleEngineException)
+						modelListenerException.getCause();
+
+			List<ObjectValidationRuleResult> objectValidationRuleResults =
+				objectValidationRuleEngineException.
+					getObjectValidationRuleResults();
+
+			Assert.assertEquals(
+				objectValidationRuleResults.toString(), 1,
+				objectValidationRuleResults.size());
+
+			ObjectValidationRuleResult objectValidationRuleResult =
+				objectValidationRuleResults.get(0);
+
+			Assert.assertEquals(
+				objectValidationRule.getErrorLabel(locale),
+				objectValidationRuleResult.getErrorMessage());
+		}
 	}
 
 	private static final String _VALID_DDM_SCRIPT =

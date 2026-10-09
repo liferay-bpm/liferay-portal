@@ -643,6 +643,8 @@ public class ObjectValidationRuleLocalServiceImpl
 			_dtoConverterRegistry, objectDefinition, payloadJSONObject,
 			_systemObjectDefinitionManagerRegistry);
 
+		Locale locale = LocaleUtil.getMostRelevantLocale();
+
 		for (ObjectValidationRule objectValidationRule :
 				objectValidationRules) {
 
@@ -697,14 +699,6 @@ public class ObjectValidationRuleLocalServiceImpl
 			else {
 				results = objectValidationRuleEngine.execute(
 					(Map<String, Object>)variables.get("entryDTO"), null);
-			}
-
-			Locale locale = LocaleUtil.getMostRelevantLocale();
-
-			User user = _userLocalService.fetchUser(userId);
-
-			if (user != null) {
-				locale = user.getLocale();
 			}
 
 			String errorMessage = null;
