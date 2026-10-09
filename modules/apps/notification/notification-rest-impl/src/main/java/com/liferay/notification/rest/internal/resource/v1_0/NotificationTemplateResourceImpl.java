@@ -274,18 +274,26 @@ public class NotificationTemplateResourceImpl
 		notificationContext.setCompanyId(contextCompany.getCompanyId());
 		notificationContext.setModelPermissions(
 			_toModelPermissions(notificationTemplate, 0L));
-		notificationContext.setNotificationRecipient(
-			NotificationUtil.toNotificationRecipient(contextUser, 0L));
-		notificationContext.setNotificationTemplate(
-			NotificationUtil.toNotificationTemplate(
-				0L, notificationTemplate, _objectDefinitionLocalService,
-				contextUser));
+
+		NotificationRecipient notificationRecipient =
+			NotificationUtil.toNotificationRecipient(contextUser, 0L);
+
+		notificationContext.setNotificationRecipient(notificationRecipient);
+
+		com.liferay.notification.model.NotificationTemplate
+			serviceBuilderNotificationTemplate =
+				NotificationUtil.toNotificationTemplate(
+					0L, notificationTemplate, _objectDefinitionLocalService,
+					contextUser);
 
 		notificationContext.setNotificationRecipientSettings(
 			_notificationRecipientSettingLocalService.
 				createNotificationRecipientSettings(
-					0L, notificationContext.getNotificationTemplate(),
+					notificationRecipient.getNotificationRecipientId(),
+					serviceBuilderNotificationTemplate,
 					notificationTemplate.getRecipients(), contextUser));
+		notificationContext.setNotificationTemplate(
+			serviceBuilderNotificationTemplate);
 
 		return _toNotificationTemplate(
 			_notificationTemplateService.addNotificationTemplate(
@@ -383,17 +391,20 @@ public class NotificationTemplateResourceImpl
 
 		notificationContext.setNotificationRecipient(notificationRecipient);
 
-		notificationContext.setNotificationTemplate(
-			NotificationUtil.toNotificationTemplate(
-				notificationTemplateId, notificationTemplate,
-				_objectDefinitionLocalService, contextUser));
+		com.liferay.notification.model.NotificationTemplate
+			serviceBuilderNotificationTemplate =
+				NotificationUtil.toNotificationTemplate(
+					notificationTemplateId, notificationTemplate,
+					_objectDefinitionLocalService, contextUser);
 
 		notificationContext.setNotificationRecipientSettings(
 			_notificationRecipientSettingLocalService.
 				createNotificationRecipientSettings(
 					notificationRecipient.getNotificationRecipientId(),
-					notificationContext.getNotificationTemplate(),
+					serviceBuilderNotificationTemplate,
 					notificationTemplate.getRecipients(), contextUser));
+		notificationContext.setNotificationTemplate(
+			serviceBuilderNotificationTemplate);
 
 		return _toNotificationTemplate(
 			_notificationTemplateService.updateNotificationTemplate(
