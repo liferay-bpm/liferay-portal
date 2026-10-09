@@ -9,12 +9,14 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.reports.engine.ByteArrayReportResultContainer;
 import com.liferay.portal.reports.engine.MemoryReportDesignRetriever;
 import com.liferay.portal.reports.engine.ReportDataSourceType;
-import com.liferay.portal.reports.engine.ReportDesignRetriever;
 import com.liferay.portal.reports.engine.ReportEngine;
 import com.liferay.portal.reports.engine.ReportFormat;
+import com.liferay.portal.reports.engine.ReportGenerationException;
 import com.liferay.portal.reports.engine.ReportRequest;
 import com.liferay.portal.reports.engine.ReportRequestContext;
 import com.liferay.portal.reports.engine.ReportResultContainer;
@@ -84,6 +86,12 @@ public class ReportEngineImplTest extends TestCase {
 	}
 
 	@Test
+	public void testExportCsvWithRestrictedClassExpression() throws Exception {
+		_assertExportFailure("java.lang.Runtime.getRuntime().toString()");
+		_assertExportFailure("java.util.UUID.randomUUID().toString()");
+	}
+
+	@Test
 	public void testExportPdf() throws Exception {
 		_export(ReportFormat.PDF);
 	}
@@ -99,7 +107,7 @@ public class ReportEngineImplTest extends TestCase {
 	public void testExportPdfWithJapaneseCharacters() throws Exception {
 		_testExportPdfWithFontExtension(
 			"dependencies/reports_admin_template_japanese_characters.jrxml",
-			"本語の文字");
+			"日本語の文字");
 	}
 
 	@Test
@@ -128,6 +136,14 @@ public class ReportEngineImplTest extends TestCase {
 		_export(ReportFormat.XML);
 	}
 
+	private void _assertExportFailure(String expression) {
+		Assert.assertThrows(
+			ReportGenerationException.class,
+			() -> _export(
+				"CsvDataSource.txt", _getBytes(expression),
+				ReportDataSourceType.CSV, ReportFormat.CSV));
+	}
+
 	private ReportRequest _compile(
 			ReportDataSourceType reportDataSourceType,
 			String dataSourceFileName, String dataSourceReportFileName,
@@ -135,7 +151,7 @@ public class ReportEngineImplTest extends TestCase {
 		throws Exception {
 
 		ReportRequest reportRequest = _getReportRequest(
-			reportDataSourceType, dataSourceFileName, dataSourceReportFileName,
+			dataSourceFileName, dataSourceReportFileName, reportDataSourceType,
 			reportFormat);
 
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
@@ -162,9 +178,38 @@ public class ReportEngineImplTest extends TestCase {
 		Assert.assertNotNull(reportResultContainer.getResults());
 	}
 
-	private ReportRequest _getReportRequest(
+	private ReportResultContainer _export(
+			String dataSourceFileName, byte[] reportByteArray,
 			ReportDataSourceType reportDataSourceType,
-			String dataSourceFileName, String dataSourceReportFileName,
+			ReportFormat reportFormat)
+		throws Exception {
+
+		ReportResultContainer reportResultContainer =
+			new ByteArrayReportResultContainer(null);
+
+		_reportEngine.execute(
+			_getReportRequest(
+				dataSourceFileName, reportByteArray, reportDataSourceType,
+				reportFormat),
+			reportResultContainer);
+
+		return reportResultContainer;
+	}
+
+	private byte[] _getBytes(String expression) {
+		String jrxml = StringUtil.replace(
+			StringUtil.read(
+				getClass(),
+				"dependencies/reports_admin_template_with_expression.jrxml"),
+			new String[] {"[$EXPRESSION$]", "[$NAME$]"},
+			new String[] {expression, RandomTestUtil.randomString()});
+
+		return jrxml.getBytes();
+	}
+
+	private ReportRequest _getReportRequest(
+			String dataSourceFileName, byte[] reportByteArray,
+			ReportDataSourceType reportDataSourceType,
 			ReportFormat reportFormat)
 		throws Exception {
 
@@ -186,25 +231,37 @@ public class ReportEngineImplTest extends TestCase {
 			ReportRequestContext.DATA_SOURCE_COLUMN_NAMES,
 			"city,id,name,address,state");
 
+		return new ReportRequest(
+			reportRequestContext,
+			new MemoryReportDesignRetriever(
+				"test", new Date(), reportByteArray),
+			new HashMap<String, String>(), reportFormat.getValue());
+	}
+
+	private ReportRequest _getReportRequest(
+			String dataSourceFileName, String dataSourceReportFileName,
+			ReportDataSourceType reportDataSourceType,
+			ReportFormat reportFormat)
+		throws Exception {
+
+		Class<?> reportEngineImplTestClass = getClass();
+
 		InputStream dataSourceReportInputStream =
 			reportEngineImplTestClass.getResourceAsStream(
 				dataSourceReportFileName);
 
 		if (dataSourceReportInputStream == null) {
+			ClassLoader classLoader =
+				reportEngineImplTestClass.getClassLoader();
+
 			dataSourceReportInputStream = classLoader.getResourceAsStream(
 				dataSourceReportFileName);
 		}
 
-		byte[] reportByteArray = IOUtils.toByteArray(
-			dataSourceReportInputStream);
-
-		ReportDesignRetriever reportDesignRetriever =
-			new MemoryReportDesignRetriever(
-				"test", new Date(), reportByteArray);
-
-		return new ReportRequest(
-			reportRequestContext, reportDesignRetriever,
-			new HashMap<String, String>(), reportFormat.getValue());
+		return _getReportRequest(
+			dataSourceFileName,
+			IOUtils.toByteArray(dataSourceReportInputStream),
+			reportDataSourceType, reportFormat);
 	}
 
 	private void _testExportPdfWithFontExtension(

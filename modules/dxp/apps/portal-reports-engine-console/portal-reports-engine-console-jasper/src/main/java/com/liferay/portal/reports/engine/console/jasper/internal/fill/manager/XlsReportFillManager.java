@@ -8,7 +8,7 @@ package com.liferay.portal.reports.engine.console.jasper.internal.fill.manager;
 import com.liferay.portal.reports.engine.ReportRequest;
 
 import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.data.XlsDataSource;
+import net.sf.jasperreports.poi.data.ExcelDataSource;
 
 /**
  * @author Gavin Wan
@@ -20,20 +20,20 @@ public class XlsReportFillManager extends BaseReportFillManager {
 	protected JRDataSource getJRDataSource(ReportRequest reportRequest)
 		throws Exception {
 
-		XlsDataSource xlsDataSource = new XlsDataSource(
+		ExcelDataSource excelDataSource = new ExcelDataSource(
 			getDataSourceByteArrayInputStream(reportRequest));
 
 		String[] dataSourceColumnNames = getDataSourceColumnNames(
 			reportRequest);
 
 		if (dataSourceColumnNames != null) {
-			xlsDataSource.setColumnNames(dataSourceColumnNames);
+			excelDataSource.setColumnNames(dataSourceColumnNames);
 		}
 		else {
-			xlsDataSource.setUseFirstRowAsHeader(true);
+			excelDataSource.setUseFirstRowAsHeader(true);
 		}
 
-		return xlsDataSource;
+		return excelDataSource;
 	}
 
 }

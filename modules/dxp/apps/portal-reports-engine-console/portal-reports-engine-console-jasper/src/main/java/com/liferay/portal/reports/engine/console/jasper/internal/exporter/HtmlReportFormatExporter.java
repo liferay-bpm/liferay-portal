@@ -7,8 +7,8 @@ package com.liferay.portal.reports.engine.console.jasper.internal.exporter;
 
 import com.liferay.portal.reports.engine.ReportFormatExporter;
 
-import net.sf.jasperreports.engine.JRExporter;
 import net.sf.jasperreports.engine.export.HtmlExporter;
+import net.sf.jasperreports.export.Exporter;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -20,7 +20,7 @@ import org.osgi.service.component.annotations.Component;
 public class HtmlReportFormatExporter extends BaseReportFormatExporter {
 
 	@Override
-	public JRExporter getJRExporter() {
+	protected Exporter getExporter() {
 		return new HtmlExporter();
 	}
 
