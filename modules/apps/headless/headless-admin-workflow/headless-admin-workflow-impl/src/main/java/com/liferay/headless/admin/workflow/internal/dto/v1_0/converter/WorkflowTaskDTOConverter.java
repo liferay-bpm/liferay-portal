@@ -64,10 +64,16 @@ public class WorkflowTaskDTOConverter
 	public WorkflowTask toDTO(DTOConverterContext dtoConverterContext)
 		throws Exception {
 
-		return _toWorkflowTask(
-			dtoConverterContext,
-			_workflowTaskManager.getWorkflowTask(
-				(Long)dtoConverterContext.getId()));
+		com.liferay.portal.kernel.workflow.WorkflowTask workflowTask =
+			(com.liferay.portal.kernel.workflow.WorkflowTask)
+				dtoConverterContext.getAttribute("workflowTask");
+
+		if (workflowTask == null) {
+			workflowTask = _workflowTaskManager.getWorkflowTask(
+				(Long)dtoConverterContext.getId());
+		}
+
+		return _toWorkflowTask(dtoConverterContext, workflowTask);
 	}
 
 	@Override
