@@ -1952,20 +1952,16 @@ public class BatchEnginePortletDataHandlerTest {
 	public void testExportImportNotificationTemplatesWithMissingRoleAndUserGroup()
 		throws Exception {
 
-		Role organizationRole = RoleTestUtil.addRole(
-			RoleConstants.TYPE_ORGANIZATION);
-		UserGroup userGroup = UserGroupTestUtil.addUserGroup();
-
-		AccountRole accountRole = _accountRoleLocalService.addAccountRole(
-			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
-			AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT,
-			RandomTestUtil.randomString(), null, null);
-
-		Role role = accountRole.getRole();
-
 		String from = RandomTestUtil.randomString() + "@liferay.com";
 		String fromName = RandomTestUtil.randomString();
+
+		Role organizationRole = RoleTestUtil.addRole(
+			RoleConstants.TYPE_ORGANIZATION);
+
 		String roleName = organizationRole.getName();
+
+		UserGroup userGroup = UserGroupTestUtil.addUserGroup();
+
 		String userGroupName = userGroup.getName();
 
 		NotificationTemplate notificationTemplate1 =
@@ -1984,6 +1980,14 @@ public class BatchEnginePortletDataHandlerTest {
 			NotificationRecipientSettingUtil.createNotificationRecipientSetting(
 				NotificationRecipientSettingConstants.NAME_USER_GROUP_NAME,
 				userGroupName));
+
+		AccountRole accountRole = _accountRoleLocalService.addAccountRole(
+			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+			AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT,
+			RandomTestUtil.randomString(), null, null);
+
+		Role role = accountRole.getRole();
+
 		NotificationTemplate notificationTemplate4 = _addNotificationTemplate(
 			NotificationRecipientConstants.TYPE_ROLE,
 			NotificationConstants.TYPE_USER_NOTIFICATION,
@@ -2194,11 +2198,15 @@ public class BatchEnginePortletDataHandlerTest {
 		throws Exception {
 
 		User user1 = UserTestUtil.addUser();
-		User user2 = UserTestUtil.addUser();
-		User user3 = UserTestUtil.addUser();
 
 		_users.add(user1);
+
+		User user2 = UserTestUtil.addUser();
+
 		_users.add(user2);
+
+		User user3 = UserTestUtil.addUser();
+
 		_users.add(user3);
 
 		NotificationTemplate notificationTemplate1 = _addNotificationTemplate(
@@ -2213,6 +2221,7 @@ public class BatchEnginePortletDataHandlerTest {
 			NotificationRecipientSettingUtil.createNotificationRecipientSetting(
 				NotificationRecipientSettingConstants.NAME_USER_SCREEN_NAME,
 				user3.getScreenName()));
+
 		NotificationTemplate notificationTemplate2 = _addNotificationTemplate(
 			NotificationRecipientConstants.TYPE_USER,
 			NotificationConstants.TYPE_USER_NOTIFICATION,
@@ -2442,15 +2451,10 @@ public class BatchEnginePortletDataHandlerTest {
 	public void testExportImportNotificationTemplatesWithRecipients()
 		throws Exception {
 
-		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
-		UserGroup userGroup = UserGroupTestUtil.addUserGroup();
-
-		User user = UserTestUtil.addUser();
-
-		_users.add(user);
-
 		String from = RandomTestUtil.randomString() + "@liferay.com";
 		String fromName = RandomTestUtil.randomString();
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+		UserGroup userGroup = UserGroupTestUtil.addUserGroup();
 
 		NotificationTemplate notificationTemplate1 =
 			_addEmailNotificationTemplate(
@@ -2468,6 +2472,11 @@ public class BatchEnginePortletDataHandlerTest {
 			NotificationRecipientSettingUtil.createNotificationRecipientSetting(
 				NotificationRecipientSettingConstants.NAME_USER_GROUP_NAME,
 				userGroup.getName()));
+
+		User user = UserTestUtil.addUser();
+
+		_users.add(user);
+
 		NotificationTemplate notificationTemplate4 = _addNotificationTemplate(
 			NotificationRecipientConstants.TYPE_USER,
 			NotificationConstants.TYPE_USER_NOTIFICATION,
