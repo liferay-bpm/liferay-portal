@@ -88,15 +88,13 @@ public class WorkflowTaskResourceImpl extends BaseWorkflowTaskResourceImpl {
 			_getActions(),
 			transform(
 				_workflowTaskManager.getWorkflowTasksByWorkflowInstance(
-					contextCompany.getCompanyId(), assigneeId,
-					workflowInstanceId, completed,
+					assigneeId, workflowInstanceId, completed,
 					pagination.getStartPosition(), pagination.getEndPosition(),
 					null),
-				this::_toWorkflowTask),
+				workflowTask -> _toWorkflowTask(true, workflowTask)),
 			pagination,
 			_workflowTaskManager.getWorkflowTaskCountByWorkflowInstance(
-				contextCompany.getCompanyId(), assigneeId, workflowInstanceId,
-				completed));
+				assigneeId, workflowInstanceId, completed));
 	}
 
 	@Override
@@ -108,14 +106,13 @@ public class WorkflowTaskResourceImpl extends BaseWorkflowTaskResourceImpl {
 			_getActions(),
 			transform(
 				_workflowTaskManager.getWorkflowTasksByWorkflowInstance(
-					contextCompany.getCompanyId(), null, workflowInstanceId,
-					completed, pagination.getStartPosition(),
-					pagination.getEndPosition(), null),
-				this::_toWorkflowTask),
+					null, workflowInstanceId, completed,
+					pagination.getStartPosition(), pagination.getEndPosition(),
+					null),
+				workflowTask -> _toWorkflowTask(true, workflowTask)),
 			pagination,
 			_workflowTaskManager.getWorkflowTaskCountByWorkflowInstance(
-				contextCompany.getCompanyId(), null, workflowInstanceId,
-				completed));
+				null, workflowInstanceId, completed));
 	}
 
 	@Override
@@ -187,13 +184,11 @@ public class WorkflowTaskResourceImpl extends BaseWorkflowTaskResourceImpl {
 			_getActions(),
 			transform(
 				_workflowTaskManager.getWorkflowTasksByRole(
-					contextCompany.getCompanyId(), roleId, null,
-					pagination.getStartPosition(), pagination.getEndPosition(),
-					null),
-				this::_toWorkflowTask),
+					roleId, null, pagination.getStartPosition(),
+					pagination.getEndPosition(), null),
+				workflowTask -> _toWorkflowTask(true, workflowTask)),
 			pagination,
-			_workflowTaskManager.getWorkflowTaskCountByRole(
-				contextCompany.getCompanyId(), roleId, null));
+			_workflowTaskManager.getWorkflowTaskCountByRole(roleId, null));
 	}
 
 	@Override
@@ -205,13 +200,11 @@ public class WorkflowTaskResourceImpl extends BaseWorkflowTaskResourceImpl {
 			_getActions(),
 			transform(
 				_workflowTaskManager.getWorkflowTasksByUser(
-					contextCompany.getCompanyId(), assigneeId, null,
-					pagination.getStartPosition(), pagination.getEndPosition(),
-					null),
-				this::_toWorkflowTask),
+					assigneeId, null, pagination.getStartPosition(),
+					pagination.getEndPosition(), null),
+				workflowTask -> _toWorkflowTask(true, workflowTask)),
 			pagination,
-			_workflowTaskManager.getWorkflowTaskCountByUser(
-				contextCompany.getCompanyId(), assigneeId, null));
+			_workflowTaskManager.getWorkflowTaskCountByUser(assigneeId, null));
 	}
 
 	@Override
@@ -223,13 +216,12 @@ public class WorkflowTaskResourceImpl extends BaseWorkflowTaskResourceImpl {
 			_getActions(),
 			transform(
 				_workflowTaskManager.getWorkflowTasksByUserRoles(
-					contextCompany.getCompanyId(), assigneeId, null,
-					pagination.getStartPosition(), pagination.getEndPosition(),
-					null),
-				this::_toWorkflowTask),
+					assigneeId, null, pagination.getStartPosition(),
+					pagination.getEndPosition(), null),
+				workflowTask -> _toWorkflowTask(true, workflowTask)),
 			pagination,
 			_workflowTaskManager.getWorkflowTaskCountByUserRoles(
-				contextCompany.getCompanyId(), assigneeId, null));
+				assigneeId, null));
 	}
 
 	@Override
@@ -241,13 +233,12 @@ public class WorkflowTaskResourceImpl extends BaseWorkflowTaskResourceImpl {
 			_getActions(),
 			transform(
 				_workflowTaskManager.getWorkflowTasksBySubmittingUser(
-					contextCompany.getCompanyId(), creatorId, null,
-					pagination.getStartPosition(), pagination.getEndPosition(),
-					null),
-				this::_toWorkflowTask),
+					creatorId, null, pagination.getStartPosition(),
+					pagination.getEndPosition(), null),
+				workflowTask -> _toWorkflowTask(true, workflowTask)),
 			pagination,
 			_workflowTaskManager.getWorkflowTaskCountBySubmittingUser(
-				contextCompany.getCompanyId(), creatorId, null));
+				creatorId, null));
 	}
 
 	@Override
@@ -519,19 +510,7 @@ public class WorkflowTaskResourceImpl extends BaseWorkflowTaskResourceImpl {
 	}
 
 	private WorkflowTask _toWorkflowTask(
-			Map<String, Map<String, String>> actions,
-			com.liferay.portal.kernel.workflow.WorkflowTask workflowTask)
-		throws Exception {
-
-		return _workflowTaskDTOConverter.toDTO(
-			new DefaultDTOConverterContext(
-				contextAcceptLanguage.isAcceptAllLanguages(), actions, null,
-				contextHttpServletRequest, workflowTask.getWorkflowTaskId(),
-				contextAcceptLanguage.getPreferredLocale(), contextUriInfo,
-				contextUser));
-	}
-
-	private WorkflowTask _toWorkflowTask(
+			boolean checkedWorkflowTask,
 			com.liferay.portal.kernel.workflow.WorkflowTask workflowTask)
 		throws Exception {
 
@@ -581,7 +560,7 @@ public class WorkflowTaskResourceImpl extends BaseWorkflowTaskResourceImpl {
 			!Objects.equals(
 				assignedUser.getUserId(), contextUser.getUserId())) {
 
-			return _toWorkflowTask(actions, workflowTask);
+			return _toWorkflowTask(actions, checkedWorkflowTask, workflowTask);
 		}
 
 		for (WorkflowTransition workflowTransition :
@@ -604,7 +583,34 @@ public class WorkflowTaskResourceImpl extends BaseWorkflowTaskResourceImpl {
 				).build());
 		}
 
-		return _toWorkflowTask(actions, workflowTask);
+		return _toWorkflowTask(actions, checkedWorkflowTask, workflowTask);
+	}
+
+	private WorkflowTask _toWorkflowTask(
+			Map<String, Map<String, String>> actions,
+			boolean checkedWorkflowTask,
+			com.liferay.portal.kernel.workflow.WorkflowTask workflowTask)
+		throws Exception {
+
+		DefaultDTOConverterContext dtoConverterContext =
+			new DefaultDTOConverterContext(
+				contextAcceptLanguage.isAcceptAllLanguages(), actions, null,
+				contextHttpServletRequest, workflowTask.getWorkflowTaskId(),
+				contextAcceptLanguage.getPreferredLocale(), contextUriInfo,
+				contextUser);
+
+		if (checkedWorkflowTask) {
+			dtoConverterContext.setAttribute("workflowTask", workflowTask);
+		}
+
+		return _workflowTaskDTOConverter.toDTO(dtoConverterContext);
+	}
+
+	private WorkflowTask _toWorkflowTask(
+			com.liferay.portal.kernel.workflow.WorkflowTask workflowTask)
+		throws Exception {
+
+		return _toWorkflowTask(false, workflowTask);
 	}
 
 	@Reference(
