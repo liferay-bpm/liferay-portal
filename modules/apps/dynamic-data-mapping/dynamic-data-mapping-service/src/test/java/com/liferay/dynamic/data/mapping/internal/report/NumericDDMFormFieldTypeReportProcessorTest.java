@@ -9,16 +9,22 @@ import com.liferay.dynamic.data.mapping.constants.DDMFormInstanceReportConstants
 import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.module.service.Snapshot;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -57,6 +63,20 @@ public class NumericDDMFormFieldTypeReportProcessorTest {
 
 		_numericDDMFormFieldTypeReportProcessor.jsonFactory =
 			new JSONFactoryImpl();
+
+		ReflectionTestUtil.setFieldValue(
+			DDMFormInstanceRecordVersionLocalServiceUtil.class,
+			"_serviceSnapshot",
+			new Snapshot<DDMFormInstanceRecordVersionLocalService>(
+				DDMFormInstanceRecordVersionLocalServiceUtil.class,
+				DDMFormInstanceRecordVersionLocalService.class) {
+
+				@Override
+				public DDMFormInstanceRecordVersionLocalService get() {
+					return _ddmFormInstanceRecordVersionLocalService;
+				}
+
+			});
 	}
 
 	@Test
@@ -79,12 +99,48 @@ public class NumericDDMFormFieldTypeReportProcessorTest {
 	public void testGetValueBigDecimal() {
 		Assert.assertEquals(
 			new BigDecimal("3.5"),
-			_numericDDMFormFieldTypeReportProcessor.getValueBigDecimal(
+			NumericDDMFormFieldTypeReportProcessor.getValueBigDecimal(
 				_mockDDMFormFieldValue(LocaleUtil.BRAZIL, "field1", "3,5")));
 		Assert.assertEquals(
 			new BigDecimal("4.5"),
-			_numericDDMFormFieldTypeReportProcessor.getValueBigDecimal(
+			NumericDDMFormFieldTypeReportProcessor.getValueBigDecimal(
 				_mockDDMFormFieldValue(LocaleUtil.US, "field1", "4.5")));
+	}
+
+	@Test
+	public void testProcessDDMFormInstanceReportOnAddEventWhenValueIsMax()
+		throws Exception {
+
+		JSONObject processedFieldJSONObject =
+			_numericDDMFormFieldTypeReportProcessor.process(
+				_mockDDMFormFieldValue(LocaleUtil.US, "field1", "5"),
+				JSONUtil.put(
+					"summary",
+					JSONUtil.put(
+						"max", "5"
+					).put(
+						"maxCount", 1
+					).put(
+						"min", "1"
+					).put(
+						"minCount", 1
+					).put(
+						"sum", "6"
+					)
+				).put(
+					"totalEntries", RandomTestUtil.randomInt()
+				),
+				RandomTestUtil.randomLong(),
+				DDMFormInstanceReportConstants.EVENT_ADD_RECORD_VERSION);
+
+		JSONObject summaryJSONObject = processedFieldJSONObject.getJSONObject(
+			"summary");
+
+		Assert.assertEquals("5", summaryJSONObject.getString("max"));
+		Assert.assertEquals(2, summaryJSONObject.getInt("maxCount"));
+		Assert.assertEquals("1", summaryJSONObject.getString("min"));
+		Assert.assertEquals(1, summaryJSONObject.getInt("minCount"));
+		Assert.assertEquals("11", summaryJSONObject.getString("sum"));
 	}
 
 	@Test
@@ -113,12 +169,6 @@ public class NumericDDMFormFieldTypeReportProcessorTest {
 			ddmFormInstanceRecords.add(
 				_createDDMFormInstanceRecord(String.valueOf(i)));
 		}
-
-		Mockito.when(
-			ddmFormInstance.getFormInstanceRecords()
-		).thenReturn(
-			ddmFormInstanceRecords
-		);
 
 		Mockito.when(
 			ddmFormInstanceRecord.getFormInstance()
@@ -193,6 +243,151 @@ public class NumericDDMFormFieldTypeReportProcessorTest {
 		Assert.assertEquals("5", summaryJSONObject.getString("max"));
 		Assert.assertEquals("1", summaryJSONObject.getString("min"));
 		Assert.assertEquals("12", summaryJSONObject.getString("sum"));
+
+		Mockito.verify(
+			ddmFormInstance, Mockito.never()
+		).getFormInstanceRecords();
+	}
+
+	@Test
+	public void testProcessDDMFormInstanceReportOnDeleteEventWhenValueIsMax()
+		throws Exception {
+
+		long formInstanceRecordId = RandomTestUtil.randomLong();
+
+		DDMFormInstanceRecord ddmFormInstanceRecord =
+			_mockDDMFormInstanceRecord(formInstanceRecordId);
+
+		DDMFormInstance ddmFormInstance = Mockito.mock(DDMFormInstance.class);
+
+		List<DDMFormInstanceRecord> ddmFormInstanceRecords = new ArrayList<>();
+
+		for (int i = _VALUES_MAX_LENGTH - 1; i > 0; i--) {
+			ddmFormInstanceRecords.add(
+				_createDDMFormInstanceRecord(String.valueOf(i)));
+		}
+
+		Mockito.when(
+			ddmFormInstance.getFormInstanceRecords()
+		).thenReturn(
+			ddmFormInstanceRecords
+		);
+
+		Mockito.when(
+			ddmFormInstanceRecord.getFormInstance()
+		).thenReturn(
+			ddmFormInstance
+		);
+
+		JSONObject processedFieldJSONObject =
+			_numericDDMFormFieldTypeReportProcessor.process(
+				_mockDDMFormFieldValue(LocaleUtil.US, "field1", "5"),
+				JSONUtil.put(
+					"summary",
+					JSONUtil.put(
+						"max", "5"
+					).put(
+						"min", String.valueOf(RandomTestUtil.randomInt())
+					).put(
+						"sum", "15"
+					)
+				).put(
+					"totalEntries", RandomTestUtil.randomInt()
+				),
+				formInstanceRecordId,
+				DDMFormInstanceReportConstants.EVENT_DELETE_RECORD_VERSION);
+
+		JSONObject summaryJSONObject = processedFieldJSONObject.getJSONObject(
+			"summary");
+
+		Assert.assertEquals("4", summaryJSONObject.getString("max"));
+		Assert.assertEquals(1, summaryJSONObject.getInt("maxCount"));
+		Assert.assertEquals("1", summaryJSONObject.getString("min"));
+		Assert.assertEquals(1, summaryJSONObject.getInt("minCount"));
+		Assert.assertEquals("10", summaryJSONObject.getString("sum"));
+	}
+
+	@Test
+	public void testProcessDDMFormInstanceReportOnDeleteEventWhenValueIsRepeatedMax()
+		throws Exception {
+
+		JSONObject processedFieldJSONObject =
+			_numericDDMFormFieldTypeReportProcessor.process(
+				_mockDDMFormFieldValue(LocaleUtil.US, "field1", "5"),
+				JSONUtil.put(
+					"summary",
+					JSONUtil.put(
+						"max", "5"
+					).put(
+						"maxCount", 2
+					).put(
+						"min", "1"
+					).put(
+						"minCount", 1
+					).put(
+						"sum", "11"
+					)
+				).put(
+					"totalEntries", RandomTestUtil.randomInt()
+				),
+				RandomTestUtil.randomLong(),
+				DDMFormInstanceReportConstants.EVENT_DELETE_RECORD_VERSION);
+
+		JSONObject summaryJSONObject = processedFieldJSONObject.getJSONObject(
+			"summary");
+
+		Assert.assertEquals("5", summaryJSONObject.getString("max"));
+		Assert.assertEquals(1, summaryJSONObject.getInt("maxCount"));
+		Assert.assertEquals("1", summaryJSONObject.getString("min"));
+		Assert.assertEquals(1, summaryJSONObject.getInt("minCount"));
+		Assert.assertEquals("6", summaryJSONObject.getString("sum"));
+
+		Mockito.verifyNoInteractions(_ddmFormInstanceRecordLocalService);
+	}
+
+	@Test
+	public void testProcessDDMFormInstanceReportOnDeleteEventWithoutSummary()
+		throws Exception {
+
+		long formInstanceRecordId = RandomTestUtil.randomLong();
+
+		DDMFormInstanceRecord ddmFormInstanceRecord =
+			_mockDDMFormInstanceRecord(formInstanceRecordId);
+
+		DDMFormInstance ddmFormInstance = Mockito.mock(DDMFormInstance.class);
+
+		List<DDMFormInstanceRecord> ddmFormInstanceRecords = Arrays.asList(
+			_createDDMFormInstanceRecord("2"),
+			_createDDMFormInstanceRecord("4"));
+
+		Mockito.when(
+			ddmFormInstance.getFormInstanceRecords()
+		).thenReturn(
+			ddmFormInstanceRecords
+		);
+
+		Mockito.when(
+			ddmFormInstanceRecord.getFormInstance()
+		).thenReturn(
+			ddmFormInstance
+		);
+
+		JSONObject processedFieldJSONObject =
+			_numericDDMFormFieldTypeReportProcessor.process(
+				_mockDDMFormFieldValue(
+					LocaleUtil.US, "field1",
+					String.valueOf(RandomTestUtil.randomInt())),
+				JSONUtil.put("totalEntries", RandomTestUtil.randomInt()),
+				formInstanceRecordId,
+				DDMFormInstanceReportConstants.EVENT_DELETE_RECORD_VERSION);
+
+		JSONObject summaryJSONObject = processedFieldJSONObject.getJSONObject(
+			"summary");
+
+		Assert.assertEquals("4", summaryJSONObject.getString("max"));
+		Assert.assertEquals(1, summaryJSONObject.getInt("maxCount"));
+		Assert.assertEquals("2", summaryJSONObject.getString("min"));
+		Assert.assertEquals(1, summaryJSONObject.getInt("minCount"));
 	}
 
 	@Test
@@ -342,6 +537,9 @@ public class NumericDDMFormFieldTypeReportProcessorTest {
 		DDMFormInstanceRecord ddmFormInstanceRecord = Mockito.mock(
 			DDMFormInstanceRecord.class);
 
+		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion =
+			Mockito.mock(DDMFormInstanceRecordVersion.class);
+
 		DDMFormFieldValue ddmFormFieldValue = _mockDDMFormFieldValue(
 			LocaleUtil.US, "", valueString);
 
@@ -359,6 +557,28 @@ public class NumericDDMFormFieldTypeReportProcessorTest {
 			ddmFormInstanceRecord.getDDMFormValues()
 		).thenReturn(
 			ddmFormValues
+		);
+
+		Mockito.when(
+			ddmFormInstanceRecordVersion.getDDMFormValues()
+		).thenReturn(
+			ddmFormValues
+		);
+
+		long formInstanceRecordId = RandomTestUtil.randomLong();
+
+		Mockito.when(
+			ddmFormInstanceRecord.getFormInstanceRecordId()
+		).thenReturn(
+			formInstanceRecordId
+		);
+
+		Mockito.when(
+			_ddmFormInstanceRecordVersionLocalService.
+				getLatestFormInstanceRecordVersion(
+					formInstanceRecordId, WorkflowConstants.STATUS_APPROVED)
+		).thenReturn(
+			ddmFormInstanceRecordVersion
 		);
 
 		return ddmFormInstanceRecord;
@@ -423,6 +643,9 @@ public class NumericDDMFormFieldTypeReportProcessorTest {
 	private final DDMFormInstanceRecordLocalService
 		_ddmFormInstanceRecordLocalService = Mockito.mock(
 			DDMFormInstanceRecordLocalService.class);
+	private final DDMFormInstanceRecordVersionLocalService
+		_ddmFormInstanceRecordVersionLocalService = Mockito.mock(
+			DDMFormInstanceRecordVersionLocalService.class);
 	private final NumericDDMFormFieldTypeReportProcessor
 		_numericDDMFormFieldTypeReportProcessor =
 			new NumericDDMFormFieldTypeReportProcessor();
