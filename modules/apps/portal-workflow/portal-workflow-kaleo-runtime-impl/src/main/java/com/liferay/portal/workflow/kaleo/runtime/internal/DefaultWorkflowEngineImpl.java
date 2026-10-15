@@ -69,6 +69,7 @@ import com.liferay.portal.workflow.kaleo.runtime.util.WorkflowContextUtil;
 import com.liferay.portal.workflow.kaleo.runtime.util.comparator.KaleoInstanceOrderByComparator;
 import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionService;
 import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionVersionService;
+import com.liferay.portal.workflow.kaleo.service.KaleoInstanceLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoInstanceService;
 import com.liferay.portal.workflow.kaleo.service.KaleoLogLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskInstanceTokenLocalService;
@@ -476,6 +477,29 @@ public class DefaultWorkflowEngineImpl
 						orderByComparator, _kaleoWorkflowModelConverter,
 						serviceContext),
 					serviceContext));
+		}
+		catch (WorkflowException workflowException) {
+			throw workflowException;
+		}
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
+		}
+	}
+
+	@Override
+	public WorkflowInstance liberalStartWorkflowInstance(
+			String workflowDefinitionName, Integer workflowDefinitionVersion,
+			String transitionName, Map<String, Serializable> workflowContext,
+			ServiceContext serviceContext, boolean waitForCompletion)
+		throws WorkflowException {
+
+		try {
+			return _kaleoWorkflowModelConverter.toWorkflowInstance(
+				_kaleoInstanceLocalService.addKaleoInstance(
+					workflowDefinitionName, workflowDefinitionVersion,
+					transitionName, workflowContext, serviceContext,
+					waitForCompletion),
+				workflowContext);
 		}
 		catch (WorkflowException workflowException) {
 			throw workflowException;
@@ -1032,6 +1056,9 @@ public class DefaultWorkflowEngineImpl
 
 	@Reference
 	private KaleoDefinitionVersionService _kaleoDefinitionVersionService;
+
+	@Reference
+	private KaleoInstanceLocalService _kaleoInstanceLocalService;
 
 	@Reference
 	private KaleoInstanceService _kaleoInstanceService;
