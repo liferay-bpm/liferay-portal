@@ -14,6 +14,8 @@ import ErrorFeedback from '../../../common/components/forms/ErrorFeedback';
 import RequiredMark from '../../../common/components/forms/RequiredMark';
 import {LogoColor} from '../../../common/types/Space';
 
+export const ALL_SCOPES_ID = -1;
+
 export type ScopeItem = {
 	displayType?: LogoColor;
 	label: string;
@@ -29,24 +31,32 @@ type ScopeLabels = {
 };
 
 export default function ScopeMultiSelect<T extends ScopeItem>({
+	defaultAllScopesChecked = true,
 	disabled = false,
 	labels,
+	onAllScopesChange,
 	onChange,
 	onError,
 	onSelectionChange,
 	preselectedItems,
+	required = true,
 	sourceItems,
 }: {
+	defaultAllScopesChecked?: boolean;
 	disabled?: boolean;
 	labels: ScopeLabels;
+	onAllScopesChange?: (value: boolean) => void;
 	onChange?: (value: boolean) => void;
 	onError: (value: string) => void;
 	onSelectionChange: (value: any) => void;
 	preselectedItems?: T[];
+	required?: boolean;
 	sourceItems: T[];
 }) {
 	const [active, setActive] = useState(false);
-	const [allScopesChecked, setAllScopesChecked] = useState(true);
+	const [allScopesChecked, setAllScopesChecked] = useState(
+		defaultAllScopesChecked
+	);
 	const [query, setQuery] = useState('');
 	const [touched, setTouched] = useState(false);
 	const [selectedItems, setSelectedItems] = useState<T[]>([]);
@@ -59,9 +69,15 @@ export default function ScopeMultiSelect<T extends ScopeItem>({
 		: undefined;
 
 	useEffect(() => {
-		setAllScopesChecked(!preselectedItems?.length);
+		setAllScopesChecked(
+			defaultAllScopesChecked && !preselectedItems?.length
+		);
 		setSelectedItems(preselectedItems ?? []);
-	}, [preselectedItems]);
+	}, [defaultAllScopesChecked, preselectedItems]);
+
+	useEffect(() => {
+		onAllScopesChange?.(allScopesChecked);
+	}, [allScopesChecked, onAllScopesChange]);
 
 	useEffect(() => {
 		if (!onChange) {
@@ -81,7 +97,7 @@ export default function ScopeMultiSelect<T extends ScopeItem>({
 	}, [allScopesChecked, onChange, preselectedItems, selectedItems]);
 
 	const errorMessage =
-		allScopesChecked || selectedItems.length
+		!required || allScopesChecked || selectedItems.length
 			? ''
 			: sub(
 					Liferay.Language.get('the-x-field-is-required'),
@@ -104,7 +120,7 @@ export default function ScopeMultiSelect<T extends ScopeItem>({
 			<label htmlFor={inputId}>
 				{labels.field}
 
-				<RequiredMark />
+				{required && <RequiredMark />}
 			</label>
 
 			<div className={showError ? 'has-error' : ''}>

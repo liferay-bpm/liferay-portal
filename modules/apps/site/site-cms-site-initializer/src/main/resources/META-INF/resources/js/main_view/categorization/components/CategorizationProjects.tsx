@@ -8,19 +8,28 @@ import React, {useEffect, useMemo, useState} from 'react';
 import ApiHelper from '../../../common/services/ApiHelper';
 import ProjectLinkService from '../../../common/services/ProjectLinkService';
 import {Space as Project} from '../../../common/types/Space';
-import ScopeMultiSelect, {ScopeItem as ProjectItem} from './ScopeMultiSelect';
+import ScopeMultiSelect, {
+	ALL_SCOPES_ID,
+	ScopeItem as ProjectItem,
+} from './ScopeMultiSelect';
 
 export default function CategorizationProjects({
 	checkboxText,
+	defaultAllScopesChecked = true,
 	disabled = false,
 	projects,
+	required = true,
+	setAllProjectsSelected,
 	setProjectChange,
 	setProjectInputError,
 	setSelectedProjects,
 }: {
 	checkboxText: string;
+	defaultAllScopesChecked?: boolean;
 	disabled?: boolean;
 	projects?: AssetLibraryType[];
+	required?: boolean;
+	setAllProjectsSelected?: (value: boolean) => void;
 	setProjectChange?: (value: boolean) => void;
 	setProjectInputError: (value: string) => void;
 	setSelectedProjects: (value: string[]) => void;
@@ -60,7 +69,7 @@ export default function CategorizationProjects({
 	}, []);
 
 	const preselectedItems = useMemo(() => {
-		if (projects?.some((project) => project.id === -1)) {
+		if (projects?.some((project) => project.id === ALL_SCOPES_ID)) {
 			return [];
 		}
 
@@ -71,6 +80,7 @@ export default function CategorizationProjects({
 
 	return (
 		<ScopeMultiSelect<ProjectItem>
+			defaultAllScopesChecked={defaultAllScopesChecked}
 			disabled={disabled}
 			labels={{
 				allItemsValue: Liferay.Language.get('all-projects'),
@@ -85,10 +95,12 @@ export default function CategorizationProjects({
 							),
 				field: Liferay.Language.get('project'),
 			}}
+			onAllScopesChange={setAllProjectsSelected}
 			onChange={setProjectChange}
 			onError={setProjectInputError}
 			onSelectionChange={setSelectedProjects}
 			preselectedItems={preselectedItems}
+			required={required}
 			sourceItems={sourceItems}
 		/>
 	);

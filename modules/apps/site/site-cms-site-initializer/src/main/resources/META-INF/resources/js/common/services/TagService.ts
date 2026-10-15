@@ -12,14 +12,22 @@ async function createTag({
 	assetLibraryId,
 	cmsGroupId,
 	name,
+	projectGroupId,
 }: {
 	assetLibraryId: number | string | null | undefined;
 	cmsGroupId: number | string;
 	name: string;
+	projectGroupId?: number | string | null;
 }) {
 	let requestBody;
 
-	if (assetLibraryId === null || assetLibraryId === undefined) {
+	if (projectGroupId) {
+		requestBody = {
+			name,
+			projects: [{id: projectGroupId}],
+		};
+	}
+	else if (assetLibraryId === null || assetLibraryId === undefined) {
 		requestBody = {name};
 	}
 	else {
@@ -42,6 +50,13 @@ async function createTag({
 	const tag = data?.items.find((item) => item.name === name);
 
 	if (tag) {
+		if (projectGroupId) {
+			return ApiHelper.patch<Tag>(
+				{...requestBody, assetLibraries: tag.assetLibraries},
+				url
+			);
+		}
+
 		if (assetLibraryId) {
 			return ApiHelper.patch<Tag>(requestBody, url);
 		}

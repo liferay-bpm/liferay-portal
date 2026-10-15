@@ -39,7 +39,7 @@ export default function ViewTags({
 	vocabulariesURL: string;
 }) {
 	const NAME_TABLE_CELL_RENDERER_NAME = 'NameTableCellRenderer';
-	const VIEWS_SPACE_TABLE_CELL_RENDERER_NAME = 'ViewsSpaceTableCellRenderer';
+	const VIEWS_SCOPE_TABLE_CELL_RENDERER_NAME = 'ViewsScopeTableCellRenderer';
 
 	const creationMenu = {
 		primaryItems: [
@@ -54,6 +54,7 @@ export default function ViewTags({
 						}) =>
 							CreateTagsModal({
 								closeModal,
+								cmpEnabled,
 								cmsGroupId,
 								dataSetId,
 								invalidTagCharacters,
@@ -72,10 +73,24 @@ export default function ViewTags({
 			id: 'groupIds',
 			itemKey: 'siteId',
 			itemLabel: 'name',
-			label: 'Space',
+			label: Liferay.Language.get('space'),
 			multiple: true,
 			type: 'selection',
 		},
+		...(cmpEnabled && Liferay.FeatureFlags['LPD-99403']
+			? [
+					{
+						apiURL: "/o/search/v1.0/search?emptySearch=true&nestedFields=embedded&filter=objectDefinitionExternalReferenceCode eq 'l_cmp_project' and status in (0, 1)",
+						entityFieldType: 'string',
+						id: 'projects',
+						itemKey: 'embedded.scopeId',
+						itemLabel: 'embedded.title',
+						label: Liferay.Language.get('project'),
+						multiple: true,
+						type: 'selection',
+					},
+				]
+			: []),
 	];
 
 	const views = [
@@ -93,9 +108,9 @@ export default function ViewTags({
 						sortable: true,
 					},
 					{
-						contentRenderer: VIEWS_SPACE_TABLE_CELL_RENDERER_NAME,
+						contentRenderer: VIEWS_SCOPE_TABLE_CELL_RENDERER_NAME,
 						fieldName: 'assetLibraries',
-						label: Liferay.Language.get('space'),
+						label: Liferay.Language.get('scope'),
 						sortable: false,
 					},
 					{
@@ -175,8 +190,10 @@ export default function ViewTags({
 				EditTagsModal({
 					assetLibraries: itemData.assetLibraries,
 					closeModal,
+					cmpEnabled,
 					editTagURL: itemData.actions.replace.href,
 					loadData,
+					projects: itemData.projects,
 					tagId: itemData.id,
 					tagName: itemData.name,
 				}),
@@ -273,7 +290,7 @@ export default function ViewTags({
 						{
 							component: (props: any) =>
 								MultipleScopesRenderer({...props, cmpEnabled}),
-							name: VIEWS_SPACE_TABLE_CELL_RENDERER_NAME,
+							name: VIEWS_SCOPE_TABLE_CELL_RENDERER_NAME,
 							type: 'internal',
 						},
 					],

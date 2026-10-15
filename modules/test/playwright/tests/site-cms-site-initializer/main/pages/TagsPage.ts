@@ -14,14 +14,21 @@ export class TagsPage {
 	readonly page: Page;
 	readonly dataSetFragmentPage: DataSetPage;
 	readonly newTagButton: Locator;
+	readonly projectCheckbox: Locator;
+	readonly projectSelector: Locator;
 	readonly saveAndAddAnotherButton: Locator;
 	readonly saveButton: Locator;
 	readonly spaceCheckbox: Locator;
+	readonly spaceSelector: Locator;
 
 	constructor(page: Page) {
 		this.page = page;
 		this.dataSetFragmentPage = new DataSetPage(page);
 		this.newTagButton = this.page.getByRole('button', {name: 'New'});
+		this.projectCheckbox = this.page.getByRole('checkbox', {
+			name: 'Make this tag available in all projects',
+		});
+		this.projectSelector = this.page.getByLabel('Project Selector');
 		this.saveAndAddAnotherButton = this.page.getByText(
 			'Save and Add Another'
 		);
@@ -29,6 +36,7 @@ export class TagsPage {
 		this.spaceCheckbox = page.getByLabel(
 			'Make this tag available in all spaces, including those yet to be created.'
 		);
+		this.spaceSelector = this.page.getByLabel('Space Selector');
 	}
 
 	async goto() {
@@ -70,6 +78,14 @@ export class TagsPage {
 		return tagName;
 	}
 
+	async clearProjects() {
+		if (!(await this.projectCheckbox.isChecked())) {
+			await this.projectCheckbox.click();
+		}
+
+		await expect(this.projectCheckbox).toBeChecked();
+	}
+
 	async deleteTag(name: string) {
 		await this.execItemAction({
 			action: 'Delete',
@@ -92,6 +108,52 @@ export class TagsPage {
 		});
 
 		await expect(this.getItem(name)).not.toBeVisible();
+	}
+
+	async selectProject(projectName: string) {
+		const option = this.page
+			.getByRole('option')
+			.filter({hasText: projectName});
+
+		// Loading the projects resets the checkbox, so unchecking before the
+		// list arrives is undone. Retry the whole sequence until an option
+		// survives the load.
+
+		await expect(async () => {
+			if (await this.projectCheckbox.isChecked({timeout: 1000})) {
+				await this.projectCheckbox.click({timeout: 1000});
+			}
+
+			await expect(this.projectSelector).toBeEnabled({timeout: 1000});
+
+			await this.projectSelector.click({timeout: 1000});
+
+			await expect(option).toBeVisible({timeout: 2000});
+		}).toPass();
+
+		await option.click();
+	}
+
+	async selectSpace(spaceName: string) {
+		const option = this.page
+			.getByRole('option')
+			.filter({hasText: spaceName});
+
+		// Loading the spaces resets the checkbox, as in selectProject.
+
+		await expect(async () => {
+			if (await this.spaceCheckbox.isChecked({timeout: 1000})) {
+				await this.spaceCheckbox.click({timeout: 1000});
+			}
+
+			await expect(this.spaceSelector).toBeEnabled({timeout: 1000});
+
+			await this.spaceSelector.click({timeout: 1000});
+
+			await expect(option).toBeVisible({timeout: 2000});
+		}).toPass();
+
+		await option.click();
 	}
 
 	getItem(filter: string) {
