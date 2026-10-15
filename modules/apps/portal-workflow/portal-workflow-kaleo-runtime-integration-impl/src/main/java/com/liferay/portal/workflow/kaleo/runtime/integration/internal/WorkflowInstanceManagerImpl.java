@@ -5,6 +5,7 @@
 
 package com.liferay.portal.workflow.kaleo.runtime.integration.internal;
 
+import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -18,8 +19,12 @@ import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.kernel.workflow.WorkflowTransition;
 import com.liferay.portal.kernel.workflow.search.WorkflowModelSearchResult;
 import com.liferay.portal.lock.service.LockLocalService;
+import com.liferay.portal.workflow.kaleo.KaleoWorkflowModelConverter;
+import com.liferay.portal.workflow.kaleo.model.KaleoInstance;
 import com.liferay.portal.workflow.kaleo.runtime.WorkflowEngine;
 import com.liferay.portal.workflow.kaleo.runtime.integration.internal.util.WorkflowLockUtil;
+import com.liferay.portal.workflow.kaleo.service.KaleoInstanceLocalService;
+import com.liferay.portal.workflow.kaleo.service.KaleoInstanceService;
 
 import java.io.Serializable;
 
@@ -213,6 +218,33 @@ public class WorkflowInstanceManagerImpl implements WorkflowInstanceManager {
 	}
 
 	@Override
+	public WorkflowInstance liberalStartWorkflowInstance(
+			long companyId, long groupId, long userId,
+			String workflowDefinitionName, Integer workflowDefinitionVersion,
+			String transitionName, Map<String, Serializable> workflowContext)
+		throws WorkflowException {
+
+		return _startWorkflowInstance(
+			companyId, groupId, userId, workflowDefinitionName,
+			workflowDefinitionVersion, transitionName, workflowContext, true,
+			false);
+	}
+
+	@Override
+	public WorkflowInstance liberalStartWorkflowInstance(
+			long companyId, long groupId, long userId,
+			String workflowDefinitionName, Integer workflowDefinitionVersion,
+			String transitionName, Map<String, Serializable> workflowContext,
+			boolean waitForCompletion)
+		throws WorkflowException {
+
+		return _startWorkflowInstance(
+			companyId, groupId, userId, workflowDefinitionName,
+			workflowDefinitionVersion, transitionName, workflowContext, true,
+			waitForCompletion);
+	}
+
+	@Override
 	public List<WorkflowInstance> search(
 			long companyId, Long userId, Boolean active, String assetClassName,
 			String assetTitle, String assetDescription, String nodeName,
@@ -314,28 +346,10 @@ public class WorkflowInstanceManagerImpl implements WorkflowInstanceManager {
 			boolean waitForCompletion)
 		throws WorkflowException {
 
-		String className = WorkflowDefinition.class.getName();
-		String key = WorkflowLockUtil.encodeKey(
-			workflowDefinitionName, workflowDefinitionVersion);
-
-		if (_lockLocalService.isLocked(className, key)) {
-			throw new WorkflowException(
-				StringBundler.concat(
-					"Workflow definition name ", workflowDefinitionName,
-					" and version ", workflowDefinitionVersion,
-					" is being undeployed"));
-		}
-
-		ServiceContext serviceContext = (ServiceContext)workflowContext.get(
-			WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
-
-		serviceContext.setCompanyId(companyId);
-		serviceContext.setScopeGroupId(groupId);
-		serviceContext.setUserId(userId);
-
-		return _workflowEngine.startWorkflowInstance(
-			workflowDefinitionName, workflowDefinitionVersion, transitionName,
-			workflowContext, serviceContext, waitForCompletion);
+		return _startWorkflowInstance(
+			companyId, groupId, userId, workflowDefinitionName,
+			workflowDefinitionVersion, transitionName, workflowContext, false,
+			waitForCompletion);
 	}
 
 	@Override
@@ -370,6 +384,78 @@ public class WorkflowInstanceManagerImpl implements WorkflowInstanceManager {
 		return _workflowEngine.updateContext(
 			workflowInstanceId, workflowContext, serviceContext);
 	}
+
+	private <T> T _get(
+			boolean liberal,
+			UnsafeSupplier<T, PortalException> localServiceUnsafeSupplier,
+			UnsafeSupplier<T, PortalException> serviceUnsafeSupplier)
+		throws PortalException {
+
+		if (liberal) {
+			return localServiceUnsafeSupplier.get();
+		}
+
+		return serviceUnsafeSupplier.get();
+	}
+
+	private WorkflowInstance _startWorkflowInstance(
+			long companyId, long groupId, long userId,
+			String workflowDefinitionName, Integer workflowDefinitionVersion,
+			String transitionName, Map<String, Serializable> workflowContext,
+			boolean liberal, boolean waitForCompletion)
+		throws WorkflowException {
+
+		String className = WorkflowDefinition.class.getName();
+
+		String key = WorkflowLockUtil.encodeKey(
+			workflowDefinitionName, workflowDefinitionVersion);
+
+		if (_lockLocalService.isLocked(className, key)) {
+			throw new WorkflowException(
+				StringBundler.concat(
+					"Workflow definition name ", workflowDefinitionName,
+					" and version ", workflowDefinitionVersion,
+					" is being undeployed"));
+		}
+
+		ServiceContext serviceContext = (ServiceContext)workflowContext.get(
+			WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+
+		serviceContext.setCompanyId(companyId);
+		serviceContext.setScopeGroupId(groupId);
+		serviceContext.setUserId(userId);
+
+		try {
+			KaleoInstance kaleoInstance = _get(
+				liberal,
+				() -> _kaleoInstanceLocalService.addKaleoInstance(
+					workflowDefinitionName, workflowDefinitionVersion,
+					transitionName, workflowContext, serviceContext,
+					waitForCompletion),
+				() -> _kaleoInstanceService.addKaleoInstance(
+					workflowDefinitionName, workflowDefinitionVersion,
+					transitionName, workflowContext, serviceContext,
+					waitForCompletion));
+
+			return _kaleoWorkflowModelConverter.toWorkflowInstance(
+				kaleoInstance, workflowContext);
+		}
+		catch (WorkflowException workflowException) {
+			throw workflowException;
+		}
+		catch (PortalException portalException) {
+			throw new WorkflowException(portalException);
+		}
+	}
+
+	@Reference
+	private KaleoInstanceLocalService _kaleoInstanceLocalService;
+
+	@Reference
+	private KaleoInstanceService _kaleoInstanceService;
+
+	@Reference
+	private KaleoWorkflowModelConverter _kaleoWorkflowModelConverter;
 
 	@Reference
 	private LockLocalService _lockLocalService;
