@@ -10,15 +10,21 @@ import com.liferay.object.admin.rest.client.http.HttpInvoker;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectFolder;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectFolderResource;
 import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
+import com.liferay.object.test.util.ObjectRelationshipTestUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.configuration.test.util.CompanyConfigurationTemporarySwapper;
@@ -30,11 +36,13 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.performance.PerformanceTimer;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.AssumeTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -55,13 +63,16 @@ import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
+import com.liferay.portal.vulcan.pagination.Pagination;
 
 import java.io.Closeable;
+import java.io.Serializable;
 
 import java.net.ConnectException;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.function.Predicate;
 
@@ -104,7 +115,7 @@ public class ObjectEntryPerformanceTest {
 
 	@Test
 	public void testGetObjectEntries() throws Exception {
-		_customObjectDefinition =
+		_customObjectDefinition1 =
 			ObjectDefinitionTestUtil.addCustomObjectDefinition(
 				Collections.singletonList(
 					ObjectFieldUtil.createObjectField(
@@ -112,15 +123,15 @@ public class ObjectEntryPerformanceTest {
 						ObjectFieldConstants.DB_TYPE_STRING, "Performance",
 						"performance")));
 
-		_customObjectDefinition =
+		_customObjectDefinition1 =
 			_objectDefinitionLocalService.publishCustomObjectDefinition(
 				TestPropsValues.getUserId(),
-				_customObjectDefinition.getObjectDefinitionId());
+				_customObjectDefinition1.getObjectDefinitionId());
 
 		ObjectEntryManager objectEntryManager =
 			_objectEntryManagerRegistry.getObjectEntryManager(
-				_customObjectDefinition.getCompanyId(),
-				_customObjectDefinition.getStorageType());
+				_customObjectDefinition1.getCompanyId(),
+				_customObjectDefinition1.getStorageType());
 
 		DTOConverterContext dtoConverterContext =
 			new DefaultDTOConverterContext(
@@ -129,7 +140,7 @@ public class ObjectEntryPerformanceTest {
 
 		for (int i = 0; i < _objectEntriesCount; i++) {
 			objectEntryManager.addObjectEntry(
-				dtoConverterContext, _customObjectDefinition,
+				dtoConverterContext, _customObjectDefinition1,
 				new ObjectEntry() {
 					{
 						properties = HashMapBuilder.<String, Object>put(
@@ -144,11 +155,108 @@ public class ObjectEntryPerformanceTest {
 				GetterUtil.getInteger(
 					_properties.getProperty("object.entries.get.max.time")),
 				"Get object entries by object definition " +
-					_customObjectDefinition.getObjectDefinitionId())) {
+					_customObjectDefinition1.getObjectDefinitionId())) {
 
 			_objectEntryLocalService.getObjectEntries(
-				0, _customObjectDefinition.getObjectDefinitionId(),
+				0, _customObjectDefinition1.getObjectDefinitionId(),
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+		}
+	}
+
+	@Test
+	public void testGetObjectEntriesWithFilter() throws Exception {
+		_customObjectDefinition1 =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition(
+				Collections.singletonList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING, "Performance",
+						"performance")));
+
+		_customObjectDefinition1 =
+			_objectDefinitionLocalService.publishCustomObjectDefinition(
+				TestPropsValues.getUserId(),
+				_customObjectDefinition1.getObjectDefinitionId());
+
+		_customObjectDefinition2 =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition(
+				Collections.singletonList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING, "Performance",
+						"performance")));
+
+		_customObjectDefinition2 =
+			_objectDefinitionLocalService.publishCustomObjectDefinition(
+				TestPropsValues.getUserId(),
+				_customObjectDefinition2.getObjectDefinitionId());
+
+		ObjectRelationship objectRelationship =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, _customObjectDefinition1,
+				_customObjectDefinition2);
+
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			objectRelationship.getObjectFieldId2());
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext();
+
+		com.liferay.object.model.ObjectEntry objectEntry =
+			_objectEntryLocalService.addObjectEntry(
+				0, TestPropsValues.getUserId(),
+				_customObjectDefinition1.getObjectDefinitionId(),
+				ObjectEntryFolderConstants.
+					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+				null,
+				HashMapBuilder.<String, Serializable>put(
+					"performance", RandomTestUtil.randomString()
+				).build(),
+				serviceContext);
+
+		for (int i = 0; i < _objectEntriesCount; i++) {
+			Map<String, Serializable> values =
+				HashMapBuilder.<String, Serializable>put(
+					"performance", RandomTestUtil.randomString()
+				).build();
+
+			if ((i % 10) == 0) {
+				values.put(
+					objectField.getName(), objectEntry.getObjectEntryId());
+			}
+
+			_objectEntryLocalService.addObjectEntry(
+				0, TestPropsValues.getUserId(),
+				_customObjectDefinition2.getObjectDefinitionId(),
+				ObjectEntryFolderConstants.
+					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+				null, values, serviceContext);
+		}
+
+		ObjectEntryManager objectEntryManager =
+			_objectEntryManagerRegistry.getObjectEntryManager(
+				_customObjectDefinition2.getCompanyId(),
+				_customObjectDefinition2.getStorageType());
+
+		DTOConverterContext dtoConverterContext =
+			new DefaultDTOConverterContext(
+				false, Collections.emptyMap(), _dtoConverterRegistry, null,
+				LocaleUtil.getDefault(), null, TestPropsValues.getUser());
+
+		try (PerformanceTimer performanceTimer = new PerformanceTimer(
+				GetterUtil.getInteger(
+					_properties.getProperty(
+						"object.entries.get.filtered.max.time")),
+				StringBundler.concat(
+					"Get object entries by object definition ",
+					_customObjectDefinition2.getObjectDefinitionId(),
+					" filtered by an unset relationship"))) {
+
+			objectEntryManager.getObjectEntries(
+				_customObjectDefinition2.getCompanyId(),
+				_customObjectDefinition2, null, null, dtoConverterContext,
+				objectField.getName() + " eq '0'", Pagination.of(1, 1), null,
+				null);
 		}
 	}
 
@@ -228,7 +336,7 @@ public class ObjectEntryPerformanceTest {
 			List<ObjectDefinition> objectDefinitions =
 				_objectDefinitionLocalService.getCustomObjectDefinitions(0);
 
-			_customObjectDefinition = objectDefinitions.get(0);
+			_customObjectDefinition1 = objectDefinitions.get(0);
 
 			_waitFor(
 				0,
@@ -302,7 +410,7 @@ public class ObjectEntryPerformanceTest {
 		while (predicate.test(currentObjectEntriesCount)) {
 			currentObjectEntriesCount =
 				_objectEntryLocalService.getObjectEntriesCount(
-					_customObjectDefinition.getObjectDefinitionId());
+					_customObjectDefinition1.getObjectDefinitionId());
 		}
 	}
 
@@ -315,7 +423,10 @@ public class ObjectEntryPerformanceTest {
 	private Company _company;
 
 	@DeleteAfterTestRun
-	private ObjectDefinition _customObjectDefinition;
+	private ObjectDefinition _customObjectDefinition1;
+
+	@DeleteAfterTestRun
+	private ObjectDefinition _customObjectDefinition2;
 
 	@Inject
 	private DTOConverterRegistry _dtoConverterRegistry;
@@ -333,6 +444,12 @@ public class ObjectEntryPerformanceTest {
 	private ObjectEntryManagerRegistry _objectEntryManagerRegistry;
 
 	@Inject
+	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Inject
 	private ObjectFolderResource.Factory _objectFolderResourceFactory;
+
+	@Inject
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
 }
