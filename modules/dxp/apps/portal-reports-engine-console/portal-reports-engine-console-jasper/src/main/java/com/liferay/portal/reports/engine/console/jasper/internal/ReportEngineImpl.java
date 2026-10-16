@@ -7,8 +7,11 @@ package com.liferay.portal.reports.engine.console.jasper.internal;
 
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StackTraceUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.reports.engine.ReportDataSourceType;
 import com.liferay.portal.reports.engine.ReportEngine;
 import com.liferay.portal.reports.engine.ReportFormat;
@@ -20,6 +23,7 @@ import com.liferay.portal.reports.engine.ReportResultContainer;
 import com.liferay.portal.reports.engine.console.jasper.internal.compiler.CachedReportCompiler;
 import com.liferay.portal.reports.engine.console.jasper.internal.compiler.DefaultReportCompiler;
 import com.liferay.portal.reports.engine.console.jasper.internal.compiler.ReportCompiler;
+import com.liferay.portal.reports.engine.console.jasper.internal.configuration.JasperReportCompilerConfiguration;
 import com.liferay.portal.reports.engine.console.jasper.internal.fill.manager.CsvReportFillManager;
 import com.liferay.portal.reports.engine.console.jasper.internal.fill.manager.EmptyReportFillManager;
 import com.liferay.portal.reports.engine.console.jasper.internal.fill.manager.JdbcReportFillManager;
@@ -33,20 +37,28 @@ import jakarta.servlet.ServletContext;
 import java.util.EnumMap;
 import java.util.Map;
 
+import net.sf.jasperreports.compilers.ReportClassFilter;
+import net.sf.jasperreports.engine.DefaultJasperReportsContext;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.JasperReportsContext;
+import net.sf.jasperreports.engine.SimpleJasperReportsContext;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 
 /**
  * @author Michael C. Han
  * @author Brian Wing Shun Chan
  * @author Brian Greenwald
  */
-@Component(service = ReportEngine.class)
+@Component(
+	configurationPid = "com.liferay.portal.reports.engine.console.jasper.internal.configuration.JasperReportCompilerConfiguration",
+	service = ReportEngine.class
+)
 public class ReportEngineImpl implements ReportEngine {
 
 	@Override
@@ -90,7 +102,7 @@ public class ReportEngineImpl implements ReportEngine {
 				reportRequest.getReportDesignRetriever());
 
 			JasperPrint jasperPrint = reportFillManager.fillReport(
-				jasperReport, reportRequest);
+				jasperReport, _jasperReportsContext, reportRequest);
 
 			ReportFormatExporter reportFormatExporter =
 				_serviceTrackerMap.getService(reportRequest.getReportFormat());
@@ -126,7 +138,9 @@ public class ReportEngineImpl implements ReportEngine {
 	}
 
 	@Activate
-	protected void activate(BundleContext bundleContext) {
+	protected void activate(
+		BundleContext bundleContext, Map<String, Object> properties) {
+
 		_reportFillManagers.put(
 			ReportDataSourceType.CSV, new CsvReportFillManager());
 		_reportFillManagers.put(
@@ -148,6 +162,8 @@ public class ReportEngineImpl implements ReportEngine {
 
 				emitter.emit(ReportFormat.parse(reportFormatString));
 			});
+
+		_updateReportCompiler(properties);
 	}
 
 	@Deactivate
@@ -155,9 +171,38 @@ public class ReportEngineImpl implements ReportEngine {
 		_serviceTrackerMap.close();
 	}
 
+	@Modified
+	protected void modified(Map<String, Object> properties) {
+		_updateReportCompiler(properties);
+	}
+
+	private void _updateReportCompiler(Map<String, Object> properties) {
+		SimpleJasperReportsContext simpleJasperReportsContext =
+			new SimpleJasperReportsContext(
+				DefaultJasperReportsContext.getInstance());
+
+		JasperReportCompilerConfiguration jasperReportCompilerConfiguration =
+			ConfigurableUtil.createConfigurable(
+				JasperReportCompilerConfiguration.class, properties);
+
+		simpleJasperReportsContext.setProperty(
+			ReportClassFilter.PROPERTY_PREFIX_CLASS_FILTER_ENABLED,
+			String.valueOf(jasperReportCompilerConfiguration.active()));
+		simpleJasperReportsContext.setProperty(
+			ReportClassFilter.PROPERTY_PREFIX_CLASS_WHITELIST + "liferay",
+			StringUtil.merge(
+				jasperReportCompilerConfiguration.allowedClassNames(),
+				StringPool.COMMA));
+
+		_jasperReportsContext = simpleJasperReportsContext;
+
+		_reportCompiler = new CachedReportCompiler(
+			new DefaultReportCompiler(simpleJasperReportsContext));
+	}
+
 	private Map<String, String> _engineParameters;
-	private final ReportCompiler _reportCompiler = new CachedReportCompiler(
-		new DefaultReportCompiler());
+	private volatile JasperReportsContext _jasperReportsContext;
+	private volatile ReportCompiler _reportCompiler;
 	private final EnumMap<ReportDataSourceType, ReportFillManager>
 		_reportFillManagers = new EnumMap<>(ReportDataSourceType.class);
 	private ServiceTrackerMap<ReportFormat, ReportFormatExporter>
