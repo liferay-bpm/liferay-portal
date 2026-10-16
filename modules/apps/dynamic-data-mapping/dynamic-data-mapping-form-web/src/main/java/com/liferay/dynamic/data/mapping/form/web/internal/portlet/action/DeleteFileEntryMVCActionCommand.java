@@ -11,12 +11,14 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import jakarta.portlet.ActionRequest;
 import jakarta.portlet.ActionResponse;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Igor Costa
@@ -38,7 +40,11 @@ public class DeleteFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
 		FileEntryMVCActionCommandUtil.deleteFileEntry(
 			ParamUtil.getLong(actionRequest, "oldFileEntryId"),
+			_portal.getHttpServletRequest(actionRequest),
 			(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY));
 	}
+
+	@Reference
+	private Portal _portal;
 
 }

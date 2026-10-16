@@ -8,7 +8,6 @@ package com.liferay.dynamic.data.mapping.form.field.type.internal.document.libra
 import com.liferay.document.library.helper.DLURLHelper;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
-import com.liferay.dynamic.data.mapping.constants.DDMFormConstants;
 import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
 import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
@@ -34,17 +33,14 @@ import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.portlet.url.builder.ResourceURLBuilder;
-import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -228,25 +224,6 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 			WebKeys.THEME_DISPLAY);
 	}
 
-	private Folder _createDDMFormFolder(
-		long userId, long repositoryId, HttpServletRequest httpServletRequest) {
-
-		try {
-			return _portletFileRepository.addPortletFolder(
-				userId, repositoryId,
-				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-				DDMFormConstants.DDM_FORM_UPLOADED_FILES_FOLDER_NAME,
-				_getServiceContext(httpServletRequest));
-		}
-		catch (PortalException portalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
-			}
-
-			return null;
-		}
-	}
-
 	private Folder _createPrivateUserFolder(
 		long repositoryId, long parentFolderId,
 		HttpServletRequest httpServletRequest, User user) {
@@ -273,35 +250,21 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 		}
 	}
 
-	private long _getDDMFormFolderId(
-		long companyId, long repositoryId,
-		HttpServletRequest httpServletRequest) {
-
-		Folder folder = null;
+	private Folder _getDDMFormFolder(
+		long companyId, long groupId, HttpServletRequest httpServletRequest) {
 
 		try {
-			folder = _portletFileRepository.getPortletFolder(
-				repositoryId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-				DDMFormConstants.DDM_FORM_UPLOADED_FILES_FOLDER_NAME);
+			return DDMFormUtil.getDDMFormFolder(
+				companyId, groupId,
+				ServiceContextFactory.getInstance(httpServletRequest));
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(portalException);
 			}
 
-			User user = DDMFormUtil.getDDMFormDefaultUser(companyId);
-
-			if (user != null) {
-				folder = _createDDMFormFolder(
-					user.getUserId(), repositoryId, httpServletRequest);
-			}
+			return null;
 		}
-
-		if (folder == null) {
-			return DLFolderConstants.DEFAULT_PARENT_FOLDER_ID;
-		}
-
-		return folder.getFolderId();
 	}
 
 	private long _getDDMFormInstanceRecordId(
@@ -406,7 +369,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 	private String _getGuestUploadURL(
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext,
-		long folderId, HttpServletRequest httpServletRequest) {
+		HttpServletRequest httpServletRequest) {
 
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
 			RequestBackedPortletURLFactoryUtil.create(httpServletRequest);
@@ -418,8 +381,6 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 					DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM))
 		).setActionName(
 			"/dynamic_data_mapping_form/upload_file_entry"
-		).setParameter(
-			"folderId", folderId
 		).setParameter(
 			"formInstanceId",
 			ParamUtil.getString(
@@ -551,44 +512,6 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 		return folder.getFolderId();
 	}
 
-	private Repository _getRepository(
-		long groupId, HttpServletRequest httpServletRequest) {
-
-		try {
-			Repository repository =
-				_portletFileRepository.fetchPortletRepository(
-					groupId, DDMFormConstants.SERVICE_NAME);
-
-			if (repository != null) {
-				return repository;
-			}
-
-			return _portletFileRepository.addPortletRepository(
-				groupId, DDMFormConstants.SERVICE_NAME,
-				_getServiceContext(httpServletRequest));
-		}
-		catch (PortalException portalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
-			}
-
-			return null;
-		}
-	}
-
-	private ServiceContext _getServiceContext(
-			HttpServletRequest httpServletRequest)
-		throws PortalException {
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			httpServletRequest);
-
-		serviceContext.setAddGroupPermissions(true);
-		serviceContext.setAddGuestPermissions(true);
-
-		return serviceContext;
-	}
-
 	private Map<String, String> _getStrings(
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
@@ -690,20 +613,8 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 			groupId = ddmFormInstance.getGroupId();
 		}
 
-		Repository repository = _getRepository(groupId, httpServletRequest);
-
-		if (repository == null) {
-			return new HashMap<>();
-		}
-
-		long ddmFormFolderId = _getDDMFormFolderId(
-			themeDisplay.getCompanyId(), repository.getRepositoryId(),
-			httpServletRequest);
-
 		if (!themeDisplay.isSignedIn()) {
 			return HashMapBuilder.<String, Object>put(
-				"folderId", ddmFormFolderId
-			).put(
 				"guestUploadURL",
 				() -> {
 					String guestUploadURL = GetterUtil.getString(
@@ -715,14 +626,21 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 
 					return _getGuestUploadURL(
 						ddmFormField, ddmFormFieldRenderingContext,
-						ddmFormFolderId, httpServletRequest);
+						httpServletRequest);
 				}
 			).build();
 		}
 
+		Folder ddmFormFolder = _getDDMFormFolder(
+			themeDisplay.getCompanyId(), groupId, httpServletRequest);
+
+		if (ddmFormFolder == null) {
+			return new HashMap<>();
+		}
+
 		long privateUserFolderId = _getPrivateUserFolderId(
-			repository.getRepositoryId(), ddmFormFolderId, httpServletRequest,
-			themeDisplay.getUser());
+			ddmFormFolder.getRepositoryId(), ddmFormFolder.getFolderId(),
+			httpServletRequest, themeDisplay.getUser());
 
 		return HashMapBuilder.<String, Object>put(
 			"folderId", privateUserFolderId
@@ -738,7 +656,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 
 				return _getItemSelectorURL(
 					ddmFormField, ddmFormFieldRenderingContext,
-					privateUserFolderId, repository.getRepositoryId(),
+					privateUserFolderId, ddmFormFolder.getRepositoryId(),
 					themeDisplay);
 			}
 		).build();
@@ -783,9 +701,6 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private PortletFileRepository _portletFileRepository;
 
 	private volatile ServiceTrackerMap<String, DDMPermissionChecker>
 		_serviceTrackerMap;

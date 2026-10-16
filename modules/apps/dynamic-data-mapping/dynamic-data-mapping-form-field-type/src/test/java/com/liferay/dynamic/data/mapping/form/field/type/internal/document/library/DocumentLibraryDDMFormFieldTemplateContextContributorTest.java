@@ -28,11 +28,13 @@ import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
-import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
+import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletURL;
@@ -88,14 +90,17 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest {
 		_setUpJSONFactoryUtil();
 		_setUpLanguage();
 		_setUpPortal();
-		_setUpPortletFileRepository();
+		_setUpPortletFileRepositoryUtil();
 		_setUpRequestBackedPortletURLFactory();
+		_setUpServiceContextFactory();
 		_setUpUserLocalServiceUtil();
 	}
 
 	@After
 	public void tearDown() {
+		_portletFileRepositoryUtilMockedStatic.close();
 		_requestBackedPortletURLFactoryUtilMockedStatic.close();
+		_serviceContextFactoryMockedStatic.close();
 		_userLocalServiceUtilMockedStatic.close();
 	}
 
@@ -145,7 +150,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest {
 				ddmFormField, _createDDMFormFieldRenderingContext());
 
 		Assert.assertTrue((boolean)parameters.get("allowGuestUsers"));
-		Assert.assertEquals(_FORMS_FOLDER_ID, parameters.get("folderId"));
+		Assert.assertFalse(parameters.containsKey("folderId"));
 
 		String guestUploadURL = String.valueOf(
 			parameters.get("guestUploadURL"));
@@ -164,7 +169,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest {
 			CoreMatchers.containsString("param_groupId=" + _GROUP_ID));
 		Assert.assertThat(
 			guestUploadURL,
-			CoreMatchers.containsString("param_folderId=" + _FORMS_FOLDER_ID));
+			CoreMatchers.not(CoreMatchers.containsString("param_folderId")));
 	}
 
 	@Test
@@ -590,6 +595,12 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest {
 			folderId
 		);
 
+		Mockito.when(
+			folder.getRepositoryId()
+		).thenReturn(
+			_REPOSITORY_ID
+		);
+
 		return folder;
 	}
 
@@ -806,28 +817,24 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest {
 		);
 	}
 
-	private void _setUpPortletFileRepository() throws Exception {
-		ReflectionTestUtil.setFieldValue(
-			_documentLibraryDDMFormFieldTemplateContextContributor,
-			"_portletFileRepository", _portletFileRepository);
+	private void _setUpPortletFileRepositoryUtil() throws Exception {
+		Repository repository = _mockRepository();
+
+		_portletFileRepositoryUtilMockedStatic.when(
+			() -> PortletFileRepositoryUtil.fetchPortletRepository(
+				_GROUP_ID, DDMFormConstants.SERVICE_NAME)
+		).thenReturn(
+			repository
+		);
 
 		Folder folder = _mockFolder(_FORMS_FOLDER_ID);
 
-		Mockito.when(
-			_portletFileRepository.getPortletFolder(
+		_portletFileRepositoryUtilMockedStatic.when(
+			() -> PortletFileRepositoryUtil.getPortletFolder(
 				_REPOSITORY_ID, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 				DDMFormConstants.DDM_FORM_UPLOADED_FILES_FOLDER_NAME)
 		).thenReturn(
 			folder
-		);
-
-		Repository repository = _mockRepository();
-
-		Mockito.when(
-			_portletFileRepository.fetchPortletRepository(
-				_GROUP_ID, DDMFormConstants.SERVICE_NAME)
-		).thenReturn(
-			repository
 		);
 	}
 
@@ -856,6 +863,15 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest {
 			requestBackedPortletURLFactory
 		).createResourceURL(
 			DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM
+		);
+	}
+
+	private void _setUpServiceContextFactory() throws Exception {
+		_serviceContextFactoryMockedStatic.when(
+			() -> ServiceContextFactory.getInstance(
+				Mockito.any(HttpServletRequest.class))
+		).thenReturn(
+			new ServiceContext()
 		);
 	}
 
@@ -906,14 +922,18 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest {
 	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
 	private final Language _language = Mockito.mock(Language.class);
 	private final Portal _portal = Mockito.mock(Portal.class);
-	private final PortletFileRepository _portletFileRepository = Mockito.mock(
-		PortletFileRepository.class);
+	private final MockedStatic<PortletFileRepositoryUtil>
+		_portletFileRepositoryUtilMockedStatic = Mockito.mockStatic(
+			PortletFileRepositoryUtil.class);
 	private final MockedStatic<RequestBackedPortletURLFactoryUtil>
 		_requestBackedPortletURLFactoryUtilMockedStatic = Mockito.mockStatic(
 			RequestBackedPortletURLFactoryUtil.class);
 	private final ResourceBundle _resourceBundle = Mockito.mock(
 		ResourceBundle.class);
 	private final Group _scopeGroup = Mockito.mock(Group.class);
+	private final MockedStatic<ServiceContextFactory>
+		_serviceContextFactoryMockedStatic = Mockito.mockStatic(
+			ServiceContextFactory.class);
 	private final MockedStatic<UserLocalServiceUtil>
 		_userLocalServiceUtilMockedStatic = Mockito.mockStatic(
 			UserLocalServiceUtil.class);
