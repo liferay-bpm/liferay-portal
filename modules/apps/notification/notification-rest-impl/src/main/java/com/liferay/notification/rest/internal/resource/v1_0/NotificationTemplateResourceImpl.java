@@ -177,7 +177,7 @@ public class NotificationTemplateResourceImpl
 				PortletDataContext portletDataContext) {
 
 				return HashMapBuilder.<String, Serializable>put(
-					"filter", "objectDefinitionId eq 0 and system eq false"
+					"filter", "system eq false"
 				).build();
 			}
 
@@ -269,18 +269,8 @@ public class NotificationTemplateResourceImpl
 			NotificationTemplate notificationTemplate)
 		throws Exception {
 
-		NotificationContext notificationContext =
-			NotificationUtil.toNotificationContext(
-				notificationTemplate, _objectFieldLocalService);
-
-		notificationContext.setCompanyId(contextCompany.getCompanyId());
-		notificationContext.setModelPermissions(
-			_toModelPermissions(notificationTemplate, 0L));
-
-		NotificationRecipient notificationRecipient =
-			NotificationUtil.toNotificationRecipient(contextUser, 0L);
-
-		notificationContext.setNotificationRecipient(notificationRecipient);
+		ModelPermissions modelPermissions = _toModelPermissions(
+			notificationTemplate, 0L);
 
 		com.liferay.notification.model.NotificationTemplate
 			serviceBuilderNotificationTemplate =
@@ -288,14 +278,24 @@ public class NotificationTemplateResourceImpl
 					0L, notificationTemplate, _objectDefinitionLocalService,
 					contextUser);
 
+		NotificationContext notificationContext =
+			NotificationUtil.toNotificationContext(
+				notificationTemplate, _objectFieldLocalService,
+				serviceBuilderNotificationTemplate);
+
+		notificationContext.setCompanyId(contextCompany.getCompanyId());
+		notificationContext.setModelPermissions(modelPermissions);
+
+		NotificationRecipient notificationRecipient =
+			NotificationUtil.toNotificationRecipient(contextUser, 0L);
+
+		notificationContext.setNotificationRecipient(notificationRecipient);
 		notificationContext.setNotificationRecipientSettings(
 			_notificationRecipientSettingLocalService.
 				createNotificationRecipientSettings(
 					notificationRecipient.getNotificationRecipientId(),
 					serviceBuilderNotificationTemplate,
 					notificationTemplate.getRecipients(), contextUser));
-		notificationContext.setNotificationTemplate(
-			serviceBuilderNotificationTemplate);
 
 		return _toNotificationTemplate(
 			_notificationTemplateService.addNotificationTemplate(
@@ -379,19 +379,8 @@ public class NotificationTemplateResourceImpl
 			NotificationTemplate notificationTemplate)
 		throws Exception {
 
-		NotificationContext notificationContext =
-			NotificationUtil.toNotificationContext(
-				notificationTemplate, _objectFieldLocalService);
-
-		notificationContext.setCompanyId(contextCompany.getCompanyId());
-		notificationContext.setModelPermissions(
-			_toModelPermissions(notificationTemplate, notificationTemplateId));
-
-		NotificationRecipient notificationRecipient =
-			NotificationUtil.toNotificationRecipient(
-				contextUser, notificationTemplateId);
-
-		notificationContext.setNotificationRecipient(notificationRecipient);
+		ModelPermissions modelPermissions = _toModelPermissions(
+			notificationTemplate, notificationTemplateId);
 
 		com.liferay.notification.model.NotificationTemplate
 			serviceBuilderNotificationTemplate =
@@ -399,14 +388,25 @@ public class NotificationTemplateResourceImpl
 					notificationTemplateId, notificationTemplate,
 					_objectDefinitionLocalService, contextUser);
 
+		NotificationContext notificationContext =
+			NotificationUtil.toNotificationContext(
+				notificationTemplate, _objectFieldLocalService,
+				serviceBuilderNotificationTemplate);
+
+		notificationContext.setCompanyId(contextCompany.getCompanyId());
+		notificationContext.setModelPermissions(modelPermissions);
+
+		NotificationRecipient notificationRecipient =
+			NotificationUtil.toNotificationRecipient(
+				contextUser, notificationTemplateId);
+
+		notificationContext.setNotificationRecipient(notificationRecipient);
 		notificationContext.setNotificationRecipientSettings(
 			_notificationRecipientSettingLocalService.
 				createNotificationRecipientSettings(
 					notificationRecipient.getNotificationRecipientId(),
 					serviceBuilderNotificationTemplate,
 					notificationTemplate.getRecipients(), contextUser));
-		notificationContext.setNotificationTemplate(
-			serviceBuilderNotificationTemplate);
 
 		return _toNotificationTemplate(
 			_notificationTemplateService.updateNotificationTemplate(
@@ -441,6 +441,25 @@ public class NotificationTemplateResourceImpl
 	protected void preparePatch(
 		NotificationTemplate notificationTemplate,
 		NotificationTemplate existingNotificationTemplate) {
+
+		String[] attachmentObjectFieldExternalReferenceCodes =
+			notificationTemplate.
+				getAttachmentObjectFieldExternalReferenceCodes();
+
+		if ((notificationTemplate.getAttachmentObjectFieldIds() != null) &&
+			(attachmentObjectFieldExternalReferenceCodes == null)) {
+
+			existingNotificationTemplate.
+				setAttachmentObjectFieldExternalReferenceCodes(() -> null);
+		}
+
+		if ((notificationTemplate.getObjectDefinitionId() != null) &&
+			(notificationTemplate.getObjectDefinitionExternalReferenceCode() ==
+				null)) {
+
+			existingNotificationTemplate.
+				setObjectDefinitionExternalReferenceCode(() -> null);
+		}
 
 		if ((notificationTemplate.getName() != null) &&
 			(notificationTemplate.getName_i18n() == null)) {

@@ -15,9 +15,16 @@ import com.liferay.notification.rest.client.dto.v1_0.Creator;
 import com.liferay.notification.rest.client.dto.v1_0.NotificationTemplate;
 import com.liferay.notification.rest.client.pagination.Page;
 import com.liferay.notification.rest.client.pagination.Pagination;
+import com.liferay.notification.rest.dto.v1_0.util.NotificationUtil;
 import com.liferay.notification.rest.resource.v1_0.NotificationTemplateResource;
 import com.liferay.notification.service.NotificationTemplateLocalService;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.exception.NoSuchObjectDefinitionException;
+import com.liferay.object.field.builder.AttachmentObjectFieldBuilder;
+import com.liferay.object.field.setting.builder.ObjectFieldSettingBuilder;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectField;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
@@ -45,6 +52,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.props.test.util.PropsTemporarySwapper;
 import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LogEntry;
 import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.FeatureFlags;
@@ -54,6 +62,7 @@ import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import jakarta.ws.rs.core.Response;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -187,6 +196,7 @@ public class NotificationTemplateResourceTest
 		super.testPatchNotificationTemplate();
 
 		_testPatchNotificationTemplateWithName();
+		_testPatchNotificationTemplateWithObjectReferences();
 		_testPatchNotificationTemplateWithoutRecipients();
 		_testPatchPutNotificationTemplateWithRecipientsAndEmailType(
 			Http.Method.PATCH);
@@ -202,10 +212,12 @@ public class NotificationTemplateResourceTest
 		_testPostNotificationTemplateWithCreator();
 		_testPostNotificationTemplateWithRecipientsAndEmailType();
 		_testPostNotificationTemplateWithNameWithoutDefaultLanguage();
+		_testPostNotificationTemplateWithObjectReferences();
 		_testPostNotificationTemplateWithPermissions();
-		_testPostNotificationTemplateWithPermissionsAndFeatureFlagDisabled();
 		_testPostNotificationTemplateWithRecipientsAndFeatureFlagDisabled();
 		_testPostNotificationTemplateWithRecipientsAndUserNotificationType();
+		_testPostPutNotificationTemplateWithPermissionsAndFeatureFlagDisabled(
+			"notification/v1.0/notification-templates", Http.Method.POST);
 	}
 
 	@Override
@@ -243,7 +255,9 @@ public class NotificationTemplateResourceTest
 		_testPatchPutNotificationTemplateWithRecipientsAndUserNotificationType(
 			Http.Method.PUT);
 		_testPutNotificationTemplateWithNameTranslations();
+		_testPutNotificationTemplateWithObjectReferences();
 		_testPutNotificationTemplateWithPermissions();
+		_testPutNotificationTemplateWithPermissionsAndFeatureFlagDisabled();
 	}
 
 	@Override
@@ -373,6 +387,41 @@ public class NotificationTemplateResourceTest
 		throws Exception {
 
 		return _addNotificationTemplate(randomNotificationTemplate());
+	}
+
+	private ObjectField _addAttachmentObjectField() throws Exception {
+		ObjectField objectField = new AttachmentObjectFieldBuilder(
+		).labelMap(
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+		).name(
+			"a" + RandomTestUtil.randomString()
+		).objectFieldSettings(
+			Arrays.asList(
+				new ObjectFieldSettingBuilder(
+				).name(
+					ObjectFieldSettingConstants.NAME_ACCEPTED_FILE_EXTENSIONS
+				).value(
+					"txt"
+				).build(),
+				new ObjectFieldSettingBuilder(
+				).name(
+					ObjectFieldSettingConstants.NAME_FILE_SOURCE
+				).value(
+					ObjectFieldSettingConstants.VALUE_DOCS_AND_MEDIA
+				).build(),
+				new ObjectFieldSettingBuilder(
+				).name(
+					ObjectFieldSettingConstants.NAME_MAX_FILE_SIZE
+				).value(
+					"100"
+				).build())
+		).build();
+
+		_objectDefinition = ObjectDefinitionTestUtil.publishObjectDefinition(
+			Collections.singletonList(objectField));
+
+		return _objectFieldLocalService.getObjectField(
+			_objectDefinition.getObjectDefinitionId(), objectField.getName());
 	}
 
 	private NotificationTemplate _addNotificationTemplate(
@@ -728,6 +777,76 @@ public class NotificationTemplateResourceTest
 		Assert.assertEquals(name, nameI18nMap.get(defaultLanguageId));
 		Assert.assertEquals(
 			translatedName, nameI18nMap.get(translatedLanguageId));
+	}
+
+	private void _testPatchNotificationTemplateWithObjectReferences()
+		throws Exception {
+
+		ObjectField objectField = _addAttachmentObjectField();
+
+		NotificationTemplate notificationTemplate =
+			randomNotificationTemplate();
+
+		notificationTemplate.setAttachmentObjectFieldIds(
+			new Long[] {objectField.getObjectFieldId()});
+		notificationTemplate.setObjectDefinitionId(
+			_objectDefinition.getObjectDefinitionId());
+
+		notificationTemplate = _addNotificationTemplate(notificationTemplate);
+
+		NotificationTemplate patchNotificationTemplate =
+			new NotificationTemplate();
+
+		patchNotificationTemplate.setAttachmentObjectFieldIds(new Long[0]);
+
+		notificationTemplate =
+			notificationTemplateResource.patchNotificationTemplate(
+				notificationTemplate.getId(), patchNotificationTemplate);
+
+		Assert.assertArrayEquals(
+			new Long[0], notificationTemplate.getAttachmentObjectFieldIds());
+
+		patchNotificationTemplate.setAttachmentObjectFieldIds(
+			new Long[] {objectField.getObjectFieldId()});
+
+		notificationTemplate =
+			notificationTemplateResource.patchNotificationTemplate(
+				notificationTemplate.getId(), patchNotificationTemplate);
+
+		Assert.assertArrayEquals(
+			new Long[] {objectField.getObjectFieldId()},
+			notificationTemplate.getAttachmentObjectFieldIds());
+
+		patchNotificationTemplate.setAttachmentObjectFieldIds(new Long[0]);
+		patchNotificationTemplate.setObjectDefinitionId(0L);
+
+		notificationTemplate =
+			notificationTemplateResource.patchNotificationTemplate(
+				notificationTemplate.getId(), patchNotificationTemplate);
+
+		Assert.assertArrayEquals(
+			new Long[0], notificationTemplate.getAttachmentObjectFieldIds());
+		Assert.assertEquals(
+			Long.valueOf(0), notificationTemplate.getObjectDefinitionId());
+
+		patchNotificationTemplate.setAttachmentObjectFieldIds(
+			new Long[] {objectField.getObjectFieldId()});
+		patchNotificationTemplate.setObjectDefinitionId(
+			_objectDefinition.getObjectDefinitionId());
+
+		notificationTemplate =
+			notificationTemplateResource.patchNotificationTemplate(
+				notificationTemplate.getId(), patchNotificationTemplate);
+
+		Assert.assertArrayEquals(
+			new Long[] {objectField.getObjectFieldId()},
+			notificationTemplate.getAttachmentObjectFieldIds());
+		Assert.assertEquals(
+			_objectDefinition.getExternalReferenceCode(),
+			notificationTemplate.getObjectDefinitionExternalReferenceCode());
+		Assert.assertEquals(
+			Long.valueOf(_objectDefinition.getObjectDefinitionId()),
+			notificationTemplate.getObjectDefinitionId());
 	}
 
 	private void _testPatchNotificationTemplateWithoutRecipients()
@@ -1121,6 +1240,100 @@ public class NotificationTemplateResourceTest
 		}
 	}
 
+	private void _testPostNotificationTemplateWithObjectReferences()
+		throws Exception {
+
+		// Feature flag disabled
+
+		ObjectField objectField = _addAttachmentObjectField();
+
+		try (PropsTemporarySwapper propsTemporarySwapper =
+				new PropsTemporarySwapper(
+					FeatureFlagConstants.getKey("LPD-49854"),
+					Boolean.FALSE.toString())) {
+
+			NotificationTemplate notificationTemplate =
+				randomNotificationTemplate();
+
+			notificationTemplate.setAttachmentObjectFieldExternalReferenceCodes(
+				new String[] {
+					RandomTestUtil.randomString(),
+					objectField.getExternalReferenceCode()
+				});
+			notificationTemplate.setAttachmentObjectFieldIds(new Long[0]);
+			notificationTemplate.setObjectDefinitionExternalReferenceCode(
+				_objectDefinition.getExternalReferenceCode());
+
+			notificationTemplate = _addNotificationTemplate(
+				notificationTemplate);
+
+			Assert.assertArrayEquals(
+				new Long[0],
+				notificationTemplate.getAttachmentObjectFieldIds());
+
+			notificationTemplate = randomNotificationTemplate();
+
+			notificationTemplate.setObjectDefinitionExternalReferenceCode(
+				RandomTestUtil.randomString());
+
+			try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+					NotificationUtil.class.getName(), LoggerTestUtil.ERROR)) {
+
+				notificationTemplate = _addNotificationTemplate(
+					notificationTemplate);
+
+				List<LogEntry> logEntries = logCapture.getLogEntries();
+
+				LogEntry logEntry = logEntries.get(0);
+
+				Throwable throwable = logEntry.getThrowable();
+
+				Assert.assertEquals(
+					NoSuchObjectDefinitionException.class,
+					throwable.getClass());
+			}
+
+			Assert.assertEquals(
+				Long.valueOf(0), notificationTemplate.getObjectDefinitionId());
+		}
+
+		// Missing object definition
+
+		NotificationTemplate notificationTemplate =
+			randomNotificationTemplate();
+
+		notificationTemplate.setObjectDefinitionExternalReferenceCode(
+			RandomTestUtil.randomString());
+
+		assertHttpResponseStatusCode(
+			404,
+			notificationTemplateResource.postNotificationTemplateHttpResponse(
+				notificationTemplate));
+
+		// Object definition and attachment external reference codes
+
+		notificationTemplate = randomNotificationTemplate();
+
+		notificationTemplate.setAttachmentObjectFieldExternalReferenceCodes(
+			new String[] {
+				RandomTestUtil.randomString(),
+				objectField.getExternalReferenceCode()
+			});
+		notificationTemplate.setAttachmentObjectFieldIds(new Long[] {0L});
+		notificationTemplate.setObjectDefinitionExternalReferenceCode(
+			_objectDefinition.getExternalReferenceCode());
+		notificationTemplate.setObjectDefinitionId(0L);
+
+		notificationTemplate = _addNotificationTemplate(notificationTemplate);
+
+		Assert.assertArrayEquals(
+			new Long[] {objectField.getObjectFieldId()},
+			notificationTemplate.getAttachmentObjectFieldIds());
+		Assert.assertEquals(
+			Long.valueOf(_objectDefinition.getObjectDefinitionId()),
+			notificationTemplate.getObjectDefinitionId());
+	}
+
 	private void _testPostNotificationTemplateWithPermissions()
 		throws Exception {
 
@@ -1128,28 +1341,6 @@ public class NotificationTemplateResourceTest
 			_postNotificationTemplateWithPermissions(
 				RoleConstants.ADMINISTRATOR),
 			RoleConstants.ADMINISTRATOR);
-	}
-
-	private void _testPostNotificationTemplateWithPermissionsAndFeatureFlagDisabled()
-		throws Exception {
-
-		try (PropsTemporarySwapper propsTemporarySwapper =
-				new PropsTemporarySwapper(
-					FeatureFlagConstants.getKey("LPD-49854"),
-					Boolean.FALSE.toString())) {
-
-			Assert.assertEquals(
-				400,
-				HTTPTestUtil.invokeToHttpCode(
-					JSONUtil.put(
-						"permissions",
-						JSONUtil.putAll(
-							_getPermissionJSONObject(
-								RoleConstants.ADMINISTRATOR))
-					).toString(),
-					"notification/v1.0/notification-templates",
-					Http.Method.POST));
-		}
 	}
 
 	private void _testPostNotificationTemplateWithRecipient(
@@ -1411,6 +1602,34 @@ public class NotificationTemplateResourceTest
 			NotificationRecipientConstants.TYPE_USER_GROUP);
 	}
 
+	private void
+			_testPostPutNotificationTemplateWithPermissionsAndFeatureFlagDisabled(
+				String endpoint, Http.Method httpMethod)
+		throws Exception {
+
+		try (PropsTemporarySwapper propsTemporarySwapper =
+				new PropsTemporarySwapper(
+					FeatureFlagConstants.getKey("LPD-49854"),
+					Boolean.FALSE.toString())) {
+
+			String body = JSONUtil.put(
+				"permissions",
+				JSONUtil.putAll(
+					_getPermissionJSONObject(RoleConstants.ADMINISTRATOR))
+			).toString();
+
+			Assert.assertEquals(
+				400, HTTPTestUtil.invokeToHttpCode(body, endpoint, httpMethod));
+
+			JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+				body, endpoint, httpMethod);
+
+			Assert.assertEquals(
+				UnsupportedOperationException.class.getSimpleName(),
+				jsonObject.getString("type"));
+		}
+	}
+
 	private void _testPutNotificationTemplateWithNameTranslations()
 		throws Exception {
 
@@ -1469,6 +1688,38 @@ public class NotificationTemplateResourceTest
 		Assert.assertEquals(name2, nameI18nMap2.get(defaultLanguageId));
 	}
 
+	private void _testPutNotificationTemplateWithObjectReferences()
+		throws Exception {
+
+		ObjectField objectField = _addAttachmentObjectField();
+
+		NotificationTemplate notificationTemplate =
+			randomNotificationTemplate();
+
+		notificationTemplate.setAttachmentObjectFieldIds(
+			new Long[] {objectField.getObjectFieldId()});
+		notificationTemplate.setObjectDefinitionId(
+			_objectDefinition.getObjectDefinitionId());
+
+		notificationTemplate = _addNotificationTemplate(notificationTemplate);
+
+		notificationTemplate.setAttachmentObjectFieldExternalReferenceCodes(
+			new String[] {RandomTestUtil.randomString()});
+		notificationTemplate.setObjectDefinitionExternalReferenceCode(
+			_objectDefinition.getExternalReferenceCode());
+		notificationTemplate.setObjectDefinitionId(0L);
+
+		notificationTemplate =
+			notificationTemplateResource.putNotificationTemplate(
+				notificationTemplate.getId(), notificationTemplate);
+
+		Assert.assertArrayEquals(
+			new Long[0], notificationTemplate.getAttachmentObjectFieldIds());
+		Assert.assertEquals(
+			Long.valueOf(_objectDefinition.getObjectDefinitionId()),
+			notificationTemplate.getObjectDefinitionId());
+	}
+
 	private void _testPutNotificationTemplateWithPermissions()
 		throws Exception {
 
@@ -1479,6 +1730,18 @@ public class NotificationTemplateResourceTest
 			_putNotificationTemplateWithPermissions(
 				jsonObject.getLong("id"), RoleConstants.GUEST),
 			RoleConstants.GUEST);
+	}
+
+	private void _testPutNotificationTemplateWithPermissionsAndFeatureFlagDisabled()
+		throws Exception {
+
+		NotificationTemplate notificationTemplate = _addNotificationTemplate(
+			randomNotificationTemplate());
+
+		_testPostPutNotificationTemplateWithPermissionsAndFeatureFlagDisabled(
+			"notification/v1.0/notification-templates/" +
+				notificationTemplate.getId(),
+			Http.Method.PUT);
 	}
 
 	private JSONObject _toEmailRecipientJSONObject(
@@ -1590,6 +1853,9 @@ public class NotificationTemplateResourceTest
 
 	@DeleteAfterTestRun
 	private ObjectDefinition _objectDefinition;
+
+	@Inject
+	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@DeleteAfterTestRun
 	private Role _role;
