@@ -2456,6 +2456,74 @@ ckeditor4Test(
 	}
 );
 
+ckeditor4Test(
+	'Reset translation restores the default language value of a required rich text field',
+	{tag: '@LPD-109677'},
+	async ({apiHelpers, journalEditArticlePage, journalPage, page, site}) => {
+		const structure = await apiHelpers.dataEngine.createStructure(
+			site.id,
+			getDataStructureDefinition({
+				defaultLanguageId: 'en_US',
+				fields: [
+					{fieldType: 'rich_text', name: 'RichText', required: true},
+				],
+				name: getRandomString(),
+			})
+		);
+
+		const defaultValue = getRandomString();
+		const title = getRandomString();
+		const translatedValue = getRandomString();
+
+		await apiHelpers.headlessDelivery.postStructuredContent({
+			contentFields: [
+				{
+					contentFieldValue: {data: `<p>${defaultValue}</p>`},
+					contentFieldValue_i18n: {
+						'ca-ES': {data: `<p>${translatedValue}</p>`},
+						'en-US': {data: `<p>${defaultValue}</p>`},
+					},
+					name: 'RichText',
+				},
+			],
+			contentStructureId: Number(structure.id),
+			datePublished: null,
+			siteId: site.id,
+			title,
+			title_i18n: {'ca-ES': title, 'en-US': title},
+		});
+
+		await journalPage.goto(site.friendlyUrlPath);
+
+		await journalEditArticlePage.editArticle(title);
+
+		const richTextBody = page
+			.locator('[data-field-name="RichText"]')
+			.frameLocator('iframe')
+			.locator('body');
+
+		await expect(richTextBody).toHaveText(defaultValue);
+
+		await clickAndExpectToBeVisible({
+			autoClick: true,
+			target: page.getByRole('option', {
+				name: 'Catalan Language: Translated',
+			}),
+			trigger: page.getByRole('combobox', {name: 'Select a language'}),
+		});
+
+		await expect(richTextBody).toHaveText(translatedValue);
+
+		await page.getByLabel('Translation Options').click();
+
+		await page.getByRole('button', {name: 'Reset Translation'}).click();
+
+		await page.getByRole('button', {name: 'Delete'}).click();
+
+		await expect(richTextBody).toHaveText(defaultValue);
+	}
+);
+
 ckeditor5Test(
 	'Web Content is published with multiple translations',
 	{
