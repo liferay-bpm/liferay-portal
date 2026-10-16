@@ -6,10 +6,13 @@
 package com.liferay.portal.workflow.kaleo.definition.internal.parser;
 
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -97,6 +100,10 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 	public Definition parse(long companyId, InputStream inputStream)
 		throws WorkflowException {
 
+		if (!FeatureFlagManagerUtil.isEnabled(companyId, "LPD-49856")) {
+			return parse(inputStream);
+		}
+
 		try {
 			Document document = SAXReaderUtil.read(
 				WorkflowDefinitionContentUtil.toXML(
@@ -132,6 +139,36 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 				_addTextElement(element, "role-type", role.getTypeLabel());
 
 				_addTextElement(element, "role-id", String.valueOf(roleId));
+			}
+
+			for (Element element :
+					TransformUtil.transform(
+						document.selectNodes("//*[local-name()='user']"),
+						node -> (Element)node)) {
+
+				if (Validator.isNotNull(
+						element.elementTextTrim(
+							"user-external-reference-code"))) {
+
+					continue;
+				}
+
+				long userId = GetterUtil.getLong(
+					element.elementTextTrim("user-id"));
+
+				User user = _userLocalService.fetchUser(userId);
+
+				if ((user == null) || (user.getCompanyId() != companyId)) {
+					continue;
+				}
+
+				element.clearContent();
+
+				_addTextElement(
+					element, "user-external-reference-code",
+					user.getExternalReferenceCode());
+
+				_addTextElement(element, "user-id", String.valueOf(userId));
 			}
 
 			return _parse(document);
@@ -515,17 +552,14 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 			"user");
 
 		for (Element userAssignmentElement : userAssignmentElements) {
-			long userId = GetterUtil.getLong(
-				userAssignmentElement.elementTextTrim("user-id"));
-			String screenName = userAssignmentElement.elementTextTrim(
-				"screen-name");
-			String emailAddress = userAssignmentElement.elementTextTrim(
-				"email-address");
-
-			UserAssignment userAssignment = new UserAssignment(
-				userId, screenName, emailAddress);
-
-			assignments.add(userAssignment);
+			assignments.add(
+				new UserAssignment(
+					userAssignmentElement.elementTextTrim(
+						"user-external-reference-code"),
+					GetterUtil.getLong(
+						userAssignmentElement.elementTextTrim("user-id")),
+					userAssignmentElement.elementTextTrim("screen-name"),
+					userAssignmentElement.elementTextTrim("email-address")));
 		}
 
 		return assignments;
@@ -927,15 +961,13 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 			"user");
 
 		for (Element userRecipientElement : userRecipientElements) {
-			long userId = GetterUtil.getLong(
-				userRecipientElement.elementTextTrim("user-id"));
-			String screenName = userRecipientElement.elementTextTrim(
-				"screen-name");
-			String emailAddress = userRecipientElement.elementTextTrim(
-				"email-address");
-
 			UserRecipient userRecipient = new UserRecipient(
-				userId, screenName, emailAddress);
+				userRecipientElement.elementTextTrim(
+					"user-external-reference-code"),
+				GetterUtil.getLong(
+					userRecipientElement.elementTextTrim("user-id")),
+				userRecipientElement.elementTextTrim("screen-name"),
+				userRecipientElement.elementTextTrim("email-address"));
 
 			userRecipient.setNotificationReceptionType(
 				notificationReceptionType);
@@ -1311,6 +1343,9 @@ public class XMLWorkflowModelParser implements WorkflowModelParser {
 
 	@Reference
 	private RoleLocalService _roleLocalService;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 	private boolean _validate;
 
