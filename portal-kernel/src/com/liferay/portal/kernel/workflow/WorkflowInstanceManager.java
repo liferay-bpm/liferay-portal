@@ -89,6 +89,28 @@ public interface WorkflowInstanceManager {
 			int end, OrderByComparator<WorkflowInstance> orderByComparator)
 		throws WorkflowException;
 
+	public WorkflowInstance liberalStartWorkflowInstance(
+			long companyId, long groupId, long userId,
+			String workflowDefinitionName, Integer workflowDefinitionVersion,
+			String transitionName, Map<String, Serializable> workflowContext)
+		throws WorkflowException;
+
+	public default WorkflowInstance liberalStartWorkflowInstance(
+			long companyId, long groupId, long userId,
+			String workflowDefinitionName, Integer workflowDefinitionVersion,
+			String transitionName, Map<String, Serializable> workflowContext,
+			boolean waitForCompletion)
+		throws WorkflowException {
+
+		if (waitForCompletion) {
+			throw new UnsupportedOperationException();
+		}
+
+		return liberalStartWorkflowInstance(
+			companyId, groupId, userId, workflowDefinitionName,
+			workflowDefinitionVersion, transitionName, workflowContext);
+	}
+
 	public default List<WorkflowInstance> search(
 			long companyId, Long userId, Boolean active, String assetClassName,
 			String assetTitle, String assetDescription, String nodeName,
