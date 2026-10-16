@@ -11,6 +11,8 @@ import {PORTLET_URLS} from '../../../../utils/portletUrls';
 export class SpaceSettingsPage {
 	readonly apiHelpers: ApiHelpers;
 	readonly enableRecycleBinCheckbox: Locator;
+	readonly googleMapsAPIKeyField: Locator;
+	readonly googleMapsRadio: Locator;
 	readonly page: Page;
 	readonly saveButton: Locator;
 	readonly trashEntriesMaxAgeField: Locator;
@@ -20,6 +22,8 @@ export class SpaceSettingsPage {
 		this.enableRecycleBinCheckbox = page.getByRole('checkbox', {
 			name: 'Enable Recycle Bin',
 		});
+		this.googleMapsAPIKeyField = page.getByLabel(/^API Key/);
+		this.googleMapsRadio = page.getByRole('radio', {name: 'Google Maps'});
 		this.page = page;
 		this.saveButton = page.getByRole('button', {name: 'Save'});
 		this.trashEntriesMaxAgeField = page.getByRole('spinbutton', {
