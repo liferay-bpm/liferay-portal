@@ -89,17 +89,45 @@ public interface WorkflowTaskManager {
 	public int getWorkflowTaskCount(long companyId, Boolean completed)
 		throws WorkflowException;
 
+	public default int getWorkflowTaskCountByRole(
+			long roleId, Boolean completed)
+		throws PortalException {
+
+		throw new UnsupportedOperationException();
+	}
+
 	public int getWorkflowTaskCountByRole(
 			long companyId, long roleId, Boolean completed)
 		throws WorkflowException;
+
+	public default int getWorkflowTaskCountBySubmittingUser(
+			long userId, Boolean completed)
+		throws PortalException {
+
+		throw new UnsupportedOperationException();
+	}
 
 	public int getWorkflowTaskCountBySubmittingUser(
 			long companyId, long userId, Boolean completed)
 		throws WorkflowException;
 
+	public default int getWorkflowTaskCountByUser(
+			long userId, Boolean completed)
+		throws PortalException {
+
+		throw new UnsupportedOperationException();
+	}
+
 	public int getWorkflowTaskCountByUser(
 			long companyId, long userId, Boolean completed)
 		throws WorkflowException;
+
+	public default int getWorkflowTaskCountByUserRoles(
+			long userId, Boolean completed)
+		throws PortalException {
+
+		throw new UnsupportedOperationException();
+	}
 
 	public int getWorkflowTaskCountByUserRoles(
 			long companyId, long userId, Boolean completed)
@@ -115,6 +143,13 @@ public interface WorkflowTaskManager {
 			Boolean completed)
 		throws WorkflowException;
 
+	public default int getWorkflowTaskCountByWorkflowInstance(
+			Long userId, long workflowInstanceId, Boolean completed)
+		throws PortalException {
+
+		throw new UnsupportedOperationException();
+	}
+
 	public List<WorkflowTransition> getWorkflowTaskWorkflowTransitions(
 			long workflowTaskId)
 		throws WorkflowException;
@@ -124,20 +159,52 @@ public interface WorkflowTaskManager {
 			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException;
 
+	public default List<WorkflowTask> getWorkflowTasksByRole(
+			long roleId, Boolean completed, int start, int end,
+			OrderByComparator<WorkflowTask> orderByComparator)
+		throws PortalException {
+
+		throw new UnsupportedOperationException();
+	}
+
 	public List<WorkflowTask> getWorkflowTasksByRole(
 			long companyId, long roleId, Boolean completed, int start, int end,
 			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException;
+
+	public default List<WorkflowTask> getWorkflowTasksBySubmittingUser(
+			long userId, Boolean completed, int start, int end,
+			OrderByComparator<WorkflowTask> orderByComparator)
+		throws PortalException {
+
+		throw new UnsupportedOperationException();
+	}
 
 	public List<WorkflowTask> getWorkflowTasksBySubmittingUser(
 			long companyId, long userId, Boolean completed, int start, int end,
 			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException;
 
+	public default List<WorkflowTask> getWorkflowTasksByUser(
+			long userId, Boolean completed, int start, int end,
+			OrderByComparator<WorkflowTask> orderByComparator)
+		throws PortalException {
+
+		throw new UnsupportedOperationException();
+	}
+
 	public List<WorkflowTask> getWorkflowTasksByUser(
 			long companyId, long userId, Boolean completed, int start, int end,
 			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException;
+
+	public default List<WorkflowTask> getWorkflowTasksByUserRoles(
+			long userId, Boolean completed, int start, int end,
+			OrderByComparator<WorkflowTask> orderByComparator)
+		throws PortalException {
+
+		throw new UnsupportedOperationException();
+	}
 
 	public List<WorkflowTask> getWorkflowTasksByUserRoles(
 			long companyId, long userId, Boolean completed, int start, int end,
@@ -149,6 +216,14 @@ public interface WorkflowTaskManager {
 			Boolean completed, int start, int end,
 			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException;
+
+	public default List<WorkflowTask> getWorkflowTasksByWorkflowInstance(
+			Long userId, long workflowInstanceId, Boolean completed, int start,
+			int end, OrderByComparator<WorkflowTask> orderByComparator)
+		throws PortalException {
+
+		throw new UnsupportedOperationException();
+	}
 
 	public boolean hasAssignableUsers(long workflowTaskId)
 		throws WorkflowException;

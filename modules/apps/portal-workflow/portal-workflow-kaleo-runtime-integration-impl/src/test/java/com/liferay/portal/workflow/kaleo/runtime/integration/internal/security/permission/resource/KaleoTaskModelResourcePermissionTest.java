@@ -115,6 +115,65 @@ public class KaleoTaskModelResourcePermissionTest {
 			_kaleoTaskModelResourcePermission.contains(
 				permissionChecker2, kaleoTaskInstanceToken2,
 				RandomTestUtil.randomString()));
+
+		// Kaleo task instance token with a different company's administrator
+
+		PermissionChecker permissionChecker3 = Mockito.mock(
+			PermissionChecker.class);
+
+		Mockito.when(
+			permissionChecker3.getCompanyId()
+		).thenReturn(
+			companyId + 1
+		);
+
+		Mockito.when(
+			permissionChecker3.isCompanyAdmin()
+		).thenReturn(
+			true
+		);
+
+		Assert.assertFalse(
+			_kaleoTaskModelResourcePermission.contains(
+				permissionChecker3, kaleoTaskInstanceToken1,
+				RandomTestUtil.randomString()));
+
+		// Kaleo task instance token with the same company's administrator
+
+		KaleoTaskInstanceToken kaleoTaskInstanceToken3 = Mockito.mock(
+			KaleoTaskInstanceToken.class);
+
+		Mockito.when(
+			kaleoTaskInstanceToken3.getCompanyId()
+		).thenReturn(
+			companyId
+		);
+
+		PermissionChecker permissionChecker4 = Mockito.mock(
+			PermissionChecker.class);
+
+		Mockito.when(
+			permissionChecker4.getCompanyId()
+		).thenReturn(
+			companyId
+		);
+
+		Mockito.when(
+			permissionChecker4.isCompanyAdmin()
+		).thenReturn(
+			true
+		);
+
+		Assert.assertTrue(
+			_kaleoTaskModelResourcePermission.contains(
+				permissionChecker4, kaleoTaskInstanceToken3,
+				RandomTestUtil.randomString()));
+
+		Mockito.verify(
+			kaleoWorkflowModelConverter, Mockito.never()
+		).toWorkflowTask(
+			Mockito.eq(kaleoTaskInstanceToken3), Mockito.any()
+		);
 	}
 
 	private final KaleoTaskModelResourcePermission
