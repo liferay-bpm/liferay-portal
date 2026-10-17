@@ -112,13 +112,24 @@ public class ObjectEntrySearchUtil {
 			String languageId)
 		throws PortalException {
 
+		return getLeftJoinLocalizationTablePredicate(
+			dynamicObjectDefinitionLocalizationTable, languageId,
+			dynamicObjectDefinitionTable.getPrimaryKeyColumn());
+	}
+
+	public static Predicate getLeftJoinLocalizationTablePredicate(
+			DynamicObjectDefinitionLocalizationTable
+				dynamicObjectDefinitionLocalizationTable,
+			String languageId, Column<?, Long> primaryKeyColumn)
+		throws PortalException {
+
 		if (dynamicObjectDefinitionLocalizationTable == null) {
 			return null;
 		}
 
 		return dynamicObjectDefinitionLocalizationTable.getForeignKeyColumn(
 		).eq(
-			dynamicObjectDefinitionTable.getPrimaryKeyColumn()
+			primaryKeyColumn
 		).and(
 			dynamicObjectDefinitionLocalizationTable.getLanguageIdColumn(
 			).eq(
