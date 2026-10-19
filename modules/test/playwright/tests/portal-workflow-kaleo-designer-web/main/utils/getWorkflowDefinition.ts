@@ -9,10 +9,13 @@ import * as path from 'path';
 type fileNames =
 	| 'basic'
 	| 'bcc-reception-type'
+	| 'role-external-reference-code-without-id'
+	| 'role-name-without-type'
 	| 'same-source-transitions'
 	| 'sample-client-extension'
 	| 'sample-start-end'
-	| 'user-external-reference-code';
+	| 'user-external-reference-code'
+	| 'user-external-reference-code-without-id';
 
 function getXMLContentFromFile(fileName: string) {
 	const absolutePath = path.resolve(__dirname, `../dependencies/${fileName}`);
