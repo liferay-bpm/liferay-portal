@@ -37,6 +37,40 @@ describe('Deserializing a notification whose recipient roles omit auto-create', 
 	});
 });
 
+describe('Deserializing roles written by name without a type', () => {
+	it('Reads every role as a regular role by name', () => {
+		const elements = getElements(
+			'role-names-without-types-workflow-definition.xml'
+		);
+
+		const task = elements.find((element) => element.id === 'Review');
+
+		expect(task.data.assignments).toEqual({
+			assignmentType: ['roleType'],
+			roleName: ['Portal Content Reviewer'],
+			roleType: ['regular'],
+		});
+		expect(task.data.notifications.recipients[0][0]).toEqual({
+			assignmentType: ['roleType'],
+			roleName: ['Portal Content Publisher'],
+			roleType: ['regular'],
+		});
+		expect(task.data.taskTimers.reassignments[0]).toEqual({
+			assignmentType: ['roleType'],
+			autoCreate: [undefined],
+			roleName: ['Portal Content Reviewer'],
+			roleType: ['regular'],
+		});
+		expect(
+			task.data.taskTimers.timerNotifications[0].recipients[0][0]
+		).toEqual({
+			assignmentType: ['roleType'],
+			roleName: ['Portal Content Publisher'],
+			roleType: ['regular'],
+		});
+	});
+});
+
 describe('Deserializing roles that carry an external reference code', () => {
 	it('Reads the external reference code, type, and ID of every role', () => {
 		const elements = getElements(
@@ -69,6 +103,39 @@ describe('Deserializing roles that carry an external reference code', () => {
 			assignmentType: ['roleId'],
 			roleExternalReferenceCode: 'ROLE_EXTERNAL_REFERENCE_CODE_4',
 			roleId: ['4'],
+			roleType: 'depot',
+		});
+	});
+});
+
+describe('Deserializing roles that carry only an external reference code', () => {
+	it('Reads the external reference code and type of every role and leaves the ID unset', () => {
+		const elements = getElements(
+			'roles-with-only-external-reference-codes-workflow-definition.xml'
+		);
+
+		const task = elements.find((element) => element.id === 'Review');
+
+		expect(task.data.assignments).toEqual({
+			assignmentType: ['roleId'],
+			roleExternalReferenceCode: 'ROLE_EXTERNAL_REFERENCE_CODE_1',
+			roleType: 'regular',
+		});
+		expect(task.data.notifications.recipients[0][0]).toEqual({
+			assignmentType: ['roleId'],
+			roleExternalReferenceCode: 'ROLE_EXTERNAL_REFERENCE_CODE_2',
+			roleType: 'site',
+		});
+		expect(task.data.taskTimers.reassignments[0]).toEqual({
+			assignmentType: ['roleId'],
+			roleExternalReferenceCode: 'ROLE_EXTERNAL_REFERENCE_CODE_3',
+			roleType: 'organization',
+		});
+		expect(
+			task.data.taskTimers.timerNotifications[0].recipients[0][0]
+		).toEqual({
+			assignmentType: ['roleId'],
+			roleExternalReferenceCode: 'ROLE_EXTERNAL_REFERENCE_CODE_4',
 			roleType: 'depot',
 		});
 	});
@@ -193,6 +260,39 @@ describe('Deserializing users that carry an external reference code and users th
 			assignmentType: ['user'],
 			userExternalReferenceCode: ['USER_EXTERNAL_REFERENCE_CODE_4', undefined],
 			userId: ['4', '40'],
+		});
+	});
+});
+
+describe('Deserializing users that carry only an external reference code', () => {
+	it('Reads the external reference code of every user and leaves the ID unset', () => {
+		const elements = getElements(
+			'users-with-only-external-reference-codes-workflow-definition.xml'
+		);
+
+		const task = elements.find((element) => element.id === 'Review');
+
+		expect(task.data.assignments).toEqual({
+			assignmentType: ['user'],
+			userExternalReferenceCode: ['USER_EXTERNAL_REFERENCE_CODE_1'],
+			userId: [undefined],
+		});
+		expect(task.data.notifications.recipients[0][0]).toEqual({
+			assignmentType: ['user'],
+			userExternalReferenceCode: ['USER_EXTERNAL_REFERENCE_CODE_2'],
+			userId: [undefined],
+		});
+		expect(task.data.taskTimers.reassignments[0]).toEqual({
+			assignmentType: ['user'],
+			userExternalReferenceCode: ['USER_EXTERNAL_REFERENCE_CODE_3'],
+			userId: [undefined],
+		});
+		expect(
+			task.data.taskTimers.timerNotifications[0].recipients[0][0]
+		).toEqual({
+			assignmentType: ['user'],
+			userExternalReferenceCode: ['USER_EXTERNAL_REFERENCE_CODE_4'],
+			userId: [undefined],
 		});
 	});
 });
