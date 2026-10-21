@@ -846,6 +846,34 @@ public class WorkflowTaskManagerImplTest extends BaseWorkflowManagerTestCase {
 	}
 
 	@Test
+	public void testGetNextTransitionNames() throws Exception {
+		_activateSingleApproverWorkflow(BlogsEntry.class.getName(), 0, 0);
+
+		_addBlogsEntry();
+
+		WorkflowTask workflowTask = _getWorkflowTask();
+
+		User user = UserTestUtil.addUser(_company);
+
+		PermissionChecker originalPermissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		try {
+			PermissionThreadLocal.setPermissionChecker(
+				PermissionCheckerFactoryUtil.create(user));
+
+			Assert.assertEquals(
+				Arrays.asList(Constants.APPROVE, Constants.REJECT),
+				_workflowTaskManager.getNextTransitionNames(
+					user.getUserId(), workflowTask.getWorkflowTaskId()));
+		}
+		finally {
+			PermissionThreadLocal.setPermissionChecker(
+				originalPermissionChecker);
+		}
+	}
+
+	@Test
 	public void testGetNotifiableUsersRoleType() throws Exception {
 		String emailAddress =
 			StringUtil.toLowerCase(RandomTestUtil.randomString()) +
