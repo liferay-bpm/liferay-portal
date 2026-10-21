@@ -59,6 +59,7 @@ import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalFolderLocalService;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTestUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -123,6 +124,7 @@ import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.WorkflowTask;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManager;
+import com.liferay.portal.kernel.workflow.WorkflowTransition;
 import com.liferay.portal.kernel.workflow.search.WorkflowModelSearchResult;
 import com.liferay.portal.search.test.rule.SearchTestRule;
 import com.liferay.portal.security.permission.SimplePermissionChecker;
@@ -871,6 +873,26 @@ public class WorkflowTaskManagerImplTest extends BaseWorkflowManagerTestCase {
 			PermissionThreadLocal.setPermissionChecker(
 				originalPermissionChecker);
 		}
+	}
+
+	@Test
+	public void testGetNextWorkflowTransitions() throws Exception {
+		_activateSingleApproverWorkflow(BlogsEntry.class.getName(), 0, 0);
+
+		_addBlogsEntry();
+
+		WorkflowTask workflowTask = _getWorkflowTask();
+
+		Assert.assertEquals(
+			Arrays.asList(Constants.APPROVE, Constants.REJECT),
+			TransformUtil.transform(
+				_workflowTaskManager.getNextWorkflowTransitions(
+					workflowTask.getWorkflowTaskId()),
+				WorkflowTransition::getName));
+
+		_assertMustHavePermission(
+			() -> _workflowTaskManager.getNextWorkflowTransitions(
+				workflowTask.getWorkflowTaskId()));
 	}
 
 	@Test
