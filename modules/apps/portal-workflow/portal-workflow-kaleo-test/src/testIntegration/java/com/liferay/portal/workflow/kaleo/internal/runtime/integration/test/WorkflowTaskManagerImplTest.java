@@ -1039,6 +1039,23 @@ public class WorkflowTaskManagerImplTest extends BaseWorkflowManagerTestCase {
 	}
 
 	@Test
+	public void testHasAssignableUsers() throws Exception {
+		_activateSingleApproverWorkflow(BlogsEntry.class.getName(), 0, 0);
+
+		_addBlogsEntry();
+
+		WorkflowTask workflowTask = _getWorkflowTask();
+
+		Assert.assertTrue(
+			_workflowTaskManager.hasAssignableUsers(
+				workflowTask.getWorkflowTaskId()));
+
+		_assertMustHavePermission(
+			() -> _workflowTaskManager.hasAssignableUsers(
+				workflowTask.getWorkflowTaskId()));
+	}
+
+	@Test
 	public void testIsNotifiableUser() throws Exception {
 		User user = UserTestUtil.addUser(_company);
 
