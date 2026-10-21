@@ -79,6 +79,7 @@ import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
@@ -117,6 +118,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.workflow.WorkflowException;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.WorkflowTask;
@@ -147,6 +149,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 import org.junit.runner.RunWith;
 
 import org.osgi.service.cm.Configuration;
@@ -822,6 +825,24 @@ public class WorkflowTaskManagerImplTest extends BaseWorkflowManagerTestCase {
 				user.getCompanyId(), user.getUserId(), false));
 
 		_deactivateWorkflow(BlogsEntry.class.getName(), 0, 0);
+	}
+
+	@Test
+	public void testGetAssignableUsers() throws Exception {
+		_activateSingleApproverWorkflow(BlogsEntry.class.getName(), 0, 0);
+
+		_addBlogsEntry();
+
+		WorkflowTask workflowTask = _getWorkflowTask();
+
+		Assert.assertFalse(
+			ListUtil.isEmpty(
+				_workflowTaskManager.getAssignableUsers(
+					workflowTask.getWorkflowTaskId())));
+
+		_assertMustHavePermission(
+			() -> _workflowTaskManager.getAssignableUsers(
+				workflowTask.getWorkflowTaskId()));
 	}
 
 	@Test
@@ -1744,6 +1765,32 @@ public class WorkflowTaskManagerImplTest extends BaseWorkflowManagerTestCase {
 					workflowTask2.getWorkflowTaskId(),
 				workflowTask1.getWorkflowTaskId(),
 				workflowTask2.getWorkflowTaskId());
+		}
+	}
+
+	private void _assertMustHavePermission(ThrowingRunnable throwingRunnable)
+		throws Exception {
+
+		PermissionChecker originalPermissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		try {
+			PermissionThreadLocal.setPermissionChecker(
+				PermissionCheckerFactoryUtil.create(
+					UserTestUtil.addUser(_company)));
+
+			WorkflowException workflowException = Assert.assertThrows(
+				WorkflowException.class, throwingRunnable);
+
+			Throwable throwable = workflowException.getCause();
+
+			Assert.assertTrue(
+				String.valueOf(throwable),
+				throwable instanceof PrincipalException.MustHavePermission);
+		}
+		finally {
+			PermissionThreadLocal.setPermissionChecker(
+				originalPermissionChecker);
 		}
 	}
 
