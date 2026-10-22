@@ -5,7 +5,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:liferay.com:liferay-workflow_7.4.0 http://www.liferay.com/dtd/liferay-workflow-definition_7_4_0.xsd"
 >
-	<name>Roles with External Reference Codes</name>
+	<name>Roles With External Reference Codes</name>
 	<state>
 		<name>Start</name>
 		<metadata>
@@ -48,7 +48,7 @@
 				<recipients>
 					<roles>
 						<role>
-							<role-external-reference-code>ROLE2_ERC</role-external-reference-code>
+							<role-external-reference-code>ROLE_EXTERNAL_REFERENCE_CODE_2</role-external-reference-code>
 							<role-type>site</role-type>
 							<role-id>2</role-id>
 						</role>
@@ -60,7 +60,7 @@
 		<assignments>
 			<roles>
 				<role>
-					<role-external-reference-code>ROLE1_ERC</role-external-reference-code>
+					<role-external-reference-code>ROLE_EXTERNAL_REFERENCE_CODE_1</role-external-reference-code>
 					<role-type>regular</role-type>
 					<role-id>1</role-id>
 				</role>
@@ -83,7 +83,7 @@
 						<recipients>
 							<roles>
 								<role>
-									<role-external-reference-code>ROLE4_ERC</role-external-reference-code>
+									<role-external-reference-code>ROLE_EXTERNAL_REFERENCE_CODE_4</role-external-reference-code>
 									<role-type>depot</role-type>
 									<role-id>4</role-id>
 								</role>
@@ -93,7 +93,7 @@
 					<reassignments>
 						<roles>
 							<role>
-								<role-external-reference-code>ROLE3_ERC</role-external-reference-code>
+								<role-external-reference-code>ROLE_EXTERNAL_REFERENCE_CODE_3</role-external-reference-code>
 								<role-type>organization</role-type>
 								<role-id>3</role-id>
 							</role>

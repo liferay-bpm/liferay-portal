@@ -47,19 +47,19 @@ describe('Deserializing roles that carry an external reference code', () => {
 
 		expect(task.data.assignments).toEqual({
 			assignmentType: ['roleId'],
-			roleExternalReferenceCode: 'ROLE1_ERC',
+			roleExternalReferenceCode: 'ROLE_EXTERNAL_REFERENCE_CODE_1',
 			roleId: 1,
 			roleType: 'regular',
 		});
 		expect(task.data.notifications.recipients[0][0]).toEqual({
 			assignmentType: ['roleId'],
-			roleExternalReferenceCode: 'ROLE2_ERC',
+			roleExternalReferenceCode: 'ROLE_EXTERNAL_REFERENCE_CODE_2',
 			roleId: '2',
 			roleType: 'site',
 		});
 		expect(task.data.taskTimers.reassignments[0]).toEqual({
 			assignmentType: ['roleId'],
-			roleExternalReferenceCode: 'ROLE3_ERC',
+			roleExternalReferenceCode: 'ROLE_EXTERNAL_REFERENCE_CODE_3',
 			roleId: 3,
 			roleType: 'organization',
 		});
@@ -67,7 +67,7 @@ describe('Deserializing roles that carry an external reference code', () => {
 			task.data.taskTimers.timerNotifications[0].recipients[0][0]
 		).toEqual({
 			assignmentType: ['roleId'],
-			roleExternalReferenceCode: 'ROLE4_ERC',
+			roleExternalReferenceCode: 'ROLE_EXTERNAL_REFERENCE_CODE_4',
 			roleId: ['4'],
 			roleType: 'depot',
 		});

@@ -35,16 +35,16 @@ describe('Serializing roles that carry an external reference code', () => {
 		);
 
 		expect(xmlDefinition).toContain(
-			'<role-external-reference-code>ROLE1_ERC</role-external-reference-code>'
+			'<role-external-reference-code>ROLE_EXTERNAL_REFERENCE_CODE_1</role-external-reference-code>'
 		);
 		expect(xmlDefinition).toContain(
-			'<role-external-reference-code>ROLE2_ERC</role-external-reference-code>'
+			'<role-external-reference-code>ROLE_EXTERNAL_REFERENCE_CODE_2</role-external-reference-code>'
 		);
 		expect(xmlDefinition).toContain(
-			'<role-external-reference-code>ROLE3_ERC</role-external-reference-code>'
+			'<role-external-reference-code>ROLE_EXTERNAL_REFERENCE_CODE_3</role-external-reference-code>'
 		);
 		expect(xmlDefinition).toContain(
-			'<role-external-reference-code>ROLE4_ERC</role-external-reference-code>'
+			'<role-external-reference-code>ROLE_EXTERNAL_REFERENCE_CODE_4</role-external-reference-code>'
 		);
 	});
 });
