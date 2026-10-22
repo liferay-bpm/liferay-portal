@@ -77,7 +77,7 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 
 	@Override
 	public KaleoDefinition deactivateKaleoDefinition(
-			String name, int version, ServiceContext serviceContext)
+		String name, int version, ServiceContext serviceContext)
 		throws PortalException {
 
 		KaleoDefinition kaleoDefinition =
@@ -85,9 +85,9 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 				serviceContext.getCompanyId(), name, version);
 
 		_checkPermissions(
-			ActionKeys.ADD_DEFINITION,
 			_getGroupId(
-				kaleoDefinition.getGroupId(), kaleoDefinition.getScope()));
+				kaleoDefinition.getGroupId(), kaleoDefinition.getScope()),
+			kaleoDefinition.getCompanyId(), ActionKeys.ADD_DEFINITION);
 
 		return _kaleoDefinitionLocalService.deactivateKaleoDefinition(
 			name, version, serviceContext);
