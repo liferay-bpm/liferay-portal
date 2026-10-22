@@ -67,8 +67,8 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 		throws PortalException {
 
 		_checkPermissions(
-			ActionKeys.ADD_DEFINITION,
-			_getGroupId(serviceContext.getScopeGroupId(), scope));
+			_getGroupId(serviceContext.getScopeGroupId(), scope),
+			serviceContext.getCompanyId(), ActionKeys.ADD_DEFINITION);
 
 		return _kaleoDefinitionLocalService.addKaleoDefinition(
 			externalReferenceCode, name, title, description, content, scope,
