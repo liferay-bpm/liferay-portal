@@ -51,7 +51,7 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 				serviceContext.getCompanyId(), name, version);
 
 		_checkPermissions(
-			ActionKeys.ADD_DEFINITION,
+			kaleoDefinition.getCompanyId(), ActionKeys.ADD_DEFINITION,
 			_getGroupId(
 				kaleoDefinition.getGroupId(), kaleoDefinition.getScope()));
 
