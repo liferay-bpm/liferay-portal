@@ -98,7 +98,8 @@ public class KaleoDefinitionServiceImplTest {
 		_originalName = PrincipalThreadLocal.getName();
 		_originalPermissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
-		_serviceContext = ServiceContextTestUtil.getServiceContext();
+		_serviceContext = ServiceContextTestUtil.getServiceContext(
+			_company.getCompanyId());
 	}
 
 	@After
