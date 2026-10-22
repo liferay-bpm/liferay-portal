@@ -207,7 +207,7 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 			content, system, serviceContext);
 	}
 
-	private void _checkPermissions(String actionId, long groupId)
+	private void _checkPermissions(long targetCompanyId, String actionId, long groupId)
 		throws PrincipalException {
 
 		PermissionChecker permissionChecker =
@@ -215,6 +215,13 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 
 		if (permissionChecker == null) {
 			return;
+		}
+
+		if (!permissionChecker.isOmniadmin() &&
+			(permissionChecker.getCompanyId() != targetCompanyId)) {
+
+			throw new PrincipalException.MustBeCompanyAdmin(
+				permissionChecker.getUserId());
 		}
 
 		_portletResourcePermission.check(permissionChecker, groupId, actionId);
