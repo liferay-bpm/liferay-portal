@@ -25,6 +25,7 @@ import com.liferay.object.model.ObjectFolder;
 import com.liferay.object.model.bag.ObjectFieldBag;
 import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.service.ObjectEntryFolderLocalService;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.base.BaseTable;
@@ -79,7 +80,7 @@ public class ObjectEntryModelDocumentContributor
 		AccountEntryOrganizationRelLocalService
 			accountEntryOrganizationRelLocalService,
 		DLFileEntryLocalService dlFileEntryLocalService,
-		DLFileEntryTextProvider dlFileEntryTextProvider,
+		ServiceTrackerList<DLFileEntryTextProvider> dlFileEntryTextProviders,
 		ObjectEntryFolderLocalService objectEntryFolderLocalService,
 		ObjectFieldBusinessTypeRegistry objectFieldBusinessTypeRegistry,
 		TextEmbeddingDocumentContributor textEmbeddingDocumentContributor) {
@@ -87,7 +88,7 @@ public class ObjectEntryModelDocumentContributor
 		_accountEntryOrganizationRelLocalService =
 			accountEntryOrganizationRelLocalService;
 		_dlFileEntryLocalService = dlFileEntryLocalService;
-		_dlFileEntryTextProvider = dlFileEntryTextProvider;
+		_dlFileEntryTextProviders = dlFileEntryTextProviders;
 		_objectEntryFolderLocalService = objectEntryFolderLocalService;
 		_objectFieldBusinessTypeRegistry = objectFieldBusinessTypeRegistry;
 		_textEmbeddingDocumentContributor = textEmbeddingDocumentContributor;
@@ -279,17 +280,30 @@ public class ObjectEntryModelDocumentContributor
 			long fileEntryId = GetterUtil.getLong(fieldValue);
 
 			if (!objectField.isIndexedAsKeyword()) {
-				String fileEntryText = _getFileEntryText(fileEntryId);
+				DLFileEntry dlFileEntry =
+					_dlFileEntryLocalService.fetchDLFileEntry(fileEntryId);
 
-				if (Validator.isNotNull(fileEntryText)) {
-					_addField(
-						fieldArray, fieldName,
-						_getValueFieldName(locale, objectEntry, objectField),
-						fileEntryText);
+				if (dlFileEntry != null) {
+					for (DLFileEntryTextProvider dlFileEntryTextProvider :
+							_dlFileEntryTextProviders) {
 
-					_appendToContent(
-						locale, fieldName, textEmbeddingContentHelper,
-						fileEntryText);
+						String text = dlFileEntryTextProvider.getText(
+							dlFileEntry);
+
+						if (Validator.isNull(text)) {
+							continue;
+						}
+
+						_addField(
+							fieldArray, fieldName,
+							_getValueFieldName(
+								locale, objectEntry, objectField),
+							text);
+
+						_appendToContent(
+							locale, fieldName, textEmbeddingContentHelper,
+							text);
+					}
 				}
 			}
 
@@ -693,21 +707,6 @@ public class ObjectEntryModelDocumentContributor
 		return _format.format(value);
 	}
 
-	private String _getFileEntryText(long fileEntryId) {
-		if (fileEntryId == 0) {
-			return null;
-		}
-
-		DLFileEntry dlFileEntry = _dlFileEntryLocalService.fetchDLFileEntry(
-			fileEntryId);
-
-		if (dlFileEntry == null) {
-			return null;
-		}
-
-		return _dlFileEntryTextProvider.getText(dlFileEntry);
-	}
-
 	private String _getFileName(
 		long dlFileEntryId, ObjectDefinition objectDefinition) {
 
@@ -907,7 +906,8 @@ public class ObjectEntryModelDocumentContributor
 	private final AccountEntryOrganizationRelLocalService
 		_accountEntryOrganizationRelLocalService;
 	private final DLFileEntryLocalService _dlFileEntryLocalService;
-	private final DLFileEntryTextProvider _dlFileEntryTextProvider;
+	private final ServiceTrackerList<DLFileEntryTextProvider>
+		_dlFileEntryTextProviders;
 	private final ObjectEntryFolderLocalService _objectEntryFolderLocalService;
 	private final ObjectFieldBusinessTypeRegistry
 		_objectFieldBusinessTypeRegistry;
