@@ -12,6 +12,7 @@ import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceReport;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
@@ -33,10 +34,12 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -178,6 +181,99 @@ public class DDMFormInstanceReportLocalServiceTest
 			radioFieldJSONObject.getJSONObject("values");
 
 		Assert.assertEquals(0, radioFieldValuesJSONObject.getInt("value 1"));
+	}
+
+	@Test
+	public void testUpdateFormInstanceReportWhenDeleteFormInstanceRecordWithMaxValue()
+		throws Exception {
+
+		_addNumericDDMFormInstance();
+
+		_addFormInstanceRecord("1", WorkflowConstants.ACTION_PUBLISH);
+		_addFormInstanceRecord("99", WorkflowConstants.ACTION_SAVE_DRAFT);
+
+		_updateFormInstanceRecord(
+			_addFormInstanceRecord("5", WorkflowConstants.ACTION_PUBLISH),
+			WorkflowConstants.STATUS_PENDING, "2");
+
+		DDMFormInstanceRecord ddmFormInstanceRecord = _addFormInstanceRecord(
+			"9", WorkflowConstants.ACTION_PUBLISH);
+
+		_ddmFormInstanceRecordLocalService.deleteFormInstanceRecord(
+			ddmFormInstanceRecord.getFormInstanceRecordId());
+
+		DDMFormInstanceReport ddmFormInstanceReport =
+			_ddmFormInstanceReportLocalService.
+				getFormInstanceReportByFormInstanceId(
+					_ddmFormInstance.getFormInstanceId());
+
+		JSONObject ddmFormInstanceReportDataJSONObject =
+			JSONFactoryUtil.createJSONObject(ddmFormInstanceReport.getData());
+
+		Assert.assertEquals(
+			2, ddmFormInstanceReportDataJSONObject.getInt("totalItems"));
+
+		JSONObject numberFieldJSONObject =
+			ddmFormInstanceReportDataJSONObject.getJSONObject("number");
+
+		JSONObject numberFieldSummaryJSONObject =
+			numberFieldJSONObject.getJSONObject("summary");
+
+		Assert.assertEquals("5", numberFieldSummaryJSONObject.getString("max"));
+		Assert.assertEquals(1, numberFieldSummaryJSONObject.getInt("maxCount"));
+		Assert.assertEquals("1", numberFieldSummaryJSONObject.getString("min"));
+		Assert.assertEquals(1, numberFieldSummaryJSONObject.getInt("minCount"));
+		Assert.assertEquals("6", numberFieldSummaryJSONObject.getString("sum"));
+	}
+
+	@Test
+	public void testUpdateFormInstanceReportWhenDeleteFormInstanceRecordsWithUnapprovedVersions()
+		throws Exception {
+
+		_addNumericDDMFormInstance();
+
+		_addFormInstanceRecord("1", WorkflowConstants.ACTION_PUBLISH);
+
+		DDMFormInstanceRecord draftDDMFormInstanceRecord =
+			_addFormInstanceRecord("5", WorkflowConstants.ACTION_PUBLISH);
+
+		_updateFormInstanceRecord(
+			draftDDMFormInstanceRecord, WorkflowConstants.STATUS_DRAFT, "2");
+
+		DDMFormInstanceRecord pendingDDMFormInstanceRecord =
+			_addFormInstanceRecord("7", WorkflowConstants.ACTION_PUBLISH);
+
+		_updateFormInstanceRecord(
+			pendingDDMFormInstanceRecord, WorkflowConstants.STATUS_PENDING,
+			"3");
+
+		_ddmFormInstanceRecordLocalService.deleteFormInstanceRecord(
+			draftDDMFormInstanceRecord.getFormInstanceRecordId());
+		_ddmFormInstanceRecordLocalService.deleteFormInstanceRecord(
+			pendingDDMFormInstanceRecord.getFormInstanceRecordId());
+
+		DDMFormInstanceReport ddmFormInstanceReport =
+			_ddmFormInstanceReportLocalService.
+				getFormInstanceReportByFormInstanceId(
+					_ddmFormInstance.getFormInstanceId());
+
+		JSONObject ddmFormInstanceReportDataJSONObject =
+			JSONFactoryUtil.createJSONObject(ddmFormInstanceReport.getData());
+
+		Assert.assertEquals(
+			1, ddmFormInstanceReportDataJSONObject.getInt("totalItems"));
+
+		JSONObject numberFieldJSONObject =
+			ddmFormInstanceReportDataJSONObject.getJSONObject("number");
+
+		Assert.assertEquals(1, numberFieldJSONObject.getInt("totalEntries"));
+
+		JSONObject numberFieldSummaryJSONObject =
+			numberFieldJSONObject.getJSONObject("summary");
+
+		Assert.assertEquals("1", numberFieldSummaryJSONObject.getString("max"));
+		Assert.assertEquals("1", numberFieldSummaryJSONObject.getString("min"));
+		Assert.assertEquals("1", numberFieldSummaryJSONObject.getString("sum"));
 	}
 
 	@Test
@@ -342,6 +438,69 @@ public class DDMFormInstanceReportLocalServiceTest
 
 	protected ServiceContext getServiceContext() throws PortalException {
 		return ServiceContextTestUtil.getServiceContext(group, _userId);
+	}
+
+	private DDMFormInstanceRecord _addFormInstanceRecord(
+			String value, int workflowAction)
+		throws Exception {
+
+		ServiceContext serviceContext = getServiceContext();
+
+		serviceContext.setWorkflowAction(workflowAction);
+
+		return _ddmFormInstanceRecordLocalService.addFormInstanceRecord(
+			_userId, group.getGroupId(), _ddmFormInstance.getFormInstanceId(),
+			_createDDMFormValues(value), serviceContext);
+	}
+
+	private void _addNumericDDMFormInstance() throws Exception {
+		DDMForm ddmForm = DDMFormTestUtil.createDDMForm();
+
+		ddmForm.addDDMFormField(
+			DDMFormTestUtil.createNumericDDMFormField(
+				"number", RandomTestUtil.randomString(), "integer", false,
+				false, false, RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString()));
+
+		_ddmFormInstance = DDMFormInstanceTestUtil.addDDMFormInstance(
+			ddmForm, group, _userId);
+	}
+
+	private DDMFormValues _createDDMFormValues(String value) throws Exception {
+		DDMFormValues ddmFormValues = DDMFormValuesTestUtil.createDDMFormValues(
+			_ddmFormInstance.getDDMForm());
+
+		ddmFormValues.addDDMFormFieldValue(
+			DDMFormValuesTestUtil.createUnlocalizedDDMFormFieldValue(
+				"number", value));
+
+		return ddmFormValues;
+	}
+
+	private void _updateFormInstanceRecord(
+			DDMFormInstanceRecord ddmFormInstanceRecord, int status,
+			String value)
+		throws Exception {
+
+		ServiceContext serviceContext = getServiceContext();
+
+		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
+
+		_ddmFormInstanceRecordLocalService.updateFormInstanceRecord(
+			_userId, ddmFormInstanceRecord.getFormInstanceRecordId(), false,
+			_createDDMFormValues(value), serviceContext);
+
+		if (status == WorkflowConstants.STATUS_DRAFT) {
+			return;
+		}
+
+		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion =
+			ddmFormInstanceRecord.getLatestFormInstanceRecordVersion();
+
+		_ddmFormInstanceRecordLocalService.updateStatus(
+			_userId,
+			ddmFormInstanceRecordVersion.getFormInstanceRecordVersionId(),
+			status, serviceContext);
 	}
 
 	private static long _classNameId;

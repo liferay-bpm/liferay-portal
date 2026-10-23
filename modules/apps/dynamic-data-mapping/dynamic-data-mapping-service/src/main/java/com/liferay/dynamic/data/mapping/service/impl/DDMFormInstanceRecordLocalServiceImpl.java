@@ -176,16 +176,22 @@ public class DDMFormInstanceRecordLocalServiceImpl
 			DDMFormInstanceRecord ddmFormInstanceRecord)
 		throws PortalException {
 
-		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion =
-			ddmFormInstanceRecord.getLatestFormInstanceRecordVersion();
+		int approvedRecordVersionsCount =
+			_ddmFormInstanceRecordVersionPersistence.countByF_S(
+				ddmFormInstanceRecord.getFormInstanceRecordId(),
+				WorkflowConstants.STATUS_APPROVED);
 
-		if (ddmFormInstanceRecordVersion.getStatus() ==
-				WorkflowConstants.STATUS_APPROVED) {
-
+		if (approvedRecordVersionsCount > 0) {
 			DDMFormInstanceReport ddmFormInstanceReport =
 				_ddmFormInstanceReportLocalService.
 					getFormInstanceReportByFormInstanceId(
 						ddmFormInstanceRecord.getFormInstanceId());
+
+			DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion =
+				_ddmFormInstanceRecordVersionLocalService.
+					getLatestFormInstanceRecordVersion(
+						ddmFormInstanceRecord.getFormInstanceRecordId(),
+						WorkflowConstants.STATUS_APPROVED);
 
 			_ddmFormInstanceReportLocalService.processFormInstanceReportEvent(
 				ddmFormInstanceReport.getFormInstanceReportId(),
