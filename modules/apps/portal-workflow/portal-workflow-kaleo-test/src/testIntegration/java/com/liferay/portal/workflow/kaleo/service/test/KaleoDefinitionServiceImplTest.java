@@ -356,10 +356,10 @@ public class KaleoDefinitionServiceImplTest {
 
 		User user = _addUser();
 
-		ServiceContext serviceContext =
+		ServiceContext serviceContext1 =
 			ServiceContextTestUtil.getServiceContext(user.getCompanyId());
 
-		serviceContext.setAttribute("checkPermission", Boolean.FALSE);
+		serviceContext1.setAttribute("checkPermission", Boolean.FALSE);
 
 		AssertUtils.assertFailure(
 			PrincipalException.MustHavePermission.class,
@@ -368,7 +368,7 @@ public class KaleoDefinitionServiceImplTest {
 				ActionKeys.ADD_DEFINITION, " permission for ",
 				WorkflowConstants.RESOURCE_NAME, StringPool.SPACE),
 			() -> _addKaleoDefinition(
-				WorkflowDefinitionConstants.SCOPE_ALL, serviceContext));
+				WorkflowDefinitionConstants.SCOPE_ALL, serviceContext1));
 
 		// Administrator with "company.administrator.can.publish" disabled
 
@@ -391,6 +391,20 @@ public class KaleoDefinitionServiceImplTest {
 			).build());
 
 		Assert.assertNotNull(_addKaleoDefinition());
+
+		// Administrator with workflow definition from another company
+
+		ServiceContext serviceContext2 =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getCompanyId());
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustBeCompanyAdmin.class,
+			StringBundler.concat(
+				"User ", _companyAdminUser.getUserId(), " must be the company ",
+				"administrator to perform the action"),
+			() -> _addKaleoDefinition(
+				WorkflowDefinitionConstants.SCOPE_ALL, serviceContext2));
 	}
 
 	private void _testAddKaleoDefinitionWithGroupId() throws Exception {
@@ -471,6 +485,21 @@ public class KaleoDefinitionServiceImplTest {
 				_serviceContext);
 
 		Assert.assertFalse(inactiveKaleoDefinition.isActive());
+
+		// Administrator with workflow definition from another company
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getCompanyId());
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustBeCompanyAdmin.class,
+			StringBundler.concat(
+				"User ", _companyAdminUser.getUserId(), " must be the company ",
+				"administrator to perform the action"),
+			() -> _kaleoDefinitionService.deactivateKaleoDefinition(
+				kaleoDefinition.getName(), kaleoDefinition.getVersion(),
+				serviceContext));
 	}
 
 	private void _testDeactivateKaleoDefinitionWithGroupId() throws Exception {
@@ -553,6 +582,20 @@ public class KaleoDefinitionServiceImplTest {
 			HashMapDictionaryBuilder.<String, Object>put(
 				"company.administrator.can.publish", true
 			).build());
+
+		// Administrator with workflow definition from another company
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getCompanyId());
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustBeCompanyAdmin.class,
+			StringBundler.concat(
+				"User ", _companyAdminUser.getUserId(), " must be the company ",
+				"administrator to perform the action"),
+			() -> _kaleoDefinitionService.deleteKaleoDefinition(
+				kaleoDefinition.getName(), serviceContext));
 
 		_kaleoDefinitionService.deleteKaleoDefinition(
 			kaleoDefinition.getName(), _serviceContext);
@@ -667,14 +710,14 @@ public class KaleoDefinitionServiceImplTest {
 	private void _testUpdateKaleoDefinition() throws Exception {
 		KaleoDefinition kaleoDefinition = _addKaleoDefinition();
 
-		// A user with the "checkPermission" attribute set to false
+		// Disable "checkPermission" attribute
 
 		User user = _addUser();
 
-		ServiceContext serviceContext =
+		ServiceContext serviceContext1 =
 			ServiceContextTestUtil.getServiceContext();
 
-		serviceContext.setAttribute("checkPermission", Boolean.FALSE);
+		serviceContext1.setAttribute("checkPermission", Boolean.FALSE);
 
 		AssertUtils.assertFailure(
 			PrincipalException.MustHavePermission.class,
@@ -686,7 +729,7 @@ public class KaleoDefinitionServiceImplTest {
 				kaleoDefinition.getExternalReferenceCode(),
 				kaleoDefinition.getKaleoDefinitionId(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-				kaleoDefinition.getContent(), false, serviceContext));
+				kaleoDefinition.getContent(), false, serviceContext1));
 
 		// Administrator with "company.administrator.can.publish" disabled
 
@@ -718,6 +761,23 @@ public class KaleoDefinitionServiceImplTest {
 				kaleoDefinition.getKaleoDefinitionId(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				kaleoDefinition.getContent(), false, _serviceContext));
+
+		// Administrator with workflow definition from another company
+
+		ServiceContext serviceContext2 =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getCompanyId());
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustBeCompanyAdmin.class,
+			StringBundler.concat(
+				"User ", _companyAdminUser.getUserId(), " must be the company ",
+				"administrator to perform the action"),
+			() -> _kaleoDefinitionService.updateKaleoDefinition(
+				kaleoDefinition.getExternalReferenceCode(),
+				kaleoDefinition.getKaleoDefinitionId(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				kaleoDefinition.getContent(), false, serviceContext2));
 	}
 
 	private void _testUpdateKaleoDefinitionWithDifferentGroupId()
