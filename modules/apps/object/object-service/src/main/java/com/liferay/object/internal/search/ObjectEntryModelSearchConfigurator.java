@@ -24,6 +24,8 @@ import com.liferay.object.service.ObjectEntryFolderLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFolderLocalService;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
@@ -79,6 +81,10 @@ public class ObjectEntryModelSearchConfigurator
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
+		_dlFileEntryTextProviderServiceTrackerList =
+			ServiceTrackerListFactory.open(
+				bundleContext, DLFileEntryTextProvider.class);
+
 		_modelIndexerWriterContributor =
 			new ObjectEntryFullReindexModelIndexerWriterContributor();
 
@@ -88,7 +94,8 @@ public class ObjectEntryModelSearchConfigurator
 					(Class<?>)ModelDocumentContributor.class,
 				new ObjectEntryModelDocumentContributor(
 					_accountEntryOrganizationRelLocalService,
-					_dlFileEntryLocalService, _dlFileEntryTextProvider,
+					_dlFileEntryLocalService,
+					_dlFileEntryTextProviderServiceTrackerList,
 					_objectEntryFolderLocalService,
 					_objectFieldBusinessTypeRegistry,
 					_textEmbeddingDocumentContributor),
@@ -101,6 +108,10 @@ public class ObjectEntryModelSearchConfigurator
 
 	@Deactivate
 	protected void deactivate() {
+		if (_dlFileEntryTextProviderServiceTrackerList != null) {
+			_dlFileEntryTextProviderServiceTrackerList.close();
+		}
+
 		if (_modelDocumentContributorServiceRegistration != null) {
 			_modelDocumentContributorServiceRegistration.unregister();
 		}
@@ -222,9 +233,8 @@ public class ObjectEntryModelSearchConfigurator
 	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
 
-	@Reference
-	private DLFileEntryTextProvider _dlFileEntryTextProvider;
-
+	private ServiceTrackerList<DLFileEntryTextProvider>
+		_dlFileEntryTextProviderServiceTrackerList;
 	private ServiceRegistration<ModelDocumentContributor<?>>
 		_modelDocumentContributorServiceRegistration;
 	private ModelIndexerWriterContributor<ObjectEntry>
