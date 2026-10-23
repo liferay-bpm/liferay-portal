@@ -211,6 +211,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.SystemEventLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
+import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.TestInfo;
@@ -1425,6 +1426,66 @@ public class ObjectEntryLocalServiceTest {
 	}
 
 	@Test
+	@TestInfo("LPS-181663")
+	public void testAddObjectEntryAsDraftWithWorkflowDefinitionLink()
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				true, false, false,
+				Collections.singletonList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING, "Text Field",
+						"textField")),
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		try {
+			_updateWorkflowDefinitionLink(objectDefinition, "Single Approver");
+
+			ServiceContext serviceContext =
+				ServiceContextTestUtil.getServiceContext();
+
+			serviceContext.setWorkflowAction(
+				WorkflowConstants.ACTION_SAVE_DRAFT);
+
+			ObjectEntry objectEntry = _addObjectEntry(
+				objectDefinition, Collections.emptyMap(), serviceContext);
+
+			_assertObjectEntryStatus(
+				WorkflowConstants.STATUS_DRAFT, objectEntry);
+
+			Assert.assertNull(
+				_workflowInstanceLinkLocalService.fetchWorkflowInstanceLink(
+					TestPropsValues.getCompanyId(),
+					objectEntry.getNonzeroGroupId(),
+					objectDefinition.getClassName(),
+					objectEntry.getObjectEntryId()));
+
+			serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
+
+			_objectEntryLocalService.updateObjectEntry(
+				TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
+				objectEntry.getObjectEntryFolderId(), Collections.emptyMap(),
+				serviceContext);
+
+			_assertObjectEntryStatus(
+				WorkflowConstants.STATUS_PENDING, objectEntry);
+
+			Assert.assertNotNull(
+				_workflowInstanceLinkLocalService.fetchWorkflowInstanceLink(
+					TestPropsValues.getCompanyId(),
+					objectEntry.getNonzeroGroupId(),
+					objectDefinition.getClassName(),
+					objectEntry.getObjectEntryId()));
+		}
+		finally {
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinition);
+		}
+	}
+
+	@Test
 	public void testAddObjectEntryToStagingGroup() throws Exception {
 		Group liveGroup = null;
 
@@ -2307,6 +2368,52 @@ public class ObjectEntryLocalServiceTest {
 	}
 
 	@Test
+	@TestInfo("LPS-158821")
+	public void testAddObjectEntryWithExternalReferenceCodeObjectValidationRule()
+		throws Exception {
+
+		ObjectValidationRule objectValidationRule = _addObjectValidationRule(
+			ObjectValidationRuleConstants.ENGINE_TYPE_DDM,
+			LocalizedMapUtil.getLocalizedMap(
+				"Last name must match the external reference code"),
+			"lastName == externalReferenceCode");
+
+		String externalReferenceCode = RandomTestUtil.randomString();
+
+		_addObjectEntry(
+			HashMapBuilder.<String, Serializable>put(
+				"emailAddressRequired", "bob@liferay.com"
+			).put(
+				"externalReferenceCode", externalReferenceCode
+			).put(
+				"lastName", externalReferenceCode
+			).put(
+				"listTypeEntryKeyRequired", "listTypeEntryKey1"
+			).build());
+
+		_assertCount(1);
+
+		try {
+			_addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"emailAddressRequired", "bob@liferay.com"
+				).put(
+					"externalReferenceCode", RandomTestUtil.randomString()
+				).put(
+					"lastName", RandomTestUtil.randomString()
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).build());
+
+			Assert.fail();
+		}
+		catch (ModelListenerException modelListenerException) {
+			_assertFailureObjectValidationRule(
+				modelListenerException, objectValidationRule);
+		}
+	}
+
+	@Test
 	@TestInfo("LPD-54861")
 	public void testAddObjectEntryWithFormulaObjectField() throws Exception {
 		ObjectField objectField1 = _addCustomObjectField(
@@ -2626,6 +2733,95 @@ public class ObjectEntryLocalServiceTest {
 				objectDefinition1);
 			_objectDefinitionLocalService.deleteObjectDefinition(
 				objectDefinition2);
+		}
+	}
+
+	@Test
+	public void testAddObjectEntryWithFormulaObjectFieldAndObjectValidationRule()
+		throws Exception {
+
+		ObjectField objectField1 = _addCustomObjectField(
+			new IntegerObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"a" + RandomTestUtil.randomString()
+			).objectDefinitionId(
+				_objectDefinition.getObjectDefinitionId()
+			).build());
+		ObjectField objectField2 = _addCustomObjectField(
+			new IntegerObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"a" + RandomTestUtil.randomString()
+			).objectDefinitionId(
+				_objectDefinition.getObjectDefinitionId()
+			).build());
+
+		ObjectField objectField3 = _addCustomObjectField(
+			new FormulaObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"a" + RandomTestUtil.randomString()
+			).objectDefinitionId(
+				_objectDefinition.getObjectDefinitionId()
+			).objectFieldSettings(
+				Arrays.asList(
+					new ObjectFieldSettingBuilder(
+					).name(
+						"output"
+					).value(
+						ObjectFieldConstants.BUSINESS_TYPE_INTEGER
+					).build(),
+					new ObjectFieldSettingBuilder(
+					).name(
+						"script"
+					).value(
+						objectField1.getName() + " + " + objectField2.getName()
+					).build())
+			).build());
+
+		ObjectValidationRule objectValidationRule = _addObjectValidationRule(
+			ObjectValidationRuleConstants.ENGINE_TYPE_DDM,
+			LocalizedMapUtil.getLocalizedMap(
+				"The sum must be less than or equal to 50"),
+			objectField3.getName() + " <= 50");
+
+		ObjectEntry objectEntry = _addObjectEntry(
+			HashMapBuilder.<String, Serializable>put(
+				objectField1.getName(), 25
+			).put(
+				objectField2.getName(), 25
+			).put(
+				"emailAddressRequired", "bob@liferay.com"
+			).put(
+				"listTypeEntryKeyRequired", "listTypeEntryKey1"
+			).build());
+
+		Assert.assertEquals(
+			50,
+			MapUtil.getInteger(
+				objectEntry.getValues(), objectField3.getName()));
+
+		try {
+			_addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					objectField1.getName(), 30
+				).put(
+					objectField2.getName(), 30
+				).put(
+					"emailAddressRequired", "bob@liferay.com"
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).build());
+
+			Assert.fail();
+		}
+		catch (ModelListenerException modelListenerException) {
+			_assertFailureObjectValidationRule(
+				modelListenerException, objectValidationRule);
 		}
 	}
 
@@ -13357,6 +13553,9 @@ public class ObjectEntryLocalServiceTest {
 
 	@Inject
 	private WorkflowDefinitionManager _workflowDefinitionManager;
+
+	@Inject
+	private WorkflowInstanceLinkLocalService _workflowInstanceLinkLocalService;
 
 	@Inject
 	private WorkflowInstanceManager _workflowInstanceManager;
