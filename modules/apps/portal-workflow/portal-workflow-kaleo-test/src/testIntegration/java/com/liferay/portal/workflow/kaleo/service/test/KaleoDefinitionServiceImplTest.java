@@ -98,7 +98,8 @@ public class KaleoDefinitionServiceImplTest {
 		_originalName = PrincipalThreadLocal.getName();
 		_originalPermissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
-		_serviceContext = ServiceContextTestUtil.getServiceContext();
+		_serviceContext = ServiceContextTestUtil.getServiceContext(
+			_company.getCompanyId());
 	}
 
 	@After
@@ -356,7 +357,7 @@ public class KaleoDefinitionServiceImplTest {
 		User user = _addUser();
 
 		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext();
+			ServiceContextTestUtil.getServiceContext(user.getCompanyId());
 
 		serviceContext.setAttribute("checkPermission", Boolean.FALSE);
 
@@ -390,6 +391,20 @@ public class KaleoDefinitionServiceImplTest {
 			).build());
 
 		Assert.assertNotNull(_addKaleoDefinition());
+
+		// Company administrator attempting to add a workflow definition to another company
+
+		ServiceContext otherCompanyServiceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getCompanyId());
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustBeCompanyAdmin.class,
+			StringBundler.concat(
+				"User ", _companyAdminUser.getUserId(), " must be the company ",
+				"administrator to perform the action"),
+			() -> _addKaleoDefinition(
+				WorkflowDefinitionConstants.SCOPE_ALL, otherCompanyServiceContext));
 	}
 
 	private void _testAddKaleoDefinitionWithGroupId() throws Exception {
@@ -470,6 +485,21 @@ public class KaleoDefinitionServiceImplTest {
 				_serviceContext);
 
 		Assert.assertFalse(inactiveKaleoDefinition.isActive());
+
+		// Company administrator attempting to deactivate a workflow definition from another company
+
+		ServiceContext otherCompanyServiceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getCompanyId());
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustBeCompanyAdmin.class,
+			StringBundler.concat(
+				"User ", _companyAdminUser.getUserId(), " must be the company ",
+				"administrator to perform the action"),
+			() -> _kaleoDefinitionService.deactivateKaleoDefinition(
+				kaleoDefinition.getName(), kaleoDefinition.getVersion(),
+				otherCompanyServiceContext));
 	}
 
 	private void _testDeactivateKaleoDefinitionWithGroupId() throws Exception {
@@ -552,6 +582,19 @@ public class KaleoDefinitionServiceImplTest {
 			HashMapDictionaryBuilder.<String, Object>put(
 				"company.administrator.can.publish", true
 			).build());
+
+		// Company administrator attempting to delete a workflow definition from another company
+		ServiceContext otherCompanyServiceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getCompanyId());
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustBeCompanyAdmin.class,
+			StringBundler.concat(
+				"User ", _companyAdminUser.getUserId(), " must be the company ",
+				"administrator to perform the action"),
+			() -> _kaleoDefinitionService.deleteKaleoDefinition(
+				kaleoDefinition.getName(), otherCompanyServiceContext));
 
 		_kaleoDefinitionService.deleteKaleoDefinition(
 			kaleoDefinition.getName(), _serviceContext);
@@ -671,7 +714,7 @@ public class KaleoDefinitionServiceImplTest {
 		User user = _addUser();
 
 		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext();
+			ServiceContextTestUtil.getServiceContext(user.getCompanyId());
 
 		serviceContext.setAttribute("checkPermission", Boolean.FALSE);
 
@@ -717,6 +760,23 @@ public class KaleoDefinitionServiceImplTest {
 				kaleoDefinition.getKaleoDefinitionId(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				kaleoDefinition.getContent(), false, _serviceContext));
+
+		// Company administrator attempting to update a workflow definition belonging to another company
+
+		ServiceContext otherCompanyServiceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getCompanyId());
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustBeCompanyAdmin.class,
+			StringBundler.concat(
+				"User ", _companyAdminUser.getUserId(), " must be the company ",
+				"administrator to perform the action"),
+			() -> _kaleoDefinitionService.updateKaleoDefinition(
+				kaleoDefinition.getExternalReferenceCode(),
+				kaleoDefinition.getKaleoDefinitionId(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				kaleoDefinition.getContent(), false, otherCompanyServiceContext));
 	}
 
 	private void _testUpdateKaleoDefinitionWithDifferentGroupId()

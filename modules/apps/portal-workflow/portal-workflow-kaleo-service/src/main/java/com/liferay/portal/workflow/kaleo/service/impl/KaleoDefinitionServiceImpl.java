@@ -51,7 +51,7 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 				serviceContext.getCompanyId(), name, version);
 
 		_checkPermissions(
-			ActionKeys.ADD_DEFINITION,
+			kaleoDefinition.getCompanyId(), ActionKeys.ADD_DEFINITION,
 			_getGroupId(
 				kaleoDefinition.getGroupId(), kaleoDefinition.getScope()));
 
@@ -67,7 +67,7 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 		throws PortalException {
 
 		_checkPermissions(
-			ActionKeys.ADD_DEFINITION,
+			serviceContext.getCompanyId(), ActionKeys.ADD_DEFINITION,
 			_getGroupId(serviceContext.getScopeGroupId(), scope));
 
 		return _kaleoDefinitionLocalService.addKaleoDefinition(
@@ -77,7 +77,7 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 
 	@Override
 	public KaleoDefinition deactivateKaleoDefinition(
-			String name, int version, ServiceContext serviceContext)
+		String name, int version, ServiceContext serviceContext)
 		throws PortalException {
 
 		KaleoDefinition kaleoDefinition =
@@ -85,7 +85,7 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 				serviceContext.getCompanyId(), name, version);
 
 		_checkPermissions(
-			ActionKeys.ADD_DEFINITION,
+			kaleoDefinition.getCompanyId(), ActionKeys.ADD_DEFINITION,
 			_getGroupId(
 				kaleoDefinition.getGroupId(), kaleoDefinition.getScope()));
 
@@ -102,7 +102,7 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 			serviceContext.getCompanyId(), name);
 
 		_checkPermissions(
-			ActionKeys.DELETE,
+			kaleoDefinition.getCompanyId(), ActionKeys.DELETE,
 			_getGroupId(
 				kaleoDefinition.getGroupId(), kaleoDefinition.getScope()));
 
@@ -198,7 +198,7 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 			kaleoDefinitionPersistence.findByPrimaryKey(kaleoDefinitionId);
 
 		_checkPermissions(
-			ActionKeys.ADD_DEFINITION,
+			kaleoDefinition.getCompanyId(), ActionKeys.ADD_DEFINITION,
 			_getGroupId(
 				kaleoDefinition.getGroupId(), kaleoDefinition.getScope()));
 
@@ -207,7 +207,7 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 			content, system, serviceContext);
 	}
 
-	private void _checkPermissions(String actionId, long groupId)
+	private void _checkPermissions(long targetCompanyId, String actionId, long groupId)
 		throws PrincipalException {
 
 		PermissionChecker permissionChecker =
@@ -215,6 +215,13 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 
 		if (permissionChecker == null) {
 			return;
+		}
+
+		if (!permissionChecker.isOmniadmin() &&
+			(permissionChecker.getCompanyId() != targetCompanyId)) {
+
+			throw new PrincipalException.MustBeCompanyAdmin(
+				permissionChecker.getUserId());
 		}
 
 		_portletResourcePermission.check(permissionChecker, groupId, actionId);
