@@ -250,6 +250,7 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -8681,13 +8682,18 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		if (invalidObjectStateTransition) {
-			User user = _userLocalService.getUser(userId);
+			Locale locale = LocaleThreadLocal.getThemeDisplayLocale();
+
+			if (locale == null) {
+				User user = _userLocalService.getUser(userId);
+
+				locale = user.getLocale();
+			}
 
 			_handle(
 				new ObjectEntryValuesException.InvalidObjectStateTransition(
-					originalListTypeEntry.getName(user.getLocale()),
-					sourceObjectState, listTypeEntry.getName(user.getLocale()),
-					targetObjectState),
+					originalListTypeEntry.getName(locale), sourceObjectState,
+					listTypeEntry.getName(locale), targetObjectState),
 				validationErrors);
 		}
 	}
@@ -8963,14 +8969,20 @@ public class ObjectEntryLocalServiceImpl
 			return;
 		}
 
-		User user = _userLocalService.getUser(userId);
+		Locale locale = LocaleThreadLocal.getThemeDisplayLocale();
+
+		if (locale == null) {
+			User user = _userLocalService.getUser(userId);
+
+			locale = user.getLocale();
+		}
+
 		Table<?> finalTable = table;
 
 		_handle(
 			new ObjectEntryValuesException.UniqueValueConstraintViolation(
 				objectField.getDBColumnName(), (Serializable)value,
-				objectField.getLabel(user.getLocale()),
-				finalTable.getTableName(), null),
+				objectField.getLabel(locale), finalTable.getTableName(), null),
 			validationErrors);
 	}
 
