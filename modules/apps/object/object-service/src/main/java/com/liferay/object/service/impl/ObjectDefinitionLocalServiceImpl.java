@@ -13,6 +13,7 @@ import com.liferay.depot.constants.DepotRolesConstants;
 import com.liferay.depot.service.DepotEntryGroupRelLocalService;
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.document.library.text.DLFileEntryTextProvider;
 import com.liferay.exportimport.kernel.empty.model.EmptyModelManager;
 import com.liferay.exportimport.kernel.empty.model.EmptyModelManagerUtil;
 import com.liferay.fragment.cache.FragmentEntryLinkCache;
@@ -121,6 +122,8 @@ import com.liferay.object.service.persistence.ObjectRelationshipPersistence;
 import com.liferay.object.service.persistence.ObjectValidationRuleSettingPersistence;
 import com.liferay.object.system.SystemObjectDefinitionManager;
 import com.liferay.osgi.service.tracker.collections.EagerServiceTrackerCustomizer;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.function.transform.TransformUtil;
@@ -1087,10 +1090,10 @@ public class ObjectDefinitionLocalServiceImpl
 			_accountEntryLocalService, _accountEntryOrganizationRelLocalService,
 			_assetEntryLocalService, _bundleContext,
 			_depotEntryGroupRelLocalService, _depotEntryLocalService,
-			_dlFileEntryLocalService, _groupLocalService,
-			_kaleoDefinitionLocalService, _listTypeLocalService,
-			_objectActionLocalService, objectDefinitionLocalService,
-			_objectDefinitionSettingLocalService,
+			_dlFileEntryLocalService, _dlFileEntryTextProviders,
+			_groupLocalService, _kaleoDefinitionLocalService,
+			_listTypeLocalService, _objectActionLocalService,
+			objectDefinitionLocalService, _objectDefinitionSettingLocalService,
 			_objectEntryFolderLocalService, _objectEntryLocalService,
 			_objectEntryService, _objectFieldBusinessTypeRegistry,
 			_objectFieldLocalService, _objectFolderLocalService,
@@ -1371,12 +1374,19 @@ public class ObjectDefinitionLocalServiceImpl
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_bundleContext = bundleContext;
+
+		_dlFileEntryTextProviders = ServiceTrackerListFactory.open(
+			bundleContext, DLFileEntryTextProvider.class);
 	}
 
 	@Deactivate
 	@Override
 	protected void deactivate() {
 		super.deactivate();
+
+		if (_dlFileEntryTextProviders != null) {
+			_dlFileEntryTextProviders.close();
+		}
 
 		if (_serviceTrackerMap != null) {
 			_serviceTrackerMap.close();
@@ -4125,6 +4135,9 @@ public class ObjectDefinitionLocalServiceImpl
 
 	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
+
+	private ServiceTrackerList<DLFileEntryTextProvider>
+		_dlFileEntryTextProviders;
 
 	@Reference
 	private EmptyModelManager _emptyModelManager;

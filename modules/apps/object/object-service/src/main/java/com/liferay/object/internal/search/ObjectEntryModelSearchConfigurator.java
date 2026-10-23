@@ -7,6 +7,7 @@ package com.liferay.object.internal.search;
 
 import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.document.library.text.DLFileEntryTextProvider;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.internal.search.spi.model.index.contributor.ObjectEntryModelDocumentContributor;
 import com.liferay.object.internal.search.spi.model.result.contributor.ObjectEntryModelSummaryContributor;
@@ -23,6 +24,8 @@ import com.liferay.object.service.ObjectEntryFolderLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFolderLocalService;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
@@ -78,6 +81,9 @@ public class ObjectEntryModelSearchConfigurator
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
+		_dlFileEntryTextProviders = ServiceTrackerListFactory.open(
+			bundleContext, DLFileEntryTextProvider.class);
+
 		_modelIndexerWriterContributor =
 			new ObjectEntryFullReindexModelIndexerWriterContributor();
 
@@ -87,7 +93,8 @@ public class ObjectEntryModelSearchConfigurator
 					(Class<?>)ModelDocumentContributor.class,
 				new ObjectEntryModelDocumentContributor(
 					_accountEntryOrganizationRelLocalService,
-					_dlFileEntryLocalService, _objectEntryFolderLocalService,
+					_dlFileEntryLocalService, _dlFileEntryTextProviders,
+					_objectEntryFolderLocalService,
 					_objectFieldBusinessTypeRegistry,
 					_textEmbeddingDocumentContributor),
 				MapUtil.singletonDictionary(
@@ -99,6 +106,10 @@ public class ObjectEntryModelSearchConfigurator
 
 	@Deactivate
 	protected void deactivate() {
+		if (_dlFileEntryTextProviders != null) {
+			_dlFileEntryTextProviders.close();
+		}
+
 		if (_modelDocumentContributorServiceRegistration != null) {
 			_modelDocumentContributorServiceRegistration.unregister();
 		}
@@ -220,6 +231,8 @@ public class ObjectEntryModelSearchConfigurator
 	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
 
+	private ServiceTrackerList<DLFileEntryTextProvider>
+		_dlFileEntryTextProviders;
 	private ServiceRegistration<ModelDocumentContributor<?>>
 		_modelDocumentContributorServiceRegistration;
 	private ModelIndexerWriterContributor<ObjectEntry>

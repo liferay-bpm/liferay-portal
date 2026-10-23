@@ -11,6 +11,7 @@ import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.depot.service.DepotEntryGroupRelLocalService;
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.document.library.text.DLFileEntryTextProvider;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
 import com.liferay.notification.handler.NotificationHandler;
@@ -69,6 +70,7 @@ import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.object.tree.Node;
 import com.liferay.object.tree.ObjectDefinitionTreeFactory;
 import com.liferay.object.tree.Tree;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -137,6 +139,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		DepotEntryGroupRelLocalService depotEntryGroupRelLocalService,
 		DepotEntryLocalService depotEntryLocalService,
 		DLFileEntryLocalService dlFileEntryLocalService,
+		ServiceTrackerList<DLFileEntryTextProvider> dlFileEntryTextProviders,
 		GroupLocalService groupLocalService,
 		KaleoDefinitionLocalService kaleoDefinitionLocalService,
 		ListTypeLocalService listTypeLocalService,
@@ -175,6 +178,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		_depotEntryGroupRelLocalService = depotEntryGroupRelLocalService;
 		_depotEntryLocalService = depotEntryLocalService;
 		_dlFileEntryLocalService = dlFileEntryLocalService;
+		_dlFileEntryTextProviders = dlFileEntryTextProviders;
 		_groupLocalService = groupLocalService;
 		_kaleoDefinitionLocalService = kaleoDefinitionLocalService;
 		_listTypeLocalService = listTypeLocalService;
@@ -350,7 +354,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					ModelDocumentContributor.class,
 					new ObjectEntryModelDocumentContributor(
 						_accountEntryOrganizationRelLocalService,
-						_dlFileEntryLocalService,
+						_dlFileEntryLocalService, _dlFileEntryTextProviders,
 						_objectEntryFolderLocalService,
 						_objectFieldBusinessTypeRegistry,
 						_textEmbeddingDocumentContributor),
@@ -700,6 +704,8 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		_depotEntryGroupRelLocalService;
 	private final DepotEntryLocalService _depotEntryLocalService;
 	private final DLFileEntryLocalService _dlFileEntryLocalService;
+	private final ServiceTrackerList<DLFileEntryTextProvider>
+		_dlFileEntryTextProviders;
 	private final GroupLocalService _groupLocalService;
 	private final KaleoDefinitionLocalService _kaleoDefinitionLocalService;
 	private final ListTypeLocalService _listTypeLocalService;
