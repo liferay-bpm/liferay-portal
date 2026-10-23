@@ -715,7 +715,7 @@ public class KaleoDefinitionServiceImplTest {
 		User user = _addUser();
 
 		ServiceContext serviceContext1 =
-			ServiceContextTestUtil.getServiceContext();
+			ServiceContextTestUtil.getServiceContext(user.getCompanyId());
 
 		serviceContext1.setAttribute("checkPermission", Boolean.FALSE);
 
