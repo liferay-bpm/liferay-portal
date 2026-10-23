@@ -125,6 +125,7 @@ import com.liferay.object.scope.ObjectDefinitionScoped;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.search.StrictObjectReindexThreadLocal;
+import com.liferay.object.service.ObjectEntryVersionDraftLocalService;
 import com.liferay.object.service.ObjectEntryVersionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
@@ -938,6 +939,14 @@ public class ObjectEntryLocalServiceImpl
 				_classNameLocalService.getClassNameId(
 					objectDefinition.getClassName()),
 				objectEntry.getObjectEntryId());
+
+			if (FeatureFlagManagerUtil.isEnabled(
+					objectDefinition.getCompanyId(), "LPD-72278")) {
+
+				_objectEntryVersionDraftLocalService.
+					deleteObjectEntryVersionDrafts(
+						objectEntry.getObjectEntryId());
+			}
 
 			_objectEntryVersionLocalService.deleteObjectEntryVersions(
 				objectEntry.getObjectEntryId());
@@ -9629,6 +9638,10 @@ public class ObjectEntryLocalServiceImpl
 
 	private ServiceTrackerList<ObjectEntryReviewNotificationContributor>
 		_objectEntryReviewNotificationContributors;
+
+	@Reference
+	private ObjectEntryVersionDraftLocalService
+		_objectEntryVersionDraftLocalService;
 
 	@Reference
 	private ObjectEntryVersionLocalService _objectEntryVersionLocalService;

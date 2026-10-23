@@ -176,6 +176,22 @@
 		<field name="statusByUserName" type="String" />
 		<field name="statusDate" type="Date" />
 	</model>
+	<model name="com.liferay.object.model.ObjectEntryVersionDraft">
+		<field name="mvccVersion" type="long" />
+		<field name="objectEntryVersionDraftId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="userId" type="long" />
+		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="objectDefinitionId" type="long" />
+		<field name="objectEntryId" type="long" />
+		<field name="content" type="String">
+			<hint-collection name="CLOB" />
+		</field>
+		<field name="version" type="int" />
+		<field name="status" type="int" />
+	</model>
 	<model name="com.liferay.object.model.ObjectField">
 		<field name="mvccVersion" type="long" />
 		<field name="uuid" type="String" />

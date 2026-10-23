@@ -8,6 +8,7 @@ package com.liferay.launch.web.internal.display.context;
 import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.item.selector.ItemSelector;
+import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.launch.entry.manager.LaunchEntryManager;
 import com.liferay.launch.entry.manager.LaunchEntryManagerRegistry;
@@ -215,21 +216,30 @@ public class ViewLaunchDisplayContext {
 
 		return TransformUtil.transform(
 			_getLaunchEntryManagers(),
-			launchEntryManager -> HashMapBuilder.<String, Object>put(
-				"className", _getClassName(launchEntryManager)
-			).put(
-				"itemSelectorURL",
-				String.valueOf(
-					_itemSelector.getItemSelectorURL(
-						RequestBackedPortletURLFactoryUtil.create(
-							_httpServletRequest),
-						themeDisplay.getScopeGroup(),
-						themeDisplay.getScopeGroupId(),
-						_getItemSelectedEventName(),
-						launchEntryManager.getItemSelectorCriterion()))
-			).put(
-				"label", launchEntryManager.getLabel(themeDisplay.getLocale())
-			).build());
+			launchEntryManager -> {
+				ItemSelectorCriterion itemSelectorCriterion =
+					launchEntryManager.getItemSelectorCriterion();
+
+				if (itemSelectorCriterion == null) {
+					return null;
+				}
+
+				return HashMapBuilder.<String, Object>put(
+					"className", _getClassName(launchEntryManager)
+				).put(
+					"itemSelectorURL",
+					String.valueOf(
+						_itemSelector.getItemSelectorURL(
+							RequestBackedPortletURLFactoryUtil.create(
+								_httpServletRequest),
+							themeDisplay.getScopeGroup(),
+							themeDisplay.getScopeGroupId(),
+							_getItemSelectedEventName(), itemSelectorCriterion))
+				).put(
+					"label",
+					launchEntryManager.getLabel(themeDisplay.getLocale())
+				).build();
+			});
 	}
 
 	private List<LaunchEntryManager> _getLaunchEntryManagers() {

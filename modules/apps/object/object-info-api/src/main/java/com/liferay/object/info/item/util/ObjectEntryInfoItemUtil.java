@@ -5,6 +5,7 @@
 
 package com.liferay.object.info.item.util;
 
+import com.liferay.object.entry.util.ObjectEntryVersionConverterUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntryVersion;
 import com.liferay.object.model.ObjectField;
@@ -16,11 +17,14 @@ import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectEntryLocalServiceUtil;
+import com.liferay.object.service.ObjectEntryVersionDraftLocalServiceUtil;
 import com.liferay.object.service.ObjectEntryVersionLocalServiceUtil;
 import com.liferay.object.service.ObjectFieldLocalServiceUtil;
 import com.liferay.object.service.ObjectRelationshipLocalServiceUtil;
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -31,10 +35,18 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.preview.PreviewableResolverUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
+
+import java.io.Serializable;
+
+import java.util.Map;
 
 /**
  * @author Carolina Barbosa
@@ -86,8 +98,13 @@ public class ObjectEntryInfoItemUtil {
 
 		if (objectDefinition.isEnableObjectEntryVersioning()) {
 			ObjectEntryVersion objectEntryVersion =
-				ObjectEntryVersionLocalServiceUtil.fetchObjectEntryVersion(
-					serviceBuilderObjectEntry.getObjectEntryId(), version);
+				_fetchPreviewObjectEntryVersion(serviceBuilderObjectEntry);
+
+			if (objectEntryVersion == null) {
+				objectEntryVersion =
+					ObjectEntryVersionLocalServiceUtil.fetchObjectEntryVersion(
+						serviceBuilderObjectEntry.getObjectEntryId(), version);
+			}
 
 			if (objectEntryVersion != null) {
 				dtoConverterContext.setAttribute(
@@ -217,6 +234,47 @@ public class ObjectEntryInfoItemUtil {
 		}
 
 		return user;
+	}
+
+	private static ObjectEntryVersion _fetchPreviewObjectEntryVersion(
+		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry) {
+
+		if (!FeatureFlagManagerUtil.isEnabled(
+				serviceBuilderObjectEntry.getCompanyId(), "LPD-72278")) {
+
+			return null;
+		}
+
+		Map<Serializable, Serializable> previewableMap =
+			PreviewableResolverUtil.getPreviewableMap(
+				com.liferay.object.model.ObjectEntry.class);
+
+		if (MapUtil.isEmpty(previewableMap)) {
+			return null;
+		}
+
+		String previewPrimaryKeyString = GetterUtil.getString(
+			previewableMap.get(serviceBuilderObjectEntry.getObjectEntryId()));
+
+		if (Validator.isNull(previewPrimaryKeyString)) {
+			return null;
+		}
+
+		long previewPrimaryKey = GetterUtil.getLong(
+			StringUtil.extractLast(
+				previewPrimaryKeyString, CharPool.UNDERLINE));
+
+		if (previewPrimaryKeyString.startsWith("draft_")) {
+			return ObjectEntryVersionConverterUtil.toObjectEntryVersion(
+				ObjectEntryVersionDraftLocalServiceUtil.
+					fetchObjectEntryVersionDraft(previewPrimaryKey));
+		}
+		else if (previewPrimaryKeyString.startsWith("version_")) {
+			return ObjectEntryVersionLocalServiceUtil.fetchObjectEntryVersion(
+				GetterUtil.getLong(previewPrimaryKey));
+		}
+
+		return null;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

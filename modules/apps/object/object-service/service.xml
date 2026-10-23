@@ -431,6 +431,37 @@
 			<finder-column name="status" />
 		</finder>
 	</entity>
+	<entity local-service="true" name="ObjectEntryVersionDraft" remote-service="false">
+
+		<!-- PK fields -->
+
+		<column name="objectEntryVersionDraftId" primary="true" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="userId" type="long" />
+		<column name="userName" type="String" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="objectDefinitionId" type="long" />
+		<column name="objectEntryId" type="long" />
+		<column name="content" type="String" />
+		<column name="version" type="int" />
+		<column name="status" type="int" />
+
+		<!-- Finder methods -->
+
+		<finder name="ObjectDefinitionId" return-type="Collection">
+			<finder-column name="objectDefinitionId" />
+		</finder>
+		<finder name="ObjectEntryId" return-type="Collection">
+			<finder-column name="objectEntryId" />
+		</finder>
+	</entity>
 	<entity local-service="true" name="ObjectField" remote-service="true" uuid="true">
 
 		<!-- External reference code -->

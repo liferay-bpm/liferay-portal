@@ -103,6 +103,7 @@ import com.liferay.object.service.ObjectDefinitionSettingLocalService;
 import com.liferay.object.service.ObjectEntryFolderLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryService;
+import com.liferay.object.service.ObjectEntryVersionDraftLocalService;
 import com.liferay.object.service.ObjectEntryVersionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFolderItemLocalService;
@@ -144,6 +145,7 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dependency.manager.DependencyManagerSyncUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.lazy.referencing.LazyReferencingThreadLocal;
 import com.liferay.portal.kernel.log.Log;
@@ -626,6 +628,14 @@ public class ObjectDefinitionLocalServiceImpl
 							objectDefinition.getCompanyId(),
 							_classNameLocalService.getClassNameId(
 								objectDefinition.getClassName()));
+
+					if (FeatureFlagManagerUtil.isEnabled(
+							objectDefinition.getCompanyId(), "LPD-72278")) {
+
+						_objectEntryVersionDraftLocalService.
+							deleteObjectEntryVersionDraftByObjectDefinitionId(
+								objectDefinition.getObjectDefinitionId());
+					}
 
 					_objectEntryVersionLocalService.
 						deleteObjectEntryVersionByObjectDefinitionId(
@@ -4190,6 +4200,10 @@ public class ObjectDefinitionLocalServiceImpl
 
 	@Reference
 	private ObjectEntryService _objectEntryService;
+
+	@Reference
+	private ObjectEntryVersionDraftLocalService
+		_objectEntryVersionDraftLocalService;
 
 	@Reference
 	private ObjectEntryVersionLocalService _objectEntryVersionLocalService;
