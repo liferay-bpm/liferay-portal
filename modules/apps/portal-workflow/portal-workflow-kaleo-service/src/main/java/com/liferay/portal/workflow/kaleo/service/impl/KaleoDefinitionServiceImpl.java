@@ -77,7 +77,7 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 
 	@Override
 	public KaleoDefinition deactivateKaleoDefinition(
-		String name, int version, ServiceContext serviceContext)
+			String name, int version, ServiceContext serviceContext)
 		throws PortalException {
 
 		KaleoDefinition kaleoDefinition =
