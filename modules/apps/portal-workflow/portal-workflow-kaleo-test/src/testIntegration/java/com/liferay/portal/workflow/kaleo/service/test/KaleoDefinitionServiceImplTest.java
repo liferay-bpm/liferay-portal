@@ -392,6 +392,7 @@ public class KaleoDefinitionServiceImplTest {
 
 		Assert.assertNotNull(_addKaleoDefinition());
 
+
 		// Administrator with workflow definition from another company
 
 		ServiceContext serviceContext2 =
@@ -401,8 +402,8 @@ public class KaleoDefinitionServiceImplTest {
 		AssertUtils.assertFailure(
 			PrincipalException.MustBeCompanyAdmin.class,
 			StringBundler.concat(
-				"User ", _companyAdminUser.getUserId(), " must be the company ",
-				"administrator to perform the action"),
+				"User ", _companyAdminUser.getUserId(),
+				" must be the company administrator to perform the action"),
 			() -> _addKaleoDefinition(
 				WorkflowDefinitionConstants.SCOPE_ALL, serviceContext2));
 	}
@@ -485,6 +486,7 @@ public class KaleoDefinitionServiceImplTest {
 				_serviceContext);
 
 		Assert.assertFalse(inactiveKaleoDefinition.isActive());
+
 
 		// Administrator with workflow definition from another company
 
