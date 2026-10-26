@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
@@ -795,6 +796,15 @@ public class WorkflowTaskManagerImpl implements WorkflowTaskManager {
 			Date dueDate)
 		throws WorkflowException {
 
+		try {
+			_kaleoTaskInstanceTokenModelResourcePermission.check(
+				PermissionThreadLocal.getPermissionChecker(), workflowTaskId,
+				ActionKeys.UPDATE);
+		}
+		catch (PortalException portalException) {
+			throw new WorkflowException(portalException);
+		}
+
 		ServiceContext serviceContext = new ServiceContext();
 
 		serviceContext.setCompanyId(companyId);
@@ -1270,6 +1280,12 @@ public class WorkflowTaskManagerImpl implements WorkflowTaskManager {
 	@Reference
 	private KaleoTaskInstanceTokenLocalService
 		_kaleoTaskInstanceTokenLocalService;
+
+	@Reference(
+		target = "(model.class.name=com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken)"
+	)
+	private ModelResourcePermission<KaleoTaskInstanceToken>
+		_kaleoTaskInstanceTokenModelResourcePermission;
 
 	@Reference
 	private KaleoTaskInstanceTokenService _kaleoTaskInstanceTokenService;
