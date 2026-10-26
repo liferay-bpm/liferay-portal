@@ -1638,6 +1638,28 @@ public class WorkflowTaskManagerImplTest extends BaseWorkflowManagerTestCase {
 
 		Assert.assertEquals(date, workflowTask.getDueDate());
 
+		long workflowTaskId = workflowTask.getWorkflowTaskId();
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				_siteMemberUser)) {
+
+			WorkflowException workflowException = Assert.assertThrows(
+				WorkflowException.class,
+				() -> _workflowTaskManager.updateDueDate(
+					_siteMemberUser.getCompanyId(), _siteMemberUser.getUserId(),
+					workflowTaskId, StringPool.BLANK,
+					new Date(System.currentTimeMillis() + (2 * Time.DAY))));
+
+			Throwable throwable = workflowException.getCause();
+
+			Assert.assertTrue(
+				throwable instanceof PrincipalException.MustHavePermission);
+		}
+
+		workflowTask = _workflowTaskManager.getWorkflowTask(workflowTaskId);
+
+		Assert.assertEquals(date, workflowTask.getDueDate());
+
 		_blogsEntryLocalService.deleteEntry(blogsEntry);
 
 		_deactivateWorkflow(BlogsEntry.class.getName(), 0, 0);
