@@ -64,6 +64,7 @@ import com.liferay.portal.workflow.metrics.rest.internal.dto.v1_0.util.SLAResult
 import com.liferay.portal.workflow.metrics.rest.internal.odata.entity.v1_0.InstanceEntityModel;
 import com.liferay.portal.workflow.metrics.rest.internal.resource.exception.NoSuchInstanceException;
 import com.liferay.portal.workflow.metrics.rest.internal.resource.helper.ResourceHelper;
+import com.liferay.portal.workflow.metrics.rest.internal.security.permission.WorkflowMetricsPermissionUtil;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.InstanceResource;
 import com.liferay.portal.workflow.metrics.search.index.InstanceWorkflowMetricsIndexer;
 import com.liferay.portal.workflow.metrics.search.index.constants.WorkflowMetricsIndexNameConstants;
@@ -102,6 +103,8 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 	public void deleteProcessInstance(Long processId, Long instanceId)
 		throws Exception {
 
+		WorkflowMetricsPermissionUtil.check();
+
 		_instanceWorkflowMetricsIndexer.deleteInstance(
 			contextCompany.getCompanyId(), instanceId);
 	}
@@ -116,6 +119,8 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 	@Override
 	public Instance getProcessInstance(Long processId, Long instanceId)
 		throws Exception {
+
+		WorkflowMetricsPermissionUtil.check();
 
 		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
 
@@ -268,6 +273,8 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 			String[] taskNames, Pagination pagination, Sort[] sorts)
 		throws Exception {
 
+		WorkflowMetricsPermissionUtil.check();
+
 		long instanceCount = _getInstanceCount(
 			assigneeIds, classPKs, dateEnd, dateStart, processId, slaStatuses,
 			statuses, taskNames);
@@ -308,6 +315,8 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 			Long processId, Long instanceId, Instance instance)
 		throws Exception {
 
+		WorkflowMetricsPermissionUtil.check();
+
 		getProcessInstance(processId, instanceId);
 
 		_instanceWorkflowMetricsIndexer.updateInstance(
@@ -323,6 +332,8 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 			Long processId, Long instanceId, Instance instance)
 		throws Exception {
 
+		WorkflowMetricsPermissionUtil.check();
+
 		getProcessInstance(processId, instanceId);
 
 		_instanceWorkflowMetricsIndexer.completeInstance(
@@ -333,6 +344,8 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 	@Override
 	public Instance postProcessInstance(Long processId, Instance instance)
 		throws Exception {
+
+		WorkflowMetricsPermissionUtil.check();
 
 		Creator creator = instance.getCreator();
 
