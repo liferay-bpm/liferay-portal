@@ -16,6 +16,7 @@ import com.liferay.portal.search.query.BooleanQuery;
 import com.liferay.portal.search.query.QueriesUtil;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.ProcessVersion;
+import com.liferay.portal.workflow.metrics.rest.internal.security.permission.WorkflowMetricsPermissionUtil;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.ProcessVersionResource;
 import com.liferay.portal.workflow.metrics.search.index.constants.WorkflowMetricsIndexNameConstants;
 
@@ -38,6 +39,8 @@ public class ProcessVersionResourceImpl extends BaseProcessVersionResourceImpl {
 	@Override
 	public Page<ProcessVersion> getProcessProcessVersionsPage(Long processId)
 		throws Exception {
+
+		WorkflowMetricsPermissionUtil.check();
 
 		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
 

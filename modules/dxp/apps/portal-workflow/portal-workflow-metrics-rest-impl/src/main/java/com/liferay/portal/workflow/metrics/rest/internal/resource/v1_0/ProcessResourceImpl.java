@@ -25,6 +25,7 @@ import com.liferay.portal.workflow.metrics.model.UpdateProcessRequest;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Process;
 import com.liferay.portal.workflow.metrics.rest.internal.dto.v1_0.util.ProcessUtil;
 import com.liferay.portal.workflow.metrics.rest.internal.resource.exception.NoSuchProcessException;
+import com.liferay.portal.workflow.metrics.rest.internal.security.permission.WorkflowMetricsPermissionUtil;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.ProcessResource;
 import com.liferay.portal.workflow.metrics.search.index.ProcessWorkflowMetricsIndexer;
 import com.liferay.portal.workflow.metrics.search.index.constants.WorkflowMetricsIndexNameConstants;
@@ -48,6 +49,8 @@ public class ProcessResourceImpl extends BaseProcessResourceImpl {
 
 	@Override
 	public void deleteProcess(Long processId) throws Exception {
+		WorkflowMetricsPermissionUtil.check();
+
 		Process process = getProcess(processId);
 
 		DeleteProcessRequest.Builder builder =
@@ -63,6 +66,8 @@ public class ProcessResourceImpl extends BaseProcessResourceImpl {
 
 	@Override
 	public Process getProcess(Long processId) throws Exception {
+		WorkflowMetricsPermissionUtil.check();
+
 		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
 
 		searchSearchRequest.setIndexNames(
@@ -91,6 +96,8 @@ public class ProcessResourceImpl extends BaseProcessResourceImpl {
 
 	@Override
 	public String getProcessTitle(Long processId) throws Exception {
+		WorkflowMetricsPermissionUtil.check();
+
 		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
 
 		searchSearchRequest.setIndexNames(
@@ -130,6 +137,8 @@ public class ProcessResourceImpl extends BaseProcessResourceImpl {
 
 	@Override
 	public Process postProcess(Process process) throws Exception {
+		WorkflowMetricsPermissionUtil.check();
+
 		AddProcessRequest.Builder builder = new AddProcessRequest.Builder();
 
 		return ProcessUtil.toProcess(
@@ -162,6 +171,8 @@ public class ProcessResourceImpl extends BaseProcessResourceImpl {
 
 	@Override
 	public void putProcess(Long processId, Process process) throws Exception {
+		WorkflowMetricsPermissionUtil.check();
+
 		Process getProcess = getProcess(processId);
 
 		Map<Locale, String> titleMap = LocalizedMapUtil.getLocalizedMap(
