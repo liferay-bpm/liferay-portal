@@ -18,6 +18,7 @@ import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.SLAResult;
 import com.liferay.portal.workflow.metrics.rest.internal.dto.v1_0.util.SLAResultUtil;
 import com.liferay.portal.workflow.metrics.rest.internal.resource.exception.NoSuchSLAResultException;
+import com.liferay.portal.workflow.metrics.rest.internal.security.permission.WorkflowMetricsPermissionUtil;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.SLAResultResource;
 import com.liferay.portal.workflow.metrics.search.index.constants.WorkflowMetricsIndexNameConstants;
 import com.liferay.portal.workflow.metrics.service.WorkflowMetricsSLADefinitionLocalService;
@@ -39,6 +40,8 @@ public class SLAResultResourceImpl extends BaseSLAResultResourceImpl {
 
 	@Override
 	public SLAResult getProcessLastSLAResult(Long processId) throws Exception {
+		WorkflowMetricsPermissionUtil.check();
+
 		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
 
 		searchSearchRequest.addSorts(

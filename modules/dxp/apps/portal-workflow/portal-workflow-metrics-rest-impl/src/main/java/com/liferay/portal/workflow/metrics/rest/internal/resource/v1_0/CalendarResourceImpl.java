@@ -7,6 +7,7 @@ package com.liferay.portal.workflow.metrics.rest.internal.resource.v1_0;
 
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Calendar;
+import com.liferay.portal.workflow.metrics.rest.internal.security.permission.WorkflowMetricsPermissionUtil;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.CalendarResource;
 import com.liferay.portal.workflow.metrics.sla.calendar.WorkflowMetricsSLACalendar;
 import com.liferay.portal.workflow.metrics.sla.calendar.WorkflowMetricsSLACalendarRegistry;
@@ -29,7 +30,9 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class CalendarResourceImpl extends BaseCalendarResourceImpl {
 
 	@Override
-	public Page<Calendar> getCalendarsPage() {
+	public Page<Calendar> getCalendarsPage() throws Exception {
+		WorkflowMetricsPermissionUtil.check();
+
 		List<Calendar> calendars = new ArrayList<>();
 
 		for (WorkflowMetricsSLACalendar workflowMetricsSLACalendar :
