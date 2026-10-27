@@ -48,6 +48,7 @@ import com.liferay.portal.workflow.metrics.rest.dto.v1_0.AssigneeMetricBulkSelec
 import com.liferay.portal.workflow.metrics.rest.internal.dto.v1_0.util.AssigneeUtil;
 import com.liferay.portal.workflow.metrics.rest.internal.odata.entity.v1_0.AssigneeMetricEntityModel;
 import com.liferay.portal.workflow.metrics.rest.internal.resource.helper.ResourceHelper;
+import com.liferay.portal.workflow.metrics.rest.internal.security.permission.WorkflowMetricsPermissionUtil;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.AssigneeMetricResource;
 import com.liferay.portal.workflow.metrics.search.index.constants.WorkflowMetricsIndexNameConstants;
 import com.liferay.portal.workflow.metrics.sla.processor.WorkflowMetricsSLAStatus;
@@ -87,6 +88,8 @@ public class AssigneeMetricResourceImpl extends BaseAssigneeMetricResourceImpl {
 			Long processId, Pagination pagination, Sort[] sorts,
 			AssigneeMetricBulkSelection assigneeMetricBulkSelection)
 		throws Exception {
+
+		WorkflowMetricsPermissionUtil.check();
 
 		Set<Long> userIds = Collections.emptySet();
 

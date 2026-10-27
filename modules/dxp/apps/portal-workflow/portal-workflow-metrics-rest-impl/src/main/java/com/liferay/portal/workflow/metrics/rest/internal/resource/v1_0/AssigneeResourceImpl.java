@@ -27,6 +27,7 @@ import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Assignee;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.AssigneeBulkSelection;
 import com.liferay.portal.workflow.metrics.rest.internal.dto.v1_0.util.AssigneeUtil;
+import com.liferay.portal.workflow.metrics.rest.internal.security.permission.WorkflowMetricsPermissionUtil;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.AssigneeResource;
 import com.liferay.portal.workflow.metrics.search.index.constants.WorkflowMetricsIndexNameConstants;
 
@@ -51,6 +52,8 @@ public class AssigneeResourceImpl extends BaseAssigneeResourceImpl {
 	public Page<Assignee> postProcessAssigneesPage(
 			Long processId, AssigneeBulkSelection assigneeBulkSelection)
 		throws Exception {
+
+		WorkflowMetricsPermissionUtil.check();
 
 		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
 

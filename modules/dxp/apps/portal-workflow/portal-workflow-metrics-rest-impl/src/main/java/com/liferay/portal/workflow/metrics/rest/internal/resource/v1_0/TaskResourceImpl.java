@@ -54,6 +54,7 @@ import com.liferay.portal.workflow.metrics.rest.dto.v1_0.TaskBulkSelection;
 import com.liferay.portal.workflow.metrics.rest.internal.dto.v1_0.util.TaskUtil;
 import com.liferay.portal.workflow.metrics.rest.internal.resource.exception.NoSuchTaskException;
 import com.liferay.portal.workflow.metrics.rest.internal.resource.helper.ResourceHelper;
+import com.liferay.portal.workflow.metrics.rest.internal.security.permission.WorkflowMetricsPermissionUtil;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.TaskResource;
 import com.liferay.portal.workflow.metrics.search.index.TaskWorkflowMetricsIndexer;
 import com.liferay.portal.workflow.metrics.search.index.constants.WorkflowMetricsIndexNameConstants;
@@ -82,6 +83,8 @@ public class TaskResourceImpl extends BaseTaskResourceImpl {
 	public void deleteProcessTask(Long processId, Long taskId)
 		throws Exception {
 
+		WorkflowMetricsPermissionUtil.check();
+
 		DeleteTaskRequest.Builder deleteTaskRequestBuilder =
 			new DeleteTaskRequest.Builder();
 
@@ -95,6 +98,8 @@ public class TaskResourceImpl extends BaseTaskResourceImpl {
 
 	@Override
 	public Task getProcessTask(Long processId, Long taskId) throws Exception {
+		WorkflowMetricsPermissionUtil.check();
+
 		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
 
 		searchSearchRequest.setIndexNames(
@@ -133,12 +138,16 @@ public class TaskResourceImpl extends BaseTaskResourceImpl {
 
 	@Override
 	public Page<Task> getProcessTasksPage(Long processId) throws Exception {
+		WorkflowMetricsPermissionUtil.check();
+
 		return Page.of(_getTasks(processId));
 	}
 
 	@Override
 	public void patchProcessTask(Long processId, Long taskId, Task task)
 		throws Exception {
+
+		WorkflowMetricsPermissionUtil.check();
 
 		getProcessTask(processId, taskId);
 
@@ -178,6 +187,8 @@ public class TaskResourceImpl extends BaseTaskResourceImpl {
 	public void patchProcessTaskComplete(Long processId, Long taskId, Task task)
 		throws Exception {
 
+		WorkflowMetricsPermissionUtil.check();
+
 		getProcessTask(processId, taskId);
 
 		CompleteTaskRequest.Builder completeTaskRequestBuilder =
@@ -203,6 +214,8 @@ public class TaskResourceImpl extends BaseTaskResourceImpl {
 
 	@Override
 	public Task postProcessTask(Long processId, Task task) throws Exception {
+		WorkflowMetricsPermissionUtil.check();
+
 		return TaskUtil.toTask(
 			_taskWorkflowMetricsIndexer.addTask(
 				_toAddTaskRequest(processId, task)),
@@ -217,6 +230,8 @@ public class TaskResourceImpl extends BaseTaskResourceImpl {
 	public Page<Task> postTasksPage(
 			Pagination pagination, TaskBulkSelection taskBulkSelection)
 		throws Exception {
+
+		WorkflowMetricsPermissionUtil.check();
 
 		if (ArrayUtil.isEmpty(taskBulkSelection.getAssigneeIds())) {
 			taskBulkSelection.setAssigneeIds(
