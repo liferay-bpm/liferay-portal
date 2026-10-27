@@ -13,6 +13,7 @@ import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstant
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.ReindexStatus;
+import com.liferay.portal.workflow.metrics.rest.internal.security.permission.WorkflowMetricsPermissionUtil;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.ReindexStatusResource;
 import com.liferay.portal.workflow.metrics.search.background.task.WorkflowMetricsBackgroundTaskExecutorNames;
 
@@ -31,6 +32,8 @@ public class ReindexStatusResourceImpl extends BaseReindexStatusResourceImpl {
 
 	@Override
 	public Page<ReindexStatus> getReindexStatusesPage() throws Exception {
+		WorkflowMetricsPermissionUtil.check();
+
 		return Page.of(
 			transform(
 				_backgroundTaskLocalService.getBackgroundTasks(
