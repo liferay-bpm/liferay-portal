@@ -6,8 +6,13 @@
 package com.liferay.portal.workflow.metrics.rest.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.rule.DataGuard;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.search.test.rule.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Assignee;
@@ -17,6 +22,7 @@ import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Task;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.TaskBulkSelection;
 import com.liferay.portal.workflow.metrics.rest.client.pagination.Page;
 import com.liferay.portal.workflow.metrics.rest.client.pagination.Pagination;
+import com.liferay.portal.workflow.metrics.rest.client.resource.v1_0.TaskResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.test.helper.WorkflowMetricsRESTTestHelper;
 
 import java.util.Arrays;
@@ -67,6 +73,30 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 		}
 	}
 
+	@Override
+	@Test
+	public void testDeleteProcessTask() throws Exception {
+		super.testDeleteProcessTask();
+
+		_testDeleteProcessTaskWithoutPermission();
+	}
+
+	@Override
+	@Test
+	public void testGetProcessTask() throws Exception {
+		super.testGetProcessTask();
+
+		_testGetProcessTaskWithoutPermission();
+	}
+
+	@Override
+	@Test
+	public void testGetProcessTasksPage() throws Exception {
+		super.testGetProcessTasksPage();
+
+		_testGetProcessTasksPageWithoutPermission();
+	}
+
 	@Ignore
 	@Override
 	@Test
@@ -79,6 +109,30 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 	@Test
 	public void testGraphQLPostProcessTask() throws Exception {
 		super.testGraphQLPostProcessTask();
+	}
+
+	@Override
+	@Test
+	public void testPatchProcessTask() throws Exception {
+		super.testPatchProcessTask();
+
+		_testPatchProcessTaskWithoutPermission();
+	}
+
+	@Override
+	@Test
+	public void testPatchProcessTaskComplete() throws Exception {
+		super.testPatchProcessTaskComplete();
+
+		_testPatchProcessTaskCompleteWithoutPermission();
+	}
+
+	@Override
+	@Test
+	public void testPostProcessTask() throws Exception {
+		super.testPostProcessTask();
+
+		_testPostProcessTaskWithoutPermission();
 	}
 
 	@Override
@@ -289,6 +343,8 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(task2), (List<Task>)page.getItems());
+
+		_testPostTasksPageWithoutPermission();
 	}
 
 	@Rule
@@ -387,6 +443,120 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 		throws Exception {
 
 		return task.getProcessId();
+	}
+
+	private TaskResource _getUserWithoutPermissionsTaskResource()
+		throws Exception {
+
+		String password = RandomTestUtil.randomString();
+
+		User user = UserTestUtil.addUser(testCompany, password);
+
+		return TaskResource.builder(
+		).authentication(
+			user.getEmailAddress(), password
+		).endpoint(
+			testCompany.getVirtualHostname(),
+			PortalUtil.getPortalServerPort(false), "http"
+		).locale(
+			LocaleUtil.getDefault()
+		).build();
+	}
+
+	private void _testDeleteProcessTaskWithoutPermission() throws Exception {
+		Task task = testDeleteProcessTask_addTask();
+
+		TaskResource userTaskResource =
+			_getUserWithoutPermissionsTaskResource();
+
+		assertHttpResponseStatusCode(
+			403,
+			userTaskResource.deleteProcessTaskHttpResponse(
+				task.getProcessId(), task.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			taskResource.getProcessTaskHttpResponse(
+				task.getProcessId(), task.getId()));
+	}
+
+	private void _testGetProcessTaskWithoutPermission() throws Exception {
+		Task task = testGetProcessTask_addTask();
+
+		TaskResource userTaskResource =
+			_getUserWithoutPermissionsTaskResource();
+
+		assertHttpResponseStatusCode(
+			404,
+			userTaskResource.getProcessTaskHttpResponse(
+				task.getProcessId(), task.getId()));
+	}
+
+	private void _testGetProcessTasksPageWithoutPermission() throws Exception {
+		TaskResource userTaskResource =
+			_getUserWithoutPermissionsTaskResource();
+
+		assertHttpResponseStatusCode(
+			404,
+			userTaskResource.getProcessTasksPageHttpResponse(_process.getId()));
+	}
+
+	private void _testPatchProcessTaskCompleteWithoutPermission()
+		throws Exception {
+
+		Task task = testPatchProcessTaskComplete_addTask();
+
+		TaskResource userTaskResource =
+			_getUserWithoutPermissionsTaskResource();
+
+		assertHttpResponseStatusCode(
+			403,
+			userTaskResource.patchProcessTaskCompleteHttpResponse(
+				task.getProcessId(), task.getId(), task));
+	}
+
+	private void _testPatchProcessTaskWithoutPermission() throws Exception {
+		Task task = testPatchProcessTask_addTask();
+
+		TaskResource userTaskResource =
+			_getUserWithoutPermissionsTaskResource();
+
+		assertHttpResponseStatusCode(
+			403,
+			userTaskResource.patchProcessTaskHttpResponse(
+				task.getProcessId(), task.getId(), task));
+	}
+
+	private void _testPostProcessTaskWithoutPermission() throws Exception {
+		Task task = randomTask();
+
+		TaskResource userTaskResource =
+			_getUserWithoutPermissionsTaskResource();
+
+		assertHttpResponseStatusCode(
+			403,
+			userTaskResource.postProcessTaskHttpResponse(
+				_process.getId(), task));
+
+		assertHttpResponseStatusCode(
+			404,
+			taskResource.getProcessTaskHttpResponse(
+				_process.getId(), task.getId()));
+	}
+
+	private void _testPostTasksPageWithoutPermission() throws Exception {
+		TaskResource userTaskResource =
+			_getUserWithoutPermissionsTaskResource();
+
+		assertHttpResponseStatusCode(
+			403,
+			userTaskResource.postTasksPageHttpResponse(
+				Pagination.of(1, 10),
+				new TaskBulkSelection() {
+					{
+						processId = _process.getId();
+					}
+				}));
 	}
 
 	private Instance _instance;

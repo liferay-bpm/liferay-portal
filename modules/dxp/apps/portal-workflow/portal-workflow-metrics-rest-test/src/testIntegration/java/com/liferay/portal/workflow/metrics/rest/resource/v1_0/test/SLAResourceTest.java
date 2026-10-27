@@ -104,6 +104,16 @@ public class SLAResourceTest extends BaseSLAResourceTestCase {
 			null,
 			(sla1, sla2, page) -> assertEquals(
 				Arrays.asList(sla2, sla1), (List<SLA>)page.getItems()));
+
+		_testGetProcessSLAsPageWithoutPermission();
+	}
+
+	@Override
+	@Test
+	public void testGetSLA() throws Exception {
+		super.testGetSLA();
+
+		_testGetSLAWithoutPermission();
 	}
 
 	@Ignore
@@ -295,6 +305,24 @@ public class SLAResourceTest extends BaseSLAResourceTestCase {
 			_process.getId(), status, Pagination.of(1, 2));
 
 		unsafeTriConsumer.accept(sla1, sla2, page);
+	}
+
+	private void _testGetProcessSLAsPageWithoutPermission() throws Exception {
+		SLAResource userSLAResource = _getUserWithoutPermissionsSLAResource();
+
+		assertHttpResponseStatusCode(
+			404,
+			userSLAResource.getProcessSLAsPageHttpResponse(
+				_process.getId(), null, Pagination.of(1, 10)));
+	}
+
+	private void _testGetSLAWithoutPermission() throws Exception {
+		SLA sla = testGetSLA_addSLA();
+
+		SLAResource userSLAResource = _getUserWithoutPermissionsSLAResource();
+
+		assertHttpResponseStatusCode(
+			404, userSLAResource.getSLAHttpResponse(sla.getId()));
 	}
 
 	private void _testPostProcessSLAWithoutPermission() throws Exception {

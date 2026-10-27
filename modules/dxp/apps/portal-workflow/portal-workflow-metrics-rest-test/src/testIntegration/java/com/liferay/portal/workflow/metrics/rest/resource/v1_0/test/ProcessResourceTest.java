@@ -6,14 +6,18 @@
 package com.liferay.portal.workflow.metrics.rest.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.test.rule.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Process;
+import com.liferay.portal.workflow.metrics.rest.client.resource.v1_0.ProcessResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.test.helper.WorkflowMetricsRESTTestHelper;
 
 import java.util.ArrayList;
@@ -61,8 +65,18 @@ public class ProcessResourceTest extends BaseProcessResourceTestCase {
 
 	@Override
 	@Test
+	public void testDeleteProcess() throws Exception {
+		super.testDeleteProcess();
+
+		_testDeleteProcessWithoutPermission();
+	}
+
+	@Override
+	@Test
 	public void testGetProcess() throws Exception {
 		super.testGetProcess();
+
+		_testGetProcessWithoutPermission();
 	}
 
 	@Override
@@ -75,6 +89,24 @@ public class ProcessResourceTest extends BaseProcessResourceTestCase {
 		String title = processResource.getProcessTitle(process.getId());
 
 		Assert.assertEquals(process.getTitle(), title);
+
+		_testGetProcessTitleWithoutPermission();
+	}
+
+	@Override
+	@Test
+	public void testPostProcess() throws Exception {
+		super.testPostProcess();
+
+		_testPostProcessWithoutPermission();
+	}
+
+	@Override
+	@Test
+	public void testPutProcess() throws Exception {
+		super.testPutProcess();
+
+		_testPutProcessWithoutPermission();
 	}
 
 	@Rule
@@ -139,6 +171,86 @@ public class ProcessResourceTest extends BaseProcessResourceTestCase {
 			_workflowMetricsRESTTestHelper.deleteProcess(
 				testGroup.getCompanyId(), process);
 		}
+	}
+
+	private ProcessResource _getUserWithoutPermissionsProcessResource()
+		throws Exception {
+
+		String password = RandomTestUtil.randomString();
+
+		User user = UserTestUtil.addUser(testCompany, password);
+
+		return ProcessResource.builder(
+		).authentication(
+			user.getEmailAddress(), password
+		).endpoint(
+			testCompany.getVirtualHostname(),
+			PortalUtil.getPortalServerPort(false), "http"
+		).locale(
+			LocaleUtil.getDefault()
+		).build();
+	}
+
+	private void _testDeleteProcessWithoutPermission() throws Exception {
+		Process process = testDeleteProcess_addProcess();
+
+		ProcessResource userProcessResource =
+			_getUserWithoutPermissionsProcessResource();
+
+		assertHttpResponseStatusCode(
+			403,
+			userProcessResource.deleteProcessHttpResponse(process.getId()));
+
+		assertHttpResponseStatusCode(
+			200, processResource.getProcessHttpResponse(process.getId()));
+	}
+
+	private void _testGetProcessTitleWithoutPermission() throws Exception {
+		Process process = testGetProcess_addProcess();
+
+		ProcessResource userProcessResource =
+			_getUserWithoutPermissionsProcessResource();
+
+		assertHttpResponseStatusCode(
+			404,
+			userProcessResource.getProcessTitleHttpResponse(process.getId()));
+	}
+
+	private void _testGetProcessWithoutPermission() throws Exception {
+		Process process = testGetProcess_addProcess();
+
+		ProcessResource userProcessResource =
+			_getUserWithoutPermissionsProcessResource();
+
+		assertHttpResponseStatusCode(
+			404, userProcessResource.getProcessHttpResponse(process.getId()));
+	}
+
+	private void _testPostProcessWithoutPermission() throws Exception {
+		Process process = randomProcess();
+
+		ProcessResource userProcessResource =
+			_getUserWithoutPermissionsProcessResource();
+
+		assertHttpResponseStatusCode(
+			403, userProcessResource.postProcessHttpResponse(process));
+
+		assertHttpResponseStatusCode(
+			404, processResource.getProcessHttpResponse(process.getId()));
+	}
+
+	private void _testPutProcessWithoutPermission() throws Exception {
+		Process process = testPutProcess_addProcess();
+
+		ProcessResource userProcessResource =
+			_getUserWithoutPermissionsProcessResource();
+
+		assertHttpResponseStatusCode(
+			403,
+			userProcessResource.putProcessHttpResponse(
+				process.getId(), randomProcess()));
+
+		assertEquals(process, processResource.getProcess(process.getId()));
 	}
 
 	private Document[] _documents;
