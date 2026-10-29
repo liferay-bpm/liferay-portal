@@ -197,6 +197,10 @@ public class ObjectEntryInfoItemObjectProvider
 			ObjectEntry objectEntry, String version)
 		throws NoSuchInfoItemException {
 
+		if (!objectEntry.isRegular()) {
+			return objectEntry;
+		}
+
 		if ((Validator.isNotNull(version) &&
 			 !Objects.equals(
 				 version, InfoItemIdentifier.VERSION_LATEST_APPROVED)) ||
