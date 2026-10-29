@@ -81,6 +81,8 @@ import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.change.tracking.CTAware;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -416,49 +418,69 @@ public class DataDefinitionResourceImpl extends BaseDataDefinitionResourceImpl {
 			};
 		}
 
+		List<DDMStructure> ddmStructures = null;
+
 		if (Validator.isNull(keywords)) {
-			return Page.of(
-				transform(
-					_ddmStructureLocalService.getStructures(
-						siteId,
+			ddmStructures = _ddmStructureLocalService.getStructures(
+				siteId,
+				DataDefinitionContentTypeRegistryUtil.getClassNameId(
+					contentType),
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				_toOrderByComparator((Sort)ArrayUtil.getValue(sorts, 0)));
+		}
+		else {
+			Page<DDMStructure> page = SearchUtil.search(
+				Collections.emptyMap(),
+				booleanQuery -> {
+				},
+				null, DDMStructure.class.getName(), keywords,
+				Pagination.of(QueryUtil.ALL_POS, QueryUtil.ALL_POS),
+				queryConfig -> queryConfig.setSelectedFieldNames(
+					Field.CLASS_NAME_ID, Field.ENTRY_CLASS_PK),
+				searchContext -> {
+					searchContext.setAttribute(
+						Field.CLASS_NAME_ID,
 						DataDefinitionContentTypeRegistryUtil.getClassNameId(
-							contentType),
-						pagination.getStartPosition(),
-						pagination.getEndPosition(),
-						_toOrderByComparator(
-							(Sort)ArrayUtil.getValue(sorts, 0))),
-					this::_toDataDefinition),
-				pagination,
-				_ddmStructureLocalService.getStructuresCount(
-					siteId,
-					DataDefinitionContentTypeRegistryUtil.getClassNameId(
-						contentType)));
+							contentType));
+					searchContext.setAttribute(Field.DESCRIPTION, keywords);
+					searchContext.setAttribute(Field.NAME, keywords);
+					searchContext.setCompanyId(contextCompany.getCompanyId());
+					searchContext.setGroupIds(new long[] {siteId});
+				},
+				sorts,
+				document -> _ddmStructureLocalService.getStructure(
+					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK))));
+
+			ddmStructures = ListUtil.fromCollection(page.getItems());
 		}
 
-		return SearchUtil.search(
-			Collections.emptyMap(),
-			booleanQuery -> {
-			},
-			null, DDMStructure.class.getName(), keywords, pagination,
-			queryConfig -> queryConfig.setSelectedFieldNames(
-				Field.CLASS_NAME_ID, Field.ENTRY_CLASS_PK),
-			searchContext -> {
-				searchContext.setAttribute(
-					Field.CLASS_NAME_ID,
-					DataDefinitionContentTypeRegistryUtil.getClassNameId(
-						contentType));
-				searchContext.setAttribute(Field.DESCRIPTION, keywords);
-				searchContext.setAttribute(Field.NAME, keywords);
-				searchContext.setCompanyId(contextCompany.getCompanyId());
-				searchContext.setGroupIds(new long[] {siteId});
-			},
-			sorts,
-			document -> DataDefinitionUtil.toDataDefinition(
-				_ddmFormFieldTypeServicesRegistry,
-				_ddmStructureLocalService.getStructure(
-					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK))),
-				_ddmStructureLayoutLocalService, _ddmStructureLocalService,
-				contextHttpServletRequest, _spiDDMFormRuleConverter));
+		ddmStructures = transform(
+			ddmStructures,
+			ddmStructure -> {
+				try {
+					if (DataDefinitionPermissionUtil.contains(
+							PermissionThreadLocal.getPermissionChecker(),
+							ddmStructure, ActionKeys.VIEW)) {
+
+						return ddmStructure;
+					}
+				}
+				catch (PortalException portalException) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(portalException);
+					}
+				}
+
+				return null;
+			});
+
+		return Page.of(
+			transform(
+				ListUtil.subList(
+					ddmStructures, pagination.getStartPosition(),
+					pagination.getEndPosition()),
+				this::_toDataDefinition),
+			pagination, ddmStructures.size());
 	}
 
 	@Override
