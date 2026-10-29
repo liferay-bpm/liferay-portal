@@ -746,6 +746,155 @@ public class ObjectEntryPersistenceImpl
 	}
 
 	private CollectionPersistenceFinder<ObjectEntry, NoSuchObjectEntryException>
+		_collectionPersistenceFinderByHOEI_NotT;
+
+	/**
+	 * Returns all the object entries where headObjectEntryId = &#63; and type &ne; &#63;.
+	 *
+	 * @param headObjectEntryId the head object entry ID
+	 * @param type the type
+	 * @return the matching object entries
+	 */
+	@Override
+	public List<ObjectEntry> findByHOEI_NotT(long headObjectEntryId, int type) {
+		return findByHOEI_NotT(
+			headObjectEntryId, type, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
+	}
+
+	/**
+	 * Returns a range of all the object entries where headObjectEntryId = &#63; and type &ne; &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ObjectEntryModelImpl</code>.
+	 * </p>
+	 *
+	 * @param headObjectEntryId the head object entry ID
+	 * @param type the type
+	 * @param start the lower bound of the range of object entries
+	 * @param end the upper bound of the range of object entries (not inclusive)
+	 * @return the range of matching object entries
+	 */
+	@Override
+	public List<ObjectEntry> findByHOEI_NotT(
+		long headObjectEntryId, int type, int start, int end) {
+
+		return findByHOEI_NotT(headObjectEntryId, type, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the object entries where headObjectEntryId = &#63; and type &ne; &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ObjectEntryModelImpl</code>.
+	 * </p>
+	 *
+	 * @param headObjectEntryId the head object entry ID
+	 * @param type the type
+	 * @param start the lower bound of the range of object entries
+	 * @param end the upper bound of the range of object entries (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching object entries
+	 */
+	@Override
+	public List<ObjectEntry> findByHOEI_NotT(
+		long headObjectEntryId, int type, int start, int end,
+		OrderByComparator<ObjectEntry> orderByComparator) {
+
+		return findByHOEI_NotT(
+			headObjectEntryId, type, start, end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the object entries where headObjectEntryId = &#63; and type &ne; &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ObjectEntryModelImpl</code>.
+	 * </p>
+	 *
+	 * @param headObjectEntryId the head object entry ID
+	 * @param type the type
+	 * @param start the lower bound of the range of object entries
+	 * @param end the upper bound of the range of object entries (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching object entries
+	 */
+	@Override
+	public List<ObjectEntry> findByHOEI_NotT(
+		long headObjectEntryId, int type, int start, int end,
+		OrderByComparator<ObjectEntry> orderByComparator,
+		boolean useFinderCache) {
+
+		return _collectionPersistenceFinderByHOEI_NotT.find(
+			finderCache, new Object[] {headObjectEntryId, type}, start, end,
+			orderByComparator, useFinderCache);
+	}
+
+	/**
+	 * Returns the first object entry in the ordered set where headObjectEntryId = &#63; and type &ne; &#63;.
+	 *
+	 * @param headObjectEntryId the head object entry ID
+	 * @param type the type
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching object entry
+	 * @throws NoSuchObjectEntryException if a matching object entry could not be found
+	 */
+	@Override
+	public ObjectEntry findByHOEI_NotT_First(
+			long headObjectEntryId, int type,
+			OrderByComparator<ObjectEntry> orderByComparator)
+		throws NoSuchObjectEntryException {
+
+		return _collectionPersistenceFinderByHOEI_NotT.findFirst(
+			finderCache, new Object[] {headObjectEntryId, type},
+			orderByComparator);
+	}
+
+	/**
+	 * Returns the first object entry in the ordered set where headObjectEntryId = &#63; and type &ne; &#63;.
+	 *
+	 * @param headObjectEntryId the head object entry ID
+	 * @param type the type
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching object entry, or <code>null</code> if a matching object entry could not be found
+	 */
+	@Override
+	public ObjectEntry fetchByHOEI_NotT_First(
+		long headObjectEntryId, int type,
+		OrderByComparator<ObjectEntry> orderByComparator) {
+
+		return _collectionPersistenceFinderByHOEI_NotT.fetchFirst(
+			finderCache, new Object[] {headObjectEntryId, type},
+			orderByComparator);
+	}
+
+	/**
+	 * Removes all the object entries where headObjectEntryId = &#63; and type &ne; &#63; from the database.
+	 *
+	 * @param headObjectEntryId the head object entry ID
+	 * @param type the type
+	 */
+	@Override
+	public void removeByHOEI_NotT(long headObjectEntryId, int type) {
+		_collectionPersistenceFinderByHOEI_NotT.remove(
+			finderCache, new Object[] {headObjectEntryId, type});
+	}
+
+	/**
+	 * Returns the number of object entries where headObjectEntryId = &#63; and type &ne; &#63;.
+	 *
+	 * @param headObjectEntryId the head object entry ID
+	 * @param type the type
+	 * @return the number of matching object entries
+	 */
+	@Override
+	public int countByHOEI_NotT(long headObjectEntryId, int type) {
+		return _collectionPersistenceFinderByHOEI_NotT.count(
+			finderCache, new Object[] {headObjectEntryId, type});
+	}
+
+	private CollectionPersistenceFinder<ObjectEntry, NoSuchObjectEntryException>
 		_collectionPersistenceFinderByODI_NotS;
 
 	/**
@@ -1677,6 +1826,7 @@ public class ObjectEntryPersistenceImpl
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
+		dbColumnNames.put("type", "type_");
 
 		setDBColumnNames(dbColumnNames);
 
@@ -2011,7 +2161,7 @@ public class ObjectEntryPersistenceImpl
 					new String[] {"headObjectEntryId"}, 0, 0, false,
 					ObjectEntry::getHeadObjectEntryId),
 				_SQL_SELECT_OBJECTENTRY_WHERE,
-				"objectEntry.objectEntryId != objectEntry.headObjectEntryId",
+				"(objectEntry.objectEntryId != objectEntry.headObjectEntryId) AND (objectEntry.type = 0)",
 				new FinderColumn<>(
 					"objectEntry.", "headObjectEntryId", FinderColumn.Type.LONG,
 					"=", true, true, ObjectEntry::getHeadObjectEntryId));
@@ -2137,6 +2287,34 @@ public class ObjectEntryPersistenceImpl
 			new FinderColumn<>(
 				"objectEntry.", "objectDefinitionId", FinderColumn.Type.LONG,
 				"=", true, true, ObjectEntry::getObjectDefinitionId));
+
+		_collectionPersistenceFinderByHOEI_NotT =
+			new CollectionPersistenceFinder<>(
+				this,
+				new FinderPath(
+					FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByHOEI_NotT",
+					new String[] {
+						Long.class.getName(), Integer.class.getName(),
+						Integer.class.getName(), Integer.class.getName(),
+						OrderByComparator.class.getName()
+					},
+					new String[] {"headObjectEntryId", "type_"}, true),
+				null,
+				new FinderPath(
+					FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByHOEI_NotT",
+					new String[] {
+						Long.class.getName(), Integer.class.getName()
+					},
+					new String[] {"headObjectEntryId", "type_"}, false),
+				_SQL_SELECT_OBJECTENTRY_WHERE, _SQL_COUNT_OBJECTENTRY_WHERE,
+				ObjectEntryModelImpl.ORDER_BY_JPQL, _ENTITY_ALIAS_PREFIX, "",
+				"", null,
+				new FinderColumn<>(
+					"objectEntry.", "headObjectEntryId", FinderColumn.Type.LONG,
+					"=", true, true, ObjectEntry::getHeadObjectEntryId),
+				new FinderColumn<>(
+					"objectEntry.", "type", "type_", FinderColumn.Type.INTEGER,
+					"!=", true, true, ObjectEntry::getType));
 
 		_collectionPersistenceFinderByODI_NotS =
 			new CollectionPersistenceFinder<>(
@@ -2458,7 +2636,7 @@ public class ObjectEntryPersistenceImpl
 		"SELECT COUNT(objectEntry) FROM ObjectEntry objectEntry WHERE ";
 
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
-		new String[] {"uuid"});
+		new String[] {"uuid", "type"});
 
 	@Override
 	protected FinderCache getFinderCache() {
@@ -2466,4 +2644,4 @@ public class ObjectEntryPersistenceImpl
 	}
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:1050007229
+// LIFERAY-SERVICE-BUILDER-HASH:344275678
