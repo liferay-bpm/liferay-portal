@@ -126,9 +126,31 @@ public class KaleoDefinitionServiceImplTest {
 	}
 
 	@Test
+	public void testActivateKaleoDefinitionFromAnotherCompany()
+		throws Exception {
+
+		KaleoDefinition kaleoDefinition =
+			_addKaleoDefinitionAndSetUpCompany2Admin();
+
+		Assert.assertThrows(
+			PrincipalException.class,
+			() -> _kaleoDefinitionService.activateKaleoDefinition(
+				kaleoDefinition.getName(), kaleoDefinition.getVersion(),
+				_serviceContext));
+	}
+
+	@Test
 	public void testAddKaleoDefinition() throws Exception {
 		_testAddKaleoDefinition();
 		_testAddKaleoDefinitionWithGroupId();
+	}
+
+	@Test
+	public void testAddKaleoDefinitionFromAnotherCompany() throws Exception {
+		_setUpCompany2AdminUserWithPublishEnabled();
+
+		Assert.assertThrows(
+			PrincipalException.class, this::_addKaleoDefinition);
 	}
 
 	@Test
@@ -138,9 +160,41 @@ public class KaleoDefinitionServiceImplTest {
 	}
 
 	@Test
+	public void testDeactivateKaleoDefinitionFromAnotherCompany()
+		throws Exception {
+
+		KaleoDefinition kaleoDefinition = _addKaleoDefinition();
+
+		_kaleoDefinitionService.activateKaleoDefinition(
+			kaleoDefinition.getName(), kaleoDefinition.getVersion(),
+			_serviceContext);
+
+		_setUpCompany2AdminUserWithPublishEnabled();
+
+		Assert.assertThrows(
+			PrincipalException.class,
+			() -> _kaleoDefinitionService.deactivateKaleoDefinition(
+				kaleoDefinition.getName(), kaleoDefinition.getVersion(),
+				_serviceContext));
+	}
+
+	@Test
 	public void testDeleteKaleoDefinition() throws Exception {
 		_testDeleteKaleoDefinition();
 		_testDeleteKaleoDefinitionWithGroupId();
+	}
+
+	@Test
+	public void testDeleteKaleoDefinitionFromAnotherCompany()
+		throws Exception {
+
+		KaleoDefinition kaleoDefinition =
+			_addKaleoDefinitionAndSetUpCompany2Admin();
+
+		Assert.assertThrows(
+			PrincipalException.class,
+			() -> _kaleoDefinitionService.deleteKaleoDefinition(
+				kaleoDefinition.getName(), _serviceContext));
 	}
 
 	@Test
@@ -195,6 +249,22 @@ public class KaleoDefinitionServiceImplTest {
 		_testUpdateKaleoDefinitionWithGroupId();
 	}
 
+	@Test
+	public void testUpdateKaleoDefinitionFromAnotherCompany()
+		throws Exception {
+
+		KaleoDefinition kaleoDefinition =
+			_addKaleoDefinitionAndSetUpCompany2Admin();
+
+		Assert.assertThrows(
+			PrincipalException.class,
+			() -> _kaleoDefinitionService.updateKaleoDefinition(
+				kaleoDefinition.getExternalReferenceCode(),
+				kaleoDefinition.getKaleoDefinitionId(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				kaleoDefinition.getContent(), false, _serviceContext));
+	}
+
 	private AccountEntry _addAccountEntry() throws Exception {
 		return _accountEntryLocalService.addAccountEntry(
 			StringPool.BLANK, TestPropsValues.getUserId(), 0L,
@@ -218,13 +288,23 @@ public class KaleoDefinitionServiceImplTest {
 	}
 
 	private KaleoDefinition _addKaleoDefinition(
-			String scope, ServiceContext serviceContext)
+		String scope, ServiceContext serviceContext)
 		throws Exception {
 
 		return _kaleoDefinitionService.addKaleoDefinition(
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			_read(), scope, false, 1, serviceContext);
+	}
+
+	private KaleoDefinition _addKaleoDefinitionAndSetUpCompany2Admin()
+		throws Exception {
+
+		KaleoDefinition kaleoDefinition = _addKaleoDefinition();
+
+		_setUpCompany2AdminUserWithPublishEnabled();
+
+		return kaleoDefinition;
 	}
 
 	private User _addUser() throws Exception {
@@ -246,6 +326,22 @@ public class KaleoDefinitionServiceImplTest {
 		PrincipalThreadLocal.setName(user.getUserId());
 
 		return user;
+	}
+
+	private void _setCompanyAdministratorCanPublish(boolean canPublish)
+		throws Exception {
+
+		ConfigurationTestUtil.saveConfiguration(
+			_configuration,
+			HashMapDictionaryBuilder.<String, Object>put(
+				"company.administrator.can.publish", canPublish
+			).build());
+	}
+
+	private void _setUpCompany2AdminUserWithPublishEnabled() throws Exception {
+		_setCompanyAdministratorCanPublish(true);
+
+		_setUpPermissionThreadLocal(_company2AdminUser);
 	}
 
 	private String _read() throws Exception {
