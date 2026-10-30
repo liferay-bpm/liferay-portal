@@ -3001,8 +3001,8 @@ public class ObjectEntryLocalServiceImpl
 			objectFieldBag, selectExpressions, true);
 
 		_putLocalizedObjectFieldValues(
-			defaultLanguageId, dynamicObjectDefinitionLocalizationTable, rows,
-			values);
+			defaultLanguageId, dynamicObjectDefinitionLocalizationTable,
+			objectFieldBag, rows, values);
 	}
 
 	private ObjectEntry _addObjectEntry(
@@ -6411,6 +6411,12 @@ public class ObjectEntryLocalServiceImpl
 			partialUpdate, values);
 
 		if (locales.isEmpty()) {
+			for (ObjectField objectField : objectFields) {
+				_putLocalizedValues(
+					objectField.getDBColumnName(), defaultLanguageId,
+					new HashMap<>(), insertedValues);
+			}
+
 			return;
 		}
 
@@ -6879,7 +6885,7 @@ public class ObjectEntryLocalServiceImpl
 			if (dynamicObjectDefinitionLocalizationTable != null) {
 				_putLocalizedObjectFieldValues(
 					objectEntry.getDefaultLanguageId(),
-					dynamicObjectDefinitionLocalizationTable,
+					dynamicObjectDefinitionLocalizationTable, objectFieldBag,
 					localizedRowsMap.get(objectEntry.getObjectEntryId()),
 					values);
 			}
@@ -7030,9 +7036,18 @@ public class ObjectEntryLocalServiceImpl
 		String defaultLanguageId,
 		DynamicObjectDefinitionLocalizationTable
 			dynamicObjectDefinitionLocalizationTable,
-		List<Object[]> rows, Map<String, Serializable> values) {
+		ObjectFieldBag objectFieldBag, List<Object[]> rows,
+		Map<String, Serializable> values) {
 
 		if (ListUtil.isEmpty(rows)) {
+			for (ObjectField objectField :
+					objectFieldBag.getLocalizedObjectFields()) {
+
+				_putLocalizedValues(
+					objectField.getDBColumnName(), defaultLanguageId,
+					new HashMap<>(), values);
+			}
+
 			return;
 		}
 

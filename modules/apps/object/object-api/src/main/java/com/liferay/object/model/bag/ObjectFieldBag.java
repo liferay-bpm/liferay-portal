@@ -26,6 +26,10 @@ public class ObjectFieldBag {
 			_idObjectFieldsMap.put(objectField.getObjectFieldId(), objectField);
 			_nameObjectFieldsMap.put(objectField.getName(), objectField);
 
+			if (objectField.isLocalized()) {
+				_localizedObjectFields.add(objectField);
+			}
+
 			if (!objectField.isIndexed()) {
 				continue;
 			}
@@ -47,6 +51,10 @@ public class ObjectFieldBag {
 		return _indexedObjectFields;
 	}
 
+	public List<ObjectField> getLocalizedObjectFields() {
+		return _localizedObjectFields;
+	}
+
 	public List<ObjectField> getNestedIndexedObjectFields() {
 		return _nestedIndexedObjectFields;
 	}
@@ -65,6 +73,7 @@ public class ObjectFieldBag {
 
 	private final Map<Long, ObjectField> _idObjectFieldsMap = new HashMap<>();
 	private final List<ObjectField> _indexedObjectFields = new ArrayList<>();
+	private final List<ObjectField> _localizedObjectFields = new ArrayList<>();
 	private final Map<String, ObjectField> _nameObjectFieldsMap =
 		new HashMap<>();
 	private final List<ObjectField> _nestedIndexedObjectFields =
