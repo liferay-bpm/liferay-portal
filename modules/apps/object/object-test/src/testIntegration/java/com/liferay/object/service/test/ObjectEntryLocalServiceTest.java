@@ -122,6 +122,8 @@ import com.liferay.object.model.ObjectStateFlow;
 import com.liferay.object.model.ObjectStateTransition;
 import com.liferay.object.model.ObjectValidationRule;
 import com.liferay.object.model.ObjectValidationRuleSetting;
+import com.liferay.object.related.models.ObjectRelatedModelsPredicateProvider;
+import com.liferay.object.related.models.ObjectRelatedModelsPredicateProviderRegistry;
 import com.liferay.object.related.models.test.util.ObjectEntryTestUtil;
 import com.liferay.object.rest.dto.v1_0.Assignee;
 import com.liferay.object.scope.CompanyScoped;
@@ -215,6 +217,7 @@ import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.TestInfo;
+import com.liferay.portal.kernel.test.context.ContextUserReplace;
 import com.liferay.portal.kernel.test.randomizerbumpers.NumericStringRandomizerBumper;
 import com.liferay.portal.kernel.test.randomizerbumpers.UniqueStringRandomizerBumper;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -227,6 +230,7 @@ import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.BigDecimalUtil;
 import com.liferay.portal.kernel.util.Constants;
@@ -7057,6 +7061,205 @@ public class ObjectEntryLocalServiceTest {
 	}
 
 	@Test
+	public void testGetValuesListCount() throws Exception {
+		ObjectField localizedObjectField = ObjectFieldUtil.createObjectField(
+			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+			ObjectFieldConstants.DB_TYPE_STRING, RandomTestUtil.randomString(),
+			"titleLocalized");
+
+		localizedObjectField.setLocalized(true);
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				Arrays.asList(
+					localizedObjectField,
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING, true, false, null,
+						RandomTestUtil.randomString(), "name", false)),
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		ObjectField extensionObjectField = _addCustomObjectField(
+			new TextObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"a" + RandomTestUtil.randomString()
+			).objectDefinitionId(
+				objectDefinition.getObjectDefinitionId()
+			).build());
+
+		Assert.assertEquals(
+			objectDefinition.getExtensionDBTableName(),
+			extensionObjectField.getDBTableName());
+
+		// Add object entry with localized value in one language
+
+		_addObjectEntry(
+			0, objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				extensionObjectField.getName(), "foo"
+			).put(
+				"name", RandomTestUtil.randomString()
+			).put(
+				"titleLocalized_i18n",
+				(Serializable)HashMapBuilder.<String, Serializable>put(
+					LocaleUtil.toLanguageId(LocaleUtil.US),
+					RandomTestUtil.randomString()
+				).build()
+			).build());
+
+		// Add object entry with localized values in two languages
+
+		_addObjectEntry(
+			0, objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				extensionObjectField.getName(), "foo"
+			).put(
+				"name", "Peter"
+			).put(
+				"titleLocalized_i18n",
+				(Serializable)HashMapBuilder.<String, Serializable>put(
+					LocaleUtil.toLanguageId(LocaleUtil.BRAZIL),
+					RandomTestUtil.randomString()
+				).put(
+					LocaleUtil.toLanguageId(LocaleUtil.US), "Peter"
+				).build()
+			).build());
+
+		// Add object entry without localized value
+
+		_addObjectEntry(
+			0, objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				extensionObjectField.getName(), RandomTestUtil.randomString()
+			).put(
+				"name", "Peter"
+			).build());
+
+		// No predicate with placeholder and trashed object entries
+
+		_objectEntryLocalService.addObjectEntry(
+			RandomTestUtil.randomString(), 0, TestPropsValues.getUserId(),
+			objectDefinition,
+			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT);
+
+		ObjectEntry objectEntry = _addObjectEntry(
+			0, objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				extensionObjectField.getName(), "foo"
+			).put(
+				"name", RandomTestUtil.randomString()
+			).build());
+
+		_objectEntryLocalService.moveObjectEntryToTrash(
+			TestPropsValues.getUserId(), objectEntry,
+			ServiceContextTestUtil.getServiceContext());
+
+		_testGetValuesListCount(
+			3, new String[0], objectDefinition, null, null,
+			TestPropsValues.getUserId());
+
+		// Predicate on extension table column
+
+		Column<?, Object> extensionColumn =
+			(Column<?, Object>)_objectFieldLocalService.getColumn(
+				objectDefinition.getObjectDefinitionId(),
+				extensionObjectField.getName());
+
+		_testGetValuesListCount(
+			2, new String[] {objectDefinition.getExtensionDBTableName()},
+			objectDefinition, extensionColumn.eq("foo"), null,
+			TestPropsValues.getUserId());
+
+		// Predicate on localized column
+
+		Column<?, Object> titleLocalizedColumn =
+			(Column<?, Object>)_objectFieldLocalService.getColumn(
+				objectDefinition.getObjectDefinitionId(), "titleLocalized");
+
+		_testGetValuesListCount(
+			1, new String[] {objectDefinition.getLocalizationDBTableName()},
+			objectDefinition, titleLocalizedColumn.eq("Peter"), null,
+			TestPropsValues.getUserId());
+
+		// Predicate on localized column with no value
+
+		_testGetValuesListCount(
+			1, new String[] {objectDefinition.getLocalizationDBTableName()},
+			objectDefinition, titleLocalizedColumn.isNull(), null,
+			TestPropsValues.getUserId());
+
+		// Predicate on object entry column
+
+		_testGetValuesListCount(
+			3, new String[0], objectDefinition,
+			ObjectEntryTable.INSTANCE.status.eq(
+				WorkflowConstants.STATUS_APPROVED),
+			null, TestPropsValues.getUserId());
+
+		// Predicate on table and extension table columns
+
+		Column<?, Object> nameColumn =
+			(Column<?, Object>)_objectFieldLocalService.getColumn(
+				objectDefinition.getObjectDefinitionId(), "name");
+
+		_testGetValuesListCount(
+			1, new String[] {objectDefinition.getExtensionDBTableName()},
+			objectDefinition,
+			extensionColumn.eq(
+				"foo"
+			).and(
+				nameColumn.eq("Peter")
+			),
+			null, TestPropsValues.getUserId());
+
+		// Predicate on table column
+
+		_testGetValuesListCount(
+			2, new String[0], objectDefinition, nameColumn.eq("Peter"), null,
+			TestPropsValues.getUserId());
+
+		// Search
+
+		_testGetValuesListCount(
+			2, new String[0], objectDefinition, null, "Peter",
+			TestPropsValues.getUserId());
+
+		// User with view permission on one object entry
+
+		User user = UserTestUtil.addUser();
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				user)) {
+
+			objectEntry = _addObjectEntry(
+				0, objectDefinition.getObjectDefinitionId(),
+				HashMapBuilder.<String, Serializable>put(
+					extensionObjectField.getName(), "foo"
+				).put(
+					"name", "Peter"
+				).build());
+
+			Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+			_resourcePermissionLocalService.setResourcePermissions(
+				TestPropsValues.getCompanyId(), objectDefinition.getClassName(),
+				ResourceConstants.SCOPE_INDIVIDUAL,
+				String.valueOf(objectEntry.getObjectEntryId()),
+				role.getRoleId(), new String[] {ActionKeys.VIEW});
+
+			_userLocalService.addRoleUser(role.getRoleId(), user);
+
+			_testGetValuesListCount(
+				1, new String[0], objectDefinition, null, null,
+				user.getUserId());
+		}
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+	}
+
+	@Test
 	public void testGetValuesListCountByObjectDefinitionIds() throws Exception {
 
 		// Add object entry on irrelevant group
@@ -7283,6 +7486,183 @@ public class ObjectEntryLocalServiceTest {
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition2);
 		_objectDefinitionLocalService.deleteObjectDefinition(
 			irrelevantObjectDefinition);
+
+		GroupTestUtil.deleteGroup(irrelevantGroup);
+	}
+
+	@Test
+	public void testGetValuesListCountWithObjectRelationship()
+		throws Exception {
+
+		ObjectDefinition objectDefinition1 =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				Collections.singletonList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING,
+						RandomTestUtil.randomString(), "name")),
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+		ObjectDefinition objectDefinition2 =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				Collections.singletonList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING,
+						RandomTestUtil.randomString(), "name")),
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		ObjectRelationship oneToManyObjectRelationship =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinition1,
+				objectDefinition2);
+
+		ObjectField oneToManyObjectField =
+			_objectFieldLocalService.getObjectField(
+				oneToManyObjectRelationship.getObjectFieldId2());
+
+		Assert.assertEquals(
+			objectDefinition2.getExtensionDBTableName(),
+			oneToManyObjectField.getDBTableName());
+
+		ObjectEntry objectEntry1 = _addObjectEntry(
+			0, objectDefinition1.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"name", "Peter"
+			).build());
+
+		// Predicate on many to many related object entry
+
+		ObjectRelationship manyToManyObjectRelationship =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinition1,
+				objectDefinition2,
+				ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+				"a" + RandomTestUtil.randomString(),
+				ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
+
+		ObjectEntry objectEntry2 = _addObjectEntry(
+			0, objectDefinition2.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"name", RandomTestUtil.randomString()
+			).build());
+
+		_objectRelationshipLocalService.addObjectRelationshipMappingTableValues(
+			TestPropsValues.getUserId(),
+			manyToManyObjectRelationship.getObjectRelationshipId(),
+			objectEntry1.getObjectEntryId(), objectEntry2.getObjectEntryId(),
+			ServiceContextTestUtil.getServiceContext());
+
+		ObjectRelatedModelsPredicateProvider
+			manyToManyObjectRelatedModelsPredicateProvider =
+				_objectRelatedModelsPredicateProviderRegistry.
+					getObjectRelatedModelsPredicateProvider(
+						objectDefinition2.getClassName(),
+						ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
+		Column<?, Object> nameColumn =
+			(Column<?, Object>)_objectFieldLocalService.getColumn(
+				objectDefinition1.getObjectDefinitionId(), "name");
+
+		_testGetValuesListCount(
+			1, new String[0], objectDefinition2,
+			manyToManyObjectRelatedModelsPredicateProvider.getPredicate(
+				new Long[] {0L}, manyToManyObjectRelationship,
+				nameColumn.eq("Peter")),
+			null, TestPropsValues.getUserId());
+
+		// Predicate on one to many related object entry
+
+		_addObjectEntry(
+			0, objectDefinition2.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				oneToManyObjectField.getName(), objectEntry1.getObjectEntryId()
+			).put(
+				"name", RandomTestUtil.randomString()
+			).build());
+
+		ObjectRelatedModelsPredicateProvider
+			oneToManyObjectRelatedModelsPredicateProvider =
+				_objectRelatedModelsPredicateProviderRegistry.
+					getObjectRelatedModelsPredicateProvider(
+						objectDefinition2.getClassName(),
+						ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
+
+		_testGetValuesListCount(
+			1, new String[] {objectDefinition2.getExtensionDBTableName()},
+			objectDefinition2,
+			oneToManyObjectRelatedModelsPredicateProvider.getPredicate(
+				new Long[] {0L}, oneToManyObjectRelationship,
+				nameColumn.eq("Peter")),
+			null, TestPropsValues.getUserId());
+
+		// Predicate on unset relationship column
+
+		_addObjectEntry(
+			0, objectDefinition2.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"name", RandomTestUtil.randomString()
+			).build());
+
+		Column<?, Object> oneToManyColumn =
+			(Column<?, Object>)_objectFieldLocalService.getColumn(
+				objectDefinition2.getObjectDefinitionId(),
+				oneToManyObjectField.getName());
+
+		_testGetValuesListCount(
+			2, new String[] {objectDefinition2.getExtensionDBTableName()},
+			objectDefinition2, oneToManyColumn.eq(0L), null,
+			TestPropsValues.getUserId());
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition2);
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition1);
+	}
+
+	@Test
+	public void testGetValuesListCountWithSiteScope() throws Exception {
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				Collections.singletonList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING,
+						RandomTestUtil.randomString(), "name")),
+				ObjectDefinitionConstants.SCOPE_SITE);
+
+		_addObjectEntry(
+			TestPropsValues.getGroupId(),
+			objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"name", RandomTestUtil.randomString()
+			).build());
+
+		Group irrelevantGroup = GroupTestUtil.addGroup();
+
+		_addObjectEntry(
+			irrelevantGroup.getGroupId(),
+			objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"name", RandomTestUtil.randomString()
+			).build());
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"org.hibernate.SQL", LoggerTestUtil.DEBUG)) {
+
+			Assert.assertEquals(
+				1,
+				_objectEntryLocalService.getValuesListCount(
+					new Long[] {TestPropsValues.getGroupId()},
+					TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+					objectDefinition.getObjectDefinitionId(), null, false,
+					null));
+
+			String sql = _getObjectEntriesCountSQL(logCapture);
+
+			Assert.assertTrue(
+				sql.contains(
+					"where ObjectEntry.companyId = ? and ObjectEntry.groupId " +
+						"in (?) and ObjectEntry.objectDefinitionId = ? "));
+		}
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 
 		GroupTestUtil.deleteGroup(irrelevantGroup);
 	}
@@ -11650,6 +12030,24 @@ public class ObjectEntryLocalServiceTest {
 		return sb.toString();
 	}
 
+	private String _getObjectEntriesCountSQL(LogCapture logCapture) {
+		List<String> sqls = TransformUtil.transform(
+			logCapture.getLogEntries(),
+			logEntry -> {
+				String message = logEntry.getMessage();
+
+				if (!message.startsWith("select count(*) COUNT_VALUE from ")) {
+					return null;
+				}
+
+				return message;
+			});
+
+		Assert.assertEquals(sqls.toString(), 1, sqls.size());
+
+		return sqls.get(0);
+	}
+
 	private String _getRandomEmailAddress() {
 		return StringBundler.concat(
 			RandomTestUtil.randomString(), CharPool.AT,
@@ -12508,6 +12906,44 @@ public class ObjectEntryLocalServiceTest {
 		finally {
 			LocaleThreadLocal.setThemeDisplayLocale(originalThemeDisplayLocale);
 			LocaleThreadLocal.setSiteDefaultLocale(originalSiteDefaultLocale);
+		}
+	}
+
+	private void _testGetValuesListCount(
+			int expectedCount, String[] expectedJoinedTableNames,
+			ObjectDefinition objectDefinition, Predicate predicate,
+			String search, long userId)
+		throws Exception {
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"org.hibernate.SQL", LoggerTestUtil.DEBUG)) {
+
+			Assert.assertEquals(
+				expectedCount,
+				_objectEntryLocalService.getValuesListCount(
+					new Long[] {0L}, TestPropsValues.getCompanyId(), userId,
+					objectDefinition.getObjectDefinitionId(), predicate, false,
+					search));
+
+			String sql = _getObjectEntriesCountSQL(logCapture);
+
+			Assert.assertTrue(
+				sql.contains(
+					"join " + objectDefinition.getDBTableName() + " "));
+			Assert.assertTrue(
+				sql.contains("where ObjectEntry.objectDefinitionId = ? "));
+
+			for (String tableName :
+					new String[] {
+						objectDefinition.getExtensionDBTableName(),
+						objectDefinition.getLocalizationDBTableName()
+					}) {
+
+				Assert.assertEquals(
+					sql,
+					ArrayUtil.contains(expectedJoinedTableNames, tableName),
+					sql.contains("join " + tableName + " "));
+			}
 		}
 	}
 
@@ -13700,6 +14136,10 @@ public class ObjectEntryLocalServiceTest {
 
 	@Inject
 	private ObjectFolderLocalService _objectFolderLocalService;
+
+	@Inject
+	private ObjectRelatedModelsPredicateProviderRegistry
+		_objectRelatedModelsPredicateProviderRegistry;
 
 	@Inject
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;

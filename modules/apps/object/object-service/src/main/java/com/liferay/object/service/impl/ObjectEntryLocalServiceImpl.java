@@ -2026,10 +2026,8 @@ public class ObjectEntryLocalServiceImpl
 		throws PortalException {
 
 		return objectEntryPersistence.dslQueryCount(
-			_getObjectEntriesGroupByStep(
+			_getObjectEntriesCountDSLQuery(
 				groupIds,
-				DSLQueryFactoryUtil.countDistinct(
-					ObjectEntryTable.INSTANCE.objectEntryId),
 				_objectDefinitionPersistence.findByPrimaryKey(
 					objectDefinitionId),
 				predicate, preferApproved, search));
@@ -5230,7 +5228,7 @@ public class ObjectEntryLocalServiceImpl
 				objectRelationship.getCompanyId()
 			).and(
 				() -> {
-					if (Objects.equals(
+					if (StringUtil.equals(
 							objectDefinition2.getScope(),
 							ObjectDefinitionConstants.SCOPE_COMPANY) ||
 						(groupId == 0)) {
@@ -5290,6 +5288,108 @@ public class ObjectEntryLocalServiceImpl
 					dynamicObjectDefinitionTable)
 			)
 		);
+	}
+
+	private DSLQuery _getObjectEntriesCountDSLQuery(
+			Long[] groupIds, ObjectDefinition objectDefinition,
+			Predicate predicate, boolean preferApproved, String search)
+		throws PortalException {
+
+		DynamicObjectDefinitionTable dynamicObjectDefinitionTable =
+			DynamicObjectDefinitionTableUtil.getDynamicObjectDefinitionTable(
+				false, objectDefinition, _objectFieldLocalService);
+
+		Predicate wherePredicate = _getObjectEntriesWherePredicate(
+			dynamicObjectDefinitionTable, groupIds,
+			_getObjectEntriesCountFilterPredicate(
+				groupIds, objectDefinition, predicate, search),
+			preferApproved);
+
+		Set<String> tableNames = _getTableNames(wherePredicate);
+
+		DynamicObjectDefinitionLocalizationTable
+			dynamicObjectDefinitionLocalizationTable =
+				DynamicObjectDefinitionLocalizationTableFactory.create(
+					objectDefinition, _objectFieldLocalService);
+		DynamicObjectDefinitionTable extensionDynamicObjectDefinitionTable =
+			DynamicObjectDefinitionTableUtil.getDynamicObjectDefinitionTable(
+				true, objectDefinition, _objectFieldLocalService);
+
+		return DSLQueryFactoryUtil.count(
+		).from(
+			ObjectEntryTable.INSTANCE
+		).innerJoinON(
+			dynamicObjectDefinitionTable,
+			dynamicObjectDefinitionTable.getPrimaryKeyColumn(
+			).eq(
+				ObjectEntryTable.INSTANCE.objectEntryId
+			)
+		).leftJoinOn(
+			extensionDynamicObjectDefinitionTable,
+			_getObjectEntriesCountJoinPredicate(
+				extensionDynamicObjectDefinitionTable, tableNames)
+		).leftJoinOn(
+			dynamicObjectDefinitionLocalizationTable,
+			_getObjectEntriesCountLocalizationJoinPredicate(
+				dynamicObjectDefinitionLocalizationTable, tableNames)
+		).where(
+			wherePredicate
+		);
+	}
+
+	private Predicate _getObjectEntriesCountFilterPredicate(
+			Long[] groupIds, ObjectDefinition objectDefinition,
+			Predicate predicate, String search)
+		throws PortalException {
+
+		Predicate fillPredicate = Predicate.withParentheses(
+			_fillPredicate(objectDefinition, predicate, search));
+
+		if (!StringUtil.equals(
+				objectDefinition.getScope(),
+				ObjectDefinitionConstants.SCOPE_COMPANY)) {
+
+			return ObjectEntrySearchUtil.getObjectEntryIndexPredicate(
+				groupIds, objectDefinition, fillPredicate);
+		}
+
+		return ObjectEntryTable.INSTANCE.objectDefinitionId.eq(
+			objectDefinition.getObjectDefinitionId()
+		).and(
+			fillPredicate
+		);
+	}
+
+	private Predicate _getObjectEntriesCountJoinPredicate(
+		DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
+		Set<String> tableNames) {
+
+		if (!tableNames.contains(dynamicObjectDefinitionTable.getTableName())) {
+			return null;
+		}
+
+		return dynamicObjectDefinitionTable.getPrimaryKeyColumn(
+		).eq(
+			ObjectEntryTable.INSTANCE.objectEntryId
+		);
+	}
+
+	private Predicate _getObjectEntriesCountLocalizationJoinPredicate(
+			DynamicObjectDefinitionLocalizationTable
+				dynamicObjectDefinitionLocalizationTable,
+			Set<String> tableNames)
+		throws PortalException {
+
+		if ((dynamicObjectDefinitionLocalizationTable == null) ||
+			!tableNames.contains(
+				dynamicObjectDefinitionLocalizationTable.getTableName())) {
+
+			return null;
+		}
+
+		return ObjectEntrySearchUtil.getLeftJoinLocalizationTablePredicate(
+			dynamicObjectDefinitionLocalizationTable, null,
+			ObjectEntryTable.INSTANCE.objectEntryId);
 	}
 
 	private GroupByStep _getObjectEntriesGroupByStep(
@@ -5372,25 +5472,34 @@ public class ObjectEntryLocalServiceImpl
 				dynamicObjectDefinitionLocalizationTable,
 				dynamicObjectDefinitionTable, null)
 		).where(
-			ObjectEntrySearchUtil.getObjectEntryIndexPredicate(
-				groupIds, objectDefinition,
-				Predicate.withParentheses(
-					_fillPredicate(objectDefinition, predicate, search))
-			).and(
-				ObjectEntryTable.INSTANCE.rootObjectEntryId.eq(
-					ObjectEntryTable.INSTANCE.objectEntryId
-				).or(
-					ObjectEntryTable.INSTANCE.rootObjectEntryId.eq(0L)
-				).withParentheses()
-			).and(
-				ObjectEntryTable.INSTANCE.status.neq(
-					WorkflowConstants.STATUS_IN_TRASH)
-			).and(
-				_getHeadObjectEntryPredicate(preferApproved)
-			).and(
-				_getPermissionWherePredicate(
-					dynamicObjectDefinitionTable, groupIds)
-			)
+			_getObjectEntriesWherePredicate(
+				dynamicObjectDefinitionTable, groupIds,
+				ObjectEntrySearchUtil.getObjectEntryIndexPredicate(
+					groupIds, objectDefinition,
+					Predicate.withParentheses(
+						_fillPredicate(objectDefinition, predicate, search))),
+				preferApproved)
+		);
+	}
+
+	private Predicate _getObjectEntriesWherePredicate(
+			DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
+			Long[] groupIds, Predicate predicate, boolean preferApproved)
+		throws PortalException {
+
+		return predicate.and(
+			ObjectEntryTable.INSTANCE.rootObjectEntryId.eq(
+				ObjectEntryTable.INSTANCE.objectEntryId
+			).or(
+				ObjectEntryTable.INSTANCE.rootObjectEntryId.eq(0L)
+			).withParentheses()
+		).and(
+			ObjectEntryTable.INSTANCE.status.neq(
+				WorkflowConstants.STATUS_IN_TRASH)
+		).and(
+			_getHeadObjectEntryPredicate(preferApproved)
+		).and(
+			_getPermissionWherePredicate(dynamicObjectDefinitionTable, groupIds)
 		);
 	}
 
@@ -6142,6 +6251,23 @@ public class ObjectEntryLocalServiceImpl
 			objectEntryVersion -> new ObjectValuePair<>(
 				objectEntryVersion.getObjectEntryVersionId(),
 				_getStatus(objectEntryVersion.getStatus())));
+	}
+
+	private Set<String> _getTableNames(Predicate predicate) {
+		Set<String> tableNames = new HashSet<>();
+
+		predicate.toSQL(
+			astNode -> {
+				if (astNode instanceof Column) {
+					Column<?, ?> column = (Column<?, ?>)astNode;
+
+					Table<?> table = column.getTable();
+
+					tableNames.add(table.getTableName());
+				}
+			});
+
+		return tableNames;
 	}
 
 	private String _getUrlTitle(
