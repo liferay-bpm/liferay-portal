@@ -19,6 +19,7 @@ import com.liferay.object.configuration.ObjectConfiguration;
 import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.constants.ObjectEntryConstants;
 import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
@@ -395,7 +396,12 @@ public class DefaultObjectEntryManagerImpl
 			dtoConverterContext, externalReferenceCode, objectDefinition,
 			scopeKey, version);
 
-		objectEntry.setExpirationDate(() -> null);
+		if (GetterUtil.getInteger(dtoConverterContext.getAttribute("type")) ==
+				ObjectEntryConstants.TYPE_REGULAR) {
+
+			objectEntry.setExpirationDate(() -> null);
+		}
+
 		objectEntry.setExternalReferenceCode(() -> null);
 		objectEntry.setId(() -> null);
 
@@ -414,13 +420,17 @@ public class DefaultObjectEntryManagerImpl
 			0L, dtoConverterContext.getLocale(), objectDefinition, objectEntry,
 			objectEntry.getScopeKey(), serviceContext);
 
-		ObjectField titleObjectField =
-			_objectFieldLocalService.fetchObjectField(
-				objectDefinition.getTitleObjectFieldId());
+		if (GetterUtil.getInteger(dtoConverterContext.getAttribute("type")) ==
+				ObjectEntryConstants.TYPE_REGULAR) {
 
-		_replaceValues(
-			objectDefinition, objectEntry.getScopeKey(), titleObjectField,
-			values);
+			ObjectField titleObjectField =
+				_objectFieldLocalService.fetchObjectField(
+					objectDefinition.getTitleObjectFieldId());
+
+			_replaceValues(
+				objectDefinition, objectEntry.getScopeKey(), titleObjectField,
+				values);
+		}
 
 		return _addObjectEntry(
 			dtoConverterContext, objectDefinition, objectEntry,
@@ -2115,7 +2125,9 @@ public class DefaultObjectEntryManagerImpl
 			com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry)
 		throws Exception {
 
-		if (serviceBuilderObjectEntry.isHead()) {
+		if (serviceBuilderObjectEntry.isHead() ||
+			!serviceBuilderObjectEntry.isRegular()) {
+
 			return;
 		}
 
@@ -2197,13 +2209,25 @@ public class DefaultObjectEntryManagerImpl
 					comment.getText()));
 		}
 
-		return ServiceContextUtil.createServiceContext(
+		ServiceContext serviceContext = ServiceContextUtil.createServiceContext(
 			objectDefinition.getCompanyId(),
 			objectDefinition.isEnableCategorization(),
 			objectDefinition.isEnableFriendlyURLCustomization(),
 			getGroupId(objectDefinition, scopeKey),
 			dtoConverterContext.getLocale(), modelPermissions, objectEntry,
 			objectEntryComments, dtoConverterContext.getUserId());
+
+		serviceContext.setAttribute(
+			"headObjectEntryId",
+			(Serializable)dtoConverterContext.getAttribute(
+				"headObjectEntryId"));
+		serviceContext.setAttribute(
+			"type", (Serializable)dtoConverterContext.getAttribute("type"));
+		serviceContext.setAttribute(
+			"version",
+			(Serializable)dtoConverterContext.getAttribute("version"));
+
+		return serviceContext;
 	}
 
 	private byte[] _decode(String fileBase64) {

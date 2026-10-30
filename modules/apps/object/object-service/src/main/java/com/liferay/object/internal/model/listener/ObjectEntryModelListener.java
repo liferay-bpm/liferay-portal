@@ -101,6 +101,10 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 	public void onAfterCreate(ObjectEntry objectEntry)
 		throws ModelListenerException {
 
+		if (!objectEntry.isRegular()) {
+			return;
+		}
+
 		try {
 			_route(EventTypes.ADD, null, objectEntry);
 
@@ -120,6 +124,10 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 	@Override
 	public void onAfterRemove(ObjectEntry objectEntry)
 		throws ModelListenerException {
+
+		if (!objectEntry.isRegular()) {
+			return;
+		}
 
 		try {
 			_route(EventTypes.DELETE, null, objectEntry);
@@ -172,6 +180,10 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 			ObjectEntry originalObjectEntry, ObjectEntry objectEntry)
 		throws ModelListenerException {
 
+		if (!objectEntry.isRegular()) {
+			return;
+		}
+
 		try {
 			_route(EventTypes.UPDATE, originalObjectEntry, objectEntry);
 
@@ -204,6 +216,10 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 
 		_validateObjectEntry(null, objectEntry);
 
+		if (!objectEntry.isRegular()) {
+			return;
+		}
+
 		_runRelevantObjectEntryModelListeners(
 			objectEntry,
 			relevantObjectEntryModelListener ->
@@ -213,6 +229,10 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 	@Override
 	public void onBeforeRemove(ObjectEntry objectEntry)
 		throws ModelListenerException {
+
+		if (!objectEntry.isRegular()) {
+			return;
+		}
 
 		_runRelevantObjectEntryModelListeners(
 			objectEntry,
@@ -226,6 +246,10 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		throws ModelListenerException {
 
 		_validateObjectEntry(originalObjectEntry, objectEntry);
+
+		if (!objectEntry.isRegular()) {
+			return;
+		}
 
 		_runRelevantObjectEntryModelListeners(
 			objectEntry,

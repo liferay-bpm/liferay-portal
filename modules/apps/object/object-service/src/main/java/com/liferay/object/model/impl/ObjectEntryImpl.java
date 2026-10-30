@@ -8,6 +8,7 @@ package com.liferay.object.model.impl;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalServiceUtil;
+import com.liferay.object.constants.ObjectEntryConstants;
 import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.entry.util.ObjectEntryValuesUtil;
@@ -333,6 +334,15 @@ public class ObjectEntryImpl extends ObjectEntryBaseImpl {
 	@Override
 	public boolean isHead() {
 		if (getHeadObjectEntryId() == getObjectEntryId()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean isRegular() {
+		if (getType() == ObjectEntryConstants.TYPE_REGULAR) {
 			return true;
 		}
 

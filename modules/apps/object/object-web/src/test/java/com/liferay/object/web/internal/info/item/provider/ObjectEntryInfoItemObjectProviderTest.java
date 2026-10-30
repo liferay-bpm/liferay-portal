@@ -348,6 +348,37 @@ public class ObjectEntryInfoItemObjectProviderTest {
 	}
 
 	@Test
+	public void testGetInfoItemNonregularLiferayObjectEntry() throws Exception {
+		ObjectEntry objectEntry = _mockObjectEntry(false);
+
+		Mockito.when(
+			objectEntry.isRegular()
+		).thenReturn(
+			false
+		);
+
+		long classPK = RandomTestUtil.randomLong();
+
+		Mockito.when(
+			_objectEntryLocalService.fetchObjectEntry(classPK)
+		).thenReturn(
+			objectEntry
+		);
+
+		Assert.assertEquals(
+			objectEntry,
+			_assertGetInfoItem(new ClassPKInfoItemIdentifier(classPK)));
+
+		Mockito.verify(
+			_objectEntryLocalService, Mockito.never()
+		).fetchObjectEntryByHeadObjectEntryId(
+			Mockito.anyLong()
+		);
+
+		Mockito.verifyNoInteractions(_objectEntryManagerRegistry);
+	}
+
+	@Test
 	public void testGetInfoItemProxyObjectEntry() throws Exception {
 		String externalReferenceCode = RandomTestUtil.randomString();
 		ObjectEntry objectEntry = _mockObjectEntry(true);
@@ -644,6 +675,12 @@ public class ObjectEntryInfoItemObjectProviderTest {
 			objectEntry.isApproved()
 		).thenReturn(
 			approved
+		);
+
+		Mockito.when(
+			objectEntry.isRegular()
+		).thenReturn(
+			true
 		);
 
 		return objectEntry;
