@@ -25,6 +25,7 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.sql.dsl.expression.Predicate;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.audit.AuditRouter;
 import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.exception.ModelListenerException;
@@ -71,6 +72,8 @@ import com.liferay.portal.workflow.kaleo.service.KaleoTaskInstanceTokenLocalServ
 import com.liferay.site.cms.site.initializer.util.CMSObjectEntryUtil;
 import com.liferay.site.cms.site.initializer.util.CMSUserUtil;
 import com.liferay.site.initializer.SiteInitializer;
+
+import jakarta.validation.ValidationException;
 
 import java.io.Serializable;
 
@@ -142,11 +145,36 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 	}
 
 	@Override
+	public void onBeforeCreate(ObjectEntry objectEntry)
+		throws ModelListenerException {
+
+		try {
+			_validateLinkedObjectEntrySpaceMembership(objectEntry);
+		}
+		catch (Exception exception) {
+			throw new ModelListenerException(exception);
+		}
+	}
+
+	@Override
 	public void onBeforeRemove(ObjectEntry objectEntry)
 		throws ModelListenerException {
 
 		try {
 			_deleteObjectEntries(objectEntry);
+		}
+		catch (Exception exception) {
+			throw new ModelListenerException(exception);
+		}
+	}
+
+	@Override
+	public void onBeforeUpdate(
+			ObjectEntry originalObjectEntry, ObjectEntry objectEntry)
+		throws ModelListenerException {
+
+		try {
+			_validateLinkedObjectEntrySpaceMembership(objectEntry);
 		}
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
@@ -641,6 +669,66 @@ public class ObjectEntryModelListener extends BaseModelListener<ObjectEntry> {
 		_deleteUserGroupRoles(
 			companyId, groupId, originalProjectManagerUserId,
 			projectManagerRoleNames, projectManagerUserId);
+	}
+
+	private void _validateLinkedObjectEntrySpaceMembership(
+			ObjectEntry objectEntry)
+		throws Exception {
+
+		ObjectDefinition objectDefinition = objectEntry.getObjectDefinition();
+
+		if ((objectDefinition == null) ||
+			(!StringUtil.equals(
+				objectDefinition.getExternalReferenceCode(),
+				"L_CMP_PROJECT_LINK") &&
+			 !StringUtil.equals(
+				 objectDefinition.getExternalReferenceCode(),
+				 "L_CMP_TASK_LINK"))) {
+
+			return;
+		}
+
+		if (_roleLocalService.hasUserRole(
+				objectEntry.getUserId(), objectEntry.getCompanyId(),
+				RoleConstants.ADMINISTRATOR, true) ||
+			_roleLocalService.hasUserRole(
+				objectEntry.getUserId(), objectEntry.getCompanyId(),
+				RoleConstants.CMS_ADMINISTRATOR, true)) {
+
+			return;
+		}
+
+		Group group = _groupLocalService.fetchGroupByExternalReferenceCode(
+			MapUtil.getString(
+				objectEntry.getValues(), "groupExternalReferenceCode"),
+			objectEntry.getCompanyId());
+
+		if (group == null) {
+			return;
+		}
+
+		DepotEntry depotEntry = _depotEntryLocalService.fetchGroupDepotEntry(
+			group.getGroupId());
+
+		if ((depotEntry == null) ||
+			(depotEntry.getType() != DepotConstants.TYPE_SPACE)) {
+
+			return;
+		}
+
+		List<Long> depotEntryGroupIds =
+			_depotEntryLocalService.getDepotEntryGroupIds(
+				objectEntry.getCompanyId(), objectEntry.getUserId(),
+				DepotConstants.TYPE_SPACE);
+
+		if (depotEntryGroupIds.contains(group.getGroupId())) {
+			return;
+		}
+
+		throw new ValidationException(
+			StringBundler.concat(
+				"User ", objectEntry.getUserId(), " must be a member of space ",
+				group.getGroupId(), " to link its assets"));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
