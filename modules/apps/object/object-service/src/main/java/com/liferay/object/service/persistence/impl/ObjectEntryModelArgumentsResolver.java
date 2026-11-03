@@ -171,17 +171,21 @@ public class ObjectEntryModelArgumentsResolver implements ArgumentsResolver {
 	static {
 		long whereColumnBitmask =
 			ObjectEntryModelImpl.getColumnBitmask("objectEntryId") |
-			ObjectEntryModelImpl.getColumnBitmask("headObjectEntryId");
+			ObjectEntryModelImpl.getColumnBitmask("headObjectEntryId") |
+			ObjectEntryModelImpl.getColumnBitmask("type_");
 
 		BiPredicate<ObjectEntryModelImpl, Boolean> whereBiPredicate =
 			(objectEntryModelImpl, original) ->
-				GetterUtil.getLong(
+				(GetterUtil.getLong(
 					_getColumnValue(
 						objectEntryModelImpl, "objectEntryId", original)) !=
 							GetterUtil.getLong(
 								_getColumnValue(
 									objectEntryModelImpl, "headObjectEntryId",
-									original));
+									original))) &&
+				(GetterUtil.getInteger(
+					_getColumnValue(objectEntryModelImpl, "type_", original)) ==
+						0);
 
 		_whereColumnBitmasks.put("HeadObjectEntryId", whereColumnBitmask);
 
@@ -232,4 +236,4 @@ public class ObjectEntryModelArgumentsResolver implements ArgumentsResolver {
 	}
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1896670392
+// LIFERAY-SERVICE-BUILDER-HASH:1111408906
