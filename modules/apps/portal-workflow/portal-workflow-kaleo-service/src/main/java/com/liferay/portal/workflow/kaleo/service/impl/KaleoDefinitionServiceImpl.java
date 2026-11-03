@@ -208,7 +208,7 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 	}
 
 	private void _checkPermissions(
-		String actionId, long companyId, long groupId)
+			String actionId, long companyId, long groupId)
 		throws PrincipalException {
 
 		PermissionChecker permissionChecker =
@@ -219,7 +219,7 @@ public class KaleoDefinitionServiceImpl extends KaleoDefinitionServiceBaseImpl {
 		}
 
 		if (!permissionChecker.isOmniadmin() &&
-			permissionChecker.getCompanyId() != companyId) {
+			(permissionChecker.getCompanyId() != companyId)) {
 
 			throw new PrincipalException(
 				"User is not Omni Admin and is not from the actual company");

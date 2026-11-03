@@ -181,9 +181,7 @@ public class KaleoDefinitionServiceImplTest {
 	}
 
 	@Test
-	public void testDeleteKaleoDefinitionFromAnotherCompany()
-		throws Exception {
-
+	public void testDeleteKaleoDefinitionFromAnotherCompany() throws Exception {
 		KaleoDefinition kaleoDefinition =
 			_addKaleoDefinitionAndSetUpCompany2Admin();
 
@@ -246,9 +244,7 @@ public class KaleoDefinitionServiceImplTest {
 	}
 
 	@Test
-	public void testUpdateKaleoDefinitionFromAnotherCompany()
-		throws Exception {
-
+	public void testUpdateKaleoDefinitionFromAnotherCompany() throws Exception {
 		KaleoDefinition kaleoDefinition =
 			_addKaleoDefinitionAndSetUpCompany2Admin();
 
@@ -284,7 +280,7 @@ public class KaleoDefinitionServiceImplTest {
 	}
 
 	private KaleoDefinition _addKaleoDefinition(
-		String scope, ServiceContext serviceContext)
+			String scope, ServiceContext serviceContext)
 		throws Exception {
 
 		return _kaleoDefinitionService.addKaleoDefinition(
@@ -334,6 +330,18 @@ public class KaleoDefinitionServiceImplTest {
 		return serviceContext;
 	}
 
+	private String _read() throws Exception {
+		ClassLoader classLoader =
+			BaseKaleoLocalServiceTestCase.class.getClassLoader();
+
+		try (InputStream inputStream = classLoader.getResourceAsStream(
+				"com/liferay/portal/workflow/kaleo/dependencies" +
+					"/legal-marketing-workflow-definition.xml")) {
+
+			return StringUtil.read(inputStream);
+		}
+	}
+
 	private void _setCompanyAdministratorCanPublish(boolean canPublish)
 		throws Exception {
 
@@ -348,18 +356,6 @@ public class KaleoDefinitionServiceImplTest {
 		_setCompanyAdministratorCanPublish(true);
 
 		_setUpPermissionThreadLocal(_company2AdminUser);
-	}
-
-	private String _read() throws Exception {
-		ClassLoader classLoader =
-			BaseKaleoLocalServiceTestCase.class.getClassLoader();
-
-		try (InputStream inputStream = classLoader.getResourceAsStream(
-				"com/liferay/portal/workflow/kaleo/dependencies" +
-					"/legal-marketing-workflow-definition.xml")) {
-
-			return StringUtil.read(inputStream);
-		}
 	}
 
 	private void _setUpPermissionThreadLocal(User user) {
@@ -963,9 +959,9 @@ public class KaleoDefinitionServiceImplTest {
 	}
 
 	private static Company _company1;
+	private static User _company1AdminUser;
 	private static Company _company2;
 	private static User _company2AdminUser;
-	private static User _company1AdminUser;
 	private static Configuration _configuration;
 
 	@Inject
