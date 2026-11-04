@@ -16,6 +16,7 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Instance;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Process;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.SLAResult;
+import com.liferay.portal.workflow.metrics.rest.client.resource.v1_0.SLAResultResource;
 import com.liferay.portal.workflow.metrics.rest.client.serdes.v1_0.SLAResultSerDes;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.test.helper.WorkflowMetricsRESTTestHelper;
 
@@ -44,6 +45,10 @@ public class SLAResultResourceTest extends BaseSLAResultResourceTestCase {
 
 		_instance = _workflowMetricsRESTTestHelper.addInstance(
 			testGroup.getCompanyId(), _process.getId());
+
+		_userSLAResultResource =
+			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
+				SLAResultResource.class, testCompany);
 	}
 
 	@After
@@ -102,6 +107,8 @@ public class SLAResultResourceTest extends BaseSLAResultResourceTestCase {
 
 		assertEquals(slaResult2, getSLAResult);
 		assertValid(getSLAResult);
+
+		_testGetProcessLastSLAResultWithoutPermission();
 	}
 
 	@Override
@@ -166,8 +173,18 @@ public class SLAResultResourceTest extends BaseSLAResultResourceTestCase {
 		return testGetProcessLastSLAResult_addSLAResult();
 	}
 
+	private void _testGetProcessLastSLAResultWithoutPermission()
+		throws Exception {
+
+		assertHttpResponseStatusCode(
+			404,
+			_userSLAResultResource.getProcessLastSLAResultHttpResponse(
+				_process.getId()));
+	}
+
 	private Instance _instance;
 	private Process _process;
+	private SLAResultResource _userSLAResultResource;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;

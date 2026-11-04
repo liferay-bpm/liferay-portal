@@ -6,14 +6,27 @@
 package com.liferay.portal.workflow.metrics.rest.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
+import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.test.rule.SearchTestRule;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Process;
+import com.liferay.portal.workflow.metrics.rest.client.http.HttpInvoker;
+import com.liferay.portal.workflow.metrics.rest.client.resource.v1_0.ProcessResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.test.helper.WorkflowMetricsRESTTestHelper;
 
 import java.util.ArrayList;
@@ -45,6 +58,14 @@ public class ProcessResourceTest extends BaseProcessResourceTestCase {
 			_workflowMetricsRESTTestHelper.deleteProcess(
 				document.getLong("companyId"), document.getLong("processId"));
 		}
+
+		_userImportTaskResource =
+			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
+				ImportTaskResource.class, testCompany);
+
+		_userProcessResource =
+			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
+				ProcessResource.class, testCompany);
 	}
 
 	@After
@@ -61,8 +82,26 @@ public class ProcessResourceTest extends BaseProcessResourceTestCase {
 
 	@Override
 	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		super.testBatchEngineDeleteImportTask();
+
+		_testBatchEngineDeleteImportTaskWithoutPermission();
+	}
+
+	@Override
+	@Test
+	public void testDeleteProcess() throws Exception {
+		super.testDeleteProcess();
+
+		_testDeleteProcessWithoutPermission();
+	}
+
+	@Override
+	@Test
 	public void testGetProcess() throws Exception {
 		super.testGetProcess();
+
+		_testGetProcessWithoutPermission();
 	}
 
 	@Override
@@ -75,6 +114,32 @@ public class ProcessResourceTest extends BaseProcessResourceTestCase {
 		String title = processResource.getProcessTitle(process.getId());
 
 		Assert.assertEquals(process.getTitle(), title);
+
+		_testGetProcessTitleWithoutPermission();
+	}
+
+	@Override
+	@Test
+	public void testGraphQLGetProcess() throws Exception {
+		super.testGraphQLGetProcess();
+
+		_testGraphQLGetProcessWithoutPermission();
+	}
+
+	@Override
+	@Test
+	public void testPostProcess() throws Exception {
+		super.testPostProcess();
+
+		_testPostProcessWithoutPermission();
+	}
+
+	@Override
+	@Test
+	public void testPutProcess() throws Exception {
+		super.testPutProcess();
+
+		_testPutProcessWithoutPermission();
 	}
 
 	@Rule
@@ -141,8 +206,134 @@ public class ProcessResourceTest extends BaseProcessResourceTestCase {
 		}
 	}
 
+	private void _testBatchEngineDeleteImportTaskWithoutPermission()
+		throws Exception {
+
+		Process process = testBatchEngineDeleteImportTask_addProcess();
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"com.liferay.batch.engine.internal." +
+					"BatchEngineImportTaskExecutorImpl",
+				LoggerTestUtil.ERROR)) {
+
+			HttpResponse httpResponse =
+				_userImportTaskResource.deleteImportTaskHttpResponse(
+					"com.liferay.portal.workflow.metrics.rest.dto.v1_0.Process",
+					null, null, "ON_ERROR_FAIL", null,
+					JSONUtil.putAll(JSONUtil.put("id", process.getId())));
+
+			Assert.assertEquals(200, httpResponse.getStatusCode());
+
+			waitForFinish(
+				"FAILED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
+
+		assertHttpResponseStatusCode(
+			200, processResource.getProcessHttpResponse(process.getId()));
+	}
+
+	private void _testDeleteProcessWithoutPermission() throws Exception {
+		Process process = testDeleteProcess_addProcess();
+
+		assertHttpResponseStatusCode(
+			403,
+			_userProcessResource.deleteProcessHttpResponse(process.getId()));
+
+		assertHttpResponseStatusCode(
+			200, processResource.getProcessHttpResponse(process.getId()));
+	}
+
+	private void _testGetProcessTitleWithoutPermission() throws Exception {
+		Process process = testGetProcess_addProcess();
+
+		assertHttpResponseStatusCode(
+			404,
+			_userProcessResource.getProcessTitleHttpResponse(process.getId()));
+	}
+
+	private void _testGetProcessWithoutPermission() throws Exception {
+		Process process = testGetProcess_addProcess();
+
+		assertHttpResponseStatusCode(
+			404, _userProcessResource.getProcessHttpResponse(process.getId()));
+	}
+
+	private void _testGraphQLGetProcessWithoutPermission() throws Exception {
+		String password = RandomTestUtil.randomString();
+
+		User user = UserTestUtil.addUser(testCompany, password);
+
+		GraphQLField processGraphQLField = new GraphQLField(
+			"process",
+			HashMapBuilder.<String, Object>put(
+				"processId",
+				() -> {
+					Process process = testGraphQLGetProcess_addProcess();
+
+					return process.getId();
+				}
+			).build(),
+			getGraphQLFields());
+
+		for (GraphQLField graphQLField :
+				new GraphQLField[] {
+					processGraphQLField,
+					new GraphQLField(
+						"portalWorkflowMetrics_v1_0", processGraphQLField)
+				}) {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			httpInvoker.body(
+				JSONUtil.put(
+					"query",
+					String.valueOf(new GraphQLField("query", graphQLField))
+				).toString(),
+				"application/json");
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+			httpInvoker.path(
+				"http://localhost:" + PortalUtil.getPortalServerPort(false) +
+					"/o/graphql");
+			httpInvoker.userNameAndPassword(
+				user.getEmailAddress() + ":" + password);
+
+			HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+				httpResponse.getContent());
+
+			JSONArray errorsJSONArray = jsonObject.getJSONArray("errors");
+
+			Assert.assertTrue(errorsJSONArray.length() > 0);
+		}
+	}
+
+	private void _testPostProcessWithoutPermission() throws Exception {
+		Process process = randomProcess();
+
+		assertHttpResponseStatusCode(
+			403, _userProcessResource.postProcessHttpResponse(process));
+
+		assertHttpResponseStatusCode(
+			404, processResource.getProcessHttpResponse(process.getId()));
+	}
+
+	private void _testPutProcessWithoutPermission() throws Exception {
+		Process process = testPutProcess_addProcess();
+
+		assertHttpResponseStatusCode(
+			403,
+			_userProcessResource.putProcessHttpResponse(
+				process.getId(), randomProcess()));
+
+		assertEquals(process, processResource.getProcess(process.getId()));
+	}
+
 	private Document[] _documents;
 	private final List<Process> _processes = new ArrayList<>();
+	private ImportTaskResource _userImportTaskResource;
+	private ProcessResource _userProcessResource;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;

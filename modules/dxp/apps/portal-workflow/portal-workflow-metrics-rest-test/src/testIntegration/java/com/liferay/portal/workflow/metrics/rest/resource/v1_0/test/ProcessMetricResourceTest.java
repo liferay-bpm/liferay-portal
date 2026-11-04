@@ -21,6 +21,7 @@ import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Process;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.ProcessMetric;
 import com.liferay.portal.workflow.metrics.rest.client.pagination.Page;
 import com.liferay.portal.workflow.metrics.rest.client.pagination.Pagination;
+import com.liferay.portal.workflow.metrics.rest.client.resource.v1_0.ProcessMetricResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.test.helper.WorkflowMetricsRESTTestHelper;
 
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import java.util.Objects;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -64,6 +66,16 @@ public class ProcessMetricResourceTest
 		}
 	}
 
+	@Before
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+
+		_userProcessMetricResource =
+			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
+				ProcessMetricResource.class, testCompany);
+	}
+
 	@After
 	@Override
 	public void tearDown() throws Exception {
@@ -83,6 +95,8 @@ public class ProcessMetricResourceTest
 			false,
 			(processMetric1, processMetric2) -> assertEquals(
 				processMetric1, processMetric2));
+
+		_testGetProcessMetricWithoutPermission();
 	}
 
 	@Override
@@ -106,6 +120,8 @@ public class ProcessMetricResourceTest
 		assertEquals(
 			Collections.singletonList(processMetric),
 			(List<ProcessMetric>)page.getItems());
+
+		_testGetProcessMetricsPageWithoutPermission();
 	}
 
 	@Override
@@ -269,11 +285,33 @@ public class ProcessMetricResourceTest
 		unsafeBiConsumer.accept(postProcessMetric, getProcessMetric);
 	}
 
+	private void _testGetProcessMetricWithoutPermission() throws Exception {
+		ProcessMetric processMetric =
+			testGetProcessMetricsPage_addProcessMetric(randomProcessMetric());
+
+		Process process = processMetric.getProcess();
+
+		assertHttpResponseStatusCode(
+			404,
+			_userProcessMetricResource.getProcessMetricHttpResponse(
+				process.getId(), null, null, null));
+	}
+
+	private void _testGetProcessMetricsPageWithoutPermission()
+		throws Exception {
+
+		assertHttpResponseStatusCode(
+			404,
+			_userProcessMetricResource.getProcessMetricsPageHttpResponse(
+				null, Pagination.of(1, 10), null));
+	}
+
 	private static Document[] _documents;
 
 	@Inject
 	private static WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;
 
 	private final List<Process> _processes = new ArrayList<>();
+	private ProcessMetricResource _userProcessMetricResource;
 
 }

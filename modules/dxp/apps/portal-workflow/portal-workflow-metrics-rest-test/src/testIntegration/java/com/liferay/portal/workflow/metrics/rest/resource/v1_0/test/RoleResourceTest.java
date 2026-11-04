@@ -20,6 +20,7 @@ import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Assignee;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Process;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Role;
 import com.liferay.portal.workflow.metrics.rest.client.pagination.Page;
+import com.liferay.portal.workflow.metrics.rest.client.resource.v1_0.RoleResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.test.helper.WorkflowMetricsRESTTestHelper;
 
 import java.util.ArrayList;
@@ -47,6 +48,10 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 
 		_process = _workflowMetricsRESTTestHelper.addProcess(
 			testGroup.getCompanyId());
+
+		_userRoleResource =
+			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
+				RoleResource.class, testCompany);
 	}
 
 	@Override
@@ -66,6 +71,8 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(role1, role2), (List<Role>)page.getItems());
 		assertValid(page);
+
+		_testGetProcessRolesPageWithoutPermission();
 	}
 
 	@Rule
@@ -141,6 +148,13 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 		return role;
 	}
 
+	private void _testGetProcessRolesPageWithoutPermission() throws Exception {
+		assertHttpResponseStatusCode(
+			404,
+			_userRoleResource.getProcessRolesPageHttpResponse(
+				_process.getId(), null));
+	}
+
 	private Process _process;
 
 	@Inject
@@ -151,6 +165,8 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 
 	@Inject
 	private UserLocalService _userLocalService;
+
+	private RoleResource _userRoleResource;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;

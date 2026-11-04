@@ -6,10 +6,16 @@
 package com.liferay.portal.workflow.metrics.rest.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.headless.batch.engine.client.dto.v1_0.ExportTask;
+import com.liferay.headless.batch.engine.client.resource.v1_0.ExportTaskResource;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.search.test.rule.SearchTestRule;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LoggerTestUtil;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Calendar;
 import com.liferay.portal.workflow.metrics.rest.client.pagination.Page;
+import com.liferay.portal.workflow.metrics.rest.client.resource.v1_0.CalendarResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.test.helper.WorkflowMetricsRESTTestHelper;
 import com.liferay.portal.workflow.metrics.sla.calendar.WorkflowMetricsSLACalendar;
 
@@ -22,6 +28,7 @@ import java.util.Locale;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,6 +54,19 @@ public class CalendarResourceTest extends BaseCalendarResourceTestCase {
 			WorkflowMetricsRESTTestHelper.class);
 
 		_bundleContext = bundle.getBundleContext();
+	}
+
+	@Before
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+
+		_userCalendarResource =
+			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
+				CalendarResource.class, testCompany);
+		_userExportTaskResource =
+			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
+				ExportTaskResource.class, testCompany);
 	}
 
 	@After
@@ -83,6 +103,9 @@ public class CalendarResourceTest extends BaseCalendarResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(_getDefaultCalendar(), _getCustomCalendar()),
 			calendars);
+
+		_testGetCalendarsPageWithoutPermission();
+		_testGetCalendarsPageExportWithoutPermission();
 	}
 
 	@Rule
@@ -148,9 +171,50 @@ public class CalendarResourceTest extends BaseCalendarResourceTestCase {
 			null);
 	}
 
+	private void _testGetCalendarsPageExportWithoutPermission()
+		throws Exception {
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"com.liferay.batch.engine.internal." +
+					"BatchEngineExportTaskExecutorImpl",
+				LoggerTestUtil.ERROR)) {
+
+			ExportTask exportTask = _userExportTaskResource.postExportTask(
+				"com.liferay.portal.workflow.metrics.rest.dto.v1_0.Calendar",
+				"JSON", null, null, null, null, null);
+
+			while (true) {
+				exportTask = _userExportTaskResource.getExportTask(
+					exportTask.getId());
+
+				ExportTask.ExecuteStatus executeStatus =
+					exportTask.getExecuteStatus();
+
+				if ((executeStatus == ExportTask.ExecuteStatus.COMPLETED) ||
+					(executeStatus == ExportTask.ExecuteStatus.FAILED)) {
+
+					Assert.assertEquals(
+						ExportTask.ExecuteStatus.FAILED, executeStatus);
+
+					break;
+				}
+			}
+		}
+	}
+
+	private void _testGetCalendarsPageWithoutPermission() throws Exception {
+		assertHttpResponseStatusCode(
+			404, _userCalendarResource.getCalendarsPageHttpResponse());
+	}
+
 	private static BundleContext _bundleContext;
 
 	private ServiceRegistration<WorkflowMetricsSLACalendar>
 		_serviceRegistration;
+	private CalendarResource _userCalendarResource;
+	private ExportTaskResource _userExportTaskResource;
+
+	@Inject
+	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;
 
 }

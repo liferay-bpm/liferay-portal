@@ -8,13 +8,17 @@ package com.liferay.portal.workflow.metrics.rest.resource.v1_0.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.search.test.rule.SearchTestRule;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.TimeRange;
 import com.liferay.portal.workflow.metrics.rest.client.pagination.Page;
+import com.liferay.portal.workflow.metrics.rest.client.resource.v1_0.TimeRangeResource;
+import com.liferay.portal.workflow.metrics.rest.resource.v1_0.test.helper.WorkflowMetricsRESTTestHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +30,16 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class TimeRangeResourceTest extends BaseTimeRangeResourceTestCase {
 
+	@Before
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+
+		_userTimeRangeResource =
+			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
+				TimeRangeResource.class, testCompany);
+	}
+
 	@Override
 	@Test
 	public void testGetTimeRangesPage() throws Exception {
@@ -36,6 +50,8 @@ public class TimeRangeResourceTest extends BaseTimeRangeResourceTestCase {
 		Assert.assertEquals(timeRanges.toString(), 7, timeRanges.size());
 
 		assertEquals(_getDefaultTimeRanges(), timeRanges);
+
+		_testGetTimeRangesPageWithoutPermission();
 	}
 
 	@Rule
@@ -101,5 +117,15 @@ public class TimeRangeResourceTest extends BaseTimeRangeResourceTestCase {
 			}
 		};
 	}
+
+	private void _testGetTimeRangesPageWithoutPermission() throws Exception {
+		assertHttpResponseStatusCode(
+			404, _userTimeRangeResource.getTimeRangesPageHttpResponse());
+	}
+
+	private TimeRangeResource _userTimeRangeResource;
+
+	@Inject
+	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;
 
 }

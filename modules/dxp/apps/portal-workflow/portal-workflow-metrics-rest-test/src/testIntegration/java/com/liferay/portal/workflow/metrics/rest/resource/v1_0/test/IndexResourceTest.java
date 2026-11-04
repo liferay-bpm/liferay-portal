@@ -7,22 +7,20 @@ package com.liferay.portal.workflow.metrics.rest.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.petra.function.UnsafeFunction;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.rule.DataGuard;
-import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.test.util.UserTestUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.search.test.rule.SearchTestRule;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Index;
 import com.liferay.portal.workflow.metrics.rest.client.http.HttpInvoker;
 import com.liferay.portal.workflow.metrics.rest.client.pagination.Page;
 import com.liferay.portal.workflow.metrics.rest.client.resource.v1_0.IndexResource;
+import com.liferay.portal.workflow.metrics.rest.resource.v1_0.test.helper.WorkflowMetricsRESTTestHelper;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +31,16 @@ import org.junit.runner.RunWith;
 @DataGuard(scope = DataGuard.Scope.METHOD)
 @RunWith(Arquillian.class)
 public class IndexResourceTest extends BaseIndexResourceTestCase {
+
+	@Before
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+
+		_userIndexResource =
+			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
+				IndexResource.class, testCompany);
+	}
 
 	@Override
 	@Test
@@ -159,39 +167,15 @@ public class IndexResourceTest extends BaseIndexResourceTestCase {
 			});
 	}
 
-	private IndexResource _getUserWithoutPermissionsIndexResource()
-		throws Exception {
-
-		String password = RandomTestUtil.randomString();
-
-		User user = UserTestUtil.addUser(testCompany, password);
-
-		return IndexResource.builder(
-		).authentication(
-			user.getEmailAddress(), password
-		).endpoint(
-			testCompany.getVirtualHostname(),
-			PortalUtil.getPortalServerPort(false), "http"
-		).locale(
-			LocaleUtil.getDefault()
-		).build();
-	}
-
 	private void _testGetIndexesPageWithoutPermission() throws Exception {
-		IndexResource userIndexResource =
-			_getUserWithoutPermissionsIndexResource();
-
 		assertHttpResponseStatusCode(
-			404, userIndexResource.getIndexesPageHttpResponse());
+			404, _userIndexResource.getIndexesPageHttpResponse());
 	}
 
 	private void _testPatchIndexRefreshWithoutPermission() throws Exception {
-		IndexResource userIndexResource =
-			_getUserWithoutPermissionsIndexResource();
-
 		assertHttpResponseStatusCode(
 			403,
-			userIndexResource.patchIndexRefreshHttpResponse(
+			_userIndexResource.patchIndexRefreshHttpResponse(
 				new Index() {
 					{
 						key = Index.Group.ALL.getValue();
@@ -200,17 +184,19 @@ public class IndexResourceTest extends BaseIndexResourceTestCase {
 	}
 
 	private void _testPatchIndexReindexWithoutPermission() throws Exception {
-		IndexResource userIndexResource =
-			_getUserWithoutPermissionsIndexResource();
-
 		assertHttpResponseStatusCode(
 			403,
-			userIndexResource.patchIndexReindexHttpResponse(
+			_userIndexResource.patchIndexReindexHttpResponse(
 				new Index() {
 					{
 						key = Index.Group.ALL.getValue();
 					}
 				}));
 	}
+
+	private IndexResource _userIndexResource;
+
+	@Inject
+	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;
 
 }
