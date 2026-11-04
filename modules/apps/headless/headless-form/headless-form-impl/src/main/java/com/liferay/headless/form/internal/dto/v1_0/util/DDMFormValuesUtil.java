@@ -8,7 +8,8 @@ package com.liferay.headless.form.internal.dto.v1_0.util;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion;
+import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.model.UnlocalizedValue;
 import com.liferay.dynamic.data.mapping.model.Value;
@@ -30,9 +31,13 @@ public class DDMFormValuesUtil {
 			Locale locale)
 		throws Exception {
 
-		DDMStructure ddmStructure = ddmFormInstance.getStructure();
+		DDMFormInstanceVersion ddmFormInstanceVersion =
+			ddmFormInstance.getLatestApprovedFormInstanceVersion();
 
-		DDMForm ddmForm = ddmStructure.getDDMForm();
+		DDMStructureVersion ddmStructureVersion =
+			ddmFormInstanceVersion.getStructureVersion();
+
+		DDMForm ddmForm = ddmStructureVersion.getDDMForm();
 
 		DDMFormValues ddmFormValues = new DDMFormValues(ddmForm);
 

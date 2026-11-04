@@ -127,7 +127,7 @@ public class FormRecordResourceImpl extends BaseFormRecordResourceImpl {
 			ddmFormInstance, formRecord.getFormFieldValues(),
 			contextAcceptLanguage.getPreferredLocale());
 
-		_linkFileEntries(ddmFormInstance.getDDMForm(), ddmFormValues);
+		_linkFileEntries(ddmFormValues);
 
 		return FormRecordUtil.toFormRecord(
 			_ddmFormInstanceRecordService.addFormInstanceRecord(
@@ -153,7 +153,7 @@ public class FormRecordResourceImpl extends BaseFormRecordResourceImpl {
 			ddmFormInstance, formRecord.getFormFieldValues(),
 			contextAcceptLanguage.getPreferredLocale());
 
-		_linkFileEntries(ddmFormInstance.getDDMForm(), ddmFormValues);
+		_linkFileEntries(ddmFormValues);
 
 		return FormRecordUtil.toFormRecord(
 			_ddmFormInstanceRecordService.updateFormInstanceRecord(
@@ -184,8 +184,8 @@ public class FormRecordResourceImpl extends BaseFormRecordResourceImpl {
 		return serviceContext;
 	}
 
-	private void _linkFileEntries(
-		DDMForm ddmForm, DDMFormValues ddmFormValues) {
+	private void _linkFileEntries(DDMFormValues ddmFormValues) {
+		DDMForm ddmForm = ddmFormValues.getDDMForm();
 
 		for (DDMFormField ddmFormField : ddmForm.getDDMFormFields()) {
 			if (!Objects.equals(ddmFormField.getType(), "document_library")) {

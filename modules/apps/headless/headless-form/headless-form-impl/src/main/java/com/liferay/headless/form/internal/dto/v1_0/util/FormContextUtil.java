@@ -8,7 +8,8 @@ package com.liferay.headless.form.internal.dto.v1_0.util;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormTemplateContextFactory;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion;
+import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
 import com.liferay.headless.form.dto.v1_0.FormContext;
 import com.liferay.headless.form.dto.v1_0.FormFieldContext;
 import com.liferay.headless.form.dto.v1_0.FormFieldValue;
@@ -37,11 +38,16 @@ public class FormContextUtil {
 				ddmFormInstance, formFieldValues, locale));
 		ddmFormRenderingContext.setLocale(locale);
 
-		DDMStructure ddmStructure = ddmFormInstance.getStructure();
+		DDMFormInstanceVersion ddmFormInstanceVersion =
+			ddmFormInstance.getLatestApprovedFormInstanceVersion();
+
+		DDMStructureVersion ddmStructureVersion =
+			ddmFormInstanceVersion.getStructureVersion();
 
 		Map<String, Object> ddmFormTemplateContext =
 			ddmFormTemplateContextFactory.create(
-				ddmStructure.getDDMForm(), ddmStructure.getDDMFormLayout(),
+				ddmStructureVersion.getDDMForm(),
+				ddmStructureVersion.getDDMFormLayout(),
 				ddmFormRenderingContext);
 
 		return new FormContext() {

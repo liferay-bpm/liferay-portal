@@ -6,7 +6,13 @@
 package com.liferay.headless.form.dto.v1_0.util;
 
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
 import com.liferay.headless.form.dto.v1_0.Form;
+import com.liferay.petra.function.UnsafeSupplierValue;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -29,11 +35,22 @@ public class FormUtil {
 			return null;
 		}
 
+		UnsafeSupplierValue<DDMFormInstanceVersion, PortalException>
+			ddmFormInstanceVersionUnsafeSupplierValue =
+				new UnsafeSupplierValue<>(
+					ddmFormInstance::getLatestApprovedFormInstanceVersion);
+
 		return new Form() {
 			{
 				setAvailableLanguages(
-					() -> LocaleUtil.toW3cLanguageIds(
-						ddmFormInstance.getAvailableLanguageIds()));
+					() -> {
+						DDMFormInstanceVersion ddmFormInstanceVersion =
+							ddmFormInstanceVersionUnsafeSupplierValue.
+								getValue();
+
+						return LocaleUtil.toW3cLanguageIds(
+							ddmFormInstanceVersion.getAvailableLanguageIds());
+					});
 				setCreator(
 					() -> CreatorUtil.toCreator(
 						portal,
@@ -42,22 +59,76 @@ public class FormUtil {
 				setDateCreated(ddmFormInstance::getCreateDate);
 				setDateModified(ddmFormInstance::getModifiedDate);
 				setDatePublished(ddmFormInstance::getLastPublishDate);
-				setDefaultLanguage(ddmFormInstance::getDefaultLanguageId);
+				setDefaultLanguage(
+					() -> {
+						DDMFormInstanceVersion ddmFormInstanceVersion =
+							ddmFormInstanceVersionUnsafeSupplierValue.
+								getValue();
+
+						return ddmFormInstanceVersion.getDefaultLanguageId();
+					});
 				setDescription(
-					() -> ddmFormInstance.getDescription(preferredLocale));
+					() -> {
+						DDMFormInstanceVersion ddmFormInstanceVersion =
+							ddmFormInstanceVersionUnsafeSupplierValue.
+								getValue();
+
+						return ddmFormInstanceVersion.getDescription(
+							preferredLocale);
+					});
 				setDescription_i18n(
-					() -> LocalizedMapUtil.getI18nMap(
-						acceptAllLanguages,
-						ddmFormInstance.getDescriptionMap()));
+					() -> {
+						DDMFormInstanceVersion ddmFormInstanceVersion =
+							ddmFormInstanceVersionUnsafeSupplierValue.
+								getValue();
+
+						return LocalizedMapUtil.getI18nMap(
+							acceptAllLanguages,
+							ddmFormInstanceVersion.getDescriptionMap());
+					});
 				setId(ddmFormInstance::getFormInstanceId);
-				setName(() -> ddmFormInstance.getName(preferredLocale));
+				setName(
+					() -> {
+						DDMFormInstanceVersion ddmFormInstanceVersion =
+							ddmFormInstanceVersionUnsafeSupplierValue.
+								getValue();
+
+						return ddmFormInstanceVersion.getName(preferredLocale);
+					});
 				setName_i18n(
-					() -> LocalizedMapUtil.getI18nMap(
-						acceptAllLanguages, ddmFormInstance.getNameMap()));
+					() -> {
+						DDMFormInstanceVersion ddmFormInstanceVersion =
+							ddmFormInstanceVersionUnsafeSupplierValue.
+								getValue();
+
+						return LocalizedMapUtil.getI18nMap(
+							acceptAllLanguages,
+							ddmFormInstanceVersion.getNameMap());
+					});
 				setStructure(
-					() -> StructureUtil.toFormStructure(
-						acceptAllLanguages, ddmFormInstance.getStructure(),
-						preferredLocale, portal, userLocalService));
+					() -> {
+						DDMFormInstanceVersion ddmFormInstanceVersion =
+							ddmFormInstanceVersionUnsafeSupplierValue.
+								getValue();
+
+						DDMStructureVersion ddmStructureVersion =
+							ddmFormInstanceVersion.getStructureVersion();
+
+						DDMStructure ddmStructure = MVCCModel.scratchClone(
+							ddmStructureVersion.getStructure());
+
+						ddmStructure.setVersion(
+							ddmStructureVersion.getVersion());
+						ddmStructure.setName(ddmStructureVersion.getName());
+						ddmStructure.setDescription(
+							ddmStructureVersion.getDescription());
+						ddmStructure.setDefinition(
+							ddmStructureVersion.getDefinition());
+
+						return StructureUtil.toFormStructure(
+							acceptAllLanguages, ddmStructure, preferredLocale,
+							portal, userLocalService);
+					});
 			}
 		};
 	}
