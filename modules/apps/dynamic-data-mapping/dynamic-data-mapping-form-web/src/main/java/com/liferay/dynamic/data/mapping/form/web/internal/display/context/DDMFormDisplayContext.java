@@ -309,15 +309,21 @@ public class DDMFormDisplayContext {
 						getLatestFormInstanceRecordVersion()));
 		}
 
+		ThemeDisplay themeDisplay = getThemeDisplay();
+
+		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion = null;
+
+		if (!isPreview() && themeDisplay.isSignedIn()) {
+			ddmFormInstanceRecordVersion =
+				_ddmFormInstanceRecordVersionLocalService.
+					fetchLatestDraftFormInstanceRecordVersion(
+						themeDisplay.getUserId(), getFormInstanceId());
+		}
+
 		return _ddmFormRenderer.getDDMFormTemplateContext(
 			ddmForm, getDDMFormLayout(ddmFormInstance),
 			createDDMFormRenderingContext(
-				ddmForm, ddmFormInstance,
-				_ddmFormInstanceRecordVersionLocalService.
-					fetchLatestFormInstanceRecordVersion(
-						_getUserId(), getFormInstanceId(),
-						getFormInstanceVersion(),
-						WorkflowConstants.STATUS_DRAFT)));
+				ddmForm, ddmFormInstance, ddmFormInstanceRecordVersion));
 	}
 
 	public DDMFormSuccessPageSettings getDDMFormSuccessPageSettings()
@@ -1081,16 +1087,6 @@ public class DDMFormDisplayContext {
 		return ddmFormLayout;
 	}
 
-	protected String getFormInstanceVersion() {
-		DDMFormInstance ddmFormInstance = getFormInstance();
-
-		if (ddmFormInstance == null) {
-			return "1.0";
-		}
-
-		return ddmFormInstance.getVersion();
-	}
-
 	protected Locale getLocale(
 		HttpServletRequest httpServletRequest, DDMForm ddmForm) {
 
@@ -1235,12 +1231,6 @@ public class DDMFormDisplayContext {
 
 		return new AggregateResourceBundle(
 			moduleResourceBundle, portalResourceBundle);
-	}
-
-	private long _getUserId() {
-		ThemeDisplay themeDisplay = getThemeDisplay();
-
-		return themeDisplay.getUserId();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

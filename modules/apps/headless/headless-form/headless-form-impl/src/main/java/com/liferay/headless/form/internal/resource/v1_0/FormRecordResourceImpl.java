@@ -7,6 +7,7 @@ package com.liferay.headless.form.internal.resource.v1_0;
 
 import com.liferay.document.library.helper.DLURLHelper;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.dynamic.data.mapping.exception.NoSuchFormInstanceRecordVersionException;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
@@ -65,13 +66,21 @@ public class FormRecordResourceImpl extends BaseFormRecordResourceImpl {
 		DDMFormInstance ddmFormInstance =
 			_ddmFormInstanceService.getFormInstance(formId);
 
-		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion =
-			_ddmFormInstanceRecordVersionService.
-				fetchLatestFormInstanceRecordVersion(
-					contextUser.getUserId(),
-					ddmFormInstance.getFormInstanceId(),
-					ddmFormInstance.getVersion(),
-					WorkflowConstants.STATUS_DRAFT);
+		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion = null;
+
+		if (!contextUser.isGuestUser()) {
+			ddmFormInstanceRecordVersion =
+				_ddmFormInstanceRecordVersionService.
+					fetchLatestDraftFormInstanceRecordVersion(
+						contextUser.getUserId(),
+						ddmFormInstance.getFormInstanceId());
+		}
+
+		if (ddmFormInstanceRecordVersion == null) {
+			throw new NoSuchFormInstanceRecordVersionException(
+				"No draft form instance record version exists for form " +
+					"instance " + formId);
+		}
 
 		return FormRecordUtil.toFormRecord(
 			ddmFormInstanceRecordVersion.getFormInstanceRecord(), _dlAppService,

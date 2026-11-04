@@ -50,7 +50,6 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import jakarta.portlet.ActionRequest;
 import jakarta.portlet.ActionResponse;
@@ -188,7 +187,7 @@ public class AddFormInstanceRecordMVCActionCommand
 
 		_updateFormInstanceRecord(
 			actionRequest, ddmFormInstance, ddmFormValues, groupId,
-			serviceContext, themeDisplay.getUserId());
+			serviceContext, themeDisplay);
 
 		if (!SessionErrors.isEmpty(actionRequest)) {
 			return;
@@ -280,7 +279,7 @@ public class AddFormInstanceRecordMVCActionCommand
 	private void _updateFormInstanceRecord(
 			ActionRequest actionRequest, DDMFormInstance ddmFormInstance,
 			DDMFormValues ddmFormValues, long groupId,
-			ServiceContext serviceContext, long userId)
+			ServiceContext serviceContext, ThemeDisplay themeDisplay)
 		throws Exception {
 
 		long ddmFormInstanceRecordId = ParamUtil.getLong(
@@ -291,12 +290,15 @@ public class AddFormInstanceRecordMVCActionCommand
 				ddmFormInstanceRecordId, false, ddmFormValues, serviceContext);
 		}
 		else {
-			DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion =
-				_ddmFormInstanceRecordVersionLocalService.
-					fetchLatestFormInstanceRecordVersion(
-						userId, ddmFormInstance.getFormInstanceId(),
-						ddmFormInstance.getVersion(),
-						WorkflowConstants.STATUS_DRAFT);
+			DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion = null;
+
+			if (themeDisplay.isSignedIn()) {
+				ddmFormInstanceRecordVersion =
+					_ddmFormInstanceRecordVersionLocalService.
+						fetchLatestDraftFormInstanceRecordVersion(
+							themeDisplay.getUserId(),
+							ddmFormInstance.getFormInstanceId());
+			}
 
 			if (ddmFormInstanceRecordVersion == null) {
 				_ddmFormInstanceRecordService.addFormInstanceRecord(
