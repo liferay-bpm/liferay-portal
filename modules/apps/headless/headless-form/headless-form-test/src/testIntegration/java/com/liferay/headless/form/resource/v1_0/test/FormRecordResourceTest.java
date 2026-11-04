@@ -8,7 +8,9 @@ package com.liferay.headless.form.resource.v1_0.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormInstanceTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.util.DDMUtil;
@@ -55,6 +57,22 @@ public class FormRecordResourceTest extends BaseFormRecordResourceTestCase {
 
 		_testGetFormFormRecordByLatestDraftNotFound();
 		_testGetFormFormRecordByLatestDraftWithPublishedFormInstanceVersion();
+	}
+
+	@Override
+	@Test
+	public void testPostFormFormRecord() throws Exception {
+		super.testPostFormFormRecord();
+
+		_testPostFormFormRecordWithDraftFormInstanceVersion();
+	}
+
+	@Override
+	@Test
+	public void testPutFormRecord() throws Exception {
+		super.testPutFormRecord();
+
+		_testPutFormRecordWithDraftFormInstanceVersion();
 	}
 
 	@Override
@@ -189,6 +207,71 @@ public class FormRecordResourceTest extends BaseFormRecordResourceTestCase {
 		Assert.assertEquals(postFormRecord.getId(), getFormRecord.getId());
 	}
 
+	private void _testPostFormFormRecordWithDraftFormInstanceVersion()
+		throws Exception {
+
+		_updateDDMFormInstance(
+			DDMFormTestUtil.createDDMForm(RandomTestUtil.randomString()),
+			WorkflowConstants.STATUS_DRAFT);
+
+		FormRecord randomFormRecord = randomFormRecord();
+
+		randomFormRecord.setDraft(false);
+
+		FormRecord postFormRecord = _addFormRecord(randomFormRecord);
+
+		FormFieldValue[] randomFormFieldValues =
+			randomFormRecord.getFormFieldValues();
+
+		FormFieldValue[] postFormFieldValues =
+			postFormRecord.getFormFieldValues();
+
+		Assert.assertEquals(
+			randomFormFieldValues[0].getValue(),
+			postFormFieldValues[0].getValue());
+
+		DDMFormInstanceRecord ddmFormInstanceRecord =
+			_ddmFormInstanceRecordLocalService.getFormInstanceRecord(
+				postFormRecord.getId());
+
+		Assert.assertEquals(
+			"1.0", ddmFormInstanceRecord.getFormInstanceVersion());
+	}
+
+	private void _testPutFormRecordWithDraftFormInstanceVersion()
+		throws Exception {
+
+		FormRecord postFormRecord = _addFormRecord(randomFormRecord());
+
+		_updateDDMFormInstance(
+			DDMFormTestUtil.createDDMForm(RandomTestUtil.randomString()),
+			WorkflowConstants.STATUS_DRAFT);
+
+		FormRecord randomFormRecord = randomFormRecord();
+
+		randomFormRecord.setDraft(false);
+
+		FormRecord putFormRecord = formRecordResource.putFormRecord(
+			postFormRecord.getId(), randomFormRecord);
+
+		FormFieldValue[] randomFormFieldValues =
+			randomFormRecord.getFormFieldValues();
+
+		FormFieldValue[] putFormFieldValues =
+			putFormRecord.getFormFieldValues();
+
+		Assert.assertEquals(
+			randomFormFieldValues[0].getValue(),
+			putFormFieldValues[0].getValue());
+
+		DDMFormInstanceRecord ddmFormInstanceRecord =
+			_ddmFormInstanceRecordLocalService.getFormInstanceRecord(
+				putFormRecord.getId());
+
+		Assert.assertEquals(
+			"1.0", ddmFormInstanceRecord.getFormInstanceVersion());
+	}
+
 	private void _updateDDMFormInstance(DDMForm ddmForm, int status)
 		throws Exception {
 
@@ -208,6 +291,10 @@ public class FormRecordResourceTest extends BaseFormRecordResourceTestCase {
 
 	@Inject(type = DDMFormInstanceLocalService.class)
 	private DDMFormInstanceLocalService _ddmFormInstanceLocalService;
+
+	@Inject(type = DDMFormInstanceRecordLocalService.class)
+	private DDMFormInstanceRecordLocalService
+		_ddmFormInstanceRecordLocalService;
 
 	@Inject(type = GroupLocalService.class)
 	private GroupLocalService _groupLocalService;
