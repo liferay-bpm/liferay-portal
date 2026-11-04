@@ -18,6 +18,7 @@ import com.liferay.dynamic.data.mapping.storage.StorageType;
 import com.liferay.dynamic.data.mapping.util.comparator.DDMFormInstanceRecordVersionIdComparator;
 import com.liferay.dynamic.data.mapping.util.comparator.FormInstanceRecordVersionVersionComparator;
 import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
@@ -26,6 +27,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Collections;
 import java.util.List;
@@ -81,6 +83,38 @@ public class DDMFormInstanceRecordVersionLocalServiceImpl
 			ddmFormInstanceRecordVersion.getPrimaryKey());
 
 		return ddmFormInstanceRecordVersion;
+	}
+
+	@Override
+	public DDMFormInstanceRecordVersion
+		fetchLatestDraftFormInstanceRecordVersion(
+			long userId, long formInstanceId) {
+
+		List<DDMFormInstanceRecordVersion> ddmFormInstanceRecordVersions =
+			ddmFormInstanceRecordVersionPersistence.findByU_F_S(
+				userId, formInstanceId, WorkflowConstants.STATUS_DRAFT,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				DDMFormInstanceRecordVersionIdComparator.getInstance(false));
+
+		for (DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion :
+				ddmFormInstanceRecordVersions) {
+
+			long formInstanceRecordId =
+				ddmFormInstanceRecordVersion.getFormInstanceRecordId();
+
+			int count =
+				ddmFormInstanceRecordVersionPersistence.
+					countByFormInstanceRecordId(formInstanceRecordId);
+
+			int draftCount = ddmFormInstanceRecordVersionPersistence.countByF_S(
+				formInstanceRecordId, WorkflowConstants.STATUS_DRAFT);
+
+			if (count == draftCount) {
+				return ddmFormInstanceRecordVersion;
+			}
+		}
+
+		return null;
 	}
 
 	@Override
