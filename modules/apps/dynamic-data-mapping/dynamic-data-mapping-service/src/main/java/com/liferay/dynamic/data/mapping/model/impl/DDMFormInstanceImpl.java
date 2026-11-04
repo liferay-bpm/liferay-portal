@@ -5,6 +5,7 @@
 
 package com.liferay.dynamic.data.mapping.model.impl;
 
+import com.liferay.dynamic.data.mapping.exception.NoSuchFormInstanceVersionException;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceSettings;
@@ -17,9 +18,12 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.StorageType;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.cache.CacheField;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.List;
 
@@ -47,6 +51,26 @@ public class DDMFormInstanceImpl extends DDMFormInstanceBaseImpl {
 
 		return DDMFormInstanceVersionLocalServiceUtil.getFormInstanceVersion(
 			getFormInstanceId(), version);
+	}
+
+	@Override
+	public DDMFormInstanceVersion getLatestApprovedFormInstanceVersion()
+		throws PortalException {
+
+		try {
+			return DDMFormInstanceVersionLocalServiceUtil.
+				getLatestFormInstanceVersion(
+					getFormInstanceId(), WorkflowConstants.STATUS_APPROVED);
+		}
+		catch (NoSuchFormInstanceVersionException
+					noSuchFormInstanceVersionException) {
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(noSuchFormInstanceVersionException);
+			}
+
+			return getFormInstanceVersion(getVersion());
+		}
 	}
 
 	@Override
@@ -138,6 +162,9 @@ public class DDMFormInstanceImpl extends DDMFormInstanceBaseImpl {
 			this, _objectDefinitionId);
 		storageTypeUpdateEntityCacheBiConsumer.accept(this, _storageType);
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DDMFormInstanceImpl.class);
 
 	private DDMFormValues _ddmFormValues;
 	private DDMFormInstanceSettings _formInstanceSettings;
