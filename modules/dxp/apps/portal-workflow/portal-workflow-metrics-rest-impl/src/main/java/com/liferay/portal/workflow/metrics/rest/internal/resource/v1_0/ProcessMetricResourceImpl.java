@@ -44,6 +44,7 @@ import com.liferay.portal.workflow.metrics.rest.dto.v1_0.ProcessMetric;
 import com.liferay.portal.workflow.metrics.rest.internal.dto.v1_0.util.ProcessUtil;
 import com.liferay.portal.workflow.metrics.rest.internal.odata.entity.v1_0.ProcessMetricEntityModel;
 import com.liferay.portal.workflow.metrics.rest.internal.resource.helper.ResourceHelper;
+import com.liferay.portal.workflow.metrics.rest.internal.security.permission.WorkflowMetricsPermissionUtil;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.ProcessMetricResource;
 import com.liferay.portal.workflow.metrics.search.index.constants.WorkflowMetricsIndexNameConstants;
 
@@ -83,6 +84,8 @@ public class ProcessMetricResourceImpl extends BaseProcessMetricResourceImpl {
 			Long processId, Boolean completed, Date dateEnd, Date dateStart)
 		throws Exception {
 
+		WorkflowMetricsPermissionUtil.check();
+
 		SearchSearchResponse searchSearchResponse =
 			_getProcessMetricsSearchSearchResponse(null, null, processId, null);
 
@@ -114,6 +117,8 @@ public class ProcessMetricResourceImpl extends BaseProcessMetricResourceImpl {
 	public Page<ProcessMetric> getProcessMetricsPage(
 			String title, Pagination pagination, Sort[] sorts)
 		throws Exception {
+
+		WorkflowMetricsPermissionUtil.check();
 
 		FieldSort fieldSort = _toFieldSort(sorts);
 

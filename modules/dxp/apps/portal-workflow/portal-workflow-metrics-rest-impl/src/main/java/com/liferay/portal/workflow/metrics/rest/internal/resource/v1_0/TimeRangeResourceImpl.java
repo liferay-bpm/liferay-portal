@@ -10,6 +10,7 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.TimeRange;
 import com.liferay.portal.workflow.metrics.rest.internal.dto.v1_0.util.TimeRangeUtil;
+import com.liferay.portal.workflow.metrics.rest.internal.security.permission.WorkflowMetricsPermissionUtil;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.TimeRangeResource;
 
 import java.util.Arrays;
@@ -29,6 +30,8 @@ public class TimeRangeResourceImpl extends BaseTimeRangeResourceImpl {
 
 	@Override
 	public Page<TimeRange> getTimeRangesPage() throws Exception {
+		WorkflowMetricsPermissionUtil.check();
+
 		return Page.of(
 			transform(
 				Arrays.asList(0, 1, 7, 30, 90, 180, 365),

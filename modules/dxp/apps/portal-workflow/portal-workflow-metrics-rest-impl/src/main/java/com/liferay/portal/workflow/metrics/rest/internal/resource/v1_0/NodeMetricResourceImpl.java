@@ -39,6 +39,7 @@ import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Node;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.NodeMetric;
 import com.liferay.portal.workflow.metrics.rest.internal.odata.entity.v1_0.NodeMetricEntityModel;
 import com.liferay.portal.workflow.metrics.rest.internal.resource.helper.ResourceHelper;
+import com.liferay.portal.workflow.metrics.rest.internal.security.permission.WorkflowMetricsPermissionUtil;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.NodeMetricResource;
 import com.liferay.portal.workflow.metrics.search.index.constants.WorkflowMetricsIndexNameConstants;
 import com.liferay.portal.workflow.metrics.sla.processor.WorkflowMetricsSLAStatus;
@@ -80,6 +81,8 @@ public class NodeMetricResourceImpl extends BaseNodeMetricResourceImpl {
 			String key, String processVersion, Pagination pagination,
 			Sort[] sorts)
 		throws Exception {
+
+		WorkflowMetricsPermissionUtil.check();
 
 		String latestProcessVersion = _resourceHelper.getLatestProcessVersion(
 			contextCompany.getCompanyId(), processId);

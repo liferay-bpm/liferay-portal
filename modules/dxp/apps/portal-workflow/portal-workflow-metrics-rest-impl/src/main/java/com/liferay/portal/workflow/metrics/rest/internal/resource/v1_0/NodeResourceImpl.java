@@ -14,6 +14,7 @@ import com.liferay.portal.workflow.metrics.model.AddNodeRequest;
 import com.liferay.portal.workflow.metrics.model.DeleteNodeRequest;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Node;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.util.NodeUtil;
+import com.liferay.portal.workflow.metrics.rest.internal.security.permission.WorkflowMetricsPermissionUtil;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.NodeResource;
 import com.liferay.portal.workflow.metrics.rest.spi.resource.SPINodeResource;
 import com.liferay.portal.workflow.metrics.search.index.NodeWorkflowMetricsIndexer;
@@ -35,6 +36,8 @@ public class NodeResourceImpl extends BaseNodeResourceImpl {
 	public void deleteProcessNode(Long processId, Long nodeId)
 		throws Exception {
 
+		WorkflowMetricsPermissionUtil.check();
+
 		DeleteNodeRequest.Builder builder = new DeleteNodeRequest.Builder();
 
 		_nodeWorkflowMetricsIndexer.deleteNode(
@@ -47,6 +50,8 @@ public class NodeResourceImpl extends BaseNodeResourceImpl {
 
 	@Override
 	public Page<Node> getProcessNodesPage(Long processId) throws Exception {
+		WorkflowMetricsPermissionUtil.check();
+
 		SPINodeResource<Node> spiNodeResource = _getSPINodeResource();
 
 		return spiNodeResource.getProcessNodesPage(processId);
@@ -54,6 +59,8 @@ public class NodeResourceImpl extends BaseNodeResourceImpl {
 
 	@Override
 	public Node postProcessNode(Long processId, Node node) throws Exception {
+		WorkflowMetricsPermissionUtil.check();
+
 		AddNodeRequest.Builder builder = new AddNodeRequest.Builder();
 
 		return NodeUtil.toNode(

@@ -23,6 +23,7 @@ import com.liferay.portal.search.query.BooleanQuery;
 import com.liferay.portal.search.query.QueriesUtil;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Role;
+import com.liferay.portal.workflow.metrics.rest.internal.security.permission.WorkflowMetricsPermissionUtil;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.RoleResource;
 import com.liferay.portal.workflow.metrics.search.index.constants.WorkflowMetricsIndexNameConstants;
 
@@ -49,6 +50,8 @@ public class RoleResourceImpl extends BaseRoleResourceImpl {
 	@Override
 	public Page<Role> getProcessRolesPage(Long processId, Boolean completed)
 		throws Exception {
+
+		WorkflowMetricsPermissionUtil.check();
 
 		return Page.of(_getRoles(GetterUtil.getBoolean(completed), processId));
 	}
