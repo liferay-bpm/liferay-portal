@@ -6,20 +6,29 @@
 package com.liferay.headless.form.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
+import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormInstanceTestUtil;
+import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
+import com.liferay.dynamic.data.mapping.util.DDMUtil;
 import com.liferay.headless.form.client.dto.v1_0.FormFieldValue;
 import com.liferay.headless.form.client.dto.v1_0.FormRecord;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 
 import java.util.Collections;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
@@ -37,6 +46,15 @@ public class FormRecordResourceTest extends BaseFormRecordResourceTestCase {
 		_ddmFormInstance = DDMFormInstanceTestUtil.addDDMFormInstance(
 			_groupLocalService.getGroup(testGroup.getGroupId()),
 			TestPropsValues.getUserId());
+	}
+
+	@Override
+	@Test
+	public void testGetFormFormRecordByLatestDraft() throws Exception {
+		super.testGetFormFormRecordByLatestDraft();
+
+		_testGetFormFormRecordByLatestDraftNotFound();
+		_testGetFormFormRecordByLatestDraftWithPublishedFormInstanceVersion();
 	}
 
 	@Override
@@ -138,7 +156,58 @@ public class FormRecordResourceTest extends BaseFormRecordResourceTestCase {
 			_ddmFormInstance.getFormInstanceId(), formRecord);
 	}
 
+	private void _testGetFormFormRecordByLatestDraftNotFound()
+		throws Exception {
+
+		DDMFormInstance ddmFormInstance =
+			DDMFormInstanceTestUtil.addDDMFormInstance(
+				_groupLocalService.getGroup(testGroup.getGroupId()),
+				TestPropsValues.getUserId());
+
+		assertHttpResponseStatusCode(
+			404,
+			formRecordResource.getFormFormRecordByLatestDraftHttpResponse(
+				ddmFormInstance.getFormInstanceId()));
+	}
+
+	private void _testGetFormFormRecordByLatestDraftWithPublishedFormInstanceVersion()
+		throws Exception {
+
+		DDMForm ddmForm = DDMFormTestUtil.createDDMForm(
+			RandomTestUtil.randomString());
+
+		_updateDDMFormInstance(ddmForm, WorkflowConstants.STATUS_DRAFT);
+
+		FormRecord postFormRecord = _addFormRecord(randomFormRecord());
+
+		_updateDDMFormInstance(ddmForm, WorkflowConstants.STATUS_APPROVED);
+
+		FormRecord getFormRecord =
+			formRecordResource.getFormFormRecordByLatestDraft(
+				_ddmFormInstance.getFormInstanceId());
+
+		Assert.assertEquals(postFormRecord.getId(), getFormRecord.getId());
+	}
+
+	private void _updateDDMFormInstance(DDMForm ddmForm, int status)
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(testGroup.getGroupId());
+
+		serviceContext.setAttribute("status", status);
+
+		_ddmFormInstanceLocalService.updateFormInstance(
+			TestPropsValues.getUserId(), _ddmFormInstance.getFormInstanceId(),
+			_ddmFormInstance.getNameMap(), _ddmFormInstance.getDescriptionMap(),
+			ddmForm, DDMUtil.getDefaultDDMFormLayout(ddmForm),
+			_ddmFormInstance.getSettingsDDMFormValues(), serviceContext);
+	}
+
 	private DDMFormInstance _ddmFormInstance;
+
+	@Inject(type = DDMFormInstanceLocalService.class)
+	private DDMFormInstanceLocalService _ddmFormInstanceLocalService;
 
 	@Inject(type = GroupLocalService.class)
 	private GroupLocalService _groupLocalService;

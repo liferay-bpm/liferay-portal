@@ -446,6 +446,15 @@ public class DDMFormDisplayContextTest {
 	}
 
 	@Test
+	public void testGetDDMFormContextWithDraftFormInstanceRecordVersion()
+		throws Exception {
+
+		_assertFetchLatestDraftFormInstanceRecordVersion(false, false, 1);
+		_assertFetchLatestDraftFormInstanceRecordVersion(false, true, 0);
+		_assertFetchLatestDraftFormInstanceRecordVersion(true, false, 0);
+	}
+
+	@Test
 	public void testGetErrorMessages() throws Exception {
 		RenderRequest renderRequest = _mockRenderRequest();
 
@@ -997,6 +1006,74 @@ public class DDMFormDisplayContextTest {
 				"limitToOneSubmissionPerUserHeader"));
 	}
 
+	private void _assertFetchLatestDraftFormInstanceRecordVersion(
+			boolean guestUser, boolean preview, int times)
+		throws Exception {
+
+		DDMFormDisplayContext ddmFormDisplayContext = _createSpy(
+			false, preview, false);
+
+		DDMFormInstance ddmFormInstance = _mockDDMFormInstance(
+			Mockito.mock(DDMFormInstanceSettings.class));
+
+		ThemeDisplay themeDisplay = _mockThemeDisplay(guestUser);
+
+		_mockHttpServletRequest2.setAttribute(
+			WebKeys.THEME_DISPLAY, themeDisplay);
+
+		Mockito.doReturn(
+			DDMFormTestUtil.createDDMForm()
+		).when(
+			ddmFormDisplayContext
+		).getDDMForm(
+			Mockito.any(DDMFormInstance.class)
+		);
+
+		Mockito.doReturn(
+			Mockito.mock(DDMFormLayout.class)
+		).when(
+			ddmFormDisplayContext
+		).getDDMFormLayout(
+			Mockito.any(DDMFormInstance.class)
+		);
+
+		Mockito.doReturn(
+			ddmFormInstance
+		).when(
+			ddmFormDisplayContext
+		).getFormInstance();
+
+		Mockito.doReturn(
+			themeDisplay
+		).when(
+			ddmFormDisplayContext
+		).getThemeDisplay();
+
+		Mockito.doReturn(
+			true
+		).when(
+			ddmFormDisplayContext
+		).hasAddFormInstanceRecordPermission();
+
+		Mockito.doReturn(
+			true
+		).when(
+			ddmFormDisplayContext
+		).hasValidStorageType(
+			ddmFormInstance
+		);
+
+		ddmFormDisplayContext.getDDMFormContext();
+
+		Mockito.verify(
+			_ddmFormInstanceRecordVersionLocalService, Mockito.times(times)
+		).fetchLatestDraftFormInstanceRecordVersion(
+			Mockito.anyLong(), Mockito.anyLong()
+		);
+
+		Mockito.clearInvocations(_ddmFormInstanceRecordVersionLocalService);
+	}
+
 	private DDMForm _createDDMForm(
 		Set<Locale> availableLocales, Locale locale) {
 
@@ -1031,8 +1108,8 @@ public class DDMFormDisplayContextTest {
 			Mockito.mock(DDMFormFieldTypeServicesRegistry.class),
 			_ddmFormInstanceLocalService,
 			Mockito.mock(DDMFormInstanceRecordService.class),
-			Mockito.mock(DDMFormInstanceRecordVersionLocalService.class),
-			_ddmFormInstanceService, _mockDDMFormInstanceVersionLocalService(),
+			_ddmFormInstanceRecordVersionLocalService, _ddmFormInstanceService,
+			_mockDDMFormInstanceVersionLocalService(),
 			Mockito.mock(DDMFormRenderer.class),
 			Mockito.mock(DDMFormValuesFactory.class),
 			Mockito.mock(DDMFormValuesMerger.class), _ddmFormWebConfiguration,
@@ -1510,6 +1587,9 @@ public class DDMFormDisplayContextTest {
 		Mockito.mock(DDMFormFieldOptionsFactory.class);
 	private final DDMFormInstanceLocalService _ddmFormInstanceLocalService =
 		Mockito.mock(DDMFormInstanceLocalService.class);
+	private final DDMFormInstanceRecordVersionLocalService
+		_ddmFormInstanceRecordVersionLocalService = Mockito.mock(
+			DDMFormInstanceRecordVersionLocalService.class);
 	private final DDMFormInstanceService _ddmFormInstanceService = Mockito.mock(
 		DDMFormInstanceService.class);
 	private final DDMFormInstanceVersion _ddmFormInstanceVersion = Mockito.mock(

@@ -20,12 +20,14 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormInstanceTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.dynamic.data.mapping.util.DDMFormUtil;
+import com.liferay.dynamic.data.mapping.util.DDMUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -318,6 +320,125 @@ public class DDMFormInstanceRecordLocalServiceTest
 			"1.1", string3);
 	}
 
+	@Test
+	public void testUpdateFormInstanceRecordWithPublishedDraftFormInstanceVersion()
+		throws Exception {
+
+		User user = TestPropsValues.getUser();
+
+		DDMFormInstance ddmFormInstance = _addDDMFormInstance(true, user);
+
+		DDMForm ddmForm = ddmFormInstance.getDDMForm();
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext();
+
+		serviceContext.setAttribute("status", WorkflowConstants.STATUS_DRAFT);
+
+		_ddmFormInstanceLocalService.updateFormInstance(
+			user.getUserId(), ddmFormInstance.getFormInstanceId(),
+			ddmFormInstance.getNameMap(), ddmFormInstance.getDescriptionMap(),
+			ddmForm, DDMUtil.getDefaultDDMFormLayout(ddmForm),
+			ddmFormInstance.getSettingsDDMFormValues(), serviceContext);
+
+		DDMFormValues ddmFormValues = DDMFormValuesTestUtil.createDDMFormValues(
+			ddmForm);
+
+		String textFieldValue = RandomTestUtil.randomString();
+
+		ddmFormValues.addDDMFormFieldValue(
+			DDMFormValuesTestUtil.createLocalizedDDMFormFieldValue(
+				"text", textFieldValue));
+
+		serviceContext = ServiceContextTestUtil.getServiceContext();
+
+		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
+
+		DDMFormInstanceRecord ddmFormInstanceRecord =
+			_ddmFormInstanceRecordLocalService.addFormInstanceRecord(
+				user.getUserId(), user.getGroupId(),
+				ddmFormInstance.getFormInstanceId(), ddmFormValues,
+				serviceContext);
+
+		_ddmFormInstanceLocalService.updateFormInstance(
+			user.getUserId(), ddmFormInstance.getFormInstanceId(),
+			ddmFormInstance.getNameMap(), ddmFormInstance.getDescriptionMap(),
+			ddmForm, DDMUtil.getDefaultDDMFormLayout(ddmForm),
+			ddmFormInstance.getSettingsDDMFormValues(),
+			ServiceContextTestUtil.getServiceContext());
+
+		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion =
+			_ddmFormInstanceRecordVersionLocalService.
+				fetchLatestDraftFormInstanceRecordVersion(
+					user.getUserId(), ddmFormInstance.getFormInstanceId());
+
+		Assert.assertEquals(
+			ddmFormInstanceRecord.getFormInstanceRecordId(),
+			ddmFormInstanceRecordVersion.getFormInstanceRecordId());
+
+		ddmFormInstanceRecord =
+			_ddmFormInstanceRecordLocalService.updateFormInstanceRecord(
+				user.getUserId(),
+				ddmFormInstanceRecordVersion.getFormInstanceRecordId(), false,
+				ddmFormValues, ServiceContextTestUtil.getServiceContext());
+
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_APPROVED,
+			ddmFormInstanceRecord.getStatus());
+
+		Assert.assertEquals(
+			1,
+			_ddmFormInstanceRecordLocalService.getFormInstanceRecordsCount(
+				ddmFormInstance.getFormInstanceId(), user.getUserId()));
+	}
+
+	@Test
+	public void testUpdateFormInstanceRecordWithSubmittedFormInstanceRecord()
+		throws Exception {
+
+		User user = TestPropsValues.getUser();
+
+		DDMFormInstance ddmFormInstance =
+			DDMFormInstanceTestUtil.addDDMFormInstance(
+				user.getGroup(), user.getUserId());
+
+		DDMFormValues ddmFormValues = DDMFormValuesTestUtil.createDDMFormValues(
+			ddmFormInstance.getDDMForm());
+
+		ddmFormValues.addDDMFormFieldValue(
+			DDMFormValuesTestUtil.createLocalizedDDMFormFieldValue(
+				"text", RandomTestUtil.randomString()));
+
+		DDMFormInstanceRecord ddmFormInstanceRecord =
+			_ddmFormInstanceRecordLocalService.addFormInstanceRecord(
+				user.getUserId(), user.getGroupId(),
+				ddmFormInstance.getFormInstanceId(), ddmFormValues,
+				ServiceContextTestUtil.getServiceContext());
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext();
+
+		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
+
+		ddmFormInstanceRecord =
+			_ddmFormInstanceRecordLocalService.updateFormInstanceRecord(
+				user.getUserId(),
+				ddmFormInstanceRecord.getFormInstanceRecordId(), false,
+				ddmFormValues, serviceContext);
+
+		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion =
+			ddmFormInstanceRecord.getLatestFormInstanceRecordVersion();
+
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_DRAFT,
+			ddmFormInstanceRecordVersion.getStatus());
+
+		Assert.assertNull(
+			_ddmFormInstanceRecordVersionLocalService.
+				fetchLatestDraftFormInstanceRecordVersion(
+					user.getUserId(), ddmFormInstance.getFormInstanceId()));
+	}
+
 	private DDMFormInstance _addDDMFormInstance(
 			boolean limitToOneSubmissionPerUser, User user)
 		throws Exception {
@@ -538,6 +659,10 @@ public class DDMFormInstanceRecordLocalServiceTest
 	@Inject
 	private DDMFormInstanceRecordLocalService
 		_ddmFormInstanceRecordLocalService;
+
+	@Inject
+	private DDMFormInstanceRecordVersionLocalService
+		_ddmFormInstanceRecordVersionLocalService;
 
 	@Inject
 	private DLFileEntryLocalService _dlFileEntryLocalService;
