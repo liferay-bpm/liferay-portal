@@ -9,7 +9,8 @@ import com.liferay.dynamic.data.mapping.form.builder.context.DDMFormContextDeser
 import com.liferay.dynamic.data.mapping.form.builder.internal.context.DDMFormContextToDDMFormValues;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion;
+import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
@@ -88,7 +89,7 @@ public class AddFormInstanceRecordMVCResourceCommandTest {
 				"TextField2", true, false, false));
 
 		Mockito.when(
-			_ddmStructure.getDDMForm()
+			_ddmStructureVersion.getDDMForm()
 		).thenReturn(
 			ddmForm
 		);
@@ -145,9 +146,15 @@ public class AddFormInstanceRecordMVCResourceCommandTest {
 
 	private static void _setUpDDMFormInstance() throws Exception {
 		Mockito.when(
-			_ddmFormInstance.getStructure()
+			_ddmFormInstanceVersion.getStructureVersion()
 		).thenReturn(
-			_ddmStructure
+			_ddmStructureVersion
+		);
+
+		Mockito.when(
+			_ddmFormInstance.getLatestApprovedFormInstanceVersion()
+		).thenReturn(
+			_ddmFormInstanceVersion
 		);
 	}
 
@@ -177,8 +184,10 @@ public class AddFormInstanceRecordMVCResourceCommandTest {
 		_ddmFormContextToDDMFormValues;
 	private static final DDMFormInstance _ddmFormInstance = Mockito.mock(
 		DDMFormInstance.class);
-	private static final DDMStructure _ddmStructure = Mockito.mock(
-		DDMStructure.class);
+	private static final DDMFormInstanceVersion _ddmFormInstanceVersion =
+		Mockito.mock(DDMFormInstanceVersion.class);
+	private static final DDMStructureVersion _ddmStructureVersion =
+		Mockito.mock(DDMStructureVersion.class);
 	private static final Language _language = Mockito.mock(Language.class);
 
 	private final ResourceRequest _resourceRequest = Mockito.mock(

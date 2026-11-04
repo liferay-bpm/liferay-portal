@@ -30,8 +30,8 @@ import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceReport;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceSettings;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion;
 import com.liferay.dynamic.data.mapping.model.DDMStorageLink;
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
@@ -438,8 +438,11 @@ public class DDMFormInstanceRecordLocalServiceImpl
 		DDMFormInstance ddmFormInstance =
 			ddmFormInstanceRecord.getFormInstance();
 
+		DDMFormInstanceVersion ddmFormInstanceVersion =
+			ddmFormInstance.getLatestApprovedFormInstanceVersion();
+
 		ddmFormInstanceRecord.setFormInstanceVersion(
-			ddmFormInstance.getVersion());
+			ddmFormInstanceVersion.getVersion());
 
 		ddmFormInstanceRecord = ddmFormInstanceRecordPersistence.update(
 			ddmFormInstanceRecord);
@@ -450,8 +453,8 @@ public class DDMFormInstanceRecordLocalServiceImpl
 		if (ddmFormInstanceRecordVersion.isApproved()) {
 			long ddmStorageId = _createDDMContent(
 				ddmFormInstanceRecord.getGroupId(),
-				ddmFormInstance.getFormInstanceId(), ddmFormValues,
-				serviceContext);
+				ddmFormInstance.getFormInstanceId(), ddmFormInstanceVersion,
+				ddmFormValues, serviceContext);
 
 			String version = _getNextVersion(
 				ddmFormInstanceRecordVersion.getVersion(), majorVersion,
@@ -464,13 +467,14 @@ public class DDMFormInstanceRecordLocalServiceImpl
 		else {
 			_updateDDMContent(
 				ddmFormInstanceRecord.getGroupId(),
-				ddmFormInstanceRecordVersion, ddmFormValues, serviceContext);
+				ddmFormInstanceRecordVersion, ddmFormInstanceVersion,
+				ddmFormValues, serviceContext);
 
 			String version = ddmFormInstanceRecordVersion.getVersion();
 
 			_updateFormInstanceRecordVersion(
 				user, ddmFormInstanceRecordVersion,
-				ddmFormInstance.getVersion(),
+				ddmFormInstanceRecord.getFormInstanceVersion(),
 				ddmFormInstanceRecordVersion.getStatus(), version,
 				serviceContext);
 
@@ -754,16 +758,19 @@ public class DDMFormInstanceRecordLocalServiceImpl
 		ddmFormInstanceRecord.setVersionUserId(user.getUserId());
 		ddmFormInstanceRecord.setVersionUserName(user.getFullName());
 
+		DDMFormInstanceVersion ddmFormInstanceVersion =
+			ddmFormInstance.getLatestApprovedFormInstanceVersion();
+
 		long ddmStorageId = _createDDMContent(
-			groupId, ddmFormInstance.getFormInstanceId(), ddmFormValues,
-			serviceContext);
+			groupId, ddmFormInstance.getFormInstanceId(),
+			ddmFormInstanceVersion, ddmFormValues, serviceContext);
 
 		ddmFormInstanceRecord.setStorageId(ddmStorageId);
 
 		ddmFormInstanceRecord.setFormInstanceId(
 			ddmFormInstance.getFormInstanceId());
 		ddmFormInstanceRecord.setFormInstanceVersion(
-			ddmFormInstance.getVersion());
+			ddmFormInstanceVersion.getVersion());
 		ddmFormInstanceRecord.setVersion(_VERSION_DEFAULT);
 
 		_setIpAddress(ddmFormInstanceRecord, serviceContext);
@@ -870,8 +877,9 @@ public class DDMFormInstanceRecordLocalServiceImpl
 	}
 
 	private long _createDDMContent(
-			long groupId, long ddmFormInstanceId, DDMFormValues ddmFormValues,
-			ServiceContext serviceContext)
+			long groupId, long ddmFormInstanceId,
+			DDMFormInstanceVersion ddmFormInstanceVersion,
+			DDMFormValues ddmFormValues, ServiceContext serviceContext)
 		throws PortalException {
 
 		_validate(ddmFormValues, serviceContext);
@@ -904,10 +912,8 @@ public class DDMFormInstanceRecordLocalServiceImpl
 			return primaryKey;
 		}
 
-		DDMStructure ddmStructure = ddmFormInstance.getStructure();
-
 		DDMStructureVersion ddmStructureVersion =
-			ddmStructure.getLatestStructureVersion();
+			ddmFormInstanceVersion.getStructureVersion();
 
 		_ddmStorageLinkLocalService.addStorageLink(
 			_portal.getClassNameId(DDMContent.class.getName()), primaryKey,
@@ -1221,6 +1227,7 @@ public class DDMFormInstanceRecordLocalServiceImpl
 	private void _updateDDMContent(
 			long groupId,
 			DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion,
+			DDMFormInstanceVersion ddmFormInstanceVersion,
 			DDMFormValues ddmFormValues, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -1244,6 +1251,29 @@ public class DDMFormInstanceRecordLocalServiceImpl
 			).withStructureId(
 				ddmFormInstance.getStructureId()
 			).build());
+
+		DDMStorageLink ddmStorageLink =
+			_ddmStorageLinkLocalService.fetchClassStorageLink(
+				ddmFormInstanceRecordVersion.getStorageId());
+
+		if (ddmStorageLink == null) {
+			return;
+		}
+
+		DDMStructureVersion ddmStructureVersion =
+			ddmFormInstanceVersion.getStructureVersion();
+
+		if (ddmStorageLink.getStructureVersionId() ==
+				ddmStructureVersion.getStructureVersionId()) {
+
+			return;
+		}
+
+		ddmStorageLink.setStructureId(ddmStructureVersion.getStructureId());
+		ddmStorageLink.setStructureVersionId(
+			ddmStructureVersion.getStructureVersionId());
+
+		_ddmStorageLinkLocalService.updateDDMStorageLink(ddmStorageLink);
 	}
 
 	private void _updateFormInstanceRecordVersion(

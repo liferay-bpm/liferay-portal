@@ -30,7 +30,6 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
-import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -227,13 +226,11 @@ public class AddFormInstanceRecordMVCActionCommand
 	protected DDMForm getDDMForm(DDMFormInstance ddmFormInstance)
 		throws PortalException {
 
-		DDMFormInstanceVersion latestDDMFormInstanceVersion =
-			_ddmFormInstanceVersionLocalService.getLatestFormInstanceVersion(
-				ddmFormInstance.getFormInstanceId(),
-				WorkflowConstants.STATUS_APPROVED);
+		DDMFormInstanceVersion ddmFormInstanceVersion =
+			ddmFormInstance.getLatestApprovedFormInstanceVersion();
 
 		DDMStructureVersion ddmStructureVersion =
-			latestDDMFormInstanceVersion.getStructureVersion();
+			ddmFormInstanceVersion.getStructureVersion();
 
 		return ddmStructureVersion.getDDMForm();
 	}
@@ -366,10 +363,6 @@ public class AddFormInstanceRecordMVCActionCommand
 	@Reference
 	private DDMFormInstanceRecordVersionLocalService
 		_ddmFormInstanceRecordVersionLocalService;
-
-	@Reference
-	private DDMFormInstanceVersionLocalService
-		_ddmFormInstanceVersionLocalService;
 
 	@Reference
 	private DDMFormValuesFactory _ddmFormValuesFactory;
