@@ -19,6 +19,8 @@ describe('The FileContainer component', () => {
 	});
 
 	it('shows the file size', () => {
+		expect(Liferay.FeatureFlags['LPD-100522']).toBe(true);
+
 		render(
 			<FileContainer
 				attachment={{
