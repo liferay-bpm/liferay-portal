@@ -140,6 +140,15 @@ public class ObjectEntryInfoItemCreator
 					infoItemFieldValues, objectDefinition,
 					GetterUtil.getLong(objectEntry.getId()), serviceContext,
 					themeDisplay.getUserId());
+
+				ObjectEntry addedObjectEntry =
+					_objectEntryLocalService.getObjectEntry(
+						GetterUtil.getLong(objectEntry.getId()));
+
+				ObjectEntryUtil.relateNestedObjectEntries(
+					themeDisplay.getCompanyId(), addedObjectEntry.getGroupId(),
+					infoItemFieldValues, _objectEntryManagerRegistry,
+					serviceContext, themeDisplay.getUserId());
 			}
 
 			ObjectEntry serviceBuilderObjectEntry =
