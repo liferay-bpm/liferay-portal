@@ -5,10 +5,14 @@
 
 package com.liferay.dynamic.data.mapping.form.renderer.internal.servlet;
 
+import com.liferay.dynamic.data.mapping.constants.DDMActionKeys;
 import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluator;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesRegistry;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.renderer.internal.DDMFormPagesTemplateContextFactory;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceSettings;
+import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLayoutLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.portal.events.EventsProcessorUtil;
@@ -20,7 +24,14 @@ import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.upload.UploadException;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -28,6 +39,7 @@ import com.liferay.portal.kernel.util.HtmlParser;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.Validator;
@@ -142,6 +154,40 @@ public class DDMFormContextProviderServlet extends HttpServlet {
 			jsonSerializer.serializeDeep(ddmFormPagesTemplateContext));
 	}
 
+	private void _checkGroupPermission(
+			DDMFormTemplateContextProcessor ddmFormTemplateContextProcessor,
+			HttpServletRequest httpServletRequest)
+		throws PortalException {
+
+		long groupId = ddmFormTemplateContextProcessor.getGroupId();
+
+		if (groupId <= 0) {
+			return;
+		}
+
+		long companyId = _portal.getCompanyId(httpServletRequest);
+		Group group = _groupLocalService.fetchGroup(groupId);
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		if ((group == null) || (group.getCompanyId() != companyId)) {
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Group.class.getName(), groupId,
+				ActionKeys.VIEW);
+		}
+
+		if (!GroupPermissionUtil.contains(
+				permissionChecker, group, ActionKeys.VIEW) &&
+			!_hasFormInstancePermission(
+				ddmFormTemplateContextProcessor.getDDMFormInstanceId(), groupId,
+				permissionChecker)) {
+
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Group.class.getName(), groupId,
+				ActionKeys.VIEW);
+		}
+	}
+
 	private List<Object> _createDDMFormPagesTemplateContext(
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse, String portletNamespace) {
@@ -238,6 +284,42 @@ public class DDMFormContextProviderServlet extends HttpServlet {
 			_language.getLanguageId(httpServletRequest));
 	}
 
+	private boolean _hasFormInstancePermission(
+			long ddmFormInstanceId, long groupId,
+			PermissionChecker permissionChecker)
+		throws PortalException {
+
+		DDMFormInstance ddmFormInstance =
+			_ddmFormInstanceLocalService.fetchFormInstance(ddmFormInstanceId);
+
+		if ((ddmFormInstance == null) ||
+			(ddmFormInstance.getGroupId() != groupId)) {
+
+			return false;
+		}
+
+		DDMFormInstanceSettings ddmFormInstanceSettings =
+			ddmFormInstance.getSettingsModel();
+
+		if (!ddmFormInstanceSettings.published() ||
+			(ddmFormInstanceSettings.requireAuthentication() &&
+			 !permissionChecker.isSignedIn())) {
+
+			return false;
+		}
+
+		if (_ddmFormInstanceModelResourcePermission.contains(
+				permissionChecker, ddmFormInstance,
+				DDMActionKeys.ADD_FORM_INSTANCE_RECORD) ||
+			_ddmFormInstanceModelResourcePermission.contains(
+				permissionChecker, ddmFormInstance, ActionKeys.VIEW)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	private void _prepareThreadLocal(Locale locale)
 		throws Exception, PortalException {
 
@@ -256,6 +338,15 @@ public class DDMFormContextProviderServlet extends HttpServlet {
 	private DDMFormFieldTypeServicesRegistry _ddmFormFieldTypeServicesRegistry;
 
 	@Reference
+	private DDMFormInstanceLocalService _ddmFormInstanceLocalService;
+
+	@Reference(
+		target = "(model.class.name=com.liferay.dynamic.data.mapping.model.DDMFormInstance)"
+	)
+	private ModelResourcePermission<DDMFormInstance>
+		_ddmFormInstanceModelResourcePermission;
+
+	@Reference
 	private DDMStructureLayoutLocalService _ddmStructureLayoutLocalService;
 
 	@Reference
@@ -272,5 +363,8 @@ public class DDMFormContextProviderServlet extends HttpServlet {
 
 	@Reference
 	private Language _language;
+
+	@Reference
+	private Portal _portal;
 
 }
