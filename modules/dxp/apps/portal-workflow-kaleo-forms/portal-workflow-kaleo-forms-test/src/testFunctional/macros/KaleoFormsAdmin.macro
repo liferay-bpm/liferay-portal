@@ -486,23 +486,32 @@ definition {
 
 	@summary = "Default summary"
 	macro enableKaleoFormsConfiguration(toggleValue = null) {
-		ApplicationsMenu.gotoRootPortlet(
-			panel = "Control Panel",
-			portlet = "Instance Settings");
-
-		SystemSettings.gotoConfiguration(
-			configurationCategory = "Feature Flags",
-			configurationName = "Deprecation",
-			configurationScope = "Virtual Instance Scope");
-
-		if (IsElementPresent(locator1 = "FeatureFlag#TOGGLE_ROW", title_row = "Kaleo Forms", toggle_state = ${toggleValue})) {
-			Check.checkToggleSwitch(
-				locator1 = "FeatureFlag#TOGGLE_ROW",
-				title_row = "Kaleo Forms",
-				toggle_state = ${toggleValue});
+		if (${toggleValue} == "Disabled") {
+			for (var featureFlagName : list "Kaleo Forms,Deprecated AlloyUI Components") {
+				PagesAdmin.enableDeprecationFeatureFlag(featureFlagName = ${featureFlagName});
+			}
 		}
+		else {
+			ApplicationsMenu.gotoRootPortlet(
+				panel = "Control Panel",
+				portlet = "Instance Settings");
 
-		Navigator.openURL();
+			SystemSettings.gotoConfiguration(
+				configurationCategory = "Feature Flags",
+				configurationName = "Deprecation",
+				configurationScope = "Virtual Instance Scope");
+
+			for (var featureFlagName : list "Kaleo Forms,Deprecated AlloyUI Components") {
+				if (IsElementPresent(locator1 = "FeatureFlag#TOGGLE_ROW", title_row = ${featureFlagName}, toggle_state = ${toggleValue})) {
+					Check.checkToggleSwitch(
+						locator1 = "FeatureFlag#TOGGLE_ROW",
+						title_row = ${featureFlagName},
+						toggle_state = ${toggleValue});
+				}
+			}
+
+			Navigator.openURL();
+		}
 	}
 
 	@summary = "Default summary"
