@@ -595,10 +595,17 @@ public class DDMFormInstanceLocalServiceImpl
 		String version = _getNextVersion(
 			latestDDMFormInstanceVersion.getVersion(), majorVersion);
 
-		if (!updateVersion) {
+		if (status != WorkflowConstants.STATUS_DRAFT) {
 			ddmFormInstance.setVersionUserId(user.getUserId());
 			ddmFormInstance.setVersionUserName(user.getFullName());
-			ddmFormInstance.setVersion(version);
+
+			if (updateVersion) {
+				ddmFormInstance.setVersion(
+					latestDDMFormInstanceVersion.getVersion());
+			}
+			else {
+				ddmFormInstance.setVersion(version);
+			}
 		}
 
 		ddmFormInstance.setNameMap(nameMap, defaultLocale);
