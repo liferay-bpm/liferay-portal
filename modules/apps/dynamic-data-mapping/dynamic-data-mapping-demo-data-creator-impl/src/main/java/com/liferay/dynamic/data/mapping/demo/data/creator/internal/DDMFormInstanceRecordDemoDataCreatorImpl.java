@@ -11,7 +11,8 @@ import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion;
+import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.model.UnlocalizedValue;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
@@ -45,9 +46,13 @@ public class DDMFormInstanceRecordDemoDataCreatorImpl
 		DDMFormInstance ddmFormInstance =
 			_ddmFormInstanceLocalService.getDDMFormInstance(ddmFormInstanceId);
 
-		DDMStructure ddmStructure = ddmFormInstance.getStructure();
+		DDMFormInstanceVersion ddmFormInstanceVersion =
+			ddmFormInstance.getLatestApprovedFormInstanceVersion();
 
-		DDMForm ddmForm = ddmStructure.getDDMForm();
+		DDMStructureVersion ddmStructureVersion =
+			ddmFormInstanceVersion.getStructureVersion();
+
+		DDMForm ddmForm = ddmStructureVersion.getDDMForm();
 
 		DDMFormValues ddmFormValues = new DDMFormValues(ddmForm) {
 			{
