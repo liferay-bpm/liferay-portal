@@ -562,7 +562,7 @@
 														"pageElements": [
 															{
 																"definition": {
-																	"customCSS": ".[$FRAGMENT_CLASS$] {\n .navigation-bar .navbar-nav .nav-link {\n margin-bottom: 0px;\n border-color: #cdced9;\n }\n\n .navigation-bar .navbar-nav .nav-link.active {\n border-color: #cdced9 #cdced9 #fff;\n border-style: solid;\n border-width: 0.0625rem;\n border-radius: 0.5rem 0.5rem 0 0;\n}\n\n .navigation-bar .navbar-nav .nav-link.active::after {\n background-color: white !important;\n bottom: -0.2rem !important;}\n}",
+																	"customCSS": ".[$FRAGMENT_CLASS$] {\n .navigation-bar .navbar-nav .nav-link {\n margin-bottom: 0px;\n border-color: var(--secondary-l2, #cdced9);\n color: var(--gray-600, #6b6c7e);\n }\n\n .navigation-bar .navbar-nav .nav-link.active {\n border-color: var(--secondary-l2, #cdced9) var(--secondary-l2, #cdced9) var(--white, #fff);\n border-style: solid;\n border-width: 0.0625rem;\n border-radius: 0.5rem 0.5rem 0 0;\n color: var(--gray-900, #272833);\n}\n\n .navigation-bar .navbar-nav .nav-link.active::after {\n background-color: var(--white, #fff) !important;\n bottom: -0.2rem !important;}\n}",
 																	"fragment": {
 																		"key": "BASIC_COMPONENT-tabs"
 																	},
