@@ -151,7 +151,6 @@ public class WorkflowDefinitionLinkServiceImplTest {
 	@TestInfo("LPD-110161")
 	public void testAddWorkflowDefinitionLinkAsAnotherUser() throws Exception {
 		User cmsAdministratorUser = _setUpCMSAdministratorUser();
-
 		User user = _addUser();
 
 		AssertUtils.assertFailure(
@@ -336,7 +335,6 @@ public class WorkflowDefinitionLinkServiceImplTest {
 		throws Exception {
 
 		User cmsAdministratorUser = _setUpCMSAdministratorUser();
-
 		User user = _addUser();
 
 		AssertUtils.assertFailure(
