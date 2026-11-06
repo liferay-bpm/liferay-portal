@@ -12,10 +12,18 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Organization;
+import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelper;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
+import com.liferay.portal.kernel.service.ResourceLocalServiceUtil;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalServiceUtil;
+
+import java.util.Arrays;
 
 /**
  * @author Carolina Barbosa
@@ -52,8 +60,9 @@ public class ObjectEntryPermissionUtil {
 			PermissionChecker permissionChecker)
 		throws PortalException {
 
-		if (permissionChecker.hasPermission(
-				accountEntry.getAccountEntryGroupId(), name, 0, actionId)) {
+		if (_hasPermission(
+				actionId, accountEntry.getAccountEntryGroupId(), name,
+				permissionChecker)) {
 
 			return true;
 		}
@@ -66,8 +75,9 @@ public class ObjectEntryPermissionUtil {
 			Organization organization =
 				accountEntryOrganizationRel.getOrganization();
 
-			if (permissionChecker.hasPermission(
-					organization.getGroupId(), name, 0, actionId)) {
+			if (_hasPermission(
+					actionId, organization.getGroupId(), name,
+					permissionChecker)) {
 
 				return true;
 			}
@@ -75,8 +85,9 @@ public class ObjectEntryPermissionUtil {
 			for (Organization ancestorOrganization :
 					organization.getAncestors()) {
 
-				if (permissionChecker.hasPermission(
-						ancestorOrganization.getGroupId(), name, 0, actionId)) {
+				if (_hasPermission(
+						actionId, ancestorOrganization.getGroupId(), name,
+						permissionChecker)) {
 
 					return true;
 				}
@@ -84,6 +95,54 @@ public class ObjectEntryPermissionUtil {
 		}
 
 		return false;
+	}
+
+	private static boolean _hasPermission(
+			String actionId, long groupId, String name,
+			PermissionChecker permissionChecker)
+		throws PortalException {
+
+		if (!permissionChecker.hasPermission(groupId, name, 0, actionId)) {
+			return false;
+		}
+
+		Group group = GroupLocalServiceUtil.getGroup(groupId);
+
+		if (!permissionChecker.isGroupAdmin(groupId) ||
+			permissionChecker.isCompanyAdmin(group.getCompanyId())) {
+
+			return true;
+		}
+
+		String individualPrimKey = "0";
+
+		int resourcePermissionsCount =
+			ResourcePermissionLocalServiceUtil.getResourcePermissionsCount(
+				group.getCompanyId(), name, ResourceConstants.SCOPE_INDIVIDUAL,
+				individualPrimKey);
+
+		if (resourcePermissionsCount == 0) {
+			individualPrimKey = name;
+		}
+
+		return ResourcePermissionLocalServiceUtil.hasResourcePermission(
+			Arrays.asList(
+				ResourceLocalServiceUtil.getResource(
+					group.getCompanyId(), name,
+					ResourceConstants.SCOPE_INDIVIDUAL, individualPrimKey),
+				ResourceLocalServiceUtil.getResource(
+					group.getCompanyId(), name, ResourceConstants.SCOPE_GROUP,
+					String.valueOf(groupId)),
+				ResourceLocalServiceUtil.getResource(
+					group.getCompanyId(), name,
+					ResourceConstants.SCOPE_GROUP_TEMPLATE,
+					String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID)),
+				ResourceLocalServiceUtil.getResource(
+					group.getCompanyId(), name, ResourceConstants.SCOPE_COMPANY,
+					String.valueOf(group.getCompanyId()))),
+			permissionChecker.getRoleIds(
+				permissionChecker.getUserId(), groupId),
+			actionId);
 	}
 
 }
