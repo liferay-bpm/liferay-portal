@@ -7,11 +7,13 @@ package com.liferay.object.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.definition.tree.util.ObjectDefinitionTreeUtil;
 import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.petra.lang.SafeCloseable;
+import com.liferay.portal.db.partition.util.DBPartitionUtil;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.instance.PortalInstancePool;
@@ -22,6 +24,7 @@ import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.AssumeTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -31,6 +34,7 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -38,6 +42,8 @@ import jakarta.portlet.Portlet;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -98,6 +104,30 @@ public class ObjectDefinitionLocalServiceDBPartitionTest {
 				_companyLocalService.deleteCompany(company);
 			}
 		}
+	}
+
+	@Test
+	public void testDeleteCompanyRemovesRootObjectDefinitionIds()
+		throws Exception {
+
+		Company company = CompanyTestUtil.addCompany();
+
+		List<ObjectDefinition> objectDefinitions = null;
+
+		try (SafeCloseable safeCloseable =
+				CompanyThreadLocal.setCompanyIdWithSafeCloseable(
+					company.getCompanyId())) {
+
+			objectDefinitions =
+				_objectDefinitionLocalService.getObjectDefinitions(
+					company.getCompanyId(), WorkflowConstants.STATUS_APPROVED);
+		}
+
+		Assert.assertTrue(_hasRootObjectDefinitionIds(objectDefinitions));
+
+		_companyLocalService.deleteCompany(company);
+
+		Assert.assertFalse(_hasRootObjectDefinitionIds(objectDefinitions));
 	}
 
 	@Test
@@ -272,6 +302,27 @@ public class ObjectDefinitionLocalServiceDBPartitionTest {
 		Assert.assertEquals(
 			serviceReferences.toString(), expectedCount,
 			serviceReferences.size());
+	}
+
+	private boolean _hasRootObjectDefinitionIds(
+		List<ObjectDefinition> objectDefinitions) {
+
+		Map<String, long[]> rootObjectDefinitionIds =
+			ReflectionTestUtil.getFieldValue(
+				ObjectDefinitionTreeUtil.class, "_rootObjectDefinitionIds");
+
+		for (ObjectDefinition objectDefinition : objectDefinitions) {
+			if (rootObjectDefinitionIds.containsKey(
+					DBPartitionUtil.getPartitionKey(
+						String.valueOf(
+							objectDefinition.getObjectDefinitionId()),
+						objectDefinition))) {
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private ObjectDefinition _publishObjectDefinition(Company company)

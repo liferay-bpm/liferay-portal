@@ -27,6 +27,7 @@ import com.liferay.object.tree.ObjectDefinitionTreeFactory;
 import com.liferay.object.tree.Tree;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.db.partition.util.DBPartitionUtil;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.CurrentConnectionUtil;
@@ -34,6 +35,7 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -83,8 +85,7 @@ public class ObjectDefinitionTreeUtil {
 
 		if (ArrayUtil.isEmpty(
 				getRootObjectDefinitionIds(
-					objectDefinition1.getObjectDefinitionId(),
-					objectDefinitionSettingLocalService))) {
+					objectDefinition1, objectDefinitionSettingLocalService))) {
 
 			_setRootObjectDefinitionIds(
 				new long[] {objectDefinition1.getObjectDefinitionId()},
@@ -132,8 +133,7 @@ public class ObjectDefinitionTreeUtil {
 
 				_setRootObjectDefinitionIds(
 					getRootObjectDefinitionIds(
-						objectDefinition1.getObjectDefinitionId(),
-						objectDefinitionSettingLocalService),
+						objectDefinition1, objectDefinitionSettingLocalService),
 					nodeObjectDefinition, objectDefinitionSettingLocalService,
 					new long[] {objectDefinition2.getObjectDefinitionId()});
 
@@ -153,7 +153,7 @@ public class ObjectDefinitionTreeUtil {
 
 			if (ArrayUtil.isNotEmpty(
 					getRootObjectDefinitionIds(
-						objectDefinition2.getObjectDefinitionId(),
+						objectDefinition2,
 						objectDefinitionSettingLocalService))) {
 
 				return;
@@ -172,8 +172,7 @@ public class ObjectDefinitionTreeUtil {
 
 		for (long rootObjectDefinitionId :
 				getRootObjectDefinitionIds(
-					objectDefinition1.getObjectDefinitionId(),
-					objectDefinitionSettingLocalService)) {
+					objectDefinition1, objectDefinitionSettingLocalService)) {
 
 			ObjectDefinition rootObjectDefinition =
 				objectDefinitionPersistence.findByPrimaryKey(
@@ -189,18 +188,19 @@ public class ObjectDefinitionTreeUtil {
 	}
 
 	public static long[] getRootObjectDefinitionIds(
-		long objectDefinitionId,
+		ObjectDefinition objectDefinition,
 		ObjectDefinitionSettingLocalService
 			objectDefinitionSettingLocalService) {
 
 		long[] rootObjectDefinitionIds =
 			_rootObjectDefinitionIds.computeIfAbsent(
-				objectDefinitionId,
+				_getPartitionKey(
+					objectDefinition.getObjectDefinitionId(), objectDefinition),
 				key -> {
 					ObjectDefinitionSetting objectDefinitionSetting =
 						objectDefinitionSettingLocalService.
 							fetchObjectDefinitionSetting(
-								key,
+								objectDefinition.getObjectDefinitionId(),
 								ObjectDefinitionSettingConstants.
 									NAME_ROOT_OBJECT_DEFINITION_IDS);
 
@@ -240,7 +240,7 @@ public class ObjectDefinitionTreeUtil {
 			ObjectDefinitionSetting objectDefinitionSetting = entry.getValue();
 
 			_rootObjectDefinitionIds.put(
-				entry.getKey(),
+				_getPartitionKey(entry.getKey(), objectDefinitionSetting),
 				ListUtil.toLongArray(
 					Arrays.asList(
 						StringUtil.split(objectDefinitionSetting.getValue())),
@@ -249,8 +249,18 @@ public class ObjectDefinitionTreeUtil {
 
 		for (ObjectDefinition objectDefinition : objectDefinitions) {
 			_rootObjectDefinitionIds.putIfAbsent(
-				objectDefinition.getObjectDefinitionId(), new long[0]);
+				_getPartitionKey(
+					objectDefinition.getObjectDefinitionId(), objectDefinition),
+				new long[0]);
 		}
+	}
+
+	public static void removeRootObjectDefinitionIds(
+		ObjectDefinition objectDefinition) {
+
+		_rootObjectDefinitionIds.remove(
+			_getPartitionKey(
+				objectDefinition.getObjectDefinitionId(), objectDefinition));
 	}
 
 	public static void unbindObjectDefinitions(
@@ -455,6 +465,13 @@ public class ObjectDefinitionTreeUtil {
 			objectDefinitionSetting);
 	}
 
+	private static String _getPartitionKey(
+		long objectDefinitionId, ShardedModel shardedModel) {
+
+		return DBPartitionUtil.getPartitionKey(
+			String.valueOf(objectDefinitionId), shardedModel);
+	}
+
 	private static void _performActions(
 			boolean addRootObjectEntryIdRestrictions,
 			ObjectDefinition objectDefinition,
@@ -538,7 +555,8 @@ public class ObjectDefinitionTreeUtil {
 		throws PortalException {
 
 		_rootObjectDefinitionIds.put(
-			objectDefinition.getObjectDefinitionId(),
+			_getPartitionKey(
+				objectDefinition.getObjectDefinitionId(), objectDefinition),
 			_updateRootObjectDefinitionIds(
 				addRootObjectDefinitionIds, objectDefinition,
 				objectDefinitionSettingLocalService,
@@ -809,7 +827,7 @@ public class ObjectDefinitionTreeUtil {
 			rootObjectDefinitionIds, GetterUtil::getLong);
 	}
 
-	private static final Map<Long, long[]> _rootObjectDefinitionIds =
+	private static final Map<String, long[]> _rootObjectDefinitionIds =
 		new ConcurrentHashMap<>();
 
 }
