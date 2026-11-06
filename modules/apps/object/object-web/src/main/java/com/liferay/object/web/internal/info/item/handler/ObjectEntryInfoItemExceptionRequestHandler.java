@@ -454,8 +454,8 @@ public class ObjectEntryInfoItemExceptionRequestHandler {
 					String.valueOf(arguments.get(0)));
 		}
 
-		if (_log.isDebugEnabled()) {
-			_log.debug(exception);
+		if (_log.isWarnEnabled()) {
+			_log.warn(exception);
 		}
 
 		throw new InfoFormException();
