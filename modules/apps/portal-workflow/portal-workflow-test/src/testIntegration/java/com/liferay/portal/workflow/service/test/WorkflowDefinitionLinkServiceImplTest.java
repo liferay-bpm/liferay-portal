@@ -11,27 +11,32 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTestUtil;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkService;
 import com.liferay.portal.kernel.test.AssertUtils;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.randomizerbumpers.NumericStringRandomizerBumper;
 import com.liferay.portal.kernel.test.randomizerbumpers.UniqueStringRandomizerBumper;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.CompanyTestUtil;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -83,6 +88,9 @@ public class WorkflowDefinitionLinkServiceImplTest {
 
 	@Before
 	public void setUp() throws Exception {
+		_group = GroupTestUtil.addGroup(
+			_company.getCompanyId(), _companyAdminUser.getUserId(),
+			GroupConstants.DEFAULT_PARENT_GROUP_ID);
 		_originalName = PrincipalThreadLocal.getName();
 		_originalPermissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
@@ -108,7 +116,7 @@ public class WorkflowDefinitionLinkServiceImplTest {
 		_kaleoDefinitionLocalService.activateKaleoDefinition(
 			kaleoDefinition.getKaleoDefinitionId(), _serviceContext);
 
-		_setUpPermissionThreadLocal(_companyAdminUser);
+		UserTestUtil.setUser(_companyAdminUser);
 
 		AssertUtils.assertFailure(
 			PrincipalException.MustBeCompanyAdmin.class,
@@ -140,8 +148,95 @@ public class WorkflowDefinitionLinkServiceImplTest {
 	}
 
 	@Test
+	@TestInfo("LPD-110161")
+	public void testAddWorkflowDefinitionLinkAsAnotherUser() throws Exception {
+		User cmsAdministratorUser = _setUpCMSAdministratorUser();
+		User user = _addUser();
+
+		AssertUtils.assertFailure(
+			PrincipalException.class,
+			StringBundler.concat(
+				"User ", cmsAdministratorUser.getUserId(),
+				" must be an omniadmin to act on behalf of user ",
+				user.getUserId()),
+			() -> _workflowDefinitionLinkService.addWorkflowDefinitionLink(
+				null, user.getUserId(), _company.getCompanyId(), 0, null, 0, 0,
+				null, 0));
+	}
+
+	@Test
+	@TestInfo("LPD-110161")
+	public void testAddWorkflowDefinitionLinkFromAnotherCompany()
+		throws Exception {
+
+		User cmsAdministratorUser = _setUpCMSAdministratorUser();
+
+		AssertUtils.assertFailure(
+			PrincipalException.class,
+			StringBundler.concat(
+				"User ", cmsAdministratorUser.getUserId(),
+				" must be an omniadmin to act in company ",
+				TestPropsValues.getCompanyId()),
+			() -> _workflowDefinitionLinkService.addWorkflowDefinitionLink(
+				null, cmsAdministratorUser.getUserId(),
+				TestPropsValues.getCompanyId(), 0, null, 0, 0, null, 0));
+	}
+
+	@Test
+	@TestInfo("LPD-110161")
+	public void testAddWorkflowDefinitionLinkWithGroupFromAnotherCompany()
+		throws Exception {
+
+		User cmsAdministratorUser = _setUpCMSAdministratorUser();
+
+		AssertUtils.assertFailure(
+			PrincipalException.class,
+			StringBundler.concat(
+				"Group ", TestPropsValues.getGroupId(),
+				" does not belong to company ", _company.getCompanyId()),
+			() -> _workflowDefinitionLinkService.addWorkflowDefinitionLink(
+				null, cmsAdministratorUser.getUserId(), _company.getCompanyId(),
+				TestPropsValues.getGroupId(), null, 0, 0, null, 0));
+	}
+
+	@Test
+	@TestInfo("LPD-110161")
+	public void testAddWorkflowDefinitionLinkWithoutGroupPermission()
+		throws Exception {
+
+		User cmsAdministratorUser = _setUpCMSAdministratorUser();
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustBeCompanyAdmin.class,
+			StringBundler.concat(
+				"User ", cmsAdministratorUser.getUserId(),
+				" must be the company administrator to perform the action"),
+			() -> _workflowDefinitionLinkService.addWorkflowDefinitionLink(
+				null, cmsAdministratorUser.getUserId(), _company.getCompanyId(),
+				WorkflowConstants.DEFAULT_GROUP_ID, null, 0, 0, null, 0));
+	}
+
+	@Test
+	@TestInfo("LPD-110161")
+	public void testAddWorkflowDefinitionLinkWithoutUpdateGroupPermission()
+		throws Exception {
+
+		User cmsAdministratorUser = _setUpCMSAdministratorUser();
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", cmsAdministratorUser.getUserId(),
+				" must have UPDATE permission for ", Group.class.getName(),
+				StringPool.SPACE, _group.getGroupId()),
+			() -> _workflowDefinitionLinkService.addWorkflowDefinitionLink(
+				null, cmsAdministratorUser.getUserId(), _company.getCompanyId(),
+				_group.getGroupId(), null, 0, 0, null, 0));
+	}
+
+	@Test
 	public void testGetWorkflowDefinitionLinks() throws Exception {
-		_setUpPermissionThreadLocal(_companyAdminUser);
+		UserTestUtil.setUser(_companyAdminUser);
 
 		ConfigurationTestUtil.saveConfiguration(
 			_configuration,
@@ -155,7 +250,7 @@ public class WorkflowDefinitionLinkServiceImplTest {
 
 		User user = _addUser();
 
-		_setUpPermissionThreadLocal(user);
+		UserTestUtil.setUser(user);
 
 		AssertUtils.assertFailure(
 			PrincipalException.MustBeCompanyAdmin.class,
@@ -165,11 +260,11 @@ public class WorkflowDefinitionLinkServiceImplTest {
 			() -> _workflowDefinitionLinkService.getWorkflowDefinitionLinks(
 				TestPropsValues.getCompanyId(), "Single Approver", 1));
 
-		_setUpPermissionThreadLocal(_companyAdminUser);
+		UserTestUtil.setUser(_companyAdminUser);
 
 		List<WorkflowDefinitionLink> workflowDefinitionLinks =
 			_workflowDefinitionLinkService.getWorkflowDefinitionLinks(
-				TestPropsValues.getCompanyId(), "Single Approver", 1);
+				_company.getCompanyId(), "Single Approver", 1);
 
 		WorkflowDefinitionLink workflowDefinitionLink2 =
 			workflowDefinitionLinks.get(0);
@@ -184,7 +279,7 @@ public class WorkflowDefinitionLinkServiceImplTest {
 
 	@Test
 	public void testUpdateWorkflowDefinitionLink() throws Exception {
-		_setUpPermissionThreadLocal(_companyAdminUser);
+		UserTestUtil.setUser(_companyAdminUser);
 
 		ConfigurationTestUtil.saveConfiguration(
 			_configuration,
@@ -200,7 +295,7 @@ public class WorkflowDefinitionLinkServiceImplTest {
 
 		User user = _addUser();
 
-		_setUpPermissionThreadLocal(user);
+		UserTestUtil.setUser(user);
 
 		AssertUtils.assertFailure(
 			PrincipalException.MustBeCompanyAdmin.class,
@@ -215,12 +310,12 @@ public class WorkflowDefinitionLinkServiceImplTest {
 				kaleoDefinition.getName(),
 				workflowDefinitionLink1.getWorkflowDefinitionVersion()));
 
-		_setUpPermissionThreadLocal(_companyAdminUser);
+		UserTestUtil.setUser(_companyAdminUser);
 
 		WorkflowDefinitionLink workflowDefinitionLink2 =
 			_workflowDefinitionLinkService.updateWorkflowDefinitionLink(
 				workflowDefinitionLink1.getExternalReferenceCode(),
-				TestPropsValues.getUserId(), TestPropsValues.getCompanyId(),
+				_companyAdminUser.getUserId(), _company.getCompanyId(),
 				workflowDefinitionLink1.getGroupId(),
 				"com.liferay.account.model.AccountEntry", 0, 0,
 				kaleoDefinition.getName(),
@@ -232,6 +327,95 @@ public class WorkflowDefinitionLinkServiceImplTest {
 		Assert.assertEquals(
 			kaleoDefinition.getName(),
 			workflowDefinitionLink2.getWorkflowDefinitionName());
+	}
+
+	@Test
+	@TestInfo("LPD-110161")
+	public void testUpdateWorkflowDefinitionLinkAsAnotherUser()
+		throws Exception {
+
+		User cmsAdministratorUser = _setUpCMSAdministratorUser();
+		User user = _addUser();
+
+		AssertUtils.assertFailure(
+			PrincipalException.class,
+			StringBundler.concat(
+				"User ", cmsAdministratorUser.getUserId(),
+				" must be an omniadmin to act on behalf of user ",
+				user.getUserId()),
+			() -> _workflowDefinitionLinkService.updateWorkflowDefinitionLink(
+				null, user.getUserId(), _company.getCompanyId(), 0, null, 0, 0,
+				null, 0));
+	}
+
+	@Test
+	@TestInfo("LPD-110161")
+	public void testUpdateWorkflowDefinitionLinkFromAnotherCompany()
+		throws Exception {
+
+		User cmsAdministratorUser = _setUpCMSAdministratorUser();
+
+		AssertUtils.assertFailure(
+			PrincipalException.class,
+			StringBundler.concat(
+				"User ", cmsAdministratorUser.getUserId(),
+				" must be an omniadmin to act in company ",
+				TestPropsValues.getCompanyId()),
+			() -> _workflowDefinitionLinkService.updateWorkflowDefinitionLink(
+				null, cmsAdministratorUser.getUserId(),
+				TestPropsValues.getCompanyId(), 0, null, 0, 0, null, 0));
+	}
+
+	@Test
+	@TestInfo("LPD-110161")
+	public void testUpdateWorkflowDefinitionLinkWithGroupFromAnotherCompany()
+		throws Exception {
+
+		User cmsAdministratorUser = _setUpCMSAdministratorUser();
+
+		AssertUtils.assertFailure(
+			PrincipalException.class,
+			StringBundler.concat(
+				"Group ", TestPropsValues.getGroupId(),
+				" does not belong to company ", _company.getCompanyId()),
+			() -> _workflowDefinitionLinkService.updateWorkflowDefinitionLink(
+				null, cmsAdministratorUser.getUserId(), _company.getCompanyId(),
+				TestPropsValues.getGroupId(), null, 0, 0, null, 0));
+	}
+
+	@Test
+	@TestInfo("LPD-110161")
+	public void testUpdateWorkflowDefinitionLinkWithoutGroupPermission()
+		throws Exception {
+
+		User cmsAdministratorUser = _setUpCMSAdministratorUser();
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustBeCompanyAdmin.class,
+			StringBundler.concat(
+				"User ", cmsAdministratorUser.getUserId(),
+				" must be the company administrator to perform the action"),
+			() -> _workflowDefinitionLinkService.updateWorkflowDefinitionLink(
+				null, cmsAdministratorUser.getUserId(), _company.getCompanyId(),
+				WorkflowConstants.DEFAULT_GROUP_ID, null, 0, 0, null, 0));
+	}
+
+	@Test
+	@TestInfo("LPD-110161")
+	public void testUpdateWorkflowDefinitionLinkWithoutUpdateGroupPermission()
+		throws Exception {
+
+		User cmsAdministratorUser = _setUpCMSAdministratorUser();
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", cmsAdministratorUser.getUserId(),
+				" must have UPDATE permission for ", Group.class.getName(),
+				StringPool.SPACE, _group.getGroupId()),
+			() -> _workflowDefinitionLinkService.updateWorkflowDefinitionLink(
+				null, cmsAdministratorUser.getUserId(), _company.getCompanyId(),
+				_group.getGroupId(), null, 0, 0, null, 0));
 	}
 
 	private KaleoDefinition _addKaleoDefinition() throws Exception {
@@ -258,15 +442,17 @@ public class WorkflowDefinitionLinkServiceImplTest {
 
 		return _workflowDefinitionLinkService.addWorkflowDefinitionLink(
 			externalReferenceCode, _companyAdminUser.getUserId(),
-			TestPropsValues.getCompanyId(), TestPropsValues.getGroupId(),
-			className, 0, 0, kaleoDefinitionName, 1);
+			_company.getCompanyId(), _group.getGroupId(), className, 0, 0,
+			kaleoDefinitionName, 1);
 	}
 
-	private void _setUpPermissionThreadLocal(User user) {
-		PrincipalThreadLocal.setName(user.getUserId());
+	private User _setUpCMSAdministratorUser() throws Exception {
+		User user = UserTestUtil.addCompanyUser(
+			_company, RoleConstants.CMS_ADMINISTRATOR);
 
-		PermissionThreadLocal.setPermissionChecker(
-			PermissionCheckerFactoryUtil.create(user));
+		UserTestUtil.setUser(user);
+
+		return user;
 	}
 
 	private static Company _company;
@@ -275,6 +461,8 @@ public class WorkflowDefinitionLinkServiceImplTest {
 
 	@Inject
 	private static ConfigurationAdmin _configurationAdmin;
+
+	private Group _group;
 
 	@Inject
 	private KaleoDefinitionLocalService _kaleoDefinitionLocalService;
