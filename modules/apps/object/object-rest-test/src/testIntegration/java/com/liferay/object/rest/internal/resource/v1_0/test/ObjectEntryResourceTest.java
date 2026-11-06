@@ -11209,7 +11209,6 @@ public class ObjectEntryResourceTest {
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
-	@FeatureFlag("LPD-11388")
 	@Test
 	public void testPostCustomObjectEntryWithLocalizedLocationObjectField()
 		throws Exception {
@@ -11271,7 +11270,6 @@ public class ObjectEntryResourceTest {
 		}
 	}
 
-	@FeatureFlag("LPD-11388")
 	@Test
 	public void testPostCustomObjectEntryWithLocationObjectField()
 		throws Exception {
