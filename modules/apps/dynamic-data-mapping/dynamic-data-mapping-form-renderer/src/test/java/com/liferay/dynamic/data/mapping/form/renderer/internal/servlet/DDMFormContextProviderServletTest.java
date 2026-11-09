@@ -5,6 +5,8 @@
 
 package com.liferay.dynamic.data.mapping.form.renderer.internal.servlet;
 
+import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceSettings;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.language.Language;
@@ -14,6 +16,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.test.AssertUtils;
@@ -57,6 +60,10 @@ public class DDMFormContextProviderServletTest {
 			_ddmFormContextProviderServlet, "_ddmFormInstanceLocalService",
 			_ddmFormInstanceLocalService);
 		ReflectionTestUtil.setFieldValue(
+			_ddmFormContextProviderServlet,
+			"_ddmFormInstanceModelResourcePermission",
+			_ddmFormInstanceModelResourcePermission);
+		ReflectionTestUtil.setFieldValue(
 			_ddmFormContextProviderServlet, "_groupLocalService",
 			_groupLocalService);
 		ReflectionTestUtil.setFieldValue(
@@ -84,6 +91,16 @@ public class DDMFormContextProviderServletTest {
 	}
 
 	@Test
+	public void testCheckGroupPermissionWhenFormInstanceIsPublished()
+		throws Exception {
+
+		_mockDDMFormInstance();
+		_mockGroup();
+
+		_invokeCheckGroupPermission(_DDM_FORM_INSTANCE_ID);
+	}
+
+	@Test
 	public void testCheckGroupPermissionWhenUserCanViewGroup() {
 		_groupPermissionUtilMockedStatic.when(
 			() -> GroupPermissionUtil.contains(
@@ -92,7 +109,7 @@ public class DDMFormContextProviderServletTest {
 			true
 		);
 
-		_invokeCheckGroupPermission();
+		_invokeCheckGroupPermission(0);
 	}
 
 	@Test
@@ -104,7 +121,7 @@ public class DDMFormContextProviderServletTest {
 			StringBundler.concat(
 				"User 0 must have VIEW permission for ", Group.class.getName(),
 				" ", _GROUP_ID),
-			() -> _invokeCheckGroupPermission());
+			() -> _invokeCheckGroupPermission(0));
 	}
 
 	@Test
@@ -143,10 +160,15 @@ public class DDMFormContextProviderServletTest {
 				new Class<?>[] {HttpServletRequest.class}, httpServletRequest));
 	}
 
-	private void _invokeCheckGroupPermission() {
+	private void _invokeCheckGroupPermission(long ddmFormInstanceId) {
 		DDMFormTemplateContextProcessor ddmFormTemplateContextProcessor =
 			Mockito.mock(DDMFormTemplateContextProcessor.class);
 
+		Mockito.when(
+			ddmFormTemplateContextProcessor.getDDMFormInstanceId()
+		).thenReturn(
+			ddmFormInstanceId
+		);
 		Mockito.when(
 			ddmFormTemplateContextProcessor.getGroupId()
 		).thenReturn(
@@ -159,6 +181,44 @@ public class DDMFormContextProviderServletTest {
 				DDMFormTemplateContextProcessor.class, HttpServletRequest.class
 			},
 			ddmFormTemplateContextProcessor, _httpServletRequest);
+	}
+
+	private void _mockDDMFormInstance() throws Exception {
+		DDMFormInstanceSettings ddmFormInstanceSettings = Mockito.mock(
+			DDMFormInstanceSettings.class);
+
+		Mockito.when(
+			ddmFormInstanceSettings.published()
+		).thenReturn(
+			true
+		);
+
+		DDMFormInstance ddmFormInstance = Mockito.mock(DDMFormInstance.class);
+
+		Mockito.when(
+			ddmFormInstance.getGroupId()
+		).thenReturn(
+			_GROUP_ID
+		);
+		Mockito.when(
+			ddmFormInstance.getSettingsModel()
+		).thenReturn(
+			ddmFormInstanceSettings
+		);
+
+		Mockito.when(
+			_ddmFormInstanceLocalService.fetchFormInstance(
+				_DDM_FORM_INSTANCE_ID)
+		).thenReturn(
+			ddmFormInstance
+		);
+
+		Mockito.when(
+			_ddmFormInstanceModelResourcePermission.contains(
+				_permissionChecker, ddmFormInstance, ActionKeys.VIEW)
+		).thenReturn(
+			true
+		);
 	}
 
 	private Group _mockGroup() {
@@ -197,11 +257,16 @@ public class DDMFormContextProviderServletTest {
 
 	private static final long _COMPANY_ID = 1L;
 
+	private static final long _DDM_FORM_INSTANCE_ID = 3L;
+
 	private static final long _GROUP_ID = 2L;
 
 	private DDMFormContextProviderServlet _ddmFormContextProviderServlet;
 	private final DDMFormInstanceLocalService _ddmFormInstanceLocalService =
 		Mockito.mock(DDMFormInstanceLocalService.class);
+	private final ModelResourcePermission<DDMFormInstance>
+		_ddmFormInstanceModelResourcePermission = Mockito.mock(
+			ModelResourcePermission.class);
 	private final GroupLocalService _groupLocalService = Mockito.mock(
 		GroupLocalService.class);
 	private MockedStatic<GroupPermissionUtil> _groupPermissionUtilMockedStatic;
