@@ -534,9 +534,9 @@ public class DDMFormInstanceRecordLocalServiceTest
 				ddmFormInstance.getFormInstanceId(), ddmFormValues,
 				serviceContext);
 
-		Value value = ddmFormFieldValue.getValue();
-
 		String textFieldValue = RandomTestUtil.randomString();
+
+		Value value = ddmFormFieldValue.getValue();
 
 		value.addString(value.getDefaultLocale(), textFieldValue);
 
