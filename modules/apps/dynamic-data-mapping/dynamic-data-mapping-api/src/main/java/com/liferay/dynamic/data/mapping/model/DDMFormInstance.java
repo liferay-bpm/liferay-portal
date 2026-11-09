@@ -57,6 +57,9 @@ public interface DDMFormInstance extends DDMFormInstanceModel, PersistedModel {
 	public DDMFormInstanceVersion getFormInstanceVersion(String version)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
+	public DDMFormInstanceVersion getLatestApprovedFormInstanceVersion()
+		throws com.liferay.portal.kernel.exception.PortalException;
+
 	public long getObjectDefinitionId()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
@@ -76,4 +79,4 @@ public interface DDMFormInstance extends DDMFormInstanceModel, PersistedModel {
 		com.liferay.dynamic.data.mapping.storage.DDMFormValues ddmFormValues);
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:722265001
+// LIFERAY-SERVICE-BUILDER-HASH:-1226623648

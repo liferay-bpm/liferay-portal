@@ -205,6 +205,11 @@ public interface DDMFormInstanceRecordVersionLocalService
 		long formInstanceRecordVersionId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public DDMFormInstanceRecordVersion
+		fetchLatestDraftFormInstanceRecordVersion(
+			long userId, long formInstanceId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMFormInstanceRecordVersion fetchLatestFormInstanceRecordVersion(
 		long userId, long formInstanceId, String formInstanceVersion,
 		int status);
@@ -324,4 +329,4 @@ public interface DDMFormInstanceRecordVersionLocalService
 		throws E;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-2062341941
+// LIFERAY-SERVICE-BUILDER-HASH:1955000804

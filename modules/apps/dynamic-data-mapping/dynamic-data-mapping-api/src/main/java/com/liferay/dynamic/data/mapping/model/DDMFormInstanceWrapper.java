@@ -339,6 +339,13 @@ public class DDMFormInstanceWrapper
 		return model.getLastPublishDate();
 	}
 
+	@Override
+	public DDMFormInstanceVersion getLatestApprovedFormInstanceVersion()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.getLatestApprovedFormInstanceVersion();
+	}
+
 	/**
 	 * Returns the modified date of this ddm form instance.
 	 *
@@ -957,4 +964,4 @@ public class DDMFormInstanceWrapper
 	}
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1814034847
+// LIFERAY-SERVICE-BUILDER-HASH:1011817493

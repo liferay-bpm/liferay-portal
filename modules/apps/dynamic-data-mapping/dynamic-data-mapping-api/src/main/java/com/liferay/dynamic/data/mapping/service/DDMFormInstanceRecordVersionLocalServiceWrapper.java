@@ -245,6 +245,15 @@ public class DDMFormInstanceRecordVersionLocalServiceWrapper
 	}
 
 	@Override
+	public DDMFormInstanceRecordVersion
+		fetchLatestDraftFormInstanceRecordVersion(
+			long userId, long formInstanceId) {
+
+		return _ddmFormInstanceRecordVersionLocalService.
+			fetchLatestDraftFormInstanceRecordVersion(userId, formInstanceId);
+	}
+
+	@Override
 	public DDMFormInstanceRecordVersion fetchLatestFormInstanceRecordVersion(
 		long userId, long formInstanceId, String formInstanceVersion,
 		int status) {
@@ -456,4 +465,4 @@ public class DDMFormInstanceRecordVersionLocalServiceWrapper
 		_ddmFormInstanceRecordVersionLocalService;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:553937546
+// LIFERAY-SERVICE-BUILDER-HASH:909539453

@@ -219,6 +219,14 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 	}
 
 	public static DDMFormInstanceRecordVersion
+		fetchLatestDraftFormInstanceRecordVersion(
+			long userId, long formInstanceId) {
+
+		return getService().fetchLatestDraftFormInstanceRecordVersion(
+			userId, formInstanceId);
+	}
+
+	public static DDMFormInstanceRecordVersion
 		fetchLatestFormInstanceRecordVersion(
 			long userId, long formInstanceId, String formInstanceVersion,
 			int status) {
@@ -376,4 +384,4 @@ public class DDMFormInstanceRecordVersionLocalServiceUtil {
 			DDMFormInstanceRecordVersionLocalService.class);
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:1259766418
+// LIFERAY-SERVICE-BUILDER-HASH:-1678606090
