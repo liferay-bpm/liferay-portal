@@ -13,18 +13,13 @@ import com.liferay.portal.configuration.module.configuration.ConfigurationProvid
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
-import com.liferay.portal.kernel.util.InetAddressUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.net.URI;
-
 import java.util.Collections;
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -70,44 +65,16 @@ public class BatchEngineTaskCallbackUtil {
 		String callbackURL, long companyId) {
 
 		try {
-			URI uri = new URI(callbackURL);
-
-			String scheme = StringUtil.toLowerCase(uri.getScheme());
-
-			if (!Objects.equals(scheme, "http") &&
-				!Objects.equals(scheme, "https")) {
-
-				return false;
-			}
-
-			String host = uri.getHost();
-
-			if (Validator.isNull(host)) {
-				return false;
-			}
-
 			BatchEngineTaskCompanyConfiguration
 				batchEngineTaskCompanyConfiguration =
 					ConfigurationProviderUtil.getCompanyConfiguration(
 						BatchEngineTaskCompanyConfiguration.class, companyId);
 
-			String[] callbackURLHostsAllowed =
-				batchEngineTaskCompanyConfiguration.callbackURLHostsAllowed();
-
-			if (ArrayUtil.isNotEmpty(callbackURLHostsAllowed) &&
-				!ArrayUtil.contains(callbackURLHostsAllowed, host, true)) {
-
-				return false;
-			}
-
-			if (batchEngineTaskCompanyConfiguration.
-					callbackURLLocalNetworkAccessEnabled()) {
-
-				return true;
-			}
-
-			return !InetAddressUtil.isLocalInetAddress(
-				InetAddressUtil.getInetAddressByName(host));
+			return HttpComponentsUtil.isAllowedURL(
+				callbackURL,
+				batchEngineTaskCompanyConfiguration.callbackURLHostsAllowed(),
+				batchEngineTaskCompanyConfiguration.
+					callbackURLLocalNetworkAccessEnabled());
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
