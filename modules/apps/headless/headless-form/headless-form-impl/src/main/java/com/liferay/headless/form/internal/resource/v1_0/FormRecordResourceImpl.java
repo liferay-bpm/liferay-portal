@@ -17,7 +17,7 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.model.UnlocalizedValue;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService;
-import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionService;
+import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
@@ -70,7 +70,7 @@ public class FormRecordResourceImpl extends BaseFormRecordResourceImpl {
 
 		if (!contextUser.isGuestUser()) {
 			ddmFormInstanceRecordVersion =
-				_ddmFormInstanceRecordVersionService.
+				_ddmFormInstanceRecordVersionLocalService.
 					fetchLatestDraftFormInstanceRecordVersion(
 						contextUser.getUserId(),
 						ddmFormInstance.getFormInstanceId());
@@ -83,8 +83,10 @@ public class FormRecordResourceImpl extends BaseFormRecordResourceImpl {
 		}
 
 		return FormRecordUtil.toFormRecord(
-			ddmFormInstanceRecordVersion.getFormInstanceRecord(), _dlAppService,
-			_dlurlHelper, contextAcceptLanguage.getPreferredLocale(), _portal,
+			_ddmFormInstanceRecordService.getFormInstanceRecord(
+				ddmFormInstanceRecordVersion.getFormInstanceRecordId()),
+			_dlAppService, _dlurlHelper,
+			contextAcceptLanguage.getPreferredLocale(), _portal,
 			_userLocalService);
 	}
 
@@ -264,8 +266,8 @@ public class FormRecordResourceImpl extends BaseFormRecordResourceImpl {
 	private DDMFormInstanceRecordService _ddmFormInstanceRecordService;
 
 	@Reference
-	private DDMFormInstanceRecordVersionService
-		_ddmFormInstanceRecordVersionService;
+	private DDMFormInstanceRecordVersionLocalService
+		_ddmFormInstanceRecordVersionLocalService;
 
 	@Reference
 	private DDMFormInstanceService _ddmFormInstanceService;
