@@ -12,22 +12,14 @@ import com.liferay.object.model.ObjectAction;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.InetAddressUtil;
+import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.key.secret.SecretResolver;
-
-import java.net.URI;
-
-import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -82,53 +74,19 @@ public class WebhookObjectActionExecutorImpl implements ObjectActionExecutor {
 	private boolean _isAllowedURL(
 		UnicodeProperties parametersUnicodeProperties, String url) {
 
-		try {
-			URI uri = new URI(url);
+		boolean urlLocalNetworkAccessEnabled = GetterUtil.getBoolean(
+			parametersUnicodeProperties.get("urlLocalNetworkAccessEnabled"));
 
-			String scheme = StringUtil.toLowerCase(uri.getScheme());
+		String[] urlHostsAllowed = new String[0];
 
-			if (!Objects.equals(scheme, Http.HTTP) &&
-				!Objects.equals(scheme, Http.HTTPS)) {
-
-				return false;
-			}
-
-			String host = uri.getHost();
-
-			if (Validator.isNull(host)) {
-				return false;
-			}
-
-			if (!GetterUtil.getBoolean(
-					parametersUnicodeProperties.get(
-						"urlLocalNetworkAccessEnabled"))) {
-
-				return !InetAddressUtil.isLocalInetAddress(
-					InetAddressUtil.getInetAddressByName(host));
-			}
-
-			String[] urlHostsAllowed = StringUtil.split(
+		if (urlLocalNetworkAccessEnabled) {
+			urlHostsAllowed = StringUtil.split(
 				parametersUnicodeProperties.get("urlHostsAllowed"));
-
-			if (ArrayUtil.isNotEmpty(urlHostsAllowed) &&
-				!ArrayUtil.contains(urlHostsAllowed, host, true)) {
-
-				return false;
-			}
-
-			return true;
 		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
 
-			return false;
-		}
+		return HttpComponentsUtil.isAllowedURL(
+			url, urlHostsAllowed, urlLocalNetworkAccessEnabled);
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		WebhookObjectActionExecutorImpl.class);
 
 	@Reference
 	private Http _http;
