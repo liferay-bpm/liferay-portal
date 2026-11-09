@@ -41,6 +41,7 @@ import com.liferay.dynamic.data.mapping.service.base.DDMFormInstanceRecordLocalS
 import com.liferay.dynamic.data.mapping.service.persistence.DDMFormInstancePersistence;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMFormInstanceRecordVersionPersistence;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMFormInstanceReportPersistence;
+import com.liferay.dynamic.data.mapping.service.persistence.DDMStorageLinkPersistence;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapter;
@@ -1253,7 +1254,7 @@ public class DDMFormInstanceRecordLocalServiceImpl
 			).build());
 
 		DDMStorageLink ddmStorageLink =
-			_ddmStorageLinkLocalService.fetchClassStorageLink(
+			_ddmStorageLinkPersistence.fetchByClassPK(
 				ddmFormInstanceRecordVersion.getStorageId());
 
 		if (ddmStorageLink == null) {
@@ -1373,6 +1374,9 @@ public class DDMFormInstanceRecordLocalServiceImpl
 
 	@Reference
 	private DDMStorageLinkLocalService _ddmStorageLinkLocalService;
+
+	@Reference
+	private DDMStorageLinkPersistence _ddmStorageLinkPersistence;
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;

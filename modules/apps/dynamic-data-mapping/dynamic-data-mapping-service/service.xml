@@ -296,11 +296,6 @@
 			<finder-column name="formInstanceRecordId" />
 			<finder-column name="status" />
 		</finder>
-		<finder name="U_F_S" return-type="Collection">
-			<finder-column name="userId" />
-			<finder-column name="formInstanceId" />
-			<finder-column name="status" />
-		</finder>
 		<finder name="U_F_F_S" return-type="Collection">
 			<finder-column name="userId" />
 			<finder-column name="formInstanceId" />

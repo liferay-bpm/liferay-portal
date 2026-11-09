@@ -91,13 +91,16 @@ public class DDMFormInstanceRecordVersionLocalServiceImpl
 			long userId, long formInstanceId) {
 
 		List<DDMFormInstanceRecordVersion> ddmFormInstanceRecordVersions =
-			ddmFormInstanceRecordVersionPersistence.findByU_F_S(
-				userId, formInstanceId, WorkflowConstants.STATUS_DRAFT,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			ddmFormInstanceRecordVersionPersistence.findByU_F(
+				userId, formInstanceId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
 				DDMFormInstanceRecordVersionIdComparator.getInstance(false));
 
 		for (DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion :
 				ddmFormInstanceRecordVersions) {
+
+			if (!ddmFormInstanceRecordVersion.isDraft()) {
+				continue;
+			}
 
 			long formInstanceRecordId =
 				ddmFormInstanceRecordVersion.getFormInstanceRecordId();
@@ -105,11 +108,11 @@ public class DDMFormInstanceRecordVersionLocalServiceImpl
 			int count =
 				ddmFormInstanceRecordVersionPersistence.
 					countByFormInstanceRecordId(formInstanceRecordId);
+			int draftsCount =
+				ddmFormInstanceRecordVersionPersistence.countByF_S(
+					formInstanceRecordId, WorkflowConstants.STATUS_DRAFT);
 
-			int draftCount = ddmFormInstanceRecordVersionPersistence.countByF_S(
-				formInstanceRecordId, WorkflowConstants.STATUS_DRAFT);
-
-			if (count == draftCount) {
+			if (count == draftsCount) {
 				return ddmFormInstanceRecordVersion;
 			}
 		}
