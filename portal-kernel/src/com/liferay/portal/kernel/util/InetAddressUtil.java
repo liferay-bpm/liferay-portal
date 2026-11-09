@@ -13,6 +13,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
@@ -116,7 +117,8 @@ public class InetAddressUtil {
 		if (inetAddress.isAnyLocalAddress() ||
 			inetAddress.isLinkLocalAddress() ||
 			inetAddress.isLoopbackAddress() ||
-			inetAddress.isSiteLocalAddress()) {
+			inetAddress.isSiteLocalAddress() ||
+			_isUniqueLocalInet6Address(inetAddress)) {
 
 			return true;
 		}
@@ -252,6 +254,20 @@ public class InetAddressUtil {
 		}
 
 		return null;
+	}
+
+	private static boolean _isUniqueLocalInet6Address(InetAddress inetAddress) {
+		if (!(inetAddress instanceof Inet6Address)) {
+			return false;
+		}
+
+		byte[] address = inetAddress.getAddress();
+
+		if ((address[0] & 0xFE) == 0xFC) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final int _DNS_SECURITY_ADDRESS_TIMEOUT_SECONDS =
