@@ -37,8 +37,11 @@ import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
@@ -53,6 +56,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.workflow.WorkflowDefinition;
 import com.liferay.portal.language.LanguageResources;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
@@ -60,6 +64,7 @@ import com.liferay.portal.vulcan.fields.NestedFieldsSupplier;
 import com.liferay.portal.vulcan.permission.Permission;
 import com.liferay.portal.vulcan.permission.PermissionUtil;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
+import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
 
 import java.util.Collection;
 import java.util.List;
@@ -101,7 +106,8 @@ public class ObjectDefinitionUtil {
 		SystemObjectDefinitionManagerRegistry
 			systemObjectDefinitionManagerRegistry,
 		User user, UserLocalService userLocalService,
-		WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService) {
+		WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService,
+		WorkflowDefinitionManager workflowDefinitionManager) {
 
 		if (serviceBuilderObjectDefinition == null) {
 			return null;
@@ -380,6 +386,10 @@ public class ObjectDefinitionUtil {
 													getCompanyId(),
 												serviceBuilderObjectDefinition.
 													getClassName());
+						boolean workflowDefinitionExternalReferenceCodeEnabled =
+							FeatureFlagManagerUtil.isEnabled(
+								serviceBuilderObjectDefinition.getCompanyId(),
+								"LPD-49856");
 
 						return TransformUtil.transformToArray(
 							serviceBuilderWorkflowDefinitionLinks,
@@ -400,6 +410,38 @@ public class ObjectDefinitionUtil {
 												}
 
 												return StringPool.BLANK;
+											});
+										setWorkflowDefinitionExternalReferenceCode(
+											() -> {
+												if (!workflowDefinitionExternalReferenceCodeEnabled) {
+													return null;
+												}
+
+												try {
+													WorkflowDefinition
+														workflowDefinition =
+															workflowDefinitionManager.
+																getWorkflowDefinition(
+																	serviceBuilderObjectDefinition.
+																		getCompanyId(),
+																	serviceBuilderWorkflowDefinitionLink.
+																		getWorkflowDefinitionName(),
+																	serviceBuilderWorkflowDefinitionLink.
+																		getWorkflowDefinitionVersion());
+
+													return workflowDefinition.
+														getExternalReferenceCode();
+												}
+												catch (PortalException
+															portalException) {
+
+													if (_log.isDebugEnabled()) {
+														_log.debug(
+															portalException);
+													}
+
+													return null;
+												}
 											});
 										setWorkflowDefinitionName(
 											serviceBuilderWorkflowDefinitionLink::
@@ -520,6 +562,9 @@ public class ObjectDefinitionUtil {
 
 		return objectDefinitionSetting;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ObjectDefinitionUtil.class);
 
 	private static final BundleContext _bundleContext =
 		SystemBundleUtil.getBundleContext();
