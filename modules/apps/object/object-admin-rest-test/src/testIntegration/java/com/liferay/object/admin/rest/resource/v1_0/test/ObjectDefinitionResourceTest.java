@@ -60,6 +60,7 @@ import com.liferay.object.service.ObjectFolderLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.test.util.TreeTestUtil;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
@@ -84,6 +85,7 @@ import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.CompanyTestUtil;
+import com.liferay.portal.kernel.test.util.FeatureFlagTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -169,6 +171,7 @@ public class ObjectDefinitionResourceTest
 		_testGetObjectDefinition();
 		_testGetObjectDefinitionWithRootObjectDefinitionExternalReferenceCodes();
 		_testGetObjectDefinitionWithWorkflowDefinitionLink();
+		_testGetObjectDefinitionWithWorkflowDefinitionLinkExternalReferenceCode();
 	}
 
 	@Override
@@ -2963,6 +2966,48 @@ public class ObjectDefinitionResourceTest
 					workflowDefinitionLink1, workflowDefinitionLink2)),
 			new HashSet<>(
 				Arrays.asList(objectDefinition.getWorkflowDefinitionLinks())));
+	}
+
+	private void _testGetObjectDefinitionWithWorkflowDefinitionLinkExternalReferenceCode()
+		throws Exception {
+
+		try (SafeCloseable safeCloseable =
+				FeatureFlagTestUtil.setFeatureFlagsWithSafeCloseable(
+					true, "LPD-49856")) {
+
+			ObjectDefinition objectDefinition = _addObjectDefinition(
+				randomObjectDefinition());
+
+			WorkflowDefinition workflowDefinition =
+				_workflowDefinitionManager.getWorkflowDefinition(
+					TestPropsValues.getCompanyId(),
+					WorkflowDefinitionConstants.
+						EXTERNAL_REFERENCE_CODE_SINGLE_APPROVER);
+
+			_workflowDefinitionLinkLocalService.addWorkflowDefinitionLink(
+				null, TestPropsValues.getUserId(),
+				TestPropsValues.getCompanyId(), 0,
+				objectDefinition.getClassName(), objectDefinition.getId(), 0,
+				workflowDefinition.getName(), workflowDefinition.getVersion());
+
+			objectDefinition = objectDefinitionResource.getObjectDefinition(
+				objectDefinition.getId());
+
+			WorkflowDefinitionLink[] workflowDefinitionLinks =
+				objectDefinition.getWorkflowDefinitionLinks();
+
+			Assert.assertEquals(
+				Arrays.toString(workflowDefinitionLinks), 1,
+				workflowDefinitionLinks.length);
+
+			WorkflowDefinitionLink workflowDefinitionLink =
+				workflowDefinitionLinks[0];
+
+			Assert.assertEquals(
+				workflowDefinition.getExternalReferenceCode(),
+				workflowDefinitionLink.
+					getWorkflowDefinitionExternalReferenceCode());
+		}
 	}
 
 	private void _testGetObjectDefinitionsPage(
