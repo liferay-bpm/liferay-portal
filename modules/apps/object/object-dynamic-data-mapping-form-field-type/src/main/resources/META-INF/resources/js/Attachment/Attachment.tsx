@@ -93,18 +93,22 @@ export default function Attachment({
 	}, [deleteFileEntry, submitButtonClicked]);
 
 	useEffect(() => {
-		Liferay.on(
-			'submitButtonClicked',
+		const handleSubmitButtonClicked = () => {
+			setSubmitButtonClicked(true);
+		};
 
-			() => {
-				setSubmitButtonClicked(true);
-			}
+		Liferay.on(
+			`${portletNamespace}submitButtonClicked`,
+			handleSubmitButtonClicked
 		);
 
 		return () => {
-			Liferay.detach('submitButtonClicked');
+			Liferay.detach(
+				`${portletNamespace}submitButtonClicked`,
+				handleSubmitButtonClicked
+			);
 		};
-	}, []);
+	}, [portletNamespace]);
 
 	const handleAttachmentChange = (
 		attachmentValue: AttachmentFile,
