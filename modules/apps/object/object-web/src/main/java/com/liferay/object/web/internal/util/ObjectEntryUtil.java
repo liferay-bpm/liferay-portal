@@ -233,8 +233,8 @@ public class ObjectEntryUtil {
 				infoField, infoFieldValue, relatedProperties);
 		}
 
-		Map<String, Object> properties = fieldsMap.get(
-			objectDefinition.getName());
+		Map<String, Object> properties = fieldsMap.computeIfAbsent(
+			objectDefinition.getName(), key -> new HashMap<>());
 
 		_addRelatedProperties(fieldsMap, objectDefinition, null, properties);
 
