@@ -88,6 +88,7 @@ import com.liferay.object.util.comparator.ObjectEntryVersionVersionComparator;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.io.StreamUtil;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.Table;
 import com.liferay.petra.sql.dsl.expression.Predicate;
@@ -1748,6 +1749,32 @@ public class DefaultObjectEntryManagerImpl
 				String scopeKey)
 		throws Exception {
 
+		if (ObjectEntryThreadLocal.getDeleteObjectEntryIds() == null) {
+			List<Long> deleteObjectEntryIds = new ArrayList<>();
+
+			try (SafeCloseable safeCloseable =
+					ObjectEntryThreadLocal.
+						setDeleteObjectEntryIdsWithSafeCloseable(
+							deleteObjectEntryIds)) {
+
+				serviceBuilderObjectEntry = _addOrUpdateNestedObjectEntries(
+					dtoConverterContext, objectDefinition, objectEntry,
+					objectRelationships, partialUpdate,
+					serviceBuilderObjectEntry, scopeKey);
+			}
+
+			if (deleteObjectEntryIds.isEmpty()) {
+				return serviceBuilderObjectEntry;
+			}
+
+			for (long deleteObjectEntryId : deleteObjectEntryIds) {
+				_objectEntryService.deleteObjectEntry(deleteObjectEntryId);
+			}
+
+			return objectEntryLocalService.getObjectEntry(
+				serviceBuilderObjectEntry.getPrimaryKey());
+		}
+
 		if (objectRelationships.isEmpty()) {
 			return serviceBuilderObjectEntry;
 		}
@@ -1763,6 +1790,11 @@ public class DefaultObjectEntryManagerImpl
 			ObjectDefinition relatedObjectDefinition =
 				_getRelatedObjectDefinition(
 					objectDefinition, objectRelationship);
+
+			boolean oneToManyObjectRelationship =
+				_isOneToManyObjectRelationship(
+					objectDefinition, objectRelationship,
+					relatedObjectDefinition);
 
 			ObjectRelationshipElementsParser objectRelationshipElementsParser =
 				_objectRelationshipElementsParserRegistry.
@@ -1832,11 +1864,6 @@ public class DefaultObjectEntryManagerImpl
 					_objectEntryManagerRegistry.getObjectEntryManager(
 						objectDefinition.getCompanyId(),
 						relatedObjectDefinition.getStorageType());
-
-				boolean oneToManyObjectRelationship =
-					_isOneToManyObjectRelationship(
-						objectDefinition, objectRelationship,
-						relatedObjectDefinition);
 
 				for (Object item : nestedObjectEntries) {
 					ObjectEntry nestedObjectEntry = (ObjectEntry)item;
@@ -1988,7 +2015,15 @@ public class DefaultObjectEntryManagerImpl
 						return relatedModel.getPrimaryKeyObj();
 					});
 
-			if (toDisassociatePrimaryKeys.length > 0) {
+			if (objectRelationship.isEdge() && oneToManyObjectRelationship) {
+				for (long toDisassociatePrimaryKey :
+						toDisassociatePrimaryKeys) {
+
+					ObjectEntryThreadLocal.addDeleteObjectEntryId(
+						toDisassociatePrimaryKey);
+				}
+			}
+			else if (toDisassociatePrimaryKeys.length > 0) {
 				_disassociateRelatedModels(
 					objectDefinition, objectRelationship,
 					serviceBuilderObjectEntry.getPrimaryKey(),
