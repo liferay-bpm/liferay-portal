@@ -142,11 +142,15 @@ public class AddFormInstanceRecordMVCResourceCommand
 			return;
 		}
 
+		DDMFormInstanceVersion latestDDMFormInstanceVersion =
+			_ddmFormInstanceVersionLocalService.getLatestFormInstanceVersion(
+				formInstanceId, WorkflowConstants.STATUS_APPROVED);
+
 		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion =
 			_ddmFormInstanceRecordVersionLocalService.
 				fetchLatestFormInstanceRecordVersion(
 					themeDisplay.getUserId(), formInstanceId,
-					ddmFormInstance.getVersion(),
+					latestDDMFormInstanceVersion.getVersion(),
 					WorkflowConstants.STATUS_DRAFT);
 
 		ServiceContext serviceContext = _createServiceContext(resourceRequest);

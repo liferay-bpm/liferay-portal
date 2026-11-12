@@ -281,11 +281,17 @@ public class AddFormInstanceRecordMVCActionCommand
 				ddmFormInstanceRecordId, false, ddmFormValues, serviceContext);
 		}
 		else {
+			DDMFormInstanceVersion latestDDMFormInstanceVersion =
+				_ddmFormInstanceVersionLocalService.
+					getLatestFormInstanceVersion(
+						ddmFormInstance.getFormInstanceId(),
+						WorkflowConstants.STATUS_APPROVED);
+
 			DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion =
 				_ddmFormInstanceRecordVersionLocalService.
 					fetchLatestFormInstanceRecordVersion(
 						userId, ddmFormInstance.getFormInstanceId(),
-						ddmFormInstance.getVersion(),
+						latestDDMFormInstanceVersion.getVersion(),
 						WorkflowConstants.STATUS_DRAFT);
 
 			if (ddmFormInstanceRecordVersion == null) {
