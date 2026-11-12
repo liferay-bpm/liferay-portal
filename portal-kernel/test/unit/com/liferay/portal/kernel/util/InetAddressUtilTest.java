@@ -47,6 +47,22 @@ public class InetAddressUtilTest {
 	}
 
 	@Test
+	public void testIsLocalInetAddressWithSharedIPv4Address() throws Exception {
+		Assert.assertFalse(
+			InetAddressUtil.isLocalInetAddress(
+				InetAddress.getByName("100.63.255.255")));
+		Assert.assertTrue(
+			InetAddressUtil.isLocalInetAddress(
+				InetAddress.getByName("100.64.0.1")));
+		Assert.assertTrue(
+			InetAddressUtil.isLocalInetAddress(
+				InetAddress.getByName("100.127.255.255")));
+		Assert.assertFalse(
+			InetAddressUtil.isLocalInetAddress(
+				InetAddress.getByName("100.128.0.1")));
+	}
+
+	@Test
 	public void testIsLocalInetAddressWithUniqueLocalIPv6Address()
 		throws Exception {
 
