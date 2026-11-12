@@ -25,7 +25,10 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFolderLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.license.util.App;
 import com.liferay.portal.kernel.license.util.LicenseManagerUtil;
 import com.liferay.portal.kernel.search.Document;
@@ -34,17 +37,26 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.URLCodec;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
+import java.io.Serializable;
+
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -168,6 +180,62 @@ public class CMPObjectEntryModelDocumentContributorTest {
 		_assertFieldValues("cmpTaskObjectEntryIds", linkedObjectEntry);
 	}
 
+	@FeatureFlag("LPD-107678")
+	@Test
+	public void testContributeWithCMPTaskObjectEntry() throws Exception {
+		Assume.assumeTrue(LicenseManagerUtil.isAppEnabled(App.CMP));
+
+		ObjectEntry cmpProjectObjectEntry =
+			CMPTestUtil.addCMPProjectObjectEntry(
+				WorkflowConstants.ACTION_PUBLISH);
+
+		ObjectEntry cmpTaskObjectEntry1 = CMPTestUtil.addCMPTaskObjectEntry(
+			cmpProjectObjectEntry, WorkflowConstants.ACTION_PUBLISH);
+
+		Indexer<ObjectEntry> indexer = IndexerRegistryUtil.getIndexer(
+			cmpTaskObjectEntry1.getModelClassName());
+
+		Document document = indexer.getDocument(cmpTaskObjectEntry1);
+
+		Assert.assertEquals("0", document.get("cmpParentTaskId"));
+		Assert.assertEquals("false", document.get("cmpSubtask"));
+
+		ObjectEntry cmpTaskObjectEntry2 = CMPTestUtil.addCMPTaskObjectEntry(
+			cmpProjectObjectEntry,
+			HashMapBuilder.<String, Serializable>put(
+				"r_cmpTaskToCMPTasks_c_cmpTaskId",
+				cmpTaskObjectEntry1.getObjectEntryId()
+			).build(),
+			WorkflowConstants.ACTION_PUBLISH);
+
+		document = indexer.getDocument(cmpTaskObjectEntry2);
+
+		Assert.assertEquals(
+			String.valueOf(cmpTaskObjectEntry1.getObjectEntryId()),
+			document.get("cmpParentTaskId"));
+		Assert.assertEquals("true", document.get("cmpSubtask"));
+
+		Assert.assertEquals(
+			Collections.singletonList(cmpTaskObjectEntry2.getObjectEntryId()),
+			_getSearchResultObjectEntryIds(
+				cmpProjectObjectEntry,
+				"cmpParentTaskId eq " +
+					cmpTaskObjectEntry1.getObjectEntryId()));
+
+		List<Long> searchResultObjectEntryIds = _getSearchResultObjectEntryIds(
+			cmpProjectObjectEntry, "cmpSubtask ne true");
+
+		Assert.assertTrue(
+			searchResultObjectEntryIds.contains(
+				cmpProjectObjectEntry.getObjectEntryId()));
+		Assert.assertTrue(
+			searchResultObjectEntryIds.contains(
+				cmpTaskObjectEntry1.getObjectEntryId()));
+		Assert.assertFalse(
+			searchResultObjectEntryIds.contains(
+				cmpTaskObjectEntry2.getObjectEntryId()));
+	}
+
 	private ObjectEntry _addLinkedObjectEntry(ObjectDefinition objectDefinition)
 		throws Exception {
 
@@ -210,6 +278,31 @@ public class CMPObjectEntryModelDocumentContributorTest {
 					objectEntry -> String.valueOf(
 						objectEntry.getObjectEntryId()))),
 			ListUtil.sort(Arrays.asList(field.getValues())));
+	}
+
+	private List<Long> _getSearchResultObjectEntryIds(
+			ObjectEntry cmpProjectObjectEntry, String filterString)
+		throws Exception {
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null,
+			StringBundler.concat(
+				"search/v1.0/search?emptySearch=true&filter=",
+				URLCodec.encodeURL(
+					StringBundler.concat(
+						"scopeGroupId eq ", cmpProjectObjectEntry.getGroupId(),
+						" and ", filterString)),
+				"&nestedFields=embedded"),
+			Http.Method.GET);
+
+		return JSONUtil.toList(
+			jsonObject.getJSONArray("items"),
+			itemJSONObject -> {
+				JSONObject embeddedJSONObject = itemJSONObject.getJSONObject(
+					"embedded");
+
+				return embeddedJSONObject.getLong("id");
+			});
 	}
 
 	private ObjectDefinition _publishObjectDefinition() throws Exception {
