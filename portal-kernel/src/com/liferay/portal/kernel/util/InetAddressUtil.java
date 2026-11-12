@@ -118,6 +118,7 @@ public class InetAddressUtil {
 			inetAddress.isLinkLocalAddress() ||
 			inetAddress.isLoopbackAddress() ||
 			inetAddress.isSiteLocalAddress() ||
+			_isSharedInet4Address(inetAddress) ||
 			_isUniqueLocalInet6Address(inetAddress)) {
 
 			return true;
@@ -254,6 +255,20 @@ public class InetAddressUtil {
 		}
 
 		return null;
+	}
+
+	private static boolean _isSharedInet4Address(InetAddress inetAddress) {
+		if (!(inetAddress instanceof Inet4Address)) {
+			return false;
+		}
+
+		byte[] address = inetAddress.getAddress();
+
+		if ((address[0] == 100) && ((address[1] & 0xC0) == 0x40)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private static boolean _isUniqueLocalInet6Address(InetAddress inetAddress) {
