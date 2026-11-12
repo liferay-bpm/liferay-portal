@@ -101,8 +101,8 @@ public class DDMTemplateServiceTest extends BaseDDMServiceTestCase {
 					LocaleUtil.getSiteDefault(), RandomTestUtil.randomString()),
 				null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
 				DDMTemplateConstants.TEMPLATE_MODE_CREATE,
-				TemplateConstants.LANG_TYPE_VM,
-				getTestTemplateScript(TemplateConstants.LANG_TYPE_VM),
+				TemplateConstants.LANG_TYPE_FTL,
+				getTestTemplateScript(TemplateConstants.LANG_TYPE_FTL),
 				ServiceContextTestUtil.getServiceContext());
 
 			Assert.fail();
@@ -124,8 +124,8 @@ public class DDMTemplateServiceTest extends BaseDDMServiceTestCase {
 				LocaleUtil.getSiteDefault(), RandomTestUtil.randomString()),
 			null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
 			DDMTemplateConstants.TEMPLATE_MODE_CREATE,
-			TemplateConstants.LANG_TYPE_VM,
-			getTestTemplateScript(TemplateConstants.LANG_TYPE_VM),
+			TemplateConstants.LANG_TYPE_FTL,
+			getTestTemplateScript(TemplateConstants.LANG_TYPE_FTL),
 			ServiceContextTestUtil.getServiceContext());
 
 		_ddmTemplateService.deleteTemplate(
@@ -147,8 +147,8 @@ public class DDMTemplateServiceTest extends BaseDDMServiceTestCase {
 				LocaleUtil.getSiteDefault(), RandomTestUtil.randomString()),
 			null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
 			DDMTemplateConstants.TEMPLATE_MODE_CREATE,
-			TemplateConstants.LANG_TYPE_VM,
-			getTestTemplateScript(TemplateConstants.LANG_TYPE_VM),
+			TemplateConstants.LANG_TYPE_FTL,
+			getTestTemplateScript(TemplateConstants.LANG_TYPE_FTL),
 			ServiceContextTestUtil.getServiceContext());
 
 		try {
@@ -177,8 +177,8 @@ public class DDMTemplateServiceTest extends BaseDDMServiceTestCase {
 				LocaleUtil.getSiteDefault(), RandomTestUtil.randomString()),
 			null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
 			DDMTemplateConstants.TEMPLATE_MODE_CREATE,
-			TemplateConstants.LANG_TYPE_VM,
-			getTestTemplateScript(TemplateConstants.LANG_TYPE_VM),
+			TemplateConstants.LANG_TYPE_FTL,
+			getTestTemplateScript(TemplateConstants.LANG_TYPE_FTL),
 			ServiceContextTestUtil.getServiceContext());
 
 		DDMTemplate curTemplate =
@@ -201,8 +201,8 @@ public class DDMTemplateServiceTest extends BaseDDMServiceTestCase {
 				LocaleUtil.getSiteDefault(), RandomTestUtil.randomString()),
 			null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
 			DDMTemplateConstants.TEMPLATE_MODE_CREATE,
-			TemplateConstants.LANG_TYPE_VM,
-			getTestTemplateScript(TemplateConstants.LANG_TYPE_VM),
+			TemplateConstants.LANG_TYPE_FTL,
+			getTestTemplateScript(TemplateConstants.LANG_TYPE_FTL),
 			ServiceContextTestUtil.getServiceContext());
 
 		RoleTestUtil.removeResourcePermission(
