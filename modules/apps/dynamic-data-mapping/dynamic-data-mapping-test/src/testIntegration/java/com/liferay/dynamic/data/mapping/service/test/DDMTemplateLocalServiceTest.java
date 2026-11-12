@@ -20,6 +20,8 @@ import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.template.TemplateConstants;
+import com.liferay.portal.kernel.template.TemplateException;
+import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -142,6 +144,20 @@ public class DDMTemplateLocalServiceTest extends BaseDDMServiceTestCase {
 				getTestTemplateScript(TemplateConstants.LANG_TYPE_FTL),
 				WorkflowConstants.STATUS_APPROVED);
 		}
+	}
+
+	@Test
+	public void testAddTemplateWithVelocityLanguage() throws Exception {
+		AssertUtils.assertFailure(
+			TemplateException.class,
+			"Velocity templates are no longer supported",
+			() -> addTemplate(
+				_classNameId, 0, null, RandomTestUtil.randomString(),
+				DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
+				DDMTemplateConstants.TEMPLATE_MODE_CREATE,
+				TemplateConstants.LANG_TYPE_VM,
+				getTestTemplateScript(TemplateConstants.LANG_TYPE_VM),
+				WorkflowConstants.STATUS_APPROVED));
 	}
 
 	@Test(expected = TemplateNameException.class)
