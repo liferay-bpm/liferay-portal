@@ -10462,6 +10462,133 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
+	public void testUpdateObjectEntryWithEdgeObjectRelationship()
+		throws Exception {
+
+		ObjectDefinition objectDefinitionA = _addObjectDefinition();
+		ObjectDefinition objectDefinitionAA = _addObjectDefinition();
+		ObjectDefinition objectDefinitionAAA = _addObjectDefinition();
+		ObjectDefinition objectDefinitionAB = _addObjectDefinition();
+
+		ObjectRelationship objectRelationshipA_AA = TreeTestUtil.bind(
+			objectDefinitionA.getObjectDefinitionId(),
+			objectDefinitionAA.getObjectDefinitionId(),
+			_objectRelationshipLocalService);
+		ObjectRelationship objectRelationshipA_AB = TreeTestUtil.bind(
+			objectDefinitionA.getObjectDefinitionId(),
+			objectDefinitionAB.getObjectDefinitionId(),
+			_objectRelationshipLocalService);
+		ObjectRelationship objectRelationshipAA_AAA = TreeTestUtil.bind(
+			objectDefinitionAA.getObjectDefinitionId(),
+			objectDefinitionAAA.getObjectDefinitionId(),
+			_objectRelationshipLocalService);
+
+		ObjectEntry objectEntryA = _addObjectEntry(
+			objectDefinitionA, Collections.emptyMap());
+
+		ObjectEntry objectEntryAA1 = _addRelatedObjectEntry(
+			objectEntryA, objectRelationshipA_AA);
+		ObjectEntry objectEntryAA2 = _addRelatedObjectEntry(
+			objectEntryA, objectRelationshipA_AA);
+		ObjectEntry objectEntryAB = _addRelatedObjectEntry(
+			objectEntryA, objectRelationshipA_AB);
+
+		ObjectEntry objectEntryAAA1 = _addRelatedObjectEntry(
+			objectEntryAA1, objectRelationshipAA_AAA);
+		ObjectEntry objectEntryAAA2 = _addRelatedObjectEntry(
+			objectEntryAA1, objectRelationshipAA_AAA);
+		ObjectEntry objectEntryAAA3 = _addRelatedObjectEntry(
+			objectEntryAA2, objectRelationshipAA_AAA);
+
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.ExceedsTextMaxLength.class,
+			"Object entry value exceeds the maximum length of 280 characters " +
+				"for object field \"textObjectFieldName\"",
+			() -> _defaultObjectEntryManager.updateObjectEntry(
+				_simpleDTOConverterContext, objectDefinitionA,
+				objectEntryA.getId(),
+				new ObjectEntry() {
+					{
+						properties = LinkedHashMapBuilder.<String, Object>put(
+							objectRelationshipA_AA.getName(),
+							List.of(
+								HashMapBuilder.<String, Object>put(
+									"externalReferenceCode",
+									objectEntryAA1.getExternalReferenceCode()
+								).put(
+									objectRelationshipAA_AAA.getName(),
+									List.of(
+										HashMapBuilder.<String, Object>put(
+											"externalReferenceCode",
+											objectEntryAAA1.
+												getExternalReferenceCode()
+										).build())
+								).build())
+						).put(
+							objectRelationshipA_AB.getName(),
+							List.of(
+								HashMapBuilder.<String, Object>put(
+									"externalReferenceCode",
+									objectEntryAB.getExternalReferenceCode()
+								).put(
+									"textObjectFieldName",
+									RandomTestUtil.randomString(281)
+								).build())
+						).build();
+					}
+				}));
+
+		Assert.assertNotNull(
+			_objectEntryLocalService.fetchObjectEntry(objectEntryAA2.getId()));
+		Assert.assertNotNull(
+			_objectEntryLocalService.fetchObjectEntry(objectEntryAAA2.getId()));
+
+		_defaultObjectEntryManager.updateObjectEntry(
+			_simpleDTOConverterContext, objectDefinitionA, objectEntryA.getId(),
+			new ObjectEntry() {
+				{
+					properties = LinkedHashMapBuilder.<String, Object>put(
+						objectRelationshipA_AA.getName(),
+						List.of(
+							HashMapBuilder.<String, Object>put(
+								"externalReferenceCode",
+								objectEntryAA1.getExternalReferenceCode()
+							).put(
+								objectRelationshipAA_AAA.getName(),
+								List.of(
+									HashMapBuilder.<String, Object>put(
+										"externalReferenceCode",
+										objectEntryAAA1.
+											getExternalReferenceCode()
+									).build())
+							).build())
+					).build();
+				}
+			});
+
+		Assert.assertNotNull(
+			_objectEntryLocalService.fetchObjectEntry(objectEntryAA1.getId()));
+		Assert.assertNull(
+			_objectEntryLocalService.fetchObjectEntry(objectEntryAA2.getId()));
+		Assert.assertNotNull(
+			_objectEntryLocalService.fetchObjectEntry(objectEntryAAA1.getId()));
+		Assert.assertNull(
+			_objectEntryLocalService.fetchObjectEntry(objectEntryAAA2.getId()));
+		Assert.assertNull(
+			_objectEntryLocalService.fetchObjectEntry(objectEntryAAA3.getId()));
+		Assert.assertNotNull(
+			_objectEntryLocalService.fetchObjectEntry(objectEntryAB.getId()));
+
+		TreeTestUtil.deleteObjectDefinitionHierarchy(
+			objectDefinitionLocalService,
+			new String[] {
+				objectDefinitionA.getName(), objectDefinitionAA.getName(),
+				objectDefinitionAAA.getName(), objectDefinitionAB.getName()
+			},
+			_objectEntryLocalService, _objectRelationshipLocalService);
+	}
+
+	@Test
 	public void testUpdateObjectEntryWithObjectEntryFolder() throws Exception {
 		ObjectEntryFolder objectEntryFolder =
 			_objectEntryFolderLocalService.addObjectEntryFolder(
@@ -11268,6 +11395,25 @@ public class DefaultObjectEntryManagerImplTest
 				}
 			},
 			ObjectDefinitionConstants.SCOPE_COMPANY);
+	}
+
+	private ObjectEntry _addRelatedObjectEntry(
+			ObjectEntry objectEntry, ObjectRelationship objectRelationship)
+		throws Exception {
+
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			objectRelationship.getObjectFieldId2());
+
+		return _defaultObjectEntryManager.addRelatedObjectEntry(
+			_simpleDTOConverterContext, objectEntry.getExternalReferenceCode(),
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						objectField.getName(), objectEntry.getId()
+					).build();
+				}
+			},
+			objectRelationship, ObjectDefinitionConstants.SCOPE_COMPANY);
 	}
 
 	private void _addResourcePermission(
