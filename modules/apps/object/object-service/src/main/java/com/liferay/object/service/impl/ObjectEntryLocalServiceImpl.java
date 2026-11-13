@@ -215,6 +215,7 @@ import com.liferay.portal.kernel.model.Users_OrgsTable;
 import com.liferay.portal.kernel.model.WorkflowInstanceLink;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.module.service.Snapshot;
+import com.liferay.portal.kernel.preview.Previewable;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Field;
@@ -1081,6 +1082,12 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	@Override
+	@Previewable
+	public ObjectEntry fetchObjectEntry(long objectEntryId) {
+		return objectEntryPersistence.fetchByPrimaryKey(objectEntryId);
+	}
+
+	@Override
 	public ObjectEntry fetchObjectEntry(long groupId, long objectDefinitionId) {
 		return objectEntryPersistence.fetchByG_ODI_First(
 			groupId, objectDefinitionId, null);
@@ -1485,6 +1492,14 @@ public class ObjectEntryLocalServiceImpl
 		return dslQueryCount(
 			joinStep.where(
 				predicate.and(ObjectEntryTable.INSTANCE.groupId.eq(groupId))));
+	}
+
+	@Override
+	@Previewable
+	public ObjectEntry getObjectEntry(long objectEntryId)
+		throws PortalException {
+
+		return objectEntryPersistence.findByPrimaryKey(objectEntryId);
 	}
 
 	@Override
