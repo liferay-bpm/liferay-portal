@@ -8,16 +8,8 @@ package com.liferay.commerce.util;
 import com.liferay.portal.configuration.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.InetAddressUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.security.configuration.URLFetchSecurityCompanyConfiguration;
-
-import java.net.URI;
-
-import java.util.Objects;
 
 /**
  * @author Stefano Motta
@@ -26,44 +18,15 @@ public class CommerceURLValidatorUtil {
 
 	public static boolean isValidURL(long companyId, String url) {
 		try {
-			URI uri = new URI(url);
-
-			String scheme = StringUtil.toLowerCase(uri.getScheme());
-
-			if (!Objects.equals(scheme, Http.HTTP) &&
-				!Objects.equals(scheme, Http.HTTPS)) {
-
-				return false;
-			}
-
-			String host = uri.getHost();
-
-			if (Validator.isNull(host)) {
-				return false;
-			}
-
 			URLFetchSecurityCompanyConfiguration
 				urlFetchSecurityCompanyConfiguration =
 					ConfigurationProviderUtil.getCompanyConfiguration(
 						URLFetchSecurityCompanyConfiguration.class, companyId);
 
-			String[] urlHostsAllowed =
-				urlFetchSecurityCompanyConfiguration.urlHostsAllowed();
-
-			if (ArrayUtil.isNotEmpty(urlHostsAllowed) &&
-				!ArrayUtil.contains(urlHostsAllowed, host, true)) {
-
-				return false;
-			}
-
-			if (urlFetchSecurityCompanyConfiguration.
-					urlLocalNetworkAccessEnabled()) {
-
-				return true;
-			}
-
-			return !InetAddressUtil.isLocalInetAddress(
-				InetAddressUtil.getInetAddressByName(host));
+			return HttpComponentsUtil.isAllowedURL(
+				url, urlFetchSecurityCompanyConfiguration.urlHostsAllowed(),
+				urlFetchSecurityCompanyConfiguration.
+					urlLocalNetworkAccessEnabled());
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
