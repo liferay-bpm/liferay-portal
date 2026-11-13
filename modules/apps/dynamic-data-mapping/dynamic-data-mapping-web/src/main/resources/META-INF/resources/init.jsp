@@ -133,6 +133,14 @@ page import="org.osgi.framework.FrameworkUtil" %>
 
 <portlet:defineObjects />
 
+<liferay-util:html-top
+	outputKey="com.liferay.dynamic.data.mapping.web#/init.jsp"
+>
+	<aui:script type="module">
+		import '@liferay/language/dynamic-data-mapping-web/all.js';
+	</aui:script>
+</liferay-util:html-top>
+
 <%
 String refererWebDAVToken = ParamUtil.getString(request, "refererWebDAVToken", portletConfig.getInitParameter("refererWebDAVToken"));
 boolean showManageTemplates = ParamUtil.getBoolean(request, "showManageTemplates", true);
