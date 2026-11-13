@@ -560,8 +560,20 @@ public class HttpComponentsUtil {
 				return true;
 			}
 
-			return !InetAddressUtil.isLocalInetAddress(
-				InetAddressUtil.getInetAddressByName(host));
+			InetAddress[] inetAddresses =
+				InetAddressUtil.getInetAddressesByName(host);
+
+			if (ArrayUtil.isEmpty(inetAddresses)) {
+				return false;
+			}
+
+			for (InetAddress inetAddress : inetAddresses) {
+				if (InetAddressUtil.isLocalInetAddress(inetAddress)) {
+					return false;
+				}
+			}
+
+			return true;
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
