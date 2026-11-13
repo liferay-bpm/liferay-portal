@@ -26,6 +26,7 @@ import {
 import getCMPProjectObjectEntryIds from '../../utils/getCMPProjectObjectEntryIds';
 import {getFormattedLabel} from '../../utils/getFormattedText';
 import {openCMPModal} from '../../utils/openCMPModal';
+import {addSubtaskWatchActions} from '../../utils/subtaskWatchActions';
 import {transformFDSBulkActions} from '../../utils/transformFDSBulkActions';
 import {ProjectTaskItemData, TaskAction} from '../../utils/types';
 import StateLabel from '../StateLabel';
@@ -210,7 +211,7 @@ export default function ProjectTasksFDSPropsTransformer({
 		},
 		hideManagementBarInEmptyState: true,
 		id,
-		itemsActions: styleActions(itemsActions),
+		itemsActions: addSubtaskWatchActions(styleActions(itemsActions)),
 		async onActionDropdownItemClick({
 			action,
 			itemData,

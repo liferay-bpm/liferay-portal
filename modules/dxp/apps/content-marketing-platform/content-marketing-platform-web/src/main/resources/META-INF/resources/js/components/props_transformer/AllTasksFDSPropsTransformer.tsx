@@ -27,6 +27,7 @@ import {WORKFLOW_TASK_ACTION_LINK_ID} from '../../utils/constants';
 import getCMPProjectObjectEntryIds from '../../utils/getCMPProjectObjectEntryIds';
 import {getFormattedLabel} from '../../utils/getFormattedText';
 import {openCMPModal} from '../../utils/openCMPModal';
+import {addSubtaskWatchActions} from '../../utils/subtaskWatchActions';
 import {transformFDSBulkActions} from '../../utils/transformFDSBulkActions';
 import {
 	ProjectTaskItemData,
@@ -277,7 +278,7 @@ export default function AllTasksFDSPropsTransformer({
 		},
 		hideManagementBarInEmptyState: true,
 		id,
-		itemsActions: styleActions(itemsActions),
+		itemsActions: addSubtaskWatchActions(styleActions(itemsActions)),
 		async onActionDropdownItemClick({
 			action,
 			itemData,
