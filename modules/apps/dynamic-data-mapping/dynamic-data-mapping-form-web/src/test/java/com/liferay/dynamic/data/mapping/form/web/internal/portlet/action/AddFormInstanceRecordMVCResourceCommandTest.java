@@ -9,8 +9,10 @@ import com.liferay.dynamic.data.mapping.form.builder.context.DDMFormContextDeser
 import com.liferay.dynamic.data.mapping.form.builder.internal.context.DDMFormContextToDDMFormValues;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion;
+import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
+import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
@@ -51,7 +53,7 @@ public class AddFormInstanceRecordMVCResourceCommandTest {
 		_setUpDDMFormContextToDDMFormValues();
 
 		_setUpAddFormInstanceRecordMVCResourceCommand();
-		_setUpDDMFormInstance();
+		_setUpDDMFormInstanceVersionLocalService();
 		_setUpLanguage();
 		_setUpLanguageUtil();
 	}
@@ -88,7 +90,7 @@ public class AddFormInstanceRecordMVCResourceCommandTest {
 				"TextField2", true, false, false));
 
 		Mockito.when(
-			_ddmStructure.getDDMForm()
+			_ddmStructureVersion.getDDMForm()
 		).thenReturn(
 			ddmForm
 		);
@@ -143,12 +145,32 @@ public class AddFormInstanceRecordMVCResourceCommandTest {
 			new JSONFactoryImpl());
 	}
 
-	private static void _setUpDDMFormInstance() throws Exception {
+	private static void _setUpDDMFormInstanceVersionLocalService()
+		throws Exception {
+
+		DDMFormInstanceVersionLocalService ddmFormInstanceVersionLocalService =
+			Mockito.mock(DDMFormInstanceVersionLocalService.class);
+
+		DDMFormInstanceVersion ddmFormInstanceVersion = Mockito.mock(
+			DDMFormInstanceVersion.class);
+
 		Mockito.when(
-			_ddmFormInstance.getStructure()
+			ddmFormInstanceVersion.getStructureVersion()
 		).thenReturn(
-			_ddmStructure
+			_ddmStructureVersion
 		);
+
+		Mockito.when(
+			ddmFormInstanceVersionLocalService.getLatestFormInstanceVersion(
+				Mockito.anyLong(), Mockito.anyInt())
+		).thenReturn(
+			ddmFormInstanceVersion
+		);
+
+		ReflectionTestUtil.setFieldValue(
+			_addFormInstanceRecordMVCResourceCommand,
+			"_ddmFormInstanceVersionLocalService",
+			ddmFormInstanceVersionLocalService);
 	}
 
 	private static void _setUpLanguage() {
@@ -177,8 +199,8 @@ public class AddFormInstanceRecordMVCResourceCommandTest {
 		_ddmFormContextToDDMFormValues;
 	private static final DDMFormInstance _ddmFormInstance = Mockito.mock(
 		DDMFormInstance.class);
-	private static final DDMStructure _ddmStructure = Mockito.mock(
-		DDMStructure.class);
+	private static final DDMStructureVersion _ddmStructureVersion =
+		Mockito.mock(DDMStructureVersion.class);
 	private static final Language _language = Mockito.mock(Language.class);
 
 	private final ResourceRequest _resourceRequest = Mockito.mock(

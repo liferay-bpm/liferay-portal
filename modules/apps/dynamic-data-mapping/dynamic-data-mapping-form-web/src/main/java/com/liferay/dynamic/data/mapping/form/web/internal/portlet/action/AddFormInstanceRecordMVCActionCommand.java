@@ -23,7 +23,6 @@ import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceSettings;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion;
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
@@ -33,7 +32,6 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLoca
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -113,7 +111,15 @@ public class AddFormInstanceRecordMVCActionCommand
 
 		_validateCaptcha(actionRequest, ddmFormInstance);
 
-		DDMForm ddmForm = getDDMForm(ddmFormInstance);
+		DDMFormInstanceVersion latestDDMFormInstanceVersion =
+			_ddmFormInstanceVersionLocalService.getLatestFormInstanceVersion(
+				ddmFormInstance.getFormInstanceId(),
+				WorkflowConstants.STATUS_APPROVED);
+
+		DDMStructureVersion ddmStructureVersion =
+			latestDDMFormInstanceVersion.getStructureVersion();
+
+		DDMForm ddmForm = ddmStructureVersion.getDDMForm();
 
 		DDMFormValues ddmFormValues = _ddmFormValuesFactory.create(
 			actionRequest, ddmForm);
@@ -149,13 +155,11 @@ public class AddFormInstanceRecordMVCActionCommand
 					_portal.getUserId(actionRequest)
 				).build());
 
-		DDMStructure ddmStructure = ddmFormInstance.getStructure();
-
 		AddFormInstanceRecordMVCCommandUtil.updateNonevaluableDDMFormFields(
 			ddmForm.getDDMFormFieldsMap(true),
 			ddmFormEvaluatorEvaluateResponse.getDDMFormFieldsPropertyChanges(),
 			ddmFormValues.getDDMFormFieldValuesMap(true),
-			ddmStructure.getDDMFormLayout(),
+			ddmStructureVersion.getDDMFormLayout(),
 			ddmFormEvaluatorEvaluateResponse.getDisabledPagesIndexes());
 
 		long ddmFormInstanceRecordId = ParamUtil.getLong(
@@ -225,20 +229,6 @@ public class AddFormInstanceRecordMVCActionCommand
 				actionRequest, "redirect", ddmFormInstanceSettingsRedirectURL));
 	}
 
-	protected DDMForm getDDMForm(DDMFormInstance ddmFormInstance)
-		throws PortalException {
-
-		DDMFormInstanceVersion latestDDMFormInstanceVersion =
-			_ddmFormInstanceVersionLocalService.getLatestFormInstanceVersion(
-				ddmFormInstance.getFormInstanceId(),
-				WorkflowConstants.STATUS_APPROVED);
-
-		DDMStructureVersion ddmStructureVersion =
-			latestDDMFormInstanceVersion.getStructureVersion();
-
-		return ddmStructureVersion.getDDMForm();
-	}
-
 	private void _createDDMFormFieldOptionsFromDataProvider(
 		ActionRequest actionRequest, DDMForm ddmForm, Locale locale) {
 
@@ -291,11 +281,17 @@ public class AddFormInstanceRecordMVCActionCommand
 				ddmFormInstanceRecordId, false, ddmFormValues, serviceContext);
 		}
 		else {
+			DDMFormInstanceVersion latestDDMFormInstanceVersion =
+				_ddmFormInstanceVersionLocalService.
+					getLatestFormInstanceVersion(
+						ddmFormInstance.getFormInstanceId(),
+						WorkflowConstants.STATUS_APPROVED);
+
 			DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion =
 				_ddmFormInstanceRecordVersionLocalService.
 					fetchLatestFormInstanceRecordVersion(
 						userId, ddmFormInstance.getFormInstanceId(),
-						ddmFormInstance.getVersion(),
+						latestDDMFormInstanceVersion.getVersion(),
 						WorkflowConstants.STATUS_DRAFT);
 
 			if (ddmFormInstanceRecordVersion == null) {
