@@ -2942,7 +2942,8 @@ public class ObjectEntryLocalServiceImpl
 			ServiceContext serviceContext, Map<String, Serializable> values)
 		throws PortalException {
 
-		if (ObjectDefinitionUtil.isDefaultFriendlyURLSeparator(
+		if (objectEntry.isTypeDraft() ||
+			ObjectDefinitionUtil.isDefaultFriendlyURLSeparator(
 				objectDefinition.getFriendlyURLSeparator())) {
 
 			return;
@@ -3170,7 +3171,9 @@ public class ObjectEntryLocalServiceImpl
 			ObjectEntry objectEntry)
 		throws PortalException {
 
-		if (!objectDefinition.isEnableObjectEntryVersioning()) {
+		if (!objectDefinition.isEnableObjectEntryVersioning() ||
+			objectEntry.isTypeDraft()) {
+
 			return objectEntry;
 		}
 
@@ -4231,6 +4234,10 @@ public class ObjectEntryLocalServiceImpl
 		ObjectDefinition objectDefinition, ObjectEntry objectEntry,
 		ObjectEntry originalObjectEntry, String preferredLanguageId,
 		User user) {
+
+		if (objectEntry.isTypeDraft()) {
+			return;
+		}
 
 		ObjectActionEngine objectActionEngine =
 			_objectActionEngineSnapshot.get();
@@ -8398,7 +8405,9 @@ public class ObjectEntryLocalServiceImpl
 			ObjectEntry objectEntry)
 		throws PortalException {
 
-		if (!objectDefinition.isEnableObjectEntryVersioning()) {
+		if (!objectDefinition.isEnableObjectEntryVersioning() ||
+			objectEntry.isTypeDraft()) {
+
 			return;
 		}
 
@@ -8609,7 +8618,9 @@ public class ObjectEntryLocalServiceImpl
 			objectDefinition.getClassName(), objectEntry.getObjectEntryId(),
 			serviceContext);
 
-		if (!objectDefinition.isEnableObjectEntryVersioning()) {
+		if (!objectDefinition.isEnableObjectEntryVersioning() &&
+			!objectEntry.isTypeDraft()) {
+
 			_deleteFileEntries(
 				objectEntry.getValues(), objectDefinition, transientValues);
 		}
@@ -9406,8 +9417,12 @@ public class ObjectEntryLocalServiceImpl
 					column, objectField.getDBType(), value);
 
 			if (objectEntryId != null) {
+				ObjectEntry objectEntry =
+					objectEntryPersistence.findByPrimaryKey(objectEntryId);
+
 				predicate = predicate.and(
-					ObjectEntryTable.INSTANCE.objectEntryId.neq(objectEntryId));
+					ObjectEntryTable.INSTANCE.headObjectEntryId.neq(
+						objectEntry.getHeadObjectEntryId()));
 			}
 
 			objectEntriesCount = getObjectEntriesCount(
