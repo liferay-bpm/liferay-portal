@@ -99,8 +99,8 @@ describe('FormView', () => {
 	it('does not submit when another form in the same page is invalid', async () => {
 		renderForms();
 
-		fetch.mockResponseOnce(JSON.stringify(INVALID_PAGES));
 		fetch.mockResponseOnce(JSON.stringify(PAGES));
+		fetch.mockResponseOnce(JSON.stringify(INVALID_PAGES));
 
 		await userEvent.click(screen.getByText('publish'));
 

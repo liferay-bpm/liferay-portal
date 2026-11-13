@@ -51,14 +51,22 @@ const mergeField = ({sourceVisible, viewMode = true, ...fieldProps}) => {
 
 describe('evaluation', () => {
 	describe('evaluate', () => {
-		it('evaluates a configuration in the default language', async () => {
-			const originalThemeDisplay = themeDisplay;
+		const originalThemeDisplay = themeDisplay;
 
+		beforeEach(() => {
 			themeDisplay = {
 				...originalThemeDisplay,
 				getSiteGroupId: () => '20126',
 			};
+		});
 
+		afterEach(() => {
+			jest.useRealTimers();
+
+			themeDisplay = originalThemeDisplay;
+		});
+
+		it('evaluates a configuration in the default language', async () => {
 			jest.useFakeTimers();
 
 			fetch.mockResponseOnce(JSON.stringify([]));
@@ -78,20 +86,9 @@ describe('evaluation', () => {
 			const [, {body}] = fetch.mock.calls[0];
 
 			expect(body.get('languageId')).toBe('en_US');
-
-			jest.useRealTimers();
-
-			themeDisplay = originalThemeDisplay;
 		});
 
 		it('evaluates every form when several forms evaluate at the same time', async () => {
-			const originalThemeDisplay = themeDisplay;
-
-			themeDisplay = {
-				...originalThemeDisplay,
-				getSiteGroupId: () => '20126',
-			};
-
 			jest.useFakeTimers();
 
 			fetch.mockResponseOnce(JSON.stringify([]));
@@ -123,10 +120,6 @@ describe('evaluation', () => {
 			).toEqual(containerIds);
 
 			await Promise.all(evaluations);
-
-			jest.useRealTimers();
-
-			themeDisplay = originalThemeDisplay;
 		});
 	});
 
