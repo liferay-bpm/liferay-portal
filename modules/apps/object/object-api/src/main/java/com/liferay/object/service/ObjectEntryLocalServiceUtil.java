@@ -37,6 +37,16 @@ public class ObjectEntryLocalServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.object.service.impl.ObjectEntryLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
+	public static ObjectEntry addDraftObjectEntry(
+			long userId, long headObjectEntryId, int version,
+			Map<String, Serializable> values,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addDraftObjectEntry(
+			userId, headObjectEntryId, version, values, serviceContext);
+	}
+
 	public static ObjectEntry addLatestApprovedObjectEntry(
 			String externalReferenceCode, long groupId, long userId,
 			long headObjectEntryId,
@@ -798,6 +808,15 @@ public class ObjectEntryLocalServiceUtil {
 			userId, objectEntryId, objectEntryFolderId, values, serviceContext);
 	}
 
+	public static ObjectEntry publishDraftObjectEntry(
+			long userId, long objectEntryId,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().publishDraftObjectEntry(
+			userId, objectEntryId, serviceContext);
+	}
+
 	public static void restoreObjectEntriesFromTrash(
 			long userId,
 			com.liferay.object.model.ObjectEntryFolder objectEntryFolder,
@@ -923,4 +942,4 @@ public class ObjectEntryLocalServiceUtil {
 			ObjectEntryLocalServiceUtil.class, ObjectEntryLocalService.class);
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:1455848682
+// LIFERAY-SERVICE-BUILDER-HASH:793051021

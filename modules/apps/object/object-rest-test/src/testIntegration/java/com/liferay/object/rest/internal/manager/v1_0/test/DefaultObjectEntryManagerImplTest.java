@@ -4738,6 +4738,48 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
+	public void testDeleteObjectEntryWithNonheadObjectEntries()
+		throws Exception {
+
+		_enableObjectEntryDraft(_objectDefinition6);
+
+		ObjectEntry headObjectEntry = _addObjectEntry(
+			_objectDefinition6,
+			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+			String.valueOf(_depotEntry.getGroupId()), 1);
+
+		com.liferay.object.model.ObjectEntry draftServiceBuilderObjectEntry =
+			_objectEntryLocalService.addDraftObjectEntry(
+				TestPropsValues.getUserId(), headObjectEntry.getId(),
+				RandomTestUtil.randomInt(), Collections.emptyMap(),
+				ServiceContextTestUtil.getServiceContext());
+
+		_defaultObjectEntryManager.deleteObjectEntry(
+			_objectDefinition6,
+			draftServiceBuilderObjectEntry.getObjectEntryId());
+
+		Assert.assertNull(
+			_objectEntryLocalService.fetchObjectEntry(
+				draftServiceBuilderObjectEntry.getObjectEntryId()));
+
+		com.liferay.object.model.ObjectEntry
+			latestApprovedServiceBuilderObjectEntry =
+				_objectEntryLocalService.addLatestApprovedObjectEntry(
+					null, _depotEntry.getGroupId(), TestPropsValues.getUserId(),
+					headObjectEntry.getId(), _objectDefinition6,
+					ObjectEntryFolderConstants.
+						PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+					_objectDefinition6.getDefaultLanguageId(),
+					RandomTestUtil.randomInt(), Collections.emptyMap());
+
+		AssertUtils.assertFailure(
+			NoSuchObjectEntryException.class, null,
+			() -> _defaultObjectEntryManager.deleteObjectEntry(
+				_objectDefinition6,
+				latestApprovedServiceBuilderObjectEntry.getObjectEntryId()));
+	}
+
+	@Test
 	public void testDeleteObjectEntryWithRelatedObjectEntries()
 		throws Exception {
 
@@ -7248,6 +7290,46 @@ public class DefaultObjectEntryManagerImplTest
 
 		Assert.assertEquals(Long.valueOf(user.getUserId()), creator.getId());
 		Assert.assertEquals(user.getFullName(), creator.getName());
+	}
+
+	@Test
+	public void testGetObjectEntryWithNonheadObjectEntries() throws Exception {
+		_objectDefinition1 = _enableObjectEntryVersioning();
+
+		_enableObjectEntryDraft(_objectDefinition1);
+
+		ObjectEntry headObjectEntry = _addObjectEntry(
+			_objectDefinition1, WorkflowConstants.STATUS_APPROVED);
+
+		AssertUtils.assertFailure(
+			NoSuchObjectEntryException.class, null,
+			() -> _defaultObjectEntryManager.getObjectEntry(
+				dtoConverterContext, _objectDefinition1,
+				_objectEntryLocalService.addLatestApprovedObjectEntry(
+					null, 0, TestPropsValues.getUserId(),
+					headObjectEntry.getId(), _objectDefinition1,
+					ObjectEntryFolderConstants.
+						PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+					_objectDefinition1.getDefaultLanguageId(),
+					RandomTestUtil.randomInt(), Collections.emptyMap())));
+
+		String textObjectFieldValue = RandomTestUtil.randomString();
+
+		ObjectEntry draftObjectEntry =
+			_defaultObjectEntryManager.getObjectEntry(
+				dtoConverterContext, _objectDefinition1,
+				_objectEntryLocalService.addDraftObjectEntry(
+					TestPropsValues.getUserId(), headObjectEntry.getId(),
+					RandomTestUtil.randomInt(),
+					HashMapBuilder.<String, Serializable>put(
+						"textObjectFieldName", textObjectFieldValue
+					).build(),
+					ServiceContextTestUtil.getServiceContext()));
+
+		Assert.assertEquals(
+			textObjectFieldValue,
+			MapUtil.getString(
+				draftObjectEntry.getProperties(), "textObjectFieldName"));
 	}
 
 	@Test
@@ -11832,6 +11914,12 @@ public class DefaultObjectEntryManagerImplTest
 			deleteAccountEntryOrganizationRel(
 				accountEntry.getAccountEntryId(),
 				organization.getOrganizationId());
+	}
+
+	private void _enableObjectEntryDraft(ObjectDefinition objectDefinition) {
+		objectDefinition.setEnableObjectEntryDraft(true);
+
+		objectDefinitionLocalService.updateObjectDefinition(objectDefinition);
 	}
 
 	private ObjectDefinition _enableObjectEntryVersioning() {
