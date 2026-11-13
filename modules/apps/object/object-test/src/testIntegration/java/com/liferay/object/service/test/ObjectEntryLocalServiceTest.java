@@ -8695,6 +8695,51 @@ public class ObjectEntryLocalServiceTest {
 	}
 
 	@Test
+	public void testPublishDraftObjectEntryWithAttachmentObjectField()
+		throws Exception {
+
+		_objectDefinition = _updateEnableObjectEntryDraft(_objectDefinition);
+		_objectDefinition = _updateEnableObjectEntryVersioning(
+			_objectDefinition);
+
+		ObjectEntry headObjectEntry = _addObjectEntry(
+			_addTempFileEntry(StringUtil.randomString()), "upload");
+
+		ObjectEntry draftObjectEntry =
+			_objectEntryLocalService.addDraftObjectEntry(
+				TestPropsValues.getUserId(), headObjectEntry.getObjectEntryId(),
+				RandomTestUtil.randomInt(), headObjectEntry.getValues(),
+				ServiceContextTestUtil.getServiceContext());
+
+		draftObjectEntry = _objectEntryLocalService.partialUpdateObjectEntry(
+			TestPropsValues.getUserId(), draftObjectEntry.getObjectEntryId(),
+			draftObjectEntry.getObjectEntryFolderId(),
+			HashMapBuilder.<String, Serializable>put(
+				"upload",
+				() -> {
+					FileEntry tempFileEntry = _addTempFileEntry(
+						StringUtil.randomString());
+
+					return tempFileEntry.getFileEntryId();
+				}
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
+		long fileEntryId = MapUtil.getLong(
+			draftObjectEntry.getValues(), "upload");
+
+		headObjectEntry = _objectEntryLocalService.publishDraftObjectEntry(
+			TestPropsValues.getUserId(), draftObjectEntry.getObjectEntryId(),
+			ServiceContextTestUtil.getServiceContext());
+
+		Assert.assertEquals(
+			fileEntryId,
+			MapUtil.getLong(headObjectEntry.getValues(), "upload"));
+
+		Assert.assertNotNull(_dlAppLocalService.fetchFileEntry(fileEntryId));
+	}
+
+	@Test
 	public void testRestoreObjectEntryFromTrashWithComments() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
