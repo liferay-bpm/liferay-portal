@@ -47,6 +47,26 @@ public class InetAddressUtilTest {
 	}
 
 	@Test
+	public void testGetInetAddressByName() throws Exception {
+		Assert.assertEquals(
+			InetAddress.getByName("127.0.0.1"),
+			InetAddressUtil.getInetAddressByName("127.0.0.1"));
+		Assert.assertEquals(
+			InetAddress.getByName("localhost"),
+			InetAddressUtil.getInetAddressByName("localhost"));
+	}
+
+	@Test
+	public void testGetInetAddressesByName() throws Exception {
+		Assert.assertArrayEquals(
+			new InetAddress[] {InetAddress.getByName("127.0.0.1")},
+			InetAddressUtil.getInetAddressesByName("127.0.0.1"));
+		Assert.assertArrayEquals(
+			InetAddress.getAllByName("localhost"),
+			InetAddressUtil.getInetAddressesByName("localhost"));
+	}
+
+	@Test
 	public void testIsLocalInetAddressWithSharedIPv4Address() throws Exception {
 		Assert.assertFalse(
 			InetAddressUtil.isLocalInetAddress(

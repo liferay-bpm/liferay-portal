@@ -9,6 +9,8 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 
+import java.net.InetAddress;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -74,7 +76,7 @@ public class HttpComponentsUtilTest {
 
 	@Test
 	@TestInfo("LPD-108705")
-	public void testIsAllowedURL() {
+	public void testIsAllowedURL() throws Exception {
 		Assert.assertFalse(
 			HttpComponentsUtil.isAllowedURL(
 				"ftp://8.8.8.8", new String[0], false));
@@ -98,6 +100,39 @@ public class HttpComponentsUtilTest {
 				"https://LIFERAY.com", new String[] {"liferay.com"}, true));
 		Assert.assertFalse(
 			HttpComponentsUtil.isAllowedURL(null, new String[0], true));
+
+		try (MockedStatic<InetAddressUtil> inetAddressUtilMockedStatic =
+				Mockito.mockStatic(InetAddressUtil.class)) {
+
+			inetAddressUtilMockedStatic.when(
+				() -> InetAddressUtil.getInetAddressesByName("liferay.com")
+			).thenReturn(
+				new InetAddress[] {
+					InetAddress.getByName("8.8.8.8"),
+					InetAddress.getByName("127.0.0.1")
+				}
+			);
+
+			inetAddressUtilMockedStatic.when(
+				() -> InetAddressUtil.getInetAddressesByName("www.liferay.com")
+			).thenReturn(
+				new InetAddress[] {
+					InetAddress.getByName("8.8.4.4"),
+					InetAddress.getByName("8.8.8.8")
+				}
+			);
+
+			inetAddressUtilMockedStatic.when(
+				() -> InetAddressUtil.isLocalInetAddress(Mockito.any())
+			).thenCallRealMethod();
+
+			Assert.assertFalse(
+				HttpComponentsUtil.isAllowedURL(
+					"http://liferay.com", new String[0], false));
+			Assert.assertTrue(
+				HttpComponentsUtil.isAllowedURL(
+					"http://www.liferay.com", new String[0], false));
+		}
 	}
 
 	private static final MockedStatic<PropsUtil> _propsUtilMockedStatic =
