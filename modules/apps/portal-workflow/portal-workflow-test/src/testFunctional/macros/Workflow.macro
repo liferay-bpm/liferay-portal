@@ -361,6 +361,8 @@ definition {
 
 		Workflow.confirmWorkflowAction();
 
+		SelectFrameTop();
+
 		Click(locator1 = "Icon#ANGLE_LEFT_BACK");
 
 		Workflow.viewTaskAssignedToMe(
@@ -511,6 +513,8 @@ definition {
 
 	@summary = "Default summary"
 	macro confirmWorkflowAction() {
+		WaitForElementPresent(locator1 = "IFrame#MODAL_BODY");
+
 		IFrame.selectConfigurationFrame();
 
 		AssertElementPresent(locator1 = "Button#DONE");
