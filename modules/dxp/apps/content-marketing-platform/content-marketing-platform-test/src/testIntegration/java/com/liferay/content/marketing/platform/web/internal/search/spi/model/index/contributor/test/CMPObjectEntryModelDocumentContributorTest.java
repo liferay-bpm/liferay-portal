@@ -37,11 +37,14 @@ import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+
+import java.io.Serializable;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -166,6 +169,44 @@ public class CMPObjectEntryModelDocumentContributorTest {
 			"cmpProjectObjectEntryIds", linkedObjectEntry,
 			cmpProjectObjectEntry2);
 		_assertFieldValues("cmpTaskObjectEntryIds", linkedObjectEntry);
+	}
+
+	@Test
+	public void testContributeWithCMPTaskObjectEntry() throws Exception {
+		Assume.assumeTrue(LicenseManagerUtil.isAppEnabled(App.CMP));
+
+		ObjectEntry cmpProjectObjectEntry =
+			CMPTestUtil.addCMPProjectObjectEntry();
+
+		ObjectEntry cmpTaskObjectEntry1 = CMPTestUtil.addCMPTaskObjectEntry(
+			cmpProjectObjectEntry);
+
+		Indexer<ObjectEntry> indexer = IndexerRegistryUtil.getIndexer(
+			cmpTaskObjectEntry1.getModelClassName());
+
+		Document document = indexer.getDocument(cmpTaskObjectEntry1);
+
+		Assert.assertEquals("0", document.get("cmpParentTaskId"));
+		Assert.assertEquals("false", document.get("cmpSubtask"));
+
+		ObjectEntry cmpTaskObjectEntry2 = CMPTestUtil.addCMPTaskObjectEntry(
+			cmpProjectObjectEntry);
+
+		document = indexer.getDocument(
+			_objectEntryLocalService.partialUpdateObjectEntry(
+				cmpTaskObjectEntry2.getUserId(),
+				cmpTaskObjectEntry2.getObjectEntryId(),
+				cmpTaskObjectEntry2.getObjectEntryFolderId(),
+				HashMapBuilder.<String, Serializable>put(
+					"r_cmpTaskToCMPTasks_c_cmpTaskId",
+					cmpTaskObjectEntry1.getObjectEntryId()
+				).build(),
+				ServiceContextTestUtil.getServiceContext()));
+
+		Assert.assertEquals(
+			String.valueOf(cmpTaskObjectEntry1.getObjectEntryId()),
+			document.get("cmpParentTaskId"));
+		Assert.assertEquals("true", document.get("cmpSubtask"));
 	}
 
 	private ObjectEntry _addLinkedObjectEntry(ObjectDefinition objectDefinition)
