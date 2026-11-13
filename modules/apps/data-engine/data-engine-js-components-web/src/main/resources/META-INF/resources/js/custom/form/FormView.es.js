@@ -47,9 +47,7 @@ import {
 const DDM_FORM_PORTLET_NAMESPACE =
 	'_com_liferay_dynamic_data_mapping_form_web_portlet_DDMFormPortlet_';
 
-const formAPIRefs = new WeakMap();
-
-const handledSubmitEvents = new WeakSet();
+const formAPIRefsMap = new WeakMap();
 
 /**
  * This is a copy of the old implementation made in Metal.js, deals with
@@ -65,7 +63,7 @@ const useFormSubmit = ({apiRef, containerRef}) => {
 
 	const submitForm = useCallback(
 		(event) => {
-			const apiRefs = formAPIRefs.get(event.target) ?? new Set([apiRef]);
+			const apiRefs = formAPIRefsMap.get(event.target);
 
 			Promise.all([...apiRefs].map((ref) => ref.current.validate()))
 				.then((validations) => {
@@ -146,18 +144,18 @@ const useFormSubmit = ({apiRef, containerRef}) => {
 					});
 				});
 		},
-		[apiRef, containerRef, submittable, title]
+		[containerRef, submittable, title]
 	);
 
 	const handleFormSubmitted = useCallback(
 		(event) => {
 			event.preventDefault();
 
-			if (handledSubmitEvents.has(event)) {
+			const [firstAPIRef] = formAPIRefsMap.get(event.currentTarget);
+
+			if (firstAPIRef !== apiRef) {
 				return;
 			}
-
-			handledSubmitEvents.add(event);
 
 			if (isDDMFormPortletNamespace) {
 				fetch(validateCSRFTokenURL, {
@@ -180,7 +178,7 @@ const useFormSubmit = ({apiRef, containerRef}) => {
 				submitForm(event);
 			}
 		},
-		[isDDMFormPortletNamespace, submitForm, validateCSRFTokenURL]
+		[apiRef, isDDMFormPortletNamespace, submitForm, validateCSRFTokenURL]
 	);
 
 	const showSessionExpiredModal = () => {
@@ -247,11 +245,11 @@ const useFormSubmit = ({apiRef, containerRef}) => {
 			(formNode) => {
 				form = formNode;
 
-				if (!formAPIRefs.has(form)) {
-					formAPIRefs.set(form, new Set());
+				if (!formAPIRefsMap.has(form)) {
+					formAPIRefsMap.set(form, new Set());
 				}
 
-				formAPIRefs.get(form).add(apiRef);
+				formAPIRefsMap.get(form).add(apiRef);
 
 				formSubmitHandler = Liferay.on(
 					'submitForm',
@@ -268,9 +266,7 @@ const useFormSubmit = ({apiRef, containerRef}) => {
 		);
 
 		return () => {
-			if (form) {
-				formAPIRefs.get(form).delete(apiRef);
-			}
+			formAPIRefsMap.get(form)?.delete(apiRef);
 
 			form?.removeEventListener('submit', handleFormSubmitted);
 			formSubmitHandler?.detach();
@@ -384,6 +380,7 @@ const usePublicAPI = ({apiRef, containerRef, unstable_onEventRef}) => {
 	useImperativeHandle(apiRef, () => ({
 		evaluate: (editingLanguageId) =>
 			evaluate(null, {
+				containerId,
 				defaultLanguageId,
 				editingLanguageId,
 				formId: containerRef.current
