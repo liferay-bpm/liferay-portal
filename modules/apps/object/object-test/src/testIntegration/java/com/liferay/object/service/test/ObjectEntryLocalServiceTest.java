@@ -3304,7 +3304,6 @@ public class ObjectEntryLocalServiceTest {
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
-	@FeatureFlag("LPD-11388")
 	@Test
 	public void testAddObjectEntryWithLocalizedLocationObjectField()
 		throws Exception {
@@ -3421,7 +3420,6 @@ public class ObjectEntryLocalServiceTest {
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
-	@FeatureFlag("LPD-11388")
 	@Test
 	public void testAddObjectEntryWithLocationObjectField() throws Exception {
 		ObjectDefinition objectDefinition =
@@ -7704,7 +7702,6 @@ public class ObjectEntryLocalServiceTest {
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
-	@FeatureFlag("LPD-11388")
 	@Test
 	public void testGetValuesWithLocalizedLocationObjectField()
 		throws Exception {
