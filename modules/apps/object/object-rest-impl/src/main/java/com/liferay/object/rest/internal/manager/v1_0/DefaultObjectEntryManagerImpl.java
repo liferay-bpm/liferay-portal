@@ -2099,7 +2099,9 @@ public class DefaultObjectEntryManagerImpl
 		throws Exception {
 
 		if (!preferApproved) {
-			_checkHeadObjectEntry(serviceBuilderObjectEntry);
+			if (!serviceBuilderObjectEntry.isTypeDraft()) {
+				_checkHeadObjectEntry(serviceBuilderObjectEntry);
+			}
 
 			return;
 		}
@@ -2221,7 +2223,10 @@ public class DefaultObjectEntryManagerImpl
 			com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry)
 		throws Exception {
 
-		_checkHeadObjectEntry(serviceBuilderObjectEntry);
+		if (!serviceBuilderObjectEntry.isTypeDraft()) {
+			_checkHeadObjectEntry(serviceBuilderObjectEntry);
+		}
+
 		_checkObjectEntryObjectDefinitionId(
 			objectDefinition, serviceBuilderObjectEntry);
 		_checkRootDescendantNode(serviceBuilderObjectEntry, false);
@@ -2229,7 +2234,7 @@ public class DefaultObjectEntryManagerImpl
 		DepotEntry depotEntry = _depotEntryLocalService.fetchGroupDepotEntry(
 			serviceBuilderObjectEntry.getGroupId());
 
-		if ((depotEntry != null) &&
+		if ((depotEntry != null) && !serviceBuilderObjectEntry.isTypeDraft() &&
 			_trashHelper.isTrashEnabled(
 				serviceBuilderObjectEntry.getGroupId()) &&
 			(serviceBuilderObjectEntry.getStatus() !=
