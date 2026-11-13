@@ -37,25 +37,37 @@ public class InetAddressUtil {
 	public static InetAddress getInetAddressByName(String domain)
 		throws UnknownHostException {
 
+		InetAddress[] inetAddresses = getInetAddressesByName(domain);
+
+		if (inetAddresses == null) {
+			return null;
+		}
+
+		return inetAddresses[0];
+	}
+
+	public static InetAddress[] getInetAddressesByName(String domain)
+		throws UnknownHostException {
+
 		InetAddress inetAddress = _fastResolveAddress(domain);
 
 		if (inetAddress != null) {
-			return inetAddress;
+			return new InetAddress[] {inetAddress};
 		}
 
 		try {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					StringBundler.concat(
-						"Get internet address for domain ", domain,
+						"Get internet addresses for domain ", domain,
 						" has active count ",
 						_noticeableThreadPoolExecutor.getActiveCount(),
 						" and pending tasking count ",
 						_noticeableThreadPoolExecutor.getPendingTaskCount()));
 			}
 
-			Future<InetAddress> future = _noticeableThreadPoolExecutor.submit(
-				() -> InetAddress.getByName(domain));
+			Future<InetAddress[]> future = _noticeableThreadPoolExecutor.submit(
+				() -> InetAddress.getAllByName(domain));
 
 			return future.get(
 				_DNS_SECURITY_ADDRESS_TIMEOUT_SECONDS, TimeUnit.SECONDS);
