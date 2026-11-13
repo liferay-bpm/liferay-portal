@@ -765,6 +765,30 @@ public class ObjectEntryLocalServiceTest {
 	}
 
 	@Test
+	public void testAddDraftObjectEntry() throws Exception {
+		ObjectEntry objectEntry = _addObjectEntry(
+			0, _irrelevantObjectDefinition.getObjectDefinitionId(),
+			Collections.emptyMap());
+
+		AssertUtils.assertFailure(
+			ObjectEntryStatusException.class, "Draft status is not allowed",
+			() -> _objectEntryLocalService.addDraftObjectEntry(
+				TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
+				RandomTestUtil.randomInt(), Collections.emptyMap(),
+				ServiceContextTestUtil.getServiceContext()));
+
+		_irrelevantObjectDefinition = _updateEnableObjectEntryDraft(
+			_irrelevantObjectDefinition);
+
+		AssertUtils.assertFailure(
+			ObjectEntryStatusException.class, "Draft status is not allowed",
+			() -> _objectEntryLocalService.addDraftObjectEntry(
+				TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
+				RandomTestUtil.randomInt(), Collections.emptyMap(),
+				ServiceContextTestUtil.getServiceContext()));
+	}
+
+	@Test
 	public void testAddMultipleObjectEntriesWithTheSameObjectValidationRule()
 		throws Exception {
 
@@ -5605,6 +5629,44 @@ public class ObjectEntryLocalServiceTest {
 			draftObjectDefinition);
 		_objectDefinitionLocalService.deleteObjectDefinition(
 			publishedObjectDefinition);
+
+		// Delete object entry with draft object entries
+
+		ObjectDefinition objectDefinition = _publishCustomObjectDefinition(
+			Arrays.asList(
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+					ObjectFieldConstants.DB_TYPE_STRING,
+					RandomTestUtil.randomString(), StringUtil.randomId())));
+
+		objectDefinition = _updateEnableObjectEntryDraft(objectDefinition);
+		objectDefinition = _updateEnableObjectEntryVersioning(objectDefinition);
+
+		ObjectEntry objectEntry6 = _addObjectEntry(
+			0, objectDefinition.getObjectDefinitionId(),
+			Collections.emptyMap());
+
+		ObjectEntry draftObjectEntry1 =
+			_objectEntryLocalService.addDraftObjectEntry(
+				TestPropsValues.getUserId(), objectEntry6.getObjectEntryId(),
+				RandomTestUtil.randomInt(), Collections.emptyMap(),
+				ServiceContextTestUtil.getServiceContext());
+		ObjectEntry draftObjectEntry2 =
+			_objectEntryLocalService.addDraftObjectEntry(
+				TestPropsValues.getUserId(), objectEntry6.getObjectEntryId(),
+				RandomTestUtil.randomInt(), Collections.emptyMap(),
+				ServiceContextTestUtil.getServiceContext());
+
+		_objectEntryLocalService.deleteObjectEntry(objectEntry6);
+
+		Assert.assertNull(
+			_objectEntryLocalService.fetchObjectEntry(
+				draftObjectEntry1.getObjectEntryId()));
+		Assert.assertNull(
+			_objectEntryLocalService.fetchObjectEntry(
+				draftObjectEntry2.getObjectEntryId()));
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
 	@Test
@@ -9627,6 +9689,7 @@ public class ObjectEntryLocalServiceTest {
 
 		_testUpdateObjectEntryExternalReferenceCode();
 		_testUpdateObjectEntryObjectStateTransitions();
+		_testUpdateObjectEntryWithDraftObjectEntry();
 		_testUpdateObjectEntryWithObjectRelationship();
 	}
 
@@ -13862,6 +13925,54 @@ public class ObjectEntryLocalServiceTest {
 			objectEntry.getObjectEntryId());
 	}
 
+	private void _testUpdateObjectEntryWithDraftObjectEntry() throws Exception {
+		_objectDefinition = _updateEnableObjectEntryDraft(_objectDefinition);
+		_objectDefinition = _updateEnableObjectEntryVersioning(
+			_objectDefinition);
+
+		Map<String, Serializable> requiredValues =
+			HashMapBuilder.<String, Serializable>put(
+				"emailAddressRequired",
+				RandomTestUtil.randomString() + "@liferay.com"
+			).put(
+				"listTypeEntryKeyRequired", "listTypeEntryKey1"
+			).build();
+
+		ObjectEntry headObjectEntry = _addObjectEntry(
+			HashMapBuilder.<String, Serializable>put(
+				"firstName", RandomTestUtil.randomString()
+			).putAll(
+				requiredValues
+			).build());
+
+		ObjectEntry draftObjectEntry =
+			_objectEntryLocalService.addDraftObjectEntry(
+				TestPropsValues.getUserId(), headObjectEntry.getObjectEntryId(),
+				RandomTestUtil.randomInt(), headObjectEntry.getValues(),
+				ServiceContextTestUtil.getServiceContext());
+
+		String firstName = RandomTestUtil.randomString();
+
+		draftObjectEntry = _objectEntryLocalService.updateObjectEntry(
+			TestPropsValues.getUserId(), draftObjectEntry.getObjectEntryId(),
+			draftObjectEntry.getObjectEntryFolderId(),
+			HashMapBuilder.<String, Serializable>put(
+				"firstName", firstName
+			).putAll(
+				requiredValues
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_DRAFT, draftObjectEntry.getStatus());
+		Assert.assertEquals(
+			firstName,
+			MapUtil.getString(draftObjectEntry.getValues(), "firstName"));
+
+		_objectEntryLocalService.deleteObjectEntry(
+			headObjectEntry.getObjectEntryId());
+	}
+
 	private void _testUpdateObjectEntryWithObjectRelationship()
 		throws Exception {
 
@@ -14044,6 +14155,15 @@ public class ObjectEntryLocalServiceTest {
 		ObjectDefinition objectDefinition) {
 
 		objectDefinition.setEnableObjectEntryDraft(true);
+
+		return _objectDefinitionLocalService.updateObjectDefinition(
+			objectDefinition);
+	}
+
+	private ObjectDefinition _updateEnableObjectEntryVersioning(
+		ObjectDefinition objectDefinition) {
+
+		objectDefinition.setEnableObjectEntryVersioning(true);
 
 		return _objectDefinitionLocalService.updateObjectDefinition(
 			objectDefinition);
