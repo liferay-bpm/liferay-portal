@@ -66,6 +66,7 @@ import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectDefinitionSettingConstants;
+import com.liferay.object.constants.ObjectEntryConstants;
 import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
@@ -8695,6 +8696,184 @@ public class ObjectEntryLocalServiceTest {
 	}
 
 	@Test
+	public void testPublishDraftObjectEntry() throws Exception {
+		_objectDefinition = _updateEnableObjectEntryDraft(_objectDefinition);
+		_objectDefinition = _updateEnableObjectEntryVersioning(
+			_objectDefinition);
+
+		ObjectEntry headObjectEntry = _addObjectEntry(
+			HashMapBuilder.<String, Serializable>put(
+				"emailAddressRequired",
+				RandomTestUtil.randomString() + "@liferay.com"
+			).put(
+				"firstName", RandomTestUtil.randomString()
+			).put(
+				"listTypeEntryKeyRequired", "listTypeEntryKey1"
+			).build());
+
+		long headObjectEntryId = headObjectEntry.getObjectEntryId();
+
+		AssertUtils.assertFailure(
+			NoSuchObjectEntryException.class,
+			StringBundler.concat(
+				"No ObjectEntry exists with the key {objectEntryId=",
+				headObjectEntryId, ", type=", ObjectEntryConstants.TYPE_DRAFT,
+				"}"),
+			() -> _objectEntryLocalService.publishDraftObjectEntry(
+				TestPropsValues.getUserId(), headObjectEntryId,
+				ServiceContextTestUtil.getServiceContext()));
+
+		String firstName1 = RandomTestUtil.randomString();
+
+		ObjectEntry draftObjectEntry1 =
+			_objectEntryLocalService.addDraftObjectEntry(
+				TestPropsValues.getUserId(), headObjectEntryId,
+				RandomTestUtil.randomInt(),
+				HashMapBuilder.<String, Serializable>putAll(
+					headObjectEntry.getValues()
+				).put(
+					"firstName", firstName1
+				).build(),
+				ServiceContextTestUtil.getServiceContext());
+
+		String firstName2 = RandomTestUtil.randomString();
+
+		ObjectEntry draftObjectEntry2 =
+			_objectEntryLocalService.addDraftObjectEntry(
+				TestPropsValues.getUserId(), headObjectEntryId,
+				RandomTestUtil.randomInt(),
+				HashMapBuilder.<String, Serializable>putAll(
+					headObjectEntry.getValues()
+				).put(
+					"firstName", firstName2
+				).build(),
+				ServiceContextTestUtil.getServiceContext());
+
+		headObjectEntry = _objectEntryLocalService.publishDraftObjectEntry(
+			TestPropsValues.getUserId(), draftObjectEntry1.getObjectEntryId(),
+			ServiceContextTestUtil.getServiceContext());
+
+		Assert.assertEquals(
+			headObjectEntryId, headObjectEntry.getObjectEntryId());
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_APPROVED, headObjectEntry.getStatus());
+		Assert.assertEquals(
+			firstName1,
+			MapUtil.getString(headObjectEntry.getValues(), "firstName"));
+
+		Assert.assertNull(
+			_objectEntryLocalService.fetchObjectEntry(
+				draftObjectEntry1.getObjectEntryId()));
+
+		headObjectEntry = _objectEntryLocalService.publishDraftObjectEntry(
+			TestPropsValues.getUserId(), draftObjectEntry2.getObjectEntryId(),
+			ServiceContextTestUtil.getServiceContext());
+
+		Assert.assertEquals(
+			draftObjectEntry2.getHeadObjectEntryId(),
+			headObjectEntry.getObjectEntryId());
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_APPROVED, headObjectEntry.getStatus());
+		Assert.assertEquals(
+			firstName2,
+			MapUtil.getString(headObjectEntry.getValues(), "firstName"));
+
+		Assert.assertNull(
+			_objectEntryLocalService.fetchObjectEntry(
+				draftObjectEntry2.getObjectEntryId()));
+	}
+
+	@Test
+	public void testPublishDraftObjectEntryWithAssetCategory()
+		throws Exception {
+
+		_siteObjectDefinition = _updateEnableObjectEntryDraft(
+			_siteObjectDefinition);
+		_siteObjectDefinition = _updateEnableObjectEntryVersioning(
+			_siteObjectDefinition);
+
+		Group group = GroupTestUtil.addGroup();
+
+		ObjectEntry headObjectEntry = _addObjectEntry(
+			group.getGroupId(), _siteObjectDefinition.getObjectDefinitionId(),
+			Collections.emptyMap());
+
+		AssetCategory assetCategory = _addAssetCategory(group);
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
+
+		serviceContext.setAssetCategoryIds(
+			new long[] {assetCategory.getCategoryId()});
+
+		ObjectEntry draftObjectEntry =
+			_objectEntryLocalService.addDraftObjectEntry(
+				TestPropsValues.getUserId(), headObjectEntry.getObjectEntryId(),
+				RandomTestUtil.randomInt(), Collections.emptyMap(),
+				serviceContext);
+
+		_objectEntryLocalService.publishDraftObjectEntry(
+			TestPropsValues.getUserId(), draftObjectEntry.getObjectEntryId(),
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId()));
+
+		AssetEntry assetEntry = _assetEntryLocalService.getEntry(
+			headObjectEntry.getModelClassName(),
+			headObjectEntry.getObjectEntryId());
+
+		Assert.assertArrayEquals(
+			new long[] {assetCategory.getCategoryId()},
+			assetEntry.getCategoryIds());
+	}
+
+	@Test
+	public void testPublishDraftObjectEntryWithAssetTag() throws Exception {
+		_siteObjectDefinition = _updateEnableObjectEntryDraft(
+			_siteObjectDefinition);
+		_siteObjectDefinition = _updateEnableObjectEntryVersioning(
+			_siteObjectDefinition);
+
+		Group group = GroupTestUtil.addGroup();
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
+
+		serviceContext.setAssetTagNames(
+			new String[] {
+				StringUtil.toLowerCase(RandomTestUtil.randomString())
+			});
+
+		ObjectEntry headObjectEntry = _addObjectEntry(
+			group.getGroupId(), _siteObjectDefinition, Collections.emptyMap(),
+			serviceContext);
+
+		String assetTagName = StringUtil.toLowerCase(
+			RandomTestUtil.randomString());
+
+		serviceContext.setAssetTagNames(new String[] {assetTagName});
+
+		ObjectEntry draftObjectEntry =
+			_objectEntryLocalService.addDraftObjectEntry(
+				TestPropsValues.getUserId(), headObjectEntry.getObjectEntryId(),
+				RandomTestUtil.randomInt(), Collections.emptyMap(),
+				serviceContext);
+
+		_objectEntryLocalService.publishDraftObjectEntry(
+			TestPropsValues.getUserId(), draftObjectEntry.getObjectEntryId(),
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId()));
+
+		AssetEntry assetEntry = _assetEntryLocalService.getEntry(
+			headObjectEntry.getModelClassName(),
+			headObjectEntry.getObjectEntryId());
+
+		Assert.assertArrayEquals(
+			new String[] {assetTagName}, assetEntry.getTagNames());
+	}
+
+	@Test
 	public void testPublishDraftObjectEntryWithAttachmentObjectField()
 		throws Exception {
 
@@ -8737,6 +8916,43 @@ public class ObjectEntryLocalServiceTest {
 			MapUtil.getLong(headObjectEntry.getValues(), "upload"));
 
 		Assert.assertNotNull(_dlAppLocalService.fetchFileEntry(fileEntryId));
+	}
+
+	@Test
+	public void testPublishDraftObjectEntryWithTrashedObjectEntry()
+		throws Exception {
+
+		_siteObjectDefinition = _updateEnableObjectEntryDraft(
+			_siteObjectDefinition);
+		_siteObjectDefinition = _updateEnableObjectEntryVersioning(
+			_siteObjectDefinition);
+
+		Group group = GroupTestUtil.addGroup();
+
+		ObjectEntry headObjectEntry = _addObjectEntry(
+			group.getGroupId(), _siteObjectDefinition.getObjectDefinitionId(),
+			Collections.emptyMap());
+
+		ObjectEntry draftObjectEntry =
+			_objectEntryLocalService.addDraftObjectEntry(
+				TestPropsValues.getUserId(), headObjectEntry.getObjectEntryId(),
+				RandomTestUtil.randomInt(), Collections.emptyMap(),
+				ServiceContextTestUtil.getServiceContext());
+
+		_objectEntryLocalService.moveObjectEntryToTrash(
+			TestPropsValues.getUserId(), headObjectEntry,
+			ServiceContextTestUtil.getServiceContext());
+
+		AssertUtils.assertFailure(
+			NoSuchObjectEntryException.class,
+			StringBundler.concat(
+				"No ObjectEntry exists with the key {objectEntryId=",
+				headObjectEntry.getObjectEntryId(), ", status=",
+				WorkflowConstants.STATUS_IN_TRASH, "}"),
+			() -> _objectEntryLocalService.publishDraftObjectEntry(
+				TestPropsValues.getUserId(),
+				draftObjectEntry.getObjectEntryId(),
+				ServiceContextTestUtil.getServiceContext()));
 	}
 
 	@Test
