@@ -30,7 +30,7 @@ import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
 import com.liferay.object.system.SystemObjectDefinitionManager;
 import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
-import com.liferay.object.util.comparator.ObjectFieldCreateDateComparator;
+import com.liferay.object.util.comparator.ObjectFieldPriorityComparator;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.petra.function.UnsafeFunction;
@@ -239,7 +239,7 @@ public class ObjectDefinitionUtil {
 							serviceBuilderObjectDefinition.
 								getObjectDefinitionId(),
 							QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-							ObjectFieldCreateDateComparator.getInstance(true)),
+							ObjectFieldPriorityComparator.getInstance(true)),
 						objectField -> objectFieldDTOConverter.toDTO(
 							new DefaultDTOConverterContext(
 								false, null, null, null, locale, null, null),
