@@ -166,15 +166,15 @@ public class DDMFormContextProviderServletTest {
 			Mockito.mock(DDMFormTemplateContextProcessor.class);
 
 		Mockito.when(
-			ddmFormTemplateContextProcessor.getDDMFormInstanceId()
-		).thenReturn(
-			ddmFormInstanceId
-		);
-
-		Mockito.when(
 			ddmFormTemplateContextProcessor.getGroupId()
 		).thenReturn(
 			_GROUP_ID
+		);
+
+		Mockito.when(
+			ddmFormTemplateContextProcessor.getDDMFormInstanceId()
+		).thenReturn(
+			ddmFormInstanceId
 		);
 
 		ReflectionTestUtil.invoke(
@@ -186,6 +186,8 @@ public class DDMFormContextProviderServletTest {
 	}
 
 	private void _mockDDMFormInstance() throws Exception {
+		DDMFormInstance ddmFormInstance = Mockito.mock(DDMFormInstance.class);
+
 		DDMFormInstanceSettings ddmFormInstanceSettings = Mockito.mock(
 			DDMFormInstanceSettings.class);
 
@@ -194,8 +196,6 @@ public class DDMFormContextProviderServletTest {
 		).thenReturn(
 			true
 		);
-
-		DDMFormInstance ddmFormInstance = Mockito.mock(DDMFormInstance.class);
 
 		Mockito.when(
 			ddmFormInstance.getGroupId()
