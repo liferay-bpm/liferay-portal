@@ -193,18 +193,18 @@ public class DDMFormContextProviderServlet extends HttpServlet {
 		HttpServletResponse httpServletResponse, String portletNamespace) {
 
 		try {
+			DDMFormTemplateContextProcessor ddmFormTemplateContextProcessor =
+				_createDDMFormTemplateContextProcessor(httpServletRequest);
+
+			_checkGroupPermission(
+				ddmFormTemplateContextProcessor, httpServletRequest);
+
 			Locale locale = _getLocale(httpServletRequest);
 
 			DDMFormRenderingContext ddmFormRenderingContext =
 				_createDDMFormRenderingContext(
 					httpServletRequest, httpServletResponse, locale,
 					portletNamespace);
-
-			DDMFormTemplateContextProcessor ddmFormTemplateContextProcessor =
-				_createDDMFormTemplateContextProcessor(httpServletRequest);
-
-			_checkGroupPermission(
-				ddmFormTemplateContextProcessor, httpServletRequest);
 
 			ddmFormRenderingContext.setDDMFormInstanceId(
 				ddmFormTemplateContextProcessor.getDDMFormInstanceId());
