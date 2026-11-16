@@ -469,6 +469,7 @@
 		<column localized="true" name="label" type="String" />
 		<column name="localized" type="boolean" />
 		<column name="name" type="String" />
+		<column name="priority" type="int" />
 		<column name="readOnly" type="String" />
 		<column name="readOnlyConditionExpression" type="String" />
 		<column name="relationshipType" type="String" />
@@ -479,6 +480,7 @@
 		<!-- Order -->
 
 		<order by="asc">
+			<order-column name="priority" />
 			<order-column name="name" />
 		</order>
 
@@ -839,9 +841,17 @@
 		<column name="edge" type="boolean" />
 		<column localized="true" name="label" type="String" />
 		<column name="name" type="String" />
+		<column name="priority" type="int" />
 		<column name="reverse" type="boolean" />
 		<column name="system" type="boolean" />
 		<column name="type" type="String" />
+
+		<!-- Order -->
+
+		<order by="asc">
+			<order-column name="priority" />
+			<order-column name="objectRelationshipId" />
+		</order>
 
 		<!-- Finder methods -->
 
