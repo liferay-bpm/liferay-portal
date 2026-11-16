@@ -74,6 +74,7 @@ import com.liferay.object.service.ObjectFilterLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.test.util.EncryptedObjectFieldTestUtil;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -1945,6 +1946,45 @@ public class ObjectFieldLocalServiceTest {
 
 		_objectDefinitionLocalService.deleteObjectDefinition(
 			modifiableSystemObjectDefinition);
+	}
+
+	@Test
+	public void testGetCustomObjectFields() throws Exception {
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition(
+				Arrays.asList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING,
+						RandomTestUtil.randomString(), "charlie"),
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING,
+						RandomTestUtil.randomString(), "baker"),
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING,
+						RandomTestUtil.randomString(), "able")));
+
+		Assert.assertEquals(
+			Arrays.asList("able", "baker", "charlie"),
+			TransformUtil.transform(
+				_objectFieldLocalService.getCustomObjectFields(
+					objectDefinition.getObjectDefinitionId()),
+				ObjectField::getName));
+
+		_updatePriority(objectDefinition, "able", 2);
+		_updatePriority(objectDefinition, "baker", 1);
+		_updatePriority(objectDefinition, "charlie", 1);
+
+		Assert.assertEquals(
+			Arrays.asList("baker", "charlie", "able"),
+			TransformUtil.transform(
+				_objectFieldLocalService.getCustomObjectFields(
+					objectDefinition.getObjectDefinitionId()),
+				ObjectField::getName));
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
 	@Test
@@ -4141,6 +4181,18 @@ public class ObjectFieldLocalServiceTest {
 
 		Assert.assertEquals(
 			StringPool.BLANK, objectField.getDescription(LocaleUtil.US));
+	}
+
+	private void _updatePriority(
+			ObjectDefinition objectDefinition, String name, int priority)
+		throws Exception {
+
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			objectDefinition.getObjectDefinitionId(), name);
+
+		objectField.setPriority(priority);
+
+		_objectFieldLocalService.updateObjectField(objectField);
 	}
 
 	private ObjectField _updateReadOnlyObjectField(

@@ -834,6 +834,51 @@ public class ObjectRelationshipLocalServiceTest {
 	}
 
 	@Test
+	public void testGetObjectRelationships() throws Exception {
+		ObjectRelationship objectRelationship1 =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, _objectDefinition1,
+				_objectDefinition2);
+		ObjectRelationship objectRelationship2 =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, _objectDefinition1,
+				_objectDefinition3);
+
+		Assert.assertEquals(
+			Arrays.asList(objectRelationship1, objectRelationship2),
+			_objectRelationshipLocalService.getObjectRelationships(
+				_objectDefinition1.getObjectDefinitionId()));
+
+		objectRelationship1.setPriority(2);
+
+		objectRelationship1 =
+			_objectRelationshipLocalService.updateObjectRelationship(
+				objectRelationship1);
+
+		objectRelationship2.setPriority(1);
+
+		objectRelationship2 =
+			_objectRelationshipLocalService.updateObjectRelationship(
+				objectRelationship2);
+
+		Assert.assertEquals(
+			Arrays.asList(objectRelationship2, objectRelationship1),
+			_objectRelationshipLocalService.getObjectRelationships(
+				_objectDefinition1.getObjectDefinitionId()));
+
+		objectRelationship1.setPriority(1);
+
+		objectRelationship1 =
+			_objectRelationshipLocalService.updateObjectRelationship(
+				objectRelationship1);
+
+		Assert.assertEquals(
+			Arrays.asList(objectRelationship1, objectRelationship2),
+			_objectRelationshipLocalService.getObjectRelationships(
+				_objectDefinition1.getObjectDefinitionId()));
+	}
+
+	@Test
 	public void testRegisterObjectRelationshipsRelatedInfoItemCollectionProviders()
 		throws Exception {
 
