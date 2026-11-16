@@ -12,6 +12,7 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
@@ -133,6 +134,17 @@ public class ObjectRelationshipDTOConverter
 									getParameterObjectFieldId());
 
 						return objectField.getName();
+					});
+				setPriority(
+					() -> {
+						if (!FeatureFlagManagerUtil.isEnabled(
+								serviceBuilderObjectRelationship.getCompanyId(),
+								"LPD-110248")) {
+
+							return null;
+						}
+
+						return serviceBuilderObjectRelationship.getPriority();
 					});
 				setReverse(serviceBuilderObjectRelationship::isReverse);
 				setSystem(serviceBuilderObjectRelationship::isSystem);
