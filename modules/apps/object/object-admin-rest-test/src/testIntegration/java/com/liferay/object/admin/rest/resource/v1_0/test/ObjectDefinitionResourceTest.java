@@ -60,6 +60,7 @@ import com.liferay.object.service.ObjectFolderLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.test.util.TreeTestUtil;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -169,6 +170,7 @@ public class ObjectDefinitionResourceTest
 	@Test
 	public void testGetObjectDefinition() throws Exception {
 		_testGetObjectDefinition();
+		_testGetObjectDefinitionWithPriority();
 		_testGetObjectDefinitionWithRootObjectDefinitionExternalReferenceCodes();
 		_testGetObjectDefinitionWithWorkflowDefinitionLink();
 	}
@@ -2482,6 +2484,33 @@ public class ObjectDefinitionResourceTest
 		return relationshipObjectField;
 	}
 
+	private ObjectField _createTextObjectField(String name) {
+		ObjectField textObjectField = new ObjectField();
+
+		textObjectField.setBusinessType(ObjectField.BusinessType.TEXT);
+		textObjectField.setDBType(ObjectField.DBType.STRING);
+		textObjectField.setLabel(
+			Collections.singletonMap("en_US", RandomTestUtil.randomString()));
+		textObjectField.setName(name);
+
+		return textObjectField;
+	}
+
+	private String[] _getCustomObjectFieldNames(
+		ObjectDefinition objectDefinition) {
+
+		return TransformUtil.transform(
+			objectDefinition.getObjectFields(),
+			objectField -> {
+				if (objectField.getSystem()) {
+					return null;
+				}
+
+				return objectField.getName();
+			},
+			String.class);
+	}
+
 	private ObjectDefinitionSetting[] _getObjectDefinitionSettings(
 		String allowStandaloneObjectEntryValue) {
 
@@ -2807,6 +2836,115 @@ public class ObjectDefinitionResourceTest
 
 		objectDefinitionResource.deleteObjectDefinition(
 			objectDefinition.getId());
+	}
+
+	private void _testGetObjectDefinitionWithPriority() throws Exception {
+		ObjectDefinition randomObjectDefinition = randomObjectDefinition();
+
+		randomObjectDefinition.setObjectFields(
+			new ObjectField[] {
+				_createTextObjectField("charlie"),
+				_createTextObjectField("able"), _createTextObjectField("baker")
+			});
+
+		ObjectDefinition objectDefinition1 =
+			objectDefinitionResource.postObjectDefinition(
+				randomObjectDefinition);
+
+		ObjectDefinition objectDefinition2 =
+			objectDefinitionResource.postObjectDefinition(
+				randomObjectDefinition());
+
+		com.liferay.object.model.ObjectRelationship
+			serviceBuilderObjectRelationship1 =
+				_objectRelationshipLocalService.addObjectRelationship(
+					null, TestPropsValues.getUserId(),
+					objectDefinition1.getId(), objectDefinition2.getId(), 0,
+					ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null,
+					false,
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString()),
+					"a" + RandomTestUtil.randomString(), false,
+					ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+		com.liferay.object.model.ObjectRelationship
+			serviceBuilderObjectRelationship2 =
+				_objectRelationshipLocalService.addObjectRelationship(
+					null, TestPropsValues.getUserId(),
+					objectDefinition1.getId(), objectDefinition2.getId(), 0,
+					ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null,
+					false,
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString()),
+					"a" + RandomTestUtil.randomString(), false,
+					ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+
+		objectDefinition1 = objectDefinitionResource.getObjectDefinition(
+			objectDefinition1.getId());
+
+		Assert.assertArrayEquals(
+			new String[] {"charlie", "able", "baker"},
+			_getCustomObjectFieldNames(objectDefinition1));
+		Assert.assertArrayEquals(
+			new Long[] {
+				serviceBuilderObjectRelationship1.getObjectRelationshipId(),
+				serviceBuilderObjectRelationship2.getObjectRelationshipId()
+			},
+			TransformUtil.transform(
+				objectDefinition1.getObjectRelationships(),
+				ObjectRelationship::getId, Long.class));
+
+		_updateObjectFieldPriority(objectDefinition1, "able", 1);
+		_updateObjectFieldPriority(objectDefinition1, "baker", 1);
+		_updateObjectFieldPriority(objectDefinition1, "charlie", 3);
+
+		serviceBuilderObjectRelationship1.setPriority(4);
+
+		_objectRelationshipLocalService.updateObjectRelationship(
+			serviceBuilderObjectRelationship1);
+
+		serviceBuilderObjectRelationship2.setPriority(2);
+
+		_objectRelationshipLocalService.updateObjectRelationship(
+			serviceBuilderObjectRelationship2);
+
+		objectDefinition1 = objectDefinitionResource.getObjectDefinition(
+			objectDefinition1.getId());
+
+		Assert.assertArrayEquals(
+			new String[] {"able", "baker", "charlie"},
+			_getCustomObjectFieldNames(objectDefinition1));
+		Assert.assertArrayEquals(
+			new Long[] {
+				serviceBuilderObjectRelationship2.getObjectRelationshipId(),
+				serviceBuilderObjectRelationship1.getObjectRelationshipId()
+			},
+			TransformUtil.transform(
+				objectDefinition1.getObjectRelationships(),
+				ObjectRelationship::getId, Long.class));
+
+		try (SafeCloseable safeCloseable =
+				FeatureFlagTestUtil.setFeatureFlagsWithSafeCloseable(
+					true, "LPD-110248")) {
+
+			objectDefinition1 = objectDefinitionResource.getObjectDefinition(
+				objectDefinition1.getId());
+
+			ObjectField objectField = _getObjectField(
+				objectDefinition1, "charlie");
+
+			Assert.assertEquals(Integer.valueOf(3), objectField.getPriority());
+
+			Assert.assertArrayEquals(
+				new Integer[] {2, 4},
+				TransformUtil.transform(
+					objectDefinition1.getObjectRelationships(),
+					ObjectRelationship::getPriority, Integer.class));
+		}
+
+		objectDefinitionResource.deleteObjectDefinition(
+			objectDefinition1.getId());
+		objectDefinitionResource.deleteObjectDefinition(
+			objectDefinition2.getId());
 	}
 
 	private void _testGetObjectDefinitionWithRootObjectDefinitionExternalReferenceCodes()
@@ -4264,6 +4402,19 @@ public class ObjectDefinitionResourceTest
 
 		Assert.assertNull(
 			_getObjectView(objectViewExternalReferenceCode, objectDefinition));
+	}
+
+	private void _updateObjectFieldPriority(
+			ObjectDefinition objectDefinition, String name, int priority)
+		throws Exception {
+
+		com.liferay.object.model.ObjectField serviceBuilderObjectField =
+			_objectFieldLocalService.getObjectField(
+				objectDefinition.getId(), name);
+
+		serviceBuilderObjectField.setPriority(priority);
+
+		_objectFieldLocalService.updateObjectField(serviceBuilderObjectField);
 	}
 
 	private JSONObject _waitForFinish(
