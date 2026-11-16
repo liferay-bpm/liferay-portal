@@ -27,6 +27,7 @@ import com.liferay.object.internal.upgrade.v10_9_1.ClassNameUpgradeProcess;
 import com.liferay.object.internal.upgrade.v13_12_0.ObjectActionDescriptionUpgradeProcess;
 import com.liferay.object.internal.upgrade.v13_13_2.ObjectEntryExtensionTableUpgradeProcess;
 import com.liferay.object.internal.upgrade.v13_13_3.ObjectEntryGroupIdUpgradeProcess;
+import com.liferay.object.internal.upgrade.v13_15_1.ObjectDefinitionPriorityUpgradeProcess;
 import com.liferay.object.internal.upgrade.v13_3_0.AttachmentObjectFieldDownloadPermissionUpgradeProcess;
 import com.liferay.object.internal.upgrade.v13_8_0.LayoutPageTemplateEntryClassNameIdUpgradeProcess;
 import com.liferay.object.internal.upgrade.v1_2_0.util.ObjectViewColumnTable;
@@ -873,6 +874,15 @@ public class ObjectServiceUpgradeStepRegistrator
 					"update ObjectEntry set type_ = ",
 					ObjectEntryConstants.TYPE_LATEST_APPROVED,
 					" where objectEntryId != headObjectEntryId")));
+
+		registry.register(
+			"13.14.0", "13.15.0",
+			UpgradeProcessFactory.addColumns("ObjectField", "priority INTEGER"),
+			UpgradeProcessFactory.addColumns(
+				"ObjectRelationship", "priority INTEGER"));
+
+		registry.register(
+			"13.15.0", "13.15.1", new ObjectDefinitionPriorityUpgradeProcess());
 	}
 
 	private static final String[] _REMOVED_PANEL_CATEGORY_KEYS = {
