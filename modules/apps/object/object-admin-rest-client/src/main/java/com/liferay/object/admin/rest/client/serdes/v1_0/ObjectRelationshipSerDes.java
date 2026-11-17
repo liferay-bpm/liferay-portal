@@ -278,6 +278,16 @@ public class ObjectRelationshipSerDes {
 			sb.append("\"");
 		}
 
+		if (objectRelationship.getPriority() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"priority\": ");
+
+			sb.append(objectRelationship.getPriority());
+		}
+
 		if (objectRelationship.getReverse() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -503,6 +513,14 @@ public class ObjectRelationshipSerDes {
 					objectRelationship.getParameterObjectFieldName()));
 		}
 
+		if (objectRelationship.getPriority() == null) {
+			map.put("priority", null);
+		}
+		else {
+			map.put(
+				"priority", String.valueOf(objectRelationship.getPriority()));
+		}
+
 		if (objectRelationship.getReverse() == null) {
 			map.put("reverse", null);
 		}
@@ -621,6 +639,9 @@ public class ObjectRelationshipSerDes {
 			else if (Objects.equals(
 						jsonParserFieldName, "parameterObjectFieldName")) {
 
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "priority")) {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "reverse")) {
@@ -780,6 +801,12 @@ public class ObjectRelationshipSerDes {
 						(String)jsonParserFieldValue);
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "priority")) {
+				if (jsonParserFieldValue != null) {
+					objectRelationship.setPriority(
+						Integer.valueOf((String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "reverse")) {
 				if (jsonParserFieldValue != null) {
 					objectRelationship.setReverse(
@@ -885,4 +912,4 @@ public class ObjectRelationshipSerDes {
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:539837164
+// LIFERAY-REST-BUILDER-HASH:-1789817294
