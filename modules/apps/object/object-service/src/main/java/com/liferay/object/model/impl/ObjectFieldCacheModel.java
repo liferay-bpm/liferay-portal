@@ -68,7 +68,7 @@ public class ObjectFieldCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(57);
+		StringBundler sb = new StringBundler(59);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -114,6 +114,8 @@ public class ObjectFieldCacheModel
 		sb.append(localized);
 		sb.append(", name=");
 		sb.append(name);
+		sb.append(", priority=");
+		sb.append(priority);
 		sb.append(", readOnly=");
 		sb.append(readOnly);
 		sb.append(", readOnlyConditionExpression=");
@@ -240,6 +242,8 @@ public class ObjectFieldCacheModel
 			objectFieldImpl.setName(name);
 		}
 
+		objectFieldImpl.setPriority(priority);
+
 		if (readOnly == null) {
 			objectFieldImpl.setReadOnly("");
 		}
@@ -305,6 +309,8 @@ public class ObjectFieldCacheModel
 
 		localized = objectInput.readBoolean();
 		name = objectInput.readUTF();
+
+		priority = objectInput.readInt();
 		readOnly = objectInput.readUTF();
 		readOnlyConditionExpression = (String)objectInput.readObject();
 		relationshipType = objectInput.readUTF();
@@ -416,6 +422,8 @@ public class ObjectFieldCacheModel
 			objectOutput.writeUTF(name);
 		}
 
+		objectOutput.writeInt(priority);
+
 		if (readOnly == null) {
 			objectOutput.writeUTF("");
 		}
@@ -466,6 +474,7 @@ public class ObjectFieldCacheModel
 	public String label;
 	public boolean localized;
 	public String name;
+	public int priority;
 	public String readOnly;
 	public String readOnlyConditionExpression;
 	public String relationshipType;
@@ -474,4 +483,4 @@ public class ObjectFieldCacheModel
 	public boolean system;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1267564296
+// LIFERAY-SERVICE-BUILDER-HASH:-1236685294

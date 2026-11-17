@@ -69,7 +69,7 @@ public class ObjectRelationshipCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(45);
+		StringBundler sb = new StringBundler(47);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -109,6 +109,8 @@ public class ObjectRelationshipCacheModel
 		sb.append(label);
 		sb.append(", name=");
 		sb.append(name);
+		sb.append(", priority=");
+		sb.append(priority);
 		sb.append(", reverse=");
 		sb.append(reverse);
 		sb.append(", system=");
@@ -210,6 +212,7 @@ public class ObjectRelationshipCacheModel
 			objectRelationshipImpl.setName(name);
 		}
 
+		objectRelationshipImpl.setPriority(priority);
 		objectRelationshipImpl.setReverse(reverse);
 		objectRelationshipImpl.setSystem(system);
 
@@ -254,6 +257,8 @@ public class ObjectRelationshipCacheModel
 		edge = objectInput.readBoolean();
 		label = objectInput.readUTF();
 		name = objectInput.readUTF();
+
+		priority = objectInput.readInt();
 
 		reverse = objectInput.readBoolean();
 
@@ -340,6 +345,8 @@ public class ObjectRelationshipCacheModel
 			objectOutput.writeUTF(name);
 		}
 
+		objectOutput.writeInt(priority);
+
 		objectOutput.writeBoolean(reverse);
 
 		objectOutput.writeBoolean(system);
@@ -371,9 +378,10 @@ public class ObjectRelationshipCacheModel
 	public boolean edge;
 	public String label;
 	public String name;
+	public int priority;
 	public boolean reverse;
 	public boolean system;
 	public String type;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:1461971225
+// LIFERAY-SERVICE-BUILDER-HASH:-1806729077
