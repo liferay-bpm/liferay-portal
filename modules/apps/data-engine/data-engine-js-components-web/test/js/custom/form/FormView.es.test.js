@@ -41,7 +41,7 @@ const getEvaluatedContainerIds = () =>
 				JSON.parse(body.get('serializedFormContext')).containerId
 		);
 
-const renderForms = () => {
+const renderForms = (props = {portletNamespace: '_portletNamespace_'}) => {
 	fetch.mockResponseOnce(JSON.stringify([]));
 	fetch.mockResponseOnce(JSON.stringify([]));
 
@@ -50,15 +50,15 @@ const renderForms = () => {
 			<FormView
 				containerId="_portletNamespace_dataEngineLayoutRenderer1"
 				pages={PAGES}
-				portletNamespace="_portletNamespace_"
 				submittable
+				{...props}
 			/>
 
 			<FormView
 				containerId="_portletNamespace_dataEngineLayoutRenderer2"
 				pages={PAGES}
-				portletNamespace="_portletNamespace_"
 				submittable
+				{...props}
 			/>
 
 			<button type="submit">publish</button>
@@ -134,6 +134,29 @@ describe('FormView', () => {
 			'_portletNamespace_dataEngineLayoutRenderer1',
 			'_portletNamespace_dataEngineLayoutRenderer2',
 		]);
+		expect(HTMLFormElement.prototype.submit).toHaveBeenCalledTimes(1);
+	});
+
+	it('validates the CSRF token once before submitting the forms of the Forms portlet', async () => {
+		renderForms({
+			portletNamespace:
+				'_com_liferay_dynamic_data_mapping_form_web_portlet_DDMFormPortlet_',
+			validateCSRFTokenURL: '/validate-csrf-token',
+		});
+
+		fetch.mockResponseOnce(JSON.stringify({validCSRFToken: true}));
+		fetch.mockResponseOnce(JSON.stringify(PAGES));
+		fetch.mockResponseOnce(JSON.stringify(PAGES));
+
+		await userEvent.click(screen.getByText('publish'));
+
+		await waitFor(() =>
+			expect(HTMLFormElement.prototype.submit).toHaveBeenCalled()
+		);
+
+		expect(
+			fetch.mock.calls.filter(([url]) => url === '/validate-csrf-token')
+		).toHaveLength(1);
 		expect(HTMLFormElement.prototype.submit).toHaveBeenCalledTimes(1);
 	});
 });
