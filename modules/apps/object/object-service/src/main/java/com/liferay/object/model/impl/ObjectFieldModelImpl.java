@@ -83,7 +83,7 @@ public class ObjectFieldModelImpl
 		{"indexed", Types.BOOLEAN}, {"indexedAsKeyword", Types.BOOLEAN},
 		{"indexedLanguageId", Types.VARCHAR}, {"label", Types.CLOB},
 		{"localized", Types.BOOLEAN}, {"name", Types.VARCHAR},
-		{"readOnly", Types.VARCHAR},
+		{"priority", Types.INTEGER}, {"readOnly", Types.VARCHAR},
 		{"readOnlyConditionExpression", Types.CLOB},
 		{"relationshipType", Types.VARCHAR}, {"required", Types.BOOLEAN},
 		{"state_", Types.BOOLEAN}, {"system_", Types.BOOLEAN}
@@ -115,6 +115,7 @@ public class ObjectFieldModelImpl
 		TABLE_COLUMNS_MAP.put("label", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("localized", Types.BOOLEAN);
 		TABLE_COLUMNS_MAP.put("name", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("priority", Types.INTEGER);
 		TABLE_COLUMNS_MAP.put("readOnly", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("readOnlyConditionExpression", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("relationshipType", Types.VARCHAR);
@@ -124,15 +125,17 @@ public class ObjectFieldModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table ObjectField (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,objectFieldId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,listTypeDefinitionId LONG,objectDefinitionId LONG,businessType VARCHAR(75) null,dbColumnName VARCHAR(75) null,dbTableName VARCHAR(75) null,dbType VARCHAR(75) null,description STRING null,indexed BOOLEAN,indexedAsKeyword BOOLEAN,indexedLanguageId VARCHAR(75) null,label TEXT null,localized BOOLEAN,name VARCHAR(75) null,readOnly VARCHAR(75) null,readOnlyConditionExpression TEXT null,relationshipType VARCHAR(75) null,required BOOLEAN,state_ BOOLEAN,system_ BOOLEAN)";
+		"create table ObjectField (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,objectFieldId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,listTypeDefinitionId LONG,objectDefinitionId LONG,businessType VARCHAR(75) null,dbColumnName VARCHAR(75) null,dbTableName VARCHAR(75) null,dbType VARCHAR(75) null,description STRING null,indexed BOOLEAN,indexedAsKeyword BOOLEAN,indexedLanguageId VARCHAR(75) null,label TEXT null,localized BOOLEAN,name VARCHAR(75) null,priority INTEGER,readOnly VARCHAR(75) null,readOnlyConditionExpression TEXT null,relationshipType VARCHAR(75) null,required BOOLEAN,state_ BOOLEAN,system_ BOOLEAN)";
 
 	public static final String TABLE_SQL_DROP = "drop table ObjectField";
 
 	public static final String ENTITY_ALIAS = "objectField";
 
-	public static final String ORDER_BY_JPQL = " ORDER BY objectField.name ASC";
+	public static final String ORDER_BY_JPQL =
+		" ORDER BY objectField.priority ASC, objectField.name ASC";
 
-	public static final String ORDER_BY_SQL = " ORDER BY ObjectField.name ASC";
+	public static final String ORDER_BY_SQL =
+		" ORDER BY ObjectField.priority ASC, ObjectField.name ASC";
 
 	public static final String DATA_SOURCE = "liferayDataSource";
 
@@ -223,6 +226,13 @@ public class ObjectFieldModelImpl
 	 */
 	@Deprecated
 	public static final long UUID_COLUMN_BITMASK = 8192L;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *		#getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long PRIORITY_COLUMN_BITMASK = 16384L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -370,6 +380,7 @@ public class ObjectFieldModelImpl
 			attributeGetterFunctions.put(
 				"localized", ObjectField::getLocalized);
 			attributeGetterFunctions.put("name", ObjectField::getName);
+			attributeGetterFunctions.put("priority", ObjectField::getPriority);
 			attributeGetterFunctions.put("readOnly", ObjectField::getReadOnly);
 			attributeGetterFunctions.put(
 				"readOnlyConditionExpression",
@@ -464,6 +475,9 @@ public class ObjectFieldModelImpl
 				(BiConsumer<ObjectField, Boolean>)ObjectField::setLocalized);
 			attributeSetterBiConsumers.put(
 				"name", (BiConsumer<ObjectField, String>)ObjectField::setName);
+			attributeSetterBiConsumers.put(
+				"priority",
+				(BiConsumer<ObjectField, Integer>)ObjectField::setPriority);
 			attributeSetterBiConsumers.put(
 				"readOnly",
 				(BiConsumer<ObjectField, String>)ObjectField::setReadOnly);
@@ -1212,6 +1226,21 @@ public class ObjectFieldModelImpl
 
 	@JSON
 	@Override
+	public int getPriority() {
+		return _priority;
+	}
+
+	@Override
+	public void setPriority(int priority) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_priority = priority;
+	}
+
+	@JSON
+	@Override
 	public String getReadOnly() {
 		if (_readOnly == null) {
 			return "";
@@ -1527,6 +1556,7 @@ public class ObjectFieldModelImpl
 		objectFieldImpl.setLabel(getLabel());
 		objectFieldImpl.setLocalized(isLocalized());
 		objectFieldImpl.setName(getName());
+		objectFieldImpl.setPriority(getPriority());
 		objectFieldImpl.setReadOnly(getReadOnly());
 		objectFieldImpl.setReadOnlyConditionExpression(
 			getReadOnlyConditionExpression());
@@ -1584,6 +1614,8 @@ public class ObjectFieldModelImpl
 		objectFieldImpl.setLocalized(
 			this.<Boolean>getColumnOriginalValue("localized"));
 		objectFieldImpl.setName(this.<String>getColumnOriginalValue("name"));
+		objectFieldImpl.setPriority(
+			this.<Integer>getColumnOriginalValue("priority"));
 		objectFieldImpl.setReadOnly(
 			this.<String>getColumnOriginalValue("readOnly"));
 		objectFieldImpl.setReadOnlyConditionExpression(
@@ -1603,6 +1635,20 @@ public class ObjectFieldModelImpl
 	@Override
 	public int compareTo(ObjectField objectField) {
 		int value = 0;
+
+		if (getPriority() < objectField.getPriority()) {
+			value = -1;
+		}
+		else if (getPriority() > objectField.getPriority()) {
+			value = 1;
+		}
+		else {
+			value = 0;
+		}
+
+		if (value != 0) {
+			return value;
+		}
 
 		value = getName().compareTo(objectField.getName());
 
@@ -1800,6 +1846,8 @@ public class ObjectFieldModelImpl
 			objectFieldCacheModel.name = null;
 		}
 
+		objectFieldCacheModel.priority = getPriority();
+
 		objectFieldCacheModel.readOnly = getReadOnly();
 
 		String readOnly = objectFieldCacheModel.readOnly;
@@ -1920,6 +1968,7 @@ public class ObjectFieldModelImpl
 	private String _labelCurrentLanguageId;
 	private boolean _localized;
 	private String _name;
+	private int _priority;
 	private String _readOnly;
 	private String _readOnlyConditionExpression;
 	private String _relationshipType;
@@ -1981,6 +2030,7 @@ public class ObjectFieldModelImpl
 		_columnOriginalValues.put("label", _label);
 		_columnOriginalValues.put("localized", _localized);
 		_columnOriginalValues.put("name", _name);
+		_columnOriginalValues.put("priority", _priority);
 		_columnOriginalValues.put("readOnly", _readOnly);
 		_columnOriginalValues.put(
 			"readOnlyConditionExpression", _readOnlyConditionExpression);
@@ -2057,17 +2107,19 @@ public class ObjectFieldModelImpl
 
 		columnBitmasks.put("name", 2097152L);
 
-		columnBitmasks.put("readOnly", 4194304L);
+		columnBitmasks.put("priority", 4194304L);
 
-		columnBitmasks.put("readOnlyConditionExpression", 8388608L);
+		columnBitmasks.put("readOnly", 8388608L);
 
-		columnBitmasks.put("relationshipType", 16777216L);
+		columnBitmasks.put("readOnlyConditionExpression", 16777216L);
 
-		columnBitmasks.put("required", 33554432L);
+		columnBitmasks.put("relationshipType", 33554432L);
 
-		columnBitmasks.put("state_", 67108864L);
+		columnBitmasks.put("required", 67108864L);
 
-		columnBitmasks.put("system_", 134217728L);
+		columnBitmasks.put("state_", 134217728L);
+
+		columnBitmasks.put("system_", 268435456L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}
@@ -2076,4 +2128,4 @@ public class ObjectFieldModelImpl
 	private ObjectField _escapedModel;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1134771864
+// LIFERAY-SERVICE-BUILDER-HASH:-708415993

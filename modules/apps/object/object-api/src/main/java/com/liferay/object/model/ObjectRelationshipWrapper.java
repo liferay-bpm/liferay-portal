@@ -53,6 +53,7 @@ public class ObjectRelationshipWrapper
 		attributes.put("edge", isEdge());
 		attributes.put("label", getLabel());
 		attributes.put("name", getName());
+		attributes.put("priority", getPriority());
 		attributes.put("reverse", isReverse());
 		attributes.put("system", isSystem());
 		attributes.put("type", getType());
@@ -177,6 +178,12 @@ public class ObjectRelationshipWrapper
 
 		if (name != null) {
 			setName(name);
+		}
+
+		Integer priority = (Integer)attributes.get("priority");
+
+		if (priority != null) {
+			setPriority(priority);
 		}
 
 		Boolean reverse = (Boolean)attributes.get("reverse");
@@ -518,6 +525,16 @@ public class ObjectRelationshipWrapper
 	@Override
 	public long getPrimaryKey() {
 		return model.getPrimaryKey();
+	}
+
+	/**
+	 * Returns the priority of this object relationship.
+	 *
+	 * @return the priority of this object relationship
+	 */
+	@Override
+	public int getPriority() {
+		return model.getPriority();
 	}
 
 	/**
@@ -932,6 +949,16 @@ public class ObjectRelationshipWrapper
 	}
 
 	/**
+	 * Sets the priority of this object relationship.
+	 *
+	 * @param priority the priority of this object relationship
+	 */
+	@Override
+	public void setPriority(int priority) {
+		model.setPriority(priority);
+	}
+
+	/**
 	 * Sets whether this object relationship is reverse.
 	 *
 	 * @param reverse the reverse of this object relationship
@@ -1019,4 +1046,4 @@ public class ObjectRelationshipWrapper
 	}
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-286267771
+// LIFERAY-SERVICE-BUILDER-HASH:-1250442423
