@@ -7,6 +7,7 @@ package com.liferay.object.admin.rest.internal.dto.v1_0.util;
 
 import com.liferay.object.admin.rest.dto.v1_0.WorkflowDefinitionLink;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
+import com.liferay.object.model.ObjectDefinitionWorkflowDefinitionLink;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
@@ -67,7 +68,11 @@ public class WorkflowDefinitionLinkUtil {
 				workflowDefinitionLink.getWorkflowDefinitionName());
 
 			serviceBuilderWorkflowDefinitionLinks.add(
-				serviceBuilderWorkflowDefinitionLink);
+				new ObjectDefinitionWorkflowDefinitionLink(
+					workflowDefinitionLink.getGroupExternalReferenceCode(),
+					workflowDefinitionLink.
+						getWorkflowDefinitionExternalReferenceCode(),
+					serviceBuilderWorkflowDefinitionLink));
 		}
 
 		return serviceBuilderWorkflowDefinitionLinks;
