@@ -204,6 +204,7 @@
 		</field>
 		<field name="localized" type="boolean" />
 		<field name="name" type="String" />
+		<field name="priority" type="int" />
 		<field name="readOnly" type="String" />
 		<field name="readOnlyConditionExpression" type="String">
 			<hint-collection name="CLOB" />
@@ -358,6 +359,7 @@
 		<field name="edge" type="boolean" />
 		<field localized="true" name="label" type="String" />
 		<field name="name" type="String" />
+		<field name="priority" type="int" />
 		<field name="reverse" type="boolean" />
 		<field name="system" type="boolean" />
 		<field name="type" type="String" />

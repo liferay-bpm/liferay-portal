@@ -175,6 +175,7 @@ create table ObjectField (
 	label TEXT null,
 	localized BOOLEAN,
 	name VARCHAR(75) null,
+	priority INTEGER,
 	readOnly VARCHAR(75) null,
 	readOnlyConditionExpression TEXT null,
 	relationshipType VARCHAR(75) null,
@@ -335,6 +336,7 @@ create table ObjectRelationship (
 	edge BOOLEAN,
 	label STRING null,
 	name VARCHAR(75) null,
+	priority INTEGER,
 	reverse BOOLEAN,
 	system_ BOOLEAN,
 	type_ VARCHAR(75) null

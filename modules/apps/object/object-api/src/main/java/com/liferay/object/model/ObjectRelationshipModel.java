@@ -540,6 +540,20 @@ public interface ObjectRelationshipModel
 	public void setName(String name);
 
 	/**
+	 * Returns the priority of this object relationship.
+	 *
+	 * @return the priority of this object relationship
+	 */
+	public int getPriority();
+
+	/**
+	 * Sets the priority of this object relationship.
+	 *
+	 * @param priority the priority of this object relationship
+	 */
+	public void setPriority(int priority);
+
+	/**
 	 * Returns the reverse of this object relationship.
 	 *
 	 * @return the reverse of this object relationship
@@ -617,4 +631,4 @@ public interface ObjectRelationshipModel
 	}
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:1100241639
+// LIFERAY-SERVICE-BUILDER-HASH:1647178460

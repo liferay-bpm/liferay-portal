@@ -130,10 +130,12 @@ public class ObjectFieldModelArgumentsResolver implements ArgumentsResolver {
 	static {
 		long orderByColumnsBitmask = 0;
 
+		orderByColumnsBitmask |= ObjectFieldModelImpl.getColumnBitmask(
+			"priority");
 		orderByColumnsBitmask |= ObjectFieldModelImpl.getColumnBitmask("name");
 
 		_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
 	}
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-784987775
+// LIFERAY-SERVICE-BUILDER-HASH:1259352578
