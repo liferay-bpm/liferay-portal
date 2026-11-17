@@ -56,6 +56,7 @@ public class ObjectFieldWrapper
 		attributes.put("label", getLabel());
 		attributes.put("localized", isLocalized());
 		attributes.put("name", getName());
+		attributes.put("priority", getPriority());
 		attributes.put("readOnly", getReadOnly());
 		attributes.put(
 			"readOnlyConditionExpression", getReadOnlyConditionExpression());
@@ -201,6 +202,12 @@ public class ObjectFieldWrapper
 
 		if (name != null) {
 			setName(name);
+		}
+
+		Integer priority = (Integer)attributes.get("priority");
+
+		if (priority != null) {
+			setPriority(priority);
 		}
 
 		String readOnly = (String)attributes.get("readOnly");
@@ -628,6 +635,16 @@ public class ObjectFieldWrapper
 	@Override
 	public long getPrimaryKey() {
 		return model.getPrimaryKey();
+	}
+
+	/**
+	 * Returns the priority of this object field.
+	 *
+	 * @return the priority of this object field
+	 */
+	@Override
+	public int getPriority() {
+		return model.getPriority();
 	}
 
 	/**
@@ -1166,6 +1183,16 @@ public class ObjectFieldWrapper
 	}
 
 	/**
+	 * Sets the priority of this object field.
+	 *
+	 * @param priority the priority of this object field
+	 */
+	@Override
+	public void setPriority(int priority) {
+		model.setPriority(priority);
+	}
+
+	/**
 	 * Sets the read only of this object field.
 	 *
 	 * @param readOnly the read only of this object field
@@ -1283,4 +1310,4 @@ public class ObjectFieldWrapper
 	}
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:1504834122
+// LIFERAY-SERVICE-BUILDER-HASH:-1937874124
