@@ -599,6 +599,20 @@ public interface ObjectFieldModel
 	public void setName(String name);
 
 	/**
+	 * Returns the priority of this object field.
+	 *
+	 * @return the priority of this object field
+	 */
+	public int getPriority();
+
+	/**
+	 * Sets the priority of this object field.
+	 *
+	 * @param priority the priority of this object field
+	 */
+	public void setPriority(int priority);
+
+	/**
 	 * Returns the read only of this object field.
 	 *
 	 * @return the read only of this object field
@@ -728,4 +742,4 @@ public interface ObjectFieldModel
 	}
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:2061266025
+// LIFERAY-SERVICE-BUILDER-HASH:-1663826528

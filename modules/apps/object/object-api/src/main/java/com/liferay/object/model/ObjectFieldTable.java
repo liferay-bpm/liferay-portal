@@ -78,6 +78,8 @@ public class ObjectFieldTable extends BaseTable<ObjectFieldTable> {
 		"localized", Boolean.class, Types.BOOLEAN, Column.FLAG_DEFAULT);
 	public final Column<ObjectFieldTable, String> name = createColumn(
 		"name", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
+	public final Column<ObjectFieldTable, Integer> priority = createColumn(
+		"priority", Integer.class, Types.INTEGER, Column.FLAG_DEFAULT);
 	public final Column<ObjectFieldTable, String> readOnly = createColumn(
 		"readOnly", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<ObjectFieldTable, Clob> readOnlyConditionExpression =
@@ -100,4 +102,4 @@ public class ObjectFieldTable extends BaseTable<ObjectFieldTable> {
 	}
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1225913692
+// LIFERAY-SERVICE-BUILDER-HASH:1662440100
