@@ -30,6 +30,7 @@
 			"objectField"?: ObjectField;
 			"parameterObjectFieldId"?: number;
 			"parameterObjectFieldName"?: string;
+			"priority"?: number;
 			"reverse"?: boolean;
 			"system"?: boolean;
 			"type"?: 'oneToMany' | 'oneToOne' | 'manyToMany';
@@ -135,6 +136,11 @@
 			baseName: "parameterObjectFieldName",
 			name: "parameterObjectFieldName",
 			type: "string",
+		},
+		{
+			baseName: "priority",
+			name: "priority",
+			type: "number",
 		},
 		{
 			baseName: "reverse",
