@@ -16,6 +16,7 @@ import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.text.DLFileEntryTextProvider;
 import com.liferay.exportimport.kernel.empty.model.EmptyModelManager;
 import com.liferay.exportimport.kernel.empty.model.EmptyModelManagerUtil;
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.fragment.cache.FragmentEntryLinkCache;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.friendly.url.separator.util.FriendlyURLSeparatorUtil;
@@ -146,6 +147,7 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dependency.manager.DependencyManagerSyncUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.lazy.referencing.LazyReferencingThreadLocal;
 import com.liferay.portal.kernel.log.Log;
@@ -1878,23 +1880,23 @@ public class ObjectDefinitionLocalServiceImpl
 
 		serviceContext.setCompanyId(objectDefinition.getCompanyId());
 
+		boolean importInProcess = false;
+
+		if (FeatureFlagManagerUtil.isEnabled(
+				objectDefinition.getCompanyId(), "LPD-49856") &&
+			ExportImportThreadLocal.isImportInProcess()) {
+
+			importInProcess = true;
+		}
+
 		for (WorkflowDefinitionLink workflowDefinitionLink :
 				workflowDefinitionLinks) {
 
-			String workflowDefinitionName =
-				workflowDefinitionLink.getWorkflowDefinitionName();
-
-			KaleoDefinition kaleoDefinition =
-				_kaleoDefinitionLocalService.fetchKaleoDefinition(
-					workflowDefinitionName, serviceContext);
+			KaleoDefinition kaleoDefinition = _getOrAddKaleoDefinition(
+				importInProcess, serviceContext, workflowDefinitionLink);
 
 			if (kaleoDefinition == null) {
-				kaleoDefinition =
-					_kaleoDefinitionLocalService.addKaleoDefinition(
-						workflowDefinitionName, workflowDefinitionName,
-						workflowDefinitionName, null, null,
-						WorkflowDefinitionConstants.SCOPE_ALL, false, 1,
-						serviceContext);
+				continue;
 			}
 
 			WorkflowDefinitionLink existingWorkflowDefinitionLink =
@@ -1916,7 +1918,7 @@ public class ObjectDefinitionLocalServiceImpl
 
 			if (!Objects.equals(
 					existingWorkflowDefinitionLink.getWorkflowDefinitionName(),
-					workflowDefinitionLink.getWorkflowDefinitionName())) {
+					kaleoDefinition.getName())) {
 
 				existingWorkflowDefinitionLink.setWorkflowDefinitionName(
 					kaleoDefinition.getName());
@@ -2389,6 +2391,60 @@ public class ObjectDefinitionLocalServiceImpl
 		return objectFolderId;
 	}
 
+	private KaleoDefinition _getOrAddKaleoDefinition(
+			boolean importInProcess, ServiceContext serviceContext,
+			WorkflowDefinitionLink workflowDefinitionLink)
+		throws PortalException {
+
+		String workflowDefinitionExternalReferenceCode =
+			_getWorkflowDefinitionExternalReferenceCode(workflowDefinitionLink);
+
+		if (importInProcess &&
+			Validator.isNotNull(workflowDefinitionExternalReferenceCode)) {
+
+			KaleoDefinition kaleoDefinition =
+				_kaleoDefinitionLocalService.
+					fetchKaleoDefinitionByExternalReferenceCode(
+						workflowDefinitionExternalReferenceCode,
+						serviceContext.getCompanyId());
+
+			if (kaleoDefinition != null) {
+				return kaleoDefinition;
+			}
+		}
+
+		String workflowDefinitionName =
+			workflowDefinitionLink.getWorkflowDefinitionName();
+
+		KaleoDefinition kaleoDefinition =
+			_kaleoDefinitionLocalService.fetchKaleoDefinition(
+				workflowDefinitionName, serviceContext);
+
+		if (kaleoDefinition != null) {
+			return kaleoDefinition;
+		}
+
+		if (!importInProcess) {
+			return _kaleoDefinitionLocalService.addKaleoDefinition(
+				workflowDefinitionName, workflowDefinitionName,
+				workflowDefinitionName, null, null,
+				WorkflowDefinitionConstants.SCOPE_ALL, false, 1,
+				serviceContext);
+		}
+
+		if (Validator.isNull(workflowDefinitionExternalReferenceCode)) {
+			return null;
+		}
+
+		try (SafeCloseable safeCloseable =
+				LazyReferencingThreadLocal.setEnabledWithSafeCloseable(true)) {
+
+			return _kaleoDefinitionLocalService.getOrAddEmptyKaleoDefinition(
+				workflowDefinitionExternalReferenceCode, workflowDefinitionName,
+				WorkflowDefinitionConstants.SCOPE_ALL, false, serviceContext);
+		}
+	}
+
 	private String _getPKObjectFieldDBColumnName(
 		String pkObjectFieldDBColumnName, String pkObjectFieldName,
 		boolean modifiable, boolean system) {
@@ -2453,6 +2509,20 @@ public class ObjectDefinitionLocalServiceImpl
 				return randomClassName;
 			}
 		}
+	}
+
+	private String _getWorkflowDefinitionExternalReferenceCode(
+		WorkflowDefinitionLink workflowDefinitionLink) {
+
+		if (workflowDefinitionLink instanceof
+				ObjectDefinitionWorkflowDefinitionLink
+					objectDefinitionWorkflowDefinitionLink) {
+
+			return objectDefinitionWorkflowDefinitionLink.
+				getWorkflowDefinitionExternalReferenceCode();
+		}
+
+		return null;
 	}
 
 	private <E extends Exception> void _handleException(
