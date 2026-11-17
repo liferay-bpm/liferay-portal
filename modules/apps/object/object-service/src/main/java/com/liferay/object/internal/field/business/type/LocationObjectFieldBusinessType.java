@@ -19,6 +19,7 @@ import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.rest.dto.v1_0.Coordinates;
 import com.liferay.object.rest.dto.v1_0.Location;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
@@ -146,7 +147,8 @@ public class LocationObjectFieldBusinessType
 			return localizedValues;
 		}
 
-		return values.get(objectField.getName());
+		return GetterUtil.getObject(
+			values.get(objectField.getName()), StringPool.BLANK);
 	}
 
 	@Override
@@ -207,8 +209,12 @@ public class LocationObjectFieldBusinessType
 			Long groupId, ObjectField objectField, Object value)
 		throws PortalException {
 
-		if (Validator.isNull(value)) {
+		if (value == null) {
 			return null;
+		}
+
+		if (Validator.isNull(value)) {
+			return Collections.emptyMap();
 		}
 
 		try {
