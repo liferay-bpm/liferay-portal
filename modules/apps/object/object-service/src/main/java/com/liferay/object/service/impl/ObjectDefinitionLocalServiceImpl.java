@@ -17,6 +17,9 @@ import com.liferay.document.library.text.DLFileEntryTextProvider;
 import com.liferay.exportimport.kernel.empty.model.EmptyModelManager;
 import com.liferay.exportimport.kernel.empty.model.EmptyModelManagerUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
+import com.liferay.exportimport.report.constants.ExportImportReportEntryConstants;
+import com.liferay.exportimport.report.model.ExportImportReportEntry;
+import com.liferay.exportimport.report.service.ExportImportReportEntryLocalService;
 import com.liferay.fragment.cache.FragmentEntryLinkCache;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.friendly.url.separator.util.FriendlyURLSeparatorUtil;
@@ -465,12 +468,9 @@ public class ObjectDefinitionLocalServiceImpl
 			List<WorkflowDefinitionLink> workflowDefinitionLinks)
 		throws PortalException {
 
-		_validateWorkflowDefinitionLinks(
-			objectDefinition.getObjectDefinitionSettings(),
-			objectDefinition.getScope(), workflowDefinitionLinks);
-
 		_addOrUpdateWorkflowDefinitionLinks(
-			objectDefinition, workflowDefinitionLinks);
+			objectDefinition, objectDefinition.getScope(),
+			workflowDefinitionLinks);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -1329,9 +1329,6 @@ public class ObjectDefinitionLocalServiceImpl
 		_validateExternalReferenceCode(
 			externalReferenceCode, objectDefinition.isSystem());
 		_validateObjectFieldId(objectDefinition, titleObjectFieldId);
-		_validateWorkflowDefinitionLinks(
-			objectDefinitionSettings, objectDefinition.getScope(),
-			workflowDefinitionLinks);
 
 		long oldObjectFolderId = objectDefinition.getObjectFolderId();
 
@@ -1353,7 +1350,8 @@ public class ObjectDefinitionLocalServiceImpl
 			oldObjectFolderId);
 
 		_addOrUpdateWorkflowDefinitionLinks(
-			objectDefinition, workflowDefinitionLinks);
+			objectDefinition, objectDefinition.getScope(),
+			workflowDefinitionLinks);
 
 		_throwObjectDefinitionValidationException(objectDefinition);
 
@@ -1534,8 +1532,6 @@ public class ObjectDefinitionLocalServiceImpl
 		_validatePluralLabel(pluralLabelMap);
 		_validateScope(panelCategoryKey, scope, storageType);
 		_validateVersion(system, version);
-		_validateWorkflowDefinitionLinks(
-			objectDefinitionSettings, scope, workflowDefinitionLinks);
 
 		ObjectDefinition objectDefinition = objectDefinitionPersistence.create(
 			counterLocalService.increment());
@@ -1676,7 +1672,7 @@ public class ObjectDefinitionLocalServiceImpl
 			objectDefinition, titleObjectFieldName);
 
 		_addOrUpdateWorkflowDefinitionLinks(
-			objectDefinition, workflowDefinitionLinks);
+			objectDefinition, scope, workflowDefinitionLinks);
 
 		ObjectDefinitionResourcePermissionUtil.updateResourcePermissions(
 			objectDefinition.getCompanyId(),
@@ -1865,20 +1861,9 @@ public class ObjectDefinitionLocalServiceImpl
 	}
 
 	private void _addOrUpdateWorkflowDefinitionLinks(
-			ObjectDefinition objectDefinition,
+			ObjectDefinition objectDefinition, String scope,
 			List<WorkflowDefinitionLink> workflowDefinitionLinks)
 		throws PortalException {
-
-		Set<Long> oldWorkflowDefinitionLinkIds = new HashSet<>(
-			TransformUtil.transform(
-				_workflowDefinitionLinkLocalService.getWorkflowDefinitionLinks(
-					objectDefinition.getCompanyId(),
-					objectDefinition.getClassName()),
-				WorkflowDefinitionLinkModel::getWorkflowDefinitionLinkId));
-
-		ServiceContext serviceContext = new ServiceContext();
-
-		serviceContext.setCompanyId(objectDefinition.getCompanyId());
 
 		boolean importInProcess = false;
 
@@ -1889,15 +1874,33 @@ public class ObjectDefinitionLocalServiceImpl
 			importInProcess = true;
 		}
 
+		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setCompanyId(objectDefinition.getCompanyId());
+
+		if (importInProcess) {
+			workflowDefinitionLinks = _removeInvalidWorkflowDefinitionLinks(
+				objectDefinition, scope, serviceContext,
+				workflowDefinitionLinks);
+		}
+		else {
+			_validateWorkflowDefinitionLinks(
+				objectDefinition.getObjectDefinitionSettings(), scope,
+				workflowDefinitionLinks);
+		}
+
+		Set<Long> oldWorkflowDefinitionLinkIds = new HashSet<>(
+			TransformUtil.transform(
+				_workflowDefinitionLinkLocalService.getWorkflowDefinitionLinks(
+					objectDefinition.getCompanyId(),
+					objectDefinition.getClassName()),
+				WorkflowDefinitionLinkModel::getWorkflowDefinitionLinkId));
+
 		for (WorkflowDefinitionLink workflowDefinitionLink :
 				workflowDefinitionLinks) {
 
 			KaleoDefinition kaleoDefinition = _getOrAddKaleoDefinition(
 				importInProcess, serviceContext, workflowDefinitionLink);
-
-			if (kaleoDefinition == null) {
-				continue;
-			}
 
 			WorkflowDefinitionLink existingWorkflowDefinitionLink =
 				_workflowDefinitionLinkLocalService.fetchWorkflowDefinitionLink(
@@ -2432,10 +2435,6 @@ public class ObjectDefinitionLocalServiceImpl
 				serviceContext);
 		}
 
-		if (Validator.isNull(workflowDefinitionExternalReferenceCode)) {
-			return null;
-		}
-
 		try (SafeCloseable safeCloseable =
 				LazyReferencingThreadLocal.setEnabledWithSafeCloseable(true)) {
 
@@ -2581,6 +2580,35 @@ public class ObjectDefinitionLocalServiceImpl
 		}
 	}
 
+	private boolean _isAcceptedGroupId(
+		long groupId, List<ObjectDefinitionSetting> objectDefinitionSettings,
+		String scope) {
+
+		if (!StringUtil.equals(scope, ObjectDefinitionConstants.SCOPE_DEPOT) ||
+			GetterUtil.getBoolean(
+				ObjectDefinitionSettingUtil.getValue(
+					ObjectDefinitionSettingConstants.NAME_ACCEPT_ALL_GROUPS,
+					objectDefinitionSettings))) {
+
+			return true;
+		}
+
+		String acceptedGroupIds = ObjectDefinitionSettingUtil.getValue(
+			ObjectDefinitionSettingConstants.NAME_ACCEPTED_GROUP_IDS,
+			objectDefinitionSettings);
+
+		if (Validator.isNotNull(acceptedGroupIds) &&
+			ArrayUtil.exists(
+				acceptedGroupIds.split("\\s*,\\s*"),
+				acceptedGroupId -> acceptedGroupId.equals(
+					String.valueOf(groupId)))) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	private boolean _isClassNameAvailable(String className) {
 		if (_getObjectDefinitionsCountByClassName(className) != 0) {
 			return false;
@@ -2721,6 +2749,160 @@ public class ObjectDefinitionLocalServiceImpl
 
 					return null;
 				});
+		}
+	}
+
+	private List<WorkflowDefinitionLink> _removeInvalidWorkflowDefinitionLinks(
+			ObjectDefinition objectDefinition, String scope,
+			ServiceContext serviceContext,
+			List<WorkflowDefinitionLink> workflowDefinitionLinks)
+		throws PortalException {
+
+		List<String> missingGroupExternalReferenceCodes = new ArrayList<>();
+		List<String> missingWorkflowDefinitionNames = new ArrayList<>();
+		List<ObjectDefinitionSetting> objectDefinitionSettings =
+			objectDefinition.getObjectDefinitionSettings();
+		ObjectScopeProvider objectScopeProvider =
+			_objectScopeProviderRegistry.getObjectScopeProvider(scope);
+		List<String> outOfScopeGroupExternalReferenceCodes = new ArrayList<>();
+		List<WorkflowDefinitionLink> validWorkflowDefinitionLinks =
+			new ArrayList<>();
+
+		for (WorkflowDefinitionLink workflowDefinitionLink :
+				workflowDefinitionLinks) {
+
+			String groupExternalReferenceCode = _getGroupExternalReferenceCode(
+				workflowDefinitionLink);
+			long groupId = workflowDefinitionLink.getGroupId();
+
+			if ((groupId == 0) &&
+				Validator.isNotNull(groupExternalReferenceCode)) {
+
+				missingGroupExternalReferenceCodes.add(
+					groupExternalReferenceCode);
+
+				continue;
+			}
+
+			if ((groupId != 0) &&
+				(!objectScopeProvider.isValidGroupId(groupId) ||
+				 !_isAcceptedGroupId(
+					 groupId, objectDefinitionSettings, scope))) {
+
+				outOfScopeGroupExternalReferenceCodes.add(
+					groupExternalReferenceCode);
+
+				continue;
+			}
+
+			if (Validator.isNull(
+					_getWorkflowDefinitionExternalReferenceCode(
+						workflowDefinitionLink))) {
+
+				KaleoDefinition kaleoDefinition =
+					_kaleoDefinitionLocalService.fetchKaleoDefinition(
+						workflowDefinitionLink.getWorkflowDefinitionName(),
+						serviceContext);
+
+				if (kaleoDefinition == null) {
+					missingWorkflowDefinitionNames.add(
+						workflowDefinitionLink.getWorkflowDefinitionName());
+
+					continue;
+				}
+			}
+
+			validWorkflowDefinitionLinks.add(workflowDefinitionLink);
+		}
+
+		_reportRemovedWorkflowDefinitionLinks(
+			missingGroupExternalReferenceCodes, missingWorkflowDefinitionNames,
+			objectDefinition, outOfScopeGroupExternalReferenceCodes);
+
+		return validWorkflowDefinitionLinks;
+	}
+
+	private void _reportRemovedWorkflowDefinitionLinks(
+		List<String> missingGroupExternalReferenceCodes,
+		List<String> missingWorkflowDefinitionNames,
+		ObjectDefinition objectDefinition,
+		List<String> outOfScopeGroupExternalReferenceCodes) {
+
+		List<String> messages = new ArrayList<>();
+
+		if (!missingGroupExternalReferenceCodes.isEmpty()) {
+			messages.add(
+				_language.format(
+					LocaleUtil.getDefault(),
+					"the-following-workflow-definition-links-of-the-object-" +
+						"definition-x-were-removed-because-their-sites-do-" +
+							"not-exist-x",
+					new Object[] {
+						objectDefinition.getLabel(LocaleUtil.getDefault()),
+						StringUtil.merge(
+							missingGroupExternalReferenceCodes,
+							StringPool.COMMA_AND_SPACE)
+					}));
+		}
+
+		if (!missingWorkflowDefinitionNames.isEmpty()) {
+			messages.add(
+				_language.format(
+					LocaleUtil.getDefault(),
+					"the-following-workflow-definition-links-of-the-object-" +
+						"definition-x-were-removed-because-their-workflow-" +
+							"definitions-do-not-exist-x",
+					new Object[] {
+						objectDefinition.getLabel(LocaleUtil.getDefault()),
+						StringUtil.merge(
+							missingWorkflowDefinitionNames,
+							StringPool.COMMA_AND_SPACE)
+					}));
+		}
+
+		if (!outOfScopeGroupExternalReferenceCodes.isEmpty()) {
+			messages.add(
+				_language.format(
+					LocaleUtil.getDefault(),
+					"the-following-workflow-definition-links-of-the-object-" +
+						"definition-x-were-removed-because-their-sites-are-" +
+							"not-accepted-by-the-object-definition-scope-x",
+					new Object[] {
+						objectDefinition.getLabel(LocaleUtil.getDefault()),
+						StringUtil.merge(
+							outOfScopeGroupExternalReferenceCodes,
+							StringPool.COMMA_AND_SPACE)
+					}));
+		}
+
+		if (messages.isEmpty()) {
+			return;
+		}
+
+		String message = StringUtil.merge(messages, StringPool.SPACE);
+
+		ExportImportReportEntry exportImportReportEntry =
+			_exportImportReportEntryLocalService.
+				getOrAddExportImportReportEntry(
+					0, objectDefinition.getCompanyId(),
+					objectDefinition.getExternalReferenceCode(),
+					_classNameLocalService.getClassNameId(
+						ObjectDefinition.class),
+					objectDefinition.getObjectDefinitionId(),
+					GetterUtil.getLong(
+						ExportImportThreadLocal.
+							getExportImportConfigurationId()),
+					ExportImportReportEntryConstants.TYPE_WARNING, message,
+					null, "object-definition");
+
+		String errorMessage = exportImportReportEntry.getErrorMessage();
+
+		if (!errorMessage.contains(message)) {
+			exportImportReportEntry.setErrorMessage(
+				errorMessage + StringPool.SPACE + message);
+
+			_exportImportReportEntryLocalService.updateExportImportReportEntry(
+				exportImportReportEntry);
 		}
 	}
 
@@ -2937,8 +3119,6 @@ public class ObjectDefinitionLocalServiceImpl
 		_validatePluralLabel(pluralLabelMap);
 		_validateScope(
 			panelCategoryKey, scope, objectDefinition.getStorageType());
-		_validateWorkflowDefinitionLinks(
-			objectDefinitionSettings, scope, workflowDefinitionLinks);
 
 		if (objectDefinition.getAccountEntryRestrictedObjectFieldId() != 0) {
 			_objectFieldLocalService.updateRequired(
@@ -3021,7 +3201,7 @@ public class ObjectDefinitionLocalServiceImpl
 		}
 
 		_addOrUpdateWorkflowDefinitionLinks(
-			objectDefinition, workflowDefinitionLinks);
+			objectDefinition, scope, workflowDefinitionLinks);
 
 		ObjectDefinitionResourcePermissionUtil.updateResourcePermissions(
 			objectDefinition.getCompanyId(),
@@ -4149,25 +4329,9 @@ public class ObjectDefinitionLocalServiceImpl
 					"workflowDefinitionLinks", null);
 			}
 
-			if (!StringUtil.equals(
-					scope, ObjectDefinitionConstants.SCOPE_DEPOT) ||
-				GetterUtil.getBoolean(
-					ObjectDefinitionSettingUtil.getValue(
-						ObjectDefinitionSettingConstants.NAME_ACCEPT_ALL_GROUPS,
-						objectDefinitionSettings))) {
-
-				continue;
-			}
-
-			String acceptedGroupIds = ObjectDefinitionSettingUtil.getValue(
-				ObjectDefinitionSettingConstants.NAME_ACCEPTED_GROUP_IDS,
-				objectDefinitionSettings);
-
-			if (Validator.isNotNull(acceptedGroupIds) &&
-				ArrayUtil.exists(
-					acceptedGroupIds.split("\\s*,\\s*"),
-					acceptedGroupId -> acceptedGroupId.equals(
-						String.valueOf(workflowDefinitionLink.getGroupId())))) {
+			if (_isAcceptedGroupId(
+					workflowDefinitionLink.getGroupId(),
+					objectDefinitionSettings, scope)) {
 
 				continue;
 			}
@@ -4244,6 +4408,10 @@ public class ObjectDefinitionLocalServiceImpl
 
 	@Reference
 	private EmptyModelManager _emptyModelManager;
+
+	@Reference
+	private ExportImportReportEntryLocalService
+		_exportImportReportEntryLocalService;
 
 	@Reference
 	private FragmentEntryLinkCache _fragmentEntryLinkCache;
