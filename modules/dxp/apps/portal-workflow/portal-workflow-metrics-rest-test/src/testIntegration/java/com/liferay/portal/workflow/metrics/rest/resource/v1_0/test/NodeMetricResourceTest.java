@@ -17,6 +17,7 @@ import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.search.test.rule.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Assignee;
+import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Instance;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Node;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.NodeMetric;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Process;
@@ -459,6 +460,8 @@ public class NodeMetricResourceTest extends BaseNodeMetricResourceTestCase {
 			Pagination.of(1, 2), null);
 
 		Assert.assertEquals(0, page.getTotalCount());
+
+		_testGetProcessNodeMetricsPageWithParallelTasks();
 	}
 
 	@Override
@@ -581,9 +584,62 @@ public class NodeMetricResourceTest extends BaseNodeMetricResourceTestCase {
 			nodeMetric, processId, status, TestPropsValues.getUser(), version);
 	}
 
+	private void _addTask(Instance instance, Node node, String version)
+		throws Exception {
+
+		User adminUser = UserTestUtil.getAdminUser(testGroup.getCompanyId());
+
+		_workflowMetricsRESTTestHelper.addTask(
+			new Assignee() {
+				{
+					id = adminUser.getUserId();
+				}
+			},
+			null, testGroup.getCompanyId(), 0L, instance, node.getName(),
+			node.getId(), _process.getId(), version,
+			RandomTestUtil.randomLong());
+	}
+
 	private void _deleteTasks() throws Exception {
 		_workflowMetricsRESTTestHelper.deleteTasks(
 			testGroup.getCompanyId(), _process.getId());
+	}
+
+	private void _testGetProcessNodeMetricsPageWithParallelTasks()
+		throws Exception {
+
+		_deleteTasks();
+
+		_workflowMetricsRESTTestHelper.updateProcess(
+			testGroup.getCompanyId(), _process.getId(), "5.0");
+
+		Node node1 = _workflowMetricsRESTTestHelper.addNode(
+			testGroup.getCompanyId(), _process.getId(), "5.0");
+		Node node2 = _workflowMetricsRESTTestHelper.addNode(
+			testGroup.getCompanyId(), _process.getId(), "5.0");
+		Node node3 = _workflowMetricsRESTTestHelper.addNode(
+			testGroup.getCompanyId(), _process.getId(), "5.0");
+
+		Instance instance = _workflowMetricsRESTTestHelper.addInstance(
+			testGroup.getCompanyId(), false, _process.getId());
+
+		_addTask(instance, node1, "5.0");
+		_addTask(instance, node2, "5.0");
+		_addTask(instance, node3, "5.0");
+
+		Page<NodeMetric> page = nodeMetricResource.getProcessNodeMetricsPage(
+			_process.getId(), false, null, null, null, "5.0",
+			Pagination.of(1, 3), null);
+
+		Assert.assertEquals(3, page.getTotalCount());
+
+		long instanceCount = 0;
+
+		for (NodeMetric nodeMetric : page.getItems()) {
+			instanceCount += nodeMetric.getInstanceCount();
+		}
+
+		Assert.assertEquals(3, instanceCount);
 	}
 
 	private Process _process;
