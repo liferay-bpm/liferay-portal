@@ -866,6 +866,47 @@ public class ObjectRelationship implements Serializable {
 	private Supplier<String> _parameterObjectFieldNameSupplier;
 
 	@io.swagger.v3.oas.annotations.media.Schema
+	public Integer getPriority() {
+		if (_prioritySupplier != null) {
+			priority = _prioritySupplier.get();
+
+			_prioritySupplier = null;
+		}
+
+		return priority;
+	}
+
+	public void setPriority(Integer priority) {
+		this.priority = priority;
+
+		_prioritySupplier = null;
+	}
+
+	@JsonIgnore
+	public void setPriority(
+		UnsafeSupplier<Integer, Exception> priorityUnsafeSupplier) {
+
+		_prioritySupplier = () -> {
+			try {
+				return priorityUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Integer priority;
+
+	@JsonIgnore
+	private Supplier<Integer> _prioritySupplier;
+
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getReverse() {
 		if (_reverseSupplier != null) {
 			reverse = _reverseSupplier.get();
@@ -1286,6 +1327,18 @@ public class ObjectRelationship implements Serializable {
 			sb.append("\"");
 		}
 
+		Integer priority = getPriority();
+
+		if (priority != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"priority\": ");
+
+			sb.append(priority);
+		}
+
 		Boolean reverse = getReverse();
 
 		if (reverse != null) {
@@ -1523,4 +1576,4 @@ public class ObjectRelationship implements Serializable {
 	private Map<String, Serializable> _extendedProperties;
 
 }
-// LIFERAY-REST-BUILDER-HASH:561838029
+// LIFERAY-REST-BUILDER-HASH:454714557

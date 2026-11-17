@@ -303,6 +303,16 @@ public class ObjectFieldSerDes {
 			sb.append("\"");
 		}
 
+		if (objectField.getPriority() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"priority\": ");
+
+			sb.append(objectField.getPriority());
+		}
+
 		if (objectField.getReadOnly() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -578,6 +588,13 @@ public class ObjectFieldSerDes {
 					objectField.getObjectRelationshipExternalReferenceCode()));
 		}
 
+		if (objectField.getPriority() == null) {
+			map.put("priority", null);
+		}
+		else {
+			map.put("priority", String.valueOf(objectField.getPriority()));
+		}
+
 		if (objectField.getReadOnly() == null) {
 			map.put("readOnly", null);
 		}
@@ -733,6 +750,9 @@ public class ObjectFieldSerDes {
 						jsonParserFieldName,
 						"objectRelationshipExternalReferenceCode")) {
 
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "priority")) {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "readOnly")) {
@@ -919,6 +939,12 @@ public class ObjectFieldSerDes {
 						(String)jsonParserFieldValue);
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "priority")) {
+				if (jsonParserFieldValue != null) {
+					objectField.setPriority(
+						Integer.valueOf((String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "readOnly")) {
 				if (jsonParserFieldValue != null) {
 					objectField.setReadOnly(
@@ -1054,4 +1080,4 @@ public class ObjectFieldSerDes {
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:-81517690
+// LIFERAY-REST-BUILDER-HASH:-151417064
