@@ -48,7 +48,7 @@ public class ObjectRelationshipServiceHttp {
 				long parameterObjectFieldId, String deletionType,
 				java.util.Map<java.util.Locale, String> descriptionMap,
 				boolean edge, java.util.Map<java.util.Locale, String> labelMap,
-				String name, boolean system, String type,
+				String name, int priority, boolean system, String type,
 				com.liferay.object.model.ObjectField objectField)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -60,7 +60,7 @@ public class ObjectRelationshipServiceHttp {
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, externalReferenceCode, objectDefinitionId1,
 				objectDefinitionId2, parameterObjectFieldId, deletionType,
-				descriptionMap, edge, labelMap, name, system, type,
+				descriptionMap, edge, labelMap, name, priority, system, type,
 				objectField);
 
 			Object returnObj = null;
@@ -349,7 +349,7 @@ public class ObjectRelationshipServiceHttp {
 				String deletionType,
 				java.util.Map<java.util.Locale, String> descriptionMap,
 				boolean edge, java.util.Map<java.util.Locale, String> labelMap,
-				com.liferay.object.model.ObjectField objectField)
+				int priority, com.liferay.object.model.ObjectField objectField)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -360,7 +360,7 @@ public class ObjectRelationshipServiceHttp {
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, externalReferenceCode, objectRelationshipId,
 				parameterObjectFieldId, deletionType, descriptionMap, edge,
-				labelMap, objectField);
+				labelMap, priority, objectField);
 
 			Object returnObj = null;
 
@@ -397,7 +397,7 @@ public class ObjectRelationshipServiceHttp {
 		new Class[] {
 			String.class, long.class, long.class, long.class, String.class,
 			java.util.Map.class, boolean.class, java.util.Map.class,
-			String.class, boolean.class, String.class,
+			String.class, int.class, boolean.class, String.class,
 			com.liferay.object.model.ObjectField.class
 		};
 	private static final Class<?>[]
@@ -419,9 +419,9 @@ public class ObjectRelationshipServiceHttp {
 	private static final Class<?>[] _updateObjectRelationshipParameterTypes7 =
 		new Class[] {
 			String.class, long.class, long.class, String.class,
-			java.util.Map.class, boolean.class, java.util.Map.class,
+			java.util.Map.class, boolean.class, java.util.Map.class, int.class,
 			com.liferay.object.model.ObjectField.class
 		};
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1860049716
+// LIFERAY-SERVICE-BUILDER-HASH:-1578859396

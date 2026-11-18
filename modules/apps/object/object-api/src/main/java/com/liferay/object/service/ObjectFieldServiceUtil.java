@@ -37,8 +37,8 @@ public class ObjectFieldServiceUtil {
 			Map<java.util.Locale, String> descriptionMap, boolean indexed,
 			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<java.util.Locale, String> labelMap, boolean localized,
-			String name, String readOnly, String readOnlyConditionExpression,
-			boolean required, boolean state,
+			String name, int priority, String readOnly,
+			String readOnlyConditionExpression, boolean required, boolean state,
 			List<com.liferay.object.model.ObjectFieldSetting>
 				objectFieldSettings)
 		throws PortalException {
@@ -46,7 +46,7 @@ public class ObjectFieldServiceUtil {
 		return getService().addCustomObjectField(
 			externalReferenceCode, listTypeDefinitionId, objectDefinitionId,
 			businessType, dbType, descriptionMap, indexed, indexedAsKeyword,
-			indexedLanguageId, labelMap, localized, name, readOnly,
+			indexedLanguageId, labelMap, localized, name, priority, readOnly,
 			readOnlyConditionExpression, required, state, objectFieldSettings);
 	}
 
@@ -77,8 +77,8 @@ public class ObjectFieldServiceUtil {
 			Map<java.util.Locale, String> descriptionMap, boolean indexed,
 			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<java.util.Locale, String> labelMap, boolean localized,
-			String name, String readOnly, String readOnlyConditionExpression,
-			boolean required, boolean state,
+			String name, int priority, String readOnly,
+			String readOnlyConditionExpression, boolean required, boolean state,
 			List<com.liferay.object.model.ObjectFieldSetting>
 				objectFieldSettings)
 		throws PortalException {
@@ -86,7 +86,7 @@ public class ObjectFieldServiceUtil {
 		return getService().updateObjectField(
 			externalReferenceCode, objectFieldId, listTypeDefinitionId,
 			businessType, dbType, descriptionMap, indexed, indexedAsKeyword,
-			indexedLanguageId, labelMap, localized, name, readOnly,
+			indexedLanguageId, labelMap, localized, name, priority, readOnly,
 			readOnlyConditionExpression, required, state, objectFieldSettings);
 	}
 
@@ -98,4 +98,4 @@ public class ObjectFieldServiceUtil {
 		new Snapshot<>(ObjectFieldServiceUtil.class, ObjectFieldService.class);
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:1699148342
+// LIFERAY-SERVICE-BUILDER-HASH:-578945582

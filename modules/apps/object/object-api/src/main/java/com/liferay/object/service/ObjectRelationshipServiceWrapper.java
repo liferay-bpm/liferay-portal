@@ -35,14 +35,14 @@ public class ObjectRelationshipServiceWrapper
 			String deletionType,
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			boolean edge, java.util.Map<java.util.Locale, String> labelMap,
-			String name, boolean system, String type,
+			String name, int priority, boolean system, String type,
 			com.liferay.object.model.ObjectField objectField)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectRelationshipService.addObjectRelationship(
 			externalReferenceCode, objectDefinitionId1, objectDefinitionId2,
 			parameterObjectFieldId, deletionType, descriptionMap, edge,
-			labelMap, name, system, type, objectField);
+			labelMap, name, priority, system, type, objectField);
 	}
 
 	@Override
@@ -119,12 +119,13 @@ public class ObjectRelationshipServiceWrapper
 			long parameterObjectFieldId, String deletionType,
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			boolean edge, java.util.Map<java.util.Locale, String> labelMap,
-			com.liferay.object.model.ObjectField objectField)
+			int priority, com.liferay.object.model.ObjectField objectField)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectRelationshipService.updateObjectRelationship(
 			externalReferenceCode, objectRelationshipId, parameterObjectFieldId,
-			deletionType, descriptionMap, edge, labelMap, objectField);
+			deletionType, descriptionMap, edge, labelMap, priority,
+			objectField);
 	}
 
 	@Override
@@ -142,4 +143,4 @@ public class ObjectRelationshipServiceWrapper
 	private ObjectRelationshipService _objectRelationshipService;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-282406461
+// LIFERAY-SERVICE-BUILDER-HASH:1723213203

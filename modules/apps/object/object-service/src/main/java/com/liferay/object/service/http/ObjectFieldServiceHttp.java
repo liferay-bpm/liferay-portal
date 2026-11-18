@@ -48,8 +48,8 @@ public class ObjectFieldServiceHttp {
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
 			java.util.Map<java.util.Locale, String> labelMap, boolean localized,
-			String name, String readOnly, String readOnlyConditionExpression,
-			boolean required, boolean state,
+			String name, int priority, String readOnly,
+			String readOnlyConditionExpression, boolean required, boolean state,
 			java.util.List<com.liferay.object.model.ObjectFieldSetting>
 				objectFieldSettings)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -63,8 +63,9 @@ public class ObjectFieldServiceHttp {
 				methodKey, externalReferenceCode, listTypeDefinitionId,
 				objectDefinitionId, businessType, dbType, descriptionMap,
 				indexed, indexedAsKeyword, indexedLanguageId, labelMap,
-				localized, name, readOnly, readOnlyConditionExpression,
-				required, state, objectFieldSettings);
+				localized, name, priority, readOnly,
+				readOnlyConditionExpression, required, state,
+				objectFieldSettings);
 
 			Object returnObj = null;
 
@@ -178,8 +179,8 @@ public class ObjectFieldServiceHttp {
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
 			java.util.Map<java.util.Locale, String> labelMap, boolean localized,
-			String name, String readOnly, String readOnlyConditionExpression,
-			boolean required, boolean state,
+			String name, int priority, String readOnly,
+			String readOnlyConditionExpression, boolean required, boolean state,
 			java.util.List<com.liferay.object.model.ObjectFieldSetting>
 				objectFieldSettings)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -193,8 +194,9 @@ public class ObjectFieldServiceHttp {
 				methodKey, externalReferenceCode, objectFieldId,
 				listTypeDefinitionId, businessType, dbType, descriptionMap,
 				indexed, indexedAsKeyword, indexedLanguageId, labelMap,
-				localized, name, readOnly, readOnlyConditionExpression,
-				required, state, objectFieldSettings);
+				localized, name, priority, readOnly,
+				readOnlyConditionExpression, required, state,
+				objectFieldSettings);
 
 			Object returnObj = null;
 
@@ -231,8 +233,9 @@ public class ObjectFieldServiceHttp {
 		new Class[] {
 			String.class, long.class, long.class, String.class, String.class,
 			java.util.Map.class, boolean.class, boolean.class, String.class,
-			java.util.Map.class, boolean.class, String.class, String.class,
-			String.class, boolean.class, boolean.class, java.util.List.class
+			java.util.Map.class, boolean.class, String.class, int.class,
+			String.class, String.class, boolean.class, boolean.class,
+			java.util.List.class
 		};
 	private static final Class<?>[] _deleteObjectFieldParameterTypes1 =
 		new Class[] {long.class};
@@ -242,9 +245,10 @@ public class ObjectFieldServiceHttp {
 		new Class[] {
 			String.class, long.class, long.class, String.class, String.class,
 			java.util.Map.class, boolean.class, boolean.class, String.class,
-			java.util.Map.class, boolean.class, String.class, String.class,
-			String.class, boolean.class, boolean.class, java.util.List.class
+			java.util.Map.class, boolean.class, String.class, int.class,
+			String.class, String.class, boolean.class, boolean.class,
+			java.util.List.class
 		};
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:718157227
+// LIFERAY-SERVICE-BUILDER-HASH:1931382995

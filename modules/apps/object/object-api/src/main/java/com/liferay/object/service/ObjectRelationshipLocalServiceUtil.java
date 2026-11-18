@@ -59,14 +59,15 @@ public class ObjectRelationshipLocalServiceUtil {
 			long objectDefinitionId2, long parameterObjectFieldId,
 			String deletionType, Map<java.util.Locale, String> descriptionMap,
 			boolean edge, Map<java.util.Locale, String> labelMap, String name,
-			boolean system, String type,
+			int priority, boolean system, String type,
 			com.liferay.object.model.ObjectField objectField)
 		throws PortalException {
 
 		return getService().addObjectRelationship(
 			externalReferenceCode, userId, objectDefinitionId1,
 			objectDefinitionId2, parameterObjectFieldId, deletionType,
-			descriptionMap, edge, labelMap, name, system, type, objectField);
+			descriptionMap, edge, labelMap, name, priority, system, type,
+			objectField);
 	}
 
 	public static ObjectRelationship addObjectRelationship(
@@ -587,13 +588,14 @@ public class ObjectRelationshipLocalServiceUtil {
 			String externalReferenceCode, long objectRelationshipId,
 			long parameterObjectFieldId, String deletionType,
 			Map<java.util.Locale, String> descriptionMap, boolean edge,
-			Map<java.util.Locale, String> labelMap,
+			Map<java.util.Locale, String> labelMap, int priority,
 			com.liferay.object.model.ObjectField objectField)
 		throws PortalException {
 
 		return getService().updateObjectRelationship(
 			externalReferenceCode, objectRelationshipId, parameterObjectFieldId,
-			deletionType, descriptionMap, edge, labelMap, objectField);
+			deletionType, descriptionMap, edge, labelMap, priority,
+			objectField);
 	}
 
 	public static void updateUserId(
@@ -613,4 +615,4 @@ public class ObjectRelationshipLocalServiceUtil {
 			ObjectRelationshipLocalService.class);
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:1426069857
+// LIFERAY-SERVICE-BUILDER-HASH:-775770031

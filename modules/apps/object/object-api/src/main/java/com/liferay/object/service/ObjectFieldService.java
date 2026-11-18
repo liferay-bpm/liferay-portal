@@ -51,7 +51,7 @@ public interface ObjectFieldService extends BaseService {
 			Map<Locale, String> descriptionMap, boolean indexed,
 			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, boolean localized, String name,
-			String readOnly, String readOnlyConditionExpression,
+			int priority, String readOnly, String readOnlyConditionExpression,
 			boolean required, boolean state,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException;
@@ -75,10 +75,10 @@ public interface ObjectFieldService extends BaseService {
 			Map<Locale, String> descriptionMap, boolean indexed,
 			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, boolean localized, String name,
-			String readOnly, String readOnlyConditionExpression,
+			int priority, String readOnly, String readOnlyConditionExpression,
 			boolean required, boolean state,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:849419468
+// LIFERAY-SERVICE-BUILDER-HASH:1671799074
