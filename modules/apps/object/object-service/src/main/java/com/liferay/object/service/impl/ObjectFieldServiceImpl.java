@@ -44,7 +44,7 @@ public class ObjectFieldServiceImpl extends ObjectFieldServiceBaseImpl {
 			Map<Locale, String> descriptionMap, boolean indexed,
 			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, boolean localized, String name,
-			String readOnly, String readOnlyConditionExpression,
+			int priority, String readOnly, String readOnlyConditionExpression,
 			boolean required, boolean state,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
@@ -67,7 +67,7 @@ public class ObjectFieldServiceImpl extends ObjectFieldServiceBaseImpl {
 			externalReferenceCode, getUserId(), listTypeDefinitionId,
 			objectDefinitionId, businessType, dbType, descriptionMap, indexed,
 			indexedAsKeyword, indexedLanguageId, labelMap, localized, name,
-			readOnly, readOnlyConditionExpression, required, state,
+			priority, readOnly, readOnlyConditionExpression, required, state,
 			objectFieldSettings);
 	}
 
@@ -104,7 +104,7 @@ public class ObjectFieldServiceImpl extends ObjectFieldServiceBaseImpl {
 			Map<Locale, String> descriptionMap, boolean indexed,
 			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, boolean localized, String name,
-			String readOnly, String readOnlyConditionExpression,
+			int priority, String readOnly, String readOnlyConditionExpression,
 			boolean required, boolean state,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
@@ -122,7 +122,7 @@ public class ObjectFieldServiceImpl extends ObjectFieldServiceBaseImpl {
 			businessType, objectField.getDBColumnName(),
 			objectField.getDBTableName(), dbType, descriptionMap, indexed,
 			indexedAsKeyword, indexedLanguageId, labelMap, localized, name,
-			readOnly, readOnlyConditionExpression, required, state,
+			priority, readOnly, readOnlyConditionExpression, required, state,
 			objectField.isSystem(), objectFieldSettings);
 	}
 
