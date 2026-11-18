@@ -1673,6 +1673,7 @@ public class ObjectDefinitionResourceImpl
 				serviceBuilderObjectField.getLabelMap(),
 				serviceBuilderObjectField.isLocalized(),
 				serviceBuilderObjectField.getName(),
+				serviceBuilderObjectField.getPriority(),
 				serviceBuilderObjectField.getReadOnly(),
 				serviceBuilderObjectField.getReadOnlyConditionExpression(),
 				serviceBuilderObjectField.isRequired(),

@@ -110,8 +110,8 @@ public class MCPPromptUpgradeProcess extends UpgradeProcess {
 				ObjectFieldConstants.BUSINESS_TYPE_TEXT, null, null,
 				ObjectFieldConstants.DB_TYPE_STRING, null, true, false, "en_US",
 				Collections.singletonMap(LocaleUtil.US, "Identifier"), false,
-				"identifier", ObjectFieldConstants.READ_ONLY_FALSE, null, true,
-				false,
+				"identifier", 0, ObjectFieldConstants.READ_ONLY_FALSE, null,
+				true, false,
 				Collections.singletonList(
 					_createObjectFieldSetting(
 						ObjectFieldSettingConstants.NAME_UNIQUE_VALUES,
@@ -130,7 +130,7 @@ public class MCPPromptUpgradeProcess extends UpgradeProcess {
 				ObjectFieldConstants.BUSINESS_TYPE_PICKLIST, null, null,
 				ObjectFieldConstants.DB_TYPE_STRING, null, true, false, null,
 				Collections.singletonMap(LocaleUtil.US, "Status"), false,
-				"promptStatus", ObjectFieldConstants.READ_ONLY_FALSE, null,
+				"promptStatus", 0, ObjectFieldConstants.READ_ONLY_FALSE, null,
 				true, false,
 				Arrays.asList(
 					_createObjectFieldSetting(

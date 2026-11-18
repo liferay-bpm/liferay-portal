@@ -61,8 +61,9 @@ public class MCPProfileToolUpgradeProcess extends UpgradeProcess {
 				ObjectFieldConstants.BUSINESS_TYPE_LONG_TEXT, null, null,
 				ObjectFieldConstants.DB_TYPE_CLOB, null, true, false, "en_US",
 				Collections.singletonMap(LocaleUtil.US, "Restrict Fields"),
-				false, "restrictFields", ObjectFieldConstants.READ_ONLY_FALSE,
-				null, false, false, Collections.emptyList());
+				false, "restrictFields", 0,
+				ObjectFieldConstants.READ_ONLY_FALSE, null, false, false,
+				Collections.emptyList());
 		}
 		catch (PortalException portalException) {
 			restrictFieldsObjectField =

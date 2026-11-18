@@ -279,7 +279,7 @@ public class MCPProfileUpgradeProcess extends UpgradeProcess {
 				ObjectFieldConstants.BUSINESS_TYPE_PICKLIST, null, null,
 				ObjectFieldConstants.DB_TYPE_STRING, null, true, false, null,
 				Collections.singletonMap(LocaleUtil.US, "Status"), false,
-				"profileStatus", ObjectFieldConstants.READ_ONLY_FALSE, null,
+				"profileStatus", 0, ObjectFieldConstants.READ_ONLY_FALSE, null,
 				true, false,
 				Arrays.asList(
 					_createObjectFieldSetting(
@@ -486,7 +486,7 @@ public class MCPProfileUpgradeProcess extends UpgradeProcess {
 				Collections.singletonMap(
 					LocaleUtil.US,
 					"MCP Server Profile to MCP Server Profile Tools"),
-				"mcpServerProfileToTools", true,
+				"mcpServerProfileToTools", 0, true,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, objectField);
 		}
 		catch (PortalException portalException) {
