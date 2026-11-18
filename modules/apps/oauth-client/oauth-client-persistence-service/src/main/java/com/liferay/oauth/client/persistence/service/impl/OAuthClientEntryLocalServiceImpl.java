@@ -335,28 +335,6 @@ public class OAuthClientEntryLocalServiceImpl
 		return false;
 	}
 
-	private boolean _isLocalInetAddress(InetAddress inetAddress) {
-		if (InetAddressUtil.isLocalInetAddress(inetAddress)) {
-			return true;
-		}
-
-		byte[] address = inetAddress.getAddress();
-
-		if (address.length == 4) {
-			if ((address[0] == 100) && ((address[1] & 0xc0) == 0x40)) {
-				return true;
-			}
-
-			return false;
-		}
-
-		if ((address[0] & 0xfe) == 0xfc) {
-			return true;
-		}
-
-		return false;
-	}
-
 	private boolean _isURIAllowed(long companyId, URI uri) {
 		try {
 			String scheme = uri.getScheme();
@@ -397,7 +375,7 @@ public class OAuthClientEntryLocalServiceImpl
 				return true;
 			}
 
-			return !_isLocalInetAddress(inetAddress);
+			return !InetAddressUtil.isLocalInetAddress(inetAddress);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {

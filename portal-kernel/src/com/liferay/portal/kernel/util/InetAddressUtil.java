@@ -13,6 +13,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
@@ -36,25 +37,37 @@ public class InetAddressUtil {
 	public static InetAddress getInetAddressByName(String domain)
 		throws UnknownHostException {
 
+		InetAddress[] inetAddresses = getInetAddressesByName(domain);
+
+		if (inetAddresses == null) {
+			return null;
+		}
+
+		return inetAddresses[0];
+	}
+
+	public static InetAddress[] getInetAddressesByName(String domain)
+		throws UnknownHostException {
+
 		InetAddress inetAddress = _fastResolveAddress(domain);
 
 		if (inetAddress != null) {
-			return inetAddress;
+			return new InetAddress[] {inetAddress};
 		}
 
 		try {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					StringBundler.concat(
-						"Get internet address for domain ", domain,
+						"Get internet addresses for domain ", domain,
 						" has active count ",
 						_noticeableThreadPoolExecutor.getActiveCount(),
 						" and pending tasking count ",
 						_noticeableThreadPoolExecutor.getPendingTaskCount()));
 			}
 
-			Future<InetAddress> future = _noticeableThreadPoolExecutor.submit(
-				() -> InetAddress.getByName(domain));
+			Future<InetAddress[]> future = _noticeableThreadPoolExecutor.submit(
+				() -> InetAddress.getAllByName(domain));
 
 			return future.get(
 				_DNS_SECURITY_ADDRESS_TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -116,7 +129,9 @@ public class InetAddressUtil {
 		if (inetAddress.isAnyLocalAddress() ||
 			inetAddress.isLinkLocalAddress() ||
 			inetAddress.isLoopbackAddress() ||
-			inetAddress.isSiteLocalAddress()) {
+			inetAddress.isSiteLocalAddress() ||
+			_isSharedInet4Address(inetAddress) ||
+			_isUniqueLocalInet6Address(inetAddress)) {
 
 			return true;
 		}
@@ -252,6 +267,34 @@ public class InetAddressUtil {
 		}
 
 		return null;
+	}
+
+	private static boolean _isSharedInet4Address(InetAddress inetAddress) {
+		if (!(inetAddress instanceof Inet4Address)) {
+			return false;
+		}
+
+		byte[] address = inetAddress.getAddress();
+
+		if ((address[0] == 100) && ((address[1] & 0xC0) == 0x40)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	private static boolean _isUniqueLocalInet6Address(InetAddress inetAddress) {
+		if (!(inetAddress instanceof Inet6Address)) {
+			return false;
+		}
+
+		byte[] address = inetAddress.getAddress();
+
+		if ((address[0] & 0xFE) == 0xFC) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final int _DNS_SECURITY_ADDRESS_TIMEOUT_SECONDS =
