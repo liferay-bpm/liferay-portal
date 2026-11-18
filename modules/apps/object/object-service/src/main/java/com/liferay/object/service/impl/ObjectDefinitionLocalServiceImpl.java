@@ -84,6 +84,7 @@ import com.liferay.object.internal.deployer.ObjectDefinitionDeployerImpl;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectDefinitionSetting;
+import com.liferay.object.model.ObjectDefinitionWorkflowDefinitionLink;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryTable;
 import com.liferay.object.model.ObjectField;
@@ -2330,6 +2331,20 @@ public class ObjectDefinitionLocalServiceImpl
 			friendlyURLSeparator);
 	}
 
+	private String _getGroupExternalReferenceCode(
+		WorkflowDefinitionLink workflowDefinitionLink) {
+
+		if (workflowDefinitionLink instanceof
+				ObjectDefinitionWorkflowDefinitionLink
+					objectDefinitionWorkflowDefinitionLink) {
+
+			return objectDefinitionWorkflowDefinitionLink.
+				getGroupExternalReferenceCode();
+		}
+
+		return null;
+	}
+
 	private String _getName(String name, boolean system) {
 		name = StringUtil.trim(name);
 
@@ -4035,6 +4050,17 @@ public class ObjectDefinitionLocalServiceImpl
 
 		for (WorkflowDefinitionLink workflowDefinitionLink :
 				workflowDefinitionLinks) {
+
+			if ((workflowDefinitionLink.getGroupId() == 0) &&
+				Validator.isNotNull(
+					_getGroupExternalReferenceCode(workflowDefinitionLink))) {
+
+				_handleException(
+					new ObjectDefinitionScopeException(
+						"An object definition can only be linked to a " +
+							"workflow definition with an existing group"),
+					"workflowDefinitionLinks", null);
+			}
 
 			if (workflowDefinitionLink.getGroupId() == 0) {
 				continue;
