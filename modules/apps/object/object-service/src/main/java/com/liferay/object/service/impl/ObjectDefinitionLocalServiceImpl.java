@@ -4060,7 +4060,7 @@ public class ObjectDefinitionLocalServiceImpl
 						ObjectDefinitionSettingConstants.NAME_ACCEPT_ALL_GROUPS,
 						objectDefinitionSettings))) {
 
-				return;
+				continue;
 			}
 
 			String acceptedGroupIds = ObjectDefinitionSettingUtil.getValue(
