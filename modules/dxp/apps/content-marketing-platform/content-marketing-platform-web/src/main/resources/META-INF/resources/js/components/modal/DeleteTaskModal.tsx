@@ -8,13 +8,17 @@ import ClayModal from '@clayui/modal';
 import {sub} from 'frontend-js-web';
 import React from 'react';
 
+import {getDeleteTaskConfirmationMessage} from '../../utils/subtasks';
+
 export default function DeleteTaskModal({
 	closeModal,
 	onSubmit,
+	subtaskCount = 0,
 	title,
 }: {
 	closeModal: () => void;
 	onSubmit: () => void;
+	subtaskCount?: number;
 	title: string;
 }) {
 	return (
@@ -29,12 +33,7 @@ export default function DeleteTaskModal({
 			</ClayModal.Header>
 
 			<ClayModal.Body>
-				<p>
-					{sub(
-						Liferay.Language.get('delete-task-confirmation-body'),
-						title
-					)}
-				</p>
+				<p>{getDeleteTaskConfirmationMessage(title, subtaskCount)}</p>
 			</ClayModal.Body>
 
 			<ClayModal.Footer
