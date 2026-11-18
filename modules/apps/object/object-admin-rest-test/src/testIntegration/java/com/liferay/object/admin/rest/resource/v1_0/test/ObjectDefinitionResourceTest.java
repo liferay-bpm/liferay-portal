@@ -778,6 +778,7 @@ public class ObjectDefinitionResourceTest
 		_testPostObjectDefinitionWithAllowStandaloneObjectEntry();
 		_testPostObjectDefinitionWithAssigneeObjectField();
 		_testPostObjectDefinitionWithPermissions();
+		_testPostObjectDefinitionWithPriority();
 		_testPostObjectDefinitionWithSystemAggregationObjectField();
 		_testPostObjectDefinitionWithWorkflowDefinitionLinks();
 	}
@@ -1632,6 +1633,7 @@ public class ObjectDefinitionResourceTest
 
 		_testPutObjectDefinitionDescription(Collections.emptyMap());
 		_testPutObjectDefinitionDescription(null);
+		_testPutObjectDefinitionWithPriority();
 	}
 
 	@Override
@@ -3518,6 +3520,40 @@ public class ObjectDefinitionResourceTest
 			ActionKeys.DELETE);
 	}
 
+	private void _testPostObjectDefinitionWithPriority() throws Exception {
+		try (SafeCloseable safeCloseable =
+				FeatureFlagTestUtil.setFeatureFlagsWithSafeCloseable(
+					true, "LPD-110248")) {
+
+			ObjectField objectField1 = _createTextObjectField("able");
+
+			objectField1.setPriority(2);
+
+			ObjectField objectField2 = _createTextObjectField("baker");
+
+			objectField2.setPriority(1);
+
+			ObjectDefinition objectDefinition = randomObjectDefinition();
+
+			objectDefinition.setObjectFields(
+				new ObjectField[] {objectField1, objectField2});
+
+			ObjectDefinition postObjectDefinition =
+				objectDefinitionResource.postObjectDefinition(objectDefinition);
+
+			ObjectDefinition getObjectDefinition =
+				objectDefinitionResource.getObjectDefinition(
+					postObjectDefinition.getId());
+
+			Assert.assertArrayEquals(
+				new String[] {"baker", "able"},
+				_getCustomObjectFieldNames(getObjectDefinition));
+
+			objectDefinitionResource.deleteObjectDefinition(
+				postObjectDefinition.getId());
+		}
+	}
+
 	private void _testPostObjectDefinitionWithSystemAggregationObjectField()
 		throws Exception {
 
@@ -4350,6 +4386,70 @@ public class ObjectDefinitionResourceTest
 			ResourceConstants.SCOPE_COMPANY,
 			String.valueOf(TestPropsValues.getCompanyId()), role1.getRoleId(),
 			ActionKeys.DELETE);
+	}
+
+	private void _testPutObjectDefinitionWithPriority() throws Exception {
+		try (SafeCloseable safeCloseable =
+				FeatureFlagTestUtil.setFeatureFlagsWithSafeCloseable(
+					true, "LPD-110248")) {
+
+			ObjectDefinition objectDefinition = randomObjectDefinition();
+
+			objectDefinition.setObjectFields(
+				new ObjectField[] {
+					_createTextObjectField("able"),
+					_createTextObjectField("baker")
+				});
+
+			objectDefinition = objectDefinitionResource.postObjectDefinition(
+				objectDefinition);
+
+			ObjectField objectField1 = _getObjectField(
+				objectDefinition, "able");
+
+			objectField1.setPriority(2);
+
+			ObjectField objectField2 = _getObjectField(
+				objectDefinition, "baker");
+
+			objectField2.setPriority(1);
+
+			objectDefinitionResource.putObjectDefinition(
+				objectDefinition.getId(), objectDefinition);
+
+			objectDefinition = objectDefinitionResource.getObjectDefinition(
+				objectDefinition.getId());
+
+			Assert.assertArrayEquals(
+				new String[] {"baker", "able"},
+				_getCustomObjectFieldNames(objectDefinition));
+
+			for (ObjectField objectField : objectDefinition.getObjectFields()) {
+				objectField.setPriority((Integer)null);
+			}
+
+			objectDefinitionResource.putObjectDefinition(
+				objectDefinition.getId(), objectDefinition);
+
+			objectDefinition = objectDefinitionResource.getObjectDefinition(
+				objectDefinition.getId());
+
+			Assert.assertArrayEquals(
+				new Integer[] {0, 0},
+				TransformUtil.transform(
+					objectDefinition.getObjectFields(),
+					objectField -> {
+						if (objectField.getSystem()) {
+							return null;
+						}
+
+						return objectField.getPriority();
+					},
+					Integer.class));
+
+			objectDefinitionResource.deleteObjectDefinition(
+				objectDefinition.getId());
+		}
 	}
 
 	private void _testPutObjectDefinitionWithoutObjectViewExternalReferenceCode()
