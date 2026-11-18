@@ -18,6 +18,7 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectFilterLocalService;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
@@ -138,7 +139,8 @@ public class ObjectFieldResourceImpl extends BaseObjectFieldResourceImpl {
 				objectField.getIndexedLanguageId(),
 				LocalizedMapUtil.populateLocalizedMap(objectField.getLabel()),
 				GetterUtil.getBoolean(objectField.getLocalized()),
-				objectField.getName(), 0, objectField.getReadOnlyAsString(),
+				objectField.getName(), _getPriority(objectField, 0),
+				objectField.getReadOnlyAsString(),
 				objectField.getReadOnlyConditionExpression(),
 				objectField.getRequired(),
 				GetterUtil.getBoolean(objectField.getState()),
@@ -171,9 +173,6 @@ public class ObjectFieldResourceImpl extends BaseObjectFieldResourceImpl {
 			() -> _getListTypeDefinitionId(
 				objectField, objectFieldId, listTypeDefinitionId));
 
-		com.liferay.object.model.ObjectField serviceBuilderObjectField =
-			_objectFieldService.getObjectField(objectFieldId);
-
 		return _toObjectField(
 			_objectFieldService.updateObjectField(
 				objectField.getExternalReferenceCode(), objectFieldId,
@@ -189,7 +188,7 @@ public class ObjectFieldResourceImpl extends BaseObjectFieldResourceImpl {
 				objectField.getIndexedLanguageId(),
 				LocalizedMapUtil.populateLocalizedMap(objectField.getLabel()),
 				GetterUtil.getBoolean(objectField.getLocalized()),
-				objectField.getName(), serviceBuilderObjectField.getPriority(),
+				objectField.getName(), _getPriority(objectField, objectFieldId),
 				objectField.getReadOnlyAsString(),
 				objectField.getReadOnlyConditionExpression(),
 				objectField.getRequired(),
@@ -294,6 +293,25 @@ public class ObjectFieldResourceImpl extends BaseObjectFieldResourceImpl {
 				objectDefinition,
 				_objectFieldService.getObjectField(
 					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))));
+	}
+
+	private int _getPriority(ObjectField objectField, long objectFieldId)
+		throws Exception {
+
+		if (FeatureFlagManagerUtil.isEnabled(
+				contextUser.getCompanyId(), "LPD-110248")) {
+
+			return GetterUtil.getInteger(objectField.getPriority());
+		}
+
+		if (objectFieldId == 0) {
+			return 0;
+		}
+
+		com.liferay.object.model.ObjectField serviceBuilderObjectField =
+			_objectFieldService.getObjectField(objectFieldId);
+
+		return serviceBuilderObjectField.getPriority();
 	}
 
 	private ObjectField _toObjectField(

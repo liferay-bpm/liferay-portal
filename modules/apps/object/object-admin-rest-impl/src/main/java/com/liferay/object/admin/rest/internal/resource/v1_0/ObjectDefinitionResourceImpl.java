@@ -352,6 +352,7 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		_addListTypeDefinition(objectDefinition);
+		_setObjectFieldPriorities(0, objectDefinition.getObjectFields());
 
 		com.liferay.object.model.ObjectDefinition
 			serviceBuilderObjectDefinition;
@@ -624,6 +625,8 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		_addListTypeDefinition(objectDefinition);
+		_setObjectFieldPriorities(
+			objectDefinitionId, objectDefinition.getObjectFields());
 
 		long accountEntryRestrictedObjectFieldId = 0;
 
@@ -1545,6 +1548,31 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		return GetterUtil.getBoolean(enableCategorization, true);
+	}
+
+	private void _setObjectFieldPriorities(
+		long objectDefinitionId, ObjectField[] objectFields) {
+
+		if ((objectFields == null) ||
+			FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-110248")) {
+
+			return;
+		}
+
+		for (ObjectField objectField : objectFields) {
+			com.liferay.object.model.ObjectField serviceBuilderObjectField =
+				_objectFieldLocalService.fetchObjectField(
+					objectDefinitionId, objectField.getName());
+
+			if (serviceBuilderObjectField == null) {
+				objectField.setPriority(() -> null);
+
+				continue;
+			}
+
+			objectField.setPriority(serviceBuilderObjectField::getPriority);
+		}
 	}
 
 	private ObjectDefinition _toObjectDefinition(
