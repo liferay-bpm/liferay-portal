@@ -5,7 +5,7 @@
 
 import {ApiHelper} from '@liferay/site-cms-site-initializer';
 
-import {ChangeTransition, ITaskObjectEntry} from './types';
+import {ChangeTransition, ISubtaskObjectEntry, ITaskObjectEntry} from './types';
 
 type WorkflowTaskAssignee = {
 	assignableUsers: Array<{id: number; name: string}>;
@@ -67,6 +67,18 @@ export async function getAssignableUsersForWorkflowTasks(
 
 export async function getTaskById({taskId}: {taskId: string}) {
 	return await ApiHelper.get<ITaskObjectEntry>(`/o/cmp/tasks/${taskId}`);
+}
+
+export async function getTasks({
+	filter,
+	scopeKey,
+}: {
+	filter: string;
+	scopeKey: string;
+}) {
+	return await ApiHelper.get<{items: ISubtaskObjectEntry[]}>(
+		`/o/cmp/tasks/scopes/${scopeKey}?fields=id,r_cmpTaskToCMPTasks_c_cmpTaskId,state&filter=${encodeURIComponent(filter)}&pageSize=-1`
+	);
 }
 
 export async function getUserAccount(id: string) {
