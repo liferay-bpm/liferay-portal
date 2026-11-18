@@ -910,7 +910,7 @@ public class AssetStatisticsResourceTest
 					null,
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
-					false, "integer", null, null, true, false,
+					false, "integer", 0, null, null, true, false,
 					Collections.emptyList());
 
 			_assertMissingRequiredFieldsCount(depotEntry1.getGroupId(), 1);

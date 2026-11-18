@@ -34,7 +34,7 @@ public class ObjectFieldTestUtil {
 			objectField.getDBType(), objectField.getDescriptionMap(),
 			objectField.isIndexed(), objectField.isIndexedAsKeyword(),
 			objectField.getIndexedLanguageId(), objectField.getLabelMap(),
-			objectField.isLocalized(), objectField.getName(),
+			objectField.isLocalized(), objectField.getName(), 0,
 			objectField.getReadOnly(),
 			objectField.getReadOnlyConditionExpression(),
 			objectField.isRequired(), objectField.isState(),
@@ -66,8 +66,8 @@ public class ObjectFieldTestUtil {
 			null, userId, 0, objectDefinition.getObjectDefinitionId(),
 			businessType, dbType, null, false, true, "",
 			LocalizedMapUtil.getLocalizedMap(objectFieldName), false,
-			objectFieldName, ObjectFieldConstants.READ_ONLY_FALSE, null, false,
-			false, objectFieldSettings);
+			objectFieldName, 0, ObjectFieldConstants.READ_ONLY_FALSE, null,
+			false, false, objectFieldSettings);
 	}
 
 }

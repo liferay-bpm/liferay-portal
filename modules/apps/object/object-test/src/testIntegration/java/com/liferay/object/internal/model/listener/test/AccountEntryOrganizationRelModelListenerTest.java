@@ -261,7 +261,7 @@ public class AccountEntryOrganizationRelModelListenerTest {
 				objectDefinition.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				StringUtil.randomId(), false,
+				StringUtil.randomId(), 0, false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null));
 	}
 

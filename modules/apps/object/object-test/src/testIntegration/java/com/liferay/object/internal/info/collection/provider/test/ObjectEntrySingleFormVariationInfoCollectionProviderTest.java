@@ -203,7 +203,7 @@ public class ObjectEntrySingleFormVariationInfoCollectionProviderTest {
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 			ObjectFieldConstants.DB_TYPE_STRING, null, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			false, "charlie", null, null, false, false,
+			false, "charlie", 0, null, null, false, false,
 			Collections.emptyList());
 
 		String value = RandomTestUtil.randomString();

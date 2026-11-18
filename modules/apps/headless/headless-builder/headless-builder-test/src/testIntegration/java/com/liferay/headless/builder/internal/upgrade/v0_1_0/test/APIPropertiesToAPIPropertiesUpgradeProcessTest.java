@@ -75,7 +75,7 @@ public class APIPropertiesToAPIPropertiesUpgradeProcessTest
 			objectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			StringUtil.randomId(), true,
+			StringUtil.randomId(), 0, true,
 			ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 
 		UpgradeProcess upgradeProcess = UpgradeTestUtil.getUpgradeStep(

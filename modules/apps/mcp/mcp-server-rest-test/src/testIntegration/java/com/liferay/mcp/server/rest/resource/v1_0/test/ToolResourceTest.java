@@ -128,7 +128,7 @@ public class ToolResourceTest extends BaseToolResourceTestCase {
 			objectDefinition.getObjectDefinitionId(),
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 			ObjectFieldConstants.DB_TYPE_STRING, null, false, false, null,
-			LocalizedMapUtil.getLocalizedMap(name), false, name, null, null,
+			LocalizedMapUtil.getLocalizedMap(name), false, name, 0, null, null,
 			false, false, Collections.emptyList());
 
 		JSONAssert.assertEquals(
@@ -312,7 +312,8 @@ public class ToolResourceTest extends BaseToolResourceTestCase {
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 			ObjectFieldConstants.DB_TYPE_STRING, descriptionMap, false, false,
 			null, LocalizedMapUtil.getLocalizedMap(objectFieldName), false,
-			objectFieldName, null, null, false, false, Collections.emptyList());
+			objectFieldName, 0, null, null, false, false,
+			Collections.emptyList());
 
 		return _objectDefinitionLocalService.publishCustomObjectDefinition(
 			userId, objectDefinition.getObjectDefinitionId());
@@ -416,7 +417,7 @@ public class ToolResourceTest extends BaseToolResourceTestCase {
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 			ObjectFieldConstants.DB_TYPE_STRING, null, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(requiredObjectFieldName), false,
-			requiredObjectFieldName, null, null, true, false,
+			requiredObjectFieldName, 0, null, null, true, false,
 			Collections.emptyList());
 
 		JSONAssert.assertEquals(

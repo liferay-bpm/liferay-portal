@@ -284,7 +284,8 @@ public class BoundObjectDefinitionsExportImportTest
 			objectRelationship.getObjectRelationshipId(),
 			objectRelationship.getParameterObjectFieldId(),
 			objectRelationship.getDeletionType(), null, false,
-			objectRelationship.getLabelMap(), null);
+			objectRelationship.getLabelMap(), objectRelationship.getPriority(),
+			null);
 
 		_objectDefinitionLocalService.deleteObjectDefinition(
 			objectDefinition.getObjectDefinitionId());

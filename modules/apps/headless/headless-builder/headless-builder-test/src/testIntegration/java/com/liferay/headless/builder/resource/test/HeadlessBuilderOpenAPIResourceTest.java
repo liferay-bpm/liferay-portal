@@ -318,7 +318,7 @@ public class HeadlessBuilderOpenAPIResourceTest extends BaseTestCase {
 			_objectDefinition2.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			relationshipName, false,
+			relationshipName, 0, false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		ObjectField aggregationObjectField = new AggregationObjectFieldBuilder(
@@ -353,7 +353,7 @@ public class HeadlessBuilderOpenAPIResourceTest extends BaseTestCase {
 			aggregationObjectField.getIndexedLanguageId(),
 			aggregationObjectField.getLabelMap(),
 			aggregationObjectField.isLocalized(),
-			aggregationObjectField.getName(),
+			aggregationObjectField.getName(), 0,
 			aggregationObjectField.getReadOnly(),
 			aggregationObjectField.getReadOnlyConditionExpression(),
 			aggregationObjectField.isRequired(),

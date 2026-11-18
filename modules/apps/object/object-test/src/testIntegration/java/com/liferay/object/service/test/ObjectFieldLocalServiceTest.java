@@ -416,7 +416,7 @@ public class ObjectFieldLocalServiceTest {
 				objectDefinition3.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				objectRelationshipName, false,
+				objectRelationshipName, 0, false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		AssertUtils.assertFailure(
@@ -515,7 +515,7 @@ public class ObjectFieldLocalServiceTest {
 				objectDefinition3.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				objectRelationshipName, false,
+				objectRelationshipName, 0, false,
 				ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 
 		AssertUtils.assertFailure(
@@ -1221,7 +1221,7 @@ public class ObjectFieldLocalServiceTest {
 			relatedObjectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			"oneToManyRelationshipName", false,
+			"oneToManyRelationshipName", 0, false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		_assertReadOnly(
@@ -1245,7 +1245,7 @@ public class ObjectFieldLocalServiceTest {
 				relatedObjectDefinition.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"relationship", false,
+				"relationship", 0, false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		ObjectField relationshipObjectField =
@@ -3056,7 +3056,7 @@ public class ObjectFieldLocalServiceTest {
 				objectDefinition2.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				StringUtil.randomId(), false,
+				StringUtil.randomId(), 0, false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		ObjectField objectField = _objectFieldLocalService.updateRequired(
@@ -3071,7 +3071,8 @@ public class ObjectFieldLocalServiceTest {
 			objectRelationship.getObjectRelationshipId(),
 			objectRelationship.getParameterObjectFieldId(),
 			ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE, null, false,
-			objectRelationship.getLabelMap(), null);
+			objectRelationship.getLabelMap(), objectRelationship.getPriority(),
+			null);
 
 		objectField = _objectFieldLocalService.fetchObjectField(
 			objectRelationship.getObjectFieldId2());
@@ -3092,7 +3093,8 @@ public class ObjectFieldLocalServiceTest {
 			objectRelationship.getObjectRelationshipId(),
 			objectRelationship.getParameterObjectFieldId(),
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
-			objectRelationship.getLabelMap(), null);
+			objectRelationship.getLabelMap(), objectRelationship.getPriority(),
+			null);
 
 		objectField = _objectFieldLocalService.updateRequired(
 			objectRelationship.getObjectFieldId2(), true);
@@ -3294,7 +3296,7 @@ public class ObjectFieldLocalServiceTest {
 			objectField.isIndexed(), objectField.isIndexedAsKeyword(),
 			objectField.getIndexedLanguageId(), objectField.getLabelMap(),
 			objectField.isLocalized(), objectField.getName(),
-			objectField.getReadOnly(),
+			objectField.getPriority(), objectField.getReadOnly(),
 			objectField.getReadOnlyConditionExpression(),
 			objectField.isRequired(), objectField.isState(),
 			objectField.getObjectFieldSettings());
@@ -3321,7 +3323,7 @@ public class ObjectFieldLocalServiceTest {
 			objectField.isIndexed(), objectField.isIndexedAsKeyword(),
 			objectField.getIndexedLanguageId(), objectField.getLabelMap(),
 			objectField.isLocalized(), objectField.getName(),
-			objectField.getReadOnly(),
+			objectField.getPriority(), objectField.getReadOnly(),
 			objectField.getReadOnlyConditionExpression(),
 			objectField.isRequired(), objectField.isState(),
 			objectFieldSettings);
@@ -3339,8 +3341,8 @@ public class ObjectFieldLocalServiceTest {
 			externalReferenceCode, TestPropsValues.getUserId(), 0L,
 			objectDefinitionId, businessType, dbColumnName, dbTableName, dbType,
 			descriptionMap, indexed, indexedAsKeyword, "", labelMap, localized,
-			name, ObjectFieldConstants.READ_ONLY_FALSE, null, required, false,
-			Collections.emptyList());
+			name, 0, ObjectFieldConstants.READ_ONLY_FALSE, null, required,
+			false, Collections.emptyList());
 	}
 
 	private ObjectField _addPicklistObjectField(
@@ -3462,7 +3464,7 @@ public class ObjectFieldLocalServiceTest {
 			null, TestPropsValues.getUserId(), 0L, objectDefinitionId,
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT, null, null,
 			ObjectFieldConstants.DB_TYPE_STRING, null, false, true, "",
-			LocalizedMapUtil.getLocalizedMap(name), false, name,
+			LocalizedMapUtil.getLocalizedMap(name), false, name, 0,
 			ObjectFieldConstants.READ_ONLY_FALSE, null, false, false,
 			objectFieldSettings);
 	}
@@ -3874,7 +3876,7 @@ public class ObjectFieldLocalServiceTest {
 			objectDefinition2.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			"oneToManyRelationshipName", false,
+			"oneToManyRelationshipName", 0, false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		_assertReadOnlyTrue(
@@ -4114,8 +4116,9 @@ public class ObjectFieldLocalServiceTest {
 			objectField.getBusinessType(), objectField.getDBColumnName(),
 			objectField.getDBTableName(), objectField.getDBType(),
 			descriptionMap, false, false, null, objectField.getLabelMap(),
-			false, objectField.getName(), objectField.getReadOnly(), null,
-			false, false, false, Collections.emptyList());
+			false, objectField.getName(), objectField.getPriority(),
+			objectField.getReadOnly(), null, false, false, false,
+			Collections.emptyList());
 
 		Assert.assertEquals(
 			"This is the description of an object field.",
@@ -4146,8 +4149,9 @@ public class ObjectFieldLocalServiceTest {
 			objectField.getBusinessType(), objectField.getDBColumnName(),
 			objectField.getDBTableName(), objectField.getDBType(),
 			objectField.getDescriptionMap(), false, false, null, labelMap,
-			false, objectField.getName(), objectField.getReadOnly(), null,
-			false, false, false, Collections.emptyList());
+			false, objectField.getName(), objectField.getPriority(),
+			objectField.getReadOnly(), null, false, false, false,
+			Collections.emptyList());
 
 		Assert.assertEquals(labelMap, objectField.getLabelMap());
 	}
@@ -4174,7 +4178,7 @@ public class ObjectFieldLocalServiceTest {
 			objectField.isIndexed(), objectField.isIndexedAsKeyword(),
 			objectField.getIndexedLanguageId(), objectField.getLabelMap(),
 			objectField.isLocalized(), objectField.getName(),
-			objectField.getReadOnly(),
+			objectField.getPriority(), objectField.getReadOnly(),
 			objectField.getReadOnlyConditionExpression(),
 			objectField.isRequired(), objectField.isState(), true,
 			objectField.getObjectFieldSettings());
@@ -4208,9 +4212,10 @@ public class ObjectFieldLocalServiceTest {
 			objectField.getDBType(), objectField.getDescriptionMap(),
 			objectField.isIndexed(), objectField.isIndexedAsKeyword(),
 			objectField.getIndexedLanguageId(), objectField.getLabelMap(),
-			objectField.isLocalized(), objectField.getName(), readOnly,
-			readOnlyConditionExpression, objectField.isRequired(),
-			objectField.isState(), objectField.getObjectFieldSettings());
+			objectField.isLocalized(), objectField.getName(),
+			objectField.getPriority(), readOnly, readOnlyConditionExpression,
+			objectField.isRequired(), objectField.isState(),
+			objectField.getObjectFieldSettings());
 	}
 
 	@Inject

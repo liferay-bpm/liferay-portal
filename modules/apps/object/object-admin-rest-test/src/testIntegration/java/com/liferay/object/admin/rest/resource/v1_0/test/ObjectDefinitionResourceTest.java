@@ -811,7 +811,7 @@ public class ObjectDefinitionResourceTest
 				postObjectDefinition.getId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"a" + RandomTestUtil.randomString(), false,
+				"a" + RandomTestUtil.randomString(), 0, false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null));
 
 		postObjectDefinition = objectDefinitionResource.getObjectDefinition(
@@ -2864,7 +2864,7 @@ public class ObjectDefinitionResourceTest
 					false,
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
-					"a" + RandomTestUtil.randomString(), false,
+					"a" + RandomTestUtil.randomString(), 0, false,
 					ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 		com.liferay.object.model.ObjectRelationship
 			serviceBuilderObjectRelationship2 =
@@ -2875,7 +2875,7 @@ public class ObjectDefinitionResourceTest
 					false,
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
-					"a" + RandomTestUtil.randomString(), false,
+					"a" + RandomTestUtil.randomString(), 0, false,
 					ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		objectDefinition1 = objectDefinitionResource.getObjectDefinition(

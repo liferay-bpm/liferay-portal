@@ -548,7 +548,7 @@ public class BaseNotificationTypeTest {
 				childObjectDefinition.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"oneToManyObjectRelationship", false,
+				"oneToManyObjectRelationship", 0, false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		_childAuthorTermValues = HashMapBuilder.<String, Object>put(

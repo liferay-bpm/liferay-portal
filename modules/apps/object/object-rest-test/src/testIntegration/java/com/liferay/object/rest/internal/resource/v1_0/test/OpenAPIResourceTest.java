@@ -224,56 +224,56 @@ public class OpenAPIResourceTest {
 			relatedObjectDefinition1.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap("relationship1"), "relationship1",
-			false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
+			0, false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(),
 			relatedObjectDefinition1.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap("relationship2"), "relationship2",
-			false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+			0, false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, TestPropsValues.getUserId(),
 			relatedObjectDefinition1.getObjectDefinitionId(),
 			relatedObjectDefinition2.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap("relationship3"), "relationship3",
-			false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
+			0, false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, TestPropsValues.getUserId(),
 			relatedObjectDefinition1.getObjectDefinitionId(),
 			relatedObjectDefinition2.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap("relationship4"), "relationship4",
-			false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+			0, false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, TestPropsValues.getUserId(),
 			relatedObjectDefinition2.getObjectDefinitionId(),
 			relatedObjectDefinition3.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap("relationship5"), "relationship5",
-			false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
+			0, false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, TestPropsValues.getUserId(),
 			relatedObjectDefinition3.getObjectDefinitionId(),
 			relatedObjectDefinition4.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap("relationship6"), "relationship6",
-			false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
+			0, false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, TestPropsValues.getUserId(),
 			relatedObjectDefinition4.getObjectDefinitionId(),
 			relatedObjectDefinition5.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap("relationship7"), "relationship7",
-			false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
+			0, false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, TestPropsValues.getUserId(),
 			relatedObjectDefinition5.getObjectDefinitionId(),
 			relatedObjectDefinition6.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap("relationship8"), "relationship8",
-			false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
+			0, false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 
 		ObjectFieldUtil.createObjectField(
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -608,22 +608,22 @@ public class OpenAPIResourceTest {
 			_objectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			"relation1ToM", false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY,
-			null);
+			"relation1ToM", 0, false,
+			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, _user.getUserId(), _objectDefinition.getObjectDefinitionId(),
 			_userSystemObjectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			"relationMTo1", false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY,
-			null);
+			"relationMTo1", 0, false,
+			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, _user.getUserId(),
 			_userSystemObjectDefinition.getObjectDefinitionId(),
 			_objectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			"relationMToM", false,
+			"relationMToM", 0, false,
 			ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 
 		JSONAssert.assertEquals(

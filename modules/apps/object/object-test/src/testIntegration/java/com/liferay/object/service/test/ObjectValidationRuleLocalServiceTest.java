@@ -1206,7 +1206,7 @@ public class ObjectValidationRuleLocalServiceTest {
 			null, TestPropsValues.getUserId(), 0L, objectDefinitionId,
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT, null, null,
 			ObjectFieldConstants.DB_TYPE_STRING, null, false, true, "",
-			LocalizedMapUtil.getLocalizedMap(name), false, name,
+			LocalizedMapUtil.getLocalizedMap(name), false, name, 0,
 			ObjectFieldConstants.READ_ONLY_FALSE, null, false, false,
 			Collections.emptyList());
 	}

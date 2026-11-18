@@ -1855,7 +1855,7 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 						false,
 						LocalizedMapUtil.getLocalizedMap(
 							RandomTestUtil.randomString()),
-						"relationship", false,
+						"relationship", 0, false,
 						ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null));
 		}
 

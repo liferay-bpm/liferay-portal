@@ -190,14 +190,15 @@ public class CMSContentMissingRequiredFieldsModelDocumentContributorTest {
 			ObjectFieldConstants.BUSINESS_TYPE_INTEGER,
 			ObjectFieldConstants.DB_TYPE_INTEGER, null, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			false, "integer", null, null, true, false, Collections.emptyList());
+			false, "integer", 0, null, null, true, false,
+			Collections.emptyList());
 		_objectFieldLocalService.addCustomObjectField(
 			null, TestPropsValues.getUserId(), 0,
 			objectDefinition.getObjectDefinitionId(),
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 			ObjectFieldConstants.DB_TYPE_STRING, null, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			false, "requiredText", null, null, true, false,
+			false, "requiredText", 0, null, null, true, false,
 			Collections.emptyList());
 	}
 
@@ -368,7 +369,7 @@ public class CMSContentMissingRequiredFieldsModelDocumentContributorTest {
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 			ObjectFieldConstants.DB_TYPE_STRING, null, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			false, "requiredText", null, null, true, false,
+			false, "requiredText", 0, null, null, true, false,
 			Collections.emptyList());
 
 		try {

@@ -340,7 +340,8 @@ public class MissingRequiredFieldsAssetResourceTest
 			ObjectFieldConstants.BUSINESS_TYPE_INTEGER,
 			ObjectFieldConstants.DB_TYPE_INTEGER, null, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			false, "integer", null, null, true, false, Collections.emptyList());
+			false, "integer", 0, null, null, true, false,
+			Collections.emptyList());
 	}
 
 	private DepotEntry _addSpaceDepotEntry() throws Exception {

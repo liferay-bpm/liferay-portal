@@ -123,7 +123,7 @@ public class TreeTestUtil {
 			objectDefinition1Id, objectDefinition2Id, 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, true,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			StringUtil.randomId(), false,
+			StringUtil.randomId(), 0, false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 	}
 
@@ -139,7 +139,8 @@ public class TreeTestUtil {
 				objectRelationship.getParameterObjectFieldId(),
 				objectRelationship.getDeletionType(),
 				objectRelationship.getDescriptionMap(), true,
-				objectRelationship.getLabelMap(), null);
+				objectRelationship.getLabelMap(),
+				objectRelationship.getPriority(), null);
 		}
 	}
 
@@ -428,7 +429,8 @@ public class TreeTestUtil {
 				objectRelationship.getParameterObjectFieldId(),
 				objectRelationship.getDeletionType(),
 				objectRelationship.getDescriptionMap(), false,
-				objectRelationship.getLabelMap(), null);
+				objectRelationship.getLabelMap(),
+				objectRelationship.getPriority(), null);
 
 		Assert.assertFalse(objectRelationship.isEdge());
 

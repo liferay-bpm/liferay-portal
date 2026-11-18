@@ -71,7 +71,7 @@ public class AccountValidatorResultUpgradeProcessTest {
 			_objectRelationship.getParameterObjectFieldId(),
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null,
 			_objectRelationship.isEdge(), _objectRelationship.getLabelMap(),
-			null);
+			_objectRelationship.getPriority(), null);
 
 		_runUpgrade();
 

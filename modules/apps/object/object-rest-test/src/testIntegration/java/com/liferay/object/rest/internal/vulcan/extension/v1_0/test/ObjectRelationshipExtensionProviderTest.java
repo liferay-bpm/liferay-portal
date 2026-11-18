@@ -284,7 +284,7 @@ public class ObjectRelationshipExtensionProviderTest {
 			userSystemObjectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			StringUtil.randomId(), false,
+			StringUtil.randomId(), 0, false,
 			ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 	}
 
@@ -399,7 +399,7 @@ public class ObjectRelationshipExtensionProviderTest {
 				cpDefinitionObjectDefinition.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				StringUtil.randomId(), false,
+				StringUtil.randomId(), 0, false,
 				ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 
 		ObjectRelationshipLocalServiceUtil.
