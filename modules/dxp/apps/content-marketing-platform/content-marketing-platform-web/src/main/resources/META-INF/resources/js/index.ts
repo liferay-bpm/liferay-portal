@@ -4,6 +4,7 @@
  */
 
 export {default as CustomAssignee} from './components/CustomAssignee';
+export {default as DueDateAlert} from './components/DueDateAlert';
 export {default as EditorToolbar} from './components/EditorToolbar';
 export {default as ProjectSelector} from './components/ProjectSelector';
 export {default as StateSelector} from './components/StateSelector';
@@ -17,7 +18,9 @@ export {default as AllTasksFDSPropsTransformer} from './components/props_transfo
 export {default as ProjectMembersFDSPropsTransformer} from './components/props_transformer/ProjectMembersFDSPropsTransformer';
 export {default as ProjectTasksFDSPropsTransformer} from './components/props_transformer/ProjectTasksFDSPropsTransformer';
 export {default as ProjectsFDSPropsTransformer} from './components/props_transformer/ProjectsFDSPropsTransformer';
+export {default as SubtasksFDSPropsTransformer} from './components/props_transformer/SubtasksFDSPropsTransformer';
 export {default as WorkflowTasksFDSPropsTransformer} from './components/props_transformer/WorkflowTasksFDSPropsTransformer';
+export {default as SubtasksTitle} from './components/task/SubtasksTitle';
 export {default as TaskHistory} from './components/task/TaskHistory';
 export {default as TaskInfoSummary} from './components/task/TaskInfoSummary';
 export {default as TasksOverview} from './components/task/TasksOverview';
