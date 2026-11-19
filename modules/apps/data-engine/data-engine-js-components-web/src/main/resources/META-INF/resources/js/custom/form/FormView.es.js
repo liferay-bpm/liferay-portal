@@ -47,6 +47,8 @@ import {
 const DDM_FORM_PORTLET_NAMESPACE =
 	'_com_liferay_dynamic_data_mapping_form_web_portlet_DDMFormPortlet_';
 
+const formAPIRefsMap = new WeakMap();
+
 /**
  * This is a copy of the old implementation made in Metal.js, deals with
  * the submit of the Form in the User View, removes the default behavior
@@ -61,9 +63,16 @@ const useFormSubmit = ({apiRef, containerRef}) => {
 
 	const submitForm = useCallback(
 		(event) => {
-			apiRef.current
-				.validate()
-				.then(([ddmFormSubmitButton, validForm]) => {
+			const apiRefs = formAPIRefsMap.get(event.target);
+
+			Promise.all([...apiRefs].map((ref) => ref.current.validate()))
+				.then((validations) => {
+					const [[ddmFormSubmitButton]] = validations;
+
+					const validForm = validations.every(
+						([, validForm]) => validForm
+					);
+
 					if (validForm) {
 						AUI().use('liferay-form', () => {
 							const liferayForm =
@@ -135,12 +144,18 @@ const useFormSubmit = ({apiRef, containerRef}) => {
 					});
 				});
 		},
-		[apiRef, containerRef, submittable, title]
+		[containerRef, submittable, title]
 	);
 
 	const handleFormSubmitted = useCallback(
 		(event) => {
 			event.preventDefault();
+
+			const [firstAPIRef] = formAPIRefsMap.get(event.currentTarget);
+
+			if (firstAPIRef !== apiRef) {
+				return;
+			}
 
 			if (isDDMFormPortletNamespace) {
 				fetch(validateCSRFTokenURL, {
@@ -163,7 +178,7 @@ const useFormSubmit = ({apiRef, containerRef}) => {
 				submitForm(event);
 			}
 		},
-		[isDDMFormPortletNamespace, submitForm, validateCSRFTokenURL]
+		[apiRef, isDDMFormPortletNamespace, submitForm, validateCSRFTokenURL]
 	);
 
 	const showSessionExpiredModal = () => {
@@ -227,7 +242,15 @@ const useFormSubmit = ({apiRef, containerRef}) => {
 		const waitForElementHandler = waitForElement(
 			container,
 			getFormNode,
-			(form) => {
+			(formNode) => {
+				form = formNode;
+
+				if (!formAPIRefsMap.has(form)) {
+					formAPIRefsMap.set(form, new Set());
+				}
+
+				formAPIRefsMap.get(form).add(apiRef);
+
 				formSubmitHandler = Liferay.on(
 					'submitForm',
 					(event) => {
@@ -243,11 +266,13 @@ const useFormSubmit = ({apiRef, containerRef}) => {
 		);
 
 		return () => {
+			formAPIRefsMap.get(form)?.delete(apiRef);
+
 			form?.removeEventListener('submit', handleFormSubmitted);
 			formSubmitHandler?.detach();
 			waitForElementHandler.dispose();
 		};
-	}, [containerRef, handleFormSubmitted]);
+	}, [apiRef, containerRef, handleFormSubmitted]);
 };
 
 /**
@@ -355,6 +380,7 @@ const usePublicAPI = ({apiRef, containerRef, unstable_onEventRef}) => {
 	useImperativeHandle(apiRef, () => ({
 		evaluate: (editingLanguageId) =>
 			evaluate(null, {
+				containerId,
 				defaultLanguageId,
 				editingLanguageId,
 				formId: containerRef.current
