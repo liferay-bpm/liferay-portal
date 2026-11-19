@@ -6,7 +6,7 @@
 import {useConfig} from 'data-engine-js-components-web';
 import {ReactFieldBase as FieldBase} from 'dynamic-data-mapping-form-field-type/api';
 import {fetch} from 'frontend-js-web';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import AttachmentBase, {
 	AttachmentBaseProps,
@@ -44,7 +44,8 @@ export default function Attachment({
 		fileEntryProperties as AttachmentFile | null
 	);
 	const [error, setError] = useState({});
-	const [submitButtonClicked, setSubmitButtonClicked] = useState(false);
+
+	const submitButtonClickedRef = useRef(false);
 
 	const deleteFileEntry = useCallback(async () => {
 		if (!attachment) {
@@ -80,31 +81,44 @@ export default function Attachment({
 		}
 	}, [attachment, deleteURL, portletNamespace]);
 
+	// Delete the uploaded file when the user leaves the page before this
+	// widget submits its entry.
+
 	useEffect(() => {
-		window.onbeforeunload = function () {
-			if (!submitButtonClicked) {
+		const handleLeavePage = () => {
+			if (!submitButtonClickedRef.current) {
 				deleteFileEntry();
 			}
 		};
 
+		Liferay.on('beforeNavigate', handleLeavePage);
+
+		window.addEventListener('beforeunload', handleLeavePage);
+
 		return () => {
-			window.onbeforeunload = null;
+			Liferay.detach('beforeNavigate', handleLeavePage);
+
+			window.removeEventListener('beforeunload', handleLeavePage);
 		};
-	}, [deleteFileEntry, submitButtonClicked]);
+	}, [deleteFileEntry]);
 
 	useEffect(() => {
-		Liferay.on(
-			'submitButtonClicked',
+		const handleSubmitButtonClicked = () => {
+			submitButtonClickedRef.current = true;
+		};
 
-			() => {
-				setSubmitButtonClicked(true);
-			}
+		Liferay.on(
+			`${portletNamespace}submitButtonClicked`,
+			handleSubmitButtonClicked
 		);
 
 		return () => {
-			Liferay.detach('submitButtonClicked');
+			Liferay.detach(
+				`${portletNamespace}submitButtonClicked`,
+				handleSubmitButtonClicked
+			);
 		};
-	}, []);
+	}, [portletNamespace]);
 
 	const handleAttachmentChange = (
 		attachmentValue: AttachmentFile,

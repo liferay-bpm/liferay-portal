@@ -406,7 +406,9 @@ if (ParamUtil.getBoolean(request, "showHeader", true)) {
 								}
 							)
 								.then((response) => {
-									Liferay.fire('submitButtonClicked');
+									Liferay.fire(
+										'<portlet:namespace />submitButtonClicked'
+									);
 
 									if (response.status === 401) {
 										window.location.reload();

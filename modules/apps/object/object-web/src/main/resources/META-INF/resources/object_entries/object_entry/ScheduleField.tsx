@@ -16,6 +16,7 @@ interface ScheduleFieldProps {
 	isChecked: boolean;
 	onCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 	onDateChange: (value: string) => void;
+	portletNamespace: string;
 	value: string;
 }
 
@@ -27,6 +28,7 @@ export default function ScheduleField({
 	isChecked,
 	onCheckboxChange,
 	onDateChange,
+	portletNamespace,
 	value,
 }: ScheduleFieldProps) {
 	const [dateError, setDateError] = useState<string>('');
@@ -53,12 +55,15 @@ export default function ScheduleField({
 			handleError(value);
 		};
 
-		Liferay.on('submitObjectEntry', handleSubmit);
+		Liferay.on(`${portletNamespace}submitObjectEntry`, handleSubmit);
 
 		return () => {
-			Liferay.detach('submitObjectEntry', handleSubmit);
+			Liferay.detach(
+				`${portletNamespace}submitObjectEntry`,
+				handleSubmit
+			);
 		};
-	}, [handleError, value]);
+	}, [handleError, portletNamespace, value]);
 
 	return (
 		<div className="col-lg-6">
