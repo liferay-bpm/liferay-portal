@@ -89,6 +89,33 @@ public class TemplateRestrictedVariablesTest {
 
 	@Test
 	public void testRestrictedSAXReaderUtil() throws Exception {
+		_testRestrictedSAXReaderUtil(
+			TemplateConstants.LANG_TYPE_FTL,
+			"<#if saxReaderUtil??>ACCESSIBLE<#else>DENIED</#if>");
+		_testRestrictedSAXReaderUtil(
+			TemplateConstants.LANG_TYPE_VM,
+			"#if($saxReaderUtil)ACCESSIBLE#{else}DENIED#end");
+	}
+
+	private String _processTemplate(
+			boolean restricted, String script, TemplateManager templateManager)
+		throws Exception {
+
+		Template template = templateManager.getTemplate(
+			new StringTemplateResource(RandomTestUtil.randomString(), script),
+			restricted);
+
+		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
+
+		template.processTemplate(unsyncStringWriter);
+
+		return unsyncStringWriter.toString();
+	}
+
+	private void _testRestrictedSAXReaderUtil(
+			String languageType, String script)
+		throws Exception {
+
 		Bundle bundle = FrameworkUtil.getBundle(
 			TemplateRestrictedVariablesTest.class);
 
@@ -96,8 +123,7 @@ public class TemplateRestrictedVariablesTest {
 
 		Collection<ServiceReference<TemplateManager>> serviceReferences =
 			bundleContext.getServiceReferences(
-				TemplateManager.class,
-				"(language.type=" + TemplateConstants.LANG_TYPE_FTL + ")");
+				TemplateManager.class, "(language.type=" + languageType + ")");
 
 		Assert.assertFalse(serviceReferences.isEmpty());
 
@@ -108,32 +134,16 @@ public class TemplateRestrictedVariablesTest {
 				serviceReference);
 
 			try {
-				_testRestrictedSAXReaderUtil(
-					"ACCESSIBLE", false, templateManager);
-				_testRestrictedSAXReaderUtil("DENIED", true, templateManager);
+				Assert.assertEquals(
+					"ACCESSIBLE",
+					_processTemplate(false, script, templateManager));
+				Assert.assertEquals(
+					"DENIED", _processTemplate(true, script, templateManager));
 			}
 			finally {
 				bundleContext.ungetService(serviceReference);
 			}
 		}
-	}
-
-	private void _testRestrictedSAXReaderUtil(
-			String expected, boolean restricted,
-			TemplateManager templateManager)
-		throws Exception {
-
-		Template template = templateManager.getTemplate(
-			new StringTemplateResource(
-				RandomTestUtil.randomString(),
-				"<#if saxReaderUtil??>ACCESSIBLE<#else>DENIED</#if>"),
-			restricted);
-
-		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
-
-		template.processTemplate(unsyncStringWriter);
-
-		Assert.assertEquals(expected, unsyncStringWriter.toString());
 	}
 
 }
