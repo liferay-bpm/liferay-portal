@@ -17,14 +17,18 @@ import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.PortletResponseUtil;
+import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.portlet.MockLiferayResourceRequest;
 import com.liferay.portal.kernel.test.portlet.MockLiferayResourceResponse;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import jakarta.portlet.ResourceRequest;
@@ -53,8 +57,10 @@ public class DownloadFileEntryMVCResourceCommandTest {
 	public void setUp() throws Exception {
 		_setUpDDMFormInstanceRecordService();
 		_setUpDLAppLocalService();
+		_setUpFileEntryModelResourcePermission();
 		_setUpJSONFactory();
 		_setUpMimeTypesUtil();
+		_setUpPortletFileRepository();
 		_setUpPortletResponseUtil();
 	}
 
@@ -125,6 +131,8 @@ public class DownloadFileEntryMVCResourceCommandTest {
 		MockLiferayResourceRequest mockLiferayResourceRequest =
 			new MockLiferayResourceRequest();
 
+		mockLiferayResourceRequest.setAttribute(
+			WebKeys.THEME_DISPLAY, new ThemeDisplay());
 		mockLiferayResourceRequest.setParameter(
 			"ddmFormFieldName", _DDM_FORM_FIELD_NAME);
 		mockLiferayResourceRequest.setParameter(
@@ -184,6 +192,13 @@ public class DownloadFileEntryMVCResourceCommandTest {
 			_dlAppLocalService);
 	}
 
+	private void _setUpFileEntryModelResourcePermission() {
+		ReflectionTestUtil.setFieldValue(
+			_downloadFileEntryMVCResourceCommand,
+			"_fileEntryModelResourcePermission",
+			Mockito.mock(ModelResourcePermission.class));
+	}
+
 	private void _setUpJSONFactory() {
 		ReflectionTestUtil.setFieldValue(
 			_downloadFileEntryMVCResourceCommand, "_jsonFactory",
@@ -196,6 +211,12 @@ public class DownloadFileEntryMVCResourceCommandTest {
 		).thenReturn(
 			_CONTENT_TYPE
 		);
+	}
+
+	private void _setUpPortletFileRepository() {
+		ReflectionTestUtil.setFieldValue(
+			_downloadFileEntryMVCResourceCommand, "_portletFileRepository",
+			Mockito.mock(PortletFileRepository.class));
 	}
 
 	private void _setUpPortletResponseUtil() {
