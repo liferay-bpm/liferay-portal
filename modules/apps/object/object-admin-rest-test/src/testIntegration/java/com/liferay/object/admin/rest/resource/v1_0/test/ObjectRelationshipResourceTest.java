@@ -15,8 +15,11 @@ import com.liferay.object.admin.rest.resource.v1_0.test.util.ObjectDefinitionTes
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.test.util.FeatureFlagTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -115,6 +118,8 @@ public class ObjectRelationshipResourceTest
 			objectRelationship, LocaleUtil.US, objectRelationshipLabel2);
 		_testGetObjectDefinitionObjectRelationshipsPage(
 			objectRelationship, LocaleUtil.US, objectRelationship.getName());
+
+		_testGetObjectDefinitionObjectRelationshipsPageWithPriority();
 	}
 
 	@Ignore
@@ -444,6 +449,44 @@ public class ObjectRelationshipResourceTest
 			randomObjectRelationship());
 	}
 
+	private ObjectRelationship _addObjectRelationship(int priority)
+		throws Exception {
+
+		ObjectRelationship objectRelationship = randomObjectRelationship();
+
+		objectRelationship.setPriority(priority);
+
+		return testPostObjectDefinitionObjectRelationship_addObjectRelationship(
+			objectRelationship);
+	}
+
+	private Long[] _getObjectRelationshipIds(
+			ObjectRelationship... objectRelationships)
+		throws Exception {
+
+		List<Long> objectRelationshipIds = TransformUtil.transformToList(
+			objectRelationships, ObjectRelationship::getId);
+
+		Page<ObjectRelationship> page =
+			objectRelationshipResource.
+				getObjectDefinitionObjectRelationshipsPage(
+					_objectDefinition1.getObjectDefinitionId(), null, null,
+					null, null);
+
+		return TransformUtil.transformToArray(
+			page.getItems(),
+			objectRelationship -> {
+				if (!objectRelationshipIds.contains(
+						objectRelationship.getId())) {
+
+					return null;
+				}
+
+				return objectRelationship.getId();
+			},
+			Long.class);
+	}
+
 	private void _testGetObjectDefinitionObjectRelationshipsPage(
 			ObjectRelationship expectedObjectRelationship, Locale locale,
 			String search)
@@ -471,6 +514,36 @@ public class ObjectRelationshipResourceTest
 		assertEquals(
 			Collections.singletonList(expectedObjectRelationship),
 			(List<ObjectRelationship>)page.getItems());
+	}
+
+	private void _testGetObjectDefinitionObjectRelationshipsPageWithPriority()
+		throws Exception {
+
+		ObjectRelationship objectRelationship1 = _addObjectRelationship(3);
+		ObjectRelationship objectRelationship2 = _addObjectRelationship(2);
+		ObjectRelationship objectRelationship3 = _addObjectRelationship(2);
+
+		Assert.assertArrayEquals(
+			new Long[] {
+				objectRelationship2.getId(), objectRelationship3.getId(),
+				objectRelationship1.getId()
+			},
+			_getObjectRelationshipIds(
+				objectRelationship1, objectRelationship2, objectRelationship3));
+
+		try (SafeCloseable safeCloseable =
+				FeatureFlagTestUtil.setFeatureFlagsWithSafeCloseable(
+					false, "LPD-110248")) {
+
+			Assert.assertArrayEquals(
+				new Long[] {
+					objectRelationship1.getId(), objectRelationship2.getId(),
+					objectRelationship3.getId()
+				},
+				_getObjectRelationshipIds(
+					objectRelationship1, objectRelationship2,
+					objectRelationship3));
+		}
 	}
 
 	private void _testPutObjectRelationshipDescription(

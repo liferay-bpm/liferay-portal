@@ -2924,6 +2924,40 @@ public class ObjectDefinitionResourceTest
 				objectDefinition1.getObjectRelationships(),
 				ObjectRelationship::getId, Long.class));
 
+		User user = TestPropsValues.getUser();
+
+		ObjectDefinitionResource nestedFieldsObjectDefinitionResource =
+			ObjectDefinitionResource.builder(
+			).authentication(
+				user.getEmailAddress(), PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(),
+				PortalUtil.getPortalServerPort(false), "http"
+			).parameter(
+				"nestedFields", "objectFields,objectRelationships"
+			).build();
+
+		try (SafeCloseable safeCloseable =
+				FeatureFlagTestUtil.setFeatureFlagsWithSafeCloseable(
+					false, "LPD-110248")) {
+
+			objectDefinition1 =
+				nestedFieldsObjectDefinitionResource.getObjectDefinition(
+					objectDefinition1.getId());
+
+			Assert.assertArrayEquals(
+				new String[] {"charlie", "able", "baker"},
+				_getCustomObjectFieldNames(objectDefinition1));
+			Assert.assertArrayEquals(
+				new Long[] {
+					serviceBuilderObjectRelationship1.getObjectRelationshipId(),
+					serviceBuilderObjectRelationship2.getObjectRelationshipId()
+				},
+				TransformUtil.transform(
+					objectDefinition1.getObjectRelationships(),
+					ObjectRelationship::getId, Long.class));
+		}
+
 		try (SafeCloseable safeCloseable =
 				FeatureFlagTestUtil.setFeatureFlagsWithSafeCloseable(
 					true, "LPD-110248")) {
@@ -2941,6 +2975,22 @@ public class ObjectDefinitionResourceTest
 				TransformUtil.transform(
 					objectDefinition1.getObjectRelationships(),
 					ObjectRelationship::getPriority, Integer.class));
+
+			objectDefinition1 =
+				nestedFieldsObjectDefinitionResource.getObjectDefinition(
+					objectDefinition1.getId());
+
+			Assert.assertArrayEquals(
+				new String[] {"able", "baker", "charlie"},
+				_getCustomObjectFieldNames(objectDefinition1));
+			Assert.assertArrayEquals(
+				new Long[] {
+					serviceBuilderObjectRelationship2.getObjectRelationshipId(),
+					serviceBuilderObjectRelationship1.getObjectRelationshipId()
+				},
+				TransformUtil.transform(
+					objectDefinition1.getObjectRelationships(),
+					ObjectRelationship::getId, Long.class));
 		}
 
 		objectDefinitionResource.deleteObjectDefinition(

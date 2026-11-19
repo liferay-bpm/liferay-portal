@@ -14,6 +14,7 @@ import com.liferay.object.admin.rest.resource.v1_0.test.util.ObjectDefinitionTes
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.test.util.FeatureFlagTestUtil;
@@ -250,6 +251,8 @@ public class ObjectFieldResourceTest extends BaseObjectFieldResourceTestCase {
 		Collection<ObjectField> items = page.getItems();
 
 		Assert.assertEquals(items.size(), page.getTotalCount());
+
+		_testGetObjectDefinitionObjectFieldsPageWithPriority();
 	}
 
 	@Override
@@ -515,6 +518,15 @@ public class ObjectFieldResourceTest extends BaseObjectFieldResourceTestCase {
 		return _objectField;
 	}
 
+	private ObjectField _addObjectField(int priority) throws Exception {
+		ObjectField objectField = randomObjectField();
+
+		objectField.setPriority(priority);
+
+		return objectFieldResource.postObjectDefinitionObjectField(
+			_objectDefinition.getObjectDefinitionId(), objectField);
+	}
+
 	private ObjectField _addUniqueObjectField() throws Exception {
 		ObjectField objectField = randomObjectField();
 
@@ -522,6 +534,24 @@ public class ObjectFieldResourceTest extends BaseObjectFieldResourceTestCase {
 
 		return objectFieldResource.postObjectDefinitionObjectField(
 			_objectDefinition.getObjectDefinitionId(), objectField);
+	}
+
+	private Long[] _getCustomObjectFieldIds() throws Exception {
+		Page<ObjectField> page =
+			objectFieldResource.getObjectDefinitionObjectFieldsPage(
+				_objectDefinition.getObjectDefinitionId(), null, null, null,
+				null);
+
+		return TransformUtil.transformToArray(
+			page.getItems(),
+			objectField -> {
+				if (objectField.getSystem()) {
+					return null;
+				}
+
+				return objectField.getId();
+			},
+			Long.class);
 	}
 
 	private void _setUnique(ObjectField objectField, boolean unique) {
@@ -534,6 +564,32 @@ public class ObjectFieldResourceTest extends BaseObjectFieldResourceTestCase {
 					}
 				}
 			});
+	}
+
+	private void _testGetObjectDefinitionObjectFieldsPageWithPriority()
+		throws Exception {
+
+		ObjectField objectField1 = _addObjectField(3);
+		ObjectField objectField2 = _addObjectField(2);
+		ObjectField objectField3 = _addObjectField(2);
+
+		Assert.assertArrayEquals(
+			new Long[] {
+				objectField2.getId(), objectField3.getId(), objectField1.getId()
+			},
+			_getCustomObjectFieldIds());
+
+		try (SafeCloseable safeCloseable =
+				FeatureFlagTestUtil.setFeatureFlagsWithSafeCloseable(
+					false, "LPD-110248")) {
+
+			Assert.assertArrayEquals(
+				new Long[] {
+					objectField1.getId(), objectField2.getId(),
+					objectField3.getId()
+				},
+				_getCustomObjectFieldIds());
+		}
 	}
 
 	private void _testPatchObjectField(ObjectField objectField, boolean unique)
