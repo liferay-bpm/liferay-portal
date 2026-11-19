@@ -143,16 +143,24 @@ definition {
 	}
 
 	@summary = "Default summary"
-	macro assertDataInRichTextField(fieldLabel = null, index = null, content = null) {
-		DERenderer.selectCKEditorByIndex(
-			fieldLabel = ${fieldLabel},
-			index = ${index});
+	macro assertDataInRichTextField(fieldLabel = null, content = null) {
+		if (IsElementPresent(key_fieldLabel = ${fieldLabel}, locator1 = "CKEditor#BODY_FIELD_IFRAME_WEB_CONTENT_ARTICLE")) {
+			SelectFrame.selectFrameNoLoading(
+				key_fieldLabel = ${fieldLabel},
+				locator1 = "CKEditor#BODY_FIELD_IFRAME_WEB_CONTENT_ARTICLE");
 
-		AssertTextEquals(
-			locator1 = "CKEditor#BODY",
-			value1 = ${content});
+			AssertTextEquals(
+				locator1 = "CKEditor#BODY",
+				value1 = ${content});
 
-		SelectFrame(value1 = "relative=top");
+			SelectFrame(value1 = "relative=top");
+		}
+		else {
+			AssertTextEquals(
+				key_fieldLabel = ${fieldLabel},
+				locator1 = "CKEditor#BODY_FIELD_CONTENTEDITABLE_WEB_CONTENT_ARTICLE",
+				value1 = ${content});
+		}
 	}
 
 	@summary = "Default summary"
@@ -513,16 +521,10 @@ definition {
 	}
 
 	@summary = "Default summary"
-	macro inputDataInRichTextField(fieldLabel = null, index = null, content = null) {
-		DERenderer.selectCKEditorByIndex(
-			fieldLabel = ${fieldLabel},
-			index = ${index});
-
-		Type(
-			locator1 = "CKEditor#BODY",
-			value1 = ${content});
-
-		SelectFrame(value1 = "relative=top");
+	macro inputDataInRichTextField(fieldLabel = null, content = null) {
+		CKEditor.addContentInWebContent(
+			content = ${content},
+			fieldLabel = ${fieldLabel});
 	}
 
 	@summary = "Default summary"
@@ -658,18 +660,6 @@ definition {
 			index = ${index},
 			key_fieldLabel = ${fieldLabel},
 			locator1 = "DataEngineRenderer#REPEATABLE_FIELD_DELETE_BUTTON_INDEXED");
-	}
-
-	@summary = "Default summary"
-	macro selectCKEditorByIndex(fieldLabel = null) {
-		if (!(isSet(index))) {
-			var index = 1;
-		}
-
-		SelectFrame.selectFrameNoLoading(
-			index = ${index},
-			key_fieldLabel = ${fieldLabel},
-			locator1 = "CKEditor#ANY_BODY_FIELD_IFRAME_WEB_CONTENT_ARTICLE");
 	}
 
 }
