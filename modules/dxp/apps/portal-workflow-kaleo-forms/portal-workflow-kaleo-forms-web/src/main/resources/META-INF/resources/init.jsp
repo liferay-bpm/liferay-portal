@@ -61,6 +61,14 @@ page import="java.util.Map" %>
 
 <portlet:defineObjects />
 
+<liferay-util:html-top
+	outputKey="com.liferay.portal.workflow.kaleo.forms.web#/init.jsp"
+>
+	<aui:script type="module">
+		import '@liferay/language/portal-workflow-kaleo-forms-web/all.js';
+	</aui:script>
+</liferay-util:html-top>
+
 <%
 String currentURL = PortalUtil.getCurrentURL(request);
 %>
