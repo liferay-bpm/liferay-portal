@@ -1,0 +1,17 @@
+.[$FRAGMENT_CLASS$] {
+ .navigation-bar .navbar-nav .nav-link {
+ margin-bottom: 0px;
+ border-color: #cdced9;
+ }
+
+ .navigation-bar .navbar-nav .nav-link.active {
+ border-color: #cdced9 #cdced9 #fff;
+ border-style: solid;
+ border-width: 0.0625rem;
+ border-radius: 0.5rem 0.5rem 0 0;
+}
+
+ .navigation-bar .navbar-nav .nav-link.active::after {
+ background-color: white !important;
+ bottom: -0.2rem !important;}
+}
