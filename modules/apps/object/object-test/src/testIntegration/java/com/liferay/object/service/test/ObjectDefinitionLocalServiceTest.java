@@ -35,6 +35,7 @@ import com.liferay.object.constants.ObjectFolderConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.constants.ObjectValidationRuleConstants;
 import com.liferay.object.constants.ObjectValidationRuleSettingConstants;
+import com.liferay.object.definition.processor.ObjectDefinitionClassNameProcessor;
 import com.liferay.object.definition.setting.builder.ObjectDefinitionSettingBuilder;
 import com.liferay.object.definition.util.ObjectDefinitionValidationThreadLocal;
 import com.liferay.object.exception.DuplicateObjectDefinitionExternalReferenceCodeException;
@@ -2673,6 +2674,65 @@ public class ObjectDefinitionLocalServiceTest {
 	}
 
 	@Test
+	public void testAddSystemObjectDefinitionWithClassNameHeldByCustomObjectDefinition()
+		throws Exception {
+
+		String className = ObjectDefinitionTestUtil.getUniqueRandomClassName();
+
+		ObjectDefinition objectDefinition1 = _addCustomObjectDefinition(
+			className, ObjectDefinitionTestUtil.getRandomName());
+
+		ObjectDefinition objectDefinition2 = null;
+
+		try {
+			objectDefinition2 =
+				_objectDefinitionLocalService.addSystemObjectDefinition(
+					null, TestPropsValues.getUserId(), 0, className, null, null,
+					true, false, true, false, true, false, false, false, false,
+					false, null, RandomTestUtil.randomLocaleStringMap(), true,
+					"Test" + RandomTestUtil.randomString(), null, null, null,
+					null, RandomTestUtil.randomLocaleStringMap(), false,
+					ObjectDefinitionConstants.SCOPE_COMPANY, null, 1,
+					WorkflowConstants.STATUS_APPROVED, Collections.emptyList(),
+					Collections.emptyList(), Collections.emptyList());
+
+			_assertUniqueClassName(className, objectDefinition2);
+
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinition2);
+
+			try (SafeCloseable safeCloseable =
+					LazyReferencingThreadLocal.setEnabledWithSafeCloseable(
+						true)) {
+
+				objectDefinition2 =
+					_objectDefinitionLocalService.getOrAddEmptyObjectDefinition(
+						"Test" + RandomTestUtil.randomString(),
+						TestPropsValues.getCompanyId(),
+						TestPropsValues.getUserId(), 0, true,
+						ObjectDefinitionConstants.SCOPE_COMPANY, true);
+
+				Assert.assertTrue(
+					Validator.isNull(objectDefinition2.getClassName()));
+
+				objectDefinition2 = _updateCustomObjectDefinition(
+					className, objectDefinition2);
+
+				_assertUniqueClassName(className, objectDefinition2);
+			}
+		}
+		finally {
+			if (objectDefinition2 != null) {
+				_objectDefinitionLocalService.deleteObjectDefinition(
+					objectDefinition2.getObjectDefinitionId());
+			}
+
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinition1);
+		}
+	}
+
+	@Test
 	public void testAuditRouter() throws Exception {
 		Queue<AuditMessage> auditMessages = new LinkedList<>();
 
@@ -4379,6 +4439,41 @@ public class ObjectDefinitionLocalServiceTest {
 	}
 
 	@Test
+	public void testUpdateCustomObjectDefinitionWithClassNameHeldByCustomObjectDefinition()
+		throws Exception {
+
+		ObjectDefinition objectDefinition1 =
+			ObjectDefinitionTestUtil.publishObjectDefinition();
+		ObjectDefinition objectDefinition2 =
+			ObjectDefinitionTestUtil.publishObjectDefinition();
+
+		try {
+			objectDefinition2 = _updateCustomObjectDefinition(
+				objectDefinition1.getClassName(), objectDefinition2);
+
+			Assert.assertNotEquals(
+				objectDefinition1.getClassName(),
+				objectDefinition2.getClassName());
+
+			ObjectDefinitionSetting objectDefinitionSetting =
+				_objectDefinitionSettingLocalService.
+					fetchObjectDefinitionSetting(
+						objectDefinition2.getObjectDefinitionId(),
+						ObjectDefinitionSettingConstants.NAME_OLD_CLASS_NAME);
+
+			Assert.assertEquals(
+				objectDefinition1.getClassName(),
+				objectDefinitionSetting.getValue());
+		}
+		finally {
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinition1.getObjectDefinitionId());
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinition2.getObjectDefinitionId());
+		}
+	}
+
+	@Test
 	public void testUpdateCustomObjectDefinitionWithClusterExecutor()
 		throws Exception {
 
@@ -5370,6 +5465,21 @@ public class ObjectDefinitionLocalServiceTest {
 			expectedObjectField.isRequired(), objectField.isRequired());
 		Assert.assertEquals(
 			expectedObjectField.isState(), objectField.isState());
+	}
+
+	private void _assertUniqueClassName(
+		String className, ObjectDefinition objectDefinition) {
+
+		Assert.assertEquals(
+			className,
+			_objectDefinitionClassNameProcessor.
+				updateObjectDefinitionReferences(className));
+		Assert.assertNotEquals(className, objectDefinition.getClassName());
+		Assert.assertTrue(
+			StringUtil.startsWith(
+				objectDefinition.getClassName(),
+				ObjectDefinitionConstants.
+					CLASS_NAME_PREFIX_CUSTOM_OBJECT_DEFINITION));
 	}
 
 	private void _assertWorkflowDefinitionLink(
@@ -6508,6 +6618,10 @@ public class ObjectDefinitionLocalServiceTest {
 
 	@Inject
 	private ObjectActionLocalService _objectActionLocalService;
+
+	@Inject
+	private ObjectDefinitionClassNameProcessor
+		_objectDefinitionClassNameProcessor;
 
 	@Inject
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
