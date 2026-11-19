@@ -10,6 +10,8 @@ import {
 import React, {useCallback, useContext, useEffect} from 'react';
 
 import {patchTaskById} from '../../../../utils/api';
+import {getOpenSubtaskCount} from '../../../../utils/subtasks';
+import {displayOpenSubtasksToast} from '../../../../utils/toastUtil';
 import {ITask} from '../../../../utils/types';
 import {State} from '../../../StateSelector';
 import {UPDATE_TASKS_QUICK_FILTER_VISIBILITY} from '../../../task/TasksQuickFilters';
@@ -31,10 +33,20 @@ function KanbanView(props: KanbanViewProps) {
 
 	const handleApiCall = useCallback(
 		async (task: ITask, newStatus: {key: string; name: string}) => {
-			return await patchTaskById({
+			const result = await patchTaskById({
 				body: {state: newStatus.key},
 				taskId: String(task.embedded.id),
 			});
+
+			if (!result.error && newStatus.key === 'done') {
+				getOpenSubtaskCount(task.embedded).then((openSubtaskCount) => {
+					if (openSubtaskCount) {
+						displayOpenSubtasksToast(openSubtaskCount);
+					}
+				});
+			}
+
+			return result;
 		},
 		[]
 	);

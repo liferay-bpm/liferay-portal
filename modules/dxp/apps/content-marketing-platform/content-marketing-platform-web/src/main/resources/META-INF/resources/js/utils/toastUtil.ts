@@ -104,6 +104,23 @@ const displayErrorToast = (errorMessage?: string) => {
 	});
 };
 
+const displayOpenSubtasksToast = (count: number) => {
+	openToast({
+		message:
+			count === 1
+				? Liferay.Language.get(
+						'task-marked-as-done-one-subtask-is-still-not-done-yet'
+					)
+				: sub(
+						Liferay.Language.get(
+							'task-marked-as-done-x-subtasks-are-still-not-done-yet'
+						),
+						String(count)
+					),
+		type: 'info',
+	});
+};
+
 const displayStateSuccessToast = () => {
 	openToast({
 		message: Liferay.Language.get('state-was-successfully-updated'),
@@ -119,5 +136,6 @@ export {
 	displayDeleteSuccessToast,
 	displayDueDateSuccessToast,
 	displayErrorToast,
+	displayOpenSubtasksToast,
 	displayStateSuccessToast,
 };

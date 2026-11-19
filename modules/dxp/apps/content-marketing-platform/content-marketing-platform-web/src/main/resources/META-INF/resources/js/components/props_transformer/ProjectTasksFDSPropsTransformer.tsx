@@ -27,6 +27,10 @@ import {
 import getCMPProjectObjectEntryIds from '../../utils/getCMPProjectObjectEntryIds';
 import {getFormattedLabel} from '../../utils/getFormattedText';
 import {openCMPModal} from '../../utils/openCMPModal';
+import {
+	getDeleteTaskConfirmationMessage,
+	getSubtaskCount,
+} from '../../utils/subtasks';
 import {transformFDSBulkActions} from '../../utils/transformFDSBulkActions';
 import {ProjectTaskItemData, TaskAction} from '../../utils/types';
 import BulkEditAssigneeModalContent from '../modal/BulkEditAssigneeModalContent';
@@ -222,9 +226,9 @@ export default function ProjectTasksFDSPropsTransformer({
 		}) {
 			if (action?.data?.id === 'delete') {
 				await deleteItemAction(
-					sub(
-						Liferay.Language.get('delete-task-confirmation-body'),
-						getFormattedLabel(itemData.embedded.title)
+					getDeleteTaskConfirmationMessage(
+						getFormattedLabel(itemData.embedded.title),
+						await getSubtaskCount(itemData.embedded)
 					),
 					itemData,
 					loadData

@@ -29,6 +29,10 @@ import {WORKFLOW_TASK_ACTION_LINK_ID} from '../../utils/constants';
 import getCMPProjectObjectEntryIds from '../../utils/getCMPProjectObjectEntryIds';
 import {getFormattedLabel} from '../../utils/getFormattedText';
 import {openCMPModal} from '../../utils/openCMPModal';
+import {
+	getDeleteTaskConfirmationMessage,
+	getSubtaskCount,
+} from '../../utils/subtasks';
 import {transformFDSBulkActions} from '../../utils/transformFDSBulkActions';
 import {
 	ProjectTaskItemData,
@@ -307,9 +311,9 @@ export default function AllTasksFDSPropsTransformer({
 
 			if (action?.data?.id === 'delete') {
 				await deleteItemAction(
-					sub(
-						Liferay.Language.get('delete-task-confirmation-body'),
-						getFormattedLabel(itemData.embedded.title)
+					getDeleteTaskConfirmationMessage(
+						getFormattedLabel(itemData.embedded.title),
+						await getSubtaskCount(itemData.embedded)
 					),
 					itemData,
 					loadData

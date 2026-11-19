@@ -23,6 +23,7 @@ import {
 	postUnsubscribeTaskByExternalReferenceCode,
 } from './api';
 import {openCMPModal} from './openCMPModal';
+import {getSubtaskCount} from './subtasks';
 import {
 	displayAssignSuccessToast,
 	displayDeleteSuccessToast,
@@ -263,6 +264,8 @@ export default function getTaskItemsActions(
 			className: 'text-danger',
 			label: Liferay.Language.get('delete'),
 			onClick: async () => {
+				const subtaskCount = await getSubtaskCount(task.embedded);
+
 				await openCMPModal({
 					center: true,
 					contentComponent: ({
@@ -288,6 +291,7 @@ export default function getTaskItemsActions(
 								}
 								closeModal();
 							}}
+							subtaskCount={subtaskCount}
 							title={task.embedded.title}
 						/>
 					),
