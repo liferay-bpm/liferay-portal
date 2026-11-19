@@ -268,6 +268,9 @@ components:
                     type: array
                 objectRelationshipExternalReferenceCode:
                     type: string
+                priority:
+                    format: int32
+                    type: integer
                 readOnly:
                     enum: [conditional, false, true]
                     type: string
@@ -521,6 +524,9 @@ components:
                     type: integer
                 parameterObjectFieldName:
                     type: string
+                priority:
+                    format: int32
+                    type: integer
                 reverse:
                     readOnly: true
                     type: boolean

@@ -19,6 +19,7 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectStateFlowLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -156,6 +157,16 @@ public class ObjectFieldDTOConverter
 
 						return finalObjectRelationship.
 							getExternalReferenceCode();
+					});
+				setPriority(
+					() -> {
+						if (!FeatureFlagManagerUtil.isEnabled(
+								objectField.getCompanyId(), "LPD-110248")) {
+
+							return null;
+						}
+
+						return objectField.getPriority();
 					});
 				setReadOnly(
 					() -> ObjectField.ReadOnly.create(

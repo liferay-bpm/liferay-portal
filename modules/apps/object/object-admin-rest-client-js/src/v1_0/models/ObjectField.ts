@@ -31,6 +31,7 @@
 			"objectDefinitionSystem1"?: boolean;
 			"objectFieldSettings"?: Array<ObjectFieldSetting>;
 			"objectRelationshipExternalReferenceCode"?: string;
+			"priority"?: number;
 			"readOnly"?: 'conditional' | 'false' | 'true';
 			"readOnlyConditionExpression"?: string;
 			"relationshipType"?: 'oneToMany' | 'oneToOne';
@@ -146,6 +147,11 @@
 			baseName: "objectRelationshipExternalReferenceCode",
 			name: "objectRelationshipExternalReferenceCode",
 			type: "string",
+		},
+		{
+			baseName: "priority",
+			name: "priority",
+			type: "number",
 		},
 		{
 			baseName: "readOnly",

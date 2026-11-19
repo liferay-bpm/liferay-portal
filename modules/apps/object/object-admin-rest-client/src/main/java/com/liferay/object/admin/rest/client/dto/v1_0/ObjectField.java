@@ -481,6 +481,27 @@ public class ObjectField implements Cloneable, Serializable {
 
 	protected String objectRelationshipExternalReferenceCode;
 
+	public Integer getPriority() {
+		return priority;
+	}
+
+	public void setPriority(Integer priority) {
+		this.priority = priority;
+	}
+
+	public void setPriority(
+		UnsafeSupplier<Integer, Exception> priorityUnsafeSupplier) {
+
+		try {
+			priority = priorityUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Integer priority;
+
 	public ReadOnly getReadOnly() {
 		return readOnly;
 	}
@@ -886,4 +907,4 @@ public class ObjectField implements Cloneable, Serializable {
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1187455085
+// LIFERAY-REST-BUILDER-HASH:-1919194556

@@ -2610,6 +2610,14 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("priority", additionalAssertFieldName)) {
+				if (objectRelationship.getPriority() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("reverse", additionalAssertFieldName)) {
 				if (objectRelationship.getReverse() == null) {
 					valid = false;
@@ -2989,6 +2997,17 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 				if (!Objects.deepEquals(
 						objectRelationship1.getParameterObjectFieldName(),
 						objectRelationship2.getParameterObjectFieldName())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("priority", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						objectRelationship1.getPriority(),
+						objectRelationship2.getPriority())) {
 
 					return false;
 				}
@@ -3521,6 +3540,12 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 			return sb.toString();
 		}
 
+		if (entityFieldName.equals("priority")) {
+			sb.append(String.valueOf(objectRelationship.getPriority()));
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("reverse")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -3603,6 +3628,7 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 				parameterObjectFieldId = RandomTestUtil.randomLong();
 				parameterObjectFieldName = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
+				priority = RandomTestUtil.randomInt();
 				reverse = RandomTestUtil.randomBoolean();
 				system = RandomTestUtil.randomBoolean();
 			}
@@ -3880,4 +3906,4 @@ public abstract class BaseObjectRelationshipResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-272667891
+// LIFERAY-REST-BUILDER-HASH:-298265376
