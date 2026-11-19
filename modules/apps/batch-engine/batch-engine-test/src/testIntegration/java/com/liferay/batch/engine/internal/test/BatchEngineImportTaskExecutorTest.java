@@ -952,7 +952,7 @@ public class BatchEngineImportTaskExecutorTest
 			HashMapBuilder.put(
 				LocaleUtil.fromLanguageId("en_US"), integerFieldName
 			).build(),
-			false, integerFieldName, null, null, true, false,
+			false, integerFieldName, 0, null, null, true, false,
 			Collections.emptyList());
 
 		String textFieldName = "a" + RandomTestUtil.randomString();
@@ -963,7 +963,7 @@ public class BatchEngineImportTaskExecutorTest
 			HashMapBuilder.put(
 				LocaleUtil.fromLanguageId("en_US"), textFieldName
 			).build(),
-			false, textFieldName, null, null, false, false,
+			false, textFieldName, 0, null, null, false, false,
 			Collections.emptyList());
 
 		Account account1 = new Account() {

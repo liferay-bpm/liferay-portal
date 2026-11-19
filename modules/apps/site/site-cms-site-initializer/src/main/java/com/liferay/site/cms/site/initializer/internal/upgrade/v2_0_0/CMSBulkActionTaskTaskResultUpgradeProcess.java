@@ -61,8 +61,8 @@ public class CMSBulkActionTaskTaskResultUpgradeProcess extends UpgradeProcess {
 				HashMapBuilder.put(
 					LocaleUtil.getSiteDefault(), "Task Result"
 				).build(),
-				false, "taskResult", ObjectFieldConstants.READ_ONLY_FALSE, null,
-				false, false, Collections.emptyList());
+				false, "taskResult", 0, ObjectFieldConstants.READ_ONLY_FALSE,
+				null, false, false, Collections.emptyList());
 		}
 	}
 

@@ -40,6 +40,7 @@ public class ObjectFieldModelDocumentContributor
 	@Override
 	public void contribute(Document document, ObjectField objectField) {
 		document.addText(Field.NAME, objectField.getName());
+		document.addNumber(Field.PRIORITY, objectField.getPriority());
 		document.addLocalizedText(
 			"label",
 			_localization.populateLocalizationMap(

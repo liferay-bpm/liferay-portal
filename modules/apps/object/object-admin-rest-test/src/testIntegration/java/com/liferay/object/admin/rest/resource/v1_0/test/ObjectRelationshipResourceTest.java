@@ -6,6 +6,7 @@
 package com.liferay.object.admin.rest.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.object.admin.rest.client.dto.v1_0.ObjectField;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectRelationship;
 import com.liferay.object.admin.rest.client.pagination.Page;
 import com.liferay.object.admin.rest.client.problem.Problem;
@@ -14,8 +15,11 @@ import com.liferay.object.admin.rest.resource.v1_0.test.util.ObjectDefinitionTes
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.test.util.FeatureFlagTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -23,6 +27,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
 
 import java.util.Collections;
@@ -41,6 +46,7 @@ import org.junit.runner.RunWith;
  * @author Javier Gamarra
  * @author Murilo Stodolni
  */
+@FeatureFlag("LPD-110248")
 @RunWith(Arquillian.class)
 public class ObjectRelationshipResourceTest
 	extends BaseObjectRelationshipResourceTestCase {
@@ -112,6 +118,8 @@ public class ObjectRelationshipResourceTest
 			objectRelationship, LocaleUtil.US, objectRelationshipLabel2);
 		_testGetObjectDefinitionObjectRelationshipsPage(
 			objectRelationship, LocaleUtil.US, objectRelationship.getName());
+
+		_testGetObjectDefinitionObjectRelationshipsPageWithPriority();
 	}
 
 	@Ignore
@@ -205,6 +213,7 @@ public class ObjectRelationshipResourceTest
 
 		_testPutObjectRelationshipDescription(Collections.emptyMap());
 		_testPutObjectRelationshipDescription(null);
+		_testPutObjectRelationshipPriority();
 	}
 
 	@Override
@@ -293,7 +302,7 @@ public class ObjectRelationshipResourceTest
 
 	@Override
 	protected String[] getAdditionalAssertFieldNames() {
-		return new String[] {"description"};
+		return new String[] {"description", "priority"};
 	}
 
 	@Override
@@ -440,6 +449,44 @@ public class ObjectRelationshipResourceTest
 			randomObjectRelationship());
 	}
 
+	private ObjectRelationship _addObjectRelationship(int priority)
+		throws Exception {
+
+		ObjectRelationship objectRelationship = randomObjectRelationship();
+
+		objectRelationship.setPriority(priority);
+
+		return testPostObjectDefinitionObjectRelationship_addObjectRelationship(
+			objectRelationship);
+	}
+
+	private Long[] _getObjectRelationshipIds(
+			ObjectRelationship... objectRelationships)
+		throws Exception {
+
+		List<Long> objectRelationshipIds = TransformUtil.transformToList(
+			objectRelationships, ObjectRelationship::getId);
+
+		Page<ObjectRelationship> page =
+			objectRelationshipResource.
+				getObjectDefinitionObjectRelationshipsPage(
+					_objectDefinition1.getObjectDefinitionId(), null, null,
+					null, null);
+
+		return TransformUtil.transformToArray(
+			page.getItems(),
+			objectRelationship -> {
+				if (!objectRelationshipIds.contains(
+						objectRelationship.getId())) {
+
+					return null;
+				}
+
+				return objectRelationship.getId();
+			},
+			Long.class);
+	}
+
 	private void _testGetObjectDefinitionObjectRelationshipsPage(
 			ObjectRelationship expectedObjectRelationship, Locale locale,
 			String search)
@@ -469,6 +516,36 @@ public class ObjectRelationshipResourceTest
 			(List<ObjectRelationship>)page.getItems());
 	}
 
+	private void _testGetObjectDefinitionObjectRelationshipsPageWithPriority()
+		throws Exception {
+
+		ObjectRelationship objectRelationship1 = _addObjectRelationship(3);
+		ObjectRelationship objectRelationship2 = _addObjectRelationship(2);
+		ObjectRelationship objectRelationship3 = _addObjectRelationship(2);
+
+		Assert.assertArrayEquals(
+			new Long[] {
+				objectRelationship2.getId(), objectRelationship3.getId(),
+				objectRelationship1.getId()
+			},
+			_getObjectRelationshipIds(
+				objectRelationship1, objectRelationship2, objectRelationship3));
+
+		try (SafeCloseable safeCloseable =
+				FeatureFlagTestUtil.setFeatureFlagsWithSafeCloseable(
+					false, "LPD-110248")) {
+
+			Assert.assertArrayEquals(
+				new Long[] {
+					objectRelationship1.getId(), objectRelationship2.getId(),
+					objectRelationship3.getId()
+				},
+				_getObjectRelationshipIds(
+					objectRelationship1, objectRelationship2,
+					objectRelationship3));
+		}
+	}
+
 	private void _testPutObjectRelationshipDescription(
 			Map<String, String> descriptionMap)
 		throws Exception {
@@ -487,6 +564,49 @@ public class ObjectRelationshipResourceTest
 
 		Assert.assertEquals(
 			expectedDescriptionMap, objectRelationship.getDescription());
+	}
+
+	private void _testPutObjectRelationshipPriority() throws Exception {
+		ObjectRelationship objectRelationship = randomObjectRelationship();
+
+		objectRelationship.setPriority(1);
+
+		objectRelationship =
+			testPostObjectDefinitionObjectRelationship_addObjectRelationship(
+				objectRelationship);
+
+		Assert.assertEquals(
+			Integer.valueOf(1), objectRelationship.getPriority());
+
+		ObjectField objectField = objectRelationship.getObjectField();
+
+		objectField.setPriority(3);
+
+		objectRelationship.setPriority(2);
+
+		objectRelationship = objectRelationshipResource.putObjectRelationship(
+			objectRelationship.getId(), objectRelationship);
+
+		Assert.assertEquals(
+			Integer.valueOf(2), objectRelationship.getPriority());
+
+		objectField = objectRelationship.getObjectField();
+
+		Assert.assertEquals(Integer.valueOf(3), objectField.getPriority());
+
+		objectField.setPriority((Integer)null);
+
+		objectRelationship.setPriority((Integer)null);
+
+		objectRelationship = objectRelationshipResource.putObjectRelationship(
+			objectRelationship.getId(), objectRelationship);
+
+		Assert.assertEquals(
+			Integer.valueOf(0), objectRelationship.getPriority());
+
+		objectField = objectRelationship.getObjectField();
+
+		Assert.assertEquals(Integer.valueOf(0), objectField.getPriority());
 	}
 
 	private ObjectDefinition _objectDefinition1;

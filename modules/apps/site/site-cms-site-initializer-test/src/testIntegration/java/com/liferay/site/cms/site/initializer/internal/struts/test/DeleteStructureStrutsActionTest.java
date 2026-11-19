@@ -65,7 +65,7 @@ public class DeleteStructureStrutsActionTest {
 			objectDefinition2.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, true,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			StringUtil.randomId(), false,
+			StringUtil.randomId(), 0, false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		ObjectDefinition objectDefinition3 =
@@ -77,7 +77,7 @@ public class DeleteStructureStrutsActionTest {
 			objectDefinition3.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, true,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			StringUtil.randomId(), false,
+			StringUtil.randomId(), 0, false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		MockHttpServletRequest mockHttpServletRequest =
@@ -135,7 +135,7 @@ public class DeleteStructureStrutsActionTest {
 			objectDefinition2.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, true,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			StringUtil.randomId(), false,
+			StringUtil.randomId(), 0, false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		ObjectDefinition objectDefinition3 =
@@ -147,7 +147,7 @@ public class DeleteStructureStrutsActionTest {
 			objectDefinition3.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, true,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			StringUtil.randomId(), false,
+			StringUtil.randomId(), 0, false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		MockHttpServletRequest mockHttpServletRequest =

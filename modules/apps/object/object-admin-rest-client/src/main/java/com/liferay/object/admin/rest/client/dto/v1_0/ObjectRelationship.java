@@ -448,6 +448,27 @@ public class ObjectRelationship implements Cloneable, Serializable {
 
 	protected String parameterObjectFieldName;
 
+	public Integer getPriority() {
+		return priority;
+	}
+
+	public void setPriority(Integer priority) {
+		this.priority = priority;
+	}
+
+	public void setPriority(
+		UnsafeSupplier<Integer, Exception> priorityUnsafeSupplier) {
+
+		try {
+			priority = priorityUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Integer priority;
+
 	public Boolean getReverse() {
 		return reverse;
 	}
@@ -616,4 +637,4 @@ public class ObjectRelationship implements Cloneable, Serializable {
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:1987733478
+// LIFERAY-REST-BUILDER-HASH:-1721556075

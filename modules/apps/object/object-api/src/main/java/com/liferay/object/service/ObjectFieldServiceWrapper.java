@@ -32,8 +32,8 @@ public class ObjectFieldServiceWrapper
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
 			java.util.Map<java.util.Locale, String> labelMap, boolean localized,
-			String name, String readOnly, String readOnlyConditionExpression,
-			boolean required, boolean state,
+			String name, int priority, String readOnly,
+			String readOnlyConditionExpression, boolean required, boolean state,
 			java.util.List<com.liferay.object.model.ObjectFieldSetting>
 				objectFieldSettings)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -41,7 +41,7 @@ public class ObjectFieldServiceWrapper
 		return _objectFieldService.addCustomObjectField(
 			externalReferenceCode, listTypeDefinitionId, objectDefinitionId,
 			businessType, dbType, descriptionMap, indexed, indexedAsKeyword,
-			indexedLanguageId, labelMap, localized, name, readOnly,
+			indexedLanguageId, labelMap, localized, name, priority, readOnly,
 			readOnlyConditionExpression, required, state, objectFieldSettings);
 	}
 
@@ -78,8 +78,8 @@ public class ObjectFieldServiceWrapper
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
 			java.util.Map<java.util.Locale, String> labelMap, boolean localized,
-			String name, String readOnly, String readOnlyConditionExpression,
-			boolean required, boolean state,
+			String name, int priority, String readOnly,
+			String readOnlyConditionExpression, boolean required, boolean state,
 			java.util.List<com.liferay.object.model.ObjectFieldSetting>
 				objectFieldSettings)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -87,7 +87,7 @@ public class ObjectFieldServiceWrapper
 		return _objectFieldService.updateObjectField(
 			externalReferenceCode, objectFieldId, listTypeDefinitionId,
 			businessType, dbType, descriptionMap, indexed, indexedAsKeyword,
-			indexedLanguageId, labelMap, localized, name, readOnly,
+			indexedLanguageId, labelMap, localized, name, priority, readOnly,
 			readOnlyConditionExpression, required, state, objectFieldSettings);
 	}
 
@@ -104,4 +104,4 @@ public class ObjectFieldServiceWrapper
 	private ObjectFieldService _objectFieldService;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-77866930
+// LIFERAY-SERVICE-BUILDER-HASH:-566613902

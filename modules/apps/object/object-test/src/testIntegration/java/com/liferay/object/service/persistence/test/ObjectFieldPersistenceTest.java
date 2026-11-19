@@ -153,6 +153,8 @@ public class ObjectFieldPersistenceTest {
 
 		newObjectField.setName(RandomTestUtil.randomString());
 
+		newObjectField.setPriority(RandomTestUtil.nextInt());
+
 		newObjectField.setReadOnly(RandomTestUtil.randomString());
 
 		newObjectField.setReadOnlyConditionExpression(
@@ -230,6 +232,8 @@ public class ObjectFieldPersistenceTest {
 			existingObjectField.isLocalized(), newObjectField.isLocalized());
 		Assert.assertEquals(
 			existingObjectField.getName(), newObjectField.getName());
+		Assert.assertEquals(
+			existingObjectField.getPriority(), newObjectField.getPriority());
 		Assert.assertEquals(
 			existingObjectField.getReadOnly(), newObjectField.getReadOnly());
 		Assert.assertEquals(
@@ -416,9 +420,9 @@ public class ObjectFieldPersistenceTest {
 			"objectDefinitionId", true, "businessType", true, "dbColumnName",
 			true, "dbTableName", true, "dbType", true, "description", true,
 			"indexed", true, "indexedAsKeyword", true, "indexedLanguageId",
-			true, "localized", true, "name", true, "readOnly", true,
-			"relationshipType", true, "required", true, "state", true, "system",
-			true);
+			true, "localized", true, "name", true, "priority", true, "readOnly",
+			true, "relationshipType", true, "required", true, "state", true,
+			"system", true);
 	}
 
 	@Test
@@ -754,6 +758,8 @@ public class ObjectFieldPersistenceTest {
 
 		objectField.setName(RandomTestUtil.randomString());
 
+		objectField.setPriority(RandomTestUtil.nextInt());
+
 		objectField.setReadOnly(RandomTestUtil.randomString());
 
 		objectField.setReadOnlyConditionExpression(
@@ -777,4 +783,4 @@ public class ObjectFieldPersistenceTest {
 	private ClassLoader _dynamicQueryClassLoader;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:983136310
+// LIFERAY-SERVICE-BUILDER-HASH:873384003

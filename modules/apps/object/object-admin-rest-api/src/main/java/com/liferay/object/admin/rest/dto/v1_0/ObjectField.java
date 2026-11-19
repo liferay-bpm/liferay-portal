@@ -927,6 +927,47 @@ public class ObjectField implements Serializable {
 	private Supplier<String> _objectRelationshipExternalReferenceCodeSupplier;
 
 	@io.swagger.v3.oas.annotations.media.Schema
+	public Integer getPriority() {
+		if (_prioritySupplier != null) {
+			priority = _prioritySupplier.get();
+
+			_prioritySupplier = null;
+		}
+
+		return priority;
+	}
+
+	public void setPriority(Integer priority) {
+		this.priority = priority;
+
+		_prioritySupplier = null;
+	}
+
+	@JsonIgnore
+	public void setPriority(
+		UnsafeSupplier<Integer, Exception> priorityUnsafeSupplier) {
+
+		_prioritySupplier = () -> {
+			try {
+				return priorityUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Integer priority;
+
+	@JsonIgnore
+	private Supplier<Integer> _prioritySupplier;
+
+	@io.swagger.v3.oas.annotations.media.Schema
 	@JsonGetter("readOnly")
 	@Valid
 	public ReadOnly getReadOnly() {
@@ -1613,6 +1654,18 @@ public class ObjectField implements Serializable {
 			sb.append("\"");
 		}
 
+		Integer priority = getPriority();
+
+		if (priority != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"priority\": ");
+
+			sb.append(priority);
+		}
+
 		ReadOnly readOnly = getReadOnly();
 
 		if (readOnly != null) {
@@ -2044,4 +2097,4 @@ public class ObjectField implements Serializable {
 	private Map<String, Serializable> _extendedProperties;
 
 }
-// LIFERAY-REST-BUILDER-HASH:2090228524
+// LIFERAY-REST-BUILDER-HASH:499301992

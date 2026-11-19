@@ -22,6 +22,7 @@ import com.liferay.object.service.ObjectFilterLocalService;
 import com.liferay.object.service.ObjectFolderLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.petra.lang.SafeCloseable;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.lazy.referencing.LazyReferencingThreadLocal;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
@@ -32,6 +33,11 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
+import com.liferay.portal.search.searcher.SearchRequestBuilder;
+import com.liferay.portal.search.sort.FieldSort;
+import com.liferay.portal.search.sort.SortOrder;
+import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
@@ -131,6 +137,22 @@ public class ObjectRelationshipResourceImpl
 				searchContext.setCompanyId(contextCompany.getCompanyId());
 				searchContext.setLocale(
 					contextAcceptLanguage.getPreferredLocale());
+
+				if ((sorts == null) &&
+					FeatureFlagManagerUtil.isEnabled(
+						contextCompany.getCompanyId(), "LPD-110248")) {
+
+					FieldSort fieldSort = _sorts.field(
+						Field.getSortableFieldName(Field.PRIORITY),
+						SortOrder.ASC);
+
+					fieldSort.setMissing("0");
+
+					SearchRequestBuilder searchRequestBuilder =
+						_searchRequestBuilderFactory.builder(searchContext);
+
+					searchRequestBuilder.sorts(fieldSort);
+				}
 			},
 			sorts,
 			document -> _toObjectRelationship(
@@ -178,6 +200,8 @@ public class ObjectRelationshipResourceImpl
 				return objectField.getObjectFieldId();
 			});
 
+		_setPriorities(objectRelationship, null);
+
 		return _toObjectRelationship(
 			_objectRelationshipService.addObjectRelationship(
 				objectRelationship.getExternalReferenceCode(),
@@ -191,6 +215,7 @@ public class ObjectRelationshipResourceImpl
 				LocalizedMapUtil.populateLocalizedMap(
 					objectRelationship.getLabel()),
 				objectRelationship.getName(),
+				GetterUtil.getInteger(objectRelationship.getPriority()),
 				GetterUtil.getBoolean(objectRelationship.getSystem()),
 				objectRelationship.getTypeAsString(), null));
 	}
@@ -212,6 +237,8 @@ public class ObjectRelationshipResourceImpl
 			objectDefinitionId2 = objectDefinition2.getObjectDefinitionId();
 		}
 
+		_setPriorities(objectRelationship, null);
+
 		return _toObjectRelationship(
 			_objectRelationshipService.addObjectRelationship(
 				objectRelationship.getExternalReferenceCode(),
@@ -225,6 +252,7 @@ public class ObjectRelationshipResourceImpl
 				LocalizedMapUtil.populateLocalizedMap(
 					objectRelationship.getLabel()),
 				objectRelationship.getName(),
+				GetterUtil.getInteger(objectRelationship.getPriority()),
 				GetterUtil.getBoolean(objectRelationship.getSystem()),
 				objectRelationship.getTypeAsString(),
 				ObjectFieldUtil.toObjectField(
@@ -261,6 +289,11 @@ public class ObjectRelationshipResourceImpl
 				});
 		}
 
+		_setPriorities(
+			objectRelationship,
+			_objectRelationshipService.getObjectRelationship(
+				objectRelationshipId));
+
 		return _toObjectRelationship(
 			_objectRelationshipService.updateObjectRelationship(
 				objectRelationship.getExternalReferenceCode(),
@@ -273,6 +306,7 @@ public class ObjectRelationshipResourceImpl
 				GetterUtil.getBoolean(objectRelationship.getEdge()),
 				LocalizedMapUtil.populateLocalizedMap(
 					objectRelationship.getLabel()),
+				GetterUtil.getInteger(objectRelationship.getPriority()),
 				ObjectFieldUtil.toObjectField(
 					LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()),
 					groupLocalService, _listTypeDefinitionLocalService,
@@ -358,6 +392,46 @@ public class ObjectRelationshipResourceImpl
 		}
 	}
 
+	private void _setPriorities(
+			ObjectRelationship objectRelationship,
+			com.liferay.object.model.ObjectRelationship
+				serviceBuilderObjectRelationship)
+		throws Exception {
+
+		if (FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-110248")) {
+
+			return;
+		}
+
+		com.liferay.object.admin.rest.dto.v1_0.ObjectField objectField =
+			objectRelationship.getObjectField();
+
+		if (objectField != null) {
+			if ((serviceBuilderObjectRelationship != null) &&
+				(serviceBuilderObjectRelationship.getObjectFieldId2() > 0)) {
+
+				ObjectField serviceBuilderObjectField =
+					_objectFieldLocalService.getObjectField(
+						serviceBuilderObjectRelationship.getObjectFieldId2());
+
+				objectField.setPriority(serviceBuilderObjectField::getPriority);
+			}
+			else {
+				objectField.setPriority(() -> null);
+			}
+		}
+
+		if (serviceBuilderObjectRelationship == null) {
+			objectRelationship.setPriority(() -> null);
+
+			return;
+		}
+
+		objectRelationship.setPriority(
+			serviceBuilderObjectRelationship::getPriority);
+	}
+
 	private ObjectRelationship _toObjectRelationship(
 			com.liferay.object.model.ObjectRelationship objectRelationship)
 		throws Exception {
@@ -412,5 +486,11 @@ public class ObjectRelationshipResourceImpl
 
 	@Reference
 	private ObjectRelationshipService _objectRelationshipService;
+
+	@Reference
+	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
+
+	@Reference
+	private Sorts _sorts;
 
 }

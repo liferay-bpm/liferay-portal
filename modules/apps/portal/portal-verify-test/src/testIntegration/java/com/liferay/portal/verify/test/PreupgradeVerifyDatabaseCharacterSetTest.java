@@ -207,7 +207,7 @@ public class PreupgradeVerifyDatabaseCharacterSetTest
 				objectDefinition2.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				StringUtil.randomId(), false,
+				StringUtil.randomId(), 0, false,
 				ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 
 		_db.runSQL("drop table " + objectDefinition1.getDBTableName());

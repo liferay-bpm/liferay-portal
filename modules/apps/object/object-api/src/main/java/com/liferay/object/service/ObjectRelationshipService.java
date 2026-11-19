@@ -51,7 +51,7 @@ public interface ObjectRelationshipService extends BaseService {
 			long objectDefinitionId2, long parameterObjectFieldId,
 			String deletionType, Map<Locale, String> descriptionMap,
 			boolean edge, Map<Locale, String> labelMap, String name,
-			boolean system, String type, ObjectField objectField)
+			int priority, boolean system, String type, ObjectField objectField)
 		throws PortalException;
 
 	public void addObjectRelationshipMappingTableValues(
@@ -94,8 +94,8 @@ public interface ObjectRelationshipService extends BaseService {
 			String externalReferenceCode, long objectRelationshipId,
 			long parameterObjectFieldId, String deletionType,
 			Map<Locale, String> descriptionMap, boolean edge,
-			Map<Locale, String> labelMap, ObjectField objectField)
+			Map<Locale, String> labelMap, int priority, ObjectField objectField)
 		throws PortalException;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:703295495
+// LIFERAY-SERVICE-BUILDER-HASH:-1596867405

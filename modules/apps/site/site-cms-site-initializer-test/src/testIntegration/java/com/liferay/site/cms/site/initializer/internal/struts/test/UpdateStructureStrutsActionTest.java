@@ -99,7 +99,7 @@ public class UpdateStructureStrutsActionTest {
 					true,
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
-					StringUtil.randomId(), false,
+					StringUtil.randomId(), 0, false,
 					ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		Assert.assertTrue(serviceBuilderObjectRelationship.isEdge());
@@ -421,7 +421,7 @@ public class UpdateStructureStrutsActionTest {
 			_serviceBuilderObjectDefinition2.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE, null, false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			name, false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+			name, 0, false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		MockHttpServletRequest mockHttpServletRequest =
 			_getMockHttpServletRequest(
@@ -645,7 +645,7 @@ public class UpdateStructureStrutsActionTest {
 					true,
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
-					StringUtil.randomId(), false,
+					StringUtil.randomId(), 0, false,
 					ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		Assert.assertTrue(serviceBuilderObjectRelationship.isEdge());
@@ -696,7 +696,7 @@ public class UpdateStructureStrutsActionTest {
 						getParameterObjectFieldId(),
 					serviceBuilderObjectRelationship.getDeletionType(), null,
 					false, serviceBuilderObjectRelationship.getLabelMap(),
-					null);
+					serviceBuilderObjectRelationship.getPriority(), null);
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
 			updatedServiceBuilderObjectRelationship);

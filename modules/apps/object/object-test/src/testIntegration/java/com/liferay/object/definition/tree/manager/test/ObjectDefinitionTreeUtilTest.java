@@ -2762,7 +2762,8 @@ public class ObjectDefinitionTreeUtilTest {
 				objectRelationship.getExternalReferenceCode(),
 				objectRelationship.getObjectRelationshipId(), 0,
 				objectRelationship.getDeletionType(), null, false,
-				objectRelationship.getLabelMap(), null);
+				objectRelationship.getLabelMap(),
+				objectRelationship.getPriority(), null);
 
 		Assert.assertFalse(objectRelationship.isEdge());
 	}

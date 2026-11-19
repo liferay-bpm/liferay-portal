@@ -279,6 +279,8 @@ public class ObjectFieldUtil {
 			ObjectFieldSettingUtil.toObjectFieldSettings(
 				groupLocalService, listTypeDefinitionId, objectField,
 				objectFieldSettingLocalService, objectFilterLocalService));
+		serviceBuilderObjectField.setPriority(
+			GetterUtil.getInteger(objectField.getPriority()));
 		serviceBuilderObjectField.setReadOnly(
 			objectField.getReadOnlyAsString());
 		serviceBuilderObjectField.setReadOnlyConditionExpression(

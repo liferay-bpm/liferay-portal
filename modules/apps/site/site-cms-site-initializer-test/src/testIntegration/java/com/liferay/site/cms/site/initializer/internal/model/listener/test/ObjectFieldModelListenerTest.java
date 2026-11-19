@@ -160,7 +160,7 @@ public class ObjectFieldModelListenerTest {
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 			ObjectFieldConstants.DB_TYPE_STRING, null, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			false, "a" + RandomTestUtil.randomString(), null, null, required,
+			false, "a" + RandomTestUtil.randomString(), 0, null, null, required,
 			false, Collections.emptyList());
 	}
 

@@ -646,8 +646,8 @@ public class ObjectRelatedModelsProviderTest {
 			_objectDefinition3.getObjectDefinitionId(),
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 			ObjectFieldConstants.DB_TYPE_STRING, null, false, false, null,
-			LocalizedMapUtil.getLocalizedMap("Able"), false, "able", null, null,
-			false, false, Collections.emptyList());
+			LocalizedMapUtil.getLocalizedMap("Able"), false, "able", 0, null,
+			null, false, false, Collections.emptyList());
 
 		_objectDefinition3.setTitleObjectFieldId(
 			objectField.getObjectFieldId());
@@ -672,7 +672,7 @@ public class ObjectRelatedModelsProviderTest {
 				_objectDefinition1.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				StringUtil.randomId(), false,
+				StringUtil.randomId(), 0, false,
 				ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 
 		ObjectEntry objectEntry1 = _addObjectEntry(
@@ -751,7 +751,7 @@ public class ObjectRelatedModelsProviderTest {
 				objectDefinition2.getObjectDefinitionId(), 0, deletionType,
 				null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				StringUtil.randomId(), false, relationshipType, null);
+				StringUtil.randomId(), 0, false, relationshipType, null);
 
 		if (!StringUtil.equals(
 				relationshipType,

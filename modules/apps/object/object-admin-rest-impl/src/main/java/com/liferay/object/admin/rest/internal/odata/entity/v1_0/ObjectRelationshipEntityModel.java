@@ -33,6 +33,7 @@ public class ObjectRelationshipEntityModel implements EntityModel {
 				"dateModified",
 				locale -> Field.getSortableFieldName(Field.MODIFIED_DATE),
 				locale -> Field.MODIFIED_DATE),
+			new IntegerEntityField("priority", locale -> Field.PRIORITY),
 			new IntegerEntityField("userId", locale -> Field.USER_ID),
 			new StringEntityField(
 				"label",

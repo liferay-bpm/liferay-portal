@@ -213,7 +213,7 @@ public class ObjectFieldServiceTest {
 				ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 				ObjectFieldConstants.DB_TYPE_STRING, null, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				false, StringUtil.randomId(),
+				false, StringUtil.randomId(), 0,
 				ObjectFieldConstants.READ_ONLY_FALSE, null, true, false,
 				Collections.emptyList());
 		}
@@ -273,8 +273,8 @@ public class ObjectFieldServiceTest {
 				ObjectFieldConstants.DB_TYPE_STRING, null, true, false,
 				LanguageUtil.getLanguageId(LocaleUtil.getDefault()),
 				LocalizedMapUtil.getLocalizedMap("baker"), false, "baker",
-				ObjectFieldConstants.READ_ONLY_FALSE, null, true, false,
-				Collections.emptyList());
+				objectField.getPriority(), ObjectFieldConstants.READ_ONLY_FALSE,
+				null, true, false, Collections.emptyList());
 		}
 		finally {
 			if (objectField != null) {

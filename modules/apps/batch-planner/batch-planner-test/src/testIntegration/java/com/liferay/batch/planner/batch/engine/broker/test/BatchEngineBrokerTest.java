@@ -563,7 +563,7 @@ public class BatchEngineBrokerTest {
 			objectField.getDBType(), objectField.getDescriptionMap(),
 			objectField.isIndexed(), objectField.isIndexedAsKeyword(),
 			objectField.getIndexedLanguageId(), objectField.getLabelMap(),
-			objectField.isLocalized(), objectField.getName(),
+			objectField.isLocalized(), objectField.getName(), 0,
 			objectField.getReadOnly(),
 			objectField.getReadOnlyConditionExpression(),
 			objectField.isRequired(), objectField.isState(),
@@ -1407,7 +1407,7 @@ public class BatchEngineBrokerTest {
 				objectDefinition.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"a" + RandomTestUtil.randomString(), false,
+				"a" + RandomTestUtil.randomString(), 0, false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		_addCustomObjectField(
@@ -1492,7 +1492,7 @@ public class BatchEngineBrokerTest {
 			_objectDefinition2.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			"a" + RandomTestUtil.randomString(), false,
+			"a" + RandomTestUtil.randomString(), 0, false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		_objectValidationRuleLocalService.addObjectValidationRule(

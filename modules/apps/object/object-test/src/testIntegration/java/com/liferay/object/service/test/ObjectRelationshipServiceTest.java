@@ -243,7 +243,7 @@ public class ObjectRelationshipServiceTest {
 			_objectDefinition2.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			StringUtil.randomId(), false,
+			StringUtil.randomId(), 0, false,
 			ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 	}
 
@@ -268,7 +268,7 @@ public class ObjectRelationshipServiceTest {
 					false,
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
-					StringUtil.randomId(), false,
+					StringUtil.randomId(), 0, false,
 					ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 		}
 		finally {
@@ -294,7 +294,7 @@ public class ObjectRelationshipServiceTest {
 				objectDefinition2.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				StringUtil.randomId(), false, type, null);
+				StringUtil.randomId(), 0, false, type, null);
 
 		ObjectEntry objectEntry1 = _objectEntryLocalService.addObjectEntry(
 			0, TestPropsValues.getUserId(),
@@ -444,7 +444,8 @@ public class ObjectRelationshipServiceTest {
 					objectRelationship.getExternalReferenceCode(),
 					objectRelationship.getObjectRelationshipId(), 0,
 					objectRelationship.getDeletionType(), null, false,
-					LocalizedMapUtil.getLocalizedMap("Baker"), null);
+					LocalizedMapUtil.getLocalizedMap("Baker"),
+					objectRelationship.getPriority(), null);
 		}
 		finally {
 			if (objectRelationship != null) {

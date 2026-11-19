@@ -410,7 +410,8 @@ public class ObjectDefinitionLocalServiceImpl
 					newObjectField.getDBType(),
 					newObjectField.getDescriptionMap(), false, false, "",
 					newObjectField.getLabelMap(), newObjectField.isLocalized(),
-					newObjectField.getName(), newObjectField.getReadOnly(),
+					newObjectField.getName(), newObjectField.getPriority(),
+					newObjectField.getReadOnly(),
 					newObjectField.getReadOnlyConditionExpression(),
 					newObjectField.isRequired(), newObjectField.isState(),
 					newObjectField.getObjectFieldSettings());
@@ -1638,7 +1639,8 @@ public class ObjectDefinitionLocalServiceImpl
 						objectField.isIndexedAsKeyword(),
 						objectField.getIndexedLanguageId(),
 						objectField.getLabelMap(), objectField.isLocalized(),
-						objectField.getName(), objectField.getReadOnly(),
+						objectField.getName(), objectField.getPriority(),
+						objectField.getReadOnly(),
 						objectField.getReadOnlyConditionExpression(),
 						objectField.isRequired(), objectField.isState(),
 						objectField.getObjectFieldSettings());
@@ -1654,7 +1656,8 @@ public class ObjectDefinitionLocalServiceImpl
 						objectField.isIndexedAsKeyword(),
 						objectField.getIndexedLanguageId(),
 						objectField.getLabelMap(), objectField.isLocalized(),
-						objectField.getName(), objectField.getReadOnly(),
+						objectField.getName(), objectField.getPriority(),
+						objectField.getReadOnly(),
 						objectField.getReadOnlyConditionExpression(),
 						objectField.isRequired(), objectField.isState(),
 						objectField.getObjectFieldSettings());
@@ -1950,7 +1953,7 @@ public class ObjectDefinitionLocalServiceImpl
 			objectField.isIndexed(), objectField.isIndexedAsKeyword(),
 			objectField.getIndexedLanguageId(), objectField.getLabelMap(),
 			objectField.isLocalized(), objectField.getName(),
-			objectField.getReadOnly(),
+			objectField.getPriority(), objectField.getReadOnly(),
 			objectField.getReadOnlyConditionExpression(),
 			objectField.isRequired(), objectField.isState(),
 			objectField.getObjectFieldSettings());
@@ -3092,6 +3095,7 @@ public class ObjectDefinitionLocalServiceImpl
 						objectField.getLabelMap(),
 						existingObjectField.isLocalized(),
 						existingObjectField.getName(),
+						objectField.getPriority(),
 						existingObjectField.getReadOnly(),
 						existingObjectField.getReadOnlyConditionExpression(),
 						existingObjectField.isRequired(),
@@ -3136,7 +3140,7 @@ public class ObjectDefinitionLocalServiceImpl
 				objectField.isIndexed(), objectField.isIndexedAsKeyword(),
 				objectField.getIndexedLanguageId(), objectField.getLabelMap(),
 				objectField.isLocalized(), objectField.getName(),
-				objectField.getReadOnly(),
+				objectField.getPriority(), objectField.getReadOnly(),
 				objectField.getReadOnlyConditionExpression(),
 				objectField.isRequired(), objectField.isState(),
 				objectField.isSystem(), objectField.getObjectFieldSettings());

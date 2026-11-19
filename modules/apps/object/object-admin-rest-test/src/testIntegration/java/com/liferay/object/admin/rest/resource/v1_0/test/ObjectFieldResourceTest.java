@@ -14,12 +14,16 @@ import com.liferay.object.admin.rest.resource.v1_0.test.util.ObjectDefinitionTes
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.test.util.FeatureFlagTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
 
 import java.util.Arrays;
@@ -38,6 +42,7 @@ import org.junit.runner.RunWith;
 /**
  * @author Javier Gamarra
  */
+@FeatureFlag("LPD-110248")
 @RunWith(Arquillian.class)
 public class ObjectFieldResourceTest extends BaseObjectFieldResourceTestCase {
 
@@ -246,6 +251,8 @@ public class ObjectFieldResourceTest extends BaseObjectFieldResourceTestCase {
 		Collection<ObjectField> items = page.getItems();
 
 		Assert.assertEquals(items.size(), page.getTotalCount());
+
+		_testGetObjectDefinitionObjectFieldsPageWithPriority();
 	}
 
 	@Override
@@ -363,6 +370,7 @@ public class ObjectFieldResourceTest extends BaseObjectFieldResourceTestCase {
 		_testPatchObjectField(_addObjectField(), true);
 		_testPatchObjectField(_addUniqueObjectField(), true);
 		_testPatchObjectField(_addUniqueObjectField(), false);
+		_testPatchObjectFieldPriority();
 	}
 
 	@Override
@@ -372,11 +380,12 @@ public class ObjectFieldResourceTest extends BaseObjectFieldResourceTestCase {
 
 		_testPutObjectFieldDescription(Collections.emptyMap());
 		_testPutObjectFieldDescription(null);
+		_testPutObjectFieldPriority();
 	}
 
 	@Override
 	protected String[] getAdditionalAssertFieldNames() {
-		return new String[] {"description", "label", "state"};
+		return new String[] {"description", "label", "priority", "state"};
 	}
 
 	@Override
@@ -509,6 +518,15 @@ public class ObjectFieldResourceTest extends BaseObjectFieldResourceTestCase {
 		return _objectField;
 	}
 
+	private ObjectField _addObjectField(int priority) throws Exception {
+		ObjectField objectField = randomObjectField();
+
+		objectField.setPriority(priority);
+
+		return objectFieldResource.postObjectDefinitionObjectField(
+			_objectDefinition.getObjectDefinitionId(), objectField);
+	}
+
 	private ObjectField _addUniqueObjectField() throws Exception {
 		ObjectField objectField = randomObjectField();
 
@@ -516,6 +534,24 @@ public class ObjectFieldResourceTest extends BaseObjectFieldResourceTestCase {
 
 		return objectFieldResource.postObjectDefinitionObjectField(
 			_objectDefinition.getObjectDefinitionId(), objectField);
+	}
+
+	private Long[] _getCustomObjectFieldIds() throws Exception {
+		Page<ObjectField> page =
+			objectFieldResource.getObjectDefinitionObjectFieldsPage(
+				_objectDefinition.getObjectDefinitionId(), null, null, null,
+				null);
+
+		return TransformUtil.transformToArray(
+			page.getItems(),
+			objectField -> {
+				if (objectField.getSystem()) {
+					return null;
+				}
+
+				return objectField.getId();
+			},
+			Long.class);
 	}
 
 	private void _setUnique(ObjectField objectField, boolean unique) {
@@ -528,6 +564,32 @@ public class ObjectFieldResourceTest extends BaseObjectFieldResourceTestCase {
 					}
 				}
 			});
+	}
+
+	private void _testGetObjectDefinitionObjectFieldsPageWithPriority()
+		throws Exception {
+
+		ObjectField objectField1 = _addObjectField(3);
+		ObjectField objectField2 = _addObjectField(2);
+		ObjectField objectField3 = _addObjectField(2);
+
+		Assert.assertArrayEquals(
+			new Long[] {
+				objectField2.getId(), objectField3.getId(), objectField1.getId()
+			},
+			_getCustomObjectFieldIds());
+
+		try (SafeCloseable safeCloseable =
+				FeatureFlagTestUtil.setFeatureFlagsWithSafeCloseable(
+					false, "LPD-110248")) {
+
+			Assert.assertArrayEquals(
+				new Long[] {
+					objectField1.getId(), objectField2.getId(),
+					objectField3.getId()
+				},
+				_getCustomObjectFieldIds());
+		}
 	}
 
 	private void _testPatchObjectField(ObjectField objectField, boolean unique)
@@ -543,6 +605,27 @@ public class ObjectFieldResourceTest extends BaseObjectFieldResourceTestCase {
 		assertEquals(randomObjectField, patchObjectField);
 
 		Assert.assertEquals(unique, patchObjectField.getUnique());
+	}
+
+	private void _testPatchObjectFieldPriority() throws Exception {
+		ObjectField objectField = randomObjectField();
+
+		objectField.setPriority(1);
+
+		objectField = objectFieldResource.postObjectDefinitionObjectField(
+			_objectDefinition.getObjectDefinitionId(), objectField);
+
+		objectField = objectFieldResource.patchObjectField(
+			objectField.getId(),
+			new ObjectField() {
+				{
+					label = Collections.singletonMap(
+						LocaleUtil.US.toString(),
+						RandomTestUtil.randomString());
+				}
+			});
+
+		Assert.assertEquals(Integer.valueOf(1), objectField.getPriority());
 	}
 
 	private void _testPutObjectFieldDescription(
@@ -568,6 +651,47 @@ public class ObjectFieldResourceTest extends BaseObjectFieldResourceTestCase {
 			description,
 			MapUtil.getString(
 				objectField.getDescription(), LocaleUtil.US.toString()));
+	}
+
+	private void _testPutObjectFieldPriority() throws Exception {
+		ObjectField objectField = randomObjectField();
+
+		objectField.setPriority(1);
+
+		objectField = objectFieldResource.postObjectDefinitionObjectField(
+			_objectDefinition.getObjectDefinitionId(), objectField);
+
+		Assert.assertEquals(Integer.valueOf(1), objectField.getPriority());
+
+		objectField.setPriority(2);
+
+		objectField = objectFieldResource.putObjectField(
+			objectField.getId(), objectField);
+
+		Assert.assertEquals(Integer.valueOf(2), objectField.getPriority());
+
+		try (SafeCloseable safeCloseable =
+				FeatureFlagTestUtil.setFeatureFlagsWithSafeCloseable(
+					false, "LPD-110248")) {
+
+			objectField.setPriority(3);
+
+			objectField = objectFieldResource.putObjectField(
+				objectField.getId(), objectField);
+
+			Assert.assertNull(objectField.getPriority());
+		}
+
+		objectField = objectFieldResource.getObjectField(objectField.getId());
+
+		Assert.assertEquals(Integer.valueOf(2), objectField.getPriority());
+
+		objectField.setPriority((Integer)null);
+
+		objectField = objectFieldResource.putObjectField(
+			objectField.getId(), objectField);
+
+		Assert.assertEquals(Integer.valueOf(0), objectField.getPriority());
 	}
 
 	private ObjectDefinition _objectDefinition;

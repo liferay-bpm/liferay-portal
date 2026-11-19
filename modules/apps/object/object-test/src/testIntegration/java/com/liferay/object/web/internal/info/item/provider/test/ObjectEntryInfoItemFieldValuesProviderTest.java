@@ -210,7 +210,7 @@ public class ObjectEntryInfoItemFieldValuesProviderTest {
 			_childObjectDefinition.getObjectDefinitionId(), 0,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			"oneToManyRelationshipName", false,
+			"oneToManyRelationshipName", 0, false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 	}
 
@@ -623,7 +623,7 @@ public class ObjectEntryInfoItemFieldValuesProviderTest {
 				childObjectDefinition.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, true,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"oneToManyRelationshipName", false,
+				"oneToManyRelationshipName", 0, false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		ObjectEntry parentObjectEntry = _objectEntryLocalService.addObjectEntry(
@@ -700,7 +700,8 @@ public class ObjectEntryInfoItemFieldValuesProviderTest {
 				objectRelationship.getObjectRelationshipId(),
 				objectRelationship.getParameterObjectFieldId(),
 				objectRelationship.getDeletionType(), null, false,
-				objectRelationship.getLabelMap(), null);
+				objectRelationship.getLabelMap(),
+				objectRelationship.getPriority(), null);
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
 			objectRelationship);

@@ -2423,6 +2423,14 @@ public abstract class BaseObjectFieldResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("priority", additionalAssertFieldName)) {
+				if (objectField.getPriority() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("readOnly", additionalAssertFieldName)) {
 				if (objectField.getReadOnly() == null) {
 					valid = false;
@@ -2847,6 +2855,17 @@ public abstract class BaseObjectFieldResourceTestCase {
 							getObjectRelationshipExternalReferenceCode(),
 						objectField2.
 							getObjectRelationshipExternalReferenceCode())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("priority", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						objectField1.getPriority(),
+						objectField2.getPriority())) {
 
 					return false;
 				}
@@ -3478,6 +3497,12 @@ public abstract class BaseObjectFieldResourceTestCase {
 			return sb.toString();
 		}
 
+		if (entityFieldName.equals("priority")) {
+			sb.append(String.valueOf(objectField.getPriority()));
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("readOnly")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -3627,6 +3652,7 @@ public abstract class BaseObjectFieldResourceTestCase {
 				objectDefinitionSystem1 = RandomTestUtil.randomBoolean();
 				objectRelationshipExternalReferenceCode =
 					StringUtil.toLowerCase(RandomTestUtil.randomString());
+				priority = RandomTestUtil.randomInt();
 				readOnlyConditionExpression = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				required = RandomTestUtil.randomBoolean();
@@ -3902,4 +3928,4 @@ public abstract class BaseObjectFieldResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1511825473
+// LIFERAY-REST-BUILDER-HASH:1790854638

@@ -2822,7 +2822,7 @@ public class ObjectDefinitionLocalServiceTest {
 				childCustomObjectDefinition.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, true,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				StringUtil.randomId(), false,
+				StringUtil.randomId(), 0, false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 			ObjectDefinition modifiableSystemObjectDefinition =
@@ -3459,7 +3459,7 @@ public class ObjectDefinitionLocalServiceTest {
 					objectDefinition.getObjectDefinitionId(), 0,
 					ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null,
 					false, RandomTestUtil.randomLocaleStringMap(),
-					StringUtil.randomId(), false,
+					StringUtil.randomId(), 0, false,
 					ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 			objectDefinition =
@@ -3499,7 +3499,7 @@ public class ObjectDefinitionLocalServiceTest {
 					false,
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
-					StringUtil.randomId(), false,
+					StringUtil.randomId(), 0, false,
 					ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null)));
 	}
 
@@ -6242,7 +6242,7 @@ public class ObjectDefinitionLocalServiceTest {
 				objectDefinition2.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				StringUtil.randomId(), false,
+				StringUtil.randomId(), 0, false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		try {

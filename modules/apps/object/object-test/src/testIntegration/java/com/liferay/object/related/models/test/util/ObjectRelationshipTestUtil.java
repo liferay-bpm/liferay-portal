@@ -82,7 +82,7 @@ public class ObjectRelationshipTestUtil {
 
 		return ObjectRelationshipLocalServiceUtil.updateObjectRelationship(
 			externalReferenceCode, objectRelationshipId, 0, deletionType, null,
-			false, labelMap, null);
+			false, labelMap, 0, null);
 	}
 
 }

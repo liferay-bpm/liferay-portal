@@ -1184,7 +1184,7 @@ public class ObjectEntryServiceTest {
 				objectDefinitionAA.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"relationship", false,
+				"relationship", 0, false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		objectDefinitionAA.setAccountEntryRestrictedObjectFieldId(
@@ -1378,7 +1378,7 @@ public class ObjectEntryServiceTest {
 				_objectDefinition.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"relationship", false,
+				"relationship", 0, false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		_objectDefinition.setAccountEntryRestrictedObjectFieldId(
@@ -2055,7 +2055,7 @@ public class ObjectEntryServiceTest {
 				_objectDefinition.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"relationship", false, type, null);
+				"relationship", 0, false, type, null);
 
 		ObjectEntry objectEntry = _addObjectEntry(_adminUser);
 		ObjectEntry relatedObjectEntry1 = _addObjectEntry(_adminUser);

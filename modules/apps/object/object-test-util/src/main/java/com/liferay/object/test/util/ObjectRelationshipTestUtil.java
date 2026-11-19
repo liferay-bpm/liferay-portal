@@ -57,7 +57,7 @@ public class ObjectRelationshipTestUtil {
 			objectDefinition2.getObjectDefinitionId(), parameterObjectFieldId,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			StringUtil.randomId(), false,
+			StringUtil.randomId(), 0, false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 	}
 
@@ -98,7 +98,7 @@ public class ObjectRelationshipTestUtil {
 			objectDefinition2.getObjectDefinitionId(), 0, deletionType, null,
 			false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			name, false, type, null);
+			name, 0, false, type, null);
 	}
 
 	public static void relateObjectEntries(

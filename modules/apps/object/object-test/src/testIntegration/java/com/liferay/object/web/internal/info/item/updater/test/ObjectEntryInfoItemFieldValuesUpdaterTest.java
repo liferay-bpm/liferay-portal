@@ -708,7 +708,7 @@ public class ObjectEntryInfoItemFieldValuesUpdaterTest
 				childObjectDefinition.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, true,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				StringUtil.randomId(), false,
+				StringUtil.randomId(), 0, false,
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 		ObjectEntry parentObjectEntry = ObjectEntryTestUtil.addObjectEntry(
 			0, parentObjectDefinition.getObjectDefinitionId(),
@@ -803,7 +803,8 @@ public class ObjectEntryInfoItemFieldValuesUpdaterTest
 				objectRelationship.getExternalReferenceCode(),
 				objectRelationship.getObjectRelationshipId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, false,
-				objectRelationship.getLabelMap(), null);
+				objectRelationship.getLabelMap(),
+				objectRelationship.getPriority(), null);
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
 			objectRelationship);

@@ -873,6 +873,15 @@ public class ObjectServiceUpgradeStepRegistrator
 					"update ObjectEntry set type_ = ",
 					ObjectEntryConstants.TYPE_LATEST_APPROVED,
 					" where objectEntryId != headObjectEntryId")));
+
+		registry.register(
+			"13.14.0", "13.15.0",
+			UpgradeProcessFactory.addColumns("ObjectField", "priority INTEGER"),
+			UpgradeProcessFactory.addColumns(
+				"ObjectRelationship", "priority INTEGER"),
+			UpgradeProcessFactory.runSQL("update ObjectField set priority = 0"),
+			UpgradeProcessFactory.runSQL(
+				"update ObjectRelationship set priority = 0"));
 	}
 
 	private static final String[] _REMOVED_PANEL_CATEGORY_KEYS = {

@@ -423,7 +423,7 @@ public class ObjectEntryResourceValidationTest
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 					ObjectFieldConstants.DB_TYPE_STRING, null, true, false,
 					null, LocalizedMapUtil.getLocalizedMap("Name Required"),
-					false, "nameRequired", null, null, true, false,
+					false, "nameRequired", 0, null, null, true, false,
 					Arrays.asList(
 						new ObjectFieldSettingBuilder(
 						).name(
