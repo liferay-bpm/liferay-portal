@@ -27,6 +27,11 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
+import com.liferay.portal.search.searcher.SearchRequestBuilder;
+import com.liferay.portal.search.sort.FieldSort;
+import com.liferay.portal.search.sort.SortOrder;
+import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
@@ -287,6 +292,22 @@ public class ObjectFieldResourceImpl extends BaseObjectFieldResourceImpl {
 					"objectDefinitionId",
 					objectDefinition.getObjectDefinitionId());
 				searchContext.setCompanyId(contextCompany.getCompanyId());
+
+				if ((sorts == null) &&
+					FeatureFlagManagerUtil.isEnabled(
+						contextCompany.getCompanyId(), "LPD-110248")) {
+
+					FieldSort fieldSort = _sorts.field(
+						Field.getSortableFieldName(Field.PRIORITY),
+						SortOrder.ASC);
+
+					fieldSort.setMissing("0");
+
+					SearchRequestBuilder searchRequestBuilder =
+						_searchRequestBuilderFactory.builder(searchContext);
+
+					searchRequestBuilder.sorts(fieldSort);
+				}
 			},
 			sorts,
 			document -> _toObjectField(
@@ -402,5 +423,11 @@ public class ObjectFieldResourceImpl extends BaseObjectFieldResourceImpl {
 
 	@Reference
 	private ObjectFilterLocalService _objectFilterLocalService;
+
+	@Reference
+	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
+
+	@Reference
+	private Sorts _sorts;
 
 }
