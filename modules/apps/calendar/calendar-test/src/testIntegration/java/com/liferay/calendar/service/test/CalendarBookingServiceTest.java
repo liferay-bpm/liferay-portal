@@ -209,7 +209,6 @@ public class CalendarBookingServiceTest {
 	@TestInfo("LPD-116162")
 	public void testUpdateCalendarBooking() throws Exception {
 		CalendarBooking calendarBooking = _addCalendarBooking();
-
 		Calendar calendar = CalendarTestUtil.addCalendar(_user2);
 
 		_assertMustHavePermission(
@@ -227,7 +226,6 @@ public class CalendarBookingServiceTest {
 	@TestInfo("LPD-116162")
 	public void testUpdateCalendarBookingInstance() throws Exception {
 		CalendarBooking calendarBooking = _addCalendarBooking();
-
 		Calendar calendar = CalendarTestUtil.addCalendar(_user2);
 
 		_assertMustHavePermission(
@@ -245,7 +243,6 @@ public class CalendarBookingServiceTest {
 	@TestInfo("LPD-116162")
 	public void testUpdateOffsetAndDuration() throws Exception {
 		CalendarBooking calendarBooking = _addCalendarBooking();
-
 		Calendar calendar = CalendarTestUtil.addCalendar(_user2);
 
 		_assertMustHavePermission(
@@ -262,7 +259,6 @@ public class CalendarBookingServiceTest {
 	@TestInfo("LPD-116162")
 	public void testUpdateRecurringCalendarBooking() throws Exception {
 		CalendarBooking calendarBooking = _addCalendarBooking();
-
 		Calendar calendar = CalendarTestUtil.addCalendar(_user2);
 
 		_assertMustHavePermission(
@@ -352,7 +348,7 @@ public class CalendarBookingServiceTest {
 			String message = principalException.getMessage();
 
 			Assert.assertTrue(
-				message, message.contains(CalendarActionKeys.MANAGE_BOOKINGS));
+				message.contains(CalendarActionKeys.MANAGE_BOOKINGS));
 		}
 	}
 
