@@ -6,6 +6,7 @@
 package com.liferay.calendar.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.calendar.constants.CalendarActionKeys;
 import com.liferay.calendar.model.Calendar;
 import com.liferay.calendar.model.CalendarBooking;
 import com.liferay.calendar.service.CalendarBookingLocalService;
@@ -13,6 +14,8 @@ import com.liferay.calendar.service.CalendarBookingService;
 import com.liferay.calendar.test.util.CalendarBookingTestUtil;
 import com.liferay.calendar.test.util.CalendarStagingTestUtil;
 import com.liferay.calendar.test.util.CalendarTestUtil;
+import com.liferay.calendar.test.util.RecurrenceTestUtil;
+import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
@@ -24,6 +27,7 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.context.ContextUserReplace;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DataGuard;
@@ -201,6 +205,77 @@ public class CalendarBookingServiceTest {
 			childCalendarBookings.toString(), 1, childCalendarBookings.size());
 	}
 
+	@Test
+	@TestInfo("LPD-116162")
+	public void testUpdateCalendarBooking() throws Exception {
+		CalendarBooking calendarBooking = _addCalendarBooking();
+
+		Calendar calendar = CalendarTestUtil.addCalendar(_user2);
+
+		_assertMustHavePermission(
+			() -> _calendarBookingService.updateCalendarBooking(
+				calendarBooking.getCalendarBookingId(),
+				calendar.getCalendarId(), calendarBooking.getTitleMap(),
+				calendarBooking.getDescriptionMap(),
+				calendarBooking.getLocation(), calendarBooking.getStartTime(),
+				calendarBooking.getEndTime(), calendarBooking.isAllDay(),
+				calendarBooking.getRecurrence(), 0, null, 0, null,
+				createServiceContext()));
+	}
+
+	@Test
+	@TestInfo("LPD-116162")
+	public void testUpdateCalendarBookingInstance() throws Exception {
+		CalendarBooking calendarBooking = _addCalendarBooking();
+
+		Calendar calendar = CalendarTestUtil.addCalendar(_user2);
+
+		_assertMustHavePermission(
+			() -> _calendarBookingService.updateCalendarBookingInstance(
+				calendarBooking.getCalendarBookingId(), 0,
+				calendar.getCalendarId(), calendarBooking.getTitleMap(),
+				calendarBooking.getDescriptionMap(),
+				calendarBooking.getLocation(), calendarBooking.getStartTime(),
+				calendarBooking.getEndTime(), calendarBooking.isAllDay(),
+				calendarBooking.getRecurrence(), false, 0, null, 0, null,
+				createServiceContext()));
+	}
+
+	@Test
+	@TestInfo("LPD-116162")
+	public void testUpdateOffsetAndDuration() throws Exception {
+		CalendarBooking calendarBooking = _addCalendarBooking();
+
+		Calendar calendar = CalendarTestUtil.addCalendar(_user2);
+
+		_assertMustHavePermission(
+			() -> _calendarBookingService.updateOffsetAndDuration(
+				calendarBooking.getCalendarBookingId(),
+				calendar.getCalendarId(), calendarBooking.getTitleMap(),
+				calendarBooking.getDescriptionMap(),
+				calendarBooking.getLocation(), 0, calendarBooking.getDuration(),
+				calendarBooking.isAllDay(), calendarBooking.getRecurrence(), 0,
+				null, 0, null, createServiceContext()));
+	}
+
+	@Test
+	@TestInfo("LPD-116162")
+	public void testUpdateRecurringCalendarBooking() throws Exception {
+		CalendarBooking calendarBooking = _addCalendarBooking();
+
+		Calendar calendar = CalendarTestUtil.addCalendar(_user2);
+
+		_assertMustHavePermission(
+			() -> _calendarBookingService.updateRecurringCalendarBooking(
+				calendarBooking.getCalendarBookingId(),
+				calendar.getCalendarId(), new long[0],
+				calendarBooking.getTitleMap(),
+				calendarBooking.getDescriptionMap(),
+				calendarBooking.getLocation(), calendarBooking.getStartTime(),
+				calendarBooking.getEndTime(), calendarBooking.isAllDay(), 0,
+				null, 0, null, createServiceContext()));
+	}
+
 	@Test(expected = PrincipalException.MustHavePermission.class)
 	public void testUserWithoutPermissionInCalendarShouldNotViewCalendarBooking()
 		throws Exception {
@@ -252,6 +327,33 @@ public class CalendarBookingServiceTest {
 			ResourceConstants.SCOPE_INDIVIDUAL,
 			String.valueOf(calendar.getPrimaryKey()), role.getRoleId(),
 			new String[0]);
+	}
+
+	private CalendarBooking _addCalendarBooking() throws Exception {
+		ServiceContext serviceContext = createServiceContext();
+
+		return CalendarBookingTestUtil.addRecurringCalendarBooking(
+			_user1, CalendarTestUtil.addCalendar(_user1, serviceContext),
+			RecurrenceTestUtil.getDailyRecurrence(), serviceContext);
+	}
+
+	private void _assertMustHavePermission(
+			UnsafeRunnable<Exception> unsafeRunnable)
+		throws Exception {
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				_user2, PermissionCheckerFactoryUtil.create(_user2))) {
+
+			unsafeRunnable.run();
+
+			Assert.fail();
+		}
+		catch (PrincipalException.MustHavePermission principalException) {
+			String message = principalException.getMessage();
+
+			Assert.assertTrue(
+				message, message.contains(CalendarActionKeys.MANAGE_BOOKINGS));
+		}
 	}
 
 	@Inject
