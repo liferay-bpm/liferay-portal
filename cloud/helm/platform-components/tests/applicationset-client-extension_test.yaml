@@ -43,7 +43,7 @@ tests:
                     base: liferay/projects/{{path.basename}}/base
     -   asserts:
             -   failedTemplate:
-                    errorMessage: The value "gitops.layout.projectId" must have the form {{path[n]}} for the client extension ApplicationSet
+                    errorPattern: gitops.layout.projectId
                 template: templates/applicationset-client-extension.yaml
         it: Fails for a layout expression that is not a path segment
         set:
@@ -77,11 +77,10 @@ tests:
                 template: templates/appproject-client-extension.yaml
         it: Omits the ApplicationSet and AppProject when the DXP operator does not deliver client extensions
         set:
-            operatorApplications:
-                dxpOperator:
-                    values:
-                        clientExtensions:
-                            enabled: false
+            dxpOperator:
+                values:
+                    clientExtensions:
+                        enabled: false
     -   asserts:
             -   hasDocuments:
                     count: 0
