@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUti
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.template.TemplateConstants;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -111,6 +112,62 @@ public class DDMTemplateServiceTest extends BaseDDMServiceTestCase {
 		}
 		finally {
 			UserTestUtil.setUser(TestPropsValues.getUser());
+		}
+	}
+
+	@Test
+	@TestInfo("LPD-116133")
+	public void testCopyTemplateWithoutViewPermission() throws Exception {
+		DDMTemplate template = addDisplayTemplate(
+			0, StringUtil.randomString(), WorkflowConstants.STATUS_APPROVED);
+
+		UserTestUtil.setUser(UserTestUtil.addGroupAdminUser(_group));
+
+		try {
+			_ddmTemplateService.copyTemplate(
+				template.getTemplateId(),
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+			Assert.fail();
+		}
+		catch (PrincipalException principalException) {
+		}
+
+		try {
+			_ddmTemplateService.copyTemplate(
+				template.getTemplateId(),
+				getDefaultLocaleMap(StringUtil.randomString()),
+				getDefaultLocaleMap(StringUtil.randomString()),
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+			Assert.fail();
+		}
+		catch (PrincipalException principalException) {
+		}
+	}
+
+	@Test
+	@TestInfo("LPD-116133")
+	public void testCopyTemplatesWithoutViewPermission() throws Exception {
+		DDMStructure structure = addStructure(
+			_recordSetClassNameId, StringUtil.randomString());
+
+		addDisplayTemplate(
+			structure.getStructureId(), StringUtil.randomString(),
+			WorkflowConstants.STATUS_APPROVED);
+
+		UserTestUtil.setUser(UserTestUtil.addGroupAdminUser(_group));
+
+		try {
+			_ddmTemplateService.copyTemplates(
+				_structureClassNameId, structure.getStructureId(),
+				_recordSetClassNameId, RandomTestUtil.randomLong(),
+				DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+			Assert.fail();
+		}
+		catch (PrincipalException principalException) {
 		}
 	}
 
