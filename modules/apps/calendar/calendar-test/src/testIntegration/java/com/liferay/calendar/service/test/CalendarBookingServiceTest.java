@@ -208,8 +208,8 @@ public class CalendarBookingServiceTest {
 	@Test
 	@TestInfo("LPD-116162")
 	public void testUpdateCalendarBooking() throws Exception {
-		CalendarBooking calendarBooking = _addCalendarBooking();
 		Calendar calendar = CalendarTestUtil.addCalendar(_user2);
+		CalendarBooking calendarBooking = _addCalendarBooking();
 
 		_assertMustHavePermission(
 			() -> _calendarBookingService.updateCalendarBooking(
@@ -225,8 +225,8 @@ public class CalendarBookingServiceTest {
 	@Test
 	@TestInfo("LPD-116162")
 	public void testUpdateCalendarBookingInstance() throws Exception {
-		CalendarBooking calendarBooking = _addCalendarBooking();
 		Calendar calendar = CalendarTestUtil.addCalendar(_user2);
+		CalendarBooking calendarBooking = _addCalendarBooking();
 
 		_assertMustHavePermission(
 			() -> _calendarBookingService.updateCalendarBookingInstance(
@@ -242,8 +242,8 @@ public class CalendarBookingServiceTest {
 	@Test
 	@TestInfo("LPD-116162")
 	public void testUpdateOffsetAndDuration() throws Exception {
-		CalendarBooking calendarBooking = _addCalendarBooking();
 		Calendar calendar = CalendarTestUtil.addCalendar(_user2);
+		CalendarBooking calendarBooking = _addCalendarBooking();
 
 		_assertMustHavePermission(
 			() -> _calendarBookingService.updateOffsetAndDuration(
@@ -258,8 +258,8 @@ public class CalendarBookingServiceTest {
 	@Test
 	@TestInfo("LPD-116162")
 	public void testUpdateRecurringCalendarBooking() throws Exception {
-		CalendarBooking calendarBooking = _addCalendarBooking();
 		Calendar calendar = CalendarTestUtil.addCalendar(_user2);
+		CalendarBooking calendarBooking = _addCalendarBooking();
 
 		_assertMustHavePermission(
 			() -> _calendarBookingService.updateRecurringCalendarBooking(
