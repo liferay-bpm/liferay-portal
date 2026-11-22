@@ -1,0 +1,18 @@
+.task-tree-table-view {
+	&-loader {
+		display: flex;
+		justify-content: center;
+		min-height: 1px;
+		padding: 0.5rem 0;
+	}
+
+	&-title {
+		align-items: center;
+		display: inline-flex;
+		gap: 0.5rem;
+	}
+
+	&-type-icon {
+		color: var(--color-text-secondary, #6b6c7e);
+	}
+}
