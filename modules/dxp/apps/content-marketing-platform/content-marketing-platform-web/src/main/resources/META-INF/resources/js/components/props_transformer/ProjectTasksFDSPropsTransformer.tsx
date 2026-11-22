@@ -22,6 +22,7 @@ import {
 	installCMPTabPersistence,
 	registerTabFDS,
 } from '../../utils/cmpTabPersistence';
+import {SUBTASKS_NESTED_FIELDS} from '../../utils/constants';
 import deleteTasksBulkAction from '../../utils/deleteTasksBulkAction';
 import getCMPProjectObjectEntryIds from '../../utils/getCMPProjectObjectEntryIds';
 import {getFormattedLabel} from '../../utils/getFormattedText';
@@ -43,6 +44,7 @@ import {cmpTasksFDSAtom} from './atoms';
 import AssigneeRenderer from './cell_renderers/AssigneeRenderer';
 import CalendarView from './views/calendar_view/CalendarView';
 import KanbanView from './views/kanban_view/KanbanView';
+import TaskTreeTableView from './views/tree_table_view/TaskTreeTableView';
 
 export default function ProjectTasksFDSPropsTransformer({
 	additionalProps,
@@ -126,8 +128,46 @@ export default function ProjectTasksFDSPropsTransformer({
 		thumbnail: 'columns',
 	};
 
+	const treeTableDataSetProps = {
+		additionalAPIURLParameters: `filter=cmpSubtask ne true&nestedFields=${SUBTASKS_NESTED_FIELDS}`,
+
+		// The tree table asks for the top-level tasks only. A search, a filter
+		// or a view that loads every item (Kanban, Calendar) shows a flat
+		// list, so it asks for the subtasks too.
+
+		additionalAPIURLParametersTransformer: ({
+			additionalAPIURLParameters,
+			delta,
+			odataFiltersStrings,
+			searchParam,
+		}: {
+			additionalAPIURLParameters?: string;
+			delta?: number;
+			odataFiltersStrings?: string[];
+			searchParam?: string;
+		}) =>
+			delta === FDS_PAGINATION_DELTA_ALL ||
+			odataFiltersStrings?.length ||
+			searchParam
+				? `nestedFields=${SUBTASKS_NESTED_FIELDS}`
+				: additionalAPIURLParameters,
+		showSelectAll: true,
+	};
+
+	const treeTableView: IView = {
+		component: TaskTreeTableView,
+		default: true,
+		initialPaginationDelta: 20,
+		label: Liferay.Language.get('table'),
+		name: 'treeTable',
+		selectable: true,
+		showPagination: false,
+		thumbnail: 'table',
+	};
+
 	return {
 		...otherProps,
+		...(Liferay.FeatureFlags['LPD-107678'] && treeTableDataSetProps),
 		atom: cmpTasksFDSAtom,
 		bulkActions: transformFDSBulkActions(
 			styleBulkActions(bulkActions).map((action) => ({
@@ -351,6 +391,8 @@ export default function ProjectTasksFDSPropsTransformer({
 				});
 			}
 		},
-		views: [...nonDefaultViews, kanbanView, calendarView],
+		views: Liferay.FeatureFlags['LPD-107678']
+			? [treeTableView, kanbanView, calendarView]
+			: [...nonDefaultViews, kanbanView, calendarView],
 	};
 }

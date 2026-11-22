@@ -8,12 +8,22 @@ import ProjectTasksFDSPropsTransformer from './ProjectTasksFDSPropsTransformer';
 /**
  * Reuses the same props as the project tasks, but overrides the views with
  * just the Subtasks table view, so it excludes the Kanban and Calendar views.
+ * It also leaves out the parameters of the tree table view, which ask for the
+ * top-level tasks only.
  */
 export default function SubtasksFDSPropsTransformer(
 	props: Parameters<typeof ProjectTasksFDSPropsTransformer>[0]
 ) {
+	const {
+		additionalAPIURLParameters: _additionalAPIURLParameters,
+		additionalAPIURLParametersTransformer:
+			_additionalAPIURLParametersTransformer,
+		showSelectAll: _showSelectAll,
+		...projectTasksProps
+	} = ProjectTasksFDSPropsTransformer(props) as Record<string, unknown>;
+
 	return {
-		...ProjectTasksFDSPropsTransformer(props),
+		...projectTasksProps,
 		views: props.views,
 	};
 }
