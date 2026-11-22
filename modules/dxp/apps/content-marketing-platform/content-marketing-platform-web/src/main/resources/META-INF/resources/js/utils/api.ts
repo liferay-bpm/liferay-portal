@@ -3,9 +3,16 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import {TSort} from '@liferay/frontend-data-set-web';
 import {ApiHelper} from '@liferay/site-cms-site-initializer';
 
-import {ChangeTransition, ISubtaskObjectEntry, ITaskObjectEntry} from './types';
+import {SUBTASKS_NESTED_FIELDS} from './constants';
+import {
+	ChangeTransition,
+	ISubtaskObjectEntry,
+	ITask,
+	ITaskObjectEntry,
+} from './types';
 
 type WorkflowTaskAssignee = {
 	assignableUsers: Array<{id: number; name: string}>;
@@ -73,6 +80,52 @@ export async function getProcessingBulkActionTasksCount() {
 	);
 
 	return data?.totalCount ?? 0;
+}
+
+/**
+ * Reuses the search URL of the tasks data set, so the subtasks come back in
+ * the same shape as the data set items.
+ */
+export async function getSubtasks({
+	apiURL,
+	parentTaskId,
+	sorts = [],
+}: {
+	apiURL: string;
+	parentTaskId: number;
+	sorts?: TSort[];
+}) {
+	const url = new URL(
+		Liferay.ThemeDisplay.getPortalURL() +
+			Liferay.ThemeDisplay.getPathContext() +
+			apiURL
+	);
+
+	const filter = url.searchParams.get('filter');
+	const nestedFields = url.searchParams.get('nestedFields');
+
+	url.searchParams.set(
+		'filter',
+		[filter, `cmpParentTaskId eq ${parentTaskId}`]
+			.filter(Boolean)
+			.join(' and ')
+	);
+	url.searchParams.set(
+		'nestedFields',
+		[nestedFields, SUBTASKS_NESTED_FIELDS].filter(Boolean).join(',')
+	);
+	url.searchParams.set('pageSize', '200');
+
+	const sortParameter = sorts
+		.filter((sort) => sort.active !== false)
+		.map((sort) => `${sort.key}:${sort.direction}`)
+		.join(',');
+
+	if (sortParameter) {
+		url.searchParams.set('sort', sortParameter);
+	}
+
+	return await ApiHelper.get<{items: ITask[]}>(url.toString());
 }
 
 export async function getTaskById({taskId}: {taskId: string}) {
