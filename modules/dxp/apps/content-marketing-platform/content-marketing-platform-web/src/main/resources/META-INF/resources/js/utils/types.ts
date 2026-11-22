@@ -80,6 +80,7 @@ export interface ITaskObjectEntry {
 	};
 	assignTo: AssigneeValue;
 	cmpProjectToCMPTasks: IProjectObjectEntry;
+	cmpTaskToCMPTasks?: ITaskObjectEntry[];
 	creator: ICreator;
 	dateCreated: string;
 	dateModified: string;
@@ -95,6 +96,7 @@ export interface ITaskObjectEntry {
 	r_cmpProjectToCMPTasks_c_cmpProject: any;
 	r_cmpProjectToCMPTasks_c_cmpProjectERC: string;
 	r_cmpProjectToCMPTasks_c_cmpProjectId: number;
+	r_cmpTaskToCMPTasks_c_cmpTask?: {title: string};
 	r_cmpTaskToCMPTasks_c_cmpTaskId?: number;
 	scopeId: number;
 	scopeKey: string;

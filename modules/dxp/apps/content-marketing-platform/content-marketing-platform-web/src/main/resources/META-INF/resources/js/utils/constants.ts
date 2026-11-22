@@ -23,6 +23,8 @@ export const KANBAN_COLUMN_ORDER = [
 	'done',
 ] as const;
 
+export const SUBTASKS_NESTED_FIELDS = 'embedded.cmpTaskToCMPTasks';
+
 // Added to the body while a task is dragged so styles can switch to the
 // grabbing cursor.
 
