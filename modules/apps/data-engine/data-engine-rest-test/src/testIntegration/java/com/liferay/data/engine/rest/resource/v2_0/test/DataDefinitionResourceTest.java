@@ -288,7 +288,7 @@ public class DataDefinitionResourceTest
 			new String[] {ActionKeys.VIEW});
 
 		DataDefinitionResource userDataDefinitionResource =
-			_getDataDefinitionResource(
+			_getUserDataDefinitionResource(
 				UserTestUtil.addUser(
 					testCompany, RandomTestUtil.randomString()));
 
@@ -323,7 +323,7 @@ public class DataDefinitionResourceTest
 				testGroup.getGroupId(), "journal", randomDataDefinition());
 
 		DataDefinitionResource userDataDefinitionResource =
-			_getDataDefinitionResource(
+			_getUserDataDefinitionResource(
 				UserTestUtil.addUser(
 					testCompany, RandomTestUtil.randomString()));
 
@@ -1116,7 +1116,7 @@ public class DataDefinitionResourceTest
 		throw new AssertionError("No data definition field named " + name);
 	}
 
-	private DataDefinitionResource _getDataDefinitionResource(User user)
+	private DataDefinitionResource _getUserDataDefinitionResource(User user)
 		throws Exception {
 
 		return DataDefinitionResource.builder(
