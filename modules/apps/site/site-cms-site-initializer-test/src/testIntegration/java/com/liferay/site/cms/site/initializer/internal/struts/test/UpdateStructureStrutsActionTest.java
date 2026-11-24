@@ -696,7 +696,7 @@ public class UpdateStructureStrutsActionTest {
 						getParameterObjectFieldId(),
 					serviceBuilderObjectRelationship.getDeletionType(), null,
 					false, serviceBuilderObjectRelationship.getLabelMap(),
-					null);
+					serviceBuilderObjectRelationship.getPriority(), null);
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
 			updatedServiceBuilderObjectRelationship);

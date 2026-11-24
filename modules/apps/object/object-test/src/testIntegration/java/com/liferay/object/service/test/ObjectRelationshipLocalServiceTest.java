@@ -1082,7 +1082,8 @@ public class ObjectRelationshipLocalServiceTest {
 				externalReferenceCode,
 				objectRelationship1.getObjectRelationshipId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE, null,
-				false, LocalizedMapUtil.getLocalizedMap("Baker"), null);
+				false, LocalizedMapUtil.getLocalizedMap("Baker"),
+				objectRelationship1.getPriority(), null);
 
 		Assert.assertEquals(
 			externalReferenceCode,
@@ -1112,7 +1113,8 @@ public class ObjectRelationshipLocalServiceTest {
 				externalReferenceCode,
 				reverseObjectRelationship.getObjectRelationshipId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE, null,
-				false, LocalizedMapUtil.getLocalizedMap("Able"), null);
+				false, LocalizedMapUtil.getLocalizedMap("Able"),
+				reverseObjectRelationship.getPriority(), null);
 
 		Assert.assertEquals(
 			externalReferenceCode,
@@ -1146,7 +1148,7 @@ public class ObjectRelationshipLocalServiceTest {
 				ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE, null,
 				true,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				null));
+				objectRelationship2.getPriority(), null));
 
 		AssertUtils.assertFailure(
 			ObjectRelationshipDeletionTypeException.MustHaveCascadeDeletionType.
@@ -1158,7 +1160,7 @@ public class ObjectRelationshipLocalServiceTest {
 				objectRelationship2.getObjectRelationshipId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, true,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				null));
+				objectRelationship2.getPriority(), null));
 
 		TreeTestUtil.deleteObjectDefinitionHierarchy(
 			_objectDefinitionLocalService, new String[] {"C_A", "C_AA"},
@@ -1206,7 +1208,7 @@ public class ObjectRelationshipLocalServiceTest {
 				objectRelationship5.getParameterObjectFieldId(),
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, true,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				null));
+				objectRelationship5.getPriority(), null));
 
 		ObjectRelationship objectRelationship6 =
 			_objectRelationshipLocalService.addObjectRelationship(
@@ -1228,7 +1230,8 @@ public class ObjectRelationshipLocalServiceTest {
 				objectRelationship6.getExternalReferenceCode(),
 				objectRelationship6.getObjectRelationshipId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE, null,
-				false, objectRelationship6.getLabelMap(), null);
+				false, objectRelationship6.getLabelMap(),
+				objectRelationship6.getPriority(), null);
 
 		objectField2 = _objectFieldLocalService.fetchObjectField(
 			objectRelationship6.getObjectFieldId2());
@@ -1249,7 +1252,8 @@ public class ObjectRelationshipLocalServiceTest {
 				systemObjectRelationship.getExternalReferenceCode(),
 				systemObjectRelationship.getObjectRelationshipId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE, null,
-				false, LocalizedMapUtil.getLocalizedMap("Able"), null);
+				false, LocalizedMapUtil.getLocalizedMap("Able"),
+				systemObjectRelationship.getPriority(), null);
 
 		Assert.assertEquals(
 			ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE,
@@ -1267,7 +1271,8 @@ public class ObjectRelationshipLocalServiceTest {
 					systemObjectRelationship.getExternalReferenceCode(),
 					systemObjectRelationship.getObjectRelationshipId(), 0,
 					ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null,
-					false, LocalizedMapUtil.getLocalizedMap("Baker"), null);
+					false, LocalizedMapUtil.getLocalizedMap("Baker"),
+					systemObjectRelationship.getPriority(), null);
 		}
 		finally {
 			SystemProperties.set("liferay.mode", liferayMode);
@@ -1709,7 +1714,8 @@ public class ObjectRelationshipLocalServiceTest {
 			objectRelationship.getExternalReferenceCode(),
 			objectRelationship.getObjectRelationshipId(), 0,
 			objectRelationship.getDeletionType(), null, true,
-			objectRelationship.getLabelMap(), null);
+			objectRelationship.getLabelMap(), objectRelationship.getPriority(),
+			null);
 	}
 
 	private boolean _hasColumn(String tableName, String columnName)
@@ -2317,7 +2323,7 @@ public class ObjectRelationshipLocalServiceTest {
 				objectRelationship.getObjectRelationshipId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
 				descriptionMap, false, objectRelationship.getLabelMap(),
-				newObjectField);
+				objectRelationship.getPriority(), newObjectField);
 
 		if (MapUtil.isNotEmpty(descriptionMap)) {
 			description = descriptionMap.get(LocaleUtil.US);

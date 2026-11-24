@@ -444,7 +444,8 @@ public class ObjectRelationshipServiceTest {
 					objectRelationship.getExternalReferenceCode(),
 					objectRelationship.getObjectRelationshipId(), 0,
 					objectRelationship.getDeletionType(), null, false,
-					LocalizedMapUtil.getLocalizedMap("Baker"), null);
+					LocalizedMapUtil.getLocalizedMap("Baker"),
+					objectRelationship.getPriority(), null);
 		}
 		finally {
 			if (objectRelationship != null) {
