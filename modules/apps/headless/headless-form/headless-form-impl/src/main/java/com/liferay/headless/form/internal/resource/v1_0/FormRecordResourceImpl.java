@@ -240,7 +240,8 @@ public class FormRecordResourceImpl extends BaseFormRecordResourceImpl {
 		DDMFormField ddmFormField = ddmFormFieldValue.getDDMFormField();
 
 		if (ddmFormField.isLocalizable()) {
-			value = new LocalizedValue();
+			value = new LocalizedValue(
+				contextAcceptLanguage.getPreferredLocale());
 
 			value.addString(value.getDefaultLocale(), json);
 		}
