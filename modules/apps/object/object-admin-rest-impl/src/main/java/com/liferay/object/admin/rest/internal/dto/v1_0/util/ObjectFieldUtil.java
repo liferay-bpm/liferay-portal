@@ -18,6 +18,7 @@ import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectFilterLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.lang.SafeCloseable;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -214,6 +215,23 @@ public class ObjectFieldUtil {
 		return listTypeDefinition.getListTypeDefinitionId();
 	}
 
+	public static int getPriority(
+		long companyId, ObjectField objectField,
+		com.liferay.object.model.ObjectField serviceBuilderObjectField) {
+
+		if (FeatureFlagManagerUtil.isEnabled(companyId, "LPD-110248") &&
+			(objectField.getPriority() != null)) {
+
+			return objectField.getPriority();
+		}
+
+		if (serviceBuilderObjectField == null) {
+			return 0;
+		}
+
+		return serviceBuilderObjectField.getPriority();
+	}
+
 	public static com.liferay.object.model.ObjectField toObjectField(
 		String defaultLanguageId, GroupLocalService groupLocalService,
 		ListTypeDefinitionLocalService listTypeDefinitionLocalService,
@@ -279,6 +297,8 @@ public class ObjectFieldUtil {
 			ObjectFieldSettingUtil.toObjectFieldSettings(
 				groupLocalService, listTypeDefinitionId, objectField,
 				objectFieldSettingLocalService, objectFilterLocalService));
+		serviceBuilderObjectField.setPriority(
+			GetterUtil.getInteger(objectField.getPriority()));
 		serviceBuilderObjectField.setReadOnly(
 			objectField.getReadOnlyAsString());
 		serviceBuilderObjectField.setReadOnlyConditionExpression(

@@ -18,6 +18,7 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectFilterLocalService;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
@@ -157,6 +158,14 @@ public class ObjectFieldResourceImpl extends BaseObjectFieldResourceImpl {
 				objectDefinition);
 		}
 
+		if ((objectField.getPriority() != null) &&
+			FeatureFlagManagerUtil.isEnabled(
+				contextUser.getCompanyId(), "LPD-110248")) {
+
+			return putObjectField(
+				serviceBuilderObjectField.getObjectFieldId(), objectField);
+		}
+
 		return _toObjectField(serviceBuilderObjectField);
 	}
 
@@ -170,9 +179,6 @@ public class ObjectFieldResourceImpl extends BaseObjectFieldResourceImpl {
 		objectField.setListTypeDefinitionId(
 			() -> _getListTypeDefinitionId(
 				objectField, objectFieldId, listTypeDefinitionId));
-
-		com.liferay.object.model.ObjectField serviceBuilderObjectField =
-			_objectFieldService.getObjectField(objectFieldId);
 
 		return _toObjectField(
 			_objectFieldService.updateObjectField(
@@ -190,7 +196,9 @@ public class ObjectFieldResourceImpl extends BaseObjectFieldResourceImpl {
 				LocalizedMapUtil.populateLocalizedMap(objectField.getLabel()),
 				GetterUtil.getBoolean(objectField.getLocalized()),
 				objectField.getName(),
-				serviceBuilderObjectField.getPriority(),
+				ObjectFieldUtil.getPriority(
+					contextUser.getCompanyId(), objectField,
+					_objectFieldService.getObjectField(objectFieldId)),
 				objectField.getReadOnlyAsString(),
 				objectField.getReadOnlyConditionExpression(),
 				objectField.getRequired(),

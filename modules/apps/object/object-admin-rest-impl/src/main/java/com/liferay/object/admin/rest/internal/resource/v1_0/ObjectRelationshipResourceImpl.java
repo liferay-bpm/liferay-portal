@@ -22,6 +22,7 @@ import com.liferay.object.service.ObjectFilterLocalService;
 import com.liferay.object.service.ObjectFolderLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.petra.lang.SafeCloseable;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.lazy.referencing.LazyReferencingThreadLocal;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
@@ -179,20 +180,22 @@ public class ObjectRelationshipResourceImpl
 			});
 
 		return _toObjectRelationship(
-			_objectRelationshipService.addObjectRelationship(
-				objectRelationship.getExternalReferenceCode(),
-				objectDefinition1.getObjectDefinitionId(),
-				objectDefinition2.getObjectDefinitionId(),
-				objectRelationship.getParameterObjectFieldId(),
-				objectRelationship.getDeletionTypeAsString(),
-				LocalizedMapUtil.populateLocalizedMap(
-					objectRelationship.getDescription()),
-				GetterUtil.getBoolean(objectRelationship.getEdge()),
-				LocalizedMapUtil.populateLocalizedMap(
-					objectRelationship.getLabel()),
-				objectRelationship.getName(),
-				GetterUtil.getBoolean(objectRelationship.getSystem()),
-				objectRelationship.getTypeAsString(), null));
+			_updatePriority(
+				objectRelationship,
+				_objectRelationshipService.addObjectRelationship(
+					objectRelationship.getExternalReferenceCode(),
+					objectDefinition1.getObjectDefinitionId(),
+					objectDefinition2.getObjectDefinitionId(),
+					objectRelationship.getParameterObjectFieldId(),
+					objectRelationship.getDeletionTypeAsString(),
+					LocalizedMapUtil.populateLocalizedMap(
+						objectRelationship.getDescription()),
+					GetterUtil.getBoolean(objectRelationship.getEdge()),
+					LocalizedMapUtil.populateLocalizedMap(
+						objectRelationship.getLabel()),
+					objectRelationship.getName(),
+					GetterUtil.getBoolean(objectRelationship.getSystem()),
+					objectRelationship.getTypeAsString(), null)));
 	}
 
 	@Override
@@ -213,26 +216,29 @@ public class ObjectRelationshipResourceImpl
 		}
 
 		return _toObjectRelationship(
-			_objectRelationshipService.addObjectRelationship(
-				objectRelationship.getExternalReferenceCode(),
-				objectDefinitionId, objectDefinitionId2,
-				GetterUtil.getLong(
-					objectRelationship.getParameterObjectFieldId()),
-				objectRelationship.getDeletionTypeAsString(),
-				LocalizedMapUtil.populateLocalizedMap(
-					objectRelationship.getDescription()),
-				GetterUtil.getBoolean(objectRelationship.getEdge()),
-				LocalizedMapUtil.populateLocalizedMap(
-					objectRelationship.getLabel()),
-				objectRelationship.getName(),
-				GetterUtil.getBoolean(objectRelationship.getSystem()),
-				objectRelationship.getTypeAsString(),
-				ObjectFieldUtil.toObjectField(
-					LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()),
-					groupLocalService, _listTypeDefinitionLocalService,
-					objectRelationship.getObjectField(),
-					_objectFieldLocalService, _objectFieldSettingLocalService,
-					_objectFilterLocalService)));
+			_updatePriority(
+				objectRelationship,
+				_objectRelationshipService.addObjectRelationship(
+					objectRelationship.getExternalReferenceCode(),
+					objectDefinitionId, objectDefinitionId2,
+					GetterUtil.getLong(
+						objectRelationship.getParameterObjectFieldId()),
+					objectRelationship.getDeletionTypeAsString(),
+					LocalizedMapUtil.populateLocalizedMap(
+						objectRelationship.getDescription()),
+					GetterUtil.getBoolean(objectRelationship.getEdge()),
+					LocalizedMapUtil.populateLocalizedMap(
+						objectRelationship.getLabel()),
+					objectRelationship.getName(),
+					GetterUtil.getBoolean(objectRelationship.getSystem()),
+					objectRelationship.getTypeAsString(),
+					ObjectFieldUtil.toObjectField(
+						LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()),
+						groupLocalService, _listTypeDefinitionLocalService,
+						objectRelationship.getObjectField(),
+						_objectFieldLocalService,
+						_objectFieldSettingLocalService,
+						_objectFilterLocalService))));
 	}
 
 	@Override
@@ -261,10 +267,10 @@ public class ObjectRelationshipResourceImpl
 				});
 		}
 
-		com.liferay.object.model.ObjectRelationship
-			serviceBuilderObjectRelationship =
-				_objectRelationshipService.getObjectRelationship(
-					objectRelationshipId);
+		_setPriorities(
+			objectRelationship,
+			_objectRelationshipService.getObjectRelationship(
+				objectRelationshipId));
 
 		return _toObjectRelationship(
 			_objectRelationshipService.updateObjectRelationship(
@@ -278,7 +284,7 @@ public class ObjectRelationshipResourceImpl
 				GetterUtil.getBoolean(objectRelationship.getEdge()),
 				LocalizedMapUtil.populateLocalizedMap(
 					objectRelationship.getLabel()),
-				serviceBuilderObjectRelationship.getPriority(),
+				GetterUtil.getInteger(objectRelationship.getPriority()),
 				ObjectFieldUtil.toObjectField(
 					LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()),
 					groupLocalService, _listTypeDefinitionLocalService,
@@ -364,6 +370,42 @@ public class ObjectRelationshipResourceImpl
 		}
 	}
 
+	private void _setPriorities(
+			ObjectRelationship objectRelationship,
+			com.liferay.object.model.ObjectRelationship
+				serviceBuilderObjectRelationship)
+		throws Exception {
+
+		com.liferay.object.admin.rest.dto.v1_0.ObjectField objectField =
+			objectRelationship.getObjectField();
+
+		if (objectField != null) {
+			ObjectField serviceBuilderObjectField = null;
+
+			if (serviceBuilderObjectRelationship.getObjectFieldId2() > 0) {
+				serviceBuilderObjectField =
+					_objectFieldLocalService.getObjectField(
+						serviceBuilderObjectRelationship.getObjectFieldId2());
+			}
+
+			int priority = ObjectFieldUtil.getPriority(
+				contextCompany.getCompanyId(), objectField,
+				serviceBuilderObjectField);
+
+			objectField.setPriority(() -> priority);
+		}
+
+		if (FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-110248") &&
+			(objectRelationship.getPriority() != null)) {
+
+			return;
+		}
+
+		objectRelationship.setPriority(
+			serviceBuilderObjectRelationship::getPriority);
+	}
+
 	private ObjectRelationship _toObjectRelationship(
 			com.liferay.object.model.ObjectRelationship objectRelationship)
 		throws Exception {
@@ -388,6 +430,30 @@ public class ObjectRelationshipResourceImpl
 				null, null, contextAcceptLanguage.getPreferredLocale(), null,
 				null),
 			objectRelationship);
+	}
+
+	private com.liferay.object.model.ObjectRelationship _updatePriority(
+			ObjectRelationship objectRelationship,
+			com.liferay.object.model.ObjectRelationship
+				serviceBuilderObjectRelationship)
+		throws Exception {
+
+		if ((objectRelationship.getPriority() == null) ||
+			!FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-110248")) {
+
+			return serviceBuilderObjectRelationship;
+		}
+
+		return _objectRelationshipService.updateObjectRelationship(
+			serviceBuilderObjectRelationship.getExternalReferenceCode(),
+			serviceBuilderObjectRelationship.getObjectRelationshipId(),
+			serviceBuilderObjectRelationship.getParameterObjectFieldId(),
+			serviceBuilderObjectRelationship.getDeletionType(),
+			serviceBuilderObjectRelationship.getDescriptionMap(),
+			serviceBuilderObjectRelationship.isEdge(),
+			serviceBuilderObjectRelationship.getLabelMap(),
+			objectRelationship.getPriority(), null);
 	}
 
 	private static final EntityModel _entityModel =
