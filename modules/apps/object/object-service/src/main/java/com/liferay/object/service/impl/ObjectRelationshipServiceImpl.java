@@ -177,7 +177,7 @@ public class ObjectRelationshipServiceImpl
 			String externalReferenceCode, long objectRelationshipId,
 			long parameterObjectFieldId, String deletionType,
 			Map<Locale, String> descriptionMap, boolean edge,
-			Map<Locale, String> labelMap, ObjectField objectField)
+			Map<Locale, String> labelMap, int priority, ObjectField objectField)
 		throws PortalException {
 
 		ObjectRelationship objectRelationship =
@@ -190,7 +190,8 @@ public class ObjectRelationshipServiceImpl
 
 		return objectRelationshipLocalService.updateObjectRelationship(
 			externalReferenceCode, objectRelationshipId, parameterObjectFieldId,
-			deletionType, descriptionMap, edge, labelMap, objectField);
+			deletionType, descriptionMap, edge, labelMap, priority,
+			objectField);
 	}
 
 	private void _checkModelResourcePermission(

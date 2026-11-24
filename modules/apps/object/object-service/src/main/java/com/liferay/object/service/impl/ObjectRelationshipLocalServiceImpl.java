@@ -1018,7 +1018,7 @@ public class ObjectRelationshipLocalServiceImpl
 			String externalReferenceCode, long objectRelationshipId,
 			long parameterObjectFieldId, String deletionType,
 			Map<Locale, String> descriptionMap, boolean edge,
-			Map<Locale, String> labelMap, ObjectField objectField)
+			Map<Locale, String> labelMap, int priority, ObjectField objectField)
 		throws PortalException {
 
 		if (Validator.isNull(deletionType)) {
@@ -1035,6 +1035,7 @@ public class ObjectRelationshipLocalServiceImpl
 			objectRelationship.setDescriptionMap(
 				_getDescriptionMap(descriptionMap));
 			objectRelationship.setLabelMap(labelMap);
+			objectRelationship.setPriority(priority);
 
 			return objectRelationshipPersistence.update(objectRelationship);
 		}
@@ -1046,6 +1047,7 @@ public class ObjectRelationshipLocalServiceImpl
 
 		if (objectRelationship.isReverse()) {
 			objectRelationship.setExternalReferenceCode(externalReferenceCode);
+			objectRelationship.setPriority(priority);
 
 			return objectRelationshipPersistence.update(objectRelationship);
 		}
@@ -1078,6 +1080,7 @@ public class ObjectRelationshipLocalServiceImpl
 			_updateObjectRelationship(
 				reverseObjectRelationship.getExternalReferenceCode(),
 				parameterObjectFieldId, deletionType, descriptionMap, labelMap,
+				reverseObjectRelationship.getPriority(),
 				reverseObjectRelationship);
 
 			Indexer<ObjectRelationship> indexer =
@@ -1112,7 +1115,8 @@ public class ObjectRelationshipLocalServiceImpl
 					existingObjectField.getIndexedLanguageId(),
 					objectField.getLabelMap(),
 					existingObjectField.isLocalized(),
-					existingObjectField.getName(), objectField.getReadOnly(),
+					existingObjectField.getName(), objectField.getPriority(),
+					objectField.getReadOnly(),
 					objectField.getReadOnlyConditionExpression(),
 					objectField.isRequired(), existingObjectField.isState(),
 					existingObjectField.isSystem(),
@@ -1128,7 +1132,7 @@ public class ObjectRelationshipLocalServiceImpl
 
 		objectRelationship = _updateObjectRelationship(
 			externalReferenceCode, parameterObjectFieldId, deletionType,
-			descriptionMap, labelMap, objectRelationship);
+			descriptionMap, labelMap, priority, objectRelationship);
 
 		if ((objectRelationship.getObjectFieldId2() != 0) &&
 			StringUtil.equals(
@@ -1805,7 +1809,8 @@ public class ObjectRelationshipLocalServiceImpl
 	private ObjectRelationship _updateObjectRelationship(
 		String externalReferenceCode, long parameterObjectFieldId,
 		String deletionType, Map<Locale, String> descriptionMap,
-		Map<Locale, String> labelMap, ObjectRelationship objectRelationship) {
+		Map<Locale, String> labelMap, int priority,
+		ObjectRelationship objectRelationship) {
 
 		objectRelationship.setExternalReferenceCode(externalReferenceCode);
 		objectRelationship.setParameterObjectFieldId(parameterObjectFieldId);
@@ -1813,6 +1818,7 @@ public class ObjectRelationshipLocalServiceImpl
 		objectRelationship.setDescriptionMap(
 			_getDescriptionMap(descriptionMap));
 		objectRelationship.setLabelMap(labelMap);
+		objectRelationship.setPriority(priority);
 
 		return objectRelationshipPersistence.update(objectRelationship);
 	}

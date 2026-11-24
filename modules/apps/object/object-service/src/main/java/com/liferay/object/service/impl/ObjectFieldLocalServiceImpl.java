@@ -176,7 +176,7 @@ public class ObjectFieldLocalServiceImpl
 			Map<Locale, String> descriptionMap, boolean indexed,
 			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, boolean localized, String name,
-			String readOnly, String readOnlyConditionExpression,
+			int priority, String readOnly, String readOnlyConditionExpression,
 			boolean required, boolean state,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
@@ -213,7 +213,7 @@ public class ObjectFieldLocalServiceImpl
 			externalReferenceCode, existingObjectField.getObjectFieldId(),
 			listTypeDefinitionId, businessType, dbType, descriptionMap, indexed,
 			indexedAsKeyword, indexedLanguageId, labelMap, localized, name,
-			readOnly, readOnlyConditionExpression, required, state,
+			priority, readOnly, readOnlyConditionExpression, required, state,
 			objectFieldSettings);
 	}
 
@@ -242,7 +242,7 @@ public class ObjectFieldLocalServiceImpl
 			String dbType, Map<Locale, String> descriptionMap, boolean indexed,
 			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, boolean localized, String name,
-			String readOnly, String readOnlyConditionExpression,
+			int priority, String readOnly, String readOnlyConditionExpression,
 			boolean required, boolean state,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
@@ -267,8 +267,9 @@ public class ObjectFieldLocalServiceImpl
 				externalReferenceCode, existingObjectField.getObjectFieldId(),
 				listTypeDefinitionId, businessType, dbType, descriptionMap,
 				indexed, indexedAsKeyword, indexedLanguageId, labelMap,
-				localized, name, readOnly, readOnlyConditionExpression,
-				required, state, objectFieldSettings);
+				localized, name, priority, readOnly,
+				readOnlyConditionExpression, required, state,
+				objectFieldSettings);
 		}
 
 		ObjectField objectField = (ObjectField)existingObjectField.clone();
@@ -292,6 +293,7 @@ public class ObjectFieldLocalServiceImpl
 		objectField.setIndexedAsKeyword(indexedAsKeyword);
 		objectField.setIndexedLanguageId(indexedLanguageId);
 		objectField.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
+		objectField.setPriority(priority);
 
 		objectField = objectFieldPersistence.update(objectField);
 
@@ -727,7 +729,7 @@ public class ObjectFieldLocalServiceImpl
 			String dbType, Map<Locale, String> descriptionMap, boolean indexed,
 			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, boolean localized, String name,
-			String readOnly, String readOnlyConditionExpression,
+			int priority, String readOnly, String readOnlyConditionExpression,
 			boolean required, boolean state, boolean system,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
@@ -737,8 +739,8 @@ public class ObjectFieldLocalServiceImpl
 				externalReferenceCode, userId, listTypeDefinitionId,
 				objectDefinitionId, businessType, dbColumnName, dbTableName,
 				dbType, descriptionMap, indexed, indexedAsKeyword,
-				indexedLanguageId, labelMap, localized, name, readOnly,
-				readOnlyConditionExpression, required, state,
+				indexedLanguageId, labelMap, localized, name, priority,
+				readOnly, readOnlyConditionExpression, required, state,
 				objectFieldSettings);
 		}
 
@@ -746,7 +748,7 @@ public class ObjectFieldLocalServiceImpl
 			externalReferenceCode, objectFieldId, userId, listTypeDefinitionId,
 			objectDefinitionId, businessType, dbType, descriptionMap, indexed,
 			indexedAsKeyword, indexedLanguageId, labelMap, localized, name,
-			readOnly, readOnlyConditionExpression, required, state,
+			priority, readOnly, readOnlyConditionExpression, required, state,
 			objectFieldSettings);
 	}
 
@@ -1647,7 +1649,7 @@ public class ObjectFieldLocalServiceImpl
 			Map<Locale, String> descriptionMap, boolean indexed,
 			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, boolean localized, String name,
-			String readOnly, String readOnlyConditionExpression,
+			int priority, String readOnly, String readOnlyConditionExpression,
 			boolean required, boolean state,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
@@ -1724,6 +1726,7 @@ public class ObjectFieldLocalServiceImpl
 				businessType, dbType, indexed, indexedAsKeyword,
 				indexedLanguageId));
 		newObjectField.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
+		newObjectField.setPriority(priority);
 		newObjectField.setReadOnly(
 			_getReadOnly(
 				businessType, objectDefinition.isDefaultStorageType(), name,
