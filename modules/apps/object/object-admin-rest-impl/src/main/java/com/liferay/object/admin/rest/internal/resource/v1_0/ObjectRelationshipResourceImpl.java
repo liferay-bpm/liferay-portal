@@ -33,6 +33,11 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
+import com.liferay.portal.search.searcher.SearchRequestBuilder;
+import com.liferay.portal.search.sort.FieldSort;
+import com.liferay.portal.search.sort.SortOrder;
+import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
@@ -132,6 +137,24 @@ public class ObjectRelationshipResourceImpl
 				searchContext.setCompanyId(contextCompany.getCompanyId());
 				searchContext.setLocale(
 					contextAcceptLanguage.getPreferredLocale());
+
+				if ((sorts == null) &&
+					FeatureFlagManagerUtil.isEnabled(
+						contextCompany.getCompanyId(), "LPD-110248")) {
+
+					FieldSort fieldSort = _sorts.field(
+						Field.getSortableFieldName(Field.PRIORITY),
+						SortOrder.ASC);
+
+					fieldSort.setMissing("0");
+
+					SearchRequestBuilder searchRequestBuilder =
+						_searchRequestBuilderFactory.builder(searchContext);
+
+					searchRequestBuilder.sorts(
+						fieldSort,
+						_sorts.field(Field.ENTRY_CLASS_PK, SortOrder.ASC));
+				}
 			},
 			sorts,
 			document -> _toObjectRelationship(
@@ -484,5 +507,11 @@ public class ObjectRelationshipResourceImpl
 
 	@Reference
 	private ObjectRelationshipService _objectRelationshipService;
+
+	@Reference
+	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
+
+	@Reference
+	private Sorts _sorts;
 
 }
