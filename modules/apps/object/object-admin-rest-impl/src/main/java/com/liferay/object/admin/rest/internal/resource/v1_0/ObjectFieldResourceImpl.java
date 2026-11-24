@@ -171,6 +171,9 @@ public class ObjectFieldResourceImpl extends BaseObjectFieldResourceImpl {
 			() -> _getListTypeDefinitionId(
 				objectField, objectFieldId, listTypeDefinitionId));
 
+		com.liferay.object.model.ObjectField serviceBuilderObjectField =
+			_objectFieldService.getObjectField(objectFieldId);
+
 		return _toObjectField(
 			_objectFieldService.updateObjectField(
 				objectField.getExternalReferenceCode(), objectFieldId,
@@ -186,7 +189,9 @@ public class ObjectFieldResourceImpl extends BaseObjectFieldResourceImpl {
 				objectField.getIndexedLanguageId(),
 				LocalizedMapUtil.populateLocalizedMap(objectField.getLabel()),
 				GetterUtil.getBoolean(objectField.getLocalized()),
-				objectField.getName(), objectField.getReadOnlyAsString(),
+				objectField.getName(),
+				serviceBuilderObjectField.getPriority(),
+				objectField.getReadOnlyAsString(),
 				objectField.getReadOnlyConditionExpression(),
 				objectField.getRequired(),
 				GetterUtil.getBoolean(objectField.getState()),

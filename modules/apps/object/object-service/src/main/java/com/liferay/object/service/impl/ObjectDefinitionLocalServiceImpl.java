@@ -1626,6 +1626,17 @@ public class ObjectDefinitionLocalServiceImpl
 				if (objectDefinition.isUnmodifiableSystemObject() ||
 					objectField.isSystem()) {
 
+					ObjectField existingObjectField =
+						_objectFieldPersistence.fetchByODI_N(
+							objectDefinition.getObjectDefinitionId(),
+							objectField.getName());
+
+					int priority = 0;
+
+					if (existingObjectField != null) {
+						priority = existingObjectField.getPriority();
+					}
+
 					_objectFieldLocalService.addOrUpdateSystemObjectField(
 						objectField.getExternalReferenceCode(), userId,
 						objectField.getListTypeDefinitionId(),
@@ -1639,7 +1650,8 @@ public class ObjectDefinitionLocalServiceImpl
 						objectField.isIndexedAsKeyword(),
 						objectField.getIndexedLanguageId(),
 						objectField.getLabelMap(), objectField.isLocalized(),
-						objectField.getName(), objectField.getReadOnly(),
+						objectField.getName(), priority,
+						objectField.getReadOnly(),
 						objectField.getReadOnlyConditionExpression(),
 						objectField.isRequired(), objectField.isState(),
 						objectField.getObjectFieldSettings());
@@ -3109,6 +3121,7 @@ public class ObjectDefinitionLocalServiceImpl
 						objectField.getLabelMap(),
 						existingObjectField.isLocalized(),
 						existingObjectField.getName(),
+						objectField.getPriority(),
 						existingObjectField.getReadOnly(),
 						existingObjectField.getReadOnlyConditionExpression(),
 						existingObjectField.isRequired(),
@@ -3153,7 +3166,7 @@ public class ObjectDefinitionLocalServiceImpl
 				objectField.isIndexed(), objectField.isIndexedAsKeyword(),
 				objectField.getIndexedLanguageId(), objectField.getLabelMap(),
 				objectField.isLocalized(), objectField.getName(),
-				objectField.getReadOnly(),
+				objectField.getPriority(), objectField.getReadOnly(),
 				objectField.getReadOnlyConditionExpression(),
 				objectField.isRequired(), objectField.isState(),
 				objectField.isSystem(), objectField.getObjectFieldSettings());

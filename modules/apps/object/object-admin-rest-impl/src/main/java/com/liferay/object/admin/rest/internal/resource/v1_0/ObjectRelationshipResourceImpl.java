@@ -261,6 +261,11 @@ public class ObjectRelationshipResourceImpl
 				});
 		}
 
+		com.liferay.object.model.ObjectRelationship
+			serviceBuilderObjectRelationship =
+				_objectRelationshipService.getObjectRelationship(
+					objectRelationshipId);
+
 		return _toObjectRelationship(
 			_objectRelationshipService.updateObjectRelationship(
 				objectRelationship.getExternalReferenceCode(),
@@ -273,6 +278,7 @@ public class ObjectRelationshipResourceImpl
 				GetterUtil.getBoolean(objectRelationship.getEdge()),
 				LocalizedMapUtil.populateLocalizedMap(
 					objectRelationship.getLabel()),
+				serviceBuilderObjectRelationship.getPriority(),
 				ObjectFieldUtil.toObjectField(
 					LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()),
 					groupLocalService, _listTypeDefinitionLocalService,

@@ -8,6 +8,7 @@ package com.liferay.site.cms.site.initializer.internal.upgrade.v2_0_0;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.definition.util.ObjectDefinitionThreadLocal;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.petra.lang.SafeCloseable;
@@ -53,6 +54,15 @@ public class CMSBulkActionTaskTaskResultUpgradeProcess extends UpgradeProcess {
 				ObjectDefinitionThreadLocal.
 					setSkipBundleAllowedCheckWithSafeCloseable(true)) {
 
+			ObjectField objectField = _objectFieldLocalService.fetchObjectField(
+				objectDefinition.getObjectDefinitionId(), "taskResult");
+
+			int priority = 0;
+
+			if (objectField != null) {
+				priority = objectField.getPriority();
+			}
+
 			_objectFieldLocalService.addOrUpdateSystemObjectField(
 				"TASK_RESULT", objectDefinition.getUserId(), 0,
 				objectDefinition.getObjectDefinitionId(),
@@ -61,8 +71,9 @@ public class CMSBulkActionTaskTaskResultUpgradeProcess extends UpgradeProcess {
 				HashMapBuilder.put(
 					LocaleUtil.getSiteDefault(), "Task Result"
 				).build(),
-				false, "taskResult", ObjectFieldConstants.READ_ONLY_FALSE, null,
-				false, false, Collections.emptyList());
+				false, "taskResult", priority,
+				ObjectFieldConstants.READ_ONLY_FALSE, null, false, false,
+				Collections.emptyList());
 		}
 	}
 

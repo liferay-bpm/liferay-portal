@@ -132,7 +132,8 @@ public class DeleteStructureStrutsAction implements StrutsAction {
 				objectRelationship.getParameterObjectFieldId(),
 				objectRelationship.getDeletionType(),
 				objectRelationship.getDescriptionMap(), false,
-				objectRelationship.getLabelMap(), null);
+				objectRelationship.getLabelMap(),
+				objectRelationship.getPriority(), null);
 		}
 
 		objectDefinitionIds.add(objectDefinitionId);
