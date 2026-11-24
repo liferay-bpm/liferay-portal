@@ -349,7 +349,7 @@ public class ObjectRelationshipServiceHttp {
 				String deletionType,
 				java.util.Map<java.util.Locale, String> descriptionMap,
 				boolean edge, java.util.Map<java.util.Locale, String> labelMap,
-				com.liferay.object.model.ObjectField objectField)
+				int priority, com.liferay.object.model.ObjectField objectField)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -360,7 +360,7 @@ public class ObjectRelationshipServiceHttp {
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, externalReferenceCode, objectRelationshipId,
 				parameterObjectFieldId, deletionType, descriptionMap, edge,
-				labelMap, objectField);
+				labelMap, priority, objectField);
 
 			Object returnObj = null;
 
@@ -419,9 +419,9 @@ public class ObjectRelationshipServiceHttp {
 	private static final Class<?>[] _updateObjectRelationshipParameterTypes7 =
 		new Class[] {
 			String.class, long.class, long.class, String.class,
-			java.util.Map.class, boolean.class, java.util.Map.class,
+			java.util.Map.class, boolean.class, java.util.Map.class, int.class,
 			com.liferay.object.model.ObjectField.class
 		};
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1860049716
+// LIFERAY-SERVICE-BUILDER-HASH:-1381023293
