@@ -36,6 +36,7 @@ import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.field.util.ObjectFieldUtil;
+import com.liferay.object.internal.definition.util.ObjectDefinitionPriorityUtil;
 import com.liferay.object.internal.field.setting.contributor.DefaultObjectFieldSettingContributor;
 import com.liferay.object.internal.field.setting.contributor.FiltersObjectFieldSettingsContributor;
 import com.liferay.object.internal.field.setting.contributor.ObjectFieldSettingContributor;
@@ -1005,6 +1006,10 @@ public class ObjectFieldLocalServiceImpl
 		objectField.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
 		objectField.setLocalized(localized);
 		objectField.setName(name);
+		objectField.setPriority(
+			ObjectDefinitionPriorityUtil.getNextPriority(
+				objectDefinitionId, objectFieldPersistence,
+				_objectRelationshipPersistence));
 		objectField.setReadOnly(
 			_getReadOnly(
 				businessType, objectDefinition.isDefaultStorageType(), name,
