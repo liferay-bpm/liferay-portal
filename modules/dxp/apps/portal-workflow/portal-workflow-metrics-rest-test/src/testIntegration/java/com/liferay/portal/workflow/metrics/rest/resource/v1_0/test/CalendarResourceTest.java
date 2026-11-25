@@ -10,6 +10,7 @@ import com.liferay.headless.batch.engine.client.dto.v1_0.ExportTask;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ExportTaskResource;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.search.test.rule.SearchTestRule;
+import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
@@ -23,6 +24,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 import java.util.List;
 import java.util.Locale;
 
@@ -175,30 +177,27 @@ public class CalendarResourceTest extends BaseCalendarResourceTestCase {
 		throws Exception {
 
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
-				"com.liferay.batch.engine.internal." +
-					"BatchEngineExportTaskExecutorImpl",
-				LoggerTestUtil.ERROR)) {
+			"com.liferay.batch.engine.internal." +
+			"BatchEngineExportTaskExecutorImpl",
+			LoggerTestUtil.ERROR)) {
 
 			ExportTask exportTask = _userExportTaskResource.postExportTask(
 				"com.liferay.portal.workflow.metrics.rest.dto.v1_0.Calendar",
 				"JSON", null, null, null, null, null);
 
-			while (true) {
-				exportTask = _userExportTaskResource.getExportTask(
-					exportTask.getId());
-
-				ExportTask.ExecuteStatus executeStatus =
-					exportTask.getExecuteStatus();
-
-				if ((executeStatus == ExportTask.ExecuteStatus.COMPLETED) ||
-					(executeStatus == ExportTask.ExecuteStatus.FAILED)) {
+			IdempotentRetryAssert.retryAssert(
+				30, TimeUnit.SECONDS,
+				() -> {
+					ExportTask currentExportTask =
+						_userExportTaskResource.getExportTask(
+							exportTask.getId());
 
 					Assert.assertEquals(
-						ExportTask.ExecuteStatus.FAILED, executeStatus);
+						ExportTask.ExecuteStatus.FAILED,
+						currentExportTask.getExecuteStatus());
 
-					break;
-				}
-			}
+					return null;
+				});
 		}
 	}
 
