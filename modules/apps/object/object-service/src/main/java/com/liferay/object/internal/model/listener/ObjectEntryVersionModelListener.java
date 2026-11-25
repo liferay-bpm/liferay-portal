@@ -89,7 +89,11 @@ public class ObjectEntryVersionModelListener
 		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
 			objectEntryVersion.getObjectEntryId());
 
-		if ((objectEntry == null) || objectEntry.isApproved()) {
+		if (objectEntry == null) {
+			return;
+		}
+
+		if (objectEntry.isApproved()) {
 			_deleteLatestApprovedObjectEntry(
 				objectEntryVersion.getObjectEntryId());
 

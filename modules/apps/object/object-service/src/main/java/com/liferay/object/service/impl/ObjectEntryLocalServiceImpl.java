@@ -966,15 +966,24 @@ public class ObjectEntryLocalServiceImpl
 				objectDefinition.getExtensionDBTableName(),
 				objectDefinition.getPKObjectFieldDBColumnName(),
 				objectEntry.getObjectEntryId());
-		}
 
-		if (objectEntry.isHead()) {
-			for (ObjectEntry draftObjectEntry :
-					objectEntryPersistence.findByHOEI_T(
-						objectEntry.getObjectEntryId(),
-						ObjectEntryConstants.TYPE_DRAFT)) {
+			if (objectEntry.isHead()) {
+				for (ObjectEntry draftObjectEntry :
+						objectEntryPersistence.findByHOEI_T(
+							objectEntry.getObjectEntryId(),
+							ObjectEntryConstants.TYPE_DRAFT)) {
 
-				objectEntryLocalService.deleteObjectEntry(draftObjectEntry);
+					objectEntryLocalService.deleteObjectEntry(draftObjectEntry);
+				}
+
+				ObjectEntry latestApprovedObjectEntry =
+					objectEntryPersistence.fetchByHeadObjectEntryId(
+						objectEntry.getObjectEntryId());
+
+				if (latestApprovedObjectEntry != null) {
+					objectEntryLocalService.deleteObjectEntry(
+						latestApprovedObjectEntry);
+				}
 			}
 		}
 
