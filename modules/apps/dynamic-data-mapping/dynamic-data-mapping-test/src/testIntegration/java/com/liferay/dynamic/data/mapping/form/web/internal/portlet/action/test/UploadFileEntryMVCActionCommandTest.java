@@ -262,7 +262,7 @@ public class UploadFileEntryMVCActionCommandTest {
 		mockHttpServletRequest.addParameter(
 			"groupId", String.valueOf(_ddmFormInstance.getGroupId()));
 		mockHttpServletRequest.addParameter(
-			"oldFileEntryId", String.valueOf(_oldFileEntry.getFileEntryId()));
+			"oldFileEntryUuid", _oldFileEntry.getUuid());
 
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
