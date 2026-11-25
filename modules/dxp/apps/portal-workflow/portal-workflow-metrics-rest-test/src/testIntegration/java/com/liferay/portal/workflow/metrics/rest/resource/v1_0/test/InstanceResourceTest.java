@@ -75,7 +75,7 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 			testGroup.getCompanyId());
 		_user = UserTestUtil.addUser();
 
-		_userInstanceResource =
+		_instanceResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				InstanceResource.class, testCompany);
 	}
@@ -634,7 +634,7 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			403,
-			_userInstanceResource.deleteProcessInstanceHttpResponse(
+			_instanceResource.deleteProcessInstanceHttpResponse(
 				instance.getProcessId(), instance.getId()));
 
 		assertHttpResponseStatusCode(
@@ -648,7 +648,7 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			404,
-			_userInstanceResource.getProcessInstanceHttpResponse(
+			_instanceResource.getProcessInstanceHttpResponse(
 				instance.getProcessId(), instance.getId()));
 	}
 
@@ -704,7 +704,7 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			404,
-			_userInstanceResource.getProcessInstancesPageHttpResponse(
+			_instanceResource.getProcessInstancesPageHttpResponse(
 				_process.getId(), null, null, null, null, null, null, null,
 				Pagination.of(1, 10), null));
 	}
@@ -716,7 +716,7 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			403,
-			_userInstanceResource.patchProcessInstanceCompleteHttpResponse(
+			_instanceResource.patchProcessInstanceCompleteHttpResponse(
 				instance.getProcessId(), instance.getId(), instance));
 	}
 
@@ -725,7 +725,7 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			403,
-			_userInstanceResource.patchProcessInstanceHttpResponse(
+			_instanceResource.patchProcessInstanceHttpResponse(
 				instance.getProcessId(), instance.getId(), instance));
 	}
 
@@ -734,7 +734,7 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			403,
-			_userInstanceResource.postProcessInstanceHttpResponse(
+			_instanceResource.postProcessInstanceHttpResponse(
 				_process.getId(), instance));
 
 		assertHttpResponseStatusCode(
@@ -763,6 +763,7 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 	}
 
 	private Long _classPK;
+	private InstanceResource _instanceResource;
 	private final List<Instance> _instances = new ArrayList<>();
 	private Process _process;
 
@@ -773,8 +774,6 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 
 	@Inject
 	private UserGroupRoleLocalService _userGroupRoleLocalService;
-
-	private InstanceResource _userInstanceResource;
 
 	@Inject
 	private UserLocalService _userLocalService;

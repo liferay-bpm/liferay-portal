@@ -24,9 +24,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -63,10 +63,10 @@ public class CalendarResourceTest extends BaseCalendarResourceTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
-		_userCalendarResource =
+		_calendarResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				CalendarResource.class, testCompany);
-		_userExportTaskResource =
+		_exportTaskResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				ExportTaskResource.class, testCompany);
 	}
@@ -177,11 +177,11 @@ public class CalendarResourceTest extends BaseCalendarResourceTestCase {
 		throws Exception {
 
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
-			"com.liferay.batch.engine.internal." +
-			"BatchEngineExportTaskExecutorImpl",
-			LoggerTestUtil.ERROR)) {
+				"com.liferay.batch.engine.internal." +
+					"BatchEngineExportTaskExecutorImpl",
+				LoggerTestUtil.ERROR)) {
 
-			ExportTask exportTask = _userExportTaskResource.postExportTask(
+			ExportTask exportTask = _exportTaskResource.postExportTask(
 				"com.liferay.portal.workflow.metrics.rest.dto.v1_0.Calendar",
 				"JSON", null, null, null, null, null);
 
@@ -189,8 +189,7 @@ public class CalendarResourceTest extends BaseCalendarResourceTestCase {
 				30, TimeUnit.SECONDS,
 				() -> {
 					ExportTask currentExportTask =
-						_userExportTaskResource.getExportTask(
-							exportTask.getId());
+						_exportTaskResource.getExportTask(exportTask.getId());
 
 					Assert.assertEquals(
 						ExportTask.ExecuteStatus.FAILED,
@@ -203,15 +202,15 @@ public class CalendarResourceTest extends BaseCalendarResourceTestCase {
 
 	private void _testGetCalendarsPageWithoutPermission() throws Exception {
 		assertHttpResponseStatusCode(
-			404, _userCalendarResource.getCalendarsPageHttpResponse());
+			404, _calendarResource.getCalendarsPageHttpResponse());
 	}
 
 	private static BundleContext _bundleContext;
 
+	private CalendarResource _calendarResource;
+	private ExportTaskResource _exportTaskResource;
 	private ServiceRegistration<WorkflowMetricsSLACalendar>
 		_serviceRegistration;
-	private CalendarResource _userCalendarResource;
-	private ExportTaskResource _userExportTaskResource;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;

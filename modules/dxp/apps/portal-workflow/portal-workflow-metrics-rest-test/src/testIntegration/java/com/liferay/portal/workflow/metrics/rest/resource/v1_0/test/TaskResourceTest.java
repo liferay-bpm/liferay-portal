@@ -51,7 +51,7 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 		_instance = _workflowMetricsRESTTestHelper.addInstance(
 			testGroup.getCompanyId(), false, _process.getId());
 
-		_userTaskResource =
+		_taskResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				TaskResource.class, testCompany);
 	}
@@ -449,7 +449,7 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			403,
-			_userTaskResource.deleteProcessTaskHttpResponse(
+			_taskResource.deleteProcessTaskHttpResponse(
 				task.getProcessId(), task.getId()));
 
 		assertHttpResponseStatusCode(
@@ -463,15 +463,14 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			404,
-			_userTaskResource.getProcessTaskHttpResponse(
+			_taskResource.getProcessTaskHttpResponse(
 				task.getProcessId(), task.getId()));
 	}
 
 	private void _testGetProcessTasksPageWithoutPermission() throws Exception {
 		assertHttpResponseStatusCode(
 			404,
-			_userTaskResource.getProcessTasksPageHttpResponse(
-				_process.getId()));
+			_taskResource.getProcessTasksPageHttpResponse(_process.getId()));
 	}
 
 	private void _testPatchProcessTaskCompleteWithoutPermission()
@@ -481,7 +480,7 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			403,
-			_userTaskResource.patchProcessTaskCompleteHttpResponse(
+			_taskResource.patchProcessTaskCompleteHttpResponse(
 				task.getProcessId(), task.getId(), task));
 	}
 
@@ -490,7 +489,7 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			403,
-			_userTaskResource.patchProcessTaskHttpResponse(
+			_taskResource.patchProcessTaskHttpResponse(
 				task.getProcessId(), task.getId(), task));
 	}
 
@@ -499,8 +498,7 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			403,
-			_userTaskResource.postProcessTaskHttpResponse(
-				_process.getId(), task));
+			_taskResource.postProcessTaskHttpResponse(_process.getId(), task));
 
 		assertHttpResponseStatusCode(
 			404,
@@ -511,7 +509,7 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 	private void _testPostTasksPageWithoutPermission() throws Exception {
 		assertHttpResponseStatusCode(
 			403,
-			_userTaskResource.postTasksPageHttpResponse(
+			_taskResource.postTasksPageHttpResponse(
 				Pagination.of(1, 10),
 				new TaskBulkSelection() {
 					{
@@ -522,7 +520,7 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 	private Instance _instance;
 	private Process _process;
-	private TaskResource _userTaskResource;
+	private TaskResource _taskResource;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;

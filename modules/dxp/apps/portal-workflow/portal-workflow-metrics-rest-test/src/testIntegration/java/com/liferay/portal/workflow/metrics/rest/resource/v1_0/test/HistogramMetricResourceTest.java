@@ -61,7 +61,7 @@ public class HistogramMetricResourceTest
 
 		_process = processMetric.getProcess();
 
-		_userHistogramMetricResource =
+		_histogramMetricResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				HistogramMetricResource.class, testCompany);
 	}
@@ -224,7 +224,7 @@ public class HistogramMetricResourceTest
 
 		assertHttpResponseStatusCode(
 			404,
-			_userHistogramMetricResource.getProcessHistogramMetricHttpResponse(
+			_histogramMetricResource.getProcessHistogramMetricHttpResponse(
 				_process.getId(), null, null,
 				HistogramMetric.Unit.DAYS.getValue()));
 	}
@@ -344,9 +344,9 @@ public class HistogramMetricResourceTest
 		return Date.from(zonedDateTime.toInstant());
 	}
 
+	private HistogramMetricResource _histogramMetricResource;
 	private final List<Instance> _instances = new ArrayList<>();
 	private Process _process;
-	private HistogramMetricResource _userHistogramMetricResource;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;

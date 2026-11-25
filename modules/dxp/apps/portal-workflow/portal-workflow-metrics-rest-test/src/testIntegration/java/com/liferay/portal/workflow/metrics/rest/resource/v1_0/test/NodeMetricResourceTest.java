@@ -52,7 +52,7 @@ public class NodeMetricResourceTest extends BaseNodeMetricResourceTestCase {
 		_process = _workflowMetricsRESTTestHelper.addProcess(
 			testGroup.getCompanyId());
 
-		_userNodeMetricResource =
+		_nodeMetricResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				NodeMetricResource.class, testCompany);
 	}
@@ -598,13 +598,13 @@ public class NodeMetricResourceTest extends BaseNodeMetricResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			404,
-			_userNodeMetricResource.getProcessNodeMetricsPageHttpResponse(
+			_nodeMetricResource.getProcessNodeMetricsPageHttpResponse(
 				_process.getId(), null, null, null, null, null,
 				Pagination.of(1, 10), null));
 	}
 
+	private NodeMetricResource _nodeMetricResource;
 	private Process _process;
-	private NodeMetricResource _userNodeMetricResource;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;

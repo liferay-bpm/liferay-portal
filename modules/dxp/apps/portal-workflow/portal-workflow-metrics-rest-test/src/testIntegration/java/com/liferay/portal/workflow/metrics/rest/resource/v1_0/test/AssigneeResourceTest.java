@@ -50,7 +50,7 @@ public class AssigneeResourceTest extends BaseAssigneeResourceTestCase {
 		_instance = _workflowMetricsRESTTestHelper.addInstance(
 			testGroup.getCompanyId(), false, _process.getId());
 
-		_userAssigneeResource =
+		_assigneeResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				AssigneeResource.class, testCompany);
 	}
@@ -150,17 +150,17 @@ public class AssigneeResourceTest extends BaseAssigneeResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			403,
-			_userAssigneeResource.postProcessAssigneesPageHttpResponse(
+			_assigneeResource.postProcessAssigneesPageHttpResponse(
 				_process.getId(), new AssigneeBulkSelection()));
 	}
 
+	private AssigneeResource _assigneeResource;
 	private Instance _instance;
 
 	@Inject
 	private Portal _portal;
 
 	private Process _process;
-	private AssigneeResource _userAssigneeResource;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;

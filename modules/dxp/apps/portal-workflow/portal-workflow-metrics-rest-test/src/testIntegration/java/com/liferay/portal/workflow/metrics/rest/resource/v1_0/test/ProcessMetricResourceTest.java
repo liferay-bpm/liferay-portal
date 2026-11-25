@@ -71,7 +71,7 @@ public class ProcessMetricResourceTest
 	public void setUp() throws Exception {
 		super.setUp();
 
-		_userProcessMetricResource =
+		_processMetricResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				ProcessMetricResource.class, testCompany);
 	}
@@ -293,7 +293,7 @@ public class ProcessMetricResourceTest
 
 		assertHttpResponseStatusCode(
 			404,
-			_userProcessMetricResource.getProcessMetricHttpResponse(
+			_processMetricResource.getProcessMetricHttpResponse(
 				process.getId(), null, null, null));
 	}
 
@@ -302,7 +302,7 @@ public class ProcessMetricResourceTest
 
 		assertHttpResponseStatusCode(
 			404,
-			_userProcessMetricResource.getProcessMetricsPageHttpResponse(
+			_processMetricResource.getProcessMetricsPageHttpResponse(
 				null, Pagination.of(1, 10), null));
 	}
 
@@ -311,7 +311,7 @@ public class ProcessMetricResourceTest
 	@Inject
 	private static WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;
 
+	private ProcessMetricResource _processMetricResource;
 	private final List<Process> _processes = new ArrayList<>();
-	private ProcessMetricResource _userProcessMetricResource;
 
 }

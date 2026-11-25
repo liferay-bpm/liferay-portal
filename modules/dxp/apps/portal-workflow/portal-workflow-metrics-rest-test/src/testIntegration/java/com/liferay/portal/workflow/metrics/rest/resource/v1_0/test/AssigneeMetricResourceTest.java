@@ -63,7 +63,7 @@ public class AssigneeMetricResourceTest
 		_process = _workflowMetricsRESTTestHelper.addProcess(
 			testGroup.getCompanyId());
 
-		_userAssigneeMetricResource =
+		_assigneeMetricResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				AssigneeMetricResource.class, testCompany);
 	}
@@ -579,11 +579,12 @@ public class AssigneeMetricResourceTest
 
 		assertHttpResponseStatusCode(
 			403,
-			_userAssigneeMetricResource.
-				postProcessAssigneeMetricsPageHttpResponse(
-					_process.getId(), Pagination.of(1, 10), null,
-					new AssigneeMetricBulkSelection()));
+			_assigneeMetricResource.postProcessAssigneeMetricsPageHttpResponse(
+				_process.getId(), Pagination.of(1, 10), null,
+				new AssigneeMetricBulkSelection()));
 	}
+
+	private AssigneeMetricResource _assigneeMetricResource;
 
 	@Inject
 	private Portal _portal;
@@ -592,8 +593,6 @@ public class AssigneeMetricResourceTest
 
 	@Inject
 	private RoleLocalService _roleLocalService;
-
-	private AssigneeMetricResource _userAssigneeMetricResource;
 
 	@Inject
 	private UserGroupRoleLocalService _userGroupRoleLocalService;

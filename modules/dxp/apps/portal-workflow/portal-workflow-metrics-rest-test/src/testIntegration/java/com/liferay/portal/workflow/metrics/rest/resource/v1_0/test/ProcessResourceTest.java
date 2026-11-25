@@ -59,11 +59,11 @@ public class ProcessResourceTest extends BaseProcessResourceTestCase {
 				document.getLong("companyId"), document.getLong("processId"));
 		}
 
-		_userImportTaskResource =
+		_importTaskResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				ImportTaskResource.class, testCompany);
 
-		_userProcessResource =
+		_processResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				ProcessResource.class, testCompany);
 	}
@@ -217,7 +217,7 @@ public class ProcessResourceTest extends BaseProcessResourceTestCase {
 				LoggerTestUtil.ERROR)) {
 
 			HttpResponse httpResponse =
-				_userImportTaskResource.deleteImportTaskHttpResponse(
+				_importTaskResource.deleteImportTaskHttpResponse(
 					"com.liferay.portal.workflow.metrics.rest.dto.v1_0.Process",
 					null, null, "ON_ERROR_FAIL", null,
 					JSONUtil.putAll(JSONUtil.put("id", process.getId())));
@@ -237,8 +237,7 @@ public class ProcessResourceTest extends BaseProcessResourceTestCase {
 		Process process = testDeleteProcess_addProcess();
 
 		assertHttpResponseStatusCode(
-			403,
-			_userProcessResource.deleteProcessHttpResponse(process.getId()));
+			403, _processResource.deleteProcessHttpResponse(process.getId()));
 
 		assertHttpResponseStatusCode(
 			200, processResource.getProcessHttpResponse(process.getId()));
@@ -248,15 +247,14 @@ public class ProcessResourceTest extends BaseProcessResourceTestCase {
 		Process process = testGetProcess_addProcess();
 
 		assertHttpResponseStatusCode(
-			404,
-			_userProcessResource.getProcessTitleHttpResponse(process.getId()));
+			404, _processResource.getProcessTitleHttpResponse(process.getId()));
 	}
 
 	private void _testGetProcessWithoutPermission() throws Exception {
 		Process process = testGetProcess_addProcess();
 
 		assertHttpResponseStatusCode(
-			404, _userProcessResource.getProcessHttpResponse(process.getId()));
+			404, _processResource.getProcessHttpResponse(process.getId()));
 	}
 
 	private void _testGraphQLGetProcessWithoutPermission() throws Exception {
@@ -313,7 +311,7 @@ public class ProcessResourceTest extends BaseProcessResourceTestCase {
 		Process process = randomProcess();
 
 		assertHttpResponseStatusCode(
-			403, _userProcessResource.postProcessHttpResponse(process));
+			403, _processResource.postProcessHttpResponse(process));
 
 		assertHttpResponseStatusCode(
 			404, processResource.getProcessHttpResponse(process.getId()));
@@ -324,16 +322,16 @@ public class ProcessResourceTest extends BaseProcessResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			403,
-			_userProcessResource.putProcessHttpResponse(
+			_processResource.putProcessHttpResponse(
 				process.getId(), randomProcess()));
 
 		assertEquals(process, processResource.getProcess(process.getId()));
 	}
 
 	private Document[] _documents;
+	private ImportTaskResource _importTaskResource;
+	private ProcessResource _processResource;
 	private final List<Process> _processes = new ArrayList<>();
-	private ImportTaskResource _userImportTaskResource;
-	private ProcessResource _userProcessResource;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;

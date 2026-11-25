@@ -37,7 +37,7 @@ public class IndexResourceTest extends BaseIndexResourceTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
-		_userIndexResource =
+		_indexResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				IndexResource.class, testCompany);
 	}
@@ -169,13 +169,13 @@ public class IndexResourceTest extends BaseIndexResourceTestCase {
 
 	private void _testGetIndexesPageWithoutPermission() throws Exception {
 		assertHttpResponseStatusCode(
-			404, _userIndexResource.getIndexesPageHttpResponse());
+			404, _indexResource.getIndexesPageHttpResponse());
 	}
 
 	private void _testPatchIndexRefreshWithoutPermission() throws Exception {
 		assertHttpResponseStatusCode(
 			403,
-			_userIndexResource.patchIndexRefreshHttpResponse(
+			_indexResource.patchIndexRefreshHttpResponse(
 				new Index() {
 					{
 						key = Index.Group.ALL.getValue();
@@ -186,7 +186,7 @@ public class IndexResourceTest extends BaseIndexResourceTestCase {
 	private void _testPatchIndexReindexWithoutPermission() throws Exception {
 		assertHttpResponseStatusCode(
 			403,
-			_userIndexResource.patchIndexReindexHttpResponse(
+			_indexResource.patchIndexReindexHttpResponse(
 				new Index() {
 					{
 						key = Index.Group.ALL.getValue();
@@ -194,7 +194,7 @@ public class IndexResourceTest extends BaseIndexResourceTestCase {
 				}));
 	}
 
-	private IndexResource _userIndexResource;
+	private IndexResource _indexResource;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;

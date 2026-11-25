@@ -35,7 +35,7 @@ public class ReindexStatusResourceTest
 	public void setUp() throws Exception {
 		super.setUp();
 
-		_userReindexStatusResource =
+		_reindexStatusResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				ReindexStatusResource.class, testCompany);
 	}
@@ -62,11 +62,10 @@ public class ReindexStatusResourceTest
 		throws Exception {
 
 		assertHttpResponseStatusCode(
-			404,
-			_userReindexStatusResource.getReindexStatusesPageHttpResponse());
+			404, _reindexStatusResource.getReindexStatusesPageHttpResponse());
 	}
 
-	private ReindexStatusResource _userReindexStatusResource;
+	private ReindexStatusResource _reindexStatusResource;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;

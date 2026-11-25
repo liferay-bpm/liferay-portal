@@ -44,7 +44,7 @@ public class ProcessVersionResourceTest
 		_process = _workflowMetricsRESTTestHelper.addProcess(
 			testGroup.getCompanyId());
 
-		_userProcessVersionResource =
+		_processVersionResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				ProcessVersionResource.class, testCompany);
 	}
@@ -141,12 +141,12 @@ public class ProcessVersionResourceTest
 
 		assertHttpResponseStatusCode(
 			404,
-			_userProcessVersionResource.
-				getProcessProcessVersionsPageHttpResponse(_process.getId()));
+			_processVersionResource.getProcessProcessVersionsPageHttpResponse(
+				_process.getId()));
 	}
 
 	private Process _process;
-	private ProcessVersionResource _userProcessVersionResource;
+	private ProcessVersionResource _processVersionResource;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;

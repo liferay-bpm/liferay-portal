@@ -55,7 +55,7 @@ public class SLAResourceTest extends BaseSLAResourceTestCase {
 		_node = _workflowMetricsRESTTestHelper.addNode(
 			testGroup.getCompanyId(), _process.getId(), "1.0");
 
-		_userSLAResource =
+		_slaResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				SLAResource.class, testCompany);
 	}
@@ -259,7 +259,7 @@ public class SLAResourceTest extends BaseSLAResourceTestCase {
 		SLA sla = testGetSLA_addSLA();
 
 		assertHttpResponseStatusCode(
-			403, _userSLAResource.deleteSLAHttpResponse(sla.getId()));
+			403, _slaResource.deleteSLAHttpResponse(sla.getId()));
 
 		assertHttpResponseStatusCode(
 			200, slaResource.getSLAHttpResponse(sla.getId()));
@@ -289,7 +289,7 @@ public class SLAResourceTest extends BaseSLAResourceTestCase {
 	private void _testGetProcessSLAsPageWithoutPermission() throws Exception {
 		assertHttpResponseStatusCode(
 			404,
-			_userSLAResource.getProcessSLAsPageHttpResponse(
+			_slaResource.getProcessSLAsPageHttpResponse(
 				_process.getId(), null, Pagination.of(1, 10)));
 	}
 
@@ -297,7 +297,7 @@ public class SLAResourceTest extends BaseSLAResourceTestCase {
 		SLA sla = testGetSLA_addSLA();
 
 		assertHttpResponseStatusCode(
-			404, _userSLAResource.getSLAHttpResponse(sla.getId()));
+			404, _slaResource.getSLAHttpResponse(sla.getId()));
 	}
 
 	private void _testPostProcessSLAWithoutPermission() throws Exception {
@@ -308,7 +308,7 @@ public class SLAResourceTest extends BaseSLAResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			403,
-			_userSLAResource.postProcessSLAHttpResponse(
+			_slaResource.postProcessSLAHttpResponse(
 				_process.getId(), randomSLA()));
 
 		page = slaResource.getProcessSLAsPage(
@@ -321,15 +321,15 @@ public class SLAResourceTest extends BaseSLAResourceTestCase {
 		SLA sla = testPutSLA_addSLA();
 
 		assertHttpResponseStatusCode(
-			403, _userSLAResource.putSLAHttpResponse(sla.getId(), randomSLA()));
+			403, _slaResource.putSLAHttpResponse(sla.getId(), randomSLA()));
 
 		assertEquals(sla, slaResource.getSLA(sla.getId()));
 	}
 
 	private Node _node;
 	private Process _process;
+	private SLAResource _slaResource;
 	private final List<SLA> _slas = new ArrayList<>();
-	private SLAResource _userSLAResource;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;

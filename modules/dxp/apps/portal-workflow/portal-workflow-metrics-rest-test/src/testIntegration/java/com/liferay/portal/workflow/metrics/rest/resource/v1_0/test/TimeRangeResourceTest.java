@@ -35,7 +35,7 @@ public class TimeRangeResourceTest extends BaseTimeRangeResourceTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
-		_userTimeRangeResource =
+		_timeRangeResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				TimeRangeResource.class, testCompany);
 	}
@@ -120,10 +120,10 @@ public class TimeRangeResourceTest extends BaseTimeRangeResourceTestCase {
 
 	private void _testGetTimeRangesPageWithoutPermission() throws Exception {
 		assertHttpResponseStatusCode(
-			404, _userTimeRangeResource.getTimeRangesPageHttpResponse());
+			404, _timeRangeResource.getTimeRangesPageHttpResponse());
 	}
 
-	private TimeRangeResource _userTimeRangeResource;
+	private TimeRangeResource _timeRangeResource;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;

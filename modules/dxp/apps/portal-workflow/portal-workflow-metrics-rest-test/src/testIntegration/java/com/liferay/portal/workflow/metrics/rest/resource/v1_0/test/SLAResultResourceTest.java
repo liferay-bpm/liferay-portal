@@ -46,7 +46,7 @@ public class SLAResultResourceTest extends BaseSLAResultResourceTestCase {
 		_instance = _workflowMetricsRESTTestHelper.addInstance(
 			testGroup.getCompanyId(), _process.getId());
 
-		_userSLAResultResource =
+		_slaResultResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				SLAResultResource.class, testCompany);
 	}
@@ -178,13 +178,13 @@ public class SLAResultResourceTest extends BaseSLAResultResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			404,
-			_userSLAResultResource.getProcessLastSLAResultHttpResponse(
+			_slaResultResource.getProcessLastSLAResultHttpResponse(
 				_process.getId()));
 	}
 
 	private Instance _instance;
 	private Process _process;
-	private SLAResultResource _userSLAResultResource;
+	private SLAResultResource _slaResultResource;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;

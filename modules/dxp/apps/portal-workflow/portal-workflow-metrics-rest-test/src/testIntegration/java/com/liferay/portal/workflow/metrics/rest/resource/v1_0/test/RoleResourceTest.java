@@ -49,7 +49,7 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 		_process = _workflowMetricsRESTTestHelper.addProcess(
 			testGroup.getCompanyId());
 
-		_userRoleResource =
+		_roleResource =
 			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
 				RoleResource.class, testCompany);
 	}
@@ -151,7 +151,7 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 	private void _testGetProcessRolesPageWithoutPermission() throws Exception {
 		assertHttpResponseStatusCode(
 			404,
-			_userRoleResource.getProcessRolesPageHttpResponse(
+			_roleResource.getProcessRolesPageHttpResponse(
 				_process.getId(), null));
 	}
 
@@ -160,13 +160,12 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 	@Inject
 	private RoleLocalService _roleLocalService;
 
+	private RoleResource _roleResource;
 	private final List<com.liferay.portal.kernel.model.Role> _roles =
 		new ArrayList<>();
 
 	@Inject
 	private UserLocalService _userLocalService;
-
-	private RoleResource _userRoleResource;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;
