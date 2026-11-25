@@ -666,6 +666,53 @@ public class ObjectEntryServiceHttp {
 		}
 	}
 
+	public static java.util.List<com.liferay.object.model.ObjectEntry>
+			getObjectEntries(
+				HttpPrincipal httpPrincipal, Long[] groupIds, long companyId,
+				long userId, long objectDefinitionId,
+				com.liferay.petra.sql.dsl.expression.Predicate predicate,
+				boolean preferApproved, String search, int start, int end,
+				com.liferay.portal.kernel.search.Sort[] sorts)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				ObjectEntryServiceUtil.class, "getObjectEntries",
+				_getObjectEntriesParameterTypes15);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, groupIds, companyId, userId, objectDefinitionId,
+				predicate, preferApproved, search, start, end, sorts);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return (java.util.List<com.liferay.object.model.ObjectEntry>)
+				returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
 	public static int getObjectEntriesCount(
 		HttpPrincipal httpPrincipal, long groupId, long objectDefinitionId,
 		int status) {
@@ -673,7 +720,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "getObjectEntriesCount",
-				_getObjectEntriesCountParameterTypes15);
+				_getObjectEntriesCountParameterTypes16);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, objectDefinitionId, status);
@@ -706,7 +753,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "getObjectEntry",
-				_getObjectEntryParameterTypes16);
+				_getObjectEntryParameterTypes17);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectEntryId);
@@ -747,7 +794,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "getObjectEntry",
-				_getObjectEntryParameterTypes17);
+				_getObjectEntryParameterTypes18);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, externalReferenceCode, groupId, objectDefinitionId);
@@ -788,7 +835,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "getOrAddEmptyObjectEntry",
-				_getOrAddEmptyObjectEntryParameterTypes18);
+				_getOrAddEmptyObjectEntryParameterTypes19);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, externalReferenceCode, groupId, objectDefinitionId);
@@ -834,7 +881,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "getRelatedObjectEntries",
-				_getRelatedObjectEntriesParameterTypes19);
+				_getRelatedObjectEntriesParameterTypes20);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, objectRelationshipId, predicate,
@@ -879,7 +926,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "getRelatedObjectEntriesCount",
-				_getRelatedObjectEntriesCountParameterTypes20);
+				_getRelatedObjectEntriesCountParameterTypes21);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, objectRelationshipId, predicate, primaryKey,
@@ -921,7 +968,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "hasModelResourcePermission",
-				_hasModelResourcePermissionParameterTypes21);
+				_hasModelResourcePermissionParameterTypes22);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectDefinitionId, objectEntryId, actionId);
@@ -962,7 +1009,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "hasModelResourcePermission",
-				_hasModelResourcePermissionParameterTypes22);
+				_hasModelResourcePermissionParameterTypes23);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectEntry, actionId);
@@ -1004,7 +1051,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "hasModelResourcePermission",
-				_hasModelResourcePermissionParameterTypes23);
+				_hasModelResourcePermissionParameterTypes24);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, user, objectEntryId, actionId);
@@ -1045,7 +1092,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "hasPortletResourcePermission",
-				_hasPortletResourcePermissionParameterTypes24);
+				_hasPortletResourcePermissionParameterTypes25);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, objectDefinitionId, actionId);
@@ -1088,7 +1135,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "moveObjectEntry",
-				_moveObjectEntryParameterTypes25);
+				_moveObjectEntryParameterTypes26);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectEntryId, objectEntryFolderId, values,
@@ -1131,7 +1178,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "moveObjectEntryToTrash",
-				_moveObjectEntryToTrashParameterTypes26);
+				_moveObjectEntryToTrashParameterTypes27);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectEntry, serviceContext);
@@ -1174,7 +1221,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "partialUpdateObjectEntry",
-				_partialUpdateObjectEntryParameterTypes27);
+				_partialUpdateObjectEntryParameterTypes28);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectEntryId, objectEntryFolderId, values,
@@ -1218,7 +1265,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "restoreObjectEntryFromTrash",
-				_restoreObjectEntryFromTrashParameterTypes28);
+				_restoreObjectEntryFromTrashParameterTypes29);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectEntry, serviceContext);
@@ -1258,7 +1305,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "subscribeObjectEntry",
-				_subscribeObjectEntryParameterTypes29);
+				_subscribeObjectEntryParameterTypes30);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, objectEntryId);
@@ -1294,7 +1341,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "unsubscribeObjectEntry",
-				_unsubscribeObjectEntryParameterTypes30);
+				_unsubscribeObjectEntryParameterTypes31);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectEntryId);
@@ -1333,7 +1380,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "updateObjectEntry",
-				_updateObjectEntryParameterTypes31);
+				_updateObjectEntryParameterTypes32);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectEntryId, objectEntryFolderId, values,
@@ -1377,7 +1424,7 @@ public class ObjectEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectEntryServiceUtil.class, "validate",
-				_validateParameterTypes32);
+				_validateParameterTypes33);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, objectEntry,
@@ -1463,15 +1510,22 @@ public class ObjectEntryServiceHttp {
 		new Class[] {long.class, long.class, int.class, int.class, int.class};
 	private static final Class<?>[] _getObjectEntriesParameterTypes14 =
 		new Class[] {long[].class};
-	private static final Class<?>[] _getObjectEntriesCountParameterTypes15 =
+	private static final Class<?>[] _getObjectEntriesParameterTypes15 =
+		new Class[] {
+			Long[].class, long.class, long.class, long.class,
+			com.liferay.petra.sql.dsl.expression.Predicate.class, boolean.class,
+			String.class, int.class, int.class,
+			com.liferay.portal.kernel.search.Sort[].class
+		};
+	private static final Class<?>[] _getObjectEntriesCountParameterTypes16 =
 		new Class[] {long.class, long.class, int.class};
-	private static final Class<?>[] _getObjectEntryParameterTypes16 =
-		new Class[] {long.class};
 	private static final Class<?>[] _getObjectEntryParameterTypes17 =
+		new Class[] {long.class};
+	private static final Class<?>[] _getObjectEntryParameterTypes18 =
 		new Class[] {String.class, long.class, long.class};
-	private static final Class<?>[] _getOrAddEmptyObjectEntryParameterTypes18 =
+	private static final Class<?>[] _getOrAddEmptyObjectEntryParameterTypes19 =
 		new Class[] {String.class, long.class, long.class};
-	private static final Class<?>[] _getRelatedObjectEntriesParameterTypes19 =
+	private static final Class<?>[] _getRelatedObjectEntriesParameterTypes20 =
 		new Class[] {
 			long.class, long.class,
 			com.liferay.petra.sql.dsl.expression.Predicate.class, boolean.class,
@@ -1479,61 +1533,61 @@ public class ObjectEntryServiceHttp {
 			com.liferay.portal.kernel.search.Sort[].class
 		};
 	private static final Class<?>[]
-		_getRelatedObjectEntriesCountParameterTypes20 = new Class[] {
+		_getRelatedObjectEntriesCountParameterTypes21 = new Class[] {
 			long.class, long.class,
 			com.liferay.petra.sql.dsl.expression.Predicate.class, long.class,
 			boolean.class, String.class
 		};
 	private static final Class<?>[]
-		_hasModelResourcePermissionParameterTypes21 = new Class[] {
-			long.class, long.class, String.class
-		};
-	private static final Class<?>[]
 		_hasModelResourcePermissionParameterTypes22 = new Class[] {
-			com.liferay.object.model.ObjectEntry.class, String.class
+			long.class, long.class, String.class
 		};
 	private static final Class<?>[]
 		_hasModelResourcePermissionParameterTypes23 = new Class[] {
+			com.liferay.object.model.ObjectEntry.class, String.class
+		};
+	private static final Class<?>[]
+		_hasModelResourcePermissionParameterTypes24 = new Class[] {
 			com.liferay.portal.kernel.model.User.class, long.class, String.class
 		};
 	private static final Class<?>[]
-		_hasPortletResourcePermissionParameterTypes24 = new Class[] {
+		_hasPortletResourcePermissionParameterTypes25 = new Class[] {
 			long.class, long.class, String.class
 		};
-	private static final Class<?>[] _moveObjectEntryParameterTypes25 =
+	private static final Class<?>[] _moveObjectEntryParameterTypes26 =
 		new Class[] {
 			long.class, long.class, java.util.Map.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
-	private static final Class<?>[] _moveObjectEntryToTrashParameterTypes26 =
+	private static final Class<?>[] _moveObjectEntryToTrashParameterTypes27 =
 		new Class[] {
 			com.liferay.object.model.ObjectEntry.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
-	private static final Class<?>[] _partialUpdateObjectEntryParameterTypes27 =
+	private static final Class<?>[] _partialUpdateObjectEntryParameterTypes28 =
 		new Class[] {
 			long.class, long.class, java.util.Map.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 	private static final Class<?>[]
-		_restoreObjectEntryFromTrashParameterTypes28 = new Class[] {
+		_restoreObjectEntryFromTrashParameterTypes29 = new Class[] {
 			com.liferay.object.model.ObjectEntry.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
-	private static final Class<?>[] _subscribeObjectEntryParameterTypes29 =
+	private static final Class<?>[] _subscribeObjectEntryParameterTypes30 =
 		new Class[] {long.class, long.class};
-	private static final Class<?>[] _unsubscribeObjectEntryParameterTypes30 =
+	private static final Class<?>[] _unsubscribeObjectEntryParameterTypes31 =
 		new Class[] {long.class};
-	private static final Class<?>[] _updateObjectEntryParameterTypes31 =
+	private static final Class<?>[] _updateObjectEntryParameterTypes32 =
 		new Class[] {
 			long.class, long.class, java.util.Map.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
-	private static final Class<?>[] _validateParameterTypes32 = new Class[] {
+	private static final Class<?>[] _validateParameterTypes33 = new Class[] {
 		long.class, com.liferay.object.model.ObjectEntry.class,
 		java.util.List.class,
 		com.liferay.portal.kernel.service.ServiceContext.class
 	};
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:154547049
+// LIFERAY-SERVICE-BUILDER-HASH:-477442202
