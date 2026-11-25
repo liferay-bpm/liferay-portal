@@ -259,90 +259,9 @@ public class DataDefinitionResourceTest
 			richTextDataDefinitionField.getCustomProperties();
 
 		Assert.assertTrue(customProperties.containsKey("editorConfig"));
-	}
 
-	@Test
-	public void testGetSiteDataDefinitionByContentTypeContentTypePageWithViewPermission()
-		throws Exception {
-
-		dataDefinitionResource.postSiteDataDefinitionByContentType(
-			testGroup.getGroupId(), "journal", randomDataDefinition());
-
-		DataDefinition dataDefinition =
-			dataDefinitionResource.postSiteDataDefinitionByContentType(
-				testGroup.getGroupId(), "journal", randomDataDefinition());
-
-		DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
-			dataDefinition.getId());
-
-		Role role = _roleLocalService.getRole(
-			testCompany.getCompanyId(), RoleConstants.USER);
-
-		_resourcePermissionLocalService.setResourcePermissions(
-			testCompany.getCompanyId(),
-			ResourceActionsUtil.getCompositeModelName(
-				_portal.getClassName(ddmStructure.getClassNameId()),
-				DDMStructure.class.getName()),
-			ResourceConstants.SCOPE_INDIVIDUAL,
-			String.valueOf(dataDefinition.getId()), role.getRoleId(),
-			new String[] {ActionKeys.VIEW});
-
-		DataDefinitionResource userDataDefinitionResource =
-			_getUserDataDefinitionResource(
-				UserTestUtil.addUser(
-					testCompany, RandomTestUtil.randomString()));
-
-		Page<DataDefinition> page =
-			userDataDefinitionResource.
-				getSiteDataDefinitionByContentTypeContentTypePage(
-					testGroup.getGroupId(), "journal", null,
-					Pagination.of(1, 10), null);
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(dataDefinition),
-			(List<DataDefinition>)page.getItems());
-
-		page =
-			userDataDefinitionResource.
-				getSiteDataDefinitionByContentTypeContentTypePage(
-					testGroup.getGroupId(), "journal",
-					MapUtil.getString(dataDefinition.getName(), "en_US"),
-					Pagination.of(1, 10), null);
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(dataDefinition),
-			(List<DataDefinition>)page.getItems());
-	}
-
-	@Test
-	public void testGetSiteDataDefinitionByContentTypeContentTypePageWithoutViewPermission()
-		throws Exception {
-
-		DataDefinition dataDefinition =
-			dataDefinitionResource.postSiteDataDefinitionByContentType(
-				testGroup.getGroupId(), "journal", randomDataDefinition());
-
-		DataDefinitionResource userDataDefinitionResource =
-			_getUserDataDefinitionResource(
-				UserTestUtil.addUser(
-					testCompany, RandomTestUtil.randomString()));
-
-		Page<DataDefinition> page =
-			userDataDefinitionResource.
-				getSiteDataDefinitionByContentTypeContentTypePage(
-					testGroup.getGroupId(), "journal", null,
-					Pagination.of(1, 10), null);
-
-		Assert.assertEquals(0, page.getTotalCount());
-
-		page =
-			userDataDefinitionResource.
-				getSiteDataDefinitionByContentTypeContentTypePage(
-					testGroup.getGroupId(), "journal",
-					MapUtil.getString(dataDefinition.getName(), "en_US"),
-					Pagination.of(1, 10), null);
-
-		Assert.assertEquals(0, page.getTotalCount());
+		_testGetSiteDataDefinitionByContentTypeContentTypePageWithoutViewPermission();
+		_testGetSiteDataDefinitionByContentTypeContentTypePageWithViewPermission();
 	}
 
 	@Override
@@ -1116,20 +1035,6 @@ public class DataDefinitionResourceTest
 		throw new AssertionError("No data definition field named " + name);
 	}
 
-	private DataDefinitionResource _getUserDataDefinitionResource(User user)
-		throws Exception {
-
-		return DataDefinitionResource.builder(
-		).authentication(
-			user.getEmailAddress(), user.getPasswordUnencrypted()
-		).endpoint(
-			testCompany.getVirtualHostname(),
-			PortalUtil.getPortalServerPort(false), "http"
-		).locale(
-			LocaleUtil.getDefault()
-		).build();
-	}
-
 	private List<String> _getDataLayoutColumnFieldNames(DataLayout dataLayout) {
 		List<String> dataLayoutColumnFieldNames = new ArrayList<>();
 
@@ -1148,6 +1053,20 @@ public class DataDefinitionResourceTest
 		}
 
 		return dataLayoutColumnFieldNames;
+	}
+
+	private DataDefinitionResource _getUserDataDefinitionResource(User user)
+		throws Exception {
+
+		return DataDefinitionResource.builder(
+		).authentication(
+			user.getEmailAddress(), user.getPasswordUnencrypted()
+		).endpoint(
+			testCompany.getVirtualHostname(),
+			PortalUtil.getPortalServerPort(false), "http"
+		).locale(
+			LocaleUtil.getDefault()
+		).build();
 	}
 
 	private void _testCopiedDataDefinitionDataLayout(
@@ -1212,6 +1131,88 @@ public class DataDefinitionResourceTest
 				dataDefinitionFields1[i].getNestedDataDefinitionFields(),
 				dataDefinitionFields2[i].getNestedDataDefinitionFields());
 		}
+	}
+
+	private void _testGetSiteDataDefinitionByContentTypeContentTypePageWithoutViewPermission()
+		throws Exception {
+
+		DataDefinition dataDefinition =
+			dataDefinitionResource.postSiteDataDefinitionByContentType(
+				testGroup.getGroupId(), "journal", randomDataDefinition());
+
+		DataDefinitionResource userDataDefinitionResource =
+			_getUserDataDefinitionResource(
+				UserTestUtil.addUser(
+					testCompany, RandomTestUtil.randomString()));
+
+		Page<DataDefinition> page =
+			userDataDefinitionResource.
+				getSiteDataDefinitionByContentTypeContentTypePage(
+					testGroup.getGroupId(), "journal", null,
+					Pagination.of(1, 10), null);
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		page =
+			userDataDefinitionResource.
+				getSiteDataDefinitionByContentTypeContentTypePage(
+					testGroup.getGroupId(), "journal",
+					MapUtil.getString(dataDefinition.getName(), "en_US"),
+					Pagination.of(1, 10), null);
+
+		Assert.assertEquals(0, page.getTotalCount());
+	}
+
+	private void _testGetSiteDataDefinitionByContentTypeContentTypePageWithViewPermission()
+		throws Exception {
+
+		dataDefinitionResource.postSiteDataDefinitionByContentType(
+			testGroup.getGroupId(), "journal", randomDataDefinition());
+
+		DataDefinition dataDefinition =
+			dataDefinitionResource.postSiteDataDefinitionByContentType(
+				testGroup.getGroupId(), "journal", randomDataDefinition());
+
+		DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
+			dataDefinition.getId());
+
+		Role role = _roleLocalService.getRole(
+			testCompany.getCompanyId(), RoleConstants.USER);
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			testCompany.getCompanyId(),
+			ResourceActionsUtil.getCompositeModelName(
+				_portal.getClassName(ddmStructure.getClassNameId()),
+				DDMStructure.class.getName()),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(dataDefinition.getId()), role.getRoleId(),
+			new String[] {ActionKeys.VIEW});
+
+		DataDefinitionResource userDataDefinitionResource =
+			_getUserDataDefinitionResource(
+				UserTestUtil.addUser(
+					testCompany, RandomTestUtil.randomString()));
+
+		Page<DataDefinition> page =
+			userDataDefinitionResource.
+				getSiteDataDefinitionByContentTypeContentTypePage(
+					testGroup.getGroupId(), "journal", null,
+					Pagination.of(1, 10), null);
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(dataDefinition),
+			(List<DataDefinition>)page.getItems());
+
+		page =
+			userDataDefinitionResource.
+				getSiteDataDefinitionByContentTypeContentTypePage(
+					testGroup.getGroupId(), "journal",
+					MapUtil.getString(dataDefinition.getName(), "en_US"),
+					Pagination.of(1, 10), null);
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(dataDefinition),
+			(List<DataDefinition>)page.getItems());
 	}
 
 	private void _testGetSiteDataDefinitionsPage(
