@@ -20,6 +20,8 @@ import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.template.TemplateConstants;
+import com.liferay.portal.kernel.template.TemplateException;
+import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -71,8 +73,8 @@ public class DDMTemplateLocalServiceTest extends BaseDDMServiceTestCase {
 				LocaleUtil.getSiteDefault(), RandomTestUtil.randomString()),
 			null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
 			DDMTemplateConstants.TEMPLATE_MODE_CREATE,
-			TemplateConstants.LANG_TYPE_VM,
-			getTestTemplateScript(TemplateConstants.LANG_TYPE_VM),
+			TemplateConstants.LANG_TYPE_FTL,
+			getTestTemplateScript(TemplateConstants.LANG_TYPE_FTL),
 			ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertTrue(
@@ -82,7 +84,7 @@ public class DDMTemplateLocalServiceTest extends BaseDDMServiceTestCase {
 	@Test(expected = TemplateDuplicateTemplateKeyException.class)
 	public void testAddTemplateWithDuplicateKey() throws Exception {
 		String templateKey = RandomTestUtil.randomString();
-		String language = TemplateConstants.LANG_TYPE_VM;
+		String language = TemplateConstants.LANG_TYPE_FTL;
 
 		addTemplate(
 			_classNameId, 0, templateKey, "Test Template 1",
@@ -109,8 +111,8 @@ public class DDMTemplateLocalServiceTest extends BaseDDMServiceTestCase {
 				LocaleUtil.getSiteDefault(), RandomTestUtil.randomString()),
 			null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
 			DDMTemplateConstants.TEMPLATE_MODE_CREATE,
-			TemplateConstants.LANG_TYPE_VM,
-			getTestTemplateScript(TemplateConstants.LANG_TYPE_VM),
+			TemplateConstants.LANG_TYPE_FTL,
+			getTestTemplateScript(TemplateConstants.LANG_TYPE_FTL),
 			ServiceContextTestUtil.getServiceContext());
 		_ddmTemplateLocalService.addTemplate(
 			externalReferenceCode, TestPropsValues.getUserId(),
@@ -119,8 +121,8 @@ public class DDMTemplateLocalServiceTest extends BaseDDMServiceTestCase {
 				LocaleUtil.getSiteDefault(), RandomTestUtil.randomString()),
 			null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
 			DDMTemplateConstants.TEMPLATE_MODE_CREATE,
-			TemplateConstants.LANG_TYPE_VM,
-			getTestTemplateScript(TemplateConstants.LANG_TYPE_VM),
+			TemplateConstants.LANG_TYPE_FTL,
+			getTestTemplateScript(TemplateConstants.LANG_TYPE_FTL),
 			ServiceContextTestUtil.getServiceContext());
 	}
 
@@ -138,10 +140,24 @@ public class DDMTemplateLocalServiceTest extends BaseDDMServiceTestCase {
 				_classNameId, 0, null, "Test Template",
 				DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
 				DDMTemplateConstants.TEMPLATE_MODE_CREATE,
-				TemplateConstants.LANG_TYPE_VM,
-				getTestTemplateScript(TemplateConstants.LANG_TYPE_VM),
+				TemplateConstants.LANG_TYPE_FTL,
+				getTestTemplateScript(TemplateConstants.LANG_TYPE_FTL),
 				WorkflowConstants.STATUS_APPROVED);
 		}
+	}
+
+	@Test
+	public void testAddTemplateWithVelocityLanguage() throws Exception {
+		AssertUtils.assertFailure(
+			TemplateException.class,
+			"Velocity templates are no longer supported",
+			() -> addTemplate(
+				_classNameId, 0, null, RandomTestUtil.randomString(),
+				DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
+				DDMTemplateConstants.TEMPLATE_MODE_CREATE,
+				TemplateConstants.LANG_TYPE_VM,
+				getTestTemplateScript(TemplateConstants.LANG_TYPE_VM),
+				WorkflowConstants.STATUS_APPROVED));
 	}
 
 	@Test(expected = TemplateNameException.class)
@@ -150,8 +166,8 @@ public class DDMTemplateLocalServiceTest extends BaseDDMServiceTestCase {
 			_classNameId, 0, null, StringPool.BLANK,
 			DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
 			DDMTemplateConstants.TEMPLATE_MODE_CREATE,
-			TemplateConstants.LANG_TYPE_VM,
-			getTestTemplateScript(TemplateConstants.LANG_TYPE_VM),
+			TemplateConstants.LANG_TYPE_FTL,
+			getTestTemplateScript(TemplateConstants.LANG_TYPE_FTL),
 			WorkflowConstants.STATUS_APPROVED);
 	}
 
@@ -161,7 +177,7 @@ public class DDMTemplateLocalServiceTest extends BaseDDMServiceTestCase {
 			_classNameId, 0, null, "Test Template",
 			DDMTemplateConstants.TEMPLATE_TYPE_FORM,
 			DDMTemplateConstants.TEMPLATE_MODE_CREATE,
-			TemplateConstants.LANG_TYPE_VM, StringPool.BLANK,
+			TemplateConstants.LANG_TYPE_FTL, StringPool.BLANK,
 			WorkflowConstants.STATUS_APPROVED);
 	}
 
@@ -206,8 +222,8 @@ public class DDMTemplateLocalServiceTest extends BaseDDMServiceTestCase {
 				LocaleUtil.getSiteDefault(), RandomTestUtil.randomString()),
 			null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY,
 			DDMTemplateConstants.TEMPLATE_MODE_CREATE,
-			TemplateConstants.LANG_TYPE_VM,
-			getTestTemplateScript(TemplateConstants.LANG_TYPE_VM),
+			TemplateConstants.LANG_TYPE_FTL,
+			getTestTemplateScript(TemplateConstants.LANG_TYPE_FTL),
 			ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertNull(
@@ -254,8 +270,8 @@ public class DDMTemplateLocalServiceTest extends BaseDDMServiceTestCase {
 			StringUtil.randomString(), StringUtil.randomString(),
 			DDMTemplateConstants.TEMPLATE_TYPE_FORM,
 			DDMTemplateConstants.TEMPLATE_MODE_CREATE,
-			TemplateConstants.LANG_TYPE_VM,
-			getTestTemplateScript(TemplateConstants.LANG_TYPE_VM),
+			TemplateConstants.LANG_TYPE_FTL,
+			getTestTemplateScript(TemplateConstants.LANG_TYPE_FTL),
 			WorkflowConstants.STATUS_APPROVED, true, "foo");
 
 		Assert.assertFalse(template.isSmallImage());
@@ -268,8 +284,8 @@ public class DDMTemplateLocalServiceTest extends BaseDDMServiceTestCase {
 			StringUtil.randomString(), StringUtil.randomString(),
 			DDMTemplateConstants.TEMPLATE_TYPE_FORM,
 			DDMTemplateConstants.TEMPLATE_MODE_CREATE,
-			TemplateConstants.LANG_TYPE_VM,
-			getTestTemplateScript(TemplateConstants.LANG_TYPE_VM),
+			TemplateConstants.LANG_TYPE_FTL,
+			getTestTemplateScript(TemplateConstants.LANG_TYPE_FTL),
 			WorkflowConstants.STATUS_APPROVED, true,
 			"http://foo.com/example.png");
 

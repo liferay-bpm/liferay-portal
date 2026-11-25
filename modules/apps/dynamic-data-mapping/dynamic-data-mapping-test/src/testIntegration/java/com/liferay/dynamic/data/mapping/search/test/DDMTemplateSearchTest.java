@@ -163,7 +163,7 @@ public class DDMTemplateSearchTest {
 			_ddmStructure.getStructureId(),
 			PortalUtil.getClassNameId(JournalArticle.class), null, nameMap,
 			null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY, null,
-			TemplateConstants.LANG_TYPE_VM,
+			TemplateConstants.LANG_TYPE_FTL,
 			DDMTemplateTestUtil.getSampleTemplateVM(), false, false, null, null,
 			serviceContext);
 	}

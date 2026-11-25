@@ -103,7 +103,7 @@ public class AddTemplateMVCActionCommand extends BaseDDMMVCActionCommand {
 		String type = ParamUtil.getString(uploadPortletRequest, "type");
 		String mode = ParamUtil.getString(uploadPortletRequest, "mode");
 		String language = ParamUtil.getString(
-			uploadPortletRequest, "language", TemplateConstants.LANG_TYPE_VM);
+			uploadPortletRequest, "language", TemplateConstants.LANG_TYPE_FTL);
 
 		String script = getScript(uploadPortletRequest);
 
