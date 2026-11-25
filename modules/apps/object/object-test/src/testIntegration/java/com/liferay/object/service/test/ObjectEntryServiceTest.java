@@ -925,6 +925,15 @@ public class ObjectEntryServiceTest {
 				" permission for ", _objectDefinition.getClassName(),
 				StringPool.SPACE, objectEntry3.getObjectEntryId()),
 			() -> _getObjectEntries(_user, objectEntry1, objectEntry3));
+
+		// Can get a page with only the viewable object entries
+
+		Assert.assertEquals(
+			SetUtil.fromArray(objectEntry1, objectEntry2),
+			_getViewableObjectEntries(_user));
+		Assert.assertEquals(
+			SetUtil.fromArray(objectEntry1, objectEntry2, objectEntry3),
+			_getViewableObjectEntries(_adminUser));
 	}
 
 	@Test
@@ -2063,6 +2072,21 @@ public class ObjectEntryServiceTest {
 			TestPropsValues.getCompanyId(), roleName);
 
 		return role.getRoleId();
+	}
+
+	private Set<ObjectEntry> _getViewableObjectEntries(User user)
+		throws Exception {
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				user)) {
+
+			return SetUtil.fromList(
+				_objectEntryService.getObjectEntries(
+					new Long[] {_group.getGroupId()}, user.getCompanyId(),
+					user.getUserId(), _objectDefinition.getObjectDefinitionId(),
+					null, false, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null));
+		}
 	}
 
 	private void _removeResourcePermission(
