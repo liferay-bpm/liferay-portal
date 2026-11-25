@@ -7164,10 +7164,9 @@ public class ObjectEntryLocalServiceImpl
 					objectField.getRelationshipType(),
 					ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
 
-				_validateOneToOneInsert(
-					objectField.getDBColumnName(),
-					GetterUtil.getLong(values.get(objectField.getName())),
-					dynamicObjectDefinitionTable);
+				_validateOneToOne(
+					dynamicObjectDefinitionTable, objectField, objectEntryId,
+					GetterUtil.getLong(values.get(objectField.getName())));
 			}
 
 			for (String dbColumnName : objectField.getDBColumnNames()) {
@@ -8998,10 +8997,9 @@ public class ObjectEntryLocalServiceImpl
 					objectField.getRelationshipType(),
 					ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
 
-				_validateOneToOneUpdate(
-					objectField.getDBColumnName(),
-					GetterUtil.getLong(values.get(objectField.getName())),
-					dynamicObjectDefinitionTable, objectEntryId);
+				_validateOneToOne(
+					dynamicObjectDefinitionTable, objectField, objectEntryId,
+					GetterUtil.getLong(values.get(objectField.getName())));
 			}
 
 			for (String dbColumnName : objectField.getDBColumnNames()) {
@@ -9395,83 +9393,90 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
-	private void _validateOneToOneInsert(
-			String dbColumnName, long dbColumnValue,
-			DynamicObjectDefinitionTable dynamicObjectDefinitionTable)
-		throws PortalException {
-
-		if (dbColumnValue == 0) {
-			return;
-		}
-
-		long count = 0;
-
-		Connection connection = _currentConnection.getConnection(
-			objectEntryPersistence.getDataSource());
-
-		try (PreparedStatement preparedStatement = connection.prepareStatement(
-				StringBundler.concat(
-					"select count(*) as count from ",
-					dynamicObjectDefinitionTable.getTableName(), " where ",
-					dbColumnName, " = ?"))) {
-
-			preparedStatement.setLong(1, dbColumnValue);
-
-			try (ResultSet resultSet = preparedStatement.executeQuery()) {
-				resultSet.next();
-
-				count = resultSet.getLong("count");
-			}
-		}
-		catch (SQLException sqlException) {
-			throw new SystemException(sqlException);
-		}
-
-		if (count > 0) {
-			throw new ObjectEntryValuesException.OneToOneConstraintViolation(
-				dbColumnName, dbColumnValue,
-				dynamicObjectDefinitionTable.getTableName());
-		}
-	}
-
-	private void _validateOneToOneUpdate(
-			String dbColumnName, long dbColumnValue,
+	private void _validateOneToOne(
 			DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
-			long objectEntryId)
+			ObjectField objectField, long primaryKey, long relatedPrimaryKey)
 		throws PortalException {
 
-		if (dbColumnValue == 0) {
+		if (relatedPrimaryKey == 0) {
 			return;
 		}
 
-		long count = 0;
+		ObjectRelationship objectRelationship =
+			_objectRelationshipPersistence.findByObjectFieldId2(
+				objectField.getObjectFieldId());
 
-		Connection connection = _currentConnection.getConnection(
-			objectEntryPersistence.getDataSource());
+		if (objectRelationship.isSelf() && (primaryKey == relatedPrimaryKey)) {
+			throw new ObjectEntryValuesException.InvalidValue(
+				objectField.getName());
+		}
 
-		try (PreparedStatement preparedStatement = connection.prepareStatement(
-				StringBundler.concat(
-					"select count(*) as count from ",
-					dynamicObjectDefinitionTable.getTableName(), " where ",
-					dynamicObjectDefinitionTable.getPrimaryKeyColumnName(),
-					" != ? and ", dbColumnName, " = ?"))) {
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.findByPrimaryKey(
+				objectRelationship.getObjectDefinitionId2());
+		ObjectEntry objectEntry = null;
 
-			preparedStatement.setLong(1, objectEntryId);
-			preparedStatement.setLong(2, dbColumnValue);
+		if (!objectDefinition.isUnmodifiableSystemObject()) {
+			objectEntry = objectEntryPersistence.fetchByPrimaryKey(primaryKey);
 
-			try (ResultSet resultSet = preparedStatement.executeQuery()) {
-				resultSet.next();
+			if ((objectEntry != null) && objectRelationship.isSelf()) {
+				ObjectEntry relatedObjectEntry =
+					objectEntryPersistence.fetchByPrimaryKey(relatedPrimaryKey);
 
-				count = resultSet.getLong("count");
+				if ((relatedObjectEntry != null) &&
+					(objectEntry.getHeadObjectEntryId() ==
+						relatedObjectEntry.getHeadObjectEntryId())) {
+
+					throw new ObjectEntryValuesException.InvalidValue(
+						objectField.getName());
+				}
 			}
 		}
-		catch (SQLException sqlException) {
-			throw new SystemException(sqlException);
+
+		DSLQuery dslQuery = null;
+
+		Column<DynamicObjectDefinitionTable, Long>
+			relationshipObjectFieldColumn =
+				(Column<DynamicObjectDefinitionTable, Long>)
+					dynamicObjectDefinitionTable.getColumn(
+						objectField.getDBColumnName());
+
+		if (objectEntry == null) {
+			dslQuery = DSLQueryFactoryUtil.count(
+			).from(
+				dynamicObjectDefinitionTable
+			).where(
+				relationshipObjectFieldColumn.eq(
+					relatedPrimaryKey
+				).and(
+					dynamicObjectDefinitionTable.getPrimaryKeyColumn(
+					).neq(
+						primaryKey
+					)
+				)
+			);
+		}
+		else {
+			dslQuery = DSLQueryFactoryUtil.count(
+			).from(
+				dynamicObjectDefinitionTable
+			).innerJoinON(
+				ObjectEntryTable.INSTANCE,
+				ObjectEntryTable.INSTANCE.objectEntryId.eq(
+					dynamicObjectDefinitionTable.getPrimaryKeyColumn())
+			).where(
+				relationshipObjectFieldColumn.eq(
+					relatedPrimaryKey
+				).and(
+					ObjectEntryTable.INSTANCE.headObjectEntryId.neq(
+						objectEntry.getHeadObjectEntryId())
+				)
+			);
 		}
 
-		if (count > 0) {
+		if (objectEntryPersistence.dslQueryCount(dslQuery, false) > 0) {
 			throw new ObjectEntryValuesException.OneToOneConstraintViolation(
-				dbColumnName, dbColumnValue,
+				objectField.getDBColumnName(), relatedPrimaryKey,
 				dynamicObjectDefinitionTable.getTableName());
 		}
 	}
