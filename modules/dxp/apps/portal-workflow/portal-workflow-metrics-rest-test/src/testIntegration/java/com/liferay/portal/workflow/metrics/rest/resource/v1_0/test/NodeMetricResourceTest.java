@@ -595,7 +595,7 @@ public class NodeMetricResourceTest extends BaseNodeMetricResourceTestCase {
 					id = adminUser.getUserId();
 				}
 			},
-			null, testGroup.getCompanyId(), 0L, instance, node.getName(),
+			null, testGroup.getCompanyId(), 0, instance, node.getName(),
 			node.getId(), _process.getId(), version,
 			RandomTestUtil.randomLong());
 	}
@@ -613,15 +613,15 @@ public class NodeMetricResourceTest extends BaseNodeMetricResourceTestCase {
 		_workflowMetricsRESTTestHelper.updateProcess(
 			testGroup.getCompanyId(), _process.getId(), "5.0");
 
+		Instance instance = _workflowMetricsRESTTestHelper.addInstance(
+			testGroup.getCompanyId(), false, _process.getId());
+
 		Node node1 = _workflowMetricsRESTTestHelper.addNode(
 			testGroup.getCompanyId(), _process.getId(), "5.0");
 		Node node2 = _workflowMetricsRESTTestHelper.addNode(
 			testGroup.getCompanyId(), _process.getId(), "5.0");
 		Node node3 = _workflowMetricsRESTTestHelper.addNode(
 			testGroup.getCompanyId(), _process.getId(), "5.0");
-
-		Instance instance = _workflowMetricsRESTTestHelper.addInstance(
-			testGroup.getCompanyId(), false, _process.getId());
 
 		_addTask(instance, node1, "5.0");
 		_addTask(instance, node2, "5.0");
@@ -633,13 +633,13 @@ public class NodeMetricResourceTest extends BaseNodeMetricResourceTestCase {
 
 		Assert.assertEquals(3, page.getTotalCount());
 
-		long instanceCount = 0;
+		long instancesCount = 0;
 
 		for (NodeMetric nodeMetric : page.getItems()) {
-			instanceCount += nodeMetric.getInstanceCount();
+			instancesCount += nodeMetric.getInstanceCount();
 		}
 
-		Assert.assertEquals(3, instanceCount);
+		Assert.assertEquals(3, instancesCount);
 	}
 
 	private Process _process;
