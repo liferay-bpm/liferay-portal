@@ -5915,6 +5915,9 @@ public class ObjectEntryLocalServiceImpl
 			).and(
 				() -> {
 					if (!objectDefinition.isEnableObjectEntryVersioning() &&
+						(!FeatureFlagManagerUtil.isEnabled(
+							objectDefinition.getCompanyId(), "LPD-116183") ||
+						 !objectDefinition.isRootDescendantNode()) &&
 						!preferApproved) {
 
 						return null;
@@ -6523,6 +6526,24 @@ public class ObjectEntryLocalServiceImpl
 
 		return DynamicObjectDefinitionTableUtil.getDynamicObjectDefinitionTable(
 			true, rootObjectDefinition, _objectFieldLocalService);
+	}
+
+	private ObjectDefinition _getRootObjectDefinition(
+			ObjectDefinition objectDefinition, ObjectEntry objectEntry)
+		throws PortalException {
+
+		if (!FeatureFlagManagerUtil.isEnabled(
+				objectEntry.getCompanyId(), "LPD-116183") ||
+			!objectEntry.isRootDescendantNode()) {
+
+			return objectDefinition;
+		}
+
+		ObjectEntry rootObjectEntry = objectEntryPersistence.findByPrimaryKey(
+			objectEntry.getRootObjectEntryId());
+
+		return _objectDefinitionPersistence.findByPrimaryKey(
+			rootObjectEntry.getObjectDefinitionId());
 	}
 
 	private Expression<?>[] _getSelectExpressions(
@@ -8727,12 +8748,14 @@ public class ObjectEntryLocalServiceImpl
 			dlFileEntriesMap, objectEntry.getGroupId(), objectDefinition,
 			objectEntryId, serviceContext, userId, values);
 
+		ObjectDefinition rootObjectDefinition = _getRootObjectDefinition(
+			objectDefinition, objectEntry);
 		int workflowAction = serviceContext.getWorkflowAction();
 
 		if (!move) {
 			_validateWorkflowAction(
-				objectDefinition.isEnableObjectEntryDraft(), objectDefinition,
-				objectEntry.getStatus(), workflowAction);
+				rootObjectDefinition.isEnableObjectEntryDraft(),
+				rootObjectDefinition, objectEntry.getStatus(), workflowAction);
 		}
 
 		Map<String, Serializable> transientValues = objectEntry.getValues();
@@ -8882,7 +8905,7 @@ public class ObjectEntryLocalServiceImpl
 			objectDefinition.getClassName(), objectEntry.getObjectEntryId(),
 			serviceContext);
 
-		if (!objectDefinition.isEnableObjectEntryVersioning() &&
+		if (!rootObjectDefinition.isEnableObjectEntryVersioning() &&
 			!objectEntry.isTypeDraft()) {
 
 			_deleteFileEntries(
