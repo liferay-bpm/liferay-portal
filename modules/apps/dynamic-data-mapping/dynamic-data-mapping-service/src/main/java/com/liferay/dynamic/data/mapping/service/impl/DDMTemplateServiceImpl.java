@@ -174,6 +174,9 @@ public class DDMTemplateServiceImpl extends DDMTemplateServiceBaseImpl {
 		DDMTemplate sourceTemplate = ddmTemplatePersistence.findByPrimaryKey(
 			sourceTemplateId);
 
+		_ddmTemplateModelResourcePermission.check(
+			getPermissionChecker(), sourceTemplate, ActionKeys.VIEW);
+
 		_ddmPermissionSupport.checkAddTemplatePermission(
 			getPermissionChecker(), serviceContext.getScopeGroupId(),
 			sourceTemplate.getClassNameId(),
@@ -191,6 +194,9 @@ public class DDMTemplateServiceImpl extends DDMTemplateServiceBaseImpl {
 
 		DDMTemplate sourceTemplate = ddmTemplatePersistence.findByPrimaryKey(
 			sourceTemplateId);
+
+		_ddmTemplateModelResourcePermission.check(
+			getPermissionChecker(), sourceTemplate, ActionKeys.VIEW);
 
 		_ddmPermissionSupport.checkAddTemplatePermission(
 			getPermissionChecker(), serviceContext.getScopeGroupId(),
@@ -225,6 +231,14 @@ public class DDMTemplateServiceImpl extends DDMTemplateServiceBaseImpl {
 			long classNameId, long sourceClassPK, long resourceClassNameId,
 			long targetClassPK, String type, ServiceContext serviceContext)
 		throws PortalException {
+
+		for (DDMTemplate sourceTemplate :
+				ddmTemplatePersistence.findByC_C_T(
+					classNameId, sourceClassPK, type)) {
+
+			_ddmTemplateModelResourcePermission.check(
+				getPermissionChecker(), sourceTemplate, ActionKeys.VIEW);
+		}
 
 		_ddmPermissionSupport.checkAddTemplatePermission(
 			getPermissionChecker(), serviceContext.getScopeGroupId(),
