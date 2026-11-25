@@ -3111,11 +3111,9 @@ public class DefaultObjectEntryManagerImpl
 				sorts)) {
 
 			serviceBuilderObjectEntries = _objectEntryService.getObjectEntries(
-				ArrayUtil.toLongArray(
-					objectEntryLocalService.getPrimaryKeys(
-						groupIds, companyId, dtoConverterContext.getUserId(),
-						objectDefinition.getObjectDefinitionId(), predicate,
-						preferApproved, search, start, end, sorts)));
+				groupIds, companyId, dtoConverterContext.getUserId(),
+				objectDefinition.getObjectDefinitionId(), predicate,
+				preferApproved, search, start, end, sorts);
 			objectEntriesCount = objectEntryLocalService.getValuesListCount(
 				groupIds, companyId, dtoConverterContext.getUserId(),
 				objectDefinition.getObjectDefinitionId(), predicate,
