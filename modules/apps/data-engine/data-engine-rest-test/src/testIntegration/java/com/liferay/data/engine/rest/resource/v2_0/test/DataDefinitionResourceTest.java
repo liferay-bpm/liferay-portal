@@ -1133,36 +1133,6 @@ public class DataDefinitionResourceTest
 		}
 	}
 
-	private void _testGetSiteDataDefinitionByContentTypeContentTypePageWithoutViewPermission()
-		throws Exception {
-
-		DataDefinition dataDefinition =
-			dataDefinitionResource.postSiteDataDefinitionByContentType(
-				testGroup.getGroupId(), "journal", randomDataDefinition());
-
-		DataDefinitionResource userDataDefinitionResource =
-			_getUserDataDefinitionResource(
-				UserTestUtil.addUser(
-					testCompany, RandomTestUtil.randomString()));
-
-		Page<DataDefinition> page =
-			userDataDefinitionResource.
-				getSiteDataDefinitionByContentTypeContentTypePage(
-					testGroup.getGroupId(), "journal", null,
-					Pagination.of(1, 10), null);
-
-		Assert.assertEquals(0, page.getTotalCount());
-
-		page =
-			userDataDefinitionResource.
-				getSiteDataDefinitionByContentTypeContentTypePage(
-					testGroup.getGroupId(), "journal",
-					MapUtil.getString(dataDefinition.getName(), "en_US"),
-					Pagination.of(1, 10), null);
-
-		Assert.assertEquals(0, page.getTotalCount());
-	}
-
 	private void _testGetSiteDataDefinitionByContentTypeContentTypePageWithViewPermission()
 		throws Exception {
 
@@ -1213,6 +1183,36 @@ public class DataDefinitionResourceTest
 		assertEqualsIgnoringOrder(
 			Arrays.asList(dataDefinition),
 			(List<DataDefinition>)page.getItems());
+	}
+
+	private void _testGetSiteDataDefinitionByContentTypeContentTypePageWithoutViewPermission()
+		throws Exception {
+
+		DataDefinition dataDefinition =
+			dataDefinitionResource.postSiteDataDefinitionByContentType(
+				testGroup.getGroupId(), "journal", randomDataDefinition());
+
+		DataDefinitionResource userDataDefinitionResource =
+			_getUserDataDefinitionResource(
+				UserTestUtil.addUser(
+					testCompany, RandomTestUtil.randomString()));
+
+		Page<DataDefinition> page =
+			userDataDefinitionResource.
+				getSiteDataDefinitionByContentTypeContentTypePage(
+					testGroup.getGroupId(), "journal", null,
+					Pagination.of(1, 10), null);
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		page =
+			userDataDefinitionResource.
+				getSiteDataDefinitionByContentTypeContentTypePage(
+					testGroup.getGroupId(), "journal",
+					MapUtil.getString(dataDefinition.getName(), "en_US"),
+					Pagination.of(1, 10), null);
+
+		Assert.assertEquals(0, page.getTotalCount());
 	}
 
 	private void _testGetSiteDataDefinitionsPage(
