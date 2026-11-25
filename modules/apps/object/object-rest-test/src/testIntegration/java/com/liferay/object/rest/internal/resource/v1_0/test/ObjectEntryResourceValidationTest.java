@@ -9,18 +9,22 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.document.library.test.util.DLTestUtil;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.constants.ObjectValidationRuleConstants;
 import com.liferay.object.constants.ObjectValidationRuleSettingConstants;
 import com.liferay.object.field.setting.builder.ObjectFieldSettingBuilder;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.model.ObjectValidationRule;
 import com.liferay.object.rest.dto.v1_0.ValidationError;
 import com.liferay.object.rest.dto.v1_0.ValidationRequest;
 import com.liferay.object.rest.dto.v1_0.ValidationResponse;
 import com.liferay.object.rest.resource.v1_0.ObjectEntryResource;
 import com.liferay.object.rest.test.util.ObjectEntryTestUtil;
+import com.liferay.object.rest.test.util.ObjectRelationshipTestUtil;
+import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.validation.rule.setting.builder.ObjectValidationRuleSettingBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -57,6 +61,8 @@ import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import jakarta.ws.rs.BadRequestException;
 
+import java.io.Serializable;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -75,7 +81,9 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
  * @author Magdalena Jedraszak
  * @author Daniel Raposo
  */
-@FeatureFlags(featureFlags = @FeatureFlag(value = "LPS-164801"))
+@FeatureFlags(
+	featureFlags = {@FeatureFlag("LPD-108620"), @FeatureFlag("LPS-164801")}
+)
 @RunWith(Arquillian.class)
 public class ObjectEntryResourceValidationTest
 	extends BaseObjectEntryResourceTestCase {
@@ -253,6 +261,23 @@ public class ObjectEntryResourceValidationTest
 			ObjectDefinition objectDefinition, ObjectField objectField1,
 			String scopeKey)
 		throws Exception {
+
+		ObjectDefinition parentObjectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition();
+
+		ObjectEntry parentObjectEntry = ObjectEntryTestUtil.addObjectEntry(
+			parentObjectDefinition, Collections.emptyMap());
+
+		ObjectRelationship objectRelationship =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+				parentObjectDefinition, objectDefinition,
+				TestPropsValues.getUserId(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_ONE);
+
+		ObjectField relationshipObjectField =
+			objectFieldLocalService.getObjectField(
+				objectRelationship.getObjectFieldId2());
 
 		String errorMessage1 = RandomTestUtil.randomString();
 
@@ -469,7 +494,33 @@ public class ObjectEntryResourceValidationTest
 				validationErrors[0].getErrorMessage());
 
 			ObjectEntryTestUtil.addObjectEntry(
-				objectDefinition, objectField2.getName(), "Peter");
+				objectDefinition,
+				HashMapBuilder.<String, Serializable>put(
+					objectField2.getName(), "Peter"
+				).put(
+					relationshipObjectField.getName(),
+					parentObjectEntry.getObjectEntryId()
+				).build());
+
+			validationResponse = _validate(
+				objectEntryResource, scopeKey,
+				_getValidationRequest(
+					HashMapBuilder.<String, Object>put(
+						objectField2.getName(), RandomTestUtil.randomString()
+					).put(
+						relationshipObjectField.getName(),
+						parentObjectEntry.getObjectEntryId()
+					).build()));
+
+			validationErrors = validationResponse.getValidationErrors();
+
+			Assert.assertEquals(
+				StringBundler.concat(
+					"One to one constraint violation for ",
+					relationshipObjectField.getDBTableName(), StringPool.PERIOD,
+					relationshipObjectField.getDBColumnName(), " with value ",
+					parentObjectEntry.getObjectEntryId()),
+				validationErrors[0].getErrorMessage());
 
 			validationResponse = _validate(
 				objectEntryResource, scopeKey,
