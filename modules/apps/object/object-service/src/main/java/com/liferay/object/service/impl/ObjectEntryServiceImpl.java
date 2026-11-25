@@ -381,30 +381,23 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 	public List<ObjectEntry> getObjectEntries(long[] objectEntryIds)
 		throws PortalException {
 
-		Map<Serializable, ObjectEntry> objectEntriesMap =
-			objectEntryPersistence.fetchByPrimaryKeys(
-				new HashSet<>(ListUtil.fromArray(objectEntryIds)));
+		return _getObjectEntries(objectEntryIds, false);
+	}
 
-		return TransformUtil.unsafeTransformToList(
-			objectEntryIds,
-			objectEntryId -> {
-				ObjectEntry objectEntry = objectEntriesMap.get(objectEntryId);
+	@Override
+	public List<ObjectEntry> getObjectEntries(
+			Long[] groupIds, long companyId, long userId,
+			long objectDefinitionId, Predicate predicate,
+			boolean preferApproved, String search, int start, int end,
+			Sort[] sorts)
+		throws PortalException {
 
-				if (objectEntry == null) {
-					objectEntry = objectEntryPersistence.findByPrimaryKey(
-						objectEntryId);
-				}
-
-				if (!ObjectEntryThreadLocal.
-						isSkipObjectEntryResourcePermission()) {
-
-					_checkPermission(
-						ActionKeys.VIEW, objectEntry.getObjectDefinitionId(),
-						objectEntry);
-				}
-
-				return objectEntry;
-			});
+		return _getObjectEntries(
+			ArrayUtil.toLongArray(
+				objectEntryLocalService.getPrimaryKeys(
+					groupIds, companyId, userId, objectDefinitionId, predicate,
+					preferApproved, search, start, end, sorts)),
+			_isInlinePermissionEnabled(groupIds, objectDefinitionId));
 	}
 
 	@Override
@@ -959,6 +952,40 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 			});
 	}
 
+	private List<ObjectEntry> _getObjectEntries(
+			long[] objectEntryIds, boolean viewPermissionChecked)
+		throws PortalException {
+
+		Map<Serializable, ObjectEntry> objectEntriesMap =
+			objectEntryPersistence.fetchByPrimaryKeys(
+				new HashSet<>(ListUtil.fromArray(objectEntryIds)));
+
+		return TransformUtil.unsafeTransformToList(
+			objectEntryIds,
+			objectEntryId -> {
+				ObjectEntry objectEntry = objectEntriesMap.get(objectEntryId);
+
+				if (objectEntry == null) {
+					objectEntry = objectEntryPersistence.findByPrimaryKey(
+						objectEntryId);
+				}
+
+				if (ObjectEntryThreadLocal.
+						isSkipObjectEntryResourcePermission() ||
+					(viewPermissionChecked && objectEntry.isHead() &&
+					 (objectEntry.getRootObjectEntryId() == 0))) {
+
+					return objectEntry;
+				}
+
+				_checkPermission(
+					ActionKeys.VIEW, objectEntry.getObjectDefinitionId(),
+					objectEntry);
+
+				return objectEntry;
+			});
+	}
+
 	private ObjectEntry _getRootObjectEntry(
 			ObjectDefinition objectDefinition, Map<String, Serializable> values)
 		throws PortalException {
@@ -1002,6 +1029,24 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 			).atStartOfDay(
 				ZoneId.systemDefault()
 			).toInstant());
+	}
+
+	private boolean _isInlinePermissionEnabled(
+			Long[] groupIds, long objectDefinitionId)
+		throws PortalException {
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
+
+		for (Long groupId : groupIds) {
+			if (!_inlineSQLHelper.isEnabled(
+					objectDefinition.getCompanyId(), groupId)) {
+
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	private void _sendUserNotificationEvents(
