@@ -86,8 +86,9 @@ public class UploadFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		throws Exception {
 
 		FileEntryMVCActionCommandUtil.deleteTempFileEntry(
-			ParamUtil.getLong(actionRequest, "oldFileEntryId"),
-			(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY));
+			ParamUtil.getLong(actionRequest, "groupId"),
+			(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY),
+			ParamUtil.getString(actionRequest, "oldFileEntryUuid"));
 
 		_uploadHandler.upload(
 			_ddmFormUploadFileEntryHandler, _ddmFormUploadResponseHandler,

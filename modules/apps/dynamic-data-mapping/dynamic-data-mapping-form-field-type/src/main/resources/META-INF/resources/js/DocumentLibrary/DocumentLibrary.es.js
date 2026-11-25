@@ -28,16 +28,14 @@ const MIME_TO_EXTENSION = {
 	'text/plain': 'txt',
 };
 
-const getFileEntryId = (fileEntryValue) => {
+const getFileEntry = (fileEntryValue) => {
 	if (!fileEntryValue) {
 		return null;
 	}
 
 	if (typeof fileEntryValue === 'string') {
 		try {
-			const fileEntry = JSON.parse(fileEntryValue);
-
-			return fileEntry.fileEntryId || null;
+			return JSON.parse(fileEntryValue);
 		}
 		catch (error) {
 			console.error('Unable to parse JSON', fileEntryValue);
@@ -46,7 +44,7 @@ const getFileEntryId = (fileEntryValue) => {
 		}
 	}
 
-	return fileEntryValue.fileEntryId || null;
+	return fileEntryValue;
 };
 
 const getValue = (value) => {
@@ -378,8 +376,8 @@ const Main = ({
 	const [valid, setValid] = useState(initialValid);
 	const [progress, setProgress] = useState(0);
 
-	const deleteFileEntry = (fileEntryId) => {
-		if (!fileEntryId || !fileEntryDeleteURL) {
+	const deleteFileEntry = (fileEntry) => {
+		if (!fileEntry?.uuid || !fileEntryDeleteURL) {
 			return;
 		}
 
@@ -388,7 +386,8 @@ const Main = ({
 		request.open('POST', fileEntryDeleteURL);
 		request.send(
 			convertToFormData({
-				[`${portletNamespace}oldFileEntryId`]: fileEntryId,
+				[`${portletNamespace}groupId`]: fileEntry.groupId,
+				[`${portletNamespace}uuid`]: fileEntry.uuid,
 			})
 		);
 	};
@@ -570,7 +569,7 @@ const Main = ({
 	const handleOnClearButtonClicked = (event, isSignedIn) => {
 		onFocus(event);
 
-		deleteFileEntry(getFileEntryId(currentValue));
+		deleteFileEntry(getFileEntry(currentValue));
 
 		setCurrentValue(null);
 
@@ -596,10 +595,10 @@ const Main = ({
 
 		onFocus(event);
 
-		uploadFileEntry(event, getFileEntryId(currentValue) || 0);
+		uploadFileEntry(event, getFileEntry(currentValue)?.uuid ?? '');
 	};
 
-	const uploadFileEntry = (event, oldFileEntryId) => {
+	const uploadFileEntry = (event, oldFileEntryUuid) => {
 		const file = event.target.files[0];
 
 		if (isExceededUploadRequestSizeLimit(file.size)) {
@@ -656,7 +655,7 @@ const Main = ({
 		request.send(
 			convertToFormData({
 				[`${portletNamespace}file`]: file,
-				[`${portletNamespace}oldFileEntryId`]: oldFileEntryId,
+				[`${portletNamespace}oldFileEntryUuid`]: oldFileEntryUuid,
 			})
 		);
 	};

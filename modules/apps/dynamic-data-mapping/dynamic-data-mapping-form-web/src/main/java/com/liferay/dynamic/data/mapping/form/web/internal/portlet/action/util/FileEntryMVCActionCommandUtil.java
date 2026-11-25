@@ -17,6 +17,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 /**
  * @author Igor Costa
@@ -24,15 +25,16 @@ import com.liferay.portal.kernel.util.TempFileEntryUtil;
 public class FileEntryMVCActionCommandUtil {
 
 	public static void deleteTempFileEntry(
-			long fileEntryId, ThemeDisplay themeDisplay)
+			long groupId, ThemeDisplay themeDisplay, String uuid)
 		throws PortalException {
 
-		if (fileEntryId == 0) {
+		if (Validator.isNull(uuid)) {
 			return;
 		}
 
-		DLFileEntry dlFileEntry = DLFileEntryLocalServiceUtil.fetchDLFileEntry(
-			fileEntryId);
+		DLFileEntry dlFileEntry =
+			DLFileEntryLocalServiceUtil.fetchDLFileEntryByUuidAndGroupId(
+				uuid, groupId);
 
 		if (dlFileEntry == null) {
 			return;
@@ -64,7 +66,7 @@ public class FileEntryMVCActionCommandUtil {
 			return;
 		}
 
-		TempFileEntryUtil.deleteTempFileEntry(fileEntryId);
+		TempFileEntryUtil.deleteTempFileEntry(dlFileEntry.getFileEntryId());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
