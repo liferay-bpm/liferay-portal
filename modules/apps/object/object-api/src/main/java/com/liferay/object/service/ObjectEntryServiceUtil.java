@@ -153,6 +153,25 @@ public class ObjectEntryServiceUtil {
 			groupId, objectDefinitionId, status, start, end);
 	}
 
+	public static List<ObjectEntry> getObjectEntries(long[] objectEntryIds)
+		throws PortalException {
+
+		return getService().getObjectEntries(objectEntryIds);
+	}
+
+	public static List<ObjectEntry> getObjectEntries(
+			Long[] groupIds, long companyId, long userId,
+			long objectDefinitionId,
+			com.liferay.petra.sql.dsl.expression.Predicate predicate,
+			boolean preferApproved, String search, int start, int end,
+			com.liferay.portal.kernel.search.Sort[] sorts)
+		throws PortalException {
+
+		return getService().getObjectEntries(
+			groupIds, companyId, userId, objectDefinitionId, predicate,
+			preferApproved, search, start, end, sorts);
+	}
+
 	public static int getObjectEntriesCount(
 		long groupId, long objectDefinitionId, int status) {
 
@@ -325,4 +344,4 @@ public class ObjectEntryServiceUtil {
 		new Snapshot<>(ObjectEntryServiceUtil.class, ObjectEntryService.class);
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1284561770
+// LIFERAY-SERVICE-BUILDER-HASH:-629806214

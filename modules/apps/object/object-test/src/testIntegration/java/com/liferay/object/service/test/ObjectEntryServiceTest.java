@@ -49,6 +49,7 @@ import com.liferay.object.tree.Node;
 import com.liferay.object.tree.Tree;
 import com.liferay.object.tree.constants.TreeConstants;
 import com.liferay.petra.function.UnsafeBiFunction;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -895,6 +896,44 @@ public class ObjectEntryServiceTest {
 		_testGetObjectEntries(
 			true, true, ObjectRelationshipConstants.TYPE_MANY_TO_MANY,
 			unsafeBiFunction);
+	}
+
+	@Test
+	@TestInfo("LPD-117379")
+	public void testGetObjectEntries() throws Exception {
+
+		// Can get object entries with owner permission
+
+		ObjectEntry objectEntry1 = _addObjectEntry(_user);
+		ObjectEntry objectEntry2 = _addObjectEntry(_user);
+
+		Assert.assertEquals(
+			Arrays.asList(objectEntry1, objectEntry2),
+			_getObjectEntries(_user, objectEntry1, objectEntry2));
+		Assert.assertEquals(
+			Arrays.asList(objectEntry2, objectEntry1),
+			_getObjectEntries(_user, objectEntry2, objectEntry1));
+
+		// Cannot get object entries without model permission
+
+		ObjectEntry objectEntry3 = _addObjectEntry(_adminUser);
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", _user.getUserId(), " must have ", ActionKeys.VIEW,
+				" permission for ", _objectDefinition.getClassName(),
+				StringPool.SPACE, objectEntry3.getObjectEntryId()),
+			() -> _getObjectEntries(_user, objectEntry1, objectEntry3));
+
+		// Can get a page with only the viewable object entries
+
+		Assert.assertEquals(
+			SetUtil.fromArray(objectEntry1, objectEntry2),
+			_getViewableObjectEntries(_user));
+		Assert.assertEquals(
+			SetUtil.fromArray(objectEntry1, objectEntry2, objectEntry3),
+			_getViewableObjectEntries(_adminUser));
 	}
 
 	@Test
@@ -2015,11 +2054,39 @@ public class ObjectEntryServiceTest {
 		}
 	}
 
+	private List<ObjectEntry> _getObjectEntries(
+			User user, ObjectEntry... objectEntries)
+		throws Exception {
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				user)) {
+
+			return _objectEntryService.getObjectEntries(
+				TransformUtil.transformToLongArray(
+					objectEntries, ObjectEntry::getObjectEntryId));
+		}
+	}
+
 	private long _getRoleId(String roleName) throws Exception {
 		Role role = _roleLocalService.getRole(
 			TestPropsValues.getCompanyId(), roleName);
 
 		return role.getRoleId();
+	}
+
+	private Set<ObjectEntry> _getViewableObjectEntries(User user)
+		throws Exception {
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				user)) {
+
+			return SetUtil.fromList(
+				_objectEntryService.getObjectEntries(
+					new Long[] {_group.getGroupId()}, user.getCompanyId(),
+					user.getUserId(), _objectDefinition.getObjectDefinitionId(),
+					null, false, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null));
+		}
 	}
 
 	private void _removeResourcePermission(

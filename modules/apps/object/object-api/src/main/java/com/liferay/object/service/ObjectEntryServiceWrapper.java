@@ -169,6 +169,29 @@ public class ObjectEntryServiceWrapper
 	}
 
 	@Override
+	public java.util.List<com.liferay.object.model.ObjectEntry>
+			getObjectEntries(long[] objectEntryIds)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectEntryService.getObjectEntries(objectEntryIds);
+	}
+
+	@Override
+	public java.util.List<com.liferay.object.model.ObjectEntry>
+			getObjectEntries(
+				Long[] groupIds, long companyId, long userId,
+				long objectDefinitionId,
+				com.liferay.petra.sql.dsl.expression.Predicate predicate,
+				boolean preferApproved, String search, int start, int end,
+				com.liferay.portal.kernel.search.Sort[] sorts)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectEntryService.getObjectEntries(
+			groupIds, companyId, userId, objectDefinitionId, predicate,
+			preferApproved, search, start, end, sorts);
+	}
+
+	@Override
 	public int getObjectEntriesCount(
 		long groupId, long objectDefinitionId, int status) {
 
@@ -368,4 +391,4 @@ public class ObjectEntryServiceWrapper
 	private ObjectEntryService _objectEntryService;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:1978829394
+// LIFERAY-SERVICE-BUILDER-HASH:1447913662
