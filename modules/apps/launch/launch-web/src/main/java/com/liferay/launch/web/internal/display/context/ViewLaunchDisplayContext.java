@@ -272,12 +272,6 @@ public class ViewLaunchDisplayContext {
 		return _published;
 	}
 
-	private String _getClassName(LaunchEntryManager launchEntryManager) {
-		Class<?> modelClass = launchEntryManager.getModelClass();
-
-		return modelClass.getName();
-	}
-
 	private String _getItemSelectedEventName() {
 		String portletNamespace = PortalUtil.getPortletNamespace(
 			LaunchPortletKeys.LAUNCH);
@@ -291,7 +285,7 @@ public class ViewLaunchDisplayContext {
 		return TransformUtil.transform(
 			_getLaunchEntryManagers(),
 			launchEntryManager -> HashMapBuilder.<String, Object>put(
-				"className", _getClassName(launchEntryManager)
+				"className", launchEntryManager.getClassName()
 			).put(
 				"itemSelectorURL",
 				String.valueOf(

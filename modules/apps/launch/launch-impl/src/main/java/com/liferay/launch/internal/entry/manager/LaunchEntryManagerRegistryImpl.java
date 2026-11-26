@@ -9,6 +9,9 @@ import com.liferay.launch.entry.manager.LaunchEntryManager;
 import com.liferay.launch.entry.manager.LaunchEntryManagerRegistry;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.portal.kernel.model.CompanyConstants;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,11 +35,35 @@ public class LaunchEntryManagerRegistryImpl
 
 	@Override
 	public List<LaunchEntryManager> getLaunchEntryManagers() {
-		return new ArrayList<>(_serviceTrackerMap.values());
+		List<LaunchEntryManager> launchEntryManagers = new ArrayList<>();
+
+		List<LaunchEntryManager> systemLaunchEntryManagers =
+			_companyIdServiceTrackerMap.getService(CompanyConstants.SYSTEM);
+
+		if (systemLaunchEntryManagers != null) {
+			launchEntryManagers.addAll(systemLaunchEntryManagers);
+		}
+
+		List<LaunchEntryManager> companyLaunchEntryManagers =
+			_companyIdServiceTrackerMap.getService(
+				CompanyThreadLocal.getCompanyId());
+
+		if (companyLaunchEntryManagers != null) {
+			launchEntryManagers.addAll(companyLaunchEntryManagers);
+		}
+
+		return launchEntryManagers;
 	}
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
+		_companyIdServiceTrackerMap =
+			ServiceTrackerMapFactory.openMultiValueMap(
+				bundleContext, LaunchEntryManager.class,
+				"(launch.entry.manager.class.name=*)",
+				(serviceReference, emitter) -> emitter.emit(
+					GetterUtil.getLong(
+						serviceReference.getProperty("company.id"))));
 		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, LaunchEntryManager.class,
 			"launch.entry.manager.class.name");
@@ -44,9 +71,12 @@ public class LaunchEntryManagerRegistryImpl
 
 	@Deactivate
 	protected void deactivate() {
+		_companyIdServiceTrackerMap.close();
 		_serviceTrackerMap.close();
 	}
 
+	private ServiceTrackerMap<Long, List<LaunchEntryManager>>
+		_companyIdServiceTrackerMap;
 	private ServiceTrackerMap<String, LaunchEntryManager> _serviceTrackerMap;
 
 }

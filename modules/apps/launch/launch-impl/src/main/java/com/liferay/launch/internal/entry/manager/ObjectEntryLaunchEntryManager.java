@@ -13,7 +13,6 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryVersion;
 import com.liferay.object.rest.dto.v1_0.TaxonomyCategoryBrief;
-import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryVersionLocalService;
 import com.liferay.object.util.comparator.ObjectEntryVersionVersionComparator;
@@ -22,9 +21,10 @@ import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.BaseModel;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -37,17 +37,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Carolina Barbosa
  */
-@Component(
-	property = "launch.entry.manager.class.name=com.liferay.object.model.ObjectEntry",
-	service = LaunchEntryManager.class
-)
 public class ObjectEntryLaunchEntryManager implements LaunchEntryManager {
+
+	public ObjectEntryLaunchEntryManager(
+		GroupLocalService groupLocalService, ObjectDefinition objectDefinition,
+		ObjectEntryLocalService objectEntryLocalService,
+		ObjectEntryVersionLocalService objectEntryVersionLocalService) {
+
+		_groupLocalService = groupLocalService;
+		_objectDefinition = objectDefinition;
+		_objectEntryLocalService = objectEntryLocalService;
+		_objectEntryVersionLocalService = objectEntryVersionLocalService;
+	}
 
 	@Override
 	public Draft addDraft(long classPK, long launchSetId, String versionKey)
@@ -105,7 +109,10 @@ public class ObjectEntryLaunchEntryManager implements LaunchEntryManager {
 		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
 			classPK);
 
-		if (objectEntry == null) {
+		if ((objectEntry == null) ||
+			(objectEntry.getObjectDefinitionId() !=
+				_objectDefinition.getObjectDefinitionId())) {
+
 			return null;
 		}
 
@@ -113,7 +120,14 @@ public class ObjectEntryLaunchEntryManager implements LaunchEntryManager {
 
 			@Override
 			public long getGroupId() {
-				return objectEntry.getGroupId();
+				if (objectEntry.getGroupId() > 0) {
+					return objectEntry.getGroupId();
+				}
+
+				Group group = _groupLocalService.fetchCompanyGroup(
+					objectEntry.getCompanyId());
+
+				return group.getGroupId();
 			}
 
 			@Override
@@ -133,11 +147,7 @@ public class ObjectEntryLaunchEntryManager implements LaunchEntryManager {
 
 			@Override
 			public String getTypeName(Locale locale) {
-				ObjectDefinition objectDefinition =
-					_objectDefinitionLocalService.fetchObjectDefinition(
-						objectEntry.getObjectDefinitionId());
-
-				return objectDefinition.getLabel(locale);
+				return _objectDefinition.getLabel(locale);
 			}
 
 		};
@@ -160,6 +170,11 @@ public class ObjectEntryLaunchEntryManager implements LaunchEntryManager {
 	}
 
 	@Override
+	public String getClassName() {
+		return _objectDefinition.getClassName();
+	}
+
+	@Override
 	public long getClassPK(Map<String, String> selectedItemData) {
 		return GetterUtil.getLong(selectedItemData.get("classPK"));
 	}
@@ -171,7 +186,7 @@ public class ObjectEntryLaunchEntryManager implements LaunchEntryManager {
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "content");
+		return _objectDefinition.getLabel(locale);
 	}
 
 	@Override
@@ -313,16 +328,10 @@ public class ObjectEntryLaunchEntryManager implements LaunchEntryManager {
 		};
 	}
 
-	@Reference
-	private Language _language;
-
-	@Reference
-	private ObjectDefinitionLocalService _objectDefinitionLocalService;
-
-	@Reference
-	private ObjectEntryLocalService _objectEntryLocalService;
-
-	@Reference
-	private ObjectEntryVersionLocalService _objectEntryVersionLocalService;
+	private final GroupLocalService _groupLocalService;
+	private final ObjectDefinition _objectDefinition;
+	private final ObjectEntryLocalService _objectEntryLocalService;
+	private final ObjectEntryVersionLocalService
+		_objectEntryVersionLocalService;
 
 }
