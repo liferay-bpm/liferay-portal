@@ -293,9 +293,7 @@ export function TreegridExpanderColumn() {
 	const [expandedKeys, setExpandedKeys] = useState<Set<React.Key>>(
 		new Set([2, 3])
 	);
-	const [selectedKeys, setSelectedKeys] = useState<Set<React.Key>>(
-		new Set()
-	);
+	const [selectedKeys, setSelectedKeys] = useState<Set<React.Key>>(new Set());
 
 	const ICON_TYPES = {
 		Folder: <Icon symbol="folder" />,
