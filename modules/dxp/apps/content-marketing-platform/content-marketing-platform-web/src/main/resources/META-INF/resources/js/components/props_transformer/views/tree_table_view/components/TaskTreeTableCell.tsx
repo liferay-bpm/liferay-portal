@@ -20,8 +20,8 @@ import {sub} from 'frontend-js-web';
 import React, {useContext} from 'react';
 
 import getTaskItemsActions from '../../../../../utils/getTaskItemsActions';
-import {isSubtask} from '../../../../../utils/subtaskWatchActions';
 import {ITaskItemsActionsTask} from '../../../../../utils/types';
+import TaskTypeIcon from '../../../../TaskTypeIcon';
 import AssigneeRenderer from '../../../cell_renderers/AssigneeRenderer';
 import {TreeTask} from '../hooks/useTaskTree';
 
@@ -58,8 +58,6 @@ export default function TaskTreeTableCell({
 		state,
 		title,
 	} = treeTask.embedded;
-
-	const subtask = isSubtask(treeTask.embedded);
 
 	switch (columnKey) {
 		case 'actions':
@@ -113,16 +111,7 @@ export default function TaskTreeTableCell({
 		case 'title':
 			return (
 				<span className="task-tree-table-view-title">
-					<ClayIcon
-						aria-label={
-							subtask
-								? Liferay.Language.get('subtask')
-								: Liferay.Language.get('task')
-						}
-						className="task-tree-table-view-type-icon"
-						role="img"
-						symbol={subtask ? 'indent-more' : 'check-square'}
-					/>
+					<TaskTypeIcon task={treeTask.embedded} />
 
 					<SimpleActionLinkRenderer
 						actions={itemsActions as any}

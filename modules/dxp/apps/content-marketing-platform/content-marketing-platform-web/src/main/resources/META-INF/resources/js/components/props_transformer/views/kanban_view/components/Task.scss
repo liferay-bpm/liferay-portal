@@ -31,4 +31,10 @@
 			white-space: nowrap;
 		}
 	}
+	&-title {
+		align-items: center;
+		display: flex;
+		gap: 0.5rem;
+		min-width: 0;
+	}
 }
