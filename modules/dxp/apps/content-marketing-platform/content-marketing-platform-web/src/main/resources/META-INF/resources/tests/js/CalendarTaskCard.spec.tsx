@@ -187,6 +187,29 @@ describe('CalendarTaskCard', () => {
 		expect(getByText('In Progress')).toBeInTheDocument();
 	});
 
+	it('renders the project and parent titles of a subtask in a tooltip when the context is shown', () => {
+		const {getByRole, getByTitle} = renderCard(
+			createTask({
+				cmpProjectToCMPTasks: {title: 'Project A'} as any,
+				r_cmpTaskToCMPTasks_c_cmpTask: {title: 'Parent task'},
+				r_cmpTaskToCMPTasks_c_cmpTaskId: 41,
+			}),
+			{showContext: true}
+		);
+
+		expect(getByRole('img', {name: 'subtask'})).toBeInTheDocument();
+		expect(getByTitle('Project A · Parent task')).toBeInTheDocument();
+	});
+
+	it('renders the task type icon without a tooltip when the context is not shown', () => {
+		const {getByRole, queryByTitle} = renderCard(
+			createTask({cmpProjectToCMPTasks: {title: 'Project A'} as any})
+		);
+
+		expect(getByRole('img', {name: 'task'})).toBeInTheDocument();
+		expect(queryByTitle('Project A')).not.toBeInTheDocument();
+	});
+
 	it('renders the task title', () => {
 		const {getByText} = renderCard(createTask());
 
