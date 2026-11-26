@@ -1130,8 +1130,8 @@ public class ObjectRelationshipLocalServiceTest {
 
 		AssertUtils.assertFailure(
 			ObjectRelationshipEdgeException.class,
-			"Object relationship must be one to many to be an edge of a root " +
-				"context",
+			"Object relationship must have a relationship object field to be " +
+				"an edge of a root context",
 			() -> _bindObjectDefinitions(objectRelationship3));
 
 		ObjectRelationship objectRelationship4 =
