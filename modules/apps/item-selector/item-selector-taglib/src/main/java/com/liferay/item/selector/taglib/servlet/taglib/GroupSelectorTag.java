@@ -5,8 +5,12 @@
 
 package com.liferay.item.selector.taglib.servlet.taglib;
 
+import com.liferay.item.selector.ItemSelector;
+import com.liferay.item.selector.ItemSelectorCriterion;
+import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
 import com.liferay.item.selector.provider.GroupItemSelectorProvider;
 import com.liferay.item.selector.taglib.internal.servlet.ServletContextUtil;
+import com.liferay.item.selector.taglib.internal.servlet.item.selector.ItemSelectorUtil;
 import com.liferay.item.selector.taglib.internal.util.GroupItemSelectorProviderRegistryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.dao.search.SearchPaginationUtil;
@@ -16,11 +20,14 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.util.IncludeTag;
+
+import jakarta.portlet.PortletRequest;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.jsp.PageContext;
@@ -119,7 +126,8 @@ public class GroupSelectorTag extends IncludeTag {
 
 		return groupSelectorProvider.getGroupsCount(
 			group.getCompanyId(), group.getGroupId(),
-			_getKeywords(httpServletRequest));
+			_getKeywords(httpServletRequest),
+			_isIncludeUnconnectedGroups(httpServletRequest));
 	}
 
 	private String _getGroupType(HttpServletRequest httpServletRequest) {
@@ -170,7 +178,9 @@ public class GroupSelectorTag extends IncludeTag {
 
 		List<Group> groups = groupItemSelectorProvider.getGroups(
 			group.getCompanyId(), group.getGroupId(),
-			_getKeywords(httpServletRequest), startAndEnd[0], startAndEnd[1]);
+			_getKeywords(httpServletRequest),
+			_isIncludeUnconnectedGroups(httpServletRequest), startAndEnd[0],
+			startAndEnd[1]);
 
 		if (groups == null) {
 			return new ArrayList<>();
@@ -222,6 +232,40 @@ public class GroupSelectorTag extends IncludeTag {
 		}
 
 		return groups;
+	}
+
+	private boolean _isIncludeUnconnectedGroups(
+		HttpServletRequest httpServletRequest) {
+
+		PortletRequest portletRequest =
+			(PortletRequest)httpServletRequest.getAttribute(
+				JavaConstants.JAKARTA_PORTLET_REQUEST);
+
+		if (portletRequest == null) {
+			return false;
+		}
+
+		ItemSelector itemSelector = ItemSelectorUtil.getItemSelector();
+
+		for (ItemSelectorCriterion itemSelectorCriterion :
+				itemSelector.getItemSelectorCriteria(
+					portletRequest.getParameterMap())) {
+
+			if (!(itemSelectorCriterion instanceof
+					InfoItemItemSelectorCriterion)) {
+
+				continue;
+			}
+
+			InfoItemItemSelectorCriterion infoItemItemSelectorCriterion =
+				(InfoItemItemSelectorCriterion)itemSelectorCriterion;
+
+			if (infoItemItemSelectorCriterion.isIncludeUnconnectedGroups()) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private boolean _isScopeGroupOnly(HttpServletRequest httpServletRequest) {

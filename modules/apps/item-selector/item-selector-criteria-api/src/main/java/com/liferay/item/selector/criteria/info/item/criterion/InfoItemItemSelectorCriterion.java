@@ -33,8 +33,16 @@ public class InfoItemItemSelectorCriterion extends BaseItemSelectorCriterion {
 		return _status;
 	}
 
+	public boolean isIncludeUnconnectedGroups() {
+		return _includeUnconnectedGroups;
+	}
+
 	public boolean isMultiSelection() {
 		return _multiSelection;
+	}
+
+	public void setIncludeUnconnectedGroups(boolean includeUnconnectedGroups) {
+		_includeUnconnectedGroups = includeUnconnectedGroups;
 	}
 
 	public void setItemSubtype(String itemSubtype) {
@@ -61,6 +69,7 @@ public class InfoItemItemSelectorCriterion extends BaseItemSelectorCriterion {
 		_status = status;
 	}
 
+	private boolean _includeUnconnectedGroups;
 	private String _itemSubtype;
 	private String _itemType;
 	private String[] _mimeTypes;

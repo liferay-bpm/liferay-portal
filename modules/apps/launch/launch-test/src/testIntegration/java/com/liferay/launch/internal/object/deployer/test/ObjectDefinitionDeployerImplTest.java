@@ -6,6 +6,7 @@
 package com.liferay.launch.internal.object.deployer.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
 import com.liferay.launch.entry.manager.LaunchEntryManager;
 import com.liferay.launch.entry.manager.LaunchEntryManagerRegistry;
 import com.liferay.object.constants.ObjectDefinitionConstants;
@@ -69,6 +70,14 @@ public class ObjectDefinitionDeployerImplTest {
 		Assert.assertEquals(
 			_objectDefinition2.getClassName(),
 			launchEntryManager.getClassName());
+
+		InfoItemItemSelectorCriterion infoItemItemSelectorCriterion =
+			(InfoItemItemSelectorCriterion)
+				launchEntryManager.getItemSelectorCriterion();
+
+		Assert.assertEquals(
+			_objectDefinition2.getClassName(),
+			infoItemItemSelectorCriterion.getItemType());
 
 		Locale locale = LocaleUtil.getDefault();
 

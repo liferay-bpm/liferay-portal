@@ -13,14 +13,19 @@ import com.liferay.item.selector.provider.GroupItemSelectorProvider;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.LayoutPrototype;
 import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.LayoutPrototypeService;
+import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Collections;
@@ -54,9 +59,15 @@ public abstract class BaseDepotGroupItemSelectorProvider
 
 	@Override
 	public List<Group> getGroups(
-		long companyId, long groupId, String keywords, int start, int end) {
+		long companyId, long groupId, String keywords,
+		boolean includeUnconnectedGroups, int start, int end) {
 
 		try {
+			if (includeUnconnectedGroups) {
+				return ListUtil.subList(
+					_getCompanyGroups(companyId, keywords), start, end);
+			}
+
 			return TransformUtil.transform(
 				depotEntryService.getCurrentAndGroupConnectedDepotEntries(
 					_getGroupId(groupId), getDepotEntryType(), start, end),
@@ -70,8 +81,29 @@ public abstract class BaseDepotGroupItemSelectorProvider
 	}
 
 	@Override
+	public List<Group> getGroups(
+		long companyId, long groupId, String keywords, int start, int end) {
+
+		return getGroups(companyId, groupId, keywords, false, start, end);
+	}
+
+	@Override
 	public int getGroupsCount(long companyId, long groupId, String keywords) {
+		return getGroupsCount(companyId, groupId, keywords, false);
+	}
+
+	@Override
+	public int getGroupsCount(
+		long companyId, long groupId, String keywords,
+		boolean includeUnconnectedGroups) {
+
 		try {
+			if (includeUnconnectedGroups) {
+				List<Group> groups = _getCompanyGroups(companyId, keywords);
+
+				return groups.size();
+			}
+
 			return depotEntryService.getGroupConnectedDepotEntriesCount(
 				_getGroupId(groupId), getDepotEntryType());
 		}
@@ -134,6 +166,24 @@ public abstract class BaseDepotGroupItemSelectorProvider
 
 	@Reference
 	protected LayoutPrototypeService layoutPrototypeService;
+
+	@Reference
+	protected Portal portal;
+
+	private List<Group> _getCompanyGroups(long companyId, String keywords)
+		throws PortalException {
+
+		return ListUtil.filter(
+			groupService.search(
+				companyId, new long[] {portal.getClassNameId(DepotEntry.class)},
+				keywords,
+				LinkedHashMapBuilder.<String, Object>put(
+					"types",
+					Collections.singletonList(GroupConstants.TYPE_DEPOT)
+				).build(),
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null),
+			this::isGroupType);
+	}
 
 	private long _getGroupId(long groupId) throws PortalException {
 		Group group = groupService.getGroup(groupId);

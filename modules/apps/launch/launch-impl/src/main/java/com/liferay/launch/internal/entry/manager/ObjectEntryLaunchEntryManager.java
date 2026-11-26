@@ -6,6 +6,8 @@
 package com.liferay.launch.internal.entry.manager;
 
 import com.liferay.item.selector.ItemSelectorCriterion;
+import com.liferay.item.selector.criteria.InfoItemItemSelectorReturnType;
+import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
 import com.liferay.launch.entry.manager.LaunchEntryManager;
 import com.liferay.object.constants.ObjectEntryConstants;
 import com.liferay.object.exception.NoSuchObjectEntryException;
@@ -181,7 +183,16 @@ public class ObjectEntryLaunchEntryManager implements LaunchEntryManager {
 
 	@Override
 	public ItemSelectorCriterion getItemSelectorCriterion() {
-		return null;
+		InfoItemItemSelectorCriterion infoItemItemSelectorCriterion =
+			new InfoItemItemSelectorCriterion();
+
+		infoItemItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			new InfoItemItemSelectorReturnType());
+		infoItemItemSelectorCriterion.setIncludeUnconnectedGroups(true);
+		infoItemItemSelectorCriterion.setItemType(
+			_objectDefinition.getClassName());
+
+		return infoItemItemSelectorCriterion;
 	}
 
 	@Override
