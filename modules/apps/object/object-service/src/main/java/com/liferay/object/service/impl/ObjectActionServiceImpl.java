@@ -9,6 +9,7 @@ import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.base.ObjectActionServiceBaseImpl;
+import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.petra.string.CharPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -19,6 +20,7 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
 import java.util.Map;
@@ -144,8 +146,44 @@ public class ObjectActionServiceImpl extends ObjectActionServiceBaseImpl {
 
 		PermissionChecker permissionChecker = getPermissionChecker();
 
-		if (permissionChecker.isCompanyAdmin() ||
-			!Objects.equals(
+		if (permissionChecker.isCompanyAdmin()) {
+			return;
+		}
+
+		if (Objects.equals(
+				objectActionExecutorKey,
+				ObjectActionExecutorConstants.KEY_ADD_OBJECT_ENTRY)) {
+
+			String objectDefinitionExternalReferenceCode = GetterUtil.getString(
+				parametersUnicodeProperties.get(
+					"objectDefinitionExternalReferenceCode"));
+
+			ObjectDefinition objectDefinition = null;
+
+			if (Validator.isNotNull(objectDefinitionExternalReferenceCode)) {
+				objectDefinition = _objectDefinitionPersistence.fetchByERC_C(
+					objectDefinitionExternalReferenceCode,
+					permissionChecker.getCompanyId());
+			}
+			else {
+				objectDefinition =
+					_objectDefinitionPersistence.fetchByPrimaryKey(
+						GetterUtil.getLong(
+							parametersUnicodeProperties.get(
+								"objectDefinitionId")));
+			}
+
+			if ((objectDefinition != null) &&
+				objectDefinition.isUnmodifiableSystemObject()) {
+
+				throw new PrincipalException.MustBeCompanyAdmin(
+					permissionChecker);
+			}
+
+			return;
+		}
+
+		if (!Objects.equals(
 				objectActionExecutorKey,
 				ObjectActionExecutorConstants.KEY_WEBHOOK)) {
 
@@ -185,5 +223,8 @@ public class ObjectActionServiceImpl extends ObjectActionServiceBaseImpl {
 	)
 	private ModelResourcePermission<ObjectDefinition>
 		_objectDefinitionModelResourcePermission;
+
+	@Reference
+	private ObjectDefinitionPersistence _objectDefinitionPersistence;
 
 }

@@ -16,6 +16,8 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
@@ -29,6 +31,7 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -170,6 +173,76 @@ public class ObjectActionServiceTest {
 		Assert.assertEquals(
 			"true",
 			parametersUnicodeProperties.get("urlLocalNetworkAccessEnabled"));
+
+		_objectActionLocalService.deleteObjectAction(objectAction);
+
+		_userLocalService.deleteUser(user);
+
+		_roleLocalService.deleteRole(role);
+	}
+
+	@Test
+	@TestInfo("LPD-116212")
+	public void testAddObjectActionWithSystemObjectDefinition()
+		throws Exception {
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		RoleTestUtil.addResourcePermission(
+			role, ObjectDefinition.class.getName(),
+			ResourceConstants.SCOPE_COMPANY,
+			String.valueOf(TestPropsValues.getCompanyId()), ActionKeys.UPDATE);
+
+		User user = _addUser(role);
+
+		ObjectAction objectAction = _addObjectAction(user);
+
+		_setUser(user);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.fetchSystemObjectDefinition(
+				TestPropsValues.getCompanyId(), "User");
+		String predefinedValuesJSON = JSONUtil.putAll(
+			_getPredefinedValueJSONObject("alternateName"),
+			_getPredefinedValueJSONObject("emailAddress"),
+			_getPredefinedValueJSONObject("familyName"),
+			_getPredefinedValueJSONObject("givenName")
+		).toString();
+
+		String message = StringBundler.concat(
+			"User ", user.getUserId(), " must be the company administrator to ",
+			"perform the action");
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustBeCompanyAdmin.class, message,
+			() -> _objectActionService.addObjectAction(
+				RandomTestUtil.randomString(),
+				_objectDefinition.getObjectDefinitionId(), true,
+				StringPool.BLANK,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				RandomTestUtil.randomString(),
+				ObjectActionExecutorConstants.KEY_ADD_OBJECT_ENTRY,
+				ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+				UnicodePropertiesBuilder.put(
+					"objectDefinitionId",
+					String.valueOf(objectDefinition.getObjectDefinitionId())
+				).put(
+					"predefinedValues", predefinedValuesJSON
+				).build(),
+				false));
+		AssertUtils.assertFailure(
+			PrincipalException.MustBeCompanyAdmin.class, message,
+			() -> _updateWebhookObjectAction(
+				objectAction,
+				ObjectActionExecutorConstants.KEY_ADD_OBJECT_ENTRY,
+				UnicodePropertiesBuilder.put(
+					"objectDefinitionExternalReferenceCode",
+					objectDefinition.getExternalReferenceCode()
+				).put(
+					"predefinedValues", predefinedValuesJSON
+				).build()));
 
 		_objectActionLocalService.deleteObjectAction(objectAction);
 
@@ -459,6 +532,16 @@ public class ObjectActionServiceTest {
 			ObjectActionExecutorConstants.KEY_WEBHOOK,
 			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
 			parametersUnicodeProperties, false);
+	}
+
+	private JSONObject _getPredefinedValueJSONObject(String name) {
+		return JSONUtil.put(
+			"inputAsValue", true
+		).put(
+			"name", name
+		).put(
+			"value", RandomTestUtil.randomString() + "@liferay.com"
+		);
 	}
 
 	private void _setUser(User user) {
