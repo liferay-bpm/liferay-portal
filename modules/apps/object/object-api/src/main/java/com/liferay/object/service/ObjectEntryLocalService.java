@@ -265,10 +265,12 @@ public interface ObjectEntryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ObjectEntry fetchObjectEntry(long groupId, long objectDefinitionId);
 
+	@Previewable
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ObjectEntry fetchObjectEntry(
 		long groupId, ObjectDefinition objectDefinition, String urlTitle);
 
+	@Previewable
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ObjectEntry fetchObjectEntry(
 		String externalReferenceCode, long groupId, long objectDefinitionId);
@@ -420,6 +422,7 @@ public interface ObjectEntryLocalService
 	public ObjectEntry getObjectEntry(long objectEntryId)
 		throws PortalException;
 
+	@Previewable
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ObjectEntry getObjectEntry(
 			String externalReferenceCode, long groupId, long objectDefinitionId)
@@ -652,4 +655,4 @@ public interface ObjectEntryLocalService
 		throws PortalException;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:2046605314
+// LIFERAY-SERVICE-BUILDER-HASH:118959679
