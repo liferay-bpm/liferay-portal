@@ -467,8 +467,8 @@ public class ObjectEntryLocalServiceImpl
 		_validateValues(
 			defaultLanguageId, dlFileEntriesMap, null, groupId,
 			user.isGuestUser(), objectDefinition, null,
-			objectFieldBag.getObjectFields(), false, serviceContext, null,
-			userId, null, values);
+			objectFieldBag.getObjectFields(), false, objectEntryId,
+			serviceContext, null, userId, null, values);
 
 		_addDLFileEntries(
 			dlFileEntriesMap, groupId, objectDefinition, objectEntryId,
@@ -662,7 +662,7 @@ public class ObjectEntryLocalServiceImpl
 				GroupConstants.DEFAULT_PARENT_GROUP_ID, user.isGuestUser(),
 				objectDefinition, null,
 				dynamicObjectDefinitionTable.getObjectFields(), true,
-				serviceContext, null, userId, null, values);
+				primaryKey, serviceContext, null, userId, null, values);
 
 			_addDLFileEntries(
 				dlFileEntriesMap, 0, objectDefinition, primaryKey,
@@ -684,7 +684,7 @@ public class ObjectEntryLocalServiceImpl
 				GroupConstants.DEFAULT_PARENT_GROUP_ID, user.isGuestUser(),
 				objectDefinition, null,
 				dynamicObjectDefinitionTable.getObjectFields(), false,
-				serviceContext, null, userId, null, values);
+				primaryKey, serviceContext, null, userId, null, values);
 
 			_addDLFileEntries(
 				dlFileEntriesMap, 0, objectDefinition, primaryKey,
@@ -2166,7 +2166,7 @@ public class ObjectEntryLocalServiceImpl
 				GroupConstants.DEFAULT_PARENT_GROUP_ID, user.isGuestUser(),
 				objectDefinition, null,
 				dynamicObjectDefinitionTable.getObjectFields(), true,
-				new ServiceContext(), null, userId, null, values);
+				primaryKey, new ServiceContext(), null, userId, null, values);
 
 			_updateTable(
 				dynamicObjectDefinitionTable, new HashMap<>(), primaryKey, true,
@@ -2178,7 +2178,7 @@ public class ObjectEntryLocalServiceImpl
 				GroupConstants.DEFAULT_PARENT_GROUP_ID, user.isGuestUser(),
 				objectDefinition, null,
 				dynamicObjectDefinitionTable.getObjectFields(), false,
-				new ServiceContext(), null, userId, null, values);
+				primaryKey, new ServiceContext(), null, userId, null, values);
 
 			_insertIntoTable(
 				dynamicObjectDefinitionTable, new HashMap<>(), primaryKey,
@@ -2884,9 +2884,9 @@ public class ObjectEntryLocalServiceImpl
 			null,
 			_objectFieldPersistence.findByObjectDefinitionId(
 				objectEntry.getObjectDefinitionId()),
-			true, serviceContext, objectEntry.getStatus(),
-			serviceContext.getUserId(), validationErrors,
-			objectEntry.getValues());
+			true, objectEntry.getObjectEntryId(), serviceContext,
+			objectEntry.getStatus(), serviceContext.getUserId(),
+			validationErrors, objectEntry.getValues());
 
 		if (ListUtil.isNotEmpty(validationErrors)) {
 			throw new ObjectEntryValidationException() {
@@ -7160,15 +7160,6 @@ public class ObjectEntryLocalServiceImpl
 				continue;
 			}
 
-			if (Objects.equals(
-					objectField.getRelationshipType(),
-					ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
-
-				_validateOneToOne(
-					dynamicObjectDefinitionTable, objectField, objectEntryId,
-					GetterUtil.getLong(values.get(objectField.getName())));
-			}
-
 			for (String dbColumnName : objectField.getDBColumnNames()) {
 				columnNames.add(dbColumnName);
 
@@ -8680,7 +8671,8 @@ public class ObjectEntryLocalServiceImpl
 			objectEntry.getValues(), objectEntry.getGroupId(),
 			user.isGuestUser(), objectDefinition,
 			objectEntry.getObjectEntryId(), objectFields, partialUpdate,
-			serviceContext, objectEntry.getStatus(), userId, null, values);
+			objectEntry.getObjectEntryId(), serviceContext,
+			objectEntry.getStatus(), userId, null, values);
 
 		_addDLFileEntries(
 			dlFileEntriesMap, objectEntry.getGroupId(), objectDefinition,
@@ -8991,15 +8983,6 @@ public class ObjectEntryLocalServiceImpl
 				!_processMissingObjectField(objectField, partialUpdate)) {
 
 				continue;
-			}
-
-			if (Objects.equals(
-					objectField.getRelationshipType(),
-					ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
-
-				_validateOneToOne(
-					dynamicObjectDefinitionTable, objectField, objectEntryId,
-					GetterUtil.getLong(values.get(objectField.getName())));
 			}
 
 			for (String dbColumnName : objectField.getDBColumnNames()) {
@@ -9393,9 +9376,10 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
-	private void _validateOneToOne(
-			DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
-			ObjectField objectField, long primaryKey, long relatedPrimaryKey)
+	private void _validateOneToOneObjectRelationship(
+			ObjectDefinition objectDefinition, ObjectField objectField,
+			long primaryKey, long relatedPrimaryKey,
+			List<ValidationError> validationErrors)
 		throws PortalException {
 
 		if (relatedPrimaryKey == 0) {
@@ -9407,13 +9391,14 @@ public class ObjectEntryLocalServiceImpl
 				objectField.getObjectFieldId());
 
 		if (objectRelationship.isSelf() && (primaryKey == relatedPrimaryKey)) {
-			throw new ObjectEntryValuesException.InvalidValue(
-				objectField.getName());
+			_handle(
+				new ObjectEntryValuesException.InvalidValue(
+					objectField.getName()),
+				validationErrors);
+
+			return;
 		}
 
-		ObjectDefinition objectDefinition =
-			_objectDefinitionPersistence.findByPrimaryKey(
-				objectRelationship.getObjectDefinitionId2());
 		ObjectEntry objectEntry = null;
 
 		if (!objectDefinition.isUnmodifiableSystemObject()) {
@@ -9427,19 +9412,28 @@ public class ObjectEntryLocalServiceImpl
 					(objectEntry.getHeadObjectEntryId() ==
 						relatedObjectEntry.getHeadObjectEntryId())) {
 
-					throw new ObjectEntryValuesException.InvalidValue(
-						objectField.getName());
+					_handle(
+						new ObjectEntryValuesException.InvalidValue(
+							objectField.getName()),
+						validationErrors);
+
+					return;
 				}
 			}
 		}
 
-		DSLQuery dslQuery = null;
+		DynamicObjectDefinitionTable dynamicObjectDefinitionTable =
+			(DynamicObjectDefinitionTable)_objectFieldLocalService.getTable(
+				objectDefinition.getObjectDefinitionId(),
+				objectField.getName());
 
 		Column<DynamicObjectDefinitionTable, Long>
 			relationshipObjectFieldColumn =
 				(Column<DynamicObjectDefinitionTable, Long>)
 					dynamicObjectDefinitionTable.getColumn(
 						objectField.getDBColumnName());
+
+		DSLQuery dslQuery = null;
 
 		if (objectEntry == null) {
 			dslQuery = DSLQueryFactoryUtil.count(
@@ -9475,9 +9469,11 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		if (objectEntryPersistence.dslQueryCount(dslQuery, false) > 0) {
-			throw new ObjectEntryValuesException.OneToOneConstraintViolation(
-				objectField.getDBColumnName(), relatedPrimaryKey,
-				dynamicObjectDefinitionTable.getTableName());
+			_handle(
+				new ObjectEntryValuesException.OneToOneConstraintViolation(
+					objectField.getDBColumnName(), relatedPrimaryKey,
+					dynamicObjectDefinitionTable.getTableName()),
+				validationErrors);
 		}
 	}
 
@@ -9679,9 +9675,9 @@ public class ObjectEntryLocalServiceImpl
 			Map<ObjectField, Set<DLFileEntry>> dlFileEntriesMap,
 			Map<String, Serializable> existingValues, long groupId,
 			boolean guestUser, ObjectDefinition objectDefinition,
-			Long objectEntryId, ObjectField objectField, long userId,
-			List<ValidationError> validationErrors, Serializable value,
-			String valueLanguageId)
+			Long objectEntryId, ObjectField objectField, long primaryKey,
+			long userId, List<ValidationError> validationErrors,
+			Serializable value, String valueLanguageId)
 		throws PortalException {
 
 		if (objectField.hasMultipleDBColumns()) {
@@ -9763,6 +9759,15 @@ public class ObjectEntryLocalServiceImpl
 							objectField.getName()),
 						validationErrors);
 				}
+			}
+
+			if (Objects.equals(
+					objectField.getRelationshipType(),
+					ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
+
+				_validateOneToOneObjectRelationship(
+					objectDefinition, objectField, primaryKey,
+					GetterUtil.getLong(value), validationErrors);
 			}
 
 			if (existingValues == null) {
@@ -9913,8 +9918,9 @@ public class ObjectEntryLocalServiceImpl
 			Map<String, Serializable> existingValues, long groupId,
 			boolean guestUser, ObjectDefinition objectDefinition,
 			Long objectEntryId, List<ObjectField> objectFields,
-			boolean partialUpdate, ServiceContext serviceContext,
-			Integer status, long userId, List<ValidationError> validationErrors,
+			boolean partialUpdate, long primaryKey,
+			ServiceContext serviceContext, Integer status, long userId,
+			List<ValidationError> validationErrors,
 			Map<String, Serializable> values)
 		throws PortalException {
 
@@ -9941,8 +9947,8 @@ public class ObjectEntryLocalServiceImpl
 
 				_validateValues(
 					dlFileEntriesMap, existingValues, groupId, guestUser,
-					objectDefinition, objectEntryId, objectField, userId,
-					validationErrors, processedValue, StringPool.BLANK);
+					objectDefinition, objectEntryId, objectField, primaryKey,
+					userId, validationErrors, processedValue, StringPool.BLANK);
 			}
 
 			Map<String, Serializable> localizedValues =
@@ -9976,8 +9982,8 @@ public class ObjectEntryLocalServiceImpl
 
 				_validateValues(
 					dlFileEntriesMap, existingValues, groupId, guestUser,
-					objectDefinition, objectEntryId, objectField, userId,
-					validationErrors, processedValue, entry.getKey());
+					objectDefinition, objectEntryId, objectField, primaryKey,
+					userId, validationErrors, processedValue, entry.getKey());
 			}
 		}
 	}
