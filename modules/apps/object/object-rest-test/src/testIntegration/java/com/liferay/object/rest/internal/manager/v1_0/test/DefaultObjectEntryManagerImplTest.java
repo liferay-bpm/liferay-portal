@@ -8909,6 +8909,126 @@ public class DefaultObjectEntryManagerImplTest
 		objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
+	@FeatureFlag("LPD-108620")
+	@Test
+	public void testPartialUpdateObjectEntryWithNestedObjectEntry()
+		throws Exception {
+
+		ObjectDefinition parentObjectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition();
+
+		ObjectEntry parentObjectEntry =
+			_defaultObjectEntryManager.addObjectEntry(
+				_simpleDTOConverterContext, parentObjectDefinition,
+				new ObjectEntry() {
+					{
+						properties = new HashMap<>();
+					}
+				},
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		ObjectDefinition childObjectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition();
+
+		ObjectEntry childObjectEntry1 =
+			_defaultObjectEntryManager.addObjectEntry(
+				_simpleDTOConverterContext, childObjectDefinition,
+				new ObjectEntry() {
+					{
+						properties = new HashMap<>();
+					}
+				},
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+		ObjectEntry childObjectEntry2 =
+			_defaultObjectEntryManager.addObjectEntry(
+				_simpleDTOConverterContext, childObjectDefinition,
+				new ObjectEntry() {
+					{
+						properties = new HashMap<>();
+					}
+				},
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		ObjectRelationship objectRelationship =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE,
+				parentObjectDefinition, childObjectDefinition,
+				TestPropsValues.getUserId(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_ONE);
+
+		_defaultObjectEntryManager.partialUpdateObjectEntry(
+			_simpleDTOConverterContext, parentObjectDefinition,
+			parentObjectEntry.getId(),
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						objectRelationship.getName(),
+						HashMapBuilder.<String, Object>put(
+							"externalReferenceCode",
+							childObjectEntry1.getExternalReferenceCode()
+						).build()
+					).build();
+				}
+			});
+
+		ObjectField objectField = objectFieldLocalService.getObjectField(
+			objectRelationship.getObjectFieldId2());
+
+		Assert.assertEquals(
+			GetterUtil.getLong(parentObjectEntry.getId()),
+			MapUtil.getLong(
+				_objectEntryLocalService.getValues(childObjectEntry1.getId()),
+				objectField.getName()));
+
+		_defaultObjectEntryManager.partialUpdateObjectEntry(
+			_simpleDTOConverterContext, parentObjectDefinition,
+			parentObjectEntry.getId(),
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						objectRelationship.getName(),
+						HashMapBuilder.<String, Object>put(
+							"externalReferenceCode",
+							childObjectEntry2.getExternalReferenceCode()
+						).build()
+					).build();
+				}
+			});
+
+		Assert.assertEquals(
+			0,
+			MapUtil.getLong(
+				_objectEntryLocalService.getValues(childObjectEntry1.getId()),
+				objectField.getName()));
+		Assert.assertEquals(
+			GetterUtil.getLong(parentObjectEntry.getId()),
+			MapUtil.getLong(
+				_objectEntryLocalService.getValues(childObjectEntry2.getId()),
+				objectField.getName()));
+
+		_defaultObjectEntryManager.partialUpdateObjectEntry(
+			_simpleDTOConverterContext, parentObjectDefinition,
+			parentObjectEntry.getId(),
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						objectRelationship.getName(), new HashMap<>()
+					).build();
+				}
+			});
+
+		Assert.assertEquals(
+			0,
+			MapUtil.getLong(
+				_objectEntryLocalService.getValues(childObjectEntry1.getId()),
+				objectField.getName()));
+		Assert.assertEquals(
+			0,
+			MapUtil.getLong(
+				_objectEntryLocalService.getValues(childObjectEntry2.getId()),
+				objectField.getName()));
+	}
+
 	@Test
 	public void testPartialUpdateObjectEntryWithNestedObjectEntryObjectAction()
 		throws Exception {
