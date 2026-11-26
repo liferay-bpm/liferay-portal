@@ -209,10 +209,27 @@ export class TasksPage {
 		});
 	}
 
+	async execTreeBulkItemAction(action: string) {
+		await this.page
+			.locator('.management-bar')
+			.getByRole('button', {exact: true, name: action})
+			.click();
+	}
+
+	async expandItem(filter: string) {
+		await this.getItem(filter)
+			.getByRole('button', {name: 'Expand'})
+			.click();
+	}
+
 	getBulkUpdateStateSelector(stepName: string) {
 		return this.bulkUpdateStateDialog.getByRole('combobox', {
 			name: `Transition from ${stepName}`,
 		});
+	}
+
+	getItemCheckbox(filter: string) {
+		return this.getItem(filter).getByRole('checkbox');
 	}
 
 	getKanbanColumn(name: string) {

@@ -13,6 +13,7 @@ import dragAndDropElement from '../../../utils/dragAndDropElement';
 import getRandomString from '../../../utils/getRandomString';
 import {waitForAlert} from '../../../utils/waitForAlert';
 import {cmpPagesTest} from './fixtures/cmpPagesTest';
+import {toDateString} from './utils/toDateString';
 
 const test = mergeTests(
 	cmpPagesTest,
@@ -84,16 +85,15 @@ test(
 
 			await projectPage.tasksTab.click();
 
+			await tasksPage.expandItem(parentTask.title);
+
 			for (const selectedTask of [parentTask, subtask, task]) {
-				await tasksPage
-					.getItem(selectedTask.title)
-					.locator('input[title="Select Item"]')
-					.check();
+				await tasksPage.getItemCheckbox(selectedTask.title).check();
 			}
 		});
 
 		await test.step('Count the selected subtask once and the unselected sub-subtask in the confirmation title', async () => {
-			await tasksPage.execBulkItemAction('Delete');
+			await tasksPage.execTreeBulkItemAction('Delete');
 
 			const deleteDialog = page.getByRole('dialog', {
 				name: 'Delete 4 Tasks',
@@ -338,7 +338,7 @@ test(
 			});
 
 			const dialog = page
-				.getByRole('alert')
+				.getByRole('dialog')
 				.filter({hasText: 'You are about to delete'});
 
 			await expect(dialog).toContainText(deleteConfirmationMessage);
@@ -531,13 +531,10 @@ test(
 		await tasksPage.projectTasksTab.click();
 
 		for (const task of tasks) {
-			await tasksPage
-				.getItem(task.title)
-				.locator('input[title="Select Item"]')
-				.check();
+			await tasksPage.getItemCheckbox(task.title).check();
 		}
 
-		await tasksPage.execBulkItemAction('Update State');
+		await tasksPage.execTreeBulkItemAction('Update State');
 
 		await tasksPage.updateStateSelector.click();
 
@@ -593,6 +590,9 @@ test(
 		await projectPage.tasksTab.click();
 
 		await expect(tasksPage.getItem(parentTask.title)).toBeVisible();
+
+		await tasksPage.expandItem(parentTask.title);
+
 		await expect(tasksPage.getItem(subtask.title)).toBeVisible();
 
 		await test.step('Show only the subtasks', async () => {
@@ -607,7 +607,9 @@ test(
 			await page.getByRole('button', {name: 'Add Filter'}).click();
 
 			await expect(tasksPage.getItem(subtask.title)).toBeVisible();
-			await expect(tasksPage.getItem(parentTask.title)).toBeHidden();
+			await expect(
+				page.getByRole('link', {exact: true, name: parentTask.title})
+			).toBeHidden();
 		});
 
 		await test.step('Show only the tasks', async () => {
@@ -899,6 +901,163 @@ test(
 			await expect(
 				page.getByRole('menuitem', {name: 'Watch Subtask'})
 			).toBeVisible();
+		});
+	}
+);
+
+test(
+	'Nest the subtasks under their task',
+	{tag: ['@LPD-114775']},
+	async ({apiHelpers, page, projectPage, projectsPage, tasksPage}) => {
+		const project = await apiHelpers.objectEntry.postObjectEntry(
+			{
+				title: getRandomString(),
+			},
+			cmpProject
+		);
+
+		const task = await apiHelpers.objectEntry.postObjectEntry(
+			{
+				r_cmpProjectToCMPTasks_c_cmpProjectId: project.id,
+				title: getRandomString(),
+			},
+			cmpTask,
+			project.scopeKey
+		);
+
+		const subtask = await apiHelpers.objectEntry.postObjectEntry(
+			{
+				r_cmpProjectToCMPTasks_c_cmpProjectId: project.id,
+				r_cmpTaskToCMPTasks_c_cmpTaskId: task.id,
+				title: getRandomString(),
+			},
+			cmpTask,
+			project.scopeKey
+		);
+
+		const subSubtask = await apiHelpers.objectEntry.postObjectEntry(
+			{
+				r_cmpProjectToCMPTasks_c_cmpProjectId: project.id,
+				r_cmpTaskToCMPTasks_c_cmpTaskId: subtask.id,
+				title: getRandomString(),
+			},
+			cmpTask,
+			project.scopeKey
+		);
+
+		await projectsPage.goto();
+
+		await projectsPage.getProject(project.title).click();
+
+		await clickAndExpectToBeVisible({
+			target: tasksPage.getItem(task.title),
+			trigger: projectPage.tasksTab,
+		});
+
+		await test.step('List only the tasks at the first level', async () => {
+			await expect(tasksPage.getItem(subtask.title)).toBeHidden();
+		});
+
+		await test.step('Expand a task and its subtask', async () => {
+			await tasksPage.expandItem(task.title);
+
+			await expect(tasksPage.getItem(subtask.title)).toBeVisible();
+
+			await tasksPage.expandItem(subtask.title);
+
+			await expect(tasksPage.getItem(subSubtask.title)).toBeVisible();
+		});
+
+		await test.step('Show a flat list with the parent of each task when searching', async () => {
+			const searchInput = page.getByPlaceholder('Search');
+
+			await searchInput.fill(subSubtask.title);
+
+			await searchInput.press('Enter');
+
+			await expect(tasksPage.getItem(task.title)).toBeHidden();
+			await expect(tasksPage.getItem(subSubtask.title)).toContainText(
+				subtask.title
+			);
+			await expect(
+				tasksPage
+					.getItem(subSubtask.title)
+					.getByRole('button', {name: 'Expand'})
+			).toBeHidden();
+		});
+	}
+);
+
+test(
+	'Show the subtasks in the Kanban and Calendar views',
+	{tag: ['@LPD-114775']},
+	async ({apiHelpers, page, tasksPage}) => {
+		const project = await apiHelpers.objectEntry.postObjectEntry(
+			{
+				title: getRandomString(),
+			},
+			cmpProject
+		);
+
+		const task = await apiHelpers.objectEntry.postObjectEntry(
+			{
+				r_cmpProjectToCMPTasks_c_cmpProjectId: project.id,
+				title: getRandomString(),
+			},
+			cmpTask,
+			project.scopeKey
+		);
+
+		const subtask = await apiHelpers.objectEntry.postObjectEntry(
+			{
+				dueDate: `${toDateString(new Date())}T00:00:00Z`,
+				r_cmpProjectToCMPTasks_c_cmpProjectId: project.id,
+				r_cmpTaskToCMPTasks_c_cmpTaskId: task.id,
+				title: getRandomString(),
+			},
+			cmpTask,
+			project.scopeKey
+		);
+
+		const context = `${project.title} · ${task.title}`;
+
+		await tasksPage.goto();
+
+		await tasksPage.projectTasksTab.click();
+
+		await test.step('Show the project and the parent on the Kanban card', async () => {
+			await tasksPage.tableViewButton.click();
+
+			await tasksPage.kanbanView.viewOption.click();
+
+			const card = page.locator('.lfr__kaban-task-card', {
+				hasText: subtask.title,
+			});
+
+			await expect(card).toContainText(context);
+			await expect(
+				card.getByRole('img', {name: 'Subtask'})
+			).toBeVisible();
+		});
+
+		await test.step('Show the project and the parent on the Calendar card', async () => {
+			await tasksPage.tableViewButton.click();
+
+			await tasksPage.calendarView.viewOption.click();
+
+			await expect(tasksPage.calendarView.title).toBeVisible();
+
+			await tasksPage.switchToDayView();
+
+			const icon = page
+				.locator('.lfr__cmp-calendar-task-card', {
+					hasText: subtask.title,
+				})
+				.getByRole('img', {name: 'Subtask'});
+
+			await icon.hover();
+
+			await expect(page.getByRole('tooltip')).toHaveText(context);
 		});
 	}
 );
