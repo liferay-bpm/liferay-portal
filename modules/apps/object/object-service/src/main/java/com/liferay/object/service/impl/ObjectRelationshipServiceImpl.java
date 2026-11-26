@@ -59,6 +59,13 @@ public class ObjectRelationshipServiceImpl
 			getPermissionChecker(), objectDefinition.getObjectDefinitionId(),
 			ActionKeys.UPDATE);
 
+		if (Objects.equals(
+				type, ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
+
+			_objectDefinitionModelResourcePermission.check(
+				getPermissionChecker(), objectDefinitionId2, ActionKeys.UPDATE);
+		}
+
 		return objectRelationshipLocalService.addObjectRelationship(
 			externalReferenceCode, getUserId(), objectDefinitionId1,
 			objectDefinitionId2, parameterObjectFieldId, deletionType,
@@ -105,6 +112,15 @@ public class ObjectRelationshipServiceImpl
 		_objectDefinitionModelResourcePermission.check(
 			getPermissionChecker(), objectRelationship.getObjectDefinitionId1(),
 			ActionKeys.UPDATE);
+
+		if (Objects.equals(
+				objectRelationship.getType(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
+
+			_objectDefinitionModelResourcePermission.check(
+				getPermissionChecker(),
+				objectRelationship.getObjectDefinitionId2(), ActionKeys.UPDATE);
+		}
 
 		return objectRelationshipLocalService.deleteObjectRelationship(
 			objectRelationshipId);
@@ -187,6 +203,15 @@ public class ObjectRelationshipServiceImpl
 		_objectDefinitionModelResourcePermission.check(
 			getPermissionChecker(), objectRelationship.getObjectDefinitionId1(),
 			ActionKeys.UPDATE);
+
+		if (Objects.equals(
+				objectRelationship.getType(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
+
+			_objectDefinitionModelResourcePermission.check(
+				getPermissionChecker(),
+				objectRelationship.getObjectDefinitionId2(), ActionKeys.UPDATE);
+		}
 
 		return objectRelationshipLocalService.updateObjectRelationship(
 			externalReferenceCode, objectRelationshipId, parameterObjectFieldId,
