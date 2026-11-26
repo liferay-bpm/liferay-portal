@@ -1050,6 +1050,7 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	@Override
+	@Previewable
 	public ObjectEntry fetchObjectEntry(
 		long groupId, ObjectDefinition objectDefinition, String urlTitle) {
 
@@ -1081,6 +1082,7 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	@Override
+	@Previewable
 	public ObjectEntry fetchObjectEntry(
 		String externalReferenceCode, long groupId, long objectDefinitionId) {
 
@@ -1529,6 +1531,7 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	@Override
+	@Previewable
 	public ObjectEntry getObjectEntry(
 			String externalReferenceCode, long groupId, long objectDefinitionId)
 		throws PortalException {
