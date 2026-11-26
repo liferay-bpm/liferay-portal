@@ -24,9 +24,11 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeTriConsumer;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -34,12 +36,14 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.context.ContextUserReplace;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
@@ -131,6 +135,41 @@ public class ObjectDefinitionServiceTest {
 			() -> _testAddCustomObjectDefinition(
 				_objectFolder.getObjectFolderId(),
 				ObjectDefinitionConstants.SCOPE_DEPOT, user));
+	}
+
+	@Test
+	@TestInfo("LPD-116166")
+	public void testAddOrUpdateWorkflowDefinitionLinks() throws Exception {
+		ObjectDefinition objectDefinition = _addCustomObjectDefinition(
+			_adminUser);
+
+		_setResourcePermissions(
+			ObjectDefinition.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(objectDefinition.getObjectDefinitionId()),
+			RoleConstants.USER, new String[] {ActionKeys.UPDATE});
+
+		_group = GroupTestUtil.addGroup();
+
+		Group group = _group;
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				_user)) {
+
+			AssertUtils.assertFailure(
+				PrincipalException.MustHavePermission.class,
+				StringBundler.concat(
+					"User ", _user.getUserId(), " must have ",
+					ActionKeys.UPDATE, " permission for ",
+					Group.class.getName(), StringPool.SPACE,
+					group.getGroupId()),
+				() ->
+					_objectDefinitionService.addOrUpdateWorkflowDefinitionLinks(
+						objectDefinition.getObjectDefinitionId(),
+						Collections.singletonList(
+							_createWorkflowDefinitionLink(
+								group.getGroupId()))));
+		}
 	}
 
 	@Test
@@ -351,6 +390,49 @@ public class ObjectDefinitionServiceTest {
 	}
 
 	@Test
+	@TestInfo("LPD-116166")
+	public void testUpdateCustomObjectDefinitionWithWorkflowDefinitionLinks()
+		throws Exception {
+
+		ObjectDefinition objectDefinition = _addCustomObjectDefinition(
+			_adminUser);
+
+		_setResourcePermissions(
+			ObjectDefinition.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(objectDefinition.getObjectDefinitionId()),
+			RoleConstants.USER, new String[] {ActionKeys.UPDATE});
+
+		_group = GroupTestUtil.addGroup();
+
+		Group group = _group;
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				_user)) {
+
+			AssertUtils.assertFailure(
+				PrincipalException.MustHavePermission.class,
+				StringBundler.concat(
+					"User ", _user.getUserId(), " must have ",
+					ActionKeys.UPDATE, " permission for ",
+					Group.class.getName(), StringPool.SPACE,
+					group.getGroupId()),
+				() -> _objectDefinitionService.updateCustomObjectDefinition(
+					null, objectDefinition.getObjectDefinitionId(), 0, 0, 0, 0,
+					false, objectDefinition.isActive(), null, null, true, false,
+					true, false, true, false, false, false, false, false, null,
+					RandomTestUtil.randomLocaleStringMap(),
+					ObjectDefinitionTestUtil.getRandomName(), null, null, false,
+					RandomTestUtil.randomLocaleStringMap(),
+					objectDefinition.getScope(), objectDefinition.getStatus(),
+					Collections.emptyList(), Collections.emptyList(),
+					Collections.singletonList(
+						_createWorkflowDefinitionLink(group.getGroupId())),
+					new ServiceContext()));
+		}
+	}
+
+	@Test
 	public void testUpdateSystemObjectDefinition() throws Exception {
 		_testUpdateObjectDefinition(this::_testUpdateSystemObjectDefinition);
 	}
@@ -448,6 +530,18 @@ public class ObjectDefinitionServiceTest {
 
 		return ObjectDefinitionTestUtil.addCustomObjectDefinition(
 			ObjectDefinitionTestUtil.getRandomName(), user.getUserId());
+	}
+
+	private WorkflowDefinitionLink _createWorkflowDefinitionLink(long groupId) {
+		WorkflowDefinitionLink workflowDefinitionLink =
+			_workflowDefinitionLinkLocalService.createWorkflowDefinitionLink(0);
+
+		workflowDefinitionLink.setGroupId(groupId);
+		workflowDefinitionLink.setUserId(_adminUser.getUserId());
+		workflowDefinitionLink.setWorkflowDefinitionName(
+			RandomTestUtil.randomString());
+
+		return workflowDefinitionLink;
 	}
 
 	private long _getRoleId(String roleName) throws Exception {
@@ -793,6 +887,9 @@ public class ObjectDefinitionServiceTest {
 
 	private User _adminUser;
 
+	@DeleteAfterTestRun
+	private Group _group;
+
 	@Inject
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
@@ -812,5 +909,9 @@ public class ObjectDefinitionServiceTest {
 	private RoleLocalService _roleLocalService;
 
 	private User _user;
+
+	@Inject
+	private WorkflowDefinitionLinkLocalService
+		_workflowDefinitionLinkLocalService;
 
 }

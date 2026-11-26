@@ -19,17 +19,23 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -74,6 +80,8 @@ public class ObjectDefinitionServiceImpl
 			getPermissionChecker(), objectFolderId,
 			ObjectActionKeys.ADD_OBJECT_DEFINITION);
 
+		_checkWorkflowDefinitionLinks(null, workflowDefinitionLinks);
+
 		return objectDefinitionLocalService.addCustomObjectDefinition(
 			externalReferenceCode, getUserId(), objectFolderId, className,
 			descriptionMap, enableCategorization, enableComments,
@@ -95,10 +103,15 @@ public class ObjectDefinitionServiceImpl
 		_objectDefinitionModelResourcePermission.check(
 			getPermissionChecker(), objectDefinitionId, ActionKeys.UPDATE);
 
-		objectDefinitionLocalService.addOrUpdateWorkflowDefinitionLinks(
+		ObjectDefinition objectDefinition =
 			objectDefinitionLocalService.getObjectDefinition(
-				objectDefinitionId),
-			workflowDefinitionLinks);
+				objectDefinitionId);
+
+		_checkWorkflowDefinitionLinks(
+			objectDefinition, workflowDefinitionLinks);
+
+		objectDefinitionLocalService.addOrUpdateWorkflowDefinitionLinks(
+			objectDefinition, workflowDefinitionLinks);
 	}
 
 	@Override
@@ -126,6 +139,8 @@ public class ObjectDefinitionServiceImpl
 		_objectFolderModelResourcePermission.check(
 			getPermissionChecker(), objectFolderId,
 			ObjectActionKeys.ADD_OBJECT_DEFINITION);
+
+		_checkWorkflowDefinitionLinks(null, workflowDefinitionLinks);
 
 		return objectDefinitionLocalService.addSystemObjectDefinition(
 			externalReferenceCode, userId, objectFolderId, className, null,
@@ -292,6 +307,11 @@ public class ObjectDefinitionServiceImpl
 			getPermissionChecker(), objectFolderId,
 			ObjectActionKeys.ADD_OBJECT_DEFINITION);
 
+		_checkWorkflowDefinitionLinks(
+			objectDefinitionLocalService.getObjectDefinition(
+				objectDefinitionId),
+			workflowDefinitionLinks);
+
 		return objectDefinitionLocalService.updateCustomObjectDefinition(
 			externalReferenceCode, objectDefinitionId,
 			accountEntryRestrictedObjectFieldId, descriptionObjectFieldId,
@@ -334,6 +354,11 @@ public class ObjectDefinitionServiceImpl
 			getPermissionChecker(), objectFolderId,
 			ObjectActionKeys.ADD_OBJECT_DEFINITION);
 
+		_checkWorkflowDefinitionLinks(
+			objectDefinitionLocalService.getObjectDefinition(
+				objectDefinitionId),
+			workflowDefinitionLinks);
+
 		return objectDefinitionLocalService.updateSystemObjectDefinition(
 			externalReferenceCode, objectDefinitionId, objectFolderId,
 			titleObjectFieldId, objectDefinitionSettings, objectFields,
@@ -352,6 +377,55 @@ public class ObjectDefinitionServiceImpl
 			objectDefinitionId, titleObjectFieldId);
 	}
 
+	private void _checkWorkflowDefinitionLinks(
+			ObjectDefinition objectDefinition,
+			List<WorkflowDefinitionLink> workflowDefinitionLinks)
+		throws PortalException {
+
+		Set<Long> groupIds = new HashSet<>();
+
+		if (workflowDefinitionLinks != null) {
+			for (WorkflowDefinitionLink workflowDefinitionLink :
+					workflowDefinitionLinks) {
+
+				groupIds.add(workflowDefinitionLink.getGroupId());
+			}
+		}
+
+		if (objectDefinition != null) {
+			for (WorkflowDefinitionLink workflowDefinitionLink :
+					_workflowDefinitionLinkLocalService.
+						getWorkflowDefinitionLinks(
+							objectDefinition.getCompanyId(),
+							objectDefinition.getClassName())) {
+
+				groupIds.add(workflowDefinitionLink.getGroupId());
+			}
+		}
+
+		PermissionChecker permissionChecker = getPermissionChecker();
+
+		for (long groupId : groupIds) {
+			if (groupId == WorkflowConstants.DEFAULT_GROUP_ID) {
+				if (!permissionChecker.isCompanyAdmin(
+						permissionChecker.getCompanyId())) {
+
+					throw new PrincipalException.MustBeCompanyAdmin(
+						permissionChecker);
+				}
+
+				continue;
+			}
+
+			GroupPermissionUtil.check(
+				permissionChecker, _groupLocalService.getGroup(groupId),
+				ActionKeys.UPDATE);
+		}
+	}
+
+	@Reference
+	private GroupLocalService _groupLocalService;
+
 	@Reference(
 		target = "(model.class.name=com.liferay.object.model.ObjectDefinition)"
 	)
@@ -369,5 +443,9 @@ public class ObjectDefinitionServiceImpl
 
 	@Reference(target = "(resource.name=" + ObjectConstants.RESOURCE_NAME + ")")
 	private PortletResourcePermission _portletResourcePermission;
+
+	@Reference
+	private WorkflowDefinitionLinkLocalService
+		_workflowDefinitionLinkLocalService;
 
 }
