@@ -1272,6 +1272,43 @@ public class ObjectEntryServiceTest {
 		_accountEntryLocalService.deleteAccountEntry(accountEntry);
 	}
 
+	@FeatureFlag("LPD-72278")
+	@Test
+	@TestInfo("LPD-116825")
+	public void testGetObjectEntryWithDraftObjectEntry() throws Exception {
+		_objectDefinition.setEnableObjectEntryDraft(true);
+		_objectDefinition.setEnableObjectEntryVersioning(true);
+
+		_objectDefinition =
+			_objectDefinitionLocalService.updateObjectDefinition(
+				_objectDefinition);
+
+		ObjectEntry objectEntry = _addObjectEntry(_adminUser);
+
+		_setResourcePermissions(
+			_objectDefinition.getClassName(), ResourceConstants.SCOPE_COMPANY,
+			String.valueOf(TestPropsValues.getCompanyId()), RoleConstants.USER,
+			new String[] {ActionKeys.VIEW});
+
+		_testGetObjectEntry(objectEntry, _user);
+
+		ObjectEntry draftObjectEntry =
+			_objectEntryLocalService.addDraftObjectEntry(
+				_adminUser.getUserId(), objectEntry.getObjectEntryId(),
+				RandomTestUtil.randomInt(), Collections.emptyMap(),
+				ServiceContextTestUtil.getServiceContext());
+
+		try {
+			_testGetObjectEntry(draftObjectEntry, _user);
+
+			Assert.fail();
+		}
+		catch (PrincipalException.MustHavePermission principalException) {
+		}
+
+		_testGetObjectEntry(draftObjectEntry, _adminUser);
+	}
+
 	@Test
 	public void testGetOrAddEmptyObjectEntry() throws Exception {
 
