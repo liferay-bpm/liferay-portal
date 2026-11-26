@@ -274,37 +274,39 @@ public class ProcessResourceTest extends BaseProcessResourceTestCase {
 			).build(),
 			getGraphQLFields());
 
-		for (GraphQLField graphQLField :
-				new GraphQLField[] {
-					processGraphQLField,
-					new GraphQLField(
-						"portalWorkflowMetrics_v1_0", processGraphQLField)
-				}) {
+		_testGraphQLGetProcessWithoutPermission(
+			new GraphQLField("portalWorkflowMetrics_v1_0", processGraphQLField),
+			user, password);
+		_testGraphQLGetProcessWithoutPermission(
+			processGraphQLField, user, password);
+	}
 
-			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+	private void _testGraphQLGetProcessWithoutPermission(
+			GraphQLField graphQLField, User user, String password)
+		throws Exception {
 
-			httpInvoker.body(
-				JSONUtil.put(
-					"query",
-					String.valueOf(new GraphQLField("query", graphQLField))
-				).toString(),
-				"application/json");
-			httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
-			httpInvoker.path(
-				"http://localhost:" + PortalUtil.getPortalServerPort(false) +
-					"/o/graphql");
-			httpInvoker.userNameAndPassword(
-				user.getEmailAddress() + ":" + password);
+		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+		httpInvoker.body(
+			JSONUtil.put(
+				"query",
+				String.valueOf(new GraphQLField("query", graphQLField))
+			).toString(),
+			"application/json");
+		httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+		httpInvoker.path(
+			"http://localhost:" + PortalUtil.getPortalServerPort(false) +
+				"/o/graphql");
+		httpInvoker.userNameAndPassword(user.getEmailAddress() + ":" + password);
 
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-				httpResponse.getContent());
+		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
 
-			JSONArray errorsJSONArray = jsonObject.getJSONArray("errors");
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+			httpResponse.getContent());
 
-			Assert.assertTrue(errorsJSONArray.length() > 0);
-		}
+		JSONArray errorsJSONArray = jsonObject.getJSONArray("errors");
+
+		Assert.assertTrue(errorsJSONArray.length() > 0);
 	}
 
 	private void _testPostProcessWithoutPermission() throws Exception {

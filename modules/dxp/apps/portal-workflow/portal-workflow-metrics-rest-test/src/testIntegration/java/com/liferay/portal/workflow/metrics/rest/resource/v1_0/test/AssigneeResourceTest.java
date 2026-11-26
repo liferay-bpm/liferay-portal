@@ -121,7 +121,7 @@ public class AssigneeResourceTest extends BaseAssigneeResourceTestCase {
 
 		Assert.assertEquals(0, page.getTotalCount());
 
-		_testPostProcessAssigneePageWithoutPermission();
+		_testPostProcessAssigneesPageWithoutPermission();
 	}
 
 	@Rule
@@ -145,7 +145,7 @@ public class AssigneeResourceTest extends BaseAssigneeResourceTestCase {
 		};
 	}
 
-	private void _testPostProcessAssigneePageWithoutPermission()
+	private void _testPostProcessAssigneesPageWithoutPermission()
 		throws Exception {
 
 		assertHttpResponseStatusCode(

@@ -106,8 +106,8 @@ public class CalendarResourceTest extends BaseCalendarResourceTestCase {
 			Arrays.asList(_getDefaultCalendar(), _getCustomCalendar()),
 			calendars);
 
-		_testGetCalendarsPageWithoutPermission();
 		_testGetCalendarsPageExportWithoutPermission();
+		_testGetCalendarsPageWithoutPermission();
 	}
 
 	@Rule
