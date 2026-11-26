@@ -6,6 +6,9 @@
 package com.liferay.object.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.notification.constants.NotificationConstants;
+import com.liferay.notification.model.NotificationTemplate;
+import com.liferay.notification.service.NotificationTemplateLocalService;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.model.ObjectAction;
@@ -29,6 +32,7 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -83,7 +87,70 @@ public class ObjectActionServiceTest {
 	}
 
 	@Test
+	@TestInfo("LPD-116155")
 	public void testAddObjectAction() throws Exception {
+
+		// Notification template permissions
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		RoleTestUtil.addResourcePermission(
+			role, ObjectDefinition.class.getName(),
+			ResourceConstants.SCOPE_COMPANY,
+			String.valueOf(TestPropsValues.getCompanyId()), ActionKeys.UPDATE);
+
+		User user = _addUser(role);
+
+		_setUser(user);
+
+		try {
+			_objectActionService.addObjectAction(
+				RandomTestUtil.randomString(),
+				_objectDefinition.getObjectDefinitionId(), true,
+				StringPool.BLANK,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				RandomTestUtil.randomString(),
+				ObjectActionExecutorConstants.KEY_NOTIFICATION,
+				ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+				_getNotificationParametersUnicodeProperties(
+					RandomTestUtil.randomString()),
+				false);
+
+			Assert.fail();
+		}
+		catch (PrincipalException.MustHavePermission principalException) {
+			String message = principalException.getMessage();
+
+			Assert.assertTrue(
+				message.contains(
+					"User " + user.getUserId() +
+						" must have ADD_NOTIFICATION_TEMPLATE permission for"));
+		}
+
+		NotificationTemplate notificationTemplate =
+			_notificationTemplateLocalService.addNotificationTemplate(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				NotificationConstants.TYPE_EMAIL);
+
+		_objectActionLocalService.deleteObjectAction(
+			_objectActionService.addObjectAction(
+				RandomTestUtil.randomString(),
+				_objectDefinition.getObjectDefinitionId(), true,
+				StringPool.BLANK,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				RandomTestUtil.randomString(),
+				ObjectActionExecutorConstants.KEY_NOTIFICATION,
+				ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+				_getNotificationParametersUnicodeProperties(
+					notificationTemplate.getExternalReferenceCode()),
+				false));
+
+		_notificationTemplateLocalService.deleteNotificationTemplate(
+			notificationTemplate);
 
 		// Object action permissions
 
@@ -104,15 +171,6 @@ public class ObjectActionServiceTest {
 		_testAddObjectAction(_user);
 
 		// Webhook local network access permissions
-
-		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
-
-		RoleTestUtil.addResourcePermission(
-			role, ObjectDefinition.class.getName(),
-			ResourceConstants.SCOPE_COMPANY,
-			String.valueOf(TestPropsValues.getCompanyId()), ActionKeys.UPDATE);
-
-		User user = _addUser(role);
 
 		_setUser(user);
 
@@ -215,7 +273,54 @@ public class ObjectActionServiceTest {
 	}
 
 	@Test
+	@TestInfo("LPD-116155")
 	public void testUpdateObjectAction() throws Exception {
+
+		// Notification template permissions
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		RoleTestUtil.addResourcePermission(
+			role, ObjectDefinition.class.getName(),
+			ResourceConstants.SCOPE_COMPANY,
+			String.valueOf(TestPropsValues.getCompanyId()), ActionKeys.UPDATE);
+
+		User user = _addUser(role);
+
+		_setUser(user);
+
+		ObjectAction objectAction1 = _addObjectAction(_user);
+
+		try {
+			_updateWebhookObjectAction(
+				objectAction1, ObjectActionExecutorConstants.KEY_NOTIFICATION,
+				_getNotificationParametersUnicodeProperties(
+					RandomTestUtil.randomString()));
+
+			Assert.fail();
+		}
+		catch (PrincipalException.MustHavePermission principalException) {
+			String message = principalException.getMessage();
+
+			Assert.assertTrue(
+				message.contains(
+					"User " + user.getUserId() +
+						" must have ADD_NOTIFICATION_TEMPLATE permission for"));
+		}
+
+		NotificationTemplate notificationTemplate =
+			_notificationTemplateLocalService.addNotificationTemplate(
+				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+				NotificationConstants.TYPE_EMAIL);
+
+		_objectActionLocalService.deleteObjectAction(
+			_updateWebhookObjectAction(
+				objectAction1, ObjectActionExecutorConstants.KEY_NOTIFICATION,
+				_getNotificationParametersUnicodeProperties(
+					notificationTemplate.getExternalReferenceCode())));
+
+		_notificationTemplateLocalService.deleteNotificationTemplate(
+			notificationTemplate);
 
 		// Object action permissions
 
@@ -237,7 +342,7 @@ public class ObjectActionServiceTest {
 
 		// Omit network access parameters as an admin user
 
-		ObjectAction objectAction1 = _objectActionLocalService.addObjectAction(
+		ObjectAction objectAction2 = _objectActionLocalService.addObjectAction(
 			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -255,14 +360,14 @@ public class ObjectActionServiceTest {
 			).build(),
 			false);
 
-		ObjectAction objectAction2 = _updateWebhookObjectAction(
-			objectAction1, ObjectActionExecutorConstants.KEY_WEBHOOK,
+		ObjectAction objectAction3 = _updateWebhookObjectAction(
+			objectAction2, ObjectActionExecutorConstants.KEY_WEBHOOK,
 			UnicodePropertiesBuilder.put(
 				"url", "https://onafteradd.com"
 			).build());
 
 		UnicodeProperties parametersUnicodeProperties =
-			objectAction2.getParametersUnicodeProperties();
+			objectAction3.getParametersUnicodeProperties();
 
 		Assert.assertEquals(
 			"standalone.com",
@@ -271,22 +376,13 @@ public class ObjectActionServiceTest {
 			"true",
 			parametersUnicodeProperties.get("urlLocalNetworkAccessEnabled"));
 
-		_objectActionLocalService.deleteObjectAction(objectAction2);
+		_objectActionLocalService.deleteObjectAction(objectAction3);
 
 		// Update network access parameters as a regular user
 
-		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
-
-		RoleTestUtil.addResourcePermission(
-			role, ObjectDefinition.class.getName(),
-			ResourceConstants.SCOPE_COMPANY,
-			String.valueOf(TestPropsValues.getCompanyId()), ActionKeys.UPDATE);
-
-		User user = _addUser(role);
-
 		_setUser(user);
 
-		ObjectAction objectAction3 = _objectActionLocalService.addObjectAction(
+		ObjectAction objectAction4 = _objectActionLocalService.addObjectAction(
 			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -310,7 +406,7 @@ public class ObjectActionServiceTest {
 				"User ", user.getUserId(), " must be the company ",
 				"administrator to perform the action"),
 			() -> _updateWebhookObjectAction(
-				objectAction3, ObjectActionExecutorConstants.KEY_WEBHOOK,
+				objectAction4, ObjectActionExecutorConstants.KEY_WEBHOOK,
 				UnicodePropertiesBuilder.put(
 					"url", "https://standalone.com"
 				).put(
@@ -323,7 +419,7 @@ public class ObjectActionServiceTest {
 				"User ", user.getUserId(), " must be the company ",
 				"administrator to perform the action"),
 			() -> _updateWebhookObjectAction(
-				objectAction3, ObjectActionExecutorConstants.KEY_WEBHOOK,
+				objectAction4, ObjectActionExecutorConstants.KEY_WEBHOOK,
 				UnicodePropertiesBuilder.put(
 					"url", "https://standalone.com"
 				).put(
@@ -338,15 +434,15 @@ public class ObjectActionServiceTest {
 				"User ", user.getUserId(), " must be the company ",
 				"administrator to perform the action"),
 			() -> _updateWebhookObjectAction(
-				objectAction3, ObjectActionExecutorConstants.KEY_WEBHOOK,
+				objectAction4, ObjectActionExecutorConstants.KEY_WEBHOOK,
 				UnicodePropertiesBuilder.put(
 					"url", "https://onafteradd.com"
 				).build()));
 
 		// Update other fields as a regular user
 
-		ObjectAction objectAction4 = _updateWebhookObjectAction(
-			objectAction3, ObjectActionExecutorConstants.KEY_WEBHOOK,
+		ObjectAction objectAction5 = _updateWebhookObjectAction(
+			objectAction4, ObjectActionExecutorConstants.KEY_WEBHOOK,
 			UnicodePropertiesBuilder.put(
 				"secret", RandomTestUtil.randomString()
 			).put(
@@ -354,7 +450,7 @@ public class ObjectActionServiceTest {
 			).build());
 
 		parametersUnicodeProperties =
-			objectAction4.getParametersUnicodeProperties();
+			objectAction5.getParametersUnicodeProperties();
 
 		Assert.assertEquals(
 			"standalone.com",
@@ -368,14 +464,14 @@ public class ObjectActionServiceTest {
 		try (Closeable closeable =
 				ScriptManagementConfigurationTestUtil.saveWithCloseable(true)) {
 
-			ObjectAction objectAction5 = _updateWebhookObjectAction(
-				objectAction4, ObjectActionExecutorConstants.KEY_GROOVY,
+			ObjectAction objectAction6 = _updateWebhookObjectAction(
+				objectAction5, ObjectActionExecutorConstants.KEY_GROOVY,
 				UnicodePropertiesBuilder.put(
 					"script", "println 'onAfterAdd'"
 				).build());
 
 			parametersUnicodeProperties =
-				objectAction5.getParametersUnicodeProperties();
+				objectAction6.getParametersUnicodeProperties();
 
 			Assert.assertFalse(
 				parametersUnicodeProperties.containsKey("urlHostsAllowed"));
@@ -383,12 +479,12 @@ public class ObjectActionServiceTest {
 				parametersUnicodeProperties.containsKey(
 					"urlLocalNetworkAccessEnabled"));
 
-			_objectActionLocalService.deleteObjectAction(objectAction5);
+			_objectActionLocalService.deleteObjectAction(objectAction6);
 		}
 
 		// Update the webhook URL without local network access as a regular user
 
-		ObjectAction objectAction6 = _objectActionLocalService.addObjectAction(
+		ObjectAction objectAction7 = _objectActionLocalService.addObjectAction(
 			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -402,19 +498,19 @@ public class ObjectActionServiceTest {
 			).build(),
 			false);
 
-		ObjectAction objectAction7 = _updateWebhookObjectAction(
-			objectAction6, ObjectActionExecutorConstants.KEY_WEBHOOK,
+		ObjectAction objectAction8 = _updateWebhookObjectAction(
+			objectAction7, ObjectActionExecutorConstants.KEY_WEBHOOK,
 			UnicodePropertiesBuilder.put(
 				"url", "https://onafteradd.com"
 			).build());
 
 		parametersUnicodeProperties =
-			objectAction7.getParametersUnicodeProperties();
+			objectAction8.getParametersUnicodeProperties();
 
 		Assert.assertEquals(
 			"https://onafteradd.com", parametersUnicodeProperties.get("url"));
 
-		_objectActionLocalService.deleteObjectAction(objectAction7);
+		_objectActionLocalService.deleteObjectAction(objectAction8);
 
 		_userLocalService.deleteUser(user);
 
@@ -459,6 +555,15 @@ public class ObjectActionServiceTest {
 			ObjectActionExecutorConstants.KEY_WEBHOOK,
 			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
 			parametersUnicodeProperties, false);
+	}
+
+	private UnicodeProperties _getNotificationParametersUnicodeProperties(
+		String notificationTemplateExternalReferenceCode) {
+
+		return UnicodePropertiesBuilder.put(
+			"notificationTemplateExternalReferenceCode",
+			notificationTemplateExternalReferenceCode
+		).build();
 	}
 
 	private void _setUser(User user) {
@@ -580,6 +685,9 @@ public class ObjectActionServiceTest {
 	}
 
 	private User _guestUser;
+
+	@Inject
+	private NotificationTemplateLocalService _notificationTemplateLocalService;
 
 	@Inject
 	private ObjectActionLocalService _objectActionLocalService;
