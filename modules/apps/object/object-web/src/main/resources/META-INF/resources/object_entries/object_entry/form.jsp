@@ -511,7 +511,7 @@ if (ParamUtil.getBoolean(request, "showHeader", true)) {
 												"<span class='alert-indicator'><svg class='lexicon-icon lexicon-icon-exclamation-full' focusable='false' role='presentation'><use xlink:href='/o/admin-theme/images/clay/icons.svg#exclamation-full'/></svg> <strong class='lead'>Error:</strong></span>"
 											);
 
-											alertElement.insertAdjacentHTML(
+											alertElement.insertAdjacentText(
 												'beforeend',
 												error.errorMessage
 											);
