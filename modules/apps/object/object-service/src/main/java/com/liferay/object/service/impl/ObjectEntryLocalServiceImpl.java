@@ -4076,10 +4076,7 @@ public class ObjectEntryLocalServiceImpl
 						relatedObjectEntry.getObjectEntryId(), serviceContext);
 			}
 		}
-		else if (Objects.equals(
-					objectRelationship.getType(),
-					ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
-
+		else if (objectRelationship.hasRelationshipObjectField()) {
 			if (!objectRelationship.isEdge()) {
 				return;
 			}
