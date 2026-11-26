@@ -557,17 +557,14 @@ public class DefaultObjectEntryManagerImpl
 			ObjectDefinition relatedObjectDefinition, long userId)
 		throws Exception {
 
-		long[] relatedPrimaryKeys = TransformUtil.transformToLongArray(
-			_getRelatedModels(
-				objectDefinition, objectRelationship, primaryKey,
-				relatedObjectDefinition),
-			BaseModel::getPrimaryKeyObj);
-
-		if (relatedPrimaryKeys.length > 0) {
-			_disassociateRelatedModels(
-				objectDefinition, objectRelationship, primaryKey,
-				relatedPrimaryKeys, relatedObjectDefinition, userId);
-		}
+		_disassociateRelatedModels(
+			objectDefinition, objectRelationship, primaryKey,
+			TransformUtil.transformToLongArray(
+				_getRelatedModels(
+					objectDefinition, objectRelationship, primaryKey,
+					relatedObjectDefinition),
+				BaseModel::getPrimaryKeyObj),
+			relatedObjectDefinition, userId);
 	}
 
 	@Override
@@ -2223,6 +2220,10 @@ public class DefaultObjectEntryManagerImpl
 			long userId)
 		throws Exception {
 
+		if (ArrayUtil.isEmpty(primaryKeys2)) {
+			return;
+		}
+
 		ObjectRelatedModelsProvider<?> objectRelatedModelsProvider = null;
 
 		if (_hasRelationshipObjectField(
@@ -2300,6 +2301,21 @@ public class DefaultObjectEntryManagerImpl
 				objectRelationshipElementsParser.parse(
 					objectRelationship, properties.get(entry.getKey()));
 
+			if (Objects.equals(
+					objectRelationship.getType(),
+					ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
+
+				_disassociateRelatedModels(
+					objectDefinition, objectRelationship,
+					serviceBuilderObjectEntry.getPrimaryKey(),
+					_getMissingPrimaryKeys(
+						_getExternalReferenceCodes(
+							nestedObjectEntries, relatedObjectDefinition),
+						objectDefinition, objectRelationship,
+						relatedObjectDefinition, serviceBuilderObjectEntry),
+					relatedObjectDefinition, dtoConverterContext.getUserId());
+			}
+
 			List<String> nestedExternalReferenceCodes = new ArrayList<>();
 
 			boolean hasRelationshipObjectField = _hasRelationshipObjectField(
@@ -2360,7 +2376,7 @@ public class DefaultObjectEntryManagerImpl
 						objectEntryId);
 				}
 			}
-			else if (missingPrimaryKeys.length > 0) {
+			else {
 				_disassociateRelatedModels(
 					objectDefinition, objectRelationship,
 					serviceBuilderObjectEntry.getPrimaryKey(),
@@ -2453,6 +2469,25 @@ public class DefaultObjectEntryManagerImpl
 		}
 
 		return QueryUtil.ALL_POS;
+	}
+
+	private List<String> _getExternalReferenceCodes(
+		List<?> nestedObjectEntries, ObjectDefinition relatedObjectDefinition) {
+
+		if (relatedObjectDefinition.isUnmodifiableSystemObject()) {
+			return TransformUtil.transform(
+				nestedObjectEntries,
+				item -> MapUtil.getString(
+					(Map<String, Object>)item, "externalReferenceCode"));
+		}
+
+		return TransformUtil.transform(
+			nestedObjectEntries,
+			item -> {
+				ObjectEntry objectEntry = (ObjectEntry)item;
+
+				return objectEntry.getExternalReferenceCode();
+			});
 	}
 
 	private List<Facet> _getFacets(
