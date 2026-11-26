@@ -3,7 +3,11 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {IDataSetData, TSort} from '@liferay/frontend-data-set-web';
+import {
+	IDataSetData,
+	IDataSetPageData,
+	TSort,
+} from '@liferay/frontend-data-set-web';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {getSubtasks} from '../../../../../utils/api';
@@ -64,7 +68,7 @@ export default function useTaskTree({
 }: {
 	apiURL: string;
 	items: ITask[];
-	requestPage?: (page: number) => Promise<IDataSetData>;
+	requestPage?: (page: number) => Promise<IDataSetPageData>;
 	sorts?: TSort[];
 	total: number;
 	updateDataSetItems?: (dataSetData: IDataSetData) => void;
@@ -166,7 +170,7 @@ export default function useTaskTree({
 
 		const data = await requestPage!(pageRef.current + 1);
 
-		if (itemsRef.current !== requestedItems) {
+		if (data.stale || itemsRef.current !== requestedItems) {
 			return;
 		}
 

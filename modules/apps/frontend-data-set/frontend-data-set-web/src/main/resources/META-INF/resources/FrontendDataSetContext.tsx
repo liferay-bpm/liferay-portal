@@ -9,6 +9,7 @@ import {
 	EConfigInURLKeys,
 	IConfigInURLUpdaterThunk,
 	IDataSetData,
+	IDataSetPageData,
 	IFDSState,
 	IInlineEditingSettings,
 	IInternalRenderer,
@@ -80,7 +81,10 @@ export interface IFrontendDataSetContext {
 	openModal: Function;
 	openSidePanel: Function;
 	portletId?: string;
-	requestPage?: (page: number, signal?: AbortSignal) => Promise<IDataSetData>;
+	requestPage?: (
+		page: number,
+		signal?: AbortSignal
+	) => Promise<IDataSetPageData>;
 	saveDataSetUserConfigurationURL?: string;
 	searchAsYouType: boolean;
 	searchParam?: string;

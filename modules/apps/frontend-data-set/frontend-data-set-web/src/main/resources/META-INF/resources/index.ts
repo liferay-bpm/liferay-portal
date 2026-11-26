@@ -63,6 +63,7 @@ export {
 	IListSchema,
 	ICreationActionItem,
 	IDataSetData,
+	IDataSetPageData,
 	IFDSState,
 	IFileDropSettings,
 	IFrontendDataSetProps,

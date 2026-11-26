@@ -84,6 +84,7 @@ import {
 	IBaseFilterState,
 	IConfigInURL,
 	IDataSetData,
+	IDataSetPageData,
 	IFDSState,
 	IField,
 	IFrontendDataSetProps,
@@ -777,9 +778,14 @@ const FrontendDataSetContent = ({
 		!paginationHidden && !!pagination && !!items?.length && !!total;
 
 	const requestIdRef = useRef(0);
+	const requestPageIdRef = useRef(0);
 
 	const requestData = useCallback(
-		(signal?: AbortSignal, page = pageNumber, tracked = true) => {
+		(
+			signal?: AbortSignal,
+			page = pageNumber,
+			trackedIdRef = requestIdRef
+		) => {
 			if (!apiURL) {
 				return;
 			}
@@ -806,12 +812,12 @@ const FrontendDataSetContent = ({
 				sorts: activeSorts,
 			};
 
-			// A request that does not replace the items must not make the one
-			// that does stale.
+			// Requests are tracked in two categories, so a page requested by a
+			// view does not make a reload stale. A reload does make a page
+			// stale, since the page was requested with the previous state.
 
-			const requestId = tracked
-				? ++requestIdRef.current
-				: requestIdRef.current;
+			const requestId = ++trackedIdRef.current;
+			const reloadId = requestIdRef.current;
 
 			return loadData({
 				...loadDataArgs,
@@ -822,7 +828,9 @@ const FrontendDataSetContent = ({
 				signal,
 			}).then((response) => ({
 				...response,
-				stale: requestId !== requestIdRef.current,
+				stale:
+					requestId !== trackedIdRef.current ||
+					reloadId !== requestIdRef.current,
 			}));
 		},
 		[
@@ -1526,16 +1534,18 @@ const FrontendDataSetContent = ({
 
 	// Fetches a page with the current search, filters and sorts, and changes
 	// nothing in the Data Set: what to do with the page is up to the view,
-	// which can also abort the request with its own signal.
+	// which can also abort the request with its own signal, and knows from
+	// stale whether a newer page request or a reload superseded the page.
 
 	const requestPage = useCallback(
-		(page: number, signal?: AbortSignal): Promise<IDataSetData> => {
-			const request = requestData(signal, page, false);
+		(page: number, signal?: AbortSignal): Promise<IDataSetPageData> => {
+			const request = requestData(signal, page, requestPageIdRef);
 
 			return request
-				? request.then(({data}) => ({
+				? request.then(({data, stale}) => ({
 						...data,
 						items: transformDataSetItems(data.items),
+						stale,
 					}))
 				: Promise.reject(new Error('The Data Set has no API URL'));
 		},
