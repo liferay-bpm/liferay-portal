@@ -37,9 +37,14 @@ type FragmentField = {
 		text?: {
 			mapping?: {
 				fieldKey: string;
-				itemReference: {
-					contextSource: string;
-				};
+				itemReference:
+					| {
+							className: string;
+							classPK: string;
+					  }
+					| {
+							contextSource: string;
+					  };
 			};
 			value_i18n?: {
 				en_US: string;

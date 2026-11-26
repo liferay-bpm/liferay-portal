@@ -6,6 +6,7 @@
 import {Page, expect, mergeTests} from '@playwright/test';
 
 import {apiHelpersTest} from '../../../fixtures/apiHelpersTest';
+import {dataApiHelpersTest} from '../../../fixtures/dataApiHelpersTest';
 import {featureFlagsTest} from '../../../fixtures/featureFlagsTest';
 import {isolatedSiteTest} from '../../../fixtures/isolatedSiteTest';
 import {launchPagesTest} from '../../../fixtures/launchPagesTest';
@@ -16,6 +17,7 @@ import {LaunchEntry, LaunchSet} from '../../../helpers/LaunchApiHelper';
 import {LaunchPreviewPage} from '../../../pages/launch-web/LaunchPreviewPage';
 import {LaunchesPage} from '../../../pages/launch-web/LaunchesPage';
 import getRandomString from '../../../utils/getRandomString';
+import {normalizeRestPath} from '../../../utils/normalizeRestPath';
 import getBasicWebContentStructureId from '../../../utils/structured-content/getBasicWebContentStructureId';
 import getFragmentDefinition from '../../layout-content-page-editor-web/main/utils/getFragmentDefinition';
 import getPageDefinition from '../../layout-content-page-editor-web/main/utils/getPageDefinition';
@@ -26,6 +28,7 @@ const LAYOUT_CLASS_NAME = 'com.liferay.portal.kernel.model.Layout';
 
 const test = mergeTests(
 	apiHelpersTest,
+	dataApiHelpersTest,
 	featureFlagsTest({
 		'LPD-72278': {enabled: true},
 		'LPS-178052': {enabled: true},
@@ -614,5 +617,126 @@ test(
 
 			await previewPage.close();
 		});
+	}
+);
+
+test(
+	'Previews the launch draft of an object entry mapped in a fragment',
+	{tag: '@LPD-110889'},
+	async ({apiHelpers, launchSetIds, launchesPage, page, site}) => {
+
+		// Create a page with a heading mapped to an object entry
+
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				enableObjectEntryDraft: true,
+				enableObjectEntryVersioning: true,
+				scope: 'site',
+				status: {code: 0},
+				titleObjectFieldName: 'textField',
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+
+		const applicationName = normalizeRestPath(
+			objectDefinition.restContextPath
+		);
+		const liveText = getRandomString();
+
+		const objectEntry = await apiHelpers.objectEntry.postObjectEntry(
+			{textField: liveText},
+			applicationName,
+			String(site.id)
+		);
+
+		const pageTitle = getRandomString();
+
+		const layout = await apiHelpers.headlessDelivery.createSitePage({
+			pageDefinition: getPageDefinition([
+				getFragmentDefinition({
+					fragmentFields: [
+						{
+							id: 'element-text',
+							value: {
+								text: {
+									mapping: {
+										fieldKey: 'ObjectField_textField',
+										itemReference: {
+											className:
+												objectDefinition.className,
+											classPK: String(objectEntry.id),
+										},
+									},
+								},
+							},
+						},
+					],
+					id: getRandomString(),
+					key: 'BASIC_COMPONENT-heading',
+				}),
+			]),
+			siteId: site.id,
+			title: pageTitle,
+		});
+
+		// Add the object entry to a launch and edit its draft
+
+		const launchName = getRandomString();
+
+		await launchesPage.goto(site.friendlyUrlPath);
+
+		await launchesPage.createLaunch(launchName, getRandomString());
+
+		const launch = await apiHelpers.launch.getLaunchSetByName(launchName);
+
+		launchSetIds.push(launch.id);
+
+		await launchesPage.goToEntries();
+
+		await launchesPage.addObjectEntry(
+			objectDefinition.label['en_US'],
+			liveText
+		);
+
+		const launchEntry = await apiHelpers.launch.getLaunchEntry(
+			launch.id,
+			objectDefinition.className
+		);
+
+		expect(launchEntry.classPK).toBe(objectEntry.id);
+		expect(launchEntry.draftId).toBeGreaterThan(0);
+
+		const draftText = getRandomString();
+
+		await apiHelpers.objectEntry.patchObjectEntry(
+			{textField: draftText},
+			applicationName,
+			launchEntry.draftId
+		);
+
+		// Preview the launch on the page
+
+		const previewPage = await launchesPage.previewOnPage(
+			site.name,
+			pageTitle
+		);
+
+		await expectPreview(previewPage, {
+			hidden: [liveText],
+			launchName,
+			shown: draftText,
+		});
+
+		await previewPage.close();
+
+		// Check the live page
+
+		await page.goto(`/web${site.friendlyUrlPath}${layout.friendlyUrlPath}`);
+
+		await expect(page.getByText(liveText, {exact: true})).toBeVisible();
+		await expect(page.getByText(draftText, {exact: true})).toBeHidden();
 	}
 );
