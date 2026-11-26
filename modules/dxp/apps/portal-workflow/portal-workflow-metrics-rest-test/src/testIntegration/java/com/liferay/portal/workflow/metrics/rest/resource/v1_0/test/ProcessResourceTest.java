@@ -289,15 +289,15 @@ public class ProcessResourceTest extends BaseProcessResourceTestCase {
 
 		httpInvoker.body(
 			JSONUtil.put(
-				"query",
-				String.valueOf(new GraphQLField("query", graphQLField))
+				"query", String.valueOf(new GraphQLField("query", graphQLField))
 			).toString(),
 			"application/json");
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
 		httpInvoker.path(
 			"http://localhost:" + PortalUtil.getPortalServerPort(false) +
 				"/o/graphql");
-		httpInvoker.userNameAndPassword(user.getEmailAddress() + ":" + password);
+		httpInvoker.userNameAndPassword(
+			user.getEmailAddress() + ":" + password);
 
 		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
 
