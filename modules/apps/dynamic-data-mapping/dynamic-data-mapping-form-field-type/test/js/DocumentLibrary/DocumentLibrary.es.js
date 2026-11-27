@@ -433,21 +433,17 @@ describe('Field DocumentLibrary', () => {
 
 		const valueParsed = (id) => JSON.parse(valueWithFileEntry(id));
 
-		const requestsTo = (url) =>
+		const requestsTo = (url, key) =>
 			xhrInstances
 				.filter((instance) => instance.url === url)
 				.map((instance) =>
-					Number(
-						formDataValue(
-							instance.send.mock.calls[0]?.[0],
-							'oldFileEntryId'
-						)
-					)
+					formDataValue(instance.send.mock.calls[0]?.[0], key)
 				);
 
-		const deleteCalls = () => requestsTo(fileEntryDeleteURL);
+		const deleteCalls = () => requestsTo(fileEntryDeleteURL, 'uuid');
 
-		const uploadCalls = () => requestsTo(guestUploadURL);
+		const uploadCalls = () =>
+			requestsTo(guestUploadURL, 'oldFileEntryUuid');
 
 		const completeUpload = (newFileEntryId) => {
 			const uploadXhr = xhrInstances.find(
@@ -579,26 +575,27 @@ describe('Field DocumentLibrary', () => {
 			completeUpload(99);
 			clickClear();
 
-			expect(deleteCalls()).toEqual([99]);
+			expect(deleteCalls()).toEqual(['uuid-99']);
+			expect(requestsTo(fileEntryDeleteURL, 'groupId')).toEqual(['1']);
 		});
 
-		it('sends the current file entry id as oldFileEntryId when replacing a file', () => {
+		it('sends the current file UUID as oldFileEntryUuid when replacing a file', () => {
 			renderField({allowGuestUsers: true, value: '{}'});
 
 			triggerGuestUpload();
 			completeUpload(88);
 			triggerGuestUpload();
 
-			expect(uploadCalls()).toEqual([0, 88]);
+			expect(uploadCalls()).toEqual(['', 'uuid-88']);
 			expect(deleteCalls()).toEqual([]);
 		});
 
-		it('sends zero as oldFileEntryId on the first upload', () => {
+		it('sends the empty string as oldFileEntryUuid on the first upload', () => {
 			renderField({allowGuestUsers: true, value: '{}'});
 
 			triggerGuestUpload();
 
-			expect(uploadCalls()).toEqual([0]);
+			expect(uploadCalls()).toEqual(['']);
 		});
 	});
 });

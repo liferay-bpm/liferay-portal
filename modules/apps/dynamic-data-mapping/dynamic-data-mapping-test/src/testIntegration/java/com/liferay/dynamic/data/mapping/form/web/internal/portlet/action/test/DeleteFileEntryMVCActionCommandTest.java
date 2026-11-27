@@ -68,12 +68,24 @@ public class DeleteFileEntryMVCActionCommandTest {
 
 	@Test
 	public void testProcessAction() throws Exception {
-		Assert.assertNotNull(_processAction(_addFileEntry()));
-		Assert.assertNull(
-			_processAction(
-				_addTempFileEntry(DDMFormConstants.TEMP_FOLDER_NAME)));
+		FileEntry fileEntry = _addFileEntry();
+
 		Assert.assertNotNull(
-			_processAction(_addTempFileEntry(RandomTestUtil.randomString())));
+			_processAction(fileEntry, "uuid", fileEntry.getUuid()));
+
+		fileEntry = _addTempFileEntry(DDMFormConstants.TEMP_FOLDER_NAME);
+
+		Assert.assertNotNull(
+			_processAction(
+				fileEntry, "oldFileEntryId",
+				String.valueOf(fileEntry.getFileEntryId())));
+		Assert.assertNull(
+			_processAction(fileEntry, "uuid", fileEntry.getUuid()));
+
+		fileEntry = _addTempFileEntry(RandomTestUtil.randomString());
+
+		Assert.assertNotNull(
+			_processAction(fileEntry, "uuid", fileEntry.getUuid()));
 	}
 
 	private FileEntry _addFileEntry() throws Exception {
@@ -95,12 +107,16 @@ public class DeleteFileEntryMVCActionCommandTest {
 			ContentTypes.TEXT_PLAIN);
 	}
 
-	private DLFileEntry _processAction(FileEntry fileEntry) throws Exception {
+	private DLFileEntry _processAction(
+			FileEntry fileEntry, String name, String value)
+		throws Exception {
+
 		MockHttpServletRequest mockHttpServletRequest =
 			new MockHttpServletRequest();
 
 		mockHttpServletRequest.addParameter(
-			"oldFileEntryId", String.valueOf(fileEntry.getFileEntryId()));
+			"groupId", String.valueOf(fileEntry.getGroupId()));
+		mockHttpServletRequest.addParameter(name, value);
 
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 

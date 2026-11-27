@@ -288,7 +288,7 @@ public class UploadFileEntryMVCActionCommandTest {
 		mockHttpServletRequest.addParameter(
 			"groupId", String.valueOf(_groupId));
 		mockHttpServletRequest.addParameter(
-			"oldFileEntryId", String.valueOf(_oldFileEntry.getFileEntryId()));
+			"oldFileEntryUuid", _oldFileEntry.getUuid());
 
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
