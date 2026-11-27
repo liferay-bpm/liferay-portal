@@ -54,6 +54,10 @@ public class KaleoInstanceServiceImpl extends KaleoInstanceServiceBaseImpl {
 				WorkflowDefinitionConstants.SCOPE_AI)) {
 
 			_portletResourcePermission.check(
+				getPermissionChecker(), kaleoDefinition.getGroupId(),
+				ActionKeys.ADD_INSTANCE);
+
+			_portletResourcePermission.check(
 				getPermissionChecker(), serviceContext.getScopeGroupId(),
 				ActionKeys.ADD_INSTANCE);
 		}

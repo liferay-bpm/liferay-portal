@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.context.ContextUserReplace;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -185,6 +186,83 @@ public class KaleoInstanceServiceTest {
 				HashMapBuilder.<String, Serializable>put(
 					WorkflowConstants.CONTEXT_SERVICE_CONTEXT, serviceContext
 				).build()));
+	}
+
+	@Test
+	@TestInfo("LPD-116202")
+	public void testAddKaleoInstanceWithAnotherAccountEntryGroup()
+		throws Exception {
+
+		ConfigurationTestUtil.saveConfiguration(
+			_configurationAdmin.getConfiguration(
+				WorkflowDefinitionConfiguration.class.getName(),
+				StringPool.QUESTION),
+			HashMapDictionaryBuilder.<String, Object>put(
+				"company.administrator.can.publish", true
+			).build());
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext();
+
+		AccountEntry accountEntry = _accountEntryLocalService.addAccountEntry(
+			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+			AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
+			RandomTestUtil.randomString() + "@liferay.com", null,
+			RandomTestUtil.randomString(),
+			AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS,
+			WorkflowConstants.STATUS_APPROVED, serviceContext);
+
+		WorkflowDefinition workflowDefinition =
+			_workflowDefinitionManager.deployWorkflowDefinition(
+				_getContentBytes("valid-workflow-definition.xml"),
+				TestPropsValues.getCompanyId(), null,
+				accountEntry.getAccountEntryGroupId(),
+				RandomTestUtil.randomString(),
+				WorkflowDefinitionConstants.SCOPE_AI, false,
+				RandomTestUtil.randomString(), TestPropsValues.getUserId());
+
+		ConfigurationTestUtil.saveConfiguration(
+			_configurationAdmin.getConfiguration(
+				WorkflowDefinitionConfiguration.class.getName(),
+				StringPool.QUESTION),
+			HashMapDictionaryBuilder.<String, Object>put(
+				"company.administrator.can.publish", false
+			).build());
+
+		User user = UserTestUtil.addUser();
+
+		AccountEntry userAccountEntry =
+			_accountEntryLocalService.addAccountEntry(
+				RandomTestUtil.randomString(), user.getUserId(),
+				AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				null, RandomTestUtil.randomString() + "@liferay.com", null,
+				RandomTestUtil.randomString(),
+				AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS,
+				WorkflowConstants.STATUS_APPROVED, serviceContext);
+
+		serviceContext.setScopeGroupId(
+			userAccountEntry.getAccountEntryGroupId());
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				user)) {
+
+			AssertUtils.assertFailure(
+				PrincipalException.MustHavePermission.class,
+				StringBundler.concat(
+					"User ", user.getUserId(), " must have ",
+					ActionKeys.ADD_INSTANCE, " permission for ",
+					WorkflowConstants.RESOURCE_NAME, StringPool.SPACE),
+				() -> _kaleoInstanceService.addKaleoInstance(
+					workflowDefinition.getName(),
+					workflowDefinition.getVersion(), null,
+					HashMapBuilder.<String, Serializable>put(
+						WorkflowConstants.CONTEXT_SERVICE_CONTEXT,
+						serviceContext
+					).build(),
+					serviceContext, false));
+		}
 	}
 
 	@Test
