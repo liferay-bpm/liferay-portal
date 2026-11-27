@@ -5,6 +5,8 @@
 
 package com.liferay.content.marketing.platform.web.internal.util;
 
+import com.liferay.info.item.InfoItemServiceRegistryUtil;
+import com.liferay.info.item.provider.InfoItemFormProvider;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 import com.liferay.object.model.ObjectDefinition;
@@ -58,10 +60,7 @@ public class SiteInitializerUtil {
 			return;
 		}
 
-		ObjectDefinition objectDefinition =
-			ObjectDefinitionLocalServiceUtil.
-				fetchObjectDefinitionByExternalReferenceCode(
-					"L_CMP_PROJECT", companyId);
+		ObjectDefinition objectDefinition = _waitForObjectDefinition(companyId);
 
 		if (objectDefinition != null) {
 			LayoutPageTemplateEntry layoutPageTemplateEntry =
@@ -135,5 +134,45 @@ public class SiteInitializerUtil {
 
 		return adminUsers.get(0);
 	}
+
+	private static ObjectDefinition _waitForObjectDefinition(long companyId) {
+		long endTime = System.currentTimeMillis() + _WAIT_TIMEOUT;
+
+		while (true) {
+			ObjectDefinition objectDefinition =
+				ObjectDefinitionLocalServiceUtil.
+					fetchObjectDefinitionByExternalReferenceCode(
+						"L_CMP_PROJECT", companyId);
+
+			if (objectDefinition != null) {
+				InfoItemFormProvider infoItemFormProvider =
+					InfoItemServiceRegistryUtil.getFirstInfoItemService(
+						InfoItemFormProvider.class,
+						objectDefinition.getClassName());
+
+				if (infoItemFormProvider != null) {
+					return objectDefinition;
+				}
+			}
+
+			if (System.currentTimeMillis() >= endTime) {
+				return objectDefinition;
+			}
+
+			try {
+				Thread.sleep(_WAIT_INTERVAL);
+			}
+			catch (InterruptedException interruptedException) {
+				Thread.currentThread(
+				).interrupt();
+
+				return objectDefinition;
+			}
+		}
+	}
+
+	private static final long _WAIT_INTERVAL = 100;
+
+	private static final long _WAIT_TIMEOUT = 10000;
 
 }

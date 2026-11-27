@@ -18,7 +18,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Carolina Barbosa
  */
-@Component(service = PortalInstanceLifecycleListener.class)
+@Component(
+	property = "service.ranking:Integer=" + Integer.MIN_VALUE,
+	service = PortalInstanceLifecycleListener.class
+)
 public class AddDefaultLayoutInitialRequestPortalInstanceLifecycleListener
 	extends InitialRequestPortalInstanceLifecycleListener {
 
