@@ -2477,14 +2477,15 @@ public class DefaultObjectEntryManagerImpl
 		if (relatedObjectDefinition.isUnmodifiableSystemObject()) {
 			return TransformUtil.transform(
 				nestedObjectEntries,
-				item -> MapUtil.getString(
-					(Map<String, Object>)item, "externalReferenceCode"));
+				nestedObjectEntry -> MapUtil.getString(
+					(Map<String, Object>)nestedObjectEntry,
+					"externalReferenceCode"));
 		}
 
 		return TransformUtil.transform(
 			nestedObjectEntries,
-			item -> {
-				ObjectEntry objectEntry = (ObjectEntry)item;
+			nestedObjectEntry -> {
+				ObjectEntry objectEntry = (ObjectEntry)nestedObjectEntry;
 
 				return objectEntry.getExternalReferenceCode();
 			});
