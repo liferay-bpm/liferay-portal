@@ -90,7 +90,7 @@ public class ObjectRelationshipTestUtil {
 		throws Exception {
 
 		return ObjectRelationshipLocalServiceUtil.updateObjectRelationship(
-			null, objectRelationshipId, 0, deletionType, null, false, null,
+			null, objectRelationshipId, 0, deletionType, null, false, null, 0,
 			null);
 	}
 

@@ -273,8 +273,8 @@ public class ObjectFieldServiceTest {
 				ObjectFieldConstants.DB_TYPE_STRING, null, true, false,
 				LanguageUtil.getLanguageId(LocaleUtil.getDefault()),
 				LocalizedMapUtil.getLocalizedMap("baker"), false, "baker",
-				ObjectFieldConstants.READ_ONLY_FALSE, null, true, false,
-				Collections.emptyList());
+				objectField.getPriority(), ObjectFieldConstants.READ_ONLY_FALSE,
+				null, true, false, Collections.emptyList());
 		}
 		finally {
 			if (objectField != null) {

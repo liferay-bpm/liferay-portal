@@ -155,7 +155,7 @@ public class UpdateStructureStrutsAction implements StrutsAction {
 						serviceBuilderObjectRelationship.getDeletionType(),
 						serviceBuilderObjectRelationship.getDescriptionMap(),
 						false, serviceBuilderObjectRelationship.getLabelMap(),
-						null);
+						serviceBuilderObjectRelationship.getPriority(), null);
 				}
 
 				_objectDefinitionLocalService.deleteObjectDefinition(
@@ -417,6 +417,7 @@ public class UpdateStructureStrutsAction implements StrutsAction {
 								getDescriptionMap(),
 							false,
 							serviceBuilderObjectRelationship.getLabelMap(),
+							serviceBuilderObjectRelationship.getPriority(),
 							null);
 					}
 

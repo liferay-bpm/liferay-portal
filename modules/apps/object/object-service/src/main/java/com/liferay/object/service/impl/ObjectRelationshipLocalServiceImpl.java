@@ -29,6 +29,7 @@ import com.liferay.object.exception.ObjectRelationshipReverseException;
 import com.liferay.object.exception.ObjectRelationshipSystemException;
 import com.liferay.object.exception.ObjectRelationshipTypeException;
 import com.liferay.object.internal.dao.db.ObjectDBManagerUtil;
+import com.liferay.object.internal.definition.util.ObjectDefinitionPriorityUtil;
 import com.liferay.object.internal.info.collection.provider.ManyToManyObjectRelationshipRelatedInfoCollectionProvider;
 import com.liferay.object.internal.info.collection.provider.OneToManyObjectRelationshipRelatedInfoCollectionProvider;
 import com.liferay.object.internal.info.collection.provider.OneToOneObjectRelationshipRelatedInfoCollectionProvider;
@@ -1017,7 +1018,7 @@ public class ObjectRelationshipLocalServiceImpl
 			String externalReferenceCode, long objectRelationshipId,
 			long parameterObjectFieldId, String deletionType,
 			Map<Locale, String> descriptionMap, boolean edge,
-			Map<Locale, String> labelMap, ObjectField objectField)
+			Map<Locale, String> labelMap, int priority, ObjectField objectField)
 		throws PortalException {
 
 		if (Validator.isNull(deletionType)) {
@@ -1034,6 +1035,7 @@ public class ObjectRelationshipLocalServiceImpl
 			objectRelationship.setDescriptionMap(
 				_getDescriptionMap(descriptionMap));
 			objectRelationship.setLabelMap(labelMap);
+			objectRelationship.setPriority(priority);
 
 			return objectRelationshipPersistence.update(objectRelationship);
 		}
@@ -1045,6 +1047,7 @@ public class ObjectRelationshipLocalServiceImpl
 
 		if (objectRelationship.isReverse()) {
 			objectRelationship.setExternalReferenceCode(externalReferenceCode);
+			objectRelationship.setPriority(priority);
 
 			return objectRelationshipPersistence.update(objectRelationship);
 		}
@@ -1077,6 +1080,7 @@ public class ObjectRelationshipLocalServiceImpl
 			_updateObjectRelationship(
 				reverseObjectRelationship.getExternalReferenceCode(),
 				parameterObjectFieldId, deletionType, descriptionMap, labelMap,
+				reverseObjectRelationship.getPriority(),
 				reverseObjectRelationship);
 
 			Indexer<ObjectRelationship> indexer =
@@ -1111,7 +1115,8 @@ public class ObjectRelationshipLocalServiceImpl
 					existingObjectField.getIndexedLanguageId(),
 					objectField.getLabelMap(),
 					existingObjectField.isLocalized(),
-					existingObjectField.getName(), objectField.getReadOnly(),
+					existingObjectField.getName(), objectField.getPriority(),
+					objectField.getReadOnly(),
 					objectField.getReadOnlyConditionExpression(),
 					objectField.isRequired(), existingObjectField.isState(),
 					existingObjectField.isSystem(),
@@ -1127,7 +1132,7 @@ public class ObjectRelationshipLocalServiceImpl
 
 		objectRelationship = _updateObjectRelationship(
 			externalReferenceCode, parameterObjectFieldId, deletionType,
-			descriptionMap, labelMap, objectRelationship);
+			descriptionMap, labelMap, priority, objectRelationship);
 
 		if ((objectRelationship.getObjectFieldId2() != 0) &&
 			StringUtil.equals(
@@ -1280,6 +1285,10 @@ public class ObjectRelationshipLocalServiceImpl
 		objectField.setIndexedLanguageId(null);
 		objectField.setLabelMap(labelMap, LocaleUtil.getSiteDefault());
 		objectField.setName(dbColumnName);
+		objectField.setPriority(
+			ObjectDefinitionPriorityUtil.getNextPriority(
+				objectDefinition2.getObjectDefinitionId(),
+				_objectFieldPersistence, objectRelationshipPersistence));
 		objectField.setReadOnly(readOnly);
 		objectField.setReadOnlyConditionExpression(readOnlyConditionExpression);
 		objectField.setRelationshipType(relationshipType);
@@ -1473,6 +1482,8 @@ public class ObjectRelationshipLocalServiceImpl
 				parameterObjectFieldId, deletionType, descriptionMap, false,
 				labelMap, name, true, system, type, objectField);
 
+			_setPriority(objectRelationship);
+
 			return objectRelationshipLocalService.
 				createManyToManyObjectRelationshipTable(
 					user.getUserId(), objectRelationship);
@@ -1488,6 +1499,8 @@ public class ObjectRelationshipLocalServiceImpl
 				_objectDefinitionSettingLocalService, _objectEntryLocalService,
 				objectRelationship, objectRelationshipLocalService);
 		}
+
+		_setPriority(objectRelationship);
 
 		return objectRelationshipLocalService.updateObjectRelationship(
 			objectRelationship);
@@ -1786,10 +1799,18 @@ public class ObjectRelationshipLocalServiceImpl
 				).build()));
 	}
 
+	private void _setPriority(ObjectRelationship objectRelationship) {
+		objectRelationship.setPriority(
+			ObjectDefinitionPriorityUtil.getNextPriority(
+				objectRelationship.getObjectDefinitionId1(),
+				_objectFieldPersistence, objectRelationshipPersistence));
+	}
+
 	private ObjectRelationship _updateObjectRelationship(
 		String externalReferenceCode, long parameterObjectFieldId,
 		String deletionType, Map<Locale, String> descriptionMap,
-		Map<Locale, String> labelMap, ObjectRelationship objectRelationship) {
+		Map<Locale, String> labelMap, int priority,
+		ObjectRelationship objectRelationship) {
 
 		objectRelationship.setExternalReferenceCode(externalReferenceCode);
 		objectRelationship.setParameterObjectFieldId(parameterObjectFieldId);
@@ -1797,6 +1818,7 @@ public class ObjectRelationshipLocalServiceImpl
 		objectRelationship.setDescriptionMap(
 			_getDescriptionMap(descriptionMap));
 		objectRelationship.setLabelMap(labelMap);
+		objectRelationship.setPriority(priority);
 
 		return objectRelationshipPersistence.update(objectRelationship);
 	}

@@ -107,13 +107,14 @@ public class ObjectRelationshipServiceUtil {
 			String externalReferenceCode, long objectRelationshipId,
 			long parameterObjectFieldId, String deletionType,
 			Map<java.util.Locale, String> descriptionMap, boolean edge,
-			Map<java.util.Locale, String> labelMap,
+			Map<java.util.Locale, String> labelMap, int priority,
 			com.liferay.object.model.ObjectField objectField)
 		throws PortalException {
 
 		return getService().updateObjectRelationship(
 			externalReferenceCode, objectRelationshipId, parameterObjectFieldId,
-			deletionType, descriptionMap, edge, labelMap, objectField);
+			deletionType, descriptionMap, edge, labelMap, priority,
+			objectField);
 	}
 
 	public static ObjectRelationshipService getService() {
@@ -126,4 +127,4 @@ public class ObjectRelationshipServiceUtil {
 			ObjectRelationshipService.class);
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1776371229
+// LIFERAY-SERVICE-BUILDER-HASH:-1814816052

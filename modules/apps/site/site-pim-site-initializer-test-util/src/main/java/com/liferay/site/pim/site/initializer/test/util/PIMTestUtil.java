@@ -68,7 +68,8 @@ public class PIMTestUtil {
 				objectRelationship.getParameterObjectFieldId(),
 				objectRelationship.getDeletionType(),
 				objectRelationship.getDescriptionMap(), false,
-				objectRelationship.getLabelMap(), null);
+				objectRelationship.getLabelMap(),
+				objectRelationship.getPriority(), null);
 
 			ObjectDefinitionLocalServiceUtil.deleteObjectDefinition(
 				objectRelationship.getObjectDefinitionId2());

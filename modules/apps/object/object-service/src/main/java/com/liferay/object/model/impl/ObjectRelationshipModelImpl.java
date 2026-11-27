@@ -83,8 +83,8 @@ public class ObjectRelationshipModelImpl
 		{"deletionType", Types.VARCHAR}, {"dbTableName", Types.VARCHAR},
 		{"description", Types.VARCHAR}, {"edge", Types.BOOLEAN},
 		{"label", Types.VARCHAR}, {"name", Types.VARCHAR},
-		{"reverse", Types.BOOLEAN}, {"system_", Types.BOOLEAN},
-		{"type_", Types.VARCHAR}
+		{"priority", Types.INTEGER}, {"reverse", Types.BOOLEAN},
+		{"system_", Types.BOOLEAN}, {"type_", Types.VARCHAR}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -110,23 +110,24 @@ public class ObjectRelationshipModelImpl
 		TABLE_COLUMNS_MAP.put("edge", Types.BOOLEAN);
 		TABLE_COLUMNS_MAP.put("label", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("name", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("priority", Types.INTEGER);
 		TABLE_COLUMNS_MAP.put("reverse", Types.BOOLEAN);
 		TABLE_COLUMNS_MAP.put("system_", Types.BOOLEAN);
 		TABLE_COLUMNS_MAP.put("type_", Types.VARCHAR);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table ObjectRelationship (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,objectRelationshipId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,objectDefinitionId1 LONG,objectDefinitionId2 LONG,objectFieldId2 LONG,parameterObjectFieldId LONG,deletionType VARCHAR(75) null,dbTableName VARCHAR(75) null,description STRING null,edge BOOLEAN,label STRING null,name VARCHAR(75) null,reverse BOOLEAN,system_ BOOLEAN,type_ VARCHAR(75) null)";
+		"create table ObjectRelationship (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,objectRelationshipId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,objectDefinitionId1 LONG,objectDefinitionId2 LONG,objectFieldId2 LONG,parameterObjectFieldId LONG,deletionType VARCHAR(75) null,dbTableName VARCHAR(75) null,description STRING null,edge BOOLEAN,label STRING null,name VARCHAR(75) null,priority INTEGER,reverse BOOLEAN,system_ BOOLEAN,type_ VARCHAR(75) null)";
 
 	public static final String TABLE_SQL_DROP = "drop table ObjectRelationship";
 
 	public static final String ENTITY_ALIAS = "objectRelationship";
 
 	public static final String ORDER_BY_JPQL =
-		" ORDER BY objectRelationship.objectRelationshipId ASC";
+		" ORDER BY objectRelationship.priority ASC, objectRelationship.objectRelationshipId ASC";
 
 	public static final String ORDER_BY_SQL =
-		" ORDER BY ObjectRelationship.objectRelationshipId ASC";
+		" ORDER BY ObjectRelationship.priority ASC, ObjectRelationship.objectRelationshipId ASC";
 
 	public static final String DATA_SOURCE = "liferayDataSource";
 
@@ -223,7 +224,14 @@ public class ObjectRelationshipModelImpl
 	 *		#getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long OBJECTRELATIONSHIPID_COLUMN_BITMASK = 16384L;
+	public static final long PRIORITY_COLUMN_BITMASK = 16384L;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *		#getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long OBJECTRELATIONSHIPID_COLUMN_BITMASK = 32768L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -375,6 +383,8 @@ public class ObjectRelationshipModelImpl
 			attributeGetterFunctions.put("label", ObjectRelationship::getLabel);
 			attributeGetterFunctions.put("name", ObjectRelationship::getName);
 			attributeGetterFunctions.put(
+				"priority", ObjectRelationship::getPriority);
+			attributeGetterFunctions.put(
 				"reverse", ObjectRelationship::getReverse);
 			attributeGetterFunctions.put(
 				"system", ObjectRelationship::getSystem);
@@ -473,6 +483,10 @@ public class ObjectRelationshipModelImpl
 				"name",
 				(BiConsumer<ObjectRelationship, String>)
 					ObjectRelationship::setName);
+			attributeSetterBiConsumers.put(
+				"priority",
+				(BiConsumer<ObjectRelationship, Integer>)
+					ObjectRelationship::setPriority);
 			attributeSetterBiConsumers.put(
 				"reverse",
 				(BiConsumer<ObjectRelationship, Boolean>)
@@ -1142,6 +1156,21 @@ public class ObjectRelationshipModelImpl
 
 	@JSON
 	@Override
+	public int getPriority() {
+		return _priority;
+	}
+
+	@Override
+	public void setPriority(int priority) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_priority = priority;
+	}
+
+	@JSON
+	@Override
 	public boolean getReverse() {
 		return _reverse;
 	}
@@ -1395,6 +1424,7 @@ public class ObjectRelationshipModelImpl
 		objectRelationshipImpl.setEdge(isEdge());
 		objectRelationshipImpl.setLabel(getLabel());
 		objectRelationshipImpl.setName(getName());
+		objectRelationshipImpl.setPriority(getPriority());
 		objectRelationshipImpl.setReverse(isReverse());
 		objectRelationshipImpl.setSystem(isSystem());
 		objectRelationshipImpl.setType(getType());
@@ -1447,6 +1477,8 @@ public class ObjectRelationshipModelImpl
 			this.<String>getColumnOriginalValue("label"));
 		objectRelationshipImpl.setName(
 			this.<String>getColumnOriginalValue("name"));
+		objectRelationshipImpl.setPriority(
+			this.<Integer>getColumnOriginalValue("priority"));
 		objectRelationshipImpl.setReverse(
 			this.<Boolean>getColumnOriginalValue("reverse"));
 		objectRelationshipImpl.setSystem(
@@ -1459,17 +1491,41 @@ public class ObjectRelationshipModelImpl
 
 	@Override
 	public int compareTo(ObjectRelationship objectRelationship) {
-		long primaryKey = objectRelationship.getPrimaryKey();
+		int value = 0;
 
-		if (getPrimaryKey() < primaryKey) {
-			return -1;
+		if (getPriority() < objectRelationship.getPriority()) {
+			value = -1;
 		}
-		else if (getPrimaryKey() > primaryKey) {
-			return 1;
+		else if (getPriority() > objectRelationship.getPriority()) {
+			value = 1;
 		}
 		else {
-			return 0;
+			value = 0;
 		}
+
+		if (value != 0) {
+			return value;
+		}
+
+		if (getObjectRelationshipId() <
+				objectRelationship.getObjectRelationshipId()) {
+
+			value = -1;
+		}
+		else if (getObjectRelationshipId() >
+					objectRelationship.getObjectRelationshipId()) {
+
+			value = 1;
+		}
+		else {
+			value = 0;
+		}
+
+		if (value != 0) {
+			return value;
+		}
+
+		return 0;
 	}
 
 	@Override
@@ -1639,6 +1695,8 @@ public class ObjectRelationshipModelImpl
 			objectRelationshipCacheModel.name = null;
 		}
 
+		objectRelationshipCacheModel.priority = getPriority();
+
 		objectRelationshipCacheModel.reverse = isReverse();
 
 		objectRelationshipCacheModel.system = isSystem();
@@ -1735,6 +1793,7 @@ public class ObjectRelationshipModelImpl
 	private String _label;
 	private String _labelCurrentLanguageId;
 	private String _name;
+	private int _priority;
 	private boolean _reverse;
 	private boolean _system;
 	private String _type;
@@ -1791,6 +1850,7 @@ public class ObjectRelationshipModelImpl
 		_columnOriginalValues.put("edge", _edge);
 		_columnOriginalValues.put("label", _label);
 		_columnOriginalValues.put("name", _name);
+		_columnOriginalValues.put("priority", _priority);
 		_columnOriginalValues.put("reverse", _reverse);
 		_columnOriginalValues.put("system_", _system);
 		_columnOriginalValues.put("type_", _type);
@@ -1857,11 +1917,13 @@ public class ObjectRelationshipModelImpl
 
 		columnBitmasks.put("name", 262144L);
 
-		columnBitmasks.put("reverse", 524288L);
+		columnBitmasks.put("priority", 524288L);
 
-		columnBitmasks.put("system_", 1048576L);
+		columnBitmasks.put("reverse", 1048576L);
 
-		columnBitmasks.put("type_", 2097152L);
+		columnBitmasks.put("system_", 2097152L);
+
+		columnBitmasks.put("type_", 4194304L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}
@@ -1870,4 +1932,4 @@ public class ObjectRelationshipModelImpl
 	private ObjectRelationship _escapedModel;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-948387582
+// LIFERAY-SERVICE-BUILDER-HASH:1876793503

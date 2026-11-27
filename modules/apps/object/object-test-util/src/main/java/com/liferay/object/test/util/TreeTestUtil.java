@@ -163,7 +163,8 @@ public class TreeTestUtil {
 				objectRelationship.getParameterObjectFieldId(),
 				objectRelationship.getDeletionType(),
 				objectRelationship.getDescriptionMap(), true,
-				objectRelationship.getLabelMap(), null);
+				objectRelationship.getLabelMap(),
+				objectRelationship.getPriority(), null);
 		}
 	}
 
@@ -444,7 +445,8 @@ public class TreeTestUtil {
 				objectRelationship.getParameterObjectFieldId(),
 				objectRelationship.getDeletionType(),
 				objectRelationship.getDescriptionMap(), false,
-				objectRelationship.getLabelMap(), null);
+				objectRelationship.getLabelMap(),
+				objectRelationship.getPriority(), null);
 
 		Assert.assertFalse(objectRelationship.isEdge());
 

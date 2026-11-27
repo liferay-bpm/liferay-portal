@@ -105,7 +105,8 @@ public class FrontendDataSetTestUtil {
 					objectRelationship.getParameterObjectFieldId(),
 					objectRelationship.getDeletionType(),
 					objectRelationship.getDescriptionMap(), false,
-					objectRelationship.getLabelMap(), null);
+					objectRelationship.getLabelMap(),
+					objectRelationship.getPriority(), null);
 			}
 		}
 

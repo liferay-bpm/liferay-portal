@@ -784,7 +784,8 @@ public class ObjectEntryInfoItemFieldValuesUpdaterTest
 				objectRelationship.getExternalReferenceCode(),
 				objectRelationship.getObjectRelationshipId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE, null, false,
-				objectRelationship.getLabelMap(), null);
+				objectRelationship.getLabelMap(),
+				objectRelationship.getPriority(), null);
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
 			objectRelationship);

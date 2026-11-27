@@ -3995,7 +3995,8 @@ public class DefaultObjectEntryManagerImplTest
 				objectRelationship.getObjectRelationshipId(),
 				objectRelationship.getParameterObjectFieldId(),
 				objectRelationship.getDeletionType(), null, false,
-				objectRelationship.getLabelMap(), null);
+				objectRelationship.getLabelMap(),
+				objectRelationship.getPriority(), null);
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
 			objectRelationship);
@@ -4314,7 +4315,8 @@ public class DefaultObjectEntryManagerImplTest
 				objectRelationship.getExternalReferenceCode(),
 				objectRelationship.getObjectRelationshipId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE, null,
-				false, objectRelationship.getLabelMap(), null);
+				false, objectRelationship.getLabelMap(),
+				objectRelationship.getPriority(), null);
 
 		_defaultObjectEntryManager.deleteObjectEntry(
 			companyId, _simpleDTOConverterContext, "externalReferenceCode1",
@@ -4350,7 +4352,8 @@ public class DefaultObjectEntryManagerImplTest
 				objectRelationship.getExternalReferenceCode(),
 				objectRelationship.getObjectRelationshipId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
-				objectRelationship.getLabelMap(), null);
+				objectRelationship.getLabelMap(),
+				objectRelationship.getPriority(), null);
 
 		AssertUtils.assertFailure(
 			RequiredObjectRelationshipException.class,
@@ -13611,7 +13614,8 @@ public class DefaultObjectEntryManagerImplTest
 				oneToManyObjectRelationship.getExternalReferenceCode(),
 				oneToManyObjectRelationship.getObjectRelationshipId(), 0,
 				oneToManyObjectRelationship.getDeletionType(), null, false,
-				oneToManyObjectRelationship.getLabelMap(), null);
+				oneToManyObjectRelationship.getLabelMap(),
+				oneToManyObjectRelationship.getPriority(), null);
 
 		copiedParentObjectEntry = _defaultObjectEntryManager.copyObjectEntry(
 			_simpleDTOConverterContext, parentObjectEntry.getId(),

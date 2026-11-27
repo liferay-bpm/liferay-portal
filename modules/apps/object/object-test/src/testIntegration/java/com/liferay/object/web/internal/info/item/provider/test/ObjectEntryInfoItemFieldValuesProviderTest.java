@@ -967,7 +967,8 @@ public class ObjectEntryInfoItemFieldValuesProviderTest {
 				objectRelationship.getObjectRelationshipId(),
 				objectRelationship.getParameterObjectFieldId(),
 				objectRelationship.getDeletionType(), null, false,
-				objectRelationship.getLabelMap(), null);
+				objectRelationship.getLabelMap(),
+				objectRelationship.getPriority(), null);
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
 			objectRelationship);
