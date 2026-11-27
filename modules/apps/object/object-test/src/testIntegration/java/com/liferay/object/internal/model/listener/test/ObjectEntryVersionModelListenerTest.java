@@ -9,16 +9,22 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectEntryConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.field.builder.AttachmentObjectFieldBuilder;
 import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.field.setting.builder.ObjectFieldSettingBuilder;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.related.models.test.util.ObjectEntryTestUtil;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryVersionLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.test.util.ObjectFieldTestUtil;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
+import com.liferay.object.test.util.ObjectRelationshipTestUtil;
+import com.liferay.object.test.util.TreeTestUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
@@ -35,6 +41,7 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowTask;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManager;
+import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
@@ -42,6 +49,7 @@ import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import java.io.Serializable;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -293,6 +301,119 @@ public class ObjectEntryVersionModelListenerTest {
 		_assertNullLatestApprovedObjectEntry(_objectEntry.getObjectEntryId());
 	}
 
+	@FeatureFlag("LPD-116183")
+	@Test
+	public void testOnAfterUpdateWithHierarchy() throws Exception {
+		List<ObjectField> objectFields = Collections.singletonList(
+			new TextObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"textObjectFieldName"
+			).build());
+
+		ObjectDefinition objectDefinitionA =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				true, false, true, objectFields,
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+		ObjectDefinition objectDefinitionAA =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				true, false, true, objectFields,
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+		ObjectDefinition objectDefinitionAAA =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				true, false, true, objectFields,
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		TreeTestUtil.bind(
+			_objectRelationshipLocalService,
+			Arrays.asList(
+				ObjectRelationshipTestUtil.addObjectRelationship(
+					_objectRelationshipLocalService, objectDefinitionA,
+					objectDefinitionAA,
+					ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
+					"objectRelationship1"),
+				ObjectRelationshipTestUtil.addObjectRelationship(
+					_objectRelationshipLocalService, objectDefinitionAA,
+					objectDefinitionAAA,
+					ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
+					"objectRelationship2")));
+
+		ObjectEntry objectEntryA1 = ObjectEntryTestUtil.addObjectEntry(
+			0, objectDefinitionA.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"textObjectFieldName", RandomTestUtil.randomString()
+			).build());
+
+		ObjectEntry objectEntryAA1 = ObjectEntryTestUtil.addObjectEntry(
+			0, objectDefinitionAA.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"r_objectRelationship1_" +
+					objectDefinitionA.getPKObjectFieldName(),
+				objectEntryA1.getObjectEntryId()
+			).put(
+				"textObjectFieldName", RandomTestUtil.randomString()
+			).build());
+
+		ObjectEntry objectEntryAAA1 = ObjectEntryTestUtil.addObjectEntry(
+			0, objectDefinitionAAA.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"r_objectRelationship2_" +
+					objectDefinitionAA.getPKObjectFieldName(),
+				objectEntryAA1.getObjectEntryId()
+			).put(
+				"textObjectFieldName", RandomTestUtil.randomString()
+			).build());
+
+		_assertNullLatestApprovedObjectEntry(objectEntryA1.getObjectEntryId());
+		_assertNullLatestApprovedObjectEntry(objectEntryAA1.getObjectEntryId());
+		_assertNullLatestApprovedObjectEntry(
+			objectEntryAAA1.getObjectEntryId());
+
+		Map<String, Serializable> values1 = objectEntryA1.getValues();
+		Map<String, Serializable> values2 = objectEntryAA1.getValues();
+		Map<String, Serializable> values3 = objectEntryAAA1.getValues();
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext();
+
+		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
+
+		_updateObjectEntry(
+			objectEntryAA1,
+			HashMapBuilder.<String, Serializable>put(
+				"r_objectRelationship1_" +
+					objectDefinitionA.getPKObjectFieldName(),
+				objectEntryA1.getObjectEntryId()
+			).put(
+				"textObjectFieldName", RandomTestUtil.randomString()
+			).build(),
+			serviceContext);
+
+		_assertLatestApprovedObjectEntry(
+			values1, 3, objectEntryA1.getObjectEntryId());
+		_assertLatestApprovedObjectEntry(
+			values2, 3, objectEntryAA1.getObjectEntryId());
+		_assertLatestApprovedObjectEntry(
+			values3, 3, objectEntryAAA1.getObjectEntryId());
+
+		_updateObjectEntry(
+			objectEntryA1, ServiceContextTestUtil.getServiceContext());
+
+		_assertNullLatestApprovedObjectEntry(objectEntryA1.getObjectEntryId());
+		_assertNullLatestApprovedObjectEntry(objectEntryAA1.getObjectEntryId());
+		_assertNullLatestApprovedObjectEntry(
+			objectEntryAAA1.getObjectEntryId());
+
+		TreeTestUtil.deleteObjectDefinitionHierarchy(
+			_objectDefinitionLocalService,
+			new String[] {
+				objectDefinitionA.getName(), objectDefinitionAA.getName(),
+				objectDefinitionAAA.getName()
+			},
+			_objectEntryLocalService, _objectRelationshipLocalService);
+	}
+
 	private void _assertLatestApprovedObjectEntry(
 		Map<String, Serializable> expectedValues, int expectedVersion,
 		long objectEntryId) {
@@ -372,6 +493,9 @@ public class ObjectEntryVersionModelListenerTest {
 	private static ObjectDefinition _objectDefinition;
 	private static PermissionChecker _originalPermissionChecker;
 
+	@Inject
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
 	private ObjectEntry _objectEntry;
 
 	@Inject
@@ -379,6 +503,9 @@ public class ObjectEntryVersionModelListenerTest {
 
 	@Inject
 	private ObjectEntryVersionLocalService _objectEntryVersionLocalService;
+
+	@Inject
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
 	@Inject
 	private WorkflowDefinitionLinkLocalService

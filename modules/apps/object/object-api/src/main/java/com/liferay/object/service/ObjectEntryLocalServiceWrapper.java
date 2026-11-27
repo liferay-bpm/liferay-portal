@@ -758,6 +758,15 @@ public class ObjectEntryLocalServiceWrapper
 	}
 
 	@Override
+	public java.util.List<com.liferay.object.model.ObjectEntry>
+		getRootDescendantNodeObjectEntries(
+			long rootObjectEntryId, int[] statuses) {
+
+		return _objectEntryLocalService.getRootDescendantNodeObjectEntries(
+			rootObjectEntryId, statuses);
+	}
+
+	@Override
 	public java.util.Map<String, Object> getSystemModelAttributes(
 			com.liferay.object.model.ObjectDefinition objectDefinition,
 			long primaryKey)
@@ -1093,4 +1102,4 @@ public class ObjectEntryLocalServiceWrapper
 	private ObjectEntryLocalService _objectEntryLocalService;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:2040248972
+// LIFERAY-SERVICE-BUILDER-HASH:1370421564

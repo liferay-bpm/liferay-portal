@@ -966,15 +966,24 @@ public class ObjectEntryLocalServiceImpl
 				objectDefinition.getExtensionDBTableName(),
 				objectDefinition.getPKObjectFieldDBColumnName(),
 				objectEntry.getObjectEntryId());
-		}
 
-		if (objectEntry.isHead()) {
-			for (ObjectEntry draftObjectEntry :
-					objectEntryPersistence.findByHOEI_T(
-						objectEntry.getObjectEntryId(),
-						ObjectEntryConstants.TYPE_DRAFT)) {
+			if (objectEntry.isHead()) {
+				for (ObjectEntry draftObjectEntry :
+						objectEntryPersistence.findByHOEI_T(
+							objectEntry.getObjectEntryId(),
+							ObjectEntryConstants.TYPE_DRAFT)) {
 
-				objectEntryLocalService.deleteObjectEntry(draftObjectEntry);
+					objectEntryLocalService.deleteObjectEntry(draftObjectEntry);
+				}
+
+				ObjectEntry latestApprovedObjectEntry =
+					objectEntryPersistence.fetchByHeadObjectEntryId(
+						objectEntry.getObjectEntryId());
+
+				if (latestApprovedObjectEntry != null) {
+					objectEntryLocalService.deleteObjectEntry(
+						latestApprovedObjectEntry);
+				}
 			}
 		}
 
@@ -1751,6 +1760,37 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		return objectEntryPersistence.dslQueryCount(dslQuery);
+	}
+
+	@Override
+	public List<ObjectEntry> getRootDescendantNodeObjectEntries(
+		long rootObjectEntryId, int[] statuses) {
+
+		return objectEntryPersistence.dslQuery(
+			DSLQueryFactoryUtil.select(
+				ObjectEntryTable.INSTANCE
+			).from(
+				ObjectEntryTable.INSTANCE
+			).where(
+				ObjectEntryTable.INSTANCE.rootObjectEntryId.eq(
+					rootObjectEntryId
+				).and(
+					ObjectEntryTable.INSTANCE.objectEntryId.neq(
+						rootObjectEntryId)
+				).and(
+					ObjectEntryTable.INSTANCE.objectEntryId.eq(
+						ObjectEntryTable.INSTANCE.headObjectEntryId)
+				).and(
+					() -> {
+						if (ArrayUtil.isEmpty(statuses)) {
+							return null;
+						}
+
+						return ObjectEntryTable.INSTANCE.status.in(
+							ArrayUtil.toArray(statuses));
+					}
+				)
+			));
 	}
 
 	@Override
@@ -5875,6 +5915,9 @@ public class ObjectEntryLocalServiceImpl
 			).and(
 				() -> {
 					if (!objectDefinition.isEnableObjectEntryVersioning() &&
+						(!FeatureFlagManagerUtil.isEnabled(
+							objectDefinition.getCompanyId(), "LPD-116183") ||
+						 !objectDefinition.isRootDescendantNode()) &&
 						!preferApproved) {
 
 						return null;
@@ -6483,6 +6526,24 @@ public class ObjectEntryLocalServiceImpl
 
 		return DynamicObjectDefinitionTableUtil.getDynamicObjectDefinitionTable(
 			true, rootObjectDefinition, _objectFieldLocalService);
+	}
+
+	private ObjectDefinition _getRootObjectDefinition(
+			ObjectDefinition objectDefinition, ObjectEntry objectEntry)
+		throws PortalException {
+
+		if (!FeatureFlagManagerUtil.isEnabled(
+				objectEntry.getCompanyId(), "LPD-116183") ||
+			!objectEntry.isRootDescendantNode()) {
+
+			return objectDefinition;
+		}
+
+		ObjectEntry rootObjectEntry = objectEntryPersistence.findByPrimaryKey(
+			objectEntry.getRootObjectEntryId());
+
+		return _objectDefinitionPersistence.findByPrimaryKey(
+			rootObjectEntry.getObjectDefinitionId());
 	}
 
 	private Expression<?>[] _getSelectExpressions(
@@ -8687,12 +8748,14 @@ public class ObjectEntryLocalServiceImpl
 			dlFileEntriesMap, objectEntry.getGroupId(), objectDefinition,
 			objectEntryId, serviceContext, userId, values);
 
+		ObjectDefinition rootObjectDefinition = _getRootObjectDefinition(
+			objectDefinition, objectEntry);
 		int workflowAction = serviceContext.getWorkflowAction();
 
 		if (!move) {
 			_validateWorkflowAction(
-				objectDefinition.isEnableObjectEntryDraft(), objectDefinition,
-				objectEntry.getStatus(), workflowAction);
+				rootObjectDefinition.isEnableObjectEntryDraft(),
+				rootObjectDefinition, objectEntry.getStatus(), workflowAction);
 		}
 
 		Map<String, Serializable> transientValues = objectEntry.getValues();
@@ -8842,7 +8905,7 @@ public class ObjectEntryLocalServiceImpl
 			objectDefinition.getClassName(), objectEntry.getObjectEntryId(),
 			serviceContext);
 
-		if (!objectDefinition.isEnableObjectEntryVersioning() &&
+		if (!rootObjectDefinition.isEnableObjectEntryVersioning() &&
 			!objectEntry.isTypeDraft()) {
 
 			_deleteFileEntries(

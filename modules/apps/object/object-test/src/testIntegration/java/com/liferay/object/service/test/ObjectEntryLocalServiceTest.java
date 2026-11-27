@@ -5578,6 +5578,32 @@ public class ObjectEntryLocalServiceTest {
 			_objectEntryLocalService.fetchObjectEntry(
 				draftObjectEntry2.getObjectEntryId()));
 
+		// Delete object entry with latest approved object entry
+
+		ObjectEntry objectEntry7 = _addObjectEntry(
+			0, objectDefinition.getObjectDefinitionId(),
+			Collections.emptyMap());
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext();
+
+		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
+
+		_objectEntryLocalService.updateObjectEntry(
+			TestPropsValues.getUserId(), objectEntry7.getObjectEntryId(),
+			objectEntry7.getObjectEntryFolderId(), Collections.emptyMap(),
+			serviceContext);
+
+		ObjectEntry latestApprovedObjectEntry =
+			_objectEntryLocalService.fetchObjectEntryByHeadObjectEntryId(
+				objectEntry7.getObjectEntryId());
+
+		_objectEntryLocalService.deleteObjectEntry(objectEntry7);
+
+		Assert.assertNull(
+			_objectEntryLocalService.fetchObjectEntry(
+				latestApprovedObjectEntry.getObjectEntryId()));
+
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
@@ -7378,6 +7404,7 @@ public class ObjectEntryLocalServiceTest {
 		GroupTestUtil.deleteGroup(irrelevantGroup);
 	}
 
+	@FeatureFlag("LPD-116183")
 	@Test
 	public void testGetValuesListCountWithObjectDefinitionTree()
 		throws Exception {
@@ -7396,6 +7423,11 @@ public class ObjectEntryLocalServiceTest {
 				_objectDefinitionLocalService.getObjectDefinition(
 					TestPropsValues.getCompanyId(), "C_A");
 
+			objectDefinitionA = _updateEnableObjectEntryDraft(
+				objectDefinitionA);
+			objectDefinitionA = _updateEnableObjectEntryVersioning(
+				objectDefinitionA);
+
 			TreeTestUtil.createObjectEntryTree(
 				"1", _objectDefinitionLocalService, _objectEntryLocalService,
 				_objectFieldLocalService, _objectRelationshipLocalService,
@@ -7404,6 +7436,22 @@ public class ObjectEntryLocalServiceTest {
 			ObjectDefinition objectDefinitionAA =
 				_objectDefinitionLocalService.getObjectDefinition(
 					TestPropsValues.getCompanyId(), "C_AA");
+
+			ObjectEntry objectEntryAA1 =
+				_objectEntryLocalService.getObjectEntry(
+					"AA1", ObjectDefinitionConstants.GROUP_ID_DEFAULT,
+					objectDefinitionAA.getObjectDefinitionId());
+
+			ServiceContext serviceContext =
+				ServiceContextTestUtil.getServiceContext();
+
+			serviceContext.setWorkflowAction(
+				WorkflowConstants.ACTION_SAVE_DRAFT);
+
+			_objectEntryLocalService.partialUpdateObjectEntry(
+				TestPropsValues.getUserId(), objectEntryAA1.getObjectEntryId(),
+				objectEntryAA1.getObjectEntryFolderId(), Collections.emptyMap(),
+				serviceContext);
 
 			ObjectEntry objectEntryAA2 = _addObjectEntry(
 				objectDefinitionAA, Collections.emptyMap(),

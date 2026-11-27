@@ -7,13 +7,11 @@ package com.liferay.site.cms.site.initializer.internal.search.spi.model.index.co
 
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
-import com.liferay.object.model.ObjectEntryTable;
 import com.liferay.object.model.ObjectEntryVersion;
 import com.liferay.object.model.bag.ObjectFieldBag;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryVersionLocalService;
 import com.liferay.object.util.comparator.ObjectEntryVersionVersionComparator;
-import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -24,8 +22,6 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentContributor;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.site.cms.site.initializer.internal.search.fields.MissingRequiredFieldsUtil;
-
-import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -75,21 +71,30 @@ public class CMSContentMissingRequiredFieldsModelDocumentContributor
 				objectDefinition, objectEntry, objectEntryVersion);
 
 			if (objectDefinition.isRootNode()) {
-				for (ObjectEntry descendantObjectEntry :
-						_getDescendantObjectEntries(objectEntry)) {
+				for (ObjectEntry rootDescendantNodeObjectEntry :
+						_objectEntryLocalService.
+							getRootDescendantNodeObjectEntries(
+								objectEntry.getObjectEntryId(),
+								new int[] {
+									WorkflowConstants.STATUS_APPROVED,
+									WorkflowConstants.STATUS_DRAFT,
+									WorkflowConstants.STATUS_PENDING,
+									WorkflowConstants.STATUS_SCHEDULED
+								})) {
 
-					ObjectEntryVersion descendantObjectEntryVersion =
-						_getApprovedObjectEntryVersion(descendantObjectEntry);
+					ObjectEntryVersion rootDescendantNodeObjectEntryVersion =
+						_getApprovedObjectEntryVersion(
+							rootDescendantNodeObjectEntry);
 
-					if (descendantObjectEntryVersion == null) {
+					if (rootDescendantNodeObjectEntryVersion == null) {
 						continue;
 					}
 
 					missingRequiredFieldsCount +=
 						_getMissingRequiredFieldsCount(
-							descendantObjectEntry.getObjectDefinition(),
-							descendantObjectEntry,
-							descendantObjectEntryVersion);
+							rootDescendantNodeObjectEntry.getObjectDefinition(),
+							rootDescendantNodeObjectEntry,
+							rootDescendantNodeObjectEntryVersion);
 				}
 			}
 
@@ -128,35 +133,6 @@ public class CMSContentMissingRequiredFieldsModelDocumentContributor
 			fetchLatestApprovedObjectEntryVersion(
 				objectEntry.getObjectEntryId(),
 				ObjectEntryVersionVersionComparator.getInstance(false));
-	}
-
-	private List<ObjectEntry> _getDescendantObjectEntries(
-		ObjectEntry objectEntry) {
-
-		return _objectEntryLocalService.dslQuery(
-			DSLQueryFactoryUtil.select(
-				ObjectEntryTable.INSTANCE
-			).from(
-				ObjectEntryTable.INSTANCE
-			).where(
-				ObjectEntryTable.INSTANCE.status.in(
-					new Integer[] {
-						WorkflowConstants.STATUS_APPROVED,
-						WorkflowConstants.STATUS_DRAFT,
-						WorkflowConstants.STATUS_PENDING,
-						WorkflowConstants.STATUS_SCHEDULED
-					}
-				).and(
-					ObjectEntryTable.INSTANCE.rootObjectEntryId.eq(
-						objectEntry.getObjectEntryId())
-				).and(
-					ObjectEntryTable.INSTANCE.objectEntryId.neq(
-						objectEntry.getObjectEntryId())
-				).and(
-					ObjectEntryTable.INSTANCE.objectEntryId.eq(
-						ObjectEntryTable.INSTANCE.headObjectEntryId)
-				)
-			));
 	}
 
 	private int _getMissingRequiredFieldsCount(
