@@ -14,16 +14,20 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.search.document.Document;
@@ -1050,6 +1054,33 @@ public class WorkflowMetricsRESTTestHelper {
 
 		return TransformUtil.transformToArray(
 			searchHits.getSearchHits(), SearchHit::getDocument, Document.class);
+	}
+
+	public <T> T getUserWithoutResourcePermissions(
+			Class<T> clazz, Company company)
+		throws Exception {
+
+		String password = RandomTestUtil.randomString();
+
+		User user = UserTestUtil.addUser(company, password);
+
+		Object builder = ReflectionTestUtil.invoke(
+			clazz, "builder", new Class<?>[0]);
+
+		ReflectionTestUtil.invoke(
+			builder, "authentication",
+			new Class<?>[] {String.class, String.class}, user.getEmailAddress(),
+			password);
+		ReflectionTestUtil.invoke(
+			builder, "endpoint",
+			new Class<?>[] {String.class, int.class, String.class},
+			company.getVirtualHostname(), PortalUtil.getPortalServerPort(false),
+			"http");
+		ReflectionTestUtil.invoke(
+			builder, "locale", new Class<?>[] {Locale.class},
+			LocaleUtil.getDefault());
+
+		return ReflectionTestUtil.invoke(builder, "build", new Class<?>[0]);
 	}
 
 	public void restoreProcess(Document document) throws Exception {

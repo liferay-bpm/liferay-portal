@@ -21,6 +21,7 @@ import com.liferay.portal.search.query.BooleanQuery;
 import com.liferay.portal.search.query.QueriesUtil;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Histogram;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.HistogramMetric;
+import com.liferay.portal.workflow.metrics.rest.internal.security.permission.WorkflowMetricsPermissionUtil;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.HistogramMetricResource;
 import com.liferay.portal.workflow.metrics.search.index.constants.WorkflowMetricsIndexNameConstants;
 
@@ -56,6 +57,8 @@ public class HistogramMetricResourceImpl
 	public HistogramMetric getProcessHistogramMetric(
 			Long processId, Date dateEnd, Date dateStart, String unit)
 		throws Exception {
+
+		WorkflowMetricsPermissionUtil.check();
 
 		HistogramMetric histogramMetric = new HistogramMetric();
 

@@ -57,6 +57,8 @@ public class SLAResourceImpl extends BaseSLAResourceImpl {
 			Long processId, Integer status, Pagination pagination)
 		throws Exception {
 
+		WorkflowMetricsPermissionUtil.check();
+
 		if (status != null) {
 			return Page.of(
 				transform(
@@ -126,6 +128,8 @@ public class SLAResourceImpl extends BaseSLAResourceImpl {
 
 	@Override
 	public SLA getSLA(Long slaId) throws Exception {
+		WorkflowMetricsPermissionUtil.check();
+
 		return _toSLA(
 			_workflowMetricsSLADefinitionLocalService.
 				getWorkflowMetricsSLADefinition(slaId, true));

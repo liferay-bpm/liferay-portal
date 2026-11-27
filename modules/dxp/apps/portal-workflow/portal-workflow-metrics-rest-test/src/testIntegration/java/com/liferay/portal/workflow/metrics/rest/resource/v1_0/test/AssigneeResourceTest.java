@@ -19,6 +19,7 @@ import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.AssigneeBulkSele
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Instance;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Process;
 import com.liferay.portal.workflow.metrics.rest.client.pagination.Page;
+import com.liferay.portal.workflow.metrics.rest.client.resource.v1_0.AssigneeResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.test.helper.WorkflowMetricsRESTTestHelper;
 
 import java.util.Arrays;
@@ -48,6 +49,10 @@ public class AssigneeResourceTest extends BaseAssigneeResourceTestCase {
 
 		_instance = _workflowMetricsRESTTestHelper.addInstance(
 			testGroup.getCompanyId(), false, _process.getId());
+
+		_assigneeResource =
+			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
+				AssigneeResource.class, testCompany);
 	}
 
 	@After
@@ -115,6 +120,8 @@ public class AssigneeResourceTest extends BaseAssigneeResourceTestCase {
 			});
 
 		Assert.assertEquals(0, page.getTotalCount());
+
+		_testPostProcessAssigneesPageWithoutPermission();
 	}
 
 	@Rule
@@ -138,6 +145,16 @@ public class AssigneeResourceTest extends BaseAssigneeResourceTestCase {
 		};
 	}
 
+	private void _testPostProcessAssigneesPageWithoutPermission()
+		throws Exception {
+
+		assertHttpResponseStatusCode(
+			403,
+			_assigneeResource.postProcessAssigneesPageHttpResponse(
+				_process.getId(), new AssigneeBulkSelection()));
+	}
+
+	private AssigneeResource _assigneeResource;
 	private Instance _instance;
 
 	@Inject

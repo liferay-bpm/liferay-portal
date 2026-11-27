@@ -38,6 +38,7 @@ import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Process;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.SLAResult;
 import com.liferay.portal.workflow.metrics.rest.client.pagination.Page;
 import com.liferay.portal.workflow.metrics.rest.client.pagination.Pagination;
+import com.liferay.portal.workflow.metrics.rest.client.resource.v1_0.InstanceResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.test.helper.WorkflowMetricsRESTTestHelper;
 
 import java.util.ArrayList;
@@ -73,6 +74,10 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 		_process = _workflowMetricsRESTTestHelper.addProcess(
 			testGroup.getCompanyId());
 		_user = UserTestUtil.addUser();
+
+		_instanceResource =
+			_workflowMetricsRESTTestHelper.getUserWithoutResourcePermissions(
+				InstanceResource.class, testCompany);
 	}
 
 	@After
@@ -86,6 +91,14 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 		}
 
 		_deleteInstances();
+	}
+
+	@Override
+	@Test
+	public void testDeleteProcessInstance() throws Exception {
+		super.testDeleteProcessInstance();
+
+		_testDeleteProcessInstanceWithoutPermission();
 	}
 
 	@Override
@@ -118,6 +131,8 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 
 		assertEquals(instance, getInstance);
 		assertValid(getInstance);
+
+		_testGetProcessInstanceWithoutPermission();
 	}
 
 	@Override
@@ -261,6 +276,8 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 			new String[] {"Completed", "Pending"},
 			instances -> assertEqualsIgnoringOrder(
 				Arrays.asList(instance1, instance2, instance3), instances));
+
+		_testGetProcessInstancesPageWithoutPermission();
 	}
 
 	@Override
@@ -391,6 +408,30 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 	@Test
 	public void testGraphQLPostProcessInstance() throws Exception {
 		super.testGraphQLPostProcessInstance();
+	}
+
+	@Override
+	@Test
+	public void testPatchProcessInstance() throws Exception {
+		super.testPatchProcessInstance();
+
+		_testPatchProcessInstanceWithoutPermission();
+	}
+
+	@Override
+	@Test
+	public void testPatchProcessInstanceComplete() throws Exception {
+		super.testPatchProcessInstanceComplete();
+
+		_testPatchProcessInstanceCompleteWithoutPermission();
+	}
+
+	@Override
+	@Test
+	public void testPostProcessInstance() throws Exception {
+		super.testPostProcessInstance();
+
+		_testPostProcessInstanceWithoutPermission();
 	}
 
 	@Rule
@@ -586,6 +627,31 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 		_instances.clear();
 	}
 
+	private void _testDeleteProcessInstanceWithoutPermission()
+		throws Exception {
+
+		Instance instance = testDeleteProcessInstance_addInstance();
+
+		assertHttpResponseStatusCode(
+			403,
+			_instanceResource.deleteProcessInstanceHttpResponse(
+				instance.getProcessId(), instance.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			instanceResource.getProcessInstanceHttpResponse(
+				instance.getProcessId(), instance.getId()));
+	}
+
+	private void _testGetProcessInstanceWithoutPermission() throws Exception {
+		Instance instance = testGetProcessInstance_addInstance();
+
+		assertHttpResponseStatusCode(
+			404,
+			_instanceResource.getProcessInstanceHttpResponse(
+				instance.getProcessId(), instance.getId()));
+	}
+
 	private void _testGetProcessInstancesPage(
 			Long[] assigneeIds, Long[] classPKs, Date dateEnd, Date dateStart,
 			String[] statuses,
@@ -633,6 +699,50 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 		return instance;
 	}
 
+	private void _testGetProcessInstancesPageWithoutPermission()
+		throws Exception {
+
+		assertHttpResponseStatusCode(
+			404,
+			_instanceResource.getProcessInstancesPageHttpResponse(
+				_process.getId(), null, null, null, null, null, null, null,
+				Pagination.of(1, 10), null));
+	}
+
+	private void _testPatchProcessInstanceCompleteWithoutPermission()
+		throws Exception {
+
+		Instance instance = testPatchProcessInstanceComplete_addInstance();
+
+		assertHttpResponseStatusCode(
+			403,
+			_instanceResource.patchProcessInstanceCompleteHttpResponse(
+				instance.getProcessId(), instance.getId(), instance));
+	}
+
+	private void _testPatchProcessInstanceWithoutPermission() throws Exception {
+		Instance instance = testPatchProcessInstance_addInstance();
+
+		assertHttpResponseStatusCode(
+			403,
+			_instanceResource.patchProcessInstanceHttpResponse(
+				instance.getProcessId(), instance.getId(), instance));
+	}
+
+	private void _testPostProcessInstanceWithoutPermission() throws Exception {
+		Instance instance = randomInstance();
+
+		assertHttpResponseStatusCode(
+			403,
+			_instanceResource.postProcessInstanceHttpResponse(
+				_process.getId(), instance));
+
+		assertHttpResponseStatusCode(
+			404,
+			instanceResource.getProcessInstanceHttpResponse(
+				_process.getId(), instance.getId()));
+	}
+
 	private SLAResult _toSLAResult(
 		boolean overdue, SLAResult.Status slaResultStatus) {
 
@@ -653,6 +763,7 @@ public class InstanceResourceTest extends BaseInstanceResourceTestCase {
 	}
 
 	private Long _classPK;
+	private InstanceResource _instanceResource;
 	private final List<Instance> _instances = new ArrayList<>();
 	private Process _process;
 
