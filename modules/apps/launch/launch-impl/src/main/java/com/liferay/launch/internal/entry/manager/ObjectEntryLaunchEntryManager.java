@@ -69,8 +69,6 @@ public class ObjectEntryLaunchEntryManager implements LaunchEntryManager {
 			com.liferay.object.rest.dto.v1_0.ObjectEntry.unsafeToDTO(
 				objectEntryVersion.getContent());
 
-		Map<String, Object> properties = contentObjectEntry.getProperties();
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -82,6 +80,8 @@ public class ObjectEntryLaunchEntryManager implements LaunchEntryManager {
 					contentObjectEntry.getTaxonomyCategoryBriefs()),
 				TaxonomyCategoryBrief::getTaxonomyCategoryId));
 		serviceContext.setAssetTagNames(contentObjectEntry.getKeywords());
+
+		Map<String, Object> properties = contentObjectEntry.getProperties();
 
 		return _toDraft(
 			_objectEntryLocalService.addDraftObjectEntry(
