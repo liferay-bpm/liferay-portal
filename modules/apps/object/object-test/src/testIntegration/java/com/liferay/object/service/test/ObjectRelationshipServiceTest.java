@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -162,6 +163,28 @@ public class ObjectRelationshipServiceTest {
 	}
 
 	@Test
+	@TestInfo("LPD-116163")
+	public void testAddObjectRelationshipOneToMany() throws Exception {
+		User user = _addUserWithObjectDefinition1UpdatePermission();
+
+		_setUser(user);
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", user.getUserId(), " must have UPDATE permission for ",
+				ObjectDefinition.class.getName(), StringPool.SPACE,
+				_objectDefinition2.getObjectDefinitionId()),
+			() -> _objectRelationshipService.addObjectRelationship(
+				null, _objectDefinition1.getObjectDefinitionId(),
+				_objectDefinition2.getObjectDefinitionId(), 0,
+				ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				StringUtil.randomId(), false,
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null));
+	}
+
+	@Test
 	public void testDeleteObjectRelationship() throws Exception {
 		try {
 			_testDeleteObjectRelationship(_guestUser);
@@ -178,6 +201,26 @@ public class ObjectRelationshipServiceTest {
 		}
 
 		_testDeleteObjectRelationship(_user);
+	}
+
+	@Test
+	@TestInfo("LPD-116163")
+	public void testDeleteObjectRelationshipOneToMany() throws Exception {
+		ObjectRelationship objectRelationship =
+			_addOneToManyObjectRelationship();
+
+		User user = _addUserWithObjectDefinition1UpdatePermission();
+
+		_setUser(user);
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", user.getUserId(), " must have UPDATE permission for ",
+				ObjectDefinition.class.getName(), StringPool.SPACE,
+				_objectDefinition2.getObjectDefinitionId()),
+			() -> _objectRelationshipService.deleteObjectRelationship(
+				objectRelationship.getObjectRelationshipId()));
 	}
 
 	@Test
@@ -235,6 +278,30 @@ public class ObjectRelationshipServiceTest {
 		_testUpdateObjectRelationship(_user);
 	}
 
+	@Test
+	@TestInfo("LPD-116163")
+	public void testUpdateObjectRelationshipOneToMany() throws Exception {
+		ObjectRelationship objectRelationship =
+			_addOneToManyObjectRelationship();
+
+		User user = _addUserWithObjectDefinition1UpdatePermission();
+
+		_setUser(user);
+
+		AssertUtils.assertFailure(
+			PrincipalException.MustHavePermission.class,
+			StringBundler.concat(
+				"User ", user.getUserId(), " must have UPDATE permission for ",
+				ObjectDefinition.class.getName(), StringPool.SPACE,
+				_objectDefinition2.getObjectDefinitionId()),
+			() -> _objectRelationshipService.updateObjectRelationship(
+				objectRelationship.getExternalReferenceCode(),
+				objectRelationship.getObjectRelationshipId(), 0,
+				objectRelationship.getDeletionType(), null, false,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				null));
+	}
+
 	private ObjectRelationship _addObjectRelationship(User user)
 		throws Exception {
 
@@ -245,6 +312,36 @@ public class ObjectRelationshipServiceTest {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			StringUtil.randomId(), false,
 			ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
+	}
+
+	private ObjectRelationship _addOneToManyObjectRelationship()
+		throws Exception {
+
+		return _objectRelationshipLocalService.addObjectRelationship(
+			null, TestPropsValues.getUserId(),
+			_objectDefinition1.getObjectDefinitionId(),
+			_objectDefinition2.getObjectDefinitionId(), 0,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			StringUtil.randomId(), false,
+			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+	}
+
+	private User _addUserWithObjectDefinition1UpdatePermission()
+		throws Exception {
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+		User user = UserTestUtil.addUser();
+
+		_userLocalService.addRoleUser(role.getRoleId(), user);
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			TestPropsValues.getCompanyId(), ObjectDefinition.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(_objectDefinition1.getObjectDefinitionId()),
+			role.getRoleId(), new String[] {ActionKeys.UPDATE});
+
+		return user;
 	}
 
 	private void _setUser(User user) {
