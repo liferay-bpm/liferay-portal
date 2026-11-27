@@ -7,6 +7,7 @@ package com.liferay.content.marketing.platform.web.internal.upgrade.registry;
 
 import com.liferay.content.marketing.platform.web.internal.upgrade.v2_0_0.CMPDescriptionObjectFieldUpgradeProcess;
 import com.liferay.content.marketing.platform.web.internal.upgrade.v2_1_0.CMPDescriptionDisplayPageTemplateUpgradeProcess;
+import com.liferay.content.marketing.platform.web.internal.upgrade.v2_2_0.CMPTaskDisplayPageTemplateUpgradeProcess;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
@@ -42,6 +43,16 @@ public class CMPSiteInitializerUpgradeStepRegistrator
 		registry.register(
 			"2.0.0", "2.1.0",
 			new CMPDescriptionDisplayPageTemplateUpgradeProcess(
+				_classNameLocalService, _companyLocalService,
+				_fragmentEntryLinkLocalService, _groupLocalService,
+				_layoutLocalService, _layoutPageTemplateEntryLocalService,
+				_layoutPageTemplateStructureLocalService,
+				_objectDefinitionLocalService,
+				_segmentsExperienceLocalService));
+
+		registry.register(
+			"2.1.0", "2.2.0",
+			new CMPTaskDisplayPageTemplateUpgradeProcess(
 				_classNameLocalService, _companyLocalService,
 				_fragmentEntryLinkLocalService, _groupLocalService,
 				_layoutLocalService, _layoutPageTemplateEntryLocalService,
