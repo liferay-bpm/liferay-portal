@@ -420,14 +420,15 @@ export function ObjectRelationshipFormBase({
 
 			{children}
 
-			{onChangeInheritanceCheckbox && values.type === 'oneToMany' && (
-				<ObjectRelationshipInheritanceCheckbox
-					disabled={inheritanceCheckboxDisabled}
-					learnResources={learnResources}
-					onChange={onChangeInheritanceCheckbox}
-					values={values}
-				/>
-			)}
+			{onChangeInheritanceCheckbox &&
+				(values.type === 'oneToMany' || values.type === 'oneToOne') && (
+					<ObjectRelationshipInheritanceCheckbox
+						disabled={inheritanceCheckboxDisabled}
+						learnResources={learnResources}
+						onChange={onChangeInheritanceCheckbox}
+						values={values}
+					/>
+				)}
 
 			{submitError && (
 				<ClayAlert

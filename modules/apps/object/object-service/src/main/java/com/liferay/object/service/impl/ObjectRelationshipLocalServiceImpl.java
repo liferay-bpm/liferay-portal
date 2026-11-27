@@ -1880,13 +1880,15 @@ public class ObjectRelationshipLocalServiceImpl
 		}
 
 		if (!Objects.equals(
-				type, ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
+				type, ObjectRelationshipConstants.TYPE_ONE_TO_MANY) &&
+			!Objects.equals(
+				type, ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
 
 			throw new ObjectRelationshipEdgeException(
-				"Object relationship must be one to many to be an edge of a " +
-					"root context",
-				"object-relationship-must-be-one-to-many-to-be-an-edge-of-a-" +
-					"root-context");
+				"Object relationship must have a relationship object field " +
+					"to be an edge of a root context",
+				"object-relationship-must-have-a-relationship-object-field-" +
+					"to-be-an-edge-of-a-root-context");
 		}
 
 		if (objectDefinition1.getObjectDefinitionId() ==
