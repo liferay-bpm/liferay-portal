@@ -126,8 +126,8 @@ public class GroupSelectorTag extends IncludeTag {
 
 		return groupSelectorProvider.getGroupsCount(
 			group.getCompanyId(), group.getGroupId(),
-			_getKeywords(httpServletRequest),
-			_isIncludeUnconnectedGroups(httpServletRequest));
+			_isIncludeUnconnectedGroups(httpServletRequest),
+			_getKeywords(httpServletRequest));
 	}
 
 	private String _getGroupType(HttpServletRequest httpServletRequest) {
@@ -178,9 +178,8 @@ public class GroupSelectorTag extends IncludeTag {
 
 		List<Group> groups = groupItemSelectorProvider.getGroups(
 			group.getCompanyId(), group.getGroupId(),
-			_getKeywords(httpServletRequest),
-			_isIncludeUnconnectedGroups(httpServletRequest), startAndEnd[0],
-			startAndEnd[1]);
+			_isIncludeUnconnectedGroups(httpServletRequest),
+			_getKeywords(httpServletRequest), startAndEnd[0], startAndEnd[1]);
 
 		if (groups == null) {
 			return new ArrayList<>();

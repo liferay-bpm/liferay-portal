@@ -107,7 +107,7 @@ public class ObjectEntryInfoItemObjectProvider
 		ObjectEntry curObjectEntry = objectEntries.get(ercInfoItemIdentifier);
 
 		if (curObjectEntry != null) {
-			return _resolveObjectEntry(curObjectEntry, ercInfoItemIdentifier);
+			return _resolveObjectEntry(ercInfoItemIdentifier, curObjectEntry);
 		}
 
 		Group group = null;
@@ -165,7 +165,7 @@ public class ObjectEntryInfoItemObjectProvider
 					ercInfoItemIdentifier, serviceBuilderObjectEntry);
 
 				return _resolveObjectEntry(
-					serviceBuilderObjectEntry, ercInfoItemIdentifier);
+					ercInfoItemIdentifier, serviceBuilderObjectEntry);
 			}
 		}
 		catch (Exception exception) {
@@ -227,8 +227,8 @@ public class ObjectEntryInfoItemObjectProvider
 	}
 
 	private ObjectEntry _resolveObjectEntry(
-			ObjectEntry objectEntry,
-			ERCInfoItemIdentifier ercInfoItemIdentifier)
+			ERCInfoItemIdentifier ercInfoItemIdentifier,
+			ObjectEntry objectEntry)
 		throws NoSuchInfoItemException {
 
 		if (!objectEntry.isApproved() &&

@@ -91,14 +91,14 @@ public class ObjectDefinitionDeployerImplTest {
 		Assert.assertNull(
 			launchEntryManager.fetchItem(objectEntry1.getObjectEntryId()));
 
+		Group companyGroup = _groupLocalService.getCompanyGroup(
+			TestPropsValues.getCompanyId());
+
 		ObjectEntry objectEntry2 = ObjectEntryTestUtil.addObjectEntry(
 			_objectDefinition2);
 
 		LaunchEntryManager.Item item = launchEntryManager.fetchItem(
 			objectEntry2.getObjectEntryId());
-
-		Group companyGroup = _groupLocalService.getCompanyGroup(
-			TestPropsValues.getCompanyId());
 
 		Assert.assertEquals(companyGroup.getGroupId(), item.getGroupId());
 

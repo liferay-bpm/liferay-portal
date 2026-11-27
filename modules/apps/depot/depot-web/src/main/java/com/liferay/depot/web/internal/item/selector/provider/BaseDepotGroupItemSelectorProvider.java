@@ -59,13 +59,13 @@ public abstract class BaseDepotGroupItemSelectorProvider
 
 	@Override
 	public List<Group> getGroups(
-		long companyId, long groupId, String keywords,
-		boolean includeUnconnectedGroups, int start, int end) {
+		long companyId, long groupId, boolean includeUnconnectedGroups,
+		String keywords, int start, int end) {
 
 		try {
 			if (includeUnconnectedGroups) {
 				return ListUtil.subList(
-					_getCompanyGroups(companyId, keywords), start, end);
+					_getDepotGroups(companyId, keywords), start, end);
 			}
 
 			return TransformUtil.transform(
@@ -84,22 +84,17 @@ public abstract class BaseDepotGroupItemSelectorProvider
 	public List<Group> getGroups(
 		long companyId, long groupId, String keywords, int start, int end) {
 
-		return getGroups(companyId, groupId, keywords, false, start, end);
-	}
-
-	@Override
-	public int getGroupsCount(long companyId, long groupId, String keywords) {
-		return getGroupsCount(companyId, groupId, keywords, false);
+		return getGroups(companyId, groupId, false, keywords, start, end);
 	}
 
 	@Override
 	public int getGroupsCount(
-		long companyId, long groupId, String keywords,
-		boolean includeUnconnectedGroups) {
+		long companyId, long groupId, boolean includeUnconnectedGroups,
+		String keywords) {
 
 		try {
 			if (includeUnconnectedGroups) {
-				List<Group> groups = _getCompanyGroups(companyId, keywords);
+				List<Group> groups = _getDepotGroups(companyId, keywords);
 
 				return groups.size();
 			}
@@ -112,6 +107,11 @@ public abstract class BaseDepotGroupItemSelectorProvider
 
 			return 0;
 		}
+	}
+
+	@Override
+	public int getGroupsCount(long companyId, long groupId, String keywords) {
+		return getGroupsCount(companyId, groupId, false, keywords);
 	}
 
 	@Override
@@ -170,7 +170,7 @@ public abstract class BaseDepotGroupItemSelectorProvider
 	@Reference
 	protected Portal portal;
 
-	private List<Group> _getCompanyGroups(long companyId, String keywords)
+	private List<Group> _getDepotGroups(long companyId, String keywords)
 		throws PortalException {
 
 		return ListUtil.filter(

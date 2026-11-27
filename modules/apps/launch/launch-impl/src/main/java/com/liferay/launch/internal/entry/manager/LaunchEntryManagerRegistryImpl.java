@@ -30,7 +30,7 @@ public class LaunchEntryManagerRegistryImpl
 
 	@Override
 	public LaunchEntryManager getLaunchEntryManager(String className) {
-		return _serviceTrackerMap.getService(className);
+		return _classNameServiceTrackerMap.getService(className);
 	}
 
 	@Override
@@ -57,6 +57,10 @@ public class LaunchEntryManagerRegistryImpl
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
+		_classNameServiceTrackerMap =
+			ServiceTrackerMapFactory.openSingleValueMap(
+				bundleContext, LaunchEntryManager.class,
+				"launch.entry.manager.class.name");
 		_companyIdServiceTrackerMap =
 			ServiceTrackerMapFactory.openMultiValueMap(
 				bundleContext, LaunchEntryManager.class,
@@ -64,19 +68,17 @@ public class LaunchEntryManagerRegistryImpl
 				(serviceReference, emitter) -> emitter.emit(
 					GetterUtil.getLong(
 						serviceReference.getProperty("company.id"))));
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, LaunchEntryManager.class,
-			"launch.entry.manager.class.name");
 	}
 
 	@Deactivate
 	protected void deactivate() {
+		_classNameServiceTrackerMap.close();
 		_companyIdServiceTrackerMap.close();
-		_serviceTrackerMap.close();
 	}
 
+	private ServiceTrackerMap<String, LaunchEntryManager>
+		_classNameServiceTrackerMap;
 	private ServiceTrackerMap<Long, List<LaunchEntryManager>>
 		_companyIdServiceTrackerMap;
-	private ServiceTrackerMap<String, LaunchEntryManager> _serviceTrackerMap;
 
 }
