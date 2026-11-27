@@ -11,6 +11,7 @@ import com.liferay.item.selector.ItemSelector;
 import com.liferay.object.display.context.ObjectEntryDisplayContext;
 import com.liferay.object.display.context.ObjectEntryDisplayContextFactory;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
+import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -42,6 +43,7 @@ public class ObjectEntryDisplayContextFactoryImpl
 			_objectEntryManagerRegistry, _objectEntryLocalService,
 			_objectEntryService, _objectFieldBusinessTypeRegistry,
 			_objectFieldLocalService, _objectLayoutLocalService,
+			_objectRelatedModelsProviderRegistry,
 			_objectRelationshipLocalService, _objectScopeProviderRegistry);
 	}
 
@@ -74,6 +76,10 @@ public class ObjectEntryDisplayContextFactoryImpl
 
 	@Reference
 	private ObjectLayoutLocalService _objectLayoutLocalService;
+
+	@Reference
+	private ObjectRelatedModelsProviderRegistry
+		_objectRelatedModelsProviderRegistry;
 
 	@Reference
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;

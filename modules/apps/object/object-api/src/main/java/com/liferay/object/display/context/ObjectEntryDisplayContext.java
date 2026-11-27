@@ -6,6 +6,7 @@
 package com.liferay.object.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectLayout;
@@ -17,6 +18,8 @@ import com.liferay.portal.kernel.portlet.constants.FriendlyURLResolverConstants;
 
 import jakarta.servlet.jsp.PageContext;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,6 +34,12 @@ public interface ObjectEntryDisplayContext {
 	public long[] getGroupIds() throws PortalException;
 
 	public String getMethod() throws PortalException;
+
+	public default List<NavigationItem> getNavigationItems()
+		throws PortalException {
+
+		return Collections.emptyList();
+	}
 
 	public ObjectDefinition getObjectDefinition1();
 

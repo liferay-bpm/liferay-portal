@@ -27,6 +27,8 @@ import com.liferay.dynamic.data.mapping.util.NumericDDMFormFieldUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemBuilder;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemBuilder;
 import com.liferay.headless.delivery.dto.v1_0.Creator;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorReturnType;
@@ -54,6 +56,8 @@ import com.liferay.object.model.ObjectLayoutColumn;
 import com.liferay.object.model.ObjectLayoutRow;
 import com.liferay.object.model.ObjectLayoutTab;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.related.models.ObjectRelatedModelsProvider;
+import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.dto.v1_0.FileEntry;
 import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
@@ -83,6 +87,7 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -96,6 +101,7 @@ import com.liferay.portal.kernel.portlet.FriendlyURLResolver;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolverRegistryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
+import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.constants.FriendlyURLResolverConstants;
@@ -123,6 +129,7 @@ import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.taglib.servlet.PipingServletResponseFactory;
 
 import jakarta.portlet.PortletRequest;
+import jakarta.portlet.PortletURL;
 import jakarta.portlet.WindowState;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -160,6 +167,7 @@ public class ObjectEntryDisplayContextImpl
 		ObjectFieldBusinessTypeRegistry objectFieldBusinessTypeRegistry,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectLayoutLocalService objectLayoutLocalService,
+		ObjectRelatedModelsProviderRegistry objectRelatedModelsProviderRegistry,
 		ObjectRelationshipLocalService objectRelationshipLocalService,
 		ObjectScopeProviderRegistry objectScopeProviderRegistry) {
 
@@ -173,6 +181,8 @@ public class ObjectEntryDisplayContextImpl
 		_objectFieldBusinessTypeRegistry = objectFieldBusinessTypeRegistry;
 		_objectFieldLocalService = objectFieldLocalService;
 		_objectLayoutLocalService = objectLayoutLocalService;
+		_objectRelatedModelsProviderRegistry =
+			objectRelatedModelsProviderRegistry;
 		_objectRelationshipLocalService = objectRelationshipLocalService;
 		_objectScopeProviderRegistry = objectScopeProviderRegistry;
 
@@ -399,6 +409,74 @@ public class ObjectEntryDisplayContextImpl
 	}
 
 	@Override
+	public List<NavigationItem> getNavigationItems() throws PortalException {
+		if (getObjectEntry() == null) {
+			return Collections.emptyList();
+		}
+
+		ObjectDefinition objectDefinition1 = getObjectDefinition1();
+
+		if (!FeatureFlagManagerUtil.isEnabled(
+				objectDefinition1.getCompanyId(), "LPD-108620")) {
+
+			return Collections.emptyList();
+		}
+
+		List<ObjectRelationship> objectRelationships = ListUtil.filter(
+			_objectRelationshipLocalService.getObjectRelationships(
+				objectDefinition1.getObjectDefinitionId(), false,
+				ObjectRelationshipConstants.TYPE_ONE_TO_ONE),
+			objectRelationship -> !objectRelationship.isEdge());
+
+		if (objectRelationships.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		List<NavigationItem> navigationItems = new ArrayList<>();
+
+		PortletURL portletURL = PortletURLUtil.getCurrent(
+			_objectRequestHelper.getLiferayPortletRequest(),
+			_objectRequestHelper.getLiferayPortletResponse());
+
+		long screenNavigationCategoryKey = ParamUtil.getLong(
+			_objectRequestHelper.getRequest(), "screenNavigationCategoryKey");
+
+		navigationItems.add(
+			NavigationItemBuilder.setActive(
+				screenNavigationCategoryKey == 0
+			).setHref(
+				PortletURLBuilder.create(
+					portletURL
+				).setParameter(
+					"screenNavigationCategoryKey", (String)null
+				).buildString()
+			).setLabel(
+				LanguageUtil.get(
+					_objectRequestHelper.getRequest(), "basic-details")
+			).build());
+
+		for (ObjectRelationship objectRelationship : objectRelationships) {
+			navigationItems.add(
+				NavigationItemBuilder.setActive(
+					screenNavigationCategoryKey ==
+						objectRelationship.getObjectRelationshipId()
+				).setHref(
+					PortletURLBuilder.create(
+						portletURL
+					).setParameter(
+						"screenNavigationCategoryKey",
+						objectRelationship.getObjectRelationshipId()
+					).buildString()
+				).setLabel(
+					_getObjectDefinitionLabel(
+						objectRelationship.getObjectDefinitionId2())
+				).build());
+		}
+
+		return navigationItems;
+	}
+
+	@Override
 	public ObjectDefinition getObjectDefinition1() {
 		HttpServletRequest httpServletRequest =
 			_objectRequestHelper.getRequest();
@@ -552,6 +630,33 @@ public class ObjectEntryDisplayContextImpl
 			_objectScopeProviderRegistry.getObjectScopeProvider(
 				objectDefinition2.getScope());
 
+		if (StringUtil.equals(
+				objectRelationship.getType(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
+
+			ObjectEntry objectEntry = _getObjectEntry();
+
+			if (objectEntry != null) {
+				ObjectRelatedModelsProvider<?> objectRelatedModelsProvider =
+					_objectRelatedModelsProviderRegistry.
+						getObjectRelatedModelsProvider(
+							objectDefinition2.getClassName(),
+							objectDefinition2.getCompanyId(),
+							objectRelationship.getType());
+
+				int relatedModelsCount =
+					objectRelatedModelsProvider.getRelatedModelsCount(
+						objectScopeProvider.getGroupId(
+							_objectRequestHelper.getRequest()),
+						objectRelationship.getObjectRelationshipId(), null,
+						objectEntry.getId(), null);
+
+				if (relatedModelsCount > 0) {
+					return creationMenu;
+				}
+			}
+		}
+
 		if ((getObjectLayoutTab() == null) && objectRelationship.isEdge()) {
 			for (long rootObjectDefinitionId :
 					objectDefinition2.getRootObjectDefinitionIds()) {
@@ -595,9 +700,7 @@ public class ObjectEntryDisplayContextImpl
 			  StringUtil.equals(
 				  objectDefinition2.getScope(),
 				  ObjectDefinitionConstants.SCOPE_SITE)) &&
-			StringUtil.equals(
-				objectRelationship.getType(),
-				ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
+			objectRelationship.hasRelationshipObjectField()) {
 
 			creationMenu.addDropdownItem(
 				_getCreateNewRelatedModelDropdownItem(
@@ -1547,6 +1650,16 @@ public class ObjectEntryDisplayContextImpl
 			});
 	}
 
+	private String _getObjectDefinitionLabel(long objectDefinitionId)
+		throws PortalException {
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				objectDefinitionId);
+
+		return objectDefinition.getLabel(_objectRequestHelper.getLocale());
+	}
+
 	private String _getObjectDefinitionPortletId() {
 		ObjectDefinition objectDefinition = getObjectDefinition1();
 
@@ -1838,6 +1951,8 @@ public class ObjectEntryDisplayContextImpl
 		_objectFieldBusinessTypeRegistry;
 	private final ObjectFieldLocalService _objectFieldLocalService;
 	private final ObjectLayoutLocalService _objectLayoutLocalService;
+	private final ObjectRelatedModelsProviderRegistry
+		_objectRelatedModelsProviderRegistry;
 	private final ObjectRelationshipLocalService
 		_objectRelationshipLocalService;
 	private final ObjectRequestHelper _objectRequestHelper;
