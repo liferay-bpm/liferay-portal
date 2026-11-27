@@ -107,8 +107,7 @@ public class ObjectEntryInfoItemObjectProvider
 		ObjectEntry curObjectEntry = objectEntries.get(ercInfoItemIdentifier);
 
 		if (curObjectEntry != null) {
-			return _resolveLatestApprovedObjectEntry(
-				curObjectEntry, ercInfoItemIdentifier.getVersion());
+			return _resolveObjectEntry(ercInfoItemIdentifier, curObjectEntry);
 		}
 
 		Group group = null;
@@ -165,9 +164,8 @@ public class ObjectEntryInfoItemObjectProvider
 				objectEntries.put(
 					ercInfoItemIdentifier, serviceBuilderObjectEntry);
 
-				return _resolveLatestApprovedObjectEntry(
-					serviceBuilderObjectEntry,
-					ercInfoItemIdentifier.getVersion());
+				return _resolveObjectEntry(
+					ercInfoItemIdentifier, serviceBuilderObjectEntry);
 			}
 		}
 		catch (Exception exception) {
@@ -226,6 +224,31 @@ public class ObjectEntryInfoItemObjectProvider
 		throw new NoSuchInfoItemException(
 			"Unable to get an approved object entry " +
 				objectEntry.getObjectEntryId());
+	}
+
+	private ObjectEntry _resolveObjectEntry(
+			ERCInfoItemIdentifier ercInfoItemIdentifier,
+			ObjectEntry objectEntry)
+		throws NoSuchInfoItemException {
+
+		if (!objectEntry.isApproved() &&
+			!Objects.equals(
+				objectEntry.getExternalReferenceCode(),
+				ercInfoItemIdentifier.getExternalReferenceCode())) {
+
+			ObjectEntry serviceBuilderObjectEntry =
+				_objectEntryLocalService.fetchObjectEntry(
+					objectEntry.getObjectEntryId());
+
+			if ((serviceBuilderObjectEntry != null) &&
+				serviceBuilderObjectEntry.isTypeDraft()) {
+
+				return objectEntry;
+			}
+		}
+
+		return _resolveLatestApprovedObjectEntry(
+			objectEntry, ercInfoItemIdentifier.getVersion());
 	}
 
 	private static final String _OBJECT_ENTRIES =

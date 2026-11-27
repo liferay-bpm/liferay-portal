@@ -272,12 +272,6 @@ public class ViewLaunchDisplayContext {
 		return _published;
 	}
 
-	private String _getClassName(LaunchEntryManager launchEntryManager) {
-		Class<?> modelClass = launchEntryManager.getModelClass();
-
-		return modelClass.getName();
-	}
-
 	private String _getItemSelectedEventName() {
 		String portletNamespace = PortalUtil.getPortletNamespace(
 			LaunchPortletKeys.LAUNCH);
@@ -291,7 +285,7 @@ public class ViewLaunchDisplayContext {
 		return TransformUtil.transform(
 			_getLaunchEntryManagers(),
 			launchEntryManager -> HashMapBuilder.<String, Object>put(
-				"className", _getClassName(launchEntryManager)
+				"className", launchEntryManager.getClassName()
 			).put(
 				"itemSelectorURL",
 				String.valueOf(
@@ -310,19 +304,17 @@ public class ViewLaunchDisplayContext {
 	private List<LaunchEntryManager> _getLaunchEntryManagers() {
 		Locale locale = _getLocale();
 
-		List<LaunchEntryManager> launchEntryManagers =
-			_launchEntryManagerRegistry.getLaunchEntryManagers();
-
-		ListUtil.sort(
-			launchEntryManagers,
+		return ListUtil.sort(
+			ListUtil.filter(
+				_launchEntryManagerRegistry.getLaunchEntryManagers(),
+				launchEntryManager ->
+					launchEntryManager.getItemSelectorCriterion() != null),
 			(launchEntryManager1, launchEntryManager2) -> {
 				String label1 = launchEntryManager1.getLabel(locale);
 				String label2 = launchEntryManager2.getLabel(locale);
 
 				return label1.compareTo(label2);
 			});
-
-		return launchEntryManagers;
 	}
 
 	private Locale _getLocale() {

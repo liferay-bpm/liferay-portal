@@ -1,9 +1,12 @@
 dependencies {
 	testIntegrationImplementation group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "default"
+	testIntegrationImplementation project(":apps:item-selector:item-selector-api")
+	testIntegrationImplementation project(":apps:item-selector:item-selector-criteria-api")
 	testIntegrationImplementation project(":apps:journal:journal-api")
 	testIntegrationImplementation project(":apps:journal:journal-test-util")
 	testIntegrationImplementation project(":apps:launch:launch-api")
 	testIntegrationImplementation project(":apps:layout:layout-test-util")
 	testIntegrationImplementation project(":apps:object:object-api")
+	testIntegrationImplementation project(":apps:object:object-test-util")
 	testIntegrationImplementation project(":test:arquillian-extension-junit-bridge")
 }

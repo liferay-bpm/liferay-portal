@@ -39,6 +39,12 @@ public interface LaunchEntryManager {
 
 	public Version fetchVersion(long classPK, String versionKey);
 
+	public default String getClassName() {
+		Class<?> modelClass = getModelClass();
+
+		return modelClass.getName();
+	}
+
 	public long getClassPK(Map<String, String> selectedItemData);
 
 	public ItemSelectorCriterion getItemSelectorCriterion();

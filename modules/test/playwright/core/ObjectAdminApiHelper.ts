@@ -127,6 +127,8 @@ export class ObjectAdminApiHelper {
 	async postRandomObjectDefinition({
 		className,
 		enableFriendlyURLCustomization,
+		enableObjectEntryDraft,
+		enableObjectEntryVersioning,
 		objectDefinitionExternalReferenceCode = `ObjectDefinition${getRandomInt()}`,
 		objectDefinitionSettings,
 		objectFields,
@@ -138,6 +140,8 @@ export class ObjectAdminApiHelper {
 	}: {
 		className?: string;
 		enableFriendlyURLCustomization?: boolean;
+		enableObjectEntryDraft?: boolean;
+		enableObjectEntryVersioning?: boolean;
 		objectDefinitionExternalReferenceCode?: string;
 		objectDefinitionSettings?: Partial<ObjectDefinitionSetting>[];
 		objectFields?: Partial<ObjectField>[];
@@ -151,6 +155,8 @@ export class ObjectAdminApiHelper {
 			active: true,
 			className,
 			enableFriendlyURLCustomization,
+			enableObjectEntryDraft,
+			enableObjectEntryVersioning,
 			externalReferenceCode: objectDefinitionExternalReferenceCode,
 			label: {
 				en_US: objectDefinitionExternalReferenceCode,

@@ -10,8 +10,6 @@ import {clickAndExpectToBeVisible} from '../../utils/clickAndExpectToBeVisible';
 import {PORTLET_URLS} from '../../utils/portletUrls';
 import {waitForPageToBeLoaded} from '../../utils/waitForPageToBeLoaded';
 
-export type LaunchEntryManagerLabel = 'Page' | 'Web Content';
-
 export class LaunchesPage {
 	readonly page: Page;
 
@@ -58,9 +56,7 @@ export class LaunchesPage {
 		);
 	}
 
-	async openEntrySelector(
-		typeLabel: LaunchEntryManagerLabel
-	): Promise<FrameLocator> {
+	async openEntrySelector(typeLabel: string): Promise<FrameLocator> {
 		await clickAndExpectToBeVisible({
 			autoClick: true,
 			target: this.page.getByRole('menuitem', {
@@ -75,6 +71,15 @@ export class LaunchesPage {
 		await iframe.getByRole('main').waitFor();
 
 		return iframe;
+	}
+
+	async addObjectEntry(objectDefinitionLabel: string, title: string) {
+		const iframe = await this.openEntrySelector(objectDefinitionLabel);
+
+		await this.selectEntry(
+			iframe.getByText(title, {exact: true}).first(),
+			title
+		);
 	}
 
 	async addPageEntry(siteName: string, pageName: string) {
@@ -251,11 +256,6 @@ export class LaunchesPage {
 			trigger: entry,
 		});
 
-		await expect(
-			this.getEntryRow(title).getByRole('link', {
-				exact: true,
-				name: title,
-			})
-		).toBeVisible();
+		await expect(this.getEntryRow(title)).toBeVisible();
 	}
 }

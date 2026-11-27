@@ -203,6 +203,13 @@ public class ObjectEntryItemSelectorViewDescriptor
 
 	@Override
 	public boolean isShowBreadcrumb() {
+		if (StringUtil.equals(
+				_objectDefinition.getScope(),
+				ObjectDefinitionConstants.SCOPE_DEPOT)) {
+
+			return _infoItemItemSelectorCriterion.isIncludeUnconnectedGroups();
+		}
+
 		return StringUtil.equals(
 			_objectDefinition.getScope(), ObjectDefinitionConstants.SCOPE_SITE);
 	}

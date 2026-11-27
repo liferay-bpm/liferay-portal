@@ -256,6 +256,7 @@ import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.kernel.workflow.WorkflowTask;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManager;
+import com.liferay.portal.preview.PreviewableResolverUtil;
 import com.liferay.portal.security.audit.event.generators.constants.EventTypes;
 import com.liferay.portal.security.script.management.test.rule.ScriptManagementConfigurationTestRule;
 import com.liferay.portal.test.log.LogCapture;
@@ -5755,6 +5756,57 @@ public class ObjectEntryLocalServiceTest {
 			_objectDefinitionLocalService,
 			new String[] {"C_A", "C_AA", "C_AB", "C_AAA", "C_AAB"},
 			_objectEntryLocalService, _objectRelationshipLocalService);
+	}
+
+	@FeatureFlag("LPD-72278")
+	@Test
+	@TestInfo("LPD-110889")
+	public void testFetchObjectEntry() throws Exception {
+		_objectDefinition.setFriendlyURLSeparator(
+			StringUtil.toLowerCase(RandomTestUtil.randomString()));
+
+		_objectDefinition = _updateEnableObjectEntryDraft(_objectDefinition);
+		_objectDefinition = _updateEnableObjectEntryVersioning(
+			_objectDefinition);
+
+		Map<String, Serializable> values =
+			HashMapBuilder.<String, Serializable>put(
+				"emailAddressRequired",
+				RandomTestUtil.randomString() + "@liferay.com"
+			).put(
+				"listTypeEntryKeyRequired", "listTypeEntryKey1"
+			).build();
+
+		ObjectEntry headObjectEntry = _addObjectEntry(values);
+
+		ObjectEntry draftObjectEntry =
+			_objectEntryLocalService.addDraftObjectEntry(
+				TestPropsValues.getUserId(), headObjectEntry.getObjectEntryId(),
+				RandomTestUtil.randomInt(), values,
+				ServiceContextTestUtil.getServiceContext());
+
+		_assertFetchObjectEntry(headObjectEntry, headObjectEntry);
+
+		Long previewId = PreviewableResolverUtil.addPreviewableMap(
+			HashMapBuilder.<Class<?>, Map<Serializable, Object>>put(
+				ObjectEntry.class,
+				HashMapBuilder.<Serializable, Object>put(
+					headObjectEntry.getObjectEntryId(),
+					draftObjectEntry.getObjectEntryId()
+				).build()
+			).build());
+
+		try (SafeCloseable safeCloseable =
+				PreviewableResolverUtil.setPreviewIdWithSafeCloseable(
+					previewId)) {
+
+			_assertFetchObjectEntry(draftObjectEntry, headObjectEntry);
+		}
+		finally {
+			PreviewableResolverUtil.removePreviewableMap(previewId);
+		}
+
+		_objectEntryLocalService.deleteObjectEntry(headObjectEntry);
 	}
 
 	@Test
@@ -11753,6 +11805,37 @@ public class ObjectEntryLocalServiceTest {
 		_assertObjectValidationRuleResult(
 			objectValidationRule.getErrorLabel(LocaleUtil.getDefault()), null,
 			objectValidationRuleResults.get(0));
+	}
+
+	private void _assertFetchObjectEntry(
+			ObjectEntry expectedObjectEntry, ObjectEntry headObjectEntry)
+		throws Exception {
+
+		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
+			headObjectEntry.getGroupId(), _objectDefinition,
+			headObjectEntry.getURLTitle(LocaleUtil.getSiteDefault()));
+
+		Assert.assertEquals(
+			expectedObjectEntry.getObjectEntryId(),
+			objectEntry.getObjectEntryId());
+
+		objectEntry = _objectEntryLocalService.fetchObjectEntry(
+			headObjectEntry.getExternalReferenceCode(),
+			headObjectEntry.getGroupId(),
+			_objectDefinition.getObjectDefinitionId());
+
+		Assert.assertEquals(
+			expectedObjectEntry.getObjectEntryId(),
+			objectEntry.getObjectEntryId());
+
+		objectEntry = _objectEntryLocalService.getObjectEntry(
+			headObjectEntry.getExternalReferenceCode(),
+			headObjectEntry.getGroupId(),
+			_objectDefinition.getObjectDefinitionId());
+
+		Assert.assertEquals(
+			expectedObjectEntry.getObjectEntryId(),
+			objectEntry.getObjectEntryId());
 	}
 
 	private void _assertFriendlyURLEntries(

@@ -27,8 +27,22 @@ public interface GroupItemSelectorProvider {
 
 	public String getGroupType();
 
+	public default List<Group> getGroups(
+		long companyId, long groupId, boolean includeUnconnectedGroups,
+		String keywords, int start, int end) {
+
+		return getGroups(companyId, groupId, keywords, start, end);
+	}
+
 	public List<Group> getGroups(
 		long companyId, long groupId, String keywords, int start, int end);
+
+	public default int getGroupsCount(
+		long companyId, long groupId, boolean includeUnconnectedGroups,
+		String keywords) {
+
+		return getGroupsCount(companyId, groupId, keywords);
+	}
 
 	public int getGroupsCount(long companyId, long groupId, String keywords);
 
