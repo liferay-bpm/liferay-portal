@@ -17,9 +17,11 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.InetAddressUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,6 +31,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 /**
@@ -62,6 +65,8 @@ public class OAuthClientEntryLocalServiceImplTest {
 		_testValidateAuthServerWellKnownURIWithHostAllowedByWildcard();
 		_testValidateAuthServerWellKnownURIWithHostAllowedIgnoringPort();
 		_testValidateAuthServerWellKnownURIWithHostNotAllowed();
+		_testValidateAuthServerWellKnownURIWithHostResolvingToLocalAddress();
+		_testValidateAuthServerWellKnownURIWithHostResolvingToMulticastAddress();
 		_testValidateAuthServerWellKnownURIWithLinkLocalHost();
 		_testValidateAuthServerWellKnownURIWithLocalNetworkAccessDisabled();
 		_testValidateAuthServerWellKnownURIWithLocalWellKnownURI();
@@ -313,6 +318,72 @@ public class OAuthClientEntryLocalServiceImplTest {
 		Mockito.verifyNoInteractions(http);
 	}
 
+	private void _testValidateAuthServerWellKnownURIWithHostResolvingToLocalAddress()
+		throws Exception {
+
+		Http http = _mockHttp();
+
+		try (MockedStatic<InetAddressUtil> inetAddressUtilMockedStatic =
+				Mockito.mockStatic(
+					InetAddressUtil.class, Mockito.CALLS_REAL_METHODS)) {
+
+			inetAddressUtilMockedStatic.when(
+				() -> InetAddressUtil.getInetAddressesByName(
+					Mockito.anyString())
+			).thenReturn(
+				new InetAddress[] {
+					InetAddress.getByName(
+						_getRandomHost(3, _HOST_PREFIX_PUBLIC)),
+					InetAddress.getByName(
+						_getRandomHost(3, _HOST_PREFIX_LOOPBACK))
+				}
+			);
+
+			Assert.assertThrows(
+				OAuthClientEntryAuthServerWellKnownURIException.class,
+				() -> _validateAuthServerWellKnownURI(
+					_getWellKnownURI(RandomTestUtil.randomString() + ".com"),
+					_createOAuthClientEntryLocalServiceImpl(
+						null, false, http)));
+		}
+
+		Mockito.verifyNoInteractions(http);
+	}
+
+	private void _testValidateAuthServerWellKnownURIWithHostResolvingToMulticastAddress()
+		throws Exception {
+
+		Http http = _mockHttp();
+
+		try (MockedStatic<InetAddressUtil> inetAddressUtilMockedStatic =
+				Mockito.mockStatic(
+					InetAddressUtil.class, Mockito.CALLS_REAL_METHODS)) {
+
+			inetAddressUtilMockedStatic.when(
+				() -> InetAddressUtil.getInetAddressesByName(
+					Mockito.anyString())
+			).thenReturn(
+				new InetAddress[] {
+					InetAddress.getByName(
+						_getRandomHost(3, _HOST_PREFIX_PUBLIC)),
+					InetAddress.getByName(
+						_getRandomHost(
+							3,
+							RandomTestUtil.randomInt(224, 239) +
+								StringPool.PERIOD))
+				}
+			);
+
+			Assert.assertThrows(
+				OAuthClientEntryAuthServerWellKnownURIException.class,
+				() -> _validateAuthServerWellKnownURI(
+					_getWellKnownURI(RandomTestUtil.randomString() + ".com"),
+					_createOAuthClientEntryLocalServiceImpl(null, true, http)));
+		}
+
+		Mockito.verifyNoInteractions(http);
+	}
+
 	private void _testValidateAuthServerWellKnownURIWithLinkLocalHost()
 		throws Exception {
 
@@ -541,6 +612,8 @@ public class OAuthClientEntryLocalServiceImplTest {
 	private static final String _HOST_PREFIX_LOOPBACK = "127.";
 
 	private static final String _HOST_PREFIX_PRIVATE = "10.";
+
+	private static final String _HOST_PREFIX_PUBLIC = "8.";
 
 	private static final int _MAXIMUM_REDIRECTS = 5;
 

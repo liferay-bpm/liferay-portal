@@ -536,6 +536,54 @@ public class HttpComponentsUtil {
 		return Validator.isNotNull(getProtocol(url));
 	}
 
+	public static boolean isAllowedURL(
+		String url, String[] urlHostsAllowed,
+		boolean urlLocalNetworkAccessEnabled) {
+
+		if (!hasHTTPProtocol(url)) {
+			return false;
+		}
+
+		try {
+			URI uri = new URI(url);
+
+			String host = uri.getHost();
+
+			if (Validator.isNull(host) ||
+				(ArrayUtil.isNotEmpty(urlHostsAllowed) &&
+				 !ArrayUtil.contains(urlHostsAllowed, host, true))) {
+
+				return false;
+			}
+
+			if (urlLocalNetworkAccessEnabled) {
+				return true;
+			}
+
+			InetAddress[] inetAddresses =
+				InetAddressUtil.getInetAddressesByName(host);
+
+			if (ArrayUtil.isEmpty(inetAddresses)) {
+				return false;
+			}
+
+			for (InetAddress inetAddress : inetAddresses) {
+				if (InetAddressUtil.isLocalInetAddress(inetAddress)) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
+
+			return false;
+		}
+	}
+
 	public static boolean isForwarded(HttpServletRequest httpServletRequest) {
 		String forwardedRequestURI = (String)httpServletRequest.getAttribute(
 			JavaConstants.JAKARTA_SERVLET_FORWARD_REQUEST_URI);

@@ -335,28 +335,6 @@ public class OAuthClientEntryLocalServiceImpl
 		return false;
 	}
 
-	private boolean _isLocalInetAddress(InetAddress inetAddress) {
-		if (InetAddressUtil.isLocalInetAddress(inetAddress)) {
-			return true;
-		}
-
-		byte[] address = inetAddress.getAddress();
-
-		if (address.length == 4) {
-			if ((address[0] == 100) && ((address[1] & 0xc0) == 0x40)) {
-				return true;
-			}
-
-			return false;
-		}
-
-		if ((address[0] & 0xfe) == 0xfc) {
-			return true;
-		}
-
-		return false;
-	}
-
 	private boolean _isURIAllowed(long companyId, URI uri) {
 		try {
 			String scheme = uri.getScheme();
@@ -384,20 +362,27 @@ public class OAuthClientEntryLocalServiceImpl
 				return false;
 			}
 
-			InetAddress inetAddress = InetAddressUtil.getInetAddressByName(
-				host);
+			InetAddress[] inetAddresses =
+				InetAddressUtil.getInetAddressesByName(host);
 
-			if (inetAddress.isMulticastAddress()) {
+			if (ArrayUtil.isEmpty(inetAddresses)) {
 				return false;
 			}
 
-			if (oAuthClientCompanyConfiguration.
-					authServerLocalNetworkAccessEnabled()) {
+			boolean authServerLocalNetworkAccessEnabled =
+				oAuthClientCompanyConfiguration.
+					authServerLocalNetworkAccessEnabled();
 
-				return true;
+			for (InetAddress inetAddress : inetAddresses) {
+				if (inetAddress.isMulticastAddress() ||
+					(!authServerLocalNetworkAccessEnabled &&
+					 InetAddressUtil.isLocalInetAddress(inetAddress))) {
+
+					return false;
+				}
 			}
 
-			return !_isLocalInetAddress(inetAddress);
+			return true;
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
