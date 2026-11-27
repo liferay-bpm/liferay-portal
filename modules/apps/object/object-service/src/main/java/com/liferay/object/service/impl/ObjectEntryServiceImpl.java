@@ -11,6 +11,7 @@ import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.object.configuration.ObjectConfiguration;
 import com.liferay.object.constants.ObjectActionKeys;
+import com.liferay.object.constants.ObjectEntryConstants;
 import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.definition.security.permission.resource.ObjectDefinitionPortletResourcePermissionRegistryUtil;
@@ -168,6 +169,13 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 			ModelResourcePermission<ObjectEntry> modelResourcePermission,
 			ObjectEntry objectEntry, String actionId)
 		throws PortalException {
+
+		if (objectEntry.getType() == ObjectEntryConstants.TYPE_DRAFT) {
+			modelResourcePermission.check(
+				getPermissionChecker(), objectEntry, ActionKeys.UPDATE);
+
+			return;
+		}
 
 		if (objectEntry.isRootDescendantNode() &&
 			(actionId.equals(ActionKeys.DELETE) ||
