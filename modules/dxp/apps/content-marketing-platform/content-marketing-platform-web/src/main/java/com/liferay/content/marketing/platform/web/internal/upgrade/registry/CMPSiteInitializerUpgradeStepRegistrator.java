@@ -7,7 +7,10 @@ package com.liferay.content.marketing.platform.web.internal.upgrade.registry;
 
 import com.liferay.content.marketing.platform.web.internal.upgrade.v2_0_0.CMPDescriptionObjectFieldUpgradeProcess;
 import com.liferay.content.marketing.platform.web.internal.upgrade.v2_1_0.CMPDescriptionDisplayPageTemplateUpgradeProcess;
+import com.liferay.content.marketing.platform.web.internal.upgrade.v2_2_0.CMPTabsFragmentEntryUpgradeProcess;
+import com.liferay.content.marketing.platform.web.internal.upgrade.v2_3_0.CMPTabsLayoutPageTemplateStructureUpgradeProcess;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -48,6 +51,22 @@ public class CMPSiteInitializerUpgradeStepRegistrator
 				_layoutPageTemplateStructureLocalService,
 				_objectDefinitionLocalService,
 				_segmentsExperienceLocalService));
+
+		registry.register(
+			"2.1.0", "2.2.0",
+			new CMPTabsFragmentEntryUpgradeProcess(
+				_companyLocalService, _fragmentEntryLinkLocalService,
+				_fragmentEntryLocalService, _groupLocalService));
+
+		registry.register(
+			"2.2.0", "2.3.0",
+			new CMPTabsLayoutPageTemplateStructureUpgradeProcess(
+				_classNameLocalService, _companyLocalService,
+				_fragmentEntryLinkLocalService, _groupLocalService,
+				_layoutLocalService, _layoutPageTemplateEntryLocalService,
+				_layoutPageTemplateStructureLocalService,
+				_objectDefinitionLocalService,
+				_segmentsExperienceLocalService));
 	}
 
 	@Reference
@@ -58,6 +77,9 @@ public class CMPSiteInitializerUpgradeStepRegistrator
 
 	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
+
+	@Reference
+	private FragmentEntryLocalService _fragmentEntryLocalService;
 
 	@Reference
 	private GroupLocalService _groupLocalService;

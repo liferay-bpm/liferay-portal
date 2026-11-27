@@ -1,0 +1,19 @@
+.[$FRAGMENT_CLASS$] {
+ .navigation-bar .navbar-nav .nav-link {
+ margin-bottom: 0px;
+ border-color: var(--secondary-l2, #cdced9);
+ color: var(--gray-600, #6b6c7e);
+ }
+
+ .navigation-bar .navbar-nav .nav-link.active {
+ border-color: var(--secondary-l2, #cdced9) var(--secondary-l2, #cdced9) var(--white, #fff);
+ border-style: solid;
+ border-width: 0.0625rem;
+ border-radius: 0.5rem 0.5rem 0 0;
+ color: var(--gray-900, #272833);
+}
+
+ .navigation-bar .navbar-nav .nav-link.active::after {
+ background-color: var(--white, #fff) !important;
+ bottom: -0.2rem !important;}
+}

@@ -1,4 +1,4 @@
-@import 'atlas-variables';
+@import '_atlas-custom-properties-variables';
 
 $content-gap-cell-accent: var(--teal);
 $content-gap-cell-accent-tier-4: var(--teal-d2);
@@ -45,7 +45,7 @@ $content-gap-cell-tiers: (
 
 	&--selected {
 		border-color: $primary;
-		box-shadow: 0 0 0 0.125rem rgba($primary, 0.25);
+		box-shadow: 0 0 0 0.125rem rgb(from var(--primary) r g b / 0.25);
 	}
 
 	@each $tier, $color in $content-gap-cell-tiers {
