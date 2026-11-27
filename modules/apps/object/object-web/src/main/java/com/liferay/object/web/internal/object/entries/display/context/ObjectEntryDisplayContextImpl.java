@@ -56,6 +56,8 @@ import com.liferay.object.model.ObjectLayoutColumn;
 import com.liferay.object.model.ObjectLayoutRow;
 import com.liferay.object.model.ObjectLayoutTab;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.related.models.ObjectRelatedModelsProvider;
+import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.dto.v1_0.FileEntry;
 import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
@@ -165,6 +167,7 @@ public class ObjectEntryDisplayContextImpl
 		ObjectFieldBusinessTypeRegistry objectFieldBusinessTypeRegistry,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectLayoutLocalService objectLayoutLocalService,
+		ObjectRelatedModelsProviderRegistry objectRelatedModelsProviderRegistry,
 		ObjectRelationshipLocalService objectRelationshipLocalService,
 		ObjectScopeProviderRegistry objectScopeProviderRegistry) {
 
@@ -178,6 +181,8 @@ public class ObjectEntryDisplayContextImpl
 		_objectFieldBusinessTypeRegistry = objectFieldBusinessTypeRegistry;
 		_objectFieldLocalService = objectFieldLocalService;
 		_objectLayoutLocalService = objectLayoutLocalService;
+		_objectRelatedModelsProviderRegistry =
+			objectRelatedModelsProviderRegistry;
 		_objectRelationshipLocalService = objectRelationshipLocalService;
 		_objectScopeProviderRegistry = objectScopeProviderRegistry;
 
@@ -625,6 +630,33 @@ public class ObjectEntryDisplayContextImpl
 			_objectScopeProviderRegistry.getObjectScopeProvider(
 				objectDefinition2.getScope());
 
+		if (StringUtil.equals(
+				objectRelationship.getType(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
+
+			ObjectEntry objectEntry = _getObjectEntry();
+
+			if (objectEntry != null) {
+				ObjectRelatedModelsProvider<?> objectRelatedModelsProvider =
+					_objectRelatedModelsProviderRegistry.
+						getObjectRelatedModelsProvider(
+							objectDefinition2.getClassName(),
+							objectDefinition2.getCompanyId(),
+							objectRelationship.getType());
+
+				int relatedModelsCount =
+					objectRelatedModelsProvider.getRelatedModelsCount(
+						objectScopeProvider.getGroupId(
+							_objectRequestHelper.getRequest()),
+						objectRelationship.getObjectRelationshipId(), null,
+						objectEntry.getId(), null);
+
+				if (relatedModelsCount > 0) {
+					return creationMenu;
+				}
+			}
+		}
+
 		if ((getObjectLayoutTab() == null) && objectRelationship.isEdge()) {
 			for (long rootObjectDefinitionId :
 					objectDefinition2.getRootObjectDefinitionIds()) {
@@ -668,9 +700,7 @@ public class ObjectEntryDisplayContextImpl
 			  StringUtil.equals(
 				  objectDefinition2.getScope(),
 				  ObjectDefinitionConstants.SCOPE_SITE)) &&
-			StringUtil.equals(
-				objectRelationship.getType(),
-				ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
+			objectRelationship.hasRelationshipObjectField()) {
 
 			creationMenu.addDropdownItem(
 				_getCreateNewRelatedModelDropdownItem(
@@ -1921,6 +1951,8 @@ public class ObjectEntryDisplayContextImpl
 		_objectFieldBusinessTypeRegistry;
 	private final ObjectFieldLocalService _objectFieldLocalService;
 	private final ObjectLayoutLocalService _objectLayoutLocalService;
+	private final ObjectRelatedModelsProviderRegistry
+		_objectRelatedModelsProviderRegistry;
 	private final ObjectRelationshipLocalService
 		_objectRelationshipLocalService;
 	private final ObjectRequestHelper _objectRequestHelper;
