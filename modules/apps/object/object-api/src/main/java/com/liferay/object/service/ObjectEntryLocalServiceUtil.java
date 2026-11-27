@@ -665,6 +665,13 @@ public class ObjectEntryLocalServiceUtil {
 			search);
 	}
 
+	public static List<ObjectEntry> getRootDescendantNodeObjectEntries(
+		long rootObjectEntryId, int[] statuses) {
+
+		return getService().getRootDescendantNodeObjectEntries(
+			rootObjectEntryId, statuses);
+	}
+
 	public static Map<String, Object> getSystemModelAttributes(
 			com.liferay.object.model.ObjectDefinition objectDefinition,
 			long primaryKey)
@@ -949,4 +956,4 @@ public class ObjectEntryLocalServiceUtil {
 			ObjectEntryLocalServiceUtil.class, ObjectEntryLocalService.class);
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-754416060
+// LIFERAY-SERVICE-BUILDER-HASH:-271788427
