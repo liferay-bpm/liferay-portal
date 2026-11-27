@@ -99,6 +99,28 @@ describe('The instance list item should', () => {
 		expect(taskNamesCell).toBeTruthy();
 	});
 
+	it('Be rendered with the assignee names separated by comma', () => {
+		const {queryByText} = render(
+			<table>
+				<tbody>
+					<Table.Item
+						{...instance}
+						assignees={[
+							{id: 20124, name: 'Test Test'},
+							{id: -1, name: 'Unassigned', reviewer: true},
+							{id: 20125, name: 'User User'},
+						]}
+					/>
+				</tbody>
+			</table>,
+			{
+				wrapper: ContainerMock,
+			}
+		);
+
+		expect(queryByText('Test Test, Unassigned, User User')).toBeTruthy();
+	});
+
 	it('Be rendered with check icon when the slaStatus is "OnTime"', () => {
 		const {container} = render(
 			<table>
