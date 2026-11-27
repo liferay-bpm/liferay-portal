@@ -1763,6 +1763,37 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	@Override
+	public List<ObjectEntry> getRootDescendantNodeObjectEntries(
+		long rootObjectEntryId, int[] statuses) {
+
+		return objectEntryPersistence.dslQuery(
+			DSLQueryFactoryUtil.select(
+				ObjectEntryTable.INSTANCE
+			).from(
+				ObjectEntryTable.INSTANCE
+			).where(
+				ObjectEntryTable.INSTANCE.rootObjectEntryId.eq(
+					rootObjectEntryId
+				).and(
+					ObjectEntryTable.INSTANCE.objectEntryId.neq(
+						rootObjectEntryId)
+				).and(
+					ObjectEntryTable.INSTANCE.objectEntryId.eq(
+						ObjectEntryTable.INSTANCE.headObjectEntryId)
+				).and(
+					() -> {
+						if (ArrayUtil.isEmpty(statuses)) {
+							return null;
+						}
+
+						return ObjectEntryTable.INSTANCE.status.in(
+							ArrayUtil.toArray(statuses));
+					}
+				)
+			));
+	}
+
+	@Override
 	public Map<String, Object> getSystemModelAttributes(
 			ObjectDefinition objectDefinition, long primaryKey)
 		throws PortalException {
