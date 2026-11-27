@@ -20,8 +20,8 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.reports.engine.console.constants.ReportsEngineConsolePortletKeys;
 import com.liferay.portal.reports.engine.console.model.Definition;
 import com.liferay.portal.reports.engine.console.model.Source;
-import com.liferay.portal.reports.engine.console.service.DefinitionLocalService;
-import com.liferay.portal.reports.engine.console.service.SourceLocalService;
+import com.liferay.portal.reports.engine.console.service.DefinitionService;
+import com.liferay.portal.reports.engine.console.service.SourceService;
 import com.liferay.portal.reports.engine.console.web.internal.admin.constants.ReportsEngineWebKeys;
 
 import jakarta.portlet.Portlet;
@@ -120,10 +120,10 @@ public class AdminPortlet extends MVCPortlet {
 	}
 
 	@Reference
-	protected DefinitionLocalService definitionLocalService;
+	protected DefinitionService definitionService;
 
 	@Reference
-	protected SourceLocalService sourceLocalService;
+	protected SourceService sourceService;
 
 	@Reference(target = "(default=true)")
 	protected Store store;
@@ -156,7 +156,7 @@ public class AdminPortlet extends MVCPortlet {
 		Definition definition = null;
 
 		if (definitionId > 0) {
-			definition = definitionLocalService.getDefinition(definitionId);
+			definition = definitionService.getDefinition(definitionId);
 		}
 
 		renderRequest.setAttribute(ReportsEngineWebKeys.DEFINITION, definition);
@@ -170,7 +170,7 @@ public class AdminPortlet extends MVCPortlet {
 		Source source = null;
 
 		if (sourceId > 0) {
-			source = sourceLocalService.getSource(sourceId);
+			source = sourceService.getSource(sourceId);
 		}
 
 		renderRequest.setAttribute(ReportsEngineWebKeys.SOURCE, source);
