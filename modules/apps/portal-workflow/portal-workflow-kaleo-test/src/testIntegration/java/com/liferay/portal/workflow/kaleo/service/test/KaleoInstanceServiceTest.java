@@ -52,11 +52,14 @@ import com.liferay.portal.workflow.configuration.WorkflowDefinitionConfiguration
 import com.liferay.portal.workflow.constants.WorkflowActionKeys;
 import com.liferay.portal.workflow.constants.WorkflowDefinitionConstants;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstance;
+import com.liferay.portal.workflow.kaleo.runtime.util.WorkflowContextUtil;
 import com.liferay.portal.workflow.kaleo.service.KaleoInstanceLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoInstanceService;
 import com.liferay.portal.workflow.manager.WorkflowDefinitionManager;
 
 import java.io.Serializable;
+
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -185,6 +188,118 @@ public class KaleoInstanceServiceTest {
 				HashMapBuilder.<String, Serializable>put(
 					WorkflowConstants.CONTEXT_SERVICE_CONTEXT, serviceContext
 				).build()));
+	}
+
+	@Test
+	public void testAddKaleoInstanceWithEntry() throws Exception {
+
+		// Entry in another group
+
+		User user = UserTestUtil.addUser();
+
+		_addStartWorkflowInstancePermission(user);
+
+		BlogsEntry blogsEntry1 = BlogsTestUtil.addEntry(
+			user.getUserId(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(),
+			ServiceContextTestUtil.getServiceContext(user.getGroupId()));
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId());
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				user)) {
+
+			AssertUtils.assertFailure(
+				PrincipalException.class,
+				StringBundler.concat(
+					BlogsEntry.class.getName(), " with primary key ",
+					blogsEntry1.getEntryId(), " is not in group ",
+					TestPropsValues.getGroupId()),
+				() -> _kaleoInstanceService.addKaleoInstance(
+					"Single Approver", 1, null,
+					HashMapBuilder.<String, Serializable>put(
+						WorkflowConstants.CONTEXT_ENTRY_CLASS_NAME,
+						BlogsEntry.class.getName()
+					).put(
+						WorkflowConstants.CONTEXT_ENTRY_CLASS_PK,
+						String.valueOf(blogsEntry1.getEntryId())
+					).put(
+						WorkflowConstants.CONTEXT_SERVICE_CONTEXT,
+						serviceContext
+					).build(),
+					serviceContext, false));
+		}
+
+		// Entry with update permission
+
+		BlogsEntry blogsEntry2 = BlogsTestUtil.addEntry(
+			user.getUserId(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(),
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId()));
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				user)) {
+
+			KaleoInstance kaleoInstance =
+				_kaleoInstanceService.addKaleoInstance(
+					"Single Approver", 1, null,
+					HashMapBuilder.<String, Serializable>put(
+						WorkflowConstants.CONTEXT_ENTRY_CLASS_NAME,
+						BlogsEntry.class.getName()
+					).put(
+						WorkflowConstants.CONTEXT_ENTRY_CLASS_PK,
+						String.valueOf(blogsEntry2.getEntryId())
+					).put(
+						WorkflowConstants.CONTEXT_SERVICE_CONTEXT,
+						serviceContext
+					).put(
+						WorkflowConstants.CONTEXT_USER_ID,
+						String.valueOf(TestPropsValues.getUserId())
+					).build(),
+					serviceContext, false);
+
+			Map<String, Serializable> workflowContext =
+				WorkflowContextUtil.convert(kaleoInstance.getWorkflowContext());
+
+			Assert.assertEquals(
+				String.valueOf(user.getUserId()),
+				workflowContext.get(WorkflowConstants.CONTEXT_USER_ID));
+		}
+
+		// Entry without update permission
+
+		BlogsEntry blogsEntry3 = BlogsTestUtil.addEntry(
+			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(),
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId()));
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				user)) {
+
+			AssertUtils.assertFailure(
+				PrincipalException.MustHavePermission.class,
+				StringBundler.concat(
+					"User ", user.getUserId(), " must have ", ActionKeys.UPDATE,
+					" permission for ", BlogsEntry.class.getName(),
+					StringPool.SPACE, blogsEntry3.getEntryId()),
+				() -> _kaleoInstanceService.addKaleoInstance(
+					"Single Approver", 1, null,
+					HashMapBuilder.<String, Serializable>put(
+						WorkflowConstants.CONTEXT_ENTRY_CLASS_NAME,
+						BlogsEntry.class.getName()
+					).put(
+						WorkflowConstants.CONTEXT_ENTRY_CLASS_PK,
+						String.valueOf(blogsEntry3.getEntryId())
+					).put(
+						WorkflowConstants.CONTEXT_SERVICE_CONTEXT,
+						serviceContext
+					).build(),
+					serviceContext, false));
+		}
 	}
 
 	@Test
@@ -318,13 +433,42 @@ public class KaleoInstanceServiceTest {
 						TestPropsValues.getCompanyId()),
 					RoleConstants.PORTAL_CONTENT_REVIEWER))) {
 
-			Assert.assertNotNull(
+			AssertUtils.assertFailure(
+				PrincipalException.class,
+				"Unable to update workflow context key " +
+					WorkflowConstants.CONTEXT_ENTRY_CLASS_PK,
+				() -> _kaleoInstanceService.updateKaleoInstance(
+					kaleoInstance.getKaleoInstanceId(),
+					HashMapBuilder.<String, Serializable>put(
+						WorkflowConstants.CONTEXT_ENTRY_CLASS_PK,
+						String.valueOf(RandomTestUtil.randomLong())
+					).build()));
+
+			KaleoInstance updatedKaleoInstance =
 				_kaleoInstanceService.updateKaleoInstance(
 					kaleoInstance.getKaleoInstanceId(),
 					HashMapBuilder.<String, Serializable>put(
 						RandomTestUtil.randomString(),
 						RandomTestUtil.randomString()
-					).build()));
+					).build());
+
+			Map<String, Serializable> workflowContext =
+				WorkflowContextUtil.convert(
+					updatedKaleoInstance.getWorkflowContext());
+
+			Assert.assertEquals(
+				String.valueOf(kaleoInstance.getClassPK()),
+				workflowContext.get(WorkflowConstants.CONTEXT_ENTRY_CLASS_PK));
+
+			updatedKaleoInstance = _kaleoInstanceService.updateKaleoInstance(
+				kaleoInstance.getKaleoInstanceId(), null);
+
+			workflowContext = WorkflowContextUtil.convert(
+				updatedKaleoInstance.getWorkflowContext());
+
+			Assert.assertEquals(
+				String.valueOf(kaleoInstance.getClassPK()),
+				workflowContext.get(WorkflowConstants.CONTEXT_ENTRY_CLASS_PK));
 		}
 
 		User user = UserTestUtil.addUser();
