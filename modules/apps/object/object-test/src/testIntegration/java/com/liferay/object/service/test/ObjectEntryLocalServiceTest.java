@@ -4784,6 +4784,17 @@ public class ObjectEntryLocalServiceTest {
 		_assertFriendlyURLEntries(0, siteObjectDefinition, siteObjectEntry2);
 	}
 
+	@FeatureFlags(
+		featureFlags = {@FeatureFlag("LPD-108620"), @FeatureFlag("LPD-72278")}
+	)
+	@Test
+	public void testAddOrUpdateObjectEntryWithOneToOneObjectRelationship()
+		throws Exception {
+
+		_testAddOrUpdateObjectEntryWithOneToOneObjectRelationship(false);
+		_testAddOrUpdateObjectEntryWithOneToOneObjectRelationship(true);
+	}
+
 	@Test
 	public void testAuditRouter() throws Exception {
 		Queue<AuditMessage> auditMessages = new LinkedList<>();
@@ -10212,6 +10223,17 @@ public class ObjectEntryLocalServiceTest {
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
+	@FeatureFlags(
+		featureFlags = {@FeatureFlag("LPD-108620"), @FeatureFlag("LPD-72278")}
+	)
+	@Test
+	public void testUpdateObjectEntryWithOneToOneObjectRelationship()
+		throws Exception {
+
+		_testUpdateObjectEntryWithOneToOneObjectRelationship(false);
+		_testUpdateObjectEntryWithOneToOneObjectRelationship(true);
+	}
+
 	@Test
 	public void testUpdateObjectEntryWithPhoneNumberObjectField()
 		throws Exception {
@@ -11168,6 +11190,66 @@ public class ObjectEntryLocalServiceTest {
 			_objectValidationRuleLocalService.deleteObjectValidationRule(
 				objectValidationRule);
 		}
+	}
+
+	@FeatureFlag("LPD-108620")
+	@Test
+	public void testUpdateUserSystemObjectWithOneToOneObjectRelationship()
+		throws Exception {
+
+		ObjectDefinition userSystemObjectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinitionByClassName(
+				TestPropsValues.getCompanyId(), User.class.getName());
+
+		ObjectRelationship objectRelationship =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService,
+				ObjectDefinitionTestUtil.publishObjectDefinition(),
+				userSystemObjectDefinition,
+				ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+				StringUtil.randomId(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_ONE);
+
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			objectRelationship.getObjectFieldId2());
+		ObjectEntry parentObjectEntry = _addObjectEntry(
+			0, objectRelationship.getObjectDefinitionId1(),
+			Collections.emptyMap());
+
+		Map<String, Serializable> values = Collections.singletonMap(
+			objectField.getName(), parentObjectEntry.getObjectEntryId());
+
+		User user1 = UserTestUtil.addUser();
+
+		_objectEntryLocalService.
+			addOrUpdateExtensionDynamicObjectDefinitionTableValues(
+				TestPropsValues.getUserId(), userSystemObjectDefinition,
+				user1.getUserId(), values,
+				ServiceContextTestUtil.getServiceContext());
+		_objectEntryLocalService.
+			addOrUpdateExtensionDynamicObjectDefinitionTableValues(
+				TestPropsValues.getUserId(), userSystemObjectDefinition,
+				user1.getUserId(), values,
+				ServiceContextTestUtil.getServiceContext());
+
+		User user2 = UserTestUtil.addUser();
+
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.OneToOneConstraintViolation.class,
+			StringBundler.concat(
+				"One to one constraint violation for ",
+				objectField.getDBTableName(), StringPool.PERIOD,
+				objectField.getDBColumnName(), " with value ",
+				parentObjectEntry.getObjectEntryId()),
+			() ->
+				_objectEntryLocalService.
+					addOrUpdateExtensionDynamicObjectDefinitionTableValues(
+						TestPropsValues.getUserId(), userSystemObjectDefinition,
+						user2.getUserId(), values,
+						ServiceContextTestUtil.getServiceContext()));
+
+		_objectRelationshipLocalService.deleteObjectRelationship(
+			objectRelationship);
 	}
 
 	@Rule
@@ -12360,6 +12442,16 @@ public class ObjectEntryLocalServiceTest {
 			objectDefinition.getObjectDefinitionId());
 	}
 
+	private ObjectDefinition _publishObjectDefinition(boolean modifiable)
+		throws Exception {
+
+		if (modifiable) {
+			return ObjectDefinitionTestUtil.publishSystemObjectDefinition();
+		}
+
+		return ObjectDefinitionTestUtil.publishObjectDefinition();
+	}
+
 	private Closeable _registerTestObjectValidationRuleEngine(
 			Consumer<Map<String, Object>> consumer, String key)
 		throws PortalException {
@@ -13242,6 +13334,68 @@ public class ObjectEntryLocalServiceTest {
 			expectedValues.get("richText"), actualValues.get("richText"));
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+	}
+
+	private void _testAddOrUpdateObjectEntryWithOneToOneObjectRelationship(
+			boolean modifiable)
+		throws Exception {
+
+		ObjectDefinition childObjectDefinition =
+			_updateEnableObjectEntryVersioning(
+				_updateEnableObjectEntryDraft(
+					_publishObjectDefinition(modifiable)));
+
+		ObjectRelationship objectRelationship =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService,
+				ObjectDefinitionTestUtil.publishObjectDefinition(),
+				childObjectDefinition,
+				ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+				StringUtil.randomId(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_ONE);
+
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			objectRelationship.getObjectFieldId2());
+		ObjectEntry parentObjectEntry = _addObjectEntry(
+			0, objectRelationship.getObjectDefinitionId1(),
+			Collections.emptyMap());
+
+		Map<String, Serializable> values = Collections.singletonMap(
+			objectField.getName(), parentObjectEntry.getObjectEntryId());
+
+		ObjectEntry childObjectEntry = _addObjectEntry(
+			0, childObjectDefinition.getObjectDefinitionId(), values);
+
+		_objectEntryLocalService.addDraftObjectEntry(
+			TestPropsValues.getUserId(), childObjectEntry.getObjectEntryId(),
+			RandomTestUtil.randomInt(), values,
+			ServiceContextTestUtil.getServiceContext());
+
+		_updateObjectEntry(childObjectEntry.getObjectEntryId(), values);
+
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.OneToOneConstraintViolation.class,
+			StringBundler.concat(
+				"One to one constraint violation for ",
+				objectField.getDBTableName(), StringPool.PERIOD,
+				objectField.getDBColumnName(), " with value ",
+				parentObjectEntry.getObjectEntryId()),
+			() -> _addObjectEntry(
+				0, childObjectDefinition.getObjectDefinitionId(), values));
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.OneToOneConstraintViolation.class,
+			StringBundler.concat(
+				"One to one constraint violation for ",
+				objectField.getDBTableName(), StringPool.PERIOD,
+				objectField.getDBColumnName(), " with value ",
+				parentObjectEntry.getObjectEntryId()),
+			() -> {
+				ObjectEntry objectEntry = _addObjectEntry(
+					0, childObjectDefinition.getObjectDefinitionId(),
+					Collections.emptyMap());
+
+				_updateObjectEntry(objectEntry.getObjectEntryId(), values);
+			});
 	}
 
 	private void _testGetPrimaryKeysWithLocalizedObjectField(
@@ -14651,6 +14805,62 @@ public class ObjectEntryLocalServiceTest {
 			objectDefinition.getObjectDefinitionId());
 	}
 
+	private void _testUpdateObjectEntryWithOneToOneObjectRelationship(
+			boolean modifiable)
+		throws Exception {
+
+		ObjectDefinition objectDefinition = _updateEnableObjectEntryVersioning(
+			_updateEnableObjectEntryDraft(
+				_publishObjectDefinition(modifiable)));
+
+		ObjectRelationship objectRelationship =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinition,
+				objectDefinition,
+				ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+				StringUtil.randomId(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_ONE);
+
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			objectRelationship.getObjectFieldId2());
+
+		ObjectEntry objectEntry1 = _addObjectEntry(
+			0, objectDefinition.getObjectDefinitionId(),
+			Collections.emptyMap());
+
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.InvalidValue.class,
+			"The value is invalid for object field \"" + objectField.getName() +
+				"\"",
+			() -> _updateObjectEntry(
+				objectEntry1.getObjectEntryId(),
+				Collections.singletonMap(
+					objectField.getName(), objectEntry1.getObjectEntryId())));
+
+		ObjectEntry objectEntry2 = _objectEntryLocalService.addDraftObjectEntry(
+			TestPropsValues.getUserId(), objectEntry1.getObjectEntryId(),
+			RandomTestUtil.randomInt(), Collections.emptyMap(),
+			ServiceContextTestUtil.getServiceContext());
+
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.InvalidValue.class,
+			"The value is invalid for object field \"" + objectField.getName() +
+				"\"",
+			() -> _updateObjectEntry(
+				objectEntry1.getObjectEntryId(),
+				Collections.singletonMap(
+					objectField.getName(), objectEntry2.getObjectEntryId())));
+
+		ObjectEntry objectEntry3 = _addObjectEntry(
+			0, objectDefinition.getObjectDefinitionId(),
+			Collections.emptyMap());
+
+		_updateObjectEntry(
+			objectEntry1.getObjectEntryId(),
+			Collections.singletonMap(
+				objectField.getName(), objectEntry3.getObjectEntryId()));
+	}
+
 	private ObjectDefinition _updateEnableObjectEntryDraft(
 		ObjectDefinition objectDefinition) {
 
@@ -14667,6 +14877,16 @@ public class ObjectEntryLocalServiceTest {
 
 		return _objectDefinitionLocalService.updateObjectDefinition(
 			objectDefinition);
+	}
+
+	private ObjectEntry _updateObjectEntry(
+			long objectEntryId, Map<String, Serializable> values)
+		throws Exception {
+
+		return _objectEntryLocalService.updateObjectEntry(
+			TestPropsValues.getUserId(), objectEntryId,
+			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+			values, ServiceContextTestUtil.getServiceContext());
 	}
 
 	private ObjectValidationRule _updateObjectValidationRule(
