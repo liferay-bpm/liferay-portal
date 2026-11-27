@@ -5,6 +5,10 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.notification.constants.NotificationActionKeys;
+import com.liferay.notification.constants.NotificationConstants;
+import com.liferay.notification.model.NotificationTemplate;
+import com.liferay.notification.service.NotificationTemplateLocalService;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
@@ -16,9 +20,11 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
 import java.util.Map;
@@ -52,6 +58,9 @@ public class ObjectActionServiceImpl extends ObjectActionServiceBaseImpl {
 
 		_objectDefinitionModelResourcePermission.check(
 			getPermissionChecker(), objectDefinitionId, ActionKeys.UPDATE);
+
+		_checkNotificationTemplate(
+			objectActionExecutorKey, parametersUnicodeProperties);
 
 		_validateParametersUnicodeProperties(
 			objectActionExecutorKey, new UnicodeProperties(),
@@ -109,6 +118,9 @@ public class ObjectActionServiceImpl extends ObjectActionServiceBaseImpl {
 			getPermissionChecker(), objectAction.getObjectDefinitionId(),
 			ActionKeys.UPDATE);
 
+		_checkNotificationTemplate(
+			objectActionExecutorKey, parametersUnicodeProperties);
+
 		_validateParametersUnicodeProperties(
 			objectActionExecutorKey,
 			objectAction.getParametersUnicodeProperties(),
@@ -119,6 +131,41 @@ public class ObjectActionServiceImpl extends ObjectActionServiceBaseImpl {
 			descriptionMap, errorMessageMap, labelMap, name,
 			objectActionExecutorKey, objectActionTriggerKey,
 			parametersUnicodeProperties);
+	}
+
+	private void _checkNotificationTemplate(
+			String objectActionExecutorKey,
+			UnicodeProperties parametersUnicodeProperties)
+		throws PortalException {
+
+		if (!Objects.equals(
+				objectActionExecutorKey,
+				ObjectActionExecutorConstants.KEY_NOTIFICATION)) {
+
+			return;
+		}
+
+		String notificationTemplateExternalReferenceCode =
+			parametersUnicodeProperties.get(
+				"notificationTemplateExternalReferenceCode");
+
+		if (Validator.isNull(notificationTemplateExternalReferenceCode)) {
+			return;
+		}
+
+		PermissionChecker permissionChecker = getPermissionChecker();
+
+		NotificationTemplate notificationTemplate =
+			_notificationTemplateLocalService.
+				fetchNotificationTemplateByExternalReferenceCode(
+					notificationTemplateExternalReferenceCode,
+					permissionChecker.getCompanyId());
+
+		if (notificationTemplate == null) {
+			_portletResourcePermission.check(
+				permissionChecker, null,
+				NotificationActionKeys.ADD_NOTIFICATION_TEMPLATE);
+		}
 	}
 
 	private void _validateParametersUnicodeProperties(
@@ -180,10 +227,18 @@ public class ObjectActionServiceImpl extends ObjectActionServiceBaseImpl {
 		}
 	}
 
+	@Reference
+	private NotificationTemplateLocalService _notificationTemplateLocalService;
+
 	@Reference(
 		target = "(model.class.name=com.liferay.object.model.ObjectDefinition)"
 	)
 	private ModelResourcePermission<ObjectDefinition>
 		_objectDefinitionModelResourcePermission;
+
+	@Reference(
+		target = "(resource.name=" + NotificationConstants.RESOURCE_NAME_NOTIFICATION_TEMPLATE + ")"
+	)
+	private PortletResourcePermission _portletResourcePermission;
 
 }
