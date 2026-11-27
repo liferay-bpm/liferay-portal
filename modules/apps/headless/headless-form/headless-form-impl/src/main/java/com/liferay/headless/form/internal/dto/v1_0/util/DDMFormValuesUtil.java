@@ -69,7 +69,7 @@ public class DDMFormValuesUtil {
 			String string = formFieldValue.getValue();
 
 			if ((string != null) && ddmFormField.isLocalizable()) {
-				value = new LocalizedValue() {
+				value = new LocalizedValue(locale) {
 					{
 						addString(locale, string);
 					}
