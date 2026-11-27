@@ -23,6 +23,7 @@ import {getEmptyImage} from 'react-dnd-html5-backend';
 
 import getTaskItemsActions from '../../../../../utils/getTaskItemsActions';
 import {ITask} from '../../../../../utils/types';
+import TaskTypeIcon from '../../../../TaskTypeIcon';
 import {KanbanViewContext} from '../context';
 import {ItemTypes} from './Column';
 
@@ -51,9 +52,13 @@ export const TaskCard = React.memo(
 						<Card.Body>
 							<Card.Row>
 								<div className="lfr__kaban-task-card-row">
-									<strong className="lfr__kaban-task-card-row-text-content">
-										{task.embedded.title}
-									</strong>
+									<span className="lfr__kaban-task-card-title">
+										<TaskTypeIcon task={task.embedded} />
+
+										<strong className="lfr__kaban-task-card-row-text-content">
+											{task.embedded.title}
+										</strong>
+									</span>
 
 									<ClayDropDownWithItems
 										items={getTaskItemsActions(
@@ -83,8 +88,15 @@ export const TaskCard = React.memo(
 									displayType="subtitle"
 								>
 									{!cmpProjectObjectEntryId
-										? task.embedded.cmpProjectToCMPTasks
-												.title
+										? [
+												task.embedded
+													.cmpProjectToCMPTasks.title,
+												task.embedded
+													.r_cmpTaskToCMPTasks_c_cmpTask
+													?.title,
+											]
+												.filter(Boolean)
+												.join(' · ')
 										: DateRenderer({
 												value: task.embedded.dueDate,
 											})}

@@ -9,6 +9,7 @@ import {
 	EConfigInURLKeys,
 	IConfigInURLUpdaterThunk,
 	IDataSetData,
+	IDataSetPageData,
 	IFDSState,
 	IInlineEditingSettings,
 	IInternalRenderer,
@@ -80,6 +81,10 @@ export interface IFrontendDataSetContext {
 	openModal: Function;
 	openSidePanel: Function;
 	portletId?: string;
+	requestPage?: (
+		page: number,
+		signal?: AbortSignal
+	) => Promise<IDataSetPageData>;
 	saveDataSetUserConfigurationURL?: string;
 	searchAsYouType: boolean;
 	searchParam?: string;
@@ -97,6 +102,7 @@ export interface IFrontendDataSetContext {
 	sorts?: Array<TSort>;
 	style?: string;
 	toggleItemInlineEdit: Function;
+	total?: number;
 	uniformActionsDisplay?: boolean;
 	updateActiveSorts: IConfigInURLUpdaterThunk<EConfigInURLKeys.ACTIVE_SORTS>;
 	updateAdditionalAPIURLParameters: (parameters: string) => void;

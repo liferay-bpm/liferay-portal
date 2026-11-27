@@ -543,6 +543,7 @@ export default function CalendarView({
 						itemsActions={itemsActions}
 						loadData={loadData}
 						onTaskChanged={handleTaskChanged}
+						showContext={!cmpProjectObjectEntryId}
 						task={arg.event.extendedProps.task}
 					/>
 				)}

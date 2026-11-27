@@ -6,7 +6,7 @@
 import {AssigneeAvatar} from '@liferay/object-dynamic-data-mapping-form-field-type';
 import React from 'react';
 
-const AssigneeRenderer = ({image, name}: {image: string; name: string}) => {
+const AssigneeRenderer = ({image, name}: {image?: string; name: string}) => {
 	return (
 		<span className="align-items-center d-flex">
 			<div className="c-mr-2">

@@ -19,6 +19,7 @@ import {
 	ITaskItemsActionsTask,
 	ITaskObjectEntry,
 } from '../../../../../utils/types';
+import TaskTypeIcon from '../../../../TaskTypeIcon';
 
 import './CalendarTaskCard.scss';
 
@@ -27,6 +28,7 @@ interface CalendarTaskCardProps {
 	itemsActions?: IItemsActions[];
 	loadData: Function;
 	onTaskChanged?: (task: ITaskItemsActionsTask) => void;
+	showContext?: boolean;
 	task: ITaskObjectEntry;
 }
 
@@ -35,6 +37,7 @@ export default function CalendarTaskCard({
 	itemsActions = [],
 	loadData,
 	onTaskChanged,
+	showContext = false,
 	task,
 }: CalendarTaskCardProps) {
 	const {assignTo, dueDate, state, title} = task;
@@ -77,6 +80,22 @@ export default function CalendarTaskCard({
 					size="sm"
 					symbol="ellipsis-v"
 				/>
+			}
+		/>
+	);
+
+	const typeIcon = (
+		<TaskTypeIcon
+			task={task}
+			tooltip={
+				showContext
+					? [
+							task.cmpProjectToCMPTasks?.title,
+							task.r_cmpTaskToCMPTasks_c_cmpTask?.title,
+						]
+							.filter(Boolean)
+							.join(' · ')
+					: undefined
 			}
 		/>
 	);
@@ -146,6 +165,8 @@ export default function CalendarTaskCard({
 			{expanded ? (
 				<>
 					<div className="lfr__cmp-calendar-task-card-header">
+						{typeIcon}
+
 						<span className="lfr__cmp-calendar-task-card-title">
 							{title}
 						</span>
@@ -165,6 +186,8 @@ export default function CalendarTaskCard({
 				</>
 			) : (
 				<>
+					{typeIcon}
+
 					<span className="lfr__cmp-calendar-task-card-title">
 						{title}
 					</span>

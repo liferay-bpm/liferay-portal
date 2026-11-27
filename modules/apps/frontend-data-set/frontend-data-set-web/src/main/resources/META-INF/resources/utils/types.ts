@@ -481,6 +481,15 @@ export interface IDataSetData {
 	totalCount: number;
 }
 
+export interface IDataSetPageData extends IDataSetData {
+
+	/**
+	 * Whether a newer page request, or a reload of the Data Set, started
+	 * after this page was requested.
+	 */
+	stale: boolean;
+}
+
 export interface IHTMLElementBuilder {
 	(args: any): HTMLElement;
 }

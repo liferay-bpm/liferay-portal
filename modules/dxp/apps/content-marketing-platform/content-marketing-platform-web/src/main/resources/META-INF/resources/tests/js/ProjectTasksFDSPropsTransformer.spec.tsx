@@ -5,6 +5,7 @@
 
 import BulkEditAssigneeModalContent from '../../js/components/modal/BulkEditAssigneeModalContent';
 import ProjectTasksFDSPropsTransformer from '../../js/components/props_transformer/ProjectTasksFDSPropsTransformer';
+import SubtasksFDSPropsTransformer from '../../js/components/props_transformer/SubtasksFDSPropsTransformer';
 
 const mockDeleteItemAction = jest.fn();
 const mockOpenCMPModal = jest.fn();
@@ -173,5 +174,45 @@ describe('ProjectTasksFDSPropsTransformer', () => {
 
 		expect(element.type).toBe(BulkEditAssigneeModalContent);
 		expect(element.props.cmpProjectObjectEntryId).toBe(456);
+	});
+
+	describe('with the LPD-107678 feature flag', () => {
+		beforeEach(() => {
+			Liferay.FeatureFlags['LPD-107678'] = true;
+		});
+
+		afterEach(() => {
+			Liferay.FeatureFlags['LPD-107678'] = false;
+		});
+
+		const getTreeTableView = () =>
+			(
+				ProjectTasksFDSPropsTransformer(baseProps as any).views as any[]
+			).find((view) => view.name === 'treeTable');
+
+		it('asks for the top-level tasks only', () => {
+			const result = ProjectTasksFDSPropsTransformer(baseProps as any);
+
+			expect((result as any).additionalAPIURLParameters).toContain(
+				'filter=cmpSubtask ne true'
+			);
+		});
+
+		it('keeps the same tree table view component between runs', () => {
+			expect(getTreeTableView().component).toBe(
+				getTreeTableView().component
+			);
+		});
+
+		it('lists every subtask in the subtasks section', () => {
+			const result = SubtasksFDSPropsTransformer(baseProps as any);
+
+			expect(result).not.toHaveProperty('additionalAPIURLParameters');
+			expect(result).not.toHaveProperty(
+				'additionalAPIURLParametersTransformer'
+			);
+			expect(result).not.toHaveProperty('showSelectAll');
+			expect(result.views).toBe(baseProps.views);
+		});
 	});
 });

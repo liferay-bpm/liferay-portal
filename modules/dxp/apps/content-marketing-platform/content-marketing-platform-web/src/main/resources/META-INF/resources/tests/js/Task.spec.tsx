@@ -313,6 +313,28 @@ describe('Kanban Task', () => {
 		expect(getByText('In Progress')).toBeInTheDocument();
 	});
 
+	it('renders the project and parent titles of a subtask when projectId is not provided', () => {
+		renderWithKanbanViewContext(
+			<Task
+				{...task}
+				embedded={{
+					...task.embedded,
+					r_cmpTaskToCMPTasks_c_cmpTask: {title: 'Parent task'},
+					r_cmpTaskToCMPTasks_c_cmpTaskId: 41,
+				}}
+			/>
+		);
+
+		expect(screen.getByText('Project A · Parent task')).toBeInTheDocument();
+		expect(screen.getByRole('img', {name: 'subtask'})).toBeInTheDocument();
+	});
+
+	it('renders the task type icon', () => {
+		renderTask();
+
+		expect(screen.getByRole('img', {name: 'task'})).toBeInTheDocument();
+	});
+
 	it('shows all items actions when task has full permissions', () => {
 		const {queryByText} = renderTask();
 
