@@ -4,7 +4,7 @@
  */
 
 import '@testing-library/jest-dom';
-import {render, screen, waitFor} from '@testing-library/react';
+import {act, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
@@ -206,5 +206,28 @@ describe('ScheduleContainer component', () => {
 				).not.toBeInTheDocument();
 			}
 		}
+	});
+
+	it('validates the dates only in the widget that submits', async () => {
+		const {container: firstWidget} = renderScheduleContainer(
+			undefined,
+			'_portletNamespace1_'
+		);
+		const {container: secondWidget} = renderScheduleContainer(
+			undefined,
+			'_portletNamespace2_'
+		);
+
+		await act(async () => {
+			Liferay.fire('_portletNamespace1_submitObjectEntry');
+		});
+
+		expect(
+			within(firstWidget).getAllByText('this-field-is-required')
+		).toHaveLength(2);
+
+		expect(
+			within(secondWidget).queryByText('this-field-is-required')
+		).not.toBeInTheDocument();
 	});
 });

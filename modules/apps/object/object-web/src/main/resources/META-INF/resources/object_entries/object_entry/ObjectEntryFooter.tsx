@@ -61,7 +61,9 @@ export default function ObjectEntryFooter({
 
 									callWindowGlobalFunction(submitRef);
 
-									Liferay.fire('submitObjectEntry');
+									Liferay.fire(
+										`${portletNamespace}submitObjectEntry`
+									);
 								}}
 								symbolLeft="arrow-right-full"
 							>

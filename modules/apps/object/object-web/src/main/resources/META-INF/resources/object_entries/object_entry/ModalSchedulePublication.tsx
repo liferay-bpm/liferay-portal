@@ -68,7 +68,7 @@ export default function ModalSchedulePublication({
 
 		onClose();
 
-		Liferay.fire('submitObjectEntry');
+		Liferay.fire(`${portletNamespace}submitObjectEntry`);
 	};
 
 	useEffect(() => {
