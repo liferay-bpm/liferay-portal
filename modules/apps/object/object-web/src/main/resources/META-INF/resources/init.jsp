@@ -25,6 +25,7 @@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 page import="com.liferay.bulk.selection.BulkSelectionRunner" %><%@
 page import="com.liferay.bulk.selection.util.BulkSelectionRunnerUtil" %><%@
 page import="com.liferay.dynamic.data.mapping.util.NumericDDMFormFieldUtil" %><%@
+page import="com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem" %><%@
 page import="com.liferay.learn.LearnMessageUtil" %><%@
 page import="com.liferay.list.type.model.ListTypeDefinition" %><%@
 page import="com.liferay.object.constants.ObjectLayoutBoxConstants" %><%@
@@ -69,6 +70,7 @@ page import="com.liferay.portal.kernel.url.URLBuilder" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
 page import="com.liferay.portal.kernel.util.HashMapBuilder" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
+page import="com.liferay.portal.kernel.util.ListUtil" %><%@
 page import="com.liferay.portal.kernel.util.LocaleUtil" %><%@
 page import="com.liferay.portal.kernel.util.LocalizationUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
@@ -82,7 +84,9 @@ page import="com.liferay.portal.kernel.workflow.WorkflowConstants" %>
 <%@ page import="java.text.DecimalFormat" %><%@
 page import="java.text.DecimalFormatSymbols" %>
 
-<%@ page import="java.util.Objects" %>
+<%@ page import="java.util.Collections" %><%@
+page import="java.util.List" %><%@
+page import="java.util.Objects" %>
 
 <liferay-frontend:defineObjects />
 

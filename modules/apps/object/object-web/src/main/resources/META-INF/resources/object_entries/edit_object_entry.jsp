@@ -25,13 +25,28 @@ ObjectRelationship objectRelationship = objectEntryDisplayContext.getObjectRelat
 		/>
 	</c:when>
 	<c:otherwise>
-		<c:if test="<%= objectEntryDisplayContext.isShowScreenNavigation() %>">
-			<liferay-frontend:screen-navigation
-				key="<%= objectDefinition.getClassName() %>"
-				navBarCssClass="container-fluid-max-xxxl"
-				portletURL="<%= currentURLObj %>"
-			/>
-		</c:if>
+
+		<%
+		boolean showScreenNavigation = objectEntryDisplayContext.isShowScreenNavigation();
+
+		List<NavigationItem> navigationItems = showScreenNavigation ? Collections.emptyList() : objectEntryDisplayContext.getNavigationItems();
+		%>
+
+		<c:choose>
+			<c:when test="<%= showScreenNavigation %>">
+				<liferay-frontend:screen-navigation
+					key="<%= objectDefinition.getClassName() %>"
+					navBarCssClass="container-fluid-max-xxxl"
+					portletURL="<%= currentURLObj %>"
+				/>
+			</c:when>
+			<c:when test="<%= ListUtil.isNotEmpty(navigationItems) %>">
+				<clay:navigation-bar
+					inverted="<%= false %>"
+					navigationItems="<%= navigationItems %>"
+				/>
+			</c:when>
+		</c:choose>
 
 		<c:choose>
 			<c:when test="<%= objectRelationship != null %>">
