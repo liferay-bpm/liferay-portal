@@ -915,6 +915,70 @@ test.describe('Object Expression Builder Validation', () => {
 		await expect(page.getByText('Required')).toBeVisible();
 	});
 
+	test(
+		'shows validation error label as text',
+		{tag: '@LPD-116144'},
+		async ({apiHelpers, page, viewObjectEntriesPage}) => {
+			const objectDefinition =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFields: [
+						{
+							DBType: 'String',
+							businessType: 'Text',
+							label: {en_US: 'Text'},
+							name: 'text',
+							required: false,
+						},
+					] as Partial<ObjectField>[],
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition.id,
+				type: 'objectDefinition',
+			});
+
+			const errorLabel =
+				'Invalid <img src=x onerror="window.__lpd116144=1"> value';
+
+			const objectValidationRuleAPIClient =
+				await apiHelpers.buildRestClient(ObjectValidationRuleAPI);
+
+			await objectValidationRuleAPIClient.postObjectDefinitionByExternalReferenceCodeObjectValidationRule(
+				objectDefinition.externalReferenceCode,
+				{
+					active: true,
+					engine: 'ddm',
+					engineLabel: 'Expression Builder',
+					errorLabel: {en_US: errorLabel},
+					name: {en_US: 'Custom validation'},
+					objectValidationRuleSettings: [],
+					outputType: 'fullValidation',
+					script: "text == 'valid'",
+					system: false,
+				}
+			);
+
+			await viewObjectEntriesPage.goto(objectDefinition.className);
+
+			await viewObjectEntriesPage.clickAddObjectEntry(
+				objectDefinition.label['en_US']
+			);
+
+			await page.getByLabel('Text', {exact: true}).fill('invalid');
+
+			await viewObjectEntriesPage.saveObjectEntryButton.click();
+
+			await expect(
+				page.getByRole('alert').filter({hasText: 'Invalid'})
+			).toContainText(errorLabel);
+
+			expect(
+				await page.evaluate(() => (window as any).__lpd116144)
+			).toBeUndefined();
+		}
+	);
+
 	test('specific error is shown when expression builder syntax is incorrect', async ({
 		apiHelpers,
 		editObjectValidationPage,
