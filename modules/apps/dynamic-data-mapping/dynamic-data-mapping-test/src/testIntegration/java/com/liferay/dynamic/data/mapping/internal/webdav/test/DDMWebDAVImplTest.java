@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.test.AssertUtils;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.context.ContextUserReplace;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -79,6 +80,44 @@ public class DDMWebDAVImplTest {
 
 		_user = UserTestUtil.addGroupUser(
 			_group1, RoleConstants.SITE_ADMINISTRATOR);
+	}
+
+	@Test
+	@TestInfo("LPD-116115")
+	public void testAddResource() throws Exception {
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				_user)) {
+
+			String content = StringBundler.concat(
+				"<root available-locales=\"en_US\" default-locale=",
+				"\"en_US\"><dynamic-element dataType=\"string\" ",
+				"indexType=\"keyword\" name=\"name\" type=\"text\">",
+				"<meta-data locale=\"en_US\"><entry name=\"label\">",
+				"<![CDATA[", RandomTestUtil.randomString(),
+				"]]></entry></meta-data></dynamic-element></root>");
+
+			MockHttpServletRequest mockHttpServletRequest =
+				new MockHttpServletRequest();
+
+			mockHttpServletRequest.setContent(content.getBytes());
+			mockHttpServletRequest.setPathInfo(
+				StringBundler.concat(
+					_group2.getFriendlyURL(), "/journal/",
+					DDMWebDAV.TYPE_STRUCTURES, "/",
+					RandomTestUtil.randomString()));
+			mockHttpServletRequest.setRemoteUser(
+				String.valueOf(_user.getUserId()));
+
+			Assert.assertThrows(
+				PrincipalException.MustHavePermission.class,
+				() -> _ddmWebDAV.addResource(
+					new WebDAVRequestImpl(
+						null, mockHttpServletRequest,
+						new MockHttpServletResponse(),
+						RandomTestUtil.randomString(),
+						PermissionThreadLocal.getPermissionChecker()),
+					PortalUtil.getClassNameId(JournalArticle.class)));
+		}
 	}
 
 	@Test

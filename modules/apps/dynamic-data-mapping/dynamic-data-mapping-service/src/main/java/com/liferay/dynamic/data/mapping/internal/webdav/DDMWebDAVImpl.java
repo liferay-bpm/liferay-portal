@@ -14,7 +14,6 @@ import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
-import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateService;
 import com.liferay.dynamic.data.mapping.storage.StorageType;
@@ -81,10 +80,9 @@ public class DDMWebDAVImpl implements DDMWebDAV {
 			serviceContext.setAddGroupPermissions(true);
 			serviceContext.setAddGuestPermissions(true);
 
-			_ddmStructureLocalService.addStructure(
-				webDAVRequest.getUserId(), webDAVRequest.getGroupId(),
-				classNameId, nameMap, null, ddmForm, ddmFormLayout,
-				StorageType.DEFAULT.toString(), serviceContext);
+			_ddmStructureService.addStructure(
+				webDAVRequest.getGroupId(), classNameId, nameMap, null, ddmForm,
+				ddmFormLayout, StorageType.DEFAULT.toString(), serviceContext);
 
 			return HttpServletResponse.SC_CREATED;
 		}
@@ -371,9 +369,6 @@ public class DDMWebDAVImpl implements DDMWebDAV {
 
 	@Reference
 	private DDM _ddm;
-
-	@Reference
-	private DDMStructureLocalService _ddmStructureLocalService;
 
 	@Reference
 	private DDMStructureService _ddmStructureService;
