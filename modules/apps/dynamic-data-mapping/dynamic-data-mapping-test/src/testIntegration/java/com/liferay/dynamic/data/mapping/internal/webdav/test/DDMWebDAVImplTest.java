@@ -88,9 +88,6 @@ public class DDMWebDAVImplTest {
 		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
 				_user)) {
 
-			MockHttpServletRequest mockHttpServletRequest =
-				new MockHttpServletRequest();
-
 			String content = StringBundler.concat(
 				"<root available-locales=\"en_US\" default-locale=",
 				"\"en_US\"><dynamic-element dataType=\"string\" ",
@@ -99,8 +96,10 @@ public class DDMWebDAVImplTest {
 				"<![CDATA[", RandomTestUtil.randomString(),
 				"]]></entry></meta-data></dynamic-element></root>");
 
-			mockHttpServletRequest.setContent(content.getBytes());
+			MockHttpServletRequest mockHttpServletRequest =
+				new MockHttpServletRequest();
 
+			mockHttpServletRequest.setContent(content.getBytes());
 			mockHttpServletRequest.setPathInfo(
 				StringBundler.concat(
 					_group2.getFriendlyURL(), "/journal/",
